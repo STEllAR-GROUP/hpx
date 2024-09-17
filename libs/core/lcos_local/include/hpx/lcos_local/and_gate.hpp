@@ -10,7 +10,6 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/allocator_support/thread_local_caching_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/stack.hpp>
 #include <hpx/datastructures/detail/dynamic_bitset.hpp>
 #include <hpx/datastructures/detail/intrusive_list.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -52,8 +51,7 @@ namespace hpx::lcos::local {
         explicit base_and_gate(std::size_t count = 0)
           : received_segments_(count)
           , promise_(std::allocator_arg,
-                hpx::util::thread_local_caching_allocator<
-                    hpx::lockfree::variable_size_stack, char,
+                hpx::util::thread_local_caching_allocator<char,
                     hpx::util::internal_allocator<>>{})
           , generation_(1)
         {
@@ -211,8 +209,7 @@ namespace hpx::lcos::local {
                 {
                     // we have received the last missing segment
                     using allocator_type =
-                        hpx::util::thread_local_caching_allocator<
-                            hpx::lockfree::variable_size_stack, char,
+                        hpx::util::thread_local_caching_allocator<char,
                             hpx::util::internal_allocator<>>;
 
                     hpx::promise<void> p(std::allocator_arg, allocator_type{});

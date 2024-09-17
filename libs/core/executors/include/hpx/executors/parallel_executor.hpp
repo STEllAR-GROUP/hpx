@@ -1,5 +1,5 @@
 //  Copyright (c) 2019-2020 ETH Zurich
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,7 +12,6 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/allocator_support/thread_local_caching_allocator.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/concurrency/stack.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/future_exec.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
@@ -390,9 +389,9 @@ namespace hpx::execution {
                 hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 #endif
 
-            using allocator_type = hpx::util::thread_local_caching_allocator<
-                hpx::lockfree::variable_size_stack, char,
-                hpx::util::internal_allocator<>>;
+            using allocator_type =
+                hpx::util::thread_local_caching_allocator<char,
+                    hpx::util::internal_allocator<>>;
             hpx::traits::detail::shared_state_ptr_t<result_type> p =
                 lcos::detail::make_continuation_alloc_nounwrap<result_type>(
                     allocator_type{}, HPX_FORWARD(Future, predecessor),

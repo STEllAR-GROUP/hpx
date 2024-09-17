@@ -12,7 +12,6 @@
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/concurrency/stack.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/execution.hpp>
@@ -771,8 +770,7 @@ namespace hpx::lcos::local {
                 !std::is_same_v<std::decay_t<F>, futures_factory>>>
         explicit futures_factory(F&& f)
           : task_(detail::create_task_object<Result, Cancelable>::call(
-                hpx::util::thread_local_caching_allocator<
-                    hpx::lockfree::variable_size_stack, char,
+                hpx::util::thread_local_caching_allocator<char,
                     hpx::util::internal_allocator<>>{},
                 HPX_FORWARD(F, f)))
         {
@@ -780,8 +778,7 @@ namespace hpx::lcos::local {
 
         explicit futures_factory(Result (*f)())
           : task_(detail::create_task_object<Result, Cancelable>::call(
-                hpx::util::thread_local_caching_allocator<
-                    hpx::lockfree::variable_size_stack, char,
+                hpx::util::thread_local_caching_allocator<char,
                     hpx::util::internal_allocator<>>{},
                 f))
         {

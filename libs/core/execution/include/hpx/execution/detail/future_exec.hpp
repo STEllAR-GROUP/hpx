@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,7 +13,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
-#include <hpx/concurrency/stack.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/future_then_result_exec.hpp>
@@ -65,9 +64,9 @@ namespace hpx::lcos::detail {
             using continuation_result_type =
                 hpx::util::invoke_result_t<F, Future>;
 
-            using allocator_type = hpx::util::thread_local_caching_allocator<
-                hpx::lockfree::variable_size_stack, char,
-                hpx::util::internal_allocator<>>;
+            using allocator_type =
+                hpx::util::thread_local_caching_allocator<char,
+                    hpx::util::internal_allocator<>>;
 
             hpx::traits::detail::shared_state_ptr_t<result_type> p =
                 detail::make_continuation_alloc<continuation_result_type>(

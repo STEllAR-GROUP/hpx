@@ -1,5 +1,5 @@
 //  Copyright (C) 2008-2013 Tim Blechmann
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -769,11 +769,5 @@ namespace hpx::lockfree {
         util::cache_aligned_data_derived<std::atomic<tagged_node_handle>> tos;
 
         pool_t pool;
-    };
-
-    template <typename T, typename Allocator = std::allocator<T>>
-    class variable_size_stack : public stack<T, Allocator>
-    {
-        using stack<T, Allocator>::stack;
     };
 }    // namespace hpx::lockfree
