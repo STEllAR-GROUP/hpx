@@ -1050,6 +1050,15 @@ hpx_option(
   ADVANCED
 )
 
+hpx_option(
+  HPX_WITH_NANOBENCH
+  BOOL
+  "Use Nanobench for performance tests. Nanobench will be fetched using FetchContent (default: OFF)"
+  OFF
+  CATEGORY "Build Targets"
+  ADVANCED
+)
+
 # cmake-format: off
 # LibCDS option
 # NOTE: The libcds option is disabled for the 1.5.0 release as it is not ready
@@ -1285,6 +1294,10 @@ if(HPX_WITH_NETWORKING)
   )
   if(HPX_WITH_PARCELPORT_ACTION_COUNTERS)
     hpx_add_config_define(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+  endif()
+  if(HPX_WITH_NANOBENCH)
+    hpx_add_config_define(HPX_HAVE_NANOBENCH)
+    include(HPX_SetupNanobench)
   endif()
 else(HPX_WITH_NETWORKING)
   # if networking is off,  then allow the option of using our asynchronous MPI
@@ -2575,6 +2588,10 @@ if(HPX_WITH_PRECOMPILED_HEADERS)
       <boost/optional.hpp>
       <boost/spirit/home/x3.hpp>
   )
+
+  if(HPX_WITH_NANOBENCH)
+    set(system_precompiled_headers ${system_precompiled_headers} <nanobench.h>)
+  endif()
 
   if(HPX_WITH_CXX17_FILESYSTEM)
     list(APPEND system_precompiled_headers <filesystem>)
