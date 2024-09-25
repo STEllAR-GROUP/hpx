@@ -109,8 +109,7 @@ namespace hpx::util {
         if (HPX_UNLIKELY(!result || nullptr == p))
         {
             // out of memory
-            HPX_THROW_EXCEPTION(hpx::error::out_of_memory, name() + "::alloc",
-                "new heap failed to allocate {1} objects", count);
+            HPX_THROW_BAD_ALLOC("one_size_heap_list::alloc");
         }
 
 #if defined(HPX_DEBUG)

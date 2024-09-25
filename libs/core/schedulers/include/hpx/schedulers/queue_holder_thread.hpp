@@ -585,9 +585,7 @@ namespace hpx::threads::policies {
                     debug::threadinfo<thread_id_type*>(&tid));
 
                 lk.unlock();
-                HPX_THROW_EXCEPTION(hpx::error::out_of_memory,
-                    "queue_holder_thread::add_to_thread_map",
-                    "Couldn't add new thread to the thread map {}", map_size);
+                HPX_THROW_BAD_ALLOC("queue_holder_thread::add_to_thread_map");
             }
 
             ++thread_map_count_.data_;

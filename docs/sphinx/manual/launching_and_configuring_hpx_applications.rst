@@ -185,6 +185,7 @@ The |hpx| configuration section
    exception_verbosity = ${HPX_EXCEPTION_VERBOSITY:2}
    trace_depth = ${HPX_TRACE_DEPTH:20}
    handle_signals = ${HPX_HANDLE_SIGNALS:1}
+   handle_failed_new = ${HPX_HANDLE_FAILED_NEW:1}
 
    [hpx.stacks]
    small_size = ${HPX_SMALL_STACK_SIZE:<hpx_small_stack_size>}
@@ -295,8 +296,14 @@ The |hpx| configuration section
        print the configuration information (stack backtrace, system information,
        etc.) whenever a signal is raised. The default is ``1``. Setting this
        value to ``0`` can be useful in cases when generating a core-dump on
-       segmentation faults or similar signals is desired. This setting has no
-       effects on non-Linux platforms.
+       segmentation faults or similar signals is desired.
+   * * ``hpx.handle_failed_new``
+     * This setting defines whether HPX will register a handler for failed
+       allocationsthat will print the configuration information
+       (stack backtrace, system information, etc.) whenever an allocation fails.
+       The default is ``1``. Setting this value to ``0`` can be useful in cases
+       when generating a core-dump on segmentation faults or similar signals
+       is desired.
    * * ``hpx.stacks.small_size``
      * This is initialized to the small stack size to be used by |hpx| threads.
        Set by default to the value of the compile time preprocessor constant

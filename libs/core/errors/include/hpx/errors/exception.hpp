@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -93,6 +93,34 @@ namespace hpx {
         ///
         /// \throws nothing
         [[nodiscard]] error get_error() const noexcept;
+
+        /// The function \a get_error_code() returns a hpx::error_code which
+        /// represents the same error condition as this hpx::exception instance.
+        ///
+        /// \param mode   The parameter \p mode specifies whether the returned
+        ///               hpx::error_code belongs to the error category
+        ///               \a hpx_category (if mode is \a throwmode::plain, this is the
+        ///               default) or to the category \a hpx_category_rethrow
+        ///               (if mode is \a rethrow).
+        [[nodiscard]] error_code get_error_code(
+            throwmode mode = throwmode::plain) const noexcept;
+    };
+
+    class bad_alloc_exception
+      : public hpx::exception
+      , public std::bad_alloc
+    {
+    public:
+        /// Construct a hpx::bad_alloc_exception.
+        bad_alloc_exception();
+
+        /// The function \a get_error() returns hpx::error::out_of_memory
+        ///
+        /// \throws nothing
+        [[nodiscard]] static constexpr error get_error() noexcept
+        {
+            return hpx::error::out_of_memory;
+        }
 
         /// The function \a get_error_code() returns a hpx::error_code which
         /// represents the same error condition as this hpx::exception instance.
