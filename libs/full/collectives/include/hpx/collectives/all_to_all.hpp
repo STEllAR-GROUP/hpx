@@ -17,22 +17,22 @@ namespace hpx { namespace collectives {
     /// This function receives a set of values from all call sites operating on
     /// the given base name.
     ///
-    /// \param  basename    The base name identifying the all_to_all operation
-    /// \param  local_result The value to transmit to all
+    /// \param basename     The base name identifying the all_to_all operation
+    /// \param local_result A vector of values to transmit to all
     ///                     participating sites from this call site.
-    /// \param  num_sites   The number of participating sites (default: all
+    /// \param num_sites    The number of participating sites (default: all
     ///                     localities).
-    /// \param  generation  The generational counter identifying the sequence
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param generation   The generational counter identifying the sequence
     ///                     number of the all_to_all operation performed on the
     ///                     given base name. This is optional and needs to be
     ///                     supplied only if the all_to_all operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
-    /// \param this_site    The sequence number of this invocation (usually
-    ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \params root_site   The site that is responsible for creating the
+    /// \param root_site    The site that is responsible for creating the
     ///                     all_to_all support object. This value is optional
     ///                     and defaults to '0' (zero).
     ///
@@ -40,9 +40,9 @@ namespace hpx { namespace collectives {
     ///             values send by all participating sites. It will become
     ///             ready once the all_to_all operation has been completed.
     ///
-    template <typename T>
-    hpx::future<std::vector<std::decay_t<T>>>
-    all_to_all(char const* basename, T&& result,
+    template <typename T> hpx::future<std::vector<T>>
+    all_to_all(char const* basename,
+        std::vector<T>&& local_result,
         num_sites_arg num_sites = num_sites_arg(),
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg(),
@@ -53,13 +53,13 @@ namespace hpx { namespace collectives {
     /// This function receives a set of values from all call sites operating on
     /// the given base name.
     ///
-    /// \param  comm        A communicator object returned from \a create_communicator
-    /// \param  local_result The value to transmit to all
+    /// \param fid          A communicator object returned from \a create_communicator
+    /// \param local_result A vector of values to transmit to all
     ///                     participating sites from this call site.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \param  generation  The generational counter identifying the sequence
+    /// \param generation   The generational counter identifying the sequence
     ///                     number of the all_to_all operation performed on the
     ///                     given base name. This is optional and needs to be
     ///                     supplied only if the all_to_all operation on the
@@ -71,9 +71,9 @@ namespace hpx { namespace collectives {
     ///             values send by all participating sites. It will become
     ///             ready once the all_to_all operation has been completed.
     ///
-    template <typename T>
-    hpx::future<std::vector<std::decay_t<T>>>
-    all_to_all(communicator comm, T&& result,
+    template <typename T> hpx::future<std::vector<T>>
+    all_to_all(communicator fid,
+        std::vector<T>&& local_result,
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg());
 
@@ -82,10 +82,10 @@ namespace hpx { namespace collectives {
     /// This function receives a set of values from all call sites operating on
     /// the given base name.
     ///
-    /// \param  comm        A communicator object returned from \a create_communicator
-    /// \param  local_result The value to transmit to all
+    /// \param fid          A communicator object returned from \a create_communicator
+    /// \param local_result A vector of values to transmit to all
     ///                     participating sites from this call site.
-    /// \param  generation  The generational counter identifying the sequence
+    /// \param generation   The generational counter identifying the sequence
     ///                     number of the all_to_all operation performed on the
     ///                     given base name. This is optional and needs to be
     ///                     supplied only if the all_to_all operation on the
@@ -100,9 +100,9 @@ namespace hpx { namespace collectives {
     ///             values send by all participating sites. It will become
     ///             ready once the all_to_all operation has been completed.
     ///
-    template <typename T>
-    hpx::future<std::vector<std::decay_t<T>>>
-    all_to_all(communicator comm, T&& result,
+    template <typename T> hpx::future<std::vector<T>>
+    all_to_all(communicator fid,
+        std::vector<T>&& local_result,
         generation_arg generation,
         this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
