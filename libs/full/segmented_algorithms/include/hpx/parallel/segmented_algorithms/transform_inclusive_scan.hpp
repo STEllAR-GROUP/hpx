@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Ajai V George
 //  Copyright (c) 2021 Akhil J Nair
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -60,7 +61,7 @@ namespace hpx { namespace segmented {
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Op, typename Conv,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_segmented_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value &&
@@ -120,7 +121,7 @@ namespace hpx { namespace segmented {
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename T, typename Op, typename Conv,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_segmented_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value &&
