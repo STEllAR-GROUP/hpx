@@ -32,7 +32,7 @@ struct pfo
 template <typename T>
 struct cmp
 {
-    cmp(T const& val = T())
+    explicit cmp(T const& val = T())
       : value_(val)
     {
     }
@@ -77,9 +77,10 @@ void verify_values_count(
     ExPolicy&& policy, hpx::partitioned_vector<T> const& v, T const& val)
 {
     HPX_TEST_EQ(
-        std::size_t(hpx::count(policy, v.begin(), v.end(), val)), v.size());
-    HPX_TEST_EQ(
-        std::size_t(hpx::count_if(policy, v.begin(), v.end(), cmp<T>(val))),
+        static_cast<std::size_t>(hpx::count(policy, v.begin(), v.end(), val)),
+        v.size());
+    HPX_TEST_EQ(static_cast<std::size_t>(
+                    hpx::count_if(policy, v.begin(), v.end(), cmp<T>(val))),
         v.size());
 }
 
@@ -111,10 +112,11 @@ template <typename ExPolicy, typename T>
 void verify_values_count_async(
     ExPolicy&& policy, hpx::partitioned_vector<T> const& v, T const& val)
 {
-    HPX_TEST_EQ(std::size_t(hpx::count(policy, v.begin(), v.end(), val).get()),
+    HPX_TEST_EQ(static_cast<std::size_t>(
+                    hpx::count(policy, v.begin(), v.end(), val).get()),
         v.size());
     HPX_TEST_EQ(
-        std::size_t(
+        static_cast<std::size_t>(
             hpx::count_if(policy, v.begin(), v.end(), cmp<T>(val)).get()),
         v.size());
 }
@@ -136,8 +138,6 @@ void test_for_each_async(
 template <typename T>
 void for_each_tests(std::vector<hpx::id_type>& localities)
 {
-    std::size_t const length = 12;
-
     {
         hpx::partitioned_vector<T> v;
         hpx::for_each(v.begin(), v.end(), pfo());
@@ -152,6 +152,7 @@ void for_each_tests(std::vector<hpx::id_type>& localities)
     }
 
     {
+        constexpr std::size_t length = 12;
         hpx::partitioned_vector<T> v(
             length, T(0), hpx::container_layout(localities));
         test_for_each(v, T(0));
@@ -169,4 +170,5 @@ int main()
     for_each_tests<int>(localities);
     return hpx::util::report_errors();
 }
+
 #endif

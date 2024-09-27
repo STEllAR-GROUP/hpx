@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Ajai V George
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -34,14 +35,14 @@ namespace hpx { namespace parallel {
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename FwdIter,
             typename F, typename Proj>
-        static typename util::detail::algorithm_result<ExPolicy, bool>::type
+        static util::detail::algorithm_result_t<ExPolicy, bool>
         segmented_none_of(Algo&& algo, ExPolicy const& policy, FwdIter first,
             FwdIter last, F&& f, Proj&& proj, std::true_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
-            typedef util::detail::algorithm_result<ExPolicy, bool> result;
+            using traits = hpx::traits::segmented_iterator_traits<FwdIter>;
+            using segment_iterator = typename traits::segment_iterator;
+            using local_iterator_type = typename traits::local_iterator;
+            using result = util::detail::algorithm_result<ExPolicy, bool>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -98,18 +99,17 @@ namespace hpx { namespace parallel {
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename FwdIter,
             typename F, typename Proj>
-        static typename util::detail::algorithm_result<ExPolicy, bool>::type
+        static util::detail::algorithm_result_t<ExPolicy, bool>
         segmented_none_of(Algo&& algo, ExPolicy const& policy, FwdIter first,
             FwdIter last, F&& f, Proj&& proj, std::false_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
-            typedef util::detail::algorithm_result<ExPolicy, bool> result;
+            using traits = hpx::traits::segmented_iterator_traits<FwdIter>;
+            using segment_iterator = typename traits::segment_iterator;
+            using local_iterator_type = typename traits::local_iterator;
+            using result = util::detail::algorithm_result<ExPolicy, bool>;
 
-            typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<FwdIter>::value>
-                forced_seq;
+            using forced_seq = std::integral_constant<bool,
+                !hpx::traits::is_forward_iterator<FwdIter>::value>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -184,14 +184,14 @@ namespace hpx { namespace parallel {
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename FwdIter,
             typename F, typename Proj>
-        static typename util::detail::algorithm_result<ExPolicy, bool>::type
+        static util::detail::algorithm_result_t<ExPolicy, bool>
         segmented_any_of(Algo&& algo, ExPolicy const& policy, FwdIter first,
             FwdIter last, F&& f, Proj&& proj, std::true_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
-            typedef util::detail::algorithm_result<ExPolicy, bool> result;
+            using traits = hpx::traits::segmented_iterator_traits<FwdIter>;
+            using segment_iterator = typename traits::segment_iterator;
+            using local_iterator_type = typename traits::local_iterator;
+            using result = util::detail::algorithm_result<ExPolicy, bool>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -248,18 +248,17 @@ namespace hpx { namespace parallel {
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename FwdIter,
             typename F, typename Proj>
-        static typename util::detail::algorithm_result<ExPolicy, bool>::type
+        static util::detail::algorithm_result_t<ExPolicy, bool>
         segmented_any_of(Algo&& algo, ExPolicy const& policy, FwdIter first,
             FwdIter last, F&& f, Proj&& proj, std::false_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
-            typedef util::detail::algorithm_result<ExPolicy, bool> result;
+            using traits = hpx::traits::segmented_iterator_traits<FwdIter>;
+            using segment_iterator = typename traits::segment_iterator;
+            using local_iterator_type = typename traits::local_iterator;
+            using result = util::detail::algorithm_result<ExPolicy, bool>;
 
-            typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<FwdIter>::value>
-                forced_seq;
+            using forced_seq = std::integral_constant<bool,
+                !hpx::traits::is_forward_iterator<FwdIter>::value>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -334,14 +333,14 @@ namespace hpx { namespace parallel {
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename FwdIter,
             typename F, typename Proj>
-        static typename util::detail::algorithm_result<ExPolicy, bool>::type
+        static util::detail::algorithm_result_t<ExPolicy, bool>
         segmented_all_of(Algo&& algo, ExPolicy const& policy, FwdIter first,
             FwdIter last, F&& f, Proj&& proj, std::true_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
-            typedef util::detail::algorithm_result<ExPolicy, bool> result;
+            using traits = hpx::traits::segmented_iterator_traits<FwdIter>;
+            using segment_iterator = typename traits::segment_iterator;
+            using local_iterator_type = typename traits::local_iterator;
+            using result = util::detail::algorithm_result<ExPolicy, bool>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -398,18 +397,17 @@ namespace hpx { namespace parallel {
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename FwdIter,
             typename F, typename Proj>
-        static typename util::detail::algorithm_result<ExPolicy, bool>::type
+        static util::detail::algorithm_result_t<ExPolicy, bool>
         segmented_all_of(Algo&& algo, ExPolicy const& policy, FwdIter first,
             FwdIter last, F&& f, Proj&& proj, std::false_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<FwdIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
-            typedef util::detail::algorithm_result<ExPolicy, bool> result;
+            using traits = hpx::traits::segmented_iterator_traits<FwdIter>;
+            using segment_iterator = typename traits::segment_iterator;
+            using local_iterator_type = typename traits::local_iterator;
+            using result = util::detail::algorithm_result<ExPolicy, bool>;
 
-            typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<FwdIter>::value>
-                forced_seq;
+            using forced_seq = std::integral_constant<bool,
+                !hpx::traits::is_forward_iterator<FwdIter>::value>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -481,7 +479,7 @@ namespace hpx { namespace parallel {
         }
         /// \endcond
     }    // namespace detail
-}}       // namespace hpx::parallel
+}}    // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
@@ -508,13 +506,12 @@ namespace hpx { namespace segmented {
     template <typename ExPolicy, typename SegIter,
         typename F,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<SegIter>::value &&
-            hpx::traits::is_segmented_iterator<SegIter>::value
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter>
         )>
     // clang-format on
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
-    tag_invoke(
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> tag_invoke(
         hpx::none_of_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
         static_assert(hpx::traits::is_forward_iterator<SegIter>::value,
@@ -549,13 +546,12 @@ namespace hpx { namespace segmented {
     template <typename ExPolicy, typename SegIter,
         typename F,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<SegIter>::value &&
-            hpx::traits::is_segmented_iterator<SegIter>::value
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter>
         )>
     // clang-format on
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
-    tag_invoke(
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> tag_invoke(
         hpx::any_of_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
         static_assert(hpx::traits::is_forward_iterator<SegIter>::value,
@@ -590,13 +586,12 @@ namespace hpx { namespace segmented {
     template <typename ExPolicy, typename SegIter,
         typename F,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<SegIter>::value &&
-            hpx::traits::is_segmented_iterator<SegIter>::value
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter>
         )>
     // clang-format on
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
-    tag_invoke(
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> tag_invoke(
         hpx::all_of_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
         static_assert(hpx::traits::is_forward_iterator<SegIter>::value,

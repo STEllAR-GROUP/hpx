@@ -28,11 +28,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
-#include <limits>
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 namespace hpx::segmented {
 
@@ -137,6 +135,7 @@ namespace hpx::segmented {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Data>
         struct local_vector_value_proxy
@@ -694,7 +693,7 @@ namespace hpx::segmented {
             return !data_ || this->base() == end_;
         }
 
-        // increment until predicate is not satisfied any more
+        // increment until predicate is not satisfied anymore
         void unsatisfy_predicate()
         {
             while (this->base() != end_ && predicate_(*this->base()))
@@ -736,7 +735,6 @@ namespace hpx::segmented {
                 data_.reset();
         }
 
-    private:
         std::shared_ptr<server::partitioned_vector<T, Data>> data_;
         predicate predicate_;
         BaseIter end_;
@@ -833,7 +831,6 @@ namespace hpx::segmented {
             return other.global_index_ - global_index_;
         }
 
-    protected:
         // refer to the vector
         partitioned_vector<T, Data>* data_;
 
@@ -863,7 +860,7 @@ namespace hpx::segmented {
 
         // constructors
         const_vector_iterator()
-          : data_(0)
+          : data_(nullptr)
           , global_index_(static_cast<size_type>(-1))
         {
         }
@@ -923,7 +920,6 @@ namespace hpx::segmented {
             return other.global_index_ - global_index_;
         }
 
-    protected:
         // refer to the vector
         partitioned_vector<T, Data> const* data_;
 
@@ -947,8 +943,6 @@ namespace hpx::traits {
         using local_iterator = typename iterator::local_iterator;
 
         using local_raw_iterator = typename local_iterator::local_raw_iterator;
-        using local_raw_const_iterator =
-            typename local_iterator::local_raw_const_iterator;
 
         //  Conceptually this function is supposed to denote which segment
         //  the iterator is currently pointing to (i.e. just global iterator).

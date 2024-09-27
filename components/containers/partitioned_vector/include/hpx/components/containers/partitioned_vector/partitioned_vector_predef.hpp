@@ -10,8 +10,8 @@
 #include <hpx/distribution_policies/container_distribution_policy.hpp>
 
 #include <hpx/components/containers/partitioned_vector/export_definitions.hpp>
-#include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>
 
 #include <string>
 #include <vector>
@@ -54,10 +54,12 @@ extern template hpx::partitioned_vector<int,
 typedef long long long_long;
 HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(long_long)
 
-extern template class hpx::server::partitioned_vector<long long, std::vector<long long>>;
+extern template class hpx::server::partitioned_vector<long long,
+    std::vector<long long>>;
 extern template class hpx::partitioned_vector_partition<long long,
     std::vector<long long>>;
-extern template class hpx::partitioned_vector<long long, std::vector<long long>>;
+extern template class hpx::partitioned_vector<long long,
+    std::vector<long long>>;
 extern template hpx::partitioned_vector<long long,
     std::vector<long long>>::partitioned_vector(size_type,
     hpx::container_distribution_policy const&, void*);
@@ -85,4 +87,3 @@ extern template hpx::partitioned_vector<std::string,
     hpx::container_distribution_policy const&, void*);
 
 #endif
-

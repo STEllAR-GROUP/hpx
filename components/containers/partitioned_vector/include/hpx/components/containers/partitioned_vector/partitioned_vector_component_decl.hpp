@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Anuj R. Sharma
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,11 +9,12 @@
 
 #pragma once
 
-/// \brief The partitioned_vector_partition as the hpx component is defined here.
+/// \brief The partitioned_vector_partition as the hpx component is defined
+///        here.
 ///
-/// The partitioned_vector_partition is the wrapper to the stl vector class except all API's
-/// are defined as component action. All the API's in stubs classes are
-/// asynchronous API which return the futures.
+/// The partitioned_vector_partition is the wrapper to the stl vector class
+/// except all APIs are defined as component action. All the APIs in stubs
+/// classes are asynchronous API which return the futures.
 
 #include <hpx/config.hpp>
 #include <hpx/actions/transfer_action.hpp>
@@ -38,10 +39,11 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace server {
+namespace hpx::server {
+
     /// \brief This is the basic wrapper class for stl vector.
     ///
-    /// This contain the implementation of the partitioned_vector_partition's
+    /// This contains the implementation of the partitioned_vector_partition's
     /// component functionality.
     template <typename T, typename Data>
     class partitioned_vector
@@ -49,16 +51,15 @@ namespace hpx { namespace server {
             components::component_base<partitioned_vector<T, Data>>>
     {
     public:
-        typedef Data data_type;
+        using data_type = Data;
 
-        typedef typename data_type::allocator_type allocator_type;
-        typedef typename data_type::size_type size_type;
-        typedef typename data_type::iterator iterator_type;
-        typedef typename data_type::const_iterator const_iterator_type;
+        using allocator_type = typename data_type::allocator_type;
+        using size_type = typename data_type::size_type;
+        using iterator_type = typename data_type::iterator;
+        using const_iterator_type = typename data_type::const_iterator;
 
-        typedef components::locking_hook<
-            components::component_base<partitioned_vector<T, Data>>>
-            base_type;
+        using base_type = components::locking_hook<
+            components::component_base<partitioned_vector<T, Data>>>;
 
         data_type partitioned_vector_partition_;
 
@@ -110,7 +111,7 @@ namespace hpx { namespace server {
         const_iterator_type cend() const;
 
         ///////////////////////////////////////////////////////////////////////
-        // Capacity Related API's in the server class
+        // Capacity Related APIs in the server class
         ///////////////////////////////////////////////////////////////////////
 
         /// Returns the number of elements
@@ -143,9 +144,8 @@ namespace hpx { namespace server {
         /// partitioned_vector_partition capacity, the function causes the
         /// partitioned_vector_partition to
         /// reallocate its storage increasing its capacity to n (or greater).
-        /// In other cases the partitioned_vector_partition capacity does not
-        /// got affected.
-        /// It does not change the partitioned_vector_partition size.
+        /// In other cases the partitioned_vector_partition capacity is not
+        /// affected. It does not change the partitioned_vector_partition size.
         ///
         /// \param n minimum capacity of partitioned_vector_partition
         ///
@@ -153,7 +153,7 @@ namespace hpx { namespace server {
         void reserve(size_type n);
 
         ///////////////////////////////////////////////////////////////////////
-        // Element access API's
+        // Element access APIs
         ///////////////////////////////////////////////////////////////////////
 
         /// Return the element at the position \a pos in the
@@ -196,7 +196,7 @@ namespace hpx { namespace server {
         T back() const;
 
         ///////////////////////////////////////////////////////////////////////
-        // Modifiers API's in server class
+        // Modifiers APIs in server class
         ///////////////////////////////////////////////////////////////////////
 
         /// Assigns new contents to the partitioned_vector_partition, replacing
@@ -275,7 +275,7 @@ namespace hpx { namespace server {
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_copied_data)
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_data)
     };
-}}    // namespace hpx::server
+}    // namespace hpx::server
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(...)                       \
@@ -319,17 +319,16 @@ namespace hpx { namespace server {
     /**/
 
 namespace hpx {
+
     template <typename T, typename Data>
     class partitioned_vector_partition
       : public components::client_base<partitioned_vector_partition<T, Data>,
             server::partitioned_vector<T, Data>>
     {
-    private:
-        typedef hpx::server::partitioned_vector<T, Data> server_type;
-        typedef hpx::components::client_base<
-            partitioned_vector_partition<T, Data>,
-            server::partitioned_vector<T, Data>>
-            base_type;
+        using server_type = hpx::server::partitioned_vector<T, Data>;
+        using base_type =
+            hpx::components::client_base<partitioned_vector_partition<T, Data>,
+                server::partitioned_vector<T, Data>>;
 
     public:
         partitioned_vector_partition() = default;
@@ -343,7 +342,7 @@ namespace hpx {
         std::shared_ptr<server::partitioned_vector<T, Data>> get_ptr() const;
 
         ///////////////////////////////////////////////////////////////////////
-        //  Capacity related API's in partitioned_vector_partition client class
+        //  Capacity related APIs in partitioned_vector_partition client class
 
         /// Asynchronously return the size of the partitioned_vector_partition
         /// component.
@@ -415,7 +414,7 @@ namespace hpx {
         //             this->base_type::reserve_async(this->get_id(), n).get();
         //         }
 
-        //  Element Access API's in Client class
+        //  Element Access APIs in Client class
 
         /// Returns the value at position \a pos in the partitioned_vector_partition
         /// component.
@@ -478,7 +477,7 @@ namespace hpx {
         //     return back_async().get();
         // }
 
-        //  Modifiers API's in client class
+        //  Modifiers APIs in client class
         // void assign(std::size_t n, T const& val)
         // {
         //     HPX_ASSERT(this->get_id());
@@ -556,7 +555,7 @@ namespace hpx {
         /// Returns a copy of the data owned by the partitioned_vector_partition
         /// component.
         ///
-        /// \return This returns the data as an hpx::future
+        /// \return This returns the data as a hpx::future
         ///
         hpx::future<typename server_type::data_type> get_copied_data() const;
 

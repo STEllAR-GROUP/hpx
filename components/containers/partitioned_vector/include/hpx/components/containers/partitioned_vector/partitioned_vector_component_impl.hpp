@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Anuj R. Sharma
-//  Copyright (c) 2014-2022 Hartmut Kaiser
+//  Copyright (c) 2014-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,16 +10,11 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/components/client_base.hpp>
 #include <hpx/components/get_ptr.hpp>
-#include <hpx/components_base/server/component.hpp>
-#include <hpx/components_base/server/component_base.hpp>
-#include <hpx/components_base/server/locking_hook.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>
 
@@ -30,7 +25,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace server {
+namespace hpx::server {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Data>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
@@ -270,7 +266,7 @@ namespace hpx { namespace server {
     {
         partitioned_vector_partition_.clear();
     }
-}}    // namespace hpx::server
+}    // namespace hpx::server
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_PARTITIONED_VECTOR(...)                                   \
@@ -317,6 +313,7 @@ namespace hpx { namespace server {
     /**/
 
 namespace hpx {
+
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
     partitioned_vector_partition<T, Data>::partitioned_vector_partition(
@@ -374,7 +371,7 @@ namespace hpx {
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
     partitioned_vector_partition<T, Data>::resize_async(
-        std::size_t n, T const& val /*= T()*/)
+        [[maybe_unused]] std::size_t n, [[maybe_unused]] T const& val /*= T()*/)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
@@ -382,8 +379,6 @@ namespace hpx {
             this->get_id(), n, val);
 #else
         HPX_ASSERT(false);
-        HPX_UNUSED(n);
-        HPX_UNUSED(val);
         return hpx::make_ready_future();
 #endif
     }
@@ -398,7 +393,8 @@ namespace hpx {
 
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<T>
-    partitioned_vector_partition<T, Data>::get_value(std::size_t pos) const
+    partitioned_vector_partition<T, Data>::get_value(
+        [[maybe_unused]] std::size_t pos) const
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
@@ -406,7 +402,6 @@ namespace hpx {
             this->get_id(), pos);
 #else
         HPX_ASSERT(false);
-        HPX_UNUSED(pos);
         return hpx::future<T>{};
 #endif
     }
@@ -422,7 +417,7 @@ namespace hpx {
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<std::vector<T>>
     partitioned_vector_partition<T, Data>::get_values(
-        std::vector<std::size_t> const& pos) const
+        [[maybe_unused]] std::vector<std::size_t> const& pos) const
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
@@ -430,7 +425,6 @@ namespace hpx {
             this->get_id(), pos);
 #else
         HPX_ASSERT(false);
-        HPX_UNUSED(pos);
         return hpx::make_ready_future(std::vector<T>{});
 #endif
     }
@@ -453,7 +447,8 @@ namespace hpx {
 
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
-    partitioned_vector_partition<T, Data>::set_value(std::size_t pos, T&& val)
+    partitioned_vector_partition<T, Data>::set_value(
+        [[maybe_unused]] std::size_t pos, [[maybe_unused]] T&& val)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
@@ -461,8 +456,6 @@ namespace hpx {
             this->get_id(), pos, HPX_MOVE(val));
 #else
         HPX_ASSERT(false);
-        HPX_UNUSED(pos);
-        HPX_UNUSED(val);
         return hpx::make_ready_future();
 #endif
     }
@@ -470,7 +463,7 @@ namespace hpx {
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
     partitioned_vector_partition<T, Data>::set_value(
-        std::size_t pos, T const& val)
+        [[maybe_unused]] std::size_t pos, [[maybe_unused]] T const& val)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
@@ -478,8 +471,6 @@ namespace hpx {
             this->get_id(), pos, val);
 #else
         HPX_ASSERT(false);
-        HPX_UNUSED(pos);
-        HPX_UNUSED(val);
         return hpx::make_ready_future();
 #endif
     }
@@ -495,7 +486,8 @@ namespace hpx {
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
     partitioned_vector_partition<T, Data>::set_values(
-        std::vector<std::size_t> const& pos, std::vector<T> const& val)
+        [[maybe_unused]] std::vector<std::size_t> const& pos,
+        [[maybe_unused]] std::vector<T> const& val)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
@@ -503,8 +495,6 @@ namespace hpx {
             this->get_id(), pos, val);
 #else
         HPX_ASSERT(false);
-        HPX_UNUSED(pos);
-        HPX_UNUSED(val);
         return hpx::make_ready_future();
 #endif
     }
@@ -512,8 +502,8 @@ namespace hpx {
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
         typename partitioned_vector_partition<T, Data>::server_type::data_type
-            partitioned_vector_partition<T, Data>::get_copied_data(
-                launch::sync_policy) const
+        partitioned_vector_partition<T, Data>::get_copied_data(
+            launch::sync_policy) const
     {
         return get_copied_data().get();
     }
@@ -545,7 +535,7 @@ namespace hpx {
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
     partitioned_vector_partition<T, Data>::set_data(
-        typename server_type::data_type&& other) const
+        [[maybe_unused]] typename server_type::data_type&& other) const
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
@@ -553,7 +543,6 @@ namespace hpx {
             this->get_id(), HPX_MOVE(other));
 #else
         HPX_ASSERT(false);
-        HPX_UNUSED(other);
         return hpx::make_ready_future();
 #endif
     }

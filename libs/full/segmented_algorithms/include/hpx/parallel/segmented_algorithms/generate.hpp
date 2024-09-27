@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -184,8 +184,8 @@ namespace hpx { namespace segmented {
     // clang-format off
     template <typename SegIter, typename F,
         HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator<SegIter>::value &&
-            hpx::traits::is_segmented_iterator<SegIter>::value
+            hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter>
         )>
     // clang-format on
     SegIter tag_invoke(hpx::generate_t, SegIter first, SegIter last, F&& f)
@@ -210,9 +210,9 @@ namespace hpx { namespace segmented {
     // clang-format off
     template <typename ExPolicy, typename SegIter, typename F,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<SegIter>::value &&
-            hpx::traits::is_segmented_iterator<SegIter>::value
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter>
         )>
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy, SegIter>::type

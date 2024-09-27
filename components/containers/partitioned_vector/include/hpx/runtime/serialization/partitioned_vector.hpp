@@ -8,13 +8,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <string>
 
-namespace hpx { namespace serialization
-{
+namespace hpx::serialization {
+
     template <typename T>
     void serialize(input_archive& ar, hpx::partitioned_vector<T>& v, unsigned)
     {
@@ -30,12 +30,10 @@ namespace hpx { namespace serialization
         std::string pvec_registered_name = v.registered_name();
         if (pvec_registered_name.empty())
         {
-            HPX_THROW_EXCEPTION(
-                hpx::error::invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::serialization::serialize",
                 "partitioned_vector is not registered");
         }
         ar << pvec_registered_name;
     }
-}}
-
+}    // namespace hpx::serialization

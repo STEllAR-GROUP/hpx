@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,12 +15,11 @@
 #include <hpx/parallel/segmented_algorithms/functional/segmented_iterator_helpers.hpp>
 
 #include <cstddef>
-#include <iterator>
 #include <type_traits>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace functional {
@@ -55,28 +54,24 @@ namespace hpx { namespace traits {
     }    // namespace functional
 
     ///////////////////////////////////////////////////////////////////////////
-    // A zip_iterator represents a segmented iterator if all of the zipped
-    // iterators are segmented iterators themselves.
+    // A zip_iterator represents a segmented iterator if all zipped iterators
+    // are segmented iterators themselves.
     template <typename... Ts>
     struct segmented_iterator_traits<util::zip_iterator<Ts...>,
-        typename std::enable_if<util::all_of<typename segmented_iterator_traits<
-            Ts>::is_segmented_iterator...>::value>::type>
+        std::enable_if_t<util::all_of_v<
+            typename segmented_iterator_traits<Ts>::is_segmented_iterator...>>>
     {
-        typedef std::true_type is_segmented_iterator;
+        using is_segmented_iterator = std::true_type;
 
-        typedef util::zip_iterator<Ts...> iterator;
-        typedef util::zip_iterator<
-            typename segmented_iterator_traits<Ts>::segment_iterator...>
-            segment_iterator;
-        typedef util::zip_iterator<
-            typename segmented_iterator_traits<Ts>::local_segment_iterator...>
-            local_segment_iterator;
-        typedef util::zip_iterator<
-            typename segmented_iterator_traits<Ts>::local_iterator...>
-            local_iterator;
-        typedef util::zip_iterator<
-            typename segmented_iterator_traits<Ts>::local_raw_iterator...>
-            local_raw_iterator;
+        using iterator = util::zip_iterator<Ts...>;
+        using segment_iterator = util::zip_iterator<
+            typename segmented_iterator_traits<Ts>::segment_iterator...>;
+        using local_segment_iterator = util::zip_iterator<
+            typename segmented_iterator_traits<Ts>::local_segment_iterator...>;
+        using local_iterator = util::zip_iterator<
+            typename segmented_iterator_traits<Ts>::local_iterator...>;
+        using local_raw_iterator = util::zip_iterator<
+            typename segmented_iterator_traits<Ts>::local_raw_iterator...>;
 
         //  Conceptually this function is supposed to denote which segment
         //  the iterator is currently pointing to (i.e. just global iterator).
@@ -136,10 +131,9 @@ namespace hpx { namespace traits {
         // iterator.
         static hpx::id_type get_id(segment_iterator const& iter)
         {
-            typedef typename hpx::tuple_element<0,
-                typename iterator::iterator_tuple_type>::type
-                first_base_iterator;
-            typedef segmented_iterator_traits<first_base_iterator> traits;
+            using first_base_iterator = typename hpx::tuple_element<0,
+                typename iterator::iterator_tuple_type>::type;
+            using traits = segmented_iterator_traits<first_base_iterator>;
 
             return traits::get_id(hpx::get<0>(iter.get_iterator_tuple()));
         }
@@ -148,19 +142,18 @@ namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     template <typename... Ts>
     struct segmented_local_iterator_traits<util::zip_iterator<Ts...>,
-        typename std::enable_if<
-            util::all_of<typename segmented_local_iterator_traits<
-                Ts>::is_segmented_local_iterator...>::value>::type>
+        std::enable_if_t<
+            util::all_of_v<typename segmented_local_iterator_traits<
+                Ts>::is_segmented_local_iterator...>>>
     {
-        typedef std::true_type is_segmented_local_iterator;
+        using is_segmented_local_iterator = std::true_type;
 
-        typedef util::zip_iterator<
-            typename segmented_local_iterator_traits<Ts>::iterator...>
-            iterator;
-        typedef util::zip_iterator<Ts...> local_iterator;
-        typedef util::zip_iterator<
-            typename segmented_local_iterator_traits<Ts>::local_raw_iterator...>
-            local_raw_iterator;
+        using iterator = util::zip_iterator<
+            typename segmented_local_iterator_traits<Ts>::iterator...>;
+        using local_iterator = util::zip_iterator<Ts...>;
+        using local_raw_iterator =
+            util::zip_iterator<typename segmented_local_iterator_traits<
+                Ts>::local_raw_iterator...>;
 
         // Extract base iterator from local_iterator
         static local_raw_iterator local(local_iterator const& iter)
@@ -177,4 +170,4 @@ namespace hpx { namespace traits {
                 functional::get_remote_iterator, iterator>::call(iter));
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
