@@ -99,7 +99,7 @@ namespace hpx::parallel { namespace detail {
         static hpx::future<bool> get_result(hpx::future<T>& itr, T& last)
         {
             return itr.then(
-                [&last](hpx::future<T> it) { return it.get() != last; });
+                [last](hpx::future<T> it) { return it.get() != last; });
         }
     };
 
