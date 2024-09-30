@@ -35,7 +35,6 @@ Main |hpx| modules
    /libs/full/naming/docs/index.rst
    /libs/full/naming_base/docs/index.rst
    /libs/full/parcelport_lci/docs/index.rst
-   /libs/full/parcelport_libfabric/docs/index.rst
    /libs/full/parcelport_mpi/docs/index.rst
    /libs/full/parcelport_tcp/docs/index.rst
    /libs/full/parcelset/docs/index.rst
