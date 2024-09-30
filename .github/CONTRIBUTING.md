@@ -19,10 +19,10 @@ i.e. pull requests.
 
 The easiest ways to get in contact with us are listed here:
 
-* Mailing list: [hpx-users@stellar-group.org](email:hpx-users@stellar-group.org), [hpx-devel@stellar-group.org](email:hpx-devel@stellar-group.org)
-* IRC channel:  #ste||ar on Libra.Chat
-* Blog:         [hpx.stellar-group.org](hpx.stellar-group.org)
-* More options: See our [support page](https://github.com/STEllAR-GROUP/hpx/blob/master/.github/SUPPORT.md)
+* Mailing list:    [hpx-users@stellar-group.org](email:hpx-users@stellar-group.org), [hpx-devel@stellar-group.org](email:hpx-devel@stellar-group.org)
+* Discord server:  [#ste||ar](https://discord.gg/Tn9QuzVjvy)
+* Blog:            [hpx.stellar-group.org](hpx.stellar-group.org)
+* More options:    See our [support page](https://github.com/STEllAR-GROUP/hpx/blob/master/.github/SUPPORT.md)
 
 The basic approach is to find something fun you want to fix, hack it up, and
 send a `git diff` as a mail attachment to [hpx-devel@stellar-group.org](email:hpx-devel@stellar-group.org)
