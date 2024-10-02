@@ -9,13 +9,12 @@
 
 # In case find_package(HPX) is called multiple times
 if(NOT TARGET hpx_dependencies_boost)
-  # We first try to find the required minimum set of Boost libraries. This will
-  # also give us the version of the found boost installation
   if(HPX_WITH_STATIC_LINKING)
     set(Boost_USE_STATIC_LIBS ON)
   endif()
 
-  # set(__boost_libraries disable_autolinking)
+  set(__boost_libraries "")
+
   if(HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING
      OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE
   )
@@ -78,11 +77,11 @@ if(NOT TARGET hpx_dependencies_boost)
       Boost
       URL https://github.com/boostorg/boost/releases/download/boost-${HPX_WITH_BOOST_VERSION}/boost-${HPX_WITH_BOOST_VERSION}-cmake.tar.xz
       TLS_VERIFY true
-      DOWNLOAD_EXTRACT_TIMESTAMP true
+      DOWNLOAD_EXTRACT_TIMESTAMP true SYSTEM
     )
 
-    # Need to explicitly list header-only dependencies, since Cmake-Boost has
-    # installs each library's headers individually, as opposed to b2-built
+    # Also need to explicitly list header-only dependencies, since Cmake-Boost
+    # has installs each library's headers individually, as opposed to b2-built
     # Boost.
     set(__boost_libraries
         ${__boost_libraries}
