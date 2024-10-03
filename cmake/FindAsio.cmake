@@ -33,7 +33,7 @@ if(NOT TARGET Asio::asio)
   if(Asio_ROOT)
     # The call to file is for compatibility with windows paths
     file(TO_CMAKE_PATH ${Asio_ROOT} Asio_ROOT)
-  elseif("$ENV{ASIO_ROOT}")
+  elseif(DEFINED ENV{ASIO_ROOT})
     file(TO_CMAKE_PATH $ENV{ASIO_ROOT} Asio_ROOT)
   else()
     file(TO_CMAKE_PATH "${Asio_INCLUDE_DIR}" Asio_INCLUDE_DIR)

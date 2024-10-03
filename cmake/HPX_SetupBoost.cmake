@@ -153,7 +153,7 @@ if(NOT TARGET hpx_dependencies_boost)
   endif()
 
   # We are assuming that there is only one Boost Root
-  if(NOT Boost_ROOT AND "$ENV{BOOST_ROOT}")
+  if(NOT Boost_ROOT AND DEFINED ENV{BOOST_ROOT})
     set(Boost_ROOT $ENV{BOOST_ROOT})
   elseif(NOT Boost_ROOT)
     string(REPLACE "/include" "" Boost_ROOT "${Boost_INCLUDE_DIRS}")

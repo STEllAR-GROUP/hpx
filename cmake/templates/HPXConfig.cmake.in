@@ -149,7 +149,7 @@ set(HPX_TBBMALLOC_ROOT "@Tbbmalloc_ROOT@")
 # Special handle for mimalloc cause we can't specify HPX_MIMALLOC_ROOT as a HINT
 # to find_package
 set(HPX_MIMALLOC_ROOT "@Mimalloc_ROOT@")
-if(NOT Mimalloc_ROOT AND NOT "$ENV{MIMALLOC_ROOT}")
+if(NOT Mimalloc_ROOT AND NOT DEFINED ENV{MIMALLOC_ROOT})
   set(Mimalloc_ROOT ${HPX_MIMALLOC_ROOT})
 endif()
 include(HPX_SetupAllocator)
@@ -160,7 +160,7 @@ include(HPX_SetupThreads)
 set(HPX_BOOST_ROOT "@Boost_ROOT@")
 # By default Boost_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
 # HWLOC cause we are specifying HPX_<lib>_ROOT as an HINT to find_package)
-if(NOT Boost_ROOT AND NOT "$ENV{BOOST_ROOT}")
+if(NOT Boost_ROOT AND NOT DEFINED ENV{BOOST_ROOT})
   set(Boost_ROOT ${HPX_BOOST_ROOT})
 endif()
 include(HPX_SetupBoost)

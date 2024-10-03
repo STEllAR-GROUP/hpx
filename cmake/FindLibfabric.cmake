@@ -33,7 +33,7 @@ find_library(
 if(Libfabric_ROOT)
   # The call to file is for compatibility with windows paths
   file(TO_CMAKE_PATH ${Libfabric_ROOT} Libfabric_ROOT)
-elseif("$ENV{LIBFABRIC_ROOT}")
+elseif(DEFINED ENV{LIBFABRIC_ROOT})
   file(TO_CMAKE_PATH $ENV{LIBFABRIC_ROOT} Libfabric_ROOT)
 else()
   file(TO_CMAKE_PATH "${Libfabric_INCLUDE_DIR}" Libfabric_INCLUDE_DIR)

@@ -37,7 +37,7 @@ if(NOT TARGET Amplifier::amplifier)
   if(Amplifier_ROOT)
     # The call to file is for compatibility for windows paths
     file(TO_CMAKE_PATH ${Amplifier_ROOT} Amplifier_ROOT)
-  elseif("$ENV{AMPLIFIER_ROOT}")
+  elseif(DEFINED ENV{AMPLIFIER_ROOT})
     file(TO_CMAKE_PATH $ENV{AMPLIFIER_ROOT} Amplifier_ROOT)
   else()
     file(TO_CMAKE_PATH "${Amplifier_INCLUDE_DIR}" Amplifier_INCLUDE_DIR)

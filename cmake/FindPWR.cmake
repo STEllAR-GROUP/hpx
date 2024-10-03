@@ -54,7 +54,7 @@ if(NOT TARGET PWR::pwr)
   if(Pwr_ROOT)
     # The call to file is for compatibility with windows paths
     file(TO_CMAKE_PATH ${Pwr_ROOT} Pwr_ROOT)
-  elseif("$ENV{PWR_ROOT}")
+  elseif(DEFINED ENV{PWR_ROOT})
     file(TO_CMAKE_PATH $ENV{PWR_ROOT} Pwr_ROOT)
   else()
     file(TO_CMAKE_PATH "${Pwr_INCLUDE_DIR}" Pwr_INCLUDE_DIR)
