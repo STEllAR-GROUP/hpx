@@ -20,6 +20,7 @@
 #include <hpx/functional/traits/is_placeholder.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
@@ -137,11 +138,13 @@ namespace hpx {
         typename Enable =
             std::enable_if_t<traits::is_action_v<std::decay_t<Action>>>>
     detail::bound_action<std::decay_t<Action>,
-        util::make_index_pack_t<sizeof...(Ts)>, std::decay_t<Ts>...>
+        util::make_index_pack_t<sizeof...(Ts)>,
+        hpx::util::decay_unwrap_t<Ts>...>
     bind(Ts&&... vs)
     {
         using result_type = detail::bound_action<std::decay_t<Action>,
-            util::make_index_pack_t<sizeof...(Ts)>, std::decay_t<Ts>...>;
+            util::make_index_pack_t<sizeof...(Ts)>,
+            hpx::util::decay_unwrap_t<Ts>...>;
 
         return result_type(Action(), HPX_FORWARD(Ts, vs)...);
     }
@@ -154,7 +157,8 @@ namespace hpx {
         Ts&&... vs)
     {
         using result_type = detail::bound_action<Derived,
-            util::make_index_pack_t<sizeof...(Ts)>, std::decay_t<Ts>...>;
+            util::make_index_pack_t<sizeof...(Ts)>,
+            hpx::util::decay_unwrap_t<Ts>...>;
 
         return result_type(
             static_cast<Derived const&>(action), HPX_FORWARD(Ts, vs)...);

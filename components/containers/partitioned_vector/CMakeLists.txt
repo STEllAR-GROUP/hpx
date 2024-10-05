@@ -30,10 +30,10 @@ set(partitioned_vector_headers
     hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp
     hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp
     hpx/components/containers/partitioned_vector/partitioned_vector_view_iterator.hpp
+    hpx/components/containers/partitioned_vector/serialization/partitioned_vector.hpp
     hpx/include/partitioned_vector.hpp
     hpx/include/partitioned_vector_predef.hpp
     hpx/include/partitioned_vector_view.hpp
-    hpx/runtime/serialization/partitioned_vector.hpp
 )
 
 set(partitioned_vector_sources

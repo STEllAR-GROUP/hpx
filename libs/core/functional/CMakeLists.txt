@@ -33,9 +33,11 @@ set(functional_headers
     hpx/functional/experimental/scope_exit.hpp
     hpx/functional/experimental/scope_fail.hpp
     hpx/functional/experimental/scope_success.hpp
+    hpx/functional/reference_wrapper.hpp
     hpx/functional/serialization/detail/serializable_basic_function.hpp
     hpx/functional/serialization/detail/vtable/serializable_function_vtable.hpp
     hpx/functional/serialization/detail/vtable/serializable_vtable.hpp
+    hpx/functional/serialization/reference_wrapper.hpp
     hpx/functional/serialization/serializable_function.hpp
     hpx/functional/serialization/serializable_move_only_function.hpp
     hpx/functional/traits/get_action_name.hpp
