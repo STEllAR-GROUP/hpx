@@ -435,7 +435,7 @@ namespace hpx {
 
             // create as many partitions as required
             hpx::future<std::vector<bulk_locality_result>> f =
-                policy.template bulk_create<component_type>(num_parts);
+                policy.template bulk_create<false, component_type>(num_parts);
 
             // now initialize our data structures
             init(f.get());
@@ -454,7 +454,7 @@ namespace hpx {
 
             // create as many partitions as required
             hpx::future<std::vector<bulk_locality_result>> f =
-                policy.template bulk_create<component_type>(
+                policy.template bulk_create<false, component_type>(
                     num_parts, bucket_count, hash, equal);
 
             // now initialize our data structures

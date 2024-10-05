@@ -27,7 +27,7 @@ namespace hpx::components {
         template <typename Component, typename... Ts>
         struct create_component_action;
 
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         struct bulk_create_component_action;
     }    // namespace server
 
@@ -50,7 +50,7 @@ namespace hpx::components {
         return hpx::async<action_type>(gid, HPX_FORWARD(Ts, vs)...);
     }
 
-    template <typename Component, typename... Ts>
+    template <bool WithCount, typename Component, typename... Ts>
     future<std::vector<hpx::id_type>> bulk_create_async(
         hpx::id_type const& gid, std::size_t count, Ts&&... vs)
     {
@@ -62,8 +62,8 @@ namespace hpx::components {
                 "a locality");
         }
 
-        using action_type = server::bulk_create_component_action<Component,
-            std::decay_t<Ts>...>;
+        using action_type = server::bulk_create_component_action<WithCount,
+            Component, std::decay_t<Ts>...>;
 
         return hpx::async<action_type>(gid, count, HPX_FORWARD(Ts, vs)...);
     }
@@ -74,11 +74,12 @@ namespace hpx::components {
         return create_async<Component>(gid, HPX_FORWARD(Ts, vs)...).get();
     }
 
-    template <typename Component, typename... Ts>
+    template <bool WithCount, typename Component, typename... Ts>
     std::vector<hpx::id_type> bulk_create(
         hpx::id_type const& gid, std::size_t count, Ts&&... vs)
     {
-        return bulk_create_async<Component>(gid, count, HPX_FORWARD(Ts, vs)...)
+        return bulk_create_async<WithCount, Component>(
+            gid, count, HPX_FORWARD(Ts, vs)...)
             .get();
     }
 
@@ -99,22 +100,22 @@ namespace hpx::components {
         return create_colocated_async(gid, HPX_FORWARD(Ts, vs)...).get();
     }
 
-    template <typename Component, typename... Ts>
+    template <bool WithCount, typename Component, typename... Ts>
     static future<std::vector<hpx::id_type>> bulk_create_colocated_async(
         hpx::id_type const& gid, std::size_t count, Ts&&... vs)
     {
-        using action_type = server::bulk_create_component_action<Component,
-            std::decay_t<Ts>...>;
+        using action_type = server::bulk_create_component_action<WithCount,
+            Component, std::decay_t<Ts>...>;
 
         return hpx::detail::async_colocated<action_type>(
             gid, count, HPX_FORWARD(Ts, vs)...);
     }
 
-    template <typename Component, typename... Ts>
+    template <bool WithCount, typename Component, typename... Ts>
     std::vector<hpx::id_type> bulk_create_colocated(
         hpx::id_type const& id, std::size_t count, Ts&&... vs)
     {
-        return bulk_create_colocated_async<Component>(
+        return bulk_create_colocated_async<WithCount, Component>(
             id, count, HPX_FORWARD(Ts, vs)...)
             .get();
     }

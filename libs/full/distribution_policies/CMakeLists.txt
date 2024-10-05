@@ -15,6 +15,7 @@ set(distribution_policies_headers
     hpx/distribution_policies/colocating_distribution_policy.hpp
     hpx/distribution_policies/container_distribution_policy.hpp
     hpx/distribution_policies/default_distribution_policy.hpp
+    hpx/distribution_policies/explicit_container_distribution_policy.hpp
     hpx/distribution_policies/target_distribution_policy.hpp
     hpx/distribution_policies/unwrapping_result_policy.hpp
 )
