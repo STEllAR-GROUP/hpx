@@ -90,7 +90,7 @@ namespace hpx::components {
         /// \returns A future holding the list of global addresses which
         ///          represent the newly created objects
         ///
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         hpx::future<std::vector<bulk_locality_result>> bulk_create(
             std::size_t count, Ts&&... vs) const
         {
@@ -98,7 +98,7 @@ namespace hpx::components {
             // locality
             hpx::id_type id = get_next_target();
             hpx::future<std::vector<hpx::id_type>> f =
-                components::bulk_create_async<Component>(
+                components::bulk_create_async<WithCount, Component>(
                     id, count, HPX_FORWARD(Ts, vs)...);
 
             return f.then(hpx::launch::sync,

@@ -125,10 +125,11 @@ namespace hpx::components::server {
         template <typename Component, typename T, typename... Ts>
         naming::gid_type create_component(T v, Ts... vs);
 
-        template <typename Component>
+        template <bool WithCount, typename Component>
         std::vector<naming::gid_type> bulk_create_component(std::size_t count);
 
-        template <typename Component, typename T, typename... Ts>
+        template <bool WithCount, typename Component, typename T,
+            typename... Ts>
         std::vector<naming::gid_type> bulk_create_component(
             std::size_t count, T v, Ts... vs);
 
@@ -418,7 +419,7 @@ namespace hpx::components::server {
     }
 #endif
 
-    template <typename Component>
+    template <bool WithCount, typename Component>
     std::vector<naming::gid_type> runtime_support::bulk_create_component(
         std::size_t count)
     {
@@ -431,7 +432,14 @@ namespace hpx::components::server {
         typedef typename Component::wrapping_type wrapping_type;
         for (std::size_t i = 0; i != count; ++i)
         {
-            ids.emplace_back(create<wrapping_type>());
+            if constexpr (WithCount)
+            {
+                ids.emplace_back(create<wrapping_type>(i));
+            }
+            else
+            {
+                ids.emplace_back(create<wrapping_type>());
+            }
         }
 
         LRT_(info).format("successfully created {} component(s) of type: {}",
@@ -440,7 +448,7 @@ namespace hpx::components::server {
         return ids;
     }
 
-    template <typename Component, typename T, typename... Ts>
+    template <bool WithCount, typename Component, typename T, typename... Ts>
     std::vector<naming::gid_type> runtime_support::bulk_create_component(
         std::size_t count, T v, Ts... vs)
     {
@@ -453,7 +461,14 @@ namespace hpx::components::server {
         typedef typename Component::wrapping_type wrapping_type;
         for (std::size_t i = 0; i != count; ++i)
         {
-            ids.push_back(create<wrapping_type>(v, vs...));
+            if constexpr (WithCount)
+            {
+                ids.push_back(create<wrapping_type>(i, v, vs...));
+            }
+            else
+            {
+                ids.push_back(create<wrapping_type>(v, vs...));
+            }
         }
 
         LRT_(info).format("successfully created {} component(s) of type: {}",
@@ -634,40 +649,42 @@ namespace hpx::components::server {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename... Ts>
+    template <bool WithCount, typename Component, typename... Ts>
     struct bulk_create_component_action
       : ::hpx::actions::action<std::vector<naming::gid_type> (
                                    runtime_support::*)(std::size_t, Ts...),
-            &runtime_support::bulk_create_component<Component, Ts...>,
-            bulk_create_component_action<Component, Ts...>>
+            &runtime_support::bulk_create_component<WithCount, Component,
+                Ts...>,
+            bulk_create_component_action<WithCount, Component, Ts...>>
     {
     };
 
-    template <typename Component>
-    struct bulk_create_component_action<Component>
+    template <bool WithCount, typename Component>
+    struct bulk_create_component_action<WithCount, Component>
       : ::hpx::actions::action<std::vector<naming::gid_type> (
                                    runtime_support::*)(std::size_t),
-            &runtime_support::bulk_create_component<Component>,
-            bulk_create_component_action<Component>>
+            &runtime_support::bulk_create_component<WithCount, Component>,
+            bulk_create_component_action<WithCount, Component>>
     {
     };
 
-    template <typename Component, typename... Ts>
+    template <bool WithCount, typename Component, typename... Ts>
     struct bulk_create_component_direct_action
       : ::hpx::actions::direct_action<std::vector<naming::gid_type> (
                                           runtime_support::*)(
                                           std::size_t, Ts...),
-            &runtime_support::bulk_create_component<Component, Ts...>,
-            bulk_create_component_direct_action<Component, Ts...>>
+            &runtime_support::bulk_create_component<WithCount, Component,
+                Ts...>,
+            bulk_create_component_direct_action<WithCount, Component, Ts...>>
     {
     };
 
-    template <typename Component>
-    struct bulk_create_component_direct_action<Component>
+    template <bool WithCount, typename Component>
+    struct bulk_create_component_direct_action<WithCount, Component>
       : ::hpx::actions::direct_action<std::vector<naming::gid_type> (
                                           runtime_support::*)(std::size_t),
-            &runtime_support::bulk_create_component<Component>,
-            bulk_create_component_direct_action<Component>>
+            &runtime_support::bulk_create_component<WithCount, Component>,
+            bulk_create_component_direct_action<WithCount, Component>>
     {
     };
 

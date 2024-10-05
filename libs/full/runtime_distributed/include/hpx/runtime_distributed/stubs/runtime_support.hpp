@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -68,14 +68,14 @@ namespace hpx { namespace components { namespace stubs {
         }
 
         /// Create multiple new components \a type using the runtime_support
-        /// colocated with the with the given \a targetgid. This is a
+        /// colocated with the given \a targetgid. This is a
         /// non-blocking call.
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         static hpx::future<std::vector<hpx::id_type>>
         bulk_create_component_colocated_async(
             hpx::id_type const& gid, std::size_t count, Ts&&... vs)
         {
-            typedef server::bulk_create_component_action<Component,
+            typedef server::bulk_create_component_action<WithCount, Component,
                 typename std::decay<Ts>::type...>
                 action_type;
 
@@ -84,20 +84,20 @@ namespace hpx { namespace components { namespace stubs {
         }
 
         /// Create multiple new components \a type using the runtime_support
-        /// colocated with the with the given \a targetgid. Block for the
+        /// colocated with the given \a targetgid. Block for the
         /// creation to finish.
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         static std::vector<hpx::id_type> bulk_create_component_colocated(
             hpx::id_type const& gid, std::size_t count, Ts&&... vs)
         {
-            return bulk_create_component_colocated_async<Component>(
+            return bulk_create_component_colocated_async<WithCount, Component>(
                 gid, count, HPX_FORWARD(Ts, vs)...)
                 .get();
         }
 
         /// Create multiple new components \a type using the runtime_support
         /// on the given locality. This is a  non-blocking call.
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         static hpx::future<std::vector<hpx::id_type>>
         bulk_create_component_async(
             hpx::id_type const& gid, std::size_t count, Ts&&... vs)
@@ -111,7 +111,7 @@ namespace hpx { namespace components { namespace stubs {
                 return hpx::make_ready_future(std::vector<hpx::id_type>());
             }
 
-            typedef server::bulk_create_component_action<Component,
+            typedef server::bulk_create_component_action<WithCount, Component,
                 typename std::decay<Ts>::type...>
                 action_type;
             return hpx::async<action_type>(gid, count, HPX_FORWARD(Ts, vs)...);
