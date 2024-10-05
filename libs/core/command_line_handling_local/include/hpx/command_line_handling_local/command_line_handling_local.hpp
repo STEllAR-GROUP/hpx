@@ -66,8 +66,8 @@ namespace hpx::local::detail {
             std::vector<std::string>& ini_config);
 
         void store_command_line(int argc, char** argv);
-        void store_unregistered_options(std::string const& cmd_name,
-            std::vector<std::string> const& unregistered_options);
+        void store_unregistered_options(std::string const& cmd_name, int argc,
+            char* argv[], std::vector<std::string> const& unregistered_options);
         bool handle_help_options(
             hpx::program_options::options_description const& help);
 

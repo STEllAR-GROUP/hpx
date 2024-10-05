@@ -62,19 +62,7 @@ namespace hpx::components {
         ///
         /// \param locs     [in] The list of localities the new instance should
         ///                 represent
-        default_distribution_policy operator()(
-            std::vector<id_type> const& locs) const
-        {
-            return default_distribution_policy(locs);
-        }
-
-        /// Create a new \a default_distribution policy representing the given
-        /// set of localities.
-        ///
-        /// \param locs     [in] The list of localities the new instance should
-        ///                 represent
-        default_distribution_policy operator()(
-            std::vector<id_type>&& locs) const
+        default_distribution_policy operator()(std::vector<id_type> locs) const
         {
             return default_distribution_policy(HPX_MOVE(locs));
         }
@@ -84,9 +72,9 @@ namespace hpx::components {
         ///
         /// \param loc     [in] The locality the new instance should
         ///                 represent
-        default_distribution_policy operator()(id_type const& loc) const
+        default_distribution_policy operator()(id_type loc) const
         {
-            return default_distribution_policy(loc);
+            return default_distribution_policy(HPX_MOVE(loc));
         }
 
         /// Create one object on one of the localities associated by
@@ -140,7 +128,7 @@ namespace hpx::components {
         /// \returns A future holding the list of global addresses that
         ///          represent the newly created objects
         ///
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         hpx::future<std::vector<bulk_locality_result>> bulk_create(
             std::size_t count, Ts&&... vs) const
         {
@@ -149,10 +137,23 @@ namespace hpx::components {
                 // schedule creation of all objects across given localities
                 std::vector<hpx::future<std::vector<hpx::id_type>>> objs;
                 objs.reserve(localities_->size());
+
+                [[maybe_unused]] std::size_t first = 0;
                 for (hpx::id_type const& loc : *localities_)
                 {
-                    objs.emplace_back(bulk_create_async<Component>(
-                        loc, get_num_items(count, loc), vs...));
+                    if constexpr (WithCount)
+                    {
+                        std::size_t const local_count =
+                            get_num_items(count, loc);
+                        objs.emplace_back(bulk_create_async<true, Component>(
+                            loc, local_count, first, vs...));
+                        first += local_count;
+                    }
+                    else
+                    {
+                        objs.emplace_back(bulk_create_async<false, Component>(
+                            loc, get_num_items(count, loc), vs...));
+                    }
                 }
 
                 // consolidate all results
@@ -179,8 +180,17 @@ namespace hpx::components {
             // handle special cases
             hpx::id_type id = get_next_target();
 
-            hpx::future<std::vector<hpx::id_type>> f =
-                bulk_create_async<Component>(id, count, HPX_FORWARD(Ts, vs)...);
+            hpx::future<std::vector<hpx::id_type>> f;
+            if constexpr (WithCount)
+            {
+                f = bulk_create_async<true, Component>(
+                    id, count, 0, HPX_FORWARD(Ts, vs)...);
+            }
+            else
+            {
+                f = bulk_create_async<false, Component>(
+                    id, count, HPX_FORWARD(Ts, vs)...);
+            }
 
             return f.then(hpx::launch::sync,
                 [id = HPX_MOVE(id)](hpx::future<std::vector<hpx::id_type>>&& f)
@@ -304,7 +314,7 @@ namespace hpx::components {
                 return (items < num_loc) ? 1 : 0;
             }
 
-            // the last locality might get less items
+            // the last locality might get fewer items
             if (locs > 1 && loc == localities_->back())
             {
                 return items - detail::round_to_multiple(items, locs, locs - 1);
@@ -317,20 +327,7 @@ namespace hpx::components {
 
     protected:
         /// \cond NOINTERNAL
-        explicit default_distribution_policy(
-            std::vector<id_type> const& localities)
-          : localities_(std::make_shared<std::vector<id_type>>(localities))
-        {
-            if (localities_->empty())
-            {
-                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                    "default_distribution_policy::default_distribution_"
-                    "policy",
-                    "unexpectedly empty list of localities");
-            }
-        }
-
-        explicit default_distribution_policy(std::vector<id_type>&& localities)
+        explicit default_distribution_policy(std::vector<id_type> localities)
           : localities_(
                 std::make_shared<std::vector<id_type>>(HPX_MOVE(localities)))
         {
@@ -342,8 +339,9 @@ namespace hpx::components {
             }
         }
 
-        explicit default_distribution_policy(id_type const& locality)
-          : localities_(std::make_shared<std::vector<id_type>>(1, locality))
+        explicit default_distribution_policy(id_type locality)
+          : localities_(
+                std::make_shared<std::vector<id_type>>(1, HPX_MOVE(locality)))
         {
         }
 

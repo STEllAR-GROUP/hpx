@@ -24,6 +24,7 @@
 #include <hpx/components/client_base.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/components_base/server/locking_hook.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -39,11 +40,33 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+namespace hpx::detail {
+
+    HPX_HAS_XXX_TRAIT_DEF(allocator_type);
+
+    template <typename T, typename Data, typename Enable = void>
+    struct extract_allocator_type
+    {
+        using type = std::allocator<T>;
+    };
+
+    template <typename T, typename Data>
+    struct extract_allocator_type<T, Data,
+        std::enable_if_t<has_allocator_type_v<Data>>>
+    {
+        using type = typename Data::allocator_type;
+    };
+
+    template <typename T, typename Data>
+    using extract_allocator_type_t =
+        typename extract_allocator_type<T, Data>::type;
+}    // namespace hpx::detail
+
 namespace hpx::server {
 
     /// \brief This is the basic wrapper class for stl vector.
     ///
-    /// This contains the implementation of the partitioned_vector_partition's
+    /// This contains the implementation of the partitioned_vector partition's
     /// component functionality.
     template <typename T, typename Data>
     class partitioned_vector
@@ -51,9 +74,9 @@ namespace hpx::server {
             components::component_base<partitioned_vector<T, Data>>>
     {
     public:
-        using data_type = Data;
+        using data_type = std::decay_t<Data>;
 
-        using allocator_type = typename data_type::allocator_type;
+        using allocator_type = hpx::detail::extract_allocator_type_t<T, Data>;
         using size_type = typename data_type::size_type;
         using iterator_type = typename data_type::iterator;
         using const_iterator_type = typename data_type::const_iterator;
@@ -71,7 +94,9 @@ namespace hpx::server {
         /// size 0.
         partitioned_vector();
 
-        explicit partitioned_vector(size_type partition_size);
+        explicit partitioned_vector(std::size_t partnum,
+            std::vector<size_type> const& partition_sizes,
+            traits::create_mode = traits::create_mode::resize);
 
         /// Constructor which create and initialize partitioned_vector_partition
         /// with all elements as \a val.
@@ -79,9 +104,11 @@ namespace hpx::server {
         /// param partition_size The size of vector
         /// param val Default value for the elements in partitioned_vector_partition
         ///
-        partitioned_vector(size_type partition_size, T const& val);
+        partitioned_vector(std::size_t partnum,
+            std::vector<size_type> const& partition_sizes, T const& val);
 
-        partitioned_vector(size_type partition_size, T const& val,
+        partitioned_vector(std::size_t partnum,
+            std::vector<size_type> const& partition_sizes, T const& val,
             allocator_type const& alloc);
 
         // support components::copy
@@ -240,8 +267,7 @@ namespace hpx::server {
         ///
         /// \param val   The value to be copied
         ///
-        void set_values(
-            std::vector<size_type> const& pos, std::vector<T> const& val);
+        void set_values(std::vector<size_type> const& pos, std::vector<T> val);
 
         /// Remove all elements from the vector leaving the
         /// partitioned_vector_partition with size 0.
@@ -274,13 +300,31 @@ namespace hpx::server {
         // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, clear)
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_copied_data)
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_data)
+
+        /// Invoke given function on given element
+        ///
+        /// \return This returns whatever the given function invocation returns
+        template <typename F, typename... Ts>
+        util::invoke_result_t<F, T, Ts...> apply(
+            std::size_t pos, F f, Ts... ts);
+
+        template <typename F, typename... Ts>
+        struct apply_action
+          : hpx::actions::make_action_t<
+                decltype(&partitioned_vector::apply<F, Ts...>),
+                &partitioned_vector::apply<F, Ts...>, apply_action<F, Ts...>>
+        {
+        };
     };
 }    // namespace hpx::server
 
 ///////////////////////////////////////////////////////////////////////////////
+#if 0
+#define HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(...)
+#else
 #define HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(...)                       \
     HPX_REGISTER_VECTOR_DECLARATION_(__VA_ARGS__)                              \
-/**/
+    /**/
 #define HPX_REGISTER_VECTOR_DECLARATION_(...)                                  \
     HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_VECTOR_DECLARATION_,                 \
         HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
@@ -307,16 +351,17 @@ namespace hpx::server {
 
 #define HPX_REGISTER_VECTOR_DECLARATION_1(type)                                \
     HPX_REGISTER_VECTOR_DECLARATION_2(type, std::vector<type>)                 \
-/**/
+    /**/
 #define HPX_REGISTER_VECTOR_DECLARATION_2(type, data)                          \
     HPX_REGISTER_VECTOR_DECLARATION_3(type, data, type)                        \
-/**/
+    /**/
 #define HPX_REGISTER_VECTOR_DECLARATION_3(type, data, name)                    \
     typedef ::hpx::server::partitioned_vector<type, data> HPX_PP_CAT(          \
         __partitioned_vector_, HPX_PP_CAT(type, name));                        \
     HPX_REGISTER_VECTOR_DECLARATION_IMPL(                                      \
         HPX_PP_CAT(__partitioned_vector_, HPX_PP_CAT(type, name)), name)       \
     /**/
+#endif
 
 namespace hpx {
 
@@ -333,7 +378,8 @@ namespace hpx {
     public:
         partitioned_vector_partition() = default;
 
-        explicit partitioned_vector_partition(id_type const& gid);
+        explicit partitioned_vector_partition(
+            id_type const& gid, bool make_unmanaged = false);
 
         explicit partitioned_vector_partition(
             hpx::shared_future<id_type> const& gid);
@@ -559,10 +605,7 @@ namespace hpx {
         ///
         hpx::future<typename server_type::data_type> get_copied_data() const;
 
-        /// Updates the data owned by the partition_vector
-        /// component.
-        ///
-        /// \return This returns the data of the partition_vector
+        /// Updates the data owned by the partition_vector component.
         ///
         void set_data(
             launch::sync_policy, typename server_type::data_type&& other) const;
@@ -574,6 +617,13 @@ namespace hpx {
         ///
         hpx::future<void> set_data(
             typename server_type::data_type&& other) const;
+
+        /// Invoke given function on given element
+        ///
+        /// \return This returns whatever the given function invocation returns
+        template <typename F, typename... Ts>
+        hpx::future<util::invoke_result_t<F, T, Ts...>> apply(
+            std::size_t pos, F&& f, Ts&&... ts);
     };
 }    // namespace hpx
 
