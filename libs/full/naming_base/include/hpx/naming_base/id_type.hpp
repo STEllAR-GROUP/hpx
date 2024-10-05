@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -133,7 +133,8 @@ namespace hpx {
 
         // Convert this id into an unmanaged one (in-place) - Use with maximum
         // care, or better, don't use this at all.
-        void make_unmanaged() const;
+        void make_unmanaged();
+        hpx::id_type make_unmanaged() const;
 
         hpx::intrusive_ptr<naming::detail::id_type_impl>& impl() noexcept
         {
@@ -410,9 +411,14 @@ namespace hpx {
         gid_->set_lsb(lsb);
     }
 
-    inline void id_type::make_unmanaged() const
+    inline void id_type::make_unmanaged()
     {
         gid_->set_management_type(management_type::unmanaged);
+    }
+
+    inline hpx::id_type id_type::make_unmanaged() const
+    {
+        return {*impl(), management_type::unmanaged};
     }
 }    // namespace hpx
 

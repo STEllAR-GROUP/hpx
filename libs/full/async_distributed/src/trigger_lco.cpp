@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,7 +20,7 @@
 
 namespace hpx {
 
-    void trigger_lco_event([[maybe_unused]] hpx::id_type const& id,
+    void trigger_lco_event([[maybe_unused]] hpx::id_type id,
         [[maybe_unused]] naming::address&& addr,
         [[maybe_unused]] bool move_credits)
     {
@@ -49,7 +49,7 @@ namespace hpx {
 #endif
     }
 
-    void trigger_lco_event([[maybe_unused]] hpx::id_type const& id,
+    void trigger_lco_event([[maybe_unused]] hpx::id_type id,
         [[maybe_unused]] naming::address&& addr,
         [[maybe_unused]] hpx::id_type const& cont,
         [[maybe_unused]] bool move_credits)
@@ -89,7 +89,7 @@ namespace hpx {
 #endif
     }
 
-    void set_lco_error([[maybe_unused]] hpx::id_type const& id,
+    void set_lco_error([[maybe_unused]] hpx::id_type id,
         [[maybe_unused]] naming::address&& addr,
         [[maybe_unused]] std::exception_ptr const& e,
         [[maybe_unused]] bool move_credits)
@@ -119,7 +119,7 @@ namespace hpx {
 #endif
     }
 
-    void set_lco_error([[maybe_unused]] hpx::id_type const& id,
+    void set_lco_error([[maybe_unused]] hpx::id_type id,
         [[maybe_unused]] naming::address&& addr,
         [[maybe_unused]] std::exception_ptr&& e,
         [[maybe_unused]] bool move_credits)
@@ -151,7 +151,7 @@ namespace hpx {
 #endif
     }
 
-    void set_lco_error([[maybe_unused]] hpx::id_type const& id,
+    void set_lco_error([[maybe_unused]] hpx::id_type id,
         [[maybe_unused]] naming::address&& addr,
         [[maybe_unused]] std::exception_ptr const& e,
         [[maybe_unused]] hpx::id_type const& cont,
@@ -192,7 +192,7 @@ namespace hpx {
 #endif
     }
 
-    void set_lco_error([[maybe_unused]] hpx::id_type const& id,
+    void set_lco_error([[maybe_unused]] hpx::id_type id,
         [[maybe_unused]] naming::address&& addr,
         [[maybe_unused]] std::exception_ptr&& e,
         [[maybe_unused]] hpx::id_type const& cont,

@@ -7,6 +7,4 @@
 #pragma once
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
-
-
-
+#include <hpx/components/containers/partitioned_vector/serialization/partitioned_vector.hpp>

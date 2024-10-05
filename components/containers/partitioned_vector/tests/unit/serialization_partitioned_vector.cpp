@@ -10,9 +10,10 @@
 
 #include <hpx/include/parallel_fill.hpp>
 #include <hpx/include/partitioned_vector.hpp>
-#include <hpx/runtime/serialization/partitioned_vector.hpp>
 
 #include <hpx/modules/testing.hpp>
+#include <hpx/naming/detail/preprocess_gid_types.hpp>
+#include <hpx/serialization/detail/preprocess_container.hpp>
 
 #include <cstddef>
 #include <numeric>
@@ -24,7 +25,7 @@
 HPX_REGISTER_PARTITIONED_VECTOR(double)
 #endif
 
-typedef unsigned long ulong;
+using ulong = unsigned long;
 
 HPX_REGISTER_PARTITIONED_VECTOR(ulong)
 HPX_REGISTER_PARTITIONED_VECTOR(long)
@@ -36,14 +37,27 @@ void test(T minval, T maxval)
     {
         std::vector<char> buffer;
 
-        hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::archive_flags::disable_data_chunking);
-
         std::size_t sz = static_cast<std::size_t>(maxval - minval);
 
         hpx::partitioned_vector<T> os(sz);
         os.register_as("test_vector");
         hpx::fill(hpx::execution::par, std::begin(os), std::end(os), 42);
+
+        hpx::serialization::detail::preprocess_container gather_size;
+        hpx::serialization::output_archive archive(gather_size,
+            hpx::serialization::archive_flags::disable_data_chunking);
+
+        auto& split_gids = archive.get_extra_data<
+            hpx::serialization::detail::preprocess_gid_types>();
+
+        archive << os;
+
+        hpx::serialization::output_archive oarchive(
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
+
+        auto& osplit_gids = oarchive.get_extra_data<
+            hpx::serialization::detail::preprocess_gid_types>();
+        osplit_gids.set_split_gids(split_gids.move_split_gids());
 
         oarchive << os;
 
@@ -88,4 +102,5 @@ int main()
 
     return hpx::util::report_errors();
 }
+
 #endif

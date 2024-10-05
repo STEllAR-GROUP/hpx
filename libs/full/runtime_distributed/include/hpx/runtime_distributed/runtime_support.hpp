@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -58,81 +58,81 @@ namespace hpx { namespace components {
 
         /// Asynchronously create N new default constructed components using
         /// the runtime_support
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         std::vector<hpx::id_type> bulk_create_component(
-            std::size_t /* count */, Ts&&... vs)
+            std::size_t count, Ts&&... vs)
         {
-            return this->base_type::template bulk_create_component<Component>(
-                gid_, HPX_FORWARD(Ts, vs)...);
+            return this->base_type::bulk_create_component<WithCount, Component>(
+                gid_, count, HPX_FORWARD(Ts, vs)...);
         }
 
         /// Asynchronously create a new component using the runtime_support
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         hpx::future<std::vector<hpx::id_type>> bulk_create_components_async(
-            std::size_t /* count */, Ts&&... vs)
+            std::size_t count, Ts&&... vs)
         {
-            return this->base_type::template bulk_create_component<Component>(
-                gid_, HPX_FORWARD(Ts, vs)...);
+            return this->base_type::bulk_create_component<WithCount, Component>(
+                gid_, count, HPX_FORWARD(Ts, vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::future<int> load_components_async()
+        hpx::future<int> load_components_async() const
         {
             return this->base_type::load_components_async(gid_);
         }
 
-        int load_components()
+        int load_components() const
         {
             return this->base_type::load_components(gid_);
         }
 
-        hpx::future<void> call_startup_functions_async(bool pre_startup)
+        hpx::future<void> call_startup_functions_async(bool pre_startup) const
         {
             return this->base_type::call_startup_functions_async(
                 gid_, pre_startup);
         }
 
-        void call_startup_functions(bool pre_startup)
+        void call_startup_functions(bool pre_startup) const
         {
             this->base_type::call_startup_functions(gid_, pre_startup);
         }
 
         /// \brief Shutdown the given runtime system
-        hpx::future<void> shutdown_async(double timeout = -1)
+        hpx::future<void> shutdown_async(double timeout = -1) const
         {
             return this->base_type::shutdown_async(gid_, timeout);
         }
 
-        void shutdown(double timeout = -1)
+        void shutdown(double timeout = -1) const
         {
             this->base_type::shutdown(gid_, timeout);
         }
 
         /// \brief Shutdown the runtime systems of all localities
-        void shutdown_all(double timeout = -1)
+        void shutdown_all(double timeout = -1) const
         {
             this->base_type::shutdown_all(gid_, timeout);
         }
 
         /// \brief Terminate the given runtime system
-        hpx::future<void> terminate_async()
+        hpx::future<void> terminate_async() const
         {
             return this->base_type::terminate_async(gid_);
         }
 
-        void terminate()
+        void terminate() const
         {
             this->base_type::terminate(gid_);
         }
 
         /// \brief Terminate the runtime systems of all localities
-        void terminate_all()
+        void terminate_all() const
         {
             this->base_type::terminate_all(gid_);
         }
 
         /// \brief Retrieve configuration information
-        void get_config(util::section& ini)
+        void get_config(util::section& ini) const
         {
             this->base_type::get_config(gid_, ini);
         }

@@ -25,7 +25,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel {
+namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // segmented_all_any_none
     namespace detail {
@@ -479,10 +480,10 @@ namespace hpx { namespace parallel {
         }
         /// \endcond
     }    // namespace detail
-}}    // namespace hpx::parallel
+}    // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
-namespace hpx { namespace segmented {
+namespace hpx::segmented {
 
     // clang-format off
     template <typename InIter,
@@ -603,4 +604,4 @@ namespace hpx { namespace segmented {
             hpx::parallel::detail::all_of(), HPX_FORWARD(ExPolicy, policy),
             first, last, HPX_FORWARD(F, f), hpx::identity_v, is_seq());
     }
-}}    // namespace hpx::segmented
+}    // namespace hpx::segmented

@@ -13,6 +13,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/distribution_policies/colocating_distribution_policy.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -306,7 +307,7 @@ namespace hpx::parallel::detail {
                 typename algo_type::result_type>::type;
 
         algorithm_invoker_action<algo_type, ExPolicy, typename IsSeq::type,
-            result_type(std::decay_t<Args>...)>
+            result_type(hpx::util::decay_unwrap_t<Args>...)>
             act;
 
         return hpx::async(act, hpx::colocated(id), HPX_FORWARD(Algo, algo),

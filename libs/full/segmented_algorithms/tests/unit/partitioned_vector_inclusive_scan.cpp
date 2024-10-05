@@ -1,11 +1,12 @@
 //  Copyright (c) 2016 Minh-Khanh Do
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_scan.hpp>
@@ -33,7 +34,6 @@
               << g << " " << h << " " << i << " ";
 
 ///////////////////////////////////////////////////////////////////////////////
-
 template <typename T>
 struct opt
 {
@@ -322,9 +322,9 @@ template <typename T>
 void inclusive_scan_tests(std::vector<hpx::id_type>& localities)
 {
 #if defined(HPX_DEBUG)
-    std::size_t const length = 1000;
+    constexpr std::size_t length = 1000;
 #else
-    std::size_t const length = 10000;
+    constexpr std::size_t length = 10000;
 #endif
 
     inclusive_scan_tests_with_policy<T>(length, hpx::container_layout);
@@ -334,7 +334,7 @@ void inclusive_scan_tests(std::vector<hpx::id_type>& localities)
     inclusive_scan_tests_with_policy<T>(
         length, hpx::container_layout(localities));
 
-    inclusive_scan_tests_with_policy<T>(1000, hpx::container_layout(1000));
+    inclusive_scan_tests_with_policy<T>(1000, hpx::container_layout(100));
 
     // multiple localities needed for the following tests
     inclusive_scan_tests_segmented_out_with_policy<T>(length,
@@ -357,4 +357,5 @@ int main()
     inclusive_scan_tests<long long>(localities);
     return hpx::util::report_errors();
 }
+
 #endif

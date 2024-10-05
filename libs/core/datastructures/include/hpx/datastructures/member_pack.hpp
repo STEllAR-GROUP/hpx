@@ -50,7 +50,7 @@ namespace hpx::util {
         }
 #else
         template <std::size_t I, typename T,
-            bool Empty = std::is_empty<T>::value && !std::is_final<T>::value>
+            bool Empty = std::is_empty_v<T> && !std::is_final_v<T>>
         struct member_leaf
         {
             T member;

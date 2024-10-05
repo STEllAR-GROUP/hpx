@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2023 Hartmut Kaiser
+//  Copyright (c) 2014-2024 Hartmut Kaiser
 //  Copyright (c) 2017 Ajai V George
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -134,6 +134,31 @@ void test_for_each_async(
     verify_values_count_async(policy, v, val);
 }
 
+template <typename T>
+struct apply_wrap
+{
+    template <typename T_>
+    void operator()([[maybe_unused]] T_& val) const
+    {
+    }
+
+    hpx::reference_wrapper<hpx::partitioned_vector<T>> v;
+
+    template <typename Archive>
+    void serialize(Archive& ar, unsigned)
+    {
+        // clang-format off
+        ar & v;
+        // clang-format on
+    }
+};
+
+template <typename ExPolicy, typename T>
+void test_for_each_apply(ExPolicy&& policy, hpx::partitioned_vector<T>& v)
+{
+    hpx::for_each(policy, v.begin(), v.end(), apply_wrap<T>{v});
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 void for_each_tests(std::vector<hpx::id_type>& localities)
@@ -151,8 +176,9 @@ void for_each_tests(std::vector<hpx::id_type>& localities)
             .get();
     }
 
+    constexpr std::size_t length = 12;
+
     {
-        constexpr std::size_t length = 12;
         hpx::partitioned_vector<T> v(
             length, T(0), hpx::container_layout(localities));
         test_for_each(v, T(0));
@@ -160,6 +186,32 @@ void for_each_tests(std::vector<hpx::id_type>& localities)
         test_for_each(hpx::execution::par, v, T(2));
         test_for_each_async(hpx::execution::seq(hpx::execution::task), v, T(3));
         test_for_each_async(hpx::execution::par(hpx::execution::task), v, T(4));
+    }
+
+    {
+        hpx::partitioned_vector<T> v(
+            length, T(0), hpx::container_layout(localities));
+
+        v.register_as("foreach_test1");
+        test_for_each_apply(hpx::execution::seq, v);
+        test_for_each_apply(hpx::execution::par, v);
+    }
+
+    {
+        std::vector<std::size_t> sizes;
+        sizes.reserve(localities.size());
+
+        for (std::size_t i = 0; i != localities.size(); ++i)
+        {
+            sizes.push_back(length / localities.size());
+        }
+
+        hpx::partitioned_vector<T> v(
+            length, T(0), hpx::explicit_container_layout(sizes, localities));
+
+        v.register_as("foreach_test2");
+        test_for_each_apply(hpx::execution::seq, v);
+        test_for_each_apply(hpx::execution::par, v);
     }
 }
 

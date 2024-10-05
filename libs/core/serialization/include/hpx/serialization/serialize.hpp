@@ -46,12 +46,16 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        template <typename Archive, typename T>
-        void serialize_one(Archive& ar, T& t)
+        template <typename T>
+        void serialize_one(output_archive& ar, T const& t)
         {
-            // clang-format off
-            ar & t;
-            // clang-format on
+            ar.save(t);
+        }
+
+        template <typename T>
+        void serialize_one(input_archive& ar, T& t)
+        {
+            ar.load(t);
         }
     }    // namespace detail
 }    // namespace hpx::serialization
