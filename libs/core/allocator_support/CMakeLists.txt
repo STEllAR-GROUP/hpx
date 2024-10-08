@@ -42,7 +42,7 @@ set(allocator_support_compat_headers
 )
 # cmake-format: on
 
-set(allocator_support_sources)
+set(allocator_support_sources thread_local_caching_allocator.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
@@ -52,6 +52,7 @@ add_hpx_module(
   HEADERS ${allocator_support_headers}
   COMPAT_HEADERS ${allocator_support_compat_headers}
   DEPENDENCIES hpx_dependencies_allocator
-  MODULE_DEPENDENCIES hpx_concepts hpx_config hpx_preprocessor hpx_type_support
+  MODULE_DEPENDENCIES hpx_assertion hpx_concepts hpx_config hpx_preprocessor
+                      hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

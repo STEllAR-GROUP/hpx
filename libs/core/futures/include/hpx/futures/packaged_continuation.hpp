@@ -540,7 +540,7 @@ struct hpx::traits::detail::shared_state_allocator<
 namespace hpx::lcos::detail {
 
     template <typename Allocator, typename Future>
-    inline traits::detail::shared_state_ptr_t<future_unwrap_result_t<Future>>
+    traits::detail::shared_state_ptr_t<future_unwrap_result_t<Future>>
     unwrap_impl_alloc(Allocator const& a, Future&& future, error_code& /*ec*/)
     {
         using base_allocator = Allocator;
@@ -573,15 +573,15 @@ namespace hpx::lcos::detail {
     }
 
     template <typename Allocator, typename Future>
-    inline traits::detail::shared_state_ptr_t<future_unwrap_result_t<Future>>
+    traits::detail::shared_state_ptr_t<future_unwrap_result_t<Future>>
     unwrap_alloc(Allocator const& a, Future&& future, error_code& ec)
     {
         return unwrap_impl_alloc(a, HPX_FORWARD(Future, future), ec);
     }
 
     template <typename Future>
-    inline traits::detail::shared_state_ptr_t<future_unwrap_result_t<Future>>
-    unwrap(Future&& future, error_code& ec)
+    traits::detail::shared_state_ptr_t<future_unwrap_result_t<Future>> unwrap(
+        Future&& future, error_code& ec)
     {
         using allocator_type = hpx::util::thread_local_caching_allocator<char,
             hpx::util::internal_allocator<>>;

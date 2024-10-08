@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Hartmut Kaiser
+//  Copyright (c) 2023-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,11 +8,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/config/defines.hpp>
+#include <hpx/assert.hpp>
 
 #include <cstddef>
+#include <cstdint>
+#include <functional>
 #include <memory>
 #include <new>
-#include <stack>
 #include <type_traits>
 #include <utility>
 
@@ -21,14 +23,42 @@ namespace hpx::util {
 #if defined(HPX_ALLOCATOR_SUPPORT_HAVE_CACHING) &&                             \
     !((defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) ||                       \
         defined(HPX_HAVE_HIP))
+
+    namespace detail {
+
+        HPX_CORE_EXPORT void init_allocator_cache(
+            std::size_t, std::function<void()>&& clear_cache);
+        HPX_CORE_EXPORT std::pair<void*, std::size_t> allocate_from_cache(
+            std::size_t) noexcept;
+        [[nodiscard]] HPX_CORE_EXPORT bool cache_empty(std::size_t) noexcept;
+        HPX_CORE_EXPORT void return_to_cache(
+            std::size_t, void* p, std::size_t n);
+
+        // maximal number of caches [0...max)
+        inline constexpr int max_number_of_caches = 16;
+
+        ///////////////////////////////////////////////////////////////////////
+        constexpr int next_power_of_two(std::int64_t n) noexcept
+        {
+            int i = 0;
+            for (--n; n > 0; n >>= 1)
+            {
+                ++i;
+            }
+            return i;
+        }
+    }    // namespace detail
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T = char, typename Allocator = std::allocator<T>>
     struct thread_local_caching_allocator
     {
         HPX_NO_UNIQUE_ADDRESS Allocator alloc;
 
+    private:
         using traits = std::allocator_traits<Allocator>;
 
+    public:
         using value_type = typename traits::value_type;
         using pointer = typename traits::pointer;
         using const_pointer = typename traits::const_pointer;
@@ -50,86 +80,38 @@ namespace hpx::util {
         using propagate_on_container_swap =
             typename traits::propagate_on_container_swap;
 
-    private:
-        struct allocated_cache
-        {
-            explicit allocated_cache(Allocator const& a) noexcept(
-                noexcept(std::is_nothrow_copy_constructible_v<Allocator>))
-              : alloc(a)
-            {
-            }
-
-            allocated_cache(allocated_cache const&) = delete;
-            allocated_cache(allocated_cache&&) = delete;
-            allocated_cache& operator=(allocated_cache const&) = delete;
-            allocated_cache& operator=(allocated_cache&&) = delete;
-
-            ~allocated_cache()
-            {
-                clear_cache();
-            }
-
-            pointer allocate(size_type n)
-            {
-                pointer p;
-                if (data.empty())
-                {
-                    p = traits::allocate(alloc, n);
-                    if (p == nullptr)
-                    {
-                        throw std::bad_alloc();
-                    }
-                }
-                else
-                {
-                    p = data.top().first;
-                    data.pop();
-                }
-
-                ++allocated;
-                return p;
-            }
-
-            void deallocate(pointer p, size_type n) noexcept
-            {
-                data.push(std::make_pair(p, n));
-                if (++deallocated > 2 * (allocated + 16))
-                {
-                    clear_cache();
-                    allocated = 0;
-                    deallocated = 0;
-                }
-            }
-
-        private:
-            void clear_cache() noexcept
-            {
-                while (!data.empty())
-                {
-                    traits::deallocate(
-                        alloc, data.top().first, data.top().second);
-                    data.pop();
-                }
-            }
-
-            HPX_NO_UNIQUE_ADDRESS Allocator alloc;
-            std::stack<std::pair<T*, size_type>> data;
-            std::size_t allocated = 0;
-            std::size_t deallocated = 0;
-        };
-
-        allocated_cache& cache()
-        {
-            thread_local allocated_cache allocated_data(alloc);
-            return allocated_data;
-        }
-
-    public:
         explicit thread_local_caching_allocator(
             Allocator const& alloc = Allocator{}) noexcept(noexcept(std::
                 is_nothrow_copy_constructible_v<Allocator>))
           : alloc(alloc)
         {
+            // Note: capturing the allocator will be ok only as long as it
+            // doesn't have any state as this lambda will be possibly called
+            // very late during destruction of the thread_local cache.
+            static_assert(std::is_empty_v<Allocator>,
+                "Please don't use allocators with state in conjunction with "
+                "the thread_local_caching_allocator");
+
+            constexpr std::size_t num_cache =
+                detail::next_power_of_two(sizeof(T));
+
+            static_assert(num_cache < detail::max_number_of_caches,
+                "This allocator does not support allocating objects larger "
+                "than 2^16 bytes");
+
+            auto f = [=]() mutable {
+                while (!detail::cache_empty(num_cache))
+                {
+                    auto [p, n] = detail::allocate_from_cache(num_cache);
+                    if (p != nullptr)
+                    {
+                        traits::deallocate(const_cast<Allocator&>(alloc),
+                            static_cast<char*>(p), n);
+                    }
+                }
+            };
+
+            detail::init_allocator_cache(num_cache, HPX_MOVE(f));
         }
 
         template <typename U, typename Alloc>
@@ -154,16 +136,32 @@ namespace hpx::util {
 
         [[nodiscard]] pointer allocate(size_type n, void const* = nullptr)
         {
-            if (max_size() < n)
+            constexpr std::size_t num_cache =
+                detail::next_power_of_two(sizeof(T));
+            std::size_t N = n * (1ull << num_cache);
+
+            if (max_size() < N)
             {
                 throw std::bad_array_new_length();
             }
-            return cache().allocate(n);
+
+            auto [p, _] = detail::allocate_from_cache(num_cache);
+            if (p == nullptr)
+            {
+                p = traits::allocate(alloc, N);
+                if (p == nullptr)
+                {
+                    throw std::bad_alloc();
+                }
+            }
+            return static_cast<pointer>(p);
         }
 
-        void deallocate(pointer p, size_type n) noexcept
+        void deallocate(pointer p, size_type n)
         {
-            cache().deallocate(p, n);
+            constexpr std::size_t num_cache =
+                detail::next_power_of_two(sizeof(T));
+            detail::return_to_cache(num_cache, p, n * (1ull << num_cache));
         }
 
         [[nodiscard]] constexpr size_type max_size() noexcept

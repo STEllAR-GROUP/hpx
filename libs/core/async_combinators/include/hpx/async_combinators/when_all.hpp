@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //  Copyright (c) 2017 Denis Blank
 //
@@ -201,14 +201,16 @@ namespace hpx::lcos::detail {
             return async_visit_future(HPX_FORWARD(T, current));
         }
 
+        // clang-format off
         template <typename T, typename N>
         auto operator()(hpx::util::async_traverse_detach_tag, T&& current,
             N&& next) -> decltype(async_detach_future(HPX_FORWARD(T, current),
-            HPX_FORWARD(N, next)))
+                          HPX_FORWARD(N, next)))
         {
             return async_detach_future(
                 HPX_FORWARD(T, current), HPX_FORWARD(N, next));
         }
+        // clang-format on
 
         template <typename T>
         void operator()(hpx::util::async_traverse_complete_tag, T&& pack)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,21 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/type_support/static_reinit_interface.hpp>
 
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    // This is a global API allowing to register functions to be called before
-    // the runtime system is about to start and after the runtime system has
-    // been terminated. This is used to initialize/reinitialize all
-    // singleton instances.
-    HPX_CORE_EXPORT void reinit_register(hpx::function<void()> const& construct,
-        hpx::function<void()> const& destruct);
-
-    // Invoke all globally registered construction functions
-    HPX_CORE_EXPORT void reinit_construct();
-
-    // Invoke all globally registered destruction functions
-    HPX_CORE_EXPORT void reinit_destruct();
+    // initialize static_reinit interface function wrappers
+    HPX_CORE_EXPORT struct static_reinit_interface_functions&
+    static_reinit_init();
 }    // namespace hpx::util
