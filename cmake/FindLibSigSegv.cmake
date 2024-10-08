@@ -45,7 +45,7 @@ find_library(
 if(Libsigsegv_ROOT)
   # The call to file is for compatibility with windows paths
   file(TO_CMAKE_PATH ${Libsigsegv_ROOT} Libsigsegv_ROOT)
-elseif("$ENV{LIBSIGSEGV_ROOT}")
+elseif(DEFINED ENV{LIBSIGSEGV_ROOT})
   file(TO_CMAKE_PATH $ENV{LIBSIGSEGV_ROOT} Libsigsegv_ROOT)
 else()
   file(TO_CMAKE_PATH "${Libsigsegv_INCLUDE_DIR}" Libsigsegv_INCLUDE_DIR)

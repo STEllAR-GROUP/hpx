@@ -55,7 +55,7 @@ find_library(
 if(Pmi_ROOT)
   # The call to file is for compatibility with windows paths
   file(TO_CMAKE_PATH ${Pmi_ROOT} Pmi_ROOT)
-elseif("$ENV{PMI_ROOT}")
+elseif(DEFINED ENV{PMI_ROOT})
   file(TO_CMAKE_PATH $ENV{PMI_ROOT} Pmi_ROOT)
 else()
   file(TO_CMAKE_PATH "${Pmi_INCLUDE_DIR}" Pmi_INCLUDE_DIR)

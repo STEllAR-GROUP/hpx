@@ -53,7 +53,7 @@ find_library(
 )
 
 # Set Tbbmalloc_ROOT in case the other hints are used
-if(NOT Tbbmalloc_ROOT AND "$ENV{TBBMALLOC_ROOT}")
+if(NOT Tbbmalloc_ROOT AND DEFINED ENV{TBBMALLOC_ROOT})
   set(Tbbmalloc_ROOT $ENV{TBBMALLOC_ROOT})
 elseif(NOT Tbbmalloc_ROOT)
   string(REPLACE "/include" "" Tbbmalloc_ROOT "${Tbbmalloc_INCLUDE_DIR}")
