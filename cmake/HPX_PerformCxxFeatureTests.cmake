@@ -3,6 +3,7 @@
 # Copyright (c) 2013-2016 Agustin Berge
 # Copyright (c)      2017 Taeguk Kwon
 # Copyright (c)      2020 Giannis Gonidelis
+# Copyright (c)      2024 Jacob Tucker
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -36,9 +37,7 @@ function(hpx_perform_cxx_feature_tests)
   )
 
   # Separately check for 128 bit atomics
-  hpx_check_for_cxx11_std_atomic_128bit(
-    DEFINITIONS HPX_HAVE_CXX11_STD_ATOMIC_128BIT
-  )
+  hpx_check_for_cxx11_std_atomic_128bit()
 
   hpx_check_for_cxx11_std_quick_exit(DEFINITIONS HPX_HAVE_CXX11_STD_QUICK_EXIT)
 
