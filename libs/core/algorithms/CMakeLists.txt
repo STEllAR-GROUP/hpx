@@ -23,6 +23,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/accumulate.hpp
     hpx/parallel/algorithms/detail/advance_and_get_distance.hpp
     hpx/parallel/algorithms/detail/advance_to_sentinel.hpp
+    hpx/parallel/algorithms/detail/contains.hpp
     hpx/parallel/algorithms/detail/dispatch.hpp
     hpx/parallel/algorithms/detail/distance.hpp
     hpx/parallel/algorithms/detail/equal.hpp
@@ -103,6 +104,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/adjacent_difference.hpp
     hpx/parallel/container_algorithms/adjacent_find.hpp
     hpx/parallel/container_algorithms/all_any_none.hpp
+    hpx/parallel/container_algorithms/contains.hpp
     hpx/parallel/container_algorithms/copy.hpp
     hpx/parallel/container_algorithms/count.hpp
     hpx/parallel/container_algorithms/destroy.hpp

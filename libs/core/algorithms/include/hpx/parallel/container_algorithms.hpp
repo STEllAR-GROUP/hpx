@@ -11,6 +11,7 @@
 
 #include <hpx/parallel/container_algorithms/adjacent_find.hpp>
 #include <hpx/parallel/container_algorithms/all_any_none.hpp>
+#include <hpx/parallel/container_algorithms/contains.hpp>
 #include <hpx/parallel/container_algorithms/copy.hpp>
 #include <hpx/parallel/container_algorithms/count.hpp>
 #include <hpx/parallel/container_algorithms/ends_with.hpp>

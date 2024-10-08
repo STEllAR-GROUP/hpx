@@ -16,6 +16,8 @@ set(tests
     adjacentfind_exception_range
     all_of_range
     any_of_range
+    contains_range
+    contains_subrange_range
     copy_range
     copyn_range
     copyif_range
