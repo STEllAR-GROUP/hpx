@@ -560,8 +560,8 @@ namespace hpx::threads::policies {
 
             num_thread = select_active_pu(num_thread);
 
-            data.schedulehint.mode = thread_schedule_hint_mode::thread;
-            data.schedulehint.hint = static_cast<std::int16_t>(num_thread);
+            data.schedulehint.schedule_hint(
+                static_cast<std::int16_t>(num_thread));
 
             // now create the thread
             switch (data.priority)

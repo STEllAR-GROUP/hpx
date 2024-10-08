@@ -104,7 +104,7 @@ namespace hpx::parallel::execution::detail {
             if (allow_stealing)
             {
                 // Then steal from the opposite end of the neighboring queues
-                static constexpr auto opposite_end =
+                constexpr auto opposite_end =
                     hpx::concurrency::detail::opposite_end_v<Which>;
 
                 for (std::uint32_t offset = 1; offset != state->num_threads;
@@ -150,7 +150,7 @@ namespace hpx::parallel::execution::detail {
         // Finish the work for one worker thread. If this is not the last worker
         // thread to finish, it will only decrement the counter. If it is the
         // last thread it will call set_exception if there is an exception.
-        // Otherwise it will call set_value on the shared state.
+        // Otherwise, it will call set_value on the shared state.
         void finish() const
         {
             if (--(state->tasks_remaining.data_) == 0)
@@ -338,8 +338,7 @@ namespace hpx::parallel::execution::detail {
                 hint.hint == -1)
             {
                 // apply hint if none was given
-                hint.mode = hpx::threads::thread_schedule_hint_mode::thread;
-                hint.hint = worker_thread + first_thread;
+                hint.schedule_hint(worker_thread + first_thread);
 
                 hpx::detail::post_policy_dispatch<Launch>::call(
                     hpx::execution::experimental::with_hint(post_policy, hint),
