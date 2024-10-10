@@ -142,7 +142,7 @@ namespace hpx::compute::host {
         /// \returns A future holding the list of global addresses which
         ///          represent the newly created objects
         ///
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         hpx::future<std::vector<bulk_locality_result>> bulk_create(
             [[maybe_unused]] std::size_t count,
             [[maybe_unused]] Ts&&... ts) const
@@ -183,8 +183,9 @@ namespace hpx::compute::host {
                 }
 
                 objs.push_back(
-                    components::bulk_create_async<Component>(localities.back(),
-                        num_partitions, ts..., HPX_MOVE(local_targets)));
+                    components::bulk_create_async<WithCount, Component>(
+                        localities.back(), num_partitions, ts...,
+                        HPX_MOVE(local_targets)));
             }
 
             return hpx::dataflow(

@@ -46,7 +46,7 @@ namespace hpx::util {
         char const* nanobench_hpx_simple_template() noexcept
         {
             return R"DELIM(Results:
-{{#result}}        
+{{#result}}
 name: {{name}},
 executor: {{context(executor)}},
 average: {{average(elapsed)}}{{^-last}}
@@ -238,7 +238,7 @@ average: {{average(elapsed)}}{{^-last}}
         using timer = std::chrono::high_resolution_clock;
         for (std::size_t i = 0; i != steps; ++i)
         {
-            // For now we don't flush the cache
+            // For now, we don't flush the cache
             //flush_cache();
             timer::time_point start = timer::now();
             test();

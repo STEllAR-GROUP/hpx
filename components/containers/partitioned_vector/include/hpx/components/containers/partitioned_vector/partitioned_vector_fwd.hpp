@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Anuj R. Sharma
-//  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c) 2014-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,24 +12,28 @@
 
 #include <vector>
 
-namespace hpx
-{
+namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Data = std::vector<T>>
     class partitioned_vector;
 
     namespace segmented {
 
-        template <typename T, typename Data> class local_vector_iterator;
-        template <typename T, typename Data> class const_local_vector_iterator;
+        template <typename T, typename Data>
+        class local_vector_iterator;
+        template <typename T, typename Data>
+        class const_local_vector_iterator;
 
         template <typename T, typename Data, typename BaseIter>
         class local_raw_vector_iterator;
         template <typename T, typename Data, typename BaseIter>
         class const_local_raw_vector_iterator;
 
-        template <typename T, typename Data> class vector_iterator;
-        template <typename T, typename Data> class const_vector_iterator;
+        template <typename T, typename Data>
+        class vector_iterator;
+        template <typename T, typename Data>
+        class const_vector_iterator;
 
         template <typename T, typename Data, typename BaseIter>
         class segment_vector_iterator;
@@ -38,15 +42,14 @@ namespace hpx
 
         template <typename T, typename Data, typename BaseIter>
         class local_segment_vector_iterator;
-    }
+    }    // namespace segmented
 
-    namespace server
-    {
+    namespace server {
+
         template <typename T, typename Data = std::vector<T>>
         class partitioned_vector;
 
         template <typename T, typename Data = std::vector<T>>
         class partitioned_vector_partition;
-    }
-}
-
+    }    // namespace server
+}    // namespace hpx

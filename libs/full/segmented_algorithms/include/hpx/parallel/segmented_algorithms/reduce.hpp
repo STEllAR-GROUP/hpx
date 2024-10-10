@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Ajai V George
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -226,7 +226,7 @@ namespace hpx { namespace segmented {
     template <typename ExPolicy, typename InIterB, typename InIterE,
         typename T, typename F,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator<InIterB>::value &&
             hpx::traits::is_segmented_iterator<InIterB>::value &&
             hpx::traits::is_iterator<InIterE>::value &&
