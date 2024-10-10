@@ -26,7 +26,7 @@ namespace hpx::parallel::util {
         struct unseq_loop_n
         {
             template <typename InIter, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr InIter call(
+            HPX_HOST_DEVICE HPX_FORCEINLINE static InIter call(
                 InIter HPX_RESTRICT it, std::size_t num, F&& f)
             {
                 // clang-format off
@@ -135,10 +135,9 @@ namespace hpx::parallel::util {
         struct unseq_loop2
         {
             template <typename InIter1, typename InIter2, typename F>
-            HPX_HOST_DEVICE
-                HPX_FORCEINLINE static constexpr std::pair<InIter1, InIter2>
-                call(InIter1 HPX_RESTRICT it1, InIter1 HPX_RESTRICT last1,
-                    InIter2 HPX_RESTRICT it2, F&& f)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter1, InIter2>
+            call(InIter1 HPX_RESTRICT it1, InIter1 HPX_RESTRICT last1,
+                InIter2 HPX_RESTRICT it2, F&& f)
             {
                 constexpr bool iterators_are_random_access =
                     hpx::traits::is_random_access_iterator_v<InIter1> &&
@@ -216,19 +215,18 @@ namespace hpx::parallel::util {
 
                     // clang-format off
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                    for (std::size_t i = 0; i < count;
-                         (void) ++it, i += 4)    // -V112
+                    for (std::size_t i = 0; i < count; i += 4)    // -V112
                     {
-                        HPX_INVOKE(f, it);
-                        HPX_INVOKE(f, ++it);
-                        HPX_INVOKE(f, ++it);
-                        HPX_INVOKE(f, ++it);
+                        HPX_INVOKE(f, it++);
+                        HPX_INVOKE(f, it++);
+                        HPX_INVOKE(f, it++);
+                        HPX_INVOKE(f, it++);
                     }
 
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                    for (/**/; count < num; (void) ++count, ++it)
+                    for (std::size_t i = count; i < num; ++i)
                     {
-                        HPX_INVOKE(f, it);
+                        HPX_INVOKE(f, it++);
                     }
                     // clang-format on
 
@@ -256,19 +254,18 @@ namespace hpx::parallel::util {
 
                     // clang-format off
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                    for (std::size_t i = 0; i < count; (void) ++it, ++dest,
-                                     i += 4)    // -V112
+                    for (std::size_t i = 0; i < count; i += 4)    // -V112
                     {
-                        HPX_INVOKE(f, it, dest);
-                        HPX_INVOKE(f, ++it, ++dest);
-                        HPX_INVOKE(f, ++it, ++dest);
-                        HPX_INVOKE(f, ++it, ++dest);
+                        HPX_INVOKE(f, it++, dest++);
+                        HPX_INVOKE(f, it++, dest++);
+                        HPX_INVOKE(f, it++, dest++);
+                        HPX_INVOKE(f, it++, dest++);
                     }
 
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                    for (/**/; count < num; (void) ++count, ++it, ++dest)
+                    for (std::size_t i = count; i < num; ++i)
                     {
-                        HPX_INVOKE(f, it, dest);
+                        HPX_INVOKE(f, it++, dest++);
                     }
                     //clang-format on
 
