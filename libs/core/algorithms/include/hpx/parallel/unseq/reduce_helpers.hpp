@@ -85,7 +85,7 @@ namespace hpx::parallel::util::detail {
     {
 #if defined(HPX_HAVE_VECTOR_REDUCTION)
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_arithmetic_plus_reduction_v<T, Reduce>, T>
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
@@ -99,7 +99,7 @@ namespace hpx::parallel::util::detail {
         }
 
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_arithmetic_minus_reduction_v<T, Reduce>, T>
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
@@ -113,7 +113,7 @@ namespace hpx::parallel::util::detail {
         }
 
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_arithmetic_multiplies_reduction_v<T, Reduce>, T>
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
@@ -127,7 +127,7 @@ namespace hpx::parallel::util::detail {
         }
 
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_arithmetic_bit_and_reduction_v<T, Reduce>, T>
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
@@ -141,7 +141,7 @@ namespace hpx::parallel::util::detail {
         }
 
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_arithmetic_bit_or_reduction_v<T, Reduce>, T>
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
@@ -155,7 +155,7 @@ namespace hpx::parallel::util::detail {
         }
 
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_arithmetic_bit_xor_reduction_v<T, Reduce>, T>
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
@@ -169,7 +169,7 @@ namespace hpx::parallel::util::detail {
         }
 
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_arithmetic_logical_and_reduction_v<T, Reduce>, T>
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
@@ -183,7 +183,7 @@ namespace hpx::parallel::util::detail {
         }
 
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_arithmetic_logical_or_reduction_v<T, Reduce>, T>
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
@@ -197,7 +197,7 @@ namespace hpx::parallel::util::detail {
         }
 #endif
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_not_omp_reduction_v<T, Reduce>, T>
         reduce(Iter1 it, std::size_t count, T init, Reduce r, Convert conv)
         {
@@ -274,7 +274,7 @@ namespace hpx::parallel::util::detail {
 #if defined(HPX_HAVE_VECTOR_REDUCTION)
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_arithmetic_plus_reduction_v<T, Reduce>, T>
         reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
             Convert conv)
@@ -290,7 +290,7 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_arithmetic_minus_reduction_v<T, Reduce>, T>
         reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
             Convert conv)
@@ -306,7 +306,7 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_arithmetic_multiplies_reduction_v<T, Reduce>, T>
         reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
             Convert conv)
@@ -322,7 +322,7 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_arithmetic_bit_and_reduction_v<T, Reduce>, T>
         reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
             Convert conv)
@@ -338,7 +338,7 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_arithmetic_bit_or_reduction_v<T, Reduce>, T>
         reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
             Convert conv)
@@ -370,7 +370,7 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_arithmetic_logical_and_reduction_v<T, Reduce>, T>
         reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
             Convert conv)
@@ -386,7 +386,7 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_arithmetic_logical_or_reduction_v<T, Reduce>, T>
         reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
             Convert conv)
@@ -402,7 +402,7 @@ namespace hpx::parallel::util::detail {
 #endif
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
             is_not_omp_reduction_v<T, Reduce>, T>
         reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce r,
             Convert conv)
