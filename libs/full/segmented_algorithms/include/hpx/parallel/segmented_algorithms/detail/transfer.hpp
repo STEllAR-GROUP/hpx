@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -26,10 +26,12 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel {
+namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // segmented transfer
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         /// \cond NOINTERNAL
 
@@ -41,20 +43,19 @@ namespace hpx { namespace parallel {
         segmented_transfer(Algo&& algo, ExPolicy const& policy, std::true_type,
             SegIter first, SegIter last, SegOutIter dest)
         {
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
+            using traits = hpx::traits::segmented_iterator_traits<SegIter>;
+            using segment_iterator = typename traits::segment_iterator;
+            using local_iterator_type = typename traits::local_iterator;
 
-            typedef hpx::traits::segmented_iterator_traits<SegOutIter>
-                output_traits;
-            typedef typename output_traits::segment_iterator
-                segment_output_iterator;
-            typedef typename output_traits::local_iterator
-                local_output_iterator_type;
+            using output_traits =
+                hpx::traits::segmented_iterator_traits<SegOutIter>;
+            using segment_output_iterator =
+                typename output_traits::segment_iterator;
+            using local_output_iterator_type =
+                typename output_traits::local_iterator;
 
-            typedef util::in_out_result<local_iterator_type,
-                local_output_iterator_type>
-                local_iterator_pair;
+            using local_iterator_pair = util::in_out_result<local_iterator_type,
+                local_output_iterator_type>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -90,7 +91,7 @@ namespace hpx { namespace parallel {
                     out = p.out;
                 }
 
-                // handle all of the full partitions
+                // handle all full partitions
                 for ((void) ++sit, ++sdest; sit != send; (void) ++sit, ++sdest)
                 {
                     beg = traits::begin(sit);
@@ -133,24 +134,22 @@ namespace hpx { namespace parallel {
         segmented_transfer(Algo&& algo, ExPolicy const& policy, std::false_type,
             SegIter first, SegIter last, SegOutIter dest)
         {
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
+            using traits = hpx::traits::segmented_iterator_traits<SegIter>;
+            using segment_iterator = typename traits::segment_iterator;
+            using local_iterator_type = typename traits::local_iterator;
 
-            typedef hpx::traits::segmented_iterator_traits<SegOutIter>
-                output_traits;
-            typedef typename output_traits::segment_iterator
-                segment_output_iterator;
-            typedef typename output_traits::local_iterator
-                local_output_iterator_type;
+            using output_traits =
+                hpx::traits::segmented_iterator_traits<SegOutIter>;
+            using segment_output_iterator =
+                typename output_traits::segment_iterator;
+            using local_output_iterator_type =
+                typename output_traits::local_iterator;
 
-            typedef util::in_out_result<local_iterator_type,
-                local_output_iterator_type>
-                local_iterator_pair;
+            using local_iterator_pair = util::in_out_result<local_iterator_type,
+                local_output_iterator_type>;
 
-            typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<SegIter>::value>
-                forced_seq;
+            using forced_seq = std::integral_constant<bool,
+                !hpx::traits::is_forward_iterator<SegIter>::value>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -185,7 +184,7 @@ namespace hpx { namespace parallel {
                         policy, forced_seq(), beg, end, out));
                 }
 
-                // handle all of the full partitions
+                // handle all full partitions
                 for ((void) ++sit, ++sdest; sit != send; (void) ++sit, ++sdest)
                 {
                     beg = traits::begin(sit);
@@ -250,7 +249,7 @@ namespace hpx { namespace parallel {
                     result_type>::get(result_type{last, dest});
             }
 
-            typedef hpx::is_sequenced_execution_policy<ExPolicy> is_seq;
+            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
             return segmented_transfer(Algo(), HPX_FORWARD(ExPolicy, policy),
                 is_seq(), first, last, dest);
         }
@@ -265,4 +264,4 @@ namespace hpx { namespace parallel {
 
         /// \endcond
     }    // namespace detail
-}}       // namespace hpx::parallel
+}    // namespace hpx::parallel
