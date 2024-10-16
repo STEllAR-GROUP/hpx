@@ -15,9 +15,9 @@ module load openmpi
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="20"
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+export CXXFLAGS="-fopenmp ${CXXFLAGS}"
 
 configure_extra_options+=" -DHPX_WITH_CXX_STANDARD=${CXX_STD}"
-configure_extra_options+=" -DCMAKE_CXX_FLAGS=-fopenmp"
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"
 configure_extra_options+=" -DHPX_WITH_FETCH_ASIO=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
