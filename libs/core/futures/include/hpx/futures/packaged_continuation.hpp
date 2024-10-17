@@ -13,6 +13,7 @@
 #include <hpx/allocator_support/thread_local_caching_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/concurrency/stack.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
@@ -583,7 +584,8 @@ namespace hpx::lcos::detail {
     traits::detail::shared_state_ptr_t<future_unwrap_result_t<Future>> unwrap(
         Future&& future, error_code& ec)
     {
-        using allocator_type = hpx::util::thread_local_caching_allocator<char,
+        using allocator_type = hpx::util::thread_local_caching_allocator<
+            hpx::lockfree::variable_size_stack, char,
             hpx::util::internal_allocator<>>;
         return unwrap_impl_alloc(
             allocator_type{}, HPX_FORWARD(Future, future), ec);

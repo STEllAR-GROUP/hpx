@@ -10,8 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/bind_front.hpp>
+#include <hpx/static_reinit/static_reinit.hpp>
 #include <hpx/type_support/construct_at.hpp>
-#include <hpx/type_support/static_reinit_interface.hpp>
 
 #include <cstddef>
 #include <memory>    // for placement new
@@ -77,7 +77,7 @@ namespace hpx::util {
         static void default_constructor()
         {
             default_construct();
-            util::reinit_register(&reinitializable_static::default_construct,
+            reinit_register(&reinitializable_static::default_construct,
                 &reinitializable_static::destruct);
         }
 
@@ -85,7 +85,7 @@ namespace hpx::util {
         static void value_constructor(U const* pv)
         {
             value_construct(*pv);
-            util::reinit_register(
+            reinit_register(
                 hpx::bind_front(
                     &reinitializable_static::value_construct<U>, *pv),
                 &reinitializable_static::destruct);

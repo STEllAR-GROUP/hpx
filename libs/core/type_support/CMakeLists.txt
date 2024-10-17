@@ -5,10 +5,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(type_support_headers
-    hpx/type_support/detail/static_reinit_functions.hpp
     hpx/type_support/detail/with_result_of.hpp
     hpx/type_support/detail/wrap_int.hpp
-    hpx/type_support/static_reinit_interface.hpp
     hpx/type_support/assert_owns_lock.hpp
     hpx/type_support/bit_cast.hpp
     hpx/type_support/construct_at.hpp
@@ -58,9 +56,7 @@ set(type_support_compat_headers
 )
 # cmake-format: on
 
-set(type_support_sources detail/static_reinit_functions.cpp
-                         static_reinit_interface.cpp
-)
+set(type_support_sources)
 
 include(HPX_AddModule)
 add_hpx_module(

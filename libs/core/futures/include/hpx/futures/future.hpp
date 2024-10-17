@@ -18,6 +18,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/concurrency/stack.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/experimental/scope_exit.hpp>
@@ -378,13 +379,14 @@ namespace hpx::lcos::detail {
         template <typename F>
         static auto then(Derived&& fut, F&& f, error_code& ec = throws)
             -> decltype(future_then_dispatch<std::decay_t<F>>::call_alloc(
-                hpx::util::thread_local_caching_allocator<char,
+                hpx::util::thread_local_caching_allocator<
+                    hpx::lockfree::variable_size_stack, char,
                     hpx::util::internal_allocator<>>{},
                 HPX_MOVE(fut), HPX_FORWARD(F, f)))
         {
-            using allocator_type =
-                hpx::util::thread_local_caching_allocator<char,
-                    hpx::util::internal_allocator<>>;
+            using allocator_type = hpx::util::thread_local_caching_allocator<
+                hpx::lockfree::variable_size_stack, char,
+                hpx::util::internal_allocator<>>;
 
             using result_type =
                 decltype(future_then_dispatch<std::decay_t<F>>::call_alloc(
@@ -404,13 +406,14 @@ namespace hpx::lcos::detail {
         template <typename F, typename T0>
         static auto then(Derived&& fut, T0&& t0, F&& f, error_code& ec = throws)
             -> decltype(future_then_dispatch<std::decay_t<T0>>::call_alloc(
-                hpx::util::thread_local_caching_allocator<char,
+                hpx::util::thread_local_caching_allocator<
+                    hpx::lockfree::variable_size_stack, char,
                     hpx::util::internal_allocator<>>{},
                 HPX_MOVE(fut), HPX_FORWARD(T0, t0), HPX_FORWARD(F, f)))
         {
-            using allocator_type =
-                hpx::util::thread_local_caching_allocator<char,
-                    hpx::util::internal_allocator<>>;
+            using allocator_type = hpx::util::thread_local_caching_allocator<
+                hpx::lockfree::variable_size_stack, char,
+                hpx::util::internal_allocator<>>;
 
             using result_type =
                 decltype(future_then_dispatch<std::decay_t<T0>>::call_alloc(
@@ -1246,7 +1249,8 @@ namespace hpx {
         std::is_constructible_v<T, Ts&&...> || std::is_void_v<T>, future<T>>
     make_ready_future(Ts&&... ts)
     {
-        using allocator_type = hpx::util::thread_local_caching_allocator<char,
+        using allocator_type = hpx::util::thread_local_caching_allocator<
+            hpx::lockfree::variable_size_stack, char,
             hpx::util::internal_allocator<>>;
         return make_ready_future_alloc<T>(
             allocator_type{}, HPX_FORWARD(Ts, ts)...);
@@ -1270,7 +1274,8 @@ namespace hpx {
     HPX_FORCEINLINE future<hpx::util::decay_unwrap_t<T>> make_ready_future(
         T&& init)
     {
-        using allocator_type = hpx::util::thread_local_caching_allocator<char,
+        using allocator_type = hpx::util::thread_local_caching_allocator<
+            hpx::lockfree::variable_size_stack, char,
             hpx::util::internal_allocator<>>;
         return hpx::make_ready_future_alloc<hpx::util::decay_unwrap_t<T>>(
             allocator_type{}, HPX_FORWARD(T, init));
@@ -1351,7 +1356,8 @@ namespace hpx {
     // extension: create a pre-initialized future object
     HPX_FORCEINLINE future<void> make_ready_future()
     {
-        using allocator_type = hpx::util::thread_local_caching_allocator<char,
+        using allocator_type = hpx::util::thread_local_caching_allocator<
+            hpx::lockfree::variable_size_stack, char,
             hpx::util::internal_allocator<>>;
         return make_ready_future_alloc<void>(allocator_type{}, util::unused);
     }
@@ -1593,7 +1599,8 @@ namespace hpx::lcos {
     std::enable_if_t<std::is_constructible_v<T, Ts&&...> || std::is_void_v<T>,
         hpx::future<T>> make_ready_future(Ts&&... ts)
     {
-        using allocator_type = hpx::util::thread_local_caching_allocator<char,
+        using allocator_type = hpx::util::thread_local_caching_allocator<
+            hpx::lockfree::variable_size_stack, char,
             hpx::util::internal_allocator<>>;
         return hpx::make_ready_future_alloc<T>(
             allocator_type{}, HPX_FORWARD(Ts, ts)...);
@@ -1616,7 +1623,8 @@ namespace hpx::lcos {
         "hpx::make_ready_future instead.")
     hpx::future<hpx::util::decay_unwrap_t<T>> make_ready_future(T&& init)
     {
-        using allocator_type = hpx::util::thread_local_caching_allocator<char,
+        using allocator_type = hpx::util::thread_local_caching_allocator<
+            hpx::lockfree::variable_size_stack, char,
             hpx::util::internal_allocator<>>;
         return hpx::make_ready_future_alloc<hpx::util::decay_unwrap_t<T>>(
             allocator_type{}, HPX_FORWARD(T, init));
@@ -1675,7 +1683,8 @@ namespace hpx::lcos {
         "hpx::make_ready_future instead.")
     inline hpx::future<void> make_ready_future()
     {
-        using allocator_type = hpx::util::thread_local_caching_allocator<char,
+        using allocator_type = hpx::util::thread_local_caching_allocator<
+            hpx::lockfree::variable_size_stack, char,
             hpx::util::internal_allocator<>>;
         return hpx::make_ready_future_alloc<void>(
             allocator_type{}, util::unused);

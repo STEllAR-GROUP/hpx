@@ -38,7 +38,6 @@
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/static_reinit/static_reinit.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>
 #include <hpx/threading/thread.hpp>
@@ -407,9 +406,6 @@ namespace hpx {
                     &hpx::detail::get_pu_mask);
                 hpx::parallel::execution::detail::set_get_os_thread_count(
                     []() { return hpx::get_os_thread_count(); });
-
-                // instantiate the interface function initialization objects
-                util::static_reinit_init();
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
                 unsetenv("LANG");

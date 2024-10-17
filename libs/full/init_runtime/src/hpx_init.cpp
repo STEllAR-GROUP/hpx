@@ -48,7 +48,6 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/static_reinit/static_reinit.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>
 #include <hpx/threading/thread.hpp>
@@ -819,7 +818,6 @@ namespace hpx {
             agas::runtime_components_init();
             components::counter_init();
 #endif
-            util::static_reinit_init();
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
             unsetenv("LANG");
