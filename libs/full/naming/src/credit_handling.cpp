@@ -615,6 +615,9 @@ namespace hpx::naming {
                     "client instead");
             }
 
+            using preprocess_gid_types =
+                serialization::detail::preprocess_gid_types;
+
             gid_type new_gid;
             if (hpx::id_type::management_type::unmanaged == type)
             {
@@ -628,16 +631,15 @@ namespace hpx::naming {
             }
             else
             {
-                auto& split_gids = ar.get_extra_data<
-                    serialization::detail::preprocess_gid_types>();
+                auto& split_gids = ar.get_extra_data<preprocess_gid_types>();
 
                 new_gid = split_gids.get_new_gid(id_impl);
                 HPX_ASSERT(new_gid != invalid_gid);
             }
 
 #if defined(HPX_DEBUG)
-            auto const* split_gids = ar.try_get_extra_data<
-                serialization::detail::preprocess_gid_types>();
+            auto const* split_gids =
+                ar.try_get_extra_data<preprocess_gid_types>();
             HPX_ASSERT(!split_gids || !split_gids->has_gid(id_impl));
 #endif
 

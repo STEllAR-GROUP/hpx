@@ -79,11 +79,11 @@ namespace hpx::components {
             std::vector<hpx::id_type> const& localities_;
         };
 
-        template <typename Component>
+        template <bool WithCount, typename Component>
         struct create_bulk_helper
         {
-            typedef std::pair<hpx::id_type, std::vector<hpx::id_type>>
-                bulk_locality_result;
+            using bulk_locality_result =
+                std::pair<hpx::id_type, std::vector<hpx::id_type>>;
 
             explicit create_bulk_helper(
                 std::vector<hpx::id_type> const& localities)
@@ -102,10 +102,23 @@ namespace hpx::components {
                 std::vector<hpx::future<std::vector<hpx::id_type>>> objs;
                 objs.reserve(localities_.size());
 
+                [[maybe_unused]] std::size_t first = 0;
                 for (std::size_t i = 0; i != to_create.size(); ++i)
                 {
-                    objs.emplace_back(bulk_create_async<Component>(
-                        localities_[i], to_create[i], vs...));
+                    if constexpr (WithCount)
+                    {
+                        std::size_t const local_count = to_create[i];
+                        objs.emplace_back(
+                            bulk_create_async<WithCount, Component>(
+                                localities_[i], local_count, vs...));
+                        first += local_count;
+                    }
+                    else
+                    {
+                        objs.emplace_back(
+                            bulk_create_async<WithCount, Component>(
+                                localities_[i], to_create[i], vs...));
+                    }
                 }
 
                 // consolidate all results
@@ -238,7 +251,7 @@ namespace hpx::components {
                     naming::get_id_from_locality_id(agas::get_locality_id()),
                     HPX_FORWARD(Ts, vs)...);
             }
-            else if (localities_.size() == 1)
+            if (localities_.size() == 1)
             {
                 return create_async<Component>(
                     localities_.front(), HPX_FORWARD(Ts, vs)...);
@@ -269,7 +282,7 @@ namespace hpx::components {
         /// \returns A future holding the list of global addresses which
         ///          represent the newly created objects
         ///
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         hpx::future<std::vector<bulk_locality_result>> bulk_create(
             std::size_t count, Ts&&... vs) const
         {
@@ -281,8 +294,9 @@ namespace hpx::components {
                         counter_name_, localities_);
 
                 return values.then(hpx::bind_back(
-                    detail::create_bulk_helper<Component>(localities_), count,
-                    HPX_FORWARD(Ts, vs)...));
+                    detail::create_bulk_helper<WithCount, Component>(
+                        localities_),
+                    count, HPX_FORWARD(Ts, vs)...));
             }
 
             // handle special cases
@@ -291,7 +305,8 @@ namespace hpx::components {
                 localities_.front();
 
             hpx::future<std::vector<hpx::id_type>> f =
-                bulk_create_async<Component>(id, count, HPX_FORWARD(Ts, vs)...);
+                bulk_create_async<WithCount, Component>(
+                    id, count, HPX_FORWARD(Ts, vs)...);
 
             return f.then(hpx::launch::sync,
                 [id = HPX_MOVE(id)](hpx::future<std::vector<hpx::id_type>>&& f)

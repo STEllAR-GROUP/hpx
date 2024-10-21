@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Ajai V George
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,20 +20,18 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <exception>
 #include <iterator>
-#include <list>
-#include <numeric>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { namespace detail {
+namespace hpx::parallel::detail {
+
     template <typename T>
-    struct seg_reduce : public detail::algorithm<seg_reduce<T>, T>
+    struct seg_reduce : algorithm<seg_reduce<T>, T>
     {
         seg_reduce()
-          : seg_reduce::algorithm("reduce")
+          : algorithm<seg_reduce<T>, T>("reduce")
         {
         }
 
@@ -64,11 +62,10 @@ namespace hpx { namespace parallel { namespace detail {
     };
 
     template <typename T>
-    struct seg_transform_reduce
-      : public detail::algorithm<seg_transform_reduce<T>, T>
+    struct seg_transform_reduce : algorithm<seg_transform_reduce<T>, T>
     {
         seg_transform_reduce()
-          : seg_transform_reduce::algorithm("transform_reduce")
+          : algorithm<seg_transform_reduce<T>, T>("transform_reduce")
         {
         }
 
@@ -112,10 +109,10 @@ namespace hpx { namespace parallel { namespace detail {
 
     template <typename T>
     struct seg_transform_reduce_binary
-      : public detail::algorithm<seg_transform_reduce_binary<T>, T>
+      : algorithm<seg_transform_reduce_binary<T>, T>
     {
         seg_transform_reduce_binary()
-          : seg_transform_reduce_binary::algorithm("transform_reduce_binary")
+          : algorithm<seg_transform_reduce_binary, T>("transform_reduce_binary")
         {
         }
 
@@ -134,7 +131,8 @@ namespace hpx { namespace parallel { namespace detail {
         parallel(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, Reduce&& r, Convert&& conv)
         {
-            typedef hpx::util::zip_iterator<FwdIter1, FwdIter2> zip_iterator;
+            using zip_iterator = hpx::util::zip_iterator<FwdIter1, FwdIter2>;
+
             return util::partitioner<ExPolicy, T>::call(
                 HPX_FORWARD(ExPolicy, policy), zip_iterator(first1, first2),
                 std::distance(first1, last1),
@@ -155,4 +153,4 @@ namespace hpx { namespace parallel { namespace detail {
                 }));
         }
     };
-}}}    // namespace hpx::parallel::detail
+}    // namespace hpx::parallel::detail
