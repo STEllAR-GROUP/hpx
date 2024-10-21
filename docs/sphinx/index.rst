@@ -6,9 +6,11 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-===================================
+===================
+|hpx| documentation
+===================
+
 Welcome to the |hpx| documentation!
-===================================
 
 If you're new to |hpx| you can get started with the :ref:`quickstart` guide.
 Don't forget to read the :ref:`terminology` section to learn about the most

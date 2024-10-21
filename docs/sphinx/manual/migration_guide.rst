@@ -200,7 +200,7 @@ Reduction
     });
 
 
-The reduction clause specifies that the variable `s`` should be reduced across iterations using the `plus<>`` operation.
+The reduction clause specifies that the variable `s` should be reduced across iterations using the `plus<>` operation.
 It initializes `s` to `0` at the beginning of the loop and accumulates the values of `s` from each iteration using the
 `+` operator. The lambda function representing the loop body takes two parameters: `i`, which represents the loop index,
 and `accum`, which is the reduction variable `s`. The lambda function is executed for each iteration of the loop.
@@ -649,7 +649,7 @@ its execution, you can simply remove the `wait()` function.
     // synchronization: wait for both sections to complete
     hpx::wait_all(future_section1, future_section2);
 
-Unlike tasks, there is an implicit synchronization barrier at the end of each `sections``
+Unlike tasks, there is an implicit synchronization barrier at the end of each `sections`
 directive in |openmp|. This synchronization is achieved using :cpp:func:`hpx::wait_all` function.
 
 .. note::
@@ -727,8 +727,8 @@ parallel_for_each
         // loop body
     });
 
-By utilizing :cpp:func:`hpx::for_each`` and specifying a parallel execution policy with
-`hpx::execution::par`, it is possible to transform `tbb::parallel_for_each`` into its
+By utilizing :cpp:func:`hpx::for_each` and specifying a parallel execution policy with
+`hpx::execution::par`, it is possible to transform `tbb::parallel_for_each` into its
 equivalent counterpart in |hpx|.
 
 parallel_invoke
@@ -881,7 +881,7 @@ Reduction
         hpx::execution::par, values.begin(), values.end(), 0, std::plus{});
 
 By utilizing :cpp:func:`hpx::reduce` and specifying a parallel execution policy with
-`hpx::execution::par`, it is possible to transform `tbb::parallel_reduce`` into its
+`hpx::execution::par`, it is possible to transform `tbb::parallel_reduce` into its
 equivalent counterpart in |hpx|. As demonstrated in the previous example, the management
 of intermediate results is seamlessly handled internally by |hpx|, eliminating the need
 for explicit consideration.
