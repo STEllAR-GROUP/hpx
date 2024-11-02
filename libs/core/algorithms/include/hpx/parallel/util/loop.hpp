@@ -58,14 +58,14 @@ namespace hpx::parallel::util {
                 HPX_CONCEPT_REQUIRES_(    // forces hpx::execution::unseq
                     hpx::is_unsequenced_execution_policy_v<ExPolicy> &&
                     !hpx::is_parallel_execution_policy_v<ExPolicy>)>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
+            HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
                 ExPolicy&&, Begin it, End end, F&& f)
             {
                 // clang-format off
                 HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                for (/**/; it != end; ++it)
+                for (Begin& iter = it; iter != end; ++iter)
                 {
-                    HPX_INVOKE(f, it);
+                    HPX_INVOKE(f, iter);
                 }
                 // clang-format on
 
@@ -695,8 +695,9 @@ namespace hpx::parallel::util {
                 {
                     // clang-format off
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                    for (/**/; it != last; (void) ++it)
-                        HPX_INVOKE(f, it);
+                    for (FwdIter& iter = it; iter != last; ++iter){
+                        HPX_INVOKE(f, iter);
+                    }
                     // clang-format on
 
                     return it;
@@ -721,8 +722,8 @@ namespace hpx::parallel::util {
                 {
                     // clang-format off
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                    for (/**/; it != last; (void) ++it, ++dest)
-                        f(it, dest);
+                    for (Iter& iter = it; iter != last; ++iter)
+                        f(iter, dest++);
                     // clang-format on
 
                     return dest;
@@ -913,16 +914,15 @@ namespace hpx::parallel::util {
 
                     // clang-format off
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                    for (std::size_t i = 0; i < count;
-                         (void) ++it, ++dest, ++i)    // -V112
+                    for (std::size_t i = 0; i < count; ++i)    // -V112
                     {
-                        HPX_INVOKE(f, it, dest);
+                        HPX_INVOKE(f, it++, dest++);
                     }
 
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                    for (/**/; count < num; (void) ++count, ++it, ++dest)
+                    for (std::size_t i = count; i < num; ++i)
                     {
-                        HPX_INVOKE(f, it, dest);
+                        HPX_INVOKE(f, it++, dest++);
                     }
                     // clang-format on
 
@@ -950,16 +950,15 @@ namespace hpx::parallel::util {
 
                     // clang-format off
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                    for (std::size_t i = 0; i < count;
-                         (void) ++it, ++i)    // -V112
+                    for (std::size_t i = 0; i < count; ++i)    // -V112
                     {
-                        HPX_INVOKE(f, it);
+                        HPX_INVOKE(f, it++);
                     }
 
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                    for (/**/; count < num; (void) ++count, ++it)
+                    for (std::size_t i = count; i < num; ++i)
                     {
-                        HPX_INVOKE(f, it);
+                        HPX_INVOKE(f, it++);
                     }
                     // clang-format on
 
