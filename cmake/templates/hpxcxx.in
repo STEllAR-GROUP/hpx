@@ -1,5 +1,6 @@
 #! @Python_EXECUTABLE@
 #
+# Copyright (c) 2020-@HPX_COPYRIGHT_YEAR@ STE||AR Group
 # Copyright (c) 2014 Steven R. Brandt
 #
 # SPDX-License-Identifier: BSL-1.0
