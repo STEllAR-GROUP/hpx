@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //  Copyright (c) 2017 Denis Blank
 //
@@ -131,6 +131,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/allocator_support/thread_local_caching_allocator.hpp>
+#include <hpx/concurrency/stack.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/detail/future_data.hpp>
@@ -201,14 +202,16 @@ namespace hpx::lcos::detail {
             return async_visit_future(HPX_FORWARD(T, current));
         }
 
+        // clang-format off
         template <typename T, typename N>
         auto operator()(hpx::util::async_traverse_detach_tag, T&& current,
             N&& next) -> decltype(async_detach_future(HPX_FORWARD(T, current),
-            HPX_FORWARD(N, next)))
+                          HPX_FORWARD(N, next)))
         {
             return async_detach_future(
                 HPX_FORWARD(T, current), HPX_FORWARD(N, next));
         }
+        // clang-format on
 
         template <typename T>
         void operator()(hpx::util::async_traverse_complete_tag, T&& pack)
@@ -226,7 +229,8 @@ namespace hpx::lcos::detail {
         using frame_type = async_when_all_frame<result_type>;
         using no_addref = typename frame_type::base_type::init_no_addref;
 
-        using allocator_type = hpx::util::thread_local_caching_allocator<char,
+        using allocator_type = hpx::util::thread_local_caching_allocator<
+            hpx::lockfree::variable_size_stack, char,
             hpx::util::internal_allocator<>>;
         auto frame = hpx::util::traverse_pack_async_allocator(allocator_type{},
             hpx::util::async_traverse_in_place_tag<frame_type>{}, no_addref{},
