@@ -47,7 +47,7 @@ else()
       execute_process(
         COMMAND
           sh -c
-          "cd ${FETCHCONTENT_BASE_DIR}/hwloc-src && ./configure --prefix=${FETCHCONTENT_BASE_DIR}/hwloc-installed && make -j && make install"
+          "cd ${FETCHCONTENT_BASE_DIR}/hwloc-src && autoreconf -f -i && ./configure --prefix=${FETCHCONTENT_BASE_DIR}/hwloc-installed && make -j && make install"
       )
     endif()
     set(HWLOC_ROOT "${FETCHCONTENT_BASE_DIR}/hwloc-installed")

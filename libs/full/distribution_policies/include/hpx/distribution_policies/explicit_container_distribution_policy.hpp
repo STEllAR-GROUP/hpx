@@ -33,24 +33,22 @@ namespace hpx {
         explicit_container_distribution_policy() = default;
 
         explicit_container_distribution_policy operator()(
+            std::vector<std::size_t> sizes) const
+        {
+            return {HPX_MOVE(sizes), get_localities()};
+        }
+
+        explicit_container_distribution_policy operator()(
+            std::vector<std::size_t> sizes, hpx::id_type locality) const
+        {
+            return {HPX_MOVE(sizes), HPX_MOVE(locality)};
+        }
+
+        explicit_container_distribution_policy operator()(
             std::vector<std::size_t> sizes,
-            traits::create_mode mode = traits::create_mode::resize) const
+            std::vector<id_type> localities) const
         {
-            return {HPX_MOVE(sizes), get_localities(), mode};
-        }
-
-        explicit_container_distribution_policy operator()(
-            std::vector<std::size_t> sizes, hpx::id_type locality,
-            traits::create_mode mode = traits::create_mode::resize) const
-        {
-            return {HPX_MOVE(sizes), HPX_MOVE(locality), mode};
-        }
-
-        explicit_container_distribution_policy operator()(
-            std::vector<std::size_t> sizes, std::vector<id_type> localities,
-            traits::create_mode mode = traits::create_mode::resize) const
-        {
-            return {HPX_MOVE(sizes), HPX_MOVE(localities), mode};
+            return {HPX_MOVE(sizes), HPX_MOVE(localities)};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -77,11 +75,6 @@ namespace hpx {
             return sizes_;
         }
 
-        [[nodiscard]] constexpr traits::create_mode get_create_mode() const
-        {
-            return mode_;
-        }
-
     private:
         friend class hpx::serialization::access;
 
@@ -89,29 +82,26 @@ namespace hpx {
         void serialize(Archive& ar, unsigned int const /* version */)
         {
             // clang-format off
-            ar & localities_ & sizes_ & mode_;
+            ar & localities_ & sizes_;
             // clang-format on
         }
 
-        explicit_container_distribution_policy(std::vector<std::size_t> sizes,
-            std::vector<id_type> localities, traits::create_mode mode)
+        explicit_container_distribution_policy(
+            std::vector<std::size_t> sizes, std::vector<id_type> localities)
           : components::default_distribution_policy(HPX_MOVE(localities))
           , sizes_(HPX_MOVE(sizes))
-          , mode_(mode)
         {
         }
 
-        explicit_container_distribution_policy(std::vector<std::size_t> sizes,
-            hpx::id_type locality, traits::create_mode mode)
+        explicit_container_distribution_policy(
+            std::vector<std::size_t> sizes, hpx::id_type locality)
           : components::default_distribution_policy(HPX_MOVE(locality))
           , sizes_(HPX_MOVE(sizes))
-          , mode_(mode)
         {
         }
 
         // number of chunks to create
         std::vector<std::size_t> sizes_;
-        traits::create_mode mode_ = traits::create_mode::resize;
     };
 
     static explicit_container_distribution_policy const
@@ -144,16 +134,6 @@ namespace hpx {
                 std::size_t)
             {
                 return policy.get_sizes();
-            }
-        };
-
-        template <>
-        struct allocation_mode<explicit_container_distribution_policy>
-        {
-            static create_mode call(
-                explicit_container_distribution_policy const& policy)
-            {
-                return policy.get_create_mode();
             }
         };
     }    // namespace traits
