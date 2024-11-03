@@ -47,21 +47,4 @@ namespace hpx::traits {
                 num_parts, (size + num_parts - 1) / num_parts);
         }
     };
-
-    // By default, the container distribution policy resizes the underlying
-    // vectors.
-    enum class create_mode : std::uint8_t
-    {
-        resize = 0,
-        reserve = 1
-    };
-
-    template <typename Policy, typename Enable = void>
-    struct allocation_mode
-    {
-        static create_mode call(Policy const&)
-        {
-            return create_mode::resize;
-        }
-    };
 }    // namespace hpx::traits

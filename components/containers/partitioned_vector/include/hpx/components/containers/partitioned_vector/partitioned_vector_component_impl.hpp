@@ -37,17 +37,10 @@ namespace hpx::server {
 
     template <typename T, typename Data>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
-    partitioned_vector<T, Data>::partitioned_vector(std::size_t partnum,
-        std::vector<size_type> const& partition_sizes, traits::create_mode mode)
+    partitioned_vector<T, Data>::partitioned_vector(
+        std::size_t partnum, std::vector<size_type> const& partition_sizes)
     {
-        if (mode == traits::create_mode::resize)
-        {
-            partitioned_vector_partition_.resize(partition_sizes[partnum]);
-        }
-        else
-        {
-            partitioned_vector_partition_.reserve(partition_sizes[partnum]);
-        }
+        partitioned_vector_partition_.resize(partition_sizes[partnum]);
     }
 
     template <typename T, typename Data>

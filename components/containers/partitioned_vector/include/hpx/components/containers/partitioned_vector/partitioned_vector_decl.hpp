@@ -180,8 +180,6 @@ namespace hpx {
         using partitioned_vector_partition_client =
             hpx::partitioned_vector_partition<T, Data>;
 
-        using create_mode = traits::create_mode;
-
         struct partition_data
           : server::partitioned_vector_config_data::partition_data
         {
@@ -333,7 +331,7 @@ namespace hpx {
         template <typename DistPolicy>
         static hpx::future<std::vector<bulk_locality_result>> create_helper1(
             DistPolicy const& policy, std::size_t count,
-            std::vector<std::size_t> const& sizes, create_mode mode);
+            std::vector<std::size_t> const& sizes);
 
         template <typename DistPolicy>
         static hpx::future<std::vector<bulk_locality_result>> create_helper2(
@@ -343,8 +341,7 @@ namespace hpx {
         // This function is called when we are creating the vector. It
         // initializes the partitions based on the give parameters.
         template <typename DistPolicy, typename Create>
-        void create(DistPolicy const& policy, Create&& creator,
-            create_mode mode = create_mode::resize);
+        void create(DistPolicy const& policy, Create&& creator);
 
         template <typename DistPolicy>
         void create(DistPolicy const& policy);

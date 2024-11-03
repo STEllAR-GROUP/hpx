@@ -373,7 +373,7 @@ void exclusive_scan_tests(std::vector<hpx::id_type>& localities)
     exclusive_scan_tests_with_policy<T>(
         length, hpx::container_layout(localities));
 
-    exclusive_scan_tests_with_policy<T>(1000, hpx::container_layout(1000));
+    exclusive_scan_tests_with_policy<T>(1000, hpx::container_layout(100));
 
     // multiple localities needed for the following tests
     exclusive_scan_tests_segmented_out_with_policy<T>(length,

@@ -94,9 +94,8 @@ namespace hpx::server {
         /// size 0.
         partitioned_vector();
 
-        explicit partitioned_vector(std::size_t partnum,
-            std::vector<size_type> const& partition_sizes,
-            traits::create_mode = traits::create_mode::resize);
+        explicit partitioned_vector(
+            std::size_t partnum, std::vector<size_type> const& partition_sizes);
 
         /// Constructor which create and initialize partitioned_vector_partition
         /// with all elements as \a val.
