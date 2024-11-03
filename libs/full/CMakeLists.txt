@@ -33,7 +33,6 @@ set(_hpx_full_modules
     naming_base
     parcelport_gasnet
     parcelport_lci
-    parcelport_libfabric
     parcelport_mpi
     parcelport_tcp
     parcelports
