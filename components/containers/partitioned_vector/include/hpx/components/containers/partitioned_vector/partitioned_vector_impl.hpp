@@ -317,14 +317,12 @@ namespace hpx {
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<
         std::vector<typename partitioned_vector<T, Data>::bulk_locality_result>>
     partitioned_vector<T, Data>::create_helper1(DistPolicy const& policy,
-        std::size_t count, std::vector<std::size_t> const& sizes,
-        create_mode mode)
+        std::size_t count, std::vector<std::size_t> const& sizes)
     {
         using component_type =
             typename partitioned_vector_partition_client::server_component_type;
 
-        return policy.template bulk_create<true, component_type>(
-            count, sizes, mode);
+        return policy.template bulk_create<true, component_type>(count, sizes);
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -344,7 +342,7 @@ namespace hpx {
     template <typename T, typename Data /*= std::vector<T> */>
     template <typename DistPolicy, typename Create>
     void partitioned_vector<T, Data>::create(
-        DistPolicy const& policy, Create&& creator, create_mode mode)
+        DistPolicy const& policy, Create&& creator)
     {
         std::size_t num_parts =
             traits::num_container_partitions<DistPolicy>::call(policy);
@@ -353,7 +351,7 @@ namespace hpx {
 
         // create as many partitions as required
         hpx::future<std::vector<bulk_locality_result>> f =
-            HPX_FORWARD(Create, creator)(policy, num_parts, part_sizes, mode);
+            HPX_FORWARD(Create, creator)(policy, num_parts, part_sizes);
 
         // now initialize our data structures
         std::uint32_t const this_locality = get_locality_id();
@@ -413,8 +411,7 @@ namespace hpx {
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
     partitioned_vector<T, Data>::create(DistPolicy const& policy)
     {
-        create(policy, &partitioned_vector::create_helper1<DistPolicy>,
-            traits::allocation_mode<DistPolicy>::call(policy));
+        create(policy, &partitioned_vector::create_helper1<DistPolicy>);
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -424,7 +421,7 @@ namespace hpx {
     {
         create(policy,
             [&val](DistPolicy const& policy, std::size_t num_parts,
-                std::vector<std::size_t> const& part_sizes, create_mode) {
+                std::vector<std::size_t> const& part_sizes) {
                 return create_helper2(policy, num_parts, part_sizes, val);
             });
     }

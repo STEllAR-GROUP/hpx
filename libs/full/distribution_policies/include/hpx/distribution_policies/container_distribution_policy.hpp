@@ -33,57 +33,48 @@ namespace hpx {
     {
         container_distribution_policy() = default;
 
-        container_distribution_policy operator()(std::size_t num_partitions,
-            traits::create_mode mode = traits::create_mode::resize) const
+        container_distribution_policy operator()(
+            std::size_t num_partitions) const
         {
-            return {num_partitions, get_localities(), mode};
-        }
-
-        container_distribution_policy operator()(traits::create_mode mode) const
-        {
-            return container_distribution_policy(mode);
-        }
-
-        container_distribution_policy operator()(hpx::id_type const& locality,
-            traits::create_mode mode = traits::create_mode::resize) const
-        {
-            return {locality, mode};
+            return {num_partitions, get_localities()};
         }
 
         container_distribution_policy operator()(
-            std::vector<id_type> const& localities,
-            traits::create_mode mode = traits::create_mode::resize) const
+            hpx::id_type const& locality) const
         {
-            if (num_partitions_ != static_cast<std::size_t>(-1))
-            {
-                return {num_partitions_, localities, mode};
-            }
-            return {localities.size(), localities, mode};
+            return {locality};
         }
 
         container_distribution_policy operator()(
-            std::vector<id_type>&& localities,
-            traits::create_mode mode = traits::create_mode::resize) const
+            std::vector<id_type> const& localities) const
         {
             if (num_partitions_ != static_cast<std::size_t>(-1))
             {
-                return {num_partitions_, HPX_MOVE(localities), mode};
+                return {num_partitions_, localities};
             }
-            return {localities.size(), HPX_MOVE(localities), mode};
+            return {localities.size(), localities};
+        }
+
+        container_distribution_policy operator()(
+            std::vector<id_type>&& localities) const
+        {
+            if (num_partitions_ != static_cast<std::size_t>(-1))
+            {
+                return {num_partitions_, HPX_MOVE(localities)};
+            }
+            return {localities.size(), HPX_MOVE(localities)};
         }
 
         container_distribution_policy operator()(std::size_t num_partitions,
-            std::vector<id_type> const& localities,
-            traits::create_mode mode = traits::create_mode::resize) const
+            std::vector<id_type> const& localities) const
         {
-            return {num_partitions, localities, mode};
+            return {num_partitions, localities};
         }
 
-        container_distribution_policy operator()(std::size_t num_partitions,
-            std::vector<id_type>&& localities,
-            traits::create_mode mode = traits::create_mode::resize) const
+        container_distribution_policy operator()(
+            std::size_t num_partitions, std::vector<id_type>&& localities) const
         {
-            return {num_partitions, HPX_MOVE(localities), mode};
+            return {num_partitions, HPX_MOVE(localities)};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -113,11 +104,6 @@ namespace hpx {
             return *localities_;
         }
 
-        [[nodiscard]] constexpr traits::create_mode get_create_mode() const
-        {
-            return mode_;
-        }
-
     private:
         friend class hpx::serialization::access;
 
@@ -125,41 +111,31 @@ namespace hpx {
         void serialize(Archive& ar, const unsigned int /* version */)
         {
             // clang-format off
-            ar & localities_ & num_partitions_ & mode_;
+            ar & localities_ & num_partitions_;
             // clang-format on
         }
 
-        container_distribution_policy(std::size_t num_partitions,
-            std::vector<id_type> const& localities, traits::create_mode mode)
+        container_distribution_policy(
+            std::size_t num_partitions, std::vector<id_type> const& localities)
           : components::default_distribution_policy(localities)
           , num_partitions_(num_partitions)
-          , mode_(mode)
-        {
-        }
-
-        container_distribution_policy(std::size_t num_partitions,
-            std::vector<id_type>&& localities, traits::create_mode mode)
-          : components::default_distribution_policy(HPX_MOVE(localities))
-          , num_partitions_(num_partitions)
-          , mode_(mode)
         {
         }
 
         container_distribution_policy(
-            hpx::id_type const& locality, traits::create_mode mode)
-          : components::default_distribution_policy(locality)
-          , mode_(mode)
+            std::size_t num_partitions, std::vector<id_type>&& localities)
+          : components::default_distribution_policy(HPX_MOVE(localities))
+          , num_partitions_(num_partitions)
         {
         }
 
-        explicit container_distribution_policy(traits::create_mode mode)
-          : mode_(mode)
+        container_distribution_policy(hpx::id_type const& locality)
+          : components::default_distribution_policy(locality)
         {
         }
 
         // number of chunks to create
         std::size_t num_partitions_ = static_cast<std::size_t>(-1);
-        traits::create_mode mode_ = traits::create_mode::resize;
     };
 
     static container_distribution_policy const container_layout{};
@@ -179,15 +155,6 @@ namespace hpx {
             static std::size_t call(container_distribution_policy const& policy)
             {
                 return policy.get_num_partitions();
-            }
-        };
-
-        template <>
-        struct allocation_mode<container_distribution_policy>
-        {
-            static create_mode call(container_distribution_policy const& policy)
-            {
-                return policy.get_create_mode();
             }
         };
     }    // namespace traits
