@@ -33,11 +33,12 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
-    /// \returns    This function returns a future that will become
+    /// \returns    This function returns a future holding the value that was
+    ///             sent to all participating sites. It will become
     ///             ready once the broadcast operation has been completed.
     ///
     template <typename T>
-    hpx::future<void> broadcast_to(char const* basename, T&& local_result,
+    hpx::future<T> broadcast_to(char const* basename, T&& local_result,
         num_sites_arg num_sites = num_sites_arg(),
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg());
@@ -64,11 +65,12 @@ namespace hpx { namespace collectives {
     /// \note       The generation values from corresponding \a broadcast_to and
     ///             \a broadcast_from have to match.
     ///
-    /// \returns    This function returns a future that will become
+    /// \returns    This function returns a future holding the value that was
+    ///             sent to all participating sites. It will become
     ///             ready once the broadcast operation has been completed.
     ///
     template <typename T>
-    hpx::future<void> broadcast_to(communicator comm,
+    hpx::future<T> broadcast_to(communicator comm,
         T&& local_result, this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg());
 
@@ -94,11 +96,12 @@ namespace hpx { namespace collectives {
     /// \note       The generation values from corresponding \a broadcast_to and
     ///             \a broadcast_from have to match.
     ///
-    /// \returns    This function returns a future that will become
+    /// \returns    This function returns a future holding the value that was
+    ///             sent to all participating sites. It will become
     ///             ready once the broadcast operation has been completed.
     ///
     template <typename T>
-    hpx::future<void> broadcast_to(communicator comm,
+    hpx::future<T> broadcast_to(communicator comm,
         generation_arg generation,
         T&& local_result, this_site_arg this_site = this_site_arg());
 
