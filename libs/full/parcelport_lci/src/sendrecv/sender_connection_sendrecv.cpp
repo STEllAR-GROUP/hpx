@@ -228,9 +228,10 @@ namespace hpx::parcelset::policies::lci {
     }
 
     sender_connection_sendrecv::return_t
-    sender_connection_sendrecv::unified_followup_send(void* address, int length)
+    sender_connection_sendrecv::unified_followup_send(
+        void* address, size_t length)
     {
-        if (length <= LCI_MEDIUM_SIZE)
+        if (length <= (size_t) LCI_MEDIUM_SIZE)
         {
             LCI_mbuffer_t buffer;
             buffer.address = address;
@@ -323,7 +324,7 @@ namespace hpx::parcelset::policies::lci {
 
         std::vector<typename parcel_buffer_type::transmission_chunk_type>&
             tchunks = buffer_.transmission_chunks_;
-        int tchunks_size = (int) tchunks.size() *
+        size_t tchunks_size = tchunks.size() *
             sizeof(parcel_buffer_type::transmission_chunk_type);
         state.store(connection_state::locked, std::memory_order_relaxed);
         auto ret = unified_followup_send(tchunks.data(), tchunks_size);
@@ -389,9 +390,8 @@ namespace hpx::parcelset::policies::lci {
             {
                 state.store(
                     connection_state::locked, std::memory_order_relaxed);
-                auto ret =
-                    unified_followup_send(const_cast<void*>(chunk.data_.cpos_),
-                        static_cast<int>(chunk.size_));
+                auto ret = unified_followup_send(
+                    const_cast<void*>(chunk.data_.cpos_), chunk.size_);
                 if (ret.status == return_status_t::done)
                 {
                     ++send_chunks_idx;
