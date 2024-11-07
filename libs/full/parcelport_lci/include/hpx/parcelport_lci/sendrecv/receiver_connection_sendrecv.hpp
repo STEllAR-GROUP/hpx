@@ -48,7 +48,7 @@ namespace hpx::parcelset::policies::lci {
             rcvd_chunks,
             locked
         };
-        LCI_comp_t unified_recv(void* address, int length);
+        LCI_comp_t unified_recv(void* address, size_t length);
         return_t receive_transmission_chunks();
         return_t receive_data();
         return_t receive_chunks();
