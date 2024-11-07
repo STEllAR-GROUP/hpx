@@ -209,7 +209,7 @@ namespace hpx { namespace lcos {
             Result operator()(
                 hpx::future<std::vector<hpx::future<Result>>> r) const
             {
-                std::vector<hpx::future<Result>> fres = HPX_MOVE(r.get());
+                std::vector<hpx::future<Result>> fres = r.get();
 
                 HPX_ASSERT(!fres.empty());
 
