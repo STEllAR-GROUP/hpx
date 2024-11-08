@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Zahra Khatami
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -96,7 +96,7 @@ namespace hpx::execution::experimental {
         // Estimate execution time for one iteration
         template <typename Executor, typename F>
         friend auto tag_override_invoke(
-            hpx::parallel::execution::measure_iteration_t,
+            hpx::execution::experimental::measure_iteration_t,
             persistent_auto_chunk_size& this_, Executor&&, F&& f,
             std::size_t count)
         {
@@ -141,7 +141,7 @@ namespace hpx::execution::experimental {
         // Estimate a chunk size based on number of cores used.
         template <typename Executor>
         friend std::size_t tag_override_invoke(
-            hpx::parallel::execution::get_chunk_size_t,
+            hpx::execution::experimental::get_chunk_size_t,
             persistent_auto_chunk_size const& this_, Executor& /* exec */,
             hpx::chrono::steady_duration const& iteration_duration,
             std::size_t cores, std::size_t count) noexcept
@@ -180,15 +180,16 @@ namespace hpx::execution::experimental {
         std::uint64_t num_iters_for_timing_;
         /// \endcond
     };
-}    // namespace hpx::execution::experimental
 
-/// \cond NOINTERNAL
-template <>
-struct hpx::parallel::execution::is_executor_parameters<
-    hpx::execution::experimental::persistent_auto_chunk_size> : std::true_type
-{
-};
-/// \endcond
+    /// \cond NOINTERNAL
+    template <>
+    struct is_executor_parameters<
+        hpx::execution::experimental::persistent_auto_chunk_size>
+      : std::true_type
+    {
+    };
+    /// \endcond
+}    // namespace hpx::execution::experimental
 
 namespace hpx::execution {
 

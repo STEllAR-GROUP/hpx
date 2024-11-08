@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2023 Hartmut Kaiser
+//  Copyright (c) 2021-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,7 +24,7 @@
 namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    /// A \a annotating_executor wraps any other executor and adds the
+    /// An \a annotating_executor wraps any other executor and adds the
     /// capability to add annotations to the launched threads.
     template <typename BaseExecutor>
     struct annotating_executor
@@ -249,7 +249,7 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // if the given executor does not support annotations, wrap it into
-    // a annotating_executor
+    // an annotating_executor
     //
     // The functions below are used for executors that do not directly support
     // annotations. Those are wrapped into an annotating_executor if passed
@@ -282,7 +282,7 @@ namespace hpx::execution::experimental {
     }
 }    // namespace hpx::execution::experimental
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     // The annotating executor exposes the same executor categories as its
     // underlying (wrapped) executor.
@@ -330,4 +330,4 @@ namespace hpx::parallel::execution {
     {
     };
     /// \endcond
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

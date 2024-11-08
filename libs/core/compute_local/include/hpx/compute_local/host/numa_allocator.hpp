@@ -118,7 +118,7 @@ namespace hpx::parallel::util {
 
                         std::size_t thread_num = hpx::get_worker_thread_num();
                         hpx::threads::mask_cref_type thread_mask =
-                            hpx::parallel::execution::get_pu_mask(
+                            hpx::execution::experimental::get_pu_mask(
                                 executors_[i], topo_, thread_num);
 
                         HPX_ASSERT(threads::mask_size(mem_mask) ==

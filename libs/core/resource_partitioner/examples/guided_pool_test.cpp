@@ -1,4 +1,5 @@
 //  Copyright (c) 2017-2018 John Biddiscombe
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -74,7 +75,7 @@ std::string a_function(hpx::future<double>&& df)
     return "The number 2";
 }
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     struct guided_test_tag
     {
@@ -121,9 +122,9 @@ namespace hpx::parallel::execution {
             return 56;
         }
     };
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental
 
-using namespace hpx::parallel::execution;
+using namespace hpx::execution::experimental;
 
 // this is called on an hpx thread after the runtime starts up
 int hpx_main()
@@ -141,7 +142,7 @@ int hpx_main()
     // we must specialize the numa callback hint for the function type we are invoking
     using hint_type1 = pool_numa_hint<guided_test_tag>;
     // create an executor using that hint type
-    hpx::parallel::execution::guided_pool_executor<hint_type1> guided_exec(
+    hpx::execution::experimental::guided_pool_executor<hint_type1> guided_exec(
         &hpx::resource::get_thread_pool(CUSTOM_POOL_NAME));
     // invoke an async function using our numa hint executor
     hpx::future<void> gf1 = hpx::async(guided_exec, &async_guided,
@@ -159,7 +160,7 @@ int hpx_main()
     // the args of the async lambda must match the args of the hint type
     using hint_type2 = pool_numa_hint<guided_test_tag>;
     // create an executor using the numa hint type
-    hpx::parallel::execution::guided_pool_executor<hint_type2>
+    hpx::execution::experimental::guided_pool_executor<hint_type2>
         guided_lambda_exec(&hpx::resource::get_thread_pool(CUSTOM_POOL_NAME));
     // invoke a lambda asynchronously and use the numa executor
     hpx::future<double> gf2 = hpx::async(
@@ -184,8 +185,8 @@ int hpx_main()
     // the args of the async lambda must match the args of the hint type
     using hint_type3 = pool_numa_hint<guided_test_tag>;
     // create an executor using the numa hint type
-    hpx::parallel::execution::guided_pool_executor<hint_type3> guided_cont_exec(
-        &hpx::resource::get_thread_pool(CUSTOM_POOL_NAME));
+    hpx::execution::experimental::guided_pool_executor<hint_type3>
+        guided_cont_exec(&hpx::resource::get_thread_pool(CUSTOM_POOL_NAME));
     // invoke the lambda asynchronously and use the numa executor
     auto new_future = hpx::async([]() -> double {
         return 2 * 3.1415;

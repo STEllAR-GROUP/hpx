@@ -40,7 +40,7 @@ namespace hpx {
 // --------------------------------------------------------------------
 // pool_numa_hint
 // --------------------------------------------------------------------
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     namespace detail {
         // --------------------------------------------------------------------
@@ -661,6 +661,6 @@ namespace hpx::parallel::execution {
     struct is_two_way_executor<guided_pool_executor_shim<Hint>> : std::true_type
     {
     };
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental
 
 #include <hpx/config/warnings_suffix.hpp>

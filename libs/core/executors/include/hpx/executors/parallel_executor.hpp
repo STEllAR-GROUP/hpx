@@ -227,7 +227,7 @@ namespace hpx::execution {
             )>
         // clang-format on
         friend constexpr auto tag_invoke(
-            hpx::parallel::execution::with_processing_units_count_t,
+            hpx::execution::experimental::with_processing_units_count_t,
             Executor_ const& exec, std::size_t num_cores) noexcept
         {
             auto exec_with_num_cores = exec;
@@ -242,8 +242,8 @@ namespace hpx::execution {
             )>
         // clang-format on
         friend constexpr std::size_t tag_invoke(
-            hpx::parallel::execution::processing_units_count_t, Parameters&&,
-            parallel_policy_executor const& exec,
+            hpx::execution::experimental::processing_units_count_t,
+            Parameters&&, parallel_policy_executor const& exec,
             hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
             std::size_t = 0)
         {
@@ -610,7 +610,7 @@ namespace hpx::execution {
     using parallel_executor = parallel_policy_executor<hpx::launch>;
 }    // namespace hpx::execution
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
     template <typename Policy>
@@ -637,4 +637,4 @@ namespace hpx::parallel::execution {
     {
     };
     /// \endcond
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

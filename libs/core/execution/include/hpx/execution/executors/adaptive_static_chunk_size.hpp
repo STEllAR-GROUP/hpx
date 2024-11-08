@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2022 Karame M.Shokooh
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -55,14 +55,15 @@ namespace hpx::execution::experimental {
         /// \cond NOINTERNAL
         template <typename Executor>
         friend std::size_t tag_override_invoke(
-            hpx::parallel::execution::get_chunk_size_t,
+            hpx::execution::experimental::get_chunk_size_t,
             adaptive_static_chunk_size const& this_, Executor& exec,
             hpx::chrono::steady_duration const&, std::size_t cores,
             std::size_t input_size)
         {
             // Make sure the internal round-robin counter of the executor is
             // reset
-            parallel::execution::reset_thread_distribution(this_, exec);
+            hpx::execution::experimental::reset_thread_distribution(
+                this_, exec);
 
             // use the given chunk size if given
             if (this_.chunk_size_ != 0)
@@ -115,15 +116,16 @@ namespace hpx::execution::experimental {
         std::size_t chunk_size_ = 0;
         /// \endcond
     };
-}    // namespace hpx::execution::experimental
 
-/// \cond NOINTERNAL
-template <>
-struct hpx::parallel::execution::is_executor_parameters<
-    hpx::execution::experimental::adaptive_static_chunk_size> : std::true_type
-{
-};
-/// \endcond
+    /// \cond NOINTERNAL
+    template <>
+    struct is_executor_parameters<
+        hpx::execution::experimental::adaptive_static_chunk_size>
+      : std::true_type
+    {
+    };
+    /// \endcond
+}    // namespace hpx::execution::experimental
 
 namespace hpx::execution {
 

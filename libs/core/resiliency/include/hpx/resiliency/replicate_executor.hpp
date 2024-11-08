@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2023 Hartmut Kaiser
+//  Copyright (c) 2020-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -253,7 +253,7 @@ namespace hpx::resiliency::experimental {
     }
 }    // namespace hpx::resiliency::experimental
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     template <typename BaseExecutor, typename Voter, typename Validator>
     struct is_two_way_executor<hpx::resiliency::experimental::
@@ -266,4 +266,4 @@ namespace hpx::parallel::execution {
             replicate_executor<BaseExecutor, Voter, Validator>> : std::true_type
     {
     };
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

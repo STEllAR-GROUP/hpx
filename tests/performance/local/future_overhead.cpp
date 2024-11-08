@@ -1,6 +1,7 @@
 //  Copyright (c) 2018-2020 Mikael Simberg
 //  Copyright (c) 2018-2019 John Biddiscombe
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -279,7 +280,7 @@ struct unlimited_number_of_chunks
 {
     template <typename Executor>
     friend std::size_t tag_override_invoke(
-        hpx::parallel::execution::maximal_number_of_chunks_t,
+        hpx::execution::experimental::maximal_number_of_chunks_t,
         unlimited_number_of_chunks, Executor&&, std::size_t,
         std::size_t num_tasks)
     {
@@ -288,7 +289,7 @@ struct unlimited_number_of_chunks
 };
 
 template <>
-struct hpx::parallel::execution::is_executor_parameters<
+struct hpx::execution::experimental::is_executor_parameters<
     unlimited_number_of_chunks> : std::true_type
 {
 };

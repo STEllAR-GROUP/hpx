@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -42,7 +42,7 @@ namespace detail {
             std::make_shared<hpx::promise<int>>();
 
         // Get a reference to one of the IO specific HPX io_service objects ...
-        hpx::parallel::execution::io_pool_executor executor;
+        hpx::execution::experimental::io_pool_executor executor;
 
         // ... and schedule the handler to run on one of its OS-threads.
         hpx::post(executor, &do_async_io, string_to_write, p);
