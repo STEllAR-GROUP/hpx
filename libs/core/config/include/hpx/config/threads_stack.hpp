@@ -40,20 +40,22 @@
 #endif
 
 #if !defined(HPX_SMALL_STACK_SIZE)
-#  if defined(HPX_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
-#    define HPX_SMALL_STACK_SIZE_TARGET    0x4000        // 16kByte
-#  else
-#    if defined(HPX_DEBUG)
-#      define HPX_SMALL_STACK_SIZE_TARGET  0x20000       // 128kByte
+#  if !defined(HPX_SMALL_STACK_SIZE_TARGET)
+#    if defined(HPX_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
+#      define HPX_SMALL_STACK_SIZE_TARGET    0x4000        // 16kByte
 #    else
-#      if defined(__powerpc__) || defined(__INTEL_COMPILER)
-#         define HPX_SMALL_STACK_SIZE_TARGET  0x20000       // 128kByte
+#      if defined(HPX_DEBUG)
+#        define HPX_SMALL_STACK_SIZE_TARGET  0x20000       // 128kByte
 #      else
-#         define HPX_SMALL_STACK_SIZE_TARGET  0x10000        // 64kByte
+#        if defined(__powerpc__) || defined(__INTEL_COMPILER)
+#           define HPX_SMALL_STACK_SIZE_TARGET  0x20000       // 128kByte
+#        else
+#           define HPX_SMALL_STACK_SIZE_TARGET  0x10000        // 64kByte
+#        endif
 #      endif
 #    endif
 #  endif
-
+#
 #  if HPX_SMALL_STACK_SIZE_TARGET < (2 * HPX_THREADS_STACK_OVERHEAD)
 #    define HPX_SMALL_STACK_SIZE (2 * HPX_THREADS_STACK_OVERHEAD)
 #  else

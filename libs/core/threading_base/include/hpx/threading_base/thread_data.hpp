@@ -689,8 +689,11 @@ namespace hpx::threads {
 
         if (is_stackless())
         {
+            HPX_ASSERT(dynamic_cast<thread_data_stackless*>(this) != nullptr);
             return static_cast<thread_data_stackless*>(this)->call();
         }
+
+        HPX_ASSERT(dynamic_cast<thread_data_stackful*>(this) != nullptr);
         return static_cast<thread_data_stackful*>(this)->call(agent_storage);
     }
 
@@ -700,8 +703,11 @@ namespace hpx::threads {
 
         if (is_stackless())
         {
+            HPX_ASSERT(dynamic_cast<thread_data_stackless*>(this) != nullptr);
             return static_cast<thread_data_stackless*>(this)->call();
         }
-        return static_cast<thread_data_stackful*>(this)->invoke_directly();
+
+        HPX_ASSERT(dynamic_cast<thread_data_stackful*>(this) != nullptr);
+        return static_cast<thread_data_stackful*>(this)->call_directly();
     }
 }    // namespace hpx::threads
