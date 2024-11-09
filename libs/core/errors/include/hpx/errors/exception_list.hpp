@@ -45,7 +45,10 @@ namespace hpx {
         exception_list_type exceptions_;
         mutable mutex_type mtx_;
 
-        void add_no_lock(std::exception_ptr const& e);
+        void add_no_lock(std::exception_ptr const& e)
+        {
+        exceptions_.push_back(e);
+        }
         /// \endcond
 
     public:
@@ -61,13 +64,37 @@ namespace hpx {
         explicit exception_list(exception_list_type&& l);
 
         exception_list(exception_list const& l);
-        exception_list(exception_list&& l) noexcept;
-
-        exception_list& operator=(exception_list const& l);
-        exception_list& operator=(exception_list&& l) noexcept;
+        exception_list(exception_list&& l) noexcept
+{
+    std::lock_guard<mutex_type> l_lock(l.mtx_);
+    exceptions_ = std::move(l.exceptions_);
+}
+        
+        exception_list& operator=(exception_list const& l)
+{
+    if (this != &l) {
+        std::lock_guard<mutex_type> this_lock(mtx_);
+        std::lock_guard<mutex_type> l_lock(l.mtx_);
+        exceptions_ = l.exceptions_;
+    }
+    return *this;
+}
+        exception_list& operator=(exception_list&& l) noexcept
+{
+    if (this != &l) {
+        std::lock_guard<mutex_type> this_lock(mtx_);
+        std::lock_guard<mutex_type> l_lock(l.mtx_);
+        exceptions_ = std::move(l.exceptions_);
+    }
+    return *this;
+}
 
         ///
-        void add(std::exception_ptr const& e);
+        void add(std::exception_ptr const& e)
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            add_no_lock(e);
+        }
         /// \endcond
 
         /// The number of exception_ptr objects contained within the
@@ -96,9 +123,15 @@ namespace hpx {
         }
 
         /// \cond NOINTERNAL
-        [[nodiscard]] std::error_code get_error_code() const;
+        [[nodiscard]] std::error_code get_error_code() const
+{
+    return std::error_code(); // placeholder implementation
+}
 
-        [[nodiscard]] std::string get_message() const;
+        [[nodiscard]] std::string get_message() const
+{
+    return "Exception occurred"; // placeholder implementation
+}
         /// \endcond
     };
 }    // namespace hpx
