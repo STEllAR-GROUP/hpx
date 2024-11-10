@@ -39,8 +39,8 @@ namespace hpx {
         // TODO: Does this need to be hpx::spinlock?
         // typedef hpx::spinlock mutex_type;
         // TODO: Add correct initialization of hpx::util::detail spinlock.
+        // using mutex_type = hpx::util::detail::spinlock;
         using mutex_type = hpx::util::detail::spinlock;
-
         using exception_list_type = std::list<std::exception_ptr>;
         exception_list_type exceptions_;
         mutable mutex_type mtx_;
@@ -60,10 +60,21 @@ namespace hpx {
         ~exception_list() noexcept override = default;
 
         exception_list();
-        explicit exception_list(std::exception_ptr const& e);
-        explicit exception_list(exception_list_type&& l);
+        explicit exception_list(std::exception_ptr const& e)
+        {
+            add(e);
+        }
+        explicit exception_list(exception_list_type&& l)
+        {
+            std::lock_guard<mutex_type> lock(mtx_);
+            exceptions_ = std::move(l);
+        }
 
-        exception_list(exception_list const& l);
+        exception_list(exception_list const& l)
+        {
+            std::lock_guard<mutex_type> lock(l.mtx_);
+            exceptions_ = l.exceptions_;
+        }
         exception_list(exception_list&& l) noexcept
 {
     std::lock_guard<mutex_type> l_lock(l.mtx_);
