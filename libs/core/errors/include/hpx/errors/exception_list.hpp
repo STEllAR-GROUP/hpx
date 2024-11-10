@@ -26,7 +26,7 @@ namespace hpx {
 
     /// The class exception_list is a container of exception_ptr objects
     /// parallel algorithms may use to communicate uncaught exceptions
-    /// encountered during parallel execution to the caller of the algorithm
+    /// encountered during parallel execution to the caller of the algorithm.
     ///
     /// The type exception_list::const_iterator fulfills the requirements of
     /// a forward iterator.
@@ -34,64 +34,51 @@ namespace hpx {
     class HPX_CORE_EXPORT exception_list : public hpx::exception
     {
     private:
-        /// \cond NOINTERNAL
-
-        // Use hpx::util::detail::spinlock for thread safety, since hpx::spinlock is not available directly
         using mutex_type = hpx::util::detail::spinlock;
-
         using exception_list_type = std::list<std::exception_ptr>;
-        exception_list_type exceptions_;   // Holds the list of exceptions
-        mutable mutex_type mtx_;           // Mutex for thread-safe access
+        
+        exception_list_type exceptions_;
+        mutable mutex_type mtx_;
 
-        // Internal function to add an exception without locking
+        // Adds an exception to the list without acquiring a lock
         void add_no_lock(std::exception_ptr const& e)
         {
             exceptions_.push_back(e);
         }
-        /// \endcond
 
     public:
-        /// bidirectional iterator
         using iterator = exception_list_type::const_iterator;
 
-        /// \cond NOINTERNAL
-        // \throws nothing
         ~exception_list() noexcept override = default;
 
-        // Default constructor
         exception_list() = default;
 
-        // Constructor that adds an initial exception
         explicit exception_list(std::exception_ptr const& e)
         {
             add(e);
         }
 
-        // Move constructor that transfers ownership of exceptions
         explicit exception_list(exception_list_type&& l)
         {
             std::lock_guard<mutex_type> lock(mtx_);
             exceptions_ = std::move(l);
         }
 
-        // Copy constructor with explicit base class copy constructor
-        exception_list(exception_list const& l) : hpx::exception(l)  // Added base class copy constructor call
+        exception_list(exception_list const& l) : hpx::exception(l)
         {
             std::lock_guard<mutex_type> lock(l.mtx_);
             exceptions_ = l.exceptions_;
         }
 
-        // Move constructor with thread-safe access
-        exception_list(exception_list&& l) noexcept
+        exception_list(exception_list&& l) noexcept : hpx::exception(std::move(l))
         {
-            std::lock_guard<mutex_type> lock(l.mtx_);
+            std::lock_guard<mutex_type> l_lock(l.mtx_);
             exceptions_ = std::move(l.exceptions_);
         }
 
-        // Copy assignment operator with thread-safe access
         exception_list& operator=(exception_list const& l)
         {
-            if (this != &l) { // Avoid self-assignment
+            if (this != &l) {
                 std::lock_guard<mutex_type> this_lock(mtx_);
                 std::lock_guard<mutex_type> l_lock(l.mtx_);
                 exceptions_ = l.exceptions_;
@@ -99,10 +86,9 @@ namespace hpx {
             return *this;
         }
 
-        // Move assignment operator with thread-safe access
         exception_list& operator=(exception_list&& l) noexcept
         {
-            if (this != &l) { // Avoid self-assignment
+            if (this != &l) {
                 std::lock_guard<mutex_type> this_lock(mtx_);
                 std::lock_guard<mutex_type> l_lock(l.mtx_);
                 exceptions_ = std::move(l.exceptions_);
@@ -116,45 +102,39 @@ namespace hpx {
             std::lock_guard<mutex_type> lock(mtx_);
             add_no_lock(e);
         }
-        /// \endcond
 
-        /// The number of exception_ptr objects contained within the
-        /// exception_list.
-        ///
-        /// \note Complexity: Constant time.
+        /// Returns the number of exception_ptr objects in the exception_list.
+        /// Complexity: Constant time.
         [[nodiscard]] std::size_t size() const noexcept
         {
             std::lock_guard<mutex_type> lock(mtx_);
             return exceptions_.size();
         }
 
-        /// An iterator referring to the first exception_ptr object contained
-        /// within the exception_list.
+        /// Returns an iterator referring to the first exception_ptr object.
         [[nodiscard]] exception_list_type::const_iterator begin() const noexcept
         {
             std::lock_guard<mutex_type> lock(mtx_);
             return exceptions_.begin();
         }
 
-        /// An iterator which is the past-the-end value for the exception_list.
+        /// Returns a past-the-end iterator for the exception_list.
         [[nodiscard]] exception_list_type::const_iterator end() const noexcept
         {
             std::lock_guard<mutex_type> lock(mtx_);
             return exceptions_.end();
         }
 
-        /// \cond NOINTERNAL
         [[nodiscard]] std::error_code get_error_code() const
         {
-            return std::error_code(); // placeholder implementation
+            return std::error_code(); // Placeholder implementation
         }
 
         [[nodiscard]] std::string get_message() const
         {
-            return "Exception occurred"; // placeholder implementation
+            return "Exception occurred"; // Placeholder implementation
         }
-        /// \endcond
     };
-}    // namespace hpx
+} // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>
