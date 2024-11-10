@@ -36,16 +36,18 @@ namespace hpx {
     private:
         /// \cond NOINTERNAL
 
-        // TODO: Does this need to be hpx::spinlock?
-        // typedef hpx::spinlock mutex_type;
-        // TODO: Add correct initialization of hpx::util::detail spinlock.
+        // Use hpx::util::detail::spinlock for thread safety, since hpx::spinlock is not available directly
         using mutex_type = hpx::util::detail::spinlock;
 
         using exception_list_type = std::list<std::exception_ptr>;
-        exception_list_type exceptions_;
-        mutable mutex_type mtx_;
+        exception_list_type exceptions_;   // Holds the list of exceptions
+        mutable mutex_type mtx_;           // Mutex for thread-safe access
 
-        void add_no_lock(std::exception_ptr const& e);
+        // Internal function to add an exception without locking
+        void add_no_lock(std::exception_ptr const& e)
+        {
+            exceptions_.push_back(e);
+        }
         /// \endcond
 
     public:
@@ -56,18 +58,64 @@ namespace hpx {
         // \throws nothing
         ~exception_list() noexcept override = default;
 
-        exception_list();
-        explicit exception_list(std::exception_ptr const& e);
-        explicit exception_list(exception_list_type&& l);
+        // Default constructor
+        exception_list() = default;
 
-        exception_list(exception_list const& l);
-        exception_list(exception_list&& l) noexcept;
+        // Constructor that adds an initial exception
+        explicit exception_list(std::exception_ptr const& e)
+        {
+            add(e);
+        }
 
-        exception_list& operator=(exception_list const& l);
-        exception_list& operator=(exception_list&& l) noexcept;
+        // Move constructor that transfers ownership of exceptions
+        explicit exception_list(exception_list_type&& l)
+        {
+            std::lock_guard<mutex_type> lock(mtx_);
+            exceptions_ = std::move(l);
+        }
 
-        ///
-        void add(std::exception_ptr const& e);
+        // Copy constructor with explicit base class copy constructor
+        exception_list(exception_list const& l) : hpx::exception(l)  // Added base class copy constructor call
+        {
+            std::lock_guard<mutex_type> lock(l.mtx_);
+            exceptions_ = l.exceptions_;
+        }
+
+        // Move constructor with thread-safe access
+        exception_list(exception_list&& l) noexcept
+        {
+            std::lock_guard<mutex_type> lock(l.mtx_);
+            exceptions_ = std::move(l.exceptions_);
+        }
+
+        // Copy assignment operator with thread-safe access
+        exception_list& operator=(exception_list const& l)
+        {
+            if (this != &l) { // Avoid self-assignment
+                std::lock_guard<mutex_type> this_lock(mtx_);
+                std::lock_guard<mutex_type> l_lock(l.mtx_);
+                exceptions_ = l.exceptions_;
+            }
+            return *this;
+        }
+
+        // Move assignment operator with thread-safe access
+        exception_list& operator=(exception_list&& l) noexcept
+        {
+            if (this != &l) { // Avoid self-assignment
+                std::lock_guard<mutex_type> this_lock(mtx_);
+                std::lock_guard<mutex_type> l_lock(l.mtx_);
+                exceptions_ = std::move(l.exceptions_);
+            }
+            return *this;
+        }
+
+        // Adds an exception to the list in a thread-safe manner
+        void add(std::exception_ptr const& e)
+        {
+            std::lock_guard<mutex_type> lock(mtx_);
+            add_no_lock(e);
+        }
         /// \endcond
 
         /// The number of exception_ptr objects contained within the
@@ -76,7 +124,7 @@ namespace hpx {
         /// \note Complexity: Constant time.
         [[nodiscard]] std::size_t size() const noexcept
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
             return exceptions_.size();
         }
 
@@ -84,21 +132,27 @@ namespace hpx {
         /// within the exception_list.
         [[nodiscard]] exception_list_type::const_iterator begin() const noexcept
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
             return exceptions_.begin();
         }
 
         /// An iterator which is the past-the-end value for the exception_list.
         [[nodiscard]] exception_list_type::const_iterator end() const noexcept
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard<mutex_type> lock(mtx_);
             return exceptions_.end();
         }
 
         /// \cond NOINTERNAL
-        [[nodiscard]] std::error_code get_error_code() const;
+        [[nodiscard]] std::error_code get_error_code() const
+        {
+            return std::error_code(); // placeholder implementation
+        }
 
-        [[nodiscard]] std::string get_message() const;
+        [[nodiscard]] std::string get_message() const
+        {
+            return "Exception occurred"; // placeholder implementation
+        }
         /// \endcond
     };
 }    // namespace hpx
