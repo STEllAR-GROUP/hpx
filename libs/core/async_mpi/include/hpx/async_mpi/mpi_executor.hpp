@@ -73,14 +73,9 @@ namespace hpx::mpi::experimental {
 }    // namespace hpx::mpi::experimental
 // namespace hpx::mpi::experimental
 
-namespace hpx::parallel::execution {
-
-    /// \cond NOINTERNAL
-    template <>
-    struct is_two_way_executor<hpx::mpi::experimental::executor>
-      : std::true_type
-    {
-    };
-    /// \endcond
-}    // namespace hpx::parallel::execution
-// namespace hpx::parallel::execution
+/// \cond NOINTERNAL
+template <>
+struct hpx::execution::experimental::is_two_way_executor<
+    hpx::mpi::experimental::executor> : std::true_type
+{
+};

@@ -1,4 +1,5 @@
 //  Copyright (c) 2017-2018 John Biddiscombe
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -137,6 +138,7 @@ private:
     // .then() execute specialized for a when_all dispatch for any future types
     // future< tuple< is_future<a>::type, is_future<b>::type, ...> >
     // --------------------------------------------------------------------
+    // clang-format off
     template <typename F, template <typename> class OuterFuture,
         typename... InnerFutures, typename... Ts,
         typename = std::enable_if_t<is_future_of_tuple_of_futures<
@@ -146,8 +148,9 @@ private:
     friend auto tag_invoke(hpx::parallel::execution::then_execute_t,
         test_async_executor const& exec, F&& f,
         OuterFuture<hpx::tuple<InnerFutures...>>&& predecessor, Ts&&... ts)
-        -> future<util::detail::invoke_deferred_result_t<F,
-            OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>>
+            -> future<util::detail::invoke_deferred_result_t<F,
+                        OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>>
+    // clang-format on
     {
         using result_type = util::detail::invoke_deferred_result_t<F,
             OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>;
@@ -235,12 +238,13 @@ private:
 // --------------------------------------------------------------------
 // set traits for executor to say it is an async executor
 // --------------------------------------------------------------------
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
+
     template <>
     struct is_two_way_executor<test_async_executor> : std::true_type
     {
     };
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental
 
 template <typename T>
 T dummy_task(T val)
@@ -426,7 +430,8 @@ struct dummy_tag
 {
 };
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
+
     template <>
     struct pool_numa_hint<dummy_tag>
     {
@@ -468,7 +473,7 @@ namespace hpx::parallel::execution {
             return 4;
         }
     };
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental
 
 int hpx_main()
 {
@@ -482,10 +487,10 @@ int hpx_main()
         std::cout << "Exception " << e.what() << std::endl;
     }
 
-    typedef hpx::parallel::execution::pool_numa_hint<dummy_tag> dummy_hint;
+    typedef hpx::execution::experimental::pool_numa_hint<dummy_tag> dummy_hint;
     try
     {
-        hpx::parallel::execution::guided_pool_executor<dummy_hint> exec2(
+        hpx::execution::experimental::guided_pool_executor<dummy_hint> exec2(
             &hpx::resource::get_thread_pool("default"));
         test("Testing guided_pool_executor<dummy_hint>", exec2);
     }
@@ -496,8 +501,8 @@ int hpx_main()
 
     try
     {
-        hpx::parallel::execution::guided_pool_executor_shim<dummy_hint> exec3(
-            true, &hpx::resource::get_thread_pool("default"));
+        hpx::execution::experimental::guided_pool_executor_shim<dummy_hint>
+            exec3(true, &hpx::resource::get_thread_pool("default"));
         test("Testing guided_pool_executor_shim<dummy_hint>", exec3);
     }
     catch (std::exception& e)

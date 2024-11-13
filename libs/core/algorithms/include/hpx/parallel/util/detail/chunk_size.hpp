@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -144,14 +144,17 @@ namespace hpx::parallel::util::detail {
         }
 
         std::size_t const cores =
-            execution::processing_units_count(policy.parameters(),
-                policy.executor(), hpx::chrono::null_duration, count);
+            hpx::execution::experimental::processing_units_count(
+                policy.parameters(), policy.executor(),
+                hpx::chrono::null_duration, count);
 
-        std::size_t max_chunks = execution::maximal_number_of_chunks(
-            policy.parameters(), policy.executor(), cores, count);
+        std::size_t max_chunks =
+            hpx::execution::experimental::maximal_number_of_chunks(
+                policy.parameters(), policy.executor(), cores, count);
 
-        std::size_t chunk_size = execution::get_chunk_size(policy.parameters(),
-            policy.executor(), hpx::chrono::null_duration, cores, count);
+        std::size_t chunk_size =
+            hpx::execution::experimental::get_chunk_size(policy.parameters(),
+                policy.executor(), hpx::chrono::null_duration, cores, count);
 
         // make sure, chunk size and max_chunks are consistent
         adjust_chunk_size_and_max_chunks(cores, count, max_chunks, chunk_size);
@@ -170,7 +173,8 @@ namespace hpx::parallel::util::detail {
 
         // update executor with new values
         policy = hpx::experimental::prefer(
-            execution::with_processing_units_count, policy, cores);
+            hpx::execution::experimental::with_processing_units_count, policy,
+            cores);
 
         auto shape_begin = chunk_size_iterator(it_or_r, chunk_size, count);
         auto shape_end = chunk_size_iterator(last, chunk_size, count, count);
@@ -221,17 +225,22 @@ namespace hpx::parallel::util::detail {
         };
 
         // note: running the test function will modify 'count'
-        auto iteration_duration = execution::measure_iteration(
-            policy.parameters(), policy.executor(), test_function, count);
+        auto iteration_duration =
+            hpx::execution::experimental::measure_iteration(
+                policy.parameters(), policy.executor(), test_function, count);
 
-        std::size_t const cores = execution::processing_units_count(
-            policy.parameters(), policy.executor(), iteration_duration, count);
+        std::size_t const cores =
+            hpx::execution::experimental::processing_units_count(
+                policy.parameters(), policy.executor(), iteration_duration,
+                count);
 
-        std::size_t max_chunks = execution::maximal_number_of_chunks(
-            policy.parameters(), policy.executor(), cores, count);
+        std::size_t max_chunks =
+            hpx::execution::experimental::maximal_number_of_chunks(
+                policy.parameters(), policy.executor(), cores, count);
 
-        std::size_t chunk_size = execution::get_chunk_size(policy.parameters(),
-            policy.executor(), iteration_duration, cores, count);
+        std::size_t chunk_size =
+            hpx::execution::experimental::get_chunk_size(policy.parameters(),
+                policy.executor(), iteration_duration, cores, count);
 
         // make sure, chunk size and max_chunks are consistent
         adjust_chunk_size_and_max_chunks(cores, count, max_chunks, chunk_size);
@@ -249,7 +258,8 @@ namespace hpx::parallel::util::detail {
 
         // update executor with new values
         policy = hpx::experimental::prefer(
-            execution::with_processing_units_count, policy, cores);
+            hpx::execution::experimental::with_processing_units_count, policy,
+            cores);
 
         auto shape_begin = chunk_size_iterator(it_or_r, chunk_size, count);
         auto shape_end = chunk_size_iterator(last, chunk_size, count, count);
@@ -272,11 +282,13 @@ namespace hpx::parallel::util::detail {
         }
 
         std::size_t const cores =
-            execution::processing_units_count(policy.parameters(),
-                policy.executor(), hpx::chrono::null_duration, count);
+            hpx::execution::experimental::processing_units_count(
+                policy.parameters(), policy.executor(),
+                hpx::chrono::null_duration, count);
 
-        std::size_t max_chunks = execution::maximal_number_of_chunks(
-            policy.parameters(), policy.executor(), cores, count);
+        std::size_t max_chunks =
+            hpx::execution::experimental::maximal_number_of_chunks(
+                policy.parameters(), policy.executor(), cores, count);
         HPX_ASSERT(0 != max_chunks);
 
         Stride stride = parallel::detail::abs(s);
@@ -292,9 +304,10 @@ namespace hpx::parallel::util::detail {
 
         while (count != 0)
         {
-            std::size_t chunk_size = execution::get_chunk_size(
-                policy.parameters(), policy.executor(),
-                hpx::chrono::null_duration, cores, count);
+            std::size_t chunk_size =
+                hpx::execution::experimental::get_chunk_size(
+                    policy.parameters(), policy.executor(),
+                    hpx::chrono::null_duration, cores, count);
 
             // make sure, chunk size and max_chunks are consistent
             adjust_chunk_size_and_max_chunks(
@@ -320,7 +333,8 @@ namespace hpx::parallel::util::detail {
 
         // update executor with new values
         policy = hpx::experimental::prefer(
-            execution::with_processing_units_count, policy, cores);
+            hpx::execution::experimental::with_processing_units_count, policy,
+            cores);
 
         return shape;
     }
@@ -387,17 +401,20 @@ namespace hpx::parallel::util::detail {
         }
 
         std::size_t const cores =
-            execution::processing_units_count(policy.parameters(),
-                policy.executor(), hpx::chrono::null_duration, count);
+            hpx::execution::experimental::processing_units_count(
+                policy.parameters(), policy.executor(),
+                hpx::chrono::null_duration, count);
 
-        std::size_t max_chunks = execution::maximal_number_of_chunks(
-            policy.parameters(), policy.executor(), cores, count);
+        std::size_t max_chunks =
+            hpx::execution::experimental::maximal_number_of_chunks(
+                policy.parameters(), policy.executor(), cores, count);
 
         FwdIter last = parallel::detail::next(begin, count);
         Stride stride = parallel::detail::abs(s);
 
-        std::size_t chunk_size = execution::get_chunk_size(policy.parameters(),
-            policy.executor(), hpx::chrono::null_duration, cores, count);
+        std::size_t chunk_size =
+            hpx::execution::experimental::get_chunk_size(policy.parameters(),
+                policy.executor(), hpx::chrono::null_duration, cores, count);
 
         // make sure, chunk size and max_chunks are consistent
         adjust_chunk_size_and_max_chunks(cores, count, max_chunks, chunk_size);
@@ -413,7 +430,8 @@ namespace hpx::parallel::util::detail {
 
         // update executor with new values
         policy = hpx::experimental::prefer(
-            execution::with_processing_units_count, policy, cores);
+            hpx::execution::experimental::with_processing_units_count, policy,
+            cores);
 
         using iterator =
             parallel::util::detail::chunk_size_idx_iterator<FwdIter>;
@@ -470,19 +488,24 @@ namespace hpx::parallel::util::detail {
         };
 
         // note: running the test function will modify 'count'
-        auto iteration_duration = execution::measure_iteration(
-            policy.parameters(), policy.executor(), test_function, count);
+        auto iteration_duration =
+            hpx::execution::experimental::measure_iteration(
+                policy.parameters(), policy.executor(), test_function, count);
 
-        std::size_t const cores = execution::processing_units_count(
-            policy.parameters(), policy.executor(), iteration_duration, count);
+        std::size_t const cores =
+            hpx::execution::experimental::processing_units_count(
+                policy.parameters(), policy.executor(), iteration_duration,
+                count);
 
-        std::size_t max_chunks = execution::maximal_number_of_chunks(
-            policy.parameters(), policy.executor(), cores, count);
+        std::size_t max_chunks =
+            hpx::execution::experimental::maximal_number_of_chunks(
+                policy.parameters(), policy.executor(), cores, count);
 
         FwdIter last = parallel::detail::next(begin, count);
 
-        std::size_t chunk_size = execution::get_chunk_size(policy.parameters(),
-            policy.executor(), iteration_duration, cores, count);
+        std::size_t chunk_size =
+            hpx::execution::experimental::get_chunk_size(policy.parameters(),
+                policy.executor(), iteration_duration, cores, count);
 
         // make sure, chunk size and max_chunks are consistent
         adjust_chunk_size_and_max_chunks(cores, count, max_chunks, chunk_size);
@@ -498,7 +521,8 @@ namespace hpx::parallel::util::detail {
 
         // update executor with new values
         policy = hpx::experimental::prefer(
-            execution::with_processing_units_count, policy, cores);
+            hpx::execution::experimental::with_processing_units_count, policy,
+            cores);
 
         using iterator =
             parallel::util::detail::chunk_size_idx_iterator<FwdIter>;
@@ -524,11 +548,13 @@ namespace hpx::parallel::util::detail {
         }
 
         std::size_t const cores =
-            execution::processing_units_count(policy.parameters(),
-                policy.executor(), hpx::chrono::null_duration, count);
+            hpx::execution::experimental::processing_units_count(
+                policy.parameters(), policy.executor(),
+                hpx::chrono::null_duration, count);
 
-        std::size_t max_chunks = execution::maximal_number_of_chunks(
-            policy.parameters(), policy.executor(), cores, count);
+        std::size_t max_chunks =
+            hpx::execution::experimental::maximal_number_of_chunks(
+                policy.parameters(), policy.executor(), cores, count);
 
         Stride stride = parallel::detail::abs(s);
 
@@ -544,9 +570,10 @@ namespace hpx::parallel::util::detail {
         std::size_t base_idx = 0;
         while (count != 0)
         {
-            std::size_t chunk_size = execution::get_chunk_size(
-                policy.parameters(), policy.executor(),
-                hpx::chrono::null_duration,  cores, count);
+            std::size_t chunk_size =
+                hpx::execution::experimental::get_chunk_size(
+                    policy.parameters(), policy.executor(),
+                    hpx::chrono::null_duration,  cores, count);
 
             // make sure, chunk size and max_chunks are consistent
             adjust_chunk_size_and_max_chunks(
@@ -573,7 +600,8 @@ namespace hpx::parallel::util::detail {
 
         // update executor with new values
         policy = hpx::experimental::prefer(
-            execution::with_processing_units_count, policy, cores);
+            hpx::execution::experimental::with_processing_units_count, policy,
+            cores);
 
         return shape;
     }

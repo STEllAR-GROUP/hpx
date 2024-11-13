@@ -369,8 +369,9 @@ namespace hpx::parallel {
                 };
 
                 std::size_t const cores =
-                    execution::processing_units_count(policy.parameters(),
-                        policy.executor(), hpx::chrono::null_duration, n);
+                    hpx::execution::experimental::processing_units_count(
+                        policy.parameters(), policy.executor(),
+                        hpx::chrono::null_duration, n);
 
                 // Take a standard chunk size (amount of work / cores), and only
                 // take a quarter of that. If our chunk size is too large a LOT
@@ -378,13 +379,15 @@ namespace hpx::parallel {
                 // barrier of heap parallelism. 1/4 of the standard chunk size
                 // is an estimate to lower the average number of levels done
                 // sequentially
-                std::size_t chunk_size = execution::get_chunk_size(
-                    policy.parameters(), policy.executor(),
-                    hpx::chrono::null_duration, cores, n);
+                std::size_t chunk_size =
+                    hpx::execution::experimental::get_chunk_size(
+                        policy.parameters(), policy.executor(),
+                        hpx::chrono::null_duration, cores, n);
                 chunk_size /= 4;
 
-                std::size_t max_chunks = execution::maximal_number_of_chunks(
-                    policy.parameters(), policy.executor(), cores, n);
+                std::size_t max_chunks =
+                    hpx::execution::experimental::maximal_number_of_chunks(
+                        policy.parameters(), policy.executor(), cores, n);
 
                 util::detail::adjust_chunk_size_and_max_chunks(
                     cores, n, chunk_size, max_chunks);

@@ -222,15 +222,18 @@ namespace hpx::parallel {
 
                 // figure out the chunk size to use
                 std::size_t cores =
-                    execution::processing_units_count(policy.parameters(),
-                        policy.executor(), hpx::chrono::null_duration, count);
+                    hpx::execution::experimental::processing_units_count(
+                        policy.parameters(), policy.executor(),
+                        hpx::chrono::null_duration, count);
 
-                std::size_t max_chunks = execution::maximal_number_of_chunks(
-                    policy.parameters(), policy.executor(), cores, count);
+                std::size_t max_chunks =
+                    hpx::execution::experimental::maximal_number_of_chunks(
+                        policy.parameters(), policy.executor(), cores, count);
 
-                std::size_t chunk_size = execution::get_chunk_size(
-                    policy.parameters(), policy.executor(),
-                    hpx::chrono::null_duration, cores, count);
+                std::size_t chunk_size =
+                    hpx::execution::experimental::get_chunk_size(
+                        policy.parameters(), policy.executor(),
+                        hpx::chrono::null_duration, cores, count);
 
                 util::detail::adjust_chunk_size_and_max_chunks(
                     cores, count, max_chunks, chunk_size);

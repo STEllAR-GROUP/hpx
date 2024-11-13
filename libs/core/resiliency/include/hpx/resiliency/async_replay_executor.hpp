@@ -58,14 +58,14 @@ namespace hpx::resiliency::experimental {
             }
 
             template <typename Executor>
-            hpx::parallel::execution::executor_future_t<Executor, Result> call(
-                Executor&& exec, std::size_t n)
+            hpx::execution::experimental::executor_future_t<Executor, Result>
+            call(Executor&& exec, std::size_t n)
             {
                 // launch given function asynchronously
                 using pack_type =
                     hpx::util::make_index_pack<std::tuple_size_v<Tuple>>;
                 using result_type =
-                    hpx::parallel::execution::executor_future_t<Executor,
+                    hpx::execution::experimental::executor_future_t<Executor,
                         Result>;
 
                 result_type f = invoke(exec, pack_type{});
@@ -148,14 +148,15 @@ namespace hpx::resiliency::experimental {
             }
 
             template <typename Executor>
-            hpx::parallel::execution::executor_future_t<Executor, void> call(
-                Executor&& exec, std::size_t n)
+            hpx::execution::experimental::executor_future_t<Executor, void>
+            call(Executor&& exec, std::size_t n)
             {
                 // launch given function asynchronously
                 using pack_type =
                     hpx::util::make_index_pack<std::tuple_size_v<Tuple>>;
                 using result_type =
-                    hpx::parallel::execution::executor_future_t<Executor, void>;
+                    hpx::execution::experimental::executor_future_t<Executor,
+                        void>;
 
                 result_type f = invoke(exec, pack_type{});
 

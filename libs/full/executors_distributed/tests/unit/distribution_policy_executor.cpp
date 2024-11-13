@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2023 Hartmut Kaiser
+//  Copyright (c) 2015-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -38,8 +38,8 @@ void test_distribution_policy_executor()
 
     for (hpx::id_type const& loc : hpx::find_all_localities())
     {
-        auto exec =
-            execution::distribution_policy_executor(hpx::colocated(loc));
+        auto exec = hpx::execution::experimental::distribution_policy_executor(
+            hpx::colocated(loc));
 
         HPX_TEST_EQ(execution::async_execute(exec, call_pfo()).get(), loc);
         HPX_TEST_EQ(execution::async_execute(exec, call_action()).get(), loc);
@@ -47,8 +47,8 @@ void test_distribution_policy_executor()
 
     for (hpx::id_type const& loc : hpx::find_all_localities())
     {
-        auto exec =
-            execution::distribution_policy_executor(hpx::colocated(loc));
+        auto exec = hpx::execution::experimental::distribution_policy_executor(
+            hpx::colocated(loc));
 
         HPX_TEST_EQ(execution::sync_execute(exec, call_pfo()), loc);
         HPX_TEST_EQ(execution::sync_execute(exec, call_action()), loc);

@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2022 Hartmut Kaiser
+//  Copyright (c) 2021-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -43,7 +43,7 @@ namespace hpx::execution::experimental {
         auto exec = hpx::execution::experimental::with_annotation(
             policy.executor(), annotation);
 
-        return hpx::parallel::execution::create_rebound_policy(
+        return hpx::execution::experimental::create_rebound_policy(
             policy, HPX_MOVE(exec), policy.parameters());
     }
 
@@ -63,7 +63,7 @@ namespace hpx::execution::experimental {
         auto exec = hpx::execution::experimental::with_annotation(
             policy.executor(), HPX_MOVE(annotation));
 
-        return hpx::parallel::execution::create_rebound_policy(
+        return hpx::execution::experimental::create_rebound_policy(
             policy, HPX_MOVE(exec), policy.parameters());
     }
 

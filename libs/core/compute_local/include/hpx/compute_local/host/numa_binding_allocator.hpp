@@ -51,7 +51,7 @@ namespace hpx {
         "NUM_B_A");
 }
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     struct numa_binding_allocator_tag
     {
@@ -69,7 +69,7 @@ namespace hpx::parallel::execution {
             return domain;
         }
     };
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental
 
 namespace hpx::compute::host {
 
@@ -448,15 +448,18 @@ namespace hpx::compute::host {
 
             using namespace parallel::execution;
             using allocator_hint_type =
-                pool_numa_hint<numa_binding_allocator_tag>;
+                hpx::execution::experimental::pool_numa_hint<
+                    hpx::execution::experimental::numa_binding_allocator_tag>;
 
             // Warning :low priority tasks are used here, because the scheduler
             // does not steal across numa domains for those tasks, so they are
             // sure to remain on the right queue and be executed on the right
             // domain.
-            guided_pool_executor<allocator_hint_type> numa_executor(
-                &hpx::resource::get_thread_pool(binding_helper_->pool_name()),
-                threads::thread_priority::bound);
+            hpx::execution::experimental::guided_pool_executor<
+                allocator_hint_type>
+                numa_executor(&hpx::resource::get_thread_pool(
+                                  binding_helper_->pool_name()),
+                    threads::thread_priority::bound);
 
             nba_deb.debug("Launching First-Touch tasks");
             // for each numa domain, we must launch a task to 'touch' the memory

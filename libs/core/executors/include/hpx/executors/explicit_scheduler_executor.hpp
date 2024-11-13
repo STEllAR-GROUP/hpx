@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2023 Hartmut Kaiser
+//  Copyright (c) 2021-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -103,12 +103,12 @@ namespace hpx::execution::experimental {
             )>
         // clang-format on
         friend auto tag_invoke(
-            hpx::parallel::execution::processing_units_count_t tag,
+            hpx::execution::experimental::processing_units_count_t tag,
             Parameters&& params, explicit_scheduler_executor const& exec,
             hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
             std::size_t = 0)
             -> decltype(std::declval<
-                hpx::parallel::execution::processing_units_count_t>()(
+                hpx::execution::experimental::processing_units_count_t>()(
                 std::declval<Parameters>(), std::declval<BaseScheduler>(),
                 std::declval<hpx::chrono::steady_duration>(), 0))
         {
@@ -330,7 +330,7 @@ namespace hpx::execution::experimental {
     }
 }    // namespace hpx::execution::experimental
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
     template <typename BaseScheduler>
@@ -369,4 +369,4 @@ namespace hpx::parallel::execution {
     {
     };
     /// \endcond
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

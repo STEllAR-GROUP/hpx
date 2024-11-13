@@ -17,14 +17,14 @@ int hpx_main()
     hpx::execution::experimental::num_cores nc(2);
     auto policy = hpx::execution::par.with(nc);
 
-    HPX_TEST_EQ(
-        hpx::parallel::execution::processing_units_count(policy.parameters(),
-            policy.executor(), hpx::chrono::null_duration, 0),
+    HPX_TEST_EQ(hpx::execution::experimental::processing_units_count(
+                    policy.parameters(), policy.executor(),
+                    hpx::chrono::null_duration, 0),
         static_cast<std::size_t>(2));
 
     auto policy2 =
-        hpx::parallel::execution::with_processing_units_count(policy, 2);
-    HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(
+        hpx::execution::experimental::with_processing_units_count(policy, 2);
+    HPX_TEST_EQ(hpx::execution::experimental::processing_units_count(
                     hpx::execution::par.parameters(), policy2.executor(),
                     hpx::chrono::null_duration, 0),
         static_cast<std::size_t>(2));

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -44,7 +44,7 @@ namespace hpx::execution::experimental {
         {
             // Make sure the internal round-robin counter of the executor is
             // reset
-            parallel::execution::reset_thread_distribution(
+            hpx::execution::experimental::reset_thread_distribution(
                 *this, HPX_FORWARD(Executor, exec));
 
             if (cores == 1)
@@ -64,12 +64,12 @@ namespace hpx::execution::experimental {
         }
         /// \endcond
     };
-}    // namespace hpx::execution::experimental
 
-/// \cond NOINTERNAL
-template <>
-struct hpx::parallel::execution::is_executor_parameters<
-    hpx::execution::experimental::default_parameters> : std::true_type
-{
-};
-/// \endcond
+    /// \cond NOINTERNAL
+    template <>
+    struct is_executor_parameters<
+        hpx::execution::experimental::default_parameters> : std::true_type
+    {
+    };
+    /// \endcond
+}    // namespace hpx::execution::experimental

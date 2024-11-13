@@ -1,5 +1,6 @@
 //  Copyright (c) 2020 John Biddiscombe
 //  Copyright (c) 2020 Teodor Nikolov
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -186,7 +187,7 @@ namespace hpx { namespace cuda { namespace experimental {
 
 }}}    // namespace hpx::cuda::experimental
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
     template <>
@@ -203,4 +204,4 @@ namespace hpx { namespace parallel { namespace execution {
         // we support returning a waitable/future
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

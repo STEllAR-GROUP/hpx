@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2015-2022 Hartmut Kaiser
+//  Copyright (c) 2015-2024 Hartmut Kaiser
 //  Copyright (c) 2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -183,7 +183,8 @@ struct external_future_additional_argument_executor
     }
 };
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
+
     template <>
     struct is_two_way_executor<external_future_executor> : std::true_type
     {
@@ -194,7 +195,7 @@ namespace hpx::parallel::execution {
       : std::true_type
     {
     };
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental
 
 int hpx_main()
 {

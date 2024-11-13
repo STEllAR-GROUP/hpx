@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -230,8 +230,8 @@ namespace hpx::execution {
             )>
         // clang-format on
         friend constexpr std::size_t tag_invoke(
-            hpx::parallel::execution::processing_units_count_t, Parameters&&,
-            sequenced_executor const&,
+            hpx::execution::experimental::processing_units_count_t,
+            Parameters&&, sequenced_executor const&,
             hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
             std::size_t = 0)
         {
@@ -279,7 +279,7 @@ namespace hpx::execution {
     };
 }    // namespace hpx::execution
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
     template <>
@@ -312,4 +312,4 @@ namespace hpx::parallel::execution {
     {
     };
     /// \endcond
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,7 +21,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     namespace detail {
 
@@ -185,9 +185,11 @@ namespace hpx::parallel::execution {
         DistPolicy policy_;
     };
 
+    // clang-format off
     template <typename DistPolicy>
     distribution_policy_executor(DistPolicy&&)
         -> distribution_policy_executor<std::decay_t<DistPolicy>>;
+    // clang-format on
 
     /// Create a new distribution_policy_executor from the given
     /// distribution_policy.
@@ -209,10 +211,9 @@ namespace hpx::parallel::execution {
 
     /// \cond NOINTERNAL
     template <typename DistPolicy>
-    struct is_two_way_executor<
-        parallel::execution::distribution_policy_executor<DistPolicy>>
+    struct is_two_way_executor<distribution_policy_executor<DistPolicy>>
       : std::true_type
     {
     };
     /// \endcond
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

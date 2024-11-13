@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2016 Marcin Copik
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -185,7 +185,7 @@ namespace hpx::execution {
                     hpx::traits::is_executor_any_v<std::decay_t<Executor_>>,
                     "hpx::traits::is_executor_any_v<Executor>");
 
-                return hpx::parallel::execution::create_rebound_policy(
+                return hpx::execution::experimental::create_rebound_policy(
                     derived(), HPX_FORWARD(Executor_, exec), parameters());
             }
 
@@ -206,9 +206,9 @@ namespace hpx::execution {
             template <typename... Parameters_>
             constexpr decltype(auto) with(Parameters_&&... params) const
             {
-                return hpx::parallel::execution::create_rebound_policy(
+                return hpx::execution::experimental::create_rebound_policy(
                     derived(), executor(),
-                    parallel::execution::join_executor_parameters(
+                    hpx::execution::experimental::join_executor_parameters(
                         HPX_FORWARD(Parameters_, params)...));
             }
 
@@ -239,7 +239,7 @@ namespace hpx::execution {
             }
 
         private:
-            friend struct hpx::parallel::execution::create_rebound_policy_t;
+            friend struct hpx::execution::experimental::create_rebound_policy_t;
             friend class hpx::serialization::access;
 
             template <typename Archive>
@@ -258,7 +258,7 @@ namespace hpx::execution {
         ///////////////////////////////////////////////////////////////////////
         // Extension: The class sequenced_task_policy_shim is an execution
         // policy type used as a unique type to disambiguate parallel algorithm
-        // overloading based on combining a underlying \a sequenced_task_policy
+        // overloading based on combining an underlying \a sequenced_task_policy
         // and an executor and indicate that a parallel algorithm's execution
         // may not be parallelized  (has to run sequentially).
         //
@@ -395,7 +395,7 @@ namespace hpx::execution {
         ///////////////////////////////////////////////////////////////////////
         // Extension: The class parallel_task_policy_shim is an execution policy
         // type used as a unique type to disambiguate parallel algorithm
-        // overloading based on combining a underlying \a parallel_task_policy
+        // overloading based on combining an underlying \a parallel_task_policy
         // and an executor and indicate that a parallel algorithm's execution
         // may be parallelized.
         template <typename Executor, typename Parameters>
@@ -664,7 +664,7 @@ namespace hpx::execution {
 
         // Extension: The class unsequenced_task_policy_shim is an execution
         // policy type used as a unique type to disambiguate parallel algorithm
-        // overloading based on combining a underlying \a
+        // overloading based on combining an underlying \a
         // unsequenced_task_policy and an executor and indicate that a parallel
         // algorithm's execution may be vectorized.
         //

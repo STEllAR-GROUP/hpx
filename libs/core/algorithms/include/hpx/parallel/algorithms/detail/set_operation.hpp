@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -114,9 +114,10 @@ namespace hpx::parallel::detail {
 
         using buffer_type = typename set_operations_buffer<Iter3>::type;
 
-        std::size_t cores = execution::processing_units_count(
-            policy.parameters(), policy.executor(), hpx::chrono::null_duration,
-            (std::min)(len1, len2));
+        std::size_t cores =
+            hpx::execution::experimental::processing_units_count(
+                policy.parameters(), policy.executor(),
+                hpx::chrono::null_duration, (std::min)(len1, len2));
 
         std::size_t const step = (len1 + cores - 1) / cores;
 
