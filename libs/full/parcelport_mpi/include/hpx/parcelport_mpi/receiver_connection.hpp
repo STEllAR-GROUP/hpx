@@ -1,6 +1,6 @@
 //  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c) 2007-2024 Hartmut Kaiser
-//  Copyright (c)      2023 Jiakun Yan
+//  Copyright (c) 2023-2024 Jiakun Yan
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -163,14 +163,11 @@ namespace hpx::parcelset::policies::mpi {
             {
                 util::mpi_environment::scoped_lock l;
 
-                int const ret = MPI_Irecv(buffer_.transmission_chunks_.data(),
-                    static_cast<int>(buffer_.transmission_chunks_.size() *
-                        sizeof(buffer_type::transmission_chunk_type)),
-                    MPI_BYTE, src_, tag_, util::mpi_environment::communicator(),
-                    &request_);
-                util::mpi_environment::check_mpi_error(
-                    l, HPX_CURRENT_SOURCE_LOCATION(), ret);
-
+                request_ = util::mpi_environment::irecv(
+                    buffer_.transmission_chunks_.data(),
+                    buffer_.transmission_chunks_.size() *
+                        sizeof(buffer_type::transmission_chunk_type),
+                    src_, tag_);
                 request_ptr_ = &request_;
 
                 state_ = connection_state::rcvd_transmission_chunks;
@@ -207,12 +204,8 @@ namespace hpx::parcelset::policies::mpi {
 
                 ack_ = static_cast<char>(
                     connection_state::acked_transmission_chunks);
-                int const ret =
-                    MPI_Isend(&ack_, sizeof(ack_), MPI_BYTE, src_, ack_tag(),
-                        util::mpi_environment::communicator(), &request_);
-                util::mpi_environment::check_mpi_error(
-                    l, HPX_CURRENT_SOURCE_LOCATION(), ret);
-
+                request_ = util::mpi_environment::isend(
+                    &ack_, sizeof(ack_), src_, ack_tag());
                 request_ptr_ = &request_;
             }
 
@@ -241,14 +234,8 @@ namespace hpx::parcelset::policies::mpi {
 
             if (need_recv_data)
             {
-                util::mpi_environment::scoped_lock l;
-
-                int const ret = MPI_Irecv(buffer_.data_.data(),
-                    static_cast<int>(buffer_.data_.size()), MPI_BYTE, src_,
-                    tag_, util::mpi_environment::communicator(), &request_);
-                util::mpi_environment::check_mpi_error(
-                    l, HPX_CURRENT_SOURCE_LOCATION(), ret);
-
+                request_ = util::mpi_environment::irecv(
+                    buffer_.data_.data(), buffer_.data_.size(), src_, tag_);
                 request_ptr_ = &request_;
 
                 state_ = connection_state::rcvd_data;
@@ -276,15 +263,8 @@ namespace hpx::parcelset::policies::mpi {
             HPX_ASSERT(request_ptr_ == nullptr);
 
             {
-                util::mpi_environment::scoped_lock l;
-
-                ack_ = static_cast<char>(connection_state::acked_data);
-                int const ret =
-                    MPI_Isend(&ack_, sizeof(ack_), MPI_BYTE, src_, ack_tag(),
-                        util::mpi_environment::communicator(), &request_);
-                util::mpi_environment::check_mpi_error(
-                    l, HPX_CURRENT_SOURCE_LOCATION(), ret);
-
+                request_ = util::mpi_environment::isend(
+                    &ack_, sizeof(ack_), src_, ack_tag());
                 request_ptr_ = &request_;
             }
 
@@ -372,17 +352,9 @@ namespace hpx::parcelset::policies::mpi {
                         "zero-copy chunk buffers should have been initialized "
                         "during de-serialization");
 
-                    {
-                        util::mpi_environment::scoped_lock l;
-
-                        int const ret = MPI_Irecv(c.data(),
-                            static_cast<int>(chunk_size), MPI_BYTE, src_, tag_,
-                            util::mpi_environment::communicator(), &request_);
-                        util::mpi_environment::check_mpi_error(
-                            l, HPX_CURRENT_SOURCE_LOCATION(), ret);
-
-                        request_ptr_ = &request_;
-                    }
+                    request_ = util::mpi_environment::irecv(
+                        c.data(), chunk_size, src_, tag_);
+                    request_ptr_ = &request_;
                 }
                 HPX_ASSERT_MSG(
                     zero_copy_chunks_idx_ == buffer_.num_chunks_.first,
@@ -412,14 +384,8 @@ namespace hpx::parcelset::policies::mpi {
                         c.data(), chunk_size);
 
                     {
-                        util::mpi_environment::scoped_lock l;
-
-                        int const ret = MPI_Irecv(c.data(),
-                            static_cast<int>(c.size()), MPI_BYTE, src_, tag_,
-                            util::mpi_environment::communicator(), &request_);
-                        util::mpi_environment::check_mpi_error(
-                            l, HPX_CURRENT_SOURCE_LOCATION(), ret);
-
+                        request_ = util::mpi_environment::irecv(
+                            c.data(), c.size(), src_, tag_);
                         request_ptr_ = &request_;
                     }
                 }
