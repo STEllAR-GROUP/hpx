@@ -82,6 +82,7 @@ if(NOT TARGET hpx_dependencies_boost)
   # cmake-format: off
   set(Boost_ADDITIONAL_VERSIONS
       ${Boost_ADDITIONAL_VERSIONS}
+      "1.86.0" "1.86"
       "1.85.0" "1.85"
       "1.84.0" "1.84"
       "1.83.0" "1.83"
@@ -109,7 +110,13 @@ if(NOT TARGET hpx_dependencies_boost)
   hpx_set_cmake_policy(CMP0167 OLD) # use CMake's FindBoost for now
 
   # Find the headers and get the version
-  find_package(Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE MODULE REQUIRED)
+  find_package(Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE CONFIG QUIET)
+  if(NOT Boost_FOUND)
+    find_package(Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE MODULE REQUIRED)
+    set(HPX_FIND_BOOST_PACKAGE_MODE MODULE)
+  else()
+    set(HPX_FIND_BOOST_PACKAGE_MODE CONFIG)
+  endif()
   if(NOT Boost_VERSION_STRING)
     set(Boost_VERSION_STRING
         "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}"
@@ -142,8 +149,8 @@ if(NOT TARGET hpx_dependencies_boost)
   endif()
 
   find_package(
-    Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE MODULE REQUIRED
-    COMPONENTS ${__boost_libraries}
+    Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE
+    ${HPX_FIND_BOOST_PACKAGE_MODE} REQUIRED COMPONENTS ${__boost_libraries}
   )
 
   if(NOT Boost_FOUND)
