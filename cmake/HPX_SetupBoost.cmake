@@ -117,13 +117,6 @@ if(NOT TARGET hpx_dependencies_boost)
   endif()
 
   set(__boost_libraries "")
-  if(HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING
-     OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE
-  )
-    set(__boost_libraries ${__boost_libraries} log log_setup date_time chrono
-                          thread
-    )
-  endif()
 
   if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
     # if context is needed, we should still link with boost thread and chrono
