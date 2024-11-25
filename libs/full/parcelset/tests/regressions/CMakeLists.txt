@@ -40,7 +40,7 @@ if(HPX_WITH_NETWORKING)
   add_hpx_regression_test(
     "modules.parcelset" very_big_parcel_int_max_plus_1
     EXECUTABLE very_big_parcel
-    PARCELPORTS tcp lci TIMEOUT 900
+    TIMEOUT 900
     PSEUDO_DEPS_NAME very_big_parcel ${very_big_parcel_PARAMETERS}
                                      --nbytes-add=1
   )
