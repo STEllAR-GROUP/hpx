@@ -87,8 +87,10 @@ namespace hpx::detail {
     inline constexpr bool is_argument_iterator_v =
         is_argument_iterator<Iter>::value;
 
-    constexpr auto round_up(
-        std::size_t n, std::size_t multiple) noexcept -> std::size_t
+    // clang-format off
+    constexpr auto round_up(std::size_t n, std::size_t multiple) noexcept
+        -> std::size_t
+    // clang-format on
     {
         return ((n + (multiple - 1)) / multiple) * multiple;
     }
@@ -209,9 +211,11 @@ namespace hpx::detail {
             alignment_of_small_vector<T>());
     }
 
+    // clang-format off
     template <typename T>
-    constexpr auto automatic_capacity(
-        std::size_t min_inline_capacity) noexcept -> std::size_t
+    constexpr auto automatic_capacity(std::size_t min_inline_capacity) noexcept
+        -> std::size_t
+    // clang-format on
     {
         return cx_min(
             (size_of_small_vector<T>(min_inline_capacity) - 1U) / sizeof(T),
@@ -316,8 +320,6 @@ namespace hpx::detail {
 
         void realloc(std::size_t new_capacity)
         {
-            // static_assert(!emulate_inplace_vector,
-                // "If called in an inplace_vector, it is a bug.");
             if (new_capacity <= N)
             {
                 // put everything into direct storage
@@ -370,9 +372,11 @@ namespace hpx::detail {
             }
         }
 
+        // clang-format off
         [[nodiscard]] static constexpr auto calculate_new_capacity(
-            std::size_t size_to_fit,
-            std::size_t starting_capacity) noexcept -> std::size_t
+            std::size_t size_to_fit, std::size_t starting_capacity) noexcept
+            -> std::size_t
+        // clang-format on
         {
             if (size_to_fit == 0)
             {
@@ -1023,8 +1027,10 @@ namespace hpx::detail {
             emplace_back(HPX_MOVE(value));
         }
 
-        [[nodiscard]] auto operator[](
-            std::size_t idx) const noexcept -> T const&
+        // clang-format off
+        [[nodiscard]] auto operator[](std::size_t idx) const noexcept
+            -> T const&
+        // clang-format on
         {
             return *(data() + idx);
         }
@@ -1265,8 +1271,10 @@ namespace hpx::detail {
             return emplace(pos, HPX_MOVE(value));
         }
 
-        auto insert(
-            const_iterator pos, std::size_t count, T const& value) -> iterator
+        // clang-format off
+        auto insert(const_iterator pos, std::size_t count, T const& value)
+            -> iterator
+        // clang-format on
         {
             if constexpr (emulate_inplace_vector)
             {
@@ -1356,46 +1364,76 @@ namespace hpx::detail {
         }
     };
 
-    template <typename T, std::size_t NA, std::size_t NB, typename alloc, bool emulate_inplace_vector>
-    [[nodiscard]] constexpr auto operator==(small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
-        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept -> bool
+    // clang-format off
+    template <typename T, std::size_t NA, std::size_t NB, typename alloc,
+        bool emulate_inplace_vector>
+    [[nodiscard]] constexpr auto operator==(
+        small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
+        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept
+        -> bool
+    // clang-format on
     {
         return std::equal(a.begin(), a.end(), b.begin(), b.end());
     }
 
-    template <typename T, std::size_t NA, std::size_t NB, typename alloc, bool emulate_inplace_vector>
-    [[nodiscard]] constexpr auto operator!=(small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
-        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept -> bool
+    // clang-format off
+    template <typename T, std::size_t NA, std::size_t NB, typename alloc,
+        bool emulate_inplace_vector>
+    [[nodiscard]] constexpr auto operator!=(
+        small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
+        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept
+        -> bool
+    // clang-format on
     {
         return !(a == b);
     }
 
-    template <typename T, std::size_t NA, std::size_t NB, typename alloc, bool emulate_inplace_vector>
-    [[nodiscard]] constexpr auto operator<(small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
-        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept -> bool
+    // clang-format off
+    template <typename T, std::size_t NA, std::size_t NB, typename alloc,
+        bool emulate_inplace_vector>
+    [[nodiscard]] constexpr auto operator<(
+        small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
+        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept
+        -> bool
+    // clang-format on
     {
         return std::lexicographical_compare(
             a.begin(), a.end(), b.begin(), b.end());
     }
 
-    template <typename T, std::size_t NA, std::size_t NB, typename alloc, bool emulate_inplace_vector>
-    [[nodiscard]] constexpr auto operator>=(small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
-        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept -> bool
+    // clang-format off
+    template <typename T, std::size_t NA, std::size_t NB, typename alloc,
+        bool emulate_inplace_vector>
+    [[nodiscard]] constexpr auto operator>=(
+        small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
+        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept
+        -> bool
+    // clang-format on
     {
         return !(a < b);
     }
 
-    template <typename T, std::size_t NA, std::size_t NB, typename alloc, bool emulate_inplace_vector>
-    [[nodiscard]] constexpr auto operator>(small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
-        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept -> bool
+    // clang-format off
+    template <typename T, std::size_t NA, std::size_t NB, typename alloc,
+        bool emulate_inplace_vector>
+    [[nodiscard]] constexpr auto operator>(
+        small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
+        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept
+        -> bool
+    // clang-format on
     {
         return std::lexicographical_compare(
             b.begin(), b.end(), a.begin(), a.end());
     }
 
-    template <typename T, std::size_t NA, std::size_t NB, typename alloc, bool emulate_inplace_vector>
-    [[nodiscard]] constexpr auto operator<=(small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
-        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept -> bool
+    // clang-format off
+    template <typename T, std::size_t NA, std::size_t NB, typename alloc,
+        bool emulate_inplace_vector>
+    [[nodiscard]] constexpr auto operator<=(
+        small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
+        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept
+        -> bool
+    // clang-format on
     {
         return !(a > b);
     }
