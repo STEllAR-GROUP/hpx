@@ -551,7 +551,9 @@ namespace hpx::detail {
             if constexpr (emulate_inplace_vector)
             {
                 // Can not have an inplace_vector with a size larger than N
-                if (s <= capacity())
+
+                // Enforce same signedness (forward iterator so s > 0)
+                if (static_cast<size_type>(s) > capacity())
                 {
                     throw std::bad_alloc();
                 }
