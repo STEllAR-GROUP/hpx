@@ -1,4 +1,5 @@
 //  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2024 Isidoros Tsaousis-Seiras
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -649,7 +650,7 @@ namespace hpx::detail {
             return p;
         }
 
-        // makes space for uninitialized data of cout elements. Also updates size.
+        // makes space for uninitialized data of count elements. Also updates size.
         [[nodiscard]] auto make_uninitialized_space(
             T const* pos, std::size_t count) -> T*
         {
