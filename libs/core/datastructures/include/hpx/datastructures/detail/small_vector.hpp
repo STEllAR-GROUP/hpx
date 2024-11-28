@@ -314,8 +314,8 @@ namespace hpx::detail {
 
         void realloc(std::size_t new_capacity)
         {
-            static_assert(!emulate_inplace_vector,
-                "If called in an inplace_vector, it is a bug.");
+            // static_assert(!emulate_inplace_vector,
+                // "If called in an inplace_vector, it is a bug.");
             if (new_capacity <= N)
             {
                 // put everything into direct storage
@@ -913,12 +913,17 @@ namespace hpx::detail {
                 {
                     throw std::bad_alloc();
                 }
+                // No-op
             }
-            auto const old_capacity = capacity();
-            auto const new_capacity = calculate_new_capacity(s, old_capacity);
-            if (new_capacity > old_capacity)
+            else
             {
-                realloc(new_capacity);
+                auto const old_capacity = capacity();
+                auto const new_capacity =
+                    calculate_new_capacity(s, old_capacity);
+                if (new_capacity > old_capacity)
+                {
+                    realloc(new_capacity);
+                }
             }
         }
 
@@ -962,42 +967,46 @@ namespace hpx::detail {
         template <typename... Args>
         auto emplace_back(Args&&... args) -> T&
         {
-            std::size_t s;    // NOLINT(cppcoreguidelines-init-variables)
-            if (is_direct())
+            if constexpr (emulate_inplace_vector)
             {
-                s = direct_size();
-                if constexpr (emulate_inplace_vector)
+                std::size_t s = direct_size();
+                if (s == N)
                 {
-                    // Exceeded static_storage
-                    if (s + 1 > N)
-                    {
-                        throw std::bad_alloc();
-                    }
+                    throw std::bad_alloc();
                 }
-
-                // avoid double-checking for inplace_vector
-                if (emulate_inplace_vector || s < N)
-                {
-                    set_direct_and_size(s + 1);
-                    return *hpx::construct_at(
-                        static_cast<T*>(direct_data() + s),
-                        HPX_FORWARD(Args, args)...);
-                }
-                realloc(calculate_new_capacity(N + 1, N));
+                set_direct_and_size(s + 1);
+                return *hpx::construct_at(static_cast<T*>(direct_data() + s),
+                    HPX_FORWARD(Args, args)...);
             }
             else
             {
-                s = size<direction::indirect>();
-                if (s == capacity<direction::indirect>())
+                std::size_t s;    // NOLINT(cppcoreguidelines-init-variables)
+                if (is_direct())
                 {
-                    realloc(calculate_new_capacity(s + 1, s));
+                    s = direct_size();
+                    if (s < N)
+                    {
+                        set_direct_and_size(s + 1);
+                        return *hpx::construct_at(
+                            static_cast<T*>(direct_data() + s),
+                            HPX_FORWARD(Args, args)...);
+                    }
+                    realloc(calculate_new_capacity(N + 1, N));
                 }
-            }
+                else
+                {
+                    s = size<direction::indirect>();
+                    if (s == capacity<direction::indirect>())
+                    {
+                        realloc(calculate_new_capacity(s + 1, s));
+                    }
+                }
 
-            set_size<direction::indirect>(s + 1);
-            return *hpx::construct_at(
-                static_cast<T*>(data<direction::indirect>() + s),
-                HPX_FORWARD(Args, args)...);
+                set_size<direction::indirect>(s + 1);
+                return *hpx::construct_at(
+                    static_cast<T*>(data<direction::indirect>() + s),
+                    HPX_FORWARD(Args, args)...);
+            }
         }
 
         void push_back(T const& value)
@@ -1056,11 +1065,20 @@ namespace hpx::detail {
 
         [[nodiscard]] auto end() const noexcept -> T const*
         {
-            if (is_direct())
+            if constexpr (emulate_inplace_vector)
             {
                 return data<direction::direct>() + size<direction::direct>();
             }
-            return data<direction::indirect>() + size<direction::indirect>();
+            else
+            {
+                if (is_direct())
+                {
+                    return data<direction::direct>() +
+                        size<direction::direct>();
+                }
+                return data<direction::indirect>() +
+                    size<direction::indirect>();
+            }
         }
 
         [[nodiscard]] auto cend() const noexcept -> T const*
@@ -1177,7 +1195,8 @@ namespace hpx::detail {
         {
             if constexpr (emulate_inplace_vector)
                 return N;
-            return (std::numeric_limits<std::size_t>::max)();
+            else
+                return (std::numeric_limits<std::size_t>::max)();
         }
 
         void swap(small_vector& other) noexcept
@@ -1196,22 +1215,24 @@ namespace hpx::detail {
                 // Can not change the capacity of a static vector so noop
                 return;
             }
-
-            auto const c = capacity();
-            auto const s = size();
-            if (s >= c)
+            else
             {
-                return;
-            }
+                auto const c = capacity();
+                auto const s = size();
+                if (s >= c)
+                {
+                    return;
+                }
 
-            auto new_capacity = calculate_new_capacity(s, N);
-            if (new_capacity == c)
-            {
-                // nothing change!
-                return;
-            }
+                auto new_capacity = calculate_new_capacity(s, N);
+                if (new_capacity == c)
+                {
+                    // nothing change!
+                    return;
+                }
 
-            realloc(new_capacity);
+                realloc(new_capacity);
+            }
         }
 
         template <typename... Args>
