@@ -49,6 +49,7 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
+#include <variant>
 
 namespace hpx::detail {
 
@@ -1397,9 +1398,9 @@ namespace hpx::detail {
         return !(a > b);
     }
 
-    template <typename T, std::size_t MinInlineCapacity,
-        typename Allocator = std::allocator<T>>
-    using inplace_vector = small_vector<T, MinInlineCapacity, Allocator, true>;
+    template <typename T, std::size_t MinInlineCapacity>
+    using inplace_vector = small_vector<T, MinInlineCapacity,
+        /* Ignore Allocator */ std::monostate, true>;
 }    // namespace hpx::detail
 
 // NOLINTNEXTLINE(cert-dcl58-cpp)
