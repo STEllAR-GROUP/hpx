@@ -344,7 +344,7 @@ namespace test {
         HPX_TEST_EQ(dist2, cont_b.size());
 
         for (std::size_t i = 0; itcont_a != itcont_a_end;
-            ++itcont_a, ++itcont_b, ++i)
+             ++itcont_a, ++itcont_b, ++i)
         {
             HPX_TEST_EQ(*itcont_a, *itcont_b);
         }
@@ -728,11 +728,11 @@ namespace test {
                 HPX_ASSERT(false);
             }
         }
-         {
+        {
             inplace_vector<int, 5> v = {1, 2, 3, 4, 5};
             try
             {
-                (void)v.at(6);
+                (void) v.at(6);
             }
             catch (std::out_of_range&)
             {
@@ -742,8 +742,6 @@ namespace test {
                 HPX_ASSERT(false);
             }
         }
-
-
     }
 }    // namespace test
 

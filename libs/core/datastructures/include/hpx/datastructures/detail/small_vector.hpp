@@ -625,7 +625,7 @@ namespace hpx::detail {
         {
             auto target = small_vector();
 
-            // we know target is indirect because we're increasing capacity
+            // we know target is indirect because we are increasing capacity
             target.reserve(s + count);
 
             // move everything [begin, pos[
