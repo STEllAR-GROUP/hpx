@@ -1356,46 +1356,46 @@ namespace hpx::detail {
         }
     };
 
-    template <typename T, std::size_t NA, std::size_t NB>
-    [[nodiscard]] constexpr auto operator==(small_vector<T, NA> const& a,
-        small_vector<T, NB> const& b) noexcept -> bool
+    template <typename T, std::size_t NA, std::size_t NB, typename alloc, bool emulate_inplace_vector>
+    [[nodiscard]] constexpr auto operator==(small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
+        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept -> bool
     {
         return std::equal(a.begin(), a.end(), b.begin(), b.end());
     }
 
-    template <typename T, std::size_t NA, std::size_t NB>
-    [[nodiscard]] constexpr auto operator!=(small_vector<T, NA> const& a,
-        small_vector<T, NB> const& b) noexcept -> bool
+    template <typename T, std::size_t NA, std::size_t NB, typename alloc, bool emulate_inplace_vector>
+    [[nodiscard]] constexpr auto operator!=(small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
+        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept -> bool
     {
         return !(a == b);
     }
 
-    template <typename T, std::size_t NA, std::size_t NB>
-    [[nodiscard]] constexpr auto operator<(small_vector<T, NA> const& a,
-        small_vector<T, NB> const& b) noexcept -> bool
+    template <typename T, std::size_t NA, std::size_t NB, typename alloc, bool emulate_inplace_vector>
+    [[nodiscard]] constexpr auto operator<(small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
+        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept -> bool
     {
         return std::lexicographical_compare(
             a.begin(), a.end(), b.begin(), b.end());
     }
 
-    template <typename T, std::size_t NA, std::size_t NB>
-    [[nodiscard]] constexpr auto operator>=(small_vector<T, NA> const& a,
-        small_vector<T, NB> const& b) noexcept -> bool
+    template <typename T, std::size_t NA, std::size_t NB, typename alloc, bool emulate_inplace_vector>
+    [[nodiscard]] constexpr auto operator>=(small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
+        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept -> bool
     {
         return !(a < b);
     }
 
-    template <typename T, std::size_t NA, std::size_t NB>
-    [[nodiscard]] constexpr auto operator>(small_vector<T, NA> const& a,
-        small_vector<T, NB> const& b) noexcept -> bool
+    template <typename T, std::size_t NA, std::size_t NB, typename alloc, bool emulate_inplace_vector>
+    [[nodiscard]] constexpr auto operator>(small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
+        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept -> bool
     {
         return std::lexicographical_compare(
             b.begin(), b.end(), a.begin(), a.end());
     }
 
-    template <typename T, std::size_t NA, std::size_t NB>
-    [[nodiscard]] constexpr auto operator<=(small_vector<T, NA> const& a,
-        small_vector<T, NB> const& b) noexcept -> bool
+    template <typename T, std::size_t NA, std::size_t NB, typename alloc, bool emulate_inplace_vector>
+    [[nodiscard]] constexpr auto operator<=(small_vector<T, NA, alloc, emulate_inplace_vector> const& a,
+        small_vector<T, NB, alloc, emulate_inplace_vector> const& b) noexcept -> bool
     {
         return !(a > b);
     }
