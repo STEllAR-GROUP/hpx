@@ -89,7 +89,7 @@ function(hpx_check_compiler_compatibility)
 endfunction()
 
 function(hpx_check_boost_compatibility)
-  if(HPX_IGNORE_BOOST_COMPATIBILITY)
+  if(HPX_IGNORE_BOOST_COMPATIBILITY OR HPX_WITH_FETCH_BOOST)
     return()
   endif()
   if(NOT DEFINED Boost_ROOT)
