@@ -46,3 +46,8 @@ add_hpx_module(
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )
+
+# see #6579
+if(MSVC AND Boost_VERSION_STRING VERSION_LESS "1.79.0")
+  target_compile_definitions(hpx_batch_environments PRIVATE NOMINMAX)
+endif()
