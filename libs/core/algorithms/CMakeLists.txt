@@ -27,6 +27,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/dispatch.hpp
     hpx/parallel/algorithms/detail/distance.hpp
     hpx/parallel/algorithms/detail/equal.hpp
+    hpx/parallel/algorithms/detail/simd_sort.hpp
     hpx/parallel/algorithms/detail/fill.hpp
     hpx/parallel/algorithms/detail/find.hpp
     hpx/parallel/algorithms/detail/generate.hpp
