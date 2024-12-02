@@ -8,7 +8,9 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <type_traits>
+#include <vector>
 
 namespace hpx::traits {
 
@@ -29,6 +31,20 @@ namespace hpx::traits {
         static std::size_t call(Policy const& policy)
         {
             return policy.get_num_localities();
+        }
+    };
+
+    // By default, the sizes of the partitions are equal across the localities
+    // represented by the given distribution policy.
+    template <typename Policy, typename Enable = void>
+    struct container_partition_sizes
+    {
+        static std::vector<std::size_t> call(
+            Policy const& policy, std::size_t const size)
+        {
+            std::size_t const num_parts = policy.get_num_partitions();
+            return std::vector<std::size_t>(
+                num_parts, (size + num_parts - 1) / num_parts);
         }
     };
 }    // namespace hpx::traits

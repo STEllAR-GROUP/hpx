@@ -100,8 +100,8 @@ namespace hpx {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Action, typename Result>
-        void set_lco_value(hpx::id_type const& id, naming::address&& addr,
-            Result&& t, bool move_credits)
+        void set_lco_value(hpx::id_type id, naming::address&& addr, Result&& t,
+            bool move_credits)
         {
             constexpr launch::async_policy policy(
                 actions::action_priority<Action>(),
@@ -127,8 +127,8 @@ namespace hpx {
         ///////////////////////////////////////////////////////////////////////
         template <typename LocalResult, typename RemoteResult, typename Action,
             typename Result>
-        void set_lco_value(hpx::id_type const& id, naming::address&& addr,
-            Result&& t, hpx::id_type const& cont, bool move_credits)
+        void set_lco_value(hpx::id_type id, naming::address&& addr, Result&& t,
+            hpx::id_type const& cont, bool move_credits)
         {
             if (move_credits &&
                 id.get_management_type() !=
@@ -156,7 +156,7 @@ namespace hpx {
 
     /// \cond NOINTERNAL
     template <typename Result>
-    void set_lco_value([[maybe_unused]] hpx::id_type const& id,
+    void set_lco_value([[maybe_unused]] hpx::id_type id,
         [[maybe_unused]] naming::address&& addr, [[maybe_unused]] Result&& t,
         [[maybe_unused]] bool move_credits)
     {
@@ -199,7 +199,7 @@ namespace hpx {
     }
 
     template <typename Result>
-    void set_lco_value([[maybe_unused]] hpx::id_type const& id,
+    void set_lco_value([[maybe_unused]] hpx::id_type id,
         [[maybe_unused]] naming::address&& addr, [[maybe_unused]] Result&& t,
         [[maybe_unused]] hpx::id_type const& cont,
         [[maybe_unused]] bool move_credits)

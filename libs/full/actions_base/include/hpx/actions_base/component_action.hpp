@@ -297,7 +297,8 @@ namespace hpx::actions {
       : hpx::actions::make_direct_action_t<decltype(&component::func),         \
             &component::func, name>                                            \
     {                                                                          \
-    }; /**/
+    };                                                                         \
+    /**/
 
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_2(component, func)                  \
     HPX_DEFINE_COMPONENT_DIRECT_ACTION_3(                                      \

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -50,9 +50,8 @@ namespace hpx { namespace components { namespace stubs {
                 return hpx::make_ready_future(hpx::invalid_id);
             }
 
-            typedef server::create_component_action<Component,
-                typename std::decay<Ts>::type...>
-                action_type;
+            using action_type =
+                server::create_component_action<Component, std::decay_t<Ts>...>;
             return hpx::async<action_type>(gid, HPX_FORWARD(Ts, vs)...);
         }
 
@@ -68,36 +67,35 @@ namespace hpx { namespace components { namespace stubs {
         }
 
         /// Create multiple new components \a type using the runtime_support
-        /// colocated with the with the given \a targetgid. This is a
+        /// colocated with the given \a targetgid. This is a
         /// non-blocking call.
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         static hpx::future<std::vector<hpx::id_type>>
         bulk_create_component_colocated_async(
             hpx::id_type const& gid, std::size_t count, Ts&&... vs)
         {
-            typedef server::bulk_create_component_action<Component,
-                typename std::decay<Ts>::type...>
-                action_type;
+            using action_type = server::bulk_create_component_action<WithCount,
+                Component, std::decay_t<Ts>...>;
 
             return hpx::detail::async_colocated<action_type>(
                 gid, count, HPX_FORWARD(Ts, vs)...);
         }
 
         /// Create multiple new components \a type using the runtime_support
-        /// colocated with the with the given \a targetgid. Block for the
+        /// colocated with the given \a targetgid. Block for the
         /// creation to finish.
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         static std::vector<hpx::id_type> bulk_create_component_colocated(
             hpx::id_type const& gid, std::size_t count, Ts&&... vs)
         {
-            return bulk_create_component_colocated_async<Component>(
+            return bulk_create_component_colocated_async<WithCount, Component>(
                 gid, count, HPX_FORWARD(Ts, vs)...)
                 .get();
         }
 
         /// Create multiple new components \a type using the runtime_support
         /// on the given locality. This is a  non-blocking call.
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         static hpx::future<std::vector<hpx::id_type>>
         bulk_create_component_async(
             hpx::id_type const& gid, std::size_t count, Ts&&... vs)
@@ -108,22 +106,20 @@ namespace hpx { namespace components { namespace stubs {
                     "stubs::runtime_support::bulk_create_component_async",
                     "The id passed as the first argument is not representing"
                     " a locality");
-                return hpx::make_ready_future(std::vector<hpx::id_type>());
             }
 
-            typedef server::bulk_create_component_action<Component,
-                typename std::decay<Ts>::type...>
-                action_type;
+            using action_type = server::bulk_create_component_action<WithCount,
+                Component, std::decay_t<Ts>...>;
             return hpx::async<action_type>(gid, count, HPX_FORWARD(Ts, vs)...);
         }
 
         /// Create multiple new components \a type using the runtime_support
         /// on the given locality. Block for the creation to finish.
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         static std::vector<hpx::id_type> bulk_create_component(
             hpx::id_type const& gid, std::size_t count, Ts&&... vs)
         {
-            return bulk_create_component_async<Component>(
+            return bulk_create_component_async<WithCount, Component>(
                 gid, count, HPX_FORWARD(Ts, vs)...)
                 .get();
         }
@@ -136,9 +132,8 @@ namespace hpx { namespace components { namespace stubs {
         static hpx::future<hpx::id_type> create_component_colocated_async(
             hpx::id_type const& gid, Ts&&... vs)
         {
-            typedef server::create_component_action<Component,
-                typename std::decay<Ts>::type...>
-                action_type;
+            using action_type =
+                server::create_component_action<Component, std::decay_t<Ts>...>;
             return hpx::detail::async_colocated<action_type>(
                 gid, HPX_FORWARD(Ts, vs)...);
         }
@@ -170,8 +165,8 @@ namespace hpx { namespace components { namespace stubs {
                 return hpx::make_ready_future(hpx::invalid_id);
             }
 
-            typedef typename server::copy_create_component_action<Component>
-                action_type;
+            using action_type =
+                typename server::copy_create_component_action<Component>;
             return hpx::async<action_type>(gid, p, local_op);
         }
 
@@ -201,8 +196,8 @@ namespace hpx { namespace components { namespace stubs {
                 return hpx::make_ready_future(hpx::invalid_id);
             }
 
-            typedef typename server::migrate_component_here_action<Component>
-                action_type;
+            using action_type =
+                typename server::migrate_component_here_action<Component>;
             return hpx::async<action_type>(target_locality, p, to_migrate);
         }
 
@@ -211,8 +206,8 @@ namespace hpx { namespace components { namespace stubs {
             DistPolicy const& policy, std::shared_ptr<Component> const& p,
             hpx::id_type const& to_migrate)
         {
-            typedef typename server::migrate_component_here_action<Component>
-                action_type;
+            using action_type =
+                typename server::migrate_component_here_action<Component>;
             return hpx::async<action_type>(policy, p, to_migrate);
         }
 

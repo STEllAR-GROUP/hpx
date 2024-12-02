@@ -18,7 +18,7 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename TD>
+        template <typename TD, typename Enable = void>
         struct decay_unwrap_impl
         {
             using type = TD;

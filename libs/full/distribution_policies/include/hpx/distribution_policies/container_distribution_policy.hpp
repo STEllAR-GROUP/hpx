@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Bibek Ghimire
-//  Copyright (c) 2014-2023 Hartmut Kaiser
+//  Copyright (c) 2014-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,20 +31,18 @@ namespace hpx {
     struct container_distribution_policy
       : components::default_distribution_policy
     {
-    public:
-        constexpr container_distribution_policy() = default;
+        container_distribution_policy() = default;
 
         container_distribution_policy operator()(
             std::size_t num_partitions) const
         {
-            return container_distribution_policy(
-                num_partitions, get_localities());
+            return {num_partitions, get_localities()};
         }
 
         container_distribution_policy operator()(
             hpx::id_type const& locality) const
         {
-            return container_distribution_policy(locality);
+            return {locality};
         }
 
         container_distribution_policy operator()(
@@ -52,10 +50,9 @@ namespace hpx {
         {
             if (num_partitions_ != static_cast<std::size_t>(-1))
             {
-                return container_distribution_policy(
-                    num_partitions_, localities);
+                return {num_partitions_, localities};
             }
-            return container_distribution_policy(localities.size(), localities);
+            return {localities.size(), localities};
         }
 
         container_distribution_policy operator()(
@@ -63,24 +60,21 @@ namespace hpx {
         {
             if (num_partitions_ != static_cast<std::size_t>(-1))
             {
-                return container_distribution_policy(
-                    num_partitions_, HPX_MOVE(localities));
+                return {num_partitions_, HPX_MOVE(localities)};
             }
-            return container_distribution_policy(
-                localities.size(), HPX_MOVE(localities));
+            return {localities.size(), HPX_MOVE(localities)};
         }
 
         container_distribution_policy operator()(std::size_t num_partitions,
             std::vector<id_type> const& localities) const
         {
-            return container_distribution_policy(num_partitions, localities);
+            return {num_partitions, localities};
         }
 
         container_distribution_policy operator()(
             std::size_t num_partitions, std::vector<id_type>&& localities) const
         {
-            return container_distribution_policy(
-                num_partitions, HPX_MOVE(localities));
+            return {num_partitions, HPX_MOVE(localities)};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -135,12 +129,11 @@ namespace hpx {
         {
         }
 
-        explicit container_distribution_policy(hpx::id_type const& locality)
+        container_distribution_policy(hpx::id_type const& locality)
           : components::default_distribution_policy(locality)
         {
         }
 
-    private:
         // number of chunks to create
         std::size_t num_partitions_ = static_cast<std::size_t>(-1);
     };
