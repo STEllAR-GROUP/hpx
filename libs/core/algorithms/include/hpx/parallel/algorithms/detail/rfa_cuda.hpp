@@ -22,12 +22,94 @@
 #pragma once
 
 #include <algorithm>
-#include <array>
+#include <climits>
 #include <cmath>
 #include <cstdint>
 #include <limits>
 
-namespace RFA {
+#ifndef __CUDACC__
+#define __host__
+#define __device__
+#define __forceinline__
+#include <array>
+using std::array;
+using std::max;
+using std::min;
+#else
+#include <cuda/std/array>
+using cuda::std::array;
+using cuda::std::max;
+using cuda::std::min;
+#include "vector.hpp"
+#endif
+
+namespace hpx::parallel::detail::rfa {
+    template <typename F>
+    struct type4
+    {
+        F x;
+        F y;
+        F z;
+        F w;
+    };
+
+    template <typename F>
+    struct type2
+    {
+        F x;
+        F y;
+    };
+    using float4 = type4<float>;
+    using double4 = type4<double>;
+    using float2 = type2<float>;
+    using double2 = type2<double>;
+
+    auto abs_max(float4 a)
+    {
+        auto x = std::abs(a.x);
+        auto y = std::abs(a.y);
+        auto z = std::abs(a.z);
+        auto w = std::abs(a.w);
+        const std::vector<float> v = {x, y, z, w};
+        return *std::max_element(v.begin(), v.end());
+    }
+
+    auto abs_max(double4 a)
+    {
+        auto x = std::abs(a.x);
+        auto y = std::abs(a.y);
+        auto z = std::abs(a.z);
+        auto w = std::abs(a.w);
+        const std::vector<double> v = {x, y, z, w};
+        return *std::max_element(v.begin(), v.end());
+    }
+
+    auto abs_max(float2 a)
+    {
+        auto x = std::abs(a.x);
+        auto y = std::abs(a.y);
+        const std::vector<float> v = {x, y};
+        return *std::max_element(v.begin(), v.end());
+    }
+
+    auto abs_max(double2 a)
+    {
+        auto x = std::abs(a.x);
+        auto y = std::abs(a.y);
+        const std::vector<double> v = {x, y};
+        return *std::max_element(v.begin(), v.end());
+    }
+
+// disable zero checks
+#define DISABLE_ZERO
+
+// disable nan / infinity checks
+#define DISABLE_NANINF
+
+// jump table for indexing into data
+#define MAX_JUMP 5
+    static_assert(MAX_JUMP <= 5, "MAX_JUMP greater than max");
+
     template <typename Real>
     inline constexpr Real ldexp_impl(Real arg, int exp) noexcept
     {
@@ -50,21 +132,77 @@ namespace RFA {
         // return arg;
     }
 
+    template <class ftype>
+    struct RFA_bins
+    {
+        static constexpr auto BIN_WIDTH =
+            std::is_same_v<ftype, double> ? 40 : 13;
+        static constexpr auto MIN_EXP =
+            std::numeric_limits<ftype>::min_exponent;
+        static constexpr auto MAX_EXP =
+            std::numeric_limits<ftype>::max_exponent;
+        static constexpr auto MANT_DIG = std::numeric_limits<ftype>::digits;
+        ///Binned floating-point maximum index
+        static constexpr auto MAXINDEX =
+            ((MAX_EXP - MIN_EXP + MANT_DIG - 1) / BIN_WIDTH) - 1;
+        //The maximum floating-point fold supported by the library
+        static constexpr auto MAXFOLD = MAXINDEX + 1;
+
+        ///The binned floating-point reference bins
+        array<ftype, MAXINDEX + MAXFOLD> bins = {};
+
+        constexpr ftype& operator[](int d)
+        {
+            return bins[d];
+        }
+
+        void initialize_bins()
+        {
+            if constexpr (std::is_same_v<ftype, float>)
+            {
+                bins[0] = std::ldexp(0.75, MAX_EXP);
+            }
+            else
+            {
+                bins[0] = 2.0 * ldexp(0.75, MAX_EXP - 1);
+            }
+
+            for (int index = 1; index <= MAXINDEX; index++)
+            {
+                bins[index] = ldexp(0.75,
+                    MAX_EXP + MANT_DIG - BIN_WIDTH + 1 - index * BIN_WIDTH);
+            }
+            for (int index = MAXINDEX + 1; index < MAXINDEX + MAXFOLD; index++)
+            {
+                bins[index] = bins[index - 1];
+            }
+        }
+    };
+
+    static char bin_host_buffer[sizeof(RFA_bins<double>)];
+#ifdef __CUDACC__
+    __constant__ static char bin_device_buffer[sizeof(RFA_bins<double>)];
+#endif
+
     ///Class to hold a reproducible summation of the numbers passed to it
     ///
-    ///@param ftype Floating-point data type; either `float` or `double`
+    ///@param ftype Floating-point data type; either `float` or `double
     ///@param FOLD  The fold; use 3 as a default unless you understand it.
-    template <class ftype, int FOLD = 3,
-        typename std::enable_if<std::is_floating_point<ftype>::value>::type* =
+    template <class ftype_, int FOLD_ = 3,
+        typename std::enable_if_t<std::is_floating_point<ftype_>::value>* =
             nullptr>
-    class ReproducibleFloatingAccumulator
+    class alignas(2 * sizeof(ftype_)) ReproducibleFloatingAccumulator
     {
     public:
-        std::array<ftype, 2 * FOLD> data = {0};
+        using ftype = ftype_;
+        static constexpr int FOLD = FOLD_;
+
+    private:
+        array<ftype, 2 * FOLD> data = {0};
 
         ///Floating-point precision bin width
         static constexpr auto BIN_WIDTH =
-            std::is_same<ftype, double>::value ? 40 : 13;
+            std::is_same_v<ftype, double> ? 40 : 13;
         static constexpr auto MIN_EXP =
             std::numeric_limits<ftype>::min_exponent;
         static constexpr auto MAX_EXP =
@@ -91,43 +229,15 @@ namespace RFA {
         ///The number of deposits that can be performed before a renorm is necessary.
         ///Applies also to binned complex double precision.
         static constexpr auto ENDURANCE = 1 << (MANT_DIG - BIN_WIDTH - 2);
-        // static_assert(ENDURANCE == 0);
-    public:
-        ///Generates binned floating-point reference bins
-        static constexpr std::array<ftype, MAXINDEX + MAXFOLD> initialize_bins()
-        {
-            std::array<ftype, MAXINDEX + MAXFOLD> bins{0};
 
-            if (std::is_same<ftype, float>::value)
-            {
-                bins[0] = ldexp_impl(0.75, MAX_EXP);
-            }
-            else
-            {
-                bins[0] = 2.0 * ldexp_impl(0.75, MAX_EXP - 1);
-            }
-
-            for (int index = 1; index <= MAXINDEX; index++)
-            {
-                bins[index] = ldexp_impl(0.75,
-                    MAX_EXP + MANT_DIG - BIN_WIDTH + 1 - index * BIN_WIDTH);
-            }
-            for (int index = MAXINDEX + 1; index < MAXINDEX + MAXFOLD; index++)
-            {
-                bins[index] = bins[index - 1];
-            }
-
-            return bins;
-        }
-
-        ///The binned floating-point reference bins
-        static std::array<ftype, MAXINDEX + MAXFOLD> bins;
-
-    private:
         ///Return a binned floating-point reference bin
-        static inline constexpr const ftype* binned_bins(const int x)
+        inline const ftype* binned_bins(const int x) const
         {
-            return &bins[x];
+#ifdef __CUDA_ARCH__    // must be arch not CC here
+            return &reinterpret_cast<RFA_bins<ftype>&>(bin_device_buffer)[x];
+#else
+            return &reinterpret_cast<RFA_bins<ftype>&>(bin_host_buffer)[x];
+#endif
         }
 
         ///Get the bit representation of a float
@@ -151,33 +261,109 @@ namespace RFA {
             return *reinterpret_cast<const uint64_t*>(&x);
         }
 
-        ///Return a pointer to the primary vector
-        inline ftype* pvec()
+        ///Return primary vector value const ref
+        inline const ftype& primary(int i) const
         {
-            return &data[0];
-        }
-        ///Return a pointer to the carry vector
-        inline ftype* cvec()
-        {
-            return &data[FOLD];
-        }
-        ///Return a const pointer to the primary vector
-        inline const ftype* pvec() const
-        {
-            return &data[0];
-        }
-        ///Return a const pointer to the carry vector
-        inline const ftype* cvec() const
-        {
-            return &data[FOLD];
+            if constexpr (FOLD <= MAX_JUMP)
+            {
+                switch (i)
+                {
+                case 0:
+                    if constexpr (FOLD >= 1)
+                        return data[0];
+                case 1:
+                    if constexpr (FOLD >= 2)
+                        return data[1];
+                case 2:
+                    if constexpr (FOLD >= 3)
+                        return data[2];
+                case 3:
+                    if constexpr (FOLD >= 4)
+                        return data[3];
+                case 4:
+                    if constexpr (FOLD >= 5)
+                        return data[4];
+                default:
+                    return data[FOLD - 1];
+                }
+            }
+            else
+            {
+                return data[i];
+            }
         }
 
+        ///Return carry vector value const ref
+        inline const ftype& carry(int i) const
+        {
+            if constexpr (FOLD <= MAX_JUMP)
+            {
+                switch (i)
+                {
+                case 0:
+                    if constexpr (FOLD >= 1)
+                        return data[FOLD + 0];
+                case 1:
+                    if constexpr (FOLD >= 2)
+                        return data[FOLD + 1];
+                case 2:
+                    if constexpr (FOLD >= 3)
+                        return data[FOLD + 2];
+                case 3:
+                    if constexpr (FOLD >= 4)
+                        return data[FOLD + 3];
+                case 4:
+                    if constexpr (FOLD >= 5)
+                        return data[FOLD + 4];
+                default:
+                    return data[2 * FOLD - 1];
+                }
+            }
+            else
+            {
+                return data[FOLD + i];
+            }
+        }
+
+        ///Return primary vector value ref
+        inline ftype& primary(int i)
+        {
+            const auto& c = *this;
+            return const_cast<ftype&>(c.primary(i));
+        }
+
+        ///Return carry vector value ref
+        inline ftype& carry(int i)
+        {
+            const auto& c = *this;
+            return const_cast<ftype&>(c.carry(i));
+        }
+
+#ifdef DISABLE_ZERO
+        static inline constexpr bool ISZERO(const ftype)
+        {
+            return false;
+        }
+#else
+        static inline constexpr bool ISZERO(const ftype x)
+        {
+            return x == 0.0;
+        }
+#endif
+
+#ifdef DISABLE_NANINF
+        static inline constexpr int ISNANINF(const ftype)
+        {
+            return false;
+        }
+#else
         static inline constexpr int ISNANINF(const ftype x)
         {
             const auto bits = get_bits(x);
             return (bits & ((2ull * MAX_EXP - 1) << (MANT_DIG - 1))) ==
                 ((2ull * MAX_EXP - 1) << (MANT_DIG - 1));
         }
+#endif
 
         static inline constexpr int EXP(const ftype x)
         {
@@ -201,7 +387,7 @@ namespace RFA {
                 else
                 {
                     frexp(x, &exp);
-                    return std::min((MAX_EXP - exp) / BIN_WIDTH, MAXINDEX);
+                    return min((MAX_EXP - exp) / BIN_WIDTH, MAXINDEX);
                 }
             }
             return ((MAX_EXP + EXP_BIAS) - exp) / BIN_WIDTH;
@@ -213,7 +399,7 @@ namespace RFA {
         inline int binned_index() const
         {
             return ((MAX_EXP + MANT_DIG - BIN_WIDTH + 1 + EXP_BIAS) -
-                       EXP(pvec()[0])) /
+                       EXP(primary(0))) /
                 BIN_WIDTH;
         }
 
@@ -221,7 +407,7 @@ namespace RFA {
         ///A quick check to determine if the index is 0
         inline bool binned_index0() const
         {
-            return EXP(pvec()[0]) == MAX_EXP + EXP_BIAS;
+            return EXP(primary(0)) == MAX_EXP + EXP_BIAS;
         }
 
         ///Update manually specified binned fp with a scalar (X -> Y)
@@ -234,43 +420,40 @@ namespace RFA {
         void binned_dmdupdate(
             const ftype max_abs_val, const int incpriY, const int inccarY)
         {
-            int i;
-            int j;
-            int X_index;
-            int shift;
-            auto* const priY = pvec();
-            auto* const carY = cvec();
-
-            if (ISNANINF(priY[0]))
-            {
+            if (ISNANINF(primary(0)))
                 return;
-            }
 
-            X_index = binned_dindex(max_abs_val);
-            if (priY[0] == 0.0)
+            int X_index = binned_dindex(max_abs_val);
+            if (ISZERO(primary(0)))
             {
                 const ftype* const bins = binned_bins(X_index);
-                for (i = 0; i < FOLD; i++)
+                for (int i = 0; i < FOLD; i++)
                 {
-                    priY[i * incpriY] = bins[i];
-                    carY[i * inccarY] = 0.0;
+                    primary(i * incpriY) = bins[i];
+                    carry(i * inccarY) = 0.0;
                 }
             }
             else
             {
-                shift = binned_index() - X_index;
+                int shift = binned_index() - X_index;
                 if (shift > 0)
                 {
-                    for (i = FOLD - 1; i >= shift; i--)
+#pragma unroll
+                    for (int i = FOLD - 1; i >= 1; i--)
                     {
-                        priY[i * incpriY] = priY[(i - shift) * incpriY];
-                        carY[i * inccarY] = carY[(i - shift) * inccarY];
+                        if (i < shift)
+                            break;
+                        primary(i * incpriY) = primary((i - shift) * incpriY);
+                        carry(i * inccarY) = carry((i - shift) * inccarY);
                     }
                     const ftype* const bins = binned_bins(X_index);
-                    for (j = 0; j < i + 1; j++)
+#pragma unroll
+                    for (int j = 0; j < FOLD; j++)
                     {
-                        priY[j * incpriY] = bins[j];
-                        carY[j * inccarY] = 0.0;
+                        if (j >= shift)
+                            break;
+                        primary(j * incpriY) = bins[j];
+                        carry(j * inccarY) = 0.0;
                     }
                 }
             }
@@ -285,59 +468,59 @@ namespace RFA {
         void binned_dmddeposit(const ftype X, const int incpriY)
         {
             ftype M;
-            int i;
             ftype x = X;
-            auto* const priY = pvec();
 
-            if (ISNANINF(x) || ISNANINF(priY[0]))
+            if (ISNANINF(x) || ISNANINF(primary(0)))
             {
-                priY[0] += x;
+                primary(0) += x;
                 return;
             }
 
             if (binned_index0())
             {
-                M = priY[0];
+                M = primary(0);
                 ftype qd = x * COMPRESSION;
                 auto& ql = get_bits(qd);
                 ql |= 1;
                 qd += M;
-                priY[0] = qd;
+                primary(0) = qd;
                 M -= qd;
                 M *= EXPANSION * 0.5;
                 x += M;
                 x += M;
-                for (i = 1; i < FOLD - 1; i++)
+#pragma unroll
+                for (int i = 1; i < FOLD - 1; i++)
                 {
-                    M = priY[i * incpriY];
+                    M = primary(i * incpriY);
                     qd = x;
                     ql |= 1;
                     qd += M;
-                    priY[i * incpriY] = qd;
+                    primary(i * incpriY) = qd;
                     M -= qd;
                     x += M;
                 }
                 qd = x;
                 ql |= 1;
-                priY[i * incpriY] += qd;
+                primary((FOLD - 1) * incpriY) += qd;
             }
             else
             {
                 ftype qd = x;
                 auto& ql = get_bits(qd);
-                for (i = 0; i < FOLD - 1; i++)
+#pragma unroll
+                for (int i = 0; i < FOLD - 1; i++)
                 {
-                    M = priY[i * incpriY];
+                    M = primary(i * incpriY);
                     qd = x;
                     ql |= 1;
                     qd += M;
-                    priY[i * incpriY] = qd;
+                    primary(i * incpriY) = qd;
                     M -= qd;
                     x += M;
                 }
                 qd = x;
                 ql |= 1;
-                priY[i * incpriY] += qd;
+                primary((FOLD - 1) * incpriY) += qd;
             }
         }
 
@@ -348,26 +531,22 @@ namespace RFA {
         ///
         ///@param incpriX stride within X's primary vector (use every incpriX'th element)
         ///@param inccarX stride within X's carry vector (use every inccarX'th element)
-        void binned_dmrenorm(const int incpriX, const int inccarX)
+        inline void binned_dmrenorm(const int incpriX, const int inccarX)
         {
-            auto* priX = pvec();
-            auto* carX = cvec();
-
-            if (priX[0] == 0.0 || ISNANINF(priX[0]))
-            {
+            if (ISZERO(primary(0)) || ISNANINF(primary(0)))
                 return;
-            }
 
-            for (int i = 0; i < FOLD; i++, priX += incpriX, carX += inccarX)
+            for (int i = 0; i < FOLD; i++)
             {
-                auto tmp_renormd = priX[0];
+                auto tmp_renormd = primary(i * incpriX);
                 auto& tmp_renorml = get_bits(tmp_renormd);
 
-                carX[0] += (int) ((tmp_renorml >> (MANT_DIG - 3)) & 3) - 2;
+                carry(i * inccarX) +=
+                    (int) ((tmp_renorml >> (MANT_DIG - 3)) & 3) - 2;
 
                 tmp_renorml &= ~(1ull << (MANT_DIG - 3));
                 tmp_renorml |= 1ull << (MANT_DIG - 2);
-                priX[0] = tmp_renormd;
+                primary(i * incpriX) = tmp_renormd;
             }
         }
 
@@ -392,18 +571,10 @@ namespace RFA {
         {
             int i = 0;
 
-            const auto* const priX = pvec();
-            const auto* const carX = cvec();
-
-            if (ISNANINF(priX[0]))
-            {
-                return priX[0];
-            }
-
-            if (priX[0] == 0.0)
-            {
+            if (ISNANINF(primary(0)))
+                return primary(0);
+            if (ISZERO(primary(0)))
                 return 0.0;
-            }
 
             double Y = 0.0;
             double scale_down;
@@ -413,30 +584,31 @@ namespace RFA {
             const auto* const bins = binned_bins(X_index);
             if (X_index <= (3 * MANT_DIG) / BIN_WIDTH)
             {
-                scale_down = ldexp_impl(0.5, 1 - (2 * MANT_DIG - BIN_WIDTH));
-                scale_up = ldexp_impl(0.5, 1 + (2 * MANT_DIG - BIN_WIDTH));
-                scaled = std::max(
-                    std::min(FOLD, (3 * MANT_DIG) / BIN_WIDTH - X_index), 0);
+                scale_down = ldexp(0.5, 1 - (2 * MANT_DIG - BIN_WIDTH));
+                scale_up = ldexp(0.5, 1 + (2 * MANT_DIG - BIN_WIDTH));
+                scaled =
+                    max(min(FOLD, (3 * MANT_DIG) / BIN_WIDTH - X_index), 0);
                 if (X_index == 0)
                 {
-                    Y += carX[0] * ((bins[0] / 6.0) * scale_down * EXPANSION);
-                    Y += carX[inccarX] * ((bins[1] / 6.0) * scale_down);
-                    Y += (priX[0] - bins[0]) * scale_down * EXPANSION;
+                    Y += carry(0) * ((bins[0] / 6.0) * scale_down * EXPANSION);
+                    Y += carry(inccarX) * ((bins[1] / 6.0) * scale_down);
+                    Y += (primary(0) - bins[0]) * scale_down * EXPANSION;
                     i = 2;
                 }
                 else
                 {
-                    Y += carX[0] * ((bins[0] / 6.0) * scale_down);
+                    Y += carry(0) * ((bins[0] / 6.0) * scale_down);
                     i = 1;
                 }
                 for (; i < scaled; i++)
                 {
-                    Y += carX[i * inccarX] * ((bins[i] / 6.0) * scale_down);
-                    Y += (priX[(i - 1) * incpriX] - bins[i - 1]) * scale_down;
+                    Y += carry(i * inccarX) * ((bins[i] / 6.0) * scale_down);
+                    Y +=
+                        (primary((i - 1) * incpriX) - bins[i - 1]) * scale_down;
                 }
                 if (i == FOLD)
                 {
-                    Y += (priX[(FOLD - 1) * incpriX] - bins[FOLD - 1]) *
+                    Y += (primary((FOLD - 1) * incpriX) - bins[FOLD - 1]) *
                         scale_down;
                     return Y * scale_up;
                 }
@@ -447,20 +619,20 @@ namespace RFA {
                 Y *= scale_up;
                 for (; i < FOLD; i++)
                 {
-                    Y += carX[i * inccarX] * (bins[i] / 6.0);
-                    Y += priX[(i - 1) * incpriX] - bins[i - 1];
+                    Y += carry(i * inccarX) * (bins[i] / 6.0);
+                    Y += primary((i - 1) * incpriX) - bins[i - 1];
                 }
-                Y += priX[(FOLD - 1) * incpriX] - bins[FOLD - 1];
+                Y += primary((FOLD - 1) * incpriX) - bins[FOLD - 1];
             }
             else
             {
-                Y += carX[0] * (bins[0] / 6.0);
+                Y += carry(0) * (bins[0] / 6.0);
                 for (i = 1; i < FOLD; i++)
                 {
-                    Y += carX[i * inccarX] * (bins[i] / 6.0);
-                    Y += (priX[(i - 1) * incpriX] - bins[i - 1]);
+                    Y += carry(i * inccarX) * (bins[i] / 6.0);
+                    Y += (primary((i - 1) * incpriX) - bins[i - 1]);
                 }
-                Y += (priX[(FOLD - 1) * incpriX] - bins[FOLD - 1]);
+                Y += (primary((FOLD - 1) * incpriX) - bins[FOLD - 1]);
             }
             return Y;
         }
@@ -473,18 +645,11 @@ namespace RFA {
         {
             int i = 0;
             double Y = 0.0;
-            const auto* const priX = pvec();
-            const auto* const carX = cvec();
 
-            if (ISNANINF(priX[0]))
-            {
-                return priX[0];
-            }
-
-            if (priX[0] == 0.0)
-            {
+            if (ISNANINF(primary(0)))
+                return primary(0);
+            if (ISZERO(primary(0)))
                 return 0.0;
-            }
 
             //Note that the following order of summation is in order of decreasing
             //exponent. The following code is specific to SBWIDTH=13, FLT_MANT_DIG=24, and
@@ -493,23 +658,23 @@ namespace RFA {
             const auto* const bins = binned_bins(X_index);
             if (X_index == 0)
             {
-                Y += (double) carX[0] * (double) (bins[0] / 6.0) *
+                Y += (double) carry(0) * (double) (bins[0] / 6.0) *
                     (double) EXPANSION;
-                Y += (double) carX[inccarX] * (double) (bins[1] / 6.0);
-                Y += (double) (priX[0] - bins[0]) * (double) EXPANSION;
+                Y += (double) carry(inccarX) * (double) (bins[1] / 6.0);
+                Y += (double) (primary(0) - bins[0]) * (double) EXPANSION;
                 i = 2;
             }
             else
             {
-                Y += (double) carX[0] * (double) (bins[0] / 6.0);
+                Y += (double) carry(0) * (double) (bins[0] / 6.0);
                 i = 1;
             }
             for (; i < FOLD; i++)
             {
-                Y += (double) carX[i * inccarX] * (double) (bins[i] / 6.0);
-                Y += (double) (priX[(i - 1) * incpriX] - bins[i - 1]);
+                Y += (double) carry(i * inccarX) * (double) (bins[i] / 6.0);
+                Y += (double) (primary((i - 1) * incpriX) - bins[i - 1]);
             }
-            Y += (double) (priX[(FOLD - 1) * incpriX] - bins[FOLD - 1]);
+            Y += (double) (primary((FOLD - 1) * incpriX) - bins[FOLD - 1]);
 
             return (float) Y;
         }
@@ -522,64 +687,78 @@ namespace RFA {
         ///@param inccarX stride within X's carry vector (use every inccarX'th element)
         ///@param incpriY stride within Y's primary vector (use every incpriY'th element)
         ///@param inccarY stride within Y's carry vector (use every inccarY'th element)
-        void binned_dmdmadd(const ReproducibleFloatingAccumulator& other,
+        void binned_dmdmadd(const ReproducibleFloatingAccumulator& x,
             const int incpriX, const int inccarX, const int incpriY,
             const int inccarY)
         {
-            auto* const priX = other.pvec();
-            auto* const carX = other.cvec();
-            auto* const priY = pvec();
-            auto* const carY = cvec();
-
-            if (priX[0] == 0.0)
+            if (ISZERO(x.primary(0)))
                 return;
 
-            if (priY[0] == 0.0)
+            if (ISZERO(primary(0)))
             {
                 for (int i = 0; i < FOLD; i++)
                 {
-                    priY[i * incpriY] = priX[i * incpriX];
-                    carY[i * inccarY] = carX[i * inccarX];
+                    primary(i * incpriY) = x.primary(i * incpriX);
+                    carry(i * inccarY) = x.carry(i * inccarX);
                 }
                 return;
             }
 
-            if (ISNANINF(priX[0]) || ISNANINF(priY[0]))
+            if (ISNANINF(x.primary(0)) || ISNANINF(primary(0)))
             {
-                priY[0] += priX[0];
+                primary(0) += x.primary(0);
                 return;
             }
 
-            // const auto X_index = binned_index(priX);
-            const auto X_index = other.binned_index();
-            const auto Y_index = binned_index();
+            const auto X_index = x.binned_index();
+            const auto Y_index = this->binned_index();
             const auto shift = Y_index - X_index;
             if (shift > 0)
             {
                 const auto* const bins = binned_bins(Y_index);
                 //shift Y upwards and add X to Y
-                for (int i = FOLD - 1; i >= shift; i--)
+#pragma unroll
+                for (int i = FOLD - 1; i >= 1; i--)
                 {
-                    priY[i * incpriY] = priX[i * incpriX] +
-                        (priY[(i - shift) * incpriY] - bins[i - shift]);
-                    carY[i * inccarY] =
-                        carX[i * inccarX] + carY[(i - shift) * inccarY];
+                    if (i < shift)
+                        break;
+                    primary(i * incpriY) = x.primary(i * incpriX) +
+                        (primary((i - shift) * incpriY) - bins[i - shift]);
+                    carry(i * inccarY) =
+                        x.carry(i * inccarX) + carry((i - shift) * inccarY);
                 }
-                for (int i = 0; i < shift && i < FOLD; i++)
+#pragma unroll
+                for (int i = 0; i < FOLD; i++)
                 {
-                    priY[i * incpriY] = priX[i * incpriX];
-                    carY[i * inccarY] = carX[i * inccarX];
+                    if (i == shift)
+                        break;
+                    primary(i * incpriY) = x.primary(i * incpriX);
+                    carry(i * inccarY) = x.carry(i * inccarX);
                 }
             }
-            else
+            else if (shift < 0)
             {
                 const auto* const bins = binned_bins(X_index);
                 //shift X upwards and add X to Y
-                for (int i = 0 - shift; i < FOLD; i++)
+#pragma unroll
+                for (int i = 0; i < FOLD; i++)
                 {
-                    priY[i * incpriY] +=
-                        priX[(i + shift) * incpriX] - bins[i + shift];
-                    carY[i * inccarY] += carX[(i + shift) * inccarX];
+                    if (i < -shift)
+                        continue;
+                    primary(i * incpriY) +=
+                        x.primary((i + shift) * incpriX) - bins[i + shift];
+                    carry(i * inccarY) += x.carry((i + shift) * inccarX);
+                }
+            }
+            else if (shift == 0)
+            {
+                const auto* const bins = binned_bins(X_index);
+                // add X to Y
+#pragma unroll
+                for (int i = 0; i < FOLD; i++)
+                {
+                    primary(i * incpriY) += x.primary(i * incpriX) - bins[i];
+                    carry(i * inccarY) += x.carry(i * inccarX);
                 }
             }
 
@@ -594,6 +773,13 @@ namespace RFA {
         }
 
     public:
+        ReproducibleFloatingAccumulator() = default;
+        ReproducibleFloatingAccumulator(
+            const ReproducibleFloatingAccumulator&) = default;
+        ///Sets this binned fp equal to another binned fp
+        ReproducibleFloatingAccumulator& operator=(
+            const ReproducibleFloatingAccumulator&) = default;
+
         ///Set the binned fp to zero
         void zero()
         {
@@ -601,22 +787,27 @@ namespace RFA {
         }
 
         ///Return the fold of the binned fp
-        int fold() const
+        constexpr int fold() const
         {
             return FOLD;
         }
 
-        ///Returns the number of reference bins. Used for judging memory usage.
-        static constexpr size_t number_of_reference_bins()
+        ///Return the endurance of the binned fp
+        constexpr int endurance() const
         {
-            return bins.size();
+            return ENDURANCE;
+        }
+
+        ///Returns the number of reference bins. Used for judging memory usage.
+        constexpr size_t number_of_reference_bins()
+        {
+            return array<ftype, MAXINDEX + MAXFOLD>::size();
         }
 
         ///Accumulate an arithmetic @p x into the binned fp.
         ///NOTE: Casts @p x to the type of the binned fp
         template <typename U,
-            typename std::enable_if<std::is_arithmetic<U>::value>::type* =
-                nullptr>
+            typename std::enable_if_t<std::is_arithmetic_v<U>>* = nullptr>
         ReproducibleFloatingAccumulator& operator+=(const U x)
         {
             binned_dmdadd(static_cast<ftype>(x), 1, 1);
@@ -626,8 +817,7 @@ namespace RFA {
         ///Accumulate-subtract an arithmetic @p x into the binned fp.
         ///NOTE: Casts @p x to the type of the binned fp
         template <typename U,
-            typename std::enable_if<std::is_arithmetic<U>::value>::type* =
-                nullptr>
+            typename std::enable_if_t<std::is_arithmetic_v<U>>* = nullptr>
         ReproducibleFloatingAccumulator& operator-=(const U x)
         {
             binned_dmdadd(-static_cast<ftype>(x), 1, 1);
@@ -666,20 +856,11 @@ namespace RFA {
         ///Sets this binned fp equal to the arithmetic value @p x
         ///NOTE: Casts @p x to the type of the binned fp
         template <typename U,
-            typename std::enable_if<std::is_arithmetic<U>::value>::type* =
-                nullptr>
+            typename std::enable_if_t<std::is_arithmetic_v<U>>* = nullptr>
         ReproducibleFloatingAccumulator& operator=(const U x)
         {
             zero();
             binned_dmdadd(static_cast<ftype>(x), 1, 1);
-            return *this;
-        }
-
-        ///Sets this binned fp equal to another binned fp
-        ReproducibleFloatingAccumulator& operator=(
-            const ReproducibleFloatingAccumulator<ftype, FOLD>& o)
-        {
-            data = o.data;
             return *this;
         }
 
@@ -690,14 +871,14 @@ namespace RFA {
             constexpr int incpriX = 1;
             constexpr int inccarX = 1;
             ReproducibleFloatingAccumulator temp = *this;
-            if (pvec()[0] != 0.0)
+            if (primary(0) != 0.0)
             {
                 const auto* const bins = binned_bins(binned_index());
                 for (int i = 0; i < FOLD; i++)
                 {
-                    temp.pvec()[i * incpriX] =
-                        bins[i] - (pvec()[i * incpriX] - bins[i]);
-                    temp.cvec()[i * inccarX] = -cvec()[i * inccarX];
+                    temp.primary(i * incpriX) =
+                        bins[i] - (primary(i * incpriX) - bins[i]);
+                    temp.carry(i * inccarX) = -carry(i * inccarX);
                 }
             }
             return temp;
@@ -706,7 +887,7 @@ namespace RFA {
         ///Convert this binned fp into its native floating-point representation
         ftype conv() const
         {
-            if (std::is_same<ftype, float>::value)
+            if (std::is_same_v<ftype, float>)
             {
                 return binned_conv_single(1, 1);
             }
@@ -729,9 +910,8 @@ namespace RFA {
         {
             const double X = std::abs(max_abs_val);
             const double S = std::abs(binned_sum);
-            return static_cast<ftype>(
-                std::max(X, ldexp_impl(0.5, MIN_EXP - 1)) *
-                    ldexp_impl(0.5, (1 - FOLD) * BIN_WIDTH + 1) * N +
+            return static_cast<ftype>(max(X, ldexp(0.5, MIN_EXP - 1)) *
+                    ldexp(0.5, (1 - FOLD) * BIN_WIDTH + 1) * N +
                 ((7.0 * EPSILON) /
                     (1.0 - 6.0 * std::sqrt(static_cast<double>(EPSILON)) -
                         7.0 * EPSILON)) *
@@ -754,10 +934,12 @@ namespace RFA {
         {
             binned_dmdupdate(std::abs(max_abs_val), 1, 1);
             size_t count = 0;
+            size_t N = last - first;
             for (; first != last; first++, count++)
             {
                 binned_dmddeposit(static_cast<ftype>(*first), 1);
-                if (count == ENDURANCE)
+                // first conditional allows compiler to remove the call here when possible
+                if (N > ENDURANCE && count == ENDURANCE)
                 {
                     binned_dmrenorm(1, 1);
                     count = 0;
@@ -788,14 +970,11 @@ namespace RFA {
         ///@param N           Number of elements to add
         ///@param max_abs_val Maximum absolute value of any member of the range
         template <typename T,
-            typename std::enable_if<std::is_arithmetic<T>::value>::type* =
-                nullptr>
+            typename std::enable_if_t<std::is_arithmetic_v<T>>* = nullptr>
         void add(const T* input, const size_t N, const ftype max_abs_val)
         {
             if (N == 0)
-            {
                 return;
-            }
             add(input, input + N, max_abs_val);
         }
 
@@ -807,19 +986,147 @@ namespace RFA {
         ///@param input       Start of the range
         ///@param N           Number of elements to add
         template <typename T,
-            typename std::enable_if<std::is_arithmetic<T>::value>::type* =
-                nullptr>
+            typename std::enable_if_t<std::is_arithmetic_v<T>>* = nullptr>
         void add(const T* input, const size_t N)
         {
             if (N == 0)
-            {
                 return;
-            }
+
             T max_abs_val = input[0];
             for (size_t i = 0; i < N; i++)
             {
-                max_abs_val = std::max(max_abs_val, std::abs(input[i]));
+                max_abs_val = max(max_abs_val, std::abs(input[i]));
             }
+            add(input, N, max_abs_val);
+        }
+
+        ///Accumulate a float4 @p x into the binned fp.
+        ///NOTE: Casts @p x to the type of the binned fp
+        ReproducibleFloatingAccumulator& operator+=(const float4& x)
+        {
+            binned_dmdupdate(abs_max(x), 1, 1);
+            binned_dmddeposit(static_cast<ftype>(x.x), 1);
+            binned_dmddeposit(static_cast<ftype>(x.y), 1);
+            binned_dmddeposit(static_cast<ftype>(x.z), 1);
+            binned_dmddeposit(static_cast<ftype>(x.w), 1);
+            return *this;
+        }
+
+        ///Accumulate a double2 @p x into the binned fp.
+        ///NOTE: Casts @p x to the type of the binned fp
+        ReproducibleFloatingAccumulator& operator+=(const float2& x)
+        {
+            binned_dmdupdate(abs_max(x), 1, 1);
+            binned_dmddeposit(static_cast<ftype>(x.x), 1);
+            binned_dmddeposit(static_cast<ftype>(x.y), 1);
+            return *this;
+        }
+
+        ///Accumulate a double2 @p x into the binned fp.
+        ///NOTE: Casts @p x to the type of the binned fp
+        ReproducibleFloatingAccumulator& operator+=(const double2& x)
+        {
+            binned_dmdupdate(abs_max(x), 1, 1);
+            binned_dmddeposit(static_cast<ftype>(x.x), 1);
+            binned_dmddeposit(static_cast<ftype>(x.y), 1);
+            return *this;
+        }
+
+        void add(const float4* input, const size_t N, float max_abs_val)
+        {
+            if (N == 0)
+                return;
+            binned_dmdupdate(max_abs_val, 1, 1);
+
+            size_t count = 0;
+            for (size_t i = 0; i < N; i++)
+            {
+                binned_dmddeposit(static_cast<ftype>(input[i].x), 1);
+                binned_dmddeposit(static_cast<ftype>(input[i].y), 1);
+                binned_dmddeposit(static_cast<ftype>(input[i].z), 1);
+                binned_dmddeposit(static_cast<ftype>(input[i].w), 1);
+
+                if (N > ENDURANCE && count == ENDURANCE)
+                {
+                    binned_dmrenorm(1, 1);
+                    count = 0;
+                }
+            }
+        }
+
+        void add(const double2* input, const size_t N, double max_abs_val)
+        {
+            if (N == 0)
+                return;
+            binned_dmdupdate(max_abs_val, 1, 1);
+
+            size_t count = 0;
+            for (size_t i = 0; i < N; i++)
+            {
+                binned_dmddeposit(static_cast<ftype>(input[i].x), 1);
+                binned_dmddeposit(static_cast<ftype>(input[i].y), 1);
+
+                if (N > ENDURANCE && count == ENDURANCE)
+                {
+                    binned_dmrenorm(1, 1);
+                    count = 0;
+                }
+            }
+        }
+
+        void add(const float2* input, const size_t N, double max_abs_val)
+        {
+            if (N == 0)
+                return;
+            binned_dmdupdate(max_abs_val, 1, 1);
+
+            size_t count = 0;
+            for (size_t i = 0; i < N; i++)
+            {
+                binned_dmddeposit(static_cast<ftype>(input[i].x), 1);
+                binned_dmddeposit(static_cast<ftype>(input[i].y), 1);
+
+                if (N > ENDURANCE && count == ENDURANCE)
+                {
+                    binned_dmrenorm(1, 1);
+                    count = 0;
+                }
+            }
+        }
+
+        void add(const float4* input, const size_t N)
+        {
+            if (N == 0)
+                return;
+
+            auto max_abs_val = abs_max(input[0]);
+            for (size_t i = 1; i < N; i++)
+                max_abs_val = fmax(max_abs_val, abs_max(input[i]));
+
+            add(input, N, max_abs_val);
+        }
+
+        void add(const double2* input, const size_t N)
+        {
+            if (N == 0)
+                return;
+
+            auto max_abs_val = abs_max(input[0]);
+            for (size_t i = 1; i < N; i++)
+                max_abs_val = fmax(max_abs_val, abs_max(input[i]));
+
+            add(input, N, max_abs_val);
+        }
+
+        void add(const float2* input, const size_t N)
+        {
+            if (N == 0)
+                return;
+
+            auto max_abs_val = abs_max(input[0]);
+            for (size_t i = 1; i < N; i++)
+                max_abs_val = fmax(max_abs_val, abs_max(input[i]));
+
             add(input, N, max_abs_val);
         }
 
@@ -833,8 +1140,7 @@ namespace RFA {
         ///with `unsafe_add` after which `renorm()` must be called. See the source of
         ///`add()` for an example
         template <typename T,
-            typename std::enable_if<std::is_arithmetic<T>::value>::type* =
-                nullptr>
+            typename std::enable_if_t<std::is_arithmetic_v<T>>* = nullptr>
         void set_max_abs_val(const T mav)
         {
             binned_dmdupdate(std::abs(mav), 1, 1);
@@ -858,11 +1164,5 @@ namespace RFA {
         }
     };
 
-    template <>
-    auto ReproducibleFloatingAccumulator<float>::bins =
-        ReproducibleFloatingAccumulator<float>::initialize_bins();
     
-    template <>
-    auto ReproducibleFloatingAccumulator<double>::bins =
-        ReproducibleFloatingAccumulator<double>::initialize_bins();
-}    // namespace RFA
+}    // namespace hpx::parallel::detail::rfa
