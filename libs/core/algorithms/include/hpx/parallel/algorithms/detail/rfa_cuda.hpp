@@ -1,34 +1,3 @@
-//  Copyright (c) 2024 Shreyas Atre
-//
-//  SPDX-License-Identifier: BSL-1.0
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying
-//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
-// ---------------------------------------------------------------------------
-// This file has been taken from
-// https://github.com/maddyscientist/reproducible_floating_sums commit
-// b5a065741d4ea459437ca004b508de9dcb6a3e52. The boost copyright has been added
-// to this file in accordance with the dual license terms for the Reproducible
-// Floating-Point Summations and conformance with the HPX policy
-// https://github.com/maddyscientist/reproducible_floating_sums/blob/feature/cuda/LICENSE.md
-// ---------------------------------------------------------------------------
-//
-/// Copyright 2022 Richard Barnes, Peter Ahrens, James Demmel
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-/// SOFTWARE.
 //Reproducible Floating Point Accumulations via Binned Floating Point
 //Adapted to C++ by Richard Barnes from ReproBLAS v2.1.0.
 //ReproBLAS by Peter Ahrens, Hong Diep Nguyen, and James Demmel.
@@ -53,14 +22,26 @@
 #pragma once
 
 #include <algorithm>
-#include <array>
+#include <climits>
 #include <cmath>
 #include <cstdint>
 #include <limits>
-#include <type_traits>
-#include <vector>
 
-#include <hpx/config.hpp>
+#ifndef __CUDACC__
+#define __host__
+#define __device__
+#define __forceinline__
+#include <array>
+using std::array;
+using std::max;
+using std::min;
+#else
+#include <cuda/std/array>
+using cuda::std::array;
+using cuda::std::max;
+using cuda::std::min;
+#include "vector.hpp"
+#endif
 
 namespace hpx::parallel::detail::rfa {
     template <typename F>
@@ -168,7 +149,7 @@ namespace hpx::parallel::detail::rfa {
         static constexpr auto MAXFOLD = MAXINDEX + 1;
 
         ///The binned floating-point reference bins
-        std::array<ftype, MAXINDEX + MAXFOLD> bins = {};
+        array<ftype, MAXINDEX + MAXFOLD> bins = {};
 
         constexpr ftype& operator[](int d)
         {
@@ -183,12 +164,12 @@ namespace hpx::parallel::detail::rfa {
             }
             else
             {
-                bins[0] = 2.0 * std::ldexp(0.75, MAX_EXP - 1);
+                bins[0] = 2.0 * ldexp(0.75, MAX_EXP - 1);
             }
 
             for (int index = 1; index <= MAXINDEX; index++)
             {
-                bins[index] = std::ldexp(0.75,
+                bins[index] = ldexp(0.75,
                     MAX_EXP + MANT_DIG - BIN_WIDTH + 1 - index * BIN_WIDTH);
             }
             for (int index = MAXINDEX + 1; index < MAXINDEX + MAXFOLD; index++)
@@ -198,7 +179,10 @@ namespace hpx::parallel::detail::rfa {
         }
     };
 
-    static char __rfa_bin_host_buffer__[sizeof(RFA_bins<double>)];
+    static char bin_host_buffer[sizeof(RFA_bins<double>)];
+#ifdef __CUDACC__
+    __constant__ static char bin_device_buffer[sizeof(RFA_bins<double>)];
+#endif
 
     ///Class to hold a reproducible summation of the numbers passed to it
     ///
@@ -214,7 +198,7 @@ namespace hpx::parallel::detail::rfa {
         static constexpr int FOLD = FOLD_;
 
     private:
-        std::array<ftype, 2 * FOLD> data = {{0}};
+        array<ftype, 2 * FOLD> data = {0};
 
         ///Floating-point precision bin width
         static constexpr auto BIN_WIDTH =
@@ -245,11 +229,15 @@ namespace hpx::parallel::detail::rfa {
         ///The number of deposits that can be performed before a renorm is necessary.
         ///Applies also to binned complex double precision.
         static constexpr auto ENDURANCE = 1 << (MANT_DIG - BIN_WIDTH - 2);
+
         ///Return a binned floating-point reference bin
         inline const ftype* binned_bins(const int x) const
         {
-            return &reinterpret_cast<RFA_bins<ftype>&>(
-                __rfa_bin_host_buffer__)[x];
+#ifdef __CUDA_ARCH__    // must be arch not CC here
+            return &reinterpret_cast<RFA_bins<ftype>&>(bin_device_buffer)[x];
+#else
+            return &reinterpret_cast<RFA_bins<ftype>&>(bin_host_buffer)[x];
+#endif
         }
 
         ///Get the bit representation of a float
@@ -385,21 +373,21 @@ namespace hpx::parallel::detail::rfa {
 
         ///Get index of float-point precision
         ///The index of a non-binned type is the smallest index a binned type would
-        ///need to have to sum it reproducibly. Higher indices correspond to smaller
+        ///need to have to sum it reproducibly. Higher indicies correspond to smaller
         ///bins.
         static inline constexpr int binned_dindex(const ftype x)
         {
             int exp = EXP(x);
             if (exp == 0)
             {
-                if (x == static_cast<ftype>(0.0))
+                if (x == 0.0)
                 {
                     return MAXINDEX;
                 }
                 else
                 {
-                    std::frexp(x, &exp);
-                    return (std::max)((MAX_EXP - exp) / BIN_WIDTH, MAXINDEX);
+                    frexp(x, &exp);
+                    return min((MAX_EXP - exp) / BIN_WIDTH, MAXINDEX);
                 }
             }
             return ((MAX_EXP + EXP_BIAS) - exp) / BIN_WIDTH;
@@ -407,7 +395,7 @@ namespace hpx::parallel::detail::rfa {
 
         ///Get index of manually specified binned double precision
         ///The index of a binned type is the bin that it corresponds to. Higher
-        ///indices correspond to smaller bins.
+        ///indicies correspond to smaller bins.
         inline int binned_index() const
         {
             return ((MAX_EXP + MANT_DIG - BIN_WIDTH + 1 + EXP_BIAS) -
@@ -450,9 +438,7 @@ namespace hpx::parallel::detail::rfa {
                 int shift = binned_index() - X_index;
                 if (shift > 0)
                 {
-#if !defined(HPX_CLANG_VERSION)
-                    HPX_UNROLL
-#endif
+#pragma unroll
                     for (int i = FOLD - 1; i >= 1; i--)
                     {
                         if (i < shift)
@@ -461,9 +447,7 @@ namespace hpx::parallel::detail::rfa {
                         carry(i * inccarY) = carry((i - shift) * inccarY);
                     }
                     const ftype* const bins = binned_bins(X_index);
-#if !defined(HPX_CLANG_VERSION)
-                    HPX_UNROLL
-#endif
+#pragma unroll
                     for (int j = 0; j < FOLD; j++)
                     {
                         if (j >= shift)
@@ -495,19 +479,16 @@ namespace hpx::parallel::detail::rfa {
             if (binned_index0())
             {
                 M = primary(0);
-                ftype qd = x * static_cast<ftype>(COMPRESSION);
+                ftype qd = x * COMPRESSION;
                 auto& ql = get_bits(qd);
                 ql |= 1;
                 qd += M;
                 primary(0) = qd;
                 M -= qd;
-                auto temp_m = (double) (((double) EXPANSION) * 0.5);
-                M *= static_cast<ftype>(temp_m);
+                M *= EXPANSION * 0.5;
                 x += M;
                 x += M;
-#if !defined(HPX_CLANG_VERSION)
-                HPX_UNROLL
-#endif
+#pragma unroll
                 for (int i = 1; i < FOLD - 1; i++)
                 {
                     M = primary(i * incpriY);
@@ -526,9 +507,7 @@ namespace hpx::parallel::detail::rfa {
             {
                 ftype qd = x;
                 auto& ql = get_bits(qd);
-#if !defined(HPX_CLANG_VERSION)
-                HPX_UNROLL
-#endif
+#pragma unroll
                 for (int i = 0; i < FOLD - 1; i++)
                 {
                     M = primary(i * incpriY);
@@ -593,7 +572,7 @@ namespace hpx::parallel::detail::rfa {
             int i = 0;
 
             if (ISNANINF(primary(0)))
-                return (double) primary(0);
+                return primary(0);
             if (ISZERO(primary(0)))
                 return 0.0;
 
@@ -605,38 +584,31 @@ namespace hpx::parallel::detail::rfa {
             const auto* const bins = binned_bins(X_index);
             if (X_index <= (3 * MANT_DIG) / BIN_WIDTH)
             {
-                scale_down = std::ldexp(0.5, 1 - (2 * MANT_DIG - BIN_WIDTH));
-                scale_up = std::ldexp(0.5, 1 + (2 * MANT_DIG - BIN_WIDTH));
-                scaled = (std::max)(
-                    (std::min)(FOLD, (3 * MANT_DIG) / BIN_WIDTH - X_index), 0);
+                scale_down = ldexp(0.5, 1 - (2 * MANT_DIG - BIN_WIDTH));
+                scale_up = ldexp(0.5, 1 + (2 * MANT_DIG - BIN_WIDTH));
+                scaled =
+                    max(min(FOLD, (3 * MANT_DIG) / BIN_WIDTH - X_index), 0);
                 if (X_index == 0)
                 {
-                    Y += ((double) carry(0)) *
-                        ((((double) bins[0]) / 6.0) * scale_down * EXPANSION);
-                    Y += ((double) carry(inccarX)) *
-                        ((((double) bins[1]) / 6.0) * scale_down);
-                    Y += ((double) primary(0) - (double) bins[0]) * scale_down *
-                        EXPANSION;
+                    Y += carry(0) * ((bins[0] / 6.0) * scale_down * EXPANSION);
+                    Y += carry(inccarX) * ((bins[1] / 6.0) * scale_down);
+                    Y += (primary(0) - bins[0]) * scale_down * EXPANSION;
                     i = 2;
                 }
                 else
                 {
-                    Y += ((double) carry(0)) *
-                        (((double) bins[0] / 6.0) * scale_down);
+                    Y += carry(0) * ((bins[0] / 6.0) * scale_down);
                     i = 1;
                 }
                 for (; i < scaled; i++)
                 {
-                    Y += ((double) carry(i * inccarX)) *
-                        (((double) bins[i] / 6.0) * scale_down);
-                    Y += ((double) primary((i - 1) * incpriX) -
-                             (double) (bins[i - 1])) *
-                        scale_down;
+                    Y += carry(i * inccarX) * ((bins[i] / 6.0) * scale_down);
+                    Y +=
+                        (primary((i - 1) * incpriX) - bins[i - 1]) * scale_down;
                 }
                 if (i == FOLD)
                 {
-                    Y += ((double) primary((FOLD - 1) * incpriX) -
-                             (double) (bins[FOLD - 1])) *
+                    Y += (primary((FOLD - 1) * incpriX) - bins[FOLD - 1]) *
                         scale_down;
                     return Y * scale_up;
                 }
@@ -647,23 +619,20 @@ namespace hpx::parallel::detail::rfa {
                 Y *= scale_up;
                 for (; i < FOLD; i++)
                 {
-                    Y += ((double) carry(i * inccarX)) *
-                        ((double) bins[i] / 6.0);
-                    Y += (double) (primary((i - 1) * incpriX) - bins[i - 1]);
+                    Y += carry(i * inccarX) * (bins[i] / 6.0);
+                    Y += primary((i - 1) * incpriX) - bins[i - 1];
                 }
-                Y += ((double) primary((FOLD - 1) * incpriX) -
-                    ((double) bins[FOLD - 1]));
+                Y += primary((FOLD - 1) * incpriX) - bins[FOLD - 1];
             }
             else
             {
-                Y += ((double) carry(0)) * ((double) bins[0] / 6.0);
+                Y += carry(0) * (bins[0] / 6.0);
                 for (i = 1; i < FOLD; i++)
                 {
-                    Y += ((double) carry(i * inccarX)) *
-                        ((double) bins[i] / 6.0);
-                    Y += (double) (primary((i - 1) * incpriX) - bins[i - 1]);
+                    Y += carry(i * inccarX) * (bins[i] / 6.0);
+                    Y += (primary((i - 1) * incpriX) - bins[i - 1]);
                 }
-                Y += (double) (primary((FOLD - 1) * incpriX) - bins[FOLD - 1]);
+                Y += (primary((FOLD - 1) * incpriX) - bins[FOLD - 1]);
             }
             return Y;
         }
@@ -680,7 +649,7 @@ namespace hpx::parallel::detail::rfa {
             if (ISNANINF(primary(0)))
                 return primary(0);
             if (ISZERO(primary(0)))
-                return 0.0f;
+                return 0.0;
 
             //Note that the following order of summation is in order of decreasing
             //exponent. The following code is specific to SBWIDTH=13, FLT_MANT_DIG=24, and
@@ -689,22 +658,20 @@ namespace hpx::parallel::detail::rfa {
             const auto* const bins = binned_bins(X_index);
             if (X_index == 0)
             {
-                Y += (double) carry(0) * (double) (((double) bins[0]) / 6.0) *
+                Y += (double) carry(0) * (double) (bins[0] / 6.0) *
                     (double) EXPANSION;
-                Y += (double) carry(inccarX) *
-                    (double) (((double) bins[1]) / 6.0);
+                Y += (double) carry(inccarX) * (double) (bins[1] / 6.0);
                 Y += (double) (primary(0) - bins[0]) * (double) EXPANSION;
                 i = 2;
             }
             else
             {
-                Y += (double) carry(0) * (double) (((double) bins[0]) / 6.0);
+                Y += (double) carry(0) * (double) (bins[0] / 6.0);
                 i = 1;
             }
             for (; i < FOLD; i++)
             {
-                Y += (double) carry(i * inccarX) *
-                    (double) (((double) bins[i]) / 6.0);
+                Y += (double) carry(i * inccarX) * (double) (bins[i] / 6.0);
                 Y += (double) (primary((i - 1) * incpriX) - bins[i - 1]);
             }
             Y += (double) (primary((FOLD - 1) * incpriX) - bins[FOLD - 1]);
@@ -749,10 +716,8 @@ namespace hpx::parallel::detail::rfa {
             if (shift > 0)
             {
                 const auto* const bins = binned_bins(Y_index);
-//shift Y upwards and add X to Y
-#if !defined(HPX_CLANG_VERSION)
-                HPX_UNROLL
-#endif
+                //shift Y upwards and add X to Y
+#pragma unroll
                 for (int i = FOLD - 1; i >= 1; i--)
                 {
                     if (i < shift)
@@ -762,9 +727,7 @@ namespace hpx::parallel::detail::rfa {
                     carry(i * inccarY) =
                         x.carry(i * inccarX) + carry((i - shift) * inccarY);
                 }
-#if !defined(HPX_CLANG_VERSION)
-                HPX_UNROLL
-#endif
+#pragma unroll
                 for (int i = 0; i < FOLD; i++)
                 {
                     if (i == shift)
@@ -776,10 +739,8 @@ namespace hpx::parallel::detail::rfa {
             else if (shift < 0)
             {
                 const auto* const bins = binned_bins(X_index);
-//shift X upwards and add X to Y
-#if !defined(HPX_CLANG_VERSION)
-                HPX_UNROLL
-#endif
+                //shift X upwards and add X to Y
+#pragma unroll
                 for (int i = 0; i < FOLD; i++)
                 {
                     if (i < -shift)
@@ -792,10 +753,8 @@ namespace hpx::parallel::detail::rfa {
             else if (shift == 0)
             {
                 const auto* const bins = binned_bins(X_index);
-// add X to Y
-#if !defined(HPX_CLANG_VERSION)
-                HPX_UNROLL
-#endif
+                // add X to Y
+#pragma unroll
                 for (int i = 0; i < FOLD; i++)
                 {
                     primary(i * incpriY) += x.primary(i * incpriX) - bins[i];
@@ -834,7 +793,7 @@ namespace hpx::parallel::detail::rfa {
         }
 
         ///Return the endurance of the binned fp
-        constexpr size_t endurance() const
+        constexpr int endurance() const
         {
             return ENDURANCE;
         }
@@ -842,7 +801,7 @@ namespace hpx::parallel::detail::rfa {
         ///Returns the number of reference bins. Used for judging memory usage.
         constexpr size_t number_of_reference_bins()
         {
-            return std::array<ftype, MAXINDEX + MAXFOLD>::size();
+            return array<ftype, MAXINDEX + MAXFOLD>::size();
         }
 
         ///Accumulate an arithmetic @p x into the binned fp.
@@ -930,11 +889,11 @@ namespace hpx::parallel::detail::rfa {
         {
             if (std::is_same_v<ftype, float>)
             {
-                return static_cast<ftype>(binned_conv_single(1, 1));
+                return binned_conv_single(1, 1);
             }
             else
             {
-                return static_cast<ftype>(binned_conv_double(1, 1));
+                return binned_conv_double(1, 1);
             }
         }
 
@@ -951,9 +910,8 @@ namespace hpx::parallel::detail::rfa {
         {
             const double X = std::abs(max_abs_val);
             const double S = std::abs(binned_sum);
-            return static_cast<ftype>(
-                (std::max)(X, std::ldexp(0.5, MIN_EXP - 1)) *
-                    std::ldexp(0.5, (1 - FOLD) * BIN_WIDTH + 1) * N +
+            return static_cast<ftype>(max(X, ldexp(0.5, MIN_EXP - 1)) *
+                    ldexp(0.5, (1 - FOLD) * BIN_WIDTH + 1) * N +
                 ((7.0 * EPSILON) /
                     (1.0 - 6.0 * std::sqrt(static_cast<double>(EPSILON)) -
                         7.0 * EPSILON)) *
@@ -1037,7 +995,7 @@ namespace hpx::parallel::detail::rfa {
             T max_abs_val = input[0];
             for (size_t i = 0; i < N; i++)
             {
-                max_abs_val = (std::max)(max_abs_val, std::abs(input[i]));
+                max_abs_val = max(max_abs_val, std::abs(input[i]));
             }
             add(input, N, max_abs_val);
         }
@@ -1143,8 +1101,7 @@ namespace hpx::parallel::detail::rfa {
 
             auto max_abs_val = abs_max(input[0]);
             for (size_t i = 1; i < N; i++)
-                max_abs_val =
-                    fmaxf((float) max_abs_val, (float) abs_max(input[i]));
+                max_abs_val = fmax(max_abs_val, abs_max(input[i]));
 
             add(input, N, max_abs_val);
         }
@@ -1156,8 +1113,7 @@ namespace hpx::parallel::detail::rfa {
 
             auto max_abs_val = abs_max(input[0]);
             for (size_t i = 1; i < N; i++)
-                max_abs_val =
-                    fmax((double) max_abs_val, (double) abs_max(input[i]));
+                max_abs_val = fmax(max_abs_val, abs_max(input[i]));
 
             add(input, N, max_abs_val);
         }
@@ -1169,8 +1125,7 @@ namespace hpx::parallel::detail::rfa {
 
             auto max_abs_val = abs_max(input[0]);
             for (size_t i = 1; i < N; i++)
-                max_abs_val =
-                    fmaxf((float) max_abs_val, (float) abs_max(input[i]));
+                max_abs_val = fmax(max_abs_val, abs_max(input[i]));
 
             add(input, N, max_abs_val);
         }
@@ -1209,4 +1164,5 @@ namespace hpx::parallel::detail::rfa {
         }
     };
 
+    
 }    // namespace hpx::parallel::detail::rfa
