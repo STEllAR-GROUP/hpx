@@ -8,7 +8,7 @@
 
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/detail/rfa_cuda.hpp>
+#include <hpx/parallel/algorithms/detail/rfa.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/parallel/algorithms/reduce_deterministic.hpp>
 

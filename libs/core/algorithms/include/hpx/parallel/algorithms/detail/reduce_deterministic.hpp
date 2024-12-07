@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/parallel/algorithms/detail/rfa_cuda.hpp>
+#include <hpx/parallel/algorithms/detail/rfa.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
 #include <cstddef>
@@ -34,19 +34,29 @@ namespace hpx::parallel::detail {
         {
             hpx::parallel::detail::rfa::RFA_bins<T> bins;
             bins.initialize_bins();
-            memcpy(rfa::bin_host_buffer, &bins, sizeof(bins));
+            std::memcpy(rfa::bin_host_buffer, &bins, sizeof(bins));
 
             hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<T> rfa;
             rfa.set_max_abs_val(init);
             rfa.unsafe_add(init);
             rfa.renorm();
-            // rfa.add(first, last);
+            size_t count = 0;
+            T max_val = std::abs(*first);
             for (auto e = first; e != last; ++e)
             {
-                // printf("%f \n",*e);
-                rfa.set_max_abs_val(*e);
+                T temp_max_val = std::abs(static_cast<T>(*e));
+                if (max_val < temp_max_val)
+                {
+                    rfa.set_max_abs_val(temp_max_val);
+                    max_val = temp_max_val;
+                }
                 rfa.unsafe_add(*e);
-                rfa.renorm();
+                count++;
+                if (count == rfa.endurance())
+                {
+                    rfa.renorm();
+                    count = 0;
+                }
             }
             return rfa.conv();
         }
