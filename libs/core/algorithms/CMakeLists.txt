@@ -50,6 +50,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/exclusive_scan.hpp
     hpx/parallel/algorithms/fill.hpp
     hpx/parallel/algorithms/find.hpp
+    hpx/parallel/algorithms/fold.hpp
     hpx/parallel/algorithms/for_each.hpp
     hpx/parallel/algorithms/for_loop.hpp
     hpx/parallel/algorithms/for_loop_induction.hpp
