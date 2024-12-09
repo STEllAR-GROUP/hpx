@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Minh-Khanh Do
-//  Copyright (c) 2020-2023 Hartmut Kaiser
+//  Copyright (c) 2020-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -34,7 +34,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel {
+namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // segmented scan
     namespace detail {
@@ -60,13 +61,12 @@ namespace hpx { namespace parallel {
 
         // does a scan and returns last value of the scan
         template <typename Value>
-        struct segmented_scan_T
-          : public detail::algorithm<segmented_scan_T<Value>, Value>
+        struct segmented_scan_T : algorithm<segmented_scan_T<Value>, Value>
         {
-            typedef Value T;
+            using T = Value;
 
             segmented_scan_T()
-              : segmented_scan_T::algorithm("segmented_scan_T")
+              : algorithm<segmented_scan_T<Value>, Value>("segmented_scan_T")
             {
             }
 
@@ -126,11 +126,10 @@ namespace hpx { namespace parallel {
         // do the scan (exclusive/inclusive)
         // does not return anything
         template <typename Algo>
-        struct segmented_scan_void
-          : public detail::algorithm<segmented_scan_void<Algo>>
+        struct segmented_scan_void : algorithm<segmented_scan_void<Algo>>
         {
             segmented_scan_void()
-              : segmented_scan_void::algorithm("segmented_scan_void")
+              : algorithm<segmented_scan_void<Algo>>("segmented_scan_void")
             {
             }
 
@@ -153,8 +152,8 @@ namespace hpx { namespace parallel {
             parallel(ExPolicy&& policy, InIter first, InIter last, OutIter dest,
                 T&& init, Op&& op, Conv&& conv)
             {
-                typedef typename util::detail::algorithm_result<ExPolicy>::type
-                    result_type;
+                using result_type =
+                    typename util::detail::algorithm_result<ExPolicy>::type;
 
                 if (first == last)
                     return util::detail::algorithm_result<ExPolicy>::get();
@@ -179,13 +178,13 @@ namespace hpx { namespace parallel {
         static bool is_segmented_the_same(
             SegIter first, SegIter last, OutIter dest, std::true_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits_in;
-            typedef typename traits_in::segment_iterator segment_iterator_in;
-            typedef typename traits_in::local_iterator local_iterator_type_in;
+            using traits_in = hpx::traits::segmented_iterator_traits<SegIter>;
+            using segment_iterator_in = typename traits_in::segment_iterator;
+            using local_iterator_type_in = typename traits_in::local_iterator;
 
-            typedef hpx::traits::segmented_iterator_traits<OutIter> traits_out;
-            typedef typename traits_out::segment_iterator segment_iterator_out;
-            typedef typename traits_out::local_iterator local_iterator_type_out;
+            using traits_out = hpx::traits::segmented_iterator_traits<OutIter>;
+            using segment_iterator_out = typename traits_out::segment_iterator;
+            using local_iterator_type_out = typename traits_out::local_iterator;
 
             segment_iterator_in sit_in = traits_in::segment(first);
             segment_iterator_in send_in = traits_in::segment(last);
@@ -205,16 +204,17 @@ namespace hpx { namespace parallel {
 
                 if (beg_in != end_in)
                 {
-                    id_type in_id =
+                    id_type const in_id =
                         get_locality_from_id(traits_in::get_id(sit_in));
-                    id_type out_id =
+                    id_type const out_id =
                         get_locality_from_id(traits_out::get_id(sit_out));
 
                     if (in_id != out_id)
                         return false;
 
-                    std::size_t in_dist = std::distance(beg_in, end_in);
-                    std::size_t out_dist = std::distance(beg_out, end_out);
+                    std::size_t const in_dist = std::distance(beg_in, end_in);
+                    std::size_t const out_dist =
+                        std::distance(beg_out, end_out);
 
                     if (in_dist != out_dist)
                         return false;
@@ -231,16 +231,17 @@ namespace hpx { namespace parallel {
 
                 if (beg_in != end_in)
                 {
-                    id_type in_id =
+                    id_type const in_id =
                         get_locality_from_id(traits_in::get_id(sit_in));
-                    id_type out_id =
+                    id_type const out_id =
                         get_locality_from_id(traits_out::get_id(sit_out));
 
                     if (in_id != out_id)
                         return false;
 
-                    std::size_t in_dist = std::distance(beg_in, end_in);
-                    std::size_t out_dist = std::distance(beg_out, end_out);
+                    std::size_t const in_dist = std::distance(beg_in, end_in);
+                    std::size_t const out_dist =
+                        std::distance(beg_out, end_out);
 
                     if (in_dist != out_dist)
                         return false;
@@ -266,8 +267,10 @@ namespace hpx { namespace parallel {
                         if (in_id != out_id)
                             return false;
 
-                        std::size_t in_dist = std::distance(beg_in, end_in);
-                        std::size_t out_dist = std::distance(beg_out, end_out);
+                        std::size_t const in_dist =
+                            std::distance(beg_in, end_in);
+                        std::size_t const out_dist =
+                            std::distance(beg_out, end_out);
 
                         if (in_dist != out_dist)
                             return false;
@@ -283,16 +286,17 @@ namespace hpx { namespace parallel {
 
                 if (beg_in != end_in)
                 {
-                    id_type in_id =
+                    id_type const in_id =
                         get_locality_from_id(traits_in::get_id(sit_in));
-                    id_type out_id =
+                    id_type const out_id =
                         get_locality_from_id(traits_out::get_id(sit_out));
 
                     if (in_id != out_id)
                         return false;
 
-                    std::size_t in_dist = std::distance(beg_in, end_in);
-                    std::size_t out_dist = std::distance(beg_out, end_out);
+                    std::size_t const in_dist = std::distance(beg_in, end_in);
+                    std::size_t const out_dist =
+                        std::distance(beg_out, end_out);
 
                     if (in_dist != out_dist)
                         return false;
@@ -311,22 +315,21 @@ namespace hpx { namespace parallel {
         segmented_scan_seq(ExPolicy const& policy, SegIter first, SegIter last,
             OutIter dest, Conv&& conv, T const& init, Op&& op, std::true_type)
         {
-            typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
+            using result = util::detail::algorithm_result<ExPolicy, OutIter>;
 
             if (first == last)
                 return result::get(HPX_MOVE(dest));
 
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits_in;
-            typedef typename traits_in::segment_iterator segment_iterator_in;
-            typedef typename traits_in::local_iterator local_iterator_type_in;
+            using traits_in = hpx::traits::segmented_iterator_traits<SegIter>;
+            using segment_iterator_in = typename traits_in::segment_iterator;
+            using local_iterator_type_in = typename traits_in::local_iterator;
 
-            typedef hpx::traits::segmented_iterator_traits<OutIter> traits_out;
-            typedef typename traits_out::segment_iterator segment_iterator_out;
-            typedef typename traits_out::local_iterator local_iterator_type_out;
+            using traits_out = hpx::traits::segmented_iterator_traits<OutIter>;
+            using segment_iterator_out = typename traits_out::segment_iterator;
+            using local_iterator_type_out = typename traits_out::local_iterator;
 
-            typedef typename hpx::tuple<local_iterator_type_in,
-                local_iterator_type_in>
-                local_iterator_in_tuple;
+            using local_iterator_in_tuple =
+                hpx::tuple<local_iterator_type_in, local_iterator_type_in>;
 
             segment_iterator_in sit_in = traits_in::segment(first);
             segment_iterator_in send_in = traits_in::segment(last);
@@ -428,19 +431,19 @@ namespace hpx { namespace parallel {
             SegIter last, OutIter dest, T const& init, Op&& op, F1&& f1,
             F2&& f2)
         {
-            typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
+            using result = util::detail::algorithm_result<ExPolicy, OutIter>;
 
             if (first == last)
                 return result::get(HPX_MOVE(dest));
 
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
+            using traits = hpx::traits::segmented_iterator_traits<SegIter>;
+            using segment_iterator = typename traits::segment_iterator;
+            using local_iterator_type = typename traits::local_iterator;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
 
-            typedef typename std::vector<T> vector_type;
+            using vector_type = std::vector<T>;
 
             std::vector<vector_type> results;
 
@@ -518,29 +521,27 @@ namespace hpx { namespace parallel {
         segmented_scan_par(ExPolicy const& policy, SegIter first, SegIter last,
             OutIter dest, Conv&& conv, T const& init, Op&& op, std::true_type)
         {
-            typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
+            using result = util::detail::algorithm_result<ExPolicy, OutIter>;
 
             if (first == last)
                 return result::get(HPX_MOVE(dest));
 
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits_in;
-            typedef typename traits_in::segment_iterator segment_iterator_in;
-            typedef typename traits_in::local_iterator local_iterator_type_in;
+            using traits_in = hpx::traits::segmented_iterator_traits<SegIter>;
+            using segment_iterator_in = typename traits_in::segment_iterator;
+            using local_iterator_type_in = typename traits_in::local_iterator;
 
-            typedef hpx::traits::segmented_iterator_traits<OutIter> traits_out;
-            typedef typename traits_out::segment_iterator segment_iterator_out;
-            typedef typename traits_out::local_iterator local_iterator_type_out;
+            using traits_out = hpx::traits::segmented_iterator_traits<OutIter>;
+            using segment_iterator_out = typename traits_out::segment_iterator;
+            using local_iterator_type_out = typename traits_out::local_iterator;
 
-            typedef typename std::iterator_traits<
-                segment_iterator_in>::difference_type difference_type;
+            using difference_type = typename std::iterator_traits<
+                segment_iterator_in>::difference_type;
 
-            typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<SegIter>::value>
-                forced_seq;
+            using forced_seq = std::integral_constant<bool,
+                !hpx::traits::is_forward_iterator<SegIter>::value>;
 
-            typedef typename hpx::tuple<local_iterator_type_in,
-                local_iterator_type_in>
-                local_iterator_in_tuple;
+            using local_iterator_in_tuple =
+                hpx::tuple<local_iterator_type_in, local_iterator_type_in>;
 
             segment_iterator_in sit_in = traits_in::segment(first);
             segment_iterator_in send_in = traits_in::segment(last);
@@ -675,28 +676,26 @@ namespace hpx { namespace parallel {
             SegIter last, OutIter dest, T const& init, Op&& op, F1&& f1,
             F2&& f2)
         {
-            typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
+            using result = util::detail::algorithm_result<ExPolicy, OutIter>;
 
             if (first == last)
                 return result::get(HPX_MOVE(dest));
 
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
-            typedef
-                typename std::iterator_traits<segment_iterator>::difference_type
-                    difference_type;
+            using traits = hpx::traits::segmented_iterator_traits<SegIter>;
+            using segment_iterator = typename traits::segment_iterator;
+            using local_iterator_type = typename traits::local_iterator;
+            using difference_type = typename std::iterator_traits<
+                segment_iterator>::difference_type;
 
-            typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<SegIter>::value>
-                forced_seq;
+            using forced_seq = std::integral_constant<bool,
+                !hpx::traits::is_forward_iterator<SegIter>::value>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
 
             difference_type count = std::distance(sit, send);
 
-            typedef typename std::vector<T> vector_type;
+            using vector_type = std::vector<T>;
             std::vector<hpx::shared_future<vector_type>> results;
             results.reserve(count);
 
@@ -797,4 +796,4 @@ namespace hpx { namespace parallel {
         }
         /// \endcond
     }    // namespace detail
-}}       // namespace hpx::parallel
+}    // namespace hpx::parallel

@@ -18,8 +18,7 @@ jobs:
     - name: Install dependencies
       run: |
           brew install --overwrite python-tk && \
-          brew install --overwrite boost gperftools ninja autoconf automake && \
-          autoreconf -f -i \
+          brew install --overwrite boost gperftools ninja autoconf automake libtool && \
           brew upgrade cmake
     - name: Configure
       shell: bash

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,10 +11,9 @@
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/distribution_policies/colocating_distribution_policy.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/type_support/decay.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -27,7 +26,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace detail {
+namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>
@@ -87,7 +86,7 @@ namespace hpx { namespace parallel { namespace detail {
     struct algorithm_result_helper<util::min_max_result<Iterator>,
         std::enable_if_t<hpx::traits::is_segmented_local_iterator_v<Iterator>>>
     {
-        typedef hpx::traits::segmented_local_iterator_traits<Iterator> traits1;
+        using traits1 = hpx::traits::segmented_local_iterator_traits<Iterator>;
 
         static HPX_FORCEINLINE
             util::min_max_result<typename traits1::local_iterator>
@@ -308,7 +307,7 @@ namespace hpx { namespace parallel { namespace detail {
                 typename algo_type::result_type>::type;
 
         algorithm_invoker_action<algo_type, ExPolicy, typename IsSeq::type,
-            result_type(std::decay_t<Args>...)>
+            result_type(hpx::util::decay_unwrap_t<Args>...)>
             act;
 
         return hpx::async(act, hpx::colocated(id), HPX_FORWARD(Algo, algo),
@@ -341,4 +340,4 @@ namespace hpx { namespace parallel { namespace detail {
         }
         return f.get();
     }
-}}}    // namespace hpx::parallel::detail
+}    // namespace hpx::parallel::detail
