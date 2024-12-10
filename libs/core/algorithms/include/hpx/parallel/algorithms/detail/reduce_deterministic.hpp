@@ -11,6 +11,7 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/algorithms/detail/rfa.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <cstring>
@@ -65,6 +66,84 @@ namespace hpx::parallel::detail {
         }
     };
 
+    template <typename ExPolicy>
+    struct sequential_reduce_deterministic_rfa_t final
+      : hpx::functional::detail::tag_fallback<
+            sequential_reduce_deterministic_rfa_t<ExPolicy>>
+    {
+    private:
+        template <typename InIterB, typename InIterE, typename T,
+            typename Reduce>
+        friend constexpr hpx::parallel::detail::rfa::
+            ReproducibleFloatingAccumulator<T>
+            tag_fallback_invoke(sequential_reduce_deterministic_rfa_t,
+                ExPolicy&&, InIterB first, InIterE last, T init, Reduce&& r)
+        {
+            hpx::parallel::detail::rfa::RFA_bins<T> bins;
+            bins.initialize_bins();
+            std::memcpy(rfa::bin_host_buffer, &bins, sizeof(bins));
+
+            hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<T> rfa;
+
+            for (auto e = first; e != last; ++e)
+            {
+                rfa += *e;
+            }
+            return rfa;
+        }
+
+        template <typename InIterB, typename T, typename Reduce>
+        friend constexpr hpx::parallel::detail::rfa::
+            ReproducibleFloatingAccumulator<T>
+            tag_fallback_invoke(sequential_reduce_deterministic_rfa_t,
+                ExPolicy&&, InIterB first, std::size_t size, T init, Reduce&& r)
+        {
+            hpx::parallel::detail::rfa::RFA_bins<T> bins;
+            bins.initialize_bins();
+            std::memcpy(rfa::bin_host_buffer, &bins, sizeof(bins));
+
+            hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<T> rfa;
+            auto e = first;
+            for (std::size_t i = 0; i < size; ++i, ++e)
+            {
+                rfa += *e;
+            }
+            return rfa;
+        }
+
+        // template <typename InIterB, typename InIterE, typename T,
+        //     typename Reduce
+        //     // typename = std::enable_if_t<hpx::util::contains<T,
+        //     //     hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<
+        //     //         float>,
+        //     //     hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<
+        //     //         double>>::value>
+        //     >
+        // friend constexpr T tag_fallback_invoke(
+        //     sequential_reduce_deterministic_rfa_t, ExPolicy&&, InIterB first,
+        //     InIterE last, T init, Reduce&& r)
+        // {
+        //     static_assert(hpx::util::contains<T,
+        //         hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<
+        //             float>,
+        //         hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<
+        //             double>>::value);
+        //     hpx::parallel::detail::rfa::RFA_bins<T> bins;
+        //     bins.initialize_bins();
+        //     std::memcpy(rfa::bin_host_buffer, &bins, sizeof(bins));
+
+        //     hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<T> rfa;
+        //     rfa.set_max_abs_val(init);
+        //     rfa.unsafe_add(init);
+        //     rfa.renorm();
+        //     for (auto e = first; e != last; ++e)
+        //     {
+        //         rfa += *e;
+        //     }
+        //     return rfa.conv();
+        // }
+    };
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
     inline constexpr sequential_reduce_deterministic_t<ExPolicy>
@@ -80,4 +159,18 @@ namespace hpx::parallel::detail {
     }
 #endif
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    inline constexpr sequential_reduce_deterministic_rfa_t<ExPolicy>
+        sequential_reduce_deterministic_rfa =
+            sequential_reduce_deterministic_rfa_t<ExPolicy>{};
+#else
+    template <typename ExPolicy, typename... Args>
+    HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_reduce_deterministic_rfa(
+        Args&&... args)
+    {
+        return sequential_reduce_deterministic_rfa_t<ExPolicy>{}(
+            std::forward<Args>(args)...);
+    }
+#endif
 }    // namespace hpx::parallel::detail
