@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "detail/reduce_deterministic.hpp"
 #if defined(DOXYGEN)
 
 namespace hpx {
@@ -396,42 +397,49 @@ namespace hpx::parallel {
             static constexpr T sequential(ExPolicy&& policy, InIterB first,
                 InIterE last, T_&& init, Reduce&& r)
             {
-                // hpx::parallel::detail::sequential_reduce_deterministic_t<ExPolicy> seq;
-                // return seq(policy,first,last,0.0f,r);
-                return hpx::parallel::detail::sequential_reduce_deterministic<ExPolicy>(
-                    HPX_FORWARD(ExPolicy, policy), first, last,
+                return hpx::parallel::detail::sequential_reduce_deterministic<
+                    ExPolicy>(HPX_FORWARD(ExPolicy, policy), first, last,
                     HPX_FORWARD(T_, init), HPX_FORWARD(Reduce, r));
             }
 
-            //     template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-            //         typename T_, typename Reduce>
-            //     static util::detail::algorithm_result_t<ExPolicy, T> parallel(
-            //         ExPolicy&& policy, FwdIterB first, FwdIterE last, T_&& init,
-            //         Reduce&& r)
-            //     {
-            //         if (first == last)
-            //         {
-            //             return util::detail::algorithm_result<ExPolicy, T>::get(
-            //                 HPX_FORWARD(T_, init));
-            //         }
+            template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
+                typename T_, typename Reduce>
+            static util::detail::algorithm_result_t<ExPolicy, T> parallel(
+                ExPolicy&& policy, FwdIterB first, FwdIterE last, T_&& init,
+                Reduce&& r)
+            {
+                if (first == last)
+                {
+                    return util::detail::algorithm_result<ExPolicy, T>::get(
+                        HPX_FORWARD(T_, init));
+                }
 
-            //         auto f1 = [r](FwdIterB part_begin, std::size_t part_size) -> T {
-            //             T val = *part_begin;
-            //             return detail::sequential_reduce<ExPolicy>(
-            //                 ++part_begin, --part_size, HPX_MOVE(val), r);
-            //         };
+                auto f1 = [r, policy](
+                              FwdIterB part_begin, std::size_t part_size)
+                    -> hpx::parallel::detail::rfa::
+                        ReproducibleFloatingAccumulator<T_> {
+                            T val = *part_begin;
+                            return hpx::parallel::detail::
+                                sequential_reduce_deterministic_rfa<ExPolicy>(
+                                    HPX_FORWARD(ExPolicy, policy), ++part_begin,
+                                    --part_size, HPX_MOVE(val), r);
+                        };
 
-            //         return util::partitioner<ExPolicy, T>::call(
-            //             HPX_FORWARD(ExPolicy, policy), first,
-            //             detail::distance(first, last), HPX_MOVE(f1),
-            //             hpx::unwrapping(
-            //                 [init = HPX_FORWARD(T_, init),
-            //                     r = HPX_FORWARD(Reduce, r)](auto&& results) -> T {
-            //                     return detail::sequential_reduce<ExPolicy>(
-            //                         hpx::util::begin(results),
-            //                         hpx::util::size(results), init, r);
-            //                 }));
-            //     }
+                return util::partitioner<ExPolicy, T,
+                    hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<
+                        T_>>::call(HPX_FORWARD(ExPolicy, policy), first,
+                    detail::distance(first, last), HPX_MOVE(f1),
+                    hpx::unwrapping([init = HPX_FORWARD(T_, init),
+                                        r = HPX_FORWARD(Reduce, r),
+                                        policy](auto&& results) -> T {
+                        return hpx::parallel::detail::
+                            sequential_reduce_deterministic_rfa<ExPolicy>(
+                                HPX_FORWARD(ExPolicy, policy),
+                                hpx::util::begin(results),
+                                hpx::util::size(results), init, r)
+                                .conv();
+                    }));
+            }
         };
         /// \endcond
     }    // namespace detail
