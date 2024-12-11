@@ -69,11 +69,10 @@ namespace hpx::parcelset::policies::lci {
             {
                 HPX_ASSERT(buffer.transmission_chunks_.size() ==
                     size_t(num_zero_copy_chunks + num_non_zero_copy_chunks));
-                int tchunk_size =
-                    static_cast<int>(buffer.transmission_chunks_.size() *
-                        sizeof(typename parcel_buffer<buffer_type,
-                            ChunkType>::transmission_chunk_type));
-                if (tchunk_size <= int(max_header_size - current_header_size))
+                size_t tchunk_size = buffer.transmission_chunks_.size() *
+                    sizeof(typename parcel_buffer<buffer_type,
+                        ChunkType>::transmission_chunk_type);
+                if (tchunk_size <= max_header_size - current_header_size)
                 {
                     current_header_size += tchunk_size;
                 }
@@ -118,12 +117,11 @@ namespace hpx::parcelset::policies::lci {
             {
                 HPX_ASSERT(buffer.transmission_chunks_.size() ==
                     size_t(num_zero_copy_chunks + num_non_zero_copy_chunks));
-                int tchunk_size =
-                    static_cast<int>(buffer.transmission_chunks_.size() *
-                        sizeof(typename parcel_buffer<buffer_type,
-                            ChunkType>::transmission_chunk_type));
+                size_t tchunk_size = buffer.transmission_chunks_.size() *
+                    sizeof(typename parcel_buffer<buffer_type,
+                        ChunkType>::transmission_chunk_type);
                 set<pos_numbytes_tchunk>(static_cast<value_type>(tchunk_size));
-                if (tchunk_size <= int(max_header_size - current_header_size))
+                if (tchunk_size <= max_header_size - current_header_size)
                 {
                     data_[pos_piggy_back_flag_tchunk] = 1;
                     std::memcpy(&data_[current_header_size],
