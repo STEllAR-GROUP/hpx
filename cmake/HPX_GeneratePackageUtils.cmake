@@ -242,16 +242,23 @@ function(hpx_sanitize_usage_requirements property is_build)
 
 endfunction(hpx_sanitize_usage_requirements)
 
-function(hpx_filter_cuda_flags cflag_list)
+function(hpx_filter_language_flags cflag_list)
   set(_cflag_list "${${cflag_list}}")
-  string(REGEX REPLACE "\\$<\\$<COMPILE_LANGUAGE:CUDA>:[^>]*>;?" "" _cflag_list
-                       "${_cflag_list}"
+  # We are always in CXX, so replace conditional values with the values
+  # themselves
+  string(REGEX REPLACE "\\$<\\$<COMPILE_LANGUAGE:CXX>:([^>]*)>?" "\\1"
+                       _cflag_list "${_cflag_list}"
   )
+  # Remove conditional values for other languages
+  string(REGEX REPLACE "\\$<\\$<COMPILE_LANGUAGE:[^>]*>:([^>]*)>?" ""
+                       _cflag_list "${_cflag_list}"
+  )
+
   set(${cflag_list}
       ${_cflag_list}
       PARENT_SCOPE
   )
-endfunction(hpx_filter_cuda_flags)
+endfunction(hpx_filter_language_flags)
 
 # Append the corresponding (-D, -I) flags for the compilation
 function(
@@ -383,8 +390,8 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
     hpx_compile_definitions hpx_compile_options hpx_pic_option
     hpx_include_directories hpx_system_include_directories hpx_cflags_list
   )
-  # Cannot generate one file per language yet so filter out cuda
-  hpx_filter_cuda_flags(hpx_cflags_list)
+  # Generator expressions that depend on language must be filtered out
+  hpx_filter_language_flags(hpx_cflags_list)
   hpx_construct_library_list(
     hpx_link_libraries hpx_link_options hpx_library_list
   )
