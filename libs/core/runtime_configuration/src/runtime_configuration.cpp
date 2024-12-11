@@ -1026,11 +1026,14 @@ namespace hpx::util {
     {
         if (num_os_threads == 0)
         {
-            num_os_threads = 1;
             if (util::section const* sec = get_section("hpx"); nullptr != sec)
             {
                 num_os_threads = hpx::util::get_entry_as<std::uint32_t>(
                     *sec, "os_threads", 1);
+            }
+            else
+            {
+                num_os_threads = 1;
             }
         }
         return static_cast<std::size_t>(num_os_threads);

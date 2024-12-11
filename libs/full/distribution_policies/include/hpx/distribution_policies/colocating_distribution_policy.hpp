@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2023 Hartmut Kaiser
+//  Copyright (c) 2014-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -39,7 +39,6 @@ namespace hpx::components {
     /// object is currently placed.
     struct colocating_distribution_policy
     {
-    public:
         /// Default-construct a new instance of a \a colocating_distribution_policy.
         /// This policy will represent the local locality.
         constexpr colocating_distribution_policy() = default;
@@ -89,6 +88,13 @@ namespace hpx::components {
                     naming::get_id_from_locality_id(agas::get_locality_id()),
                     HPX_FORWARD(Ts, vs)...);
             }
+            if (!naming::detail::is_migratable(id_.get_gid()))
+            {
+                return create_async<Component>(
+                    naming::get_id_from_locality_id(
+                        naming::get_locality_id_from_id(id_)),
+                    HPX_FORWARD(Ts, vs)...);
+            }
             return create_colocated_async<Component>(
                 id_, HPX_FORWARD(Ts, vs)...);
         }
@@ -111,7 +117,7 @@ namespace hpx::components {
         /// \returns A future holding the list of global addresses which
         ///          represent the newly created objects
         ///
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         hpx::future<std::vector<bulk_locality_result>> bulk_create(
             std::size_t count, Ts&&... vs) const
         {
@@ -120,14 +126,45 @@ namespace hpx::components {
             if (!id_)
             {
                 id = naming::get_id_from_locality_id(agas::get_locality_id());
-                f = bulk_create_async<Component>(
-                    id, count, HPX_FORWARD(Ts, vs)...);
+                if constexpr (WithCount)
+                {
+                    f = bulk_create_async<WithCount, Component>(
+                        id, count, 0, HPX_FORWARD(Ts, vs)...);
+                }
+                else
+                {
+                    f = bulk_create_async<WithCount, Component>(
+                        id, count, HPX_FORWARD(Ts, vs)...);
+                }
+            }
+            else if (!naming::detail::is_migratable(id_.get_gid()))
+            {
+                id = naming::get_id_from_locality_id(
+                    naming::get_locality_id_from_id(id_));
+                if constexpr (WithCount)
+                {
+                    f = bulk_create_async<WithCount, Component>(
+                        id, count, 0, HPX_FORWARD(Ts, vs)...);
+                }
+                else
+                {
+                    f = bulk_create_async<WithCount, Component>(
+                        id, count, HPX_FORWARD(Ts, vs)...);
+                }
             }
             else
             {
                 id = id_;
-                f = bulk_create_colocated_async<Component>(
-                    id, count, HPX_FORWARD(Ts, vs)...);
+                if constexpr (WithCount)
+                {
+                    f = bulk_create_colocated_async<WithCount, Component>(
+                        id, count, 0, HPX_FORWARD(Ts, vs)...);
+                }
+                else
+                {
+                    f = bulk_create_colocated_async<WithCount, Component>(
+                        id, count, HPX_FORWARD(Ts, vs)...);
+                }
             }
 
             return f.then(hpx::launch::sync,
@@ -160,6 +197,13 @@ namespace hpx::components {
                     naming::get_id_from_locality_id(agas::get_locality_id()),
                     HPX_FORWARD(Ts, vs)...);
             }
+            if (!naming::detail::is_migratable(id_.get_gid()))
+            {
+                return hpx::detail::async_impl<Action>(policy,
+                    naming::get_id_from_locality_id(
+                        naming::get_locality_id_from_id(id_)),
+                    HPX_FORWARD(Ts, vs)...);
+            }
             return hpx::detail::async_colocated<Action>(
                 id_, HPX_FORWARD(Ts, vs)...);
         }
@@ -175,6 +219,13 @@ namespace hpx::components {
             {
                 return hpx::detail::async_cb_impl<Action>(policy,
                     naming::get_id_from_locality_id(agas::get_locality_id()),
+                    HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+            }
+            if (!naming::detail::is_migratable(id_.get_gid()))
+            {
+                return hpx::detail::async_cb_impl<Action>(policy,
+                    naming::get_id_from_locality_id(
+                        naming::get_locality_id_from_id(id_)),
                     HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
             }
             return hpx::detail::async_colocated_cb<Action>(
@@ -194,6 +245,14 @@ namespace hpx::components {
                     naming::get_id_from_locality_id(agas::get_locality_id()),
                     policy, HPX_FORWARD(Ts, vs)...);
             }
+            if (!naming::detail::is_migratable(id_.get_gid()))
+            {
+                return hpx::detail::post_impl<Action>(
+                    HPX_FORWARD(Continuation, c),
+                    naming::get_id_from_locality_id(
+                        naming::get_locality_id_from_id(id_)),
+                    policy, HPX_FORWARD(Ts, vs)...);
+            }
             return hpx::detail::post_colocated<Action>(
                 HPX_FORWARD(Continuation, c), id_, HPX_FORWARD(Ts, vs)...);
         }
@@ -205,6 +264,13 @@ namespace hpx::components {
             {
                 return hpx::detail::post_impl<Action>(
                     naming::get_id_from_locality_id(agas::get_locality_id()),
+                    policy, HPX_FORWARD(Ts, vs)...);
+            }
+            if (!naming::detail::is_migratable(id_.get_gid()))
+            {
+                return hpx::detail::post_impl<Action>(
+                    naming::get_id_from_locality_id(
+                        naming::get_locality_id_from_id(id_)),
                     policy, HPX_FORWARD(Ts, vs)...);
             }
             return hpx::detail::post_colocated<Action>(
@@ -226,6 +292,14 @@ namespace hpx::components {
                     naming::get_id_from_locality_id(agas::get_locality_id()),
                     policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
             }
+            if (!naming::detail::is_migratable(id_.get_gid()))
+            {
+                return hpx::detail::post_cb_impl<Action>(
+                    HPX_FORWARD(Continuation, c),
+                    naming::get_id_from_locality_id(
+                        naming::get_locality_id_from_id(id_)),
+                    policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+            }
             return hpx::detail::post_colocated_cb<Action>(
                 HPX_FORWARD(Continuation, c), id_, HPX_FORWARD(Callback, cb),
                 HPX_FORWARD(Ts, vs)...);
@@ -238,6 +312,13 @@ namespace hpx::components {
             {
                 return hpx::detail::post_cb_impl<Action>(
                     naming::get_id_from_locality_id(agas::get_locality_id()),
+                    policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+            }
+            if (!naming::detail::is_migratable(id_.get_gid()))
+            {
+                return hpx::detail::post_cb_impl<Action>(
+                    naming::get_id_from_locality_id(
+                        naming::get_locality_id_from_id(id_)),
                     policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
             }
             return hpx::detail::post_colocated_cb<Action>(
