@@ -94,6 +94,7 @@ set(tests
     partition_copy
     reduce_
     reduce_by_key
+    reduce_deterministic
     remove
     remove1
     remove2
@@ -245,3 +246,7 @@ foreach(test ${tests})
     "modules.algorithms.algorithms" ${test} ${${test}_PARAMETERS}
   )
 endforeach()
+
+target_compile_options(reduce_deterministic_test PRIVATE -fsanitize=address)
+
+target_link_options(reduce_deterministic_test PRIVATE -fsanitize=address)
