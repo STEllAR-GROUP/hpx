@@ -153,10 +153,10 @@ void test_concurrent(pop_mode m)
     std::uint32_t step = 7;
     hpx::concurrency::detail::non_contiguous_index_queue<> q{first, last, step};
 
-    std::size_t const num_threads = hpx::get_num_worker_threads();
+    std::size_t const num_threads = 2 * hpx::get_num_worker_threads();
 
     // This test should be run on at least two worker threads.
-    HPX_TEST_LTE(std::size_t(2), num_threads);
+    HPX_TEST_LTE(std::size_t(4), num_threads);
 
     std::vector<hpx::future<void>> fs;
     std::vector<std::vector<std::uint32_t>> popped_indices(num_threads);

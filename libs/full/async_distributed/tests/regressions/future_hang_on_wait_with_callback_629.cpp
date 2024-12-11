@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
     // clang-format off
     cmdline.add_options()
         ("test-runs"
-        , value<std::uint64_t>()->default_value(1000)
+        , value<std::uint64_t>()->default_value(100)
         , "number of times to repeat the test (0 == infinite)")
 
         ("verbose"
@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
         , "depth of the tree structure")
 
         ("delay-iterations"
-        , value<std::uint64_t>()->default_value(1000)
+        , value<std::uint64_t>()->default_value(100)
         , "number of iterations in the delay loop");
     // clang-format on
 
