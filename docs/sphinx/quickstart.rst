@@ -26,7 +26,7 @@ Installing |hpx|
 The easiest way to install |hpx| on your system is by choosing one of the steps
 below:
 
-#.* * vcpkg * *
+#. **vcpkg**
 
    You can download and install |hpx| using the `vcpkg
    <https://github.com/Microsoft/vcpkg>`_ dependency manager:
@@ -35,7 +35,7 @@ below:
 
       $ vcpkg install hpx
 
-#.* * Spack * *
+#. **Spack**
 
    Another way to install |hpx| is using
    `Spack <https://spack.readthedocs.io/en/latest/>`_:
@@ -44,7 +44,7 @@ below:
 
       $ spack install hpx
 
-#.* * Fedora * *
+#. **Fedora**
 
    Installation can be done with
    `Fedora <https://fedoraproject.org/wiki/DNF>`_ as well:
@@ -53,7 +53,7 @@ below:
 
       $ dnf install hpx*
 
-#.* * Arch Linux * *
+#. **Arch Linux**
 
    |hpx| is available in the
    `Arch User Repository (AUR) <https://wiki.archlinux.org/title/Arch_User_Repository>`_
