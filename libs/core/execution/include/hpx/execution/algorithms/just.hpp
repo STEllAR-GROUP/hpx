@@ -119,8 +119,11 @@ namespace hpx::execution::experimental {
 
             template <typename Receiver>
             friend auto
-            tag_invoke(connect_t, just_sender& s, Receiver&& receiver) noexcept(
+            tag_invoke(connect_t, just_sender& s, Receiver&& receiver) 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+            noexcept(
                 util::all_of_v<std::is_nothrow_copy_constructible<Ts>...>)
+#endif
             {
                 return operation_state<Receiver>{
                     HPX_FORWARD(Receiver, receiver), s.ts};
