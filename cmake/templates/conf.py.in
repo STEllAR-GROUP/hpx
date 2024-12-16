@@ -72,10 +72,10 @@ def get_info_from_file(source):
         with open(source, 'r') as file:
             # Search for patterns indicating the title and header
             for line in file:
-                if "/// \page" in line:
-                    title = line.split("/// \page", 1)[-1].strip()
-                elif "/// \headerfile" in line:
-                    header = line.split("/// \headerfile", 1)[-1].strip()
+                if "/// \\page" in line:
+                    title = line.split("/// \\page", 1)[-1].strip()
+                elif "/// \\headerfile" in line:
+                    header = line.split("/// \\headerfile", 1)[-1].strip()
 
     return title, header
 
