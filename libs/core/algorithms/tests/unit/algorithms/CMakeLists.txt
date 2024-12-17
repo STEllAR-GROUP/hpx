@@ -94,6 +94,7 @@ set(tests
     partition_copy
     reduce_
     reduce_by_key
+    reduce_deterministic
     remove
     remove1
     remove2
