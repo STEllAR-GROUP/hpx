@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#pragma once
-
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/detail/rfa.hpp>
@@ -19,6 +17,7 @@
 #include <limits>
 #include <numeric>
 #include <random>
+#include <string>
 #include <vector>
 
 #include "test_utils.hpp"
@@ -27,11 +26,12 @@ int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename T>
-T get_rand(
-    T LO = std::numeric_limits<T>::min(), T HI = std::numeric_limits<T>::max())
+T get_rand(T LO = (std::numeric_limits<T>::min)(),
+    T HI = (std::numeric_limits<T>::max)())
 {
     return LO +
-        static_cast<T>(std::rand()) / (static_cast<T>(RAND_MAX / (HI - LO)));
+        static_cast<T>(std::rand()) /
+        (static_cast<T>(static_cast<T>((RAND_MAX)) / (HI - LO)));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,10 +42,12 @@ void test_reduce1(IteratorTag)
 {
     // check if different type for deterministic and nondeeterministic
     // and same result i.e. correct computation
-    using base_iterator_det = std::vector<FloatTypeDeterministic>::iterator;
+    using base_iterator_det =
+        typename std::vector<FloatTypeDeterministic>::iterator;
     using iterator_det = test::test_iterator<base_iterator_det, IteratorTag>;
 
-    using base_iterator_ndet = std::vector<FloatTypeNonDeterministic>::iterator;
+    using base_iterator_ndet =
+        typename std::vector<FloatTypeNonDeterministic>::iterator;
     using iterator_ndet = test::test_iterator<base_iterator_ndet, IteratorTag>;
 
     std::vector<FloatTypeDeterministic> deterministic(LEN);
@@ -75,8 +77,8 @@ void test_reduce1(IteratorTag)
     FloatTypeNonDeterministic r3 = std::accumulate(
         nondeterministic.begin(), nondeterministic.end(), val_non_det);
 
-    HPX_TEST_EQ(r1, r3);
-    HPX_TEST_EQ(r2, r3);
+    HPX_TEST_EQ(static_cast<FloatTypeNonDeterministic>(r1), r3);
+    HPX_TEST_EQ(static_cast<FloatTypeNonDeterministic>(r2), r3);
 }
 
 template <typename IteratorTag, typename FloatTypeDeterministic,
@@ -85,7 +87,8 @@ void test_reduce_determinism(IteratorTag)
 {
     // check if different type for deterministic and nondeeterministic
     // and same result
-    using base_iterator_det = std::vector<FloatTypeDeterministic>::iterator;
+    using base_iterator_det =
+        typename std::vector<FloatTypeDeterministic>::iterator;
     using iterator_det = test::test_iterator<base_iterator_det, IteratorTag>;
 
     constexpr FloatTypeDeterministic num_bounds_det =
@@ -129,7 +132,8 @@ template <typename IteratorTag, typename FloatTypeNonDeterministic,
     size_t LEN = 10007>
 void test_orig_reduce_determinism(IteratorTag)
 {
-    using base_iterator_ndet = std::vector<FloatTypeNonDeterministic>::iterator;
+    using base_iterator_ndet =
+        typename std::vector<FloatTypeNonDeterministic>::iterator;
     using iterator_ndet = test::test_iterator<base_iterator_ndet, IteratorTag>;
 
     constexpr auto num_bounds_ndet =
