@@ -13,6 +13,7 @@
 #include <hpx/parallel/util/loop.hpp>
 
 #include <cstddef>
+#include <cstring>
 #include <limits>
 #include <type_traits>
 #include <utility>
@@ -32,6 +33,8 @@ namespace hpx::parallel::detail {
             sequential_reduce_deterministic_t, ExPolicy&&, InIterB first,
             InIterE last, T init, Reduce&& r)
         {
+            /// TODO: Put constraint on Reduce to be a binary plus operator
+            (void) r;
             hpx::parallel::detail::rfa::RFA_bins<T> bins;
             bins.initialize_bins();
             std::memcpy(rfa::__rfa_bin_host_buffer__, &bins, sizeof(bins));
