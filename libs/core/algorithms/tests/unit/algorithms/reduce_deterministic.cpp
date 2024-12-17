@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#pragma once
-
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/detail/rfa.hpp>
@@ -19,6 +17,7 @@
 #include <limits>
 #include <numeric>
 #include <random>
+#include <string>
 #include <vector>
 
 #include "test_utils.hpp"
@@ -27,11 +26,12 @@ int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename T>
-T get_rand(
-    T LO = std::numeric_limits<T>::min(), T HI = std::numeric_limits<T>::max())
+T get_rand(T LO = (std::numeric_limits<T>::min)(),
+    T HI = (std::numeric_limits<T>::max)())
 {
     return LO +
-        static_cast<T>(std::rand()) / (static_cast<T>(RAND_MAX / (HI - LO)));
+        static_cast<T>(std::rand()) /
+        (static_cast<T>(static_cast<T>((RAND_MAX)) / (HI - LO)));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,8 +75,8 @@ void test_reduce1(IteratorTag)
     FloatTypeNonDeterministic r3 = std::accumulate(
         nondeterministic.begin(), nondeterministic.end(), val_non_det);
 
-    HPX_TEST_EQ(r1, r3);
-    HPX_TEST_EQ(r2, r3);
+    HPX_TEST_EQ(static_cast<FloatTypeNonDeterministic>(r1), r3);
+    HPX_TEST_EQ(static_cast<FloatTypeNonDeterministic>(r2), r3);
 }
 
 template <typename IteratorTag, typename FloatTypeDeterministic,
