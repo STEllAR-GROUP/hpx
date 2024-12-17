@@ -17,6 +17,7 @@
 #include <limits>
 #include <numeric>
 #include <random>
+#include <string>
 #include <vector>
 
 #include "test_utils.hpp"
@@ -89,7 +90,8 @@ void test_reduce_parallel1(IteratorTag)
     using base_iterator_det = std::vector<FloatTypeDeterministic>::iterator;
     using iterator_det = test::test_iterator<base_iterator_det, IteratorTag>;
 
-    using base_iterator_ndet = std::vector<FloatTypeNonDeterministic>::iterator;
+    using base_iterator_ndet =
+        typename std::vector<FloatTypeNonDeterministic>::iterator;
     using iterator_ndet = test::test_iterator<base_iterator_ndet, IteratorTag>;
 
     std::vector<FloatTypeDeterministic> deterministic(LEN);
