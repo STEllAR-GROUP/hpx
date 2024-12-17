@@ -251,6 +251,15 @@ function(hpx_check_for_builtin_forward_move)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_builtin_frame_address)
+  add_hpx_config_test(
+    HPX_WITH_BUILTIN_FRAME_ADDRESS
+    SOURCE cmake/tests/builtin_frame_address.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_libfun_std_experimental_optional)
   add_hpx_config_test(
     HPX_WITH_LIBFUN_EXPERIMENTAL_OPTIONAL

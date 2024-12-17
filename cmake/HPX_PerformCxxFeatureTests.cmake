@@ -173,4 +173,8 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_builtin_forward_move(DEFINITIONS HPX_HAVE_BUILTIN_FORWARD_MOVE)
 
+  hpx_check_for_builtin_frame_address(
+    DEFINITIONS HPX_HAVE_BUILTIN_FRAME_ADDRESS
+  )
+
 endfunction()

@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config/compiler_specific.hpp>
+#include <hpx/config/defines.hpp>
 
 #if defined(HPX_WINDOWS)
 #define HPX_HAVE_THREADS_GET_STACK_POINTER
@@ -30,7 +31,7 @@ namespace hpx::threads::coroutines::detail {
 
     inline std::size_t get_stack_ptr() noexcept
     {
-#if defined(HPX_GCC_VERSION)
+#if defined(HPX_HAVE_BUILTIN_FRAME_ADDRESS)
         return std::size_t(__builtin_frame_address(0));
 #else
         std::size_t stack_ptr = (std::numeric_limits<std::size_t>::max)();
