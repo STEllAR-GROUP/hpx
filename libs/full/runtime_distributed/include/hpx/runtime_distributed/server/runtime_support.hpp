@@ -99,10 +99,6 @@ namespace hpx::components::server {
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
-        ///
-        /// \param self [in] The HPX \a thread used to execute this function.
-        /// \param appl [in] The applier to be used for finalization of the
-        ///             component instance.
         static constexpr void finalize() {}
 
         void delete_function_lists();

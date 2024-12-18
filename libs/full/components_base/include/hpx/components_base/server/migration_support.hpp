@@ -27,6 +27,7 @@
 
 namespace hpx::components {
 
+    /// \cond NOINTERNAL
     namespace detail {
 
         template <typename Mutex>
