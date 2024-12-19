@@ -120,8 +120,8 @@ namespace hpx::parcelset::policies::lci {
                     std::vector<
                         typename parcel_buffer_type::transmission_chunk_type>&
                         tchunks = buffer_.transmission_chunks_;
-                    int tchunks_length = static_cast<int>(tchunks.size() *
-                        sizeof(parcel_buffer_type::transmission_chunk_type));
+                    size_t tchunks_length = tchunks.size() *
+                        sizeof(parcel_buffer_type::transmission_chunk_type);
                     iovec.lbuffers[i].address = tchunks.data();
                     iovec.lbuffers[i].length = tchunks_length;
                     if (config_t::reg_mem)
