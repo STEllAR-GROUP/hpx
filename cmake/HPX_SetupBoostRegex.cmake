@@ -8,7 +8,8 @@ if(NOT TARGET Boost::regex)
   hpx_set_cmake_policy(CMP0167 OLD) # use CMake's FindBoost for now
 
   find_package(
-    Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE MODULE COMPONENTS regex
+    Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE
+    ${HPX_FIND_BOOST_PACKAGE_MODE} COMPONENTS regex
   )
 
   if(Boost_REGEX_FOUND)
