@@ -8,6 +8,7 @@
 
 #if !defined(HPX_HAVE_STATIC_LINKING)
 #include <hpx/distribution_policies/container_distribution_policy.hpp>
+#include <hpx/distribution_policies/explicit_container_distribution_policy.hpp>
 
 #include <hpx/components/containers/partitioned_vector/export_definitions.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
@@ -16,7 +17,7 @@
 #include <vector>
 
 HPX_REGISTER_PARTITIONED_VECTOR(int)
-typedef long long long_long;
+using long_long = long long;
 HPX_REGISTER_PARTITIONED_VECTOR(long_long)
 
 // an out-of-line definition of a member of a class template cannot have default
@@ -38,6 +39,12 @@ hpx::partitioned_vector<int, std::vector<int>>::partitioned_vector(
 template HPX_PARTITIONED_VECTOR_EXPORT
 hpx::partitioned_vector<int, std::vector<int>>::partitioned_vector(
     size_type, int const&, hpx::container_distribution_policy const&, void*);
+template HPX_PARTITIONED_VECTOR_EXPORT
+hpx::partitioned_vector<int, std::vector<int>>::partitioned_vector(
+    size_type, hpx::explicit_container_distribution_policy const&, void*);
+template HPX_PARTITIONED_VECTOR_EXPORT
+hpx::partitioned_vector<int, std::vector<int>>::partitioned_vector(
+    size_type, int const&, hpx::explicit_container_distribution_policy const&, void*);
 
 template class HPX_PARTITIONED_VECTOR_EXPORT
     hpx::server::partitioned_vector<long long, std::vector<long long>>;
@@ -51,6 +58,12 @@ hpx::partitioned_vector<long long, std::vector<long long>>::partitioned_vector(
 template HPX_PARTITIONED_VECTOR_EXPORT hpx::partitioned_vector<long long,
     std::vector<long long>>::partitioned_vector(size_type, long long const&,
     hpx::container_distribution_policy const&, void*);
+template HPX_PARTITIONED_VECTOR_EXPORT
+hpx::partitioned_vector<long long, std::vector<long long>>::partitioned_vector(
+    size_type, hpx::explicit_container_distribution_policy const&, void*);
+template HPX_PARTITIONED_VECTOR_EXPORT hpx::partitioned_vector<long long,
+    std::vector<long long>>::partitioned_vector(size_type, long long const&,
+    hpx::explicit_container_distribution_policy const&, void*);
 
 #if defined(HPX_MSVC)
 #pragma warning(pop)
