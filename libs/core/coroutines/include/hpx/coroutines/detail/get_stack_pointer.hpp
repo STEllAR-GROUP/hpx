@@ -14,7 +14,7 @@
 #if defined(HPX_WINDOWS)
 #define HPX_HAVE_THREADS_GET_STACK_POINTER
 #else
-#if defined(HPX_GCC_VERSION)
+#if defined(HPX_HAVE_BUILTIN_FRAME_ADDRESS)
 #define HPX_HAVE_THREADS_GET_STACK_POINTER
 #else
 #if defined(__x86_64__) || defined(__amd64) || defined(__i386__) ||            \
