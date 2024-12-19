@@ -68,17 +68,7 @@ namespace hpx::components {
             return true;
         }
 
-        /// \brief Return the unique identifier of the component type this
-        ///        factory is responsible for
-        ///
-        /// \param locality     [in] The id of the locality this factory
-        ///                     is responsible for.
-        /// \param agas_client  [in] The AGAS client to use for component id
-        ///                     registration (if needed).
-        ///
-        /// \return Returns the unique identifier of the component type this
-        ///         factory instance is responsible for. This function throws
-        ///         on any error.
+        /// \brief Enables this type of registry and sets its destroy mechanism
         void register_component_type() override
         {
             using type_holder = typename Component::type_holder;
