@@ -158,8 +158,8 @@ namespace hpx::parcelset::policies::lci {
                 buffer.num_chunks_.second = num_non_zero_copy_chunks;
                 auto& tchunks = buffer.transmission_chunks_;
                 tchunks.resize(num_zero_copy_chunks + num_non_zero_copy_chunks);
-                int tchunks_length = static_cast<int>(tchunks.size() *
-                    sizeof(buffer_type::transmission_chunk_type));
+                size_t tchunks_length = tchunks.size() *
+                    sizeof(buffer_type::transmission_chunk_type);
                 char* piggy_back_tchunk = header_.piggy_back_tchunk();
                 if (piggy_back_tchunk)
                 {
@@ -178,8 +178,7 @@ namespace hpx::parcelset::policies::lci {
                 buffer.chunks_.resize(num_zero_copy_chunks);
                 for (int j = 0; j < num_zero_copy_chunks; ++j)
                 {
-                    std::size_t chunk_size =
-                        buffer.transmission_chunks_[j].second;
+                    size_t chunk_size = buffer.transmission_chunks_[j].second;
                     HPX_ASSERT(iovec.lbuffers[i].length == chunk_size);
                     buffer.chunks_[j] = serialization::create_pointer_chunk(
                         iovec.lbuffers[i].address, chunk_size);
