@@ -9,8 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/config/compiler_specific.hpp>
-#include <hpx/config/defines.hpp>
 
 #if defined(HPX_WINDOWS)
 #define HPX_HAVE_THREADS_GET_STACK_POINTER
