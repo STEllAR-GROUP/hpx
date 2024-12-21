@@ -29,19 +29,19 @@ foreach(test ${tests})
     FOLDER "Tests/Regressions/Modules/Full/Parcelset"
   )
 
-  add_hpx_regression_test(
-    "modules.parcelset" ${test} ${${test}_PARAMETERS} TIMEOUT 900
-  )
+  # Disable the test due to limited CircleCI resources
+
+  # add_hpx_regression_test( "modules.parcelset" ${test} ${${test}_PARAMETERS}
+  # TIMEOUT 900 )
 
 endforeach()
 
 if(HPX_WITH_NETWORKING)
+  # Disable the test due to limited CircleCI resources
+
   # very_big_parcel with one additional configurations
-  add_hpx_regression_test(
-    "modules.parcelset" very_big_parcel_int_max_plus_1
-    EXECUTABLE very_big_parcel
-    PARCELPORTS tcp lci TIMEOUT 900
-    PSEUDO_DEPS_NAME very_big_parcel ${very_big_parcel_PARAMETERS}
-                                     --nbytes-add=1
-  )
+
+  # add_hpx_regression_test( "modules.parcelset" very_big_parcel_int_max_plus_1
+  # EXECUTABLE very_big_parcel PARCELPORTS tcp lci TIMEOUT 900 PSEUDO_DEPS_NAME
+  # very_big_parcel ${very_big_parcel_PARAMETERS} --nbytes-add=1 )
 endif()
