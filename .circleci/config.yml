@@ -105,12 +105,9 @@ jobs:
           command: |
               git clone --depth=1 file:///hpx/source-full source
       - run:
-          name: Downloading CTest XML to Junit XML
+          name: Copying CTest XML to Junit XML
           command: |
-              curl \
-                https://raw.githubusercontent.com/Kitware/CDash/master/app/cdash/tests/circle/conv.xsl \
-                --fail \
-                -o /hpx/conv.xsl
+              cp /hpx/source/.circleci/conv.xsl /hpx/conv.xsl
       - persist_to_workspace:
           root: /hpx
           paths:

@@ -70,27 +70,6 @@ set(HPX_WITH_PARCELPORT_MPI_MULTITHREADED
     CACHE BOOL ""
 )
 
-set(HPX_WITH_PARCELPORT_LIBFABRIC
-    ON
-    CACHE BOOL ""
-)
-set(HPX_PARCELPORT_LIBFABRIC_PROVIDER
-    "gni"
-    CACHE STRING "See libfabric docs for details, gni,verbs,psm2 etc etc"
-)
-set(HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS
-    "256"
-    CACHE STRING "Max number of messages in flight at once"
-)
-set(HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE
-    OFF
-    CACHE BOOL "Custom libfabric logging flag"
-)
-set(HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING
-    OFF
-    CACHE BOOL "Libfabric parcelport logging on/off flag"
-)
-
 # We do a cross compilation here ...
 set(CMAKE_CROSSCOMPILING
     ON

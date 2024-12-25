@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include "detail/reduce_deterministic.hpp"
 #if defined(DOXYGEN)
 
 namespace hpx {
@@ -420,7 +419,7 @@ namespace hpx::parallel {
                         ReproducibleFloatingAccumulator<T_> {
                             T val = *part_begin;
                             return hpx::parallel::detail::
-                                sequential_reduce_deterministic_rfa<ExPolicy>(
+                                sequential_reduce_deterministic<ExPolicy>(
                                     HPX_FORWARD(ExPolicy, policy), ++part_begin,
                                     --part_size, HPX_MOVE(val), r);
                         };
@@ -433,7 +432,7 @@ namespace hpx::parallel {
                                         r = HPX_FORWARD(Reduce, r),
                                         policy](auto&& results) -> T {
                         return hpx::parallel::detail::
-                            sequential_reduce_deterministic_rfa<ExPolicy>(
+                            sequential_reduce_deterministic<ExPolicy>(
                                 HPX_FORWARD(ExPolicy, policy),
                                 hpx::util::begin(results),
                                 hpx::util::size(results), init, r)

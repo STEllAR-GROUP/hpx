@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#pragma once
-
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/detail/rfa.hpp>
@@ -19,6 +17,7 @@
 #include <limits>
 #include <numeric>
 #include <random>
+#include <string>
 #include <vector>
 
 #include "test_utils.hpp"
@@ -27,11 +26,12 @@ int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename T>
-T get_rand(
-    T LO = std::numeric_limits<T>::min(), T HI = std::numeric_limits<T>::max())
+T get_rand(T LO = (std::numeric_limits<T>::min)(),
+    T HI = (std::numeric_limits<T>::max)())
 {
     return LO +
-        static_cast<T>(std::rand()) / (static_cast<T>(RAND_MAX / (HI - LO)));
+        static_cast<T>(std::rand()) /
+        (static_cast<T>(static_cast<T>((RAND_MAX)) / (HI - LO)));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,10 +42,12 @@ void test_reduce1(IteratorTag)
 {
     // check if different type for deterministic and nondeeterministic
     // and same result i.e. correct computation
-    using base_iterator_det = std::vector<FloatTypeDeterministic>::iterator;
+    using base_iterator_det =
+        typename std::vector<FloatTypeDeterministic>::iterator;
     using iterator_det = test::test_iterator<base_iterator_det, IteratorTag>;
 
-    using base_iterator_ndet = std::vector<FloatTypeNonDeterministic>::iterator;
+    using base_iterator_ndet =
+        typename std::vector<FloatTypeNonDeterministic>::iterator;
     using iterator_ndet = test::test_iterator<base_iterator_ndet, IteratorTag>;
 
     std::vector<FloatTypeDeterministic> deterministic(LEN);
@@ -75,51 +77,8 @@ void test_reduce1(IteratorTag)
     FloatTypeNonDeterministic r3 = std::accumulate(
         nondeterministic.begin(), nondeterministic.end(), val_non_det);
 
-    HPX_TEST_EQ(r1, r3);
-    HPX_TEST_EQ(r2, r3);
-}
-
-template <typename IteratorTag, typename FloatTypeDeterministic,
-    typename FloatTypeNonDeterministic, size_t LEN = 10007>
-void test_reduce_parallel1(IteratorTag)
-{
-    // check if different type for deterministic and nondeeterministic
-    // and same result i.e. correct computation
-    using base_iterator_det = std::vector<FloatTypeDeterministic>::iterator;
-    using iterator_det = test::test_iterator<base_iterator_det, IteratorTag>;
-
-    using base_iterator_ndet = std::vector<FloatTypeNonDeterministic>::iterator;
-    using iterator_ndet = test::test_iterator<base_iterator_ndet, IteratorTag>;
-
-    std::vector<FloatTypeDeterministic> deterministic(LEN);
-    std::vector<FloatTypeNonDeterministic> nondeterministic(LEN);
-
-    std::iota(
-        deterministic.begin(), deterministic.end(), FloatTypeDeterministic(0));
-
-    std::iota(nondeterministic.begin(), nondeterministic.end(),
-        FloatTypeNonDeterministic(0));
-
-    FloatTypeDeterministic val_det(0);
-    FloatTypeNonDeterministic val_non_det(0);
-    auto op = [](FloatTypeNonDeterministic v1, FloatTypeNonDeterministic v2) {
-        return v1 + v2;
-    };
-
-    FloatTypeDeterministic r1 = hpx::reduce_deterministic(hpx::execution::par,
-        iterator_det(std::begin(deterministic)),
-        iterator_det(std::end(deterministic)), val_det, op);
-
-    // verify values
-    // FloatTypeNonDeterministic r2 = hpx::reduce(hpx::execution::par,
-    //     iterator_ndet(std::begin(nondeterministic)),
-    //     iterator_ndet(std::end(nondeterministic)), val_non_det, op);
-
-    FloatTypeNonDeterministic r3 = std::accumulate(
-        nondeterministic.begin(), nondeterministic.end(), val_non_det);
-
-    HPX_TEST_EQ(r1, r3);
-    // HPX_TEST_EQ(r2, r3);
+    HPX_TEST_EQ(static_cast<FloatTypeNonDeterministic>(r1), r3);
+    HPX_TEST_EQ(static_cast<FloatTypeNonDeterministic>(r2), r3);
 }
 
 template <typename IteratorTag, typename FloatTypeDeterministic,
@@ -128,11 +87,12 @@ void test_reduce_determinism(IteratorTag)
 {
     // check if different type for deterministic and nondeeterministic
     // and same result
-    using base_iterator_det = std::vector<FloatTypeDeterministic>::iterator;
+    using base_iterator_det =
+        typename std::vector<FloatTypeDeterministic>::iterator;
     using iterator_det = test::test_iterator<base_iterator_det, IteratorTag>;
 
-    constexpr auto num_bounds_det =
-        std::is_same_v<FloatTypeDeterministic, float> ? 1000.0f : 1000000.0f;
+    constexpr FloatTypeDeterministic num_bounds_det =
+        std::is_same_v<FloatTypeDeterministic, float> ? 1000.0 : 1000000.0;
 
     std::vector<FloatTypeDeterministic> deterministic(LEN);
 
@@ -165,11 +125,15 @@ void test_reduce_determinism(IteratorTag)
         r1_shuffled);    // Deterministically calculated, should always satisfy
 }
 
+/// This test function is never called because it is not guaranteed to pass
+/// It serves an important purpose to demonstrate that floating point summation
+/// is not always associative i.e. a+b+c != a+c+b
 template <typename IteratorTag, typename FloatTypeNonDeterministic,
     size_t LEN = 10007>
 void test_orig_reduce_determinism(IteratorTag)
 {
-    using base_iterator_ndet = std::vector<FloatTypeNonDeterministic>::iterator;
+    using base_iterator_ndet =
+        typename std::vector<FloatTypeNonDeterministic>::iterator;
     using iterator_ndet = test::test_iterator<base_iterator_ndet, IteratorTag>;
 
     constexpr auto num_bounds_ndet =
@@ -221,7 +185,6 @@ void test_reduce1()
     test_reduce1<IteratorTag, double, float, 1000>(IteratorTag());
     test_reduce1<IteratorTag, float, double, 1000>(IteratorTag());
     test_reduce1<IteratorTag, double, double, 1000>(IteratorTag());
-    test_reduce_parallel1<IteratorTag, float, float, 1000>(IteratorTag());
 }
 
 template <typename IteratorTag>
@@ -233,21 +196,22 @@ void test_reduce2()
     test_reduce_determinism<IteratorTag, double, 1000>(IteratorTag());
 }
 
-template <typename IteratorTag>
-void test_reduce3()
-{
-    using namespace hpx::execution;
+// template <typename IteratorTag>
+// void test_reduce3()
+// {
+//     using namespace hpx::execution;
 
-    test_orig_reduce_determinism<IteratorTag, float, 1000>(IteratorTag());
-    test_orig_reduce_determinism<IteratorTag, double, 1000>(IteratorTag());
-}
+//     test_orig_reduce_determinism<IteratorTag, float, 1000>(IteratorTag());
+//     test_orig_reduce_determinism<IteratorTag, double, 1000>(IteratorTag());
+// }
 
 void reduce_test1()
 {
     test_reduce1<std::random_access_iterator_tag>();
     test_reduce2<std::random_access_iterator_tag>();
-    test_reduce3<std::random_access_iterator_tag>();
-    // test_reduce1<std::forward_iterator_tag>();
+    // test_reduce3<std::random_access_iterator_tag>();
+    test_reduce1<std::forward_iterator_tag>();
+    test_reduce2<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

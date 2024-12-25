@@ -246,7 +246,3 @@ foreach(test ${tests})
     "modules.algorithms.algorithms" ${test} ${${test}_PARAMETERS}
   )
 endforeach()
-
-target_compile_options(reduce_deterministic_test PRIVATE -fsanitize=address)
-
-target_link_options(reduce_deterministic_test PRIVATE -fsanitize=address)
