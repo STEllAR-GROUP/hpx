@@ -407,35 +407,37 @@ namespace hpx::parallel {
                 ExPolicy&& policy, FwdIterB first, FwdIterE last, T_&& init,
                 Reduce&& r)
             {
+                (void)r;
                 if (first == last)
                 {
                     return util::detail::algorithm_result<ExPolicy, T>::get(
                         HPX_FORWARD(T_, init));
                 }
 
-                auto f1 = [r, policy](
-                              FwdIterB part_begin, std::size_t part_size)
+                auto f1 = [policy](FwdIterB part_begin, std::size_t part_size)
                     -> hpx::parallel::detail::rfa::
                         ReproducibleFloatingAccumulator<T_> {
-                            T val = *part_begin;
+                            T_ val = *part_begin;
                             return hpx::parallel::detail::
-                                sequential_reduce_deterministic<ExPolicy>(
+                                sequential_reduce_deterministic_rfa<ExPolicy>(
                                     HPX_FORWARD(ExPolicy, policy), ++part_begin,
-                                    --part_size, HPX_MOVE(val), r);
+                                    --part_size, HPX_MOVE(val),
+                                    std::true_type{});
                         };
 
-                return util::partitioner<ExPolicy, T,
+                return util::partitioner<ExPolicy, T_,
                     hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<
                         T_>>::call(HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
-                    hpx::unwrapping([init = HPX_FORWARD(T_, init),
-                                        r = HPX_FORWARD(Reduce, r),
-                                        policy](auto&& results) -> T {
+                    hpx::unwrapping([policy](auto&& results) -> T_ {
                         return hpx::parallel::detail::
-                            sequential_reduce_deterministic<ExPolicy>(
+                            sequential_reduce_deterministic_rfa<ExPolicy>(
                                 HPX_FORWARD(ExPolicy, policy),
                                 hpx::util::begin(results),
-                                hpx::util::size(results), init, r)
+                                hpx::util::size(results),
+                                hpx::parallel::detail::rfa::
+                                    ReproducibleFloatingAccumulator<T_>{},
+                                std::false_type{})
                                 .conv();
                     }));
             }

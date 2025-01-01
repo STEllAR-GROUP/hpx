@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <cstddef>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/algorithm.hpp>
@@ -33,15 +34,15 @@ T get_rand(T LO = (std::numeric_limits<T>::min)(),
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void bench_reduce_deterministic(
+void bench_reduce_deterministic(const auto& policy,
     const auto& deterministic_shuffled, const auto& val_det, const auto& op)
 {
     // check if different type for deterministic and nondeeterministic
     // and same result
 
     auto r1_shuffled =
-        hpx::reduce_deterministic((std::begin(deterministic_shuffled)),
-            (std::end(deterministic_shuffled)), val_det, op);
+        hpx::reduce_deterministic(policy, std::begin(deterministic_shuffled),
+            std::end(deterministic_shuffled), val_det, op);
 
     HPX_UNUSED(r1_shuffled);
 }
@@ -61,6 +62,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::srand(seed);
 
     auto test_count = vm["test_count"].as<int>();
+    std::size_t vector_size = vm["vector-size"].as<std::size_t>();
 
     hpx::util::perftests_init(vm);
 
@@ -74,7 +76,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     {
         using FloatTypeDeterministic = float;
-        std::size_t LEN = 10000;
+        std::size_t LEN = vector_size;
 
         constexpr FloatTypeDeterministic num_bounds_det =
             std::is_same_v<FloatTypeDeterministic, float> ? 1000.0 : 1000000.0;
@@ -113,7 +115,14 @@ int hpx_main(hpx::program_options::variables_map& vm)
         {
             hpx::util::perftests_report(
                 "reduce deterministic", "seq", test_count, [&]() {
-                    bench_reduce_deterministic(
+                    bench_reduce_deterministic(hpx::execution::seq,
+                        deterministic_shuffled, val_det, op);
+                });
+        }
+        {
+            hpx::util::perftests_report(
+                "reduce deterministic", "par", test_count, [&]() {
+                    bench_reduce_deterministic(hpx::execution::par,
                         deterministic_shuffled, val_det, op);
                 });
         }
@@ -135,6 +144,8 @@ int main(int argc, char* argv[])
     cmdline.add_options()
         ("test_count", value<int>()->default_value(100),
             "number of tests to be averaged")
+        ("vector-size", value<std::size_t>()->default_value(1000000),
+            "number of elements to be reduced")
         ;
     // clang-format on
 

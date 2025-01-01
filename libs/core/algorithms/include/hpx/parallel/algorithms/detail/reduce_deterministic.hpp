@@ -65,6 +65,71 @@ namespace hpx::parallel::detail {
         }
     };
 
+    template <typename ExPolicy>
+    struct sequential_reduce_deterministic_rfa_t final
+      : hpx::functional::detail::tag_fallback<
+            sequential_reduce_deterministic_rfa_t<ExPolicy>>
+    {
+    private:
+        template <typename InIterB, typename T>
+        friend constexpr hpx::parallel::detail::rfa::
+            ReproducibleFloatingAccumulator<T>
+            tag_fallback_invoke(sequential_reduce_deterministic_rfa_t,
+                ExPolicy&&, InIterB first, std::size_t partition_size, T init,
+                std::true_type&&)
+        {
+            hpx::parallel::detail::rfa::RFA_bins<T> bins;
+            bins.initialize_bins();
+            std::memcpy(rfa::__rfa_bin_host_buffer__, &bins, sizeof(bins));
+
+            hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<T> rfa;
+            rfa.set_max_abs_val(init);
+            rfa.unsafe_add(init);
+            rfa.renorm();
+            size_t count = 0;
+            T max_val = std::abs(*first);
+            std::size_t partition_size_lim = 0;
+            for (auto e = first; partition_size_lim <= partition_size;
+                partition_size_lim++, e++)
+            {
+                T temp_max_val = std::abs(static_cast<T>(*e));
+                if (max_val < temp_max_val)
+                {
+                    rfa.set_max_abs_val(temp_max_val);
+                    max_val = temp_max_val;
+                }
+                rfa.unsafe_add(*e);
+                count++;
+                if (count == rfa.endurance())
+                {
+                    rfa.renorm();
+                    count = 0;
+                }
+            }
+            return rfa;
+        }
+
+        template <typename InIterB, typename T>
+        friend constexpr T tag_fallback_invoke(
+            sequential_reduce_deterministic_rfa_t, ExPolicy&&, InIterB first,
+            std::size_t partition_size, T init, std::false_type&&)
+        {
+            hpx::parallel::detail::rfa::RFA_bins<typename T::ftype> bins;
+            bins.initialize_bins();
+            std::memcpy(rfa::__rfa_bin_host_buffer__, &bins, sizeof(bins));
+
+            T rfa;
+            rfa += init;
+            std::size_t partition_size_lim = 0;
+            for (auto e = first; partition_size_lim <= partition_size;
+                partition_size_lim++, e++)
+            {
+                rfa += (*e);
+            }
+            return rfa;
+        }
+    };
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
     inline constexpr sequential_reduce_deterministic_t<ExPolicy>
@@ -80,4 +145,18 @@ namespace hpx::parallel::detail {
     }
 #endif
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    inline constexpr sequential_reduce_deterministic_rfa_t<ExPolicy>
+        sequential_reduce_deterministic_rfa =
+            sequential_reduce_deterministic_rfa_t<ExPolicy>{};
+#else
+    template <typename ExPolicy, typename... Args>
+    HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_reduce_deterministic_rfa(
+        Args&&... args)
+    {
+        return sequential_reduce_deterministic_rfa_t<ExPolicy>{}(
+            std::forward<Args>(args)...);
+    }
+#endif
 }    // namespace hpx::parallel::detail
