@@ -49,7 +49,12 @@ namespace hpx {
         template <typename, typename>
         friend class const_partitioned_vector_local_view_iterator;
 
-        DataType& dereference() const
+        DataType& dereference()
+        {
+            HPX_ASSERT(!is_at_end());
+            return this->base_reference()->data();
+        }
+        DataType const& dereference() const
         {
             HPX_ASSERT(!is_at_end());
             return this->base_reference()->data();

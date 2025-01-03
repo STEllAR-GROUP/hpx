@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2023 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -106,7 +106,7 @@ namespace hpx::util {
     //
     //   Reference - the reference type of the resulting iterator, and in
     //      particular, the result type of operator*(). If not supplied but
-    //      Value is supplied, Value& is used. Otherwise
+    //      Value is supplied, Value& is used. Otherwise,
     //      iterator_traits<Base>::reference is used.
     //
     //   Difference - the difference_type of the resulting iterator. If not
@@ -143,19 +143,24 @@ namespace hpx::util {
             return iterator_;
         }
 
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Base& base() noexcept
+        {
+            return iterator_;
+        }
+
     protected:
         // for convenience in derived classes
         using iterator_adaptor_ = iterator_adaptor<Derived, Base, Value,
             Category, Reference, Difference, Pointer>;
 
         // lvalue access to the Base object for Derived
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Base const& base_reference()
-            const noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE Base& base_reference() noexcept
         {
             return iterator_;
         }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE Base& base_reference() noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Base const& base_reference()
+            const noexcept
         {
             return iterator_;
         }

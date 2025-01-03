@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2019 Austin McCartney
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,7 +14,6 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 namespace hpx::traits {
 

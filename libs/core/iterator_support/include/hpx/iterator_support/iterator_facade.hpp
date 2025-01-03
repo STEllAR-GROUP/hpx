@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2016-2023 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,6 +14,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/equality.hpp>
 
@@ -63,10 +64,21 @@ namespace hpx::util {
 
         template <typename Reference, typename Iterator>
         HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Reference dereference(
+            Iterator& it)
+#if !defined(HPX_MSVC)
+            // MSVC has issues with this
+            noexcept(noexcept(std::declval<Iterator&>().dereference()))
+#endif
+        {
+            return it.dereference();
+        }
+
+        template <typename Reference, typename Iterator>
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Reference dereference(
             Iterator const& it)
 #if !defined(HPX_MSVC)
             // MSVC has issues with this
-            noexcept(noexcept(std::declval<Iterator>().dereference()))
+            noexcept(noexcept(std::declval<Iterator const&>().dereference()))
 #endif
         {
             return it.dereference();
@@ -105,8 +117,14 @@ namespace hpx::util {
                 {
                 }
 
-                HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Reference*
+                HPX_HOST_DEVICE HPX_FORCEINLINE constexpr decltype(auto)
                 operator->() noexcept
+                {
+                    return std::addressof(ref_);
+                }
+
+                HPX_HOST_DEVICE HPX_FORCEINLINE constexpr decltype(auto)
+                operator->() const noexcept
                 {
                     return std::addressof(ref_);
                 }
@@ -128,12 +146,36 @@ namespace hpx::util {
         {
             using type = T*;
 
-            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr type call(
-                T& x) noexcept
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr decltype(auto)
+            call(T& x) noexcept
             {
                 return std::addressof(x);
             }
         };
+
+        template <typename T>
+        struct arrow_dispatch<T const&>    // "real" references
+        {
+            using type = T const*;
+
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr decltype(auto)
+            call(T const& x) noexcept
+            {
+                return std::addressof(x);
+            }
+        };
+
+        template <typename T>
+        struct make_const_reference
+        {
+            using type = std::conditional_t<std::is_reference_v<T>,
+                std::add_lvalue_reference_t<
+                    std::add_const_t<std::remove_reference_t<T>>>,
+                std::add_const_t<T>>;
+        };
+
+        template <typename T>
+        using make_const_reference_t = typename make_const_reference<T>::type;
 
         template <typename T>
         using arrow_dispatch_t = typename arrow_dispatch<T>::type;
@@ -165,20 +207,37 @@ namespace hpx::util {
                 return *static_cast<Derived const*>(this);
             }
 
+            using const_reference = make_const_reference_t<Reference>;
+
         public:
+            //            HPX_HOST_DEVICE constexpr decltype(auto) operator*() noexcept(
+            //                noexcept(iterator_core_access::dereference<reference>(
+            //                    std::declval<Derived>())))
+            //            {
+            //                return iterator_core_access::dereference<reference>(
+            //                    this->derived());
+            //            }
+
             HPX_HOST_DEVICE constexpr decltype(auto) operator*() const
                 noexcept(noexcept(iterator_core_access::dereference<reference>(
-                    std::declval<Derived>())))
+                    std::declval<Derived const>())))
             {
                 return iterator_core_access::dereference<reference>(
                     this->derived());
             }
 
-            HPX_HOST_DEVICE constexpr pointer operator->() const
+            //            HPX_HOST_DEVICE constexpr decltype(auto) operator->() noexcept(
+            //                noexcept(iterator_core_access::dereference<reference>(
+            //                    std::declval<Derived>())))
+            //            {
+            //                return arrow_dispatch<Reference>::call(*this->derived());
+            //            }
+
+            HPX_HOST_DEVICE constexpr decltype(auto) operator->() const
                 noexcept(noexcept(iterator_core_access::dereference<reference>(
-                    std::declval<Derived>())))
+                    std::declval<Derived const>())))
             {
-                return arrow_dispatch<Reference>::call(*this->derived());
+                return arrow_dispatch<reference>::call(*this->derived());
             }
 
             HPX_HOST_DEVICE Derived& operator++() noexcept(noexcept(
@@ -250,8 +309,8 @@ namespace hpx::util {
             {
             }
 
-            HPX_HOST_DEVICE constexpr operator reference() const
-                noexcept(noexcept(*std::declval<Iterator>()))
+            HPX_HOST_DEVICE constexpr operator reference() noexcept(
+                noexcept(*std::declval<Iterator>()))
             {
                 return *iter_;
             }

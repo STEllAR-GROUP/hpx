@@ -150,7 +150,7 @@ namespace hpx::util {
             "${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
 
             // add placeholders for keys to be added by command line handling
-            "os_threads = cores",
+            "os_threads = ${HPX_NUM_WORKER_THREADS:cores}",
             "cores = all",
             "localities = 1",
             "first_pu = 0",

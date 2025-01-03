@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,19 +32,20 @@ namespace hpx::parallel::detail {
         }
 
         HPX_HOST_DEVICE
-        constexpr void init_iteration(std::size_t index) noexcept
+        constexpr void init_iteration(
+            std::size_t index, std::size_t /*current_thread*/) noexcept
         {
             curr_ = parallel::detail::next(var_, index);
         }
 
-        HPX_HOST_DEVICE
-        constexpr T const& iteration_value() const noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T const& iteration_value(
+            std::size_t /*current_thread*/) const noexcept
         {
             return curr_;
         }
 
-        HPX_HOST_DEVICE
-        constexpr void next_iteration() noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void next_iteration(
+            std::size_t /*current_thread*/) noexcept
         {
             ++curr_;
         }
@@ -68,19 +69,20 @@ namespace hpx::parallel::detail {
         }
 
         HPX_HOST_DEVICE
-        constexpr void init_iteration(std::size_t index) noexcept
+        constexpr void init_iteration(
+            std::size_t index, std::size_t /*current_thread*/) noexcept
         {
             curr_ = parallel::detail::next(var_, index);
         }
 
-        HPX_HOST_DEVICE
-        constexpr T const& iteration_value() const noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T const& iteration_value(
+            std::size_t /*current_thread*/) const noexcept
         {
             return curr_;
         }
 
-        HPX_HOST_DEVICE
-        constexpr void next_iteration() noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void next_iteration(
+            std::size_t /*current_thread*/) noexcept
         {
             ++curr_;
         }
@@ -109,19 +111,20 @@ namespace hpx::parallel::detail {
         }
 
         HPX_HOST_DEVICE
-        constexpr void init_iteration(std::size_t index) noexcept
+        constexpr void init_iteration(
+            std::size_t index, std::size_t /*current_thread*/) noexcept
         {
             curr_ = parallel::detail::next(var_, stride_ * index);
         }
 
-        HPX_HOST_DEVICE
-        constexpr T const& iteration_value() const noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T const& iteration_value(
+            std::size_t /*current_thread*/) const noexcept
         {
             return curr_;
         }
 
-        HPX_HOST_DEVICE
-        constexpr void next_iteration() noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void next_iteration(
+            std::size_t /*current_thread*/) noexcept
         {
             curr_ = parallel::detail::next(curr_, stride_);
         }
@@ -147,19 +150,20 @@ namespace hpx::parallel::detail {
         }
 
         HPX_HOST_DEVICE
-        constexpr void init_iteration(std::size_t index) noexcept
+        constexpr void init_iteration(
+            std::size_t index, std::size_t /*current_thread*/) noexcept
         {
             curr_ = parallel::detail::next(var_, stride_ * index);
         }
 
-        HPX_HOST_DEVICE
-        constexpr T const& iteration_value() const noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T const& iteration_value(
+            std::size_t /*current_thread*/) const noexcept
         {
             return curr_;
         }
 
-        HPX_HOST_DEVICE
-        constexpr void next_iteration() noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void next_iteration(
+            std::size_t /*current_thread*/) noexcept
         {
             curr_ = parallel::detail::next(curr_, stride_);
         }
@@ -184,8 +188,8 @@ namespace hpx::parallel::detail {
 namespace hpx::experimental {
 
     /// The function template returns an induction object of unspecified type
-    /// having a value type and encapsulating an initial value \a value of that
-    /// type and, optionally, a stride.
+    /// having a value type and encapsulating an initial \a value of that type
+    /// and, optionally, a stride.
     ///
     /// For each element in the input range, a looping algorithm over input
     /// sequence \a S computes an induction value from an induction variable and
@@ -207,10 +211,9 @@ namespace hpx::experimental {
     ///                 object (default: 1)
     ///
     /// \returns This returns an induction object with value type \a T, initial
-    ///          value \a value, and (if specified) stride \a stride. If \a T is
-    ///          an lvalue of non-const type, \a value is used as the live-out
-    ///          object for the induction object; otherwise there is no live-out
-    ///          object.
+    ///          \a value, and (if specified) \a stride. If \a T is a lvalue of
+    ///          non-const type, \a value is used as the live-out object for the
+    ///          induction object; otherwise there is no live-out object.
     ///
     template <typename T>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::induction_stride_helper<T>

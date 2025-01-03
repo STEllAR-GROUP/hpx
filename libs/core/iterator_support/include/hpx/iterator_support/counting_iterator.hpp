@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2023 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -84,7 +84,7 @@ namespace hpx::util {
 
             using type = iterator_adaptor<counting_iterator<Incrementable,
                                               CategoryOrTraversal, Difference>,
-                Incrementable, Incrementable, traversal, Incrementable const&,
+                Incrementable, Incrementable, traversal, Incrementable&,
                 difference>;
         };
     }    // namespace detail
@@ -119,6 +119,11 @@ namespace hpx::util {
     private:
         HPX_HOST_DEVICE constexpr typename base_type::reference dereference()
             const
+        {
+            return this->base_reference();
+        }
+
+        HPX_HOST_DEVICE constexpr typename base_type::reference dereference()
         {
             return this->base_reference();
         }
@@ -175,8 +180,12 @@ namespace hpx::util {
                 static_cast<typename base_type::base_type>(n);
         }
 
-        HPX_HOST_DEVICE constexpr typename base_type::reference dereference()
-            const noexcept
+        HPX_HOST_DEVICE constexpr decltype(auto) dereference() const noexcept
+        {
+            return this->base_reference();
+        }
+
+        HPX_HOST_DEVICE constexpr decltype(auto) dereference() noexcept
         {
             return this->base_reference();
         }

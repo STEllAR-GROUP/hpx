@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -124,10 +124,15 @@ namespace hpx::util {
         struct dereference_iterator<hpx::tuple<Ts...>>
         {
             template <std::size_t... Is>
-            HPX_HOST_DEVICE static constexpr
-                typename zip_iterator_reference<hpx::tuple<Ts...>>::type
-                call(
-                    util::index_pack<Is...>, hpx::tuple<Ts...> const& iterators)
+            HPX_HOST_DEVICE static constexpr decltype(auto) call(
+                util::index_pack<Is...>, hpx::tuple<Ts...>& iterators)
+            {
+                return hpx::forward_as_tuple(*hpx::get<Is>(iterators)...);
+            }
+
+            template <std::size_t... Is>
+            HPX_HOST_DEVICE static constexpr decltype(auto) call(
+                util::index_pack<Is...>, hpx::tuple<Ts...> const& iterators)
             {
                 return hpx::forward_as_tuple(*hpx::get<Is>(iterators)...);
             }
@@ -307,8 +312,15 @@ namespace hpx::util {
                 }
             }
 
-            HPX_HOST_DEVICE constexpr typename base_type::reference
-            dereference() const
+            HPX_HOST_DEVICE constexpr decltype(auto) dereference()
+            {
+                return dereference_iterator<IteratorTuple>::call(
+                    util::make_index_pack_t<
+                        hpx::tuple_size<IteratorTuple>::value>(),
+                    iterators_);
+            }
+
+            HPX_HOST_DEVICE constexpr decltype(auto) dereference() const
             {
                 return dereference_iterator<IteratorTuple>::call(
                     util::make_index_pack_t<
@@ -365,6 +377,12 @@ namespace hpx::util {
 
         private:
             IteratorTuple iterators_;
+        };
+
+        template <typename... Ts>
+        struct make_const_reference<hpx::tuple<Ts...>>
+        {
+            using type = hpx::tuple<make_const_reference_t<Ts>...>;
         };
     }    // namespace detail
 
