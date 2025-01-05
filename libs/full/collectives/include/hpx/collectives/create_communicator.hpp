@@ -186,6 +186,10 @@ namespace hpx::collectives {
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    // Predefined global communicator
+    HPX_EXPORT communicator get_world_communicator();
+
+    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT communicator create_communicator(char const* basename,
         num_sites_arg num_sites = num_sites_arg(),
         this_site_arg this_site = this_site_arg(),

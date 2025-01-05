@@ -200,6 +200,24 @@ namespace hpx::collectives {
         // find existing communicator
         return hpx::find_from_basename<communicator>(HPX_MOVE(name), root_site);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Predefined global communicator
+    namespace {
+        communicator world_communicator;
+        hpx::mutex world_communicator_mtx;
+    }    // namespace
+
+    communicator get_world_communicator()
+    {
+        {
+            std::lock_guard<hpx::mutex> l(world_communicator_mtx);
+            if (!world_communicator)
+                world_communicator =
+                    create_communicator("hpx::collectives::world_communicator");
+        }
+        return world_communicator;
+    }
 }    // namespace hpx::collectives
 
 #endif    // !HPX_COMPUTE_DEVICE_CODE

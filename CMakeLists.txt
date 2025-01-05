@@ -1894,6 +1894,9 @@ if(WIN32)
       # Silence C++20 deprecation warnings
       hpx_add_config_cond_define(_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS)
 
+      # Silence C++23 deprecation warnings
+      hpx_add_config_cond_define(_SILENCE_ALL_CXX23_DEPRECATION_WARNINGS)
+
       # ASan is available in Visual Studion starting V16.8
       if((MSVC_VERSION GREATER_EQUAL 1928) AND HPX_WITH_SANITIZERS)
         hpx_add_target_compile_option(
