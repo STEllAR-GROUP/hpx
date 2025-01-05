@@ -11,7 +11,7 @@ working_dir_default: &working_dir_default
 
 docker_default: &docker_default
     docker:
-      - image: stellargroup/build_env:14
+      - image: stellargroup/build_env:17
 
 defaults: &defaults
     <<: *working_dir_default
