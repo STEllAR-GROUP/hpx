@@ -80,11 +80,6 @@ namespace hpx { namespace program_options {
             return m_at_eof && other.m_at_eof;
         }
 
-        ValueType& dereference() noexcept
-        {
-            return m_value;
-        }
-
         ValueType const& dereference() const noexcept
         {
             return m_value;

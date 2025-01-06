@@ -143,24 +143,19 @@ namespace hpx::util {
             return iterator_;
         }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Base& base() noexcept
-        {
-            return iterator_;
-        }
-
     protected:
         // for convenience in derived classes
         using iterator_adaptor_ = iterator_adaptor<Derived, Base, Value,
             Category, Reference, Difference, Pointer>;
 
         // lvalue access to the Base object for Derived
-        HPX_HOST_DEVICE HPX_FORCEINLINE Base& base_reference() noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Base const& base_reference()
+            const noexcept
         {
             return iterator_;
         }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Base const& base_reference()
-            const noexcept
+        HPX_HOST_DEVICE HPX_FORCEINLINE Base& base_reference() noexcept
         {
             return iterator_;
         }

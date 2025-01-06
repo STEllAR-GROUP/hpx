@@ -765,13 +765,6 @@ namespace hpx::segmented {
         using local_iterator =
             typename partitioned_vector<T, Data>::local_iterator;
 
-        using const_segment_iterator =
-            typename partitioned_vector<T, Data>::const_segment_iterator;
-        using const_local_segment_iterator =
-            typename partitioned_vector<T, Data>::const_local_segment_iterator;
-        using const_local_iterator =
-            typename partitioned_vector<T, Data>::const_local_iterator;
-
         // constructors
         vector_iterator()
           : data_(nullptr)
@@ -1012,31 +1005,17 @@ namespace hpx::traits {
 
         //  This function should specify the local iterator which is at the
         //  beginning of the partition data.
-        static local_raw_iterator begin(local_segment_iterator& seg_iter)
+        static local_raw_iterator begin(local_segment_iterator const& seg_iter)
         {
             return local_raw_iterator(
-                seg_iter->begin(), seg_iter.base()->local_data_);
-        }
-
-        static local_raw_const_iterator begin(
-            local_segment_iterator const& seg_iter)
-        {
-            return local_raw_const_iterator(
                 seg_iter->begin(), seg_iter.base()->local_data_);
         }
 
         //  This function should specify the local iterator which is at the
         //  end of the partition data.
-        static local_raw_iterator end(local_segment_iterator& seg_iter)
+        static local_raw_iterator end(local_segment_iterator const& seg_iter)
         {
             return local_raw_iterator(
-                seg_iter->end(), seg_iter.base()->local_data_);
-        }
-
-        static local_raw_const_iterator end(
-            local_segment_iterator const& seg_iter)
-        {
-            return local_raw_const_iterator(
                 seg_iter->end(), seg_iter.base()->local_data_);
         }
 

@@ -32,7 +32,8 @@ namespace hpx::parallel::util::detail {
     {
         static HPX_FORCEINLINE bool call(Iter& it) noexcept
         {
-            using value_type = typename std::iterator_traits<Iter>::value_type;
+            using value_type = typename std::iterator_traits<
+                std::remove_const_t<Iter>>::value_type;
             using pack_type = traits::vector_pack_type_t<value_type>;
 
             return (reinterpret_cast<std::uintptr_t>(std::addressof(*it)) &

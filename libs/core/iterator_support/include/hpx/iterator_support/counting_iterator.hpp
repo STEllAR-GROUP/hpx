@@ -84,7 +84,7 @@ namespace hpx::util {
 
             using type = iterator_adaptor<counting_iterator<Incrementable,
                                               CategoryOrTraversal, Difference>,
-                Incrementable, Incrementable, traversal, Incrementable&,
+                Incrementable, Incrementable, traversal, Incrementable const&,
                 difference>;
         };
     }    // namespace detail
@@ -119,11 +119,6 @@ namespace hpx::util {
     private:
         HPX_HOST_DEVICE constexpr typename base_type::reference dereference()
             const
-        {
-            return this->base_reference();
-        }
-
-        HPX_HOST_DEVICE constexpr typename base_type::reference dereference()
         {
             return this->base_reference();
         }
@@ -180,12 +175,8 @@ namespace hpx::util {
                 static_cast<typename base_type::base_type>(n);
         }
 
-        HPX_HOST_DEVICE constexpr decltype(auto) dereference() const noexcept
-        {
-            return this->base_reference();
-        }
-
-        HPX_HOST_DEVICE constexpr decltype(auto) dereference() noexcept
+        HPX_HOST_DEVICE constexpr typename base_type::reference dereference()
+            const noexcept
         {
             return this->base_reference();
         }

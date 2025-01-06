@@ -43,11 +43,7 @@ namespace hpx::parallel::detail {
         {
             std::size_t const cores =
                 hpx::parallel::execution::detail::get_os_thread_count();
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-            data_ = std::make_shared<hpx::util::cache_line_data<T>[]>(cores);
-#else
             data_.reset(new hpx::util::cache_line_data<T>[cores]);
-#endif
             for (std::size_t i = 0; i != cores; ++i)
             {
                 data_[i].data_ = identity;
