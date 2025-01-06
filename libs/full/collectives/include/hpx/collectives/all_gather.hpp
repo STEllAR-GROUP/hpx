@@ -233,6 +233,42 @@ namespace hpx::collectives {
                               generation, root_site),
             HPX_FORWARD(T, local_result), this_site);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    std::vector<std::decay_t<T>> all_gather(hpx::launch::sync_policy,
+        communicator fid, T&& local_result,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        return all_gather(
+            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    std::vector<std::decay_t<T>> all_gather(hpx::launch::sync_policy,
+        communicator fid, T&& local_result, generation_arg generation,
+        this_site_arg this_site = this_site_arg())
+    {
+        return all_gather(
+            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    std::vector<std::decay_t<T>> all_gather(hpx::launch::sync_policy,
+        char const* basename, T&& local_result,
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
+    {
+        return all_gather(create_communicator(basename, num_sites, this_site,
+                              generation, root_site),
+            HPX_FORWARD(T, local_result), this_site)
+            .get();
+    }
 }    // namespace hpx::collectives
 
 ////////////////////////////////////////////////////////////////////////////////

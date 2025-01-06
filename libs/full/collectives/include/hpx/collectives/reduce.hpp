@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2024 Hartmut Kaiser
+//  Copyright (c) 2019-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -382,6 +382,39 @@ namespace hpx::collectives {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename F>
+    decltype(auto) reduce_here(hpx::launch::sync_policy, communicator fid,
+        T&& local_result, F&& op, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        return reduce_here(HPX_MOVE(fid), HPX_FORWARD(T, local_result),
+            HPX_FORWARD(F, op), this_site, generation)
+            .get();
+    }
+
+    template <typename T, typename F>
+    decltype(auto) reduce_here(hpx::launch::sync_policy, communicator fid,
+        T&& local_result, F&& op, generation_arg generation,
+        this_site_arg this_site = this_site_arg())
+    {
+        return reduce_here(HPX_MOVE(fid), HPX_FORWARD(T, local_result),
+            HPX_FORWARD(F, op), this_site, generation)
+            .get();
+    }
+
+    template <typename T, typename F>
+    decltype(auto) reduce_here(hpx::launch::sync_policy, char const* basename,
+        T&& result, F&& op, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        return reduce_here(create_communicator(basename, num_sites, this_site,
+                               generation, root_site_arg(this_site.argument_)),
+            HPX_FORWARD(T, result), HPX_FORWARD(F, op), this_site)
+            .get();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // reduce plain values
     template <typename T>
     hpx::future<void> reduce_there(communicator fid, T&& local_result,
@@ -442,6 +475,66 @@ namespace hpx::collectives {
         return reduce_there(create_communicator(basename, num_sites_arg(),
                                 this_site, generation, root_site),
             HPX_FORWARD(T, local_result), this_site);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    void reduce_there(hpx::launch::sync_policy, communicator fid,
+        T&& local_result, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        reduce_there(
+            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    void reduce_there(hpx::launch::sync_policy, communicator fid,
+        T&& local_result, generation_arg generation,
+        this_site_arg this_site = this_site_arg())
+    {
+        reduce_there(
+            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    void reduce_there(hpx::launch::sync_policy, char const* basename,
+        T&& local_result, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
+    {
+        HPX_ASSERT(this_site != root_site);
+        reduce_there(create_communicator(basename, num_sites_arg(), this_site,
+                         generation, root_site),
+            HPX_FORWARD(T, local_result), this_site)
+            .get();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename T, typename F>
+    void reduce(communicator fid, T&& local_result, F&& op,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        if (this_site == static_cast<std::size_t>(-1))
+        {
+            this_site = static_cast<std::size_t>(agas::get_locality_id());
+        }
+
+        fid.wait();    // make sure communicator was created
+
+        if (this_site == fid.get_info().second)
+        {
+            local_result = reduce_here(hpx::launch::sync, HPX_MOVE(fid),
+                HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site,
+                generation);
+        }
+        else
+        {
+            reduce_there(hpx::launch::sync, HPX_MOVE(fid),
+                HPX_FORWARD(T, local_result), this_site, generation);
+        }
     }
 }    // namespace hpx::collectives
 

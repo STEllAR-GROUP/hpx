@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2024 Hartmut Kaiser
+//  Copyright (c) 2019-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -271,6 +271,40 @@ namespace hpx::collectives {
         return all_reduce(create_communicator(basename, num_sites, this_site,
                               generation, root_site),
             HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename T, typename F>
+    decltype(auto) all_reduce(hpx::launch::sync_policy, communicator fid,
+        T&& local_result, F&& op, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        return all_reduce(HPX_MOVE(fid), HPX_FORWARD(T, local_result),
+            HPX_FORWARD(F, op), this_site, generation)
+            .get();
+    }
+
+    template <typename T, typename F>
+    decltype(auto) all_reduce(hpx::launch::sync_policy, communicator fid,
+        T&& local_result, F&& op, generation_arg generation,
+        this_site_arg this_site = this_site_arg())
+    {
+        return all_reduce(HPX_MOVE(fid), HPX_FORWARD(T, local_result),
+            HPX_FORWARD(F, op), this_site, generation)
+            .get();
+    }
+
+    template <typename T, typename F>
+    decltype(auto) all_reduce(hpx::launch::sync_policy, char const* basename,
+        T&& local_result, F&& op, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
+    {
+        return all_reduce(create_communicator(basename, num_sites, this_site,
+                              generation, root_site),
+            HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site)
+            .get();
     }
 }    // namespace hpx::collectives
 
