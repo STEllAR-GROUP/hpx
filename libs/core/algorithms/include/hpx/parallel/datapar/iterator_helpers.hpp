@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,9 +30,10 @@ namespace hpx::parallel::util::detail {
     template <typename Iter>
     struct is_data_aligned_impl
     {
-        static HPX_FORCEINLINE bool call(Iter const& it) noexcept
+        static HPX_FORCEINLINE bool call(Iter& it) noexcept
         {
-            using value_type = typename std::iterator_traits<Iter>::value_type;
+            using value_type = typename std::iterator_traits<
+                std::remove_const_t<Iter>>::value_type;
             using pack_type = traits::vector_pack_type_t<value_type>;
 
             return (reinterpret_cast<std::uintptr_t>(std::addressof(*it)) &
@@ -42,7 +43,7 @@ namespace hpx::parallel::util::detail {
     };
 
     template <typename Iter>
-    HPX_FORCEINLINE bool is_data_aligned(Iter const& it) noexcept
+    HPX_FORCEINLINE bool is_data_aligned(Iter& it) noexcept
     {
         return is_data_aligned_impl<Iter>::call(it);
     }

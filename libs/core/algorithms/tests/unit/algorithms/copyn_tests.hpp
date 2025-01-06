@@ -14,7 +14,7 @@
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
-#include <iostream>
+#include <cstdint>
 #include <iterator>
 #include <numeric>
 #include <random>
@@ -30,18 +30,18 @@ std::mt19937 gen(seed);
 template <typename IteratorTag>
 void test_copy_n(IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::uint32_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(c.size());
+    std::vector<std::uint32_t> c(10007);
+    std::vector<std::uint32_t> d(c.size());
     std::iota(std::begin(c), std::end(c), gen());
 
     hpx::copy_n(iterator(std::begin(c)), c.size(), std::begin(d));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
-        [&count](std::size_t v1, std::size_t v2) -> bool {
+        [&count](std::uint32_t v1, std::uint32_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
@@ -55,18 +55,18 @@ void test_copy_n(ExPolicy&& policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::uint32_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(c.size());
+    std::vector<std::uint32_t> c(10007);
+    std::vector<std::uint32_t> d(c.size());
     std::iota(std::begin(c), std::end(c), gen());
 
     hpx::copy_n(policy, iterator(std::begin(c)), c.size(), std::begin(d));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
-        [&count](std::size_t v1, std::size_t v2) -> bool {
+        [&count](std::uint32_t v1, std::uint32_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
@@ -116,11 +116,11 @@ void test_copy_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_copy_n_async(ExPolicy&& p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::uint32_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(c.size());
+    std::vector<std::uint32_t> c(10007);
+    std::vector<std::uint32_t> d(c.size());
     std::iota(std::begin(c), std::end(c), gen());
 
     auto f = hpx::copy_n(p, iterator(std::begin(c)), c.size(), std::begin(d));
@@ -128,7 +128,7 @@ void test_copy_n_async(ExPolicy&& p, IteratorTag)
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
-        [&count](std::size_t v1, std::size_t v2) -> bool {
+        [&count](std::uint32_t v1, std::uint32_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
             return v1 == v2;
@@ -140,12 +140,12 @@ void test_copy_n_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_copy_n_exception(IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator<base_iterator, IteratorTag>
-        decorated_iterator;
+    using base_iterator = std::vector<std::uint32_t>::iterator;
+    using decorated_iterator =
+        test::decorated_iterator<base_iterator, IteratorTag>;
 
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(c.size());
+    std::vector<std::uint32_t> c(10007);
+    std::vector<std::uint32_t> d(c.size());
     std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
@@ -176,12 +176,12 @@ void test_copy_n_exception(ExPolicy&& policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator<base_iterator, IteratorTag>
-        decorated_iterator;
+    using base_iterator = std::vector<std::uint32_t>::iterator;
+    using decorated_iterator =
+        test::decorated_iterator<base_iterator, IteratorTag>;
 
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(c.size());
+    std::vector<std::uint32_t> c(10007);
+    std::vector<std::uint32_t> d(c.size());
     std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
@@ -209,12 +209,12 @@ void test_copy_n_exception(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_copy_n_exception_async(ExPolicy&& p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator<base_iterator, IteratorTag>
-        decorated_iterator;
+    using base_iterator = std::vector<std::uint32_t>::iterator;
+    using decorated_iterator =
+        test::decorated_iterator<base_iterator, IteratorTag>;
 
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(c.size());
+    std::vector<std::uint32_t> c(10007);
+    std::vector<std::uint32_t> d(c.size());
     std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_exception = false;
@@ -252,12 +252,12 @@ void test_copy_n_bad_alloc(ExPolicy&& policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator<base_iterator, IteratorTag>
-        decorated_iterator;
+    using base_iterator = std::vector<std::uint32_t>::iterator;
+    using decorated_iterator =
+        test::decorated_iterator<base_iterator, IteratorTag>;
 
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(c.size());
+    std::vector<std::uint32_t> c(10007);
+    std::vector<std::uint32_t> d(c.size());
     std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_bad_alloc = false;
@@ -284,12 +284,12 @@ void test_copy_n_bad_alloc(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_copy_n_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::decorated_iterator<base_iterator, IteratorTag>
-        decorated_iterator;
+    using base_iterator = std::vector<std::uint32_t>::iterator;
+    using decorated_iterator =
+        test::decorated_iterator<base_iterator, IteratorTag>;
 
-    std::vector<std::size_t> c(10007);
-    std::vector<std::size_t> d(c.size());
+    std::vector<std::uint32_t> c(10007);
+    std::vector<std::uint32_t> d(c.size());
     std::iota(std::begin(c), std::end(c), gen());
 
     bool caught_bad_alloc = false;

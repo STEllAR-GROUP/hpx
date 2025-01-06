@@ -470,8 +470,8 @@ namespace hpx::collectives {
         root_site_arg root_site = root_site_arg())
     {
         HPX_ASSERT(this_site != root_site);
-        gather_there(create_communicator(basename, num_sites_arg(),
-                                this_site, generation, root_site),
+        gather_there(create_communicator(basename, num_sites_arg(), this_site,
+                         generation, root_site),
             HPX_FORWARD(T, local_result), this_site)
             .get();
     }
