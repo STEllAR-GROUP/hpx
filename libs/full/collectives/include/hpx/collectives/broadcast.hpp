@@ -467,7 +467,7 @@ namespace hpx::collectives {
 
         fid.wait();    // make sure communicator was created
 
-        if (this_site == fid.get_info().second)
+        if (this_site == std::get<2>(fid.get_info_ex()))
         {
             broadcast_to(
                 hpx::launch::sync, HPX_MOVE(fid), value, this_site, generation);

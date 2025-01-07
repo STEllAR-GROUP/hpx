@@ -4,13 +4,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_main.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 
 #include <string>
 #include <vector>
 
 namespace hpx_startup {
+
+    void install_user_main_config();
 
     namespace {
 

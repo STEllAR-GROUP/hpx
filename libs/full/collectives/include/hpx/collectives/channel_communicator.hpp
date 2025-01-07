@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -102,8 +102,6 @@ namespace hpx { namespace collectives {
 
 #else
 
-#include <hpx/config.hpp>
-
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
@@ -115,9 +113,8 @@ namespace hpx { namespace collectives {
 #include <cstddef>
 #include <memory>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace collectives {
+namespace hpx::collectives {
 
     // forward declarations
     class channel_communicator;
@@ -127,8 +124,16 @@ namespace hpx { namespace collectives {
         channel_communicator, that_site_arg, tag_arg = tag_arg());
 
     template <typename T>
+    T get(hpx::launch::sync_policy, channel_communicator, that_site_arg,
+        tag_arg = tag_arg());
+
+    template <typename T>
     hpx::future<void> set(
         channel_communicator, that_site_arg, T&&, tag_arg = tag_arg());
+
+    template <typename T>
+    void set(hpx::launch::sync_policy, channel_communicator, that_site_arg, T&&,
+        tag_arg = tag_arg());
 
     class channel_communicator
     {
@@ -141,8 +146,16 @@ namespace hpx { namespace collectives {
         friend hpx::future<T> get(channel_communicator, that_site_arg, tag_arg);
 
         template <typename T>
+        friend T get(hpx::launch::sync_policy, channel_communicator,
+            that_site_arg, tag_arg);
+
+        template <typename T>
         friend hpx::future<void> set(
             channel_communicator, that_site_arg, T&&, tag_arg);
+
+        template <typename T>
+        friend void set(hpx::launch::sync_policy, channel_communicator,
+            that_site_arg, T&&, tag_arg);
 
     private:
         HPX_EXPORT channel_communicator(char const* basename,
@@ -162,6 +175,11 @@ namespace hpx { namespace collectives {
             channel_communicator&& rhs) noexcept = default;
 
         HPX_EXPORT void free();
+
+        explicit operator bool() const noexcept
+        {
+            return comm_.get() != nullptr;
+        }
 
     private:
         std::shared_ptr<detail::channel_communicator> comm_;
@@ -186,13 +204,40 @@ namespace hpx { namespace collectives {
     }
 
     template <typename T>
+    T get(hpx::launch::sync_policy, channel_communicator comm,
+        that_site_arg site, tag_arg tag)
+    {
+        return comm.comm_->template get<T>(site.argument_, tag.argument_).get();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
     hpx::future<void> set(
         channel_communicator comm, that_site_arg site, T&& value, tag_arg tag)
     {
         return comm.comm_->set(
             site.argument_, HPX_FORWARD(T, value), tag.argument_);
     }
-}}    // namespace hpx::collectives
+
+    template <typename T>
+    void set(hpx::launch::sync_policy, channel_communicator comm,
+        that_site_arg site, T&& value, tag_arg tag)
+    {
+        return comm.comm_
+            ->set(site.argument_, HPX_FORWARD(T, value), tag.argument_)
+            .get();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Predefined p2p communicator (refers to all localities)
+    HPX_EXPORT channel_communicator get_world_channel_communicator();
+
+    namespace detail {
+
+        HPX_EXPORT void create_world_channel_communicator();
+        HPX_EXPORT void reset_world_channel_communicator();
+    }    // namespace detail
+}    // namespace hpx::collectives
 
 #endif    // !HPX_COMPUTE_DEVICE_CODE
 #endif    // DOXYGEN

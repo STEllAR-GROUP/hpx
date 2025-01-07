@@ -524,7 +524,7 @@ namespace hpx::collectives {
 
         fid.wait();    // make sure communicator was created
 
-        if (this_site == fid.get_info().second)
+        if (this_site == std::get<2>(fid.get_info_ex()))
         {
             local_result = reduce_here(hpx::launch::sync, HPX_MOVE(fid),
                 HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site,
