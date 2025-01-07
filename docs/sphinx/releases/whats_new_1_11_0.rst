@@ -14,6 +14,12 @@
 General changes
 ===============
 
+- Added synchronous versions of all collective operations. Added global predefined
+  communicator objects that are accessible through new APIs:
+  ``hpx::collectives::get_world_communicator()`` refers to all localities and
+  ``hpx::collectives::get_local_communicator()`` refers to all threads on the
+  calling locality.
+
 Breaking changes
 ================
 
@@ -22,6 +28,9 @@ Breaking changes
   It was not possible to add compatibility facilities that will allow to continue
   using the old APIs, applications will have to be changed in order to
   continue functioning correctly.
+- The CMake configuration parameter ``HPX_WITH_RUN_MAIN_EVERYWHERE`` is now
+  deprecated and will be removed in the future. Use the preprocessor macro
+  ``HPX_HAVE_RUN_MAIN_EVERYWHERE`` on a target-by-target case instead.
 
 Closed issues
 =============

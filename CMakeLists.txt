@@ -1582,12 +1582,18 @@ if(HPX_WITH_THREAD_DEBUG_INFO)
   hpx_add_config_define(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
 endif()
 
-# run hpx_main on all localities by default
+# run hpx_main on all localities by default (will be removed after V1.11.0)
 hpx_option(
-  HPX_WITH_RUN_MAIN_EVERYWHERE BOOL
-  "Run hpx_main by default on all localities (default: OFF)." OFF ADVANCED
+  HPX_WITH_RUN_MAIN_EVERYWHERE
+  BOOL
+  "Run hpx_main by default on all localities (default: OFF, deprecated, will be removed)."
+  OFF
+  ADVANCED
 )
 if(HPX_WITH_RUN_MAIN_EVERYWHERE)
+  hpx_info("Note: the configuration parameter HPX_WITH_RUN_MAIN_EVERYWHERE is\n"
+           "     deprecated and will be removed in the future."
+  )
   hpx_add_config_define(HPX_HAVE_RUN_MAIN_EVERYWHERE)
 endif()
 
