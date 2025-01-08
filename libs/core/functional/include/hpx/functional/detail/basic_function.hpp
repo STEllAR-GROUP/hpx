@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include <cstring>
+#include <functional>
 #include <memory>
 #include <new>
 #include <string>
@@ -110,6 +111,13 @@ namespace hpx::util::detail {
     [[nodiscard]] constexpr bool is_empty_function(F const& f) noexcept
     {
         return detail::is_empty_function_impl(&f);
+    }
+
+    template <typename Sig>
+    [[nodiscard]] constexpr bool is_empty_function(
+        std::function<Sig> const& f) noexcept
+    {
+        return !f;
     }
 
     ///////////////////////////////////////////////////////////////////////////

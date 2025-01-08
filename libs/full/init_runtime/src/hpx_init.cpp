@@ -8,6 +8,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
+#include <algorithm>
 
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
@@ -97,6 +98,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx_startup {
+
     std::vector<std::string> (*user_main_config_function)(
         std::vector<std::string> const&) = nullptr;
 }    // namespace hpx_startup
@@ -928,8 +930,7 @@ namespace hpx {
                     // contain --hpx:help or --hpx:version, on error result is < 0)
                     if (result != 0)
                     {
-                        if (result > 0)
-                            result = 0;
+                        result = (std::min)(result, 0);
                         return result;
                     }
 
@@ -999,7 +1000,7 @@ namespace hpx {
                 rt->set_app_options(params.desc_cmdline);
 
                 result = run_or_start(blocking, HPX_MOVE(rt), cmdline,
-                    HPX_MOVE(params.startup), HPX_MOVE(params.shutdown));
+                    params.startup, params.shutdown);
             }
             catch (detail::command_line_error const& e)
             {

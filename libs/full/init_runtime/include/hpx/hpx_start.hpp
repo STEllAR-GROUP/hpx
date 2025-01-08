@@ -1,5 +1,5 @@
 //  Copyright (c)      2018 Mikael Simberg
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -57,7 +57,7 @@ namespace hpx {
     ///                     the created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    ///                     Otherwise it will be executed as specified by the
+    ///                     Otherwise, it will be executed as specified by the
     ///                     parameter\p mode.
     inline bool start(
         std::function<int(hpx::program_options::variables_map&)> f, int argc,
@@ -95,7 +95,7 @@ namespace hpx {
     ///                     the created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    ///                     Otherwise it will be executed as specified by the
+    ///                     Otherwise, it will be executed as specified by the
     ///                     parameter\p mode.
     inline bool start(std::function<int(int, char**)> f, int argc, char** argv,
         init_params const& params = init_params());
@@ -127,7 +127,7 @@ namespace hpx {
     ///                     the created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    ///                     Otherwise it will be executed as specified by the
+    ///                     Otherwise, it will be executed as specified by the
     ///                     parameter\p mode.
     inline bool start(
         int argc, char** argv, init_params const& params = init_params());
@@ -164,7 +164,7 @@ namespace hpx {
     ///                     the created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    ///                     Otherwise it will be executed as specified by the
+    ///                     Otherwise, it will be executed as specified by the
     ///                     parameter\p mode.
     inline bool start(std::nullptr_t f, int argc, char** argv,
         init_params const& params = init_params());
