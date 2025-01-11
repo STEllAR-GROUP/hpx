@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2021 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,10 +17,13 @@
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/errors/exception.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/runtime_components/new.hpp>
+#include <hpx/synchronization/mutex.hpp>
 
 #include <cstddef>
 #include <memory>
+#include <mutex>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -90,6 +93,48 @@ namespace hpx::collectives {
         return create_channel_communicator(basename, num_sites, this_site)
             .get();
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Predefined channel (p2p) communicator
+    namespace {
+
+        channel_communicator world_channel_communicator;
+        hpx::mutex world_channel_communicator_mtx;
+    }    // namespace
+
+    channel_communicator get_world_channel_communicator()
+    {
+        detail::create_world_channel_communicator();
+        return world_channel_communicator;
+    }
+
+    namespace detail {
+
+        void create_world_channel_communicator()
+        {
+            std::unique_lock<hpx::mutex> l(world_channel_communicator_mtx);
+            [[maybe_unused]] util::ignore_while_checking il(&l);
+
+            if (!world_channel_communicator)
+            {
+                auto const num_sites =
+                    num_sites_arg(agas::get_num_localities(hpx::launch::sync));
+                auto const this_site = this_site_arg(agas::get_locality_id());
+
+                world_channel_communicator =
+                    collectives::create_channel_communicator(hpx::launch::sync,
+                        "world_channel_communicator", num_sites, this_site);
+            }
+        }
+
+        void reset_world_channel_communicator()
+        {
+            if (world_channel_communicator)
+            {
+                world_channel_communicator.free();
+            }
+        }
+    }    // namespace detail
 }    // namespace hpx::collectives
 
 #endif    // !HPX_COMPUTE_DEVICE_CODE

@@ -17,10 +17,13 @@ else()
   return()
 endif()
 
-set(example_programs channel_communicator)
+set(example_programs channel_communicator distributed_pi)
 
 set(channel_communicator_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(channel_communicator_FLAGS DEPENDENCIES iostreams_component)
+
+set(distributed_pi_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
+set(distributed_pi_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)
 
 foreach(example_program ${example_programs})
 

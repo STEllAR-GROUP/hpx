@@ -25,7 +25,7 @@ using channel_communicator_component = hpx::components::component<
 HPX_REGISTER_COMPONENT(channel_communicator_component)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace collectives { namespace detail {
+namespace hpx::collectives::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     channel_communicator::channel_communicator(char const* basename,
@@ -36,6 +36,6 @@ namespace hpx { namespace collectives { namespace detail {
         // replace reference to our own client (manages base-name registration)
         clients_[this_site] = HPX_MOVE(here);
     }
-}}}    // namespace hpx::collectives::detail
+}    // namespace hpx::collectives::detail
 
 #endif    // !HPX_COMPUTE_DEVICE_CODE
