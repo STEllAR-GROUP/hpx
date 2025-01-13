@@ -9,7 +9,6 @@ if((HPX_WITH_COMPRESSION_BZIP2
     OR HPX_WITH_COMPRESSION_ZLIB)
    AND NOT TARGET Boost::iostreams
 )
-  hpx_set_cmake_policy(CMP0167 OLD) # use CMake's FindBoost for now
 
   find_package(
     Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE MODULE COMPONENTS iostreams

@@ -15,20 +15,10 @@ if(NOT TARGET hpx_dependencies_boost)
 
   set(__boost_libraries "")
 
-  if(HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING
-     OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE
-  )
-    set(__boost_libraries ${__boost_libraries} log log_setup date_time chrono
-                          thread
-    )
-  endif()
-
   if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
     # if context is needed, we should still link with boost thread and chrono
     set(__boost_libraries ${__boost_libraries} context thread chrono)
   endif()
-
-  list(REMOVE_DUPLICATES __boost_libraries)
 
   # compatibility with older CMake versions
   if(BOOST_ROOT AND NOT Boost_ROOT)
@@ -39,7 +29,7 @@ if(NOT TARGET hpx_dependencies_boost)
     unset(BOOST_ROOT CACHE)
   endif()
 
-  if((NOT HPX_WITH_FETCH_BOOST) OR HPX_FIND_PACKAGE)
+  if(NOT HPX_WITH_FETCH_BOOST OR HPX_FIND_PACKAGE)
 
     set(Boost_MINIMUM_VERSION
         "1.71"
@@ -63,7 +53,6 @@ if(NOT TARGET hpx_dependencies_boost)
 
   elseif(NOT TARGET Boost::boost AND NOT HPX_FIND_PACKAGE)
     # Fetch Boost using CMake's FetchContent
-
     if(NOT HPX_WITH_BOOST_VERSION)
       set(HPX_WITH_BOOST_VERSION "1.86.0")
     endif()
@@ -81,7 +70,7 @@ if(NOT TARGET hpx_dependencies_boost)
     )
 
     # Also need to explicitly list header-only dependencies, since Cmake-Boost
-    # has installs each library's headers individually, as opposed to b2-built
+    # installs each library's headers individually, as opposed to b2-built
     # Boost.
     set(__boost_libraries
         ${__boost_libraries}
@@ -89,18 +78,26 @@ if(NOT TARGET hpx_dependencies_boost)
         bind
         config
         exception
-        filesystem
         functional
         fusion
-        iostreams
-        log
         optional
         parameter
         phoenix
-        regex
         spirit
         variant
     )
+
+    if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
+      set(__boost_libraries ${__boost_libraries} filesystem)
+    endif()
+
+    if(HPX_WITH_TOOLS)
+      set(__boost_libraries ${__boost_libraries} regex)
+    endif()
+
+    if(HPX_WITH_DISTRIBUTED_RUNTIME)
+      set(__boost_libraries ${__boost_libraries} iostreams)
+    endif()
 
     set(BOOST_INCLUDE_LIBRARIES ${__boost_libraries})
     set(BOOST_SKIP_INSTALL_RULES OFF)
@@ -110,7 +107,7 @@ if(NOT TARGET hpx_dependencies_boost)
     add_library(hpx_dependencies_boost INTERFACE)
 
     list(TRANSFORM __boost_libraries
-         PREPEND "boost_" OUTPUT_VARIABLE __boost_libraries_prefixed
+         PREPEND "Boost::" OUTPUT_VARIABLE __boost_libraries_prefixed
     )
 
     target_link_libraries(
