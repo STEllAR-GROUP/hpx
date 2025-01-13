@@ -230,7 +230,7 @@ namespace hpx::collectives {
         generation_arg generation = generation_arg(),
         root_site_arg root_site = root_site_arg());
 
-    HPX_EXPORT vec<communicator> create_hierarchical_communicator(char const* basename,
+    HPX_EXPORT vector<communicator> create_hierarchical_communicator(char const* basename,
         num_sites_arg num_sites = num_sites_arg(),
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg(),
