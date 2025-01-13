@@ -443,6 +443,93 @@ namespace hpx::collectives {
             }
         }
     }    // namespace detail
+
+     ///////////////////////////////////////////////////////////////////////////
+    communicator create_hierarchical_communicator(char const* basename,
+        num_sites_arg num_sites, this_site_arg this_site,
+        generation_arg generation, root_site_arg root_site,
+        arity_arg arity)
+    {
+        if (num_sites == static_cast<std::size_t>(-1))
+        {
+            num_sites = agas::get_num_localities(hpx::launch::sync);
+        }
+        if (this_site == static_cast<std::size_t>(-1))
+        {
+            this_site = agas::get_locality_id();
+            if (root_site == static_cast<std::size_t>(-1))    //-V1051
+            {
+                root_site = this_site;
+            }
+        }
+
+        HPX_ASSERT(this_site < num_sites);
+        HPX_ASSERT(
+            root_site != static_cast<std::size_t>(-1) && root_site < num_sites);
+        
+
+        std::string name(basename);
+        if (generation != static_cast<std::size_t>(-1))
+        {
+            name += std::to_string(generation) + "/";
+        }
+
+        if (this_site == root_site)
+        {
+            // create a new communicator
+            auto c = hpx::local_new<communicator>(num_sites, basename);
+
+            // register the communicator's id using the given basename, this
+            // keeps the communicator alive
+            auto f = c.register_as(
+                hpx::detail::name_from_basename(HPX_MOVE(name), this_site));
+
+            return f.then(hpx::launch::sync,
+                [=, target = HPX_MOVE(c)](hpx::future<bool>&& fut) mutable {
+                    if (bool const result = fut.get(); !result)
+                    {
+                        HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                            "hpx::collectives::detail::create_communicator",
+                            "the given base name for the communicator "
+                            "operation was already registered: {}",
+                            target.registered_name());
+                    }
+                    target.set_info(num_sites, this_site);
+                    return target;
+                });
+        }
+
+        // find existing communicator
+        return hpx::find_from_basename<communicator>(HPX_MOVE(name), root_site);
+    }
+    void recursively_fill_communicators(vec<array<communicator>> vector, int left, int right, char const* basename, int arity, int max_depth)
+    {
+        std::string name(basename);
+        if (generation != static_cast<std::size_t>(-1))
+        {
+            name += std::to_string(left) + "-" + std::to_string(right) "/";
+        }
+        auto c = hpx::local_new<communicator>(num_sites, name.c_str());
+        int pivot = ((right - left)/2)+left;
+        if (left-right == vector.size()){pivot = 0;}
+        vector[pivot].push_back(c);
+        if (left-right < arity || max_depth == 0)
+        {
+            for(int i = left; i< right; i++)
+            {
+                vector[i].push_back(c);
+            }
+            return;
+        }
+        int division_steps = (right - left)/arity;
+        for (int i = 0; i < arity; i++)
+        {
+            vector[left + (division_steps*i)].push_back(c);
+            recursively_fill_communicators(vector, left + (division_steps*i), left + (division_steps*(i+1)-1), basename, arity)
+        }
+
+    }
+
 }    // namespace hpx::collectives
 
 #endif    // !HPX_COMPUTE_DEVICE_CODE
