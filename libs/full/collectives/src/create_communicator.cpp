@@ -241,7 +241,6 @@ namespace hpx::collectives {
     {
         std::string name(basename);
         name += std::to_string(left) + "-" + std::to_string(right) + "/";
-        this_site_arg
         int pivot = ((right - left)/2)+left;
         if (left-right == num_sites){pivot = 0;}
         if (this_site == pivot){
@@ -260,7 +259,7 @@ namespace hpx::collectives {
                     }
                     target.set_info(num_sites, this_site);
                     return target;
-                }););
+                }));
         }
         if (left-right < arity || max_depth == 0)
         {
@@ -276,7 +275,7 @@ namespace hpx::collectives {
             if (this_site == left + (division_steps*i)){
                 communicators.push_back(hpx::find_from_basename<communicator>(HPX_MOVE(name), pivot));
             }
-            return recursively_fill_communicators(communicators, left + (division_steps*i), left + (division_steps*(i+1)-1), basename, arity);
+            return recursively_fill_communicators(communicators, left + (division_steps*i), left + (division_steps*(i+1)-1), basename, arity, max_depth-1, this_site, num_sites);
         }
 
     }
