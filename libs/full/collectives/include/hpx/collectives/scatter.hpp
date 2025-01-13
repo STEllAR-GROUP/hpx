@@ -521,6 +521,175 @@ namespace hpx::collectives {
             this_site);
     }
 
+    template <typename T>
+    hpx::future<T> scatter_hierarchically(std::vector<std::tuple<communicator,int>> communicators, std::vector<T>&& local_result,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_art root_site = root_site_arg(),
+        int arity)
+{
+        if (this_site == static_cast<std::size_t>(-1))
+        {
+            this_site = agas::get_locality_id();
+        }
+        if (generation == 0)
+        {
+            return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
+                hpx::error::bad_parameter, "hpx::collectives::scatter_to",
+                "the generation number shouldn't be zero"));
+        }
+
+        if (this_site == root_site)
+        {
+            ///////////////////////////////////////////////////////////////////////////
+            // Root Scatter To
+            
+            std::vector<std::vector<T>> grouped(arity+1);
+            for (int i = 0; i< arity; i++)
+            {
+                grouped[i+1] = std::vector<T>(local_result.begin() + i*arity, local_result.begin() + (i+1)*arity);
+            }
+            
+            auto scatter_to_data = [local_result = HPX_MOVE(grouped),
+                                   this_site, generation](
+                                   communicator&& c) mutable -> hpx::future<std::vector<T>> {
+            using action_type =
+                detail::communicator_server::communication_set_direct_action<
+                    traits::communication::scatter_tag, hpx::future<std::vector<T>>,
+                    std::vector<std::vector<T>>>;
+
+            // explicitly unwrap returned future
+            hpx::future<std::vector<T>> result = hpx::async(action_type(), c, this_site,
+                generation, HPX_MOVE(local_result));
+
+            if (!result.is_ready())
+            {
+                // make sure id is kept alive as long as the returned future
+                traits::detail::get_shared_state(result)->set_on_completed(
+                    [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
+            }
+
+            return result;
+        };
+        hpx::future<std::vector<T>> root_node = std::get<0>(communicators[0]).then(hpx::launch::sync, HPX_MOVE(scatter_to_data));
+        communicators.erase(communicators.begin());
+        hpx::future<std::vector<T>> intermediate_node;
+        }
+
+        for (int i = 0; i < communicators.size()-2; i++){
+            ///////////////////////////////////////////////////////////////////////////
+            // Intermediary Scatter To.
+            if (i % 2 == 0){
+                auto scatter_from_data = [this_site, generation](
+                                     communicator&& c) -> hpx::future<T> {
+            using action_type =
+                detail::communicator_server::communication_get_direct_action<
+                    traits::communication::scatter_tag, hpx::future<std::vector<T>>>;
+
+            // explicitly unwrap returned future
+            hpx::future<std::vector<T>> result =
+                hpx::async(action_type(), c, std::get<1>(communicators[i]), generation);
+
+            if (!result.is_ready())
+            {
+                // make sure id is kept alive as long as the returned future
+                traits::detail::get_shared_state(result)->set_on_completed(
+                    [client = HPX_MOVE(c)] { HPX_UNUSED(client); });
+            }
+
+            return result;
+            };
+            hpx::future<std::vector<T>> intermediate_node = std::get<0>(communicators[i]).then(hpx::launch::sync, HPX_MOVE(scatter_from_data));
+            }
+            ///////////////////////////////////////////////////////////////////////////
+            // Intermediary Scatter From
+            else
+            {
+                std::vector<std::vector<T>> grouped_intermediate(arity+1);
+                std::vector<T> intermediate_result= intermediate_node.get();
+            for (int i = 0; i< arity; i++)
+            {
+                grouped[i+1] = std::vector<T>(intermediate_result.begin() + i*arity, intermediate_result.begin() + (i+1)*arity);
+            }
+            
+            auto scatter_to_data = [local_result = HPX_MOVE(grouped_intermediate),
+                                   this_site, generation](
+                                   communicator&& c) mutable -> hpx::future<std::vector<T>> {
+            using action_type =
+                detail::communicator_server::communication_set_direct_action<
+                    traits::communication::scatter_tag, hpx::future<std::vector<T>>,
+                    std::vector<std::vector<T>>>;
+
+            // explicitly unwrap returned future
+            hpx::future<std::vector<T>> result = hpx::async(action_type(), c, this_site,
+                generation, HPX_MOVE(local_result));
+
+            if (!result.is_ready())
+            {
+                // make sure id is kept alive as long as the returned future
+                traits::detail::get_shared_state(result)->set_on_completed(
+                    [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
+            }
+
+            return result;
+            };
+                hpx::future<std::vector<T>> intermediary_node = std::get<0>(communicators[0]).then(hpx::launch::sync, HPX_MOVE(scatter_to_data));
+            }
+
+        }
+        ///////////////////////////////////////////////////////////////////////////
+        // Leaf scatter To.
+
+        if (communicators.size() > 1 && std::get<1>(communicators.end()[-2]) == -2){
+            auto scatter_to_data = [local_result = intermediate_node.get(),
+                                   this_site, generation](
+                                   communicator&& c) mutable -> hpx::future<T> {
+            using action_type =
+                detail::communicator_server::communication_set_direct_action<
+                    traits::communication::scatter_tag, hpx::future<T>,
+                    std::vector<T>>;
+
+            // explicitly unwrap returned future
+            hpx::future<T> result = hpx::async(action_type(), c, this_site,
+                generation, HPX_MOVE(local_result));
+
+            if (!result.is_ready())
+            {
+                // make sure id is kept alive as long as the returned future
+                traits::detail::get_shared_state(result)->set_on_completed(
+                    [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
+            }
+
+            return result;
+        };
+            return std::get<0>(communicators.end()[-2]).then(hpx::launch::sync, HPX_MOVE(scatter_to_data));
+        }
+        ///////////////////////////////////////////////////////////////////////////
+        // Leaf scatter from.
+
+        auto scatter_from_data = [this_site, generation](
+                                     communicator&& c) -> hpx::future<T> {
+            using action_type =
+                detail::communicator_server::communication_get_direct_action<
+                    traits::communication::scatter_tag, hpx::future<T>>;
+
+            // explicitly unwrap returned future
+            hpx::future<T> result =
+                hpx::async(action_type(), c, this_site, generation);
+
+            if (!result.is_ready())
+            {
+                // make sure id is kept alive as long as the returned future
+                traits::detail::get_shared_state(result)->set_on_completed(
+                    [client = HPX_MOVE(c)] { HPX_UNUSED(client); });
+            }
+
+            return result;
+        };
+        return std::get<0>(communicators.end()[-1]).then(hpx::launch::sync, HPX_MOVE(scatter_from_data));
+    }
+
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     T scatter_from(hpx::launch::sync_policy, communicator fid,
