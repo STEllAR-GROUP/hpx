@@ -480,11 +480,11 @@ namespace hpx::collectives {
             return recursively_fill_communicators(communicators, 0, num_sites - 1, basename, arity, -1, this_site);
         }
     }
-    std::vector<communicator> recursively_fill_communicators(vector<communicator> communicators, int left, int right, char const* basename, int arity, int max_depth, this_site_arg this_site, num_sites_arg num_sites)
+    std::vector<communicator> recursively_fill_communicators(std::vector<communicator> communicators, int left, int right, char const* basename, int arity, int max_depth, this_site_arg this_site, num_sites_arg num_sites)
     {
         std::string name(basename);
         name += std::to_string(left) + "-" + std::to_string(right) + "/";
-        
+        vector<communicator>vector<communicator>
         u_int8_t pivot = ((right - left)/2)+left;
         if (left-right == num_sites){pivot = 0;}
         if (this_site == pivot){
