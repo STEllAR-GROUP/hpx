@@ -474,10 +474,10 @@ namespace hpx::collectives {
             name += std::to_string(generation) + "/";
         }
 
-        std::vector<std::tuple<communicator,int> communicators;
+        std::vector<std::tuple<communicator,int>> communicators;
         return recursively_fill_communicators(communicators, 0, num_sites - 1, basename, arity, -1, this_site, num_sites);
     }
-    std::vector<std::tuple<communicator,int> recursively_fill_communicators(std::vector<std::tuple<communicator,int> communicators, int left, int right, char const* basename, int arity, int max_depth, int this_site, int num_sites)
+    std::vector<std::tuple<communicator,int>> recursively_fill_communicators(std::vector<std::tuple<communicator,int>> communicators, int left, int right, char const* basename, int arity, int max_depth, int this_site, int num_sites)
     {
         std::string name(basename);
         name += std::to_string(left) + "-" + std::to_string(right) + "/";
