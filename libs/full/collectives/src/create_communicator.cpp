@@ -257,7 +257,7 @@ namespace hpx::collectives {
                             "operation was already registered: {}",
                             target.registered_name());
                     }
-                    target.set_info(num_sites, this_site);
+                    target.set_info(num_sites_arg(left-right), this_site);
                     return target;
                 }));
         }
@@ -277,6 +277,7 @@ namespace hpx::collectives {
             }
             return recursively_fill_communicators(communicators, left + (division_steps*i), left + (division_steps*(i+1)-1), basename, arity, max_depth-1, this_site, num_sites);
         }
+        return communicators;
 
     }
 
