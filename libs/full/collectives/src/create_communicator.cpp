@@ -489,7 +489,7 @@ namespace hpx::collectives {
             auto c = hpx::local_new<communicator>(left-right, name.c_str());
             auto f = c.register_as(
                 hpx::detail::name_from_basename(HPX_MOVE(name), this_site));
-            communicators.push_back(f.then(std::tuple(hpx::launch::sync,
+            communicators.push_back(std::tuple(f.then(hpx::launch::sync,
                 [=, target = HPX_MOVE(c)](hpx::future<bool>&& fut) mutable {
                     if (bool const result = fut.get(); !result)
                     {
@@ -501,7 +501,7 @@ namespace hpx::collectives {
                     }
                     target.set_info(num_sites_arg(left-right), this_site_arg(this_site));
                     return target;
-                })),last_intermediary);
+                }),last_intermediary));
         }
         if (left-right < arity || max_depth == 0)
         {
