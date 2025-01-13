@@ -230,13 +230,13 @@ namespace hpx::collectives {
         generation_arg generation = generation_arg(),
         root_site_arg root_site = root_site_arg());
 
-    HPX_EXPORT std::vector<communicator> create_hierarchical_communicator(char const* basename,
+    HPX_EXPORT std::vector<std::tuple<communicator,int> create_hierarchical_communicator(char const* basename,
         num_sites_arg num_sites = num_sites_arg(),
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg(),
         root_site_arg root_site = root_site_arg(),
         arity_arg arity = arity_arg());
-    std::vector<communicator> recursively_fill_communicators(std::vector<communicator> communicators, int left, int right, char const* basename, int arity, int max_depth, int this_site, int num_sites);
+    std::vector<communicator> recursively_fill_communicators(std::vector<std::tuple<communicator,int> communicators, int left, int right, char const* basename, int arity, int max_depth, int this_site, int num_sites);
 
 }    // namespace hpx::collectives
 
