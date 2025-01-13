@@ -234,7 +234,7 @@ namespace hpx::collectives {
         if (this_site == root_site)
         {
             std::vector<communicator> communicators;
-            return recursively_fill_communicators(communicators, 0, num_sites - 1, basename, arity, -1, this_site);
+            return recursively_fill_communicators(communicators, 0, num_sites - 1, basename, arity, -1, this_site, num_sites);
         }
     }
     std::vector<communicator> recursively_fill_communicators(std::vector<communicator> communicators, int left, int right, char const* basename, int arity, int max_depth, int this_site, int num_sites)
