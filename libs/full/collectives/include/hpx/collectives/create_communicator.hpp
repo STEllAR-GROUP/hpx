@@ -100,6 +100,39 @@ namespace hpx { namespace collectives {
         num_sites_arg num_sites, this_site_arg this_site,
         generation_arg generation = generation_arg(),
         root_site_arg root_site = root_site_arg());
+
+    /// Create a new communicator object usable with any collective operation
+    ///
+    /// This functions creates a new communicator object that can be called in
+    /// order to pre-allocate a communicator object usable with multiple
+    /// invocations of any of the collective operations (such as \a all_gather,
+    /// \a all_reduce, \a all_to_all, \a broadcast, etc.).
+    ///
+    /// \param  basename    The base name identifying the collective operation
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the collective operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the collective operation on the
+    ///                     given base name has to be performed more than once.
+    /// \param  root_site   The site that is responsible for creating the
+    ///                     collective support object. This value is optional
+    ///                     and defaults to '0' (zero).
+    ///
+    /// \returns    This function returns a new communicator object usable
+    ///             with the collective operation.
+    ///
+    communicator create_hierarchical_communicator(char const* basename,
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg(),
+        arity_arg arity = arity_arg());
+
 }}
 // clang-format on
 
@@ -234,6 +267,13 @@ namespace hpx::collectives {
         char const* basename, num_sites_arg num_sites, this_site_arg this_site,
         generation_arg generation = generation_arg(),
         root_site_arg root_site = root_site_arg());
+
+    HPX_EXPORT communicator create_hierarchical_communicator(char const* basename,
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg(),
+        arity_arg arity = arity_arg());
 
 }    // namespace hpx::collectives
 
