@@ -445,7 +445,7 @@ namespace hpx::collectives {
     }    // namespace detail
 
      ///////////////////////////////////////////////////////////////////////////
-    vec<communicator> create_hierarchical_communicator(char const* basename,
+    std::vector<communicator> create_hierarchical_communicator(char const* basename,
         num_sites_arg num_sites, this_site_arg this_site,
         generation_arg generation, root_site_arg root_site,
         arity_arg arity)
@@ -480,18 +480,15 @@ namespace hpx::collectives {
             return recursively_fill_communicators(communicators, 0, num_sites - 1, basename, arity, -1, this_site);
         }
     }
-    vec<communicator> recursively_fill_communicators(vector<communicator> communicators, int left, int right, char const* basename, int arity, int max_depth, this_site_arg this_site)
+    std::vector<communicator> recursively_fill_communicators(vector<communicator> communicators, int left, int right, char const* basename, int arity, int max_depth, this_site_arg this_site, num_sites_arg num_sites)
     {
         std::string name(basename);
-        if (generation != static_cast<std::size_t>(-1))
-        {
-            name += std::to_string(left) + "-" + std::to_string(right) "/";
-        }
+        name += std::to_string(left) + "-" + std::to_string(right) + "/";
         
-        int pivot = ((right - left)/2)+left;
-        if (left-right == vector.size()){pivot = 0;}
+        u_int8_t pivot = ((right - left)/2)+left;
+        if (left-right == num_sites){pivot = 0;}
         if (this_site == pivot){
-            auto c = hpx::local_new<communicator>(num_sites, name.c_str());
+            auto c = hpx::local_new<communicator>(left-right, name.c_str());
             auto f = c.register_as(
                 hpx::detail::name_from_basename(HPX_MOVE(name), this_site));
             communicators.push_back(f.then(hpx::launch::sync,
@@ -514,7 +511,7 @@ namespace hpx::collectives {
             {
                 communicators.push_back(hpx::find_from_basename<communicator>(HPX_MOVE(name), pivot));
             }
-            return;
+            return communicators;
         }
         int division_steps = (right - left)/arity;
         for (int i = 0; i < arity; i++)
@@ -522,7 +519,7 @@ namespace hpx::collectives {
             if (this_site == left + (division_steps*i)){
                 communicators.push_back(hpx::find_from_basename<communicator>(HPX_MOVE(name), pivot));
             }
-            recursively_fill_communicators(vector, left + (division_steps*i), left + (division_steps*(i+1)-1), basename, arity);
+            return recursively_fill_communicators(communicators, left + (division_steps*i), left + (division_steps*(i+1)-1), basename, arity);
         }
 
     }
