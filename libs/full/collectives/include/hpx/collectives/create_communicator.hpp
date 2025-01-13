@@ -236,7 +236,7 @@ namespace hpx::collectives {
         generation_arg generation = generation_arg(),
         root_site_arg root_site = root_site_arg(),
         arity_arg arity = arity_arg());
-    
+    std::vector<communicator> recursively_fill_communicators(std::vector<communicator> communicators, u_int8_t left, u_int8_t right, char const* basename, u_int8_t arity, int max_depth, this_site_arg this_site, num_sites_arg num_sites);
 
 }    // namespace hpx::collectives
 
