@@ -67,8 +67,8 @@ namespace hpx::parcelset::policies::lci {
             buffer.num_chunks_.second = num_non_zero_copy_chunks;
             auto& tchunks = buffer.transmission_chunks_;
             tchunks.resize(num_zero_copy_chunks + num_non_zero_copy_chunks);
-            int tchunks_length = static_cast<int>(tchunks.size() *
-                sizeof(receiver_base::buffer_type::transmission_chunk_type));
+            size_t tchunks_length = tchunks.size() *
+                sizeof(receiver_base::buffer_type::transmission_chunk_type);
             char* piggy_back_tchunk = header_.piggy_back_tchunk();
             if (piggy_back_tchunk)
             {
@@ -135,11 +135,11 @@ namespace hpx::parcelset::policies::lci {
     }
 
     LCI_comp_t receiver_connection_sendrecv::unified_recv(
-        void* address, int length)
+        void* address, size_t length)
     {
         LCI_comp_t completion =
             device_p->completion_manager_p->recv_followup->alloc_completion();
-        if (length <= LCI_MEDIUM_SIZE)
+        if (length <= (size_t) LCI_MEDIUM_SIZE)
         {
             LCI_mbuffer_t mbuffer;
             mbuffer.address = address;
@@ -197,8 +197,8 @@ namespace hpx::parcelset::policies::lci {
         if (need_recv_tchunks)
         {
             auto& tchunks = buffer.transmission_chunks_;
-            int tchunk_length = static_cast<int>(tchunks.size() *
-                sizeof(receiver_base::buffer_type::transmission_chunk_type));
+            size_t tchunk_length = tchunks.size() *
+                sizeof(receiver_base::buffer_type::transmission_chunk_type);
             state.store(connection_state::locked, std::memory_order_relaxed);
             LCI_comp_t completion = unified_recv(tchunks.data(), tchunk_length);
             state.store(next_state, std::memory_order_release);
@@ -221,8 +221,8 @@ namespace hpx::parcelset::policies::lci {
         if (need_recv_data)
         {
             state.store(connection_state::locked, std::memory_order_relaxed);
-            LCI_comp_t completion = unified_recv(
-                buffer.data_.data(), static_cast<int>(buffer.data_.size()));
+            LCI_comp_t completion =
+                unified_recv(buffer.data_.data(), buffer.data_.size());
             state.store(next_state, std::memory_order_release);
             return {false, completion};
         }
@@ -316,8 +316,7 @@ namespace hpx::parcelset::policies::lci {
             HPX_UNUSED(chunk_size);
 
             state.store(connection_state::locked, std::memory_order_relaxed);
-            LCI_comp_t completion =
-                unified_recv(chunk.data(), static_cast<int>(chunk.size()));
+            LCI_comp_t completion = unified_recv(chunk.data(), chunk.size());
             state.store(current_state, std::memory_order_release);
             return {false, completion};
         }
@@ -344,8 +343,7 @@ namespace hpx::parcelset::policies::lci {
             buffer.chunks_[idx] =
                 serialization::create_pointer_chunk(chunk.data(), chunk.size());
             state.store(connection_state::locked, std::memory_order_relaxed);
-            LCI_comp_t completion =
-                unified_recv(chunk.data(), static_cast<int>(chunk.size()));
+            LCI_comp_t completion = unified_recv(chunk.data(), chunk.size());
             state.store(current_state, std::memory_order_release);
             return {false, completion};
         }
