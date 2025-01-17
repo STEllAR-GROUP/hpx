@@ -156,6 +156,6 @@ int main()
     generate_tests<double>();
     generate_tests<int>();
 
-    return 0;
+    return hpx::util::report_errors();
 }
 #endif
