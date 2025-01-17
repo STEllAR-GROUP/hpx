@@ -35,18 +35,6 @@
 
 namespace hpx::components {
 
-    ///////////////////////////////////////////////////////////////////////////
-    /// \cond NOINTERNAL
-    namespace detail {
-
-        HPX_FORCEINLINE constexpr std::size_t round_to_multiple(
-            std::size_t n1, std::size_t n2, std::size_t n3) noexcept
-        {
-            return (n1 / n2) * n3;
-        }
-    }    // namespace detail
-    /// \endcond
-
     /// This class specifies the parameters for a simple distribution policy
     /// to use for creating (and evenly distributing) a given number of items
     /// on a given set of localities.
@@ -314,14 +302,16 @@ namespace hpx::components {
                 return (items < num_loc) ? 1 : 0;
             }
 
+            std::size_t const items_per_loc = (items + locs - 1) / locs;
+
             // the last locality might get fewer items
             if (locs > 1 && loc == localities_->back())
             {
-                return items - detail::round_to_multiple(items, locs, locs - 1);
+                return items - (locs - 1) * items_per_loc;
             }
 
             // otherwise just distribute evenly
-            return (items + locs - 1) / locs;
+            return items_per_loc;
         }
         /// \endcond
 
