@@ -32,7 +32,8 @@ jobs:
               -DHPX_WITH_EXAMPLES=ON \
               -DHPX_WITH_TESTS=ON \
               -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
-              -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On
+              -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On \
+              -DHPX_WITH_TESTS_EXTERNAL_BUILD=Off
     - name: Build
       shell: bash
       run: |
@@ -73,5 +74,4 @@ jobs:
           tests.unit.threads.distributed.tcp.thread_stacksize|\
           tests.unit.topology.numa_allocator|\
           tests.unit.modules.runtime_components.distributed.tcp.migrate_polymorphic_component|\
-          tests.unit.modules.executors.limiting_executor|"
-          "build_dir_targets_test"
+          tests.unit.modules.executors.limiting_executor"
