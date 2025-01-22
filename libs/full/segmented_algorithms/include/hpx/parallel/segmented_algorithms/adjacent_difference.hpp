@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Ajai V George
 //  Copyright (c) 2021 Karame M.Shokooh
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +14,6 @@
 
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/adjacent_difference.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
@@ -23,16 +23,16 @@
 #include <exception>
 #include <iterator>
 #include <list>
-#include <numeric>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel {
+namespace hpx::parallel {
 
     ///////////////////////////////////////////////////////////////////////////
     // segmented_adjacent_difference
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         /// \cond NOINTERNAL
 
@@ -87,7 +87,7 @@ namespace hpx { namespace parallel {
                         std::true_type(), beg, end, ldest, op);
                 }
 
-                // handle all of the full partitions
+                // handle all full partitions
                 for (++sit, ++sdest; sit != send; ++sit, ++sdest)
                 {
                     beg = traits1::begin(sit);
@@ -195,7 +195,7 @@ namespace hpx { namespace parallel {
                         algo, policy, forced_seq(), beg, end, ldest, op));
                 }
 
-                // handle all of the full partitions
+                // handle all full partitions
                 for (++sit, ++sdest; sit != send; ++sit, ++sdest)
                 {
                     beg = traits1::begin(sit);
@@ -245,10 +245,10 @@ namespace hpx { namespace parallel {
         }
         /// \endcond
     }    // namespace detail
-}}       // namespace hpx::parallel
+}    // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
-namespace hpx { namespace segmented {
+namespace hpx::segmented {
 
     // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
@@ -318,4 +318,4 @@ namespace hpx { namespace segmented {
             hpx::execution::seq, first, last, dest, HPX_FORWARD(Op, op),
             std::true_type{});
     }
-}}    // namespace hpx::segmented
+}    // namespace hpx::segmented

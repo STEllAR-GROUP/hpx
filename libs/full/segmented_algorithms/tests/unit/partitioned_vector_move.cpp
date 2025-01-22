@@ -194,6 +194,6 @@ int main()
     move_tests<int>(43, 42);
     move_tests<std::string>("test", "not_test");
 
-    return 0;
+    return hpx::util::report_errors();
 }
 #endif

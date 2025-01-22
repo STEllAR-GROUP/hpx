@@ -37,9 +37,12 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        template <typename Archive, typename T>
-        void serialize_one(Archive& ar, T& t);
-    }
+        template <typename T>
+        void serialize_one(output_archive& ar, T const& t);
+
+        template <typename T>
+        void serialize_one(input_archive& ar, T& t);
+    }    // namespace detail
 
     template <typename T>
     class array;

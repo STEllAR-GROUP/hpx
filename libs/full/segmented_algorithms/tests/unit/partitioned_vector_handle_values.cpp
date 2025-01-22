@@ -156,6 +156,6 @@ int main()
     handle_values_tests<double>();
     handle_values_tests<int>();
 
-    return 0;
+    return hpx::util::report_errors();
 }
 #endif

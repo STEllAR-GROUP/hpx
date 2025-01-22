@@ -8,6 +8,7 @@
 
 #if !defined(HPX_HAVE_STATIC_LINKING)
 #include <hpx/distribution_policies/container_distribution_policy.hpp>
+#include <hpx/distribution_policies/explicit_container_distribution_policy.hpp>
 
 #include <hpx/components/containers/partitioned_vector/export_definitions.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
@@ -36,6 +37,12 @@ hpx::partitioned_vector<double, std::vector<double>>::partitioned_vector(
 template HPX_PARTITIONED_VECTOR_EXPORT
 hpx::partitioned_vector<double, std::vector<double>>::partitioned_vector(
     size_type, double const&, hpx::container_distribution_policy const&, void*);
+template HPX_PARTITIONED_VECTOR_EXPORT
+hpx::partitioned_vector<double, std::vector<double>>::partitioned_vector(
+    size_type, hpx::explicit_container_distribution_policy const&, void*);
+template HPX_PARTITIONED_VECTOR_EXPORT hpx::partitioned_vector<double,
+    std::vector<double>>::partitioned_vector(size_type, double const&,
+    hpx::explicit_container_distribution_policy const&, void*);
 
 #if defined(HPX_MSVC)
 #pragma warning(pop)

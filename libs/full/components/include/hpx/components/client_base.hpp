@@ -337,6 +337,28 @@ namespace hpx::components {
             shared_state_->set_value(HPX_MOVE(id));
         }
 
+        client_base(id_type const& id, bool make_unmanaged)
+          : shared_state_(new shared_state_type)
+        {
+            if (make_unmanaged)
+            {
+                shared_state_->set_value(id.make_unmanaged());
+            }
+            else
+            {
+                shared_state_->set_value(id);
+            }
+        }
+        client_base(id_type&& id, bool make_unmanaged)
+          : shared_state_(new shared_state_type)
+        {
+            if (make_unmanaged)
+            {
+                id.make_unmanaged();
+            }
+            shared_state_->set_value(HPX_MOVE(id));
+        }
+
         explicit client_base(hpx::shared_future<hpx::id_type> const& f) noexcept
           : shared_state_(
                 hpx::traits::future_access<future_type>::get_shared_state(f))
