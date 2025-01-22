@@ -18,7 +18,7 @@ jobs:
     - name: Install dependencies
       run: |
           brew install --overwrite python-tk && \
-          brew install --overwrite boost gperftools ninja autoconf automake libtool && \
+          brew install --overwrite boost gperftools ninja autoconf automake pkgconf libtool && \
           brew upgrade cmake
     - name: Configure
       shell: bash
@@ -36,6 +36,7 @@ jobs:
               -DHPX_WITH_VERIFY_LOCKS=ON \
               -DHPX_WITH_VERIFY_LOCKS_BACKTRACE=ON \
               -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=ON
+          cd build/_deps/hwloc-src/ && autoreconf -f -i
     - name: Build
       shell: bash
       run: |
