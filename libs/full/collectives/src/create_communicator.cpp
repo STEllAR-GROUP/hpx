@@ -445,10 +445,10 @@ namespace hpx::collectives {
     }    // namespace detail
 
      ///////////////////////////////////////////////////////////////////////////
-    std::vector<std::tuple<communicator,int> create_hierarchical_communicator(char const* basename,
+    std::vector<std::tuple<communicator,int>> create_hierarchical_communicator(char const* basename,
         num_sites_arg num_sites, this_site_arg this_site,
         generation_arg generation, root_site_arg root_site,
-        arity_arg arity)
+        int arity)
     {
         if (num_sites == static_cast<std::size_t>(-1))
         {
@@ -485,7 +485,7 @@ namespace hpx::collectives {
         if (left-right == num_sites){pivot = 0;}
         if (this_site == pivot){
             int last_intermediary = -1;
-            if (left-right < arity || max_depth == 0) {last_intermediary = -2}
+            if (left-right < arity || max_depth == 0) {last_intermediary = -2;}
             auto c = hpx::local_new<communicator>(left-right, name.c_str());
             auto f = c.register_as(
                 hpx::detail::name_from_basename(HPX_MOVE(name), this_site));
@@ -507,7 +507,7 @@ namespace hpx::collectives {
         {
             if(this_site >= left && this_site < right)
             {
-                communicators.push_back(std::tuple(hpx::find_from_basename<communicator>(HPX_MOVE(name), pivot)), this_site - left);
+                communicators.push_back(std::tuple(hpx::find_from_basename<communicator>(HPX_MOVE(name), pivot), this_site - left));
             }
             return communicators;
         }
@@ -515,7 +515,7 @@ namespace hpx::collectives {
         for (int i = 0; i < arity; i++)
         {
             if (this_site == left + (division_steps*i)){
-                communicators.push_back(std::tuple(hpx::find_from_basename<communicator>(HPX_MOVE(name), pivot)),i);
+                communicators.push_back(std::tuple(hpx::find_from_basename<communicator>(HPX_MOVE(name), pivot),i));
             }
             return recursively_fill_communicators(communicators, left + (division_steps*i), left + (division_steps*(i+1)-1), basename, arity, max_depth-1, this_site, num_sites);
         }
