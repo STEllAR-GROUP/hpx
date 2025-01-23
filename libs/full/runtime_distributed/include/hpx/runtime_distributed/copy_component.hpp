@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,7 +19,7 @@
 
 #include <type_traits>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     /// \brief Copy given component to the specified target locality
     ///
@@ -43,8 +43,7 @@ namespace hpx { namespace components {
 #if defined(DOXYGEN)
     future<hpx::id_type>
 #else
-    inline typename std::enable_if<traits::is_component<Component>::value,
-        future<hpx::id_type>>::type
+    std::enable_if_t<traits::is_component_v<Component>, future<hpx::id_type>>
 #endif
     copy(hpx::id_type const& to_copy)
     {
@@ -73,8 +72,7 @@ namespace hpx { namespace components {
 #if defined(DOXYGEN)
     future<hpx::id_type>
 #else
-    inline typename std::enable_if<traits::is_component<Component>::value,
-        future<hpx::id_type>>::type
+    std::enable_if_t<traits::is_component_v<Component>, future<hpx::id_type>>
 #endif
     copy(hpx::id_type const& to_copy, hpx::id_type const& target_locality)
     {
@@ -115,8 +113,7 @@ namespace hpx { namespace components {
             typename client_base<Derived, Stub, Data>::server_component_type;
         using action_type = server::copy_component_action<component_type>;
 
-        id_type id = to_copy.get_id();
         return Derived(hpx::detail::async_colocated<action_type>(
             to_copy, to_copy, target_locality));
     }
-}}    // namespace hpx::components
+}    // namespace hpx::components
