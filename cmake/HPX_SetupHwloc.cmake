@@ -44,11 +44,21 @@ else()
     )
     if(NOT HWLoc_POPULATED)
       fetchcontent_populate(HWLoc)
-      execute_process(
-        COMMAND
-          sh -c
-          "cd ${FETCHCONTENT_BASE_DIR}/hwloc-src && autoreconf -f -i && ./configure --prefix=${FETCHCONTENT_BASE_DIR}/hwloc-installed && make -j && make install"
-      )
+      if(NOT Hwloc_BUILD_INSTALLED)
+        execute_process(
+          COMMAND
+            sh -c
+            "cd ${FETCHCONTENT_BASE_DIR}/hwloc-src && ./configure --prefix=${FETCHCONTENT_BASE_DIR}/hwloc-installed && make -j && make install"
+        )
+        set(Hwloc_BUILD_INSTALLED
+            TRUE
+            CACHE INTERNAL ""
+        )
+      else()
+        message(
+          "HWLoc is installed at ${FETCHCONTENT_BASE_DIR}/hwloc-installed"
+        )
+      endif()
     endif()
     set(HWLOC_ROOT "${FETCHCONTENT_BASE_DIR}/hwloc-installed")
     set(Hwloc_INCLUDE_DIR
