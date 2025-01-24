@@ -559,6 +559,33 @@ hpx_option(
   ADVANCED
 )
 
+hpx_option(
+  HPX_WITH_SIMD_SORT
+  BOOL
+  "Use FetchContent to fetch x86-simd-sort. By default an installed x86-simd-sort will be used. (default: On). It has support only for AVX-512 registers. If the architecture has no AVX-512 registers, simd-sort won't be used"
+  ON
+  CATEGORY "Build Targets"
+  ADVANCED
+)
+hpx_option(
+  HPX_WITH_SIMD_SORT_TAG STRING "x86-simd-sort repository tag or branch"
+  "1b396372e2bc10fd883d49e28dfc2a5ea5d2e194"
+  CATEGORY "Build Targets"
+  ADVANCED
+)
+
+hpx_check_for_avx512f(DEFINITIONS HPX_HAVE_AVX512F)
+
+if(NOT HPX_WITH_AVX512F)
+  set(HPX_WITH_SIMD_SORT Off)
+endif()
+
+if(HPX_WITH_SIMD_SORT)
+  include(HPX_SetupSimdSort)
+  hpx_add_config_define(HPX_HAVE_SIMD_SORT)
+  add_compile_options(-mavx512f)
+endif()
+
 # ##############################################################################
 # HPX CUDA configuration
 # ##############################################################################
