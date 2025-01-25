@@ -2330,7 +2330,7 @@ endif()
 
 if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
   # Check if we can use generic coroutine contexts without any problems
-  if(NOT Boost_CONTEXT_FOUND)
+  if(NOT (Boost_CONTEXT_FOUND OR TARGET Boost::context))
     hpx_error(
       "The usage of Boost.Context was selected but Boost.Context was not found."
     )
