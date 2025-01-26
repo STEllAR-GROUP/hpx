@@ -9,12 +9,17 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_VC)
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/execution/traits/vector_pack_alignment_size.hpp>
+
 #include <cstddef>
 
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Vector>
+    template <typename Vector,
+        HPX_CONCEPT_REQUIRES_(
+            is_vector_pack_v<Vector> || is_scalar_vector_pack_v<Vector>)>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
         Vector& vec, std::size_t index) noexcept
     {
@@ -22,7 +27,9 @@ namespace hpx::parallel::traits {
     }
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Vector, typename T>
+    template <typename Vector, typename T,
+        HPX_CONCEPT_REQUIRES_(
+            is_vector_pack_v<Vector> || is_scalar_vector_pack_v<Vector>)>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto set(
         Vector& vec, std::size_t index, T val) noexcept
     {
