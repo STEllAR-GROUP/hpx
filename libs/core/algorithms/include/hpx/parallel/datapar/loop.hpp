@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +15,7 @@
 #include <hpx/execution/traits/vector_pack_load_store.hpp>
 #include <hpx/execution/traits/vector_pack_type.hpp>
 #include <hpx/executors/datapar/execution_policy.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
@@ -238,8 +239,12 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Iterator, typename Enable = void>
+        struct datapar_loop_n;
+
         template <typename Iterator>
-        struct datapar_loop_n
+        struct datapar_loop_n<Iterator,
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
         {
             using iterator_type = std::decay_t<Iterator>;
             using value_type =
@@ -258,8 +263,9 @@ namespace hpx::parallel::util {
                 {
                     std::size_t len = count;
 
+                    // clang-format off
                     for (/* */; !detail::is_data_aligned(first) && len != 0;
-                         --len)
+                        --len)
                     {
                         datapar_loop_step<InIter>::call1(f, first);
                     }
@@ -268,16 +274,18 @@ namespace hpx::parallel::util {
 
                     for (auto len_v =
                              static_cast<std::int64_t>(len - (size + 1));
-                         len_v > 0;
-                         len_v -= static_cast<std::int64_t>(size), len -= size)
+                        len_v > 0;
+                        len_v -= static_cast<std::int64_t>(size), len -= size)
                     {
                         datapar_loop_step<InIter>::callv(f, first);
                     }
+                    // clang-format on
 
                     for (/* */; len != 0; --len)
                     {
                         datapar_loop_step<InIter>::call1(f, first);
                     }
+
                     return first;
                 }
                 else
@@ -293,6 +301,51 @@ namespace hpx::parallel::util {
             template <typename InIter, typename CancelToken, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr InIter call(
                 InIter first, std::size_t count, CancelToken& tok, F&& f)
+            {
+                // check at the start of a partition only
+                if (tok.was_cancelled())
+                    return first;
+
+                return call(first, count, HPX_FORWARD(F, f));
+            }
+        };
+
+        template <typename I>
+        struct datapar_loop_n<I, std::enable_if_t<std::is_integral_v<I>>>
+        {
+            using V = traits::vector_pack_type_t<I>;
+
+            template <typename Iter, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
+                Iter first, std::size_t count, F&& f)
+            {
+                std::size_t len = count;
+                constexpr std::size_t size = traits::vector_pack_size_v<V>;
+
+                for (size_t i = first % size; i != 0 && len != 0; --i, --len)
+                {
+                    datapar_loop_step<Iter>::call1(f, first);
+                }
+
+                // clang-format off
+                for (auto len_v = static_cast<std::int64_t>(len - (size + 1));
+                    len_v > 0;
+                    len_v -= static_cast<std::int64_t>(size), len -= size)
+                {
+                    datapar_loop_step<Iter>::callv(f, first);
+                }
+                // clang-format on
+
+                for (/* */; len != 0; --len)
+                {
+                    datapar_loop_step<Iter>::call1(f, first);
+                }
+                return first;
+            }
+
+            template <typename Iter, typename CancelToken, typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
+                Iter first, std::size_t count, CancelToken& tok, F&& f)
             {
                 // check at the start of a partition only
                 if (tok.was_cancelled())
@@ -323,8 +376,9 @@ namespace hpx::parallel::util {
                 {
                     std::size_t len = count;
 
+                    // clang-format off
                     for (/* */; !detail::is_data_aligned(first) && len != 0;
-                         --len)
+                        --len)
                     {
                         datapar_loop_step_ind<InIter>::call1(f, first);
                     }
@@ -333,11 +387,12 @@ namespace hpx::parallel::util {
 
                     for (auto len_v =
                              static_cast<std::int64_t>(len - (size + 1));
-                         len_v > 0;
-                         len_v -= static_cast<std::int64_t>(size), len -= size)
+                        len_v > 0;
+                        len_v -= static_cast<std::int64_t>(size), len -= size)
                     {
                         datapar_loop_step_ind<InIter>::callv(f, first);
                     }
+                    // clang-format on
 
                     for (/* */; len != 0; --len)
                     {
@@ -381,14 +436,16 @@ namespace hpx::parallel::util {
 
                 constexpr std::size_t size = traits::vector_pack_size_v<V>;
 
+                // clang-format off
                 for (auto len_v = static_cast<std::int64_t>(len - (size + 1));
-                     len_v > 0;
-                     len_v -= static_cast<std::int64_t>(size), len -= size)
+                    len_v > 0;
+                    len_v -= static_cast<std::int64_t>(size), len -= size)
                 {
                     datapar_loop_idx_step<Iter>::callv(f, it, base_idx);
                     std::advance(it, size);
                     base_idx += size;
                 }
+                // clang-format on
 
                 for (/* */; len != 0; --len)
                 {

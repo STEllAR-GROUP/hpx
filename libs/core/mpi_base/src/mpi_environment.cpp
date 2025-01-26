@@ -470,9 +470,9 @@ namespace hpx::util {
     }
 
     // Acknowledgement: code adapted from github.com/jeffhammond/BigMPI
-    MPI_Datatype mpi_environment::type_contiguous(size_t nbytes)
+    MPI_Datatype mpi_environment::type_contiguous(size_t const nbytes)
     {
-        size_t int_max = (std::numeric_limits<int>::max)();
+        constexpr int int_max = (std::numeric_limits<int>::max)();
 
         size_t c = nbytes / int_max;
         size_t r = nbytes % int_max;
@@ -481,13 +481,14 @@ namespace hpx::util {
         HPX_ASSERT(r < int_max);
 
         MPI_Datatype chunks;
-        MPI_Type_vector(c, int_max, int_max, MPI_BYTE, &chunks);
+        MPI_Type_vector(
+            static_cast<int>(c), int_max, int_max, MPI_BYTE, &chunks);
 
         MPI_Datatype remainder;
-        MPI_Type_contiguous(r, MPI_BYTE, &remainder);
+        MPI_Type_contiguous(static_cast<int>(r), MPI_BYTE, &remainder);
 
-        MPI_Aint remdisp = (MPI_Aint) c * int_max;
-        int blocklengths[2] = {1, 1};
+        MPI_Aint const remdisp = static_cast<MPI_Aint>(c) * int_max;
+        constexpr int blocklengths[2] = {1, 1};
         MPI_Aint displacements[2] = {0, remdisp};
         MPI_Datatype types[2] = {chunks, remainder};
         MPI_Datatype newtype;
@@ -500,7 +501,7 @@ namespace hpx::util {
     }
 
     MPI_Request mpi_environment::isend(
-        void* address, size_t size, int rank, int tag)
+        void const* address, size_t size, int rank, int tag)
     {
         MPI_Request request;
         MPI_Datatype datatype;
