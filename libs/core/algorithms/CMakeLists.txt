@@ -37,7 +37,9 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
     hpx/parallel/algorithms/detail/pivot.hpp
     hpx/parallel/algorithms/detail/reduce.hpp
+    hpx/parallel/algorithms/detail/reduce_deterministic.hpp
     hpx/parallel/algorithms/detail/replace.hpp
+    hpx/parallel/algorithms/detail/rfa.hpp
     hpx/parallel/algorithms/detail/rotate.hpp
     hpx/parallel/algorithms/detail/sample_sort.hpp
     hpx/parallel/algorithms/detail/search.hpp
@@ -72,6 +74,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/partition.hpp
     hpx/parallel/algorithms/reduce_by_key.hpp
     hpx/parallel/algorithms/reduce.hpp
+    hpx/parallel/algorithms/reduce_deterministic.hpp
     hpx/parallel/algorithms/remove_copy.hpp
     hpx/parallel/algorithms/remove.hpp
     hpx/parallel/algorithms/replace.hpp
