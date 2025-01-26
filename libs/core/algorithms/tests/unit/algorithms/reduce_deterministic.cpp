@@ -65,9 +65,9 @@ void test_reduce1(IteratorTag)
         return v1 + v2;
     };
 
-    FloatTypeDeterministic r1 =
-        hpx::reduce_deterministic(iterator_det(std::begin(deterministic)),
-            iterator_det(std::end(deterministic)), val_det, op);
+    FloatTypeDeterministic r1 = hpx::experimental::reduce_deterministic(
+        iterator_det(std::begin(deterministic)),
+        iterator_det(std::end(deterministic)), val_det, op);
 
     // verify values
     FloatTypeNonDeterministic r2 = hpx::reduce(hpx::execution::seq,
@@ -113,13 +113,14 @@ void test_reduce_determinism(IteratorTag)
         return v1 + v2;
     };
 
-    FloatTypeDeterministic r1 =
-        hpx::reduce_deterministic(iterator_det(std::begin(deterministic)),
-            iterator_det(std::end(deterministic)), val_det, op);
+    FloatTypeDeterministic r1 = hpx::experimental::reduce_deterministic(
+        iterator_det(std::begin(deterministic)),
+        iterator_det(std::end(deterministic)), val_det, op);
 
-    FloatTypeDeterministic r1_shuffled = hpx::reduce_deterministic(
-        iterator_det(std::begin(deterministic_shuffled)),
-        iterator_det(std::end(deterministic_shuffled)), val_det, op);
+    FloatTypeDeterministic r1_shuffled =
+        hpx::experimental::reduce_deterministic(
+            iterator_det(std::begin(deterministic_shuffled)),
+            iterator_det(std::end(deterministic_shuffled)), val_det, op);
 
     HPX_TEST_EQ(r1,
         r1_shuffled);    // Deterministically calculated, should always satisfy
@@ -196,20 +197,10 @@ void test_reduce2()
     test_reduce_determinism<IteratorTag, double, 1000>(IteratorTag());
 }
 
-// template <typename IteratorTag>
-// void test_reduce3()
-// {
-//     using namespace hpx::execution;
-
-//     test_orig_reduce_determinism<IteratorTag, float, 1000>(IteratorTag());
-//     test_orig_reduce_determinism<IteratorTag, double, 1000>(IteratorTag());
-// }
-
 void reduce_test1()
 {
     test_reduce1<std::random_access_iterator_tag>();
     test_reduce2<std::random_access_iterator_tag>();
-    // test_reduce3<std::random_access_iterator_tag>();
     test_reduce1<std::forward_iterator_tag>();
     test_reduce2<std::forward_iterator_tag>();
 }

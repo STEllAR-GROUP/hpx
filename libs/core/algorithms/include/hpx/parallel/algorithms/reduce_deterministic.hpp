@@ -405,7 +405,7 @@ namespace hpx::parallel {
     }    // namespace detail
 }    // namespace hpx::parallel
 
-namespace hpx {
+namespace hpx::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::reduce
@@ -422,8 +422,8 @@ namespace hpx {
             )>
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
-        tag_fallback_invoke(hpx::reduce_deterministic_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, T init, F f)
+        tag_fallback_invoke(hpx::experimental::reduce_deterministic_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, T init, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
@@ -442,8 +442,8 @@ namespace hpx {
             )>
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
-        tag_fallback_invoke(hpx::reduce_deterministic_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, T init)
+        tag_fallback_invoke(hpx::experimental::reduce_deterministic_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, T init)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
@@ -462,8 +462,8 @@ namespace hpx {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             typename std::iterator_traits<FwdIter>::value_type>
-        tag_fallback_invoke(hpx::reduce_deterministic_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last)
+        tag_fallback_invoke(hpx::experimental::reduce_deterministic_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
@@ -483,8 +483,8 @@ namespace hpx {
                 hpx::traits::is_iterator_v<InIter>
             )>
         // clang-format on
-        friend T tag_fallback_invoke(
-            hpx::reduce_deterministic_t, InIter first, InIter last, T init, F f)
+        friend T tag_fallback_invoke(hpx::experimental::reduce_deterministic_t,
+            InIter first, InIter last, T init, F f)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
@@ -500,8 +500,8 @@ namespace hpx {
                 hpx::traits::is_iterator_v<InIter>
             )>
         // clang-format on
-        friend T tag_fallback_invoke(
-            hpx::reduce_deterministic_t, InIter first, InIter last, T init)
+        friend T tag_fallback_invoke(hpx::experimental::reduce_deterministic_t,
+            InIter first, InIter last, T init)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
@@ -518,8 +518,8 @@ namespace hpx {
             )>
         // clang-format on
         friend typename std::iterator_traits<InIter>::value_type
-        tag_fallback_invoke(
-            hpx::reduce_deterministic_t, InIter first, InIter last)
+        tag_fallback_invoke(hpx::experimental::reduce_deterministic_t,
+            InIter first, InIter last)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
@@ -532,6 +532,6 @@ namespace hpx {
                     std::plus<>());
         }
     } reduce_deterministic{};
-}    // namespace hpx
+}    // namespace hpx::experimental
 
 #endif    // DOXYGEN
