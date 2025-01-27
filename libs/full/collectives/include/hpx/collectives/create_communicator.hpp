@@ -274,7 +274,7 @@ namespace hpx::collectives {
         generation_arg generation = generation_arg(),
         root_site_arg root_site = root_site_arg(),
         int arity = 4);
-    std::vector<std::tuple<communicator,int>> recursively_fill_communicators(std::vector<std::tuple<communicator,int>> communicators, int left, int right, char const* basename, int arity, int max_depth, int this_site, int num_sites);
+    std::vector<std::tuple<communicator,int>> recursively_fill_communicators(std::vector<std::tuple<communicator,int>> communicators, int left, int right, std::string basename, int arity, int max_depth, int this_site, int num_sites);
 
 }    // namespace hpx::collectives
 

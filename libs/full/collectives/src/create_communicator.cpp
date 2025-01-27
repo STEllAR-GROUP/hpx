@@ -475,18 +475,17 @@ namespace hpx::collectives {
         }
 
         std::vector<std::tuple<communicator,int>> communicators;
-        return recursively_fill_communicators(communicators, 0, num_sites - 1, basename, arity, -1, this_site, num_sites);
+        return recursively_fill_communicators(std::move(communicators), 0, num_sites - 1, name, arity, -1, this_site, num_sites);
     }
-    std::vector<std::tuple<communicator,int>> recursively_fill_communicators(std::vector<std::tuple<communicator,int>> communicators, int left, int right, char const* basename, int arity, int max_depth, int this_site, int num_sites)
+    std::vector<std::tuple<communicator,int>> recursively_fill_communicators(std::vector<std::tuple<communicator,int>> communicators, int left, int right, std::string basename, int arity, int max_depth, int this_site, int num_sites)
     {
         std::string name(basename);
         name += std::to_string(left) + "-" + std::to_string(right) + "/";
         int pivot = ((right - left)/2)+left;
-        if (left-right == num_sites){pivot = 0;}
+        if (right-left + 1 == num_sites){pivot = 0;}
         if (this_site == pivot){
             int last_intermediary = -1;
-            if (left-right < arity || max_depth == 0) {last_intermediary = -2;}
-            auto c = hpx::local_new<communicator>(left-right, name.c_str());
+            auto c = hpx::local_new<communicator>(right - left, name.c_str());
             auto f = c.register_as(
                 hpx::detail::name_from_basename(HPX_MOVE(name), this_site));
             communicators.push_back(std::tuple(f.then(hpx::launch::sync,
@@ -499,25 +498,34 @@ namespace hpx::collectives {
                             "operation was already registered: {}",
                             target.registered_name());
                     }
-                    target.set_info(num_sites_arg(left-right), this_site_arg(this_site));
+                    target.set_info(num_sites_arg(right-left), this_site_arg(this_site));
                     return target;
                 }),last_intermediary));
+            if (right-left < arity || max_depth == 0)
+            {
+                return communicators;
+            }
         }
-        if (left-right < arity || max_depth == 0)
+        if (right-left < arity || max_depth == 0)
         {
-            if(this_site >= left && this_site < right)
+            if(this_site >= left && this_site < right && this_site !=pivot)
             {
                 communicators.push_back(std::tuple(hpx::find_from_basename<communicator>(HPX_MOVE(name), pivot), this_site - left));
             }
             return communicators;
         }
-        int division_steps = (right - left)/arity;
+        int division_steps = (right - left + 1)/arity;
         for (int i = 0; i < arity; i++)
         {
-            if (this_site == left + (division_steps*i)){
+            if (this_site == left + (division_steps*i)-1 + (division_steps/2)){
                 communicators.push_back(std::tuple(hpx::find_from_basename<communicator>(HPX_MOVE(name), pivot),i));
             }
-            return recursively_fill_communicators(communicators, left + (division_steps*i), left + (division_steps*(i+1)-1), basename, arity, max_depth-1, this_site, num_sites);
+            int current_left = left + (division_steps*i);
+            int current_right = left + (division_steps*(i+1)-1);
+            if (this_site >= current_left && this_site < current_right)
+            {
+                return recursively_fill_communicators(std::move(communicators), current_left, current_right, basename, arity, max_depth-1, this_site, num_sites);
+            }
         }
         return communicators;
 
