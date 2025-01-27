@@ -577,11 +577,15 @@ namespace hpx::collectives {
         communicators.erase(communicators.begin());
         }
 
-        for (int i = 0; i < communicators.size()/2; i++){
+        for (int i = 0; i < communicators.size(); i++){
+
+            if (std::get<1>(communicators[i])>=0 && i != communicators.size()-1)
+            {
             ///////////////////////////////////////////////////////////////////////////
             // Intermediary Scatter From.
+                this_site = this_site_arg(std::get<1>(communicators[i]));
                 auto scatter_from_data = [this_site, generation](
-                                     communicator&& c) -> hpx::future<T> {
+                                     communicator&& c) -> hpx::future<std::vector<T>> {
             using action_type =
                 detail::communicator_server::communication_get_direct_action<
                     traits::communication::scatter_tag, hpx::future<std::vector<T>>>;
@@ -599,15 +603,14 @@ namespace hpx::collectives {
 
             return result;
             };
-            hpx::future<std::vector<T>> intermediate_node = std::get<0>(communicators[2*i]).then(hpx::launch::sync, HPX_MOVE(scatter_from_data));
-            
-            
-                
-                std::vector<T> intermediate_result= intermediate_node.get();
+            hpx::future<std::vector<T>> intermediate_node = std::get<0>(communicators[i]).then(hpx::launch::sync, HPX_MOVE(scatter_from_data));
+
+            std::vector<T> intermediate_result= intermediate_node.get();
             ///////////////////////////////////////////////////////////////////////////
             // Leaf scatter To.
-            if (std::get<1>(communicators[i*2+1]) == -2)
+            if (i == communicators.size()-1)
             {
+                this_site = this_site_arg((arity-1)/2);
                 auto scatter_to_data = [local_result = intermediate_result,
                                    this_site, generation](
                                    communicator&& c) mutable -> hpx::future<T> {
@@ -629,13 +632,14 @@ namespace hpx::collectives {
 
             return result;
         };
-            return std::get<0>(communicators.end()[-2]).then(hpx::launch::sync, HPX_MOVE(scatter_to_data));
+            return std::get<0>(communicators[i+1]).then(hpx::launch::sync, HPX_MOVE(scatter_to_data));
 
             }
             ///////////////////////////////////////////////////////////////////////////
             // Intermediary Scatter to
             else 
             {
+                this_site = this_site_arg((arity-1)/2);
                 std::vector<std::vector<T>> grouped_intermediate(arity+1);
                 for (int j = 0; j< arity; j++)
                 {
@@ -665,11 +669,18 @@ namespace hpx::collectives {
 
             std::get<0>(communicators[0]).then(hpx::launch::sync, HPX_MOVE(scatter_to_data));
             }
+            }
+            
+            
+            
+                
+                
+            
         }
         
         ///////////////////////////////////////////////////////////////////////////
         // Leaf scatter from.
-
+        this_site = this_site_arg(std::get<1>(communicators.end()[-1]));
         auto scatter_from_data = [this_site, generation](
                                      communicator&& c) -> hpx::future<T> {
             using action_type =
