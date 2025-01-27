@@ -88,6 +88,15 @@ namespace hpx::parallel::traits {
     template <typename T>
     inline constexpr std::size_t vector_pack_size_v =
         vector_pack_size<T>::value;
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename Pack,
+        typename Enable = std::enable_if_t<is_vector_pack_v<Pack> ||
+            is_scalar_vector_pack_v<Pack>>>
+    constexpr std::size_t size(Pack) noexcept
+    {
+        return vector_pack_size_v<Pack>;
+    }
 }    // namespace hpx::parallel::traits
 
 #if !defined(__CUDACC__)
