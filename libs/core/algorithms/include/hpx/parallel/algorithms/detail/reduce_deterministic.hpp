@@ -89,7 +89,7 @@ namespace hpx::parallel::detail {
             T max_val = std::abs(std::numeric_limits<T>::min());
             std::size_t partition_size_lim = 0;
             for (auto e = first; partition_size_lim < partition_size;
-                partition_size_lim++, e++)
+                 partition_size_lim++, e++)
             {
                 T temp_max_val = std::abs(static_cast<T>(*e));
                 if (max_val < temp_max_val)
@@ -121,7 +121,7 @@ namespace hpx::parallel::detail {
             rfa += init;
             std::size_t partition_size_lim = 0;
             for (auto e = first; partition_size_lim < partition_size;
-                partition_size_lim++, e++)
+                 partition_size_lim++, e++)
             {
                 rfa += (*e);
             }
