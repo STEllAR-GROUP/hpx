@@ -824,7 +824,7 @@ namespace hpx::parallel::detail::rfa {
         ///Set the binned fp to zero
         void zero()
         {
-            data = {0};
+            data = {{0}};
         }
 
         ///Return the fold of the binned fp
