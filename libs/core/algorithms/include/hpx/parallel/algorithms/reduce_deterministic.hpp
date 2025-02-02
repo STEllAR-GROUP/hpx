@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include "detail/reduce_deterministic.hpp"
 #if defined(DOXYGEN)
 
 namespace hpx {
