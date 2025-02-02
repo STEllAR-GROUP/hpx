@@ -245,7 +245,6 @@ namespace hpx::parallel::detail::rfa {
         ///The number of deposits that can be performed before a renorm is necessary.
         ///Applies also to binned complex double precision.
         static constexpr auto ENDURANCE = 1 << (MANT_DIG - BIN_WIDTH - 2);
-
         ///Return a binned floating-point reference bin
         inline const ftype* binned_bins(const int x) const
         {
@@ -825,7 +824,7 @@ namespace hpx::parallel::detail::rfa {
         ///Set the binned fp to zero
         void zero()
         {
-            data = {0};
+            data = {{0}};
         }
 
         ///Return the fold of the binned fp
