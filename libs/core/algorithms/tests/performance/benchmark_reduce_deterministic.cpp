@@ -33,25 +33,28 @@ T get_rand(T LO = (std::numeric_limits<T>::min)(),
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-void bench_reduce_deterministic(const auto& policy,
-    const auto& deterministic_shuffled, const auto& val_det, const auto& op)
+template <typename PolicyT, typename IteratorT, typename InitVal, typename Op>
+void bench_reduce_deterministic(const PolicyT& policy,
+    const IteratorT& deterministic_shuffled, const InitVal& val_det,
+    const Op& op)
 {
     // check if different type for deterministic and nondeeterministic
     // and same result
 
-    auto r1_shuffled =
-        hpx::reduce_deterministic(policy, std::begin(deterministic_shuffled),
-            std::end(deterministic_shuffled), val_det, op);
+    auto r1_shuffled = hpx::experimental::reduce_deterministic(policy,
+        std::begin(deterministic_shuffled), std::end(deterministic_shuffled),
+        val_det, op);
 
     HPX_UNUSED(r1_shuffled);
 }
 
-void bench_reduce(const auto& policy, const auto& deterministic_shuffled,
-    const auto& val_det, const auto& op)
+template <typename PolicyT, typename IteratorT, typename InitVal, typename Op>
+void bench_reduce(const PolicyT& policy,
+    const IteratorT& non_deterministic_shuffled, const InitVal& val_det,
+    const Op& op)
 {
-    auto r = hpx::reduce(policy, (std::begin(deterministic_shuffled)),
-        (std::end(deterministic_shuffled)), val_det, op);
+    auto r = hpx::reduce(policy, (std::begin(non_deterministic_shuffled)),
+        (std::end(non_deterministic_shuffled)), val_det, op);
 
     HPX_UNUSED(r);
 }
