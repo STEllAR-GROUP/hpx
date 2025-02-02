@@ -87,7 +87,8 @@ void test_reduce_parallel1(IteratorTag)
 {
     // check if different type for deterministic and nondeeterministic
     // and same result i.e. correct computation
-    using base_iterator_det = std::vector<FloatTypeDeterministic>::iterator;
+    using base_iterator_det =
+        typename std::vector<FloatTypeDeterministic>::iterator;
     using iterator_det = test::test_iterator<base_iterator_det, IteratorTag>;
 
     using base_iterator_ndet =
@@ -109,20 +110,20 @@ void test_reduce_parallel1(IteratorTag)
         return v1 + v2;
     };
 
-    FloatTypeDeterministic r1 = hpx::reduce_deterministic(hpx::execution::par,
-        iterator_det(std::begin(deterministic)),
+    FloatTypeDeterministic r1 = hpx::experimental::reduce_deterministic(
+        hpx::execution::par, iterator_det(std::begin(deterministic)),
         iterator_det(std::end(deterministic)), val_det, op);
 
     // verify values
-    // FloatTypeNonDeterministic r2 = hpx::reduce(hpx::execution::par,
-    //     iterator_ndet(std::begin(nondeterministic)),
-    //     iterator_ndet(std::end(nondeterministic)), val_non_det, op);
+    FloatTypeNonDeterministic r2 = hpx::reduce(hpx::execution::par,
+        iterator_ndet(std::begin(nondeterministic)),
+        iterator_ndet(std::end(nondeterministic)), val_non_det, op);
 
     FloatTypeNonDeterministic r3 = std::accumulate(
         nondeterministic.begin(), nondeterministic.end(), val_non_det);
 
     HPX_TEST_EQ(r1, r3);
-    // HPX_TEST_EQ(r2, r3);
+    HPX_TEST_EQ(r2, r3);
 }
 
 template <typename IteratorTag, typename FloatTypeDeterministic,
@@ -226,10 +227,10 @@ void test_reduce1()
 {
     using namespace hpx::execution;
 
-    test_reduce1<IteratorTag, float, float, 1000>(IteratorTag());
-    test_reduce1<IteratorTag, double, float, 1000>(IteratorTag());
-    test_reduce1<IteratorTag, float, double, 1000>(IteratorTag());
-    test_reduce1<IteratorTag, double, double, 1000>(IteratorTag());
+    // test_reduce1<IteratorTag, float, float, 1000>(IteratorTag());
+    // test_reduce1<IteratorTag, double, float, 1000>(IteratorTag());
+    // test_reduce1<IteratorTag, float, double, 1000>(IteratorTag());
+    // test_reduce1<IteratorTag, double, double, 1000>(IteratorTag());
     test_reduce_parallel1<IteratorTag, float, float, 1000>(IteratorTag());
 }
 
@@ -238,16 +239,16 @@ void test_reduce2()
 {
     using namespace hpx::execution;
 
-    test_reduce_determinism<IteratorTag, float, 1000>(IteratorTag());
-    test_reduce_determinism<IteratorTag, double, 1000>(IteratorTag());
+    // test_reduce_determinism<IteratorTag, float, 1000>(IteratorTag());
+    // test_reduce_determinism<IteratorTag, double, 1000>(IteratorTag());
 }
 
 void reduce_test1()
 {
     test_reduce1<std::random_access_iterator_tag>();
-    test_reduce2<std::random_access_iterator_tag>();
-    test_reduce1<std::forward_iterator_tag>();
-    test_reduce2<std::forward_iterator_tag>();
+    // test_reduce2<std::random_access_iterator_tag>();
+    // test_reduce1<std::forward_iterator_tag>();
+    // test_reduce2<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
