@@ -227,10 +227,10 @@ void test_reduce1()
 {
     using namespace hpx::execution;
 
-    // test_reduce1<IteratorTag, float, float, 1000>(IteratorTag());
-    // test_reduce1<IteratorTag, double, float, 1000>(IteratorTag());
-    // test_reduce1<IteratorTag, float, double, 1000>(IteratorTag());
-    // test_reduce1<IteratorTag, double, double, 1000>(IteratorTag());
+    test_reduce1<IteratorTag, float, float, 1000>(IteratorTag());
+    test_reduce1<IteratorTag, double, float, 1000>(IteratorTag());
+    test_reduce1<IteratorTag, float, double, 1000>(IteratorTag());
+    test_reduce1<IteratorTag, double, double, 1000>(IteratorTag());
     test_reduce_parallel1<IteratorTag, float, float, 1000>(IteratorTag());
 }
 
@@ -239,16 +239,16 @@ void test_reduce2()
 {
     using namespace hpx::execution;
 
-    // test_reduce_determinism<IteratorTag, float, 1000>(IteratorTag());
-    // test_reduce_determinism<IteratorTag, double, 1000>(IteratorTag());
+    test_reduce_determinism<IteratorTag, float, 1000>(IteratorTag());
+    test_reduce_determinism<IteratorTag, double, 1000>(IteratorTag());
 }
 
 void reduce_test1()
 {
     test_reduce1<std::random_access_iterator_tag>();
-    // test_reduce2<std::random_access_iterator_tag>();
-    // test_reduce1<std::forward_iterator_tag>();
-    // test_reduce2<std::forward_iterator_tag>();
+    test_reduce2<std::random_access_iterator_tag>();
+    test_reduce1<std::forward_iterator_tag>();
+    test_reduce2<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

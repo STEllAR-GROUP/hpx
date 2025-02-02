@@ -397,6 +397,7 @@ namespace hpx::parallel {
             static constexpr T sequential(ExPolicy&& policy, InIterB first,
                 InIterE last, T_&& init, Reduce&& r)
             {
+                // TODO: abstract initializing memory
                 hpx::parallel::detail::rfa::RFA_bins<T_> bins;
                 bins.initialize_bins();
                 std::memcpy(hpx::parallel::detail::rfa::__rfa_bin_host_buffer__,
@@ -419,6 +420,7 @@ namespace hpx::parallel {
                         HPX_FORWARD(T_, init));
                 }
 
+                // TODO: abstract initializing memory
                 hpx::parallel::detail::rfa::RFA_bins<T_> bins;
                 bins.initialize_bins();
                 std::memcpy(hpx::parallel::detail::rfa::__rfa_bin_host_buffer__,
@@ -428,6 +430,7 @@ namespace hpx::parallel {
                     -> hpx::parallel::detail::rfa::
                         ReproducibleFloatingAccumulator<T_> {
                             T_ val = *part_begin;
+                            // Assumed that __rfa_bin_host_buffer__ is initiallized
                             return hpx::parallel::detail::
                                 sequential_reduce_deterministic_rfa<ExPolicy>(
                                     HPX_FORWARD(ExPolicy, policy), ++part_begin,
@@ -440,16 +443,12 @@ namespace hpx::parallel {
                         T_>>::call(HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
                     hpx::unwrapping([policy, init](auto&& results) -> T_ {
-                        // Assumed that
+                        // Assumed that __rfa_bin_host_buffer__ is initiallized
                         hpx::parallel::detail::rfa::
                             ReproducibleFloatingAccumulator<T_>
                                 rfa;
                         rfa.zero();
                         rfa += init;
-                        for (auto e : results)
-                        {
-                            printf("rfa results %f\n", e.conv());
-                        }
                         return hpx::parallel::detail::
                             sequential_reduce_deterministic_rfa<ExPolicy>(
                                 HPX_FORWARD(ExPolicy, policy),

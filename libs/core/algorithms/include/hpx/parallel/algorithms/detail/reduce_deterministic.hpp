@@ -36,16 +36,16 @@ namespace hpx::parallel::detail {
         {
             /// TODO: Put constraint on Reduce to be a binary plus operator
             (void) r;
-            // hpx::parallel::detail::rfa::RFA_bins<T> bins;
-            // bins.initialize_bins();
-            // std::memcpy(rfa::__rfa_bin_host_buffer__, &bins, sizeof(bins));
+
+            // __rfa_bin_host_buffer__ should be initialized by the frontend of
+            // this method
 
             hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<T> rfa;
             rfa.set_max_abs_val(init);
             rfa.unsafe_add(init);
             rfa.renorm();
             size_t count = 0;
-            T max_val = std::abs(*first);
+            T max_val = std::abs(std::numeric_limits<T>::min());
             for (auto e = first; e != last; ++e)
             {
                 T temp_max_val = std::abs(static_cast<T>(*e));
@@ -79,15 +79,14 @@ namespace hpx::parallel::detail {
                 ExPolicy&&, InIterB first, std::size_t partition_size, T init,
                 std::true_type&&)
         {
-            // hpx::parallel::detail::rfa::RFA_bins<T> bins;
-            // bins.initialize_bins();
-            // std::memcpy(rfa::__rfa_bin_host_buffer__, &bins, sizeof(bins));
+            // __rfa_bin_host_buffer__ should be initialized by the frontend of
+            // this method
 
             hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<T> rfa;
             rfa.zero();
             rfa += init;
             size_t count = 0;
-            T max_val = std::abs(*first);
+            T max_val = std::abs(std::numeric_limits<T>::min());
             std::size_t partition_size_lim = 0;
             for (auto e = first; partition_size_lim < partition_size;
                 partition_size_lim++, e++)
@@ -106,8 +105,7 @@ namespace hpx::parallel::detail {
                     count = 0;
                 }
             }
-            printf("rfa res conv: %f\n", rfa.conv());
-            return std::move(rfa);
+            return rfa;
         }
 
         template <typename InIterB, typename T>
@@ -115,9 +113,8 @@ namespace hpx::parallel::detail {
             sequential_reduce_deterministic_rfa_t, ExPolicy&&, InIterB first,
             std::size_t partition_size, T init, std::false_type&&)
         {
-            // hpx::parallel::detail::rfa::RFA_bins<typename T::ftype> bins;
-            // bins.initialize_bins();
-            // std::memcpy(rfa::__rfa_bin_host_buffer__, &bins, sizeof(bins));
+            // __rfa_bin_host_buffer__ should be initialized by the frontend of
+            // this method
 
             T rfa;
             rfa.zero();
@@ -126,9 +123,7 @@ namespace hpx::parallel::detail {
             for (auto e = first; partition_size_lim < partition_size;
                 partition_size_lim++, e++)
             {
-                printf("rfa: %f rfa val before:%f\n", (*e).conv(), rfa.conv());
                 rfa += (*e);
-                printf("rfa: %f rfa val:%f\n", (*e).conv(), rfa.conv());
             }
             return rfa;
         }
