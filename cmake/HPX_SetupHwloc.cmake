@@ -8,6 +8,7 @@
 # Copyright (c) 2017      Abhimanyu Rawat
 # Copyright (c) 2017      Google
 # Copyright (c) 2017      Taeguk Kwon
+# Copyright (c) 2025      Srinivas Yadav Singanaboina
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -44,11 +45,12 @@ else()
     )
     if(NOT HWLoc_POPULATED)
       fetchcontent_populate(HWLoc)
+      set(HPX_HWLOC_BUILD_DIR_INSTALLATION_PATH "${FETCHCONTENT_BASE_DIR}/hwloc_installed")
       if(NOT Hwloc_BUILD_INSTALLED)
         execute_process(
           COMMAND
             sh -c
-            "cd ${FETCHCONTENT_BASE_DIR}/hwloc-src && ./configure --prefix=${FETCHCONTENT_BASE_DIR}/hwloc-installed && make -j && make install"
+            "cd ${FETCHCONTENT_BASE_DIR}/hwloc-src && ./configure --prefix=${HPX_HWLOC_BUILD_DIR_INSTALLATION_PATH} && make -j && make install"
         )
         set(Hwloc_BUILD_INSTALLED
             TRUE
@@ -59,8 +61,8 @@ else()
           "HWLoc is installed at ${FETCHCONTENT_BASE_DIR}/hwloc-installed"
         )
       endif()
+      set(HWLOC_ROOT ${HPX_HWLOC_BUILD_DIR_INSTALLATION_PATH})
     endif()
-    set(HWLOC_ROOT "${FETCHCONTENT_BASE_DIR}/hwloc-installed")
     set(Hwloc_INCLUDE_DIR
         ${HWLOC_ROOT}/include
         CACHE INTERNAL ""
@@ -113,26 +115,10 @@ else()
     )
   endif() # End hwloc installation
 
-  add_library(Hwloc::hwloc INTERFACE IMPORTED)
-  target_include_directories(Hwloc::hwloc INTERFACE ${Hwloc_INCLUDE_DIR})
-  target_link_libraries(Hwloc::hwloc INTERFACE ${Hwloc_LIBRARY})
-
-  if(HPX_WITH_FETCH_HWLOC AND "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
-    if(RUNTIME_OUTPUT_DIRECTORY)
-      set(EXE_DIRECTORY_PATH "${RUNTIME_OUTPUT_DIRECTORY}")
-    else()
-      set(EXE_DIRECTORY_PATH "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/")
-    endif()
-
-    set(DLL_PATH "${HWLOC_ROOT}/bin/libhwloc-15.dll")
-    add_custom_target(
-      HwlocDLL ALL
-      COMMAND ${CMAKE_COMMAND} -E make_directory ${EXE_DIRECTORY_PATH}
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DLL_PATH}
-              ${EXE_DIRECTORY_PATH}
-    )
-    install(FILES ${DLL_PATH} DESTINATION ${CMAKE_INSTALL_BINDIR})
-    add_hpx_pseudo_target(HwlocDLL)
-  endif()
-
+  find_package(Hwloc)
+  install(
+    DIRECTORY ${HWLOC_ROOT}/
+    DESTINATION ${HPX_HWLOC_INSTALL_PATH}
+    COMPONENT core
+  )
 endif()

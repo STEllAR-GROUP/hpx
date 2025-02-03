@@ -2278,6 +2278,10 @@ include(HPX_SetupAsio)
 
 # Find all allocators which are currently supported.
 include(HPX_SetupAllocator)
+
+if (HPX_WITH_FETCH_HWLOC)
+  set(HPX_HWLOC_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/hwloc_installed)
+endif()
 include(HPX_SetupHwloc)
 
 # reset external source lists
