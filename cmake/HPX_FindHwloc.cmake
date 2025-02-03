@@ -10,4 +10,3 @@ if(NOT Hwloc_FOUND)
     "Hwloc could not be found, please specify Hwloc_ROOT to point to the correct location"
   )
 endif()
-

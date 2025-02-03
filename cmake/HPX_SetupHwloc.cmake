@@ -45,7 +45,9 @@ else()
     )
     if(NOT HWLoc_POPULATED)
       fetchcontent_populate(HWLoc)
-      set(HPX_HWLOC_BUILD_DIR_INSTALLATION_PATH "${FETCHCONTENT_BASE_DIR}/hwloc_installed")
+      set(HPX_HWLOC_BUILD_DIR_INSTALLATION_PATH
+          "${FETCHCONTENT_BASE_DIR}/hwloc_installed"
+      )
       if(NOT Hwloc_BUILD_INSTALLED)
         execute_process(
           COMMAND
