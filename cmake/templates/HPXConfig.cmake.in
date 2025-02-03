@@ -172,8 +172,16 @@ include(HPX_SetupBoostIostreams)
 include(HPX_SetupHIP)
 
 # Hwloc
-set(HPX_HWLOC_ROOT "@Hwloc_ROOT@")
-include(HPX_SetupHwloc)
+if(HPX_WITH_FETCH_HWLOC)
+  if(EXISTS ${HPX_PREFIX}/_deps/hwloc_installed)
+    set(Hwloc_ROOT ${HPX_PREFIX}/_deps/hwloc_installed)
+  else()
+    set(Hwloc_ROOT "@HPX_HWLOC_INSTALL_PATH@")
+  endif()
+else()
+  set(Hwloc_ROOT "@Hwloc_ROOT@")
+endif()
+include(HPX_FindHwloc)
 
 # Papi
 set(HPX_PAPI_ROOT "@Papi_ROOT@")
