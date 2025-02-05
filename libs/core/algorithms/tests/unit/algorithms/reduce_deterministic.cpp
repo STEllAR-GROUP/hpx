@@ -122,8 +122,8 @@ void test_reduce_parallel1(IteratorTag)
     FloatTypeNonDeterministic r3 = std::accumulate(
         nondeterministic.begin(), nondeterministic.end(), val_non_det);
 
-    HPX_TEST_EQ(r1, r3);
-    HPX_TEST_EQ(r2, r3);
+    HPX_TEST_EQ(static_cast<FloatTypeNonDeterministic>(r1), r3);
+    HPX_TEST_EQ(static_cast<FloatTypeNonDeterministic>(r2), r3);
 }
 
 template <typename IteratorTag, typename FloatTypeDeterministic,
@@ -232,6 +232,9 @@ void test_reduce1()
     test_reduce1<IteratorTag, float, double, 1000>(IteratorTag());
     test_reduce1<IteratorTag, double, double, 1000>(IteratorTag());
     test_reduce_parallel1<IteratorTag, float, float, 1000>(IteratorTag());
+    test_reduce_parallel1<IteratorTag, float, double, 1000>(IteratorTag());
+    test_reduce_parallel1<IteratorTag, double, float, 1000>(IteratorTag());
+    test_reduce_parallel1<IteratorTag, double, double, 1000>(IteratorTag());
 }
 
 template <typename IteratorTag>

@@ -79,56 +79,117 @@ int hpx_main(hpx::program_options::variables_map& vm)
     }
 
     {
-        using FloatTypeDeterministic = float;
-        std::size_t LEN = vector_size;
-
-        constexpr FloatTypeDeterministic num_bounds_det =
-            std::is_same_v<FloatTypeDeterministic, float> ? 1000.0 : 1000000.0;
-
-        std::vector<FloatTypeDeterministic> deterministic(LEN);
-
-        for (size_t i = 0; i < LEN; ++i)
         {
-            deterministic[i] = get_rand<FloatTypeDeterministic>(
-                -num_bounds_det, num_bounds_det);
+            using FloatTypeDeterministic = float;
+            std::size_t LEN = vector_size;
+
+            constexpr FloatTypeDeterministic num_bounds_det =
+                std::is_same_v<FloatTypeDeterministic, float> ? 1000.0 :
+                                                                1000000.0;
+
+            std::vector<FloatTypeDeterministic> deterministic(LEN);
+
+            for (size_t i = 0; i < LEN; ++i)
+            {
+                deterministic[i] = get_rand<FloatTypeDeterministic>(
+                    -num_bounds_det, num_bounds_det);
+            }
+
+            std::vector<FloatTypeDeterministic> deterministic_shuffled =
+                deterministic;
+
+            std::shuffle(deterministic_shuffled.begin(),
+                deterministic_shuffled.end(), gen);
+
+            FloatTypeDeterministic val_det(41.999);
+
+            auto op = [](FloatTypeDeterministic v1, FloatTypeDeterministic v2) {
+                return v1 + v2;
+            };
+            {
+                hpx::util::perftests_report(
+                    "fl reduce", "seq", test_count, [&]() {
+                        bench_reduce(hpx::execution::seq,
+                            deterministic_shuffled, val_det, op);
+                    });
+            }
+            {
+                hpx::util::perftests_report(
+                    "fl reduce", "par", test_count, [&]() {
+                        bench_reduce(hpx::execution::par,
+                            deterministic_shuffled, val_det, op);
+                    });
+            }
+            {
+                hpx::util::perftests_report(
+                    "fl reduce deterministic", "seq", test_count, [&]() {
+                        bench_reduce_deterministic(hpx::execution::seq,
+                            deterministic_shuffled, val_det, op);
+                    });
+            }
+            {
+                hpx::util::perftests_report(
+                    "fl reduce deterministic", "par", test_count, [&]() {
+                        bench_reduce_deterministic(hpx::execution::par,
+                            deterministic_shuffled, val_det, op);
+                    });
+            }
         }
-
-        std::vector<FloatTypeDeterministic> deterministic_shuffled =
-            deterministic;
-
-        std::shuffle(
-            deterministic_shuffled.begin(), deterministic_shuffled.end(), gen);
-
-        FloatTypeDeterministic val_det(41.999);
-
-        auto op = [](FloatTypeDeterministic v1, FloatTypeDeterministic v2) {
-            return v1 + v2;
-        };
         {
-            hpx::util::perftests_report("reduce", "seq", test_count, [&]() {
-                bench_reduce(
-                    hpx::execution::seq, deterministic_shuffled, val_det, op);
-            });
-        }
-        {
-            hpx::util::perftests_report("reduce", "par", test_count, [&]() {
-                bench_reduce(
-                    hpx::execution::par, deterministic_shuffled, val_det, op);
-            });
-        }
-        {
-            hpx::util::perftests_report(
-                "reduce deterministic", "seq", test_count, [&]() {
-                    bench_reduce_deterministic(hpx::execution::seq,
-                        deterministic_shuffled, val_det, op);
-                });
-        }
-        {
-            hpx::util::perftests_report(
-                "reduce deterministic", "par", test_count, [&]() {
-                    bench_reduce_deterministic(hpx::execution::par,
-                        deterministic_shuffled, val_det, op);
-                });
+            using FloatTypeDeterministic = double;
+            std::size_t LEN = vector_size;
+
+            constexpr FloatTypeDeterministic num_bounds_det =
+                std::is_same_v<FloatTypeDeterministic, float> ? 1000.0 :
+                                                                1000000.0;
+
+            std::vector<FloatTypeDeterministic> deterministic(LEN);
+
+            for (size_t i = 0; i < LEN; ++i)
+            {
+                deterministic[i] = get_rand<FloatTypeDeterministic>(
+                    -num_bounds_det, num_bounds_det);
+            }
+
+            std::vector<FloatTypeDeterministic> deterministic_shuffled =
+                deterministic;
+
+            std::shuffle(deterministic_shuffled.begin(),
+                deterministic_shuffled.end(), gen);
+
+            FloatTypeDeterministic val_det(41.999);
+
+            auto op = [](FloatTypeDeterministic v1, FloatTypeDeterministic v2) {
+                return v1 + v2;
+            };
+            {
+                hpx::util::perftests_report(
+                    "dbl reduce", "seq", test_count, [&]() {
+                        bench_reduce(hpx::execution::seq,
+                            deterministic_shuffled, val_det, op);
+                    });
+            }
+            {
+                hpx::util::perftests_report(
+                    "dbl reduce", "par", test_count, [&]() {
+                        bench_reduce(hpx::execution::par,
+                            deterministic_shuffled, val_det, op);
+                    });
+            }
+            {
+                hpx::util::perftests_report(
+                    "dbl reduce deterministic", "seq", test_count, [&]() {
+                        bench_reduce_deterministic(hpx::execution::seq,
+                            deterministic_shuffled, val_det, op);
+                    });
+            }
+            {
+                hpx::util::perftests_report(
+                    "dbl reduce deterministic", "par", test_count, [&]() {
+                        bench_reduce_deterministic(hpx::execution::par,
+                            deterministic_shuffled, val_det, op);
+                    });
+            }
         }
 
         hpx::util::perftests_print_times();
