@@ -16,6 +16,7 @@
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/parallel/algorithms/reduce_deterministic.hpp>
 
+#include <iostream>
 #include <numeric>
 #include <random>
 #include <vector>

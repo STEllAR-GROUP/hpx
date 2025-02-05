@@ -371,6 +371,7 @@ namespace hpx {
 
 #include <algorithm>
 #include <cstddef>
+#include <cstring>
 #include <iterator>
 #include <type_traits>
 #include <utility>
