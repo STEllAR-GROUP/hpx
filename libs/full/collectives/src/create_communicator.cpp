@@ -469,23 +469,28 @@ namespace hpx::collectives {
         
 
         std::string name(basename);
-        if (generation != static_cast<std::size_t>(-1))
-        {
-            name += std::to_string(generation) + "/";
-        }
-
         std::vector<std::tuple<communicator,int>> communicators;
-        return recursively_fill_communicators(std::move(communicators), 0, num_sites - 1, name, arity, -1, this_site, num_sites);
+        return recursively_fill_communicators(std::move(communicators), 0, num_sites - 1, name, arity, -1, this_site, num_sites, generation);
     }
-    std::vector<std::tuple<communicator,int>> recursively_fill_communicators(std::vector<std::tuple<communicator,int>> communicators, int left, int right, std::string basename, int arity, int max_depth, int this_site, int num_sites)
+    std::vector<std::tuple<communicator,int>> recursively_fill_communicators(std::vector<std::tuple<communicator,int>> communicators, int left, int right, std::string basename, int arity, int max_depth, int this_site, int num_sites, generation_arg generation)
     {
         std::string name(basename);
         name += std::to_string(left) + "-" + std::to_string(right) + "/";
-        int pivot = ((right - left)/2)+left;
-        if (right-left + 1 == num_sites){pivot = 0;}
-        if (this_site == pivot){
-            int last_intermediary = -1;
-            auto c = hpx::local_new<communicator>(right - left, name.c_str());
+        int pivot = left; // was ((right - left)/2)+left
+        //if (right-left + 1 == num_sites){pivot = 0;}
+        if (right-left < arity || max_depth == 0)
+        {
+
+            auto c = create_communicator(name.c_str(),num_sites_arg(right-left + 1), this_site_arg(this_site % (right-left+1)), generation_arg(generation), root_site_arg(0));
+            communicators.push_back(std::tuple(std::move(c), this_site % arity)); // 0 originally pivot, but might've been wrong
+            //std::cout << "this_site: " << this_site << " (create_communicator )number of Communicators " << communicators.size() << "right, left:"<< left << "," << right <<"\n";
+            return communicators;
+        }
+        /* if (this_site == pivot){
+            //int last_intermediary = -1;
+            auto c = create_communicator(name.c_str(),num_sites_arg(arity), this_site_arg(0), generation_arg(generation), root_site_arg(0));
+            communicators.push_back(std::tuple(std::move(c), 0));
+            auto c = hpx::local_new<communicator>(arity, name.c_str());
             auto f = c.register_as(
                 hpx::detail::name_from_basename(HPX_MOVE(name), this_site));
             communicators.push_back(std::tuple(f.then(hpx::launch::sync,
@@ -498,33 +503,27 @@ namespace hpx::collectives {
                             "operation was already registered: {}",
                             target.registered_name());
                     }
-                    target.set_info(num_sites_arg(right-left), this_site_arg(this_site));
+                    target.set_info(num_sites_arg(arity), this_site_arg(0)); // this_site - left originally
                     return target;
                 }),last_intermediary));
             if (right-left < arity || max_depth == 0)
             {
                 return communicators;
             }
-        }
-        if (right-left < arity || max_depth == 0)
-        {
-            if(this_site >= left && this_site < right && this_site !=pivot)
-            {
-                communicators.push_back(std::tuple(hpx::find_from_basename<communicator>(HPX_MOVE(name), pivot), this_site - left));
-            }
-            return communicators;
-        }
+        } */
         int division_steps = (right - left + 1)/arity;
         for (int i = 0; i < arity; i++)
         {
-            if (this_site == left + (division_steps*i)-1 + (division_steps/2)){
-                communicators.push_back(std::tuple(hpx::find_from_basename<communicator>(HPX_MOVE(name), pivot),i));
-            }
             int current_left = left + (division_steps*i);
+            if (this_site == current_left) //was before left + (division_steps*i)-1 + (division_steps/2)
+            { 
+                auto c = create_communicator(name.c_str(),num_sites_arg(arity), this_site_arg(i), generation_arg(generation), root_site_arg(0));
+                communicators.push_back(std::tuple(c, i)); // Was pivot before
+            }
             int current_right = left + (division_steps*(i+1)-1);
-            if (this_site >= current_left && this_site < current_right)
+            if (this_site >= current_left && this_site < current_right+1)
             {
-                return recursively_fill_communicators(std::move(communicators), current_left, current_right, basename, arity, max_depth-1, this_site, num_sites);
+                return recursively_fill_communicators(std::move(communicators), current_left, current_right, basename, arity, max_depth-1, this_site, num_sites, generation);
             }
         }
         return communicators;
