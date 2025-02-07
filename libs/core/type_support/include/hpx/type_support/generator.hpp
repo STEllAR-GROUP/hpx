@@ -324,7 +324,7 @@ namespace hpx {
 
                 dealloc_fn const dealloc =
                     [](void* const p, [[maybe_unused]] std::size_t const s) {
-#if defined(HPX_WITH_CXX14_DELETE_OPERATOR_WITH_SIZE)
+#if defined(HPX_HAVE_CXX14_DELETE_OPERATOR_WITH_SIZE)
                         ::operator delete[](
                             p, s + sizeof(std::size_t) + sizeof(dealloc_fn));
 #else
