@@ -118,6 +118,25 @@ else()
   endif() # End hwloc installation
 
   find_package(Hwloc)
+
+  if(HPX_WITH_FETCH_HWLOC AND "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
+    if(RUNTIME_OUTPUT_DIRECTORY)
+      set(EXE_DIRECTORY_PATH "${RUNTIME_OUTPUT_DIRECTORY}")
+    else()
+      set(EXE_DIRECTORY_PATH "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/")
+    endif()
+
+    set(DLL_PATH "${HWLOC_ROOT}/bin/libhwloc-15.dll")
+    add_custom_target(
+      HwlocDLL ALL
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${EXE_DIRECTORY_PATH}
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DLL_PATH}
+              ${EXE_DIRECTORY_PATH}
+    )
+    install(FILES ${DLL_PATH} DESTINATION ${CMAKE_INSTALL_BINDIR})
+    add_hpx_pseudo_target(HwlocDLL)
+  endif()
+
   install(
     DIRECTORY ${HWLOC_ROOT}/
     DESTINATION ${HPX_HWLOC_INSTALL_PATH}
