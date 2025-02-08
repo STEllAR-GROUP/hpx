@@ -18,7 +18,7 @@ namespace hpx { namespace collectives {
     /// the given base name.
     ///
     /// \param  basename    The base name identifying the all_reduce operation
-    /// \param  local_result A value to reduce on the central reduction point
+    /// \param  result      A value to reduce on the central reduction point
     ///                     from this call site.
     /// \param  op          Reduction operation to apply to all values supplied
     ///                     from all participating sites
@@ -37,7 +37,7 @@ namespace hpx { namespace collectives {
     ///
     /// \returns    This function returns a future holding a vector with all
     ///             values send by all participating sites. It will become
-    ///             ready once the all_reduce operation has been completed.
+    ///             ready once the reduce operation has been completed.
     ///
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> reduce_here(char const* basename, T&& result,
@@ -52,7 +52,7 @@ namespace hpx { namespace collectives {
     /// the given base name.
     ///
     /// \param  comm        A communicator object returned from \a create_communicator
-    /// \param  local_result A value to reduce on the root_site from this call site.
+    /// \param  result      A value to reduce on the root_site from this call site.
     /// \param  op          Reduction operation to apply to all values supplied
     ///                     from all participating sites
     /// \param this_site    The sequence number of this invocation (usually
@@ -71,11 +71,11 @@ namespace hpx { namespace collectives {
     ///
     /// \returns    This function returns a future holding a value calculated
     ///             based on the values send by all participating sites. It will
-    ///             become ready once the all_reduce operation has been completed.
+    ///             become ready once the reduce operation has been completed.
     ///
     template <typename T, typename F>
     hpx::future<decay_t<T>> reduce_here(
-        communicator comm, T&& local_result, F&& op,
+        communicator comm, T&& result, F&& op,
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg());
 
@@ -86,7 +86,7 @@ namespace hpx { namespace collectives {
     /// the given base name.
     ///
     /// \param  comm        A communicator object returned from \a create_communicator
-    /// \param  local_result A value to reduce on the root_site from this call site.
+    /// \param  result      A value to reduce on the root_site from this call site.
     /// \param  op          Reduction operation to apply to all values supplied
     ///                     from all participating sites
     /// \param  generation  The generational counter identifying the sequence
@@ -105,11 +105,11 @@ namespace hpx { namespace collectives {
     ///
     /// \returns    This function returns a future holding a value calculated
     ///             based on the values send by all participating sites. It will
-    ///             become ready once the all_reduce operation has been completed.
+    ///             become ready once the reduce operation has been completed.
     ///
     template <typename T, typename F>
     hpx::future<decay_t<T>> reduce_here(
-        communicator comm, T&& local_result, F&& op,
+        communicator comm, T&& result, F&& op,
         generation_arg generation,
         this_site_arg this_site = this_site_arg());
 
@@ -150,7 +150,7 @@ namespace hpx { namespace collectives {
     /// site (where the corresponding \a reduce_here is executed)
     ///
     /// \param  comm        A communicator object returned from \a create_communicator
-    /// \param  local_result A value to reduce on the central reduction point
+    /// \param  result      A value to reduce on the central reduction point
     ///                     from this call site.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
@@ -168,11 +168,11 @@ namespace hpx { namespace collectives {
     ///
     /// \returns    This function returns a future holding a value calculated
     ///             based on the values send by all participating sites. It will
-    ///             become ready once the all_reduce operation has been completed.
+    ///             become ready once the reduce operation has been completed.
     ///
     template <typename T>
     hpx::future<void> reduce_there(
-        communicator comm, T&& local_result,
+        communicator comm, T&& result,
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg());
 
@@ -182,7 +182,7 @@ namespace hpx { namespace collectives {
     /// site (where the corresponding \a reduce_here is executed)
     ///
     /// \param  comm        A communicator object returned from \a create_communicator
-    /// \param  local_result A value to reduce on the central reduction point
+    /// \param  result      A value to reduce on the central reduction point
     ///                     from this call site.
     /// \param  generation  The generational counter identifying the sequence
     ///                     number of the all_reduce operation performed on the
@@ -200,12 +200,193 @@ namespace hpx { namespace collectives {
     ///
     /// \returns    This function returns a future holding a value calculated
     ///             based on the values send by all participating sites. It will
-    ///             become ready once the all_reduce operation has been completed.
+    ///             become ready once the reduce operation has been completed.
     ///
     template <typename T>
     hpx::future<void> reduce_there(
-        communicator comm, T&& local_result,
+        communicator comm, T&& result,
         generation_arg generation,
+        this_site_arg this_site = this_site_arg());
+
+    /// Reduce a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  basename    The base name identifying the all_reduce operation
+    /// \param  result      A value to reduce on the central reduction point
+    ///                     from this call site.
+    /// \param  op          Reduction operation to apply to all values supplied
+    ///                     from all participating sites
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_reduce operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_reduce operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \returns The final reduced value after applying `op` to all contributions.
+    ///
+    template <typename T, typename F>
+    decltype(auto) reduce_here(hpx::launch::sync_policy, char const* basename,
+        T&& result, F&& op, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// Reduce a set of values from different call sites
+    ///
+    /// This function receives a set of values that are the result of applying
+    /// a given operator on values supplied from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  result      A value to reduce on the root_site from this call site.
+    /// \param  op          Reduction operation to apply to all values supplied
+    ///                     from all participating sites
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_reduce operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_reduce operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \note       The generation values from corresponding \a reduce_here and
+    ///             \a reduce_there have to match.
+    ///
+    /// \returns The final reduced value after applying `op` to all contributions.
+    ///
+    template <typename T, typename F>
+    decltype(auto) reduce_here(hpx::launch::sync_policy, communicator comm,
+        T&& result, F&& op, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// Reduce a set of values from different call sites
+    ///
+    /// This function receives a set of values that are the result of applying
+    /// a given operator on values supplied from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  result      A value to reduce on the root_site from this call site.
+    /// \param  op          Reduction operation to apply to all values supplied
+    ///                     from all participating sites
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_reduce operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_reduce operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \note       The generation values from corresponding \a reduce_here and
+    ///             \a reduce_there have to match.
+    ///
+    /// \returns The final reduced value after applying `op` to all contributions.
+    ///
+    template <typename T, typename F>
+    decltype(auto) reduce_here(hpx::launch::sync_policy, communicator comm,
+        T&& result, F&& op, generation_arg generation,
+        this_site_arg this_site = this_site_arg());
+
+    /// Reduce a given value at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central reduce
+    /// site (where the corresponding \a reduce_here is executed)
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  basename    The base name identifying the reduction operation
+    /// \param  result      A future referring to the value to transmit to the
+    ///                     central reduction point from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_reduce operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_reduce operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param root_site    The sequence number of the central reduction point
+    ///                     (usually the locality id). This value is optional
+    ///                     and defaults to 0.
+    ///
+    template <typename T>
+    void reduce_there(hpx::launch::sync_policy, char const* basename,
+        T&& result, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
+
+    /// Reduce a given value at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central reduce
+    /// site (where the corresponding \a reduce_here is executed)
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  result      A value to reduce on the central reduction point
+    ///                     from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_reduce operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_reduce operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \note       The generation values from corresponding \a reduce_here and
+    ///             \a reduce_there have to match.
+    ///
+    template <typename T>
+    void reduce_there(hpx::launch::sync_policy, communicator comm,
+        T&& result, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// Reduce a given value at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central reduce
+    /// site (where the corresponding \a reduce_here is executed)
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  result      A value to reduce on the central reduction point
+    ///                     from this call site.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_reduce operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_reduce operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \note       The generation values from corresponding \a reduce_here and
+    ///             \a reduce_there have to match.
+    ///
+    template <typename T>
+    void reduce_there(hpx::launch::sync_policy, communicator comm,
+        T&& result, generation_arg generation,
         this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
 

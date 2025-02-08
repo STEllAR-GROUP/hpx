@@ -18,7 +18,7 @@ namespace hpx { namespace collectives {
     /// received from all call sites operating on the given base name.
     ///
     /// \param  basename    The base name identifying the inclusive_scan operation
-    /// \param  local_result The value to transmit to all
+    /// \param  result      The value to transmit to all
     ///                     participating sites from this call site.
     /// \param  op          Reduction operation to apply to all values supplied
     ///                     from all participating sites
@@ -34,7 +34,7 @@ namespace hpx { namespace collectives {
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
-    /// \params root_site   The site that is responsible for creating the
+    /// \param root_site    The site that is responsible for creating the
     ///                     inclusive_scan support object. This value is optional
     ///                     and defaults to '0' (zero).
     ///
@@ -55,7 +55,7 @@ namespace hpx { namespace collectives {
     /// received from all call sites operating on the given base name.
     ///
     /// \param  comm        A communicator object returned from \a create_communicator
-    /// \param  local_result The value to transmit to all
+    /// \param  result      The value to transmit to all
     ///                     participating sites from this call site.
     /// \param  op          Reduction operation to apply to all values supplied
     ///                     from all participating sites
@@ -86,7 +86,7 @@ namespace hpx { namespace collectives {
     /// received from all call sites operating on the given base name.
     ///
     /// \param  comm        A communicator object returned from \a create_communicator
-    /// \param  local_result The value to transmit to all
+    /// \param  result      The value to transmit to all
     ///                     participating sites from this call site.
     /// \param  op          Reduction operation to apply to all values supplied
     ///                     from all participating sites
@@ -109,6 +109,107 @@ namespace hpx { namespace collectives {
     hpx::future<std::decay_t<T>> inclusive_scan(
         communicator comm, T&& result, F&& op,
         generation_arg generation,
+        this_site_arg this_site = this_site_arg());
+
+    /// Inclusive inclusive_scan a set of values from different call sites
+    ///
+    /// This function performs an inclusive scan operation on a set of values
+    /// received from all call sites operating on the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  basename    The base name identifying the inclusive_scan operation
+    /// \param  result      The value to transmit to all
+    ///                     participating sites from this call site.
+    /// \param  op          Reduction operation to apply to all values supplied
+    ///                     from all participating sites
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the inclusive_scan operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the inclusive_scan operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param root_site    The site that is responsible for creating the
+    ///                     inclusive_scan support object. This value is optional
+    ///                     and defaults to '0' (zero).
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T, typename F>
+    decltype(auto) inclusive_scan(hpx::launch::sync_policy,
+        char const* basename, T&& result, F&& op,
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
+
+    /// Inclusive inclusive_scan a set of values from different call sites
+    ///
+    /// This function performs an inclusive scan operation on a set of values
+    /// received from all call sites operating on the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  result      The value to transmit to all
+    ///                     participating sites from this call site.
+    /// \param  op          Reduction operation to apply to all values supplied
+    ///                     from all participating sites
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the inclusive_scan operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the inclusive_scan operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T, typename F>
+    decltype(auto) inclusive_scan(hpx::launch::sync_policy, communicator comm,
+        T&& result, F&& op, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// Inclusive inclusive_scan a set of values from different call sites
+    ///
+    /// This function performs an inclusive scan operation on a set of values
+    /// received from all call sites operating on the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  result      The value to transmit to all
+    ///                     participating sites from this call site.
+    /// \param  op          Reduction operation to apply to all values supplied
+    ///                     from all participating sites
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the inclusive_scan operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the inclusive_scan operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T, typename F>
+    decltype(auto) inclusive_scan(hpx::launch::sync_policy, communicator comm,
+        T&& result, F&& op, generation_arg generation,
         this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
 
