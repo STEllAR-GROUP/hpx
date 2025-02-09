@@ -126,7 +126,8 @@ else()
       set(EXE_DIRECTORY_PATH "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/")
     endif()
 
-    set(DLL_PATH "${HWLOC_ROOT}/bin/libhwloc-15.dll")
+    set(DLL_PATH ${Hwloc_LIBRARY})
+    message("Copying ${DLL_PATH} to ${EXE_DIRECTORY_PATH})
     add_custom_target(
       HwlocDLL ALL
       COMMAND ${CMAKE_COMMAND} -E make_directory ${EXE_DIRECTORY_PATH}
