@@ -61,6 +61,7 @@ install(
 )
 
 # Install dir
+set(HPX_CONFIG_IS_INSTALL ON)
 configure_file(
   cmake/templates/${HPX_PACKAGE_NAME}Config.cmake.in
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${HPX_PACKAGE_NAME}Config.cmake"
@@ -76,6 +77,7 @@ if(HPX_WITH_PKGCONFIG)
 endif()
 
 # Build dir
+set(HPX_CONFIG_IS_INSTALL OFF)
 configure_file(
   cmake/templates/${HPX_PACKAGE_NAME}Config.cmake.in
   "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/${HPX_PACKAGE_NAME}Config.cmake"
@@ -88,6 +90,7 @@ if(HPX_WITH_PKGCONFIG)
     cmake/templates/hpxcxx.in "${CMAKE_CURRENT_BINARY_DIR}/bin/hpxcxx" @ONLY
   )
 endif()
+unset(HPX_CONFIG_IS_INSTALL)
 
 # Configure macros for the install dir ...
 set(HPX_CMAKE_MODULE_PATH "\${CMAKE_CURRENT_LIST_DIR}")
