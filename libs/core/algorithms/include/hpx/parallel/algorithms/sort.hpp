@@ -163,6 +163,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/algorithms/detail/pivot.hpp>
+#include <hpx/parallel/algorithms/detail/simd_sort.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
@@ -175,6 +176,7 @@ namespace hpx {
 #include <exception>
 #include <iterator>
 #include <list>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -470,6 +472,19 @@ namespace hpx {
                        HPX_MOVE(comp), hpx::identity_v);
         }
     } sort{};
+
+#ifdef HPX_HAVE_SIMD_SORT
+    template <typename RandomIt, typename Comp = hpx::parallel::detail::less,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_random_access_iterator_v<RandomIt>)>
+    void tag_invoke(hpx::sort_t, hpx::execution::unsequenced_policy,
+        RandomIt first, RandomIt last, Comp)
+    {
+        return hpx::parallel::util::simd_quicksort(
+            std::addressof(*first), std::distance(first, last));
+    }
+#endif
+
 }    // namespace hpx
 
 #endif    // DOXYGEN

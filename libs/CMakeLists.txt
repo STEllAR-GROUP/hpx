@@ -372,6 +372,10 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE")
   target_link_libraries(hpx_core PUBLIC SVE::sve)
 endif()
 
+if(HPX_WITH_SIMD_SORT)
+  target_link_libraries(hpx_core PUBLIC SimdSort::simdsort)
+endif()
+
 if(HPX_WITH_ITTNOTIFY)
   target_link_libraries(hpx_core PUBLIC Amplifier::amplifier)
 endif()
