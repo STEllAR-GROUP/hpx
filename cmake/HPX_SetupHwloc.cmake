@@ -123,7 +123,7 @@ else()
     if(RUNTIME_OUTPUT_DIRECTORY)
       set(EXE_DIRECTORY_PATH "${RUNTIME_OUTPUT_DIRECTORY}")
     else()
-      set(EXE_DIRECTORY_PATH "${CMAKE_BINARY_DIR}/bin/")
+      set(EXE_DIRECTORY_PATH "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bin/")
     endif()
 
     set(DLL_PATH ${Hwloc_LIBRARY})
