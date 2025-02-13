@@ -136,7 +136,7 @@ else()
     )
     install(FILES ${DLL_PATH} DESTINATION ${CMAKE_INSTALL_BINDIR})
      add_hpx_pseudo_target(HwlocDLL)
-     target_link_libraries(Hwloc::hwloc INTERFACE HwlocDLL)
+     add_dependencies(Hwloc::hwloc HwlocDLL)
   endif()
 
   install(
