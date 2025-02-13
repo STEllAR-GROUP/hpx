@@ -36,10 +36,19 @@ if(NOT TARGET hpx_dependencies_boost)
         CACHE INTERNAL "1.71" FORCE
     )
 
+    # Search using CONFIG mode first
     find_package(
-      Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE REQUIRED
+      Boost ${Boost_MINIMUM_VERSION} CONFIG QUIET NO_POLICY_SCOPE
       COMPONENTS ${__boost_libraries} HINTS ${HPX_BOOST_ROOT} $ENV{BOOST_ROOT}
     )
+
+    if(NOT Boost_FOUND)
+      # Search using MODULE mode
+      find_package(
+        Boost ${Boost_MINIMUM_VERSION} MODULE REQUIRED NO_POLICY_SCOPE
+        COMPONENTS ${__boost_libraries}
+      )
+    endif()
 
     add_library(hpx_dependencies_boost INTERFACE IMPORTED)
 
