@@ -29,6 +29,7 @@ if(HPX_WITH_DATAPAR)
       foreach_datapar
       foreach_datapar_zipiter
       foreachn_datapar
+      for_loop_datapar
       generate_datapar
       generaten_datapar
       mismatch_binary_datapar
