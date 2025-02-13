@@ -111,6 +111,7 @@ else()
         ${HWLOC_ROOT}/lib/libhwloc.dll.a
         CACHE INTERNAL ""
     )
+    file(GLOB HWLOC_DLL ${HWLOC_ROOT}/bin/libhwloc*.dll)
   else()
     hpx_error(
       "Building HWLOC as part of HPX' configuration process is not supported on this platform"
@@ -126,17 +127,16 @@ else()
       set(EXE_DIRECTORY_PATH "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/")
     endif()
 
-    set(DLL_PATH ${Hwloc_LIBRARY})
-    message("Copying ${DLL_PATH} to ${EXE_DIRECTORY_PATH}")
+    message("Copying ${HWLOC_DLL} to ${EXE_DIRECTORY_PATH}")
     add_custom_target(
       HwlocDLL ALL
       COMMAND ${CMAKE_COMMAND} -E make_directory ${EXE_DIRECTORY_PATH}
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DLL_PATH}
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${HWLOC_DLL}
               ${EXE_DIRECTORY_PATH}
     )
-    install(FILES ${DLL_PATH} DESTINATION ${CMAKE_INSTALL_BINDIR})
-     add_hpx_pseudo_target(HwlocDLL)
-     add_dependencies(Hwloc::hwloc HwlocDLL)
+    install(FILES ${HWLOC_DLL} DESTINATION ${CMAKE_INSTALL_BINDIR})
+    add_hpx_pseudo_target(HwlocDLL)
+    add_dependencies(Hwloc::hwloc HwlocDLL)
   endif()
 
   install(
