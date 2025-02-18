@@ -12,7 +12,9 @@
 
 if(HPX_WITH_NETWORKING)
   set(tests ${tests} very_big_parcel)
+  set(tests ${tests} very_big_tchunk)
   set(very_big_parcel_PARAMETERS LOCALITIES 2)
+  set(very_big_tchunk_PARAMETERS LOCALITIES 2)
 endif()
 
 foreach(test ${tests})
@@ -29,10 +31,13 @@ foreach(test ${tests})
     FOLDER "Tests/Regressions/Modules/Full/Parcelset"
   )
 
-  # Disable the test due to limited CircleCI resources
-
-  # add_hpx_regression_test( "modules.parcelset" ${test} ${${test}_PARAMETERS}
-  # TIMEOUT 900 )
+  # Disable the test for very_big_parcel due to limited CircleCI resources
+  if(${test} STREQUAL "very_big_parcel")
+    continue()
+  endif()
+  add_hpx_regression_test(
+    "modules.parcelset" ${test} ${${test}_PARAMETERS} TIMEOUT 900
+  )
 
 endforeach()
 
