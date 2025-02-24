@@ -34,8 +34,7 @@ namespace hpx::parallel::detail {
             sequential_find_t<ExPolicy>, Iterator first, Sentinel last,
             T const& value, Proj proj = Proj())
         {
-            return util::loop_pred<
-                std::decay_t<hpx::execution::sequenced_policy>>(
+            return util::loop_pred<ExPolicy>(
                 first, last, [&value, &proj](auto const& curr) {
                     return HPX_INVOKE(proj, *curr) == value;
                 });
