@@ -1,5 +1,6 @@
 //  Copyright (C) 2011 Tim Blechmann
 //  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2024 Jacob Tucker
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,7 +26,7 @@ void tagged_ptr_test()
         i = j;
 
         HPX_TEST_EQ(i.get_ptr(), &b);
-        HPX_TEST_EQ(i.get_tag(), 1);
+        HPX_TEST_EQ(i.get_tag(), 1UL);
     }
 
     {
@@ -43,7 +44,7 @@ void tagged_ptr_test()
 
     {
         tagged_ptr<int> j(&a, max_tag);
-        HPX_TEST_EQ(j.get_next_tag(), 0);
+        HPX_TEST_EQ(j.get_next_tag(), 0UL);
     }
 
     {
