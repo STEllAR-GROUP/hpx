@@ -49,6 +49,7 @@ set(tests
     findfirstof_binary
     findif
     findifnot
+    fold_
     foreach
     foreach_executors
     foreach_prefetching
