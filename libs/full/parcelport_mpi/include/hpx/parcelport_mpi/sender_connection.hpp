@@ -201,7 +201,9 @@ namespace hpx::parcelset::policies::mpi {
                 request_ = util::mpi_environment::isend(
                     const_cast<void*>(
                         reinterpret_cast<const void*>(chunks.data())),
-                    chunks.size(), dst_, tag_);
+                    chunks.size() *
+                        sizeof(parcel_buffer_type::transmission_chunk_type),
+                    dst_, tag_);
                 request_ptr_ = &request_;
 
                 state_ = connection_state::sent_transmission_chunks;
