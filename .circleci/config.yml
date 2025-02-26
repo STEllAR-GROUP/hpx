@@ -1,6 +1,6 @@
 #  Copyright (c) 2017-2018 Thomas Heller
 #  Copyright (c) 2015 Martin Stumpf
-#  Copyright (c) 2022-2024 Hartmut Kaiser
+#  Copyright (c) 2022-2025 Hartmut Kaiser
 #
 #  SPDX-License-Identifier: BSL-1.0
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -703,8 +703,10 @@ jobs:
                 --output-on-failure \
                 -R tests.regressions \
                 --exclude-regex \
-              "tests.regressions.modules.threading_base.thread_stacksize_current|\
-              tests.regressions.modules.parcelset.distributed.*.very_big_parcel"
+              "tests.regressions.modules.threading_base.thread_stacksize_current" \
+              "tests.regressions.modules.parcelset.nested_vectors_6623" \
+              "tests.regressions.modules.parcelset.very_big_parcel" \
+              "tests.regressions.modules.parcelset.very_big_parcel_int_max_plus_1"
       - run:
           <<: *convert_xml
       - run:
