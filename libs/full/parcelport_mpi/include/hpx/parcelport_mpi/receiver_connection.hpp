@@ -161,8 +161,6 @@ namespace hpx::parcelset::policies::mpi {
         {
             if (need_recv_tchunks)
             {
-                util::mpi_environment::scoped_lock l;
-
                 request_ = util::mpi_environment::irecv(
                     buffer_.transmission_chunks_.data(),
                     buffer_.transmission_chunks_.size() *
@@ -200,8 +198,6 @@ namespace hpx::parcelset::policies::mpi {
             HPX_ASSERT(request_ptr_ == nullptr);
 
             {
-                util::mpi_environment::scoped_lock l;
-
                 ack_ = static_cast<char>(
                     connection_state::acked_transmission_chunks);
                 request_ = util::mpi_environment::isend(
