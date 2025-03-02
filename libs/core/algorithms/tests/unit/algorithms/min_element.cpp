@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,33 +15,94 @@
 #include <string>
 #include <vector>
 
+#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include "test_utils.hpp"
+
+///////////////////////////////////////////////////////////////////////////////
+void test_min_element_sent()
+{
+    using hpx::get;
+
+    auto c = test::random_iota(100);
+    auto ref = std::min_element(std::begin(c), std::begin(c) + 50);
+    auto r = hpx::ranges::min_element(
+        std::begin(c), sentinel<size_t>{*(std::begin(c) + 50)});
+
+    HPX_TEST(*r == *ref);
+
+    auto c1 = std::vector<size_t>{5, 7, 8};
+    ref = std::min_element(
+        std::begin(c1), std::begin(c1) + 2, std::greater<std::size_t>());
+    r = hpx::ranges::min_element(
+        std::begin(c1), sentinel<size_t>{8}, std::greater<std::size_t>());
+
+    HPX_TEST(*r == *ref);
+
+    auto c2 = std::vector<size_t>{2, 2, 2};
+    r = hpx::ranges::min_element(std::begin(c2), sentinel<size_t>{2});
+    HPX_TEST(r == std::begin(c2));
+
+    auto c3 = std::vector<size_t>{2, 3, 3, 4};
+    r = hpx::ranges::min_element(std::begin(c3), sentinel<size_t>{3});
+    HPX_TEST(*r == 2);
+}
+
+template <typename ExPolicy>
+void test_min_element_sent(ExPolicy policy)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    using hpx::get;
+
+    auto c = test::random_iota(100);
+    auto ref = std::min_element(std::begin(c), std::begin(c) + 50);
+    auto r = hpx::ranges::min_element(
+        policy, std::begin(c), sentinel<size_t>{*(std::begin(c) + 50)});
+
+    HPX_TEST(*r == *ref);
+
+    auto c1 = std::vector<size_t>{5, 7, 8};
+    ref = std::min_element(
+        std::begin(c1), std::begin(c1) + 2, std::greater<std::size_t>());
+    r = hpx::ranges::min_element(policy, std::begin(c1), sentinel<size_t>{8},
+        std::greater<std::size_t>());
+
+    HPX_TEST(*r == *ref);
+
+    auto c2 = std::vector<size_t>{2, 2, 2};
+    r = hpx::ranges::min_element(policy, std::begin(c2), sentinel<size_t>{2});
+    HPX_TEST(r == std::begin(c2));
+
+    auto c3 = std::vector<size_t>{4, 3, 3, 4};
+    r = hpx::ranges::min_element(policy, std::begin(c3), sentinel<size_t>{3});
+    HPX_TEST(*r == 4);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_min_element(IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag>
+        test_vector;
 
-    std::vector<std::size_t> c = test::random_iota(10007);
+    test_vector c = test::random_iota(10007);
 
-    iterator end(std::end(c));
-    base_iterator ref_end(std::end(c));
+    base_iterator ref_end(std::end(c.base()));
 
-    iterator r = hpx::min_element(
-        iterator(std::begin(c)), iterator(end), std::less<std::size_t>());
-    HPX_TEST(r != end);
+    auto r = hpx::ranges::min_element(c, std::less<std::size_t>());
+    HPX_TEST(r != std::end(c));
 
-    base_iterator ref =
-        std::min_element(std::begin(c), std::end(c), std::less<std::size_t>());
+    base_iterator ref = std::min_element(
+        std::begin(c.base()), std::end(c.base()), std::less<std::size_t>());
     HPX_TEST(ref != ref_end);
     HPX_TEST_EQ(*ref, *r);
 
-    r = hpx::min_element(iterator(std::begin(c)), iterator(std::end(c)));
-    HPX_TEST(r != end);
+    r = hpx::ranges::min_element(c);
+    HPX_TEST(r != std::end(c));
 
-    ref = std::min_element(std::begin(c), std::end(c));
+    ref = std::min_element(std::begin(c.base()), std::end(c.base()));
     HPX_TEST(ref != ref_end);
     HPX_TEST_EQ(*ref, *r);
 }
@@ -53,27 +114,25 @@ void test_min_element(ExPolicy policy, IteratorTag)
         "hpx::is_execution_policy<ExPolicy>::value");
 
     typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag>
+        test_vector;
 
-    std::vector<std::size_t> c = test::random_iota(10007);
+    test_vector c = test::random_iota(10007);
 
-    iterator end(std::end(c));
-    base_iterator ref_end(std::end(c));
+    base_iterator ref_end(std::end(c.base()));
 
-    iterator r = hpx::min_element(policy, iterator(std::begin(c)),
-        iterator(end), std::less<std::size_t>());
-    HPX_TEST(r != end);
+    auto r = hpx::ranges::min_element(policy, c, std::less<std::size_t>());
+    HPX_TEST(r != std::end(c));
 
-    base_iterator ref =
-        std::min_element(std::begin(c), std::end(c), std::less<std::size_t>());
+    base_iterator ref = std::min_element(
+        std::begin(c.base()), std::end(c.base()), std::less<std::size_t>());
     HPX_TEST(ref != ref_end);
     HPX_TEST_EQ(*ref, *r);
 
-    r = hpx::min_element(
-        policy, iterator(std::begin(c)), iterator(std::end(c)));
-    HPX_TEST(r != end);
+    r = hpx::ranges::min_element(policy, c);
+    HPX_TEST(r != std::end(c));
 
-    ref = std::min_element(std::begin(c), std::end(c));
+    ref = std::min_element(std::begin(c.base()), std::end(c.base()));
     HPX_TEST(ref != ref_end);
     HPX_TEST_EQ(*ref, *r);
 }
@@ -84,28 +143,121 @@ void test_min_element_async(ExPolicy p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c = test::random_iota(10007);
+    typedef test::test_container<std::vector<std::size_t>, IteratorTag>
+        test_vector;
 
-    iterator end(std::end(c));
-    base_iterator ref_end(std::end(c));
+    test_vector c = test::random_iota(10007);
 
-    hpx::future<iterator> r = hpx::min_element(
-        p, iterator(std::begin(c)), iterator(end), std::less<std::size_t>());
+    base_iterator ref_end(std::end(c.base()));
+
+    auto r = hpx::ranges::min_element(p, c, std::less<std::size_t>());
     iterator rit = r.get();
-    HPX_TEST(rit != end);
+    HPX_TEST(rit != std::end(c));
 
-    base_iterator ref =
-        std::min_element(std::begin(c), std::end(c), std::less<std::size_t>());
+    base_iterator ref = std::min_element(
+        std::begin(c.base()), std::end(c.base()), std::less<std::size_t>());
     HPX_TEST(ref != ref_end);
     HPX_TEST_EQ(*ref, *rit);
 
-    r = hpx::min_element(p, iterator(std::begin(c)), iterator(std::end(c)));
+    r = hpx::ranges::min_element(p, c);
     rit = r.get();
-    HPX_TEST(rit != end);
+    HPX_TEST(rit != std::end(c));
 
-    ref = std::min_element(std::begin(c), std::end(c));
+    ref = std::min_element(std::begin(c.base()), std::end(c.base()));
     HPX_TEST(ref != ref_end);
     HPX_TEST_EQ(*ref, *rit);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Test for first occurrence semantics with multiple equal minimum values
+void test_min_element_first_occurrence()
+{
+    // Create a vector with multiple minimum values
+    std::vector<std::size_t> c = {5, 2, 3, 2, 4, 2};
+    
+    // Test standard version (without execution policy)
+    {
+        auto r = hpx::ranges::min_element(c);
+        // Should return iterator to the first occurrence of 2 (index 1)
+        HPX_TEST(r != std::end(c));
+        HPX_TEST_EQ(*r, 2);
+        HPX_TEST_EQ(std::distance(std::begin(c), r), 1);
+        
+        // Verify against std::min_element for comparison
+        auto ref = std::min_element(std::begin(c), std::end(c));
+        HPX_TEST_EQ(std::distance(std::begin(c), r), std::distance(std::begin(c), ref));
+    }
+    
+    // Test with custom comparator
+    {
+        auto r = hpx::ranges::min_element(c, std::less<std::size_t>());
+        HPX_TEST(r != std::end(c));
+        HPX_TEST_EQ(*r, 2);
+        HPX_TEST_EQ(std::distance(std::begin(c), r), 1);
+    }
+    
+    // Test with different execution policies
+    using namespace hpx::execution;
+    
+    {
+        auto r = hpx::ranges::min_element(seq, c);
+        HPX_TEST(r != std::end(c));
+        HPX_TEST_EQ(*r, 2);
+        HPX_TEST_EQ(std::distance(std::begin(c), r), 1);
+    }
+    
+    {
+        auto r = hpx::ranges::min_element(par, c);
+        HPX_TEST(r != std::end(c));
+        HPX_TEST_EQ(*r, 2);
+        HPX_TEST_EQ(std::distance(std::begin(c), r), 1);
+    }
+    
+    {
+        auto r = hpx::ranges::min_element(par_unseq, c);
+        HPX_TEST(r != std::end(c));
+        HPX_TEST_EQ(*r, 2);
+        HPX_TEST_EQ(std::distance(std::begin(c), r), 1);
+    }
+    
+    // Test async versions
+    {
+        auto f = hpx::ranges::min_element(seq(task), c);
+        auto r = f.get();
+        HPX_TEST(r != std::end(c));
+        HPX_TEST_EQ(*r, 2);
+        HPX_TEST_EQ(std::distance(std::begin(c), r), 1);
+    }
+    
+    {
+        auto f = hpx::ranges::min_element(par(task), c);
+        auto r = f.get();
+        HPX_TEST(r != std::end(c));
+        HPX_TEST_EQ(*r, 2);
+        HPX_TEST_EQ(std::distance(std::begin(c), r), 1);
+    }
+    
+    // Test with a more complex scenario - equal values at beginning and end
+    std::vector<std::size_t> c2 = {1, 3, 4, 1, 5, 1};
+    
+    {
+        auto r = hpx::ranges::min_element(c2);
+        // Should return iterator to the first occurrence of 1 (index 0)
+        HPX_TEST(r != std::end(c2));
+        HPX_TEST_EQ(*r, 1);
+        HPX_TEST_EQ(std::distance(std::begin(c2), r), 0);
+    }
+    
+    // Test with all identical values
+    std::vector<std::size_t> c3(10, 7);  // 10 values all equal to 7
+    
+    {
+        auto r = hpx::ranges::min_element(c3);
+        // Should return iterator to the first element
+        HPX_TEST(r != std::end(c3));
+        HPX_TEST_EQ(*r, 7);
+        HPX_TEST_EQ(std::distance(std::begin(c3), r), 0);
+    }
 }
 
 template <typename IteratorTag>
@@ -120,12 +272,20 @@ void test_min_element()
 
     test_min_element_async(seq(task), IteratorTag());
     test_min_element_async(par(task), IteratorTag());
+
+    test_min_element_sent();
+    test_min_element_sent(seq);
+    test_min_element_sent(par);
+    test_min_element_sent(par_unseq);
 }
 
 void min_element_test()
 {
     test_min_element<std::random_access_iterator_tag>();
     test_min_element<std::forward_iterator_tag>();
+    
+    // Added test for first occurrence semantics
+    test_min_element_first_occurrence();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -142,9 +302,12 @@ void test_min_element_exception(IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::min_element(decorated_iterator(std::begin(c),
-                                 []() { throw std::runtime_error("test"); }),
-                decorated_iterator(std::end(c)), std::less<std::size_t>());
+            hpx::ranges::min_element(
+                hpx::util::iterator_range(
+                    decorated_iterator(std::begin(c),
+                        []() { throw std::runtime_error("test"); }),
+                    decorated_iterator(std::end(c))),
+                std::less<std::size_t>());
 
             HPX_TEST(false);
         }
@@ -165,9 +328,10 @@ void test_min_element_exception(IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::min_element(decorated_iterator(std::begin(c),
-                                 []() { throw std::runtime_error("test"); }),
-                decorated_iterator(std::end(c)));
+            hpx::ranges::min_element(hpx::util::iterator_range(
+                decorated_iterator(
+                    std::begin(c), []() { throw std::runtime_error("test"); }),
+                decorated_iterator(std::end(c))));
 
             HPX_TEST(false);
         }
@@ -201,10 +365,12 @@ void test_min_element_exception(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::min_element(policy,
-                decorated_iterator(
-                    std::begin(c), []() { throw std::runtime_error("test"); }),
-                decorated_iterator(std::end(c)), std::less<std::size_t>());
+            hpx::ranges::min_element(policy,
+                hpx::util::iterator_range(
+                    decorated_iterator(std::begin(c),
+                        []() { throw std::runtime_error("test"); }),
+                    decorated_iterator(std::end(c))),
+                std::less<std::size_t>());
 
             HPX_TEST(false);
         }
@@ -224,10 +390,11 @@ void test_min_element_exception(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::min_element(policy,
-                decorated_iterator(
-                    std::begin(c), []() { throw std::runtime_error("test"); }),
-                decorated_iterator(std::end(c)));
+            hpx::ranges::min_element(policy,
+                hpx::util::iterator_range(
+                    decorated_iterator(std::begin(c),
+                        []() { throw std::runtime_error("test"); }),
+                    decorated_iterator(std::end(c))));
 
             HPX_TEST(false);
         }
@@ -259,10 +426,12 @@ void test_min_element_exception_async(ExPolicy p, IteratorTag)
 
         try
         {
-            hpx::future<decorated_iterator> f = hpx::min_element(p,
-                decorated_iterator(
-                    std::begin(c), []() { throw std::runtime_error("test"); }),
-                decorated_iterator(std::end(c)), std::less<std::size_t>());
+            hpx::future<decorated_iterator> f = hpx::ranges::min_element(p,
+                hpx::util::iterator_range(
+                    decorated_iterator(std::begin(c),
+                        []() { throw std::runtime_error("test"); }),
+                    decorated_iterator(std::end(c))),
+                std::less<std::size_t>());
 
             returned_from_algorithm = true;
 
@@ -290,10 +459,11 @@ void test_min_element_exception_async(ExPolicy p, IteratorTag)
 
         try
         {
-            hpx::future<decorated_iterator> f = hpx::min_element(p,
-                decorated_iterator(
-                    std::begin(c), []() { throw std::runtime_error("test"); }),
-                decorated_iterator(std::end(c)));
+            hpx::future<decorated_iterator> f = hpx::ranges::min_element(p,
+                hpx::util::iterator_range(
+                    decorated_iterator(std::begin(c),
+                        []() { throw std::runtime_error("test"); }),
+                    decorated_iterator(std::end(c))));
 
             returned_from_algorithm = true;
 
@@ -352,9 +522,11 @@ void test_min_element_bad_alloc(IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::min_element(decorated_iterator(std::begin(c),
-                                 []() { throw std::bad_alloc(); }),
-                decorated_iterator(std::end(c)), std::less<std::size_t>());
+            hpx::ranges::min_element(
+                hpx::util::iterator_range(decorated_iterator(std::begin(c),
+                                              []() { throw std::bad_alloc(); }),
+                    decorated_iterator(std::end(c))),
+                std::less<std::size_t>());
 
             HPX_TEST(false);
         }
@@ -373,9 +545,10 @@ void test_min_element_bad_alloc(IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::min_element(decorated_iterator(std::begin(c),
-                                 []() { throw std::bad_alloc(); }),
-                decorated_iterator(std::end(c)));
+            hpx::ranges::min_element(
+                hpx::util::iterator_range(decorated_iterator(std::begin(c),
+                                              []() { throw std::bad_alloc(); }),
+                    decorated_iterator(std::end(c))));
 
             HPX_TEST(false);
         }
@@ -407,10 +580,11 @@ void test_min_element_bad_alloc(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::min_element(policy,
-                decorated_iterator(
-                    std::begin(c), []() { throw std::bad_alloc(); }),
-                decorated_iterator(std::end(c)), std::less<std::size_t>());
+            hpx::ranges::min_element(policy,
+                hpx::util::iterator_range(decorated_iterator(std::begin(c),
+                                              []() { throw std::bad_alloc(); }),
+                    decorated_iterator(std::end(c))),
+                std::less<std::size_t>());
 
             HPX_TEST(false);
         }
@@ -429,10 +603,10 @@ void test_min_element_bad_alloc(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::min_element(policy,
-                decorated_iterator(
-                    std::begin(c), []() { throw std::bad_alloc(); }),
-                decorated_iterator(std::end(c)));
+            hpx::ranges::min_element(policy,
+                hpx::util::iterator_range(decorated_iterator(std::begin(c),
+                                              []() { throw std::bad_alloc(); }),
+                    decorated_iterator(std::end(c))));
 
             HPX_TEST(false);
         }
@@ -463,10 +637,11 @@ void test_min_element_bad_alloc_async(ExPolicy p, IteratorTag)
 
         try
         {
-            hpx::future<decorated_iterator> f = hpx::min_element(p,
-                decorated_iterator(
-                    std::begin(c), []() { throw std::bad_alloc(); }),
-                decorated_iterator(std::end(c)), std::less<std::size_t>());
+            hpx::future<decorated_iterator> f = hpx::ranges::min_element(p,
+                hpx::util::iterator_range(decorated_iterator(std::begin(c),
+                                              []() { throw std::bad_alloc(); }),
+                    decorated_iterator(std::end(c))),
+                std::less<std::size_t>());
 
             returned_from_algorithm = true;
 
@@ -493,10 +668,10 @@ void test_min_element_bad_alloc_async(ExPolicy p, IteratorTag)
 
         try
         {
-            hpx::future<decorated_iterator> f = hpx::min_element(p,
-                decorated_iterator(
-                    std::begin(c), []() { throw std::bad_alloc(); }),
-                decorated_iterator(std::end(c)));
+            hpx::future<decorated_iterator> f = hpx::ranges::min_element(p,
+                hpx::util::iterator_range(decorated_iterator(std::begin(c),
+                                              []() { throw std::bad_alloc(); }),
+                    decorated_iterator(std::end(c))));
 
             returned_from_algorithm = true;
 
