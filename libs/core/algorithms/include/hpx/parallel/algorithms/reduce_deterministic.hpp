@@ -428,7 +428,7 @@ namespace hpx::parallel {
 
                 auto f1 = [policy](FwdIterB part_begin, std::size_t part_size)
                     -> hpx::parallel::detail::rfa::
-                        ReproducibleFloatingAccumulator<T_> {
+                        reproducible_floating_accumulator<T_> {
                             T_ val = *part_begin;
                             // Assumed that hpx_rfa_bin_host_buffer is initiallized
                             return hpx::parallel::detail::
@@ -439,24 +439,25 @@ namespace hpx::parallel {
                         };
 
                 return util::partitioner<ExPolicy, T_,
-                    hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<
-                        T_>>::call(HPX_FORWARD(ExPolicy, policy), first,
-                    detail::distance(first, last), HPX_MOVE(f1),
-                    hpx::unwrapping([policy, init](auto&& results) -> T_ {
-                        // Assumed that hpx_rfa_bin_host_buffer is initiallized
-                        hpx::parallel::detail::rfa::
-                            ReproducibleFloatingAccumulator<T_>
-                                rfa;
-                        rfa.zero();
-                        rfa += init;
-                        return hpx::parallel::detail::
-                            sequential_reduce_deterministic_rfa<ExPolicy>(
-                                HPX_FORWARD(ExPolicy, policy),
-                                hpx::util::begin(results),
-                                hpx::util::size(results), HPX_MOVE(rfa),
-                                std::false_type{})
-                                .conv();
-                    }));
+                    hpx::parallel::detail::rfa::
+                        reproducible_floating_accumulator<T_>>::
+                    call(HPX_FORWARD(ExPolicy, policy), first,
+                        detail::distance(first, last), HPX_MOVE(f1),
+                        hpx::unwrapping([policy, init](auto&& results) -> T_ {
+                            // Assumed that hpx_rfa_bin_host_buffer is initiallized
+                            hpx::parallel::detail::rfa::
+                                reproducible_floating_accumulator<T_>
+                                    rfa;
+                            rfa.zero();
+                            rfa += init;
+                            return hpx::parallel::detail::
+                                sequential_reduce_deterministic_rfa<ExPolicy>(
+                                    HPX_FORWARD(ExPolicy, policy),
+                                    hpx::util::begin(results),
+                                    hpx::util::size(results), HPX_MOVE(rfa),
+                                    std::false_type{})
+                                    .conv();
+                        }));
             }
         };
         /// \endcond

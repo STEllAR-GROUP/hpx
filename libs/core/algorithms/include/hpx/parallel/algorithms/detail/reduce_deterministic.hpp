@@ -40,7 +40,8 @@ namespace hpx::parallel::detail {
             // hpx_rfa_bin_host_buffer should be initialized by the frontend of
             // this method
 
-            hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<T> rfa;
+            hpx::parallel::detail::rfa::reproducible_floating_accumulator<T>
+                rfa;
             rfa.set_max_abs_val(init);
             rfa.unsafe_add(init);
             rfa.renorm();
@@ -74,7 +75,7 @@ namespace hpx::parallel::detail {
     private:
         template <typename InIterB, typename T>
         friend constexpr hpx::parallel::detail::rfa::
-            ReproducibleFloatingAccumulator<T>
+            reproducible_floating_accumulator<T>
             tag_fallback_invoke(sequential_reduce_deterministic_rfa_t,
                 ExPolicy&&, InIterB first, std::size_t partition_size, T init,
                 std::true_type&&)
@@ -82,7 +83,8 @@ namespace hpx::parallel::detail {
             // hpx_rfa_bin_host_buffer should be initialized by the frontend of
             // this method
 
-            hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<T> rfa;
+            hpx::parallel::detail::rfa::reproducible_floating_accumulator<T>
+                rfa;
             rfa.zero();
             rfa += init;
             size_t count = 0;
