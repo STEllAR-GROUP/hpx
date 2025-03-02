@@ -36,7 +36,6 @@ jobs:
               -DHPX_WITH_VERIFY_LOCKS=ON \
               -DHPX_WITH_VERIFY_LOCKS_BACKTRACE=ON \
               -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=ON
-          ln -s "$(which aclocal)" /opt/homebrew/bin/aclocal-1.16
           cd build/_deps/hwloc-src/ && autoreconf -f -i
     - name: Build
       shell: bash
