@@ -198,7 +198,7 @@ namespace hpx::parallel::detail::rfa {
         }
     };
 
-    static char __rfa_bin_host_buffer__[sizeof(RFA_bins<double>)];
+    static char hpx_rfa_bin_host_buffer[sizeof(RFA_bins<double>)];
 
     ///Class to hold a reproducible summation of the numbers passed to it
     ///
@@ -249,7 +249,7 @@ namespace hpx::parallel::detail::rfa {
         inline const ftype* binned_bins(const int x) const
         {
             return &reinterpret_cast<RFA_bins<ftype>&>(
-                __rfa_bin_host_buffer__)[x];
+                hpx_rfa_bin_host_buffer)[x];
         }
 
         ///Get the bit representation of a float

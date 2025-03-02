@@ -37,7 +37,7 @@ namespace hpx::parallel::detail {
             /// TODO: Put constraint on Reduce to be a binary plus operator
             (void) r;
 
-            // __rfa_bin_host_buffer__ should be initialized by the frontend of
+            // hpx_rfa_bin_host_buffer should be initialized by the frontend of
             // this method
 
             hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<T> rfa;
@@ -79,7 +79,7 @@ namespace hpx::parallel::detail {
                 ExPolicy&&, InIterB first, std::size_t partition_size, T init,
                 std::true_type&&)
         {
-            // __rfa_bin_host_buffer__ should be initialized by the frontend of
+            // hpx_rfa_bin_host_buffer should be initialized by the frontend of
             // this method
 
             hpx::parallel::detail::rfa::ReproducibleFloatingAccumulator<T> rfa;
@@ -89,7 +89,7 @@ namespace hpx::parallel::detail {
             T max_val = std::abs((std::numeric_limits<T>::min)());
             std::size_t partition_size_lim = 0;
             for (auto e = first; partition_size_lim < partition_size;
-                 partition_size_lim++, e++)
+                partition_size_lim++, e++)
             {
                 T temp_max_val = std::abs(static_cast<T>(*e));
                 if (max_val < temp_max_val)
@@ -113,7 +113,7 @@ namespace hpx::parallel::detail {
             sequential_reduce_deterministic_rfa_t, ExPolicy&&, InIterB first,
             std::size_t partition_size, T init, std::false_type&&)
         {
-            // __rfa_bin_host_buffer__ should be initialized by the frontend of
+            // hpx_rfa_bin_host_buffer should be initialized by the frontend of
             // this method
 
             T rfa;
@@ -121,7 +121,7 @@ namespace hpx::parallel::detail {
             rfa += init;
             std::size_t partition_size_lim = 0;
             for (auto e = first; partition_size_lim < partition_size;
-                 partition_size_lim++, e++)
+                partition_size_lim++, e++)
             {
                 rfa += (*e);
             }

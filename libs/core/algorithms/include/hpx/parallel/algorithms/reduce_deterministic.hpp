@@ -400,7 +400,7 @@ namespace hpx::parallel {
                 // TODO: abstract initializing memory
                 hpx::parallel::detail::rfa::RFA_bins<T_> bins;
                 bins.initialize_bins();
-                std::memcpy(hpx::parallel::detail::rfa::__rfa_bin_host_buffer__,
+                std::memcpy(hpx::parallel::detail::rfa::hpx_rfa_bin_host_buffer,
                     &bins, sizeof(bins));
                 return hpx::parallel::detail::sequential_reduce_deterministic<
                     ExPolicy>(HPX_FORWARD(ExPolicy, policy), first, last,
@@ -423,14 +423,14 @@ namespace hpx::parallel {
                 // TODO: abstract initializing memory
                 hpx::parallel::detail::rfa::RFA_bins<T_> bins;
                 bins.initialize_bins();
-                std::memcpy(hpx::parallel::detail::rfa::__rfa_bin_host_buffer__,
+                std::memcpy(hpx::parallel::detail::rfa::hpx_rfa_bin_host_buffer,
                     &bins, sizeof(bins));
 
                 auto f1 = [policy](FwdIterB part_begin, std::size_t part_size)
                     -> hpx::parallel::detail::rfa::
                         ReproducibleFloatingAccumulator<T_> {
                             T_ val = *part_begin;
-                            // Assumed that __rfa_bin_host_buffer__ is initiallized
+                            // Assumed that hpx_rfa_bin_host_buffer is initiallized
                             return hpx::parallel::detail::
                                 sequential_reduce_deterministic_rfa<ExPolicy>(
                                     HPX_FORWARD(ExPolicy, policy), ++part_begin,
@@ -443,7 +443,7 @@ namespace hpx::parallel {
                         T_>>::call(HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
                     hpx::unwrapping([policy, init](auto&& results) -> T_ {
-                        // Assumed that __rfa_bin_host_buffer__ is initiallized
+                        // Assumed that hpx_rfa_bin_host_buffer is initiallized
                         hpx::parallel::detail::rfa::
                             ReproducibleFloatingAccumulator<T_>
                                 rfa;
