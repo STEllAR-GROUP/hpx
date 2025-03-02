@@ -45,7 +45,7 @@ namespace hpx::parallel::detail {
             rfa.unsafe_add(init);
             rfa.renorm();
             size_t count = 0;
-            T max_val = std::abs((std::numeric_limits<T>::min)());
+            T max_val = static_cast<T>(0.0);
             for (auto e = first; e != last; ++e)
             {
                 T temp_max_val = std::abs(static_cast<T>(*e));
@@ -86,7 +86,7 @@ namespace hpx::parallel::detail {
             rfa.zero();
             rfa += init;
             size_t count = 0;
-            T max_val = std::abs((std::numeric_limits<T>::min)());
+            T max_val = static_cast<T>(0.0);
             std::size_t partition_size_lim = 0;
             for (auto e = first; partition_size_lim < partition_size;
                 partition_size_lim++, e++)
