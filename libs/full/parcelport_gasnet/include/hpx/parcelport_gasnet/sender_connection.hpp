@@ -41,15 +41,13 @@ namespace hpx::parcelset::policies::gasnet {
     void add_connection(sender*, std::shared_ptr<sender_connection> const&);
 
     struct sender_connection
-      : parcelset::parcelport_connection<sender_connection, std::vector<char>>
+      : parcelset::parcelport_connection<sender_connection>
     {
     private:
         using sender_type = sender;
 
         using write_handler_type =
             hpx::function<void(std::error_code const&, parcel const&)>;
-
-        using data_type = std::vector<char>;
 
         enum connection_state
         {
@@ -60,8 +58,7 @@ namespace hpx::parcelset::policies::gasnet {
             sent_chunks
         };
 
-        using base_type =
-            parcelset::parcelport_connection<sender_connection, data_type>;
+        using base_type = parcelset::parcelport_connection<sender_connection>;
 
     public:
         sender_connection(sender_type* s, int dst, parcelset::parcelport* pp)
@@ -168,9 +165,8 @@ namespace hpx::parcelset::policies::gasnet {
                 // into the remote locality (dst_)'s shared memory segment
                 //
                 hpx::util::gasnet_environment::put(
-                    static_cast<std::uint8_t*>(
-                        hpx::util::gasnet_environment::segments
-                            [hpx::util::gasnet_environment::rank()]
+                    static_cast<std::uint8_t*>(hpx::util::gasnet_environment::
+                            segments[hpx::util::gasnet_environment::rank()]
                                 .addr),
                     dst_,
                     static_cast<std::uint8_t*>(
@@ -205,9 +201,8 @@ namespace hpx::parcelset::policies::gasnet {
                 gasnet_put_bulk(dst_,
                     static_cast<std::uint8_t*>(
                         hpx::util::gasnet_environment::segments[dst_].addr),
-                    static_cast<std::uint8_t*>(
-                        hpx::util::gasnet_environment::segments
-                            [hpx::util::gasnet_environment::rank()]
+                    static_cast<std::uint8_t*>(hpx::util::gasnet_environment::
+                            segments[hpx::util::gasnet_environment::rank()]
                                 .addr),
                     static_cast<int>(chunks.size() *
                         sizeof(parcel_buffer_type::transmission_chunk_type)));
@@ -234,9 +229,8 @@ namespace hpx::parcelset::policies::gasnet {
                     buffer_.data_.data(), buffer_.data_.size());
 
                 hpx::util::gasnet_environment::put(
-                    static_cast<std::uint8_t*>(
-                        hpx::util::gasnet_environment::segments
-                            [hpx::util::gasnet_environment::rank()]
+                    static_cast<std::uint8_t*>(hpx::util::gasnet_environment::
+                            segments[hpx::util::gasnet_environment::rank()]
                                 .addr),
                     dst_,
                     static_cast<std::uint8_t*>(

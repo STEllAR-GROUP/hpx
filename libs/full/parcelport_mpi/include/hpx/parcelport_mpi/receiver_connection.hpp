@@ -43,9 +43,7 @@ namespace hpx::parcelset::policies::mpi {
             acked_data = 6
         };
 
-        using data_type = std::vector<char>;
-        using buffer_type =
-            parcel_buffer<data_type, serialization::serialization_chunk>;
+        using buffer_type = parcel_buffer<>;
 
         constexpr int ack_tag() const noexcept
         {
