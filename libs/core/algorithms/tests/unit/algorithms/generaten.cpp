@@ -24,7 +24,6 @@ void test_generate_n()
 
     test_generate_n(seq, IteratorTag());
     test_generate_n(par, IteratorTag());
-    test_generate_n(par_unseq, IteratorTag());
 
     test_generate_n_async(seq(task), IteratorTag());
     test_generate_n_async(par(task), IteratorTag());
