@@ -98,9 +98,7 @@ namespace hpx::parcelset::policies::mpi {
             return has_work;
         }
 
-        using buffer_type = std::vector<char>;
-        using chunk_type = serialization::serialization_chunk;
-        using parcel_buffer_type = parcel_buffer<buffer_type, chunk_type>;
+        using parcel_buffer_type = parcel_buffer<>;
         using callback_fn_type =
             hpx::move_only_function<void(error_code const&)>;
 

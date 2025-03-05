@@ -20,7 +20,7 @@
 
 namespace hpx::parcelset {
 
-    template <typename BufferType,
+    template <typename BufferType = std::vector<char>,
         typename ChunkType = serialization::serialization_chunk>
     struct parcel_buffer
     {
