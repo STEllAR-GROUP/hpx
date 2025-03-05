@@ -40,15 +40,13 @@ namespace hpx::parcelset::policies::mpi {
     void add_connection(sender*, std::shared_ptr<sender_connection> const&);
 
     struct sender_connection
-      : parcelset::parcelport_connection<sender_connection, std::vector<char>>
+      : parcelset::parcelport_connection<sender_connection>
     {
     private:
         using sender_type = sender;
 
         using write_handler_type =
             hpx::function<void(std::error_code const&, parcel const&)>;
-
-        using data_type = std::vector<char>;
 
         enum class connection_state : std::uint8_t
         {
@@ -62,8 +60,7 @@ namespace hpx::parcelset::policies::mpi {
             acked_data = 6
         };
 
-        using base_type =
-            parcelset::parcelport_connection<sender_connection, data_type>;
+        using base_type = parcelset::parcelport_connection<sender_connection>;
 
     public:
         sender_connection(sender_type* s, int dst, parcelset::parcelport* pp,

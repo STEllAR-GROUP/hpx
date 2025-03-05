@@ -53,9 +53,7 @@ namespace hpx::parcelset::policies::tcp {
 
     class connection_handler;
 
-    class receiver
-      : public parcelport_connection<receiver, std::vector<char>,
-            serialization::serialization_chunk>
+    class receiver : public parcelport_connection<receiver>
     {
     public:
         receiver(asio::io_context& io_service, std::uint64_t max_inbound_size,
