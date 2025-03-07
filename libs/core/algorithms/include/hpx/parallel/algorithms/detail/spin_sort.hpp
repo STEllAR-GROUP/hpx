@@ -48,8 +48,8 @@ namespace hpx::parallel::detail {
 
         if (level < 2)
         {
-            insertion_sort(rng_a1.begin(), rng_a1.end(), comp);
-            insertion_sort(rng_a2.begin(), rng_a2.end(), comp);
+            hpx::parallel::detail::insertion_sort(rng_a1.begin(), rng_a1.end(), comp);
+            hpx::parallel::detail::insertion_sort(rng_a2.begin(), rng_a2.end(), comp);
         }
         else
         {
@@ -157,7 +157,7 @@ namespace hpx::parallel::detail {
 
         if (nelem <= (sort_min << 1))
         {
-            insertion_sort(first, last, comp);
+            hpx::parallel::detail::insertion_sort(first, last, comp);
             return;
         }
 
