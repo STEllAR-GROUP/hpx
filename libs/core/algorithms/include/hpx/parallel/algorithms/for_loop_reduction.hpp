@@ -153,6 +153,15 @@ namespace hpx::experimental {
             var, identity, HPX_FORWARD(Op, combiner));
     }
 
+    template <typename T, typename Op>
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
+        std::decay_t<Op>>
+    reduction(T& var, Op&& combiner)
+    {
+        return hpx::parallel::detail::reduction_helper<T, std::decay_t<Op>>(
+            var, var, HPX_FORWARD(Op, combiner));
+    }
+
     /// \cond NOINTERNAL
     template <typename T>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
