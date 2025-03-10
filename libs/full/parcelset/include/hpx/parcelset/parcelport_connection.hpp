@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <utility>
+#include <vector>
 
 namespace hpx::parcelset {
 
@@ -27,13 +28,14 @@ namespace hpx::parcelset {
         using buffer_type = std::vector<char>;
         using parcel_buffer_type = parcel_buffer<>;
 
+    protected:
         parcelport_connection(parcelport_connection const&) = delete;
         parcelport_connection(parcelport_connection&&) = delete;
         parcelport_connection& operator=(parcelport_connection const&) = delete;
         parcelport_connection& operator=(parcelport_connection&&) = delete;
 
-    public:
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+        // clang-format off
         enum state
         {
             state_initialized,
@@ -47,6 +49,7 @@ namespace hpx::parcelset {
             state_reclaimed,
             state_deleting
         };
+        // clang-format on
 
         parcelport_connection()
           : state_(state_initialized)
@@ -84,6 +87,8 @@ namespace hpx::parcelset {
         {
         }
 #endif
+
+    public:
         virtual ~parcelport_connection() = default;
 
         parcel_buffer_type buffer_;    // buffer for data

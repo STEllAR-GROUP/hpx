@@ -77,7 +77,9 @@ namespace hpx::parcelset::policies::lci {
         void free()
         {
             HPX_ASSERT(ptr != nullptr);
+            // clang-format off
             delete[] (char*) ptr;
+            // clang-format on
         }
     };
 
