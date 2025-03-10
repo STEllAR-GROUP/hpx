@@ -82,6 +82,51 @@ void test_reduce1(IteratorTag)
 }
 
 template <typename IteratorTag, typename FloatTypeDeterministic,
+    typename FloatTypeNonDeterministic, size_t LEN = 10007>
+void test_reduce_parallel1(IteratorTag)
+{
+    // check if different type for deterministic and nondeeterministic
+    // and same result i.e. correct computation
+    using base_iterator_det =
+        typename std::vector<FloatTypeDeterministic>::iterator;
+    using iterator_det = test::test_iterator<base_iterator_det, IteratorTag>;
+
+    using base_iterator_ndet =
+        typename std::vector<FloatTypeNonDeterministic>::iterator;
+    using iterator_ndet = test::test_iterator<base_iterator_ndet, IteratorTag>;
+
+    std::vector<FloatTypeDeterministic> deterministic(LEN);
+    std::vector<FloatTypeNonDeterministic> nondeterministic(LEN);
+
+    std::iota(
+        deterministic.begin(), deterministic.end(), FloatTypeDeterministic(0));
+
+    std::iota(nondeterministic.begin(), nondeterministic.end(),
+        FloatTypeNonDeterministic(0));
+
+    FloatTypeDeterministic val_det(0);
+    FloatTypeNonDeterministic val_non_det(0);
+    auto op = [](FloatTypeNonDeterministic v1, FloatTypeNonDeterministic v2) {
+        return v1 + v2;
+    };
+
+    FloatTypeDeterministic r1 = hpx::experimental::reduce_deterministic(
+        hpx::execution::par, iterator_det(std::begin(deterministic)),
+        iterator_det(std::end(deterministic)), val_det, op);
+
+    // verify values
+    FloatTypeNonDeterministic r2 = hpx::reduce(hpx::execution::par,
+        iterator_ndet(std::begin(nondeterministic)),
+        iterator_ndet(std::end(nondeterministic)), val_non_det, op);
+
+    FloatTypeNonDeterministic r3 = std::accumulate(
+        nondeterministic.begin(), nondeterministic.end(), val_non_det);
+
+    HPX_TEST_EQ(static_cast<FloatTypeNonDeterministic>(r1), r3);
+    HPX_TEST_EQ(static_cast<FloatTypeNonDeterministic>(r2), r3);
+}
+
+template <typename IteratorTag, typename FloatTypeDeterministic,
     size_t LEN = 10007>
 void test_reduce_determinism(IteratorTag)
 {
@@ -186,6 +231,10 @@ void test_reduce1()
     test_reduce1<IteratorTag, double, float, 1000>(IteratorTag());
     test_reduce1<IteratorTag, float, double, 1000>(IteratorTag());
     test_reduce1<IteratorTag, double, double, 1000>(IteratorTag());
+    test_reduce_parallel1<IteratorTag, float, float, 1000>(IteratorTag());
+    test_reduce_parallel1<IteratorTag, float, double, 1000>(IteratorTag());
+    test_reduce_parallel1<IteratorTag, double, float, 1000>(IteratorTag());
+    test_reduce_parallel1<IteratorTag, double, double, 1000>(IteratorTag());
 }
 
 template <typename IteratorTag>

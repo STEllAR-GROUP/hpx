@@ -198,7 +198,7 @@ namespace hpx::parallel::detail::rfa {
         }
     };
 
-    static char __rfa_bin_host_buffer__[sizeof(RFA_bins<double>)];
+    static char hpx_rfa_bin_host_buffer[sizeof(RFA_bins<double>)];
 
     ///Class to hold a reproducible summation of the numbers passed to it
     ///
@@ -207,7 +207,7 @@ namespace hpx::parallel::detail::rfa {
     template <class ftype_, int FOLD_ = 3,
         typename std::enable_if_t<std::is_floating_point<ftype_>::value>* =
             nullptr>
-    class alignas(2 * sizeof(ftype_)) ReproducibleFloatingAccumulator
+    class alignas(2 * sizeof(ftype_)) reproducible_floating_accumulator
     {
     public:
         using ftype = ftype_;
@@ -245,12 +245,11 @@ namespace hpx::parallel::detail::rfa {
         ///The number of deposits that can be performed before a renorm is necessary.
         ///Applies also to binned complex double precision.
         static constexpr auto ENDURANCE = 1 << (MANT_DIG - BIN_WIDTH - 2);
-
         ///Return a binned floating-point reference bin
         inline const ftype* binned_bins(const int x) const
         {
             return &reinterpret_cast<RFA_bins<ftype>&>(
-                __rfa_bin_host_buffer__)[x];
+                hpx_rfa_bin_host_buffer)[x];
         }
 
         ///Get the bit representation of a float
@@ -721,7 +720,7 @@ namespace hpx::parallel::detail::rfa {
         ///@param inccarX stride within X's carry vector (use every inccarX'th element)
         ///@param incpriY stride within Y's primary vector (use every incpriY'th element)
         ///@param inccarY stride within Y's carry vector (use every inccarY'th element)
-        void binned_dmdmadd(const ReproducibleFloatingAccumulator& x,
+        void binned_dmdmadd(const reproducible_floating_accumulator& x,
             const int incpriX, const int inccarX, const int incpriY,
             const int inccarY)
         {
@@ -809,23 +808,23 @@ namespace hpx::parallel::detail::rfa {
 
         ///Add two manually specified binned fp (Y += X)
         ///Performs the operation Y += X
-        void binned_dbdbadd(const ReproducibleFloatingAccumulator& other)
+        void binned_dbdbadd(const reproducible_floating_accumulator& other)
         {
             binned_dmdmadd(other, 1, 1, 1, 1);
         }
 
     public:
-        ReproducibleFloatingAccumulator() = default;
-        ReproducibleFloatingAccumulator(
-            const ReproducibleFloatingAccumulator&) = default;
+        reproducible_floating_accumulator() = default;
+        reproducible_floating_accumulator(
+            const reproducible_floating_accumulator&) = default;
         ///Sets this binned fp equal to another binned fp
-        ReproducibleFloatingAccumulator& operator=(
-            const ReproducibleFloatingAccumulator&) = default;
+        reproducible_floating_accumulator& operator=(
+            const reproducible_floating_accumulator&) = default;
 
         ///Set the binned fp to zero
         void zero()
         {
-            data = {0};
+            data = {{0}};
         }
 
         ///Return the fold of the binned fp
@@ -850,7 +849,7 @@ namespace hpx::parallel::detail::rfa {
         ///NOTE: Casts @p x to the type of the binned fp
         template <typename U,
             typename std::enable_if_t<std::is_arithmetic_v<U>>* = nullptr>
-        ReproducibleFloatingAccumulator& operator+=(const U x)
+        reproducible_floating_accumulator& operator+=(const U x)
         {
             binned_dmdadd(static_cast<ftype>(x), 1, 1);
             return *this;
@@ -860,15 +859,15 @@ namespace hpx::parallel::detail::rfa {
         ///NOTE: Casts @p x to the type of the binned fp
         template <typename U,
             typename std::enable_if_t<std::is_arithmetic_v<U>>* = nullptr>
-        ReproducibleFloatingAccumulator& operator-=(const U x)
+        reproducible_floating_accumulator& operator-=(const U x)
         {
             binned_dmdadd(-static_cast<ftype>(x), 1, 1);
             return *this;
         }
 
         ///Accumulate a binned fp @p x into the binned fp.
-        ReproducibleFloatingAccumulator& operator+=(
-            const ReproducibleFloatingAccumulator& other)
+        reproducible_floating_accumulator& operator+=(
+            const reproducible_floating_accumulator& other)
         {
             binned_dbdbadd(other);
             return *this;
@@ -876,21 +875,21 @@ namespace hpx::parallel::detail::rfa {
 
         ///Accumulate-subtract a binned fp @p x into the binned fp.
         ///NOTE: Makes a copy and performs arithmetic; slow.
-        ReproducibleFloatingAccumulator& operator-=(
-            const ReproducibleFloatingAccumulator& other)
+        reproducible_floating_accumulator& operator-=(
+            const reproducible_floating_accumulator& other)
         {
             const auto temp = -other;
             binned_dbdbadd(temp);
         }
 
         ///Determines if two binned fp are equal
-        bool operator==(const ReproducibleFloatingAccumulator& other) const
+        bool operator==(const reproducible_floating_accumulator& other) const
         {
             return data == other.data;
         }
 
         ///Determines if two binned fp are not equal
-        bool operator!=(const ReproducibleFloatingAccumulator& other) const
+        bool operator!=(const reproducible_floating_accumulator& other) const
         {
             return !operator==(other);
         }
@@ -899,7 +898,7 @@ namespace hpx::parallel::detail::rfa {
         ///NOTE: Casts @p x to the type of the binned fp
         template <typename U,
             typename std::enable_if_t<std::is_arithmetic_v<U>>* = nullptr>
-        ReproducibleFloatingAccumulator& operator=(const U x)
+        reproducible_floating_accumulator& operator=(const U x)
         {
             zero();
             binned_dmdadd(static_cast<ftype>(x), 1, 1);
@@ -908,11 +907,11 @@ namespace hpx::parallel::detail::rfa {
 
         ///Returns the negative of this binned fp
         ///NOTE: Makes a copy and performs arithmetic; slow.
-        ReproducibleFloatingAccumulator operator-()
+        reproducible_floating_accumulator operator-()
         {
             constexpr int incpriX = 1;
             constexpr int inccarX = 1;
-            ReproducibleFloatingAccumulator temp = *this;
+            reproducible_floating_accumulator temp = *this;
             if (primary(0) != 0.0)
             {
                 const auto* const bins = binned_bins(binned_index());
@@ -1045,7 +1044,7 @@ namespace hpx::parallel::detail::rfa {
 
         ///Accumulate a float4 @p x into the binned fp.
         ///NOTE: Casts @p x to the type of the binned fp
-        ReproducibleFloatingAccumulator& operator+=(const float4& x)
+        reproducible_floating_accumulator& operator+=(const float4& x)
         {
             binned_dmdupdate(abs_max(x), 1, 1);
             binned_dmddeposit(static_cast<ftype>(x.x), 1);
@@ -1057,7 +1056,7 @@ namespace hpx::parallel::detail::rfa {
 
         ///Accumulate a double2 @p x into the binned fp.
         ///NOTE: Casts @p x to the type of the binned fp
-        ReproducibleFloatingAccumulator& operator+=(const float2& x)
+        reproducible_floating_accumulator& operator+=(const float2& x)
         {
             binned_dmdupdate(abs_max(x), 1, 1);
             binned_dmddeposit(static_cast<ftype>(x.x), 1);
@@ -1067,7 +1066,7 @@ namespace hpx::parallel::detail::rfa {
 
         ///Accumulate a double2 @p x into the binned fp.
         ///NOTE: Casts @p x to the type of the binned fp
-        ReproducibleFloatingAccumulator& operator+=(const double2& x)
+        reproducible_floating_accumulator& operator+=(const double2& x)
         {
             binned_dmdupdate(abs_max(x), 1, 1);
             binned_dmddeposit(static_cast<ftype>(x.x), 1);
