@@ -48,8 +48,10 @@ namespace hpx::parallel::detail {
 
         if (level < 2)
         {
-            hpx::parallel::detail::insertion_sort(rng_a1.begin(), rng_a1.end(), comp);
-            hpx::parallel::detail::insertion_sort(rng_a2.begin(), rng_a2.end(), comp);
+            hpx::parallel::detail::insertion_sort(
+                rng_a1.begin(), rng_a1.end(), comp);
+            hpx::parallel::detail::insertion_sort(
+                rng_a2.begin(), rng_a2.end(), comp);
         }
         else
         {
