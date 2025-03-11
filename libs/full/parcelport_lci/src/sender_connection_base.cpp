@@ -125,7 +125,7 @@ namespace hpx::parcelset::policies::lci {
         char buf[1024];
         size_t consumed = 0;
         consumed += snprintf(buf + consumed, sizeof(buf) - consumed,
-            "%d:%lf:send_connection(%p) start:%d:%d:%d:%d:[", LCI_RANK,
+            "%d:%lf:send_connection(%p) start:%d:%lu:%d:%d:[", LCI_RANK,
             hpx::chrono::high_resolution_clock::now() / 1e9, (void*) this,
             dst_rank, header_.numbytes_nonzero_copy(),
             header_.numbytes_tchunk(), header_.num_zero_copy_chunks());

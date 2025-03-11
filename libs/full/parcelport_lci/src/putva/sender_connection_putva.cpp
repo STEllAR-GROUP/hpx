@@ -33,7 +33,7 @@ namespace hpx::parcelset::policies::lci {
         if (num_zero_copy_chunks > 0)
             // if there are non-zero-copy chunks, we have to use iovec
             return false;
-        size_t header_size = header::data_pos::pos_piggy_back_address;
+        size_t header_size = sizeof(header::header_format_t);
         size_t data_size = buffer_.data_.size();
         size_t tchunk_size = buffer_.transmission_chunks_.size() *
             sizeof(parcel_buffer_type::transmission_chunk_type);
