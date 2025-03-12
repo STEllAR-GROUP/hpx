@@ -141,7 +141,7 @@ namespace hpx::parcelset::policies::lci {
             data_ = static_cast<char*>(header_buffer);
         }
 
-        bool valid() const noexcept
+        [[nodiscard]] bool valid() const noexcept
         {
             return data_ != nullptr && signature() == MAGIC_SIGNATURE;
         }
@@ -151,17 +151,17 @@ namespace hpx::parcelset::policies::lci {
             HPX_ASSERT(valid());
         }
 
-        char* data() noexcept
+        [[nodiscard]] char* data() noexcept
         {
-            return &data_[0];
+            return data_;
         }
 
-        size_t size() noexcept
+        [[nodiscard]] size_t size() noexcept
         {
             return sizeof(header_format_t) + piggy_back_size();
         }
 
-        int signature() const noexcept
+        [[nodiscard]] int signature() const noexcept
         {
             return reinterpret_cast<header_format_t*>(data_)->signature;
         }
@@ -171,7 +171,7 @@ namespace hpx::parcelset::policies::lci {
             reinterpret_cast<header_format_t*>(data_)->device_idx = device_idx;
         }
 
-        int get_device_idx() const noexcept
+        [[nodiscard]] int get_device_idx() const noexcept
         {
             return reinterpret_cast<header_format_t*>(data_)->device_idx;
         }
@@ -181,59 +181,59 @@ namespace hpx::parcelset::policies::lci {
             reinterpret_cast<header_format_t*>(data_)->tag = tag;
         }
 
-        int get_tag() const noexcept
+        [[nodiscard]] int get_tag() const noexcept
         {
             return reinterpret_cast<header_format_t*>(data_)->tag;
         }
 
-        size_t numbytes_nonzero_copy() const noexcept
+        [[nodiscard]] size_t numbytes_nonzero_copy() const noexcept
         {
             return reinterpret_cast<header_format_t*>(data_)
                 ->numbytes_nonzero_copy;
         }
 
-        int numbytes_tchunk() const noexcept
+        [[nodiscard]] int numbytes_tchunk() const noexcept
         {
             return reinterpret_cast<header_format_t*>(data_)->numbytes_tchunk;
         }
 
-        size_t numbytes() const noexcept
+        [[nodiscard]] size_t numbytes() const noexcept
         {
             return reinterpret_cast<header_format_t*>(data_)->numbytes;
         }
 
-        int num_zero_copy_chunks() const noexcept
+        [[nodiscard]] int num_zero_copy_chunks() const noexcept
         {
             return reinterpret_cast<header_format_t*>(data_)
                 ->numchunks_zero_copy;
         }
 
-        int num_non_zero_copy_chunks() const noexcept
+        [[nodiscard]] int num_non_zero_copy_chunks() const noexcept
         {
             return reinterpret_cast<header_format_t*>(data_)
                 ->numchunks_nonzero_copy;
         }
 
-        bool piggy_back_flag_data() const noexcept
+        [[nodiscard]] bool piggy_back_flag_data() const noexcept
         {
             return reinterpret_cast<header_format_t*>(data_)
                 ->piggy_back_flag_data;
         }
 
-        bool piggy_back_flag_tchunk() const noexcept
+        [[nodiscard]] bool piggy_back_flag_tchunk() const noexcept
         {
             return reinterpret_cast<header_format_t*>(data_)
                 ->piggy_back_flag_tchunk;
         }
 
-        char* piggy_back_address() noexcept
+        [[nodiscard]] char* piggy_back_address() noexcept
         {
             if (piggy_back_flag_data() || piggy_back_flag_tchunk())
                 return &data_[sizeof(header_format_t)];
             return nullptr;
         }
 
-        size_t piggy_back_size() noexcept
+        [[nodiscard]] size_t piggy_back_size() const noexcept
         {
             size_t result = 0;
             if (piggy_back_flag_data())
@@ -243,14 +243,14 @@ namespace hpx::parcelset::policies::lci {
             return result;
         }
 
-        char* piggy_back_data() noexcept
+        [[nodiscard]] char* piggy_back_data() const noexcept
         {
             if (piggy_back_flag_data())
                 return &data_[sizeof(header_format_t)];
             return nullptr;
         }
 
-        char* piggy_back_tchunk() noexcept
+        [[nodiscard]] char* piggy_back_tchunk() const noexcept
         {
             size_t current_header_size = sizeof(header_format_t);
             if (!piggy_back_flag_tchunk())
