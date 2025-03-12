@@ -401,7 +401,8 @@ namespace hpx {
             static_assert(hpx::traits::is_output_iterator_v<FwdIter3>,
                 "Requires at least output iterator.");
 
-            using result_type = hpx::parallel::util::in_in_out_result<FwdIter1, FwdIter2, FwdIter3>;
+            using result_type = 
+                hpx::parallel::util::in_in_out_result<FwdIter1, FwdIter2, FwdIter3>;
 
             return hpx::parallel::util::get_third_element(
                 hpx::parallel::detail::set_union<result_type>().call(
