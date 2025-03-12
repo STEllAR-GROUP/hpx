@@ -26,15 +26,25 @@ namespace hpx::parcelset::policies::lci {
     {
         struct header_format_t
         {
+            // signature for assert_valid
             int signature;
+            // device idx
             int device_idx;
+            // tag
             int tag;
+            // non-zero-copy chunk size
             int numbytes_tchunk;
+            // transmission chunk size
             size_t numbytes_nonzero_copy;
+            // how many bytes in total (including zero-copy and non-zero-copy chunks)
             size_t numbytes;
+            // zero-copy chunk number
             int numchunks_zero_copy;
+            // non-zero-copy chunk number
             int numchunks_nonzero_copy;
+            // whether piggyback data
             bool piggy_back_flag_data;
+            // whether piggyback transmission chunk
             bool piggy_back_flag_tchunk;
         };
 
