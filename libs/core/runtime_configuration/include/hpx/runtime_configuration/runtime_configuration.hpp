@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -131,15 +131,17 @@ namespace hpx::util {
         std::ptrdiff_t get_stack_size(
             threads::thread_stacksize stacksize) const;
 
-        // Return the configured sizes of any of the know thread pools
+        // Return the configured sizes of the known thread pools
         std::size_t get_thread_pool_size(char const* poolname) const;
 
         // Return the endianness to be used for out-serialization
         std::string get_endian_out() const;
 
         // Return maximally allowed message sizes
-        std::uint64_t get_max_inbound_message_size() const;
-        std::uint64_t get_max_outbound_message_size() const;
+        std::uint64_t get_max_inbound_message_size(
+            std::string const& type) const;
+        std::uint64_t get_max_outbound_message_size(
+            std::string const& type) const;
 
         std::map<std::string, hpx::util::plugin::dll>& modules()
         {

@@ -58,7 +58,7 @@ public:
         return;
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(Component, call);
+    HPX_DEFINE_COMPONENT_ACTION(Component, call)
 };
 
 HPX_REGISTER_COMPONENT(hpx::components::component<Component>, Component);
