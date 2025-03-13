@@ -194,18 +194,8 @@ namespace hpx::util {
             static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE bool call(
                 TTuple const& t, UTuple const& u)
             {
-                if constexpr (has_default_sentinel_v<
-                                  hpx::tuple_element_t<I, TTuple>> ||
-                    has_default_sentinel_v<hpx::tuple_element_t<I, UTuple>>)
-                {
-                    return get<I>(t) == get<I>(u) ||
-                        one_tuple_element_equal_to<I + 1, Size>::call(t, u);
-                }
-                else
-                {
-                    return get<I>(t) == get<I>(u) &&
-                        one_tuple_element_equal_to<I + 1, Size>::call(t, u);
-                }
+                return get<I>(t) == get<I>(u) ||
+                    one_tuple_element_equal_to<I + 1, Size>::call(t, u);
             }
         };
 
@@ -294,17 +284,9 @@ namespace hpx::util {
                 noexcept(noexcept(
                     std::declval<IteratorTuple>() == std::declval<IterTuple>()))
             {
-                if constexpr (has_default_sentinel_v<IterTuple> ||
-                    has_default_sentinel_v<IteratorTuple>)
-                {
-                    return one_tuple_element_equal_to<0,
-                        hpx::tuple_size_v<IterTuple>>::call(iterators_,
-                        other.get_iterator_tuple());
-                }
-                else
-                {
-                    return iterators_ == other.get_iterator_tuple();
-                }
+                return one_tuple_element_equal_to<0,
+                    hpx::tuple_size_v<IterTuple>>::call(iterators_,
+                    other.get_iterator_tuple());
             }
 
             HPX_HOST_DEVICE constexpr typename base_type::reference

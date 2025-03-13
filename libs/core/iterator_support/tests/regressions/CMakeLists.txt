@@ -4,8 +4,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# Function tests
-set(tests custom_iterator_category_6640)
+# Iterator tests
+set(tests custom_iterator_category_6640 zip_iterator_different_range_length)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
