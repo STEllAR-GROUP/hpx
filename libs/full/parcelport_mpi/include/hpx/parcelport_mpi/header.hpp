@@ -25,30 +25,28 @@ namespace hpx::parcelset::policies::mpi {
 
     struct header
     {
-        using value_type = int;
-        enum data_pos
+        struct header_format_t
         {
             // signature for assert_valid
-            pos_signature = 0,
+            int signature;
             // tag
-            pos_tag = 1 * sizeof(value_type),
-            // enable ack handshakes
-            pos_ack_handshakes = 2 * sizeof(value_type),
+            int tag;
             // non-zero-copy chunk size
-            pos_numbytes_nonzero_copy = 3 * sizeof(value_type),
+            int numbytes_tchunk;
             // transmission chunk size
-            pos_numbytes_tchunk = 4 * sizeof(value_type),
+            size_t numbytes_nonzero_copy;
             // how many bytes in total (including zero-copy and non-zero-copy chunks)
-            pos_numbytes = 5 * sizeof(value_type),
+            size_t numbytes;
             // zero-copy chunk number
-            pos_numchunks_zero_copy = 6 * sizeof(value_type),
+            int numchunks_zero_copy;
             // non-zero-copy chunk number
-            pos_numchunks_nonzero_copy = 7 * sizeof(value_type),
+            int numchunks_nonzero_copy;
+            // enable ack handshakes
+            bool enable_ack_handshake;
             // whether piggyback data
-            pos_piggy_back_flag_data = 8 * sizeof(value_type),
+            bool piggy_back_flag_data;
             // whether piggyback transmission chunk
-            pos_piggy_back_flag_tchunk = 8 * sizeof(value_type) + 1,
-            pos_piggy_back_address = 8 * sizeof(value_type) + 2
+            bool piggy_back_flag_tchunk;
         };
 
         template <typename buffer_type, typename ChunkType>
@@ -56,28 +54,24 @@ namespace hpx::parcelset::policies::mpi {
             parcel_buffer<buffer_type, ChunkType> const& buffer,
             size_t max_header_size) noexcept
         {
-            HPX_ASSERT(max_header_size >= pos_piggy_back_address);
+            HPX_ASSERT(max_header_size >= sizeof(header_format_t));
 
-            size_t current_header_size = pos_piggy_back_address;
+            size_t current_header_size = sizeof(header_format_t);
             if (buffer.data_.size() <= (max_header_size - current_header_size))
             {
                 current_header_size += buffer.data_.size();
             }
-
-            int const num_zero_copy_chunks = buffer.num_chunks_.first;
-            [[maybe_unused]] int const num_non_zero_copy_chunks =
+            int num_zero_copy_chunks = buffer.num_chunks_.first;
+            [[maybe_unused]] int num_non_zero_copy_chunks =
                 buffer.num_chunks_.second;
             if (num_zero_copy_chunks != 0)
             {
                 HPX_ASSERT(buffer.transmission_chunks_.size() ==
-                    static_cast<size_t>(
-                        num_zero_copy_chunks + num_non_zero_copy_chunks));
-                int const tchunk_size =
-                    static_cast<int>(buffer.transmission_chunks_.size() *
-                        sizeof(typename parcel_buffer<buffer_type,
-                            ChunkType>::transmission_chunk_type));
-                if (tchunk_size <=
-                    static_cast<int>(max_header_size - current_header_size))
+                    size_t(num_zero_copy_chunks + num_non_zero_copy_chunks));
+                size_t tchunk_size = buffer.transmission_chunks_.size() *
+                    sizeof(typename parcel_buffer<buffer_type,
+                        ChunkType>::transmission_chunk_type);
+                if (tchunk_size <= max_header_size - current_header_size)
                 {
                     current_header_size += tchunk_size;
                 }
@@ -87,53 +81,51 @@ namespace hpx::parcelset::policies::mpi {
 
         template <typename buffer_type, typename ChunkType>
         header(parcel_buffer<buffer_type, ChunkType> const& buffer,
-            char* header_buffer, size_t max_header_size) noexcept
+            void* header_buffer, size_t max_header_size) noexcept
         {
-            HPX_ASSERT(max_header_size >= pos_piggy_back_address);
-            data_ = header_buffer;
-            memset(data_, 0, pos_piggy_back_address);
+            HPX_ASSERT(max_header_size >= sizeof(header_format_t));
+            data_ = static_cast<char*>(header_buffer);
+            header_format_t* p_format_ =
+                reinterpret_cast<header_format_t*>(data_);
+            p_format_ = reinterpret_cast<header_format_t*>(header_buffer);
+            memset(data_, 0, sizeof(header_format_t));
+            size_t size = buffer.data_.size();
+            size_t numbytes = buffer.data_size_;
+            HPX_ASSERT(
+                buffer.num_chunks_.first <= (std::numeric_limits<int>::max)());
+            HPX_ASSERT(
+                buffer.num_chunks_.second <= (std::numeric_limits<int>::max)());
+            int num_zero_copy_chunks = buffer.num_chunks_.first;
+            int num_non_zero_copy_chunks = buffer.num_chunks_.second;
 
-            std::int64_t const size =
-                static_cast<std::int64_t>(buffer.data_.size());
-            std::int64_t const numbytes =
-                static_cast<std::int64_t>(buffer.data_size_);
-            HPX_ASSERT(size <= (std::numeric_limits<value_type>::max)());
-            HPX_ASSERT(numbytes <= (std::numeric_limits<value_type>::max)());
+            p_format_->signature = MAGIC_SIGNATURE;
+            p_format_->numbytes_nonzero_copy = size;
+            p_format_->numbytes = numbytes;
+            p_format_->numchunks_zero_copy = num_zero_copy_chunks;
+            p_format_->numchunks_nonzero_copy = num_non_zero_copy_chunks;
+            p_format_->piggy_back_flag_data = false;
+            p_format_->piggy_back_flag_tchunk = false;
 
-            int const num_zero_copy_chunks = buffer.num_chunks_.first;
-            int const num_non_zero_copy_chunks = buffer.num_chunks_.second;
-
-            set(pos_signature, MAGIC_SIGNATURE);
-            set(pos_numbytes_nonzero_copy, static_cast<value_type>(size));
-            set(pos_numbytes, static_cast<value_type>(numbytes));
-            set(pos_numchunks_zero_copy, num_zero_copy_chunks);
-            set(pos_numchunks_nonzero_copy, num_non_zero_copy_chunks);
-            data_[pos_piggy_back_flag_data] = 0;
-            data_[pos_piggy_back_flag_tchunk] = 0;
-
-            size_t current_header_size = pos_piggy_back_address;
+            size_t current_header_size = sizeof(header_format_t);
             if (buffer.data_.size() <= (max_header_size - current_header_size))
             {
-                data_[pos_piggy_back_flag_data] = 1;
+                p_format_->piggy_back_flag_data = true;
                 std::memcpy(
                     &data_[current_header_size], &buffer.data_[0], size);
                 current_header_size += size;
             }
-
             if (num_zero_copy_chunks != 0)
             {
                 HPX_ASSERT(buffer.transmission_chunks_.size() ==
-                    static_cast<size_t>(
-                        num_zero_copy_chunks + num_non_zero_copy_chunks));
-                int const tchunk_size =
-                    static_cast<int>(buffer.transmission_chunks_.size() *
-                        sizeof(typename parcel_buffer<buffer_type,
-                            ChunkType>::transmission_chunk_type));
-                set(pos_numbytes_tchunk, static_cast<value_type>(tchunk_size));
-                if (tchunk_size <=
-                    static_cast<int>(max_header_size - current_header_size))
+                    size_t(num_zero_copy_chunks + num_non_zero_copy_chunks));
+                size_t tchunk_size = buffer.transmission_chunks_.size() *
+                    sizeof(typename parcel_buffer<buffer_type,
+                        ChunkType>::transmission_chunk_type);
+                HPX_ASSERT(tchunk_size <= (std::numeric_limits<int>::max)());
+                p_format_->numbytes_tchunk = tchunk_size;
+                if (tchunk_size <= max_header_size - current_header_size)
                 {
-                    data_[pos_piggy_back_flag_tchunk] = 1;
+                    p_format_->piggy_back_flag_tchunk = true;
                     std::memcpy(&data_[current_header_size],
                         buffer.transmission_chunks_.data(), tchunk_size);
                 }
@@ -147,7 +139,7 @@ namespace hpx::parcelset::policies::mpi {
 
         explicit header(char* header_buffer) noexcept
         {
-            data_ = header_buffer;
+            data_ = static_cast<char*>(header_buffer);
         }
 
         void reset() noexcept
@@ -170,92 +162,108 @@ namespace hpx::parcelset::policies::mpi {
             return data_;
         }
 
-        [[nodiscard]] size_t size() const noexcept
+        [[nodiscard]] size_t size() noexcept
         {
-            return pos_piggy_back_address + piggy_back_size();
+            return sizeof(header_format_t) + piggy_back_size();
         }
 
-        [[nodiscard]] value_type signature() const noexcept
+        [[nodiscard]] int signature() const noexcept
         {
-            return get(pos_signature);
-        }
-
-        void set_tag(int tag) noexcept
-        {
-            set(pos_tag, static_cast<value_type>(tag));
+            return reinterpret_cast<header_format_t*>(data_)->signature;
         }
 
         void set_ack_handshakes(bool enable_ack_handshakes) noexcept
         {
-            set(pos_ack_handshakes, enable_ack_handshakes ? 1 : 0);
+            reinterpret_cast<header_format_t*>(data_)->enable_ack_handshake =
+                enable_ack_handshakes;
         }
 
-        [[nodiscard]] value_type get_tag() const noexcept
+        [[nodiscard]] bool get_ack_handshakes() const noexcept
         {
-            return get(pos_tag);
+            return reinterpret_cast<header_format_t*>(data_)
+                ->enable_ack_handshake;
         }
 
-        [[nodiscard]] value_type get_ack_handshakes() const noexcept
+        void set_tag(int tag) noexcept
         {
-            return get(pos_ack_handshakes);
+            reinterpret_cast<header_format_t*>(data_)->tag = tag;
         }
 
-        [[nodiscard]] value_type numbytes_nonzero_copy() const noexcept
+        [[nodiscard]] int get_tag() const noexcept
         {
-            return get(pos_numbytes_nonzero_copy);
+            return reinterpret_cast<header_format_t*>(data_)->tag;
         }
 
-        [[nodiscard]] value_type numbytes_tchunk() const noexcept
+        [[nodiscard]] size_t numbytes_nonzero_copy() const noexcept
         {
-            return get(pos_numbytes_tchunk);
+            return reinterpret_cast<header_format_t*>(data_)
+                ->numbytes_nonzero_copy;
         }
 
-        [[nodiscard]] value_type numbytes() const noexcept
+        [[nodiscard]] int numbytes_tchunk() const noexcept
         {
-            return get(pos_numbytes);
+            return reinterpret_cast<header_format_t*>(data_)->numbytes_tchunk;
         }
 
-        [[nodiscard]] value_type num_zero_copy_chunks() const noexcept
+        [[nodiscard]] size_t numbytes() const noexcept
         {
-            return get(pos_numchunks_zero_copy);
+            return reinterpret_cast<header_format_t*>(data_)->numbytes;
         }
 
-        [[nodiscard]] value_type num_non_zero_copy_chunks() const noexcept
+        [[nodiscard]] int num_zero_copy_chunks() const noexcept
         {
-            return get(pos_numchunks_nonzero_copy);
+            return reinterpret_cast<header_format_t*>(data_)
+                ->numchunks_zero_copy;
         }
 
-        [[nodiscard]] constexpr char* piggy_back_address() const noexcept
+        [[nodiscard]] int num_non_zero_copy_chunks() const noexcept
         {
-            if (data_[pos_piggy_back_flag_data] ||
-                data_[pos_piggy_back_flag_tchunk])
-                return &data_[pos_piggy_back_address];
+            return reinterpret_cast<header_format_t*>(data_)
+                ->numchunks_nonzero_copy;
+        }
+
+        [[nodiscard]] bool piggy_back_flag_data() const noexcept
+        {
+            return reinterpret_cast<header_format_t*>(data_)
+                ->piggy_back_flag_data;
+        }
+
+        [[nodiscard]] bool piggy_back_flag_tchunk() const noexcept
+        {
+            return reinterpret_cast<header_format_t*>(data_)
+                ->piggy_back_flag_tchunk;
+        }
+
+        [[nodiscard]] char* piggy_back_address() noexcept
+        {
+            if (piggy_back_flag_data() || piggy_back_flag_tchunk())
+                return &data_[sizeof(header_format_t)];
             return nullptr;
         }
 
-        [[nodiscard]] int piggy_back_size() const noexcept
+        [[nodiscard]] size_t piggy_back_size() const noexcept
         {
-            int result = 0;
-            if (data_[pos_piggy_back_flag_data])
+            size_t result = 0;
+            if (piggy_back_flag_data())
                 result += numbytes_nonzero_copy();
-            if (data_[pos_piggy_back_flag_tchunk])
+            if (piggy_back_flag_tchunk())
                 result += numbytes_tchunk();
             return result;
         }
 
-        [[nodiscard]] constexpr char* piggy_back_data() const noexcept
+        [[nodiscard]] char* piggy_back_data() const noexcept
         {
-            if (data_[pos_piggy_back_flag_data])
-                return &data_[pos_piggy_back_address];
+            if (piggy_back_flag_data())
+                return &data_[sizeof(header_format_t)];
             return nullptr;
         }
 
-        [[nodiscard]] constexpr char* piggy_back_tchunk() const noexcept
+        [[nodiscard]] char* piggy_back_tchunk() const noexcept
         {
-            size_t current_header_size = pos_piggy_back_address;
-            if (!data_[pos_piggy_back_flag_tchunk])
+            size_t current_header_size = sizeof(header_format_t);
+            if (!piggy_back_flag_tchunk())
                 return nullptr;
-            if (data_[pos_piggy_back_flag_data])
+            if (piggy_back_flag_data())
                 current_header_size += numbytes_nonzero_copy();
             return &data_[current_header_size];
         }
@@ -264,16 +272,6 @@ namespace hpx::parcelset::policies::mpi {
         // random magic number for assert_valid
         static constexpr int MAGIC_SIGNATURE = 19527;
         char* data_;
-
-        constexpr void set(std::size_t Pos, value_type const& t) noexcept
-        {
-            *hpx::bit_cast<value_type*>(&data_[Pos]) = t;
-        }
-
-        [[nodiscard]] constexpr value_type get(std::size_t Pos) const noexcept
-        {
-            return *hpx::bit_cast<value_type const*>(&data_[Pos]);
-        }
     };
 }    // namespace hpx::parcelset::policies::mpi
 
