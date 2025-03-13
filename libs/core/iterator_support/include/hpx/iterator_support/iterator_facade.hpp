@@ -383,11 +383,19 @@ namespace hpx::util {
         typename Reference = T&, typename Distance = std::ptrdiff_t,
         typename Pointer = void>
     struct iterator_facade
-      : detail::iterator_facade_base<Derived, T, Category, Reference, Distance,
-            Pointer>
+      : detail::iterator_facade_base<Derived, T,
+            // clang-format off
+            decltype(traits::detail::coerce_iterator_tag(
+                std::declval<Category>())),
+            // clang-format on
+            Reference, Distance, Pointer>
     {
     private:
-        using base_type = detail::iterator_facade_base<Derived, T, Category,
+        using base_type = detail::iterator_facade_base<Derived, T,
+            // clang-format off
+            decltype(traits::detail::coerce_iterator_tag(
+                std::declval<Category>())),
+            // clang-format on
             Reference, Distance, Pointer>;
 
     protected:
