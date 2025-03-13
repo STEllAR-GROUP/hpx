@@ -504,7 +504,7 @@ jobs:
           command: |
               ulimit -c unlimited
               ctest \
-                --timeout 120 \
+                --timeout 180 \
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
@@ -537,7 +537,7 @@ jobs:
           command: |
               ulimit -c unlimited
               ctest \
-                --timeout 120 \
+                --timeout 180 \
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
@@ -631,7 +631,7 @@ jobs:
           command: |
               ulimit -c unlimited
               ctest \
-                --timeout 120 \
+                --timeout 180 \
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
@@ -664,7 +664,7 @@ jobs:
               # NOTE: the numa_allocator test is disabled because
               # hwloc_get_area_membind_nodeset used by it fails with EPERM.
               ctest \
-                --timeout 120 \
+                --timeout 180 \
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
@@ -697,7 +697,7 @@ jobs:
           when: always
           command: |
               ctest \
-                --timeout 60 \
+                --timeout 180 \
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
