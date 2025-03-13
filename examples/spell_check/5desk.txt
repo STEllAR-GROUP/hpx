@@ -3536,7 +3536,7 @@ atropine
 Atropos
 attach
 attachable
-attache
+attachÃ©
 attached
 attachment
 attack
@@ -20747,7 +20747,7 @@ founder
 founding
 foundling
 foundry
-fount
+found
 fountain
 fountainhead
 four
@@ -22132,7 +22132,7 @@ Gipsy
 gipsy
 giraffe
 Giraudoux
-gird
+grid
 girder
 girdle
 girdler
@@ -25223,7 +25223,7 @@ housing
 Housman
 Houston
 Houstonian
-hove
+have
 hovel
 hover
 hovercraft
@@ -27274,7 +27274,7 @@ Inland
 inland
 inlay
 inlet
-inly
+only
 inmate
 inmost
 inn
@@ -49594,7 +49594,7 @@ sing
 singable
 Singapore
 Singaporean
-singe
+single
 Singer
 singer
 Singhalese
@@ -59319,7 +59319,7 @@ viscous
 viscously
 viscousness
 viscus
-vise
+vice
 Vishakhapatnam
 Vishnu
 visibility
