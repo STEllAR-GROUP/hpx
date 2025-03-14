@@ -31,10 +31,6 @@ foreach(test ${tests})
     FOLDER "Tests/Regressions/Modules/Full/Parcelset"
   )
 
-  # Disable the test for very_big_parcel due to limited CircleCI resources
-  if(${test} STREQUAL "very_big_parcel")
-    continue()
-  endif()
   add_hpx_regression_test(
     "modules.parcelset" ${test} ${${test}_PARAMETERS} TIMEOUT 900
   )
