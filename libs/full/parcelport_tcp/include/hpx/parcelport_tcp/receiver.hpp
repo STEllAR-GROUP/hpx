@@ -53,9 +53,7 @@ namespace hpx::parcelset::policies::tcp {
 
     class connection_handler;
 
-    class receiver
-      : public parcelport_connection<receiver, std::vector<char>,
-            serialization::serialization_chunk>
+    class receiver : public parcelport_connection<receiver>
     {
     public:
         receiver(asio::io_context& io_service, std::uint64_t max_inbound_size,
@@ -175,7 +173,9 @@ namespace hpx::parcelset::policies::tcp {
                 // Determine the length of the serialized data.
                 std::uint64_t const inbound_size = buffer_.size_;
 
-                if (inbound_size > max_inbound_size_)
+                // check for the message exceeding the given limit (only if
+                // given)
+                if (max_inbound_size_ != 0 && inbound_size > max_inbound_size_)
                 {
                     // report this problem back to the handler
                     handler(asio::error::make_error_code(

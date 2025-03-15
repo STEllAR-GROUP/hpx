@@ -77,7 +77,9 @@ namespace hpx::parcelset::policies::lci {
         void free()
         {
             HPX_ASSERT(ptr != nullptr);
-            delete[](char*) ptr;
+            // clang-format off
+            delete[] (char*) ptr;
+            // clang-format on
         }
     };
 
@@ -116,8 +118,7 @@ namespace hpx::parcelset::policies::lci {
 
     struct receiver_base
     {
-        using buffer_type =
-            parcel_buffer<buffer_wrapper, serialization::serialization_chunk>;
+        using buffer_type = parcel_buffer<buffer_wrapper>;
 
         explicit receiver_base(parcelport* pp) noexcept
           : pp_(pp)
