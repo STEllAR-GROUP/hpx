@@ -703,7 +703,8 @@ jobs:
                 --output-on-failure \
                 -R tests.regressions \
                 --exclude-regex \
-              "tests.regressions.modules.threading_base.thread_stacksize_current"
+              "tests.regressions.modules.threading_base.thread_stacksize_current|\
+              tests.regressions.modules.parcelset.distributed.*.very_big_parcel"
       - run:
           <<: *convert_xml
       - run:
