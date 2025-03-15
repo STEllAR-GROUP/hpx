@@ -32,7 +32,7 @@ namespace hpx::compute::host {
             {
             }
 
-            explicit native_handle_type(hpx::threads::mask_type mask)
+            explicit native_handle_type(hpx::threads::mask_type const& mask)
               : mask_(mask)
             {
             }
@@ -56,7 +56,7 @@ namespace hpx::compute::host {
         target() = default;
 
         // Constructs target from a given mask of processing units
-        explicit target(hpx::threads::mask_type mask)
+        explicit target(hpx::threads::mask_type const& mask)
           : handle_(mask)
         {
         }
