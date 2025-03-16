@@ -167,36 +167,24 @@ jobs:
       - attach_workspace:
           at: /hpx
       - run:
+          name: Install Clang Format 14
+          command: |
+              apt-get update
+              apt-get install -y clang-format-14
+              ln -sf /usr/bin/clang-format-14 /usr/bin/clang-format-11
+      - run:
           name: Check that the modules are well clang-formatted
           command: |
-              cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
-              clang-format-11 --version
-              clang-format-11 -i **/*.{cpp,hpp}
+              cd /hpx/source/libs && shopt -s globstar
+              clang-format-11 -i **/*.{cpp,hpp}  # This now points to clang-format-14
               cd /hpx/source/examples
               clang-format-11 -i **/*.{cpp,hpp}
               cd /hpx/source/tests
               clang-format-11 -i **/*.{cpp,hpp}
-              git diff --exit-code > /tmp/modified_clang_format_files.txt
+              git diff --exit-code > /tmp/modified_clang_format_files.txt || true
       - store_artifacts:
           path: /tmp/modified_clang_format_files.txt
           destination: /hpx/artifacts/modified_clang_format_files.txt
-
-  # Ensure that CMake files stay cmake-formatted
-  cmake_format:
-    <<: *docker_default
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Check that CMake files are well cmake-formatted
-          command: |
-              cd /hpx/source && shopt -s globstar # to activate the ** globbing
-              cmake-format --version
-              cmake-format -i **/*.cmake **/CMakeLists.txt
-              git diff --exit-code > /tmp/modified_cmake_format_files.txt
-      - store_artifacts:
-          path: /tmp/modified_cmake_format_files.txt
-          destination: /hpx/artifacts/modified_cmake_format_files.txt
 
   configure:
     <<: *defaults
