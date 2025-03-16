@@ -186,6 +186,24 @@ jobs:
           path: /tmp/modified_clang_format_files.txt
           destination: /hpx/artifacts/modified_clang_format_files.txt
 
+
+  # Ensure that CMake files stay cmake-formatted
+  cmake_format:
+    <<: *docker_default
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Check that CMake files are well cmake-formatted
+          command: |
+              cd /hpx/source && shopt -s globstar # to activate the ** globbing
+              cmake-format --version
+              cmake-format -i **/*.cmake **/CMakeLists.txt
+              git diff --exit-code > /tmp/modified_cmake_format_files.txt
+      - store_artifacts:
+          path: /tmp/modified_cmake_format_files.txt
+          destination: /hpx/artifacts/modified_cmake_format_files.txt
+
   configure:
     <<: *defaults
     steps:
