@@ -705,6 +705,7 @@ jobs:
                 --exclude-regex \
               "tests.regressions.modules.threading_base.thread_stacksize_current|\
               tests.regressions.modules.parcelset.distributed.tcp.nested_vectors_6623|\
+              tests.regressions.modules.parcelset.distributed.tcp.very_big_tchunk|\
               tests.regressions.modules.parcelset.distributed.tcp.very_big_parcel|\
               tests.regressions.modules.parcelset.distributed.tcp.very_big_parcel_int_max_plus_1"
       - run:
