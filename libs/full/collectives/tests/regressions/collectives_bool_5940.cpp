@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,11 +30,13 @@ constexpr char const* scatter_bool_basename = "/test/scatter_bool/";
 
 void test_all_reduce_bool()
 {
-    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
-    std::uint32_t here = hpx::get_locality_id();
+    std::uint32_t const num_localities =
+        hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t const here = hpx::get_locality_id();
 
-    auto all_reduce_bool_client = create_communicator(add_reduce_bool_basename,
-        num_sites_arg(num_localities), this_site_arg(here));
+    auto const all_reduce_bool_client =
+        create_communicator(add_reduce_bool_basename,
+            num_sites_arg(num_localities), this_site_arg(here));
 
     // test functionality based on immediate local result value
     for (int i = 0; i != 10; ++i)
@@ -50,13 +52,15 @@ void test_all_reduce_bool()
 
 void test_broadcast_bool()
 {
-    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
-    HPX_TEST_LTE(std::uint32_t(2), num_localities);
+    std::uint32_t const num_localities =
+        hpx::get_num_localities(hpx::launch::sync);
+    HPX_TEST_LTE(static_cast<std::uint32_t>(2), num_localities);
 
-    std::uint32_t here = hpx::get_locality_id();
+    std::uint32_t const here = hpx::get_locality_id();
 
-    auto broadcast_bool_client = create_communicator(broadcast_bool_basename,
-        num_sites_arg(num_localities), this_site_arg(here));
+    auto const broadcast_bool_client =
+        create_communicator(broadcast_bool_basename,
+            num_sites_arg(num_localities), this_site_arg(here));
 
     // test functionality based on immediate local result value
     for (std::uint32_t i = 0; i != 10; ++i)
@@ -81,10 +85,11 @@ void test_broadcast_bool()
 
 void test_exclusive_scan_bool()
 {
-    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
-    std::uint32_t here = hpx::get_locality_id();
+    std::uint32_t const num_localities =
+        hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t const here = hpx::get_locality_id();
 
-    auto exclusive_scan_bool_client =
+    auto const exclusive_scan_bool_client =
         create_communicator(exclusive_scan_bool_basename,
             num_sites_arg(num_localities), this_site_arg(here));
 
@@ -94,7 +99,7 @@ void test_exclusive_scan_bool()
         bool value = i % 2 ? true : false;
 
         hpx::future<bool> overall_result =
-            exclusive_scan(exclusive_scan_bool_client, value,
+            exclusive_scan(exclusive_scan_bool_client, value, value,
                 std::logical_or<>{}, generation_arg(i + 1));
 
         HPX_TEST_EQ(value, overall_result.get());
@@ -103,10 +108,11 @@ void test_exclusive_scan_bool()
 
 void test_inclusive_scan_bool()
 {
-    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
-    std::uint32_t here = hpx::get_locality_id();
+    std::uint32_t const num_localities =
+        hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t const here = hpx::get_locality_id();
 
-    auto inclusive_scan_client =
+    auto const inclusive_scan_client =
         create_communicator(inclusive_scan_bool_basename,
             num_sites_arg(num_localities), this_site_arg(here));
 
@@ -124,10 +130,11 @@ void test_inclusive_scan_bool()
 
 void test_reduce_bool()
 {
-    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
-    std::uint32_t this_locality = hpx::get_locality_id();
+    std::uint32_t const num_localities =
+        hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t const this_locality = hpx::get_locality_id();
 
-    auto reduce_bool_client = create_communicator(reduce_bool_basename,
+    auto const reduce_bool_client = create_communicator(reduce_bool_basename,
         num_sites_arg(num_localities), this_site_arg(this_locality));
 
     // test functionality based on immediate local result value
@@ -152,12 +159,13 @@ void test_reduce_bool()
 
 void test_scatter_bool()
 {
-    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
-    HPX_TEST_LTE(std::uint32_t(2), num_localities);
+    std::uint32_t const num_localities =
+        hpx::get_num_localities(hpx::launch::sync);
+    HPX_TEST_LTE(static_cast<std::uint32_t>(2), num_localities);
 
-    std::uint32_t this_locality = hpx::get_locality_id();
+    std::uint32_t const this_locality = hpx::get_locality_id();
 
-    auto scatter_bool_client =
+    auto const scatter_bool_client =
         hpx::collectives::create_communicator(scatter_bool_basename,
             num_sites_arg(num_localities), this_site_arg(this_locality));
 
@@ -168,9 +176,9 @@ void test_scatter_bool()
         if (this_locality == 0)
         {
             std::vector<bool> data(num_localities);
-            for (std::size_t i = 0; i != data.size(); ++i)
+            for (std::size_t j = 0; j != data.size(); ++j)
             {
-                data[i] = value;
+                data[j] = value;
             }
 
             hpx::future<bool> result = scatter_to(
