@@ -366,10 +366,10 @@ namespace hpx {
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
                     !hpx::traits::is_random_access_iterator_v<FwdIter1> ||
                     !hpx::traits::is_random_access_iterator_v<FwdIter2>>;
-
+             //clang-format off                          
             using in_out_result = hpx::parallel::util::in_in_out_result;
             using result_type = in_out_result<FwdIter1, FwdIter2, FwdIter3>;
-
+             //clang-format on
             return hpx::parallel::util::get_third_element(
                 hpx::parallel::detail::set_union<result_type>().call2(
                     HPX_FORWARD(ExPolicy, policy), is_seq(), first1, last1,
@@ -400,10 +400,10 @@ namespace hpx {
                 "Requires at least input iterator.");
             static_assert(hpx::traits::is_output_iterator_v<FwdIter3>,
                 "Requires at least output iterator.");
-
+                //clang-format off
                 using in_out_result = hpx::parallel::util::in_in_out_result;
                 using result_type = in_out_result<FwdIter1, FwdIter2, FwdIter3>;
-
+                //clang-format on
             return hpx::parallel::util::get_third_element(
                 hpx::parallel::detail::set_union<result_type>().call(
                     hpx::execution::seq, first1, last1, first2, last2, dest,
