@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  Parts of this code were taken from the Boost.Asio library
 //  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
@@ -17,6 +17,7 @@
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <winsock2.h>
 #endif
+#include <asio/executor_work_guard.hpp>
 #include <asio/io_context.hpp>
 
 // The boost asio support includes termios.h. The termios.h file on ppc64le
@@ -40,9 +41,6 @@ namespace hpx::util {
     class io_service_pool
     {
     public:
-        HPX_NON_COPYABLE(io_service_pool);
-
-    public:
         /// \brief Construct the io_service pool.
         /// \param pool_size [in] The number of threads to run to serve incoming
         ///                  requests
@@ -61,6 +59,11 @@ namespace hpx::util {
         explicit io_service_pool(
             threads::policies::callback_notifier const& notifier,
             char const* pool_name = "", char const* name_postfix = "");
+
+        io_service_pool(io_service_pool const&) = delete;
+        io_service_pool(io_service_pool&&) = delete;
+        io_service_pool& operator=(io_service_pool const&) = delete;
+        io_service_pool& operator=(io_service_pool&&) = delete;
 
         ~io_service_pool();
 
@@ -94,7 +97,7 @@ namespace hpx::util {
         std::thread& get_os_thread_handle(std::size_t thread_num);
 
         /// \brief Get number of threads associated with this I/O service.
-        constexpr std::size_t size() const noexcept
+        [[nodiscard]] constexpr std::size_t size() const noexcept
         {
             return pool_size_;
         }
@@ -103,7 +106,7 @@ namespace hpx::util {
         void thread_run(std::size_t index, barrier* startup = nullptr) const;
 
         /// \brief Return name of this pool
-        constexpr char const* get_name() const noexcept
+        [[nodiscard]] constexpr char const* get_name() const noexcept
         {
             return pool_name_;
         }
@@ -120,14 +123,12 @@ namespace hpx::util {
 
     private:
         using io_service_ptr = std::unique_ptr<asio::io_context>;
-        using work_type = std::unique_ptr<asio::io_context::work>;
 
-        HPX_FORCEINLINE static work_type initialize_work(
-            asio::io_context& io_service)
-        {
-            return work_type(
-                std::make_unique<asio::io_context::work>(io_service));
-        }
+        using raw_work_type =
+            asio::executor_work_guard<asio::io_context::executor_type>;
+        using work_type = std::unique_ptr<raw_work_type>;
+
+        static work_type initialize_work(asio::io_context& io_service);
 
         std::mutex mtx_;
 
