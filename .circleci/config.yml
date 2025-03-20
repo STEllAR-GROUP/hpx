@@ -166,8 +166,8 @@ jobs:
     steps:
       - attach_workspace:
           at: /hpx
-      - run:
-          name: Install Clang Format 14
+      - run:s
+          name: Install Clang Format 11
           command: |
               apt-get update
               apt-get install -y clang-format-11
