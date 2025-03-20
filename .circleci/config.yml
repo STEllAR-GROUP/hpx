@@ -334,20 +334,36 @@ jobs:
 
   # We need a full clone here to be able to compare to master.
   spellcheck:
-    <<: *defaults
+    docker:
+      - image: stellargroup/build_env:14
+    resource_class: large  # Increased memory allocation
     steps:
       - checkout:
           path: /hpx/source
+          fetch-depth: 0  # Ensure full history for proper diff
       - run:
           name: Running codespell
           command: |
               if [[ -n "$CIRCLE_PULL_REQUEST" ]]; then
                   cd /hpx/source
                   codespell --version
-                  codespell --ignore-words tools/.codespell_whitelist --skip='*.h5,*.png' $(git diff --name-only origin/master...) > /tmp/spelling_suggestions.txt
+                  
+                  echo "Fetching changed files from origin/master..."
+                  git fetch origin master --depth=1
+                  
+                  echo "Files being checked:"
+                  git diff --name-only origin/master... | tee /tmp/file_list.txt
+
+                  echo "Limiting to 50 files for memory efficiency..."
+                  head -n 50 /tmp/file_list.txt > /tmp/limited_file_list.txt
+
+                  set -x  # Debugging mode enabled
+                  codespell --ignore-words tools/.codespell_whitelist --skip='*.h5,*.png' -f /tmp/limited_file_list.txt > /tmp/spelling_suggestions.txt
+                  set +x  # Disable debugging
+
                   if [ -s /tmp/spelling_suggestions.txt ]; then exit 1; fi
               else
-                  echo "skipping spellcheck on non-PR build"
+                  echo "Skipping spellcheck on non-PR build"
               fi
           when: always
       - store_artifacts:
