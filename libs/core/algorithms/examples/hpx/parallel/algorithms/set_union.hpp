@@ -9,6 +9,9 @@ ss//  Copyright (c) 2007-2023 Hartmut Kaiser
 /// \headerfile hpx/algorithm.hpp
 
 #pragma once
+#pragma GCC diagnostic ignored "-Woverlength-strings"
+#pragma GCC diagnostic ignored "-Wlong-lines"
+#pragma clang diagnostic ignored "-Woverlength-strings"
 
 #if defined(DOXYGEN)
 namespace hpx {
