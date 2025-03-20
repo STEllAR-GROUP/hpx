@@ -27,16 +27,26 @@ namespace hpx::compute::host {
         hpx::threads::mask_type const mask = native_handle().get_device();
         std::size_t const mask_size = hpx::threads::mask_size(mask);
 
+        bool found_one = false;
+
         std::size_t num_thread = 0;
         for (/**/; num_thread != num_os_threads; ++num_thread)
         {
             if (hpx::threads::bit_and(
                     mask, rp.get_pu_mask(num_thread), mask_size))
             {
+                found_one = true;
                 break;
             }
         }
-        return std::make_pair(num_thread, hpx::threads::count(mask));
+
+        if (!found_one)
+        {
+            return std::make_pair(static_cast<std::size_t>(-1), 0);
+        }
+
+        return std::make_pair(
+            num_thread, (std::min)(num_os_threads, hpx::threads::count(mask)));
     }
 
     void target::serialize(serialization::input_archive& ar, unsigned int)
