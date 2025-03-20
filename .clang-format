@@ -59,7 +59,7 @@ BreakBeforeInheritanceComma: true
 BreakBeforeTernaryOperators: false
 BreakConstructorInitializersBeforeComma: true
 BreakStringLiterals: true
-ColumnLimit: 0
+ColumnLimit: 80
 CommentPragmas: "///"
 CompactNamespaces: true
 ConstructorInitializerAllOnOneLineOrOnePerLine: false

@@ -9,9 +9,6 @@ ss//  Copyright (c) 2007-2023 Hartmut Kaiser
 /// \headerfile hpx/algorithm.hpp
 
 #pragma once
-#pragma GCC diagnostic ignored "-Woverlength-strings"
-#pragma GCC diagnostic ignored "-Wlong-lines"
-#pragma clang diagnostic ignored "-Woverlength-strings"
 
 #if defined(DOXYGEN)
 namespace hpx {
@@ -370,7 +367,8 @@ namespace hpx {
                     !hpx::traits::is_random_access_iterator_v<FwdIter1> ||
                     !hpx::traits::is_random_access_iterator_v<FwdIter2>>;
 
-            using result_type = hpx::parallel::util::in_in_out_result<FwdIter1,FwdIter2, FwdIter3>;
+            using in_out_result = hpx::parallel::util::in_in_out_result;
+            using result_type = in_out_result<FwdIter1, FwdIter2, FwdIter3>;
 
             return hpx::parallel::util::get_third_element(
                 hpx::parallel::detail::set_union<result_type>().call2(
@@ -403,7 +401,8 @@ namespace hpx {
             static_assert(hpx::traits::is_output_iterator_v<FwdIter3>,
                 "Requires at least output iterator.");
 
-            using result_type = hpx::parallel::util::in_in_out_result<FwdIter1,FwdIter2,FwdIter3>;
+                using in_out_result = hpx::parallel::util::in_in_out_result;
+                using result_type = in_out_result<FwdIter1, FwdIter2, FwdIter3>;
 
             return hpx::parallel::util::get_third_element(
                 hpx::parallel::detail::set_union<result_type>().call(
