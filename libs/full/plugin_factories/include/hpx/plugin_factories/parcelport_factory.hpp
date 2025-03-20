@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2020 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -54,6 +54,11 @@ namespace hpx::plugins {
         {
             factories.push_back(this);
         }
+
+        parcelport_factory(parcelport_factory const&) = delete;
+        parcelport_factory(parcelport_factory&&) = delete;
+        parcelport_factory& operator=(parcelport_factory const&) = delete;
+        parcelport_factory& operator=(parcelport_factory&&) = delete;
 
         ~parcelport_factory() override
         {
@@ -125,8 +130,9 @@ namespace hpx::plugins {
                 traits::plugin_config_data<Parcelport>::priority() + "}");
 
             // get the parcelport specific information ...
-            char const* more = traits::plugin_config_data<Parcelport>::call();
-            if (more != nullptr)    // -V547
+            if (char const* more =
+                    traits::plugin_config_data<Parcelport>::call();
+                more != nullptr)    // -V547
             {
                 std::vector<std::string> data;
                 hpx::string_util::split(
