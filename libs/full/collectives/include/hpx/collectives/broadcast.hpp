@@ -392,6 +392,79 @@ namespace hpx::collectives {
                                      this_site, generation, root_site),
             this_site);
     }
+
+    template <typename T>
+    hpx::future<std::decay_t<T>> broadcast_to_hierarchically(
+        std::vector<std::tuple<communicator,int>> communicators, 
+        T&& local_result,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg(),
+        int arity = 2)
+{
+        if (this_site == static_cast<std::size_t>(-1))
+        {
+            this_site = agas::get_locality_id();
+        }
+        if (generation == 0)
+        {
+            return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
+                hpx::error::bad_parameter, "hpx::collectives::scatter_to",
+                "the generation number shouldn't be zero"));
+        }
+        
+        communicator current_communicator = std::get<0>(communicators[0]);
+        int current_site = std::get<1>(communicators[0]);
+        if (this_site == root_site)
+        {
+            T current_local_result = std::move(local_result);
+            for (int i = 0; i < communicators.size()-1;i++)
+            {
+                current_communicator = std::get<0>(communicators[i]);
+                current_local_result = broadcast_to(current_communicator, std::move(current_local_result), generation, this_site_arg(0)).get();
+            }
+            current_communicator = std::get<0>(communicators[communicators.size()-1]);
+            return broadcast_to(current_communicator, std::move(current_local_result), generation, this_site_arg(0));
+        } 
+    }
+
+    template <typename T>
+    hpx::future<T> broadcast_from_hierarchically(
+        std::vector<std::tuple<communicator,int>> communicators,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg(),
+        int arity = 2)
+{
+        if (this_site == static_cast<std::size_t>(-1))
+        {
+            this_site = agas::get_locality_id();
+        }
+        if (generation == 0)
+        {
+            return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
+                hpx::error::bad_parameter, "hpx::collectives::scatter_to",
+                "the generation number shouldn't be zero"));
+        }
+        
+        communicator current_communicator = std::get<0>(communicators[0]);
+        int current_site = std::get<1>(communicators[0]);
+        if (this_site != root_site && communicators.size()>1)
+        {
+            T current_local_result = broadcast_from<T>(current_communicator, generation, this_site_arg(current_site)).get();
+            for (int i = 1; i < communicators.size()-1; i++)
+            {
+                current_communicator = std::get<0>(communicators[i]);
+                current_local_result = broadcast_to(current_communicator, std::move(current_local_result), generation, this_site_arg(0)).get();
+            }
+            current_communicator = std::get<0>(communicators[communicators.size()-1]);
+            return broadcast_to(current_communicator, std::move(current_local_result), generation, this_site_arg(0));
+        } 
+        else if (this_site != root_site )
+        {
+            return broadcast_from<T>(current_communicator, generation, this_site_arg(current_site));
+        }
+    }
 }    // namespace hpx::collectives
 
 ////////////////////////////////////////////////////////////////////////////////
