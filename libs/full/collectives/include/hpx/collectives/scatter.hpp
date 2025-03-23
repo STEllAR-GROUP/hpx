@@ -586,6 +586,176 @@ namespace hpx::collectives {
             HPX_MOVE(local_result), this_site);
     }
 
+    
+
+    template <typename T>
+    hpx::future<T> scatter_from_hierarchically(
+        std::vector<std::tuple<communicator,int>> communicators, 
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg(),
+        int arity = 2)
+{
+
+        if (this_site == static_cast<std::size_t>(-1))
+        {
+            this_site = agas::get_locality_id();
+        }
+        if (generation == 0)
+        {
+            return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
+                hpx::error::bad_parameter, "hpx::collectives::scatter_to",
+                "the generation number shouldn't be zero"));
+        }
+
+        communicator current_communicator = std::get<0>(communicators[0]);
+        int current_site = std::get<1>(communicators[0]);
+        /* if (this_site != root_site)
+        {
+            if (communicators.size() == 1)
+            {
+                return scatter_from<T>(current_communicator, generation_arg(generation), this_site_arg(current_site));
+            }
+            else
+            {
+                std::vector<T> intermediary_node = scatter_from<std::vector<T>>(current_communicator, generation, this_site_arg(current_site)).get();
+                for (int i = 1; i < communicators.size()-1;i++)
+                {
+                    current_communicator = std::get<0>(communicators[i]);
+                    std::vector<std::vector<T>> grouped_intermediate(arity);
+                    //std::cout << "this_site: " << this_site << " number of Intermediary Results " << intermediate_result.size() <<"\n";
+                    int step_size = intermediary_node.size()/arity;
+                    for (int j = 0; j< arity; j++)
+                    {
+                        std::move(intermediary_node.begin()+ j*step_size, intermediary_node.begin() + (j+1)*step_size, std::back_inserter(grouped_intermediate[j]));
+                    //grouped_intermediate[j] = std::vector<T>(arity, intermediate_result[0]);
+                    }
+                    intermediary_node = scatter_to(current_communicator,std::move(grouped_intermediate), this_site_arg(0), generation).get();
+                }
+                return scatter_to(current_communicator, std::move(intermediary_node), this_site_arg(0), generation);
+
+            }
+        } */
+        if (communicators.size()== 1 &&  current_site != 0){
+
+            return scatter_from<T>(current_communicator, generation_arg(generation), this_site_arg(current_site));
+        }
+        else
+        {
+            /* int adjusted_site = this_site/min_sites;
+            while (adjusted_site % arity == 0 && adjusted_site != 0)
+            {
+                adjusted_site /= arity;
+            } */
+            std::vector<T> intermediary_node = scatter_from<std::vector<T>>(current_communicator, this_site_arg(current_site), generation).get();
+            for (int i = 1; i < communicators.size();i++)
+            {
+                current_communicator = std::get<0>(communicators[i]);
+                if (i == communicators.size()-1)
+                {
+                    return scatter_to(current_communicator, std::move(intermediary_node), this_site_arg(0), generation);
+                }
+                else 
+                {
+                    std::vector<std::vector<T>> grouped_intermediate(arity);
+                    //std::cout << "this_site: " << this_site << " number of Intermediary Results " << intermediate_result.size() <<"\n";
+                    float step_size = intermediary_node.size()/arity;
+                    for (int j = 0; j< arity; j++)
+                    {
+                        std::move(intermediary_node.begin()+ j*step_size, intermediary_node.begin() + (j+1)*step_size, std::back_inserter(grouped_intermediate[j]));
+                        //grouped_intermediate[j] = std::vector<T>(arity, intermediate_result[0]);
+                    }
+                    intermediary_node = scatter_to(current_communicator,std::move(grouped_intermediate), this_site_arg(0), generation).get();
+                }
+            }
+
+        }
+
+        
+
+}
+
+template <typename T>
+    hpx::future<T> scatter_to_hierarchically(
+        std::vector<std::tuple<communicator,int>> communicators, 
+        std::vector<T>&& local_result,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg(),
+        int arity = 2)
+{
+        if (this_site == static_cast<std::size_t>(-1))
+        {
+            this_site = agas::get_locality_id();
+        }
+        if (generation == 0)
+        {
+            return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
+                hpx::error::bad_parameter, "hpx::collectives::scatter_to",
+                "the generation number shouldn't be zero"));
+        }
+
+        
+        communicator current_communicator = std::get<0>(communicators[0]);
+        int current_site = std::get<1>(communicators[0]);
+        /* if (this_site == root_site)
+        {
+            ///////////////////////////////////////////////////////////////////////////
+            // Root Scatter To
+            
+            
+            std::vector<T> intermediary_node = std::move(local_result);
+            for (int i = 0; i < communicators.size()-1;i++)
+            {
+                current_communicator = std::get<0>(communicators[i]);
+                std::vector<std::vector<T>> grouped_intermediate(arity);
+                int step_size = intermediary_node.size()/arity;
+                for (int j = 0; j< arity; j++)
+                {
+                    std::move(intermediary_node.begin()+ j*step_size, intermediary_node.begin() + (j+1)*step_size, std::back_inserter(grouped_intermediate[j]));
+                    //grouped_intermediate[j] = std::vector<T>(arity, intermediate_result[0]);
+                }
+                intermediary_node = scatter_to(current_communicator,std::move(grouped_intermediate), this_site_arg(0), generation).get();
+            }
+            current_communicator = std::get<0>(communicators[communicators.size() - 1]);
+            return scatter_to(current_communicator, std::move(intermediary_node), this_site_arg(0), generation);
+        } */
+       if (this_site == root_site)
+        {
+            ///////////////////////////////////////////////////////////////////////////
+            // Root Scatter To
+            
+            std::vector<std::vector<T>> grouped(arity);
+            int step_size = local_result.size()/arity;
+            for (int i = 0; i< arity; i++)
+            {
+                std::move(local_result.begin() + i*step_size, local_result.begin() + (i+1)*step_size, std::back_inserter(grouped[i]));
+                //grouped[i] = std::vector<T>(arity, local_result[0]);
+            }
+            
+            std::vector<T> intermediary_node = scatter_to(current_communicator, std::move(grouped), this_site_arg(0), generation).get();
+            for (int i = 1; i < communicators.size();i++)
+            {
+                current_communicator = std::get<0>(communicators[i]);
+                if (i == communicators.size()-1)
+                {
+                    return scatter_to(current_communicator, std::move(intermediary_node), this_site_arg(0), generation);
+                }
+                else 
+                {
+                    std::vector<std::vector<T>> grouped_intermediate(arity);
+                    int step_size = intermediary_node.size()/arity;
+                    for (int j = 0; j< arity; j++)
+                    {
+                        std::move(intermediary_node.begin()+ j*step_size, intermediary_node.begin() + (j+1)*step_size, std::back_inserter(grouped_intermediate[j]));
+                        //grouped_intermediate[j] = std::vector<T>(arity, intermediate_result[0]);
+                    }
+                    intermediary_node = scatter_to(current_communicator,std::move(grouped_intermediate), this_site_arg(this_site % arity), generation).get();
+                }
+            }
+        } 
+}
+
 
     template <typename T>
     hpx::future<T> scatter_hierarchically(
@@ -617,6 +787,7 @@ namespace hpx::collectives {
         //std::cout << "min_sites after: " << min_sites << "\n";
         
         communicator current_communicator = std::get<0>(communicators[0]);
+        int current_site = std::get<1>(communicators[0]);
         if (this_site == root_site)
         {
             ///////////////////////////////////////////////////////////////////////////
@@ -626,63 +797,61 @@ namespace hpx::collectives {
             int step_size = local_result.size()/arity;
             for (int i = 0; i< arity; i++)
             {
-                grouped[i] = std::vector<T>(local_result.begin() + i*step_size, local_result.begin() + (i+1)*step_size);
+                std::move(local_result.begin() + i*step_size, local_result.begin() + (i+1)*step_size, std::back_inserter(grouped[i]));
                 //grouped[i] = std::vector<T>(arity, local_result[0]);
             }
             
-            hpx::future<std::vector<T>> intermediary_node = scatter_to(current_communicator, std::move(grouped), this_site_arg(0), generation);
+            std::vector<T> intermediary_node = scatter_to(current_communicator, std::move(grouped), this_site_arg(0), generation).get();
             for (int i = 1; i < communicators.size();i++)
             {
                 current_communicator = std::get<0>(communicators[i]);
                 if (i == communicators.size()-1)
                 {
-                    return scatter_to(current_communicator, intermediary_node.get(), this_site_arg(0), generation);
+                    return scatter_to(current_communicator, std::move(intermediary_node), this_site_arg(0), generation);
                 }
                 else 
                 {
-                    std::vector<T> intermediate_result= std::move(intermediary_node.get());
                     std::vector<std::vector<T>> grouped_intermediate(arity);
-                    int step_size = intermediate_result.size()/arity;
+                    int step_size = intermediary_node.size()/arity;
                     for (int j = 0; j< arity; j++)
                     {
-                        grouped_intermediate[j] = std::vector<T>(intermediate_result.begin() + j*step_size, intermediate_result.begin() + (j+1)*step_size);
+                        std::move(intermediary_node.begin()+ j*step_size, intermediary_node.begin() + (j+1)*step_size, std::back_inserter(grouped_intermediate[j]));
                         //grouped_intermediate[j] = std::vector<T>(arity, intermediate_result[0]);
                     }
-                    intermediary_node = scatter_to(current_communicator,std::move(grouped_intermediate), this_site_arg(this_site % arity), generation);
+                    intermediary_node = scatter_to(current_communicator,std::move(grouped_intermediate), this_site_arg(this_site % arity), generation).get();
                 }
             }
         } 
-        else if (this_site % min_sites != 0){
+        else if (communicators.size()== 1 &&  current_site != 0){
 
-            return scatter_from<T>(current_communicator, this_site_arg(this_site % min_sites), generation_arg(generation));
+            return scatter_from<T>(current_communicator, generation_arg(generation), this_site_arg(current_site));
         }
         else
         {
-            int adjusted_site = this_site;
+            /* int adjusted_site = this_site/min_sites;
             while (adjusted_site % arity == 0 && adjusted_site != 0)
             {
                 adjusted_site /= arity;
-            }
-            hpx::future<std::vector<T>> intermediary_node = scatter_from<std::vector<T>>(current_communicator, this_site_arg(adjusted_site % arity), generation);
+            } */
+            std::vector<T> intermediary_node = scatter_from<std::vector<T>>(current_communicator, this_site_arg(current_site), generation).get();
             for (int i = 1; i < communicators.size();i++)
             {
                 current_communicator = std::get<0>(communicators[i]);
                 if (i == communicators.size()-1)
                 {
-                    return scatter_to(current_communicator, intermediary_node.get(), this_site_arg(0), generation);
+                    return scatter_to(current_communicator, std::move(intermediary_node), this_site_arg(0), generation);
                 }
                 else 
                 {
-                    std::vector<T> intermediate_result= std::move(intermediary_node.get());
                     std::vector<std::vector<T>> grouped_intermediate(arity);
                     //std::cout << "this_site: " << this_site << " number of Intermediary Results " << intermediate_result.size() <<"\n";
-                    int step_size = intermediate_result.size()/arity;
+                    float step_size = intermediary_node.size()/arity;
                     for (int j = 0; j< arity; j++)
                     {
-                        //grouped_intermediate[j] = std::vector<T>(intermediate_result.begin() + j*step_size, intermediate_result.begin() + (j+1)*step_size);
-                        grouped_intermediate[j] = std::vector<T>(arity, intermediate_result[0]);
+                        std::move(intermediary_node.begin()+ j*step_size, intermediary_node.begin() + (j+1)*step_size, std::back_inserter(grouped_intermediate[j]));
+                        //grouped_intermediate[j] = std::vector<T>(arity, intermediate_result[0]);
                     }
-                    intermediary_node = scatter_to(current_communicator,std::move(grouped_intermediate), this_site_arg(0), generation);
+                    intermediary_node = scatter_to(current_communicator,std::move(grouped_intermediate), this_site_arg(0), generation).get();
                 }
             }
 
@@ -814,6 +983,8 @@ namespace hpx::collectives {
         return std::get<0>(communicators.end()[-1]).then(hpx::launch::sync, HPX_MOVE(scatter_from_data));
     */
     }
+
+    
  
 }    // namespace hpx::collectives
 
