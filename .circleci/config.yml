@@ -357,9 +357,16 @@ jobs:
                   echo "Limiting to 50 files for memory efficiency..."
                   head -n 50 /tmp/file_list.txt > /tmp/limited_file_list.txt
 
-                  set -x  # Debugging mode enabled
-                  codespell --ignore-words tools/.codespell_whitelist --skip='*.h5,*.png' -f /tmp/limited_file_list.txt > /tmp/spelling_suggestions.txt
-                  set +x  # Disable debugging
+                  set -x
+
+                  mapfile -t FILES < /tmp/limited_file_list.txt
+
+                  for ((i = 0; i < ${#FILES[@]}; i += 50)); do
+                    codespell --ignore-words tools/.codespell_whitelist --skip='*.h5,*.png' "${FILES[@]:i:50}" >> /tmp/spelling_suggestions.txt
+                  done
+
+                  set +x
+
 
                   if [ -s /tmp/spelling_suggestions.txt ]; then exit 1; fi
               else
