@@ -20,7 +20,7 @@
 
 using namespace hpx::collectives;
 
-constexpr char const* exclusive_scan_basename = "/test/exclusive_scan/";
+constexpr char const* exclusive_scan_basename = "/test/exclusive_scan_sync/";
 #if defined(HPX_DEBUG)
 constexpr int ITERATIONS = 100;
 #else
@@ -37,10 +37,10 @@ void test_one_shot_use()
     // test functionality based on immediate local result value
     for (int i = 0; i != ITERATIONS; ++i)
     {
-        std::uint32_t overall_result =
-            exclusive_scan(hpx::launch::sync, exclusive_scan_basename, here + i,
-                std::plus<std::uint32_t>{}, num_sites_arg(num_localities),
-                this_site_arg(here), generation_arg(i + 1));
+        std::uint32_t overall_result = exclusive_scan(hpx::launch::sync,
+            exclusive_scan_basename, here + i, static_cast<std::uint32_t>(i),
+            std::plus<std::uint32_t>{}, num_sites_arg(num_localities),
+            this_site_arg(here), generation_arg(i + 1));
 
         std::uint32_t sum = i;
         for (std::uint32_t j = 0; j < here; ++j)
@@ -65,8 +65,9 @@ void test_multiple_use()
     // test functionality based on immediate local result value
     for (int i = 0; i != ITERATIONS; ++i)
     {
-        std::uint32_t overall_result = exclusive_scan(hpx::launch::sync,
-            exclusive_scan_client, here + i, std::plus<std::uint32_t>{});
+        std::uint32_t overall_result =
+            exclusive_scan(hpx::launch::sync, exclusive_scan_client, here + i,
+                static_cast<std::uint32_t>(i), std::plus<std::uint32_t>{});
 
         std::uint32_t sum = i;
         for (std::uint32_t j = 0; j < here; ++j)
@@ -92,9 +93,9 @@ void test_multiple_use_with_generation()
 
     for (int i = 0; i != ITERATIONS; ++i)
     {
-        std::uint32_t overall_result =
-            exclusive_scan(hpx::launch::sync, exclusive_scan_client, here + i,
-                std::plus<std::uint32_t>{}, generation_arg(i + 1));
+        std::uint32_t overall_result = exclusive_scan(hpx::launch::sync,
+            exclusive_scan_client, here + i, static_cast<std::uint32_t>(i),
+            std::plus<std::uint32_t>{}, generation_arg(i + 1));
 
         std::uint32_t sum = i;
         for (std::uint32_t j = 0; j < here; ++j)
@@ -131,7 +132,7 @@ void test_local_use()
             for (std::uint32_t i = 0; i != 10 * ITERATIONS; ++i)
             {
                 std::uint32_t overall_result = exclusive_scan(hpx::launch::sync,
-                    exclusive_scan_client, site + i, std::plus<>{},
+                    exclusive_scan_client, site + i, i, std::plus<>{},
                     this_site_arg(site), generation_arg(i + 1));
 
                 auto const result = overall_result;
