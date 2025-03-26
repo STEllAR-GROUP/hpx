@@ -344,34 +344,38 @@ jobs:
       - run:
           name: Running codespell
           command: |
-              if [[ -n "$CIRCLE_PULL_REQUEST" ]]; then
-                  cd /hpx/source
-                  codespell --version
-                  
-                  echo "Fetching changed files from origin/master..."
-                  git fetch origin master --depth=1
-                  
-                  echo "Files being checked:"
-                  git diff --name-only origin/master... | tee /tmp/file_list.txt
+            if [[ -n "$CIRCLE_PULL_REQUEST" ]]; then
+                cd /hpx/source
+                codespell --version
 
-                  echo "Limiting to 50 files for memory efficiency..."
-                  head -n 50 /tmp/file_list.txt > /tmp/limited_file_list.txt
+                echo "Fetching changed files from origin/master..."
+                git fetch origin master --depth=1
 
-                  set -x
+                echo "Files being checked:"
+                git diff --name-only origin/master... > /tmp/file_list.txt
+                cat /tmp/file_list.txt  # Print all files being checked
 
-                  mapfile -t FILES < /tmp/limited_file_list.txt
+                set -x  # Enable debug mode
 
-                  for ((i = 0; i < ${#FILES[@]}; i += 50)); do
-                    codespell --ignore-words tools/.codespell_whitelist --skip='*.h5,*.png' "${FILES[@]:i:50}" >> /tmp/spelling_suggestions.txt
-                  done
+                # Read all changed files into an array
+                mapfile -t FILES < /tmp/file_list.txt
 
-                  set +x
+                # Process files in batches of 50
+                for ((i = 0; i < ${#FILES[@]}; i += 50)); do
+                codespell --ignore-words tools/.codespell_whitelist --skip='*.h5,*.png' "${FILES[@]:i:50}" >> /tmp/spelling_suggestions.txt
+                done
 
+                set +x  # Disable debug mode
 
-                  if [ -s /tmp/spelling_suggestions.txt ]; then exit 1; fi
-              else
-                  echo "Skipping spellcheck on non-PR build"
-              fi
+                # If there are spelling errors, exit with error code 1
+                if [[ -s /tmp/spelling_suggestions.txt ]]; then
+                    echo "Spelling errors found:"
+                    cat /tmp/spelling_suggestions.txt
+                    exit 1
+                fi
+            else
+                echo "Skipping spellcheck on non-PR build"
+            fi
           when: always
       - store_artifacts:
           path: /tmp/spelling_suggestions.txt
