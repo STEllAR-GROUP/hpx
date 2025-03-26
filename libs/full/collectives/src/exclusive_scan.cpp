@@ -1,4 +1,4 @@
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,12 @@ namespace hpx::traits::communication {
     char const* communicator_data<exclusive_scan_tag>::name() noexcept
     {
         static char const* name = "exclusive_scan";
+        return name;
+    }
+
+    char const* communicator_data<exclusive_scan_init_tag>::name() noexcept
+    {
+        static char const* name = "exclusive_scan_init";
         return name;
     }
 }    // namespace hpx::traits::communication

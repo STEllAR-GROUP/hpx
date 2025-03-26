@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,6 +9,7 @@
 #include <hpx/asio/asio_util.hpp>
 #include <hpx/batch_environments/alps_environment.hpp>
 #include <hpx/batch_environments/batch_environment.hpp>
+#include <hpx/batch_environments/flux_environment.hpp>
 #include <hpx/batch_environments/pbs_environment.hpp>
 #include <hpx/batch_environments/pjm_environment.hpp>
 #include <hpx/batch_environments/slurm_environment.hpp>
@@ -87,6 +88,15 @@ namespace hpx::util {
             num_threads_ = pjm_env.num_threads();
             num_localities_ = pjm_env.num_localities();
             node_num_ = pjm_env.node_num();
+            return;
+        }
+
+        batch_environments::flux_environment const flux_env;
+        if (flux_env.valid())
+        {
+            batch_name_ = "FLUX";
+            num_localities_ = flux_env.num_localities();
+            node_num_ = flux_env.node_num();
             return;
         }
 
@@ -200,12 +210,14 @@ namespace hpx::util {
 #if defined(HPX_HAVE_PARCELPORT_TCP)
             std::cerr << "Nodes from nodelist:" << std::endl;
             node_map_type::const_iterator const end = nodes_.end();
+            // clang-format off
             for (node_map_type::const_iterator it = nodes_.begin(); it != end;
                  ++it)
             {
                 std::cerr << (*it).second.first << ": " << (*it).second.second
                           << " (" << (*it).first << ")" << std::endl;
             }
+            // clang-format on
 #endif
         }
         HPX_UNUSED(nodes);

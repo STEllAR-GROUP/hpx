@@ -201,7 +201,7 @@ namespace hpx::parcelset {
 #endif
                 {
                     // Serialize the data
-                    if (filter.get() != nullptr)
+                    if (filter)
                     {
                         filter->set_max_length(buffer.data_.capacity());
                     }

@@ -40,15 +40,13 @@ namespace hpx::parcelset::policies::mpi {
     void add_connection(sender*, std::shared_ptr<sender_connection> const&);
 
     struct sender_connection
-      : parcelset::parcelport_connection<sender_connection, std::vector<char>>
+      : parcelset::parcelport_connection<sender_connection>
     {
     private:
         using sender_type = sender;
 
         using write_handler_type =
             hpx::function<void(std::error_code const&, parcel const&)>;
-
-        using data_type = std::vector<char>;
 
         enum class connection_state : std::uint8_t
         {
@@ -62,8 +60,7 @@ namespace hpx::parcelset::policies::mpi {
             acked_data = 6
         };
 
-        using base_type =
-            parcelset::parcelport_connection<sender_connection, data_type>;
+        using base_type = parcelset::parcelport_connection<sender_connection>;
 
     public:
         sender_connection(sender_type* s, int dst, parcelset::parcelport* pp,
@@ -198,9 +195,7 @@ namespace hpx::parcelset::policies::mpi {
             auto const& chunks = buffer_.transmission_chunks_;
             if (!chunks.empty() && !header_.piggy_back_tchunk())
             {
-                request_ = util::mpi_environment::isend(
-                    const_cast<void*>(
-                        reinterpret_cast<const void*>(chunks.data())),
+                request_ = util::mpi_environment::isend(chunks.data(),
                     chunks.size() *
                         sizeof(parcel_buffer_type::transmission_chunk_type),
                     dst_, tag_);
@@ -263,8 +258,6 @@ namespace hpx::parcelset::policies::mpi {
 
             if (!header_.piggy_back_data())
             {
-                util::mpi_environment::scoped_lock l;
-
                 request_ = util::mpi_environment::isend(
                     buffer_.data_.data(), buffer_.data_.size(), dst_, tag_);
                 request_ptr_ = &request_;
@@ -325,7 +318,7 @@ namespace hpx::parcelset::policies::mpi {
                     }
                     HPX_ASSERT(request_ptr_ == nullptr);
                     request_ = util::mpi_environment::isend(
-                        const_cast<void*>(c.data()), c.size(), dst_, tag_);
+                        c.data(), c.size(), dst_, tag_);
                     request_ptr_ = &request_;
                 }
 

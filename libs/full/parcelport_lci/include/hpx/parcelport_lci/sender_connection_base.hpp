@@ -23,15 +23,13 @@
 
 namespace hpx::parcelset::policies::lci {
     struct sender_connection_base
-      : public parcelset::parcelport_connection<sender_connection_base,
-            std::vector<char>>
+      : public parcelset::parcelport_connection<sender_connection_base>
     {
     protected:
         using write_handler_type =
             hpx::function<void(std::error_code const&, parcel const&)>;
-        using data_type = std::vector<char>;
         using base_type =
-            parcelset::parcelport_connection<sender_connection_base, data_type>;
+            parcelset::parcelport_connection<sender_connection_base>;
         using handler_type = hpx::move_only_function<void(error_code const&)>;
         using postprocess_handler_type = hpx::move_only_function<void(
             error_code const&, parcelset::locality const&,

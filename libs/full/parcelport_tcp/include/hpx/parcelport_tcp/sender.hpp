@@ -50,8 +50,7 @@
 
 namespace hpx::parcelset::policies::tcp {
 
-    class sender
-      : public parcelset::parcelport_connection<sender, std::vector<char>>
+    class sender : public parcelset::parcelport_connection<sender>
     {
         using postprocess_handler_type =
             hpx::move_only_function<void(std::error_code const&)>;
