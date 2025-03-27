@@ -72,6 +72,7 @@ set(coroutines_sources
     detail/context_posix.cpp
     detail/coroutine_impl.cpp
     detail/coroutine_self.cpp
+    detail/get_stack_pointer.cpp
     detail/posix_utility.cpp
     detail/tss.cpp
     swapcontext.cpp

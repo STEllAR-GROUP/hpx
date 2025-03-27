@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,22 +19,25 @@
 namespace hpx::threads::detail {
 
     /// Set the global thread id to thread local storage.
-    HPX_CORE_EXPORT std::size_t set_global_thread_num_tss(std::size_t num);
+    HPX_CORE_EXPORT std::size_t set_global_thread_num_tss(
+        std::size_t num) noexcept;
 
     /// Get the global thread id from thread local storage.
-    HPX_CORE_EXPORT std::size_t get_global_thread_num_tss();
+    HPX_CORE_EXPORT std::size_t get_global_thread_num_tss() noexcept;
 
     /// Set the local thread id to thread local storage.
-    HPX_CORE_EXPORT std::size_t set_local_thread_num_tss(std::size_t num);
+    HPX_CORE_EXPORT std::size_t set_local_thread_num_tss(
+        std::size_t num) noexcept;
 
     /// Get the local thread id from thread local storage.
-    HPX_CORE_EXPORT std::size_t get_local_thread_num_tss();
+    HPX_CORE_EXPORT std::size_t get_local_thread_num_tss() noexcept;
 
     /// Set the thread pool id to thread local storage.
-    HPX_CORE_EXPORT std::size_t set_thread_pool_num_tss(std::size_t num);
+    HPX_CORE_EXPORT std::size_t set_thread_pool_num_tss(
+        std::size_t num) noexcept;
 
     /// Get the thread pool id from thread local storage.
-    HPX_CORE_EXPORT std::size_t get_thread_pool_num_tss();
+    HPX_CORE_EXPORT std::size_t get_thread_pool_num_tss() noexcept;
 
     /// Holds the global and local thread numbers, and the pool number
     /// associated with the thread.
@@ -45,13 +48,13 @@ namespace hpx::threads::detail {
         std::size_t thread_pool_num;
     };
 
-    HPX_CORE_EXPORT void set_thread_nums_tss(thread_nums const&);
-    HPX_CORE_EXPORT thread_nums get_thread_nums_tss();
+    HPX_CORE_EXPORT void set_thread_nums_tss(thread_nums const&) noexcept;
+    HPX_CORE_EXPORT thread_nums get_thread_nums_tss() noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     struct reset_tss_helper
     {
-        explicit reset_tss_helper(std::size_t global_thread_num)
+        explicit reset_tss_helper(std::size_t global_thread_num) noexcept
           : global_thread_num_(set_global_thread_num_tss(global_thread_num))
         {
         }
@@ -92,7 +95,7 @@ namespace hpx {
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         fail otherwise (it will return -1).
-    HPX_CORE_EXPORT std::size_t get_worker_thread_num();
+    HPX_CORE_EXPORT std::size_t get_worker_thread_num() noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the current OS-thread running in the runtime
@@ -101,7 +104,8 @@ namespace hpx {
     /// This function returns the zero based index of the OS-thread which
     /// executes the current HPX-thread.
     ///
-    /// \param ec [in,out] this represents the error status on exit.
+    /// \param ec [in,out] this represents the error status on exit (obsolete,
+    ///        ignored).
     ///
     /// \note   The returned value is zero based and its maximum value is
     ///         smaller than the overall number of OS-threads executed (as
@@ -111,7 +115,7 @@ namespace hpx {
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         fail otherwise (it will return -1).
-    HPX_CORE_EXPORT std::size_t get_worker_thread_num(error_code& ec);
+    HPX_CORE_EXPORT std::size_t get_worker_thread_num(error_code&) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the current OS-thread running in the current
@@ -127,7 +131,7 @@ namespace hpx {
     ///
     /// \note This function needs to be executed on a HPX-thread. It will fail
     ///         otherwise (it will return -1).
-    HPX_CORE_EXPORT std::size_t get_local_worker_thread_num();
+    HPX_CORE_EXPORT std::size_t get_local_worker_thread_num() noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the current OS-thread running in the current
@@ -136,7 +140,8 @@ namespace hpx {
     /// This function returns the zero based index of the OS-thread on the
     /// current thread pool which executes the current HPX-thread.
     ///
-    /// \param ec [in,out] this represents the error status on exit.
+    /// \param ec [in,out] this represents the error status on exit (obsolete,
+    ///        ignored).
     ///
     /// \note The returned value is zero based and its maximum value is smaller
     ///       than the number of OS-threads executed on the current thread pool.
@@ -145,7 +150,8 @@ namespace hpx {
     ///
     /// \note This function needs to be executed on a HPX-thread. It will fail
     ///         otherwise (it will return -1).
-    HPX_CORE_EXPORT std::size_t get_local_worker_thread_num(error_code& ec);
+    HPX_CORE_EXPORT std::size_t get_local_worker_thread_num(
+        error_code&) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the current thread pool the current
@@ -161,7 +167,7 @@ namespace hpx {
     ///
     /// \note This function needs to be executed on a HPX-thread. It will fail
     ///         otherwise (it will return -1).
-    HPX_CORE_EXPORT std::size_t get_thread_pool_num();
+    HPX_CORE_EXPORT std::size_t get_thread_pool_num() noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the current thread pool the current
@@ -170,7 +176,8 @@ namespace hpx {
     /// This function returns the zero based index of the thread pool which
     /// executes the current HPX-thread.
     ///
-    /// \param ec [in,out] this represents the error status on exit.
+    /// \param ec [in,out] this represents the error status on exit (obsolete,
+    ///        ignored).
     ///
     /// \note The returned value is zero based and its maximum value is smaller
     ///       than the number of thread pools started by the runtime. It will
@@ -179,7 +186,7 @@ namespace hpx {
     ///
     /// \note This function needs to be executed on a HPX-thread. It will fail
     ///         otherwise (it will return -1).
-    HPX_CORE_EXPORT std::size_t get_thread_pool_num(error_code& ec);
+    HPX_CORE_EXPORT std::size_t get_thread_pool_num(error_code&) noexcept;
 }    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>

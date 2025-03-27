@@ -49,7 +49,7 @@ function(hpx_perform_cxx_feature_tests)
   hpx_check_for_c11_aligned_alloc(DEFINITIONS HPX_HAVE_C11_ALIGNED_ALLOC)
 
   hpx_check_for_cxx14_delete_operator_with_size(
-    DEFINITIONS HPX_WITH_CXX14_DELETE_OPERATOR_WITH_SIZE
+    DEFINITIONS HPX_HAVE_CXX14_DELETE_OPERATOR_WITH_SIZE
   )
 
   hpx_check_for_cxx17_std_aligned_alloc(
@@ -172,5 +172,9 @@ function(hpx_perform_cxx_feature_tests)
   )
 
   hpx_check_for_builtin_forward_move(DEFINITIONS HPX_HAVE_BUILTIN_FORWARD_MOVE)
+
+  hpx_check_for_builtin_frame_address(
+    DEFINITIONS HPX_HAVE_BUILTIN_FRAME_ADDRESS
+  )
 
 endfunction()

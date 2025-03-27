@@ -346,8 +346,8 @@ namespace hpx::parcelset {
         locality here_;
 
         // The maximally allowed message size
-        std::int64_t const max_inbound_message_size_;
-        std::int64_t const max_outbound_message_size_;
+        std::int64_t max_inbound_message_size_;
+        std::int64_t max_outbound_message_size_;
 
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         // Overall parcel statistics

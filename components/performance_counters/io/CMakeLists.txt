@@ -28,6 +28,11 @@ if(HPX_WITH_IO_COUNTERS)
     SOURCES ${io_counters_sources} ${HPX_WITH_UNITY_BUILD_OPTION}
   )
 
+  # see #6579
+  if(MSVC AND Boost_VERSION_STRING VERSION_LESS "1.79.0")
+    target_compile_definitions(io_counters_component PRIVATE NOMINMAX)
+  endif()
+
   add_hpx_pseudo_dependencies(
     components.performance_counters.io io_counters_component
   )

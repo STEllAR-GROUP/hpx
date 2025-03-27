@@ -1,4 +1,5 @@
 //  Copyright (c) 2013-2015 Thomas Heller
+//  Copyright (c)      2024 Jiakun Yan
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -41,6 +42,11 @@ namespace hpx::util {
         static MPI_Comm& communicator() noexcept;
 
         static std::string get_processor_name();
+
+        static MPI_Datatype type_contiguous(size_t nbytes);
+        static MPI_Request isend(
+            void const* address, size_t size, int rank, int tag);
+        static MPI_Request irecv(void* address, size_t size, int rank, int tag);
 
         struct HPX_CORE_EXPORT scoped_lock
         {

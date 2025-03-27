@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2024 Hartmut Kaiser
+//  Copyright (c) 2019-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -104,6 +104,102 @@ namespace hpx { namespace collectives {
     all_to_all(communicator fid,
         std::vector<T>&& local_result,
         generation_arg generation,
+        this_site_arg this_site = this_site_arg());
+
+    /// AllToAll a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param policy       The execution policy specifying synchronous execution.
+    /// \param basename     The base name identifying the all_to_all operation
+    /// \param local_result A vector of values to transmit to all
+    ///                     participating sites from this call site.
+    /// \param num_sites    The number of participating sites (default: all
+    ///                     localities).
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param generation   The generational counter identifying the sequence
+    ///                     number of the all_to_all operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_to_all operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param root_site    The site that is responsible for creating the
+    ///                     all_to_all support object. This value is optional
+    ///                     and defaults to '0' (zero).
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T>
+    std::vector<T> all_to_all(hpx::launch::sync_policy, char const* basename,
+        std::vector<T>&& local_result,
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
+
+    /// AllToAll a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param fid          A communicator object returned from \a create_communicator
+    /// \param local_result A vector of values to transmit to all
+    ///                     participating sites from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param generation   The generational counter identifying the sequence
+    ///                     number of the all_to_all operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_to_all operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T>
+    std::vector<T> all_to_all(hpx::launch::sync_policy, communicator fid,
+        std::vector<T>&& local_result,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// AllToAll a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param policy      The execution policy specifying synchronous execution.
+    /// \param fid          A communicator object returned from \a create_communicator
+    /// \param local_result A vector of values to transmit to all
+    ///                     participating sites from this call site.
+    /// \param generation   The generational counter identifying the sequence
+    ///                     number of the all_to_all operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_to_all operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T>
+    std::vector<T> all_to_all(hpx::launch::sync_policy, communicator fid,
+        std::vector<T>&& local_result, generation_arg generation,
         this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
 
@@ -222,7 +318,6 @@ namespace hpx::collectives {
         return fid.then(hpx::launch::sync, HPX_MOVE(all_to_all_data));
     }
 
-    ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     hpx::future<std::vector<T>> all_to_all(communicator fid,
         std::vector<T>&& local_result, generation_arg generation,
@@ -232,7 +327,6 @@ namespace hpx::collectives {
             HPX_MOVE(fid), HPX_MOVE(local_result), this_site, generation);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     hpx::future<std::vector<T>> all_to_all(char const* basename,
         std::vector<T>&& local_result,
@@ -244,6 +338,42 @@ namespace hpx::collectives {
         return all_to_all(create_communicator(basename, num_sites, this_site,
                               generation, root_site),
             HPX_MOVE(local_result), this_site);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    std::vector<T> all_to_all(hpx::launch::sync_policy, communicator fid,
+        std::vector<T>&& local_result,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        return all_to_all(
+            HPX_MOVE(fid), HPX_MOVE(local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    std::vector<T> all_to_all(hpx::launch::sync_policy, communicator fid,
+        std::vector<T>&& local_result, generation_arg generation,
+        this_site_arg this_site = this_site_arg())
+    {
+        return all_to_all(
+            HPX_MOVE(fid), HPX_MOVE(local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    std::vector<T> all_to_all(hpx::launch::sync_policy, char const* basename,
+        std::vector<T>&& local_result,
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
+    {
+        return all_to_all(create_communicator(basename, num_sites, this_site,
+                              generation, root_site),
+            HPX_MOVE(local_result), this_site)
+            .get();
     }
 }    // namespace hpx::collectives
 

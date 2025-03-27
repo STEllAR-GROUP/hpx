@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2023 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -105,14 +105,13 @@ namespace hpx { namespace collectives {
 
 #else
 
-#include <hpx/config.hpp>
-
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/type_support/extra_data.hpp>
 
+#include <tuple>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -123,6 +122,7 @@ namespace hpx::collectives::detail {
     {
         num_sites_arg num_sites_;
         this_site_arg this_site_;
+        root_site_arg root_site_;
     };
 }    // namespace hpx::collectives::detail
 
@@ -173,8 +173,13 @@ namespace hpx::collectives {
         {
         }
 
-        HPX_EXPORT void set_info(
-            num_sites_arg num_sites, this_site_arg this_site) noexcept;
+        HPX_EXPORT void set_info(num_sites_arg num_sites,
+            this_site_arg this_site,
+            root_site_arg root_site = root_site_arg()) noexcept;
+
+        [[nodiscard]] HPX_EXPORT
+            std::tuple<num_sites_arg, this_site_arg, root_site_arg>
+            get_info_ex() const noexcept;
 
         [[nodiscard]] HPX_EXPORT std::pair<num_sites_arg, this_site_arg>
         get_info() const noexcept;
@@ -184,6 +189,27 @@ namespace hpx::collectives {
             return !base_type::registered_name().empty();
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Predefined global communicator (refers to all localities)
+    HPX_EXPORT communicator get_world_communicator();
+
+    namespace detail {
+
+        HPX_EXPORT void create_global_communicator();
+        HPX_EXPORT void reset_global_communicator();
+    }    // namespace detail
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Predefined local communicator (refers to all threads on the calling
+    // locality)
+    HPX_EXPORT communicator get_local_communicator();
+
+    namespace detail {
+
+        HPX_EXPORT void create_local_communicator();
+        HPX_EXPORT void reset_local_communicator();
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT communicator create_communicator(char const* basename,

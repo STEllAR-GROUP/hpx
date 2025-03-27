@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(batch_environments_headers
     hpx/batch_environments/alps_environment.hpp
     hpx/batch_environments/batch_environment.hpp
+    hpx/batch_environments/flux_environment.hpp
     hpx/batch_environments/pjm_environment.hpp
     hpx/batch_environments/pbs_environment.hpp
     hpx/batch_environments/slurm_environment.hpp
@@ -25,8 +26,8 @@ set(batch_environments_compat_headers
 # cmake-format: on
 
 set(batch_environments_sources
-    alps_environment.cpp batch_environment.cpp pbs_environment.cpp
-    pjm_environment.cpp slurm_environment.cpp
+    alps_environment.cpp batch_environment.cpp flux_environment.cpp
+    pbs_environment.cpp pjm_environment.cpp slurm_environment.cpp
 )
 
 include(HPX_AddModule)
@@ -46,3 +47,8 @@ add_hpx_module(
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )
+
+# see #6579
+if(MSVC AND Boost_VERSION_STRING VERSION_LESS "1.79.0")
+  target_compile_definitions(hpx_batch_environments PRIVATE NOMINMAX)
+endif()

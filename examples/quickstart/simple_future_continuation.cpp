@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -58,7 +58,7 @@ int hpx_main()
 
     // executing continuation cont2 on UI (main) thread
     {
-        hpx::parallel::execution::main_pool_executor exec;
+        hpx::execution::experimental::main_pool_executor exec;
         hpx::future<int> t = hpx::async(&func1);
         hpx::future<int> t2 = t.then(exec, &cont2);
         t2.get();

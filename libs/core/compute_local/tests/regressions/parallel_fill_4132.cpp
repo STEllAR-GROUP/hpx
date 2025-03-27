@@ -17,7 +17,7 @@
 int hpx_main()
 {
     std::size_t const max_targets =
-        (std::min)(hpx::get_num_worker_threads(), std::size_t(10));
+        (std::min)(2 * hpx::get_num_worker_threads(), std::size_t(10));
     ;
     auto targets = hpx::compute::host::get_local_targets();
 

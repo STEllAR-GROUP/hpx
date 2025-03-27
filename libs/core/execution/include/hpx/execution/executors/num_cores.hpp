@@ -1,4 +1,4 @@
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //  Copyright (c) 2022 Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -42,14 +42,14 @@ namespace hpx::execution::experimental {
         // discover the number of cores to use for parallelization
         template <typename Executor>
         friend std::size_t tag_override_invoke(
-            hpx::parallel::execution::processing_units_count_t,
+            hpx::execution::experimental::processing_units_count_t,
             num_cores const& this_, Executor&& exec,
             hpx::chrono::steady_duration const& duration =
                 hpx::chrono::null_duration,
             std::size_t num_tasks = 0) noexcept
         {
             std::size_t const available_pus =
-                parallel::execution::processing_units_count(
+                hpx::execution::experimental::processing_units_count(
                     exec, duration, num_tasks);
             return (std::min)(this_.num_cores_, available_pus);
         }
@@ -73,15 +73,15 @@ namespace hpx::execution::experimental {
         std::size_t num_cores_;
         /// \endcond
     };
-}    // namespace hpx::execution::experimental
 
-/// \cond NOINTERNAL
-template <>
-struct hpx::parallel::execution::is_executor_parameters<
-    hpx::execution::experimental::num_cores> : std::true_type
-{
-};
-/// \endcond
+    /// \cond NOINTERNAL
+    template <>
+    struct is_executor_parameters<hpx::execution::experimental::num_cores>
+      : std::true_type
+    {
+    };
+    /// \endcond
+}    // namespace hpx::execution::experimental
 
 namespace hpx::execution {
 

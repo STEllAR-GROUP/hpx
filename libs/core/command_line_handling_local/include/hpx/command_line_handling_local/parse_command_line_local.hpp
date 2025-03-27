@@ -113,7 +113,7 @@ namespace hpx::local::detail {
         options_map& all_options);
 
     HPX_CORE_EXPORT std::string reconstruct_command_line(
-        hpx::program_options::variables_map const& vm);
+        int argc, char* argv[]);
 
     HPX_CORE_EXPORT bool parse_commandline(util::section const& rtcfg,
         options_map& all_options,
@@ -140,7 +140,4 @@ namespace hpx::local::detail {
             util::commandline_error_mode::return_on_error,
         hpx::program_options::options_description* visible = nullptr,
         std::vector<std::string>* unregistered_options = nullptr);
-
-    HPX_CORE_EXPORT std::string reconstruct_command_line(
-        hpx::program_options::variables_map const& vm);
 }    // namespace hpx::local::detail

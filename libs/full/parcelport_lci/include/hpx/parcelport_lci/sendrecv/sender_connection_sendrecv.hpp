@@ -48,7 +48,7 @@ namespace hpx::parcelset::policies::lci {
             locked,
         };
         return_t send_header();
-        return_t unified_followup_send(void* address, int length);
+        return_t unified_followup_send(void* address, size_t length);
         return_t send_transmission_chunks();
         return_t send_data();
         return_t send_chunks();

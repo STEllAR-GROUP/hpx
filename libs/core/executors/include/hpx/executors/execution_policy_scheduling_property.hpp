@@ -34,7 +34,7 @@ namespace hpx::execution::experimental {
     constexpr decltype(auto) tag_invoke(
         Tag tag, ExPolicy&& policy, Property prop)
     {
-        return hpx::parallel::execution::create_rebound_policy(
+        return hpx::execution::experimental::create_rebound_policy(
             policy, tag(policy.executor(), prop), policy.parameters());
     }
 

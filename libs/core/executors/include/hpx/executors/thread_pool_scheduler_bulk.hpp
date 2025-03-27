@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -651,8 +651,8 @@ namespace hpx::execution::experimental::detail {
           , f(HPX_FORWARD(F_, f))
           , pu_mask(detail::full_mask(
                 hpx::execution::experimental::get_first_core(scheduler),
-                hpx::parallel::execution::processing_units_count(
-                    hpx::parallel::execution::null_parameters, scheduler,
+                hpx::execution::experimental::processing_units_count(
+                    hpx::execution::experimental::null_parameters, scheduler,
                     hpx::chrono::null_duration, 0)))
         {
         }
@@ -805,9 +805,9 @@ namespace hpx::execution::experimental::detail {
               , first_thread(
                     hpx::execution::experimental::get_first_core(scheduler))
               , num_worker_threads(
-                    hpx::parallel::execution::processing_units_count(
-                        hpx::parallel::execution::null_parameters, scheduler,
-                        hpx::chrono::null_duration, 0))
+                    hpx::execution::experimental::processing_units_count(
+                        hpx::execution::experimental::null_parameters,
+                        scheduler, hpx::chrono::null_duration, 0))
               , pu_mask(HPX_MOVE(pumask))
               , queues(num_worker_threads)
               , shape(HPX_FORWARD(Shape_, shape))

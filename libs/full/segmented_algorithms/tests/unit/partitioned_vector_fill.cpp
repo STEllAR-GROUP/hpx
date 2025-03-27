@@ -140,6 +140,6 @@ int main()
     fill_tests<double>();
     fill_tests<int>();
 
-    return 0;
+    return hpx::util::report_errors();
 }
 #endif

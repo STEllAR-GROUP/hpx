@@ -73,8 +73,8 @@ namespace hpx::components {
         }
 
         /// \cond NOINTERNAL
-        typedef std::pair<hpx::id_type, std::vector<hpx::id_type>>
-            bulk_locality_result;
+        using bulk_locality_result =
+            std::pair<hpx::id_type, std::vector<hpx::id_type>>;
         /// \endcond
 
         /// Create multiple objects on the localities associated by
@@ -90,16 +90,25 @@ namespace hpx::components {
         /// \returns A future holding the list of global addresses which
         ///          represent the newly created objects
         ///
-        template <typename Component, typename... Ts>
+        template <bool WithCount, typename Component, typename... Ts>
         hpx::future<std::vector<bulk_locality_result>> bulk_create(
             std::size_t count, Ts&&... vs) const
         {
             // by default the object will be created on the current
             // locality
             hpx::id_type id = get_next_target();
-            hpx::future<std::vector<hpx::id_type>> f =
-                components::bulk_create_async<Component>(
+
+            hpx::future<std::vector<hpx::id_type>> f;
+            if constexpr (WithCount)
+            {
+                f = components::bulk_create_async<WithCount, Component>(
+                    id, count, 0, HPX_FORWARD(Ts, vs)...);
+            }
+            else
+            {
+                f = components::bulk_create_async<WithCount, Component>(
                     id, count, HPX_FORWARD(Ts, vs)...);
+            }
 
             return f.then(hpx::launch::sync,
                 [id = HPX_MOVE(id)](hpx::future<std::vector<hpx::id_type>>&& f)

@@ -74,15 +74,15 @@ namespace tests {
 
     // Preconditions: *i == v1, *++i == v2
     template <typename Iterator, typename T>
-    void input_iterator_test(Iterator i, T v1, T v2)
+    void input_iterator_test(Iterator it, T v1, T v2)
     {
-        Iterator i1(i);
+        Iterator i1(it);
 
-        HPX_TEST(i == i1);
-        HPX_TEST(!(i != i1));
+        HPX_TEST(it == i1);
+        HPX_TEST(!(it != i1));
 
         // I can see no generic way to create an input iterator
-        // that is in the domain of== of i and != i.
+        // that is in the domain of it and != it.
         // The following works for istream_iterator but is not
         // guaranteed to work for arbitrary input iterators.
         //
@@ -92,22 +92,22 @@ namespace tests {
         //HPX_TEST(!(i == i2));
 
         HPX_TEST(*i1 == v1);
-        HPX_TEST(*i == v1);
+        HPX_TEST(*it == v1);
 
         // we cannot test for equivalence of (void)++i & (void)i++
-        // as i is only guaranteed to be single pass.
-        HPX_TEST(*i++ == v1);
+        // as it is only guaranteed to be single pass.
+        HPX_TEST(*it++ == v1);
 
-        i1 = i;
+        i1 = it;
 
-        HPX_TEST(i == i1);
-        HPX_TEST(!(i != i1));
+        HPX_TEST(it == i1);
+        HPX_TEST(!(it != i1));
 
         HPX_TEST(*i1 == v2);
-        HPX_TEST(*i == v2);
+        HPX_TEST(*it == v2);
 
-        // i is dereferenceable, so it must be incrementable.
-        ++i;
+        // it is dereferenceable, so it must be incrementable.
+        ++it;
 
         // how to test for operator-> ?
     }
@@ -154,7 +154,7 @@ namespace tests {
     template <typename Iterator, typename T>
     void readable_iterator_test(const Iterator i1, T v)
     {
-        typedef typename std::iterator_traits<Iterator>::reference ref_t;
+        using ref_t = typename std::iterator_traits<Iterator>::reference;
 
         Iterator i2(i1);    // Copy Constructible
         ref_t r1 = *i1;
@@ -280,7 +280,7 @@ namespace tests {
         template <typename T>
         struct identity
         {
-            typedef T type;
+            using type = T;
         };
 
         // implementation originally suggested by C. Green in
@@ -383,10 +383,10 @@ namespace tests {
     void constant_lvalue_iterator_test(Iterator i, T v1)
     {
         Iterator i2(i);
-        typedef typename std::iterator_traits<Iterator>::value_type value_type;
-        typedef typename std::iterator_traits<Iterator>::reference reference;
-        HPX_TEST((std::is_same<const value_type&, reference>::value));
-        const T& v2 = *i2;
+        using value_type = typename std::iterator_traits<Iterator>::value_type;
+        using reference = typename std::iterator_traits<Iterator>::reference;
+        HPX_TEST((std::is_same_v<const value_type&, reference>) );
+        T const& v2 = *i2;
         HPX_TEST_EQ(v1, v2);
         //HPX_TEST(is_lvalue_iterator<Iterator>::value);
         //HPX_TEST(!is_non_const_lvalue_iterator<Iterator>::value);
@@ -396,9 +396,9 @@ namespace tests {
     void non_const_lvalue_iterator_test(Iterator i, T v1, T v2)
     {
         Iterator i2(i);
-        typedef typename std::iterator_traits<Iterator>::value_type value_type;
-        typedef typename std::iterator_traits<Iterator>::reference reference;
-        HPX_TEST((std::is_same<value_type&, reference>::value));
+        using value_type = typename std::iterator_traits<Iterator>::value_type;
+        using reference = typename std::iterator_traits<Iterator>::reference;
+        HPX_TEST((std::is_same_v<value_type&, reference>) );
         T& v3 = *i2;
         HPX_TEST_EQ(v1, v3);
 
@@ -449,11 +449,13 @@ namespace tests {
         Iterator i2(i);    // Copy Constructible
         *i2 = v;
 
+        // clang-format off
         writable_iterator_traversal_test(i, v2,
-            typename std::integral_constant < bool,
-            tests::traits::is_incrementable<Iterator>::value&&
-                    tests::traits::is_postfix_incrementable<Iterator>::value >
-                ());
+            std::integral_constant<bool,
+                tests::traits::is_incrementable<Iterator>::value &&
+                tests::traits::is_postfix_incrementable<Iterator>::value
+            >());
+        // clang-format on
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -472,7 +474,7 @@ namespace tests {
     class input_output_iterator_archetype
     {
     private:
-        typedef input_output_iterator_archetype self;
+        using self = input_output_iterator_archetype;
         struct in_out_tag
           : public std::input_iterator_tag
           , public std::output_iterator_tag
@@ -480,8 +482,8 @@ namespace tests {
         };
 
     public:
-        typedef in_out_tag iterator_category;
-        typedef T value_type;
+        using iterator_category = in_out_tag;
+        using value_type = T;
         struct reference
         {
             reference& operator=(const T&)
@@ -494,19 +496,17 @@ namespace tests {
             }
         };
 
-        typedef const T* pointer;
-        typedef std::ptrdiff_t difference_type;
+        using pointer = const T*;
+        using difference_type = std::ptrdiff_t;
 
-        input_output_iterator_archetype() {}
-        self& operator=(const self&)
-        {
-            return *this;
-        }
-        bool operator==(const self&) const
+        input_output_iterator_archetype() = default;
+        self& operator=(self const&) = default;
+
+        bool operator==(self const&) const
         {
             return true;
         }
-        bool operator!=(const self&) const
+        bool operator!=(self const&) const
         {
             return true;
         }
@@ -528,28 +528,25 @@ namespace tests {
     class input_iterator_archetype_no_proxy
     {
     private:
-        typedef input_iterator_archetype_no_proxy self;
+        using self = input_iterator_archetype_no_proxy;
 
     public:
-        typedef std::input_iterator_tag iterator_category;
-        typedef T value_type;
-        typedef const T& reference;
-        typedef const T* pointer;
-        typedef std::ptrdiff_t difference_type;
-        input_iterator_archetype_no_proxy() {}
+        using iterator_category = std::input_iterator_tag;
+        using value_type = T;
+        using reference = T const&;
+        using pointer = T const*;
+        using difference_type = std::ptrdiff_t;
+        input_iterator_archetype_no_proxy() = default;
         input_iterator_archetype_no_proxy(
-            input_iterator_archetype_no_proxy const&)
-        {
-        }
-        self& operator=(const self&)
-        {
-            return *this;
-        }
-        bool operator==(const self&) const
+            input_iterator_archetype_no_proxy const&) = default;
+
+        self& operator=(self const&) = default;
+
+        bool operator==(self const&) const
         {
             return true;
         }
-        bool operator!=(const self&) const
+        bool operator!=(self const&) const
         {
             return true;
         }
@@ -571,20 +568,19 @@ namespace tests {
     class forward_iterator_archetype
     {
     public:
-        typedef forward_iterator_archetype self;
+        using self = forward_iterator_archetype;
 
     public:
-        typedef std::forward_iterator_tag iterator_category;
-        typedef T value_type;
-        typedef const T& reference;
-        typedef T const* pointer;
-        typedef std::ptrdiff_t difference_type;
-        forward_iterator_archetype() {}
-        forward_iterator_archetype(forward_iterator_archetype const&) {}
-        self& operator=(const self&)
-        {
-            return *this;
-        }
+        using iterator_category = std::forward_iterator_tag;
+        using value_type = T;
+        using reference = const T&;
+        using pointer = T const*;
+        using difference_type = std::ptrdiff_t;
+
+        forward_iterator_archetype() = default;
+        forward_iterator_archetype(forward_iterator_archetype const&) = default;
+        self& operator=(const self&) = default;
+
         bool operator==(const self&) const
         {
             return true;

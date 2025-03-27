@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2019 Austin McCartney
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,7 +14,6 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 namespace hpx::traits {
 
@@ -386,6 +385,18 @@ namespace hpx::traits {
           : std::is_same<Cat, iter_category_t<Iter>>
         {
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        std::random_access_iterator_tag coerce_iterator_tag(
+            std::random_access_iterator_tag const&);
+        std::bidirectional_iterator_tag coerce_iterator_tag(
+            std::bidirectional_iterator_tag const&);
+        std::forward_iterator_tag coerce_iterator_tag(
+            std::forward_iterator_tag const&);
+        std::input_iterator_tag coerce_iterator_tag(
+            std::input_iterator_tag const&);
+        std::output_iterator_tag coerce_iterator_tag(
+            std::output_iterator_tag const&);
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Iter, typename Traversal, typename Enable = void>

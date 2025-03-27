@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //  Copyright (c) 2016 Matthias Kretz
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -69,13 +69,13 @@ namespace hpx::parallel::traits {
         using value_type = typename rebind_pack<V, ValueType>::type;
 
         template <typename Iter>
-        static value_type aligned(Iter const& iter)
+        static value_type aligned(Iter& iter)
         {
             return value_type(std::addressof(*iter), Vc::Aligned);
         }
 
         template <typename Iter>
-        static value_type unaligned(Iter const& iter)
+        static value_type unaligned(Iter& iter)
         {
             return value_type(std::addressof(*iter), Vc::Unaligned);
         }
@@ -87,13 +87,13 @@ namespace hpx::parallel::traits {
         using value_type = typename rebind_pack<V, Vc::Vector<T, Abi>>::type;
 
         template <typename Iter>
-        static value_type aligned(Iter const& iter)
+        static value_type aligned(Iter& iter)
         {
             return *iter;
         }
 
         template <typename Iter>
-        static value_type unaligned(Iter const& iter)
+        static value_type unaligned(Iter& iter)
         {
             return *iter;
         }
@@ -107,13 +107,13 @@ namespace hpx::parallel::traits {
             typename rebind_pack<Value, Vc::SimdArray<T, N, V, W>>::type;
 
         template <typename Iter>
-        static value_type aligned(Iter const& iter)
+        static value_type aligned(Iter& iter)
         {
             return *iter;
         }
 
         template <typename Iter>
-        static value_type unaligned(Iter const& iter)
+        static value_type unaligned(Iter& iter)
         {
             return *iter;
         }
@@ -124,13 +124,13 @@ namespace hpx::parallel::traits {
     struct vector_pack_store
     {
         template <typename Iter>
-        static void aligned(V const& value, Iter const& iter)
+        static void aligned(V& value, Iter& iter)
         {
             value.store(std::addressof(*iter), Vc::Aligned);
         }
 
         template <typename Iter>
-        static void unaligned(V const& value, Iter const& iter)
+        static void unaligned(V& value, Iter& iter)
         {
             value.store(std::addressof(*iter), Vc::Unaligned);
         }
@@ -140,13 +140,13 @@ namespace hpx::parallel::traits {
     struct vector_pack_store<V, Vc::Vector<T, Abi>>
     {
         template <typename Iter>
-        static void aligned(V const& value, Iter const& iter)
+        static void aligned(V& value, Iter& iter)
         {
             *iter = value;
         }
 
         template <typename Iter>
-        static void unaligned(V const& value, Iter const& iter)
+        static void unaligned(V& value, Iter& iter)
         {
             *iter = value;
         }
@@ -157,13 +157,13 @@ namespace hpx::parallel::traits {
     struct vector_pack_store<Value, Vc::SimdArray<T, N, V, W>>
     {
         template <typename Iter>
-        static void aligned(Value const& value, Iter const& iter)
+        static void aligned(Value& value, Iter& iter)
         {
             *iter = value;
         }
 
         template <typename Iter>
-        static void unaligned(Value const& value, Iter const& iter)
+        static void unaligned(Value& value, Iter& iter)
         {
             *iter = value;
         }

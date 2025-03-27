@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +15,6 @@
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
@@ -35,6 +34,8 @@ namespace hpx::parallel::detail {
     template <typename T, typename Op>
     struct reduction_helper
     {
+        using needs_current_thread_num = void;
+
         template <typename Op_>
         constexpr reduction_helper(T& var, T const& identity, Op_&& op)
           : var_(var)
@@ -44,28 +45,38 @@ namespace hpx::parallel::detail {
                 hpx::parallel::execution::detail::get_os_thread_count();
             data_.reset(new hpx::util::cache_line_data<T>[cores]);
             for (std::size_t i = 0; i != cores; ++i)
+            {
                 data_[i].data_ = identity;
+            }
         }
 
-        static constexpr void init_iteration(std::size_t)
+        HPX_HOST_DEVICE static constexpr void init_iteration(
+            std::size_t /*index*/,
+            [[maybe_unused]] std::size_t current_thread) noexcept
         {
-            HPX_ASSERT(hpx::get_worker_thread_num() <
+            HPX_ASSERT(current_thread <
                 hpx::parallel::execution::detail::get_os_thread_count());
         }
 
-        constexpr T& iteration_value()
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T& iteration_value(
+            std::size_t current_thread) noexcept
         {
-            return data_[hpx::get_worker_thread_num()].data_;
+            return data_[current_thread].data_;
         }
 
-        static constexpr void next_iteration() noexcept {}
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr void next_iteration(
+            std::size_t /*current_thread*/) noexcept
+        {
+        }
 
-        void exit_iteration(std::size_t /*index*/)
+        HPX_HOST_DEVICE void exit_iteration(std::size_t /*index*/)
         {
             std::size_t const cores =
                 hpx::parallel::execution::detail::get_os_thread_count();
             for (std::size_t i = 0; i != cores; ++i)
+            {
                 var_ = op_(var_, data_[i].data_);
+            }
         }
 
     private:
@@ -140,6 +151,15 @@ namespace hpx::experimental {
     {
         return hpx::parallel::detail::reduction_helper<T, std::decay_t<Op>>(
             var, identity, HPX_FORWARD(Op, combiner));
+    }
+
+    template <typename T, typename Op>
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
+        std::decay_t<Op>>
+    reduction(T& var, Op&& combiner)
+    {
+        return hpx::parallel::detail::reduction_helper<T, std::decay_t<Op>>(
+            var, var, HPX_FORWARD(Op, combiner));
     }
 
     /// \cond NOINTERNAL

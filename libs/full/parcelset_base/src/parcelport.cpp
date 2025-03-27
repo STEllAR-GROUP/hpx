@@ -37,10 +37,8 @@ namespace hpx::parcelset {
         std::size_t zero_copy_serialization_threshold)
       : num_parcel_destinations_(0)
       , here_(HPX_MOVE(here))
-      , max_inbound_message_size_(
-            static_cast<std::int64_t>(ini.get_max_inbound_message_size()))
-      , max_outbound_message_size_(
-            static_cast<std::int64_t>(ini.get_max_outbound_message_size()))
+      , max_inbound_message_size_(0)
+      , max_outbound_message_size_(0)
       , allow_array_optimizations_(true)
       , allow_zero_copy_optimizations_(true)
       , allow_zero_copy_receive_optimizations_(true)
@@ -52,6 +50,13 @@ namespace hpx::parcelset {
     {
         std::string key("hpx.parcel.");
         key += type;
+
+        // clang-format off
+        max_inbound_message_size_ = static_cast<std::int64_t>(
+            ini.get_max_inbound_message_size(type));
+        max_outbound_message_size_ = static_cast<std::int64_t>(
+            ini.get_max_outbound_message_size(type));
+        // clang-format on
 
         if (hpx::util::get_entry_as<int>(ini, key + ".array_optimization", 1) ==
             0)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2024 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -121,6 +121,8 @@ namespace hpx { namespace collectives {
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param root_site    The site responsible for broadcasting the value.
+    ///                     This is optional and defaults to site `0` (zero).
     ///
     /// \returns    This function returns a future holding the value that was
     ///             sent to all participating sites. It will become
@@ -129,7 +131,8 @@ namespace hpx { namespace collectives {
     template <typename T>
     hpx::future<T> broadcast_from(char const* basename,
         this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg());
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
 
     /// Receive a value that was broadcast to different call sites
     ///
@@ -188,6 +191,191 @@ namespace hpx { namespace collectives {
     hpx::future<T> broadcast_from(communicator comm,
         generation_arg generation,
         this_site_arg this_site = this_site_arg());
+
+    /// Broadcast a value to different call sites
+    ///
+    /// This function sends a set of values to all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  basename    The base name identifying the broadcast operation
+    /// \param  local_result A value to transmit to all
+    ///                     participating sites from this call site.
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the broadcast operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the broadcast operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T>
+    decltype(auto) broadcast_to(hpx::launch::sync_policy, char const* basename,
+        T&& local_result, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// Broadcast a value to different call sites
+    ///
+    /// This function sends a set of values to all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  local_result A value to transmit to all
+    ///                     participating sites from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the broadcast operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the broadcast operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \note       The generation values from corresponding \a broadcast_to and
+    ///             \a broadcast_from have to match.
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T>
+    decltype(auto) broadcast_to(hpx::launch::sync_policy, communicator comm,
+        T&& local_result, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// Broadcast a value to different call sites
+    ///
+    /// This function sends a set of values to all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  local_result A value to transmit to all
+    ///                     participating sites from this call site.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the broadcast operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the broadcast operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \note       The generation values from corresponding \a broadcast_to and
+    ///             \a broadcast_from have to match.
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T>
+    decltype(auto) broadcast_to(hpx::launch::sync_policy, communicator comm,
+        T&& local_result, generation_arg generation,
+        this_site_arg this_site = this_site_arg());
+
+    /// Receive a value that was broadcast to different call sites
+    ///
+    /// This function sends a set of values to all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  basename    The base name identifying the broadcast operation
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the broadcast operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the broadcast operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param root_site    The site responsible for broadcasting the value.
+    ///                     This is optional and defaults to site `0` (zero).
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T>
+    T broadcast_from(hpx::launch::sync_policy, char const* basename,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
+
+    /// Receive a value that was broadcast to different call sites
+    ///
+    /// This function sends a set of values to all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the broadcast operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the broadcast operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \note       The generation values from corresponding \a broadcast_to and
+    ///             \a broadcast_from have to match.
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T>
+    T broadcast_from(hpx::launch::sync_policy, communicator comm,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// Receive a value that was broadcast to different call sites
+    ///
+    /// This function sends a set of values to all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the broadcast operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the broadcast operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \note       The generation values from corresponding \a broadcast_to and
+    ///             \a broadcast_from have to match.
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T>
+    T broadcast_from(hpx::launch::sync_policy, communicator comm,
+        generation_arg generation, this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
 
 // clang-format on
@@ -200,7 +388,6 @@ namespace hpx { namespace collectives {
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
-#include <hpx/async_local/dataflow.hpp>
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
@@ -334,6 +521,39 @@ namespace hpx::collectives {
             HPX_FORWARD(T, local_result), this_site);
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    decltype(auto) broadcast_to(hpx::launch::sync_policy, communicator fid,
+        T&& local_result, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        return broadcast_to(
+            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    decltype(auto) broadcast_to(hpx::launch::sync_policy, communicator fid,
+        T&& local_result, generation_arg generation,
+        this_site_arg this_site = this_site_arg())
+    {
+        return broadcast_to(
+            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    decltype(auto) broadcast_to(hpx::launch::sync_policy, char const* basename,
+        T&& local_result, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        return broadcast_to(hpx::launch::sync,
+            create_communicator(basename, num_sites, this_site, generation,
+                root_site_arg(this_site.argument_)),
+            HPX_FORWARD(T, local_result), this_site);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     hpx::future<T> broadcast_from(communicator fid,
@@ -391,6 +611,60 @@ namespace hpx::collectives {
         return broadcast_from<T>(create_communicator(basename, num_sites_arg(),
                                      this_site, generation, root_site),
             this_site);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    T broadcast_from(hpx::launch::sync_policy, communicator fid,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        return broadcast_from<T>(HPX_MOVE(fid), this_site, generation).get();
+    }
+
+    template <typename T>
+    T broadcast_from(hpx::launch::sync_policy, communicator fid,
+        generation_arg generation, this_site_arg this_site = this_site_arg())
+    {
+        return broadcast_from<T>(HPX_MOVE(fid), this_site, generation).get();
+    }
+
+    template <typename T>
+    T broadcast_from(hpx::launch::sync_policy, char const* basename,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
+    {
+        HPX_ASSERT(this_site != root_site);
+        return broadcast_from<T>(create_communicator(basename, num_sites_arg(),
+                                     this_site, generation, root_site),
+            this_site)
+            .get();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    void broadcast(communicator fid, T& value,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        if (this_site == static_cast<std::size_t>(-1))
+        {
+            this_site = static_cast<std::size_t>(agas::get_locality_id());
+        }
+
+        fid.wait();    // make sure communicator was created
+
+        if (this_site == std::get<2>(fid.get_info_ex()))
+        {
+            broadcast_to(
+                hpx::launch::sync, HPX_MOVE(fid), value, this_site, generation);
+        }
+        else
+        {
+            value = broadcast_from<T>(
+                hpx::launch::sync, HPX_MOVE(fid), this_site, generation);
+        }
     }
 }    // namespace hpx::collectives
 

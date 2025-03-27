@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2023 Hartmut Kaiser
+//  Copyright (c) 2005-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -150,7 +150,7 @@ namespace hpx::util {
             "${HPX_EXPECT_CONNECTING_LOCALITIES:0}",
 
             // add placeholders for keys to be added by command line handling
-            "os_threads = cores",
+            "os_threads = ${HPX_NUM_WORKER_THREADS:cores}",
             "cores = all",
             "localities = 1",
             "first_pu = 0",
@@ -265,7 +265,7 @@ namespace hpx::util {
             // allow for unknown options to be passed through
             "allow_unknown = ${HPX_COMMANDLINE_ALLOW_UNKNOWN:0}",
 
-            // allow for command line options to to be passed through the
+            // allow for command line options to be passed through the
             // environment
             "prepend_options = ${HPX_COMMANDLINE_OPTIONS}",
 
@@ -635,7 +635,7 @@ namespace hpx::util {
         // protect against duplicate paths
         std::set<std::string> component_paths;
 
-        // list of base names avoiding to load a module more than once
+        // list of base names avoiding loading a module more than once
         std::map<std::string, filesystem::path> basenames;
 
         // plugin registry object
@@ -881,8 +881,7 @@ namespace hpx::util {
                 *sec, "local_cache_size", cache_size);
         }
 
-        if ((cache_size != static_cast<std::size_t>(~0x0ul)) &&
-            cache_size < 16ul)
+        if (cache_size != ~static_cast<std::size_t>(0) && cache_size < 16ul)
         {
             cache_size = 16;    // limit lower bound
         }
@@ -1026,11 +1025,14 @@ namespace hpx::util {
     {
         if (num_os_threads == 0)
         {
-            num_os_threads = 1;
             if (util::section const* sec = get_section("hpx"); nullptr != sec)
             {
                 num_os_threads = hpx::util::get_entry_as<std::uint32_t>(
                     *sec, "os_threads", 1);
+            }
+            else
+            {
+                num_os_threads = 1;
             }
         }
         return static_cast<std::size_t>(num_os_threads);
@@ -1045,7 +1047,7 @@ namespace hpx::util {
         return "";
     }
 
-    // Return the configured sizes of any of the know thread pools
+    // Return the configured sizes of the known thread pools
     std::size_t runtime_configuration::get_thread_pool_size(
         char const* poolname) const
     {
@@ -1126,26 +1128,23 @@ namespace hpx::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Return maximally allowed message size
-    std::uint64_t runtime_configuration::get_max_inbound_message_size() const
+    // Return maximally allowed message size (zero for unlimited)
+    std::uint64_t runtime_configuration::get_max_inbound_message_size(
+        std::string const& type) const
     {
-        if (util::section const* sec = get_section("hpx.parcel");
+        if (util::section const* sec = get_section("hpx.parcel." + type);
             nullptr != sec)
         {
-            if (std::uint64_t const maxsize =
-                    hpx::util::get_entry_as<std::uint64_t>(
-                        *sec, "max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE);
-                maxsize > 0)
-            {
-                return maxsize;
-            }
+            return hpx::util::get_entry_as<std::uint64_t>(
+                *sec, "max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE);
         }
         return HPX_PARCEL_MAX_MESSAGE_SIZE;    // default is 1GByte
     }
 
-    std::uint64_t runtime_configuration::get_max_outbound_message_size() const
+    std::uint64_t runtime_configuration::get_max_outbound_message_size(
+        std::string const& type) const
     {
-        if (util::section const* sec = get_section("hpx.parcel");
+        if (util::section const* sec = get_section("hpx.parcel." + type);
             nullptr != sec)
         {
             if (std::uint64_t const maxsize =

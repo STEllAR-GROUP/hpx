@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The STE||AR-Group
+# Copyright (c) 2023-2024 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,7 +22,7 @@ jobs:
         choco install ninja -y
         md C:\projects
         $client = new-object System.Net.WebClient
-        $client.DownloadFile("https://master.dl.sourceforge.net/project/boost/boost/1.78.0/boost_1_78_0.7z","C:\projects\boost_1_78_0.7z")
+        $client.DownloadFile("https://archives.boost.io/release/1.78.0/source/boost_1_78_0.7z","C:\projects\boost_1_78_0.7z")
         7z x C:\projects\boost_1_78_0.7z -y -oC:\projects\boost
         cd C:\projects\boost\boost_1_78_0
         .\bootstrap.bat gcc

@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2021 Hartmut Kaiser
+//  Copyright (c) 2015-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 
-namespace hpx { namespace util { namespace functional {
+namespace hpx::util::functional {
 
     ///////////////////////////////////////////////////////////////////////////
     struct segmented_iterator_segment
@@ -108,4 +108,4 @@ namespace hpx { namespace util { namespace functional {
             }
         };
     };
-}}}    // namespace hpx::util::functional
+}    // namespace hpx::util::functional

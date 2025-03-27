@@ -28,9 +28,8 @@ else()
   include(HPX_SetupAsio)
 endif()
 
-
-# Stdexec can be installed by HPX or externally installed. In the first case we use
-# exported targets, in the second we find Stdexec again using find_package.
+# Stdexec can be installed by HPX or externally installed. In the first case we
+# use exported targets, in the second we find Stdexec again using find_package.
 if(HPX_WITH_STDEXEC)
   if(HPX_WITH_FETCH_STDEXEC)
     include("${CMAKE_CURRENT_LIST_DIR}/HPXStdexecTarget.cmake")
@@ -39,8 +38,6 @@ if(HPX_WITH_STDEXEC)
     include(HPX_SetupStdexec)
   endif()
 endif()
-
-
 
 # NLohnmann JSON can be installed by HPX or externally installed. In the first
 # case we use exported targets, in the second we find JSON again using
@@ -90,6 +87,32 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE")
     set(Sve_ROOT "@Sve_ROOT@")
     include(HPX_SetupSVE)
   endif()
+endif()
+
+if(HPX_WITH_FETCH_BOOST)
+  # Boost has been installed alongside HPX, let HPX_SetupBoost find it
+  if(NOT HPX_CONFIG_IS_INSTALL)
+    hpx_error(
+      "HPX_WITH_FETCH_BOOST=ON requires HPX to be installed after it is built.
+      Please execute the CMake install step (cmake --install) on your HPX build
+      directory, and link your project against the installed instance of HPX."
+    )
+  endif()
+  set(HPX_BOOST_ROOT "${CMAKE_CURRENT_LIST_DIR}/../")
+  include(HPX_SetupBoost)
+  include(HPX_SetupBoostFilesystem)
+  include(HPX_SetupBoostIostreams)
+else()
+  # Boost Separate boost targets to be unarily linked to some modules
+  set(HPX_BOOST_ROOT "@Boost_ROOT@")
+  # By default Boost_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
+  # HWLOC cause we are specifying HPX_<lib>_ROOT as an HINT to find_package)
+  if(NOT Boost_ROOT AND NOT "$ENV{BOOST_ROOT}")
+    set(Boost_ROOT ${HPX_BOOST_ROOT})
+  endif()
+  include(HPX_SetupBoost)
+  include(HPX_SetupBoostFilesystem)
+  include(HPX_SetupBoostIostreams)
 endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/HPXInternalTargets.cmake")
@@ -157,23 +180,20 @@ include(HPX_SetupAllocator)
 
 include(HPX_SetupThreads)
 
-# Boost Separate boost targets to be unarily linked to some modules
-set(HPX_BOOST_ROOT "@Boost_ROOT@")
-# By default Boost_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
-# HWLOC cause we are specifying HPX_<lib>_ROOT as an HINT to find_package)
-if(NOT Boost_ROOT AND NOT DEFINED ENV{BOOST_ROOT})
-  set(Boost_ROOT ${HPX_BOOST_ROOT})
-endif()
-include(HPX_SetupBoost)
-include(HPX_SetupBoostFilesystem)
-include(HPX_SetupBoostIostreams)
-
 # HIP
 include(HPX_SetupHIP)
 
 # Hwloc
-set(HPX_HWLOC_ROOT "@Hwloc_ROOT@")
-include(HPX_SetupHwloc)
+if(HPX_WITH_FETCH_HWLOC)
+  if(EXISTS ${HPX_PREFIX}/_deps/hwloc_installed)
+    set(Hwloc_ROOT ${HPX_PREFIX}/_deps/hwloc_installed)
+  else()
+    set(Hwloc_ROOT "@HPX_HWLOC_INSTALL_PATH@")
+  endif()
+else()
+  set(Hwloc_ROOT "@Hwloc_ROOT@")
+endif()
+include(HPX_FindHwloc)
 
 # Papi
 set(HPX_PAPI_ROOT "@Papi_ROOT@")

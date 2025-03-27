@@ -170,14 +170,16 @@ namespace executor_example {
         thread_hook on_stop_;
     };
 
+    // clang-format off
     template <typename Executor, typename OnStart, typename OnStop>
     executor_with_thread_hooks(Executor&&, OnStart&&, OnStop&&)
         -> executor_with_thread_hooks<std::decay_t<Executor>>;
+    // clang-format on
 }    // namespace executor_example
 
 ///////////////////////////////////////////////////////////////////////////////
 // simple forwarding implementations of executor traits
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     template <typename BaseExecutor>
     struct is_one_way_executor<
@@ -213,7 +215,7 @@ namespace hpx::parallel::execution {
       : is_bulk_two_way_executor<std::decay_t<BaseExecutor>>
     {
     };
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental
 
 int hpx_main()
 {

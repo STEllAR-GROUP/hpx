@@ -38,8 +38,7 @@ namespace hpx::parallel::util::detail {
         static HPX_FORCEINLINE constexpr bool call(
             hpx::util::zip_iterator<Iter...> const& it)
         {
-            return call(it,
-                typename hpx::util::make_index_pack<sizeof...(Iter)>::type());
+            return call(it, hpx::util::make_index_pack_t<sizeof...(Iter)>());
         }
     };
 
@@ -57,6 +56,7 @@ namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Tuple, typename... Iter, std::size_t... Is>
         constexpr Tuple aligned_pack(
             hpx::util::zip_iterator<Iter...> const& iter,
@@ -64,7 +64,7 @@ namespace hpx::parallel::traits {
         {
             auto const& t = iter.get_iterator_tuple();
             return hpx::make_tuple(
-                vector_pack_load<typename hpx::tuple_element<Is, Tuple>::type,
+                vector_pack_load<hpx::tuple_element_t<Is, Tuple>,
                     typename std::iterator_traits<Iter>::value_type>::
                     aligned(hpx::get<Is>(t))...);
         }
@@ -76,7 +76,7 @@ namespace hpx::parallel::traits {
         {
             auto const& t = iter.get_iterator_tuple();
             return hpx::make_tuple(
-                vector_pack_load<typename hpx::tuple_element<Is, Tuple>::type,
+                vector_pack_load<hpx::tuple_element_t<Is, Tuple>,
                     typename std::iterator_traits<Iter>::value_type>::
                     unaligned(hpx::get<Is>(t))...);
         }
@@ -91,16 +91,16 @@ namespace hpx::parallel::traits {
         static constexpr value_type aligned(
             hpx::util::zip_iterator<Iter...> const& iter)
         {
-            return traits::detail::aligned_pack<value_type>(iter,
-                typename hpx::util::make_index_pack<sizeof...(Iter)>::type());
+            return traits::detail::aligned_pack<value_type>(
+                iter, hpx::util::make_index_pack_t<sizeof...(Iter)>());
         }
 
         template <typename... Iter>
         static constexpr value_type unaligned(
             hpx::util::zip_iterator<Iter...> const& iter)
         {
-            return traits::detail::unaligned_pack<value_type>(iter,
-                typename hpx::util::make_index_pack<sizeof...(Iter)>::type());
+            return traits::detail::unaligned_pack<value_type>(
+                iter, hpx::util::make_index_pack_t<sizeof...(Iter)>());
         }
     };
 
@@ -113,7 +113,7 @@ namespace hpx::parallel::traits {
             hpx::util::index_pack<Is...>)
         {
             auto const& t = iter.get_iterator_tuple();
-            (vector_pack_store<typename hpx::tuple_element<Is, Tuple>::type,
+            (vector_pack_store<hpx::tuple_element_t<Is, Tuple>,
                  typename std::iterator_traits<Iter>::value_type>::
                     aligned(hpx::get<Is>(value), hpx::get<Is>(t)),
                 ...);
@@ -125,7 +125,7 @@ namespace hpx::parallel::traits {
             hpx::util::index_pack<Is...>)
         {
             auto const& t = iter.get_iterator_tuple();
-            (vector_pack_store<typename hpx::tuple_element<Is, Tuple>::type,
+            (vector_pack_store<hpx::tuple_element_t<Is, Tuple>,
                  typename std::iterator_traits<Iter>::value_type>::
                     unaligned(hpx::get<Is>(value), hpx::get<Is>(t)),
                 ...);
@@ -139,16 +139,16 @@ namespace hpx::parallel::traits {
         static constexpr void aligned(
             V& value, hpx::util::zip_iterator<Iter...> const& iter)
         {
-            traits::detail::aligned_pack(value, iter,
-                typename hpx::util::make_index_pack<sizeof...(Iter)>::type());
+            traits::detail::aligned_pack(
+                value, iter, hpx::util::make_index_pack_t<sizeof...(Iter)>());
         }
 
         template <typename V, typename... Iter>
         static constexpr void unaligned(
             V& value, hpx::util::zip_iterator<Iter...> const& iter)
         {
-            traits::detail::unaligned_pack(value, iter,
-                typename hpx::util::make_index_pack<sizeof...(Iter)>::type());
+            traits::detail::unaligned_pack(
+                value, iter, hpx::util::make_index_pack_t<sizeof...(Iter)>());
         }
     };
 }    // namespace hpx::parallel::traits

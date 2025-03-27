@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2024 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -114,7 +114,7 @@ namespace hpx { namespace collectives {
     /// site (where the corresponding \a gather_here is executed)
     ///
     /// \param basename     The base name identifying the gather operation
-    /// \param local_result The value to transmit to the central gather point
+    /// \param result       The value to transmit to the central gather point
     ///                     from this call site.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
@@ -135,7 +135,7 @@ namespace hpx { namespace collectives {
     ///             operation has been completed.
     ///
     template <typename T> hpx::future<void>
-    gather_there(char const* basename, T&& local_result,
+    gather_there(char const* basename, T&& result,
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg(),
         root_site_arg root_site = root_site_arg());
@@ -145,8 +145,8 @@ namespace hpx { namespace collectives {
     /// This function transmits the value given by \a result to a central gather
     /// site (where the corresponding \a gather_here is executed)
     ///
-    /// \param fid          A communicator object returned from \a create_communicator
-    /// \param local_result The value to transmit to the central gather point
+    /// \param comm         A communicator object returned from \a create_communicator
+    /// \param result       The value to transmit to the central gather point
     ///                     from this call site.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
@@ -167,7 +167,7 @@ namespace hpx { namespace collectives {
     ///             operation has been completed.
     ///
     template <typename T> hpx::future<void>
-    gather_there(communicator fid, T&& local_result,
+    gather_there(communicator comm, T&& result,
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg());
 
@@ -176,8 +176,8 @@ namespace hpx { namespace collectives {
     /// This function transmits the value given by \a result to a central gather
     /// site (where the corresponding \a gather_here is executed)
     ///
-    /// \param fid          A communicator object returned from \a create_communicator
-    /// \param local_result The value to transmit to the central gather point
+    /// \param comm         A communicator object returned from \a create_communicator
+    /// \param result       The value to transmit to the central gather point
     ///                     from this call site.
     /// \param generation   The generational counter identifying the sequence
     ///                     number of the gather operation performed on the
@@ -198,8 +198,201 @@ namespace hpx { namespace collectives {
     ///             operation has been completed.
     ///
     template <typename T> hpx::future<void>
-    gather_there(communicator fid, T&& local_result,
+    gather_there(communicator comm, T&& result,
         generation_arg generation,
+        this_site_arg this_site = this_site_arg());
+
+    /// Gather a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  basename    The base name identifying the gather operation
+    /// \param  result      The value to transmit to the central gather point
+    ///                     from this call site.
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the gather operation on the given
+    ///                     base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T>
+    decltype(auto) gather_here(hpx::launch::sync_policy, char const* basename,
+        T&& result, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// Gather a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  result      The value to transmit to the central gather point
+    ///                     from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the gather operation on the given
+    ///                     base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \note       The generation values from corresponding \a gather_here and
+    ///             \a gather_there have to match.
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T>
+    decltype(auto) gather_here(hpx::launch::sync_policy, communicator comm,
+        T&& result, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// Gather a set of values from different call sites
+    ///
+    /// This function receives a set of values from all call sites operating on
+    /// the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  result      The value to transmit to the central gather point
+    ///                     from this call site.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the gather operation on the given
+    ///                     base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \note       The generation values from corresponding \a gather_here and
+    ///             \a gather_there have to match.
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T>
+    decltype(auto) gather_here(hpx::launch::sync_policy, communicator comm,
+        T&& result, generation_arg generation,
+        this_site_arg this_site = this_site_arg());
+
+    /// Gather a given value at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central gather
+    /// site (where the corresponding \a gather_here is executed)
+    ///
+    /// \param policy       The execution policy specifying synchronous execution.
+    /// \param basename     The base name identifying the gather operation
+    /// \param result       The value to transmit to the central gather point
+    ///                     from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param generation   The generational counter identifying the sequence
+    ///                     number of the gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the gather operation on the given
+    ///                     base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param root_site    The sequence number of the central gather point
+    ///                     (usually the locality id). This value is optional
+    ///                     and defaults to 0.
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T>
+    void gather_there(hpx::launch::sync_policy, char const* basename,
+        T&& result, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
+
+    /// Gather a given value at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central gather
+    /// site (where the corresponding \a gather_here is executed)
+    ///
+    /// \param policy       The execution policy specifying synchronous execution.
+    /// \param comm         A communicator object returned from \a create_communicator
+    /// \param result       The value to transmit to the central gather point
+    ///                     from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param generation   The generational counter identifying the sequence
+    ///                     number of the gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the gather operation on the given
+    ///                     base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \note       The generation values from corresponding \a gather_here and
+    ///             \a gather_there have to match.
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T>
+    void gather_there(hpx::launch::sync_policy, communicator comm,
+        T&& result, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// Gather a given value at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central gather
+    /// site (where the corresponding \a gather_here is executed)
+    ///
+    /// \param policy       The execution policy specifying synchronous execution.
+    /// \param comm         A communicator object returned from \a create_communicator
+    /// \param result       The value to transmit to the central gather point
+    ///                     from this call site.
+    /// \param generation   The generational counter identifying the sequence
+    ///                     number of the gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the gather operation on the given
+    ///                     base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \note       The generation values from corresponding \a gather_here and
+    ///             \a gather_there have to match.
+    ///
+    /// \returns    This function returns a vector with all values send by all
+    ///             participating sites. This function executes synchronously and
+    ///             directly returns the result.
+    ///
+    template <typename T>
+    void gather_there(hpx::launch::sync_policy, communicator comm,
+        T&& result, generation_arg generation,
         this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
 
@@ -347,6 +540,39 @@ namespace hpx::collectives {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    decltype(auto) gather_here(hpx::launch::sync_policy, communicator fid,
+        T&& local_result, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        return gather_here(
+            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    decltype(auto) gather_here(hpx::launch::sync_policy, communicator fid,
+        T&& local_result, generation_arg generation,
+        this_site_arg this_site = this_site_arg())
+    {
+        return gather_here(
+            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    decltype(auto) gather_here(hpx::launch::sync_policy, char const* basename,
+        T&& result, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        return gather_here(create_communicator(basename, num_sites, this_site,
+                               generation, root_site_arg(this_site.argument_)),
+            HPX_FORWARD(T, result), this_site)
+            .get();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // gather plain values
     template <typename T>
     hpx::future<void> gather_there(communicator fid, T&& local_result,
@@ -407,6 +633,40 @@ namespace hpx::collectives {
         return gather_there(create_communicator(basename, num_sites_arg(),
                                 this_site, generation, root_site),
             HPX_FORWARD(T, local_result), this_site);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    void gather_there(hpx::launch::sync_policy, communicator fid,
+        T&& local_result, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        gather_there(
+            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    void gather_there(hpx::launch::sync_policy, communicator fid,
+        T&& local_result, generation_arg generation,
+        this_site_arg this_site = this_site_arg())
+    {
+        gather_there(
+            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    void gather_there(hpx::launch::sync_policy, char const* basename,
+        T&& local_result, this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
+    {
+        HPX_ASSERT(this_site != root_site);
+        gather_there(create_communicator(basename, num_sites_arg(), this_site,
+                         generation, root_site),
+            HPX_FORWARD(T, local_result), this_site)
+            .get();
     }
 }    // namespace hpx::collectives
 
