@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+  parallel_scheduler_test
     annotating_executor
     annotation_property
     created_executor
