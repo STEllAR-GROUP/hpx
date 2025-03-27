@@ -46,6 +46,14 @@ namespace hpx::collectives {
         comm_.reset();
     }
 
+    std::pair<num_sites_arg, this_site_arg> channel_communicator::get_info()
+        const noexcept
+    {
+        auto [num_localities, this_locality] = comm_->get_info();
+        return std::make_pair(
+            num_sites_arg(num_localities), this_site_arg(this_locality));
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     hpx::future<channel_communicator> create_channel_communicator(
         char const* basename, num_sites_arg num_sites, this_site_arg this_site)
