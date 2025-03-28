@@ -181,6 +181,9 @@ namespace hpx::collectives {
             return comm_.get() != nullptr;
         }
 
+        HPX_EXPORT std::pair<num_sites_arg, this_site_arg> get_info()
+            const noexcept;
+
     private:
         std::shared_ptr<detail::channel_communicator> comm_;
     };
