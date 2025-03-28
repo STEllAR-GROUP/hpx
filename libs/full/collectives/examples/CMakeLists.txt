@@ -1,4 +1,4 @@
-# Copyright (c) 2021 The STE||AR-Group
+# Copyright (c) 2021-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,13 +17,16 @@ else()
   return()
 endif()
 
-set(example_programs channel_communicator distributed_pi)
+set(example_programs channel_communicator channel_pingpong distributed_pi)
 
 set(channel_communicator_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(channel_communicator_FLAGS DEPENDENCIES iostreams_component)
 
 set(distributed_pi_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(distributed_pi_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)
+
+set(channel_pingpong_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
+set(channel_pingpong_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)
 
 foreach(example_program ${example_programs})
 
