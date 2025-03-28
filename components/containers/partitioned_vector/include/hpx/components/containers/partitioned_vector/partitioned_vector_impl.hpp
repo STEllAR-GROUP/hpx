@@ -535,6 +535,7 @@ namespace hpx {
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
     partitioned_vector<T, Data>::partitioned_vector(
         typename Data::const_iterator begin, typename Data::const_iterator end)
       : size_(std::distance(begin, end))
@@ -576,11 +577,10 @@ namespace hpx {
     template <typename T, typename Data /*= std::vector<T> */>
     template <typename DistPolicy>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
-    partitioned_vector<T, Data>::partitioned_vector(DistPolicy const& policy,
+    partitioned_vector<T, Data>::partitioned_vector(DistPolicy const&,
         std::enable_if_t<traits::is_distribution_policy_v<DistPolicy>>*)
       : size_(0)
     {
-        reserve(policy);
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
