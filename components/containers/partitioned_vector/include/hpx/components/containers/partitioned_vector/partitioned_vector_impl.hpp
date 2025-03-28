@@ -580,7 +580,6 @@ namespace hpx {
         std::enable_if_t<traits::is_distribution_policy_v<DistPolicy>>*)
       : size_(0)
     {
-        reserve(policy);
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
