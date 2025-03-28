@@ -21,6 +21,7 @@
 #include <hpx/parallel/algorithms/equal.hpp>
 #include <hpx/parallel/algorithms/fill.hpp>
 #include <hpx/parallel/algorithms/find.hpp>
+#include <hpx/parallel/algorithms/fold.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/generate.hpp>
 #include <hpx/parallel/algorithms/includes.hpp>
