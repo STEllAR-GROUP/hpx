@@ -35,7 +35,7 @@ std::uint64_t averageout_plain_for(std::size_t vector_size)
     std::iota(
         std::begin(data_representation), std::end(data_representation), gen());
 
-    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
+    std::uint64_t const start = hpx::chrono::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
     for (auto i = 0; i < test_count; i++)
@@ -52,7 +52,7 @@ std::uint64_t averageout_plain_for_iter(std::size_t vector_size)
     std::iota(
         std::begin(data_representation), std::end(data_representation), gen());
 
-    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
+    std::uint64_t const start = hpx::chrono::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
     for (auto i = 0; i < test_count; i++)
@@ -72,7 +72,7 @@ std::uint64_t averageout_parallel_foreach(
     std::iota(
         std::begin(data_representation), std::end(data_representation), gen());
 
-    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
+    std::uint64_t const start = hpx::chrono::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
     for (auto i = 0; i < test_count; i++)
@@ -92,7 +92,7 @@ std::uint64_t averageout_task_foreach(std::size_t vector_size, Executor&& exec)
 
     if (num_overlapping_loops <= 0)
     {
-        std::uint64_t start = hpx::chrono::high_resolution_clock::now();
+        std::uint64_t const start = hpx::chrono::high_resolution_clock::now();
 
         for (auto i = 0; i < test_count; i++)
             measure_task_foreach(data_representation, exec).wait();
@@ -103,7 +103,7 @@ std::uint64_t averageout_task_foreach(std::size_t vector_size, Executor&& exec)
     std::vector<hpx::shared_future<void>> tests;
     tests.resize(num_overlapping_loops);
 
-    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
+    std::uint64_t const start = hpx::chrono::high_resolution_clock::now();
 
     for (auto i = 0; i < test_count; i++)
     {
@@ -124,7 +124,7 @@ std::uint64_t averageout_sequential_foreach(std::size_t vector_size)
     std::iota(
         std::begin(data_representation), std::end(data_representation), gen());
 
-    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
+    std::uint64_t const start = hpx::chrono::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
     for (auto i = 0; i < test_count; i++)
@@ -142,7 +142,7 @@ std::uint64_t averageout_parallel_forloop(
     std::iota(
         std::begin(data_representation), std::end(data_representation), gen());
 
-    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
+    std::uint64_t const start = hpx::chrono::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
     for (auto i = 0; i < test_count; i++)
@@ -167,7 +167,7 @@ std::uint64_t averageout_task_forloop(std::size_t vector_size, Executor&& exec)
 
     if (num_overlapping_loops <= 0)
     {
-        std::uint64_t start = hpx::chrono::high_resolution_clock::now();
+        std::uint64_t const start = hpx::chrono::high_resolution_clock::now();
 
         for (auto i = 0; i < test_count; i++)
             measure_task_forloop(data_representation, exec).wait();
@@ -178,7 +178,7 @@ std::uint64_t averageout_task_forloop(std::size_t vector_size, Executor&& exec)
     std::vector<hpx::shared_future<void>> tests;
     tests.resize(num_overlapping_loops);
 
-    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
+    std::uint64_t const start = hpx::chrono::high_resolution_clock::now();
 
     for (auto i = 0; i < test_count; i++)
     {
@@ -199,7 +199,7 @@ std::uint64_t averageout_sequential_forloop(std::size_t vector_size)
     std::iota(
         std::begin(data_representation), std::end(data_representation), gen());
 
-    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
+    std::uint64_t const start = hpx::chrono::high_resolution_clock::now();
 
     // average out 100 executions to avoid varying results
     for (auto i = 0; i < test_count; i++)
@@ -212,8 +212,8 @@ std::uint64_t averageout_sequential_forloop(std::size_t vector_size)
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     // pull values from cmd
-    std::size_t vector_size = vm["vector_size"].as<std::size_t>();
-    bool csvoutput = vm.count("csv_output") != 0;
+    std::size_t const vector_size = vm["vector_size"].as<std::size_t>();
+    bool const csvoutput = vm.count("csv_output") != 0;
     delay = vm["work_delay"].as<int>();
     test_count = vm["test_count"].as<int>();
     chunk_size = vm["chunk_size"].as<int>();
@@ -264,8 +264,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::uint64_t task_time_forloop = 0;
         std::uint64_t seq_time_forloop = 0;
 
-        std::uint64_t plain_time_for = averageout_plain_for(vector_size);
-        std::uint64_t plain_time_for_iter =
+        std::uint64_t const plain_time_for = averageout_plain_for(vector_size);
+        std::uint64_t const plain_time_for_iter =
             averageout_plain_for_iter(vector_size);
 
         if (vm["executor"].as<std::string>() == "forkjoin")
@@ -467,11 +467,15 @@ int hpx_main(hpx::program_options::variables_map& vm)
                       << std::left
                       << "Parallel Scale                    : " << std::right
                       << std::setw(8)
-                      << (double(seq_time_foreach) / par_time_foreach) << "\n"
+                      << (static_cast<double>(seq_time_foreach) /
+                             par_time_foreach)
+                      << "\n"
                       << std::left
                       << "Task Scale                        : " << std::right
                       << std::setw(8)
-                      << (double(seq_time_foreach) / task_time_foreach) << "\n"
+                      << (static_cast<double>(seq_time_foreach) /
+                             task_time_foreach)
+                      << "\n"
                       << std::flush;
 
             std::cout << "-------------Average-(for_loop)----------------\n"
@@ -490,11 +494,15 @@ int hpx_main(hpx::program_options::variables_map& vm)
                       << std::left
                       << "Parallel Scale                    : " << std::right
                       << std::setw(8)
-                      << (double(seq_time_forloop) / par_time_forloop) << "\n"
+                      << (static_cast<double>(seq_time_forloop) /
+                             par_time_forloop)
+                      << "\n"
                       << std::left
                       << "Task Scale                        : " << std::right
                       << std::setw(8)
-                      << (double(seq_time_forloop) / task_time_forloop) << "\n";
+                      << (static_cast<double>(seq_time_forloop) /
+                             task_time_forloop)
+                      << "\n";
         }
     }
 
