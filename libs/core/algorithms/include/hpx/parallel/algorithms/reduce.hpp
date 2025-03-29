@@ -417,14 +417,14 @@ namespace hpx::parallel {
                     }
                 }
 
-                auto f1 = [r](FwdIterB part_begin, std::size_t part_size) -> T {
-                    T val = init;
-                    auto it = part_begin;
-                    while (it != part_end)
+                auto f1 = [r, init = HPX_FORWARD(T_, init)](FwdIterB part_begin,
+                               std::size_t part_size) -> T {
+                    if (part_size == 0)
                     {
-                       val = HPX_INVOKE(binary_op, val, *it);
-                       ++it;
+                        return init;
                     }
+                    T val = init;
+                    val = hpx::invoke(r, HPX_MOVE(val), *part_begin);
                     return detail::sequential_reduce<ExPolicy>(
                         ++part_begin, --part_size, HPX_MOVE(val), r);
                 };
@@ -483,7 +483,7 @@ namespace hpx {
         friend auto tag_fallback_invoke(hpx::reduce_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T init)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter),
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::reduce<T>().call(
@@ -501,7 +501,7 @@ namespace hpx {
         friend auto tag_fallback_invoke(
             hpx::reduce_t, ExPolicy&& policy, FwdIter first, FwdIter last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter),
                 "Requires at least forward iterator.");
 
             using value_type =
@@ -539,7 +539,7 @@ namespace hpx {
         friend T tag_fallback_invoke(
             hpx::reduce_t, InIter first, InIter last, T init)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(hpx::traits::is_input_iterator_v<InIter),
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::reduce<T>().call(hpx::execution::seq,
@@ -555,14 +555,14 @@ namespace hpx {
         friend typename std::iterator_traits<InIter>::value_type
         tag_fallback_invoke(hpx::reduce_t, InIter first, InIter last)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(hpx::traits::is_input_iterator_v<InIter),
                 "Requires at least input iterator.");
 
             using value_type =
                 typename std::iterator_traits<InIter>::value_type;
 
             return hpx::parallel::detail::reduce<value_type>().call(
-                hpx::execution::seq, first, last, value_type{}, std::plus<>());
+                hpx::execution::seq, first, last, value_type{}, std::plus<>{});
         }
     } reduce{};
 }    // namespace hpx
