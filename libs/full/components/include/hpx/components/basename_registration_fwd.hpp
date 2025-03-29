@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 #include <hpx/components/components_fwd.hpp>
 #include <hpx/components/make_client.hpp>
 #include <hpx/futures/future_fwd.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
@@ -53,6 +54,9 @@ namespace hpx {
     HPX_EXPORT std::vector<hpx::future<hpx::id_type>> find_all_from_basename(
         std::string base_name, std::size_t num_ids);
 
+    HPX_EXPORT std::vector<hpx::future<hpx::id_type>> find_all_from_basename(
+        hpx::launch::sync_policy, std::string base_name, std::size_t num_ids);
+
     /// Return registered ids from the given base name and sequence numbers.
     ///
     /// This function locates the ids which were registered with the given
@@ -74,6 +78,10 @@ namespace hpx {
     HPX_EXPORT std::vector<hpx::future<hpx::id_type>> find_from_basename(
         std::string base_name, std::vector<std::size_t> const& ids);
 
+    HPX_EXPORT std::vector<hpx::future<hpx::id_type>> find_from_basename(
+        hpx::launch::sync_policy, std::string base_name,
+        std::vector<std::size_t> const& ids);
+
     /// \brief Return registered id from the given base name and sequence number.
     ///
     /// This function locates the id which was registered with the given
@@ -93,6 +101,10 @@ namespace hpx {
     ///         name, even if the name was already registered.
     ///
     HPX_EXPORT hpx::future<hpx::id_type> find_from_basename(
+        std::string base_name,
+        std::size_t sequence_nr = ~static_cast<std::size_t>(0));
+
+    HPX_EXPORT hpx::id_type find_from_basename(hpx::launch::sync_policy,
         std::string base_name,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0));
 
@@ -196,6 +208,10 @@ namespace hpx {
     std::vector<Client> find_all_from_basename(
         std::string base_name, std::size_t num_ids);
 
+    template <typename Client>
+    std::vector<Client> find_all_from_basename(hpx::launch::sync_policy policy,
+        std::string base_name, std::size_t num_ids);
+
     /// Return registered clients from the given base name and sequence numbers.
     ///
     /// This function locates the ids which were registered with the given
@@ -221,6 +237,10 @@ namespace hpx {
     std::vector<Client> find_from_basename(
         std::string base_name, std::vector<std::size_t> const& ids);
 
+    template <typename Client>
+    std::vector<Client> find_from_basename(hpx::launch::sync_policy policy,
+        std::string base_name, std::vector<std::size_t> const& ids);
+
     /// \brief Return registered id from the given base name and sequence number.
     ///
     /// This function locates the id which was registered with the given
@@ -244,6 +264,11 @@ namespace hpx {
     ///
     template <typename Client>
     Client find_from_basename(std::string base_name,
+        std::size_t sequence_nr = ~static_cast<std::size_t>(0));
+
+    template <typename Client>
+    Client find_from_basename(hpx::launch::sync_policy policy,
+        std::string base_name,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0));
 
     /// Register the id wrapped in the given client using the given base name.

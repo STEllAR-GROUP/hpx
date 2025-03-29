@@ -142,6 +142,10 @@ namespace hpx::collectives {
         create_channel_communicator(char const* basename,
             num_sites_arg num_sites, this_site_arg this_site);
 
+        friend HPX_EXPORT channel_communicator create_channel_communicator(
+            hpx::launch::sync_policy, char const* basename,
+            num_sites_arg num_sites, this_site_arg this_site);
+
         template <typename T>
         friend hpx::future<T> get(channel_communicator, that_site_arg, tag_arg);
 
@@ -162,6 +166,11 @@ namespace hpx::collectives {
             num_sites_arg num_sites, this_site_arg this_site,
             components::client<detail::channel_communicator_server>&& here);
 
+        HPX_EXPORT channel_communicator(hpx::launch::sync_policy,
+            char const* basename, num_sites_arg num_sites,
+            this_site_arg this_site,
+            components::client<detail::channel_communicator_server>&& here);
+
     public:
         HPX_EXPORT channel_communicator();
         HPX_EXPORT ~channel_communicator();
@@ -178,7 +187,7 @@ namespace hpx::collectives {
 
         explicit operator bool() const noexcept
         {
-            return comm_.get() != nullptr;
+            return !!comm_;
         }
 
     private:
@@ -198,29 +207,29 @@ namespace hpx::collectives {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     hpx::future<T> get(
-        channel_communicator comm, that_site_arg site, tag_arg tag)
+        channel_communicator const comm, that_site_arg site, tag_arg tag)
     {
-        return comm.comm_->template get<T>(site.argument_, tag.argument_);
+        return comm.comm_->get<T>(site.argument_, tag.argument_);
     }
 
     template <typename T>
-    T get(hpx::launch::sync_policy, channel_communicator comm,
+    T get(hpx::launch::sync_policy, channel_communicator const comm,
         that_site_arg site, tag_arg tag)
     {
-        return comm.comm_->template get<T>(site.argument_, tag.argument_).get();
+        return comm.comm_->get<T>(site.argument_, tag.argument_).get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    hpx::future<void> set(
-        channel_communicator comm, that_site_arg site, T&& value, tag_arg tag)
+    hpx::future<void> set(channel_communicator const comm, that_site_arg site,
+        T&& value, tag_arg tag)
     {
         return comm.comm_->set(
             site.argument_, HPX_FORWARD(T, value), tag.argument_);
     }
 
     template <typename T>
-    void set(hpx::launch::sync_policy, channel_communicator comm,
+    void set(hpx::launch::sync_policy, channel_communicator const comm,
         that_site_arg site, T&& value, tag_arg tag)
     {
         return comm.comm_
