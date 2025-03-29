@@ -418,7 +418,13 @@ namespace hpx::parallel {
                 }
 
                 auto f1 = [r](FwdIterB part_begin, std::size_t part_size) -> T {
-                    T val = *part_begin;
+                    T val = init;
+                    auto it = part_begin;
+                    while (it != part_end)
+                    {
+                       val = HPX_INVOKE(binary_op, val, *it);
+                       ++it;
+                    }
                     return detail::sequential_reduce<ExPolicy>(
                         ++part_begin, --part_size, HPX_MOVE(val), r);
                 };
