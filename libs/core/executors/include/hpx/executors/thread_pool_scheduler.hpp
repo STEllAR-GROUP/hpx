@@ -474,7 +474,7 @@ namespace hpx::execution::experimental {
 #include <atomic>
 #include <iostream>
 #include <memory>
-#include <hpx/execution/algorithms/bulk.hpp>  // for bulk_t
+#include <hpx/execution/algorithms/bulk.hpp>
 namespace hpx::execution::experimental {
 
     struct parallel_scheduler
