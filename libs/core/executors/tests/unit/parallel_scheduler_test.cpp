@@ -8,6 +8,7 @@
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/executors/parallel_scheduler.hpp>
 #include <hpx/thread.hpp>
 #include <exception>
 #include <iostream>
