@@ -486,6 +486,9 @@ namespace hpx::execution::experimental {
                 hpx::threads::detail::get_self_or_default_pool()) noexcept
           : pool_(pool)
         {
+            if (!pool_) {
+                throw std::runtime_error("parallel_scheduler: thread pool is null");
+            }
             HPX_ASSERT(pool_);
             // std::cout << "Scheduler created with pool: " << pool_ << std::endl;
         }
@@ -732,8 +735,12 @@ namespace hpx::execution::experimental {
     }
 
     inline parallel_scheduler get_system_scheduler() noexcept
-    {
-        return parallel_scheduler{};
+{
+    hpx::init_params init_args;
+    if (!hpx::is_runtime_initialized()) {
+        hpx::init(nullptr, 0, init_args);
     }
+    return parallel_scheduler{};
+}
 
 }    // namespace hpx::execution::experimental
