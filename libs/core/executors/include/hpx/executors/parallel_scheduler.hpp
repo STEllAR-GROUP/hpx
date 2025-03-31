@@ -5,11 +5,16 @@
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#pragma once
+
+#include <hpx/assert.hpp>
 #include <hpx/async_base/post.hpp>
+#include <hpx/execution/algorithms/bulk.hpp>
 #include <atomic>
+#include <exception>
 #include <iostream>
 #include <memory>
-#include <hpx/execution/algorithms/bulk.hpp>
+
 namespace hpx::execution::experimental {
 
     struct parallel_scheduler
