@@ -1,12 +1,12 @@
-//  Copyright (c) 2025 Sai Charan Arvapally
+// Copyright (c) 2025 Sai Charan Arvapally
 //
-//  SPDX-License-Identifier: BSL-1.0
-//  Distributed under the Boost Software License, Version 1.0.
-//  See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt)
+// SPDX-License-Identifier: BSL-1.0
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/execution.hpp>
 #include <hpx/executors/parallel_scheduler.hpp>
+#include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/thread.hpp>
