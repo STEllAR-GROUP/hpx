@@ -6,9 +6,9 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/execution.hpp>
+#include <hpx/executors/parallel_scheduler.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/executors/parallel_scheduler.hpp>
 #include <hpx/thread.hpp>
 #include <exception>
 #include <iostream>
