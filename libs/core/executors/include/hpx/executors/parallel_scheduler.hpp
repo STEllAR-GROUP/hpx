@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include <hpx/assert.hpp>
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/functional.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>
