@@ -14,14 +14,11 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/init.hpp>
-#include <hpx/thread.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <atomic>
 #include <exception>
-#include <iosfwd>
 #include <memory>
 
 namespace hpx::execution::experimental {
