@@ -182,6 +182,7 @@ set(algorithms_headers
     hpx/parallel/datapar/zip_iterator.hpp
     hpx/parallel/memory.hpp
     hpx/parallel/numeric.hpp
+    hpx/parallel/run_on_all.hpp
     hpx/parallel/spmd_block.hpp
     hpx/parallel/task_block.hpp
     hpx/parallel/task_group.hpp
