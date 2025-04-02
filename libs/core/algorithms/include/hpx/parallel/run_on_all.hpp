@@ -12,14 +12,17 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/execution/execution.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/experimental/scope_exit.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/algorithms/for_loop_reduction.hpp>
 
 #include <cstddef>
+#include <type_traits>
 
 namespace hpx::experimental {
 
@@ -51,5 +54,28 @@ namespace hpx::experimental {
             hpx::parallel::execution::detail::get_os_thread_count();
         run_on_all(
             cores, HPX_MOVE(r), HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename F, typename... Ts>
+    void run_on_all(std::size_t num_tasks, F&& f, Ts&&... ts)
+    {
+        // force using index_queue scheduler with given amount of threads
+        auto exec = hpx::execution::experimental::with_processing_units_count(
+            hpx::execution::parallel_executor(
+                hpx::threads::thread_priority::bound),
+            num_tasks);
+        exec.set_hierarchical_threshold(0);
+
+        hpx::wait_all(hpx::parallel::execution::bulk_async_execute(
+            exec, [&](auto) { f(ts...); }, num_tasks, HPX_FORWARD(Ts, ts)...));
+    }
+
+    template <typename F, typename... Ts,
+        HPX_CONCEPT_REQUIRES_(std::is_invocable_v<F&&, Ts&&...>)>
+    void run_on_all(F&& f, Ts&&... ts)
+    {
+        std::size_t cores =
+            hpx::parallel::execution::detail::get_os_thread_count();
+        run_on_all(cores, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx::experimental

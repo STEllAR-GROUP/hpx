@@ -9,19 +9,34 @@
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <atomic>
 #include <cstdint>
 
 int main()
 {
     using namespace hpx::experimental;
 
-    std::uint32_t n = 0;
-    run_on_all(reduction_plus(n), [](std::uint32_t& local_n) { ++local_n; });
-    HPX_TEST_EQ(n, hpx::get_num_worker_threads());
+    {
+        std::atomic<std::uint32_t> n(0);
+        run_on_all([&]() { ++n; });
+        HPX_TEST_EQ(n.load(), hpx::get_num_worker_threads());
 
-    n = 0;
-    run_on_all(2, reduction_plus(n), [](std::uint32_t& local_n) { ++local_n; });
-    HPX_TEST_EQ(n, static_cast<std::uint32_t>(2));
+        n.store(0);
+        run_on_all(2, [&]() { ++n; });
+        HPX_TEST_EQ(n.load(), static_cast<std::uint32_t>(2));
+    }
+
+    {
+        std::uint32_t n = 0;
+        run_on_all(
+            reduction_plus(n), [](std::uint32_t& local_n) { ++local_n; });
+        HPX_TEST_EQ(n, hpx::get_num_worker_threads());
+
+        n = 0;
+        run_on_all(
+            2, reduction_plus(n), [](std::uint32_t& local_n) { ++local_n; });
+        HPX_TEST_EQ(n, static_cast<std::uint32_t>(2));
+    }
 
     return hpx::util::report_errors();
 }
