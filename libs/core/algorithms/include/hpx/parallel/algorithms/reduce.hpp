@@ -418,7 +418,7 @@ namespace hpx::parallel {
                 }
 
                 auto f1 = [r](FwdIterB part_begin, std::size_t part_size) -> T {
-                    auto val = *part_begin;
+                    T val = *part_begin;
                     return detail::sequential_reduce<ExPolicy>(
                         ++part_begin, --part_size, HPX_MOVE(val), r);
                 };
@@ -562,16 +562,3 @@ namespace hpx {
 }    // namespace hpx
 
 #endif    // DOXYGEN
-
-template <typename ExPolicy, typename FwdIterB, typename FwdIterE, typename T,
-    typename F>
-HPX_HOST_DEVICE HPX_FORCEINLINE T sequential_reduce_t::call(ExPolicy&& policy,
-    FwdIterB first, FwdIterE last, T init, F&& f)
-{
-    if (first == last)
-        return init;
-
-    auto val = *first;
-    return detail::sequential_reduce<ExPolicy>(
-        ++first, --last, HPX_MOVE(val), f);
-}
