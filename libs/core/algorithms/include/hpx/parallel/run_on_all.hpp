@@ -78,4 +78,63 @@ namespace hpx::experimental {
             hpx::parallel::execution::detail::get_os_thread_count();
         run_on_all(cores, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
+
+    // Execution policy overloads
+    template <typename ExPolicy, typename T, typename Op, typename F, typename... Ts,
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
+    auto run_on_all(ExPolicy&& policy, std::size_t num_tasks,
+        hpx::parallel::detail::reduction_helper<T, Op>&& r, F&& f, Ts&&... ts)
+    {
+        // force using index_queue scheduler with given amount of threads
+        auto exec = hpx::execution::experimental::with_processing_units_count(
+            hpx::execution::parallel_executor(
+                hpx::threads::thread_priority::bound),
+            num_tasks);
+        exec.set_hierarchical_threshold(0);
+
+        r.init_iteration(0, 0);
+        auto on_exit =
+            hpx::experimental::scope_exit([&] { r.exit_iteration(0); });
+
+        return hpx::parallel::execution::bulk_async_execute(
+            exec, [&](auto i) { f(r.iteration_value(i), ts...); }, num_tasks,
+            HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename ExPolicy, typename T, typename Op, typename F, typename... Ts,
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
+    auto run_on_all(ExPolicy&& policy,
+        hpx::parallel::detail::reduction_helper<T, Op>&& r, F&& f, Ts&&... ts)
+    {
+        std::size_t cores =
+            hpx::parallel::execution::detail::get_os_thread_count();
+        return run_on_all(HPX_FORWARD(ExPolicy, policy), cores,
+            HPX_MOVE(r), HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename ExPolicy, typename F, typename... Ts,
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
+    auto run_on_all(ExPolicy&& policy, std::size_t num_tasks, F&& f, Ts&&... ts)
+    {
+        // force using index_queue scheduler with given amount of threads
+        auto exec = hpx::execution::experimental::with_processing_units_count(
+            hpx::execution::parallel_executor(
+                hpx::threads::thread_priority::bound),
+            num_tasks);
+        exec.set_hierarchical_threshold(0);
+
+        return hpx::parallel::execution::bulk_async_execute(
+            exec, [&](auto) { f(ts...); }, num_tasks, HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename ExPolicy, typename F, typename... Ts,
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy> &&
+            std::is_invocable_v<F&&, Ts&&...>)>
+    auto run_on_all(ExPolicy&& policy, F&& f, Ts&&... ts)
+    {
+        std::size_t cores =
+            hpx::parallel::execution::detail::get_os_thread_count();
+        return run_on_all(HPX_FORWARD(ExPolicy, policy), cores,
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+    }
 }    // namespace hpx::experimental

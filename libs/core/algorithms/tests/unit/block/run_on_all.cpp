@@ -38,5 +38,32 @@ int main()
         HPX_TEST_EQ(n, static_cast<std::uint32_t>(2));
     }
 
+    // Test execution policy overloads
+    {
+        std::atomic<std::uint32_t> n(0);
+        auto future = run_on_all(hpx::execution::par, [&]() { ++n; });
+        future.wait();
+        HPX_TEST_EQ(n.load(), hpx::get_num_worker_threads());
+
+        n.store(0);
+        auto future2 = run_on_all(hpx::execution::par, 2, [&]() { ++n; });
+        future2.wait();
+        HPX_TEST_EQ(n.load(), static_cast<std::uint32_t>(2));
+    }
+
+    {
+        std::uint32_t n = 0;
+        auto future = run_on_all(hpx::execution::par,
+            reduction_plus(n), [](std::uint32_t& local_n) { ++local_n; });
+        future.wait();
+        HPX_TEST_EQ(n, hpx::get_num_worker_threads());
+
+        n = 0;
+        auto future2 = run_on_all(hpx::execution::par, 2,
+            reduction_plus(n), [](std::uint32_t& local_n) { ++local_n; });
+        future2.wait();
+        HPX_TEST_EQ(n, static_cast<std::uint32_t>(2));
+    }
+
     return hpx::util::report_errors();
 }
