@@ -102,7 +102,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        // Helper functions for determining shape size
+        // Helper functions for determining shape size.
         template <typename S>
         std::enable_if_t<std::is_integral_v<S>, std::size_t> get_shape_size(
             S const& sh)
