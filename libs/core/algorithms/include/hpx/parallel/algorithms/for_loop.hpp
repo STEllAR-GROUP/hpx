@@ -182,8 +182,8 @@ namespace hpx { namespace experimental {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename... Args>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy> for_loop(
-        ExPolicy&& policy, std::decay_t<I> first, I last, Args&&... args);
+    <unspecified> for_loop(ExPolicy&& policy, std::decay_t<I> first,
+        I last, Args&&... args);
 
     /// The for_loop_strided implements loop functionality over a range
     /// specified by integral or iterator bounds. For the iterator case, these
@@ -366,7 +366,7 @@ namespace hpx { namespace experimental {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename S, typename... Args>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy> for_loop_strided(
+    <unspecified> for_loop_strided(
         ExPolicy&& policy, std::decay_t<I> first, I last, S stride,
         Args&&... args);
 
@@ -542,8 +542,7 @@ namespace hpx { namespace experimental {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename Size, typename... Args>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy> for_loop_n(
-        ExPolicy&& policy, I first, Size size, Args&&... args);
+    <unspecified> for_loop_n(ExPolicy&& policy, I first, Size size, Args&&... args);
 
     /// The for_loop_n_strided implements loop functionality over a range
     /// specified by integral or iterator bounds. For the iterator case, these
@@ -730,8 +729,7 @@ namespace hpx { namespace experimental {
     ///
     template <typename ExPolicy, typename I, typename Size, typename S,
         typename... Args>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
-    for_loop_n_strided(
+    <unspecified> for_loop_n_strided(
         ExPolicy&& policy, I first, Size size, S stride, Args&&... args);
 }}    // namespace hpx::experimental
 
