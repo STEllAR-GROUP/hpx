@@ -1,10 +1,11 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_copy.hpp>
@@ -153,6 +154,12 @@ void copy_tests()
         copy_tests(v);
     }
 
+    {
+        std::vector<T> data(length, T(42));
+        hpx::partitioned_vector<T> v(data.begin(), data.end());
+        copy_tests(v);
+    }
+
     copy_tests_with_policy<T>(length, 1, hpx::container_layout);
     copy_tests_with_policy<T>(length, 3, hpx::container_layout(3));
     copy_tests_with_policy<T>(length, 3, hpx::container_layout(3, localities));
@@ -168,4 +175,5 @@ int main()
 
     return hpx::util::report_errors();
 }
+
 #endif

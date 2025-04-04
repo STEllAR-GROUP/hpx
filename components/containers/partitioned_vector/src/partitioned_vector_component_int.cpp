@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -43,8 +43,12 @@ template HPX_PARTITIONED_VECTOR_EXPORT
 hpx::partitioned_vector<int, std::vector<int>>::partitioned_vector(
     size_type, hpx::explicit_container_distribution_policy const&, void*);
 template HPX_PARTITIONED_VECTOR_EXPORT
+hpx::partitioned_vector<int, std::vector<int>>::partitioned_vector(size_type,
+    int const&, hpx::explicit_container_distribution_policy const&, void*);
+template HPX_PARTITIONED_VECTOR_EXPORT
 hpx::partitioned_vector<int, std::vector<int>>::partitioned_vector(
-    size_type, int const&, hpx::explicit_container_distribution_policy const&, void*);
+    std::vector<int>::const_iterator, std::vector<int>::const_iterator,
+    hpx::explicit_container_distribution_policy const&, void*);
 
 template class HPX_PARTITIONED_VECTOR_EXPORT
     hpx::server::partitioned_vector<long long, std::vector<long long>>;
@@ -63,6 +67,11 @@ hpx::partitioned_vector<long long, std::vector<long long>>::partitioned_vector(
     size_type, hpx::explicit_container_distribution_policy const&, void*);
 template HPX_PARTITIONED_VECTOR_EXPORT hpx::partitioned_vector<long long,
     std::vector<long long>>::partitioned_vector(size_type, long long const&,
+    hpx::explicit_container_distribution_policy const&, void*);
+template HPX_PARTITIONED_VECTOR_EXPORT
+hpx::partitioned_vector<long long, std::vector<long long>>::partitioned_vector(
+    std::vector<long long>::const_iterator,
+    std::vector<long long>::const_iterator,
     hpx::explicit_container_distribution_policy const&, void*);
 
 #if defined(HPX_MSVC)
