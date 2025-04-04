@@ -43,7 +43,7 @@ namespace hpx { namespace collectives {
     ///
     /// This functions creates a new communicator object that can be called in
     /// order to pre-allocate a communicator object usable with multiple
-    /// invocations of any of the collective operations (such as \a all_gather,
+    /// invocations of the collective operations (such as \a all_gather,
     /// \a all_reduce, \a all_to_all, \a broadcast, etc.).
     ///
     /// \param  basename    The base name identifying the collective operation
@@ -75,7 +75,7 @@ namespace hpx { namespace collectives {
     ///
     /// This functions creates a new communicator object that can be called in
     /// order to pre-allocate a communicator object usable with multiple
-    /// invocations of any of the collective operations (such as \a all_gather,
+    /// invocations of the collective operations (such as \a all_gather,
     /// \a all_reduce, \a all_to_all, \a broadcast, etc.).
     ///
     /// \param  basename    The base name identifying the collective operation
@@ -109,6 +109,7 @@ namespace hpx { namespace collectives {
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/components/client_base.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/type_support/extra_data.hpp>
 
 #include <tuple>
@@ -218,8 +219,19 @@ namespace hpx::collectives {
         generation_arg generation = generation_arg(),
         root_site_arg root_site = root_site_arg());
 
+    HPX_EXPORT communicator create_communicator(hpx::launch::sync_policy,
+        char const* basename, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
+
     HPX_EXPORT communicator create_local_communicator(char const* basename,
         num_sites_arg num_sites, this_site_arg this_site,
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
+
+    HPX_EXPORT communicator create_local_communicator(hpx::launch::sync_policy,
+        char const* basename, num_sites_arg num_sites, this_site_arg this_site,
         generation_arg generation = generation_arg(),
         root_site_arg root_site = root_site_arg());
 

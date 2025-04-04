@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2024 Hartmut Kaiser
+//  Copyright (c) 2011-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
 
+#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -95,6 +96,15 @@ namespace hpx {
         return results;
     }
 
+    std::vector<hpx::future<hpx::id_type>> find_all_from_basename(
+        hpx::launch::sync_policy, std::string base_name, std::size_t num_ids)
+    {
+        std::vector<hpx::future<hpx::id_type>> results =
+            find_all_from_basename(HPX_MOVE(base_name), num_ids);
+        hpx::wait_all(results);
+        return results;
+    }
+
     std::vector<hpx::future<hpx::id_type>> find_from_basename(
         std::string basename, std::vector<std::size_t> const& ids)
     {
@@ -127,6 +137,16 @@ namespace hpx {
         return results;
     }
 
+    std::vector<hpx::future<hpx::id_type>> find_from_basename(
+        hpx::launch::sync_policy, std::string base_name,
+        std::vector<std::size_t> const& ids)
+    {
+        std::vector<hpx::future<hpx::id_type>> results =
+            find_from_basename(HPX_MOVE(base_name), ids);
+        hpx::wait_all(results);
+        return results;
+    }
+
     hpx::future<hpx::id_type> find_from_basename(
         std::string basename, std::size_t sequence_nr)
     {
@@ -144,6 +164,25 @@ namespace hpx {
         std::string name =
             detail::name_from_basename(HPX_MOVE(basename), sequence_nr);
         return agas::on_symbol_namespace_event(HPX_MOVE(name), true);
+    }
+
+    hpx::id_type find_from_basename(
+        hpx::launch::sync_policy, std::string basename, std::size_t sequence_nr)
+    {
+        if (basename.empty())
+        {
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::find_from_basename", "no basename specified");
+        }
+
+        if (sequence_nr == ~static_cast<std::size_t>(0))
+        {
+            sequence_nr = static_cast<std::size_t>(agas::get_locality_id());
+        }
+
+        std::string name =
+            detail::name_from_basename(HPX_MOVE(basename), sequence_nr);
+        return agas::on_symbol_namespace_event(HPX_MOVE(name), true).get();
     }
 
     hpx::future<bool> register_with_basename(
