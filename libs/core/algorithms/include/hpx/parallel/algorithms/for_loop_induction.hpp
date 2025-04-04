@@ -18,8 +18,8 @@
 #include <type_traits>
 #include <utility>
 
+/// \cond NOINTERNAL
 namespace hpx::parallel::detail {
-    /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////
     template <typename T>
@@ -181,9 +181,8 @@ namespace hpx::parallel::detail {
         T curr_;
         std::size_t stride_;
     };
-
-    /// \endcond
 }    // namespace hpx::parallel::detail
+/// \endcond
 
 namespace hpx::experimental {
 
@@ -223,7 +222,6 @@ namespace hpx::experimental {
             HPX_FORWARD(T, value), stride);
     }
 
-    /// \cond NOINTERNAL
     template <typename T>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::induction_helper<T>
     induction(T&& value)
@@ -231,11 +229,10 @@ namespace hpx::experimental {
         return hpx::parallel::detail::induction_helper<T>(
             HPX_FORWARD(T, value));
     }
-    /// \endcond
 }    // namespace hpx::experimental
 
+/// \cond IGNORE_DEPRECATED
 namespace hpx::parallel {
-    /// \cond IGNORE_DEPRECATED
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
@@ -254,5 +251,5 @@ namespace hpx::parallel {
     {
         return hpx::experimental::induction(HPX_FORWARD(T, value));
     }
-    /// \endcond
 }    // namespace hpx::parallel
+/// \endcond
