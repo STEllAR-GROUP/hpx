@@ -23,7 +23,7 @@ int hpx_main()
 
     // Make sure the iterations are being scheduled on their own threads
     decltype(auto) policy =
-        hpx::parallel::util::adapt_sharing_mode(hpx::execution::par,
+        hpx::execution::experimental::adapt_sharing_mode(hpx::execution::par,
             hpx::threads::thread_sharing_hint::do_not_combine_tasks);
 
     hpx::experimental::for_loop(policy, 0, 100, [&](int) {

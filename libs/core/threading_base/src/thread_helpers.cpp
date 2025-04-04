@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -451,9 +451,14 @@ namespace hpx::this_thread {
         threads::thread_restart_state statex;
 
         {
-            // verify that there are no more registered locks for this OS-thread
 #ifdef HPX_HAVE_VERIFY_LOCKS
+            // verify that there are no more registered locks for this OS-thread
             util::verify_no_locks();
+
+            [[maybe_unused]] auto held_locks = hpx::experimental::scope_exit(
+                [data = hpx::util::get_held_locks_data()]() mutable {
+                    hpx::util::set_held_locks_data(HPX_MOVE(data));
+                });
 #endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             threads::detail::reset_lco_description desc(
@@ -462,6 +467,7 @@ namespace hpx::this_thread {
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             threads::detail::reset_backtrace bt(id, ec);
 #endif
+
             // We might need to dispatch 'nextid' to it's correct scheduler only
             // if our current scheduler is the same, we should yield to the id
             if (nextid &&
@@ -526,6 +532,11 @@ namespace hpx::this_thread {
 #ifdef HPX_HAVE_VERIFY_LOCKS
             // verify that there are no more registered locks for this OS-thread
             util::verify_no_locks();
+
+            [[maybe_unused]] auto held_locks = hpx::experimental::scope_exit(
+                [data = hpx::util::get_held_locks_data()]() mutable {
+                    hpx::util::set_held_locks_data(HPX_MOVE(data));
+                });
 #endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             threads::detail::reset_lco_description desc(
@@ -534,6 +545,7 @@ namespace hpx::this_thread {
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             threads::detail::reset_backtrace bt(id, ec);
 #endif
+
             std::atomic<bool> timer_started(false);
             threads::thread_id_ref_type const timer_id =
                 threads::set_thread_state(id.noref(), abs_time, &timer_started,
