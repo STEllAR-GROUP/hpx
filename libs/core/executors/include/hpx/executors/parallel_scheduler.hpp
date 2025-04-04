@@ -218,7 +218,7 @@ namespace hpx::execution::experimental {
                                      // clang-format off
                                     for (std::size_t i = start; i < end;
                                         ++i, ++it)
-                                        // clang-format on
+                                    // clang-format on
                                     {
                                         HPX_INVOKE(os.f, *it);
                                     }    // clang-format on
