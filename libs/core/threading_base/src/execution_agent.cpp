@@ -156,8 +156,9 @@ namespace hpx::threads {
 
         thrd_data->interruption_point();
 
+        auto const num_thread = hpx::get_local_worker_thread_num();
         thrd_data->set_last_worker_thread_num(
-            hpx::get_local_worker_thread_num());
+            static_cast<std::uint16_t>(num_thread));
 
         threads::thread_restart_state statex;
 
@@ -188,6 +189,11 @@ namespace hpx::threads {
                 thrd_data->get_state().state() ==
                     thread_schedule_state::active);
         }
+
+        // we should have rescheduled on the previous core if our priority is
+        // bound
+        HPX_ASSERT(thrd_data->get_priority() != thread_priority::bound ||
+            num_thread == hpx::get_local_worker_thread_num());
 
         // handle interruption, if needed
         thrd_data->interruption_point();

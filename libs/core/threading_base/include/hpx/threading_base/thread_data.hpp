@@ -506,13 +506,13 @@ namespace hpx::threads {
             return scheduler_base_;
         }
 
-        constexpr std::size_t get_last_worker_thread_num() const noexcept
+        constexpr std::uint16_t get_last_worker_thread_num() const noexcept
         {
             return last_worker_thread_num_;
         }
 
         void set_last_worker_thread_num(
-            std::size_t last_worker_thread_num) noexcept
+            std::uint16_t last_worker_thread_num) noexcept
         {
             last_worker_thread_num_ = last_worker_thread_num;
         }
@@ -615,14 +615,12 @@ namespace hpx::threads {
         threads::thread_description lco_description_;
 #endif
 
+        std::uint16_t last_worker_thread_num_;
+
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
         std::uint32_t parent_locality_id_;
         thread_id_type parent_thread_id_;
         std::size_t parent_thread_phase_;
-#endif
-
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-        mutable thread_schedule_state marked_state_;
 #endif
 
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
@@ -632,6 +630,11 @@ namespace hpx::threads {
         util::backtrace const* backtrace_;
 #endif
 #endif
+
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
+        mutable thread_schedule_state marked_state_;
+#endif
+
         ///////////////////////////////////////////////////////////////////////
         thread_priority priority_;
 
@@ -643,15 +646,14 @@ namespace hpx::threads {
         // support scoped child execution
         std::atomic<bool> runs_as_child_;
 
+        thread_stacksize stacksize_enum_;
+        std::ptrdiff_t stacksize_;
+
         // Singly linked list (heap-allocated)
         std::forward_list<hpx::function<void()>> exit_funcs_;
 
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;
-        std::size_t last_worker_thread_num_;
-
-        std::ptrdiff_t stacksize_;
-        thread_stacksize stacksize_enum_;
 
         void* queue_;
 
