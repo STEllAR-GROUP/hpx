@@ -1238,7 +1238,7 @@ namespace hpx::parallel {
                     // any of the induction or reduction operations prevent us
                     // from sharing the part_iteration between threads
                     decltype(auto) hinted_policy =
-                        parallel::util::adapt_sharing_mode(
+                        hpx::execution::experimental::adapt_sharing_mode(
                             HPX_FORWARD(ExPolicy, policy),
                             hpx::threads::thread_sharing_hint::
                                 do_not_share_function);
@@ -1440,7 +1440,7 @@ namespace hpx::parallel {
                     // any of the induction or reduction operations prevent us
                     // from sharing the part_iteration between threads
                     decltype(auto) hinted_policy =
-                        parallel::util::adapt_sharing_mode(
+                        hpx::execution::experimental::adapt_sharing_mode(
                             HPX_FORWARD(ExPolicy, policy),
                             hpx::threads::thread_sharing_hint::
                                 do_not_share_function);

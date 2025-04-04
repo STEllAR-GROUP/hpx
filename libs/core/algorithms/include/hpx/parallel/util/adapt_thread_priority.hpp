@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Hartmut Kaiser
+//  Copyright (c) 2023-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,7 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/executors/execution_policy_scheduling_property.hpp>
 
-namespace hpx::parallel::util {
+namespace hpx::execution::experimental {
 
     // clang-format off
     template <typename ExPolicy,
@@ -48,5 +48,24 @@ namespace hpx::parallel::util {
         {
             return HPX_FORWARD(ExPolicy, policy);
         }
+    }
+}    // namespace hpx::execution::experimental
+
+namespace hpx::parallel::util {
+
+    // clang-format off
+    template <typename ExPolicy,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy_v<ExPolicy>
+        )>
+    HPX_DEPRECATED_V(1, 11,
+        "hpx::parallel::util::adapt_thread_priority is deprecated. Please use "
+        "hpx::execution::experimental::adapt_thread_priority instead.")
+    // clang-format on
+    decltype(auto) adapt_thread_priority(
+        ExPolicy&& policy, hpx::threads::thread_priority new_priority)
+    {
+        return hpx::execution::experimental::adapt_thread_priority(
+            HPX_FORWARD(ExPolicy, policy), new_priority);
     }
 }    // namespace hpx::parallel::util

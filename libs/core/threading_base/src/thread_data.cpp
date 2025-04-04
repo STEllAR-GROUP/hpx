@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2011      Bryce Lelbach
 //
@@ -21,6 +21,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <memory>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,23 +54,6 @@ namespace hpx::threads {
     thread_data::thread_data(thread_init_data& init_data, void* queue,
         std::ptrdiff_t stacksize, bool is_stackless, thread_id_addref addref)
       : detail::thread_data_reference_counting(addref)
-      , current_state_(thread_state(
-            init_data.initial_state, thread_restart_state::signaled))
-#ifdef HPX_HAVE_THREAD_DESCRIPTION
-      , description_(init_data.description)
-      , lco_description_()
-#endif
-#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
-      , parent_locality_id_(init_data.parent_locality_id)
-      , parent_thread_id_(init_data.parent_id)
-      , parent_thread_phase_(init_data.parent_phase)
-#endif
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-      , marked_state_(thread_schedule_state::unknown)
-#endif
-#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-      , backtrace_(nullptr)
-#endif
       , priority_(init_data.priority)
       , requested_interrupt_(false)
       , enabled_interrupt_(true)
@@ -77,15 +61,35 @@ namespace hpx::threads {
       , is_stackless_(is_stackless)
       , runs_as_child_(init_data.schedulehint.runs_as_child_mode() ==
             hpx::threads::thread_execution_hint::run_as_child)
-      , scheduler_base_(init_data.scheduler_base)
-      , last_worker_thread_num_(static_cast<std::size_t>(-1))
-      , stacksize_(stacksize)
+      , last_worker_thread_num_(
+            init_data.schedulehint.mode == thread_schedule_hint_mode::thread ?
+                init_data.schedulehint.hint :
+                static_cast<std::uint16_t>(-1))
       , stacksize_enum_(init_data.stacksize)
+      , stacksize_(stacksize_enum_ == thread_stacksize::nostack ?
+                (std::numeric_limits<std::int32_t>::max)() :
+                static_cast<std::int32_t>(stacksize))
+      , current_state_(thread_state(
+            init_data.initial_state, thread_restart_state::signaled))
+      , scheduler_base_(init_data.scheduler_base)
       , queue_(queue)
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
+      , description_(init_data.description)
+#endif
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
+      , marked_state_(thread_schedule_state::unknown)
+#endif
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
+      , parent_locality_id_(init_data.parent_locality_id)
+      , parent_thread_id_(init_data.parent_id)
+      , parent_thread_phase_(init_data.parent_phase)
+#endif
     {
         LTM_(debug).format(
             "thread::thread({}), description({})", this, get_description());
 
+        HPX_ASSERT(is_stackless_ ||
+            stacksize <= (std::numeric_limits<std::int32_t>::max)());
         HPX_ASSERT(stacksize_enum_ != threads::thread_stacksize::current);
 
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
@@ -201,6 +205,30 @@ namespace hpx::threads {
 
         free_thread_exit_callbacks();
 
+        priority_ = init_data.priority;
+        requested_interrupt_ = false;
+        enabled_interrupt_ = true;
+        ran_exit_funcs_ = false;
+
+        runs_as_child_.store(init_data.schedulehint.runs_as_child_mode() ==
+                hpx::threads::thread_execution_hint::run_as_child,
+            std::memory_order_relaxed);
+
+        last_worker_thread_num_ =
+            init_data.schedulehint.mode == thread_schedule_hint_mode::thread ?
+            init_data.schedulehint.hint :
+            static_cast<std::uint16_t>(-1);
+
+        exit_funcs_.clear();
+        scheduler_base_ = init_data.scheduler_base;
+
+        // We explicitly set the logical stack size again as it can be different
+        // from what the previous use required. However, the physical stack size
+        // must be the same as before.
+        stacksize_enum_ = init_data.stacksize;
+        HPX_ASSERT(stacksize_ == get_stack_size());
+        HPX_ASSERT(stacksize_ != 0);
+
         current_state_.store(thread_state(
             init_data.initial_state, thread_restart_state::signaled));
 
@@ -219,25 +247,6 @@ namespace hpx::threads {
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
         backtrace_ = nullptr;
 #endif
-        priority_ = init_data.priority;
-        requested_interrupt_ = false;
-        enabled_interrupt_ = true;
-        ran_exit_funcs_ = false;
-
-        runs_as_child_.store(init_data.schedulehint.runs_as_child_mode() ==
-                hpx::threads::thread_execution_hint::run_as_child,
-            std::memory_order_relaxed);
-
-        exit_funcs_.clear();
-        scheduler_base_ = init_data.scheduler_base;
-        last_worker_thread_num_ = static_cast<std::size_t>(-1);
-
-        // We explicitly set the logical stack size again as it can be different
-        // from what the previous use required. However, the physical stack size
-        // must be the same as before.
-        stacksize_enum_ = init_data.stacksize;
-        HPX_ASSERT(stacksize_ == get_stack_size());
-        HPX_ASSERT(stacksize_ != 0);
 
         LTM_(debug).format("thread::thread({}), description({}), rebind", this,
             get_description());

@@ -197,8 +197,9 @@ namespace hpx::lcos::local {
         // The tasks launched here may synchronize between each other. This may
         // lead to deadlocks if the tasks are combined to run on the same
         // thread.
-        decltype(auto) hinted_policy = parallel::util::adapt_sharing_mode(
-            policy, hpx::threads::thread_sharing_hint::do_not_combine_tasks);
+        decltype(auto) hinted_policy =
+            hpx::execution::experimental::adapt_sharing_mode(policy,
+                hpx::threads::thread_sharing_hint::do_not_combine_tasks);
 
         return hpx::parallel::execution::bulk_async_execute(
             hinted_policy.executor(),
@@ -237,8 +238,9 @@ namespace hpx::lcos::local {
         // The tasks launched here may synchronize between each other. This may
         // lead to deadlocks if the tasks are combined to run on the same
         // thread.
-        decltype(auto) hinted_policy = parallel::util::adapt_sharing_mode(
-            policy, hpx::threads::thread_sharing_hint::do_not_combine_tasks);
+        decltype(auto) hinted_policy =
+            hpx::execution::experimental::adapt_sharing_mode(policy,
+                hpx::threads::thread_sharing_hint::do_not_combine_tasks);
 
         hpx::parallel::execution::bulk_sync_execute(hinted_policy.executor(),
             detail::spmd_block_helper<F>{

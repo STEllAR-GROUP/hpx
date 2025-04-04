@@ -383,9 +383,10 @@ namespace hpx::parallel {
                 util::invoke_projected<Pred, Proj> pred_projected{
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
 
-                decltype(auto) policy = parallel::util::adapt_placement_mode(
-                    HPX_FORWARD(ExPolicy, orgpolicy),
-                    hpx::threads::thread_placement_hint::breadth_first);
+                decltype(auto) policy =
+                    hpx::execution::experimental::adapt_placement_mode(
+                        HPX_FORWARD(ExPolicy, orgpolicy),
+                        hpx::threads::thread_placement_hint::breadth_first);
 
                 using policy_type = std::decay_t<decltype(policy)>;
 

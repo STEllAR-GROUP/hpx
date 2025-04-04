@@ -204,8 +204,10 @@ namespace hpx::parallel {
                 Sent1 last1, InIter2 first2, Sent2 last2, Pred&& pred,
                 Proj1&& proj1, Proj2&& proj2)
             {
+                // clang-format off
                 for (; first1 != last1 && first2 != last2;
-                     (void) ++first1, ++first2)
+                    (void) ++first1, ++first2)
+                // clang-format on
                 {
                     if (HPX_INVOKE(pred, HPX_INVOKE(proj1, *first1),
                             HPX_INVOKE(proj2, *first2)))
@@ -254,9 +256,10 @@ namespace hpx::parallel {
                     }
                 }
 
-                decltype(auto) policy = parallel::util::adapt_placement_mode(
-                    HPX_FORWARD(ExPolicy, orgpolicy),
-                    hpx::threads::thread_placement_hint::breadth_first);
+                decltype(auto) policy =
+                    hpx::execution::experimental::adapt_placement_mode(
+                        HPX_FORWARD(ExPolicy, orgpolicy),
+                        hpx::threads::thread_placement_hint::breadth_first);
 
                 using policy_type = std::decay_t<decltype(policy)>;
 

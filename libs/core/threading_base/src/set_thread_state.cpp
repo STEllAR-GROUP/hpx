@@ -18,6 +18,7 @@
 #include <hpx/threading_base/threading_base_fwd.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 #include <utility>
 
@@ -259,13 +260,20 @@ namespace hpx::threads::detail {
             (new_state == thread_schedule_state::pending ||
                 new_state == thread_schedule_state::pending_boost))
         {
-            // REVIEW: Passing a specific target thread may interfere with the
-            // round-robin queuing.
-
             auto const* thrd_data = get_thread_id_data(thrd);
             auto* scheduler = thrd_data->get_scheduler_base();
-            scheduler->schedule_thread(
-                thrd, schedulehint, false, thrd_data->get_priority());
+            if (thrd_data->get_priority() == thread_priority::bound)
+            {
+                schedulehint.mode = thread_schedule_hint_mode::thread;
+                schedulehint.hint = static_cast<std::int16_t>(
+                    thrd_data->get_last_worker_thread_num());
+                scheduler->schedule_thread(
+                    thrd, schedulehint, false, thread_priority::bound);
+            }
+            else
+            {
+                scheduler->schedule_thread(thrd, schedulehint, false, priority);
+            }
 
             // NOTE: Don't care if the hint is a NUMA hint, just want to wake up
             // a thread.

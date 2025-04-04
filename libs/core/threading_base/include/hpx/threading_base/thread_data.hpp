@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -31,6 +31,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <forward_list>
+#include <limits>
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -506,20 +507,22 @@ namespace hpx::threads {
             return scheduler_base_;
         }
 
-        constexpr std::size_t get_last_worker_thread_num() const noexcept
+        constexpr std::uint16_t get_last_worker_thread_num() const noexcept
         {
             return last_worker_thread_num_;
         }
 
         void set_last_worker_thread_num(
-            std::size_t last_worker_thread_num) noexcept
+            std::uint16_t last_worker_thread_num) noexcept
         {
             last_worker_thread_num_ = last_worker_thread_num;
         }
 
         constexpr std::ptrdiff_t get_stack_size() const noexcept
         {
-            return stacksize_;
+            return stacksize_enum_ == thread_stacksize::nostack ?
+                (std::numeric_limits<std::ptrdiff_t>::max)() :
+                stacksize_;
         }
 
         thread_stacksize get_stack_size_enum() const noexcept
@@ -606,33 +609,6 @@ namespace hpx::threads {
         void rebind_base(thread_init_data& init_data);
 
     private:
-        mutable std::atomic<thread_state> current_state_;
-
-        ///////////////////////////////////////////////////////////////////////
-        // Debugging/logging information
-#ifdef HPX_HAVE_THREAD_DESCRIPTION
-        threads::thread_description description_;
-        threads::thread_description lco_description_;
-#endif
-
-#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
-        std::uint32_t parent_locality_id_;
-        thread_id_type parent_thread_id_;
-        std::size_t parent_thread_phase_;
-#endif
-
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-        mutable thread_schedule_state marked_state_;
-#endif
-
-#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
-        char const* backtrace_;
-#else
-        util::backtrace const* backtrace_;
-#endif
-#endif
-        ///////////////////////////////////////////////////////////////////////
         thread_priority priority_;
 
         bool requested_interrupt_;
@@ -643,17 +619,45 @@ namespace hpx::threads {
         // support scoped child execution
         std::atomic<bool> runs_as_child_;
 
+        std::uint16_t last_worker_thread_num_;
+
+        thread_stacksize stacksize_enum_;
+        std::int32_t stacksize_;
+
+        mutable std::atomic<thread_state> current_state_;
+
         // Singly linked list (heap-allocated)
         std::forward_list<hpx::function<void()>> exit_funcs_;
 
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;
-        std::size_t last_worker_thread_num_;
-
-        std::ptrdiff_t stacksize_;
-        thread_stacksize stacksize_enum_;
 
         void* queue_;
+
+        ///////////////////////////////////////////////////////////////////////
+        // Debugging/logging information
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
+        threads::thread_description description_;
+        threads::thread_description lco_description_;
+#endif
+
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
+        mutable thread_schedule_state marked_state_;
+#endif
+
+#ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
+        std::uint32_t parent_locality_id_;
+        thread_id_type parent_thread_id_;
+        std::size_t parent_thread_phase_;
+#endif
+
+#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
+        char const* backtrace_ = nullptr;
+#else
+        util::backtrace const* backtrace_ = nullptr;
+#endif
+#endif
 
     public:
 #if defined(HPX_HAVE_APEX)
