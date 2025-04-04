@@ -215,8 +215,10 @@ namespace hpx::execution::experimental {
                                     // clang-format off
                                     auto it = std::next(
                                         hpx::util::begin(os.shape), start);
+                                     // clang-format off
                                     for (std::size_t i = start; i < end;
                                         ++i, ++it)
+                                        // clang-format on
                                     {
                                         HPX_INVOKE(os.f, *it);
                                     }    // clang-format on
