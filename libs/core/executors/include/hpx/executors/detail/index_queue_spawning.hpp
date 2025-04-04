@@ -108,8 +108,10 @@ namespace hpx::parallel::execution::detail {
                 constexpr auto opposite_end =
                     hpx::concurrency::detail::opposite_end_v<Which>;
 
+                // clang-format off
                 for (std::uint32_t offset = 1; offset != state->num_threads;
-                     ++offset)
+                    ++offset)
+                // clang-format on
                 {
                     std::size_t neighbor_thread =
                         (worker_thread + offset) % state->num_threads;
@@ -252,8 +254,10 @@ namespace hpx::parallel::execution::detail {
 
             auto mask = hpx::threads::mask_type();
             hpx::threads::resize(mask, num_cores);
+            // clang-format off
             for (std::size_t i = 0, j = 0; i != num_threads && j != num_cores;
-                 ++j)
+                ++j)
+            // clang-format on
             {
                 if (hpx::threads::test(orgmask, j))
                 {
@@ -397,8 +401,11 @@ namespace hpx::parallel::execution::detail {
 
             // Initialize the queues for all worker threads so that worker
             // threads can start stealing immediately when they start.
+
+            // clang-format off
             for (std::uint32_t worker_thread = 0; worker_thread != num_threads;
-                 ++worker_thread)
+                ++worker_thread)
+            // clang-format on
             {
                 if (hint.placement_mode() == placement::breadth_first ||
                     hint.placement_mode() == placement::breadth_first_reverse)
@@ -411,6 +418,13 @@ namespace hpx::parallel::execution::detail {
                     init_queue_depth_first(worker_thread, num_chunks);
                 }
             }
+
+            // If the priority is 'bound' then we shouldn't run any of the tasks
+            // on the current thread but rather create a new thread for each of
+            // the tasks.
+            bool const bound_priority =
+                hpx::execution::experimental::get_priority(policy) ==
+                hpx::threads::thread_priority::bound;
 
             // Spawn the worker threads for all except the local queue.
             auto local_worker_thread =
@@ -435,17 +449,21 @@ namespace hpx::parallel::execution::detail {
             bool allow_stealing =
                 !hpx::threads::do_not_share_function(hint.sharing_mode());
 
+            // clang-format off
             for (std::uint32_t pu = 0;
-                 worker_thread != num_threads && pu != num_pus; ++pu)
+                worker_thread != num_threads && pu != num_pus; ++pu)
+            // clang-format on
             {
                 std::size_t const pu_num =
                     rp.get_pu_num(pu + first_thread);    //-V106
 
                 // The queue for the local thread is handled later inline.
-                if (!main_thread_ok && pu == local_worker_thread)
+                if (!bound_priority && !main_thread_ok &&
+                    pu == local_worker_thread)
                 {
-                    // the initializing thread is expected to participate in
-                    // evaluating parallel regions
+                    // The initializing thread is expected to participate in
+                    // evaluating parallel regions, but only if the requested
+                    // priority is not 'bound'.
                     HPX_ASSERT(hpx::threads::test(pu_mask, pu_num));
                     main_thread_ok = true;
                     local_worker_thread = worker_thread++;

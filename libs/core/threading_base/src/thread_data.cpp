@@ -59,16 +59,20 @@ namespace hpx::threads {
       , description_(init_data.description)
       , lco_description_()
 #endif
+      , last_worker_thread_num_(
+            init_data.schedulehint.mode == thread_schedule_hint_mode::thread ?
+                init_data.schedulehint.hint :
+                static_cast<std::uint16_t>(-1))
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
       , parent_locality_id_(init_data.parent_locality_id)
       , parent_thread_id_(init_data.parent_id)
       , parent_thread_phase_(init_data.parent_phase)
 #endif
-#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-      , marked_state_(thread_schedule_state::unknown)
-#endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
       , backtrace_(nullptr)
+#endif
+#ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
+      , marked_state_(thread_schedule_state::unknown)
 #endif
       , priority_(init_data.priority)
       , requested_interrupt_(false)
@@ -77,10 +81,9 @@ namespace hpx::threads {
       , is_stackless_(is_stackless)
       , runs_as_child_(init_data.schedulehint.runs_as_child_mode() ==
             hpx::threads::thread_execution_hint::run_as_child)
-      , scheduler_base_(init_data.scheduler_base)
-      , last_worker_thread_num_(static_cast<std::size_t>(-1))
-      , stacksize_(stacksize)
       , stacksize_enum_(init_data.stacksize)
+      , stacksize_(stacksize)
+      , scheduler_base_(init_data.scheduler_base)
       , queue_(queue)
     {
         LTM_(debug).format(
@@ -208,6 +211,11 @@ namespace hpx::threads {
         description_ = init_data.description;
         lco_description_ = threads::thread_description();
 #endif
+        last_worker_thread_num_ =
+            init_data.schedulehint.mode == thread_schedule_hint_mode::thread ?
+            init_data.schedulehint.hint :
+            static_cast<std::uint16_t>(-1);
+
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
         parent_locality_id_ = init_data.parent_locality_id;
         parent_thread_id_ = init_data.parent_id;
@@ -230,7 +238,6 @@ namespace hpx::threads {
 
         exit_funcs_.clear();
         scheduler_base_ = init_data.scheduler_base;
-        last_worker_thread_num_ = static_cast<std::size_t>(-1);
 
         // We explicitly set the logical stack size again as it can be different
         // from what the previous use required. However, the physical stack size
