@@ -880,23 +880,31 @@ namespace hpx::parallel {
                 }
                 else
                 {
-                    while (part_steps >= static_cast<std::size_t>(-stride_))
+                    // Silence unary minus warning for unsigned types
+                    if constexpr (std::is_signed_v<S>)
                     {
-                        detail::invoke_iteration(
-                            args_, pack, f_, part_begin, current_thread);
+                        while (part_steps >= static_cast<std::size_t>(-stride_))
+                        {
+                            detail::invoke_iteration(
+                                args_, pack, f_, part_begin, current_thread);
 
-                        part_begin =
-                            parallel::detail::next(part_begin, stride_);
-                        part_steps += stride_;
+                            part_begin =
+                                parallel::detail::next(part_begin, stride_);
+                            part_steps += stride_;
 
-                        detail::next_iteration(args_, pack, current_thread);
+                            detail::next_iteration(args_, pack, current_thread);
+                        }
+
+                        if (part_steps != 0)
+                        {
+                            detail::invoke_iteration(
+                                args_, pack, f_, part_begin, current_thread);
+                            detail::next_iteration(args_, pack, current_thread);
+                        }
                     }
-
-                    if (part_steps != 0)
+                    else
                     {
-                        detail::invoke_iteration(
-                            args_, pack, f_, part_begin, current_thread);
-                        detail::next_iteration(args_, pack, current_thread);
+                        HPX_UNREACHABLE;
                     }
                 }
             }
@@ -978,18 +986,26 @@ namespace hpx::parallel {
                 }
                 else
                 {
-                    while (part_steps >= static_cast<std::size_t>(-stride_))
+                    // Silence unary minus warning for unsigned types
+                    if constexpr (std::is_signed_v<S>)
                     {
-                        HPX_INVOKE(f_, part_begin);
+                        while (part_steps >= static_cast<std::size_t>(-stride_))
+                        {
+                            HPX_INVOKE(f_, part_begin);
 
-                        part_begin =
-                            parallel::detail::next(part_begin, stride_);
-                        part_steps += stride_;
+                            part_begin =
+                                parallel::detail::next(part_begin, stride_);
+                            part_steps += stride_;
+                        }
+
+                        if (part_steps != 0)
+                        {
+                            HPX_INVOKE(f_, part_begin);
+                        }
                     }
-
-                    if (part_steps != 0)
+                    else
                     {
-                        HPX_INVOKE(f_, part_begin);
+                        HPX_UNREACHABLE;
                     }
                 }
             }
