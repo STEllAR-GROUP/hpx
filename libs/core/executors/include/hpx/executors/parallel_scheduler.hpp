@@ -212,13 +212,14 @@ namespace hpx::execution::experimental {
                                 }
                                 else
                                 {
+                                    // clang-format off
                                     auto it = std::next(
                                         hpx::util::begin(os.shape), start);
                                     for (std::size_t i = start; i < end;
                                         ++i, ++it)
                                     {
                                         HPX_INVOKE(os.f, *it);
-                                    }
+                                    }    // clang-format on
                                 }
                                 if (--(*os.tasks_remaining) == 0)
                                 {
