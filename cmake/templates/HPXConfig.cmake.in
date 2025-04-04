@@ -91,7 +91,7 @@ endif()
 
 if(HPX_WITH_FETCH_BOOST)
   # Boost has been installed alongside HPX, let HPX_SetupBoost find it
-  if(NOT HPX_CONFIG_IS_INSTALL)
+  if(NOT "@HPX_CONFIG_IS_INSTALL@")
     hpx_error(
       "HPX_WITH_FETCH_BOOST=ON requires HPX to be installed after it is built.
       Please execute the CMake install step (cmake --install) on your HPX build
