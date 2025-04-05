@@ -38,15 +38,15 @@ jobs:
       shell: bash
       run: |
           cd build
-          ninja run_on_all_exec_policy_test
+          ninja -j2 libs.core.algorithms.tests.unit.block.run_on_all_exec_policy_test
     - name: Test
       shell: bash
       run: |
           cd build
-          ctest --output-on-failure -R run_on_all
+          ctest --output-on-failure -R "run_on_all_exec_policy"
     - name: Run inspect
       shell: bash
       run: |
           cd build
-          ninja tools.inspect
-          bin/inspect --all --output=./hpx_inspect_report.html /hpx/source 
+          ninja -j2 tools.inspect
+          ./bin/inspect --all --output=./hpx_inspect_report.html .. 
