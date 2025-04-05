@@ -53,14 +53,14 @@ int main()
 
     {
         std::uint32_t n = 0;
-        auto future = run_on_all(hpx::execution::par,
-            reduction_plus(n), [](std::uint32_t& local_n) { ++local_n; });
+        auto future = run_on_all(hpx::execution::par, reduction_plus(n),
+            [](std::uint32_t& local_n) { ++local_n; });
         future.wait();
         HPX_TEST_EQ(n, hpx::get_num_worker_threads());
 
         n = 0;
-        auto future2 = run_on_all(hpx::execution::par, 2,
-            reduction_plus(n), [](std::uint32_t& local_n) { ++local_n; });
+        auto future2 = run_on_all(hpx::execution::par, 2, reduction_plus(n),
+            [](std::uint32_t& local_n) { ++local_n; });
         future2.wait();
         HPX_TEST_EQ(n, static_cast<std::uint32_t>(2));
     }

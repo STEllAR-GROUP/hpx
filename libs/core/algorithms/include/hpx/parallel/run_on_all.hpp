@@ -80,12 +80,13 @@ namespace hpx::experimental {
     }
 
     // Execution policy overloads
-    template <typename ExPolicy, typename T, typename Op, typename F, typename... Ts,
+    template <typename ExPolicy, typename T, typename Op, typename F,
+        typename... Ts,
         HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
     auto run_on_all(ExPolicy&& policy, T&& init, Op&& op, F&& f, Ts&&... ts)
     {
         static_assert(hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-            hpx::is_parallel_execution_policy_v<ExPolicy>,
+                hpx::is_parallel_execution_policy_v<ExPolicy>,
             "hpx::is_sequenced_execution_policy_v<ExPolicy> || "
             "hpx::is_parallel_execution_policy_v<ExPolicy>");
 
@@ -94,13 +95,13 @@ namespace hpx::experimental {
 
         if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
         {
-            return hpx::async(policy.executor(), [init = std::forward<T>(init),
-                                                op = std::forward<Op>(op),
-                                                f = std::forward<F>(f),
-                                                ... ts = std::forward<Ts>(ts)]() mutable {
-                return run_on_all_impl(std::move(init), std::move(op), std::move(f),
-                    std::move(ts)...);
-            });
+            return hpx::async(policy.executor(),
+                [init = std::forward<T>(init), op = std::forward<Op>(op),
+                    f = std::forward<F>(f),
+                    ... ts = std::forward<Ts>(ts)]() mutable {
+                    return run_on_all_impl(std::move(init), std::move(op),
+                        std::move(f), std::move(ts)...);
+                });
         }
         else
         {
@@ -109,15 +110,16 @@ namespace hpx::experimental {
         }
     }
 
-    template <typename ExPolicy, typename T, typename Op, typename F, typename... Ts,
+    template <typename ExPolicy, typename T, typename Op, typename F,
+        typename... Ts,
         HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
     auto run_on_all(ExPolicy&& policy,
         hpx::parallel::detail::reduction_helper<T, Op>&& r, F&& f, Ts&&... ts)
     {
         std::size_t cores =
             hpx::parallel::execution::detail::get_os_thread_count();
-        return run_on_all(HPX_FORWARD(ExPolicy, policy), cores,
-            HPX_MOVE(r), HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        return run_on_all(HPX_FORWARD(ExPolicy, policy), cores, HPX_MOVE(r),
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 
     template <typename ExPolicy, typename F, typename... Ts,
@@ -136,8 +138,8 @@ namespace hpx::experimental {
     }
 
     template <typename ExPolicy, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy> &&
-            std::is_invocable_v<F&&, Ts&&...>)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>&&
+                std::is_invocable_v<F&&, Ts&&...>)>
     auto run_on_all(ExPolicy&& policy, F&& f, Ts&&... ts)
     {
         std::size_t cores =
