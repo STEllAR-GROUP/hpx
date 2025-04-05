@@ -67,4 +67,3 @@ int main()
 
     return hpx::util::report_errors();
 }
-
