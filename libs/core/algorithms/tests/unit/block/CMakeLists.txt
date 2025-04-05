@@ -26,3 +26,10 @@ foreach(test ${tests})
 
   add_hpx_unit_test("modules.algorithms.block" ${test} ${${test}_PARAMETERS})
 endforeach()
+
+hpx_add_test(
+    NAME algorithms.block.run_on_all_exec_policy
+    SOURCES run_on_all_exec_policy.cpp
+    DEPENDENCIES hpx_testing
+    COMPONENT_DEPENDENCIES iostreams
+)
