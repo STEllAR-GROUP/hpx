@@ -4,13 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/async.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
 #include <hpx/init.hpp>
+#include <hpx/parallel/algorithms/for_loop_reduction.hpp>
 #include <hpx/parallel/run_on_all.hpp>
 #include <hpx/testing.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/async.hpp>
-#include <hpx/future.hpp>
-#include <hpx/parallel/algorithms/for_loop_reduction.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -25,9 +25,7 @@ int hpx_main()
     {
         // Test synchronous execution
         std::atomic<std::size_t> count{0};
-        hpx::experimental::run_on_all(
-            num_tasks,
-            [&count]() { ++count; });
+        hpx::experimental::run_on_all(num_tasks, [&count]() { ++count; });
 
         HPX_TEST_EQ(count.load(), num_tasks);
     }
@@ -36,8 +34,7 @@ int hpx_main()
         // Test asynchronous execution with execution policy
         std::atomic<std::size_t> count{0};
         auto futures = hpx::experimental::run_on_all(
-            hpx::execution::par(hpx::execution::task),
-            num_tasks,
+            hpx::execution::par(hpx::execution::task), num_tasks,
             [&count]() { ++count; });
 
         hpx::wait_all(futures);
@@ -47,11 +44,7 @@ int hpx_main()
     {
         // Test with simple reduction approach
         std::atomic<std::size_t> sum{0};
-        hpx::experimental::run_on_all(
-            num_tasks,
-            [&sum]() { 
-                sum += 1; 
-            });
+        hpx::experimental::run_on_all(num_tasks, [&sum]() { sum += 1; });
 
         HPX_TEST_EQ(sum.load(), num_tasks);
     }
@@ -60,11 +53,8 @@ int hpx_main()
         // Test with async reduction
         std::atomic<std::size_t> sum{0};
         auto futures = hpx::experimental::run_on_all(
-            hpx::execution::par(hpx::execution::task),
-            num_tasks,
-            [&sum]() { 
-                sum += 1; 
-            });
+            hpx::execution::par(hpx::execution::task), num_tasks,
+            [&sum]() { sum += 1; });
 
         hpx::wait_all(futures);
         HPX_TEST_EQ(sum.load(), num_tasks);
@@ -75,8 +65,8 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
-} 
+}
