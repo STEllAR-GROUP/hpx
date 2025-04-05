@@ -23,6 +23,7 @@
 
 #include <cstddef>
 #include <type_traits>
+#include <utility>    // for std::move
 
 namespace hpx::experimental {
 
