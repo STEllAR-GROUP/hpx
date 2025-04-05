@@ -96,6 +96,7 @@ namespace hpx::experimental {
 
         if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
         {
+#if defined(HPX_HAVE_CXX20_PERFECT_PACK_CAPTURE)
             return hpx::async(policy.executor(),
                 [init = std::forward<T>(init), op = std::forward<Op>(op),
                     f = std::forward<F>(f),
@@ -103,6 +104,19 @@ namespace hpx::experimental {
                     return run_on_all_impl(std::move(init), std::move(op),
                         std::move(f), std::move(ts)...);
                 });
+#else
+            return hpx::async(policy.executor(),
+                [init = std::forward<T>(init), op = std::forward<Op>(op),
+                    f = std::forward<F>(f),
+                    t = hpx::make_tuple(std::forward<Ts>(ts)...)]() mutable {
+                    return hpx::apply_tuple(
+                        [&init, &op, &f](Ts&&... ts) mutable {
+                            return run_on_all_impl(std::move(init), std::move(op),
+                                std::move(f), std::move(ts)...);
+                        },
+                        std::move(t));
+                });
+#endif
         }
         else
         {
