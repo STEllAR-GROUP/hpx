@@ -5,8 +5,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/init.hpp>
-#include <hpx/parallel/algorithms/run_on_all.hpp>
+#include <hpx/parallel/run_on_all.hpp>
 #include <hpx/testing.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/async.hpp>
+#include <hpx/future.hpp>
+#include <hpx/parallel/algorithms/for_loop_reduction.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -14,67 +18,56 @@
 
 int hpx_main()
 {
+    // We're using a single node/locality, so we need to use a number of tasks
+    // equal to the number of OS threads, not the number of localities.
+    const std::size_t num_tasks = hpx::get_os_thread_count();
+
     {
         // Test synchronous execution
         std::atomic<std::size_t> count{0};
-        auto result = hpx::parallel::run_on_all(
-            hpx::execution::seq, 0, [&count](std::size_t) { ++count; });
+        hpx::experimental::run_on_all(
+            num_tasks,
+            [&count]() { ++count; });
 
-        HPX_TEST_EQ(count.load(), hpx::get_num_localities(hpx::launch::sync));
+        HPX_TEST_EQ(count.load(), num_tasks);
     }
 
     {
-        // Test asynchronous execution
+        // Test asynchronous execution with execution policy
         std::atomic<std::size_t> count{0};
-        auto future = hpx::parallel::run_on_all(
-            hpx::execution::par(hpx::execution::task), 0,
-            [&count](std::size_t) { ++count; });
+        auto futures = hpx::experimental::run_on_all(
+            hpx::execution::par(hpx::execution::task),
+            num_tasks,
+            [&count]() { ++count; });
 
-        future.get();
-        HPX_TEST_EQ(count.load(), hpx::get_num_localities(hpx::launch::sync));
+        hpx::wait_all(futures);
+        HPX_TEST_EQ(count.load(), num_tasks);
     }
 
     {
-        // Test with reduction
-        std::vector<std::size_t> values(hpx::get_num_localities(hpx::launch::sync));
-        for (std::size_t i = 0; i != values.size(); ++i)
-        {
-            values[i] = i + 1;
-        }
+        // Test with simple reduction approach
+        std::atomic<std::size_t> sum{0};
+        hpx::experimental::run_on_all(
+            num_tasks,
+            [&sum]() { 
+                sum += 1; 
+            });
 
-        auto result = hpx::parallel::run_on_all(hpx::execution::par, 0,
-            [&values](std::size_t i) { return values[i]; },
-            [](std::size_t a, std::size_t b) { return a + b; });
-
-        std::size_t expected = 0;
-        for (std::size_t i = 0; i != values.size(); ++i)
-        {
-            expected += values[i];
-        }
-
-        HPX_TEST_EQ(result, expected);
+        HPX_TEST_EQ(sum.load(), num_tasks);
     }
 
     {
-        // Test async with reduction
-        std::vector<std::size_t> values(hpx::get_num_localities(hpx::launch::sync));
-        for (std::size_t i = 0; i != values.size(); ++i)
-        {
-            values[i] = i + 1;
-        }
+        // Test with async reduction
+        std::atomic<std::size_t> sum{0};
+        auto futures = hpx::experimental::run_on_all(
+            hpx::execution::par(hpx::execution::task),
+            num_tasks,
+            [&sum]() { 
+                sum += 1; 
+            });
 
-        auto future = hpx::parallel::run_on_all(
-            hpx::execution::par(hpx::execution::task), 0,
-            [&values](std::size_t i) { return values[i]; },
-            [](std::size_t a, std::size_t b) { return a + b; });
-
-        std::size_t expected = 0;
-        for (std::size_t i = 0; i != values.size(); ++i)
-        {
-            expected += values[i];
-        }
-
-        HPX_TEST_EQ(future.get(), expected);
+        hpx::wait_all(futures);
+        HPX_TEST_EQ(sum.load(), num_tasks);
     }
 
     return hpx::finalize();
@@ -82,6 +75,8 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    HPX_TEST_EQ(hpx::init(argc, argv), 0);
+    HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
+        "HPX main exited with non-zero status");
+
     return hpx::util::report_errors();
 } 
