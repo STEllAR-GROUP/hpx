@@ -39,11 +39,11 @@ jobs:
       run: |
           cd build
           ninja -j2 libs.core.algorithms.tests.unit.block.run_on_all_exec_policy_test
-    - name: Test
+    - name: Test Specific Test
       shell: bash
       run: |
           cd build
-          ctest --output-on-failure -R "run_on_all_exec_policy"
+          ./bin/run_on_all_exec_policy_test
     - name: Run inspect
       shell: bash
       run: |
