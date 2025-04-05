@@ -1,0 +1,52 @@
+name: Run_on_all Test
+
+on:
+  push:
+    branches: [ run_on_all_exec_policy ]
+  pull_request:
+    branches: [ run_on_all_exec_policy ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: stellargroup/build_env:14
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Configure
+      shell: bash
+      run: |
+          cmake \
+              . \
+              -Bbuild \
+              -GNinja \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DHPX_WITH_MALLOC=system \
+              -DHPX_WITH_FETCH_ASIO=ON \
+              -DHPX_WITH_EXAMPLES=OFF \
+              -DHPX_WITH_TESTS=ON \
+              -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
+              -DHPX_WITH_TESTS_UNIT=ON \
+              -DHPX_WITH_TESTS_REGRESSIONS=OFF \
+              -DHPX_WITH_TESTS_BENCHMARKS=OFF \
+              -DHPX_WITH_TESTS_EXAMPLES=OFF \
+              -DHPX_WITH_TESTS_EXTERNAL=OFF \
+              -DHPX_WITH_TESTS_HEADERS=OFF \
+              -DHPX_WITH_TESTS_COMPONENT=OFF \
+              -DHPX_WITH_TESTS_ABI=OFF
+    - name: Build
+      shell: bash
+      run: |
+          cd build
+          ninja run_on_all_exec_policy_test
+    - name: Test
+      shell: bash
+      run: |
+          cd build
+          ctest --output-on-failure -R run_on_all
+    - name: Run inspect
+      shell: bash
+      run: |
+          cd build
+          ninja tools.inspect
+          bin/inspect --all --output=./hpx_inspect_report.html /hpx/source 
