@@ -1,9 +1,10 @@
-//  Copyright (c) 2024 Harith
+// Copyright (c) 2024 Harith
 //
-//  SPDX-License-Identifier: BSL-1.0
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying
-//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+// SPDX-License-Identifier: BSL-1.0
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// This test verifies run_on_all functionality with different execution policies
 #include <hpx/async.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/future.hpp>
