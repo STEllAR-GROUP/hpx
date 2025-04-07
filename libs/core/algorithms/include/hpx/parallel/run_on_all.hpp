@@ -80,7 +80,8 @@ namespace hpx::experimental {
     }
 
     // New overloads with execution policy support
-    template <typename ExPolicy, typename T, typename Op, typename F, typename... Ts,
+    template <typename ExPolicy, typename T, typename Op, typename F,
+        typename... Ts,
         HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
     auto run_on_all(ExPolicy&& policy, std::size_t num_tasks,
         hpx::parallel::detail::reduction_helper<T, Op>&& r, F&& f, Ts&&... ts)
@@ -99,25 +100,26 @@ namespace hpx::experimental {
         auto future = hpx::parallel::execution::bulk_async_execute(
             exec, [&](auto i) { f(r.iteration_value(i), ts...); }, num_tasks,
             HPX_FORWARD(Ts, ts)...);
-        
+
         // If the policy is synchronous, wait for completion
         if constexpr (!hpx::is_async_execution_policy_v<ExPolicy>)
         {
             hpx::wait_all(future);
         }
-        
+
         return future;
     }
 
-    template <typename ExPolicy, typename T, typename Op, typename F, typename... Ts,
+    template <typename ExPolicy, typename T, typename Op, typename F,
+        typename... Ts,
         HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
     auto run_on_all(ExPolicy&& policy,
         hpx::parallel::detail::reduction_helper<T, Op>&& r, F&& f, Ts&&... ts)
     {
         std::size_t cores =
             hpx::parallel::execution::detail::get_os_thread_count();
-        return run_on_all(HPX_FORWARD(ExPolicy, policy), cores, 
-            HPX_MOVE(r), HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        return run_on_all(HPX_FORWARD(ExPolicy, policy), cores, HPX_MOVE(r),
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 
     template <typename ExPolicy, typename F, typename... Ts,
@@ -133,24 +135,24 @@ namespace hpx::experimental {
 
         auto future = hpx::parallel::execution::bulk_async_execute(
             exec, [&](auto) { f(ts...); }, num_tasks, HPX_FORWARD(Ts, ts)...);
-        
+
         // If the policy is synchronous, wait for completion
         if constexpr (!hpx::is_async_execution_policy_v<ExPolicy>)
         {
             hpx::wait_all(future);
         }
-        
+
         return future;
     }
 
     template <typename ExPolicy, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy> && 
-                             std::is_invocable_v<F&&, Ts&&...>)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>&&
+                std::is_invocable_v<F&&, Ts&&...>)>
     auto run_on_all(ExPolicy&& policy, F&& f, Ts&&... ts)
     {
         std::size_t cores =
             hpx::parallel::execution::detail::get_os_thread_count();
-        return run_on_all(HPX_FORWARD(ExPolicy, policy), cores, 
+        return run_on_all(HPX_FORWARD(ExPolicy, policy), cores,
             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx::experimental
