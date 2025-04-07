@@ -86,16 +86,8 @@ namespace hpx::experimental {
     auto run_on_all(ExPolicy&& policy, std::size_t num_tasks,
         hpx::parallel::detail::reduction_helper<T, Op>&& r, F&& f, Ts&&... ts)
     {
-        // force using index_queue scheduler with given amount of threads
-        auto exec = hpx::execution::experimental::with_processing_units_count(
-            hpx::execution::parallel_executor(
-                hpx::threads::thread_priority::bound),
-            num_tasks);
-        exec.set_hierarchical_threshold(0);
-
-        r.init_iteration(0, 0);
-        auto on_exit =
-            hpx::experimental::scope_exit([&] { r.exit_iteration(0); });
+        auto exec = hpx::parallel::execution::detail::create_rebound_executor(
+            policy.executor(), policy.parameters());
 
         auto future = hpx::parallel::execution::bulk_async_execute(
             exec, [&](auto i) { f(r.iteration_value(i), ts...); }, num_tasks,
@@ -123,15 +115,12 @@ namespace hpx::experimental {
     }
 
     template <typename ExPolicy, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>&&
+                std::is_invocable_v<F&&, Ts&&...>)>
     auto run_on_all(ExPolicy&& policy, std::size_t num_tasks, F&& f, Ts&&... ts)
     {
-        // force using index_queue scheduler with given amount of threads
-        auto exec = hpx::execution::experimental::with_processing_units_count(
-            hpx::execution::parallel_executor(
-                hpx::threads::thread_priority::bound),
-            num_tasks);
-        exec.set_hierarchical_threshold(0);
+        auto exec = hpx::parallel::execution::detail::create_rebound_executor(
+            policy.executor(), policy.parameters());
 
         auto future = hpx::parallel::execution::bulk_async_execute(
             exec, [&](auto) { f(ts...); }, num_tasks, HPX_FORWARD(Ts, ts)...);
