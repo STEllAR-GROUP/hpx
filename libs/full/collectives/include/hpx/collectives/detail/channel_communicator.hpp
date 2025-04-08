@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -122,6 +122,10 @@ namespace hpx::collectives::detail {
     public:
         HPX_EXPORT channel_communicator(char const* basename,
             std::size_t num_sites, std::size_t this_site, client_type here);
+
+        HPX_EXPORT channel_communicator(hpx::launch::sync_policy,
+            char const* basename, std::size_t num_sites, std::size_t this_site,
+            client_type here);
 
         template <typename T>
         hpx::future<T> get(std::size_t site, std::size_t tag) const
