@@ -547,9 +547,10 @@ namespace hpx::parallel {
                     }
                 }
 
-                auto policy = parallel::util::adapt_placement_mode(
-                    HPX_FORWARD(ExPolicy, orgpolicy),
-                    hpx::threads::thread_placement_hint::breadth_first);
+                auto policy =
+                    hpx::execution::experimental::adapt_placement_mode(
+                        HPX_FORWARD(ExPolicy, orgpolicy),
+                        hpx::threads::thread_placement_hint::breadth_first);
 
                 using policy_type = decltype(policy);
                 using zip_iterator = hpx::util::zip_iterator<Iter1, Iter2>;
@@ -635,9 +636,10 @@ namespace hpx::parallel {
                     typename std::iterator_traits<FwdIter1>::difference_type;
                 difference_type count = std::distance(first1, last1);
 
-                decltype(auto) policy = parallel::util::adapt_placement_mode(
-                    HPX_FORWARD(ExPolicy, orgpolicy),
-                    hpx::threads::thread_placement_hint::breadth_first);
+                decltype(auto) policy =
+                    hpx::execution::experimental::adapt_placement_mode(
+                        HPX_FORWARD(ExPolicy, orgpolicy),
+                        hpx::threads::thread_placement_hint::breadth_first);
 
                 using policy_type = std::decay_t<decltype(policy)>;
                 using zip_iterator =

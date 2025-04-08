@@ -116,9 +116,10 @@ namespace hpx::parallel::detail {
                     tok.cancel(0);
             }
 
-            decltype(auto) policy = parallel::util::adapt_placement_mode(
-                HPX_FORWARD(ExPolicy, orgpolicy),
-                hpx::threads::thread_placement_hint::breadth_first);
+            decltype(auto) policy =
+                hpx::execution::experimental::adapt_placement_mode(
+                    HPX_FORWARD(ExPolicy, orgpolicy),
+                    hpx::threads::thread_placement_hint::breadth_first);
             using policy_type = std::decay_t<decltype(policy)>;
             using partitioner =
                 hpx::parallel::util::partitioner<decltype(policy), FwdIter,
@@ -146,9 +147,11 @@ namespace hpx::parallel::detail {
                             FwdIter2 needle = s_first;
                             FwdIter mid = curr;
 
+                            // clang-format off
                             for (difference_type len = 0;
-                                 local_count != diff && len != count;
-                                 ++local_count, ++len, ++mid)
+                                local_count != diff && len != count;
+                                ++local_count, ++len, ++mid)
+                            // clang-format on
                             {
                                 if (!HPX_INVOKE(op, HPX_INVOKE(proj1, *mid),
                                         HPX_INVOKE(proj2, *++needle)))
@@ -232,9 +235,10 @@ namespace hpx::parallel::detail {
             if (diff > s_difference_type(count))
                 return result::get(HPX_MOVE(first));
 
-            decltype(auto) policy = parallel::util::adapt_placement_mode(
-                HPX_FORWARD(ExPolicy, orgpolicy),
-                hpx::threads::thread_placement_hint::breadth_first);
+            decltype(auto) policy =
+                hpx::execution::experimental::adapt_placement_mode(
+                    HPX_FORWARD(ExPolicy, orgpolicy),
+                    hpx::threads::thread_placement_hint::breadth_first);
 
             using policy_type = std::decay_t<decltype(policy)>;
 
@@ -264,9 +268,11 @@ namespace hpx::parallel::detail {
                             FwdIter2 needle = s_first;
                             FwdIter mid = curr;
 
+                            // clang-format off
                             for (difference_type len = 0; local_count != diff &&
-                                 len != difference_type(count);
-                                 ++local_count, ++len, ++mid)
+                                len != difference_type(count);
+                                ++local_count, ++len, ++mid)
+                            // clang-format on
                             {
                                 if (!HPX_INVOKE(op, HPX_INVOKE(proj1, *mid),
                                         HPX_INVOKE(proj2, *++needle)))

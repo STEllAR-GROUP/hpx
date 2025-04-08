@@ -18,7 +18,6 @@
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/experimental/scope_exit.hpp>
-#include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/algorithms/for_loop_reduction.hpp>
 
 #include <cstddef>
@@ -31,9 +30,13 @@ namespace hpx::experimental {
         hpx::parallel::detail::reduction_helper<T, Op>&& r, F&& f, Ts&&... ts)
     {
         // force using index_queue scheduler with given amount of threads
+        hpx::threads::thread_schedule_hint hint;
+        hint.sharing_mode(
+            hpx::threads::thread_sharing_hint::do_not_share_function);
         auto exec = hpx::execution::experimental::with_processing_units_count(
             hpx::execution::parallel_executor(
-                hpx::threads::thread_priority::bound),
+                hpx::threads::thread_priority::bound,
+                hpx::threads::thread_stacksize::default_, hint),
             num_tasks);
         exec.set_hierarchical_threshold(0);
 
@@ -60,9 +63,13 @@ namespace hpx::experimental {
     void run_on_all(std::size_t num_tasks, F&& f, Ts&&... ts)
     {
         // force using index_queue scheduler with given amount of threads
+        hpx::threads::thread_schedule_hint hint;
+        hint.sharing_mode(
+            hpx::threads::thread_sharing_hint::do_not_share_function);
         auto exec = hpx::execution::experimental::with_processing_units_count(
             hpx::execution::parallel_executor(
-                hpx::threads::thread_priority::bound),
+                hpx::threads::thread_priority::bound,
+                hpx::threads::thread_stacksize::default_, hint),
             num_tasks);
         exec.set_hierarchical_threshold(0);
 

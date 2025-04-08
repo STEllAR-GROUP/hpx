@@ -20,13 +20,13 @@ namespace hpx::threads {
         std::ostream& os, [[maybe_unused]] thread_description const& d)
     {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-        if (d.kind() == thread_description::data_type_description)
+        if (d.kind() == thread_description::data_type::description)
         {
             os << d.get_description();
         }
         else
         {
-            HPX_ASSERT(d.kind() == thread_description::data_type_address);
+            HPX_ASSERT(d.kind() == thread_description::data_type::address);
             os << d.get_address();    //-V128
         }
 #else
@@ -38,7 +38,7 @@ namespace hpx::threads {
     std::string as_string([[maybe_unused]] thread_description const& desc)
     {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-        if (desc.kind() == threads::thread_description::data_type_description)
+        if (desc.kind() == threads::thread_description::data_type::description)
             return desc ? desc.get_description() : "<unknown>";
 
         return hpx::util::format("address: {:#x}", desc.get_address());
@@ -55,7 +55,7 @@ namespace hpx::threads {
     !defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
         if (altname != nullptr)
         {
-            data_.type_ = data_type_description;
+            data_.type_ = data_type::description;
             data_.desc_ = altname;
             return;
         }
@@ -68,20 +68,20 @@ namespace hpx::threads {
             data_.type_ = desc.kind();
 
             // if the current task has a description, use it.
-            if (data_.type_ == data_type_description)
+            if (data_.type_ == data_type::description)
             {
                 data_.desc_ = desc.get_description();
             }
             else
             {
                 // otherwise, use the address of the task.
-                HPX_ASSERT(data_.type_ == data_type_address);
+                HPX_ASSERT(data_.type_ == data_type::address);
                 data_.addr_ = desc.get_address();
             }
         }
         else
         {
-            data_.type_ = data_type_description;
+            data_.type_ = data_type::description;
             data_.desc_ = "<unknown>";
         }
 #endif

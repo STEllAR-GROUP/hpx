@@ -226,7 +226,7 @@ namespace hpx::util {
                 return new_task(description, 0, parent_task);
             }
             else if (description.kind() ==
-                threads::thread_description::data_type_description)
+                threads::thread_description::data_type::description)
             {
                 // Disambiguate the call by making a temporary string object
                 return update_task(
@@ -235,7 +235,7 @@ namespace hpx::util {
             else
             {
                 HPX_ASSERT(description.kind() ==
-                    threads::thread_description::data_type_address);
+                    threads::thread_description::data_type::address);
                 return update_task(wrapper, description.get_address());
             }
         }
