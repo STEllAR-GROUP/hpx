@@ -30,12 +30,9 @@ namespace hpx::experimental {
     void run_on_all(std::size_t num_tasks,
         hpx::parallel::detail::reduction_helper<T, Op>&& r, F&& f, Ts&&... ts)
     {
-        // force using index_queue scheduler with given amount of threads
-        auto exec = hpx::execution::experimental::with_processing_units_count(
-            hpx::execution::parallel_executor(
-                hpx::threads::thread_priority::bound),
-            num_tasks);
-        exec.set_hierarchical_threshold(0);
+        // Create a parallel executor with the specified number of threads
+        auto exec = hpx::execution::parallel_executor(
+            hpx::threads::thread_priority::bound);
 
         r.init_iteration(0, 0);
         auto on_exit =
@@ -59,12 +56,9 @@ namespace hpx::experimental {
     template <typename F, typename... Ts>
     void run_on_all(std::size_t num_tasks, F&& f, Ts&&... ts)
     {
-        // force using index_queue scheduler with given amount of threads
-        auto exec = hpx::execution::experimental::with_processing_units_count(
-            hpx::execution::parallel_executor(
-                hpx::threads::thread_priority::bound),
-            num_tasks);
-        exec.set_hierarchical_threshold(0);
+        // Create a parallel executor with the specified number of threads
+        auto exec = hpx::execution::parallel_executor(
+            hpx::threads::thread_priority::bound);
 
         hpx::wait_all(hpx::parallel::execution::bulk_async_execute(
             exec, [&](auto) { f(ts...); }, num_tasks, HPX_FORWARD(Ts, ts)...));
@@ -86,8 +80,7 @@ namespace hpx::experimental {
     auto run_on_all(ExPolicy&& policy, std::size_t num_tasks,
         hpx::parallel::detail::reduction_helper<T, Op>&& r, F&& f, Ts&&... ts)
     {
-        auto exec = hpx::execution::experimental::with_processing_units_count(
-            policy.executor(), num_tasks);
+        auto exec = policy.executor();
 
         auto future = hpx::parallel::execution::bulk_async_execute(
             exec, [&](auto i) { f(r.iteration_value(i), ts...); }, num_tasks,
@@ -119,8 +112,7 @@ namespace hpx::experimental {
                 std::is_invocable_v<F&&, Ts&&...>)>
     auto run_on_all(ExPolicy&& policy, std::size_t num_tasks, F&& f, Ts&&... ts)
     {
-        auto exec = hpx::execution::experimental::with_processing_units_count(
-            policy.executor(), num_tasks);
+        auto exec = policy.executor();
 
         auto future = hpx::parallel::execution::bulk_async_execute(
             exec, [&](auto) { f(ts...); }, num_tasks, HPX_FORWARD(Ts, ts)...);
