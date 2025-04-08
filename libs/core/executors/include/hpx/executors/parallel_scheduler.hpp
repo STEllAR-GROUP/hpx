@@ -9,12 +9,12 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/execution/algorithms/bulk.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
+#include <hpx/execution.hpp>   
+#include <hpx/execution/traits/executor_traits.hpp> 
+#include <hpx/futures/future.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/synchronization/stop_token.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -27,6 +27,8 @@
 #include <utility>
 
 namespace hpx::execution::experimental {
+
+    struct bulk_t;
 
     struct parallel_scheduler
     {
@@ -65,12 +67,12 @@ namespace hpx::execution::experimental {
                 virtual void set_value() noexcept = 0;
                 virtual void set_error(std::exception_ptr) noexcept = 0;
                 virtual void set_stopped() noexcept = 0;
-                virtual std::optional<hpx::stop_token> try_query_stop_token() noexcept { return std::nullopt; } // Specific to stop_token
+                virtual std::optional<hpx::stop_token> try_query_stop_token() noexcept { return std::nullopt; }
             };
 
             struct bulk_item_receiver : receiver {
                 virtual void start(uint32_t start, uint32_t end) noexcept = 0;
-                virtual std::exception_ptr get_error() const noexcept { return nullptr; } // To handle errors
+                virtual std::exception_ptr get_error() const noexcept { return nullptr; }
             };
 
             struct parallel_scheduler {
@@ -142,16 +144,13 @@ namespace hpx::execution::experimental {
                 void schedule(receiver* r, storage s) noexcept override {
                     (void)s;
                     if (!r) {
-                        std::cerr << "Error: Null receiver in schedule" << std::endl;
                         return;
                     }
-                    // Capture stop token and check it inside the task
                     auto stop_token_opt = r->try_query_stop_token();
                     hpx::async([r, stop_token_opt]() {
                         if (stop_token_opt && stop_token_opt->stop_requested()) {
                             r->set_stopped();
                         } else {
-                            std::cout << "Task executing set_value" << std::endl;
                             r->set_value();
                         }
                     });
@@ -160,14 +159,12 @@ namespace hpx::execution::experimental {
                 void schedule_bulk_chunked(uint32_t n, bulk_item_receiver* r, storage s) noexcept override {
                     (void)s;
                     if (!r) {
-                        std::cerr << "Error: Null bulk_item_receiver in schedule_bulk_chunked" << std::endl;
                         return;
                     }
                     if (n == 0) {
                         r->set_value();
                         return;
                     }
-                    // Check stop token
                     if (auto stop_token_opt = r->try_query_stop_token()) {
                         if (stop_token_opt->stop_requested()) {
                             r->set_stopped();
@@ -207,14 +204,12 @@ namespace hpx::execution::experimental {
                 void schedule_bulk_unchunked(uint32_t n, bulk_item_receiver* r, storage s) noexcept override {
                     (void)s;
                     if (!r) {
-                        std::cerr << "Error: Null bulk_item_receiver in schedule_bulk_unchunked" << std::endl;
                         return;
                     }
                     if (n == 0) {
                         r->set_value();
                         return;
                     }
-                    // Check stop token
                     if (auto stop_token_opt = r->try_query_stop_token()) {
                         if (stop_token_opt->stop_requested()) {
                             r->set_stopped();
