@@ -6,7 +6,7 @@
 
 #include <hpx/executors/parallel_scheduler.hpp>
 
-std::shared_ptr<
+__attribute__((weak)) std::shared_ptr<
     hpx::execution::experimental::detail::replaceability::parallel_scheduler>
 hpx::execution::experimental::detail::replaceability::
     query_parallel_scheduler_backend()
