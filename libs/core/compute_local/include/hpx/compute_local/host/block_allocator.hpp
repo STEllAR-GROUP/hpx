@@ -261,15 +261,15 @@ namespace hpx::compute::host {
     struct block_allocator
       : public detail::policy_allocator<T,
             hpx::execution::detail::parallel_policy_shim<
-                block_executor<Executor>,
+                hpx::execution::detail::empty_base, block_executor<Executor>,
                 typename block_executor<Executor>::executor_parameters_type>>
     {
         using executor_type = block_executor<Executor>;
         using executor_parameters_type =
             typename executor_type::executor_parameters_type;
-        using policy_type =
-            hpx::execution::detail::parallel_policy_shim<executor_type,
-                executor_parameters_type>;
+        using policy_type = hpx::execution::detail::parallel_policy_shim<
+            hpx::execution::detail::empty_base, executor_type,
+            executor_parameters_type>;
         using base_type = detail::policy_allocator<T, policy_type>;
         using target_type = std::vector<host::target>;
 
