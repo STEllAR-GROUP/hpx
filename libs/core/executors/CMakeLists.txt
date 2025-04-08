@@ -84,7 +84,7 @@ endif()
 # cmake-format: on
 
 set(executors_sources current_executor.cpp exception_list_callbacks.cpp
-                      fork_join_executor.cpp service_executors.cpp
+                      fork_join_executor.cpp parallel_scheduler.cpp service_executors.cpp
 )
 
 include(HPX_AddModule)
