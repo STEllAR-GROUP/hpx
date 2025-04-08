@@ -1,0 +1,10 @@
+# CMake generated Testfile for 
+# Source directory: /Users/harith/Desktop/Open Source/hpx/components/iostreams/tests/regressions
+# Build directory: /Users/harith/Desktop/Open Source/hpx/build2/components/iostreams/tests/regressions
+# 
+# This file includes the relevant testing commands required for 
+# testing this directory and lists subdirectories to be tested as well.
+add_test(tests.regressions.components.iostreams.lost_output_2236 "/Users/harith/Desktop/Open Source/hpx/build2/bin/hpxrun.py" "/Users/harith/Desktop/Open Source/hpx/build2/bin/lost_output_2236_test" "-e" "0" "-t" "1" "-l" "1" "-v" "--")
+set_tests_properties(tests.regressions.components.iostreams.lost_output_2236 PROPERTIES  _BACKTRACE_TRIPLES "/Users/harith/Desktop/Open Source/hpx/cmake/HPX_AddTest.cmake;126;add_test;/Users/harith/Desktop/Open Source/hpx/cmake/HPX_AddTest.cmake;269;add_hpx_test;/Users/harith/Desktop/Open Source/hpx/cmake/HPX_AddTest.cmake;282;add_test_and_deps_test;/Users/harith/Desktop/Open Source/hpx/components/iostreams/tests/regressions/CMakeLists.txt;28;add_hpx_regression_test;/Users/harith/Desktop/Open Source/hpx/components/iostreams/tests/regressions/CMakeLists.txt;0;")
+add_test(tests.regressions.components.iostreams.distributed.tcp.no_output_1173 "/Users/harith/Desktop/Open Source/hpx/build2/bin/hpxrun.py" "/Users/harith/Desktop/Open Source/hpx/build2/bin/no_output_1173_test" "-e" "0" "-t" "1" "-l" "2" "-p" "tcp" "-v" "--")
+set_tests_properties(tests.regressions.components.iostreams.distributed.tcp.no_output_1173 PROPERTIES  RUN_SERIAL "TRUE" _BACKTRACE_TRIPLES "/Users/harith/Desktop/Open Source/hpx/cmake/HPX_AddTest.cmake;227;add_test;/Users/harith/Desktop/Open Source/hpx/cmake/HPX_AddTest.cmake;269;add_hpx_test;/Users/harith/Desktop/Open Source/hpx/cmake/HPX_AddTest.cmake;282;add_test_and_deps_test;/Users/harith/Desktop/Open Source/hpx/components/iostreams/tests/regressions/CMakeLists.txt;28;add_hpx_regression_test;/Users/harith/Desktop/Open Source/hpx/components/iostreams/tests/regressions/CMakeLists.txt;0;")

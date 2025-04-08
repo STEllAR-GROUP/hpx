@@ -1,0 +1,6 @@
+# CMake generated Testfile for 
+# Source directory: /Users/harith/Desktop/Open Source/hpx/libs/full/runtime_distributed/examples
+# Build directory: /Users/harith/Desktop/Open Source/hpx/build2/libs/full/runtime_distributed/examples
+# 
+# This file includes the relevant testing commands required for 
+# testing this directory and lists subdirectories to be tested as well.

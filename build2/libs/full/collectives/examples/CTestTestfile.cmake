@@ -1,0 +1,10 @@
+# CMake generated Testfile for 
+# Source directory: /Users/harith/Desktop/Open Source/hpx/libs/full/collectives/examples
+# Build directory: /Users/harith/Desktop/Open Source/hpx/build2/libs/full/collectives/examples
+# 
+# This file includes the relevant testing commands required for 
+# testing this directory and lists subdirectories to be tested as well.
+add_test(tests.examples.modules.collectives.distributed.tcp.channel_communicator "/Users/harith/Desktop/Open Source/hpx/build2/bin/hpxrun.py" "/Users/harith/Desktop/Open Source/hpx/build2/bin/channel_communicator" "-e" "0" "-t" "2" "-l" "2" "-p" "tcp" "-v" "--")
+set_tests_properties(tests.examples.modules.collectives.distributed.tcp.channel_communicator PROPERTIES  RUN_SERIAL "TRUE" _BACKTRACE_TRIPLES "/Users/harith/Desktop/Open Source/hpx/cmake/HPX_AddTest.cmake;227;add_test;/Users/harith/Desktop/Open Source/hpx/cmake/HPX_AddTest.cmake;269;add_hpx_test;/Users/harith/Desktop/Open Source/hpx/cmake/HPX_AddTest.cmake;292;add_test_and_deps_test;/Users/harith/Desktop/Open Source/hpx/libs/full/collectives/examples/CMakeLists.txt;44;add_hpx_example_test;/Users/harith/Desktop/Open Source/hpx/libs/full/collectives/examples/CMakeLists.txt;0;")
+add_test(tests.examples.modules.collectives.distributed.tcp.distributed_pi "/Users/harith/Desktop/Open Source/hpx/build2/bin/hpxrun.py" "/Users/harith/Desktop/Open Source/hpx/build2/bin/distributed_pi" "-e" "0" "-t" "2" "-l" "2" "-p" "tcp" "-v" "--")
+set_tests_properties(tests.examples.modules.collectives.distributed.tcp.distributed_pi PROPERTIES  RUN_SERIAL "TRUE" _BACKTRACE_TRIPLES "/Users/harith/Desktop/Open Source/hpx/cmake/HPX_AddTest.cmake;227;add_test;/Users/harith/Desktop/Open Source/hpx/cmake/HPX_AddTest.cmake;269;add_hpx_test;/Users/harith/Desktop/Open Source/hpx/cmake/HPX_AddTest.cmake;292;add_test_and_deps_test;/Users/harith/Desktop/Open Source/hpx/libs/full/collectives/examples/CMakeLists.txt;44;add_hpx_example_test;/Users/harith/Desktop/Open Source/hpx/libs/full/collectives/examples/CMakeLists.txt;0;")

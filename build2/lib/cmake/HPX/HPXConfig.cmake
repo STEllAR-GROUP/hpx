@@ -1,0 +1,246 @@
+# Copyright (c) 2020-2025 STE||AR Group
+# Copyright (c) 2014 Thomas Heller
+# Copyright (c) 2015 Andreas Schaefer
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+set(HPX_FIND_PACKAGE ON)
+cmake_policy(VERSION 3.18)
+
+include(CMakeFindDependencyMacro)
+
+# Forward HPX_* cache variables
+include("${CMAKE_CURRENT_LIST_DIR}/HPXCacheVariables.cmake")
+
+# include HPX cmake utilities
+include("${CMAKE_CURRENT_LIST_DIR}/HPXMacros.cmake")
+
+# include exported targets
+
+# Asio can be installed by HPX or externally installed. In the first case we use
+# exported targets, in the second we find Asio again using find_package.
+if(HPX_WITH_FETCH_ASIO)
+  include("${CMAKE_CURRENT_LIST_DIR}/HPXAsioTarget.cmake")
+else()
+  set(HPX_ASIO_ROOT "/Users/harith/Desktop/Open Source/hpx/build2/_deps/asio-src")
+  include(HPX_SetupAsio)
+endif()
+
+# Stdexec can be installed by HPX or externally installed. In the first case we
+# use exported targets, in the second we find Stdexec again using find_package.
+if(HPX_WITH_STDEXEC)
+  if(HPX_WITH_FETCH_STDEXEC)
+    include("${CMAKE_CURRENT_LIST_DIR}/HPXStdexecTarget.cmake")
+  else()
+    set(Stdexec_ROOT "")
+    include(HPX_SetupStdexec)
+  endif()
+endif()
+
+# NLohnmann JSON can be installed by HPX or externally installed. In the first
+# case we use exported targets, in the second we find JSON again using
+# find_package.
+if(HPX_COMMAND_LINE_HANDLING_LOCAL_WITH_JSON_CONFIGURATION_FILES)
+  if(HPX_WITH_FETCH_JSON)
+    include("${CMAKE_CURRENT_LIST_DIR}/HPXJsonTarget.cmake")
+  else()
+    set(HPX_JSON_ROOT "")
+    include(HPX_SetupJSON)
+  endif()
+endif()
+
+# LCI
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
+  if(HPX_WITH_FETCH_LCI)
+    find_dependency(Threads)
+    find_dependency()
+    include("${CMAKE_CURRENT_LIST_DIR}/HPXLCITarget.cmake")
+  else()
+    set(Lci_ROOT "")
+    include(HPX_SetupLCI)
+    hpx_setup_lci()
+  endif()
+endif()
+
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_GASNET)
+  include(HPX_SetupGasnet)
+  hpx_setup_gasnet()
+endif()
+
+# Eve can be installed by HPX or externally installed. In the first case we use
+# exported targets, in the second we find Eve again using find_package.
+if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE")
+  if(HPX_WITH_FETCH_EVE)
+    include("${CMAKE_CURRENT_LIST_DIR}/HPXEveTarget.cmake")
+  else()
+    set(Eve_ROOT "")
+    include(HPX_SetupEve)
+  endif()
+endif()
+
+if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE")
+  if(HPX_WITH_FETCH_SVE)
+    include("${CMAKE_CURRENT_LIST_DIR}/HPXSVETarget.cmake")
+  else()
+    set(Sve_ROOT "")
+    include(HPX_SetupSVE)
+  endif()
+endif()
+
+if(HPX_WITH_FETCH_BOOST)
+  # Boost has been installed alongside HPX, let HPX_SetupBoost find it
+  if(NOT "OFF")
+    hpx_error(
+      "HPX_WITH_FETCH_BOOST=ON requires HPX to be installed after it is built.
+      Please execute the CMake install step (cmake --install) on your HPX build
+      directory, and link your project against the installed instance of HPX."
+    )
+  endif()
+  set(HPX_BOOST_ROOT "${CMAKE_CURRENT_LIST_DIR}/../")
+  include(HPX_SetupBoost)
+  include(HPX_SetupBoostFilesystem)
+  include(HPX_SetupBoostIostreams)
+else()
+  # Boost Separate boost targets to be unarily linked to some modules
+  set(HPX_BOOST_ROOT "/opt/homebrew")
+  # By default Boost_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
+  # HWLOC cause we are specifying HPX_<lib>_ROOT as an HINT to find_package)
+  if(NOT Boost_ROOT AND NOT "$ENV{BOOST_ROOT}")
+    set(Boost_ROOT ${HPX_BOOST_ROOT})
+  endif()
+  include(HPX_SetupBoost)
+  include(HPX_SetupBoostFilesystem)
+  include(HPX_SetupBoostIostreams)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/HPXInternalTargets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/HPXTargets.cmake")
+
+get_filename_component(
+  _hpx_root_dir "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE
+)
+
+set(HPX_VERSION_STRING "1.11.0")
+set(HPX_VERSION_MAJOR 1)
+set(HPX_VERSION_MINOR 11)
+set(HPX_VERSION_SUBMINOR 0)
+
+set(HPX_PREFIX "${_hpx_root_dir}")
+set(HPX_DEBUG_POSTFIX "d")
+set(HPX_BUILD_TYPE "Release")
+set(HPX_CXX_STANDARD "17")
+# We explicitly set the default to 98 to force CMake to emit a -std=c++XX flag.
+# Some compilers (clang) have a different default standard for cpp and cu files,
+# but CMake does not know about this difference. If the standard is set to the
+# .cpp default in CMake, CMake will omit the flag, resulting in the wrong
+# standard for .cu files.
+set(CMAKE_CXX_STANDARD_DEFAULT 98)
+
+set(HPX_GIT_COMMIT
+    "372f2d04baf7a1d08037a7fad29ee28c90d58dd9"
+    CACHE STRING "Revision of HPX from Git" FORCE
+)
+
+set(HPX_CXX_COMPILER
+    "/Library/Developer/CommandLineTools/usr/bin/c++"
+    CACHE STRING "CXX compiler for HPX" FORCE
+)
+set(HPX_CXX_COMPILER_ID
+    "AppleClang"
+    CACHE STRING "CXX compiler id for HPX" FORCE
+)
+set(HPX_CXX_COMPILER_VERSION
+    "16.0.0.16000026"
+    CACHE STRING "CXX compiler version for HPX" FORCE
+)
+
+# ##############################################################################
+# Setup the imported libraries (publicly linked) #
+
+# Propagate Amplifier settings, if needed
+if(HPX_WITH_ITTNOTIFY)
+  set(Amplifier_INCLUDE_DIR "")
+  set(Amplifier_LIBRARY "")
+  set(Amplifier_ROOT "")
+endif()
+
+# Allocator
+set(HPX_JEMALLOC_ROOT "")
+set(HPX_TCMALLOC_ROOT "")
+set(HPX_TBBMALLOC_ROOT "")
+# Special handle for mimalloc cause we can't specify HPX_MIMALLOC_ROOT as a HINT
+# to find_package
+set(HPX_MIMALLOC_ROOT "")
+if(NOT Mimalloc_ROOT AND NOT DEFINED ENV{MIMALLOC_ROOT})
+  set(Mimalloc_ROOT ${HPX_MIMALLOC_ROOT})
+endif()
+include(HPX_SetupAllocator)
+
+include(HPX_SetupThreads)
+
+# HIP
+include(HPX_SetupHIP)
+
+# Hwloc
+if(HPX_WITH_FETCH_HWLOC)
+  if(EXISTS ${HPX_PREFIX}/_deps/hwloc_installed)
+    set(Hwloc_ROOT ${HPX_PREFIX}/_deps/hwloc_installed)
+  else()
+    set(Hwloc_ROOT "")
+  endif()
+else()
+  set(Hwloc_ROOT "/opt/homebrew")
+endif()
+include(HPX_FindHwloc)
+
+# Papi
+set(HPX_PAPI_ROOT "")
+include(HPX_SetupPapi)
+
+# CUDA
+include(HPX_SetupCUDA)
+
+include(HPX_SetupMPI)
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
+  hpx_setup_mpi()
+endif()
+
+# APEX
+set(APEX_WITH_MSR "")
+set(Msr_ROOT "")
+set(APEX_WITH_ACTIVEHARMONY "")
+set(Activeharmony_ROOT "")
+set(APEX_WITH_OTF2 "")
+set(Otf2_ROOT "")
+set(Apex_ROOT "")
+include(HPX_SetupApex)
+# ##############################################################################
+
+set(HPX_WITH_MALLOC_DEFAULT system)
+
+if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC") AND NOT Vc_DIR)
+  set(Vc_DIR "")
+endif()
+include(HPX_SetupVc)
+
+if(NOT HPX_CMAKE_LOGLEVEL)
+  set(HPX_CMAKE_LOGLEVEL "WARN")
+endif()
+
+hpx_check_compiler_compatibility()
+hpx_check_boost_compatibility()
+hpx_check_allocator_compatibility()
+
+if(NOT DEFINED ${CMAKE_FIND_PACKAGE_NAME}_FOUND)
+  set(${CMAKE_FIND_PACKAGE_NAME}_FOUND true)
+endif()
+
+# Set legacy variables for linking and include directories
+set(HPX_LIBRARIES "HPX::hpx;")
+# All properties are propagated from HPX::hpx, so the following can be empty
+set(HPX_INCLUDE_DIRS "")
+set(HPX_LIBRARY_DIR "")
+set(HPX_LINK_LIBRARIES "")
+set(HPX_LINKER_FLAGS "")
