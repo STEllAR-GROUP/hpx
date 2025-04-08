@@ -142,7 +142,6 @@ namespace hpx::resource::detail {
         case resource::scheduling_policy::local_priority_lifo:
             sched = "local_priority_lifo";
             break;
-#if defined(HPX_HAVE_WORK_REQUESTING_SCHEDULERS)
         case resource::scheduling_policy::local_workrequesting_fifo:
             sched = "local_workrequesting_fifo";
             break;
@@ -152,7 +151,6 @@ namespace hpx::resource::detail {
         case resource::scheduling_policy::local_workrequesting_mc:
             sched = "local_workrequesting_mc";
             break;
-#endif
         case resource::scheduling_policy::static_:
             sched = "static";
             break;
@@ -167,6 +165,9 @@ namespace hpx::resource::detail {
             break;
         case resource::scheduling_policy::shared_priority:
             sched = "shared_priority";
+            break;
+        default:
+            sched = "unknown";
             break;
         }
 

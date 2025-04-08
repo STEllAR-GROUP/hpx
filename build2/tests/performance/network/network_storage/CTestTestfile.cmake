@@ -1,6 +1,0 @@
-# CMake generated Testfile for 
-# Source directory: /Users/harith/Desktop/Open Source/hpx/tests/performance/network/network_storage
-# Build directory: /Users/harith/Desktop/Open Source/hpx/build2/tests/performance/network/network_storage
-# 
-# This file includes the relevant testing commands required for 
-# testing this directory and lists subdirectories to be tested as well.
