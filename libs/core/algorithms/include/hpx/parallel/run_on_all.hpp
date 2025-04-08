@@ -86,8 +86,8 @@ namespace hpx::experimental {
     auto run_on_all(ExPolicy&& policy, std::size_t num_tasks,
         hpx::parallel::detail::reduction_helper<T, Op>&& r, F&& f, Ts&&... ts)
     {
-        auto exec = hpx::parallel::execution::detail::create_rebound_executor(
-            policy.executor(), policy.parameters());
+        auto exec = hpx::execution::experimental::with_processing_units_count(
+            policy.executor(), num_tasks);
 
         auto future = hpx::parallel::execution::bulk_async_execute(
             exec, [&](auto i) { f(r.iteration_value(i), ts...); }, num_tasks,
@@ -119,8 +119,8 @@ namespace hpx::experimental {
                 std::is_invocable_v<F&&, Ts&&...>)>
     auto run_on_all(ExPolicy&& policy, std::size_t num_tasks, F&& f, Ts&&... ts)
     {
-        auto exec = hpx::parallel::execution::detail::create_rebound_executor(
-            policy.executor(), policy.parameters());
+        auto exec = hpx::execution::experimental::with_processing_units_count(
+            policy.executor(), num_tasks);
 
         auto future = hpx::parallel::execution::bulk_async_execute(
             exec, [&](auto) { f(ts...); }, num_tasks, HPX_FORWARD(Ts, ts)...);
