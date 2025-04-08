@@ -28,6 +28,7 @@ set(executors_headers
     hpx/executors/limiting_executor.hpp
     hpx/executors/parallel_executor_aggregated.hpp
     hpx/executors/parallel_executor.hpp
+    hpx/executors/parallel_scheduler.hpp
     hpx/executors/post.hpp
     hpx/executors/restricted_thread_pool_executor.hpp
     hpx/executors/scheduler_executor.hpp
@@ -83,7 +84,7 @@ endif()
 # cmake-format: on
 
 set(executors_sources current_executor.cpp exception_list_callbacks.cpp
-                      fork_join_executor.cpp service_executors.cpp
+                      fork_join_executor.cpp parallel_scheduler.cpp service_executors.cpp
 )
 
 include(HPX_AddModule)
