@@ -9,18 +9,20 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/threading_base/detail/get_default_pool.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/synchronization/stop_token.hpp>
 
 #include <atomic>
 #include <cstddef>
 #include <exception>
 #include <memory>
+#include <optional>
+#include <thread>
+#include <vector>
 #include <type_traits>
 #include <utility>
 
@@ -30,57 +32,233 @@ namespace hpx::execution::experimental {
     {
         using execution_category = parallel_execution_tag;
 
-        explicit parallel_scheduler(
-            hpx::threads::thread_pool_base* pool =
-                hpx::threads::detail::get_self_or_default_pool()) noexcept
-          : pool_(pool)
-        {
-            HPX_ASSERT(pool_);
-        }
+        parallel_scheduler() noexcept = default;
 
         parallel_scheduler(parallel_scheduler const&) noexcept = default;
         parallel_scheduler(parallel_scheduler&&) noexcept = default;
-        parallel_scheduler& operator=(
-            parallel_scheduler const&) noexcept = default;
+        parallel_scheduler& operator=(parallel_scheduler const&) noexcept = default;
         parallel_scheduler& operator=(parallel_scheduler&&) noexcept = default;
 
-        friend bool operator==(parallel_scheduler const& lhs,
-            parallel_scheduler const& rhs) noexcept
+        friend bool operator==(parallel_scheduler const&, parallel_scheduler const&) noexcept
         {
-            return lhs.pool_ == rhs.pool_;
-        }
-
-        constexpr hpx::threads::thread_pool_base* get_thread_pool()
-            const noexcept
-        {
-            return pool_;
+            return true;
         }
 
         friend hpx::execution::experimental::forward_progress_guarantee
-        tag_invoke(
-            hpx::execution::experimental::get_forward_progress_guarantee_t,
+        tag_invoke(hpx::execution::experimental::get_forward_progress_guarantee_t,
             parallel_scheduler const&) noexcept
         {
-            return hpx::execution::experimental::forward_progress_guarantee::
-                parallel;
+            return hpx::execution::experimental::forward_progress_guarantee::parallel;
         }
-
-    private:
-        hpx::threads::thread_pool_base* pool_;
     };
 
     namespace detail {
+        namespace replaceability {
+
+            struct storage {
+                void* data;
+                uint32_t size;
+            };
+
+            struct receiver {
+                virtual ~receiver() = default;
+                virtual void set_value() noexcept = 0;
+                virtual void set_error(std::exception_ptr) noexcept = 0;
+                virtual void set_stopped() noexcept = 0;
+                virtual std::optional<hpx::stop_token> try_query_stop_token() noexcept { return std::nullopt; } // Specific to stop_token
+            };
+
+            struct bulk_item_receiver : receiver {
+                virtual void start(uint32_t start, uint32_t end) noexcept = 0;
+                virtual std::exception_ptr get_error() const noexcept { return nullptr; } // To handle errors
+            };
+
+            struct parallel_scheduler {
+                virtual ~parallel_scheduler() = default;
+                virtual void schedule(receiver*, storage) noexcept = 0;
+                virtual void schedule_bulk_chunked(uint32_t n, bulk_item_receiver*, storage) noexcept = 0;
+                virtual void schedule_bulk_unchunked(uint32_t n, bulk_item_receiver*, storage) noexcept = 0;
+            };
+
+            template <typename Receiver>
+            struct my_receiver : receiver {
+                Receiver& r;
+                my_receiver(Receiver& r_) : r(r_) {}
+                void set_value() noexcept override { hpx::execution::experimental::set_value(r); }
+                void set_error(std::exception_ptr ep) noexcept override { hpx::execution::experimental::set_error(HPX_MOVE(r), HPX_MOVE(ep)); }
+                void set_stopped() noexcept override { hpx::execution::experimental::set_stopped(r); }
+                std::optional<hpx::stop_token> try_query_stop_token() noexcept override {
+                    auto env = hpx::execution::experimental::get_env(r);
+                    return hpx::execution::experimental::get_stop_token(env);
+                }
+            };
+
+            template <typename Receiver, typename Shape, typename F>
+            struct my_bulk_item_receiver : bulk_item_receiver {
+                Receiver& r;
+                F f;
+                Shape shape;
+                std::exception_ptr error_ptr = nullptr;
+
+                my_bulk_item_receiver(Receiver& r_, F&& f_, Shape sh)
+                    : r(r_), f(HPX_FORWARD(F, f_)), shape(sh) {}
+
+                void start(uint32_t start, uint32_t end) noexcept override {
+                    try {
+                        if constexpr (std::is_integral_v<Shape>) {
+                            for (uint32_t i = start; i < end; ++i) {
+                                HPX_INVOKE(f, static_cast<Shape>(i));
+                            }
+                        } else {
+                            auto it = std::next(hpx::util::begin(shape), start);
+                            for (uint32_t i = start; i < end; ++i, ++it) {
+                                HPX_INVOKE(f, *it);
+                            }
+                        }
+                    } catch (...) {
+                        error_ptr = std::current_exception();
+                    }
+                }
+
+                std::exception_ptr get_error() const noexcept override {
+                    return error_ptr;
+                }
+
+                void set_value() noexcept override {
+                    hpx::execution::experimental::set_value(r);
+                }
+
+                void set_error(std::exception_ptr ep) noexcept override {
+                    hpx::execution::experimental::set_error(HPX_MOVE(r), HPX_MOVE(ep));
+                }
+
+                void set_stopped() noexcept override {
+                    hpx::execution::experimental::set_stopped(r);
+                }
+            };
+
+            class default_parallel_scheduler : public parallel_scheduler {
+            public:
+                void schedule(receiver* r, storage s) noexcept override {
+                    (void)s;
+                    if (!r) {
+                        std::cerr << "Error: Null receiver in schedule" << std::endl;
+                        return;
+                    }
+                    // Capture stop token and check it inside the task
+                    auto stop_token_opt = r->try_query_stop_token();
+                    hpx::async([r, stop_token_opt]() {
+                        if (stop_token_opt && stop_token_opt->stop_requested()) {
+                            r->set_stopped();
+                        } else {
+                            std::cout << "Task executing set_value" << std::endl;
+                            r->set_value();
+                        }
+                    });
+                }
+
+                void schedule_bulk_chunked(uint32_t n, bulk_item_receiver* r, storage s) noexcept override {
+                    (void)s;
+                    if (!r) {
+                        std::cerr << "Error: Null bulk_item_receiver in schedule_bulk_chunked" << std::endl;
+                        return;
+                    }
+                    if (n == 0) {
+                        r->set_value();
+                        return;
+                    }
+                    // Check stop token
+                    if (auto stop_token_opt = r->try_query_stop_token()) {
+                        if (stop_token_opt->stop_requested()) {
+                            r->set_stopped();
+                            return;
+                        }
+                    }
+                    std::size_t num_threads = std::thread::hardware_concurrency();
+                    std::size_t chunk_size = (n + num_threads - 1) / num_threads;
+                    std::vector<hpx::future<void>> futures;
+
+                    for (std::size_t t = 0; t < num_threads; ++t) {
+                        uint32_t start = static_cast<uint32_t>(t * chunk_size);
+                        uint32_t end = static_cast<uint32_t>(std::min(static_cast<std::size_t>(start) + chunk_size, static_cast<std::size_t>(n)));
+                        if (start >= n)
+                            break;
+
+                        futures.push_back(hpx::async([r, start, end]() {
+                            r->start(start, end);
+                        }));
+                    }
+
+                    hpx::when_all(futures).then([r](hpx::future<std::vector<hpx::future<void>>>&& f) noexcept {
+                        try {
+                            f.get();
+                            auto error_ep = r->get_error();
+                            if (error_ep != nullptr) {
+                                r->set_error(error_ep);
+                            } else {
+                                r->set_value();
+                            }
+                        } catch (...) {
+                            r->set_error(std::current_exception());
+                        }
+                    });
+                }
+
+                void schedule_bulk_unchunked(uint32_t n, bulk_item_receiver* r, storage s) noexcept override {
+                    (void)s;
+                    if (!r) {
+                        std::cerr << "Error: Null bulk_item_receiver in schedule_bulk_unchunked" << std::endl;
+                        return;
+                    }
+                    if (n == 0) {
+                        r->set_value();
+                        return;
+                    }
+                    // Check stop token
+                    if (auto stop_token_opt = r->try_query_stop_token()) {
+                        if (stop_token_opt->stop_requested()) {
+                            r->set_stopped();
+                            return;
+                        }
+                    }
+                    std::vector<hpx::future<void>> futures;
+
+                    for (uint32_t i = 0; i < n; ++i) {
+                        futures.push_back(hpx::async([r, i]() {
+                            r->start(i, i + 1);
+                        }));
+                    }
+
+                    hpx::when_all(futures).then([r](hpx::future<std::vector<hpx::future<void>>>&& f) noexcept {
+                        try {
+                            f.get();
+                            auto error_ep = r->get_error();
+                            if (error_ep != nullptr) {
+                                r->set_error(error_ep);
+                            } else {
+                                r->set_value();
+                            }
+                        } catch (...) {
+                            r->set_error(std::current_exception());
+                        }
+                    });
+                }
+            };
+
+            std::shared_ptr<parallel_scheduler> query_parallel_scheduler_backend();
+
+        }  // namespace replaceability
 
         template <typename Scheduler, typename Receiver>
         struct parallel_operation_state
         {
             Scheduler scheduler;
             Receiver& receiver;
+            std::shared_ptr<replaceability::my_receiver<Receiver>> my_r;
 
             template <typename S, typename R>
             parallel_operation_state(S&& s, R& r)
-              : scheduler(HPX_FORWARD(S, s))
-              , receiver(r)
+              : scheduler(HPX_FORWARD(S, s)), receiver(r), my_r(std::make_shared<replaceability::my_receiver<Receiver>>(r))
             {
             }
 
@@ -89,30 +267,30 @@ namespace hpx::execution::experimental {
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        thread_pool_scheduler exec{
-                            os.scheduler.get_thread_pool()};
-                        exec.execute([&r = os.receiver]() mutable {
-                            hpx::execution::experimental::set_value(r);
-                        });
+                        auto backend = replaceability::query_parallel_scheduler_backend();
+                        auto env = hpx::execution::experimental::get_env(os.receiver);
+                        auto stop_token = hpx::execution::experimental::get_stop_token(env);
+                        if (stop_token.stop_requested()) {
+                            hpx::execution::experimental::set_stopped(os.receiver);
+                            return;
+                        }
+                        replaceability::storage s{nullptr, 0};
+                        backend->schedule(os.my_r.get(), s);
                     },
                     [&](std::exception_ptr ep) {
-                        hpx::execution::experimental::set_error(
-                            HPX_MOVE(os.receiver), HPX_MOVE(ep));
+                        hpx::execution::experimental::set_error(HPX_MOVE(os.receiver), HPX_MOVE(ep));
                     });
             }
         };
 
-        // Helper functions for determining shape size.
         template <typename S>
-        std::enable_if_t<std::is_integral_v<S>, std::size_t> get_shape_size(
-            S const& sh)
+        std::enable_if_t<std::is_integral_v<S>, std::size_t> get_shape_size(S const& sh)
         {
             return static_cast<std::size_t>(sh);
         }
 
         template <typename S>
-        std::enable_if_t<!std::is_integral_v<S>, std::size_t> get_shape_size(
-            S const& sh)
+        std::enable_if_t<!std::is_integral_v<S>, std::size_t> get_shape_size(S const& sh)
         {
             return std::distance(hpx::util::begin(sh), hpx::util::end(sh));
         }
@@ -125,9 +303,7 @@ namespace hpx::execution::experimental {
             F f;
 
             parallel_bulk_sender(parallel_scheduler&& sched, Shape sh, F&& func)
-              : scheduler(HPX_MOVE(sched))
-              , shape(sh)
-              , f(HPX_FORWARD(F, func))
+              : scheduler(HPX_MOVE(sched)), shape(sh), f(HPX_FORWARD(F, func))
             {
             }
 
@@ -137,15 +313,13 @@ namespace hpx::execution::experimental {
             using completion_signatures =
                 hpx::execution::experimental::completion_signatures<
                     hpx::execution::experimental::set_value_t(),
-                    hpx::execution::experimental::set_error_t(
-                        std::exception_ptr),
+                    hpx::execution::experimental::set_error_t(std::exception_ptr),
                     hpx::execution::experimental::set_stopped_t()>;
 
             template <typename Env>
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_signatures_t,
-                parallel_bulk_sender const&, Env) noexcept
-                -> completion_signatures
+                parallel_bulk_sender const&, Env) noexcept -> completion_signatures
             {
                 return {};
             }
@@ -159,26 +333,14 @@ namespace hpx::execution::experimental {
             Shape shape;
             F f;
             std::size_t size;
-            std::shared_ptr<std::atomic<int>> tasks_remaining;
+            std::shared_ptr<replaceability::my_bulk_item_receiver<Receiver, Shape, F>> my_r;
 
             template <typename R, typename S>
-            parallel_bulk_operation_state(
-                parallel_scheduler&& sched, R& r, S sh, F&& func)
-              : scheduler(HPX_MOVE(sched))
-              , receiver(r)
-              , shape(sh)
-              , f(HPX_FORWARD(F, func))
+            parallel_bulk_operation_state(parallel_scheduler&& sched, R& r, S sh, F&& func)
+              : scheduler(HPX_MOVE(sched)), receiver(r), shape(sh), f(HPX_FORWARD(F, func)),
+                my_r(std::make_shared<replaceability::my_bulk_item_receiver<Receiver, Shape, F>>(r, std::move(f), sh))
             {
-                static_assert(
-                    std::is_integral_v<S> || hpx::traits::is_range_v<S>,
-                    "Shape must be an integral type or a range");
                 size = get_shape_size(sh);
-                std::size_t num_threads =
-                    scheduler.get_thread_pool()->get_os_thread_count();
-                std::size_t chunk_size = (size + num_threads - 1) / num_threads;
-                std::size_t num_chunks = (size + chunk_size - 1) / chunk_size;
-                tasks_remaining = std::make_shared<std::atomic<int>>(
-                    static_cast<int>(num_chunks));
             }
 
             friend void tag_invoke(hpx::execution::experimental::start_t,
@@ -186,59 +348,23 @@ namespace hpx::execution::experimental {
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        thread_pool_scheduler exec{
-                            os.scheduler.get_thread_pool()};
-                        std::size_t num_threads =
-                            os.scheduler.get_thread_pool()
-                                ->get_os_thread_count();
-                        std::size_t chunk_size =
-                            (os.size + num_threads - 1) / num_threads;
-
-                        for (std::size_t t = 0; t < num_threads; ++t)
-                        {
-                            std::size_t start = t * chunk_size;
-                            std::size_t end =
-                                (std::min)(start + chunk_size, os.size);
-                            if (start >= os.size)
-                                break;
-
-                            exec.execute([start, end, &os]() mutable {
-                                if constexpr (std::is_integral_v<Shape>)
-                                {
-                                    for (std::size_t i = start; i < end; ++i)
-                                    {
-                                        HPX_INVOKE(os.f, static_cast<Shape>(i));
-                                    }
-                                }
-                                else
-                                {
-                                    // clang-format off
-                                    auto it = std::next(
-                                        hpx::util::begin(os.shape), start);
-                                     // clang-format off
-                                    for (std::size_t i = start; i < end;
-                                        ++i, ++it)
-                                    // clang-format on
-                                    {
-                                        HPX_INVOKE(os.f, *it);
-                                    }    // clang-format on
-                                }
-                                if (--(*os.tasks_remaining) == 0)
-                                {
-                                    hpx::execution::experimental::set_value(
-                                        os.receiver);
-                                }
-                            });
+                        auto backend = replaceability::query_parallel_scheduler_backend();
+                        auto env = hpx::execution::experimental::get_env(os.receiver);
+                        auto stop_token = hpx::execution::experimental::get_stop_token(env);
+                        if (stop_token.stop_requested()) {
+                            hpx::execution::experimental::set_stopped(os.receiver);
+                            return;
                         }
+                        replaceability::storage s{nullptr, 0};
+                        backend->schedule_bulk_chunked(static_cast<uint32_t>(os.size), os.my_r.get(), s);
                     },
                     [&](std::exception_ptr ep) {
-                        hpx::execution::experimental::set_error(
-                            HPX_MOVE(os.receiver), HPX_MOVE(ep));
+                        hpx::execution::experimental::set_error(HPX_MOVE(os.receiver), HPX_MOVE(ep));
                     });
             }
         };
 
-    }    // namespace detail
+    }  // namespace detail
 
     struct parallel_sender
     {
@@ -265,16 +391,14 @@ namespace hpx::execution::experimental {
         friend auto tag_invoke(hpx::execution::experimental::connect_t,
             parallel_sender&& s, Receiver& r)
         {
-            return detail::parallel_operation_state<parallel_scheduler,
-                Receiver>{HPX_MOVE(s.scheduler), r};
+            return detail::parallel_operation_state<parallel_scheduler, Receiver>{HPX_MOVE(s.scheduler), r};
         }
 
         template <typename Receiver>
         friend auto tag_invoke(hpx::execution::experimental::connect_t,
             parallel_sender& s, Receiver& r)
         {
-            return detail::parallel_operation_state<parallel_scheduler,
-                Receiver>{s.scheduler, r};
+            return detail::parallel_operation_state<parallel_scheduler, Receiver>{s.scheduler, r};
         }
 
         template <typename Shape, typename F>
@@ -291,7 +415,7 @@ namespace hpx::execution::experimental {
             Receiver& r)
         {
             return detail::parallel_bulk_operation_state<Receiver, Shape, F>{
-                HPX_MOVE(s.scheduler), r, s.shape, HPX_MOVE(s.f)};
+                HPX_MOVE(s.scheduler), r, s.shape, HPX_FORWARD(F, s.f)};
         }
 
 #if defined(HPX_HAVE_STDEXEC)
@@ -300,24 +424,22 @@ namespace hpx::execution::experimental {
             parallel_scheduler const& sched;
 
             friend auto tag_invoke(
-                hpx::execution::experimental::get_completion_scheduler_t<
-                    set_value_t>,
-                env const& e) const noexcept -> parallel_scheduler
+                hpx::execution::experimental::get_completion_scheduler_t<set_value_t>,
+                env const& e) noexcept -> parallel_scheduler
             {
                 return e.sched;
             }
 
             friend auto tag_invoke(
-                hpx::execution::experimental::get_completion_scheduler_t<
-                    set_stopped_t>,
-                env const& e) const noexcept -> parallel_scheduler
+                hpx::execution::experimental::get_completion_scheduler_t<set_stopped_t>,
+                env const& e) noexcept -> parallel_scheduler
             {
                 return e.sched;
             }
         };
 
         friend env tag_invoke(hpx::execution::experimental::get_env_t,
-            parallel_sender const& s) const noexcept
+            parallel_sender const& s) noexcept
         {
             return {s.scheduler};
         }
@@ -336,9 +458,9 @@ namespace hpx::execution::experimental {
         return {sched};
     }
 
-    inline parallel_scheduler get_system_scheduler() noexcept
+    inline parallel_scheduler get_parallel_scheduler() noexcept
     {
         return parallel_scheduler{};
     }
 
-}    // namespace hpx::execution::experimental
+}  // namespace hpx::execution::experimental
