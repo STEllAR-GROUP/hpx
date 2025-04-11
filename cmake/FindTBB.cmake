@@ -42,7 +42,7 @@ set(Tbb_LIBRARIES ${Tbb_LIBRARY} ${Tbb_PROXY_LIBRARY})
 set(Tbb_INCLUDE_DIRS ${Tbb_INCLUDE_DIR})
 
 find_package_handle_standard_args(
-  TBBmalloc DEFAULT_MSG Tbb_LIBRARY Tbb_PROXY_LIBRARY Tbb_INCLUDE_DIR
+  TBB DEFAULT_MSG TBB_LIBRARY TBB_INCLUDE_DIR
 )
 
 foreach(v Tbb_ROOT Tbb_PLATFORM)
@@ -60,3 +60,7 @@ foreach(v Tbb_ROOT Tbb_PLATFORM)
 endforeach()
 
 mark_as_advanced(Tbb_ROOT Tbb_LIBRARY Tbb_PROXY_LIBRARY Tbb_INCLUDE_DIR)
+
+
+find_path(Tbb_INCLUDE_DIR tbb/tbb.h PATHS /usr/include)
+find_library(TBB_LIBRARY NAMES tbb PATHS /usr/lib /usr/lib/x86_64-linux-gnu)
