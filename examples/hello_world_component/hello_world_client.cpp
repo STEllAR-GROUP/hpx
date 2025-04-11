@@ -19,16 +19,11 @@
 
 int main()
 {
-    {
-        // Create a single instance of the component on this locality.
-        examples::hello_world client =
-            hpx::new_<examples::hello_world>(hpx::find_here());
-
-        // Invoke the component's action, which will print "Hello World!".
-        client.invoke();
-    }
-
-    return 0;
+    // Initialize HPX runtime
+    hpx::init_params init_args;
+    init_args.cfg = {"hpx.commandline.allow_unknown=1"};
+    
+    return hpx::init(init_args);
 }
 #endif
 //]
