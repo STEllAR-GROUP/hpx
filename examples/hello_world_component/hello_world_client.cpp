@@ -22,7 +22,7 @@ int main()
     // Initialize HPX runtime
     hpx::init_params init_args;
     init_args.cfg = {"hpx.commandline.allow_unknown=1"};
-    
+
     return hpx::init(init_args);
 }
 #endif
