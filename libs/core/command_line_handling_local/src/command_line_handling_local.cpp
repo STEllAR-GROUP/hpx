@@ -744,7 +744,7 @@ namespace hpx::local::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     void command_line_handling::store_unregistered_options(
-        std::string const& cmd_name,
+        std::string const& cmd_name, int argc, char* argv[],
         std::vector<std::string> const& unregistered_options)
     {
         std::string unregistered_options_cmd_line;
@@ -772,8 +772,7 @@ namespace hpx::local::detail {
 
         ini_config_.emplace_back("hpx.program_name!=" + cmd_name);
         ini_config_.emplace_back("hpx.reconstructed_cmd_line!=" +
-            encode_and_enquote(cmd_name) + " " + reconstruct_command_line(vm_) +
-            " " + unregistered_options_cmd_line);
+            std::string(" ") + reconstruct_command_line(argc, argv));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1014,7 +1013,7 @@ namespace hpx::local::detail {
     {
         // store unregistered command line and arguments
         store_command_line(argc, argv);
-        store_unregistered_options(argv[0], unregistered_options);
+        store_unregistered_options(argv[0], argc, argv, unregistered_options);
 
         // add all remaining ini settings to the global configuration
         rtcfg_.reconfigure(ini_config_);

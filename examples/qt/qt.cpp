@@ -1,4 +1,4 @@
-//  Copyright (c) 2012-2014 Thomas Heller
+//  Copyright (c) 2012-2024 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -59,7 +59,8 @@ int hpx_main(int argc, char* argv[])
 {
     {
         // Get a reference to one of the main thread
-        hpx::parallel::execution::main_pool_executor scheduler;
+        hpx::execution::experimental::main_pool_executor scheduler;
+
         // run an async function on the main thread to start the Qt application
         hpx::future<void> qt_application =
             hpx::async(scheduler, qt_main, argc, argv);

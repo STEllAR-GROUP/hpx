@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2023 Hartmut Kaiser
+# Copyright (c) 2007-2025 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2018 Nikunj Gupta
 #
@@ -16,7 +16,7 @@ set(hpx_wrap_SOURCES
     ""
     CACHE INTERNAL "Sources for libhpx_wrap." FORCE
 )
-list(APPEND hpx_wrap_SOURCES hpx_wrap.cpp)
+list(APPEND hpx_wrap_SOURCES hpx_wrap.cpp hpx_main.cpp)
 
 # make source groups
 set(hpx_wrap_SOURCE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src)

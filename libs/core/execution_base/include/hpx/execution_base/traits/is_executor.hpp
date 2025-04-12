@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,11 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <type_traits>
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     namespace detail {
 
@@ -94,14 +95,14 @@ namespace hpx::parallel::execution {
       : detail::is_scheduler_executor<std::decay_t<T>>
     {
     };
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental
 
 namespace hpx::traits {
 
     // Concurrency TS V2: executor framework
     template <typename T, typename Enable = void>
     struct is_one_way_executor
-      : parallel::execution::is_one_way_executor<std::decay_t<T>>
+      : execution::experimental::is_one_way_executor<std::decay_t<T>>
     {
     };
 
@@ -110,7 +111,8 @@ namespace hpx::traits {
 
     template <typename T, typename Enable = void>
     struct is_never_blocking_one_way_executor
-      : parallel::execution::is_never_blocking_one_way_executor<std::decay_t<T>>
+      : execution::experimental::is_never_blocking_one_way_executor<
+            std::decay_t<T>>
     {
     };
 
@@ -120,7 +122,7 @@ namespace hpx::traits {
 
     template <typename T, typename Enable = void>
     struct is_bulk_one_way_executor
-      : parallel::execution::is_bulk_one_way_executor<std::decay_t<T>>
+      : execution::experimental::is_bulk_one_way_executor<std::decay_t<T>>
     {
     };
 
@@ -130,7 +132,7 @@ namespace hpx::traits {
 
     template <typename T, typename Enable = void>
     struct is_two_way_executor
-      : parallel::execution::is_two_way_executor<std::decay_t<T>>
+      : execution::experimental::is_two_way_executor<std::decay_t<T>>
     {
     };
 
@@ -139,7 +141,7 @@ namespace hpx::traits {
 
     template <typename T, typename Enable = void>
     struct is_bulk_two_way_executor
-      : parallel::execution::is_bulk_two_way_executor<std::decay_t<T>>
+      : execution::experimental::is_bulk_two_way_executor<std::decay_t<T>>
     {
     };
 
@@ -163,7 +165,8 @@ namespace hpx::traits {
     // is_scheduler_executor evaluates to true for executors that return senders
     // from their scheduling functions
     template <typename T, typename Enable = void>
-    struct is_scheduler_executor : parallel::execution::is_scheduler_executor<T>
+    struct is_scheduler_executor
+      : execution::experimental::is_scheduler_executor<T>
     {
     };
 
@@ -171,3 +174,23 @@ namespace hpx::traits {
     inline constexpr bool is_scheduler_executor_v =
         is_scheduler_executor<T>::value;
 }    // namespace hpx::traits
+
+// backwards compatibility layer
+namespace hpx::parallel::execution {
+
+#define HPX_IS_EXECUTOR_DEPRECATED(name)                                       \
+    template <typename T, typename Enable = void>                              \
+    using name HPX_DEPRECATED_V(1, 11,                                         \
+        "hpx::parallel::execution::" HPX_PP_STRINGIZE(                         \
+            name) " is deprecated, use "                                       \
+                  "hpx::execution::experimental::" HPX_PP_STRINGIZE(           \
+                      name) " instead") =                                      \
+        hpx::execution::experimental::name<T, Enable> /**/
+
+    HPX_IS_EXECUTOR_DEPRECATED(is_one_way_executor);
+    HPX_IS_EXECUTOR_DEPRECATED(is_never_blocking_one_way_executor);
+    HPX_IS_EXECUTOR_DEPRECATED(is_bulk_one_way_executor);
+    HPX_IS_EXECUTOR_DEPRECATED(is_two_way_executor);
+    HPX_IS_EXECUTOR_DEPRECATED(is_bulk_two_way_executor);
+    HPX_IS_EXECUTOR_DEPRECATED(is_scheduler_executor);
+}    // namespace hpx::parallel::execution

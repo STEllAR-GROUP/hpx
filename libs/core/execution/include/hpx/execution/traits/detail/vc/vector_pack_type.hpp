@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //  Copyright (c) 2016 Matthias Kretz
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -74,7 +74,7 @@ namespace hpx::parallel::traits {
     ////////////////////////////////////////////////////////////////////
     template <typename T>
     struct vector_pack_mask_type<T,
-        typename std::enable_if_t<Vc::Traits::is_simd_vector<T>::value>>
+        std::enable_if_t<Vc::Traits::is_simd_vector<T>::value>>
     {
         using type = typename T::mask_type;
     };

@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,8 +29,13 @@ namespace hpx::components {
             constexpr base_component() = default;
             HPX_EXPORT ~base_component();
 
-            base_component(base_component const&) = default;
-            base_component& operator=(base_component const&) = default;
+            // do not copy the gid_
+            base_component(base_component const&) noexcept {}
+            base_component& operator=(base_component const&) noexcept
+            {
+                gid_ = naming::gid_type();
+                return *this;
+            }
 
             // just move our gid_
             base_component(base_component&& rhs) noexcept = default;

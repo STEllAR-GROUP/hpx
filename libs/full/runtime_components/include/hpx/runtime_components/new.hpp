@@ -282,7 +282,7 @@ namespace hpx::components {
             static type call(
                 hpx::id_type const& locality, std::size_t count, Ts&&... vs)
             {
-                return components::bulk_create_async<Component>(
+                return components::bulk_create_async<false, Component>(
                     locality, count, HPX_FORWARD(Ts, vs)...);
             }
 
@@ -294,7 +294,7 @@ namespace hpx::components {
                     typename DistPolicy::bulk_locality_result;
 
                 hpx::future<std::vector<bulk_locality_result>> f =
-                    policy.template bulk_create<Component>(
+                    policy.template bulk_create<false, Component>(
                         count, HPX_FORWARD(Ts, vs)...);
 
                 return f.then(launch::sync,

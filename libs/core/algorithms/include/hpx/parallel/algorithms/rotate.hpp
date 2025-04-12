@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2021-2022 Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -225,9 +225,9 @@ namespace hpx::parallel {
 
             // get number of cores currently used
             std::size_t const cores =
-                parallel::execution::processing_units_count(policy.parameters(),
-                    policy.executor(), hpx::chrono::null_duration,
-                    size_left + size_right);
+                hpx::execution::experimental::processing_units_count(
+                    policy.parameters(), policy.executor(),
+                    hpx::chrono::null_duration, size_left + size_right);
 
             // get currently used first core
             std::size_t first_core =
@@ -257,11 +257,13 @@ namespace hpx::parallel {
             auto p = policy(hpx::execution::task);
 
             auto left_policy =
-                execution::with_processing_units_count(p, cores_left);
-            auto right_policy = execution::with_processing_units_count(
-                hpx::execution::experimental::with_first_core(
-                    p, cores == 1 ? first_core : first_core + cores_left),
-                cores_right);
+                hpx::execution::experimental::with_processing_units_count(
+                    p, cores_left);
+            auto right_policy =
+                hpx::execution::experimental::with_processing_units_count(
+                    hpx::execution::experimental::with_first_core(
+                        p, cores == 1 ? first_core : first_core + cores_left),
+                    cores_right);
 
             detail::reverse<FwdIter> r;
 

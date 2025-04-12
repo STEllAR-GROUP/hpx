@@ -386,21 +386,16 @@ namespace hpx::execution::experimental {
         fork_join_executor exec_;
         std::vector<fork_join_executor> block_execs_;
     };
-}    // namespace hpx::execution::experimental
-
-namespace hpx::parallel::execution {
 
     /// \cond NOINTERNAL
     template <>
-    struct is_bulk_one_way_executor<
-        hpx::execution::experimental::block_fork_join_executor> : std::true_type
+    struct is_bulk_one_way_executor<block_fork_join_executor> : std::true_type
     {
     };
 
     template <>
-    struct is_bulk_two_way_executor<
-        hpx::execution::experimental::block_fork_join_executor> : std::true_type
+    struct is_bulk_two_way_executor<block_fork_join_executor> : std::true_type
     {
     };
     /// \endcond
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

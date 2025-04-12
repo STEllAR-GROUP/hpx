@@ -14,11 +14,10 @@
 #include <hpx/runtime_components/component_factory.hpp>
 
 #include <hpx/components/containers/partitioned_vector/export_definitions.hpp>
-#include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 
 HPX_DISTRIBUTED_METADATA(hpx::server::partitioned_vector_config_data,
     hpx_server_partitioned_vector_config_data)
 
 HPX_REGISTER_COMPONENT_MODULE()
-

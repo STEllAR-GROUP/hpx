@@ -38,6 +38,7 @@ namespace hpx {
     namespace util {
         struct binary_filter;
     }    // namespace util
+    /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Start all active performance counters, optionally naming the

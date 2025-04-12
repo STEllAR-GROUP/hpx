@@ -88,19 +88,19 @@ namespace hpx::util {
             performance_counters::counter_values_array const& value);
 
         template <typename Stream>
-        static void print_name_csv(Stream& out, std::string const& name);
+        void print_name_csv(Stream& out, std::string const& name);
 
         template <typename Stream>
-        static void print_value_csv(Stream* out,
+        void print_value_csv(Stream* out,
             performance_counters::counter_info const& infos,
             performance_counters::counter_value const& value);
         template <typename Stream>
-        static void print_value_csv(Stream* out,
+        void print_value_csv(Stream* out,
             performance_counters::counter_info const& infos,
             performance_counters::counter_values_array const& value);
 
         template <typename Stream>
-        static void print_name_csv_short(Stream& out, std::string const& name);
+        void print_name_csv_short(Stream& out, std::string const& name);
 
     private:
         using mutex_type = hpx::mutex;

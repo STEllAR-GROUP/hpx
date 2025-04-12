@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  Parts of this code were taken from the Boost.Asio library
@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
 
-    io_service_pool::io_service_pool(std::size_t pool_size,
+    io_service_pool::io_service_pool(std::size_t const pool_size,
         threads::policies::callback_notifier const& notifier,
         char const* pool_name, char const* name_postfix)
       : next_io_service_(0)
@@ -42,7 +42,7 @@ namespace hpx::util {
         init(pool_size);
     }
 
-    void io_service_pool::init(std::size_t pool_size)
+    void io_service_pool::init(std::size_t const pool_size)
     {
         pool_size_ = pool_size;
         if (pool_size_ == 0)
@@ -91,9 +91,9 @@ namespace hpx::util {
     }
 
     void io_service_pool::thread_run(
-        std::size_t index, util::barrier* startup) const
+        std::size_t const index, util::barrier* startup) const
     {
-        // wait for all threads to start up before before starting HPX work
+        // wait for all threads to start up before starting HPX work
         if (startup != nullptr)
             startup->wait();
 
@@ -118,12 +118,12 @@ namespace hpx::util {
         notifier_.on_stop_thread(index, index, pool_name_, pool_name_postfix_);
     }
 
-    bool io_service_pool::run(
-        std::size_t num_threads, bool join_threads, util::barrier* startup)
+    bool io_service_pool::run(std::size_t const num_threads,
+        bool const join_threads, util::barrier* startup)
     {
         std::lock_guard<std::mutex> l(mtx_);
 
-        // Create a pool of threads to run all of the io_services.
+        // Create a pool of threads to run all io_services.
         if (!threads_.empty())    // should be called only once
         {
             HPX_ASSERT(pool_size_ == io_services_.size());
@@ -144,11 +144,11 @@ namespace hpx::util {
         return run_locked(num_threads, join_threads, startup);
     }
 
-    bool io_service_pool::run(bool join_threads, util::barrier* startup)
+    bool io_service_pool::run(bool const join_threads, util::barrier* startup)
     {
         std::lock_guard<std::mutex> l(mtx_);
 
-        // Create a pool of threads to run all of the io_services.
+        // Create a pool of threads to run all io_services.
         if (!threads_.empty())    // should be called only once
         {
             HPX_ASSERT(pool_size_ == io_services_.size());
@@ -169,8 +169,8 @@ namespace hpx::util {
         return run_locked(pool_size_, join_threads, startup);
     }
 
-    bool io_service_pool::run_locked(
-        std::size_t num_threads, bool join_threads, util::barrier* startup)
+    bool io_service_pool::run_locked(std::size_t const num_threads,
+        bool const join_threads, util::barrier* startup)
     {
         if (io_services_.empty())
         {
@@ -289,6 +289,12 @@ namespace hpx::util {
         return stopped_;
     }
 
+    io_service_pool::work_type io_service_pool::initialize_work(
+        asio::io_context& io_service)
+    {
+        return std::make_unique<raw_work_type>(io_service.get_executor());
+    }
+
     asio::io_context& io_service_pool::get_io_service(int index)
     {
         // use this function for single group io_service pools only
@@ -310,7 +316,8 @@ namespace hpx::util {
         return *io_services_[static_cast<std::size_t>(index)];    //-V108
     }
 
-    std::thread& io_service_pool::get_os_thread_handle(std::size_t thread_num)
+    std::thread& io_service_pool::get_os_thread_handle(
+        std::size_t const thread_num)
     {
         HPX_ASSERT(thread_num < pool_size_);
         return threads_[thread_num];

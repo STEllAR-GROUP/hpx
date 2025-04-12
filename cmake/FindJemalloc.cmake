@@ -53,7 +53,7 @@ endif()
 if(Jemalloc_ROOT)
   # The call to file is for compatibility with windows paths
   file(TO_CMAKE_PATH ${Jemalloc_ROOT} Jemalloc_ROOT)
-elseif("$ENV{JEMALLOC_ROOT}")
+elseif(DEFINED ENV{JEMALLOC_ROOT})
   file(TO_CMAKE_PATH $ENV{JEMALLOC_ROOT} Jemalloc_ROOT)
 else()
   file(TO_CMAKE_PATH "${Jemalloc_INCLUDE_DIR}" Jemalloc_INCLUDE_DIR)
@@ -75,7 +75,7 @@ find_library(
 )
 
 # Set Jemalloc_ROOT in case the other hints are used
-if(NOT Jemalloc_ROOT AND "$ENV{JEMALLOC_ROOT}")
+if(NOT Jemalloc_ROOT AND DEFINED ENV{JEMALLOC_ROOT})
   set(Jemalloc_ROOT $ENV{JEMALLOC_ROOT})
 elseif(NOT Jemalloc_ROOT)
   string(REPLACE "/include" "" Jemalloc_ROOT "${Jemalloc_INCLUDE_DIR}")

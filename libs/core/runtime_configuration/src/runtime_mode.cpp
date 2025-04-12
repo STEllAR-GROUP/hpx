@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2012 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2023 Hartmut Kaiser
+//  Copyright (c) 2012-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,7 +28,7 @@ namespace hpx {
 
     char const* get_runtime_mode_name(runtime_mode state) noexcept
     {
-        if (state < runtime_mode::invalid || state >= runtime_mode::last)
+        if (state < runtime_mode::invalid || state > runtime_mode::last)
             return "invalid (value out of bounds)";
         return strings::runtime_mode_names[static_cast<int>(state) + 1];
     }
@@ -36,7 +36,7 @@ namespace hpx {
     runtime_mode get_runtime_mode_from_name(std::string const& mode)
     {
         for (std::size_t i = 0;
-             static_cast<runtime_mode>(i) < runtime_mode::last; ++i)
+             static_cast<runtime_mode>(i) <= runtime_mode::last; ++i)
         {
             if (mode == strings::runtime_mode_names[i])
                 return static_cast<runtime_mode>(i - 1);

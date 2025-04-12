@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -53,7 +53,7 @@ namespace hpx::execution::experimental {
         /// \cond NOINTERNAL
         template <typename Executor>
         friend constexpr std::size_t tag_override_invoke(
-            hpx::parallel::execution::get_chunk_size_t,
+            hpx::execution::experimental::get_chunk_size_t,
             dynamic_chunk_size const& this_, Executor&&,
             hpx::chrono::steady_duration const&, std::size_t,
             std::size_t) noexcept
@@ -80,15 +80,15 @@ namespace hpx::execution::experimental {
         std::size_t chunk_size_ = 1;
         /// \endcond
     };
-}    // namespace hpx::execution::experimental
 
-/// \cond NOINTERNAL
-template <>
-struct hpx::parallel::execution::is_executor_parameters<
-    hpx::execution::experimental::dynamic_chunk_size> : std::true_type
-{
-};
-/// \endcond
+    /// \cond NOINTERNAL
+    template <>
+    struct is_executor_parameters<
+        hpx::execution::experimental::dynamic_chunk_size> : std::true_type
+    {
+    };
+    /// \endcond
+}    // namespace hpx::execution::experimental
 
 namespace hpx::execution {
 

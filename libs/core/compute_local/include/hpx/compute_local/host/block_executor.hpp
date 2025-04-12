@@ -35,7 +35,7 @@ namespace hpx::compute::host {
     ///
     /// \tparam Executor The underlying executor to use
     template <typename Executor =
-                  hpx::parallel::execution::restricted_thread_pool_executor>
+                  hpx::execution::experimental::restricted_thread_pool_executor>
     struct block_executor
     {
     public:
@@ -301,7 +301,7 @@ namespace hpx::compute::host {
     };
 }    // namespace hpx::compute::host
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     template <typename Executor>
     struct executor_execution_category<compute::host::block_executor<Executor>>
@@ -332,4 +332,4 @@ namespace hpx::parallel::execution {
       : std::true_type
     {
     };
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

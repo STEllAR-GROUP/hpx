@@ -41,6 +41,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     disable_stealing = vm.count("disable_stealing");
     fast_idle_mode = vm.count("fast_idle_mode");
 
+    hpx::util::perftests_init(vm);
+
     // verify that input is within domain of program
     if (test_count == 0 || test_count < 0)
     {
@@ -122,6 +124,7 @@ int main(int argc, char* argv[])
         ;
     // clang-format on
 
+    hpx::util::perftests_cfg(cmdline);
     hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
     init_args.cfg = {"hpx.os_threads=all"};

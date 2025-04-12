@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2023 Hartmut Kaiser
+//  Copyright (c) 2014-2024 Hartmut Kaiser
 //  Copyright (c) 2016 Marcin Copik
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,7 +19,7 @@ namespace hpx::traits {
     struct is_executor_parameters;
 }    // namespace hpx::traits
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // Default sequential executor parameters
@@ -137,14 +137,15 @@ namespace hpx::parallel::execution {
     template <typename T>
     inline constexpr bool is_executor_parameters_v =
         is_executor_parameters<T>::value;
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental
 
 namespace hpx::traits {
 
     // new executor framework
     template <typename Parameters, typename Enable>
     struct is_executor_parameters
-      : parallel::execution::is_executor_parameters<std::decay_t<Parameters>>
+      : hpx::execution::experimental::is_executor_parameters<
+            std::decay_t<Parameters>>
     {
     };
 

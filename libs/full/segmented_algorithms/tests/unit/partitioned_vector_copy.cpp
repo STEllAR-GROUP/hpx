@@ -166,6 +166,6 @@ int main()
     copy_tests<double>();
     copy_tests<int>();
 
-    return 0;
+    return hpx::util::report_errors();
 }
 #endif

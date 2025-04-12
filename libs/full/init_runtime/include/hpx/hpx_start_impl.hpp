@@ -1,5 +1,5 @@
 //  Copyright (c)      2018 Mikael Simberg
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -48,6 +48,7 @@ namespace hpx_startup {
 }
 
 namespace hpx {
+
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is the main, non-blocking entry point for any HPX application.
@@ -91,8 +92,15 @@ namespace hpx {
     /// with the runtime system's execution.
     inline bool start(int argc, char** argv, init_params const& params)
     {
+#if defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
+        init_params pars = params;
+        pars.cfg.insert(pars.cfg.begin(), "hpx.run_hpx_main!=1");
+        return detail::start_impl(hpx_startup::get_main_func(), argc, argv,
+            pars, HPX_PREFIX, environ);
+#else
         return detail::start_impl(hpx_startup::get_main_func(), argc, argv,
             params, HPX_PREFIX, environ);
+#endif
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -121,8 +129,16 @@ namespace hpx {
     /// with the runtime system's execution.
     inline bool start(init_params const& params)
     {
+#if defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
+        init_params pars = params;
+        pars.cfg.insert(pars.cfg.begin(), "hpx.run_hpx_main!=1");
+        return detail::start_impl(hpx_startup::get_main_func(),
+            hpx::local::detail::dummy_argc, hpx::local::detail::dummy_argv,
+            pars, HPX_PREFIX, environ);
+#else
         return detail::start_impl(hpx_startup::get_main_func(),
             hpx::local::detail::dummy_argc, hpx::local::detail::dummy_argv,
             params, HPX_PREFIX, environ);
+#endif
     }
 }    // namespace hpx

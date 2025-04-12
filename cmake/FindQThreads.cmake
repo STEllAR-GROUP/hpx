@@ -36,7 +36,7 @@ find_library(
 if(Qthreads_ROOT)
   # The call to file is for compatibility with windows paths
   file(TO_CMAKE_PATH ${Qthreads_ROOT} Qthreads_ROOT)
-elseif("$ENV{QTHREADS_ROOT}")
+elseif(DEFINED ENV{QTHREADS_ROOT})
   file(TO_CMAKE_PATH $ENV{QTHREADS_ROOT} Qthreads_ROOT)
 else()
   file(TO_CMAKE_PATH "${Qthreads_INCLUDE_DIR}" Qthreads_INCLUDE_DIR)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2023 Hartmut Kaiser
+//  Copyright (c) 2015-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -165,21 +165,21 @@ struct timer_hooks_parameters
 
     template <typename Executor>
     friend void tag_override_invoke(
-        hpx::parallel::execution::mark_begin_execution_t,
+        hpx::execution::experimental::mark_begin_execution_t,
         timer_hooks_parameters const&, Executor&&)
     {
     }
 
     template <typename Executor>
     friend void tag_override_invoke(
-        hpx::parallel::execution::mark_end_of_scheduling_t,
+        hpx::execution::experimental::mark_end_of_scheduling_t,
         timer_hooks_parameters const&, Executor&&)
     {
     }
 
     template <typename Executor>
     friend void tag_override_invoke(
-        hpx::parallel::execution::mark_end_execution_t,
+        hpx::execution::experimental::mark_end_execution_t,
         timer_hooks_parameters const&, Executor&&)
     {
     }
@@ -188,8 +188,8 @@ struct timer_hooks_parameters
 };
 
 template <>
-struct hpx::parallel::execution::is_executor_parameters<timer_hooks_parameters>
-  : std::true_type
+struct hpx::execution::experimental::is_executor_parameters<
+    timer_hooks_parameters> : std::true_type
 {
 };
 

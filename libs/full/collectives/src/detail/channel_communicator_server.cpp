@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2021 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,7 +25,7 @@ using channel_communicator_component = hpx::components::component<
 HPX_REGISTER_COMPONENT(channel_communicator_component)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace collectives { namespace detail {
+namespace hpx::collectives::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     channel_communicator::channel_communicator(char const* basename,
@@ -36,6 +36,17 @@ namespace hpx { namespace collectives { namespace detail {
         // replace reference to our own client (manages base-name registration)
         clients_[this_site] = HPX_MOVE(here);
     }
-}}}    // namespace hpx::collectives::detail
+
+    channel_communicator::channel_communicator(hpx::launch::sync_policy policy,
+        char const* basename, std::size_t num_sites, std::size_t this_site,
+        client_type here)
+      : this_site_(this_site)
+      , clients_(
+            find_all_from_basename<client_type>(policy, basename, num_sites))
+    {
+        // replace reference to our own client (manages base-name registration)
+        clients_[this_site] = HPX_MOVE(here);
+    }
+}    // namespace hpx::collectives::detail
 
 #endif    // !HPX_COMPUTE_DEVICE_CODE

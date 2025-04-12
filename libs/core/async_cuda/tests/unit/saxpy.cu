@@ -28,6 +28,6 @@ void launch_saxpy_kernel(hpx::cuda::experimental::cuda_executor& cudaexec,
 #else
     auto launch_kernel = cudaLaunchKernel<void>;
 #endif
-    hpx::post(cudaexec, launch_kernel, reinterpret_cast<const void*>(&saxpy),
+    hpx::post(cudaexec, launch_kernel, reinterpret_cast<void*>(&saxpy),
         dim3(blocks), dim3(threads), args, std::size_t(0));
 }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -584,7 +584,6 @@ namespace hpx::util {
             {
                 rtcfg_.mode_ = hpx::runtime_mode::worker;
 
-#if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
                 // do not execute any explicit hpx_main except if asked
                 // otherwise
                 if (!vm.count("hpx:run-hpx-main") &&
@@ -592,7 +591,6 @@ namespace hpx::util {
                 {
                     util::detail::reset_function(hpx_main_f_);
                 }
-#endif
             }
             else if (vm.count("hpx:connect"))
             {
@@ -628,7 +626,6 @@ namespace hpx::util {
                     hpx::util::from_string<std::uint16_t>(rtcfg_.get_entry(
                         "hpx.parcel.port", HPX_CONNECTING_IP_PORT)));
 
-#if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
                 // do not execute any explicit hpx_main except if asked
                 // otherwise
                 if (!vm.count("hpx:run-hpx-main") &&
@@ -636,7 +633,6 @@ namespace hpx::util {
                 {
                     util::detail::reset_function(hpx_main_f_);
                 }
-#endif
             }
             else if (node != static_cast<std::size_t>(-1) ||
                 vm.count("hpx:node"))
@@ -667,11 +663,10 @@ namespace hpx::util {
                         if (hpx_port == 0 && node != 0)
                             hpx_port = HPX_INITIAL_IP_PORT;
 
-                        // each node gets an unique port
+                        // each node gets a unique port
                         hpx_port = static_cast<std::uint16_t>(hpx_port + node);
                         rtcfg_.mode_ = hpx::runtime_mode::worker;
 
-#if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
                         // do not execute any explicit hpx_main except if asked
                         // otherwise
                         if (!vm.count("hpx:run-hpx-main") &&
@@ -679,7 +674,6 @@ namespace hpx::util {
                         {
                             util::detail::reset_function(hpx_main_f_);
                         }
-#endif
                     }
                 }
 
@@ -778,7 +772,6 @@ namespace hpx::util {
                 // should not run the AGAS server we assume to be in worker mode
                 rtcfg_.mode_ = hpx::runtime_mode::worker;
 
-#if !defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
                 // do not execute any explicit hpx_main except if asked
                 // otherwise
                 if (!vm.count("hpx:run-hpx-main") &&
@@ -786,7 +779,6 @@ namespace hpx::util {
                 {
                     util::detail::reset_function(hpx_main_f_);
                 }
-#endif
             }
 
             // write HPX and AGAS network parameters to the proper ini-file
@@ -1051,7 +1043,7 @@ namespace hpx::util {
             reg->init(&argc, &argv, rtcfg_);
         }
 
-        // Now re-parse the command line using the node number (if given). This
+        // Now reparse the command line using the node number (if given). This
         // will additionally detect any --hpx:N:foo options.
         hpx::program_options::options_description help;
         std::vector<std::string> unregistered_options;

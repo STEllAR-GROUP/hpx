@@ -625,8 +625,7 @@ namespace hpx::this_thread {
         std::ptrdiff_t const remaining_stack = get_available_stack_space();
         if (remaining_stack < 0)
         {
-            HPX_THROW_EXCEPTION(hpx::error::out_of_memory,
-                "has_sufficient_stack_space", "Stack overflow");
+            HPX_THROW_BAD_ALLOC("has_sufficient_stack_space");
         }
         bool const sufficient_stack_space =
             static_cast<std::size_t>(remaining_stack) >= space_needed;

@@ -12,6 +12,7 @@ tests.unit.modules.algorithms.algorithms.partition
 tests.unit.modules.algorithms.algorithms.partition_copy
 tests.unit.modules.algorithms.algorithms.reduce_
 tests.unit.modules.algorithms.algorithms.reduce_by_key
+tests.unit.modules.algorithms.algorithms.reduce_deterministic
 tests.unit.modules.algorithms.algorithms.remove
 tests.unit.modules.algorithms.algorithms.remove1
 tests.unit.modules.algorithms.algorithms.remove2

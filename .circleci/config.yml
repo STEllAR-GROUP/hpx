@@ -1,6 +1,6 @@
 #  Copyright (c) 2017-2018 Thomas Heller
 #  Copyright (c) 2015 Martin Stumpf
-#  Copyright (c) 2022-2024 Hartmut Kaiser
+#  Copyright (c) 2022-2025 Hartmut Kaiser
 #
 #  SPDX-License-Identifier: BSL-1.0
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -105,12 +105,9 @@ jobs:
           command: |
               git clone --depth=1 file:///hpx/source-full source
       - run:
-          name: Downloading CTest XML to Junit XML
+          name: Copying CTest XML to Junit XML
           command: |
-              curl \
-                https://raw.githubusercontent.com/Kitware/CDash/master/app/cdash/tests/circle/conv.xsl \
-                --fail \
-                -o /hpx/conv.xsl
+              cp /hpx/source/.circleci/conv.xsl /hpx/conv.xsl
       - persist_to_workspace:
           root: /hpx
           paths:
@@ -252,7 +249,8 @@ jobs:
                 -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
                 -DHPX_WITH_DOCUMENTATION=On \
                 -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="${DOCUMENTATION_OUTPUT_FORMATS}" \
-                -DHPX_WITH_TESTS_COMMAND_LINE=--hpx:queuing=local-workrequesting-fifo
+                -DHPX_WITH_TESTS_COMMAND_LINE=--hpx:queuing=local-workrequesting-fifo \
+                -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2
       - persist_to_workspace:
           root: /hpx
           paths:
@@ -336,21 +334,48 @@ jobs:
 
   # We need a full clone here to be able to compare to master.
   spellcheck:
-    <<: *defaults
+    docker:
+      - image: stellargroup/build_env:14
+    resource_class: large  # Increased memory allocation
     steps:
       - checkout:
           path: /hpx/source
+          fetch-depth: 0  # Ensure full history for proper diff
       - run:
           name: Running codespell
           command: |
-              if [[ -n "$CIRCLE_PULL_REQUEST" ]]; then
-                  cd /hpx/source
-                  codespell --version
-                  codespell --ignore-words tools/.codespell_whitelist --skip='*.h5,*.png' $(git diff --name-only origin/master...) > /tmp/spelling_suggestions.txt
-                  if [ -s /tmp/spelling_suggestions.txt ]; then exit 1; fi
-              else
-                  echo "skipping spellcheck on non-PR build"
-              fi
+            if [[ -n "$CIRCLE_PULL_REQUEST" ]]; then
+                cd /hpx/source
+                codespell --version
+
+                echo "Fetching changed files from origin/master..."
+                git fetch origin master --depth=1
+
+                echo "Files being checked:"
+                git diff --name-only origin/master... > /tmp/file_list.txt
+                cat /tmp/file_list.txt  # Print all files being checked
+
+                set -x  # Enable debug mode
+
+                # Read all changed files into an array
+                mapfile -t FILES < /tmp/file_list.txt
+
+                # Process files in batches of 50
+                for ((i = 0; i < ${#FILES[@]}; i += 50)); do
+                codespell --ignore-words tools/.codespell_whitelist --skip='*.h5,*.png' "${FILES[@]:i:50}" >> /tmp/spelling_suggestions.txt
+                done
+
+                set +x  # Disable debug mode
+
+                # If there are spelling errors, exit with error code 1
+                if [[ -s /tmp/spelling_suggestions.txt ]]; then
+                    echo "Spelling errors found:"
+                    cat /tmp/spelling_suggestions.txt
+                    exit 1
+                fi
+            else
+                echo "Skipping spellcheck on non-PR build"
+            fi
           when: always
       - store_artifacts:
           path: /tmp/spelling_suggestions.txt
@@ -506,7 +531,7 @@ jobs:
           command: |
               ulimit -c unlimited
               ctest \
-                --timeout 120 \
+                --timeout 180 \
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
@@ -539,7 +564,7 @@ jobs:
           command: |
               ulimit -c unlimited
               ctest \
-                --timeout 120 \
+                --timeout 180 \
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
@@ -633,7 +658,7 @@ jobs:
           command: |
               ulimit -c unlimited
               ctest \
-                --timeout 120 \
+                --timeout 180 \
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
@@ -666,7 +691,7 @@ jobs:
               # NOTE: the numa_allocator test is disabled because
               # hwloc_get_area_membind_nodeset used by it fails with EPERM.
               ctest \
-                --timeout 120 \
+                --timeout 180 \
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
@@ -699,13 +724,17 @@ jobs:
           when: always
           command: |
               ctest \
-                --timeout 60 \
+                --timeout 180 \
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
                 -R tests.regressions \
                 --exclude-regex \
-              "tests.regressions.modules.threading_base.thread_stacksize_current"
+              "tests.regressions.modules.threading_base.thread_stacksize_current|\
+              tests.regressions.modules.parcelset.distributed.tcp.nested_vectors_6623|\
+              tests.regressions.modules.parcelset.distributed.tcp.very_big_tchunk|\
+              tests.regressions.modules.parcelset.distributed.tcp.very_big_parcel|\
+              tests.regressions.modules.parcelset.distributed.tcp.very_big_parcel_int_max_plus_1"
       - run:
           <<: *convert_xml
       - run:

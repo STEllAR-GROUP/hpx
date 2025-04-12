@@ -23,14 +23,14 @@ namespace hpx::parallel::traits {
     struct vector_pack_load
     {
         template <typename Iter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static V aligned(Iter const& iter)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static V aligned(Iter& iter)
         {
             return V(
                 eve::as_aligned(std::addressof(*iter), eve::cardinal_t<V>{}));
         }
 
         template <typename Iter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static V unaligned(Iter const& iter)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static V unaligned(Iter& iter)
         {
             return *iter;
         }
@@ -42,7 +42,7 @@ namespace hpx::parallel::traits {
     {
         template <typename Iter>
         HPX_HOST_DEVICE HPX_FORCEINLINE static void aligned(
-            V& value, Iter const& iter)
+            V& value, Iter& iter)
         {
             eve::store(value,
                 eve::as_aligned(std::addressof(*iter), eve::cardinal_t<V>{}));
@@ -50,10 +50,9 @@ namespace hpx::parallel::traits {
 
         template <typename Iter>
         HPX_HOST_DEVICE HPX_FORCEINLINE static void unaligned(
-            V& value, Iter const& iter)
+            V& value, Iter& iter)
         {
             *iter = value;
-            return;
         }
     };
 }    // namespace hpx::parallel::traits

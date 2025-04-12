@@ -1,4 +1,5 @@
 //  Copyright (c) 2017-2018 John Biddiscombe
+//  Copyright (c) 2020-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -312,7 +313,7 @@ namespace hpx::execution::experimental {
     };
 }    // namespace hpx::execution::experimental
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     // --------------------------------------------------------------------
     // simple forwarding implementations of executor traits
@@ -358,6 +359,6 @@ namespace hpx::parallel::execution {
       : is_scheduler_executor<std::decay_t<BaseExecutor>>
     {
     };
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 Srinivas Yadav
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,14 +25,14 @@ namespace hpx::parallel::traits {
     struct vector_pack_load
     {
         template <typename Iter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static V aligned(Iter const& iter)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static V aligned(Iter& iter)
         {
             return V(
                 std::addressof(*iter), datapar::experimental::vector_aligned);
         }
 
         template <typename Iter>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static V unaligned(Iter const& iter)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static V unaligned(Iter& iter)
         {
             return *iter;
         }
@@ -44,7 +44,7 @@ namespace hpx::parallel::traits {
     {
         template <typename Iter>
         HPX_HOST_DEVICE HPX_FORCEINLINE static void aligned(
-            V& value, Iter const& iter)
+            V& value, Iter& iter)
         {
             value.copy_to(
                 std::addressof(*iter), datapar::experimental::vector_aligned);
@@ -52,7 +52,7 @@ namespace hpx::parallel::traits {
 
         template <typename Iter>
         HPX_HOST_DEVICE HPX_FORCEINLINE static void unaligned(
-            V& value, Iter const& iter)
+            V& value, Iter& iter)
         {
             *iter = value;
         }

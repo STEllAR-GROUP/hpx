@@ -226,7 +226,7 @@ namespace hpx::resiliency::experimental {
     }
 }    // namespace hpx::resiliency::experimental
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     template <typename BaseExecutor, typename Validator>
     struct is_two_way_executor<
@@ -241,4 +241,4 @@ namespace hpx::parallel::execution {
       : std::true_type
     {
     };
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

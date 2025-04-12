@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Daniel Bourgeois
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -57,7 +57,8 @@ struct void_parallel_executor : hpx::execution::parallel_executor
     }
 };
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
+
     template <>
     struct is_bulk_one_way_executor<void_parallel_executor> : std::true_type
     {
@@ -67,7 +68,7 @@ namespace hpx::parallel::execution {
     struct is_bulk_two_way_executor<void_parallel_executor> : std::true_type
     {
     };
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental
 
 ////////////////////////////////////////////////////////////////////////////////
 // Tests to void_parallel_executor behavior for the bulk executes

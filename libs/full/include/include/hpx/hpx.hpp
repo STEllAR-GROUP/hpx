@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 #include <hpx/algorithm.hpp>
 #include <hpx/any.hpp>
 #include <hpx/chrono.hpp>
+#include <hpx/collectives.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/functional.hpp>
 #include <hpx/future.hpp>

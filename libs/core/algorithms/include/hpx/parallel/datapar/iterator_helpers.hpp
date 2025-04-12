@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/assert.hpp>
 #include <hpx/execution/traits/vector_pack_alignment_size.hpp>
+#include <hpx/execution/traits/vector_pack_get_set.hpp>
 #include <hpx/execution/traits/vector_pack_load_store.hpp>
 #include <hpx/execution/traits/vector_pack_type.hpp>
 #include <hpx/functional/detail/invoke.hpp>
@@ -30,9 +31,10 @@ namespace hpx::parallel::util::detail {
     template <typename Iter>
     struct is_data_aligned_impl
     {
-        static HPX_FORCEINLINE bool call(Iter const& it) noexcept
+        static HPX_FORCEINLINE bool call(Iter& it) noexcept
         {
-            using value_type = typename std::iterator_traits<Iter>::value_type;
+            using value_type = typename std::iterator_traits<
+                std::remove_const_t<Iter>>::value_type;
             using pack_type = traits::vector_pack_type_t<value_type>;
 
             return (reinterpret_cast<std::uintptr_t>(std::addressof(*it)) &
@@ -42,7 +44,7 @@ namespace hpx::parallel::util::detail {
     };
 
     template <typename Iter>
-    HPX_FORCEINLINE bool is_data_aligned(Iter const& it) noexcept
+    HPX_FORCEINLINE bool is_data_aligned(Iter& it) noexcept
     {
         return is_data_aligned_impl<Iter>::call(it);
     }
@@ -129,6 +131,31 @@ namespace hpx::parallel::util::detail {
             HPX_INVOKE(f, &tmp);
             traits::vector_pack_store<V, value_type>::aligned(tmp, it);
             std::advance(it, traits::vector_pack_size_v<V>);
+        }
+    };
+
+    template <typename I>
+    struct datapar_loop_step<I, std::enable_if_t<std::is_integral_v<I>>>
+    {
+        using V1 = traits::vector_pack_type_t<I, 1>;
+        using V = traits::vector_pack_type_t<I>;
+
+        template <typename F>
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr void call1(F&& f, I& i)
+        {
+            V1 tmp(i);
+            HPX_INVOKE(f, tmp);
+            ++i;
+        }
+
+        template <typename F>
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr void callv(F&& f, I& i)
+        {
+            V tmp;
+            for (std::size_t e = 0; e != traits::size(tmp); ++e)
+                traits::set(tmp, e, static_cast<I>(i + e));
+            HPX_INVOKE(f, tmp);
+            i += traits::vector_pack_size_v<V>;
         }
     };
 

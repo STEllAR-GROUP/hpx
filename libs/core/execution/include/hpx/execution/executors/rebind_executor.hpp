@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +14,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -95,4 +95,4 @@ namespace hpx::parallel::execution {
                 HPX_FORWARD(Parameters, parameters));
         }
     } create_rebound_policy{};
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

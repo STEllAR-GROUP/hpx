@@ -109,6 +109,7 @@ namespace hpx::parallel::execution {
                     HPX_FORWARD(Ts, ts)...);
             }
 
+            // clang-format off
             template <typename Executor, typename F, typename... Ts,
                 typename Enable =
                     std::enable_if_t<!hpx::functional::is_tag_invocable_v<
@@ -122,7 +123,8 @@ namespace hpx::parallel::execution {
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.sync_execute_at(abs_time,
-                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+            // clang-format on
             {
                 return exec.sync_execute_at(
                     abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -159,6 +161,7 @@ namespace hpx::parallel::execution {
                     HPX_FORWARD(Ts, ts)...);
             }
 
+            // clang-format off
             template <typename Executor, typename F, typename... Ts,
                 typename Enable =
                     std::enable_if_t<!hpx::functional::is_tag_invocable_v<
@@ -172,7 +175,8 @@ namespace hpx::parallel::execution {
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.sync_execute_at(abs_time,
-                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+            // clang-format on
             {
                 return exec.sync_execute_at(
                     abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -242,6 +246,7 @@ namespace hpx::parallel::execution {
                     HPX_FORWARD(Ts, ts)...);
             }
 
+            // clang-format off
             template <typename Executor, typename F, typename... Ts,
                 typename Enable =
                     std::enable_if_t<!hpx::functional::is_tag_invocable_v<
@@ -256,7 +261,8 @@ namespace hpx::parallel::execution {
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.async_execute_at(abs_time,
-                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+            // clang-format on
             {
                 return exec.async_execute_at(
                     abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -298,6 +304,7 @@ namespace hpx::parallel::execution {
                     HPX_FORWARD(Ts, ts)...);
             }
 
+            // clang-format off
             template <typename Executor, typename F, typename... Ts,
                 typename Enable =
                     std::enable_if_t<!hpx::functional::is_tag_invocable_v<
@@ -312,7 +319,8 @@ namespace hpx::parallel::execution {
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.async_execute_at(abs_time,
-                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+            // clang-format on
             {
                 return exec.async_execute_at(
                     abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -373,6 +381,7 @@ namespace hpx::parallel::execution {
                     HPX_FORWARD(Ts, ts)...);
             }
 
+            // clang-format off
             template <typename Executor, typename F, typename... Ts,
                 typename Enable =
                     std::enable_if_t<!hpx::functional::is_tag_invocable_v<
@@ -386,7 +395,8 @@ namespace hpx::parallel::execution {
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.post_at(abs_time,
-                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+            // clang-format on
             {
                 return exec.post_at(
                     abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -420,6 +430,7 @@ namespace hpx::parallel::execution {
                     abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
+            // clang-format off
             template <typename Executor, typename F, typename... Ts,
                 typename Enable =
                     std::enable_if_t<!hpx::functional::is_tag_invocable_v<
@@ -433,7 +444,8 @@ namespace hpx::parallel::execution {
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.post_at(abs_time,
-                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+            // clang-format on
             {
                 return exec.post_at(
                     abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -581,7 +593,7 @@ namespace hpx::parallel::execution {
         timed_executor<hpx::execution::parallel_executor>;
 }    // namespace hpx::parallel::execution
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
@@ -619,4 +631,4 @@ namespace hpx::parallel::execution {
     {
     };
     /// \endcond
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

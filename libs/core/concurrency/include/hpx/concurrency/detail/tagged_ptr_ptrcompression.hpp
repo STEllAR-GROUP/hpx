@@ -67,7 +67,7 @@ namespace hpx::lockfree::detail {
 
         static constexpr compressed_ptr_t pack_ptr(T* ptr, tag_t tag) noexcept
         {
-            cast_unit ret(hpx::bit_cast<compressed_ptr_t>(ptr), tag);
+            cast_unit ret(hpx::bit_cast<std::size_t>(ptr), tag);
             return ret.value;
         }
 

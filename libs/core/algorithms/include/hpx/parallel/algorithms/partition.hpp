@@ -670,19 +670,19 @@ namespace hpx::parallel {
                     }
                     else
                     {
-                        std::size_t const cores =
-                            execution::processing_units_count(
-                                policy.parameters(), policy.executor(),
-                                hpx::chrono::null_duration, size);
-
-                        std::size_t chunk_size = execution::get_chunk_size(
-                            policy.parameters(), policy.executor(),
-                            hpx::chrono::null_duration, cores, size);
-
-                        std::size_t max_chunks =
-                            execution::maximal_number_of_chunks(
-                                policy.parameters(), policy.executor(), cores,
+                        std::size_t const cores = hpx::execution::experimental::
+                            processing_units_count(policy.parameters(),
+                                policy.executor(), hpx::chrono::null_duration,
                                 size);
+
+                        std::size_t chunk_size =
+                            hpx::execution::experimental::get_chunk_size(
+                                policy.parameters(), policy.executor(),
+                                hpx::chrono::null_duration, cores, size);
+
+                        std::size_t max_chunks = hpx::execution::experimental::
+                            maximal_number_of_chunks(policy.parameters(),
+                                policy.executor(), cores, size);
 
                         util::detail::adjust_chunk_size_and_max_chunks(
                             cores, size, chunk_size, max_chunks);
@@ -1341,9 +1341,10 @@ namespace hpx::parallel {
                 if (first == last)
                     return first;
 
-                std::size_t const cores = execution::processing_units_count(
-                    policy.parameters(), policy.executor(),
-                    hpx::chrono::null_duration, std::distance(first, last));
+                std::size_t const cores =
+                    hpx::execution::experimental::processing_units_count(
+                        policy.parameters(), policy.executor(),
+                        hpx::chrono::null_duration, std::distance(first, last));
 
                 // TODO: Find better block size.
                 constexpr std::size_t block_size =

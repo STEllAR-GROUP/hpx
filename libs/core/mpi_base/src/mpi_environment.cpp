@@ -2,6 +2,7 @@
 //  Copyright (c)      2020 Google
 //  Copyright (c)      2022 Patrick Diehl
 //  Copyright (c)      2023 Hartmut Kaiser
+//  Copyright (c)      2024 Jiakun Yan
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -466,6 +467,98 @@ namespace hpx::util {
         l.unlock();
 
         report_error(sl, error_code);
+    }
+
+    // Acknowledgement: code adapted from github.com/jeffhammond/BigMPI
+    MPI_Datatype mpi_environment::type_contiguous(size_t const nbytes)
+    {
+        constexpr int int_max = (std::numeric_limits<int>::max)();
+
+        size_t c = nbytes / int_max;
+        size_t r = nbytes % int_max;
+
+        HPX_ASSERT(c < int_max);
+        HPX_ASSERT(r < int_max);
+
+        MPI_Datatype chunks;
+        MPI_Type_vector(
+            static_cast<int>(c), int_max, int_max, MPI_BYTE, &chunks);
+
+        MPI_Datatype remainder;
+        MPI_Type_contiguous(static_cast<int>(r), MPI_BYTE, &remainder);
+
+        MPI_Aint const remdisp = static_cast<MPI_Aint>(c) * int_max;
+        constexpr int blocklengths[2] = {1, 1};
+        MPI_Aint displacements[2] = {0, remdisp};
+        MPI_Datatype types[2] = {chunks, remainder};
+        MPI_Datatype newtype;
+        MPI_Type_create_struct(2, blocklengths, displacements, types, &newtype);
+
+        MPI_Type_free(&chunks);
+        MPI_Type_free(&remainder);
+
+        return newtype;
+    }
+
+    MPI_Request mpi_environment::isend(
+        void const* address, size_t size, int rank, int tag)
+    {
+        MPI_Request request;
+        MPI_Datatype datatype;
+        int length;
+        if (size > static_cast<size_t>((std::numeric_limits<int>::max)()))
+        {
+            datatype = type_contiguous(size);
+            MPI_Type_commit(&datatype);
+            length = 1;
+        }
+        else
+        {
+            datatype = MPI_BYTE;
+            length = static_cast<int>(size);
+        }
+
+        {
+            scoped_lock l;
+            int const ret = MPI_Isend(
+                address, length, datatype, rank, tag, communicator(), &request);
+            check_mpi_error(l, HPX_CURRENT_SOURCE_LOCATION(), ret);
+        }
+
+        if (datatype != MPI_BYTE)
+            MPI_Type_free(&datatype);
+        return request;
+    }
+
+    MPI_Request mpi_environment::irecv(
+        void* address, size_t size, int rank, int tag)
+    {
+        MPI_Request request;
+        MPI_Datatype datatype;
+        int length;
+        if (size > static_cast<size_t>((std::numeric_limits<int>::max)()))
+        {
+            datatype = type_contiguous(size);
+            MPI_Type_commit(&datatype);
+            length = 1;
+        }
+        else
+        {
+            datatype = MPI_BYTE;
+            length = static_cast<int>(size);
+        }
+
+        {
+            scoped_lock l;
+            int const ret = MPI_Irecv(
+                address, length, datatype, rank, tag, communicator(), &request);
+            check_mpi_error(l, HPX_CURRENT_SOURCE_LOCATION(), ret);
+        }
+
+        if (datatype != MPI_BYTE)
+            MPI_Type_free(&datatype);
+
+        return request;
     }
 }    // namespace hpx::util
 

@@ -14,8 +14,9 @@
 
 int hpx_main()
 {
-    hpx::parallel::execution::restricted_thread_pool_executor executor{0, 3};
-    HPX_TEST_EQ(hpx::parallel::execution::processing_units_count(executor),
+    hpx::execution::experimental::restricted_thread_pool_executor executor{
+        0, 3};
+    HPX_TEST_EQ(hpx::execution::experimental::processing_units_count(executor),
         static_cast<std::size_t>(3));
     return hpx::local::finalize();
 }

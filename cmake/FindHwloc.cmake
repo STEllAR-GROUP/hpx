@@ -51,7 +51,7 @@ if(NOT TARGET Hwloc::hwloc)
   if(Hwloc_ROOT)
     # The call to file is for compatibility with windows paths
     file(TO_CMAKE_PATH ${Hwloc_ROOT} Hwloc_ROOT)
-  elseif("$ENV{HWLOC_ROOT}")
+  elseif(DEFINED ENV{HWLOC_ROOT})
     file(TO_CMAKE_PATH $ENV{HWLOC_ROOT} Hwloc_ROOT)
   else()
     file(TO_CMAKE_PATH "${Hwloc_INCLUDE_DIR}" Hwloc_INCLUDE_DIR)

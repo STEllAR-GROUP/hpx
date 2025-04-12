@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2023 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -106,7 +106,7 @@ namespace hpx::util {
     //
     //   Reference - the reference type of the resulting iterator, and in
     //      particular, the result type of operator*(). If not supplied but
-    //      Value is supplied, Value& is used. Otherwise
+    //      Value is supplied, Value& is used. Otherwise,
     //      iterator_traits<Base>::reference is used.
     //
     //   Difference - the difference_type of the resulting iterator. If not

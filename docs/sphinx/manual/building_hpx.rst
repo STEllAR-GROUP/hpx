@@ -251,7 +251,7 @@ To build |hpx| under Windows 10 x64 with Visual Studio 2015:
 * Download the CMake V3.18.1 installer (or latest version) from `here
   <https://blog.kitware.com/cmake-3-18-1-available-for-download/>`__
 * Download the hwloc V1.11.0 (or the latest version) from `here
-  <http://www.open-mpi.org/software/hwloc/v1.11/downloads/hwloc-win64-build-1.11.0.zip>`__
+  <https://www.open-mpi.org/software/hwloc/v2.11/>`__
   and unpack it.
 * Download the latest Boost libraries from `here
   <https://www.boost.org/users/download/>`__ and unpack them.

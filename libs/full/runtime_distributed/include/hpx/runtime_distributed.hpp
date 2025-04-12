@@ -48,8 +48,11 @@ namespace hpx {
     public:
         /// Construct a new HPX runtime instance
         ///
-        /// \param locality_mode  [in] This is the mode the given runtime
-        ///                       instance should be executed in.
+        /// \param rtcfg        Runtime configuration for this instance
+        /// \param pre_main     Function to be called before running the
+        ///                     main action of this instance
+        /// \param post_main    Function to be called after running the
+        ///                     main action of this instance
         explicit runtime_distributed(util::runtime_configuration& rtcfg,
             int (*pre_main)(runtime_mode) = nullptr,
             void (*post_main)() = nullptr);
@@ -122,6 +125,9 @@ namespace hpx {
         ///                   return immediately. Use a second call to stop
         ///                   with this parameter set to \a true to wait for
         ///                   all internal work to be completed.
+        /// \param cond       Condition used to update all thread when done
+        /// \param mtx        Mutex used by this function to sync all threads
+
         void stop_helper(
             bool blocking, std::condition_variable& cond, std::mutex& mtx);
 

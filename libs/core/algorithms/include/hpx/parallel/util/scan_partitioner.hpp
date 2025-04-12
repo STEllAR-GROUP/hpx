@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2015 Daniel Bourgeois
 //  Copyright (c)      2017 Taeguk Kwon
 //  Copyright (c)      2021 Akhil J Nair
@@ -85,8 +85,8 @@ namespace hpx::parallel::util {
                     std::size_t const count_ = count;
 
                     // estimate a chunk size based on number of cores used
-                    using has_variable_chunk_size =
-                        typename execution::extract_has_variable_chunk_size<
+                    using has_variable_chunk_size = typename hpx::execution::
+                        experimental::extract_has_variable_chunk_size<
                             parameters_type>::type;
 
                     auto shape = detail::get_bulk_iteration_shape(

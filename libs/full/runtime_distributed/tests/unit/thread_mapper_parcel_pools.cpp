@@ -38,7 +38,7 @@ void enumerate_threads(std::size_t num_custom_threads)
 #ifdef HPX_HAVE_NETWORKING
     std::size_t num_parcel_threads = 0;
     std::vector<std::string> const parcelport_names = {
-        "tcp", "mpi", "lci", "libfabric"};
+        "tcp", "mpi", "lci", "gasnet"};
     for (auto parcelport_name : parcelport_names)
     {
         if (hpx::get_config_entry(

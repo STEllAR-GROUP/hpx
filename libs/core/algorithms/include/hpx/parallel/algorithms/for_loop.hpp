@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -182,7 +182,7 @@ namespace hpx { namespace experimental {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename... Args>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy> for_loop(
+    <unspecified> for_loop(
         ExPolicy&& policy, std::decay_t<I> first, I last, Args&&... args);
 
     /// The for_loop_strided implements loop functionality over a range
@@ -366,9 +366,8 @@ namespace hpx { namespace experimental {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename S, typename... Args>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy> for_loop_strided(
-        ExPolicy&& policy, std::decay_t<I> first, I last, S stride,
-        Args&&... args);
+    <unspecified> for_loop_strided(ExPolicy&& policy, std::decay_t<I> first,
+        I last, S stride, Args&&... args);
 
     /// The for_loop_n implements loop functionality over a range specified by
     /// integral or iterator bounds. For the iterator case, these algorithms
@@ -542,7 +541,7 @@ namespace hpx { namespace experimental {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename Size, typename... Args>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy> for_loop_n(
+    <unspecified> for_loop_n(
         ExPolicy&& policy, I first, Size size, Args&&... args);
 
     /// The for_loop_n_strided implements loop functionality over a range
@@ -730,8 +729,7 @@ namespace hpx { namespace experimental {
     ///
     template <typename ExPolicy, typename I, typename Size, typename S,
         typename... Args>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
-    for_loop_n_strided(
+    <unspecified> for_loop_n_strided(
         ExPolicy&& policy, I first, Size size, S stride, Args&&... args);
 }}    // namespace hpx::experimental
 
@@ -740,6 +738,7 @@ namespace hpx { namespace experimental {
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/functional/detail/invoke.hpp>
@@ -755,6 +754,7 @@ namespace hpx { namespace experimental {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/type_support/empty_function.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -772,34 +772,38 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
+        HPX_HAS_XXX_TRAIT_DEF(needs_current_thread_num);
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename... Ts, std::size_t... Is>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void init_iteration(
-            hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
-            std::size_t part_index) noexcept
+        HPX_HOST_DEVICE constexpr void init_iteration(hpx::tuple<Ts...>& args,
+            hpx::util::index_pack<Is...>, std::size_t part_index,
+            std::size_t current_thread) noexcept
         {
-            (hpx::get<Is>(args).init_iteration(part_index), ...);
+            (hpx::get<Is>(args).init_iteration(part_index, current_thread),
+                ...);
         }
 
         template <typename... Ts, std::size_t... Is, typename F, typename B>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void invoke_iteration(
             hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>, F&& f,
-            B part_begin)
+            B part_begin, std::size_t current_thread)
         {
             HPX_INVOKE(HPX_FORWARD(F, f), part_begin,
-                hpx::get<Is>(args).iteration_value()...);
+                hpx::get<Is>(args).iteration_value(current_thread)...);
         }
 
         template <typename... Ts, std::size_t... Is>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void next_iteration(
-            hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>) noexcept
+            hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
+            std::size_t current_thread) noexcept
         {
-            (hpx::get<Is>(args).next_iteration(), ...);
+            (hpx::get<Is>(args).next_iteration(current_thread), ...);
         }
 
         template <typename... Ts, std::size_t... Is>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void exit_iteration(
-            hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
-            std::size_t size) noexcept
+        HPX_HOST_DEVICE constexpr void exit_iteration(hpx::tuple<Ts...>& args,
+            hpx::util::index_pack<Is...>, std::size_t size) noexcept
         {
             (hpx::get<Is>(args).exit_iteration(size), ...);
         }
@@ -832,53 +836,73 @@ namespace hpx::parallel {
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
                 B part_begin, std::size_t part_steps, std::size_t part_index)
             {
+                std::size_t current_thread = -1;
+                if constexpr (hpx::util::any_of_v<has_needs_current_thread_num<
+                                  std::decay_t<Ts>...>>)
+                {
+                    current_thread = hpx::get_worker_thread_num();
+                }
+
                 auto pack = hpx::util::make_index_pack_t<sizeof...(Ts)>();
-                detail::init_iteration(args_, pack, part_index);
+                detail::init_iteration(args_, pack, part_index, current_thread);
 
                 if (stride_ == 1)
                 {
                     while (part_steps-- != 0)
                     {
-                        detail::invoke_iteration(args_, pack, f_, part_begin++);
-                        detail::next_iteration(args_, pack);
+                        detail::invoke_iteration(
+                            args_, pack, f_, part_begin++, current_thread);
+                        detail::next_iteration(args_, pack, current_thread);
                     }
                 }
                 else if (stride_ > 0)
                 {
                     while (part_steps >= static_cast<std::size_t>(stride_))
                     {
-                        detail::invoke_iteration(args_, pack, f_, part_begin);
+                        detail::invoke_iteration(
+                            args_, pack, f_, part_begin, current_thread);
 
                         part_begin =
                             parallel::detail::next(part_begin, stride_);
                         part_steps -= stride_;
 
-                        detail::next_iteration(args_, pack);
+                        detail::next_iteration(args_, pack, current_thread);
                     }
 
                     if (part_steps != 0)
                     {
-                        detail::invoke_iteration(args_, pack, f_, part_begin);
-                        detail::next_iteration(args_, pack);
+                        detail::invoke_iteration(
+                            args_, pack, f_, part_begin, current_thread);
+                        detail::next_iteration(args_, pack, current_thread);
                     }
                 }
                 else
                 {
-                    while (part_steps >= static_cast<std::size_t>(-stride_))
+                    // Silence unary minus warning for unsigned types
+                    if constexpr (std::is_signed_v<S>)
                     {
-                        detail::invoke_iteration(args_, pack, f_, part_begin);
+                        while (part_steps >= static_cast<std::size_t>(-stride_))
+                        {
+                            detail::invoke_iteration(
+                                args_, pack, f_, part_begin, current_thread);
 
-                        part_begin =
-                            parallel::detail::next(part_begin, stride_);
-                        part_steps += stride_;
+                            part_begin =
+                                parallel::detail::next(part_begin, stride_);
+                            part_steps += stride_;
 
-                        detail::next_iteration(args_, pack);
+                            detail::next_iteration(args_, pack, current_thread);
+                        }
+
+                        if (part_steps != 0)
+                        {
+                            detail::invoke_iteration(
+                                args_, pack, f_, part_begin, current_thread);
+                            detail::next_iteration(args_, pack, current_thread);
+                        }
                     }
-
-                    if (part_steps != 0)
+                    else
                     {
-                        detail::invoke_iteration(args_, pack, f_, part_begin);
-                        detail::next_iteration(args_, pack);
+                        HPX_UNREACHABLE;
                     }
                 }
             }
@@ -960,18 +984,26 @@ namespace hpx::parallel {
                 }
                 else
                 {
-                    while (part_steps >= static_cast<std::size_t>(-stride_))
+                    // Silence unary minus warning for unsigned types
+                    if constexpr (std::is_signed_v<S>)
                     {
-                        HPX_INVOKE(f_, part_begin);
+                        while (part_steps >= static_cast<std::size_t>(-stride_))
+                        {
+                            HPX_INVOKE(f_, part_begin);
 
-                        part_begin =
-                            parallel::detail::next(part_begin, stride_);
-                        part_steps += stride_;
+                            part_begin =
+                                parallel::detail::next(part_begin, stride_);
+                            part_steps += stride_;
+                        }
+
+                        if (part_steps != 0)
+                        {
+                            HPX_INVOKE(f_, part_begin);
+                        }
                     }
-
-                    if (part_steps != 0)
+                    else
                     {
-                        HPX_INVOKE(f_, part_begin);
+                        HPX_UNREACHABLE;
                     }
                 }
             }
@@ -1004,15 +1036,17 @@ namespace hpx::parallel {
 
             template <typename B, typename E>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void loop_iter(
-                B part_begin, E part_end, std::size_t part_index)
+                B part_begin, E part_end, std::size_t part_index,
+                std::uint32_t current_thread)
             {
                 auto pack = hpx::util::make_index_pack_t<sizeof...(Ts)>();
-                detail::init_iteration(args_, pack, part_index);
+                detail::init_iteration(args_, pack, part_index, current_thread);
 
                 while (part_begin != part_end)
                 {
-                    detail::invoke_iteration(args_, pack, f_, part_begin++);
-                    detail::next_iteration(args_, pack);
+                    detail::invoke_iteration(
+                        args_, pack, f_, part_begin++, current_thread);
+                    detail::next_iteration(args_, pack, current_thread);
                 }
             }
 
@@ -1021,27 +1055,36 @@ namespace hpx::parallel {
                 B part_begin, std::size_t part_steps,
                 std::size_t part_index = 0)
             {
+                std::size_t current_thread = -1;
+                if constexpr (hpx::util::any_of_v<has_needs_current_thread_num<
+                                  std::decay_t<Ts>...>>)
+                {
+                    current_thread = hpx::get_worker_thread_num();
+                }
+
                 if constexpr (hpx::traits::is_range_generator_v<B>)
                 {
                     auto g = hpx::util::iterate(part_begin);
-                    loop_iter(
-                        hpx::util::begin(g), hpx::util::end(g), part_index);
+                    loop_iter(hpx::util::begin(g), hpx::util::end(g),
+                        part_index, current_thread);
                 }
                 else if constexpr (hpx::traits::is_range_v<B>)
                 {
                     loop_iter(hpx::util::begin(part_begin),
-                        hpx::util::end(part_begin), part_index);
+                        hpx::util::end(part_begin), part_index, current_thread);
                 }
                 else
                 {
                     auto pack = hpx::util::make_index_pack_t<sizeof...(Ts)>();
-                    detail::init_iteration(args_, pack, part_index);
+                    detail::init_iteration(
+                        args_, pack, part_index, current_thread);
 
-                    while (part_steps-- != 0)
-                    {
-                        detail::invoke_iteration(args_, pack, f_, part_begin++);
-                        detail::next_iteration(args_, pack);
-                    }
+                    parallel::util::loop_n<std::decay_t<ExPolicy>>(
+                        part_begin, part_steps, [&](auto it) {
+                            detail::invoke_iteration(
+                                args_, pack, f_, it, current_thread);
+                            detail::next_iteration(args_, pack, current_thread);
+                        });
                 }
             }
 
@@ -1284,8 +1327,15 @@ namespace hpx::parallel {
                 ExPolicy&&, InIter first, Size size, S stride, F&& f, Arg&& arg,
                 Args&&... args)
             {
-                arg.init_iteration(0);
-                (args.init_iteration(0), ...);
+                std::size_t current_thread = -1;
+                if constexpr (hpx::util::any_of_v<has_needs_current_thread_num<
+                                  std::decay_t<Args>...>>)
+                {
+                    current_thread = hpx::get_worker_thread_num();
+                }
+
+                arg.init_iteration(0, current_thread);
+                (args.init_iteration(0, current_thread), ...);
 
                 std::size_t count = size;
                 if (stride > 0)
@@ -1298,29 +1348,30 @@ namespace hpx::parallel {
                         first = parallel::detail::next(first, stride);
                         count -= stride;
 
-                        arg.next_iteration();
-                        (args.next_iteration(), ...);
+                        arg.next_iteration(current_thread);
+                        (args.next_iteration(current_thread), ...);
                     }
                 }
                 else
                 {
                     while (count >= static_cast<std::size_t>(-stride))
                     {
-                        HPX_INVOKE(f, first, arg.iteration_value(),
-                            args.iteration_value()...);
+                        HPX_INVOKE(f, first,
+                            arg.iteration_value(current_thread),
+                            args.iteration_value(current_thread)...);
 
                         first = parallel::detail::next(first, stride);
                         count += stride;
 
-                        arg.next_iteration();
-                        (args.next_iteration(), ...);
+                        arg.next_iteration(current_thread);
+                        (args.next_iteration(current_thread), ...);
                     }
                 }
 
                 if (count != 0)
                 {
-                    HPX_INVOKE(f, first, arg.iteration_value(),
-                        args.iteration_value()...);
+                    HPX_INVOKE(f, first, arg.iteration_value(current_thread),
+                        args.iteration_value(current_thread)...);
                 }
 
                 // make sure live-out variables are properly set on return

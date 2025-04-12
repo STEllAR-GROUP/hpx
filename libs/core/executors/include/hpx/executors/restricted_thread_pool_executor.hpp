@@ -1,5 +1,5 @@
 //  Copyright (c)      2020 Mikael Simberg
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     template <typename Policy>
     class restricted_policy_executor
@@ -60,7 +60,7 @@ namespace hpx::parallel::execution {
                 hierarchical_threshold)
         {
             // set initial number of cores
-            exec_ = hpx::parallel::execution::with_processing_units_count(
+            exec_ = hpx::execution::experimental::with_processing_units_count(
                 exec_, num_threads);
         }
 
@@ -102,7 +102,8 @@ namespace hpx::parallel::execution {
         {
             return static_cast<std::int16_t>(first_thread_ +
                 (os_thread_++ %
-                    hpx::parallel::execution::processing_units_count(exec_)));
+                    hpx::execution::experimental::processing_units_count(
+                        exec_)));
         }
 
         std::int16_t get_current_thread_num() const
@@ -158,7 +159,7 @@ namespace hpx::parallel::execution {
             )>
         // clang-format on
         friend constexpr std::size_t tag_invoke(
-            hpx::parallel::execution::processing_units_count_t tag,
+            hpx::execution::experimental::processing_units_count_t tag,
             Parameters&& params, restricted_policy_executor const& exec,
             hpx::chrono::steady_duration const& duration =
                 hpx::chrono::null_duration,
@@ -255,6 +256,9 @@ namespace hpx::parallel::execution {
 
     using restricted_thread_pool_executor =
         restricted_policy_executor<hpx::launch>;
+}    // namespace hpx::execution::experimental
+
+namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
@@ -298,4 +302,4 @@ namespace hpx::parallel::execution {
     {
     };
     /// \endcond
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

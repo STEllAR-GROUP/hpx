@@ -1,5 +1,5 @@
 //  Copyright (c)      2018 Mikael Simberg
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -50,6 +50,7 @@ namespace hpx_startup {
 }
 
 namespace hpx {
+
     /// \brief Main entry point for launching the HPX runtime system.
     ///
     /// This is the main entry point for any HPX application. This function
@@ -86,8 +87,15 @@ namespace hpx {
     /// function given by \p f as a HPX thread.
     inline int init(int argc, char** argv, init_params const& params)
     {
+#if defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
+        init_params pars = params;
+        pars.cfg.insert(pars.cfg.begin(), "hpx.run_hpx_main!=1");
+        return detail::init_impl(hpx_startup::get_main_func(), argc, argv, pars,
+            HPX_PREFIX, environ);
+#else
         return detail::init_impl(hpx_startup::get_main_func(), argc, argv,
             params, HPX_PREFIX, environ);
+#endif
     }
 
     /// \brief Main entry point for launching the HPX runtime system.
@@ -111,8 +119,16 @@ namespace hpx {
     /// console mode or worker mode depending on the command line settings).
     inline int init(init_params const& params)
     {
+#if defined(HPX_HAVE_RUN_MAIN_EVERYWHERE)
+        init_params pars = params;
+        pars.cfg.insert(pars.cfg.begin(), "hpx.run_hpx_main!=1");
+        return detail::init_impl(hpx_startup::get_main_func(),
+            hpx::local::detail::dummy_argc, hpx::local::detail::dummy_argv,
+            pars, HPX_PREFIX, environ);
+#else
         return detail::init_impl(hpx_startup::get_main_func(),
             hpx::local::detail::dummy_argc, hpx::local::detail::dummy_argv,
             params, HPX_PREFIX, environ);
+#endif
     }
 }    // namespace hpx

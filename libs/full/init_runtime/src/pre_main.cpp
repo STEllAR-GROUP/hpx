@@ -11,6 +11,8 @@
 
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/collectives/barrier.hpp>
+#include <hpx/collectives/channel_communicator.hpp>
+#include <hpx/collectives/create_communicator.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/collectives/latch.hpp>
 #include <hpx/components_base/agas_interface.hpp>
@@ -28,6 +30,7 @@
 #include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/runtime_support.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 
@@ -158,6 +161,17 @@ namespace hpx { namespace detail {
                         "barriers";
             }
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+            // create predefined communicator, but only if locality is not
+            // connecting late
+            if (hpx::get_config_entry("hpx.runtime_mode",
+                    get_runtime_mode_name(runtime_mode::console)) !=
+                get_runtime_mode_name(runtime_mode::connect))
+            {
+                hpx::collectives::detail::create_global_communicator();
+            }
+#endif
+
             // create our global barrier...
             hpx::distributed::barrier::get_global_barrier() =
                 hpx::distributed::barrier::create_global_barrier();
@@ -239,6 +253,13 @@ namespace hpx { namespace detail {
 
     void post_main()
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        // destroy predefined communicators
+        hpx::collectives::detail::reset_global_communicator();
+        hpx::collectives::detail::reset_local_communicator();
+        hpx::collectives::detail::reset_world_channel_communicator();
+#endif
+
         // simply destroy global barrier
         auto& b = hpx::distributed::barrier::get_global_barrier();
         b[0].detach();

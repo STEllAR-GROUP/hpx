@@ -1,5 +1,5 @@
 //  Copyright (c) 2019-2020 ETH Zurich
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,6 +12,7 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/allocator_support/thread_local_caching_allocator.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/concurrency/stack.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/future_exec.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
@@ -226,7 +227,7 @@ namespace hpx::execution {
             )>
         // clang-format on
         friend constexpr auto tag_invoke(
-            hpx::parallel::execution::with_processing_units_count_t,
+            hpx::execution::experimental::with_processing_units_count_t,
             Executor_ const& exec, std::size_t num_cores) noexcept
         {
             auto exec_with_num_cores = exec;
@@ -241,8 +242,8 @@ namespace hpx::execution {
             )>
         // clang-format on
         friend constexpr std::size_t tag_invoke(
-            hpx::parallel::execution::processing_units_count_t, Parameters&&,
-            parallel_policy_executor const& exec,
+            hpx::execution::experimental::processing_units_count_t,
+            Parameters&&, parallel_policy_executor const& exec,
             hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
             std::size_t = 0)
         {
@@ -389,9 +390,9 @@ namespace hpx::execution {
                 hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 #endif
 
-            using allocator_type =
-                hpx::util::thread_local_caching_allocator<char,
-                    hpx::util::internal_allocator<>>;
+            using allocator_type = hpx::util::thread_local_caching_allocator<
+                hpx::lockfree::variable_size_stack, char,
+                hpx::util::internal_allocator<>>;
             hpx::traits::detail::shared_state_ptr_t<result_type> p =
                 lcos::detail::make_continuation_alloc_nounwrap<result_type>(
                     allocator_type{}, HPX_FORWARD(Future, predecessor),
@@ -609,7 +610,7 @@ namespace hpx::execution {
     using parallel_executor = parallel_policy_executor<hpx::launch>;
 }    // namespace hpx::execution
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
     template <typename Policy>
@@ -636,4 +637,4 @@ namespace hpx::parallel::execution {
     {
     };
     /// \endcond
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

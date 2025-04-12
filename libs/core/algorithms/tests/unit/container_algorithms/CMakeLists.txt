@@ -16,6 +16,8 @@ set(tests
     adjacentfind_exception_range
     all_of_range
     any_of_range
+    contains_range
+    contains_subrange_range
     copy_range
     copyn_range
     copyif_range
@@ -55,6 +57,7 @@ set(tests
     inplace_merge_range
     is_heap_range
     is_heap_until_range
+    is_partitioned_async_range
     is_partitioned_range
     is_partitioned_projection_range
     is_sorted_range

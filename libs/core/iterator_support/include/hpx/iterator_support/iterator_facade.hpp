@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2016-2023 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,6 +14,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#include <hpx/concepts/has_xxx.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/equality.hpp>
 
@@ -233,7 +235,7 @@ namespace hpx::util {
         // Implementation for random access iterators
 
         // A proxy return type for operator[], needed to deal with iterators
-        // that may invalidate referents upon destruction. Consider the
+        // that may invalidate references upon destruction. Consider the
         // temporary iterator in *(a + n)
         template <typename Iterator>
         class operator_brackets_proxy
@@ -267,22 +269,34 @@ namespace hpx::util {
             Iterator iter_;
         };
 
+        // We can force (not) using the operator_brackets_proxy by adding an
+        // embedded type use_brackets_proxy to the iterator that evaluates to
+        // either std::true_type of std::false_type.
+        HPX_HAS_XXX_TRAIT_DEF(use_brackets_proxy)
+
         // A meta-function that determines whether operator[] must return a
         // proxy, or whether it can simply return a copy of the value_type.
-        template <typename ValueType>
+        template <typename Iterator, typename Value, typename Enable = void>
         struct use_operator_brackets_proxy
           : std::integral_constant<bool,
-                !(std::is_copy_constructible_v<ValueType> &&
-                    std::is_const_v<ValueType>)>
+                !(std::is_copy_constructible_v<Value> &&
+                    std::is_const_v<Value>)>
+        {
+        };
+
+        template <typename Iterator, typename Value>
+        struct use_operator_brackets_proxy<Iterator, Value,
+            std::enable_if_t<has_use_brackets_proxy_v<Iterator>>>
+          : Iterator::use_brackets_proxy
         {
         };
 
         template <typename Iterator, typename Value>
         struct operator_brackets_result
         {
-            using type =
-                std::conditional_t<use_operator_brackets_proxy<Value>::value,
-                    operator_brackets_proxy<Iterator>, Value>;
+            using type = std::conditional_t<
+                use_operator_brackets_proxy<Iterator, Value>::value,
+                operator_brackets_proxy<Iterator>, Value>;
         };
 
         template <typename Iterator>
@@ -319,11 +333,9 @@ namespace hpx::util {
 
             HPX_HOST_DEVICE iterator_facade_base() = default;
 
-            HPX_HOST_DEVICE constexpr
-                typename operator_brackets_result<Derived, T>::type
-                operator[](difference_type n) const
+            HPX_HOST_DEVICE constexpr auto operator[](difference_type n) const
             {
-                using use_proxy = use_operator_brackets_proxy<T>;
+                using use_proxy = use_operator_brackets_proxy<Derived, T>;
 
                 return make_operator_brackets_result<Derived>(
                     this->derived() + n, use_proxy{});
@@ -371,11 +383,19 @@ namespace hpx::util {
         typename Reference = T&, typename Distance = std::ptrdiff_t,
         typename Pointer = void>
     struct iterator_facade
-      : detail::iterator_facade_base<Derived, T, Category, Reference, Distance,
-            Pointer>
+      : detail::iterator_facade_base<Derived, T,
+            // clang-format off
+            decltype(traits::detail::coerce_iterator_tag(
+                std::declval<Category>())),
+            // clang-format on
+            Reference, Distance, Pointer>
     {
     private:
-        using base_type = detail::iterator_facade_base<Derived, T, Category,
+        using base_type = detail::iterator_facade_base<Derived, T,
+            // clang-format off
+            decltype(traits::detail::coerce_iterator_tag(
+                std::declval<Category>())),
+            // clang-format on
             Reference, Distance, Pointer>;
 
     protected:

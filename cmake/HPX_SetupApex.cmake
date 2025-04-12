@@ -39,7 +39,7 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
   endif()
 
   if(NOT HPX_FIND_PACKAGE)
-    if(NOT "${Apex_ROOT}" AND "$ENV{APEX_ROOT}")
+    if(NOT "${Apex_ROOT}" AND DEFINED ENV{APEX_ROOT})
       set(Apex_ROOT "$ENV{APEX_ROOT}")
     endif()
 

@@ -74,7 +74,7 @@ int main()
     allocation_tests<double>();
     allocation_tests<int>();
 
-    return 0;
+    return hpx::util::report_errors();
 }
 
 #endif

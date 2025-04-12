@@ -1,4 +1,4 @@
-//  Copyright (C) 2017 Hartmut Kaiser
+//  Copyright (C) 2017-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,4 @@
 #pragma once
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_predef.hpp>
-
-
-
+#include <hpx/components/containers/partitioned_vector/serialization/partitioned_vector.hpp>

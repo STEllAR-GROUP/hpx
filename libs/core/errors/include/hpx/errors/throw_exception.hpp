@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file throw_exception.hpp
-/// \page HPX_THROW_EXCEPTION, HPX_THROWS_IF
+/// \page HPX_THROW_EXCEPTION, HPX_THROW_BAD_ALLOC, HPX_THROWS_IF
 /// \headerfile hpx/exception.hpp
 
 #pragma once
@@ -37,6 +37,9 @@ namespace hpx::detail {
         std::string const& msg, std::string const& func,
         std::string const& file, long line);
 
+    [[noreturn]] HPX_CORE_EXPORT void throw_bad_alloc_exception(
+        char const* func, char const* file, long line);
+
     [[noreturn]] HPX_CORE_EXPORT void rethrow_exception(
         exception const& e, std::string const& func);
 
@@ -62,6 +65,9 @@ namespace hpx::detail {
         std::string const& msg, std::string const& func,
         std::string const& file, long line);
 
+    HPX_CORE_EXPORT void throws_bad_alloc_if(
+        hpx::error_code& ec, char const* func, char const* file, long line);
+
     HPX_CORE_EXPORT void rethrows_if(
         hpx::error_code& ec, exception const& e, std::string const& func);
 
@@ -72,7 +78,7 @@ namespace hpx::detail {
 namespace hpx {
     /// \cond NOINTERNAL
 
-    /// \brief throw an hpx::exception initialized from the given arguments
+    /// \brief throw a hpx::exception initialized from the given arguments
     [[noreturn]] inline void throw_exception(error e, std::string const& msg,
         std::string const& func, std::string const& file = "", long line = -1)
     {
@@ -163,6 +169,37 @@ namespace hpx {
     hpx::detail::throw_exception(                                              \
         errcode, hpx::util::format(__VA_ARGS__), f, __FILE__, __LINE__) /**/
 
+///////////////////////////////////////////////////////////////////////////////
+/// \def HPX_THROW_BAD_ALLOC(f, msg)
+/// \brief Throw a hpx::bad_alloc_exception initialized from the given parameters
+///
+/// The macro \a HPX_THROW_BAD_ALLOC can be used to throw a hpx::exception.
+/// The purpose of this macro is to prepend the source file name and line number
+/// of the position where the exception is thrown to the error message.
+/// Moreover, this associates additional diagnostic information with the
+/// exception, such as file name and line number, locality id and thread id,
+/// and stack backtrace from the point where the exception was thrown.
+///
+/// The parameter \p errcode holds the hpx::error code the new exception should
+/// encapsulate. The parameter \p f is expected to hold the name of the
+/// function exception is thrown from and the parameter \p msg holds the error
+/// message the new exception should encapsulate.
+///
+/// \par Example:
+///
+/// \code
+///      void raise_exception()
+///      {
+///          // Throw a hpx::exception initialized from the given parameters.
+///          // Additionally associate with this exception some detailed
+///          // diagnostic information about the throw-site.
+///          HPX_THROW_BAD_ALLOC("raise_exception", "simulated error");
+///      }
+/// \endcode
+///
+#define HPX_THROW_BAD_ALLOC(f)                                                 \
+    hpx::detail::throw_bad_alloc_exception(f, __FILE__, __LINE__) /**/
+
 /// \def HPX_THROWS_IF(ec, errcode, f, msg)
 /// \brief Either throw a hpx::exception or initialize \a hpx::error_code from
 ///        the given parameters
@@ -181,5 +218,18 @@ namespace hpx {
 #define HPX_THROWS_IF(ec, errcode, f, ...)                                     \
     hpx::detail::throws_if(ec, errcode, hpx::util::format(__VA_ARGS__), f,     \
         __FILE__, __LINE__) /**/
+
+/// \def HPX_THROWS_BAD_ALLOC_IF(ec, f)
+/// \brief Either throw a hpx::bad_alloc_exception or \a hpx::error_code to out_of_memory
+///
+/// The macro \a HPX_THROWS_BAD_ALLOC_IF can be used to either throw a
+/// \a hpx::bad_alloc_exception or to initialize a \a hpx::error_code to
+/// \a hpx::error::out_of_memory. If
+/// &ec == &hpx::throws, the semantics of this macro are equivalent to
+/// \a HPX_THROW_BAD_ALLOC. If &ec != &hpx::throws, the \a hpx::error_code
+/// instance \p ec is initialized instead.
+///
+#define HPX_THROWS_BAD_ALLOC_IF(ec, f)                                         \
+    hpx::detail::throws_bad_alloc_if(ec, f, __FILE__, __LINE__) /**/
 
 #include <hpx/config/warnings_suffix.hpp>

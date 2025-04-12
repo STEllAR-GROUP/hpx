@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,7 +21,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // Executor information customization points
@@ -320,9 +320,8 @@ namespace hpx::parallel::execution {
             processing_units_count_t tag, Executor&& exec,
             std::size_t num_tasks = 0)
         {
-            return tag(hpx::parallel::execution::null_parameters,
-                HPX_FORWARD(Executor, exec), hpx::chrono::null_duration,
-                num_tasks);
+            return tag(null_parameters, HPX_FORWARD(Executor, exec),
+                hpx::chrono::null_duration, num_tasks);
         }
     } processing_units_count{};
 
@@ -419,10 +418,10 @@ namespace hpx::parallel::execution {
                 HPX_FORWARD(Executor, exec));
         }
     } mark_end_execution{};
-}    // namespace hpx::parallel::execution
 
-template <>
-struct hpx::execution::experimental::is_scheduling_property<
-    hpx::parallel::execution::with_processing_units_count_t> : std::true_type
-{
-};
+    template <>
+    struct is_scheduling_property<with_processing_units_count_t>
+      : std::true_type
+    {
+    };
+}    // namespace hpx::execution::experimental

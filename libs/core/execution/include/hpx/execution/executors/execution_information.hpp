@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2024 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,7 +21,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -69,7 +69,7 @@ namespace hpx::parallel::execution {
         friend HPX_FORCEINLINE decltype(auto) tag_invoke(
             has_pending_closures_t, Executor&& exec)
         {
-            return exec.has_pending_closures();
+            return HPX_FORWARD(Executor, exec).has_pending_closures();
         }
     } has_pending_closures{};
 
@@ -102,7 +102,8 @@ namespace hpx::parallel::execution {
             Executor&& /*exec*/, threads::topology& topo,
             std::size_t thread_num)
         {
-            return detail::get_pu_mask(topo, thread_num);
+            return hpx::parallel::execution::detail::get_pu_mask(
+                topo, thread_num);
         }
 
         // clang-format off
@@ -115,7 +116,7 @@ namespace hpx::parallel::execution {
         friend HPX_FORCEINLINE decltype(auto) tag_invoke(get_pu_mask_t,
             Executor&& exec, threads::topology& topo, std::size_t thread_num)
         {
-            return exec.get_pu_mask(topo, thread_num);
+            return HPX_FORWARD(Executor, exec).get_pu_mask(topo, thread_num);
         }
     } get_pu_mask{};
 
@@ -153,7 +154,7 @@ namespace hpx::parallel::execution {
         friend HPX_FORCEINLINE void tag_invoke(
             set_scheduler_mode_t, Executor&& exec, Mode const& mode)
         {
-            exec.set_scheduler_mode(mode);
+            HPX_FORWARD(Executor, exec).set_scheduler_mode(mode);
         }
     } set_scheduler_mode{};
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

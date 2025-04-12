@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -107,7 +107,7 @@ namespace hpx::execution::experimental {
             )>
         // clang-format on
         friend constexpr auto tag_invoke(
-            hpx::parallel::execution::with_processing_units_count_t,
+            hpx::execution::experimental::with_processing_units_count_t,
             Executor_ const& scheduler, std::size_t num_cores) noexcept
         {
             auto scheduler_with_num_cores = scheduler;
@@ -122,8 +122,8 @@ namespace hpx::execution::experimental {
             )>
         // clang-format on
         friend constexpr std::size_t tag_invoke(
-            hpx::parallel::execution::processing_units_count_t, Parameters&&,
-            thread_pool_policy_scheduler const& scheduler,
+            hpx::execution::experimental::processing_units_count_t,
+            Parameters&&, thread_pool_policy_scheduler const& scheduler,
             hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
             std::size_t = 0)
         {

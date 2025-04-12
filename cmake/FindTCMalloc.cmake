@@ -48,7 +48,7 @@ find_library(
 )
 
 # Set Tcmalloc_ROOT in case the other hints are used
-if(NOT Tcmalloc_ROOT AND "$ENV{TCMALLOC_ROOT}")
+if(NOT Tcmalloc_ROOT AND DEFINED ENV{TCMALLOC_ROOT})
   set(Tcmalloc_ROOT $ENV{TCMALLOC_ROOT})
 elseif(NOT Tcmalloc_ROOT)
   string(REPLACE "/include" "" Tcmalloc_ROOT "${Tcmalloc_INCLUDE_DIR}")

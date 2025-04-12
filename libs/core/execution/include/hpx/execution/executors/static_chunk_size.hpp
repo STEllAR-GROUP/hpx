@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -53,14 +53,15 @@ namespace hpx::execution::experimental {
         /// \cond NOINTERNAL
         template <typename Executor>
         friend std::size_t tag_override_invoke(
-            hpx::parallel::execution::get_chunk_size_t,
+            hpx::execution::experimental::get_chunk_size_t,
             static_chunk_size& this_, Executor& exec,
             hpx::chrono::steady_duration const&, std::size_t cores,
             std::size_t num_tasks)
         {
             // Make sure the internal round-robin counter of the executor is
             // reset
-            parallel::execution::reset_thread_distribution(this_, exec);
+            hpx::execution::experimental::reset_thread_distribution(
+                this_, exec);
 
             // use the given chunk size if given
             if (this_.chunk_size_ != 0)
@@ -107,7 +108,7 @@ namespace hpx::execution::experimental {
 
 /// \cond NOINTERNAL
 template <>
-struct hpx::parallel::execution::is_executor_parameters<
+struct hpx::execution::experimental::is_executor_parameters<
     hpx::execution::experimental::static_chunk_size> : std::true_type
 {
 };

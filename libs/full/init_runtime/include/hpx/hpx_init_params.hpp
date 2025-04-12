@@ -78,10 +78,10 @@ namespace hpx {
     ///                     'hpx.component.enabled=1')
     /// \var startup        A function to be executed inside a HPX thread before
     ///                     \p f is called. If this parameter is
-    ///                     not given no function will be executed.
+    ///                     not given, no function will be executed.
     /// \var shutdown       A function to be executed inside an HPX
     ///                     thread while hpx::finalize is executed. If this
-    ///                     parameter is not given no function will be executed.
+    ///                     parameter is not given, no function will be executed.
     /// \var mode           The mode the created runtime environment
     ///                     should be initialized in. There has to be exactly
     ///                     one locality in each HPX application which is
@@ -112,8 +112,8 @@ namespace hpx {
             desc_cmdline =
                 hpx::local::detail::default_desc(HPX_APPLICATION_STRING);
         std::vector<std::string> cfg;
-        mutable startup_function_type startup;
-        mutable shutdown_function_type shutdown;
+        std::function<void()> startup;
+        std::function<void()> shutdown;
         hpx::runtime_mode mode = ::hpx::runtime_mode::default_;
         hpx::resource::partitioner_mode rp_mode =
             ::hpx::resource::partitioner_mode::default_;

@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Ajai V George
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -675,8 +676,8 @@ namespace hpx { namespace segmented {
     // clang-format off
     template <typename SegIter, typename OutIter, typename F,
         HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator<SegIter>::value &&
-            hpx::traits::is_segmented_iterator<SegIter>::value &&
+            hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter> &&
             hpx::traits::is_iterator<OutIter>::value &&
             hpx::traits::is_segmented_iterator<OutIter>::value
         )>
@@ -710,9 +711,9 @@ namespace hpx { namespace segmented {
     template <typename ExPolicy, typename SegIter, typename OutIter,
         typename F,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<SegIter>::value &&
-            hpx::traits::is_segmented_iterator<SegIter>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter> &&
             hpx::traits::is_iterator<OutIter>::value &&
             hpx::traits::is_segmented_iterator<OutIter>::value
         )>
@@ -800,7 +801,7 @@ namespace hpx { namespace segmented {
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename OutIter, typename F,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator<InIter1>::value &&
             hpx::traits::is_segmented_iterator<InIter1>::value &&
             hpx::traits::is_iterator<InIter2>::value &&
@@ -898,7 +899,7 @@ namespace hpx { namespace segmented {
     template <typename ExPolicy, typename InIter1, typename InIter2,
         typename OutIter, typename F,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator<InIter1>::value &&
             hpx::traits::is_segmented_iterator<InIter1>::value &&
             hpx::traits::is_iterator<InIter2>::value &&

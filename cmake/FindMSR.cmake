@@ -37,7 +37,7 @@ find_library(
 if(Msr_ROOT)
   # The call to file is for compatibility with windows paths
   file(TO_CMAKE_PATH ${Msr_ROOT} Msr_ROOT)
-elseif("$ENV{MSR_ROOT}")
+elseif(DEFINED ENV{MSR_ROOT})
   file(TO_CMAKE_PATH $ENV{MSR_ROOT} Msr_ROOT)
 else()
   file(TO_CMAKE_PATH "${Msr_INCLUDE_DIR}" Msr_INCLUDE_DIR)

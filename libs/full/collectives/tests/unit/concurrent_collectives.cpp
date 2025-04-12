@@ -212,8 +212,10 @@ double test_broadcast(communicator const& comm, std::uint32_t here)
     hpx::chrono::high_resolution_timer const t;
 
     std::size_t gen = 0;
+    // clang-format off
     for (std::uint32_t i = 0; distributed.get_next_generation("broadcast", gen);
          ++i)
+    // clang-format on
     {
         if (here == 0)
         {
@@ -243,7 +245,8 @@ double test_exclusive_scan(communicator const& comm, std::uint32_t here)
     for (int i = 0; distributed.get_next_generation("exclusive_scan", gen); ++i)
     {
         hpx::future<std::uint32_t> overall_result =
-            exclusive_scan(comm, here + i, std::plus<>{}, generation_arg(gen));
+            exclusive_scan(comm, here + i, static_cast<std::uint32_t>(i),
+                std::plus<>{}, generation_arg(gen));
 
         std::uint32_t sum = i;
         for (std::uint32_t j = 0; j < here; ++j)
@@ -261,8 +264,10 @@ double test_gather(communicator const& comm, std::uint32_t here)
     hpx::chrono::high_resolution_timer const t;
 
     std::size_t gen = 0;
+    // clang-format off
     for (std::uint32_t i = 0; distributed.get_next_generation("gather", gen);
          ++i)
+    // clang-format on
     {
         if (here == 0)
         {
@@ -291,8 +296,10 @@ double test_inclusive_scan(communicator const& comm, std::uint32_t here)
     hpx::chrono::high_resolution_timer const t;
 
     std::size_t gen = 0;
+    // clang-format off
     for (std::uint32_t i = 0;
          distributed.get_next_generation("inclusive_scan", gen); ++i)
+    // clang-format on
     {
         hpx::future<std::uint32_t> overall_result = inclusive_scan(
             comm, here + i, std::plus<std::uint32_t>{}, generation_arg(gen));
@@ -419,8 +426,10 @@ double test_local_all_reduce(std::vector<communicator> const& comms)
     double elapsed = 0.;
 
     std::size_t gen = 0;
+    // clang-format off
     for ([[maybe_unused]] std::uint32_t i = 0;
          local.get_next_generation("all_reduce", gen); ++i)
+    // clang-format on
     {
         std::vector<hpx::future<void>> sites;
         sites.reserve(num_sites);
@@ -464,8 +473,10 @@ double test_local_all_to_all(std::vector<communicator> const& comms)
     double elapsed = 0.;
 
     std::size_t gen = 0;
+    // clang-format off
     for ([[maybe_unused]] std::uint32_t i = 0;
          local.get_next_generation("all_to_all", gen); ++i)
+    // clang-format on
     {
         std::vector<hpx::future<void>> sites;
         sites.reserve(num_sites);
@@ -557,8 +568,10 @@ double test_local_exclusive_scan(std::vector<communicator> const& comms)
     double elapsed = 0.;
 
     std::size_t gen = 0;
+    // clang-format off
     for (std::uint32_t i = 0; local.get_next_generation("exclusive_scan", gen);
          ++i)
+    // clang-format on
     {
         std::vector<hpx::future<void>> sites;
         sites.reserve(num_sites);
@@ -570,7 +583,7 @@ double test_local_exclusive_scan(std::vector<communicator> const& comms)
                 hpx::chrono::high_resolution_timer const t;
 
                 hpx::future<std::uint32_t> overall_result =
-                    exclusive_scan(comms[site], site + i, std::plus<>{},
+                    exclusive_scan(comms[site], site + i, i, std::plus<>{},
                         this_site_arg(site), generation_arg(gen));
 
                 auto const result = overall_result.get();
@@ -649,8 +662,10 @@ double test_local_inclusive_scan(std::vector<communicator> const& comms)
     double elapsed = 0.;
 
     std::size_t gen = 0;
+    // clang-format off
     for (std::uint32_t i = 0; local.get_next_generation("inclusive_scan", gen);
          ++i)
+    // clang-format on
     {
         std::vector<hpx::future<void>> sites;
         sites.reserve(num_sites);

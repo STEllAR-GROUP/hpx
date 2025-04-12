@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,7 @@
 
 #include <memory>
 
-namespace hpx { namespace components { namespace server {
+namespace hpx::components::server {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Copy given component to the specified target locality
@@ -49,8 +49,10 @@ namespace hpx { namespace components { namespace server {
                 hpx::components::server::runtime_support* rts =
                     hpx::get_runtime_support_ptr();
 
+                // clang-format off
                 return traits::get_remote_result<id_type, naming::gid_type>::
                     call(rts->copy_create_component<Component>(ptr, true));
+                // clang-format on
             }
 
             return runtime_support::copy_create_component<Component>(
@@ -60,13 +62,11 @@ namespace hpx { namespace components { namespace server {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    future<hpx::id_type> copy_component_here(hpx::id_type const& to_copy)
+    hpx::id_type copy_component_here(hpx::id_type const& to_copy)
     {
-        future<std::shared_ptr<Component>> f = get_ptr<Component>(to_copy);
-        return f.then(
-            [=](future<std::shared_ptr<Component>> f) -> hpx::id_type {
-                return detail::copy_component_here_postproc(f.get());
-            });
+        std::shared_ptr<Component> sp =
+            get_ptr<Component>(hpx::launch::sync, to_copy);
+        return detail::copy_component_here_postproc(HPX_MOVE(sp));
     }
 
     template <typename Component>
@@ -75,15 +75,15 @@ namespace hpx { namespace components { namespace server {
     {
         future<std::shared_ptr<Component>> f = get_ptr<Component>(to_copy);
         return f.then(
-            [=](future<std::shared_ptr<Component>> f) -> hpx::id_type {
+            [=](future<std::shared_ptr<Component>>&& fsp) -> hpx::id_type {
                 return detail::copy_component_postproc(
-                    f.get(), target_locality);
+                    fsp.get(), target_locality);
             });
     }
 
     template <typename Component>
     struct copy_component_action_here
-      : ::hpx::actions::action<future<hpx::id_type> (*)(hpx::id_type const&),
+      : ::hpx::actions::action<hpx::id_type (*)(hpx::id_type const&),
             &copy_component_here<Component>,
             copy_component_action_here<Component>>
     {
@@ -96,4 +96,4 @@ namespace hpx { namespace components { namespace server {
             &copy_component<Component>, copy_component_action<Component>>
     {
     };
-}}}    // namespace hpx::components::server
+}    // namespace hpx::components::server

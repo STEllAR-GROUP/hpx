@@ -1,5 +1,5 @@
 //  Copyright (c)      2018 Mikael Simberg
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -28,6 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// \namespace hpx
 namespace hpx {
+
     /// \brief Main entry point for launching the HPX runtime system.
     ///
     /// This is the main entry point for any HPX application. This function
@@ -58,7 +59,7 @@ namespace hpx {
     ///                     the created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    ///                     Otherwise it will be executed as specified by the
+    ///                     Otherwise, it will be executed as specified by the
     ///                     parameter\p mode.
     inline int init(std::function<int(hpx::program_options::variables_map&)> f,
         int argc, char** argv, init_params const& params = init_params());
@@ -93,7 +94,7 @@ namespace hpx {
     ///                     the created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    ///                     Otherwise it will be executed as specified by the
+    ///                     Otherwise, it will be executed as specified by the
     ///                     parameter\p mode.
     inline int init(std::function<int(int, char**)> f, int argc, char** argv,
         init_params const& params = init_params());
@@ -123,7 +124,7 @@ namespace hpx {
     ///                     the created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    ///                     Otherwise it will be executed as specified by the
+    ///                     Otherwise, it will be executed as specified by the
     ///                     parameter\p mode.
     inline int init(
         int argc, char** argv, init_params const& params = init_params());
@@ -158,7 +159,7 @@ namespace hpx {
     ///                     the created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    ///                     Otherwise it will be executed as specified by the
+    ///                     Otherwise, it will be executed as specified by the
     ///                     parameter\p mode.
     inline int init(std::nullptr_t f, int argc, char** argv,
         init_params const& params = init_params());

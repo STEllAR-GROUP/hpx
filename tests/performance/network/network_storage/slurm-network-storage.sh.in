@@ -100,13 +100,11 @@ do
     QUEUE=normal
   fi
 
-#  for PARCELTYPE in "mpi" "libfabric"
-  for PARCELTYPE in "libfabric"
+  for PARCELTYPE in "mpi" "tcp"
   do
 
     TCP_ENABLE="-Ihpx.parcel.tcp.enable=0"
     MPI_ENABLE="-Ihpx.parcel.mpi.enable=0"
-    FAB_ENABLE="-Ihpx.parcel.libfabric.enable=0"
 
     BOOTSTRAP="-Ihpx.parcel.bootstrap=$PARCELTYPE"
 
@@ -114,8 +112,6 @@ do
       TCP_ENABLE="-Ihpx.parcel.tcp.enable=1"
     elif [ "$PARCELTYPE" == "mpi" ]; then
       MPI_ENABLE="-Ihpx.parcel.mpi.enable=1"
-    elif [ "$PARCELTYPE" == "libfabric" ]; then
-      FAB_ENABLE="-Ihpx.parcel.libfabric.enable=1"
     fi
 
     HPX_ARGS="-Ihpx.parcel.message_handlers=0 --hpx:bind=balanced "
@@ -126,7 +122,7 @@ do
       do
         LOCAL_SIZE=$(printf "%.0f" $( bc <<< "scale=6;(128 * $TRANSFERSIZE * $THREADS_PERTASK)/1024" ))
         LOCAL_SIZE=$(echo $((LOCAL_SIZE>1024?1024:LOCAL_SIZE)))
-        PROGRAM_PARAMS="${BOOTSTRAP} ${TCP_ENABLE} ${MPI_ENABLE} ${FAB_ENABLE} --hpx:threads=${THREADS_PERTASK} ${HPX_ARGS} --localMB=${LOCAL_SIZE} --transferKB=${TRANSFERSIZE} --parceltype=${PARCELTYPE} --distribution=0 --all-to-all=1 --no-local=1 --iterations=100"
+        PROGRAM_PARAMS="${BOOTSTRAP} ${TCP_ENABLE} ${MPI_ENABLE} --hpx:threads=${THREADS_PERTASK} ${HPX_ARGS} --localMB=${LOCAL_SIZE} --transferKB=${TRANSFERSIZE} --parceltype=${PARCELTYPE} --distribution=0 --all-to-all=1 --no-local=1 --iterations=100"
         write_script
       done
     done

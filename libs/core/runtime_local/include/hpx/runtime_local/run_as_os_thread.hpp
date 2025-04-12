@@ -24,7 +24,7 @@ namespace hpx {
     {
         HPX_ASSERT(threads::get_self_ptr() != nullptr);
 
-        parallel::execution::io_pool_executor executor;
+        hpx::execution::experimental::io_pool_executor executor;
         return parallel::execution::async_execute(
             executor, HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
     }

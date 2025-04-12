@@ -37,7 +37,7 @@ find_library(
 if(Orangefs_ROOT)
   # The call to file is for compatibility with windows paths
   file(TO_CMAKE_PATH ${Orangefs_ROOT} Orangefs_ROOT)
-elseif("$ENV{ORANGEFS_ROOT}")
+elseif(DEFINED ENV{ORANGEFS_ROOT})
   file(TO_CMAKE_PATH $ENV{ORANGEFS_ROOT} Orangefs_ROOT)
 else()
   file(TO_CMAKE_PATH "${Orangefs_INCLUDE_DIR}" Orangefs_INCLUDE_DIR)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -149,26 +149,27 @@ void test_service_executor(Executor& exec)
 
 int hpx_main()
 {
-    using namespace hpx::parallel;
-    using hpx::parallel::execution::service_executor_type;
+    using hpx::execution::experimental::service_executor_type;
 
 #if defined(HPX_HAVE_IO_POOL)
     {
-        execution::service_executor exec(service_executor_type::io_thread_pool);
+        hpx::execution::experimental::service_executor exec(
+            service_executor_type::io_thread_pool);
         test_service_executor(exec);
     }
 #endif
 
 #if defined(HPX_HAVE_TIMER_POOL)
     {
-        execution::service_executor exec(
+        hpx::execution::experimental::service_executor exec(
             service_executor_type::timer_thread_pool);
         test_service_executor(exec);
     }
 #endif
 
     {
-        execution::service_executor exec(service_executor_type::main_thread);
+        hpx::execution::experimental::service_executor exec(
+            service_executor_type::main_thread);
         test_service_executor(exec);
     }
 

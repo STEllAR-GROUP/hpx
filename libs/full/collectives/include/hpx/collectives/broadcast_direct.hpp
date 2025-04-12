@@ -361,12 +361,11 @@ namespace hpx { namespace lcos {
             hpx::future<std::vector<hpx::future<std::vector<Result>>>> r)
         {
             std::vector<Result> res;
-            std::vector<hpx::future<std::vector<Result>>> fres =
-                HPX_MOVE(r.get());
+            std::vector<hpx::future<std::vector<Result>>> fres = r.get();
 
             for (hpx::future<std::vector<Result>>& f : fres)
             {
-                std::vector<Result> t = HPX_MOVE(f.get());
+                std::vector<Result> t = f.get();
                 res.reserve(res.capacity() + t.size());
                 std::move(t.begin(), t.end(), std::back_inserter(res));
             }

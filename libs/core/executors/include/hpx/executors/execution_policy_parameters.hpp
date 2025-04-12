@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,7 +20,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     // with_processing_units_count property implementation for execution
     // policies that simply forwards to the embedded executor (if that supports
@@ -102,4 +102,4 @@ namespace hpx::parallel::execution {
     {
         return prop(policy.executor(), HPX_FORWARD(Ts, ts)...);
     }
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

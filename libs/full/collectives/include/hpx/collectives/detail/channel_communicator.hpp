@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,7 +19,6 @@
 #include <hpx/lcos_local/channel.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <map>
@@ -27,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace collectives { namespace detail {
+namespace hpx::collectives::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     class channel_communicator_server
@@ -39,7 +38,6 @@ namespace hpx { namespace collectives { namespace detail {
 
     public:
         channel_communicator_server()    //-V730
-          : data_()
         {
             HPX_ASSERT(false);    // shouldn't ever be called
         }
@@ -57,8 +55,7 @@ namespace hpx { namespace collectives { namespace detail {
 
             {
                 std::unique_lock l(data_[which].mtx_);
-                util::ignore_while_checking il(&l);
-                HPX_UNUSED(il);
+                [[maybe_unused]] util::ignore_while_checking il(&l);
 
                 channel_type& c = data_[which].channels_[tag];
                 f = c.get();
@@ -84,8 +81,7 @@ namespace hpx { namespace collectives { namespace detail {
         void set(std::size_t which, T value, std::size_t tag)
         {
             std::unique_lock l(data_[which].mtx_);
-            util::ignore_while_checking il(&l);
-            HPX_UNUSED(il);
+            [[maybe_unused]] util::ignore_while_checking il(&l);
 
             data_[which].channels_[tag].set(unique_any_nonser(HPX_MOVE(value)));
         }
@@ -127,6 +123,10 @@ namespace hpx { namespace collectives { namespace detail {
         HPX_EXPORT channel_communicator(char const* basename,
             std::size_t num_sites, std::size_t this_site, client_type here);
 
+        HPX_EXPORT channel_communicator(hpx::launch::sync_policy,
+            char const* basename, std::size_t num_sites, std::size_t this_site,
+            client_type here);
+
         template <typename T>
         hpx::future<T> get(std::size_t site, std::size_t tag) const
         {
@@ -157,6 +157,6 @@ namespace hpx { namespace collectives { namespace detail {
         std::size_t this_site_;
         std::vector<client_type> clients_;
     };
-}}}    // namespace hpx::collectives::detail
+}    // namespace hpx::collectives::detail
 
 #endif    // COMPUTE_HOST_CODE

@@ -23,6 +23,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/accumulate.hpp
     hpx/parallel/algorithms/detail/advance_and_get_distance.hpp
     hpx/parallel/algorithms/detail/advance_to_sentinel.hpp
+    hpx/parallel/algorithms/detail/contains.hpp
     hpx/parallel/algorithms/detail/dispatch.hpp
     hpx/parallel/algorithms/detail/distance.hpp
     hpx/parallel/algorithms/detail/equal.hpp
@@ -36,7 +37,9 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
     hpx/parallel/algorithms/detail/pivot.hpp
     hpx/parallel/algorithms/detail/reduce.hpp
+    hpx/parallel/algorithms/detail/reduce_deterministic.hpp
     hpx/parallel/algorithms/detail/replace.hpp
+    hpx/parallel/algorithms/detail/rfa.hpp
     hpx/parallel/algorithms/detail/rotate.hpp
     hpx/parallel/algorithms/detail/sample_sort.hpp
     hpx/parallel/algorithms/detail/search.hpp
@@ -53,6 +56,14 @@ set(algorithms_headers
     hpx/parallel/algorithms/for_loop.hpp
     hpx/parallel/algorithms/for_loop_induction.hpp
     hpx/parallel/algorithms/for_loop_reduction.hpp
+    hpx/parallel/algorithms/for_loop_reduction_base.hpp
+    hpx/parallel/algorithms/for_loop_reduction_bit_and.hpp
+    hpx/parallel/algorithms/for_loop_reduction_bit_or.hpp
+    hpx/parallel/algorithms/for_loop_reduction_bit_xor.hpp
+    hpx/parallel/algorithms/for_loop_reduction_max.hpp
+    hpx/parallel/algorithms/for_loop_reduction_min.hpp
+    hpx/parallel/algorithms/for_loop_reduction_multiplies.hpp
+    hpx/parallel/algorithms/for_loop_reduction_plus.hpp
     hpx/parallel/algorithms/generate.hpp
     hpx/parallel/algorithms/includes.hpp
     hpx/parallel/algorithms/inclusive_scan.hpp
@@ -71,6 +82,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/partition.hpp
     hpx/parallel/algorithms/reduce_by_key.hpp
     hpx/parallel/algorithms/reduce.hpp
+    hpx/parallel/algorithms/reduce_deterministic.hpp
     hpx/parallel/algorithms/remove_copy.hpp
     hpx/parallel/algorithms/remove.hpp
     hpx/parallel/algorithms/replace.hpp
@@ -103,6 +115,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/adjacent_difference.hpp
     hpx/parallel/container_algorithms/adjacent_find.hpp
     hpx/parallel/container_algorithms/all_any_none.hpp
+    hpx/parallel/container_algorithms/contains.hpp
     hpx/parallel/container_algorithms/copy.hpp
     hpx/parallel/container_algorithms/count.hpp
     hpx/parallel/container_algorithms/destroy.hpp
@@ -177,6 +190,7 @@ set(algorithms_headers
     hpx/parallel/datapar/zip_iterator.hpp
     hpx/parallel/memory.hpp
     hpx/parallel/numeric.hpp
+    hpx/parallel/run_on_all.hpp
     hpx/parallel/spmd_block.hpp
     hpx/parallel/task_block.hpp
     hpx/parallel/task_group.hpp

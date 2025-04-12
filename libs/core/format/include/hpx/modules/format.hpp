@@ -280,6 +280,9 @@ namespace hpx::util {
             format_arg const* args, std::size_t count);
     }    // namespace detail
 
+    // enable using format in variadic contexts
+    HPX_CORE_EXPORT std::string const& format();
+
     template <typename... Args>
     std::string format(std::string_view format_str, Args const&... args)
     {

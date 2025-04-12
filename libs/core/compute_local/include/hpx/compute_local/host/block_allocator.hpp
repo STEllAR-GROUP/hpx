@@ -257,7 +257,7 @@ namespace hpx::compute::host {
     ///
     template <typename T,
         typename Executor =
-            hpx::parallel::execution::restricted_thread_pool_executor>
+            hpx::execution::experimental::restricted_thread_pool_executor>
     struct block_allocator
       : public detail::policy_allocator<T,
             hpx::execution::detail::parallel_policy_shim<
@@ -298,4 +298,3 @@ namespace hpx::compute::host {
         }
     };
 }    // namespace hpx::compute::host
-// namespace hpx::compute::host

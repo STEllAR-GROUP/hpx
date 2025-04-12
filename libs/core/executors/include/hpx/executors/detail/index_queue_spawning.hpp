@@ -1,5 +1,5 @@
 //  Copyright (c) 2019-2020 ETH Zurich
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -53,7 +53,7 @@ namespace hpx::parallel::execution::detail {
         bool const allow_stealing;
 
         template <std::size_t... Is, typename F, typename T, typename Ts>
-        static constexpr void bulk_invoke_helper(
+        HPX_FORCEINLINE static constexpr void bulk_invoke_helper(
             hpx::util::index_pack<Is...>, F&& f, T&& t, Ts&& ts)
         {
             HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t),
@@ -63,7 +63,8 @@ namespace hpx::parallel::execution::detail {
         // Perform the work in one element indexed by index. The index
         // represents a range of indices (iterators) in the given shape.
         template <typename F, typename Ts>
-        void do_work_chunk(F&& f, Ts&& ts, std::uint32_t const index) const
+        HPX_FORCEINLINE void do_work_chunk(
+            F&& f, Ts&& ts, std::uint32_t const index) const
         {
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
             static hpx::util::itt::event notify_event(
@@ -104,7 +105,7 @@ namespace hpx::parallel::execution::detail {
             if (allow_stealing)
             {
                 // Then steal from the opposite end of the neighboring queues
-                static constexpr auto opposite_end =
+                constexpr auto opposite_end =
                     hpx::concurrency::detail::opposite_end_v<Which>;
 
                 for (std::uint32_t offset = 1; offset != state->num_threads;
@@ -123,20 +124,6 @@ namespace hpx::parallel::execution::detail {
             }
         }
 
-        // Execute task function
-        void do_work() const
-        {
-            // schedule chunks from the end, if needed
-            if (reverse_placement)
-            {
-                do_work<hpx::concurrency::detail::queue_end::right>();
-            }
-            else
-            {
-                do_work<hpx::concurrency::detail::queue_end::left>();
-            }
-        }
-
         // Store an exception and mark that an exception was thrown in the
         // operation state. This function assumes that there is a current
         // exception.
@@ -150,7 +137,7 @@ namespace hpx::parallel::execution::detail {
         // Finish the work for one worker thread. If this is not the last worker
         // thread to finish, it will only decrement the counter. If it is the
         // last thread it will call set_exception if there is an exception.
-        // Otherwise it will call set_value on the shared state.
+        // Otherwise, it will call set_value on the shared state.
         void finish() const
         {
             if (--(state->tasks_remaining.data_) == 0)
@@ -186,7 +173,16 @@ namespace hpx::parallel::execution::detail {
         {
             try
             {
-                do_work();
+                // Execute task function
+                if (reverse_placement)
+                {
+                    // schedule chunks from the end, if needed
+                    do_work<hpx::concurrency::detail::queue_end::right>();
+                }
+                else
+                {
+                    do_work<hpx::concurrency::detail::queue_end::left>();
+                }
             }
             catch (std::bad_alloc const&)
             {

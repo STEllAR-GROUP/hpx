@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -41,11 +41,14 @@ namespace hpx::parallel::util::detail {
     {
         // estimate a chunk size based on number of cores used
         using parameters_type =
-            execution::extract_executor_parameters_t<std::decay_t<ExPolicy>>;
+            hpx::execution::experimental::extract_executor_parameters_t<
+                std::decay_t<ExPolicy>>;
         constexpr bool has_variable_chunk_size =
-            execution::extract_has_variable_chunk_size_v<parameters_type>;
+            hpx::execution::experimental::extract_has_variable_chunk_size_v<
+                parameters_type>;
         constexpr bool invokes_testing_function =
-            execution::extract_invokes_testing_function_v<parameters_type>;
+            hpx::execution::experimental::extract_invokes_testing_function_v<
+                parameters_type>;
 
         if constexpr (has_variable_chunk_size)
         {

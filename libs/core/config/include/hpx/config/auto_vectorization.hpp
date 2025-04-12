@@ -49,7 +49,7 @@
 
 #define HPX_HAVE_VECTOR_REDUCTION
 
-#elif (_OPENMP >= 201307) || (defined(__clang__) && HPX_CLANG_VERSION >= 30700)
+#elif (_OPENMP >= 201307) && !defined(HPX_CLANG_VERSION)
 
 #define HPX_PRAGMA_SIMD_EARLYEXIT
 #define HPX_IVDEP

@@ -36,7 +36,7 @@ if(NOT TARGET Papi::papi)
   )
 
   # Set Papi_ROOT in case the other hints are used
-  if(NOT Papi_ROOT AND "$ENV{PAPI_ROOT}")
+  if(NOT Papi_ROOT AND DEFINED ENV{PAPI_ROOT})
     set(Papi_ROOT $ENV{PAPI_ROOT})
   elseif(NOT Papi_ROOT)
     string(REPLACE "/include" "" Papi_ROOT "${Papi_INCLUDE_DIR}")
@@ -46,7 +46,7 @@ if(NOT TARGET Papi::papi)
   if(Papi_ROOT)
     # The call to file is for compatibility with windows paths
     file(TO_CMAKE_PATH ${Papi_ROOT} Papi_ROOT)
-  elseif("$ENV{PAPI_ROOT}")
+  elseif(DEFINED ENV{PAPI_ROOT})
     file(TO_CMAKE_PATH $ENV{PAPI_ROOT} Papi_ROOT)
   else()
     file(TO_CMAKE_PATH "${Papi_INCLUDE_DIR}" Papi_INCLUDE_DIR)

@@ -259,9 +259,7 @@ namespace hpx::threads::policies {
                 {
                     --addfrom->new_tasks_count_.data_;
                     lk.unlock();
-                    HPX_THROW_EXCEPTION(hpx::error::out_of_memory,
-                        "thread_queue::add_new",
-                        "Couldn't add new thread to the thread map");
+                    HPX_THROW_BAD_ALLOC("thread_queue::add_new");
                 }
 
 #if defined(HPX_MSVC)
@@ -724,9 +722,7 @@ namespace hpx::threads::policies {
                 if (HPX_UNLIKELY(!p.second))
                 {
                     lk.unlock();
-                    HPX_THROWS_IF(ec, hpx::error::out_of_memory,
-                        "thread_queue::create_thread",
-                        "Couldn't add new thread to the map of threads");
+                    HPX_THROWS_BAD_ALLOC_IF(ec, "thread_queue::create_thread");
                     return;
                 }
                 ++thread_map_count_;

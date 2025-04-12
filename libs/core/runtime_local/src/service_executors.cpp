@@ -10,7 +10,7 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/service_executors.hpp>
 
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     namespace detail {
 
@@ -47,31 +47,28 @@ namespace hpx::parallel::execution {
 
     service_executor::service_executor(
         service_executor_type t, char const* name_suffix)
-      : detail::service_executor(detail::get_service_pool(t, name_suffix))
+      : hpx::parallel::execution::detail::service_executor(
+            detail::get_service_pool(t, name_suffix))
     {
     }
 
     io_pool_executor::io_pool_executor()
-      : detail::service_executor(
-            detail::get_service_pool(service_executor_type::io_thread_pool))
+      : service_executor(service_executor_type::io_thread_pool)
     {
     }
 
     parcel_pool_executor::parcel_pool_executor(char const* name_suffix)
-      : detail::service_executor(detail::get_service_pool(
-            service_executor_type::parcel_thread_pool, name_suffix))
+      : service_executor(service_executor_type::parcel_thread_pool, name_suffix)
     {
     }
 
     timer_pool_executor::timer_pool_executor()
-      : detail::service_executor(
-            detail::get_service_pool(service_executor_type::timer_thread_pool))
+      : service_executor(service_executor_type::timer_thread_pool)
     {
     }
 
     main_pool_executor::main_pool_executor()
-      : detail::service_executor(
-            detail::get_service_pool(service_executor_type::main_thread))
+      : service_executor(service_executor_type::main_thread)
     {
     }
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental

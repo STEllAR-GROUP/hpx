@@ -56,6 +56,9 @@ if(HPX_WITH_INSTALLED_VERSION)
 endif()
 
 # ##############################################################################
+string(TIMESTAMP HPX_COPYRIGHT_YEAR "%Y")
+
+# ##############################################################################
 # Build all of HPX
 # ##############################################################################
 set(HPX_VERSION_MAJOR 1)
@@ -1050,6 +1053,15 @@ hpx_option(
   ADVANCED
 )
 
+hpx_option(
+  HPX_WITH_NANOBENCH
+  BOOL
+  "Use Nanobench for performance tests. Nanobench will be fetched using FetchContent (default: OFF)"
+  OFF
+  CATEGORY "Build Targets"
+  ADVANCED
+)
+
 # cmake-format: off
 # LibCDS option
 # NOTE: The libcds option is disabled for the 1.5.0 release as it is not ready
@@ -1217,7 +1229,7 @@ if(HPX_WITH_NETWORKING)
     ADVANCED
   )
   hpx_option(
-    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch" "v1.7.7"
+    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch" "v1.7.8"
     CATEGORY "Build Targets"
     ADVANCED
   )
@@ -1285,6 +1297,10 @@ if(HPX_WITH_NETWORKING)
   )
   if(HPX_WITH_PARCELPORT_ACTION_COUNTERS)
     hpx_add_config_define(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
+  endif()
+  if(HPX_WITH_NANOBENCH)
+    hpx_add_config_define(HPX_HAVE_NANOBENCH)
+    include(HPX_SetupNanobench)
   endif()
 else(HPX_WITH_NETWORKING)
   # if networking is off,  then allow the option of using our asynchronous MPI
@@ -1566,12 +1582,18 @@ if(HPX_WITH_THREAD_DEBUG_INFO)
   hpx_add_config_define(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
 endif()
 
-# run hpx_main on all localities by default
+# run hpx_main on all localities by default (will be removed after V1.11.0)
 hpx_option(
-  HPX_WITH_RUN_MAIN_EVERYWHERE BOOL
-  "Run hpx_main by default on all localities (default: OFF)." OFF ADVANCED
+  HPX_WITH_RUN_MAIN_EVERYWHERE
+  BOOL
+  "Run hpx_main by default on all localities (default: OFF, deprecated, will be removed)."
+  OFF
+  ADVANCED
 )
 if(HPX_WITH_RUN_MAIN_EVERYWHERE)
+  hpx_info("Note: the configuration parameter HPX_WITH_RUN_MAIN_EVERYWHERE is\n"
+           "     deprecated and will be removed in the future."
+  )
   hpx_add_config_define(HPX_HAVE_RUN_MAIN_EVERYWHERE)
 endif()
 
@@ -1877,6 +1899,9 @@ if(WIN32)
 
       # Silence C++20 deprecation warnings
       hpx_add_config_cond_define(_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS)
+
+      # Silence C++23 deprecation warnings
+      hpx_add_config_cond_define(_SILENCE_ALL_CXX23_DEPRECATION_WARNINGS)
 
       # ASan is available in Visual Studion starting V16.8
       if((MSVC_VERSION GREATER_EQUAL 1928) AND HPX_WITH_SANITIZERS)
@@ -2253,6 +2278,10 @@ include(HPX_SetupAsio)
 
 # Find all allocators which are currently supported.
 include(HPX_SetupAllocator)
+
+if(HPX_WITH_FETCH_HWLOC)
+  set(HPX_HWLOC_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/hwloc_installed)
+endif()
 include(HPX_SetupHwloc)
 
 # reset external source lists
@@ -2305,7 +2334,7 @@ endif()
 
 if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
   # Check if we can use generic coroutine contexts without any problems
-  if(NOT Boost_CONTEXT_FOUND)
+  if(NOT (Boost_CONTEXT_FOUND OR TARGET Boost::context))
     hpx_error(
       "The usage of Boost.Context was selected but Boost.Context was not found."
     )
@@ -2575,6 +2604,10 @@ if(HPX_WITH_PRECOMPILED_HEADERS)
       <boost/optional.hpp>
       <boost/spirit/home/x3.hpp>
   )
+
+  if(HPX_WITH_NANOBENCH)
+    set(system_precompiled_headers ${system_precompiled_headers} <nanobench.h>)
+  endif()
 
   if(HPX_WITH_CXX17_FILESYSTEM)
     list(APPEND system_precompiled_headers <filesystem>)

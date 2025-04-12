@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -45,6 +45,7 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <csignal>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -72,17 +73,19 @@ namespace hpx::detail {
             if (rt == nullptr)
                 return;
 
-            rt->get_thread_manager().enumerate_threads(
-                [](hpx::threads::thread_id_type id) -> bool {
-                    hpx::threads::thread_data* td = get_thread_id_data(id);
-                    auto sched = td->get_scheduler_base();
-                    LTM_(debug).format("Logging all runtime threads: pool({}), "
-                                       "scheduler({}),"
-                                       "thread({}), description({}), state({})",
-                        sched->get_parent_pool(), sched, id,
-                        td->get_description(), td->get_state().state());
-                    return true;
-                });
+            [[maybe_unused]] auto ret =
+                rt->get_thread_manager().enumerate_threads(
+                    [](hpx::threads::thread_id_type const& id) -> bool {
+                        hpx::threads::thread_data* td = get_thread_id_data(id);
+                        auto sched = td->get_scheduler_base();
+                        LTM_(debug).format(
+                            "Logging all runtime threads: pool({}), "
+                            "scheduler({}),"
+                            "thread({}), description({}), state({})",
+                            sched->get_parent_pool(), sched, id,
+                            td->get_description(), td->get_state().state());
+                        return true;
+                    });
         }
         catch (...)
         {
@@ -229,8 +232,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     [[noreturn]] HPX_CORE_EXPORT void HPX_CDECL new_handler()
     {
-        HPX_THROW_EXCEPTION(hpx::error::out_of_memory, "new_handler",
-            "new allocator failed to allocate memory");
+        HPX_THROW_BAD_ALLOC("new_handler");
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -252,7 +254,7 @@ namespace hpx {
         void on_abort(int) noexcept
         {
             exit_called = true;
-            std::exit(-1);
+            std::abort();
         }
     }    // namespace detail
 
@@ -276,11 +278,22 @@ namespace hpx {
 #endif
 
 #if defined(HPX_WINDOWS)
+        if (hpx::util::get_entry_as<int>(cfg, "hpx.handle_signals", 1))
+        {
+            [[maybe_unused]] auto const prev_signal =
+                std::signal(SIGABRT, detail::on_abort);
+            HPX_ASSERT(prev_signal != SIG_ERR);
+        }
+
         // Set console control handler to allow server to be stopped.
         SetConsoleCtrlHandler(hpx::termination_handler, TRUE);
 #else
         if (hpx::util::get_entry_as<int>(cfg, "hpx.handle_signals", 1))
         {
+            [[maybe_unused]] auto const prev_signal =
+                std::signal(SIGABRT, detail::on_abort);
+            HPX_ASSERT(prev_signal != SIG_ERR);
+
             struct sigaction new_action;
             new_action.sa_handler = hpx::termination_handler;
             sigemptyset(&new_action.sa_mask);
@@ -303,7 +316,10 @@ namespace hpx {
         }
 #endif
 
-        std::set_new_handler(hpx::new_handler);
+        if (hpx::util::get_entry_as<int>(cfg, "hpx.handle_failed_new", 1))
+        {
+            std::set_new_handler(hpx::new_handler);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -622,7 +638,9 @@ namespace hpx {
     std::uint64_t runtime::get_system_uptime()
     {
         std::int64_t const diff =
-            hpx::chrono::high_resolution_clock::now() - runtime_uptime();
+            static_cast<std::int64_t>(
+                hpx::chrono::high_resolution_clock::now()) -
+            runtime_uptime();
         return diff < 0LL ? 0ULL : static_cast<std::uint64_t>(diff);
     }
 

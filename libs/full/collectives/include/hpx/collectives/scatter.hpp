@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2024 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,7 +32,7 @@ namespace hpx { namespace collectives {
     ///                     (usually the locality id). This value is optional
     ///                     and defaults to 0.
     ///
-    /// \returns    This function returns a future holding a the
+    /// \returns    This function returns a future holding the
     ///             scattered value. It will become ready once the scatter
     ///             operation has been completed.
     ///
@@ -62,7 +62,7 @@ namespace hpx { namespace collectives {
     /// \note       The generation values from corresponding \a scatter_to and
     ///             \a scatter_from have to match.
     ///
-    /// \returns    This function returns a future holding a the
+    /// \returns    This function returns a future holding the
     ///             scattered value. It will become ready once the scatter
     ///             operation has been completed.
     ///
@@ -92,7 +92,7 @@ namespace hpx { namespace collectives {
     /// \note       The generation values from corresponding \a scatter_to and
     ///             \a scatter_from have to match.
     ///
-    /// \returns    This function returns a future holding a the
+    /// \returns    This function returns a future holding the
     ///             scattered value. It will become ready once the scatter
     ///             operation has been completed.
     ///
@@ -112,6 +112,9 @@ namespace hpx { namespace collectives {
     ///                     from this call site.
     /// \param  num_sites   The number of participating sites (default: all
     ///                     localities).
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
     ///                     number of the all_gather operation performed on the
     ///                     given base name. This is optional and needs to be
@@ -119,11 +122,8 @@ namespace hpx { namespace collectives {
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
-    /// \param this_site    The sequence number of this invocation (usually
-    ///                     the locality id). This value is optional and
-    ///                     defaults to whatever hpx::get_locality_id() returns.
     ///
-    /// \returns    This function returns a future holding a the
+    /// \returns    This function returns a future holding the
     ///             scattered value. It will become ready once the scatter
     ///             operation has been completed.
     ///
@@ -140,9 +140,9 @@ namespace hpx { namespace collectives {
     /// site (where the corresponding \a scatter_from is executed)
     ///
     /// \param  comm        A communicator object returned from \a create_communicator
-    /// \param  num_sites   The number of participating sites (default: all
-    ///                     localities).
-    /// \param this_site    The sequence number of this invocation (usually
+    /// \param  result      The value to transmit to the central scatter point
+    ///                     from this call site.
+    /// \param  this_site   The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
@@ -156,7 +156,7 @@ namespace hpx { namespace collectives {
     /// \note       The generation values from corresponding \a scatter_to and
     ///             \a scatter_from have to match.
     ///
-    /// \returns    This function returns a future holding a the
+    /// \returns    This function returns a future holding the
     ///             scattered value. It will become ready once the scatter
     ///             operation has been completed.
     ///
@@ -172,8 +172,8 @@ namespace hpx { namespace collectives {
     /// site (where the corresponding \a scatter_from is executed)
     ///
     /// \param  comm        A communicator object returned from \a create_communicator
-    /// \param  num_sites   The number of participating sites (default: all
-    ///                     localities).
+    /// \param  result      The value to transmit to the central scatter point
+    ///                     from this call site.
     /// \param  generation  The generational counter identifying the sequence
     ///                     number of the all_gather operation performed on the
     ///                     given base name. This is optional and needs to be
@@ -188,7 +188,7 @@ namespace hpx { namespace collectives {
     /// \note       The generation values from corresponding \a scatter_to and
     ///             \a scatter_from have to match.
     ///
-    /// \returns    This function returns a future holding a the
+    /// \returns    This function returns a future holding the
     ///             scattered value. It will become ready once the scatter
     ///             operation has been completed.
     ///
@@ -196,6 +196,188 @@ namespace hpx { namespace collectives {
     hpx::future<T> scatter_to(
         communicator comm, std::vector<T>&& result,
         generation_arg generation,
+        this_site_arg this_site = this_site_arg());
+
+    /// Scatter (receive) a set of values to different call sites
+    ///
+    /// This function receives an element of a set of values operating on
+    /// the given base name.
+    ///
+    /// \param policy       The execution policy specifying synchronous execution.
+    /// \param basename     The base name identifying the scatter operation
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_gather operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param root_site    The sequence number of the central scatter point
+    ///                     (usually the locality id). This value is optional
+    ///                     and defaults to 0.
+    ///
+    /// \returns    This function returns the scattered value. It executes
+    ///             synchronously and directly returns the result.
+    ///
+    template <typename T>
+    T scatter_from(hpx::launch::sync_policy, char const* basename,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
+
+    /// Scatter (receive) a set of values to different call sites
+    ///
+    /// This function receives an element of a set of values operating on
+    /// the given base name.
+    ///
+    /// \param policy       The execution policy specifying synchronous execution.
+    /// \param comm         A communicator object returned from \a create_communicator
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_gather operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \note       The generation values from corresponding \a scatter_to and
+    ///             \a scatter_from have to match.
+    ///
+    /// \returns    This function returns the scattered value. It executes
+    ///             synchronously and directly returns the result.
+    ///
+    template <typename T>
+    T scatter_from(hpx::launch::sync_policy, communicator comm,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// Scatter (receive) a set of values to different call sites
+    ///
+    /// This function receives an element of a set of values operating on
+    /// the given base name.
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_gather operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \note       The generation values from corresponding \a scatter_to and
+    ///             \a scatter_from have to match.
+    ///
+    /// \returns    This function returns the scattered value. It executes
+    ///             synchronously and directly returns the result.
+    ///
+    template <typename T>
+    T scatter_from(hpx::launch::sync_policy, communicator comm,
+        generation_arg generation, this_site_arg this_site = this_site_arg());
+
+    /// Scatter (send) a part of the value set at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central scatter
+    /// site (where the corresponding \a scatter_from is executed)
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  basename    The base name identifying the scatter operation
+    /// \param  result      The value to transmit to the central scatter point
+    ///                     from this call site.
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_gather operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \returns    This function returns the scattered value. It executes
+    ///             synchronously and directly returns the result.
+    ///
+    template <typename T>
+    T scatter_to(hpx::launch::sync_policy, char const* basename,
+        std::vector<T>&& result,
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// Scatter (send) a part of the value set at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central scatter
+    /// site (where the corresponding \a scatter_from is executed)
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  result      The value to transmit to the central scatter point
+    ///                     from this call site.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_gather operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \note       The generation values from corresponding \a scatter_to and
+    ///             \a scatter_from have to match.
+    ///
+    /// \returns    This function returns the scattered value. It executes
+    ///             synchronously and directly returns the result.
+    ///
+    template <typename T>
+    T scatter_to(hpx::launch::sync_policy, communicator comm,
+        std::vector<T>&& result,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// Scatter (send) a part of the value set at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central scatter
+    /// site (where the corresponding \a scatter_from is executed)
+    ///
+    /// \param  policy      The execution policy specifying synchronous execution.
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  result      The value to transmit to the central scatter point
+    ///                     from this call site.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_gather operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \note       The generation values from corresponding \a scatter_to and
+    ///             \a scatter_from have to match.
+    ///
+    /// \returns    This function returns the scattered value. It executes
+    ///             synchronously and directly returns the result.
+    ///
+    template <typename T>
+    T scatter_to(hpx::launch::sync_policy, communicator comm,
+        std::vector<T>&& result, generation_arg generation,
         this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
 
@@ -339,6 +521,35 @@ namespace hpx::collectives {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    T scatter_from(hpx::launch::sync_policy, communicator fid,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        return scatter_from<T>(HPX_MOVE(fid), this_site, generation).get();
+    }
+
+    template <typename T>
+    T scatter_from(hpx::launch::sync_policy, communicator fid,
+        generation_arg generation, this_site_arg this_site = this_site_arg())
+    {
+        return scatter_from<T>(HPX_MOVE(fid), this_site, generation).get();
+    }
+
+    template <typename T>
+    T scatter_from(hpx::launch::sync_policy, char const* basename,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
+    {
+        HPX_ASSERT(this_site != root_site);
+        return scatter_from<T>(create_communicator(basename, num_sites_arg(),
+                                   this_site, generation, root_site),
+            this_site)
+            .get();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // scatter plain values
     template <typename T>
     hpx::future<T> scatter_to(communicator fid, std::vector<T>&& local_result,
@@ -399,6 +610,41 @@ namespace hpx::collectives {
         return scatter_to(create_communicator(basename, num_sites, this_site,
                               generation, root_site_arg(this_site.argument_)),
             HPX_MOVE(local_result), this_site);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    T scatter_to(hpx::launch::sync_policy, communicator fid,
+        std::vector<T>&& local_result,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        return scatter_to(
+            HPX_MOVE(fid), HPX_MOVE(local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    T scatter_to(hpx::launch::sync_policy, communicator fid,
+        std::vector<T>&& local_result, generation_arg generation,
+        this_site_arg this_site = this_site_arg())
+    {
+        return scatter_to(
+            HPX_MOVE(fid), HPX_MOVE(local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    T scatter_to(hpx::launch::sync_policy, char const* basename,
+        std::vector<T>&& local_result,
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
+    {
+        return scatter_to(create_communicator(basename, num_sites, this_site,
+                              generation, root_site_arg(this_site.argument_)),
+            HPX_MOVE(local_result), this_site)
+            .get();
     }
 }    // namespace hpx::collectives
 

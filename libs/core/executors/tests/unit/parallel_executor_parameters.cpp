@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -155,15 +155,15 @@ void test_num_cores()
     using executor = hpx::execution::parallel_executor;
 
     executor exec;
-    auto num_cores = hpx::parallel::execution::processing_units_count(exec);
+    auto num_cores = hpx::execution::experimental::processing_units_count(exec);
 
     auto newexec =
-        hpx::parallel::execution::with_processing_units_count(exec, 2);
+        hpx::execution::experimental::with_processing_units_count(exec, 2);
 
-    HPX_TEST(
-        num_cores == hpx::parallel::execution::processing_units_count(exec));
+    HPX_TEST(num_cores ==
+        hpx::execution::experimental::processing_units_count(exec));
     HPX_TEST(std::size_t(2) ==
-        hpx::parallel::execution::processing_units_count(newexec));
+        hpx::execution::experimental::processing_units_count(newexec));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

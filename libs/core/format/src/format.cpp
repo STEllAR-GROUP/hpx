@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2017-2018 Agustin Berge
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -129,3 +129,12 @@ namespace hpx::util::detail {
         return os.str();
     }
 }    // namespace hpx::util::detail
+
+namespace hpx::util {
+
+    std::string const& format()
+    {
+        static std::string empty;
+        return empty;
+    }
+}    // namespace hpx::util
