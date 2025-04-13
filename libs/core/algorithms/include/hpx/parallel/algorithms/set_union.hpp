@@ -373,7 +373,6 @@ namespace hpx {
                 FwdIter3
             >;
 
-
             return hpx::parallel::util::get_third_element(
                 hpx::parallel::detail::set_union<result_type>().call2(
                     HPX_FORWARD(ExPolicy, policy), is_seq(), first1, last1,
