@@ -9,19 +9,15 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution/algorithms/then.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/synchronization/stop_token.hpp>
-#include <hpx/execution/algorithms/then.hpp>
 
 #include <cstddef>
 #include <exception>
 #include <utility>
 
-// Forward declaration of hpx::get_num_worker_threads to avoid including <hpx/thread.hpp>
-namespace hpx {
-    std::size_t get_num_worker_threads();
-}
 
 // Forward declarations for execution::experimental
 namespace hpx::execution::experimental {
@@ -84,15 +80,30 @@ namespace hpx::execution::experimental {
 
     inline parallel_scheduler get_parallel_scheduler()
     {
-        // Set policy based on number of worker threads
-        hpx::launch policy = hpx::launch::async;
-        if (hpx::get_num_worker_threads() == 1)
-        {
-            policy = hpx::launch::sync;
+        // Create a thread-local instance with the appropriate policy
+        thread_local bool is_on_hpx_thread = false;
+        thread_local bool initialized = false;
+        
+        if (!initialized) {
+            try {
+                // If this doesn't throw, we're on an HPX thread
+                hpx::threads::get_self_id();
+                is_on_hpx_thread = true;
+            }
+            catch (...) {
+                // Not on an HPX thread
+                is_on_hpx_thread = false;
+            }
+            initialized = true;
         }
-        static parallel_scheduler instance(policy);
-        return instance;
+        
+        // Use sync policy if we're on an HPX thread, async otherwise
+        static parallel_scheduler async_instance(hpx::launch::async);
+        static parallel_scheduler sync_instance(hpx::launch::sync);
+        
+        return is_on_hpx_thread ? sync_instance : async_instance;
     }
+    
 
     template <typename Receiver, typename Func>
     struct wrapped_receiver
