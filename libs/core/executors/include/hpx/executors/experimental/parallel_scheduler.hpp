@@ -18,7 +18,6 @@
 #include <exception>
 #include <utility>
 
-
 // Forward declarations for execution::experimental
 namespace hpx::execution::experimental {
     enum class forward_progress_guarantee;
@@ -83,27 +82,29 @@ namespace hpx::execution::experimental {
         // Create a thread-local instance with the appropriate policy
         thread_local bool is_on_hpx_thread = false;
         thread_local bool initialized = false;
-        
-        if (!initialized) {
-            try {
+
+        if (!initialized)
+        {
+            try
+            {
                 // If this doesn't throw, we're on an HPX thread
                 hpx::threads::get_self_id();
                 is_on_hpx_thread = true;
             }
-            catch (...) {
+            catch (...)
+            {
                 // Not on an HPX thread
                 is_on_hpx_thread = false;
             }
             initialized = true;
         }
-        
+
         // Use sync policy if we're on an HPX thread, async otherwise
         static parallel_scheduler async_instance(hpx::launch::async);
         static parallel_scheduler sync_instance(hpx::launch::sync);
-        
+
         return is_on_hpx_thread ? sync_instance : async_instance;
     }
-    
 
     template <typename Receiver, typename Func>
     struct wrapped_receiver

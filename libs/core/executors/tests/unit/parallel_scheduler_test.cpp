@@ -16,7 +16,6 @@
 #include <memory>
 #include <utility>
 
-
 namespace ex = hpx::execution::experimental;
 
 struct test_receiver
