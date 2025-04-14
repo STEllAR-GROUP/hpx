@@ -12,17 +12,18 @@
 #include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/synchronization/stop_token.hpp>
+#include <hpx/execution/algorithms/then.hpp>
 
-#include <cstddef> 
-#include <utility>  
-#include <exception>  
+#include <cstddef>
+#include <exception>
+#include <utility>
 
 // Forward declaration of hpx::get_num_worker_threads to avoid including <hpx/thread.hpp>
 namespace hpx {
     std::size_t get_num_worker_threads();
 }
 
-// Forward declarations for execution::experimentalå
+// Forward declarations for execution::experimental
 namespace hpx::execution::experimental {
     enum class forward_progress_guarantee;
     struct get_forward_progress_guarantee_t;
