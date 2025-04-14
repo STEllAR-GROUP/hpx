@@ -114,7 +114,7 @@ For a full list of support options please see our `Support page
 <https://github.com/STEllAR-GROUP/hpx/blob/master/.github/SUPPORT.md>`_.
 
 If you would like to read more about HPX, we recommend the `book <https://link.springer.com/book/10.1007/978-3-031-54369-2>`_ 
-"Parallel C++ &ndash; Efficient and Scalable High-Performance Parallel Programming Using HPX" the code examples are available `here <https://github.com/ModernCPPBook/Examples)`_.
+"Parallel C++ &ndash; Efficient and Scalable High-Performance Parallel Programming Using HPX" the code examples are available `here <https://github.com/ModernCPPBook/Examples>`_.
 
 
 Code of conduct
