@@ -715,7 +715,7 @@ void test_sorted_until3_seq()
     std::iota(std::begin(c1), std::end(c1), 0);
     std::iota(std::begin(c2), std::end(c2), 0);
 
-    auto until1 =
+    auto const until1 =
         hpx::ranges::is_sorted_until(c1, std::less<int>(), [&](int x) {
             if (x == 0)
             {
@@ -730,7 +730,7 @@ void test_sorted_until3_seq()
                 return x;
             }
         });
-    auto until2 =
+    auto const until2 =
         hpx::ranges::is_sorted_until(c2, std::less<int>(), [&](int x) {
             if (x == static_cast<int>(c2.size()) / 3 ||
                 x == 2 * static_cast<int>(c2.size()) / 3)
@@ -743,8 +743,8 @@ void test_sorted_until3_seq()
             }
         });
 
-    auto test_index1 = std::begin(c1) + 1;
-    auto test_index2 = std::begin(c2) + c2.size() / 3;
+    auto const test_index1 = std::begin(c1) + 1;
+    auto const test_index2 = std::begin(c2) + c2.size() / 3;
 
     HPX_TEST(until1 == test_index1);
     HPX_TEST(until2 == test_index2);
