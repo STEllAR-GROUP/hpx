@@ -51,13 +51,13 @@ int hpx_main(int, char*[])
     // function won't be found -- in this case we need to cast from float* to void*
     // otherwise the correct memset overload won't be found
     hpx::apply(
-        exec, &cl::sycl::queue::memset, static_cast<void*>(c), 0, num_bytes);
+        exec, &cl::sycl::queue::memset, static_cast<void*>(c), 0, static_cast<size_t>(num_bytes));
     hpx::apply(exec, &cl::sycl::queue::memset, static_cast<void*>(a_host), 0,
-        num_bytes);
+        static_cast<size_t>(num_bytes));
     hpx::apply(exec, &cl::sycl::queue::memset, static_cast<void*>(b_host), 0,
-        num_bytes);
+        static_cast<size_t>(num_bytes));
     hpx::apply(exec, &cl::sycl::queue::memset, static_cast<void*>(c_host), 0,
-        num_bytes);
+        static_cast<size_t>(num_bytes));
 
     float aj = 1.0;
     float bj = 2.0;
@@ -90,11 +90,11 @@ int hpx_main(int, char*[])
     // function won't be found -- in this case we need to cast from float* to const float*
     // otherwise the correct copy overload won't be found
     hpx::apply(exec, &cl::sycl::queue::copy, static_cast<const float*>(c),
-        c_host, vectorsize);
+        static_cast<float*>(c_host), static_cast<size_t>(vectorsize));
     hpx::apply(exec, &cl::sycl::queue::copy, static_cast<const float*>(b),
-        b_host, vectorsize);
+        static_cast<float*>(b_host), static_cast<size_t>(vectorsize));
     auto fut = hpx::async(exec, &cl::sycl::queue::copy,
-        static_cast<const float*>(a), a_host, vectorsize);
+        static_cast<const float*>(a), static_cast<float*>(a_host), static_cast<size_t>(vectorsize));
 
     fut.get();
 
