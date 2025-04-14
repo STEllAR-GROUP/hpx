@@ -1,6 +1,8 @@
 // Copyright (c) 2025 Sai Charan Arvapally
-// SPDX-License-License: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
+//
+// SPDX-License-Identifier: BSL-1.0
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
@@ -11,12 +13,16 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/synchronization/stop_token.hpp>
 
+#include <cstddef> 
+#include <utility>  
+#include <exception>  
+
 // Forward declaration of hpx::get_num_worker_threads to avoid including <hpx/thread.hpp>
 namespace hpx {
     std::size_t get_num_worker_threads();
 }
 
-// Forward declarations for execution::experimental
+// Forward declarations for execution::experimentalå
 namespace hpx::execution::experimental {
     enum class forward_progress_guarantee;
     struct get_forward_progress_guarantee_t;
