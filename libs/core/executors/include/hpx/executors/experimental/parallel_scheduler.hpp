@@ -1,30 +1,35 @@
 // Copyright (c) 2025 Sai Charan Arvapally
-//
-// SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+// SPDX-License-License: BSL-1.0
+// Distributed under the Boost Software License, Version 1.0.
 
 #pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution_base/completion_scheduler.hpp>
-#include <hpx/execution_base/get_env.hpp>
-#include <hpx/execution_base/sender.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/modules/iterator_support.hpp>
 #include <hpx/synchronization/stop_token.hpp>
 
-#include <cstddef>
-#include <exception>
-#include <memory>
-#include <type_traits>
-#include <utility>
+// Forward declaration of hpx::get_num_worker_threads to avoid including <hpx/thread.hpp>
+namespace hpx {
+    std::size_t get_num_worker_threads();
+}
+
+// Forward declarations for execution::experimental
+namespace hpx::execution::experimental {
+    enum class forward_progress_guarantee;
+    struct get_forward_progress_guarantee_t;
+    struct schedule_t;
+    struct connect_t;
+    struct start_t;
+    struct set_value_t;
+    struct set_error_t;
+    struct set_stopped_t;
+    struct get_env_t;
+    struct then_t;
+    struct sender_t;
+}    // namespace hpx::execution::experimental
 
 namespace hpx::execution::experimental {
 
@@ -40,14 +45,12 @@ namespace hpx::execution::experimental {
 
     struct parallel_scheduler
     {
-        using wrapped_type =
-            thread_pool_policy_scheduler<hpx::launch::async_policy>;
+        using wrapped_type = thread_pool_policy_scheduler<hpx::launch>;
 
-        parallel_scheduler() noexcept
-          : wrapped_(hpx::launch::async_policy{})
+        parallel_scheduler(hpx::launch policy) noexcept
+          : wrapped_(policy)
         {
         }
-
         parallel_scheduler(const parallel_scheduler&) noexcept = default;
         parallel_scheduler(parallel_scheduler&&) noexcept = default;
         parallel_scheduler& operator=(
@@ -72,15 +75,117 @@ namespace hpx::execution::experimental {
         wrapped_type wrapped_;
     };
 
-    parallel_scheduler get_parallel_scheduler();
+    inline parallel_scheduler get_parallel_scheduler()
+    {
+        // Set policy based on number of worker threads
+        hpx::launch policy = hpx::launch::async;
+        if (hpx::get_num_worker_threads() == 1)
+        {
+            policy = hpx::launch::sync;
+        }
+        static parallel_scheduler instance(policy);
+        return instance;
+    }
+
+    template <typename Receiver, typename Func>
+    struct wrapped_receiver
+    {
+        Receiver receiver_;
+        Func func_;
+
+        wrapped_receiver(Receiver&& receiver, Func&& func)
+          : receiver_(std::move(receiver))
+          , func_(std::move(func))
+        {
+        }
+
+        friend void tag_invoke(set_value_t, wrapped_receiver&& wr)
+        {
+            try
+            {
+                wr.func_();
+                tag_invoke(set_value_t{}, std::move(wr.receiver_));
+            }
+            catch (...)
+            {
+                tag_invoke(set_error_t{}, std::move(wr.receiver_),
+                    std::current_exception());
+            }
+        }
+
+        friend void tag_invoke(
+            set_error_t, wrapped_receiver&& wr, std::exception_ptr ep) noexcept
+        {
+            tag_invoke(set_error_t{}, std::move(wr.receiver_), ep);
+        }
+
+        friend void tag_invoke(set_stopped_t, wrapped_receiver&& wr) noexcept
+        {
+            tag_invoke(set_stopped_t{}, std::move(wr.receiver_));
+        }
+    };
+
+    template <typename Sender, typename Func>
+    struct then_sender
+    {
+        using sender_concept = sender_t;
+
+        Sender sender_;
+        Func func_;
+
+        then_sender(Sender&& sender, Func&& func)
+          : sender_(std::move(sender))
+          , func_(std::move(func))
+        {
+        }
+
+        friend auto tag_invoke(get_env_t, const then_sender& s) noexcept
+        {
+            return get_env(s.sender_);
+        }
+
+        template <typename Receiver>
+        struct operation_state
+        {
+            using wrapped_receiver_t = wrapped_receiver<Receiver, Func>;
+            using wrapped_op_state_t =
+                decltype(tag_invoke(connect_t{}, std::declval<Sender&&>(),
+                    std::declval<wrapped_receiver_t&&>()));
+
+            wrapped_op_state_t wrapped_op_;
+
+            operation_state(Sender&& sender, Func&& func, Receiver&& receiver)
+              : wrapped_op_(tag_invoke(connect_t{}, std::move(sender),
+                    wrapped_receiver_t{std::move(receiver), std::move(func)}))
+            {
+            }
+
+            friend void tag_invoke(start_t, operation_state& op) noexcept
+            {
+                start(op.wrapped_op_);
+            }
+        };
+
+        template <typename Receiver>
+        friend auto tag_invoke(connect_t, then_sender&& s, Receiver&& receiver)
+        {
+            return operation_state<Receiver>{std::move(s.sender_),
+                std::move(s.func_), std::forward<Receiver>(receiver)};
+        }
+
+        template <typename Receiver>
+        friend auto tag_invoke(
+            connect_t, const then_sender& s, Receiver&& receiver)
+        {
+            return operation_state<Receiver>{
+                s.sender_, s.func_, std::forward<Receiver>(receiver)};
+        }
+    };
 
     template <typename Scheduler>
     struct parallel_sender
     {
         using sender_concept = sender_t;
-
-        using completion_signatures = completion_signatures<set_value_t(),
-            set_stopped_t(), set_error_t(std::exception_ptr)>;
 
         explicit parallel_sender(Scheduler scheduler) noexcept
           : scheduler_(std::move(scheduler))
@@ -90,9 +195,11 @@ namespace hpx::execution::experimental {
         friend auto tag_invoke(
             get_env_t, const parallel_sender& sender) noexcept
         {
-            return hpx::execution::experimental::get_env(
-                hpx::execution::experimental::schedule(
-                    sender.scheduler_.wrapped_));
+            struct env
+            {
+                Scheduler scheduler_;
+            };
+            return env{sender.scheduler_};
         }
 
         template <typename Receiver>
@@ -123,10 +230,6 @@ namespace hpx::execution::experimental {
                     auto wrapped_op = hpx::execution::experimental::connect(
                         std::move(wrapped_sender), std::move(op.receiver_));
                     start(wrapped_op);
-                    if (hpx::get_num_worker_threads() == 1)
-                    {
-                        hpx::this_thread::yield();
-                    }
                 }
                 catch (...)
                 {
@@ -152,6 +255,21 @@ namespace hpx::execution::experimental {
                 std::forward<Receiver>(receiver), sender.scheduler_.wrapped_};
         }
 
+        template <typename Func>
+        friend auto tag_invoke(then_t, parallel_sender&& sender, Func&& func)
+        {
+            return then_sender<parallel_sender, std::decay_t<Func>>{
+                std::move(sender), std::forward<Func>(func)};
+        }
+
+        template <typename Func>
+        friend auto tag_invoke(
+            then_t, const parallel_sender& sender, Func&& func)
+        {
+            return then_sender<parallel_sender, std::decay_t<Func>>{
+                sender, std::forward<Func>(func)};
+        }
+
     private:
         Scheduler scheduler_;
     };
@@ -162,16 +280,9 @@ namespace hpx::execution::experimental {
         return parallel_sender<parallel_scheduler>(*this);
     }
 
-    inline parallel_scheduler get_parallel_scheduler()
-    {
-        static parallel_scheduler instance;
-        return instance;
-    }
-
     inline parallel_sender<parallel_scheduler> tag_invoke(
         schedule_t, const parallel_scheduler& sched) noexcept
     {
         return sched.schedule();
     }
-
 }    // namespace hpx::execution::experimental
