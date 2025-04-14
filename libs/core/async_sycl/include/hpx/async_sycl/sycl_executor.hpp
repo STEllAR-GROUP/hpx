@@ -27,6 +27,17 @@
 #include <utility>
 
 namespace hpx::sycl::experimental {
+    namespace detail {
+        /// type trait to identify basic sycl queue args (as in: no sycl indices / callable kernels) 
+        /// Required for correct overloading later on
+        template <class T>
+        struct is_basic_queue_arg
+          : std::integral_constant<bool,
+                std::is_scalar<T>::value ||
+                    std::is_same<T, cl::sycl::event>::value ||
+                    std::is_same<T, const std::vector<cl::sycl::event>&>::value>
+        {};
+    }    // namespace detail
 
     struct sycl_executor
     {
@@ -135,7 +146,10 @@ namespace hpx::sycl::experimental {
         /// sycl::queue::member_function type with code_location parameter
         template <typename... Params>
         using queue_function_code_loc_ptr_t = cl::sycl::event (
-            cl::sycl::queue::*)(Params..., cl::sycl::detail::code_location const&);
+            cl::sycl::queue::*)(std::conditional_t<
+                std::is_trivial_v<std::remove_reference_t<Params>>,
+                std::decay_t<Params>, Params>..., cl::sycl::detail::code_location const&);
+
         /// Invoke member function given queue and parameters. Default
         /// code_location argument added automatically.
         template <typename... Params>
@@ -209,6 +223,12 @@ namespace hpx::sycl::experimental {
         {
             return command_queue.get_context();
         }
+        /// Return the underlying queue for direct access
+        HPX_FORCEINLINE cl::sycl::queue& get_queue() 
+        {
+            return command_queue;
+        }
+
 
         // TODO Future work: Check if we want to expose any other (non-event)
         // queue methods
@@ -247,7 +267,12 @@ namespace hpx {
 
     /// hpx::async overload for launching sycl queue member functions with an
     /// sycl executor
-    template <typename Executor, typename... Ts, std::enable_if_t<!(std::conjunction_v<std::is_scalar<Ts>...>), bool> guard=true>
+#if defined(__INTEL_LLVM_COMPILER) ||                                          \
+    (defined(__clang__) && defined(SYCL_IMPLEMENTATION_ONEAPI))
+    template <typename Executor, typename... Ts, std::enable_if_t<!(std::conjunction_v<sycl::experimental::detail::is_basic_queue_arg<Ts>...>), bool> guard=true>
+#else
+    template <typename Executor, typename... Ts>
+#endif
     HPX_FORCEINLINE decltype(auto) async(Executor&& exec,
         hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts...>&& f,
         Ts&&... ts)
@@ -268,7 +293,12 @@ namespace hpx {
 
     /// hpx::apply overload for launching sycl queue member functions with an
     /// sycl executor
-    template <typename Executor, typename... Ts, std::enable_if_t<!(std::conjunction_v<std::is_scalar<Ts>...>), bool> guard=true>
+#if defined(__INTEL_LLVM_COMPILER) ||                                          \
+    (defined(__clang__) && defined(SYCL_IMPLEMENTATION_ONEAPI))
+    template <typename Executor, typename... Ts, std::enable_if_t<!(std::conjunction_v<sycl::experimental::detail::is_basic_queue_arg<Ts>...>), bool> guard=true>
+#else
+    template <typename Executor, typename... Ts>
+#endif
     HPX_FORCEINLINE bool apply(Executor&& exec,
         hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts...>&& f,
         Ts&&... ts)
@@ -290,7 +320,7 @@ namespace hpx {
     (defined(__clang__) && defined(SYCL_IMPLEMENTATION_ONEAPI))
     /// hpx::async overload for launching sycl queue member functions with an
     /// sycl executor and code location ptrs
-    template <typename Executor, typename... Ts, std::enable_if_t<(std::conjunction_v<std::is_scalar<Ts>...>), bool> guard=true>
+    template <typename Executor, typename... Ts, std::enable_if_t<(std::conjunction_v<sycl::experimental::detail::is_basic_queue_arg<Ts>...>), bool> guard=true>
     HPX_FORCEINLINE decltype(auto) async(Executor&& exec,
         hpx::sycl::experimental::sycl_executor::queue_function_code_loc_ptr_t<
             Ts...>&& f,
@@ -311,7 +341,7 @@ namespace hpx {
 
     /// hpx::apply overload for launching sycl queue member functions with an
     /// sycl executor and code location ptrs
-    template <typename Executor, typename... Ts, std::enable_if_t<(std::conjunction_v<std::is_scalar<Ts>...>), bool> guard=true>
+    template <typename Executor, typename... Ts, std::enable_if_t<(std::conjunction_v<sycl::experimental::detail::is_basic_queue_arg<Ts>...>), bool> guard=true>
     HPX_FORCEINLINE bool apply(Executor&& exec,
         hpx::sycl::experimental::sycl_executor::queue_function_code_loc_ptr_t<
             Ts...>&& f,
@@ -331,10 +361,10 @@ namespace hpx {
 
     // TODO(daissgr) Maybe make the next two specialized for the submit method (mostly by requiring a different function point?
 
-    template <typename Executor, typename T>
+    template <typename Executor, typename... Ts, typename T, std::enable_if_t<(std::conjunction_v<sycl::experimental::detail::is_basic_queue_arg<Ts>...>), bool> guard=true>
     HPX_FORCEINLINE decltype(auto) async(Executor&& exec,
         hpx::sycl::experimental::sycl_executor::queue_function_code_loc_ptr_t<
-            T>&& f,
+            Ts..., T>&& f, Ts&&... ts,
         T&& t)
     {
         // Make sure we only use this for sycl executors
@@ -344,18 +374,19 @@ namespace hpx {
         return detail::async_dispatch<
             typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
                                                            exec),
-            HPX_FORWARD(hpx::sycl::experimental::sycl_executor::
-                            queue_function_code_loc_ptr_t<T>,
-                f),
-            HPX_FORWARD(T, t));
+            std::forward<hpx::sycl::experimental::sycl_executor::
+                            queue_function_code_loc_ptr_t<Ts..., T>>(f),
+                std::forward<Ts>(ts)...,
+            std::forward<T>(t));
     }
 
     /// hpx::apply overload for launching sycl queue member functions with an
     /// sycl executor and code location ptrs
-    template <typename Executor, typename T>
+    /* template <typename Executor, typename T> */
+    template <typename Executor, typename... Ts, typename T, std::enable_if_t<(std::conjunction_v<sycl::experimental::detail::is_basic_queue_arg<Ts>...>), bool> guard=true>
     HPX_FORCEINLINE bool apply(Executor&& exec,
         hpx::sycl::experimental::sycl_executor::queue_function_code_loc_ptr_t<
-            T>&& f,
+            Ts..., T>&& f, Ts&&... ts,
         T&& t)
     {
         // Make sure we only use this for sycl executors
@@ -364,10 +395,10 @@ namespace hpx {
         // Use the same apply_dispatch than the normal apply otherwise
         return detail::post_dispatch<typename std::decay<Executor>::type>::call(
             HPX_FORWARD(Executor, exec),
-            HPX_FORWARD(hpx::sycl::experimental::sycl_executor::
-                            queue_function_code_loc_ptr_t<T>,
-                f),
-            HPX_FORWARD(T, t));
+            std::forward<hpx::sycl::experimental::sycl_executor::
+                            queue_function_code_loc_ptr_t<Ts..., T>>(f),
+                std::forward<Ts>(ts)...,
+            std::forward<T>(t));
     }
 #endif
 }    // namespace hpx
