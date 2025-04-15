@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,17 +20,20 @@
 
 namespace hpx::threads::policies::detail {
 
-    inline std::size_t count_initialized(
-        std::vector<mask_type> const& masks) noexcept
-    {
-        std::size_t count = 0;
-        for (mask_cref_type m : masks)
+    namespace {
+
+        inline std::size_t count_initialized(
+            std::vector<mask_type> const& masks) noexcept
         {
-            if (threads::any(m))
-                ++count;
+            std::size_t count = 0;
+            for (mask_cref_type m : masks)
+            {
+                if (threads::any(m))
+                    ++count;
+            }
+            return count;
         }
-        return count;
-    }
+    }    // namespace
 
     affinity_data::affinity_data()
       : num_threads_(0)
@@ -39,6 +42,7 @@ namespace hpx::threads::policies::detail {
       , used_cores_(0)
       , affinity_domain_("pu")
       , no_affinity_()
+      , disable_affinities_(false)
       , use_process_mask_(false)
       , num_pus_needed_(0)
     {
@@ -56,13 +60,15 @@ namespace hpx::threads::policies::detail {
         --instance_number_counter_;
     }
 
-    void affinity_data::init(std::size_t num_threads, std::size_t max_cores,
-        std::size_t pu_offset, std::size_t pu_step, std::size_t used_cores,
+    void affinity_data::init(std::size_t const num_threads,
+        std::size_t const max_cores, std::size_t const pu_offset,
+        std::size_t const pu_step, std::size_t const used_cores,
         std::string affinity_domain,    // -V813
         std::string const& affinity_description, bool use_process_mask)
     {
 #if defined(__APPLE__)
         use_process_mask = false;
+        disable_affinities_ = true;
 #endif
 
         use_process_mask_ = use_process_mask;
@@ -97,6 +103,7 @@ namespace hpx::threads::policies::detail {
             threads::resize(no_affinity_, num_system_pus);
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::set(no_affinity_, get_pu_num(i));
+            disable_affinities_ = true;
         }
         else if (!affinity_description.empty())
         {
@@ -155,7 +162,7 @@ namespace hpx::threads::policies::detail {
         num_pus_needed_ = (std::max)(num_unique_cores, max_cores);
     }
 
-    void affinity_data::set_num_threads(size_t num_threads) noexcept
+    void affinity_data::set_num_threads(size_t const num_threads) noexcept
     {
         num_threads_ = num_threads;
     }
@@ -172,13 +179,13 @@ namespace hpx::threads::policies::detail {
         affinity_masks_ = HPX_MOVE(affinity_masks);
     }
 
-    mask_type affinity_data::get_pu_mask(
-        threads::topology const& topo, std::size_t global_thread_num) const
+    mask_type affinity_data::get_pu_mask(threads::topology const& topo,
+        std::size_t const global_thread_num) const
     {
         // --hpx:bind=none disables all affinity
         if (threads::test(no_affinity_, global_thread_num))
         {
-            mask_type m = mask_type();
+            auto m = mask_type();
             threads::resize(
                 m, static_cast<std::size_t>(hardware_concurrency()));
             threads::set(m, get_pu_num(global_thread_num));
@@ -218,7 +225,7 @@ namespace hpx::threads::policies::detail {
     }
 
     mask_type affinity_data::get_used_pus_mask(
-        threads::topology const& topo, std::size_t pu_num) const
+        threads::topology const& topo, std::size_t const pu_num) const
     {
         auto const overall_threads =
             static_cast<std::size_t>(hardware_concurrency());
@@ -233,8 +240,10 @@ namespace hpx::threads::policies::detail {
             return ret;
         }
 
+        // clang-format off
         for (std::size_t thread_num = 0; thread_num != num_threads_;
-             ++thread_num)
+            ++thread_num)
+        // clang-format on
         {
             auto const thread_mask = get_pu_mask(topo, thread_num);
             for (std::size_t i = 0; i != overall_threads; ++i)
@@ -250,7 +259,7 @@ namespace hpx::threads::policies::detail {
     }
 
     std::size_t affinity_data::get_thread_occupancy(
-        threads::topology const& topo, std::size_t pu_num) const
+        threads::topology const& topo, std::size_t const pu_num) const
     {
         std::size_t count = 0;
         if (threads::test(no_affinity_, pu_num))
@@ -259,14 +268,16 @@ namespace hpx::threads::policies::detail {
         }
         else
         {
-            mask_type pu_mask = mask_type();
+            auto pu_mask = mask_type();
 
             threads::resize(
                 pu_mask, static_cast<std::size_t>(hardware_concurrency()));
             threads::set(pu_mask, pu_num);
 
+            // clang-format off
             for (std::size_t num_thread = 0; num_thread != num_threads_;
-                 ++num_thread)
+                ++num_thread)
+            // clang-format on
             {
                 mask_cref_type affinity_mask = get_pu_mask(topo, num_thread);
                 if (threads::any(pu_mask & affinity_mask))
@@ -276,7 +287,8 @@ namespace hpx::threads::policies::detail {
         return count;
     }
 
-    std::size_t affinity_data::get_pu_num(std::size_t num_thread) const noexcept
+    std::size_t affinity_data::get_pu_num(
+        std::size_t const num_thread) const noexcept
     {
         HPX_ASSERT(num_thread < pu_nums_.size());
         return pu_nums_[num_thread];
@@ -293,7 +305,8 @@ namespace hpx::threads::policies::detail {
     }
 
     // means of adding a processing unit after initialization
-    void affinity_data::add_punit(std::size_t virt_core, std::size_t thread_num)
+    void affinity_data::add_punit(
+        std::size_t const virt_core, std::size_t const thread_num)
     {
         std::size_t const num_system_pus =
             static_cast<std::size_t>(hardware_concurrency());
@@ -320,7 +333,8 @@ namespace hpx::threads::policies::detail {
         init_cached_pu_nums(num_system_pus);
     }
 
-    void affinity_data::init_cached_pu_nums(std::size_t hardware_concurrency)
+    void affinity_data::init_cached_pu_nums(
+        std::size_t const hardware_concurrency)
     {
         if (pu_nums_.empty())
         {
@@ -332,8 +346,8 @@ namespace hpx::threads::policies::detail {
         }
     }
 
-    std::size_t affinity_data::get_pu_num(
-        std::size_t num_thread, std::size_t hardware_concurrency) const
+    std::size_t affinity_data::get_pu_num(std::size_t const num_thread,
+        std::size_t const hardware_concurrency) const
     {
         // The offset shouldn't be larger than the number of available
         // processing units.

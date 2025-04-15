@@ -154,16 +154,18 @@ namespace hpx::compute::host {
                     hpx::forward_as_tuple(HPX_FORWARD(Args, args)...);
 
                 decltype(auto) hinted_policy =
-                    parallel::util::adapt_sharing_mode(policy_,
+                    hpx::execution::experimental::adapt_sharing_mode(policy_,
                         hpx::threads::thread_sharing_hint::
                             do_not_share_function);
 
                 cancellation_token tok;
                 partitioner::call(
                     hinted_policy, util::begin(irange), count,
+                    // clang-format off
                     [&arguments, p, &tok](
                         iterator_type it, std::size_t part_size) mutable
-                    -> partition_result_type {
+                        -> partition_result_type {
+                        // clang-format on
                         iterator_type last =
                             parallel::util::loop_with_cleanup_n_with_token(
                                 it, part_size, tok,
