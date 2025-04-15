@@ -13,3 +13,4 @@
 #include <hpx/hpx_init_params.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_suspend.hpp>
+#include <hpx/manage_runtime.hpp>

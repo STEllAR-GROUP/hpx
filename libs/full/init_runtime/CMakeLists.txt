@@ -8,6 +8,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(init_runtime_headers
     hpx/init.hpp
+    hpx/manage_runtime.hpp
     hpx/hpx_finalize.hpp
     hpx/hpx_init.hpp
     hpx/hpx_init_impl.hpp
