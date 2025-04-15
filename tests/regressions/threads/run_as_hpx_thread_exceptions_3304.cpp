@@ -23,7 +23,9 @@ void hpx_thread_func()
 
 int main(int argc, char** argv)
 {
-    hpx::manage_runtime rt(argc, argv);
+    hpx::manage_runtime rt;
+
+    rt.start(argc, argv);
 
     bool exception_caught = false;
     try
@@ -37,5 +39,5 @@ int main(int argc, char** argv)
     }
     HPX_TEST(exception_caught);
 
-    return 0;
+    return rt.stop();
 }

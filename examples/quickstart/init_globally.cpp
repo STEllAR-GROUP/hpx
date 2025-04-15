@@ -86,26 +86,42 @@ char** __argv = *_NSGetArgv();
 // sequencing of destructors.
 class manage_global_runtime
 {
-    static hpx::init_params make_init_args()
+    struct impl
     {
-        std::vector<std::string> cfg = {// make sure hpx_main is always executed
-            "hpx.run_hpx_main!=1",
-            // allow for unknown command line options
-            "hpx.commandline.allow_unknown!=1",
-            // disable HPX' short options
-            "hpx.commandline.aliasing!=0"};
+        hpx::manage_runtime rts;
 
-        hpx::init_params init_args;
-        init_args.cfg = std::move(cfg);
-        init_args.mode = hpx::runtime_mode::default_;
-        return init_args;
-    }
+        impl()
+        {
+            hpx::init_params init_args;
+            init_args.cfg = {
+                // make sure hpx_main is always executed
+                "hpx.run_hpx_main!=1",
+                // allow for unknown command line options
+                "hpx.commandline.allow_unknown!=1",
+                // disable HPX' short options
+                "hpx.commandline.aliasing!=0",
+            };
+            init_args.mode = hpx::runtime_mode::default_;
+
+            if (!rts.start(__argc, __argv, init_args))
+            {
+                // Something went wrong while initializing the runtime.
+                // This early we can't generate any output, just bail out.
+                std::abort();
+            }
+        }
+
+        ~impl()
+        {
+            // Something went wrong while stopping the runtime. Ignore.
+            (void) rts.stop();
+        }
+    };
 
     hpx::manage_runtime& get()
     {
-        static thread_local hpx::manage_runtime m(
-            __argc, __argv, make_init_args());
-        return m;
+        static thread_local impl m;
+        return m.rts;
     }
 
     hpx::execution_base::agent_base& agent =

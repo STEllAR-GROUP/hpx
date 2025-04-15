@@ -19,10 +19,8 @@ namespace hpx {
     class manage_runtime
     {
     public:
-        manage_runtime(
+        int start(
             int argc, char** argv, const init_params& init_args = init_params())
-          : running_(false)
-          , rts_(nullptr)
         {
 #if defined(HPX_WINDOWS)
             detail::init_winsocket();
@@ -31,20 +29,18 @@ namespace hpx {
             function<int(int, char**)> start_function =
                 bind_front(&manage_runtime::hpx_main, this);
 
-            if (!start(start_function, argc, argv, init_args))
-            {
-                // Something went wrong while initializing the runtime.
-                // This early we can't generate any output, just bail out.
-                std::abort();
-            }
+            const int ret = hpx::start(start_function, argc, argv, init_args);
+            if (!ret) return ret;
 
             // Wait for the main HPX thread (hpx_main below) to have started running
             std::unique_lock<std::mutex> lk(startup_mtx_);
             while (!running_)
                 startup_cond_.wait(lk);
+
+            return ret;
         }
 
-        ~manage_runtime()
+        int stop()
         {
             // notify hpx_main above to tear down the runtime
             {
@@ -55,7 +51,7 @@ namespace hpx {
             cond_.notify_one();    // signal exit
 
             // wait for the runtime to exit
-            stop();
+            return hpx::stop();
         }
 
         runtime* get_runtime_ptr() const noexcept
@@ -97,8 +93,8 @@ namespace hpx {
 
         std::mutex startup_mtx_;
         std::condition_variable startup_cond_;
-        bool running_;
+        bool running_ = false;
 
-        runtime* rts_;
+        runtime* rts_ = nullptr;
     };
 }    // namespace hpx
