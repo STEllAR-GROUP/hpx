@@ -89,8 +89,7 @@ void VectorAdd(sycl::queue& q, std::vector<size_t> const& a_vector,
         my_kernel_event = q.submit([&](sycl::handler& h) {
             sycl::accessor a(a_buf, h, sycl::read_only);
             sycl::accessor b(b_buf, h, sycl::read_only);
-            sycl::accessor add(
-                add_buf, h, sycl::write_only, sycl::no_init);
+            sycl::accessor add(add_buf, h, sycl::write_only, sycl::no_init);
             h.parallel_for(num_items, [=](auto i) { add[i] = a[i] + b[i]; });
         });
         // Get future from event
@@ -123,8 +122,7 @@ void VectorAdd(sycl::queue& q, std::vector<size_t> const& a_vector,
         auto const event_status_after =
             my_kernel_event
                 .get_info<sycl::info::event::command_execution_status>();
-        if (event_status_after ==
-            sycl::info::event_command_status::complete)
+        if (event_status_after == sycl::info::event_command_status::complete)
         {
             std::cout << "OKAY: Kernel is done!" << std::endl;
         }
@@ -179,8 +177,8 @@ int hpx_main(int, char*[])
     // Create queue and run on device
     try
     {
-        sycl::queue q(sycl::default_selector_v,
-            sycl::property::queue::in_order{});
+        sycl::queue q(
+            sycl::default_selector_v, sycl::property::queue::in_order{});
         std::cout << "Running on device: "
                   << q.get_device().get_info<sycl::info::device::name>()
                   << "\n";

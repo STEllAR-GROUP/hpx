@@ -231,8 +231,9 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
         detail::event_callback continuation;
         while (detail::get_event_callback_queue().try_dequeue(continuation))
         {
-            auto const event_status = continuation.event.get_info<
-                ::sycl::info::event::command_execution_status>();
+            auto const event_status =
+                continuation.event
+                    .get_info<::sycl::info::event::command_execution_status>();
 
             if (event_status != ::sycl::info::event_command_status::complete)
             {
@@ -280,8 +281,8 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
             "Error: Internal SYCL queue was already existing when activating "
             "the SYCL event polling. This is likely due to improper disabling "
             "of previous event polling");
-        optional_queue.emplace(::sycl::default_selector_v,
-            ::sycl::property::queue::in_order{});
+        optional_queue.emplace(
+            ::sycl::default_selector_v, ::sycl::property::queue::in_order{});
         auto* sched = pool.get_scheduler();
         sched->set_sycl_polling_functions(
             &hpx::sycl::experimental::detail::poll, &get_work_count);

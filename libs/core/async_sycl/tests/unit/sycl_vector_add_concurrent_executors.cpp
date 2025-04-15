@@ -59,15 +59,14 @@ void VectorAdd(std::vector<size_t> const& a_vector,
                 sycl::buffer add_buf(c_data + current_chunk_id, num_items);
 
                 // Testing post
-                hpx::apply(
-                    exec, &sycl::queue::submit, [&](sycl::handler& h) {
-                        sycl::accessor a(a_buf, h, sycl::read_only);
-                        sycl::accessor b(b_buf, h, sycl::read_only);
-                        sycl::accessor add(add_buf, h, sycl::write_only,
-                            sycl::no_init);
-                        h.parallel_for(
-                            num_items, [=](auto i) { add[i] = a[i] + b[i]; });
-                    });
+                hpx::apply(exec, &sycl::queue::submit, [&](sycl::handler& h) {
+                    sycl::accessor a(a_buf, h, sycl::read_only);
+                    sycl::accessor b(b_buf, h, sycl::read_only);
+                    sycl::accessor add(
+                        add_buf, h, sycl::write_only, sycl::no_init);
+                    h.parallel_for(
+                        num_items, [=](auto i) { add[i] = a[i] + b[i]; });
+                });
             }
             size_t const last_chunk_id = slice_size_per_executor *
                 (exec_id * number_repetitions + number_repetitions - 1);
@@ -76,8 +75,8 @@ void VectorAdd(std::vector<size_t> const& a_vector,
             sycl::buffer add_buf(c_data + last_chunk_id, num_items);
 
             // Testing async_exec
-            auto kernel_fut = hpx::async(
-                exec, &sycl::queue::submit, [&](sycl::handler& h) {
+            auto kernel_fut =
+                hpx::async(exec, &sycl::queue::submit, [&](sycl::handler& h) {
                     sycl::accessor a(a_buf, h, sycl::read_only);
                     sycl::accessor b(b_buf, h, sycl::read_only);
                     sycl::accessor add(
