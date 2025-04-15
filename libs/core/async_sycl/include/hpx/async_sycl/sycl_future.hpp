@@ -57,7 +57,7 @@ namespace hpx { namespace sycl { namespace experimental {
             /// Default way to construct a SYCL future
             /// Prefer this over the host_task version
             future_data(init_no_addref no_addref, other_allocator const& alloc,
-                cl::sycl::event command_event)
+                ::sycl::event command_event)
               : lcos::detail::future_data_allocator<void, Allocator>(
                     no_addref, alloc)
             {
@@ -76,13 +76,13 @@ namespace hpx { namespace sycl { namespace experimental {
             /// Alternative integration: Use SYCL host tasks
             /// Slower but useful for comparisons...
             future_data(init_no_addref no_addref, other_allocator const& alloc,
-                cl::sycl::event command_event, cl::sycl::queue& command_queue)
+                ::sycl::event command_event, ::sycl::queue& command_queue)
               : lcos::detail::future_data_allocator<void, Allocator>(
                     no_addref, alloc)
             {
                 command_queue.submit([fdp = hpx::intrusive_ptr<future_data>(
                                           this),
-                                         command_event](cl::sycl::handler& h) {
+                                         command_event](::sycl::handler& h) {
                     h.depends_on(command_event);
                     h.host_task([fdp]() { fdp->set_data(hpx::util::unused); });
                 });
@@ -94,7 +94,7 @@ namespace hpx { namespace sycl { namespace experimental {
         /// Construct an HPX future, using event polling to set data
         template <typename Allocator>
         hpx::future<void> get_future(
-            Allocator const& a, cl::sycl::event command_event)
+            Allocator const& a, ::sycl::event command_event)
         {
             using shared_state = future_data<Allocator>;
 
@@ -123,7 +123,7 @@ namespace hpx { namespace sycl { namespace experimental {
         /// Note: Slower than event polling version in my tests
         template <typename Allocator>
         hpx::future<void> get_future_using_host_task(Allocator const& a,
-            cl::sycl::event command_event, cl::sycl::queue& command_queue)
+            ::sycl::event command_event, ::sycl::queue& command_queue)
         {
             using shared_state = future_data<Allocator>;
 
@@ -157,16 +157,16 @@ namespace hpx { namespace sycl { namespace experimental {
         // -------------------------------------------------------------
         // non allocator version of get future with an event
         HPX_CORE_EXPORT hpx::future<void> get_future(
-            cl::sycl::event command_event);
+            ::sycl::event command_event);
         // -------------------------------------------------------------
         // non allocator version of get future with an SYCL host task
         HPX_CORE_EXPORT hpx::future<void> get_future_using_host_task(
-            cl::sycl::event command_event, cl::sycl::queue& command_queue);
+            ::sycl::event command_event, ::sycl::queue& command_queue);
         // -------------------------------------------------------------
         /// Convenience wrapper to get future from just a queue
         /// Note: queue needs to be constructed with the in_order attribute
         HPX_FORCEINLINE hpx::future<void> get_future(
-            cl::sycl::queue& command_queue)
+            ::sycl::queue& command_queue)
         {
             HPX_ASSERT(queue.is_in_order());
             return hpx::detail::try_catch_exception_ptr(
@@ -174,8 +174,8 @@ namespace hpx { namespace sycl { namespace experimental {
                     // The SYCL standard does not include a eventRecord method Instead
                     // we have to submit some dummy function and use the event the
                     // launch returns
-                    cl::sycl::event event = command_queue.submit(
-                        [](cl::sycl::handler& h) { h.single_task([]() {}); });
+                    ::sycl::event event = command_queue.submit(
+                        [](::sycl::handler& h) { h.single_task([]() {}); });
                     return get_future(event);
                 },
                 [&](std::exception_ptr&& ep) {
@@ -186,7 +186,7 @@ namespace hpx { namespace sycl { namespace experimental {
         /// Convenience wrapper to get future from just a queue using SYCL host tasks
         /// Note: queue needs to be constructed with the in_order attribute
         HPX_FORCEINLINE hpx::future<void> get_future_using_host_task(
-            cl::sycl::queue& command_queue)
+            ::sycl::queue& command_queue)
         {
             HPX_ASSERT(queue.is_in_order());
             return hpx::detail::try_catch_exception_ptr(
@@ -194,8 +194,8 @@ namespace hpx { namespace sycl { namespace experimental {
                     // The SYCL standard does not include a eventRecord method Instead
                     // we have to submit some dummy function and use the event the
                     // launch returns
-                    cl::sycl::event event = command_queue.submit(
-                        [](cl::sycl::handler& h) { h.single_task([]() {}); });
+                    ::sycl::event event = command_queue.submit(
+                        [](::sycl::handler& h) { h.single_task([]() {}); });
                     return get_future_using_host_task(event, command_queue);
                 },
                 [&](std::exception_ptr&& ep) {

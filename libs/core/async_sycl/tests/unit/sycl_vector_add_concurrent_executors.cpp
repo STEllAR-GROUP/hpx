@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include <CL/sycl.hpp>
+#include <sycl/sycl.hpp>
 
 #include "common/sycl_vector_add_test_utils.hpp"
 
@@ -47,41 +47,41 @@ void VectorAdd(std::vector<size_t> const& a_vector,
         auto c_data = add_parallel.data();
         futs[exec_id] = hpx::async([exec_id, a_data, b_data, c_data]() {
             hpx::sycl::experimental::sycl_executor exec(
-                cl::sycl::default_selector{});
-            cl::sycl::range<1> num_items{slice_size_per_executor};
+                sycl::default_selector_v);
+            sycl::range<1> num_items{slice_size_per_executor};
             for (size_t repetition = 0; repetition < number_repetitions - 1;
                  repetition++)
             {
                 size_t const current_chunk_id = slice_size_per_executor *
                     (exec_id * number_repetitions + repetition);
-                cl::sycl::buffer a_buf(a_data + current_chunk_id, num_items);
-                cl::sycl::buffer b_buf(b_data + current_chunk_id, num_items);
-                cl::sycl::buffer add_buf(c_data + current_chunk_id, num_items);
+                sycl::buffer a_buf(a_data + current_chunk_id, num_items);
+                sycl::buffer b_buf(b_data + current_chunk_id, num_items);
+                sycl::buffer add_buf(c_data + current_chunk_id, num_items);
 
                 // Testing post
                 hpx::apply(
-                    exec, &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
-                        cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
-                        cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
-                        cl::sycl::accessor add(add_buf, h, cl::sycl::write_only,
-                            cl::sycl::no_init);
+                    exec, &sycl::queue::submit, [&](sycl::handler& h) {
+                        sycl::accessor a(a_buf, h, sycl::read_only);
+                        sycl::accessor b(b_buf, h, sycl::read_only);
+                        sycl::accessor add(add_buf, h, sycl::write_only,
+                            sycl::no_init);
                         h.parallel_for(
                             num_items, [=](auto i) { add[i] = a[i] + b[i]; });
                     });
             }
             size_t const last_chunk_id = slice_size_per_executor *
                 (exec_id * number_repetitions + number_repetitions - 1);
-            cl::sycl::buffer a_buf(a_data + last_chunk_id, num_items);
-            cl::sycl::buffer b_buf(b_data + last_chunk_id, num_items);
-            cl::sycl::buffer add_buf(c_data + last_chunk_id, num_items);
+            sycl::buffer a_buf(a_data + last_chunk_id, num_items);
+            sycl::buffer b_buf(b_data + last_chunk_id, num_items);
+            sycl::buffer add_buf(c_data + last_chunk_id, num_items);
 
             // Testing async_exec
             auto kernel_fut = hpx::async(
-                exec, &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
-                    cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
-                    cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
-                    cl::sycl::accessor add(
-                        add_buf, h, cl::sycl::write_only, cl::sycl::no_init);
+                exec, &sycl::queue::submit, [&](sycl::handler& h) {
+                    sycl::accessor a(a_buf, h, sycl::read_only);
+                    sycl::accessor b(b_buf, h, sycl::read_only);
+                    sycl::accessor add(
+                        add_buf, h, sycl::write_only, sycl::no_init);
                     h.parallel_for(
                         num_items, [=](auto i) { add[i] = a[i] + b[i]; });
                 });

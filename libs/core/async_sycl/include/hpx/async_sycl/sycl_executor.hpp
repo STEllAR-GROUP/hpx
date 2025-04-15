@@ -34,8 +34,8 @@ namespace hpx::sycl::experimental {
         struct is_basic_queue_arg
           : std::integral_constant<bool,
                 std::is_scalar<T>::value ||
-                    std::is_same<T, cl::sycl::event>::value ||
-                    std::is_same<T, const std::vector<cl::sycl::event>&>::value>
+                    std::is_same<T, ::sycl::event>::value ||
+                    std::is_same<T, const std::vector<::sycl::event>&>::value>
         {};
     }    // namespace detail
 
@@ -45,8 +45,9 @@ namespace hpx::sycl::experimental {
 
         // --------------------------------------------------------------------
         /// Create a SYCL executor (based on a sycl queue)
-        explicit sycl_executor(cl::sycl::default_selector selector)
-          : command_queue(selector, cl::sycl::property::queue::in_order{})
+        template<typename sycl_device_selector>
+        explicit sycl_executor(const sycl_device_selector& selector)
+          : command_queue(selector, ::sycl::property::queue::in_order{})
         {
         }
 
@@ -65,7 +66,7 @@ namespace hpx::sycl::experimental {
         }
 
         /// Get future for that becomes ready when the given event completes
-        HPX_FORCEINLINE future_type get_future(cl::sycl::event event)
+        HPX_FORCEINLINE future_type get_future(::sycl::event event)
         {
             return detail::get_future(event);
         }
@@ -74,7 +75,7 @@ namespace hpx::sycl::experimental {
         /// parameter. Removes the reference for trivial types to make the
         /// function matching easier (see sycl_stream.cpp test)
         template <typename... Params>
-        using queue_function_ptr_t = cl::sycl::event (cl::sycl::queue::*)(
+        using queue_function_ptr_t = ::sycl::event (::sycl::queue::*)(
             std::conditional_t<
                 std::is_trivial_v<std::remove_reference_t<Params>>,
                 std::decay_t<Params>, Params>...);
@@ -84,7 +85,7 @@ namespace hpx::sycl::experimental {
         void post(queue_function_ptr_t<Params...>&& queue_member_function,
             Params&&... args)
         {
-            cl::sycl::event e =
+            ::sycl::event e =
                 HPX_INVOKE(HPX_FORWARD(queue_function_ptr_t<Params...>,
                                queue_member_function),
                     command_queue, HPX_FORWARD(Params, args)...);
@@ -100,7 +101,7 @@ namespace hpx::sycl::experimental {
             // into the future
             return hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    cl::sycl::event e =
+                    ::sycl::event e =
                         HPX_INVOKE(HPX_FORWARD(queue_function_ptr_t<Params...>,
                                        queue_member_function),
                             command_queue, HPX_FORWARD(Params, args)...);
@@ -145,10 +146,10 @@ namespace hpx::sycl::experimental {
 
         /// sycl::queue::member_function type with code_location parameter
         template <typename... Params>
-        using queue_function_code_loc_ptr_t = cl::sycl::event (
-            cl::sycl::queue::*)(std::conditional_t<
+        using queue_function_code_loc_ptr_t = ::sycl::event (
+            ::sycl::queue::*)(std::conditional_t<
                 std::is_trivial_v<std::remove_reference_t<Params>>,
-                std::decay_t<Params>, Params>..., cl::sycl::detail::code_location const&);
+                std::decay_t<Params>, Params>..., ::sycl::detail::code_location const&);
 
         /// Invoke member function given queue and parameters. Default
         /// code_location argument added automatically.
@@ -159,11 +160,11 @@ namespace hpx::sycl::experimental {
             // for the intel version we need to actually pass the code
             // location.  Within the intel sycl api this is usually a default
             // argument, but for invoke we need to pass it manually
-            cl::sycl::event e =
+            ::sycl::event e =
                 HPX_INVOKE(HPX_FORWARD(queue_function_code_loc_ptr_t<Params...>,
                                queue_member_function),
                     command_queue, HPX_FORWARD(Params, args)...,
-                    cl::sycl::detail::code_location::current());
+                    ::sycl::detail::code_location::current());
         }
         /// Invoke queue member function given queue and parameters. Default
         /// code_location argument added automatically.  / Returns hpx::future
@@ -178,11 +179,11 @@ namespace hpx::sycl::experimental {
             // into the future
             return hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    cl::sycl::event e = HPX_INVOKE(
+                    ::sycl::event e = HPX_INVOKE(
                         HPX_FORWARD(queue_function_code_loc_ptr_t<Params...>,
                             queue_member_function),
                         command_queue, HPX_FORWARD(Params, args)...,
-                        cl::sycl::detail::code_location::current());
+                        ::sycl::detail::code_location::current());
                     return get_future(e);
                 },
                 [&](std::exception_ptr&& ep) {
@@ -214,17 +215,17 @@ namespace hpx::sycl::experimental {
         // Property interface:
 
         /// Return the device used by the underlying SYCL queue
-        HPX_FORCEINLINE cl::sycl::device get_device() const
+        HPX_FORCEINLINE ::sycl::device get_device() const
         {
             return command_queue.get_device();
         }
         /// Return the context used by the underlying SYCL queue
-        HPX_FORCEINLINE cl::sycl::context get_context() const
+        HPX_FORCEINLINE ::sycl::context get_context() const
         {
             return command_queue.get_context();
         }
         /// Return the underlying queue for direct access
-        HPX_FORCEINLINE cl::sycl::queue& get_queue() 
+        HPX_FORCEINLINE ::sycl::queue& get_queue() 
         {
             return command_queue;
         }
@@ -233,7 +234,7 @@ namespace hpx::sycl::experimental {
         // TODO Future work: Check if we want to expose any other (non-event)
         // queue methods
     protected:
-        cl::sycl::queue command_queue;
+        ::sycl::queue command_queue;
     };
 }    // namespace hpx::sycl::experimental
 

@@ -60,9 +60,9 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     // the register_polling and will be reset during unregister_polling For
     // hipsycl, it further serves the purpose of flushing the DAG, preventing
     // deadlocks from lazy kernel invocation.
-    std::optional<cl::sycl::queue>& get_default_queue()
+    std::optional<::sycl::queue>& get_default_queue()
     {
-        static std::optional<cl::sycl::queue> default_queue;
+        static std::optional<::sycl::queue> default_queue;
         return default_queue;
     }
     // Default queue is protected by this mutex un/register_polling need a
@@ -80,7 +80,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     /// called when the event is ready.
     struct event_callback
     {
-        cl::sycl::event event;
+        ::sycl::event event;
         event_callback_function_type f;
     };
 
@@ -140,7 +140,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     // Adds an event callback directly for a given event
     // (event needs to be from the queue in question when using hipsycl)
     void add_event_callback(
-        event_callback_function_type&& f, cl::sycl::event event)
+        event_callback_function_type&& f, ::sycl::event event)
     {
         detail::add_to_event_callback_queue(event_callback{event, HPX_MOVE(f)});
 
@@ -214,10 +214,10 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
                 event_callback_vector.end(),
                 [&](event_callback& continuation) {
                     auto const event_status = continuation.event.get_info<
-                        cl::sycl::info::event::command_execution_status>();
+                        ::sycl::info::event::command_execution_status>();
 
                     if (event_status !=
-                        cl::sycl::info::event_command_status::complete)
+                        ::sycl::info::event_command_status::complete)
                     {
                         return false;
                     }
@@ -232,9 +232,9 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
         while (detail::get_event_callback_queue().try_dequeue(continuation))
         {
             auto const event_status = continuation.event.get_info<
-                cl::sycl::info::event::command_execution_status>();
+                ::sycl::info::event::command_execution_status>();
 
-            if (event_status != cl::sycl::info::event_command_status::complete)
+            if (event_status != ::sycl::info::event_command_status::complete)
             {
                 add_to_event_callback_vector(HPX_MOVE(continuation));
             }
@@ -280,8 +280,8 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
             "Error: Internal SYCL queue was already existing when activating "
             "the SYCL event polling. This is likely due to improper disabling "
             "of previous event polling");
-        optional_queue.emplace(cl::sycl::default_selector{},
-            cl::sycl::property::queue::in_order{});
+        optional_queue.emplace(::sycl::default_selector_v,
+            ::sycl::property::queue::in_order{});
         auto* sched = pool.get_scheduler();
         sched->set_sycl_polling_functions(
             &hpx::sycl::experimental::detail::poll, &get_work_count);

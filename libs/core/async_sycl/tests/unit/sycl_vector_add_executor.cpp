@@ -22,7 +22,7 @@
 
 #include "common/sycl_vector_add_test_utils.hpp"
 
-#include <CL/sycl.hpp>
+#include <sycl/sycl.hpp>
 
 // This vector_size leads to 610MB per buffer (size_t datatypes)
 // Entire scenario thus requires about 1830MB device memory when running
@@ -32,27 +32,27 @@ constexpr size_t vector_size = 80000000;
 void VectorAdd_test1(std::vector<size_t> const& a_vector,
     std::vector<size_t> const& b_vector, std::vector<size_t>& add_parallel)
 {
-    cl::sycl::range<1> num_items{a_vector.size()};
+    sycl::range<1> num_items{a_vector.size()};
     {
         bool continuation_triggered = false;
         // buffers from host vectors
-        cl::sycl::buffer a_buf(a_vector.data(), num_items);
-        cl::sycl::buffer b_buf(b_vector.data(), num_items);
-        cl::sycl::buffer add_buf(add_parallel.data(), num_items);
+        sycl::buffer a_buf(a_vector.data(), num_items);
+        sycl::buffer b_buf(b_vector.data(), num_items);
+        sycl::buffer add_buf(add_parallel.data(), num_items);
 
         // Create executor
         hpx::sycl::experimental::sycl_executor exec(
-            cl::sycl::default_selector{});
+            sycl::default_selector_v);
         std::cout << "Running on device: "
-                  << exec.get_device().get_info<cl::sycl::info::device::name>()
+                  << exec.get_device().get_info<sycl::info::device::name>()
                   << std::endl;
         // use async_execute
         auto async_normal_fut = exec.async_execute(
-            &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
-                cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
-                cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
-                cl::sycl::accessor add(
-                    add_buf, h, cl::sycl::write_only, cl::sycl::no_init);
+            &sycl::queue::submit, [&](sycl::handler& h) {
+                sycl::accessor a(a_buf, h, sycl::read_only);
+                sycl::accessor b(b_buf, h, sycl::read_only);
+                sycl::accessor add(
+                    add_buf, h, sycl::write_only, sycl::no_init);
                 h.parallel_for(
                     num_items, [=](auto i) { add[i] = a[i] + b[i]; });
             });
@@ -101,23 +101,23 @@ void VectorAdd_test1(std::vector<size_t> const& a_vector,
 void VectorAdd_test2(std::vector<size_t> const& a_vector,
     std::vector<size_t> const& b_vector, std::vector<size_t>& add_parallel)
 {
-    cl::sycl::range<1> num_items{a_vector.size()};
+    sycl::range<1> num_items{a_vector.size()};
     // buffers from host vectors
-    cl::sycl::buffer a_buf(a_vector.data(), num_items);
-    cl::sycl::buffer b_buf(b_vector.data(), num_items);
-    cl::sycl::buffer add_buf(add_parallel.data(), num_items);
+    sycl::buffer a_buf(a_vector.data(), num_items);
+    sycl::buffer b_buf(b_vector.data(), num_items);
+    sycl::buffer add_buf(add_parallel.data(), num_items);
 
     // Test post and get_future methods
-    hpx::sycl::experimental::sycl_executor exec(cl::sycl::default_selector{});
+    hpx::sycl::experimental::sycl_executor exec(sycl::default_selector_v);
     std::cout << "Running on device: "
-              << exec.get_device().get_info<cl::sycl::info::device::name>()
+              << exec.get_device().get_info<sycl::info::device::name>()
               << std::endl;
     // Launch kernel one-way
-    exec.post(&cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
-        cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
-        cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
-        cl::sycl::accessor add(
-            add_buf, h, cl::sycl::write_only, cl::sycl::no_init);
+    exec.post(&sycl::queue::submit, [&](sycl::handler& h) {
+        sycl::accessor a(a_buf, h, sycl::read_only);
+        sycl::accessor b(b_buf, h, sycl::read_only);
+        sycl::accessor add(
+            add_buf, h, sycl::write_only, sycl::no_init);
         h.parallel_for(num_items, [=](auto i) { add[i] = a[i] + b[i]; });
     });
     // NOTE: This is NOT the recommended way to get a future for a kernel
@@ -150,26 +150,26 @@ void VectorAdd_test2(std::vector<size_t> const& a_vector,
 void VectorAdd_test3(std::vector<size_t> const& a_vector,
     std::vector<size_t> const& b_vector, std::vector<size_t>& add_parallel)
 {
-    cl::sycl::range<1> num_items{a_vector.size()};
+    sycl::range<1> num_items{a_vector.size()};
     bool continuation_triggered = false;
     // buffers from host vectors
     {
-        cl::sycl::buffer a_buf(a_vector.data(), num_items);
-        cl::sycl::buffer b_buf(b_vector.data(), num_items);
-        cl::sycl::buffer add_buf(add_parallel.data(), num_items);
+        sycl::buffer a_buf(a_vector.data(), num_items);
+        sycl::buffer b_buf(b_vector.data(), num_items);
+        sycl::buffer add_buf(add_parallel.data(), num_items);
 
         // Create executor
         hpx::sycl::experimental::sycl_executor exec(
-            cl::sycl::default_selector{});
+            sycl::default_selector_v);
         std::cout << "Running on device: "
-                  << exec.get_device().get_info<cl::sycl::info::device::name>()
+                  << exec.get_device().get_info<sycl::info::device::name>()
                   << std::endl;
         auto async_normal_fut = hpx::async(
-            exec, &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
-                cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
-                cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
-                cl::sycl::accessor add(
-                    add_buf, h, cl::sycl::write_only, cl::sycl::no_init);
+            exec, &sycl::queue::submit, [&](sycl::handler& h) {
+                sycl::accessor a(a_buf, h, sycl::read_only);
+                sycl::accessor b(b_buf, h, sycl::read_only);
+                sycl::accessor add(
+                    add_buf, h, sycl::write_only, sycl::no_init);
                 h.parallel_for(
                     num_items, [=](auto i) { add[i] = a[i] + b[i]; });
             });
@@ -212,23 +212,23 @@ void VectorAdd_test3(std::vector<size_t> const& a_vector,
 void VectorAdd_test4(std::vector<size_t> const& a_vector,
     std::vector<size_t> const& b_vector, std::vector<size_t>& add_parallel)
 {
-    cl::sycl::range<1> num_items{a_vector.size()};
+    sycl::range<1> num_items{a_vector.size()};
     // buffers from host vectors
-    cl::sycl::buffer a_buf(a_vector.data(), num_items);
-    cl::sycl::buffer b_buf(b_vector.data(), num_items);
-    cl::sycl::buffer add_buf(add_parallel.data(), num_items);
+    sycl::buffer a_buf(a_vector.data(), num_items);
+    sycl::buffer b_buf(b_vector.data(), num_items);
+    sycl::buffer add_buf(add_parallel.data(), num_items);
 
     // Test post and get_future methods
-    hpx::sycl::experimental::sycl_executor exec(cl::sycl::default_selector{});
+    hpx::sycl::experimental::sycl_executor exec(sycl::default_selector_v);
     std::cout << "Running on device: "
-              << exec.get_device().get_info<cl::sycl::info::device::name>()
+              << exec.get_device().get_info<sycl::info::device::name>()
               << std::endl;
     // Launch kernel one-way
-    hpx::apply(exec, &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
-        cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
-        cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
-        cl::sycl::accessor add(
-            add_buf, h, cl::sycl::write_only, cl::sycl::no_init);
+    hpx::apply(exec, &sycl::queue::submit, [&](sycl::handler& h) {
+        sycl::accessor a(a_buf, h, sycl::read_only);
+        sycl::accessor b(b_buf, h, sycl::read_only);
+        sycl::accessor add(
+            add_buf, h, sycl::write_only, sycl::no_init);
         h.parallel_for(num_items, [=](auto i) { add[i] = a[i] + b[i]; });
     });
     // For the sake of testing: still get a future

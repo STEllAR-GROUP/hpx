@@ -21,7 +21,7 @@
 
 #include "common/sycl_vector_add_test_utils.hpp"
 
-#include <CL/sycl.hpp>
+#include <sycl/sycl.hpp>
 
 // Check compiler compatibility:
 // Needs to be done AFTER sycl include for HipSYCL
@@ -73,24 +73,24 @@ constexpr size_t vector_size = 80000000;
 // This test will launch an simple vector add kernel on the given queue.
 // It will then create a hpx::future from the returned sycl event.
 // Includes various sanity / asynchronousy tests
-void VectorAdd(cl::sycl::queue& q, std::vector<size_t> const& a_vector,
+void VectorAdd(sycl::queue& q, std::vector<size_t> const& a_vector,
     std::vector<size_t> const& b_vector, std::vector<size_t>& add_parallel)
 {
-    cl::sycl::event my_kernel_event;
-    cl::sycl::range<1> num_items{a_vector.size()};
+    sycl::event my_kernel_event;
+    sycl::range<1> num_items{a_vector.size()};
     {
         // buffers from host vectors
-        cl::sycl::buffer a_buf(a_vector.data(), num_items);
-        cl::sycl::buffer b_buf(b_vector.data(), num_items);
-        cl::sycl::buffer add_buf(add_parallel.data(), num_items);
+        sycl::buffer a_buf(a_vector.data(), num_items);
+        sycl::buffer b_buf(b_vector.data(), num_items);
+        sycl::buffer add_buf(add_parallel.data(), num_items);
 
         bool continuation_triggered = false;
         // Launch SYCL kernel
-        my_kernel_event = q.submit([&](cl::sycl::handler& h) {
-            cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
-            cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
-            cl::sycl::accessor add(
-                add_buf, h, cl::sycl::write_only, cl::sycl::no_init);
+        my_kernel_event = q.submit([&](sycl::handler& h) {
+            sycl::accessor a(a_buf, h, sycl::read_only);
+            sycl::accessor b(b_buf, h, sycl::read_only);
+            sycl::accessor add(
+                add_buf, h, sycl::write_only, sycl::no_init);
             h.parallel_for(num_items, [=](auto i) { add[i] = a[i] + b[i]; });
         });
         // Get future from event
@@ -122,9 +122,9 @@ void VectorAdd(cl::sycl::queue& q, std::vector<size_t> const& a_vector,
         continuation_future.get();
         auto const event_status_after =
             my_kernel_event
-                .get_info<cl::sycl::info::event::command_execution_status>();
+                .get_info<sycl::info::event::command_execution_status>();
         if (event_status_after ==
-            cl::sycl::info::event_command_status::complete)
+            sycl::info::event_command_status::complete)
         {
             std::cout << "OKAY: Kernel is done!" << std::endl;
         }
@@ -179,14 +179,14 @@ int hpx_main(int, char*[])
     // Create queue and run on device
     try
     {
-        cl::sycl::queue q(cl::sycl::default_selector{},
-            cl::sycl::property::queue::in_order{});
+        sycl::queue q(sycl::default_selector_v,
+            sycl::property::queue::in_order{});
         std::cout << "Running on device: "
-                  << q.get_device().get_info<cl::sycl::info::device::name>()
+                  << q.get_device().get_info<sycl::info::device::name>()
                   << "\n";
         VectorAdd(q, a, b, add_parallel);
     }
-    catch (cl::sycl::exception const& e)
+    catch (sycl::exception const& e)
     {
         std::cout << "An exception is caught for vector add.\n" << e.what();
         std::terminate();

@@ -23,7 +23,7 @@
 
 #include "common/sycl_vector_add_test_utils.hpp"
 
-#include <CL/sycl.hpp>
+#include <sycl/sycl.hpp>
 
 constexpr size_t vectorsize = 200000000;
 constexpr size_t num_bytes = vectorsize * sizeof(float);
@@ -36,69 +36,69 @@ int hpx_main(int, char*[])
     std::cout << "SYCL Future polling enabled!\n";
     std::cout << "SYCL language version: " << SYCL_LANGUAGE_VERSION << "\n";
 
-    hpx::sycl::experimental::sycl_executor exec(cl::sycl::default_selector{});
-    auto a = cl::sycl::malloc_device<float>(
+    hpx::sycl::experimental::sycl_executor exec(sycl::default_selector_v);
+    auto a = sycl::malloc_device<float>(
         vectorsize, exec.get_device(), exec.get_context());
-    auto b = cl::sycl::malloc_device<float>(
+    auto b = sycl::malloc_device<float>(
         vectorsize, exec.get_device(), exec.get_context());
-    auto c = cl::sycl::malloc_device<float>(
+    auto c = sycl::malloc_device<float>(
         vectorsize, exec.get_device(), exec.get_context());
-    auto a_host = cl::sycl::malloc_host<float>(vectorsize, exec.get_context());
-    auto b_host = cl::sycl::malloc_host<float>(vectorsize, exec.get_context());
-    auto c_host = cl::sycl::malloc_host<float>(vectorsize, exec.get_context());
+    auto a_host = sycl::malloc_host<float>(vectorsize, exec.get_context());
+    auto b_host = sycl::malloc_host<float>(vectorsize, exec.get_context());
+    auto c_host = sycl::malloc_host<float>(vectorsize, exec.get_context());
 
     // Note: Parameter types needs to match exactly, otherwise the correct
     // function won't be found -- in this case we need to cast from float* to void*
     // otherwise the correct memset overload won't be found
     hpx::apply(
-        exec, &cl::sycl::queue::memset, static_cast<void*>(c), 0, static_cast<size_t>(num_bytes));
-    hpx::apply(exec, &cl::sycl::queue::memset, static_cast<void*>(a_host), 0,
+        exec, &sycl::queue::memset, static_cast<void*>(c), 0, static_cast<size_t>(num_bytes));
+    hpx::apply(exec, &sycl::queue::memset, static_cast<void*>(a_host), 0,
         static_cast<size_t>(num_bytes));
-    hpx::apply(exec, &cl::sycl::queue::memset, static_cast<void*>(b_host), 0,
+    hpx::apply(exec, &sycl::queue::memset, static_cast<void*>(b_host), 0,
         static_cast<size_t>(num_bytes));
-    hpx::apply(exec, &cl::sycl::queue::memset, static_cast<void*>(c_host), 0,
+    hpx::apply(exec, &sycl::queue::memset, static_cast<void*>(c_host), 0,
         static_cast<size_t>(num_bytes));
 
     float aj = 1.0;
     float bj = 2.0;
     float cj = 0.0;
     const float scalar = 3.0;
-    const auto reset_input_method = [=](cl::sycl::id<1> i) {
+    const auto reset_input_method = [=](sycl::id<1> i) {
         a[i] = aj;
         b[i] = bj;
     };
-    hpx::apply(exec, &cl::sycl::queue::parallel_for,
-        cl::sycl::range<1>{vectorsize}, reset_input_method);
+    hpx::apply(exec, &sycl::queue::parallel_for,
+        sycl::range<1>{vectorsize}, reset_input_method);
 
-    // Note: shortcut function like cl::sycl::queue::parallel_for (which bypass
+    // Note: shortcut function like sycl::queue::parallel_for (which bypass
     // the usual queue.submit pattern) require a reference to a kernel function
     // (hence we cannot pass a temporary. Instead we define our kernel lambdas
     // here...
-    const auto copy_step = [=](cl::sycl::id<1> i) { c[i] = a[i]; };
-    const auto scale_step = [=](cl::sycl::id<1> i) { b[i] = scalar * c[i]; };
-    const auto add_step = [=](cl::sycl::id<1> i) { c[i] = a[i] + b[i]; };
-    const auto triad_step = [=](cl::sycl::id<1> i) {
+    const auto copy_step = [=](sycl::id<1> i) { c[i] = a[i]; };
+    const auto scale_step = [=](sycl::id<1> i) { b[i] = scalar * c[i]; };
+    const auto add_step = [=](sycl::id<1> i) { c[i] = a[i] + b[i]; };
+    const auto triad_step = [=](sycl::id<1> i) {
         a[i] = b[i] + scalar * c[i];
     };
 
     // ... and call them here
-    hpx::apply(exec, &cl::sycl::queue::parallel_for,
-        cl::sycl::range<1>{vectorsize}, copy_step);
-    hpx::apply(exec, &cl::sycl::queue::parallel_for,
-        cl::sycl::range<1>{vectorsize}, scale_step);
-    hpx::apply(exec, &cl::sycl::queue::parallel_for,
-        cl::sycl::range<1>{vectorsize}, add_step);
-    hpx::apply(exec, &cl::sycl::queue::parallel_for,
-        cl::sycl::range<1>{vectorsize}, triad_step);
+    hpx::apply(exec, &sycl::queue::parallel_for,
+        sycl::range<1>{vectorsize}, copy_step);
+    hpx::apply(exec, &sycl::queue::parallel_for,
+        sycl::range<1>{vectorsize}, scale_step);
+    hpx::apply(exec, &sycl::queue::parallel_for,
+        sycl::range<1>{vectorsize}, add_step);
+    hpx::apply(exec, &sycl::queue::parallel_for,
+        sycl::range<1>{vectorsize}, triad_step);
 
     // Note: Parameter types needs to match exactly, otherwise the correct
     // function won't be found -- in this case we need to cast from float* to const float*
     // otherwise the correct copy overload won't be found
-    hpx::apply(exec, &cl::sycl::queue::copy, static_cast<const float*>(c),
+    hpx::apply(exec, &sycl::queue::copy, static_cast<const float*>(c),
         static_cast<float*>(c_host), static_cast<size_t>(vectorsize));
-    hpx::apply(exec, &cl::sycl::queue::copy, static_cast<const float*>(b),
+    hpx::apply(exec, &sycl::queue::copy, static_cast<const float*>(b),
         static_cast<float*>(b_host), static_cast<size_t>(vectorsize));
-    auto fut = hpx::async(exec, &cl::sycl::queue::copy,
+    auto fut = hpx::async(exec, &sycl::queue::copy,
         static_cast<const float*>(a), static_cast<float*>(a_host), static_cast<size_t>(vectorsize));
 
     fut.get();
@@ -145,10 +145,10 @@ int hpx_main(int, char*[])
     const auto single_task_test2 = [=]() {
         a[137] = 42.0f;
     };
-    hpx::apply(exec, &cl::sycl::queue::single_task, single_task_test1);
-    hpx::apply(exec, &cl::sycl::queue::single_task, single_task_test2);
+    hpx::apply(exec, &sycl::queue::single_task, single_task_test1);
+    hpx::apply(exec, &sycl::queue::single_task, single_task_test2);
 
-    auto fut_single_task_test = hpx::async(exec, &cl::sycl::queue::copy,
+    auto fut_single_task_test = hpx::async(exec, &sycl::queue::copy,
         static_cast<const float*>(a), static_cast<float*>(a_host), static_cast<size_t>(vectorsize));
     fut_single_task_test.get();
 
