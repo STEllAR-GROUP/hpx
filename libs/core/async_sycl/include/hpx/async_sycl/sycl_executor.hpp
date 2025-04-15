@@ -25,6 +25,7 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace hpx::sycl::experimental {
     namespace detail {
@@ -377,8 +378,6 @@ namespace hpx {
                 f),
             HPX_FORWARD(Ts, ts)...);
     }
-
-    // TODO(daissgr) Maybe make the next two specialized for the submit method (mostly by requiring a different function point?
 
     template <typename Executor, typename... Ts, typename T,
         std::enable_if_t<(std::conjunction_v<sycl::experimental::detail::
