@@ -28,7 +28,7 @@
 
 namespace hpx::sycl::experimental {
     namespace detail {
-        /// type trait to identify basic sycl queue args (as in: no sycl indices / callable kernels) 
+        /// type trait to identify basic sycl queue args (as in: no sycl indices / callable kernels)
         /// Required for correct overloading later on
         template <class T>
         struct is_basic_queue_arg
@@ -36,7 +36,8 @@ namespace hpx::sycl::experimental {
                 std::is_scalar<T>::value ||
                     std::is_same<T, cl::sycl::event>::value ||
                     std::is_same<T, const std::vector<cl::sycl::event>&>::value>
-        {};
+        {
+        };
     }    // namespace detail
 
     struct sycl_executor
@@ -146,14 +147,17 @@ namespace hpx::sycl::experimental {
         /// sycl::queue::member_function type with code_location parameter
         template <typename... Params>
         using queue_function_code_loc_ptr_t = cl::sycl::event (
-            cl::sycl::queue::*)(std::conditional_t<
+            cl::sycl::queue::*)(
+            std::conditional_t<
                 std::is_trivial_v<std::remove_reference_t<Params>>,
-                std::decay_t<Params>, Params>..., cl::sycl::detail::code_location const&);
+                std::decay_t<Params>, Params>...,
+            cl::sycl::detail::code_location const&);
 
         /// Invoke member function given queue and parameters. Default
         /// code_location argument added automatically.
         template <typename... Params>
-        void post(queue_function_code_loc_ptr_t<Params...>&& queue_member_function,
+        void post(
+            queue_function_code_loc_ptr_t<Params...>&& queue_member_function,
             Params&&... args)
         {
             // for the intel version we need to actually pass the code
@@ -224,11 +228,10 @@ namespace hpx::sycl::experimental {
             return command_queue.get_context();
         }
         /// Return the underlying queue for direct access
-        HPX_FORCEINLINE cl::sycl::queue& get_queue() 
+        HPX_FORCEINLINE cl::sycl::queue& get_queue()
         {
             return command_queue;
         }
-
 
         // TODO Future work: Check if we want to expose any other (non-event)
         // queue methods
@@ -395,9 +398,8 @@ namespace hpx {
             typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
                                                            exec),
             std::forward<hpx::sycl::experimental::sycl_executor::
-                            queue_function_code_loc_ptr_t<Ts..., T>>(f),
-                std::forward<Ts>(ts)...,
-            std::forward<T>(t));
+                    queue_function_code_loc_ptr_t<Ts..., T>>(f),
+            std::forward<Ts>(ts)..., std::forward<T>(t));
     }
 
     /// hpx::apply overload for launching sycl queue member functions with an
@@ -420,9 +422,8 @@ namespace hpx {
         return detail::post_dispatch<typename std::decay<Executor>::type>::call(
             HPX_FORWARD(Executor, exec),
             std::forward<hpx::sycl::experimental::sycl_executor::
-                            queue_function_code_loc_ptr_t<Ts..., T>>(f),
-                std::forward<Ts>(ts)...,
-            std::forward<T>(t));
+                    queue_function_code_loc_ptr_t<Ts..., T>>(f),
+            std::forward<Ts>(ts)..., std::forward<T>(t));
     }
 #endif
 }    // namespace hpx

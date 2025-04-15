@@ -50,8 +50,8 @@ int hpx_main(int, char*[])
     // Note: Parameter types needs to match exactly, otherwise the correct
     // function won't be found -- in this case we need to cast from float* to void*
     // otherwise the correct memset overload won't be found
-    hpx::apply(
-        exec, &cl::sycl::queue::memset, static_cast<void*>(c), 0, static_cast<size_t>(num_bytes));
+    hpx::apply(exec, &cl::sycl::queue::memset, static_cast<void*>(c), 0,
+        static_cast<size_t>(num_bytes));
     hpx::apply(exec, &cl::sycl::queue::memset, static_cast<void*>(a_host), 0,
         static_cast<size_t>(num_bytes));
     hpx::apply(exec, &cl::sycl::queue::memset, static_cast<void*>(b_host), 0,
@@ -98,8 +98,9 @@ int hpx_main(int, char*[])
         static_cast<float*>(c_host), static_cast<size_t>(vectorsize));
     hpx::apply(exec, &cl::sycl::queue::copy, static_cast<const float*>(b),
         static_cast<float*>(b_host), static_cast<size_t>(vectorsize));
-    auto fut = hpx::async(exec, &cl::sycl::queue::copy,
-        static_cast<const float*>(a), static_cast<float*>(a_host), static_cast<size_t>(vectorsize));
+    auto fut =
+        hpx::async(exec, &cl::sycl::queue::copy, static_cast<const float*>(a),
+            static_cast<float*>(a_host), static_cast<size_t>(vectorsize));
 
     fut.get();
 
@@ -139,20 +140,18 @@ int hpx_main(int, char*[])
     std::cerr << "Validation passed!" << std::endl;
 
     // Test running single_tasks with executor (to test single_task overloads are working)
-    const auto single_task_test1 = [=]() {
-        a[42] = 137.0f;
-    };
-    const auto single_task_test2 = [=]() {
-        a[137] = 42.0f;
-    };
+    const auto single_task_test1 = [=]() { a[42] = 137.0f; };
+    const auto single_task_test2 = [=]() { a[137] = 42.0f; };
     hpx::apply(exec, &cl::sycl::queue::single_task, single_task_test1);
     hpx::apply(exec, &cl::sycl::queue::single_task, single_task_test2);
 
-    auto fut_single_task_test = hpx::async(exec, &cl::sycl::queue::copy,
-        static_cast<const float*>(a), static_cast<float*>(a_host), static_cast<size_t>(vectorsize));
+    auto fut_single_task_test =
+        hpx::async(exec, &cl::sycl::queue::copy, static_cast<const float*>(a),
+            static_cast<float*>(a_host), static_cast<size_t>(vectorsize));
     fut_single_task_test.get();
 
-    if (std::abs(a_host[42] - 137.0f) > epsilon || std::abs(a_host[137] - 42.0f) > epsilon)
+    if (std::abs(a_host[42] - 137.0f) > epsilon ||
+        std::abs(a_host[137] - 42.0f) > epsilon)
     {
         std::cerr << "Validation error! Wrong results in array a after "
                      "single_task test!"
