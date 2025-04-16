@@ -11,6 +11,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_sycl/sycl_future.hpp>
 
+#include <exception>
 #include <iostream>
 
 namespace hpx { namespace sycl { namespace experimental { namespace detail {
