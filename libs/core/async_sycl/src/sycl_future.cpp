@@ -11,6 +11,8 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_sycl/sycl_future.hpp>
 
+#include <iostream>
+
 namespace hpx { namespace sycl { namespace experimental { namespace detail {
 
 #if defined(__INTEL_LLVM_COMPILER) ||                                          \
