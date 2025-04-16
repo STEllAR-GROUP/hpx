@@ -58,7 +58,7 @@ namespace hpx {
         /// \note               This function will block and wait for the runtime
         ///                     system to start before returning to the caller.
         bool start(int argc, char** argv,
-            const init_params& init_args = init_params());
+            init_params const& init_args = init_params());
 
         /// Stops the runtime system.
         ///
