@@ -86,12 +86,16 @@ char** __argv = *_NSGetArgv();
 // sequencing of destructors.
 class manage_global_runtime
 {
-    struct impl
+    struct init
     {
         hpx::manage_runtime rts;
 
-        impl()
+        init()
         {
+#if defined(HPX_WINDOWS)
+            hpx::detail::init_winsocket();
+#endif
+
             hpx::init_params init_args;
             init_args.cfg = {
                 // make sure hpx_main is always executed
@@ -111,7 +115,7 @@ class manage_global_runtime
             }
         }
 
-        ~impl()
+        ~init()
         {
             // Something went wrong while stopping the runtime. Ignore.
             (void) rts.stop();
@@ -120,7 +124,7 @@ class manage_global_runtime
 
     hpx::manage_runtime& get()
     {
-        static thread_local impl m;
+        static thread_local init m;
         return m.rts;
     }
 
