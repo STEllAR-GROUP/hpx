@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
         hpx::manage_runtime rt;
 
         HPX_TEST(hpx::get_runtime_ptr() == nullptr);
-        HPX_TEST(rt.start(argc, argv) != 0);
+        HPX_TEST(rt.start(argc, argv));
 
         HPX_TEST(
             hpx::get_runtime_ptr() == hpx::run_as_hpx_thread(hpx_thread_func));
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
         HPX_TEST(hpx::get_runtime_ptr() == nullptr);
 
         hpx::init_params iparams;
-        HPX_TEST(rt.start(argc, argv, iparams) != 0);
+        HPX_TEST(rt.start(argc, argv, iparams));
 
         HPX_TEST(
             hpx::get_runtime_ptr() == hpx::run_as_hpx_thread(hpx_thread_func));
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 
         hpx::init_params iparams;
         iparams.mode = hpx::runtime_mode::local;
-        HPX_TEST(rt.start(argc, argv, iparams) != 0);
+        HPX_TEST(rt.start(argc, argv, iparams));
 
         HPX_TEST(
             hpx::get_runtime_ptr() == hpx::run_as_hpx_thread(hpx_thread_func));

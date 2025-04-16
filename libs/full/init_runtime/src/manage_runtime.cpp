@@ -21,7 +21,7 @@
 
 namespace hpx {
 
-    int manage_runtime::start(
+    bool manage_runtime::start(
         int argc, char** argv, const init_params& init_args)
     {
         HPX_ASSERT(!running_);
@@ -29,7 +29,7 @@ namespace hpx {
         function<int(int, char**)> start_function =
             bind_front(&manage_runtime::hpx_main, this);
 
-        const int ret = hpx::start(start_function, argc, argv, init_args);
+        const bool ret = hpx::start(start_function, argc, argv, init_args);
         if (!ret)
             return ret;
 

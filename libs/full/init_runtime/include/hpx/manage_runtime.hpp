@@ -22,13 +22,58 @@
 
 namespace hpx {
 
+    /// \brief Manages starting/stopping the HPX runtime system.
+    ///
+    /// An instance of this class may be used to start the HPX runtime system.
     class HPX_EXPORT manage_runtime
     {
     public:
-        int start(int argc, char** argv,
+        /// Starts the runtime system.
+        ///
+        /// \param argc         [in] The number of command line arguments passed
+        ///                     in \p argv. This is usually the unchanged value as
+        ///                     passed by the operating system (to `main()`).
+        /// \param argv         [in] The command line arguments for this
+        ///                     application, usually that is the value as passed
+        ///                     by the operating system (to `main()`).
+        /// \param params       [in] The parameters to the \a hpx::init function
+        ///                     (See documentation of \a hpx::init_params)
+        ///
+        /// \returns            The function returns `true` if command line
+        ///                     processing succeeded and the runtime system was
+        ///                     started successfully. It will return `false`
+        ///                     otherwise.
+        ///
+        /// \note               The created runtime system instance will be
+        ///                     executed in console or worker mode depending on the
+        ///                     command line arguments passed in `argc`/`argv`. If not
+        ///                     command line arguments are passed, console mode is
+        ///                     assumed.
+        ///
+        /// \note               If no command line arguments are passed the HPX
+        ///                     runtime system will not support any of the default
+        ///                     command line options as described in the section
+        ///                     'HPX Command Line Options'.
+        ///
+        /// \note               This function will block and wait for the runtime
+        ///                     system to start before returning to the caller.
+        bool start(int argc, char** argv,
             const init_params& init_args = init_params());
+
+        /// Stops the runtime system.
+        ///
+        /// \returns            This function will always return zero.
+        ///
+        /// \note               The runtime system instance must have been
+        ///                     previously started by a successful call to
+        ///                     `start()`.
+        ///
+        /// \note               This function will block and wait for the runtime
+        ///                     system to stop before returning to the caller.
         int stop();
 
+        /// \returns            A pointer to the runtime system if an instance is
+        ///                     running, otherwise `nullptr`.
         runtime* get_runtime_ptr() const noexcept
         {
             return rts_;
