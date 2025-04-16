@@ -19,6 +19,7 @@
 #endif
 
 #include <cstddef>
+#include <cstdint>
 #include <iosfwd>
 #include <string>
 #include <type_traits>
@@ -36,10 +37,10 @@ namespace hpx::threads {
     struct thread_description
     {
     public:
-        enum data_type
+        enum class data_type : std::uint8_t
         {
-            data_type_description = 0,
-            data_type_address = 1
+            description = 0,
+            address = 1
         };
 
     private:
@@ -54,12 +55,12 @@ namespace hpx::threads {
 
             constexpr data() noexcept
               : desc_(nullptr)
-              , type_(data_type_description)
+              , type_(data_type::description)
             {
             }
             explicit constexpr data(char const* str) noexcept
               : desc_(str)
-              , type_(data_type_description)
+              , type_(data_type::description)
             {
             }
         };
@@ -127,7 +128,7 @@ namespace hpx::threads {
             }
             else
             {
-                data_.type_ = data_type_address;
+                data_.type_ = data_type::address;
                 data_.addr_ = traits::get_function_address<F>::call(f);
             }
 #else
@@ -160,7 +161,7 @@ namespace hpx::threads {
 
         [[nodiscard]] constexpr char const* get_description() const noexcept
         {
-            HPX_ASSERT(data_.type_ == data_type_description);
+            HPX_ASSERT(data_.type_ == data_type::description);
             return data_.desc_;
         }
 
@@ -168,7 +169,7 @@ namespace hpx::threads {
         [[nodiscard]] util::itt::string_handle get_description_itt()
             const noexcept
         {
-            HPX_ASSERT(data_.type_ == data_type_description);
+            HPX_ASSERT(data_.type_ == data_type::description);
             return desc_itt_ ? desc_itt_ :
                                util::itt::string_handle(get_description());
         }
@@ -178,10 +179,10 @@ namespace hpx::threads {
         {
             switch (kind())
             {
-            case threads::thread_description::data_type_description:
+            case threads::thread_description::data_type::description:
                 return {domain, get_description_itt()};
 
-            case threads::thread_description::data_type_address:
+            case threads::thread_description::data_type::address:
                 return {
                     domain, util::itt::string_handle("address"), get_address()};
 
@@ -196,7 +197,7 @@ namespace hpx::threads {
 
         [[nodiscard]] constexpr std::size_t get_address() const noexcept
         {
-            HPX_ASSERT(data_.type_ == data_type_address);
+            HPX_ASSERT(data_.type_ == data_type::address);
             return data_.addr_;
         }
 
@@ -207,10 +208,10 @@ namespace hpx::threads {
 
         [[nodiscard]] constexpr bool valid() const noexcept
         {
-            if (data_.type_ == data_type_description)
+            if (data_.type_ == data_type::description)
                 return nullptr != data_.desc_;
 
-            HPX_ASSERT(data_.type_ == data_type_address);
+            HPX_ASSERT(data_.type_ == data_type::address);
             return 0 != data_.addr_;
         }
     };
@@ -219,10 +220,10 @@ namespace hpx::threads {
     struct thread_description
     {
     public:
-        enum data_type
+        enum class data_type : std::uint8_t
         {
-            data_type_description = 0,
-            data_type_address = 1
+            description = 0,
+            address = 1
         };
 
     private:
@@ -256,7 +257,7 @@ namespace hpx::threads {
 
         [[nodiscard]] static constexpr data_type kind() noexcept
         {
-            return data_type_description;
+            return data_type::description;
         }
 
         [[nodiscard]] static constexpr char const* get_description() noexcept
@@ -268,7 +269,7 @@ namespace hpx::threads {
         [[nodiscard]] util::itt::string_handle get_description_itt()
             const noexcept
         {
-            HPX_ASSERT(data_.type_ == data_type_description);
+            HPX_ASSERT(data_.type_ == data_type::description);
             return util::itt::string_handle(get_description());
         }
 
@@ -277,10 +278,10 @@ namespace hpx::threads {
         {
             switch (kind())
             {
-            case threads::thread_description::data_type_description:
+            case threads::thread_description::data_type::description:
                 return {domain, get_description_itt()};
 
-            case threads::thread_description::data_type_address:
+            case threads::thread_description::data_type::address:
                 return {domain, "address", get_address()};
 
             default:

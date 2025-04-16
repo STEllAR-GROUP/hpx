@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Hartmut Kaiser
+# Copyright (c) 2023-2025 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,11 +13,12 @@ if(JSON_ROOT AND NOT Json_ROOT)
   unset(JSON_ROOT CACHE)
 endif()
 
+# CMake V4 is not supported before JSON V3.12
 if(NOT HPX_WITH_FETCH_JSON)
-  find_package(nlohmann_json 3.2.0 REQUIRED)
+  find_package(nlohmann_json 3.12.0 REQUIRED)
 elseif(NOT TARGET Json::json)
   if(NOT HPX_WITH_JSON_TAG)
-    set(HPX_WITH_JSON_TAG "v3.11.2")
+    set(HPX_WITH_JSON_TAG "v3.12.0")
   endif()
 
   if(FETCHCONTENT_SOURCE_DIR_JSON)

@@ -43,7 +43,7 @@ namespace hpx::util {
             }
 
             if (description.kind() ==
-                threads::thread_description::data_type_description)
+                threads::thread_description::data_type::description)
             {
                 return new_task(
                     description.get_description(), UINTMAX_MAX, parent_wrapper);
@@ -51,7 +51,7 @@ namespace hpx::util {
             else
             {
                 HPX_ASSERT(description.kind() ==
-                    threads::thread_description::data_type_address);
+                    threads::thread_description::data_type::address);
                 return new_task(
                     description.get_address(), UINTMAX_MAX, parent_wrapper);
             }
