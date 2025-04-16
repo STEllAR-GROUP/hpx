@@ -48,7 +48,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
             std::cerr << "(NON-FATAL) ERROR: Caught sycl::exception during HPX "
                          "SYCL dummy kernel!\n";
             std::cerr << " {what}: " << e.what() << "\n ";
-            std::cerr << "Continuing for now as error only occured in the "
+            std::cerr << "Continuing for now as error only occurred in the "
                          "dummy kernel meant to "
                       << "initialize the device by first touch...\n";
             return 2;
