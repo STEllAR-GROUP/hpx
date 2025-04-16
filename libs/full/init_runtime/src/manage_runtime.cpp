@@ -7,8 +7,6 @@
 
 /// \file manage_runtime.hpp
 
-#pragma once
-
 #include <hpx/config.hpp>
 
 #include <hpx/condition_variable.hpp>
