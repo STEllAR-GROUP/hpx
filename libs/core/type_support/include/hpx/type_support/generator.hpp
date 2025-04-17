@@ -18,7 +18,7 @@
 namespace hpx {
 
     template <typename Ref, typename V = void, typename Allocator = void>
-    using generator = std::generator<Ref, V, Allocator>
+    using generator = std::generator<Ref, V, Allocator>;
 }
 
 #else
