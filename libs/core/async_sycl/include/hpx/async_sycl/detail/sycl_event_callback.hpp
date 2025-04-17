@@ -14,7 +14,7 @@
 
 #include <string>
 
-#include <CL/sycl.hpp>
+#include <sycl/sycl.hpp>
 
 // Check compiler compatibility:
 // Needs to be done AFTER sycl include for HipSYCL
@@ -58,7 +58,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
      * done by this method as well
     */
     HPX_CORE_EXPORT void add_event_callback(
-        event_callback_function_type&& f, cl::sycl::event event);
+        event_callback_function_type&& f, ::sycl::event event);
 
     /// Register SYCL event polling function with the scheduler (see scheduler_base.hpp)
     HPX_CORE_EXPORT void register_polling(hpx::threads::thread_pool_base& pool);
