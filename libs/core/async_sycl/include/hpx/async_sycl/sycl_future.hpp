@@ -165,23 +165,8 @@ namespace hpx { namespace sycl { namespace experimental {
         // -------------------------------------------------------------
         /// Convenience wrapper to get future from just a queue
         /// Note: queue needs to be constructed with the in_order attribute
-        HPX_FORCEINLINE hpx::future<void> get_future(
-            ::sycl::queue& command_queue)
-        {
-            HPX_ASSERT(queue.is_in_order());
-            return hpx::detail::try_catch_exception_ptr(
-                [&]() {
-                    // The SYCL standard does not include a eventRecord method Instead
-                    // we have to submit some dummy function and use the event the
-                    // launch returns
-                    ::sycl::event event = command_queue.submit(
-                        [](::sycl::handler& h) { h.single_task([]() {}); });
-                    return get_future(event);
-                },
-                [&](std::exception_ptr&& ep) {
-                    return hpx::make_exceptional_future<void>(HPX_MOVE(ep));
-                });
-        }
+        HPX_CORE_EXPORT hpx::future<void> get_future(
+            ::sycl::queue& command_queue);
 #if !defined(__HIPSYCL__)
         /// Convenience wrapper to get future from just a queue using SYCL host tasks
         /// Note: queue needs to be constructed with the in_order attribute
