@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -324,11 +324,14 @@ namespace hpx::threads::detail {
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
+                        auto priority = thrdptr->get_priority();
                         scheduler.SchedulingPolicy::schedule_thread_last(
                             HPX_MOVE(thrd),
                             threads::thread_schedule_hint(
                                 static_cast<std::int16_t>(num_thread)),
-                            true);
+                            priority != threads::thread_priority::bound,
+                            priority);
+
                         scheduler.SchedulingPolicy::do_some_work(num_thread);
                     }
                     else if (HPX_UNLIKELY(state_val ==
@@ -360,6 +363,7 @@ namespace hpx::threads::detail {
                                     threads::thread_schedule_hint(
                                         static_cast<std::int16_t>(num_thread)),
                                     true, thread_priority::boost);
+
                                 scheduler.SchedulingPolicy::do_some_work(
                                     num_thread);
                             }
@@ -373,6 +377,7 @@ namespace hpx::threads::detail {
                                 threads::thread_schedule_hint(
                                     static_cast<std::int16_t>(num_thread)),
                                 true, thread_priority::boost);
+
                             scheduler.SchedulingPolicy::do_some_work(
                                 num_thread);
                         }
@@ -392,7 +397,8 @@ namespace hpx::threads::detail {
                     scheduler.SchedulingPolicy::schedule_thread(HPX_MOVE(thrd),
                         threads::thread_schedule_hint(
                             static_cast<std::int16_t>(num_thread)),
-                        true, priority);
+                        priority != threads::thread_priority::bound, priority);
+
                     scheduler.SchedulingPolicy::do_some_work(num_thread);
                 }
 
