@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Anuj R. Sharma
-//  Copyright (c) 2014-2024 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -410,17 +410,26 @@ namespace hpx {
         ///
         /// \param size             The overall size of the vector
         /// \param val              Default value for the elements in vector
-        /// \param symbolic_name    The (optional) name to register the newly
-        ///                         created vector
         ///
         partitioned_vector(size_type size, T const& val);
+
+        /// Constructor which creates and initializes vector of a size as given
+        /// by the range, where all elements are initialized with the values
+        /// from the given range [begin, end) and using the given distribution
+        /// policy.
+        ///
+        /// \param begin            Start of range to use for initializing the
+        ///                         new instance.
+        /// \param end              End of range to use for initializing the
+        ///                         new instance.
+        ///
+        partitioned_vector(typename Data::const_iterator begin,
+            typename Data::const_iterator end);
 
         /// Constructor which creates vector of \a size using the given
         /// distribution policy.
         ///
         /// \param policy           The distribution policy to use
-        /// \param symbolic_name    The (optional) name to register the newly
-        ///                         created vector
         ///
         template <typename DistPolicy>
         explicit partitioned_vector(DistPolicy const& policy,
@@ -432,8 +441,6 @@ namespace hpx {
         ///
         /// \param size             The overall size of the vector
         /// \param policy           The distribution policy to use
-        /// \param symbolic_name    The (optional) name to register the newly
-        ///                         created vector
         ///
         template <typename DistPolicy>
         partitioned_vector(size_type size, DistPolicy const& policy,
@@ -447,12 +454,27 @@ namespace hpx {
         /// \param size             The overall size of the vector
         /// \param val              Default value for the elements in vector
         /// \param policy           The distribution policy to use
-        /// \param symbolic_name    The (optional) name to register the newly
-        ///                         created vector
         ///
         template <typename DistPolicy>
         partitioned_vector(size_type size, T const& val,
             DistPolicy const& policy,
+            std::enable_if_t<traits::is_distribution_policy_v<DistPolicy>>* =
+                nullptr);
+
+        /// Constructor which creates and initializes vector of a size as given
+        /// by the range, where all elements are initialized with the values
+        /// from the given range [begin, end) and using the given distribution
+        /// policy.
+        ///
+        /// \param begin            Start of range to use for initializing the
+        ///                         new instance.
+        /// \param end              End of range to use for initializing the
+        ///                         new instance.
+        /// \param policy           The distribution policy to use
+        ///
+        template <typename DistPolicy>
+        partitioned_vector(typename Data::const_iterator begin,
+            typename Data::const_iterator end, DistPolicy const& policy,
             std::enable_if_t<traits::is_distribution_policy_v<DistPolicy>>* =
                 nullptr);
 
@@ -467,14 +489,13 @@ namespace hpx {
         }
 
         partitioned_vector(partitioned_vector&& rhs) noexcept
-          : base_type(HPX_MOVE(rhs))
+          : base_type(HPX_MOVE(static_cast<base_type&&>(rhs)))
           , size_(rhs.size_)
           , partitions_(HPX_MOVE(rhs.partitions_))
         {
             rhs.size_ = 0;
         }
 
-    public:
         /// \brief Array subscript operator. This does not throw any exception.
         ///
         /// \param pos Position of the element in the vector [Note the first
