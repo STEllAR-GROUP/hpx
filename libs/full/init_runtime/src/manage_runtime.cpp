@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/assert.hpp>
 #include <hpx/condition_variable.hpp>
 #include <hpx/functional.hpp>
 #include <hpx/init.hpp>
@@ -26,7 +27,7 @@ namespace hpx {
     {
         HPX_ASSERT(!running_);
 
-        function<int(int, char**)> start_function =
+        std::function<int(int, char**)> start_function =
             bind_front(&manage_runtime::hpx_main, this);
 
         bool const ret = hpx::start(start_function, argc, argv, init_args);
