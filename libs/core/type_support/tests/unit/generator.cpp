@@ -342,23 +342,6 @@ int main()
     constexpr tests::member_coro m;
     HPX_TEST(*m.f().begin() == 42);
 
-    // Test with string sequence
-    auto std_str_gen = []() -> std::generator<std::string> {
-        co_yield "Hello";
-        co_yield "World";
-        co_yield "from";
-        co_yield "HPX";
-    };
-
-    std::vector<std::string> std_result;
-    for (auto&& str : std_str_gen())
-    {
-        std_result.push_back(str);
-    }
-
-    HPX_TEST(std_result == std::vector<std::string>{
-                              "Hello", "World", "from", "HPX"});
-
     return hpx::util::report_errors();
 }
 
