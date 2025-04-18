@@ -7,7 +7,6 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(init_runtime_headers
-    hpx/init.hpp
     hpx/hpx_finalize.hpp
     hpx/hpx_init.hpp
     hpx/hpx_init_impl.hpp
@@ -17,6 +16,7 @@ set(init_runtime_headers
     hpx/hpx_start_impl.hpp
     hpx/hpx_suspend.hpp
     hpx/hpx_user_main_config.hpp
+    hpx/init.hpp
     hpx/init_runtime/detail/init_logging.hpp
     hpx/init_runtime/detail/run_or_start.hpp
 )

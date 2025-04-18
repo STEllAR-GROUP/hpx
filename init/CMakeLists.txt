@@ -10,7 +10,7 @@ set(hpx_init_HEADERS
     ""
     CACHE INTERNAL "Headers for libhpx_init." FORCE
 )
-list(APPEND hpx_init_HEADERS hpx/hpx_main_impl.hpp)
+list(APPEND hpx_init_HEADERS hpx/hpx_main_impl.hpp hpx/manage_runtime.hpp)
 set(hpx_init_SOURCES
     ""
     CACHE INTERNAL "Sources for libhpx_init." FORCE
@@ -25,6 +25,7 @@ list(
   hpx_user_main.cpp
   hpx_user_main_argc_argv.cpp
   main.cpp
+  manage_runtime.cpp
 )
 
 # make source groups
