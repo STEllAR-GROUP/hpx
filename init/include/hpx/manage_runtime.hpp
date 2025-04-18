@@ -25,7 +25,7 @@ namespace hpx {
     /// \brief Manages starting/stopping the HPX runtime system.
     ///
     /// An instance of this class may be used to start the HPX runtime system.
-    class HPX_EXPORT manage_runtime
+    class manage_runtime
     {
     public:
         /// Starts the runtime system.
