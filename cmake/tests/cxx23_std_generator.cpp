@@ -7,17 +7,35 @@
 // test for availability of std::generator (C++ 23)
 
 #include <generator>
+#include <string>
 
-std::generator<char> letters(char first)
+// Test basic generator functionality
+std::generator<std::string> test_generator()
 {
-    for (;; co_yield first++)
-        ;
+    co_yield "test";
+    co_yield "string";
+}
+
+// Test generator with reference type
+std::generator<std::string&> test_ref_generator(std::string& str)
+{
+    co_yield str;
 }
 
 int main()
 {
-    for (const char ch : letters('a'))
+    // Test basic generator
+    for (const auto& str : test_generator())
     {
+        (void)str;
     }
+
+    // Test generator with reference
+    std::string test_str = "test";
+    for (auto& str : test_ref_generator(test_str))
+    {
+        (void)str;
+    }
+
     return 0;
 }

@@ -8,9 +8,6 @@ set(tests relocate relocate_at uninitialized_relocate_n_primitive)
 
 if(HPX_WITH_CXX20_COROUTINES)
   set(tests ${tests} generator)
-  if(HPX_WITH_CXX23_STD_GENERATOR)
-    set(generator_FLAGS ${HPX_CXX23_FLAG})
-  endif()
 endif()
 
 foreach(test ${tests})

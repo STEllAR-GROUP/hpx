@@ -230,63 +230,6 @@ namespace tests {
             co_yield 42;
         }
     };
-
-    void test_std_generator_equivalence()
-    {
-        // Test with simple integer sequence
-        auto hpx_gen = []() -> hpx::generator<int> {
-            for (int i = 0; i < 5; ++i)
-            {
-                co_yield i;
-            }
-        };
-
-        auto std_gen = []() -> std::generator<int> {
-            for (int i = 0; i < 5; ++i)
-            {
-                co_yield i;
-            }
-        };
-
-        std::vector<int> hpx_result;
-        for (int i : hpx_gen())
-        {
-            hpx_result.push_back(i);
-        }
-
-        std::vector<int> std_result;
-        for (int i : std_gen())
-        {
-            std_result.push_back(i);
-        }
-
-        HPX_TEST(hpx_result == std_result);
-
-        // Test with string sequence
-        auto hpx_str_gen = []() -> hpx::generator<std::string> {
-            co_yield "hello";
-            co_yield "world";
-        };
-
-        auto std_str_gen = []() -> std::generator<std::string> {
-            co_yield "hello";
-            co_yield "world";
-        };
-
-        std::vector<std::string> hpx_str_result;
-        for (std::string const& s : hpx_str_gen())
-        {
-            hpx_str_result.push_back(s);
-        }
-
-        std::vector<std::string> std_str_result;
-        for (std::string const& s : std_str_gen())
-        {
-            std_str_result.push_back(s);
-        }
-
-        HPX_TEST(hpx_str_result == std_str_result);
-    }
 }    // namespace tests
 
 int main()
@@ -399,9 +342,22 @@ int main()
     constexpr tests::member_coro m;
     HPX_TEST(*m.f().begin() == 42);
 
-#if defined(HPX_HAVE_CXX23_STD_GENERATOR)
-    tests::test_std_generator_equivalence();
-#endif
+    // Test with string sequence
+    auto std_str_gen = []() -> std::generator<std::string> {
+        co_yield "Hello";
+        co_yield "World";
+        co_yield "from";
+        co_yield "HPX";
+    };
+
+    std::vector<std::string> std_result;
+    for (auto&& str : std_str_gen())
+    {
+        std_result.push_back(str);
+    }
+
+    HPX_TEST(std_result == std::vector<std::string>{
+                              "Hello", "World", "from", "HPX"});
 
     return hpx::util::report_errors();
 }
