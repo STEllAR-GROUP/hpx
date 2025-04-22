@@ -51,35 +51,14 @@ macro(hpx_setup_lci)
       fetchcontent_getproperties(lci)
       if(NOT lci_POPULATED)
         fetchcontent_populate(lci)
-        if(NOT LCI_WITH_EXAMPLES)
-          set(LCI_WITH_EXAMPLES
-              OFF
-              CACHE INTERNAL ""
-          )
-        endif()
-        if(NOT LCI_WITH_TESTS)
-          set(LCI_WITH_TESTS
-              OFF
-              CACHE INTERNAL ""
-          )
-        endif()
-        if(NOT LCI_WITH_BENCHMARKS)
-          set(LCI_WITH_BENCHMARKS
-              OFF
-              CACHE INTERNAL ""
-          )
-        endif()
-        if(NOT LCI_WITH_DOC)
-          set(LCI_WITH_DOC
-              OFF
-              CACHE INTERNAL ""
-          )
-        endif()
+        set(LCI_FETCHCONTENT_INSTALL
+            OFF
+            CACHE INTERNAL ""
+        )
         enable_language(C)
         add_subdirectory(${lci_SOURCE_DIR} ${lci_BINARY_DIR})
         # Move LCI target into its own FOLDER
         set_target_properties(LCI PROPERTIES FOLDER "Core/Dependencies")
-        add_library(LCI::LCI ALIAS LCI)
         set(HPX_CMAKE_ADDITIONAL_MODULE_PATH_BUILD
             "${lci_SOURCE_DIR}/cmake_modules"
             CACHE INTERNAL ""
