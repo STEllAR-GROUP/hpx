@@ -5,10 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/init.hpp>
+#include <hpx/manage_runtime.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/runtime_local/run_as_hpx_thread.hpp>
 
 hpx::runtime* hpx_thread_func()
