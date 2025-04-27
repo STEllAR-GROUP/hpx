@@ -5,8 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/experimental/run_on_all.hpp>
-#include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <cstdlib>
 #include <iostream>
