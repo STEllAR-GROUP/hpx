@@ -14,33 +14,17 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/synchronization/stop_token.hpp>
 
+#if defined(HPX_HAVE_STDEXEC)
+#include <hpx/execution_base/stdexec_forward.hpp>
+#else
+#error "HPX_WITH_STDEXEC must be enabled for parallel_scheduler.hpp"
+#endif
+
 #include <cstddef>
 #include <exception>
 #include <utility>
 
-// Forward declarations for execution::experimental
 namespace hpx::execution::experimental {
-    enum class forward_progress_guarantee;
-    struct get_forward_progress_guarantee_t;
-    struct schedule_t;
-    struct connect_t;
-    struct start_t;
-    struct set_value_t;
-    struct set_error_t;
-    struct set_stopped_t;
-    struct get_env_t;
-    struct then_t;
-    struct sender_t;
-}    // namespace hpx::execution::experimental
-
-namespace hpx::execution::experimental {
-
-#ifndef HPX_EXECUTION_EXPERIMENTAL_SENDER_T
-#define HPX_EXECUTION_EXPERIMENTAL_SENDER_T
-    struct sender_t
-    {
-    };
-#endif
 
     template <typename Scheduler>
     struct parallel_sender;
@@ -65,11 +49,17 @@ namespace hpx::execution::experimental {
             return true;
         }
 
-        friend forward_progress_guarantee tag_invoke(
-            get_forward_progress_guarantee_t,
-            const parallel_scheduler&) noexcept
+        forward_progress_guarantee get_forward_progress_guarantee()
+            const noexcept
         {
             return forward_progress_guarantee::parallel;
+        }
+
+        friend forward_progress_guarantee tag_invoke(
+            get_forward_progress_guarantee_t,
+            const parallel_scheduler& sched) noexcept
+        {
+            return sched.get_forward_progress_guarantee();
         }
 
         parallel_sender<parallel_scheduler> schedule() const noexcept;
@@ -118,36 +108,34 @@ namespace hpx::execution::experimental {
         {
         }
 
-        friend void tag_invoke(set_value_t, wrapped_receiver&& wr)
+        void set_value() &&
         {
             try
             {
-                wr.func_();
-                tag_invoke(set_value_t{}, std::move(wr.receiver_));
+                func_();
+                std::move(receiver_).set_value();
             }
             catch (...)
             {
-                tag_invoke(set_error_t{}, std::move(wr.receiver_),
-                    std::current_exception());
+                std::move(receiver_).set_error(std::current_exception());
             }
         }
 
-        friend void tag_invoke(
-            set_error_t, wrapped_receiver&& wr, std::exception_ptr ep) noexcept
+        void set_error(std::exception_ptr ep) && noexcept
         {
-            tag_invoke(set_error_t{}, std::move(wr.receiver_), ep);
+            std::move(receiver_).set_error(ep);
         }
 
-        friend void tag_invoke(set_stopped_t, wrapped_receiver&& wr) noexcept
+        void set_stopped() && noexcept
         {
-            tag_invoke(set_stopped_t{}, std::move(wr.receiver_));
+            std::move(receiver_).set_stopped();
         }
     };
 
     template <typename Sender, typename Func>
     struct then_sender
     {
-        using sender_concept = sender_t;
+        using sender_concept = hpx::execution::experimental::sender_t;
 
         Sender sender_;
         Func func_;
@@ -158,9 +146,9 @@ namespace hpx::execution::experimental {
         {
         }
 
-        friend auto tag_invoke(get_env_t, const then_sender& s) noexcept
+        auto get_env() const noexcept
         {
-            return get_env(s.sender_);
+            return hpx::execution::experimental::get_env(sender_);
         }
 
         template <typename Receiver>
@@ -168,57 +156,57 @@ namespace hpx::execution::experimental {
         {
             using wrapped_receiver_t = wrapped_receiver<Receiver, Func>;
             using wrapped_op_state_t =
-                decltype(tag_invoke(connect_t{}, std::declval<Sender&&>(),
+                decltype(hpx::execution::experimental::connect(
+                    std::declval<Sender&&>(),
                     std::declval<wrapped_receiver_t&&>()));
 
             wrapped_op_state_t wrapped_op_;
 
             operation_state(Sender&& sender, Func&& func, Receiver&& receiver)
-              : wrapped_op_(tag_invoke(connect_t{}, std::move(sender),
+              : wrapped_op_(hpx::execution::experimental::connect(
+                    std::move(sender),
                     wrapped_receiver_t{std::move(receiver), std::move(func)}))
             {
             }
 
-            friend void tag_invoke(start_t, operation_state& op) noexcept
+            void start() noexcept
             {
-                start(op.wrapped_op_);
+                hpx::execution::experimental::start(wrapped_op_);
             }
         };
 
         template <typename Receiver>
-        friend auto tag_invoke(connect_t, then_sender&& s, Receiver&& receiver)
+        auto connect(Receiver&& receiver) &&
         {
-            return operation_state<Receiver>{std::move(s.sender_),
-                std::move(s.func_), std::forward<Receiver>(receiver)};
+            return operation_state<Receiver>{std::move(sender_),
+                std::move(func_), std::forward<Receiver>(receiver)};
         }
 
         template <typename Receiver>
-        friend auto tag_invoke(
-            connect_t, const then_sender& s, Receiver&& receiver)
+        auto connect(Receiver&& receiver) const&
         {
             return operation_state<Receiver>{
-                s.sender_, s.func_, std::forward<Receiver>(receiver)};
+                sender_, func_, std::forward<Receiver>(receiver)};
         }
     };
 
     template <typename Scheduler>
     struct parallel_sender
     {
-        using sender_concept = sender_t;
+        using sender_concept = hpx::execution::experimental::sender_t;
 
         explicit parallel_sender(Scheduler scheduler) noexcept
           : scheduler_(std::move(scheduler))
         {
         }
 
-        friend auto tag_invoke(
-            get_env_t, const parallel_sender& sender) noexcept
+        auto get_env() const noexcept
         {
             struct env
             {
                 Scheduler scheduler_;
             };
-            return env{sender.scheduler_};
+            return env{scheduler_};
         }
 
         template <typename Receiver>
@@ -234,59 +222,56 @@ namespace hpx::execution::experimental {
             {
             }
 
-            friend void tag_invoke(start_t, operation_state& op) noexcept
+            void start() noexcept
             {
-                auto stop_token = get_stop_token(get_env(op.receiver_));
+                auto stop_token = hpx::execution::experimental::get_stop_token(
+                    hpx::execution::experimental::get_env(receiver_));
                 if (stop_token.stop_requested())
                 {
-                    set_stopped(std::move(op.receiver_));
+                    std::move(receiver_).set_stopped();
                     return;
                 }
                 try
                 {
                     auto wrapped_sender =
-                        hpx::execution::experimental::schedule(op.scheduler_);
+                        hpx::execution::experimental::schedule(scheduler_);
                     auto wrapped_op = hpx::execution::experimental::connect(
-                        std::move(wrapped_sender), std::move(op.receiver_));
-                    start(wrapped_op);
+                        std::move(wrapped_sender), std::move(receiver_));
+                    hpx::execution::experimental::start(wrapped_op);
                 }
                 catch (...)
                 {
-                    set_error(
-                        std::move(op.receiver_), std::current_exception());
+                    std::move(receiver_).set_error(std::current_exception());
                 }
             }
         };
 
         template <typename Receiver>
-        friend auto tag_invoke(
-            connect_t, parallel_sender&& sender, Receiver&& receiver)
+        auto connect(Receiver&& receiver) &&
         {
             return operation_state<Receiver>{std::forward<Receiver>(receiver),
-                std::move(sender.scheduler_.wrapped_)};
+                std::move(scheduler_.wrapped_)};
         }
 
         template <typename Receiver>
-        friend auto tag_invoke(
-            connect_t, const parallel_sender& sender, Receiver&& receiver)
+        auto connect(Receiver&& receiver) const&
         {
             return operation_state<Receiver>{
-                std::forward<Receiver>(receiver), sender.scheduler_.wrapped_};
+                std::forward<Receiver>(receiver), scheduler_.wrapped_};
         }
 
         template <typename Func>
-        friend auto tag_invoke(then_t, parallel_sender&& sender, Func&& func)
+        auto then(Func&& func) &&
         {
             return then_sender<parallel_sender, std::decay_t<Func>>{
-                std::move(sender), std::forward<Func>(func)};
+                std::move(*this), std::forward<Func>(func)};
         }
 
         template <typename Func>
-        friend auto tag_invoke(
-            then_t, const parallel_sender& sender, Func&& func)
+        auto then(Func&& func) const&
         {
             return then_sender<parallel_sender, std::decay_t<Func>>{
-                sender, std::forward<Func>(func)};
+                *this, std::forward<Func>(func)};
         }
 
     private:
@@ -299,9 +284,4 @@ namespace hpx::execution::experimental {
         return parallel_sender<parallel_scheduler>(*this);
     }
 
-    inline parallel_sender<parallel_scheduler> tag_invoke(
-        schedule_t, const parallel_scheduler& sched) noexcept
-    {
-        return sched.schedule();
-    }
 }    // namespace hpx::execution::experimental

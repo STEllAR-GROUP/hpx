@@ -18,6 +18,23 @@
 
 namespace ex = hpx::execution::experimental;
 
+// Forward declaration
+struct test_receiver;
+
+// Enable test_receiver as a valid stdexec receiver
+namespace stdexec {
+    template <>
+    inline constexpr bool enable_receiver<::test_receiver> = true;
+
+    // Define completion signatures for test_receiver
+    template <>
+    struct completion_signatures<::test_receiver>
+    {
+        using type = ex::completion_signatures<ex::set_value_t(),
+            ex::set_error_t(std::exception_ptr), ex::set_stopped_t()>;
+    };
+}    // namespace stdexec
+
 struct test_receiver
 {
     struct state
@@ -28,7 +45,7 @@ struct test_receiver
     };
 
     std::shared_ptr<state> state_ = std::make_shared<state>();
-    hpx::stop_token stop_token;
+    ex::inplace_stop_token stop_token;    // Use stdexec stop token
     std::shared_ptr<std::promise<void>> done_promise =
         std::make_shared<std::promise<void>>();
 
@@ -43,44 +60,40 @@ struct test_receiver
         return done_promise->get_future();
     }
 
-    friend void tag_invoke(ex::set_value_t, test_receiver&& r) noexcept
+    void set_value() && noexcept
     {
         std::cout << "set_value called" << std::endl;
-        r.state_->completed = true;
-        r.done_promise->set_value();
+        state_->completed = true;
+        done_promise->set_value();
     }
 
-    friend void tag_invoke(
-        ex::set_error_t, test_receiver&& r, std::exception_ptr ep) noexcept
+    void set_error([[maybe_unused]] std::exception_ptr ep) && noexcept
     {
-        (void) ep;
         std::cout << "set_error called" << std::endl;
-        r.state_->error_called = true;
-        r.done_promise->set_value();
+        state_->error_called = true;
+        done_promise->set_value();
     }
 
-    friend void tag_invoke(ex::set_stopped_t, test_receiver&& r) noexcept
+    void set_stopped() && noexcept
     {
         std::cout << "set_stopped called" << std::endl;
-        r.state_->stopped_called = true;
-        r.done_promise->set_value();
+        state_->stopped_called = true;
+        done_promise->set_value();
     }
 
     struct env
     {
-        hpx::stop_token token;
+        ex::inplace_stop_token token;
 
-        friend auto tag_invoke(hpx::execution::experimental::get_stop_token_t,
-            env const& e) noexcept
+        friend auto tag_invoke(ex::get_stop_token_t, env const& e) noexcept
         {
             return e.token;
         }
     };
 
-    friend env tag_invoke(hpx::execution::experimental::get_env_t,
-        test_receiver const& r) noexcept
+    env get_env() const noexcept
     {
-        return {r.stop_token};
+        return {stop_token};
     }
 };
 
@@ -95,6 +108,15 @@ int hpx_main(hpx::program_options::variables_map&)
         auto guarantee = ex::get_forward_progress_guarantee(sched);
         std::cout << "Forward progress guarantee: "
                   << static_cast<int>(guarantee) << std::endl;
+        std::cout << "Expected parallel: "
+                  << static_cast<int>(ex::forward_progress_guarantee::parallel)
+                  << ", concurrent: "
+                  << static_cast<int>(
+                         ex::forward_progress_guarantee::concurrent)
+                  << ", weakly_parallel: "
+                  << static_cast<int>(
+                         ex::forward_progress_guarantee::weakly_parallel)
+                  << std::endl;
         HPX_TEST(guarantee == ex::forward_progress_guarantee::parallel);
     }
 
@@ -123,7 +145,7 @@ int hpx_main(hpx::program_options::variables_map&)
         test_receiver recv;
         auto state = recv.state_;
         auto future = recv.get_future();
-        hpx::stop_source stop_src;
+        ex::inplace_stop_source stop_src;
         recv.stop_token = stop_src.get_token();
         auto sender = ex::schedule(sched);
         {
