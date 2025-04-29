@@ -10,16 +10,25 @@
 #include <hpx/assert.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/then.hpp>
-#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/synchronization/stop_token.hpp>
+
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_forward.hpp>
+#endif
 
 #include <cstddef>
 #include <exception>
 #include <utility>
 
 namespace hpx::execution::experimental {
+
+#ifdef HPX_HAVE_STDEXEC
+    using hpx_sender_concept_t = hpx::execution::experimental::sender_t;
+#else
+    using hpx_sender_concept_t = void;    // Fallback type
+#endif
 
     template <typename Scheduler>
     struct parallel_sender;
@@ -103,6 +112,7 @@ namespace hpx::execution::experimental {
         {
         }
 
+#ifdef HPX_HAVE_STDEXEC
         void set_value() &&
         {
             try
@@ -125,12 +135,28 @@ namespace hpx::execution::experimental {
         {
             std::move(receiver_).set_stopped();
         }
+#else
+        void set_value() &&
+        {
+            throw std::runtime_error("stdexec not enabled");
+        }
+
+        void set_error(std::exception_ptr) && noexcept
+        {
+            throw std::runtime_error("stdexec not enabled");
+        }
+
+        void set_stopped() && noexcept
+        {
+            throw std::runtime_error("stdexec not enabled");
+        }
+#endif
     };
 
     template <typename Sender, typename Func>
     struct then_sender
     {
-        using sender_concept = hpx::execution::experimental::sender_t;
+        using sender_concept = hpx_sender_concept_t;
 
         Sender sender_;
         Func func_;
@@ -141,15 +167,23 @@ namespace hpx::execution::experimental {
         {
         }
 
+#ifdef HPX_HAVE_STDEXEC
         auto get_env() const noexcept
         {
             return hpx::execution::experimental::get_env(sender_);
         }
+#else
+        auto get_env() const noexcept
+        {
+            throw std::runtime_error("stdexec not enabled");
+        }
+#endif
 
         template <typename Receiver>
         struct operation_state
         {
             using wrapped_receiver_t = wrapped_receiver<Receiver, Func>;
+#ifdef HPX_HAVE_STDEXEC
             using wrapped_op_state_t =
                 decltype(hpx::execution::experimental::connect(
                     std::declval<Sender&&>(),
@@ -168,8 +202,20 @@ namespace hpx::execution::experimental {
             {
                 hpx::execution::experimental::start(wrapped_op_);
             }
+#else
+            operation_state(Sender&&, Func&&, Receiver&&)
+            {
+                throw std::runtime_error("stdexec not enabled");
+            }
+
+            void start() noexcept
+            {
+                throw std::runtime_error("stdexec not enabled");
+            }
+#endif
         };
 
+#ifdef HPX_HAVE_STDEXEC
         template <typename Receiver>
         auto connect(Receiver&& receiver) &&
         {
@@ -183,12 +229,25 @@ namespace hpx::execution::experimental {
             return operation_state<Receiver>{
                 sender_, func_, std::forward<Receiver>(receiver)};
         }
+#else
+        template <typename Receiver>
+        auto connect(Receiver&&) &&
+        {
+            throw std::runtime_error("stdexec not enabled");
+        }
+
+        template <typename Receiver>
+        auto connect(Receiver&&) const&
+        {
+            throw std::runtime_error("stdexec not enabled");
+        }
+#endif
     };
 
     template <typename Scheduler>
     struct parallel_sender
     {
-        using sender_concept = hpx::execution::experimental::sender_t;
+        using sender_concept = hpx_sender_concept_t;
 
         explicit parallel_sender(Scheduler scheduler) noexcept
           : scheduler_(std::move(scheduler))
@@ -217,6 +276,7 @@ namespace hpx::execution::experimental {
             {
             }
 
+#ifdef HPX_HAVE_STDEXEC
             void start() noexcept
             {
                 auto stop_token = hpx::execution::experimental::get_stop_token(
@@ -239,8 +299,15 @@ namespace hpx::execution::experimental {
                     std::move(receiver_).set_error(std::current_exception());
                 }
             }
+#else
+            void start() noexcept
+            {
+                throw std::runtime_error("stdexec not enabled");
+            }
+#endif
         };
 
+#ifdef HPX_HAVE_STDEXEC
         template <typename Receiver>
         auto connect(Receiver&& receiver) &&
         {
@@ -254,7 +321,21 @@ namespace hpx::execution::experimental {
             return operation_state<Receiver>{
                 std::forward<Receiver>(receiver), scheduler_.wrapped_};
         }
+#else
+        template <typename Receiver>
+        auto connect(Receiver&&) &&
+        {
+            throw std::runtime_error("stdexec not enabled");
+        }
 
+        template <typename Receiver>
+        auto connect(Receiver&&) const&
+        {
+            throw std::runtime_error("stdexec not enabled");
+        }
+#endif
+
+#ifdef HPX_HAVE_STDEXEC
         template <typename Func>
         auto then(Func&& func) &&
         {
@@ -268,6 +349,19 @@ namespace hpx::execution::experimental {
             return then_sender<parallel_sender, std::decay_t<Func>>{
                 *this, std::forward<Func>(func)};
         }
+#else
+        template <typename Func>
+        auto then(Func&&) &&
+        {
+            throw std::runtime_error("stdexec not enabled");
+        }
+
+        template <typename Func>
+        auto then(Func&&) const&
+        {
+            throw std::runtime_error("stdexec not enabled");
+        }
+#endif
 
     private:
         Scheduler scheduler_;
@@ -276,7 +370,11 @@ namespace hpx::execution::experimental {
     inline parallel_sender<parallel_scheduler> parallel_scheduler::schedule()
         const noexcept
     {
+#ifdef HPX_HAVE_STDEXEC
         return parallel_sender<parallel_scheduler>(*this);
+#else
+        throw std::runtime_error("stdexec not enabled");
+#endif
     }
 
 }    // namespace hpx::execution::experimental
