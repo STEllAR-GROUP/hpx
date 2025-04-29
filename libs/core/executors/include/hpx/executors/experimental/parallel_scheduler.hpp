@@ -10,15 +10,10 @@
 #include <hpx/assert.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/then.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/synchronization/stop_token.hpp>
-
-#if defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution_base/stdexec_forward.hpp>
-#else
-#error "HPX_WITH_STDEXEC must be enabled for parallel_scheduler.hpp"
-#endif
 
 #include <cstddef>
 #include <exception>
