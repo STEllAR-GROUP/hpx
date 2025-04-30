@@ -4,13 +4,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+#include <hpx/type_support/is_contiguous_iterator.hpp>
+
 #include <array>
 #include <cassert>
 #include <iterator>
 #include <string>
 #include <vector>
-
-#include <hpx/type_support/is_contiguous_iterator.hpp>
 
 using namespace hpx::traits::detail;
 using namespace hpx::traits;
@@ -30,12 +31,12 @@ static_assert(
     !is_contiguous_iterator_v<std::vector<int>::const_reverse_iterator>);
 
 // std::array<int, 4>::iterator is a contiguous iterator
-static_assert(is_contiguous_iterator_v<std::array<int, 4>::iterator>);
-static_assert(is_contiguous_iterator_v<std::array<int, 4>::const_iterator>);
+static_assert(is_contiguous_iterator_v<std::array<int, 1>::iterator>);
+static_assert(is_contiguous_iterator_v<std::array<int, 1>::const_iterator>);
 // reverse_iterator is not a contiguous iterator
-static_assert(!is_contiguous_iterator_v<std::array<int, 4>::reverse_iterator>);
+static_assert(!is_contiguous_iterator_v<std::array<int, 1>::reverse_iterator>);
 static_assert(
-    !is_contiguous_iterator_v<std::array<int, 4>::const_reverse_iterator>);
+    !is_contiguous_iterator_v<std::array<int, 1>::const_reverse_iterator>);
 
 // pointers are contiguous iterators
 static_assert(is_contiguous_iterator_v<int*>);
@@ -60,6 +61,10 @@ static_assert(!is_contiguous_iterator_v<int[]>);
 static_assert(!is_contiguous_iterator_v<int[4]>);
 static_assert(!is_contiguous_iterator_v<int const[]>);
 static_assert(!is_contiguous_iterator_v<int const[4]>);
+
+#if defined(HPX_MSVC)
+#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+#endif
 
 // Unknown type iterators to "weird"
 // types should not cause compile errors
