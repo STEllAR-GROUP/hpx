@@ -389,11 +389,11 @@ namespace hpx {
     {
         // clang-format off
         private:
-        template <typename FwdIter1, typename FwdIter2,
-             HPX_CONCEPT_REQUIRES_(
+        template <typename FwdIter1, typename FwdIter2>
+            requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(hpx::adjacent_difference_t,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest)
@@ -409,12 +409,12 @@ namespace hpx {
         }
 
         // clang-format off
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::adjacent_difference_t,
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
@@ -430,11 +430,11 @@ namespace hpx {
         }
 
         // clang-format off
-        template <typename FwdIter1, typename FwdIter2, typename Op,
-             HPX_CONCEPT_REQUIRES_(
+        template <typename FwdIter1, typename FwdIter2, typename Op>
+             requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(hpx::adjacent_difference_t,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op op)
@@ -451,12 +451,12 @@ namespace hpx {
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Op,
-            HPX_CONCEPT_REQUIRES_(
+            typename Op>
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::adjacent_difference_t,
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
