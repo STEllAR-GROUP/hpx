@@ -66,7 +66,7 @@ namespace hpx::execution::experimental {
             return sched.get_forward_progress_guarantee();
         }
 
-        parallel_sender<parallel_scheduler> schedule() const noexcept;
+        parallel_sender<parallel_scheduler> schedule() const;
 
         wrapped_type wrapped_;
     };
@@ -178,7 +178,7 @@ namespace hpx::execution::experimental {
             throw std::runtime_error("stdexec not enabled");
         }
 #endif
-
+        // clang-format off
         template <typename Receiver>
         struct operation_state
         {
@@ -214,7 +214,7 @@ namespace hpx::execution::experimental {
             }
 #endif
         };
-
+// clang-format on
 #ifdef HPX_HAVE_STDEXEC
         template <typename Receiver>
         auto connect(Receiver&& receiver) &&
@@ -368,7 +368,7 @@ namespace hpx::execution::experimental {
     };
 
     inline parallel_sender<parallel_scheduler> parallel_scheduler::schedule()
-        const noexcept
+        const
     {
 #ifdef HPX_HAVE_STDEXEC
         return parallel_sender<parallel_scheduler>(*this);

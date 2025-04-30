@@ -16,11 +16,16 @@
 #include <memory>
 #include <utility>
 
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_forward.hpp>
+#endif
+
 namespace ex = hpx::execution::experimental;
 
 // Forward declaration
 struct test_receiver;
 
+#ifdef HPX_HAVE_STDEXEC
 // Enable test_receiver as a valid stdexec receiver
 namespace stdexec {
     template <>
@@ -34,6 +39,7 @@ namespace stdexec {
             ex::set_error_t(std::exception_ptr), ex::set_stopped_t()>;
     };
 }    // namespace stdexec
+#endif
 
 struct test_receiver
 {
@@ -45,7 +51,11 @@ struct test_receiver
     };
 
     std::shared_ptr<state> state_ = std::make_shared<state>();
+#ifdef HPX_HAVE_STDEXEC
     ex::inplace_stop_token stop_token;    // Use stdexec stop token
+#else
+    hpx::experimental::in_place_stop_token stop_token;    // Use HPX stop token
+#endif
     std::shared_ptr<std::promise<void>> done_promise =
         std::make_shared<std::promise<void>>();
 
@@ -60,6 +70,7 @@ struct test_receiver
         return done_promise->get_future();
     }
 
+#ifdef HPX_HAVE_STDEXEC
     void set_value() && noexcept
     {
         std::cout << "set_value called" << std::endl;
@@ -80,15 +91,43 @@ struct test_receiver
         state_->stopped_called = true;
         done_promise->set_value();
     }
+#else
+    void set_value() && noexcept
+    {
+        std::cerr << "set_value not supported without stdexec" << std::endl;
+    }
+
+    void set_error([[maybe_unused]] std::exception_ptr) && noexcept
+    {
+        std::cerr << "set_error not supported without stdexec" << std::endl;
+    }
+
+    void set_stopped() && noexcept
+    {
+        std::cerr << "set_stopped not supported without stdexec" << std::endl;
+    }
+#endif
 
     struct env
     {
+#ifdef HPX_HAVE_STDEXEC
         ex::inplace_stop_token token;
+#else
+        hpx::experimental::in_place_stop_token token;
+#endif
 
+#ifdef HPX_HAVE_STDEXEC
         friend auto tag_invoke(ex::get_stop_token_t, env const& e) noexcept
         {
             return e.token;
         }
+#else
+        friend auto tag_invoke(hpx::execution::experimental::get_stop_token_t,
+            env const& e) noexcept
+        {
+            return e.token;
+        }
+#endif
     };
 
     env get_env() const noexcept
@@ -120,6 +159,7 @@ int hpx_main(hpx::program_options::variables_map&)
         HPX_TEST(guarantee == ex::forward_progress_guarantee::parallel);
     }
 
+#ifdef HPX_HAVE_STDEXEC
     // Test single task (schedule)
     std::cout << "\n=== Single Task ===" << std::endl;
     {
@@ -145,7 +185,7 @@ int hpx_main(hpx::program_options::variables_map&)
         test_receiver recv;
         auto state = recv.state_;
         auto future = recv.get_future();
-        ex::inplace_stop_source stop_src;
+        stdexec::inplace_stop_source stop_src;
         recv.stop_token = stop_src.get_token();
         auto sender = ex::schedule(sched);
         {
@@ -188,6 +228,11 @@ int hpx_main(hpx::program_options::variables_map&)
                   << state->error_called << std::endl;
         HPX_TEST(state->error_called);
     }
+#else
+    std::cout << "\n=== Skipping stdexec-dependent tests ===" << std::endl;
+    std::cerr
+        << "Warning: stdexec not enabled, skipping parallel_scheduler tests\n";
+#endif
 
     std::cout << "Calling hpx::finalize()" << std::endl;
     return hpx::finalize();
