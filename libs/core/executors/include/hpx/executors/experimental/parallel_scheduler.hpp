@@ -27,7 +27,8 @@ namespace hpx::execution::experimental {
 #ifdef HPX_HAVE_STDEXEC
     using hpx_sender_concept_t = hpx::execution::experimental::sender_t;
 #else
-    using hpx_sender_concept_t = void;    // Fallback type
+    // Fallback type
+    using hpx_sender_concept_t = void;
 #endif
 
     template <typename Scheduler>
