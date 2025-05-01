@@ -279,24 +279,24 @@ namespace hpx::parallel {
 
                 if (first1 == last1)
                 {
+                    // clang-format off
                     return util::detail::convert_to_result(
                         detail::copy<util::in_out_result<Iter2, Iter3>>().call(
                             HPX_FORWARD(ExPolicy, policy), first2, last2, dest),
                         [first1](util::in_out_result<Iter2, Iter3> const& p)
-                            -> result_type {
-                            return {first1, p.in, p.out};
-                        });
+                            -> result_type { return {first1, p.in, p.out}; });
+                    // clang-format on
                 }
 
                 if (first2 == last2)
                 {
+                    // clang-format off
                     return util::detail::convert_to_result(
                         detail::copy<util::in_out_result<Iter1, Iter3>>().call(
                             HPX_FORWARD(ExPolicy, policy), first1, last1, dest),
                         [first2](util::in_out_result<Iter1, Iter3> const& p)
-                            -> result_type {
-                            return {p.in, first2, p.out};
-                        });
+                            -> result_type { return {p.in, first2, p.out}; });
+                    // clang-format on
                 }
 
                 using buffer_type = typename set_operations_buffer<Iter3>::type;
@@ -402,7 +402,7 @@ namespace hpx {
                 "Requires at least output iterator.");
 
             using result_type = hpx::parallel::util::in_in_out_result<FwdIter1,
-                FwdIter3, FwdIter3>;
+                FwdIter2, FwdIter3>;
 
             return hpx::parallel::util::get_third_element(
                 hpx::parallel::detail::set_union<result_type>().call(
