@@ -80,17 +80,7 @@ namespace hpx::execution::experimental {
 
         if (!initialized)
         {
-            try
-            {
-                // If this doesn't throw, we're on an HPX thread
-                hpx::threads::get_self_id();
-                is_on_hpx_thread = true;
-            }
-            catch (...)
-            {
-                // Not on an HPX thread
-                is_on_hpx_thread = false;
-            }
+            is_on_hpx_thread = hpx::threads::get_self_ptr() != nullptr;
             initialized = true;
         }
 
