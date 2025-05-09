@@ -77,8 +77,11 @@ namespace hpx::experimental {
             exec, [&](auto) { f(ts...); }, num_tasks, HPX_FORWARD(Ts, ts)...));
     }
 
-    template <typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(std::is_invocable_v<F&&, Ts&&...>)>
+    template <typename F, typename... Ts>
+    // clang-format off
+        requires (std::is_invocable_v<F&&, Ts&&...>
+        )
+    // clang-format on
     void run_on_all(F&& f, Ts&&... ts)
     {
         std::size_t cores =

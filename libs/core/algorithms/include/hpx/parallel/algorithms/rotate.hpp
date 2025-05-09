@@ -243,14 +243,14 @@ namespace hpx::parallel {
                     static_cast<double>(size_left + size_right);
 
                 // avoid cores_left == 0 after integer rounding
-                cores_left = (std::max)(static_cast<std::size_t>(1),
+                cores_left = (std::max) (static_cast<std::size_t>(1),
                     static_cast<std::size_t>(
                         partition_size_ratio * static_cast<double>(cores)));
             }
 
             // cores_right should be at least 1.
             std::size_t cores_right =
-                (std::max)(static_cast<std::size_t>(1), cores - cores_left);
+                (std::max) (static_cast<std::size_t>(1), cores - cores_left);
 
             // invoke the reverse operations on the left and right sections
             // concurrently
@@ -348,12 +348,12 @@ namespace hpx::parallel {
         /// \endcond
     }    // namespace detail
 
+    template <typename ExPolicy, typename FwdIter>
     // clang-format off
-    template <typename ExPolicy, typename FwdIter,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<FwdIter>
-        )>
+        )
     // clang-format on
     HPX_DEPRECATED_V(
         1, 8, "hpx::parallel::rotate is deprecated, use hpx::rotate instead ")
@@ -462,13 +462,13 @@ namespace hpx::parallel {
         /// \endcond
     }    // namespace detail
 
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
     // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_iterator_v<FwdIter1> &&
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<FwdIter2>
-        )>
+        )
     // clang-format on
     HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::rotate_copy is deprecated, use hpx::rotate_copy "
@@ -500,11 +500,11 @@ namespace hpx {
     inline constexpr struct rotate_t final
       : hpx::detail::tag_parallel_algorithm<rotate_t>
     {
+        template <typename FwdIter>
         // clang-format off
-        template <typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::rotate_t, FwdIter first, FwdIter new_first, FwdIter last)
@@ -518,12 +518,12 @@ namespace hpx {
                     .call(hpx::execution::seq, first, new_first, last));
         }
 
+        template <typename ExPolicy, typename FwdIter>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::rotate_t,
             ExPolicy&& policy, FwdIter first, FwdIter new_first, FwdIter last)
@@ -548,12 +548,12 @@ namespace hpx {
     inline constexpr struct rotate_copy_t final
       : hpx::detail::tag_parallel_algorithm<rotate_copy_t>
     {
+        template <typename FwdIter, typename OutIter>
         // clang-format off
-        template <typename FwdIter, typename OutIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_iterator_v<OutIter>
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::rotate_copy_t, FwdIter first,
             FwdIter new_first, FwdIter last, OutIter dest_first)
@@ -570,13 +570,13 @@ namespace hpx {
                         dest_first));
         }
 
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::rotate_copy_t,
             ExPolicy&& policy, FwdIter1 first, FwdIter1 new_first,

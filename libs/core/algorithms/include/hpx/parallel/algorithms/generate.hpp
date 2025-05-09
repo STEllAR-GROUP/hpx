@@ -315,12 +315,12 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<generate_t>
     {
     private:
+        template <typename ExPolicy, typename FwdIter, typename F>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             generate_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
@@ -332,11 +332,11 @@ namespace hpx {
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f));
         }
 
+        template <typename FwdIter, typename F>
         // clang-format off
-        template <typename FwdIter, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             generate_t, FwdIter first, FwdIter last, F f)
@@ -355,13 +355,14 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<generate_n_t>
     {
     private:
+        template <typename ExPolicy, typename FwdIter, typename Size,
+            typename F>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename Size, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             generate_n_t, ExPolicy&& policy, FwdIter first, Size count, F f)
@@ -390,12 +391,12 @@ namespace hpx {
                 static_cast<std::size_t>(count), HPX_MOVE(f));
         }
 
+        template <typename FwdIter, typename Size, typename F>
         // clang-format off
-        template <typename FwdIter, typename Size, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             generate_n_t, FwdIter first, Size count, F&& f)
