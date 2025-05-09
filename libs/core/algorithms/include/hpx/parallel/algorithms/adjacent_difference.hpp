@@ -352,9 +352,9 @@ namespace hpx {
     inline constexpr struct adjacent_difference_t final
       : hpx::detail::tag_parallel_algorithm<adjacent_difference_t>
     {
-        // clang-format off
-        private:
+    private:
         template <typename FwdIter1, typename FwdIter2>
+        // clang-format off
             requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
@@ -373,14 +373,14 @@ namespace hpx {
                 std::minus<>());
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
             )
-        // clang-format on
+            // clang-format on 
         friend decltype(auto) tag_fallback_invoke(hpx::adjacent_difference_t,
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
@@ -394,8 +394,9 @@ namespace hpx {
                 std::minus<>());
         }
 
-        // clang-format off
+        
         template <typename FwdIter1, typename FwdIter2, typename Op>
+            // clang-format off
              requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
@@ -414,9 +415,9 @@ namespace hpx {
                 HPX_MOVE(op));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Op>
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&

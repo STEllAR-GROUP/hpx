@@ -329,11 +329,11 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<reverse_t>
     {
     private:
+        template <typename BidirIter>
         // clang-format off
-        template <typename BidirIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<BidirIter>
-            )>
+            )
         // clang-format on
         friend void tag_fallback_invoke(
             hpx::reverse_t, BidirIter first, BidirIter last)
@@ -345,12 +345,12 @@ namespace hpx {
                 hpx::execution::sequenced_policy{}, first, last);
         }
 
+        template <typename ExPolicy, typename BidirIter>
         // clang-format off
-        template <typename ExPolicy, typename BidirIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<BidirIter> &&
                 hpx::is_execution_policy_v<ExPolicy>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             hpx::reverse_t, ExPolicy&& policy, BidirIter first, BidirIter last)
@@ -370,12 +370,12 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<reverse_copy_t>
     {
     private:
+        template <typename BidirIter, typename OutIter>
         // clang-format off
-        template <typename BidirIter, typename OutIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<BidirIter> &&
                 hpx::traits::is_iterator_v<OutIter>
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(
             hpx::reverse_copy_t, BidirIter first, BidirIter last, OutIter dest)
@@ -394,12 +394,13 @@ namespace hpx {
         }
 
         // clang-format off
-        template <typename ExPolicy, typename BidirIter, typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+        template <typename ExPolicy, typename BidirIter, typename FwdIter>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<BidirIter> &&
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::reverse_copy_t,
             ExPolicy&& policy, BidirIter first, BidirIter last, FwdIter dest)

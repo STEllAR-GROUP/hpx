@@ -720,9 +720,12 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential partition with projection function for bidirectional iterator.
-        template <typename BidirIter, typename Pred, typename Proj,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_bidirectional_iterator_v<BidirIter>)>
+        template <typename BidirIter, typename Pred, typename Proj>
+        // clang-format off
+            requires (
+                hpx::traits::is_bidirectional_iterator_v<BidirIter>
+            )
+        // clang-format on
         constexpr BidirIter sequential_partition(
             BidirIter first, BidirIter last, Pred&& pred, Proj&& proj)
         {
@@ -754,9 +757,12 @@ namespace hpx::parallel {
         }
 
         // sequential partition with projection function for forward iterator.
-        template <typename FwdIter, typename Pred, typename Proj,
-            HPX_CONCEPT_REQUIRES_(hpx::traits::is_forward_iterator_v<FwdIter> &&
-                !hpx::traits::is_bidirectional_iterator_v<FwdIter>)>
+        template <typename FwdIter, typename Pred, typename Proj>
+        // clang-format off
+            requires (hpx::traits::is_forward_iterator_v<FwdIter> &&
+                !hpx::traits::is_bidirectional_iterator_v<FwdIter>
+            )
+        // clang-format on 
         constexpr FwdIter sequential_partition(
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
         {
@@ -1147,11 +1153,11 @@ namespace hpx::parallel {
             // remaining blocks are merged into one block which is adjacent to
             // the left of boundary.
 
-            // clang-format off
-            template <typename BidirIter,
-                HPX_CONCEPT_REQUIRES_(
+          
+            template <typename BidirIter>
+                requires (
                     hpx::traits::is_bidirectional_iterator_v<BidirIter>
-                )>
+                )
             // clang-format on
             static block<BidirIter> merge_leftside_remaining_blocks(
                 std::vector<block<BidirIter>>& remaining_blocks,
@@ -1187,12 +1193,12 @@ namespace hpx::parallel {
             // remaining blocks are merged into one block which is adjacent to
             // the left of boundary.
 
+            template <typename FwdIter>
             // clang-format off
-            template <typename FwdIter,
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     hpx::traits::is_forward_iterator_v<FwdIter> &&
                     !hpx::traits::is_bidirectional_iterator_v<FwdIter>
-                )>
+                )
             // clang-format on
             static block<FwdIter> merge_leftside_remaining_blocks(
                 std::vector<block<FwdIter>>& remaining_blocks, FwdIter boundary,
@@ -1613,11 +1619,10 @@ namespace hpx::parallel {
         /// \endcond
     }    // namespace detail
 
-    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename FwdIter3, typename Pred,
-        typename Proj = hpx::identity,
-        HPX_CONCEPT_REQUIRES_(
+        typename FwdIter3, typename Pred, typename Proj = hpx::identity>
+    // clang-format off
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<FwdIter1> &&
             hpx::traits::is_iterator_v<FwdIter2> &&
@@ -1625,7 +1630,7 @@ namespace hpx::parallel {
             traits::is_projected_v<Proj, FwdIter1> &&
             traits::is_indirect_callable_v<ExPolicy, Pred,
                 traits::projected<Proj, FwdIter1>>
-        )>
+        )
     // clang-format on
     util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter2, FwdIter3>>
     partition_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
@@ -1662,12 +1667,12 @@ namespace hpx {
     inline constexpr struct stable_partition_t final
       : hpx::detail::tag_parallel_algorithm<stable_partition_t>
     {
+        template <typename BidirIter, typename F>
         // clang-format off
-        template <typename BidirIter, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<BidirIter> &&
                 hpx::is_invocable_v<F, hpx::traits::iter_value_t<BidirIter>>
-        )>
+        )
         // clang-format on
         friend BidirIter tag_fallback_invoke(
             hpx::stable_partition_t, BidirIter first, BidirIter last, F f)
@@ -1680,13 +1685,13 @@ namespace hpx {
                 hpx::identity_v);
         }
 
+        template <typename ExPolicy, typename BidirIter, typename F>
         // clang-format off
-        template <typename ExPolicy, typename BidirIter, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<BidirIter> &&
                 hpx::is_invocable_v<F, hpx::traits::iter_value_t<BidirIter>>
-        )>
+        )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, BidirIter>
         tag_fallback_invoke(hpx::stable_partition_t, ExPolicy&& policy,
@@ -1710,12 +1715,12 @@ namespace hpx {
     inline constexpr struct partition_t final
       : hpx::detail::tag_parallel_algorithm<partition_t>
     {
+        template <typename FwdIter, typename Pred>
         // clang-format off
-        template <typename FwdIter, typename Pred,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<FwdIter>>
-        )>
+        )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::partition_t, FwdIter first, FwdIter last, Pred pred)
@@ -1728,13 +1733,13 @@ namespace hpx {
                 hpx::identity_v);
         }
 
+        template <typename ExPolicy, typename FwdIter, typename Pred>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename Pred,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<FwdIter>>
-        )>
+        )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
         tag_fallback_invoke(hpx::partition_t, ExPolicy&& policy, FwdIter first,
@@ -1754,15 +1759,15 @@ namespace hpx {
     inline constexpr struct partition_copy_t final
       : hpx::detail::tag_parallel_algorithm<partition_copy_t>
     {
+        template <typename FwdIter1, typename FwdIter2, typename FwdIter3,
+            typename Pred>
         // clang-format off
-        template <typename FwdIter1, typename FwdIter2,
-            typename FwdIter3, typename Pred,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::traits::is_iterator_v<FwdIter3> &&
                 hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<FwdIter1>>
-            )>
+            )
         // clang-format on
         friend std::pair<FwdIter2, FwdIter3> tag_fallback_invoke(
             hpx::partition_copy_t, FwdIter1 first, FwdIter1 last,
@@ -1783,16 +1788,16 @@ namespace hpx {
                     HPX_MOVE(pred), hpx::identity_v));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename FwdIter3, typename Pred,
-            HPX_CONCEPT_REQUIRES_(
+            typename FwdIter3, typename Pred>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::traits::is_iterator_v<FwdIter3> &&
                 hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<FwdIter1>>
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             std::pair<FwdIter2, FwdIter3>>
