@@ -13,8 +13,14 @@ if(JSON_ROOT AND NOT Json_ROOT)
   unset(JSON_ROOT CACHE)
 endif()
 
+# ignore version limitations imposed by the JSON library
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+
 # CMake V4 is not supported before JSON V3.12
 if(NOT HPX_WITH_FETCH_JSON)
+  hpx_info(
+    "HPX_WITH_FETCH_JSON=OFF, a preinstalled version of JSON will be used"
+  )
   find_package(nlohmann_json 3.12.0 REQUIRED)
 elseif(NOT TARGET Json::json)
   if(NOT HPX_WITH_JSON_TAG)
