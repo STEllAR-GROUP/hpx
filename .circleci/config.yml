@@ -129,6 +129,7 @@ jobs:
               cpp-dependencies \
                   --dir /hpx/source/libs \
                   --ignore $(find /hpx/source/libs -type d -wholename '*/include_compatibility' | cut -d'/' -f5-) \
+                  --ignore $(find /hpx/source/libs -type d -wholename '*/include_local' | cut -d'/' -f5-) \
                   --graph-cycles /tmp/circular_deps.dot
               dot /tmp/circular_deps.dot -Tsvg -o /tmp/circular_deps.svg
               if [[ $(wc -l /tmp/circular_deps.dot | awk '{print $1}') -gt 2 ]]; then exit 1; fi
