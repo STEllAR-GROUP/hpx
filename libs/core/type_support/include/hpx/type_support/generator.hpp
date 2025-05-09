@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Hartmut Kaiser
+//  Copyright (c) 2023-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,7 +18,7 @@
 namespace hpx {
 
     template <typename Ref, typename V = void, typename Allocator = void>
-    using generator = std::generator<Ref, V, Allocator>
+    using generator = std::generator<Ref, V, Allocator>;
 }
 
 #else
