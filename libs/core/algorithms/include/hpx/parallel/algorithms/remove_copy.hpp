@@ -404,15 +404,15 @@ namespace hpx {
     inline constexpr struct remove_copy_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_copy_if_t>
     {
+        template <typename InIter, typename OutIter, typename Pred>
         // clang-format off
-        template <typename InIter, typename OutIter,
-            typename Pred, HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<InIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::remove_copy_if_t, InIter first,
             InIter last, OutIter dest, Pred pred)
@@ -431,16 +431,17 @@ namespace hpx {
             return hpx::parallel::util::get_second_element(HPX_MOVE(res));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Pred, HPX_CONCEPT_REQUIRES_(
+            typename Pred>
+        // clang-format off
+             requires (
                 hpx::is_execution_policy_v<ExPolicy>&&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
@@ -468,13 +469,13 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<remove_copy_t>
     {
     private:
-        // clang-format off
         template <typename InIter, typename OutIter,
-            typename T = typename std::iterator_traits<InIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<InIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter>
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::remove_copy_t, InIter first,
             InIter last, OutIter dest, T const& value)
@@ -491,14 +492,14 @@ namespace hpx {
                 [value](type const& a) -> bool { return value == a; });
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T = typename std::iterator_traits<FwdIter1>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter1>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy>&&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type

@@ -356,11 +356,12 @@ namespace hpx::experimental {
     /// \note It is expected (but not mandated) that f will (directly or
     ///       indirectly) call tr.run(_callable_object_).
     ///
+
+    template <typename ExPolicy, typename F>
     // clang-format off
-    template <typename ExPolicy, typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<std::decay_t<ExPolicy>>
-        )>
+        )
     // clang-format on
     decltype(auto) define_task_block(ExPolicy&& policy, F&& f)
     {
@@ -496,9 +497,12 @@ namespace hpx::parallel {
         "hpx::experimental::task_block instead") =
         hpx::experimental::task_block<ExPolicy>;
 
-    template <typename ExPolicy, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_async_execution_policy<std::decay_t<ExPolicy>>::value)>
+    template <typename ExPolicy, typename F>
+    // clang-format off
+        requires (
+            hpx::is_async_execution_policy<std::decay_t<ExPolicy>>::value
+        )
+    // clang-format on 
     HPX_DEPRECATED_V(1, 9,
         "hpx::parallel:v2::define_task_block is deprecated, use "
         "hpx::experimental::define_task_block instead")
@@ -507,13 +511,17 @@ namespace hpx::parallel {
         return hpx::experimental::define_task_block(policy, f);
     }
 
-    template <typename ExPolicy, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            !hpx::is_async_execution_policy<std::decay_t<ExPolicy>>::value)>
+    template <typename ExPolicy, typename F>
+    // clang-format off
+        requires (
+            !hpx::is_async_execution_policy<std::decay_t<ExPolicy>>::value
+        )
+    // clang-format on
     HPX_DEPRECATED_V(1, 9,
         "hpx::parallel:v2::define_task_block is deprecated, use "
-        "hpx::experimental::define_task_block instead")
-    void define_task_block(ExPolicy&& policy, F&& f)
+        "hpx::experimental::define_task_block instead") void define_task_block(ExPolicy&&
+                                                                                   policy,
+        F&& f)
     {
         return hpx::experimental::define_task_block(policy, f);
     }

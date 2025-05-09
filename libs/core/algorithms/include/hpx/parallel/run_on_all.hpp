@@ -155,7 +155,7 @@ namespace hpx::experimental {
     /// \param ts        The list of reductions and the function to invoke (last
     ///                  argument)
     template <typename T, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(!hpx::is_execution_policy_v<T>)>
+        requires (std::is_invocable_v<F&&, Ts&&...>)
     decltype(auto) run_on_all(T&& t, Ts&&... ts)
     {
         return detail::run_on_all(hpx::execution::par,

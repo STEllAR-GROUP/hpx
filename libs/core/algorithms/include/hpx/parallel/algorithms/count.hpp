@@ -429,13 +429,13 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<count_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(count_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T const& value)
@@ -451,12 +451,12 @@ namespace hpx {
                 hpx::identity_v);
         }
 
-        // clang-format off
         template <typename InIter,
-            typename T  = typename std::iterator_traits<InIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<InIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter>
-            )>
+            )
         // clang-format on
         friend typename std::iterator_traits<InIter>::difference_type
         tag_fallback_invoke(count_t, InIter first, InIter last, T const& value)
@@ -478,15 +478,15 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<count_if_t>
     {
     private:
+        template <typename ExPolicy, typename FwdIter, typename F>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename F,
-            HPX_CONCEPT_REQUIRES_(
+        requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<F,
                     typename std::iterator_traits<FwdIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             count_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
@@ -502,14 +502,14 @@ namespace hpx {
                 hpx::identity_v);
         }
 
+        template <typename InIter, typename F>
         // clang-format off
-        template <typename InIter, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::is_invocable_v<F,
                     typename std::iterator_traits<InIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend typename std::iterator_traits<InIter>::difference_type
         tag_fallback_invoke(count_if_t, InIter first, InIter last, F f)
