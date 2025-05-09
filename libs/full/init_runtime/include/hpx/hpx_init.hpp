@@ -32,7 +32,7 @@ namespace hpx {
     /// \brief Main entry point for launching the HPX runtime system.
     ///
     /// This is the main entry point for any HPX application. This function
-    /// (or one of its overloads below) should be called from the users `main()`
+    /// (or one of its overloads) should be called from the users `main()`
     /// function. It will set up the HPX runtime environment and schedule the
     /// function given by \p f as a HPX thread. This overload will not call
     /// `hpx_main`.
@@ -67,7 +67,7 @@ namespace hpx {
     /// \brief Main entry point for launching the HPX runtime system.
     ///
     /// This is the main entry point for any HPX application. This function
-    /// (or one of its overloads below) should be called from the users `main()`
+    /// (or one of its overloads) should be called from the users `main()`
     /// function. It will set up the HPX runtime environment and schedule the
     /// function given by \p f as a HPX thread. This overload will not call
     /// `hpx_main`.
@@ -102,10 +102,10 @@ namespace hpx {
     /// \brief Main entry point for launching the HPX runtime system.
     ///
     /// This is the main entry point for any HPX application. This function
-    /// (or one of its overloads below) should be called from the users `main()`
-    /// function. It will set up the HPX runtime environment and schedule the
-    /// function given by \p f as a HPX thread. This overload will not call
-    /// `hpx_main`.
+    /// (or one of its overloads) should be called from the users `main()`
+    /// function. This overload expects a user-defined function named `hpx_main`
+    /// at global scope, which will be used as the entry point for the HPX
+    /// application.
     ///
     ///
     /// \param argc         [in] The number of command line arguments passed
@@ -118,7 +118,8 @@ namespace hpx {
     ///                     (See documentation of \a hpx::init_params)
     ///
     /// \returns            The function returns the value, which has been
-    ///                     returned from the user supplied \p f.
+    ///                     returned from `hpx_main` (or 0 when executed in
+    ///                     worker mode).
     ///
     /// \note               If the parameter \p mode is not given (defaulted),
     ///                     the created runtime system instance will be
@@ -169,6 +170,8 @@ namespace hpx {
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
+    /// This overload expects a user-defined function named `hpx_main` at global
+    /// scope, which will be used as the entry point for the HPX application.
     ///
     /// \param params       [in] The parameters to the \a hpx::init function
     ///                     (See documentation of \a hpx::init_params)
