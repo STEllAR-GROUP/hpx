@@ -98,6 +98,9 @@ namespace hpx::execution::experimental {
     using stdexec::get_completion_signatures;
     using stdexec::get_completion_signatures_t;
 
+    // Operation State
+    using stdexec::operation_state_t;
+
     // Sender
     using stdexec::connect;
     using stdexec::connect_result_t;
