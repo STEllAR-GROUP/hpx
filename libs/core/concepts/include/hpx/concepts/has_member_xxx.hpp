@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2020-2021 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
@@ -17,9 +17,10 @@
 /// only if its parameter type has member function with MEMBER name (no matter
 /// static it is or not). The generated trait ends up in a namespace where the
 /// macro itself has been placed.
+//
+// clang-format off
 #define HPX_HAS_MEMBER_XXX_TRAIT_DEF(MEMBER)                                   \
-    namespace HPX_PP_CAT(HPX_PP_CAT(has_, MEMBER), _detail)                    \
-    {                                                                          \
+    namespace HPX_PP_CAT(HPX_PP_CAT(has_, MEMBER), _detail) {                  \
         struct helper                                                          \
         {                                                                      \
             void MEMBER(...);                                                  \
@@ -44,7 +45,8 @@
         };                                                                     \
                                                                                \
         template <typename T>                                                  \
-        struct impl<T, member_function_holder<&helper_composed<T>::MEMBER>>    \
+        struct impl<T,                                                         \
+            member_function_holder<&helper_composed<std::decay_t<T>>::MEMBER>> \
           : std::false_type                                                    \
         {                                                                      \
         };                                                                     \
@@ -70,3 +72,5 @@
     inline constexpr bool HPX_PP_CAT(HPX_PP_CAT(has_, MEMBER), _v) =           \
         HPX_PP_CAT(has_, MEMBER)<T>::value;                                    \
     /**/
+
+// clang-format on

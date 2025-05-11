@@ -412,19 +412,19 @@ namespace hpx {
                 return {};
             }
 
-            [[nodiscard]] static constexpr auto final_suspend() noexcept
+            static constexpr auto final_suspend() noexcept
             {
                 return final_awaiter{};
             }
 
-            [[nodiscard]] hpx::suspend_always yield_value(Yielded val) noexcept
+            hpx::suspend_always yield_value(Yielded val) noexcept
             {
                 ptr = ::std::addressof(val);
                 return {};
             }
 
             // clang-format off
-            [[nodiscard]] auto
+            auto
             yield_value(std::remove_reference_t<Yielded> const& val) noexcept(
                 std::is_nothrow_constructible_v<std::remove_cvref_t<Yielded>,
                     std::remove_reference_t<Yielded> const&>)
@@ -457,7 +457,7 @@ namespace hpx {
             {
                 std::remove_cvref_t<Yielded> val;
 
-                [[nodiscard]] static constexpr bool await_ready() noexcept
+                static constexpr bool await_ready() noexcept
                 {
                     return false;
                 }
@@ -487,13 +487,13 @@ namespace hpx {
 
             struct final_awaiter
             {
-                [[nodiscard]] static constexpr bool await_ready() noexcept
+                static constexpr bool await_ready() noexcept
                 {
                     return false;
                 }
 
                 template <typename Promise>
-                [[nodiscard]] hpx::coroutine_handle<> await_suspend(
+                hpx::coroutine_handle<> await_suspend(
                     hpx::coroutine_handle<Promise> handle) noexcept
                 {
 #ifdef __cpp_lib_is_pointer_interconvertible
@@ -532,14 +532,14 @@ namespace hpx {
                 {
                 }
 
-                [[nodiscard]] constexpr bool await_ready() noexcept
+                constexpr bool await_ready() noexcept
                 {
                     return !gen.coro;
                 }
 
                 template <typename Promise>
-                [[nodiscard]] hpx::coroutine_handle<gen_promise_base>
-                await_suspend(hpx::coroutine_handle<Promise> current) noexcept
+                hpx::coroutine_handle<gen_promise_base> await_suspend(
+                    hpx::coroutine_handle<Promise> current) noexcept
                 {
 #ifdef __cpp_lib_is_pointer_interconvertible
                     static_assert(std::is_pointer_interconvertible_base_of_v<
@@ -616,7 +616,7 @@ namespace hpx {
                 return *this;
             }
 
-            [[nodiscard]] Ref operator*() const noexcept
+            Ref operator*() const noexcept
             {
                 HPX_ASSERT_MSG(
                     !coro.done(), "Can't dereference generator end iterator");
@@ -751,9 +751,13 @@ namespace hpx {
             HPX_ASSERT_MSG(coro, "Can't call begin on moved-from generator");
 
             coro.resume();
+
+            // clang-format off
             return detail::gen_iter<value, reference>{detail::gen_secret_tag{},
-                coroutine_handle<detail::gen_promise_base<detail::gen_yield_t<
-                    reference>>>::from_address(coro.address())};
+                coroutine_handle<detail::gen_promise_base<
+                    detail::gen_yield_t<reference>>>::from_address(coro
+                        .address())};
+            // clang-format on
         }
 
         [[nodiscard]] static constexpr hpx::default_sentinel_t end() noexcept
