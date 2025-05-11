@@ -58,7 +58,7 @@ namespace hpx::threads {
             util::io_service_pool& timer_pool,
 #endif
             notification_policy_type& notifier,
-            detail::network_background_callback_type const&
+            detail::network_background_callback_type
                 network_background_callback =
                     detail::network_background_callback_type());
 
