@@ -1,5 +1,6 @@
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2025 Isidoros Tsaousis-Seiras
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -65,6 +66,9 @@ namespace hpx::when_all_vector_detail {
     struct when_all_vector_sender_impl<Sender>::when_all_vector_sender_type
     {
         using is_sender = void;
+#if defined(HPX_HAVE_STDEXEC)
+        using sender_concept = hpx::execution::experimental::sender_t;
+#endif
         using senders_type = std::vector<Sender>;
         senders_type senders;
 
@@ -174,6 +178,10 @@ namespace hpx::when_all_vector_detail {
         struct operation_state
         {
             using receiver_type = std::decay_t<Receiver>;
+#if defined(HPX_HAVE_STDEXEC)
+            using operation_state_concept =
+                hpx::execution::experimental::operation_state_t;
+#endif
 
             struct when_all_vector_receiver
             {
