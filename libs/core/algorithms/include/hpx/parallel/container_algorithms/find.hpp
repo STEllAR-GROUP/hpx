@@ -1415,16 +1415,16 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<find_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Proj = hpx::identity,
             typename T = typename hpx::parallel::traits::projected<Iter,
-                Proj>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+                Proj>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter>
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
         tag_fallback_invoke(find_t, ExPolicy&& policy, Iter first, Sent last,
@@ -1438,16 +1438,16 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Rng,
             typename Proj = hpx::identity,
             typename T = typename hpx::parallel::traits::projected<
-                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             hpx::traits::range_iterator_t<Rng>>
@@ -1464,18 +1464,19 @@ namespace hpx::ranges {
                 hpx::util::end(rng), val, HPX_MOVE(proj));
         }
 
-        // clang-format off
-        template <typename Iter, typename Sent,
-            typename Proj = hpx::identity,
-            typename T = typename hpx::parallel::traits::projected<Iter,
-                Proj>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+        
+            template <typename Iter, typename Sent,
+                typename Proj = hpx::identity,
+                typename T = typename hpx::parallel::traits::projected<Iter,
+                    Proj>::value_type>
+            // clang-format off
+            requires (
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter>
-            )>
-        // clang-format on
-        friend Iter tag_fallback_invoke(
-            find_t, Iter first, Sent last, T const& val, Proj&& proj = Proj())
+            )
+            // clang-format on
+            friend Iter tag_fallback_invoke(find_t, Iter first, Sent last,
+                T const& val, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_input_iterator_v<Iter>,
                 "Requires at least input iterator.");
@@ -1484,15 +1485,14 @@ namespace hpx::ranges {
                 hpx::execution::seq, first, last, val, HPX_FORWARD(Proj, proj));
         }
 
-        // clang-format off
-        template <typename Rng,
-            typename Proj = hpx::identity,
+        template <typename Rng, typename Proj = hpx::identity,
             typename T = typename hpx::parallel::traits::projected<
-                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
-            )>
+            )
         // clang-format on
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             find_t, Rng&& rng, T const& val, Proj&& proj = Proj())
@@ -1514,17 +1514,17 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<find_if_t>
     {
     private:
+        template <typename ExPolicy, typename Iter, typename Sent,
+            typename Pred, typename Proj = hpx::identity>
         // clang-format off
-        template <typename ExPolicy, typename Iter, typename Sent, typename Pred,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<Iter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
@@ -1539,10 +1539,10 @@ namespace hpx::ranges {
                 HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Rng, typename Pred,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -1551,7 +1551,7 @@ namespace hpx::ranges {
                         hpx::traits::range_iterator_t<Rng>
                     >::value_type
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             hpx::traits::range_iterator_t<Rng>>
@@ -1568,16 +1568,16 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename Iter, typename Sent, typename Pred,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<Iter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend Iter tag_fallback_invoke(
             find_if_t, Iter first, Sent last, Pred pred, Proj proj = Proj())
@@ -1590,18 +1590,12 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        // clang-format off
-        template <typename Rng, typename Pred,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range_v<Rng> &&
+        template <typename Rng, typename Pred, typename Proj = hpx::identity>
+            requires(hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<
-                        hpx::traits::range_iterator_t<Rng>
-                    >::value_type
-                >
-            )>
+                        hpx::traits::range_iterator_t<Rng>>::value_type>)
         // clang-format on
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             find_if_t, Rng&& rng, Pred pred, Proj proj = Proj())
@@ -1623,17 +1617,17 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<find_if_not_t>
     {
     private:
+        template <typename ExPolicy, typename Iter, typename Sent,
+            typename Pred, typename Proj = hpx::identity>
         // clang-format off
-        template <typename ExPolicy, typename Iter, typename Sent, typename Pred,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<Iter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
         tag_fallback_invoke(find_if_not_t, ExPolicy&& policy, Iter first,
@@ -1647,10 +1641,10 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Rng, typename Pred,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -1659,7 +1653,7 @@ namespace hpx::ranges {
                         hpx::traits::range_iterator_t<Rng>
                     >::value_type
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             hpx::traits::range_iterator_t<Rng>>
@@ -1676,16 +1670,16 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename Iter, typename Sent, typename Pred,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<Iter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend Iter tag_fallback_invoke(
             find_if_not_t, Iter first, Sent last, Pred pred, Proj proj = Proj())
@@ -1698,10 +1692,9 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
+        template <typename Rng, typename Pred, typename Proj = hpx::identity>
         // clang-format off
-        template <typename Rng, typename Pred,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::is_invocable_v<Pred,
@@ -1709,7 +1702,7 @@ namespace hpx::ranges {
                         hpx::traits::range_iterator_t<Rng>
                     >::value_type
                 >
-            )>
+            )
         // clang-format on
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             find_if_not_t, Rng&& rng, Pred pred, Proj proj = Proj())
@@ -1731,12 +1724,11 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<find_end_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename Rng1, typename Rng2,
-            typename Pred = equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = equal_to, typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
@@ -1744,7 +1736,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
                     hpx::parallel::traits::projected_range<Proj2, Rng2>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             hpx::traits::range_iterator_t<Rng1>>
@@ -1767,12 +1759,11 @@ namespace hpx::ranges {
                 HPX_MOVE(proj2));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Iter1, typename Sent1,
             typename Iter2, typename Sent2, typename Pred = equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
@@ -1780,7 +1771,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected<Proj1, Iter1>,
                     hpx::parallel::traits::projected<Proj2, Iter2>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter1>
         tag_fallback_invoke(find_end_t, ExPolicy&& policy, Iter1 first1,
@@ -1797,11 +1788,10 @@ namespace hpx::ranges {
                 HPX_MOVE(op), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-        // clang-format off
         template <typename Rng1, typename Rng2, typename Pred = equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -1809,7 +1799,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
                     hpx::parallel::traits::projected_range<Proj2, Rng2>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::traits::range_iterator_t<Rng1> tag_fallback_invoke(
             find_end_t, Rng1&& rng1, Rng2&& rng2, Pred op = Pred(),
@@ -1830,12 +1820,11 @@ namespace hpx::ranges {
                 HPX_MOVE(proj2));
         }
 
+        template <typename Iter1, typename Sent1, typename Iter2,
+            typename Sent2, typename Pred = equal_to,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-        template <typename Iter1, typename Sent1,
-            typename Iter2, typename Sent2, typename Pred = equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -1843,7 +1832,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected<Proj1, Iter1>,
                     hpx::parallel::traits::projected<Proj2, Iter2>
                 >
-            )>
+            )
         // clang-format on
         friend Iter1 tag_fallback_invoke(find_end_t, Iter1 first1, Sent1 last1,
             Iter2 first2, Sent2 last2, Pred op = Pred(), Proj1 proj1 = Proj1(),
@@ -1866,12 +1855,11 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<find_first_of_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename Rng1, typename Rng2,
-            typename Pred = equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = equal_to, typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
@@ -1879,7 +1867,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
                     hpx::parallel::traits::projected_range<Proj2, Rng2>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             hpx::traits::range_iterator_t<Rng1>>
@@ -1902,12 +1890,11 @@ namespace hpx::ranges {
                 HPX_MOVE(proj2));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Iter1, typename Sent1,
             typename Iter2, typename Sent2, typename Pred = equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
@@ -1915,7 +1902,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected<Proj1, Iter1>,
                     hpx::parallel::traits::projected<Proj2, Iter2>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter1>
         tag_fallback_invoke(find_first_of_t, ExPolicy&& policy, Iter1 first1,
@@ -1932,11 +1919,10 @@ namespace hpx::ranges {
                 HPX_MOVE(op), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-        // clang-format off
         template <typename Rng1, typename Rng2, typename Pred = equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -1944,7 +1930,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
                     hpx::parallel::traits::projected_range<Proj2, Rng2>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::traits::range_iterator_t<Rng1> tag_fallback_invoke(
             find_first_of_t, Rng1&& rng1, Rng2&& rng2, Pred op = Pred(),
@@ -1965,12 +1951,11 @@ namespace hpx::ranges {
                 HPX_MOVE(proj2));
         }
 
+        template <typename Iter1, typename Sent1, typename Iter2,
+            typename Sent2, typename Pred = equal_to,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-        template <typename Iter1, typename Sent1, typename Iter2, typename Sent2,
-            typename Pred = equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -1978,7 +1963,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected<Proj1, Iter1>,
                     hpx::parallel::traits::projected<Proj2, Iter2>
                 >
-            )>
+            )
         // clang-format on
         friend Iter1 tag_fallback_invoke(find_first_of_t, Iter1 first1,
             Sent1 last1, Iter2 first2, Sent2 last2, Pred op = Pred(),
