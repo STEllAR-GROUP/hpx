@@ -374,14 +374,4 @@ namespace hpx {
     /// \endcond
 }    // namespace hpx
 
-/// \cond NOINTERNAL
-namespace hpx::lcos::local {
-
-    template <typename OnCompletion = hpx::detail::empty_oncompletion>
-    using cpp20_barrier HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::cpp20_barrier is deprecated, use hpx::barrier "
-        "instead") = hpx::barrier<OnCompletion>;
-}    // namespace hpx::lcos::local
-/// \endcond
-
 #include <hpx/config/warnings_suffix.hpp>

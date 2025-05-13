@@ -54,22 +54,6 @@ namespace hpx {
 #pragma warning(pop)
 #endif
 
-#define HPX_THROWMODE_UNSCOPED_ENUM_DEPRECATION_MSG                            \
-    "The unscoped throwmode names are deprecated. Please use "                 \
-    "throwmode::<mode> instead."
-
-    HPX_DEPRECATED_V(1, 8, HPX_THROWMODE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    inline constexpr throwmode plain = throwmode::plain;
-    HPX_DEPRECATED_V(1, 8, HPX_THROWMODE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    inline constexpr throwmode rethrow = throwmode::rethrow;
-    HPX_DEPRECATED_V(1, 8, HPX_THROWMODE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    inline constexpr throwmode lightweight = throwmode::lightweight;
-    HPX_DEPRECATED_V(1, 8, HPX_THROWMODE_UNSCOPED_ENUM_DEPRECATION_MSG)
-    inline constexpr throwmode lightweight_rethrow =
-        throwmode::lightweight_rethrow;
-
-#undef HPX_THROWMODE_UNSCOPED_ENUM_DEPRECATION_MSG
-
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Predefined error_code object used as "throw on error" tag.
     ///

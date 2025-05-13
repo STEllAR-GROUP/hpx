@@ -378,39 +378,6 @@ namespace hpx::parallel {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename RandomIt,
-        typename Comp = detail::less, typename Proj = hpx::identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<RandomIt> &&
-            traits::is_projected_v<Proj, RandomIt> &&
-            traits::is_indirect_callable<ExPolicy, Comp,
-                traits::projected<Proj, RandomIt>,
-                traits::projected<Proj, RandomIt>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::parallel::sort is deprecated, use hpx::sort instead")
-        util::detail::algorithm_result_t<ExPolicy, RandomIt> sort(
-            ExPolicy&& policy, RandomIt first, RandomIt last,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
-    {
-        static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
-            "Requires a random access iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::sort<RandomIt>().call(HPX_FORWARD(ExPolicy, policy),
-            first, last, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
 }    // namespace hpx::parallel
 
 namespace hpx {

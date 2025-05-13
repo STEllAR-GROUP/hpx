@@ -194,17 +194,6 @@ namespace hpx {
     }
 }    // namespace hpx
 
-namespace hpx::util {
-
-    template <typename F, typename... Ts>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::util::bind_back is deprecated, use hpx::bind_back instead")
-    constexpr decltype(auto) bind_back(F&& f, Ts&&... ts)
-    {
-        return hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-    }
-}    // namespace hpx::util
-
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 namespace hpx::traits {

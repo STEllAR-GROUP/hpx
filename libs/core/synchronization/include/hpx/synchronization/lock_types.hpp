@@ -262,17 +262,3 @@ namespace hpx {
         }
     };
 }    // namespace hpx
-
-namespace hpx::lcos::local {
-
-    template <typename Mutex>
-    using upgrade_to_unique_lock HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::upgrade_to_unique_lock is deprecated, use "
-        "hpx::upgrade_to_unique_lock instead") =
-        hpx::upgrade_to_unique_lock<Mutex>;
-
-    template <typename Mutex>
-    using upgrade_lock HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::upgrade_lock is deprecated, use hpx::upgrade_lock "
-        "instead") = hpx::upgrade_lock<Mutex>;
-}    // namespace hpx::lcos::local

@@ -262,25 +262,4 @@ namespace hpx {
     } wait_each_n{};    // namespace hpx
 }    // namespace hpx
 
-namespace hpx::lcos {
-
-    template <typename F, typename... Ts>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_each is deprecated. Use hpx::wait_each instead.")
-    void wait_each(F&& f, Ts&&... ts)
-    {
-        hpx::wait_each(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-    }
-
-    template <typename F, typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_each is deprecated. Use hpx::wait_each instead.")
-    void wait_each_n(F&& f, Iterator begin, std::size_t count)
-    {
-        hpx::wait_each_n(HPX_FORWARD(F, f), begin, count);
-    }
-}    // namespace hpx::lcos
-
 #endif    // DOXYGEN
