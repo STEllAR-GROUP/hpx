@@ -698,13 +698,14 @@ namespace hpx::ranges {
     inline constexpr struct reduce_t final
       : hpx::detail::tag_parallel_algorithm<reduce_t>
     {
-        // clang-format off
+       
         template <typename ExPolicy, typename FwdIter, typename Sent, typename F,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
-            )>
+            )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
@@ -719,14 +720,15 @@ namespace hpx::ranges {
                 HPX_MOVE(f));
         }
 
-        // clang-format off
+        
         template <typename ExPolicy, typename Rng, typename F,
             typename T = typename std::iterator_traits<
-                hpx::traits::range_iterator_t<Rng>>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::range_iterator_t<Rng>>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng>
-            )>
+            )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
@@ -743,13 +745,14 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(init), HPX_MOVE(f));
         }
 
-        // clang-format off
+        
         template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
-            )>
+            )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
@@ -764,14 +767,15 @@ namespace hpx::ranges {
                 std::plus<T>{});
         }
 
-        // clang-format off
+       
         template <typename ExPolicy, typename Rng,
             typename T = typename std::iterator_traits<
-                hpx::traits::range_iterator_t<Rng>>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::range_iterator_t<Rng>>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng>
-            )>
+            )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
@@ -788,12 +792,12 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(init), std::plus<T>{});
         }
 
+        template <typename ExPolicy, typename FwdIter, typename Sent>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename Sent,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             typename std::iterator_traits<FwdIter>::value_type>
@@ -811,12 +815,13 @@ namespace hpx::ranges {
                 std::plus<value_type>{});
         }
 
+        
+        template <typename ExPolicy, typename Rng>
         // clang-format off
-        template <typename ExPolicy, typename Rng,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng>
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             typename std::iterator_traits<typename hpx::traits::range_traits<
@@ -837,12 +842,13 @@ namespace hpx::ranges {
         }
 
         ////////////////////////////////////////////////////////////////////////
-        // clang-format off
+        
         template <typename FwdIter, typename Sent, typename F,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
-            )>
+            )
         // clang-format on
         friend T tag_fallback_invoke(
             hpx::ranges::reduce_t, FwdIter first, Sent last, T init, F f)
@@ -854,13 +860,14 @@ namespace hpx::ranges {
                 hpx::execution::seq, first, last, HPX_MOVE(init), HPX_MOVE(f));
         }
 
-        // clang-format off
+        
         template <typename Rng, typename F,
             typename T = typename std::iterator_traits<
-                hpx::traits::range_iterator_t<Rng>>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::range_iterator_t<Rng>>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_range_v<Rng>
-            )>
+            )
         // clang-format on
         friend T tag_fallback_invoke(
             hpx::ranges::reduce_t, Rng&& rng, T init, F f)
@@ -874,12 +881,13 @@ namespace hpx::ranges {
                 HPX_MOVE(f));
         }
 
-        // clang-format off
+        
         template <typename FwdIter, typename Sent,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
-            )>
+            )
         // clang-format on
         friend T tag_fallback_invoke(
             hpx::ranges::reduce_t, FwdIter first, Sent last, T init)
@@ -890,14 +898,14 @@ namespace hpx::ranges {
             return hpx::parallel::detail::reduce<T>().call(hpx::execution::seq,
                 first, last, HPX_MOVE(init), std::plus<T>{});
         }
-
-        // clang-format off
+ 
         template <typename Rng,
              typename T = typename std::iterator_traits<
-                hpx::traits::range_iterator_t<Rng>>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::range_iterator_t<Rng>>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_range_v<Rng>
-            )>
+            )
         // clang-format on
         friend T tag_fallback_invoke(hpx::ranges::reduce_t, Rng&& rng, T init)
         {
@@ -910,11 +918,12 @@ namespace hpx::ranges {
                 std::plus<T>{});
         }
 
+        
+        template <typename FwdIter, typename Sent>
         // clang-format off
-        template <typename FwdIter, typename Sent,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
-            )>
+            )
         // clang-format on
         friend typename std::iterator_traits<FwdIter>::value_type
         tag_fallback_invoke(hpx::ranges::reduce_t, FwdIter first, Sent last)
@@ -930,11 +939,12 @@ namespace hpx::ranges {
                 std::plus<value_type>{});
         }
 
+        
+        template <typename Rng>
         // clang-format off
-        template <typename Rng,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng>
-            )>
+            )
         // clang-format on
         friend typename std::iterator_traits<
             typename hpx::traits::range_traits<Rng>::iterator_type>::value_type
