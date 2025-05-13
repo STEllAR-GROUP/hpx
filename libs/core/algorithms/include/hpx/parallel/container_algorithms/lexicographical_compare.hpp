@@ -380,12 +380,12 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<lexicographical_compare_t>
     {
     private:
+        template <typename InIter1, typename Sent1, typename InIter2,
+            typename Sent2, typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity,
+            typename Pred = hpx::parallel::detail::less>
         // clang-format off
-        template <typename InIter1, typename Sent1, typename InIter2, typename Sent2,
-            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            typename Pred = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator_v<InIter1> &&
+            requires(hpx::traits::is_iterator_v<InIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, InIter1> &&
                 hpx::traits::is_iterator_v<InIter2> &&
                 hpx::traits::is_sentinel_for_v<Sent2, InIter2> &&
@@ -394,9 +394,7 @@ namespace hpx::ranges {
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected<Proj1, InIter1>,
-                    hpx::parallel::traits::projected<Proj2, InIter2>
-                >
-            )>
+                    hpx::parallel::traits::projected<Proj2, InIter2>>)
         // clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
             InIter1 first1, Sent1 last1, InIter2 first2, Sent2 last2,
@@ -412,12 +410,12 @@ namespace hpx::ranges {
                 HPX_MOVE(pred), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename Sent2,
-            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            typename Pred = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename FwdIter2, typename Sent2, typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity,
+            typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
@@ -430,7 +428,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected<Proj1, FwdIter1>,
                     hpx::parallel::traits::projected<Proj2, FwdIter2>
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
@@ -448,11 +446,11 @@ namespace hpx::ranges {
                 HPX_MOVE(pred), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
+        template <typename Rng1, typename Rng2, typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity,
+            typename Pred = hpx::parallel::detail::less>
         // clang-format off
-        template <typename Rng1, typename Rng2,
-            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            typename Pred = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
@@ -462,7 +460,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
                     hpx::parallel::traits::projected_range<Proj2, Rng2>
                 >
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
             Rng1&& rng1, Rng2&& rng2, Pred pred = Pred(), Proj1 proj1 = Proj1(),
@@ -485,11 +483,11 @@ namespace hpx::ranges {
                 HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Rng1, typename Rng2,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            typename Pred = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&
@@ -500,7 +498,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
                     hpx::parallel::traits::projected_range<Proj2, Rng2>
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
