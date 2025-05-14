@@ -299,9 +299,7 @@ namespace hpx::parallel {
                         detail::copy<util::in_out_result<Iter2, Iter3>>().call(
                             HPX_FORWARD(ExPolicy, policy), first2, last2, dest),
                         [first1](util::in_out_result<Iter2, Iter3> const& p)
-                            -> result_type {
-                            return {first1, p.in, p.out};
-                        });
+                            -> result_type { return {first1, p.in, p.out}; });
                 }
 
                 if (first2 == last2)
@@ -310,9 +308,7 @@ namespace hpx::parallel {
                         detail::copy<util::in_out_result<Iter1, Iter3>>().call(
                             HPX_FORWARD(ExPolicy, policy), first1, last1, dest),
                         [first2](util::in_out_result<Iter1, Iter3> const& p)
-                            -> result_type {
-                            return {p.in, first2, p.out};
-                        });
+                            -> result_type { return {p.in, first2, p.out}; });
                 }
 
                 using buffer_type = typename set_operations_buffer<Iter3>::type;
@@ -350,10 +346,10 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<set_symmetric_difference_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename FwdIter3, typename Pred = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename FwdIter3, typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -362,7 +358,7 @@ namespace hpx {
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             FwdIter3>
@@ -394,18 +390,15 @@ namespace hpx {
                         hpx::identity_v, hpx::identity_v));
         }
 
-        // clang-format off
         template <typename FwdIter1, typename FwdIter2, typename FwdIter3,
-            typename Pred = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator_v<FwdIter1> &&
+            typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires(hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::traits::is_iterator_v<FwdIter3> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type
-                >
-            )>
+                    typename std::iterator_traits<FwdIter2>::value_type>)
         // clang-format on
         friend FwdIter3 tag_fallback_invoke(set_symmetric_difference_t,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,

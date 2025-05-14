@@ -378,14 +378,14 @@ namespace hpx {
     inline constexpr struct remove_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_if_t>
     {
+        template <typename FwdIter, typename Pred>
         // clang-format off
-        template <typename FwdIter,
-            typename Pred, HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::remove_if_t, FwdIter first, FwdIter last, Pred pred)
@@ -398,15 +398,15 @@ namespace hpx {
                 hpx::identity_v);
         }
 
+        template <typename ExPolicy, typename FwdIter, typename Pred>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter,
-            typename Pred, HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::remove_if_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred)
@@ -426,12 +426,12 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<remove_t>
     {
     private:
-        // clang-format off
         template <typename FwdIter,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::remove_t, FwdIter first, FwdIter last, T const& value)
@@ -442,13 +442,13 @@ namespace hpx {
                 [value](Type const& a) -> bool { return value == a; });
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::remove_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)

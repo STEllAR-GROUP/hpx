@@ -354,11 +354,11 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<partial_sort_copy_t>
     {
     private:
-        // clang-format off
         template <typename InIter, typename Sent1, typename RandIter,
             typename Sent2, typename Comp = ranges::less,
-            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_sentinel_for_v<Sent1, InIter> &&
                 hpx::traits::is_iterator_v<RandIter> &&
@@ -370,7 +370,7 @@ namespace hpx::ranges {
                     parallel::traits::projected<Proj1, InIter>,
                     parallel::traits::projected<Proj1, InIter>
                 >
-            )>
+            )
         // clang-format on
         friend partial_sort_copy_result<InIter, RandIter> tag_fallback_invoke(
             hpx::ranges::partial_sort_copy_t, InIter first, Sent1 last,
@@ -390,12 +390,11 @@ namespace hpx::ranges {
                 HPX_MOVE(comp), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Sent1,
-            typename RandIter, typename Sent2,
-            typename Comp = ranges::less,
-            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename RandIter, typename Sent2, typename Comp = ranges::less,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter> &&
@@ -408,7 +407,7 @@ namespace hpx::ranges {
                     parallel::traits::projected<Proj1, FwdIter>,
                     parallel::traits::projected<Proj1, FwdIter>
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             partial_sort_copy_result<FwdIter, RandIter>>
@@ -429,11 +428,10 @@ namespace hpx::ranges {
                 HPX_MOVE(comp), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
+        template <typename Rng1, typename Rng2, typename Comp = ranges::less,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-        template <typename Rng1, typename Rng2,
-            typename Comp = ranges::less,
-            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&
                 parallel::traits::is_projected_range_v<Proj1, Rng1> &&
@@ -443,7 +441,7 @@ namespace hpx::ranges {
                     parallel::traits::projected_range<Proj1, Rng1>,
                     parallel::traits::projected_range<Proj1, Rng1>
                 >
-            )>
+            )
         // clang-format on
         friend partial_sort_copy_result<hpx::traits::range_iterator_t<Rng1>,
             hpx::traits::range_iterator_t<Rng2>>
@@ -470,11 +468,11 @@ namespace hpx::ranges {
                 HPX_MOVE(proj2));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Rng1, typename Rng2,
-            typename Comp = ranges::less,
-            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = ranges::less, typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&
@@ -485,7 +483,7 @@ namespace hpx::ranges {
                     parallel::traits::projected_range<Proj1, Rng1>,
                     parallel::traits::projected_range<Proj1, Rng1>
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             partial_sort_copy_result<hpx::traits::range_iterator_t<Rng1>,

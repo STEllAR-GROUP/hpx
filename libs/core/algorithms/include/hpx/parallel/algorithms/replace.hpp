@@ -653,16 +653,15 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<replace_if_t>
     {
     private:
+        template <typename Iter, typename Pred,
+            typename T = typename std::iterator_traits<Iter>::value_type>
         // clang-format off
-        template <typename Iter,
-            typename Pred,
-            typename T = typename std::iterator_traits<Iter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<Iter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<Iter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend void tag_fallback_invoke(hpx::replace_if_t, Iter first,
             Iter last, Pred pred, T const& new_value)
@@ -675,17 +674,16 @@ namespace hpx {
                 new_value, hpx::identity_v);
         }
 
+        template <typename ExPolicy, typename FwdIter, typename Pred,
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter,
-            typename Pred,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::replace_if_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred,
@@ -707,12 +705,12 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<replace_t>
     {
     private:
-        // clang-format off
         template <typename InIter,
-            typename T = typename std::iterator_traits<InIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<InIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter>
-            )>
+            )
         // clang-format on
         friend void tag_fallback_invoke(hpx::replace_t, InIter first,
             InIter last, T const& old_value, T const& new_value)
@@ -728,13 +726,13 @@ namespace hpx {
                 new_value);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::replace_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, T const& old_value,
@@ -756,17 +754,16 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<replace_copy_if_t>
     {
     private:
+        template <typename InIter, typename OutIter, typename Pred,
+            typename T = typename std::iterator_traits<OutIter>::value_type>
         // clang-format off
-        template <typename InIter, typename OutIter,
-            typename Pred,
-            typename T = typename std::iterator_traits<OutIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<InIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::replace_copy_if_t, InIter first,
             InIter last, OutIter dest, Pred pred, T const& new_value)
@@ -784,18 +781,18 @@ namespace hpx {
                         HPX_MOVE(pred), new_value, hpx::identity_v));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred,
-            typename T = typename std::iterator_traits<FwdIter2>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter2>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::replace_copy_if_t,
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
@@ -821,13 +818,13 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<replace_copy_t>
     {
     private:
-        // clang-format off
         template <typename InIter, typename OutIter,
-            typename T = typename std::iterator_traits<OutIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<OutIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter>
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::replace_copy_t, InIter first,
             InIter last, OutIter dest, T const& old_value, T const& new_value)
@@ -846,14 +843,14 @@ namespace hpx {
                 new_value);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T = typename std::iterator_traits<FwdIter2>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter2>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::replace_copy_t,
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,

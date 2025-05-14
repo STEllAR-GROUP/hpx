@@ -211,7 +211,7 @@ namespace hpx::parallel {
                 auto dist2 = detail::distance(first2, last2);
 
                 return parallel_swap_ranges(HPX_FORWARD(ExPolicy, policy),
-                    first1, first2, (std::min)(dist1, dist2));
+                    first1, first2, (std::min) (dist1, dist2));
             }
         };
         /// \endcond
@@ -250,12 +250,12 @@ namespace hpx {
     inline constexpr struct swap_ranges_t final
       : hpx::detail::tag_parallel_algorithm<swap_ranges_t>
     {
+        template <typename FwdIter1, typename FwdIter2>
         // clang-format off
-        template <typename FwdIter1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(hpx::swap_ranges_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2)
@@ -269,13 +269,13 @@ namespace hpx {
                 hpx::execution::seq, first1, last1, first2);
         }
 
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::swap_ranges_t,
             ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)

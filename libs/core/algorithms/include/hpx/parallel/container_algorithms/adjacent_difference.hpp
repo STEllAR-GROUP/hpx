@@ -351,13 +351,13 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<adjacent_difference_t>
     {
     private:
+        template <typename FwdIter1, typename FwdIter2, typename Sent>
         // clang-format off
-        template <typename FwdIter1, typename FwdIter2, typename Sent,
-             HPX_CONCEPT_REQUIRES_(
+             requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter1>
-            )>
+            )
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(hpx::ranges::adjacent_difference_t,
             FwdIter1 first, Sent last, FwdIter2 dest)
@@ -371,12 +371,10 @@ namespace hpx::ranges {
                 hpx::execution::seq, first, last, dest, std::minus<>());
         }
 
+        template <typename Rng, typename FwdIter2>
         // clang-format off
-        template <typename Rng, typename FwdIter2,
-             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range_v<Rng> &&
-                hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            requires(hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_iterator_v<FwdIter2>)
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, Rng&& rng, FwdIter2 dest)
@@ -392,15 +390,15 @@ namespace hpx::ranges {
                 dest, std::minus<>());
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent,
-            typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            typename FwdIter2>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter1>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, ExPolicy&& policy,
@@ -416,13 +414,13 @@ namespace hpx::ranges {
                 std::minus<>());
         }
 
+        template <typename ExPolicy, typename Rng, typename FwdIter2>
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, ExPolicy&& policy, Rng&& rng,
@@ -439,14 +437,12 @@ namespace hpx::ranges {
                 hpx::util::end(rng), dest, std::minus<>());
         }
 
-        // clang-format off
         template <typename FwdIter1, typename Sent, typename FwdIter2,
-            typename Op,
-             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator_v<FwdIter1> &&
+            typename Op>
+        // clang-format off
+            requires(hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter1>
-            )>
+                hpx::traits::is_sentinel_for_v<Sent, FwdIter1>)
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(hpx::ranges::adjacent_difference_t,
             FwdIter1 first, Sent last, FwdIter2 dest, Op op)
@@ -461,12 +457,12 @@ namespace hpx::ranges {
                 HPX_MOVE(op));
         }
 
+        template <typename Rng, typename FwdIter2, typename Op>
         // clang-format off
-        template <typename Rng, typename FwdIter2, typename Op,
-             HPX_CONCEPT_REQUIRES_(
+             requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, Rng&& rng, FwdIter2 dest, Op op)
@@ -482,15 +478,15 @@ namespace hpx::ranges {
                 dest, HPX_MOVE(op));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent,
-            typename FwdIter2, typename Op,
-            HPX_CONCEPT_REQUIRES_(
+            typename FwdIter2, typename Op>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter1>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, ExPolicy&& policy,
@@ -505,14 +501,14 @@ namespace hpx::ranges {
                 HPX_FORWARD(ExPolicy, policy), first, last, dest, HPX_MOVE(op));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Rng, typename FwdIter2,
-            typename Op,
-            HPX_CONCEPT_REQUIRES_(
+            typename Op>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, ExPolicy&& policy, Rng&& rng,
