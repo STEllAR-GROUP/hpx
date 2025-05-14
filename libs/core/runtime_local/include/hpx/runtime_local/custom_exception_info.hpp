@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -159,12 +159,27 @@ namespace hpx {
     HPX_CORE_EXPORT std::string diagnostic_information(
         exception_info const& xi);
 
+    HPX_CORE_EXPORT std::string default_diagnostic_information(
+        std::exception_ptr const& e);
+
     /// \cond NOINTERNAL
     template <typename E>
     std::string diagnostic_information(E const& e)
     {
-        return invoke_with_exception_info(e, [](exception_info const* xi) {
-            return xi ? diagnostic_information(*xi) : std::string("<unknown>");
+        return invoke_with_exception_info(e, [&](exception_info const* xi) {
+            if (xi)
+            {
+                return diagnostic_information(*xi);
+            }
+
+            if constexpr (std::is_same_v<std::exception_ptr, E>)
+            {
+                return default_diagnostic_information(e);
+            }
+            else
+            {
+                return std::string("<unknown>");
+            }
         });
     }
     /// \endcond

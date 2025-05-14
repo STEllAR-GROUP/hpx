@@ -46,16 +46,16 @@
 namespace hpx::threads {
 
     namespace detail {
-        void check_num_high_priority_queues(
-            std::size_t num_threads, std::size_t num_high_priority_queues)
+        static void check_num_high_priority_queues(
+            std::size_t const num_threads,
+            std::size_t const num_high_priority_queues)
         {
             if (num_high_priority_queues > num_threads)
             {
                 throw hpx::detail::command_line_error(
-                    "Invalid command line option: "
-                    "number of high priority threads ("
-                    "--hpx:high-priority-threads), should not be larger "
-                    "than number of threads (--hpx:threads)");
+                    "Invalid command line option: number of high priority "
+                    "threads (--hpx:high-priority-threads), should not be "
+                    "larger than number of threads (--hpx:threads)");
             }
         }
     }    // namespace detail
@@ -66,14 +66,13 @@ namespace hpx::threads {
         util::io_service_pool& timer_pool,
 #endif
         notification_policy_type& notifier,
-        detail::network_background_callback_type const&
-            network_background_callback)
+        detail::network_background_callback_type network_background_callback)
       : rtcfg_(rtcfg)
 #ifdef HPX_HAVE_TIMER_POOL
       , timer_pool_(timer_pool)
 #endif
       , notifier_(notifier)
-      , network_background_callback_(network_background_callback)
+      , network_background_callback_(HPX_MOVE(network_background_callback))
     {
         using placeholders::_1;
         using placeholders::_3;
@@ -163,7 +162,7 @@ namespace hpx::threads {
     void threadmanager::create_scheduler_local(
         thread_pool_init_parameters const& thread_pool_init,
         policies::thread_queue_init_parameters const& thread_queue_init,
-        std::size_t numa_sensitive)
+        std::size_t const numa_sensitive)
     {
         // instantiate the scheduler
         using local_sched_type =
@@ -192,7 +191,7 @@ namespace hpx::threads {
     void threadmanager::create_scheduler_local_priority_fifo(
         thread_pool_init_parameters const& thread_pool_init,
         policies::thread_queue_init_parameters const& thread_queue_init,
-        std::size_t numa_sensitive)
+        std::size_t const numa_sensitive)
     {
         // set parameters for scheduler and pool instantiation and perform
         // compatibility checks
@@ -281,7 +280,7 @@ namespace hpx::threads {
     void threadmanager::create_scheduler_static(
         thread_pool_init_parameters const& thread_pool_init,
         policies::thread_queue_init_parameters const& thread_queue_init,
-        std::size_t numa_sensitive)
+        std::size_t const numa_sensitive)
     {
         // instantiate the scheduler
         std::unique_ptr<thread_pool_base> pool;
@@ -332,7 +331,7 @@ namespace hpx::threads {
     void threadmanager::create_scheduler_static_priority(
         thread_pool_init_parameters const& thread_pool_init,
         policies::thread_queue_init_parameters const& thread_queue_init,
-        std::size_t numa_sensitive)
+        std::size_t const numa_sensitive)
     {
         // set parameters for scheduler and pool instantiation and perform
         // compatibility checks
@@ -467,7 +466,7 @@ namespace hpx::threads {
     void threadmanager::create_scheduler_shared_priority(
         thread_pool_init_parameters const& thread_pool_init,
         policies::thread_queue_init_parameters const& thread_queue_init,
-        std::size_t numa_sensitive)
+        std::size_t const numa_sensitive)
     {
         // instantiate the scheduler
         using local_sched_type =
@@ -497,7 +496,7 @@ namespace hpx::threads {
         [[maybe_unused]] thread_pool_init_parameters const& thread_pool_init,
         [[maybe_unused]] policies::thread_queue_init_parameters const&
             thread_queue_init,
-        [[maybe_unused]] std::size_t numa_sensitive)
+        [[maybe_unused]] std::size_t const numa_sensitive)
     {
 #if defined(HPX_HAVE_WORK_REQUESTING_SCHEDULERS)
         // set parameters for scheduler and pool instantiation and perform
@@ -544,7 +543,7 @@ namespace hpx::threads {
         [[maybe_unused]] thread_pool_init_parameters const& thread_pool_init,
         [[maybe_unused]] policies::thread_queue_init_parameters const&
             thread_queue_init,
-        [[maybe_unused]] std::size_t numa_sensitive)
+        [[maybe_unused]] std::size_t const numa_sensitive)
     {
 #if defined(HPX_HAVE_WORK_REQUESTING_SCHEDULERS)
         // set parameters for scheduler and pool instantiation and perform
@@ -716,7 +715,7 @@ namespace hpx::threads {
 #else
                     overall_background_work =
                         [this, background_work](
-                            std::size_t num_thread) -> bool {
+                            std::size_t const num_thread) -> bool {
                         bool const result = background_work(num_thread);
                         return network_background_callback_(num_thread) ||
                             result;
@@ -903,7 +902,8 @@ namespace hpx::threads {
         return get_pool(pool_id.name());
     }
 
-    thread_pool_base& threadmanager::get_pool(std::size_t thread_index) const
+    thread_pool_base& threadmanager::get_pool(
+        std::size_t const thread_index) const
     {
         return get_pool(threads_lookup_[thread_index]);
     }
@@ -932,14 +932,15 @@ namespace hpx::threads {
         return false;
     }
 
-    bool threadmanager::pool_exists(std::size_t pool_index) const
+    bool threadmanager::pool_exists(std::size_t const pool_index) const
     {
         return pool_index < pools_.size();
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::int64_t threadmanager::get_thread_count(thread_schedule_state state,
-        thread_priority priority, std::size_t num_thread, bool reset) const
+    std::int64_t threadmanager::get_thread_count(
+        thread_schedule_state const state, thread_priority const priority,
+        std::size_t const num_thread, bool const reset) const
     {
         std::int64_t total_count = 0;
         std::lock_guard<mutex_type> lk(mtx_);
@@ -998,7 +999,7 @@ namespace hpx::threads {
     // Enumerate all matching threads
     bool threadmanager::enumerate_threads(
         hpx::function<bool(thread_id_type)> const& f,
-        thread_schedule_state state) const
+        thread_schedule_state const state) const
     {
         std::lock_guard<mutex_type> lk(mtx_);
         bool result = true;
@@ -1029,7 +1030,7 @@ namespace hpx::threads {
     // have been terminated but which are still held in the queue
     // of terminated threads. Some schedulers might not do anything
     // here.
-    bool threadmanager::cleanup_terminated(bool delete_all) const
+    bool threadmanager::cleanup_terminated(bool const delete_all) const
     {
         std::lock_guard<mutex_type> lk(mtx_);
         bool result = true;
@@ -1054,7 +1055,7 @@ namespace hpx::threads {
     }
 
     std::thread& threadmanager::get_os_thread_handle(
-        std::size_t num_thread) const
+        std::size_t const num_thread) const
     {
         std::lock_guard<mutex_type> lk(mtx_);
         pool_id_type const id = threads_lookup_[num_thread];
@@ -1063,7 +1064,7 @@ namespace hpx::threads {
     }
 
     void threadmanager::report_error(
-        std::size_t num_thread, std::exception_ptr const& e) const
+        std::size_t const num_thread, std::exception_ptr const& e) const
     {
         // propagate the error reporting to all pools, which in turn
         // will propagate to schedulers
@@ -1095,7 +1096,7 @@ namespace hpx::threads {
     }
 
     void threadmanager::set_scheduler_mode(
-        threads::policies::scheduler_mode mode) const noexcept
+        threads::policies::scheduler_mode const mode) const noexcept
     {
         for (auto const& pool_iter : pools_)
         {
@@ -1104,7 +1105,7 @@ namespace hpx::threads {
     }
 
     void threadmanager::add_scheduler_mode(
-        threads::policies::scheduler_mode mode) const noexcept
+        threads::policies::scheduler_mode const mode) const noexcept
     {
         for (auto const& pool_iter : pools_)
         {
@@ -1113,8 +1114,8 @@ namespace hpx::threads {
     }
 
     void threadmanager::add_remove_scheduler_mode(
-        threads::policies::scheduler_mode to_add_mode,
-        threads::policies::scheduler_mode to_remove_mode) const noexcept
+        threads::policies::scheduler_mode const to_add_mode,
+        threads::policies::scheduler_mode const to_remove_mode) const noexcept
     {
         for (auto const& pool_iter : pools_)
         {
@@ -1124,7 +1125,7 @@ namespace hpx::threads {
     }
 
     void threadmanager::remove_scheduler_mode(
-        threads::policies::scheduler_mode mode) const noexcept
+        threads::policies::scheduler_mode const mode) const noexcept
     {
         for (auto const& pool_iter : pools_)
         {
@@ -1172,7 +1173,7 @@ namespace hpx::threads {
         return pool->create_work(data, ec);
     }
 
-    void threadmanager::init_tss(std::size_t global_thread_num)
+    void threadmanager::init_tss(std::size_t const global_thread_num)
     {
         detail::set_global_thread_num_tss(global_thread_num);
     }
@@ -1185,7 +1186,7 @@ namespace hpx::threads {
     ///////////////////////////////////////////////////////////////////////////
     inline constexpr std::size_t all_threads = static_cast<std::size_t>(-1);
 
-    std::int64_t threadmanager::get_queue_length(bool reset) const
+    std::int64_t threadmanager::get_queue_length(bool const reset) const
     {
         std::int64_t result = 0;
         for (auto const& pool_iter : pools_)
@@ -1212,7 +1213,7 @@ namespace hpx::threads {
     }
 #endif
 
-    std::int64_t threadmanager::get_cumulative_duration(bool reset) const
+    std::int64_t threadmanager::get_cumulative_duration(bool const reset) const
     {
         std::int64_t result = 0;
         for (auto const& pool_iter : pools_)
@@ -1220,37 +1221,39 @@ namespace hpx::threads {
         return result;
     }
 
-    std::int64_t threadmanager::get_thread_count_unknown(bool reset) const
+    std::int64_t threadmanager::get_thread_count_unknown(bool const reset) const
     {
         return get_thread_count(thread_schedule_state::unknown,
             thread_priority::default_, static_cast<std::size_t>(-1), reset);
     }
 
-    std::int64_t threadmanager::get_thread_count_active(bool reset) const
+    std::int64_t threadmanager::get_thread_count_active(bool const reset) const
     {
         return get_thread_count(thread_schedule_state::active,
             thread_priority::default_, static_cast<std::size_t>(-1), reset);
     }
 
-    std::int64_t threadmanager::get_thread_count_pending(bool reset) const
+    std::int64_t threadmanager::get_thread_count_pending(bool const reset) const
     {
         return get_thread_count(thread_schedule_state::pending,
             thread_priority::default_, static_cast<std::size_t>(-1), reset);
     }
 
-    std::int64_t threadmanager::get_thread_count_suspended(bool reset) const
+    std::int64_t threadmanager::get_thread_count_suspended(
+        bool const reset) const
     {
         return get_thread_count(thread_schedule_state::suspended,
             thread_priority::default_, static_cast<std::size_t>(-1), reset);
     }
 
-    std::int64_t threadmanager::get_thread_count_terminated(bool reset) const
+    std::int64_t threadmanager::get_thread_count_terminated(
+        bool const reset) const
     {
         return get_thread_count(thread_schedule_state::terminated,
             thread_priority::default_, static_cast<std::size_t>(-1), reset);
     }
 
-    std::int64_t threadmanager::get_thread_count_staged(bool reset) const
+    std::int64_t threadmanager::get_thread_count_staged(bool const reset) const
     {
         return get_thread_count(thread_schedule_state::staged,
             thread_priority::default_, static_cast<std::size_t>(-1), reset);
@@ -1508,7 +1511,7 @@ namespace hpx::threads {
         return true;
     }
 
-    void threadmanager::stop(bool blocking) const
+    void threadmanager::stop(bool const blocking) const
     {
         LTM_(info).format("stop: blocking({})", blocking ? "true" : "false");
 
