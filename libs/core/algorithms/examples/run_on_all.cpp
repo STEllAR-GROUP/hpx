@@ -6,10 +6,10 @@
 
 #include <hpx/experimental/run_on_all.hpp>
 #include <hpx/hpx_main.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/synchronization.hpp>
 
-#include <cstddef>
 #include <cstdlib>
 #include <iostream>
 #include <mutex>
@@ -35,17 +35,19 @@ int main(int argc, char* argv[])
               << hpx::get_num_worker_threads() << "\n";
     std::cout << delim;
 
+    // use parallel execution policy with num_threads concurrent threads to
+    // execute the lambda
+    auto policy = hpx::execution::experimental::with_processing_units_count(
+        hpx::execution::par, num_threads);
+
     hpx::mutex mtx;
-    hpx::experimental::run_on_all(
-        hpx::execution::par,    // use parallel execution policy
-        num_threads,    // use num_threads concurrent threads to execute the lambda
-        [&](std::size_t index, std::tuple<> const& reductions) {
-            std::lock_guard l(mtx);
-            std::cout << "Hello! I am thread " << index << " of "
-                      << hpx::get_num_worker_threads() << "\n";
-            std::cout << "My C++ std::thread id is "
-                      << std::this_thread::get_id() << "\n";
-        });
+    hpx::experimental::run_on_all(policy, [&] {
+        std::lock_guard l(mtx);
+        std::cout << "Hello! I am thread " << hpx::get_worker_thread_num()
+                  << " of " << hpx::get_num_worker_threads() << "\n";
+        std::cout << "My C++ std::thread id is " << std::this_thread::get_id()
+                  << "\n";
+    });
 
     std::cout << delim;
 
