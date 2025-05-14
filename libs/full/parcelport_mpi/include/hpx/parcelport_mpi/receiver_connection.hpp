@@ -99,7 +99,7 @@ namespace hpx::parcelset::policies::mpi {
 
                 auto& tchunks = buffer_.transmission_chunks_;
                 tchunks.resize(num_zero_copy_chunks + num_non_zero_copy_chunks);
-                if (char* piggy_back_tchunk = header_.piggy_back_tchunk())
+                if (char const* piggy_back_tchunk = header_.piggy_back_tchunk())
                 {
 #if defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION)
 #pragma GCC diagnostic push
@@ -107,7 +107,8 @@ namespace hpx::parcelset::policies::mpi {
 #endif
                     int const tchunks_length = static_cast<int>(tchunks.size() *
                         sizeof(buffer_type::transmission_chunk_type));
-                    memcpy(tchunks.data(), piggy_back_tchunk, tchunks_length);
+                    memcpy(static_cast<void*>(tchunks.data()),
+                        piggy_back_tchunk, tchunks_length);
 
 #if defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION)
 #pragma GCC diagnostic pop

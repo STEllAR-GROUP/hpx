@@ -426,6 +426,7 @@ function(add_hpx_module libname modulename)
     DIRECTORY include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT ${modulename}
+    PATTERN "*.hpp.in" EXCLUDE
   )
 
   # Install the compatibility headers from the source

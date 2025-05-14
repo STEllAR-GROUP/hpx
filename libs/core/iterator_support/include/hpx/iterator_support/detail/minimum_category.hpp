@@ -1,4 +1,4 @@
-//  Copyright (c) 022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,127 +7,26 @@
 #pragma once
 
 #include <iterator>
+#include <utility>
 
 namespace hpx::util::detail {
 
     ///////////////////////////////////////////////////////////////////////
+    std::random_access_iterator_tag minimum_category_impl(
+        std::random_access_iterator_tag, std::random_access_iterator_tag);
+    std::bidirectional_iterator_tag minimum_category_impl(
+        std::bidirectional_iterator_tag, std::bidirectional_iterator_tag);
+    std::forward_iterator_tag minimum_category_impl(
+        std::forward_iterator_tag, std::forward_iterator_tag);
+    std::input_iterator_tag minimum_category_impl(
+        std::input_iterator_tag, std::input_iterator_tag);
+
     template <typename T, typename U>
     struct minimum_category
     {
-        static_assert(sizeof(T) == 0 && sizeof(U) == 0,
-            "unknown combination of iterator categories");
-    };
-
-    // random_access_iterator_tag
-    template <>
-    struct minimum_category<std::random_access_iterator_tag,
-        std::random_access_iterator_tag>
-    {
-        using type = std::random_access_iterator_tag;
-    };
-
-    template <>
-    struct minimum_category<std::random_access_iterator_tag,
-        std::bidirectional_iterator_tag>
-    {
-        using type = std::bidirectional_iterator_tag;
-    };
-
-    template <>
-    struct minimum_category<std::bidirectional_iterator_tag,
-        std::random_access_iterator_tag>
-    {
-        using type = std::bidirectional_iterator_tag;
-    };
-
-    template <>
-    struct minimum_category<std::random_access_iterator_tag,
-        std::forward_iterator_tag>
-    {
-        using type = std::forward_iterator_tag;
-    };
-
-    template <>
-    struct minimum_category<std::forward_iterator_tag,
-        std::random_access_iterator_tag>
-    {
-        using type = std::forward_iterator_tag;
-    };
-
-    template <>
-    struct minimum_category<std::random_access_iterator_tag,
-        std::input_iterator_tag>
-    {
-        using type = std::input_iterator_tag;
-    };
-
-    template <>
-    struct minimum_category<std::input_iterator_tag,
-        std::random_access_iterator_tag>
-    {
-        using type = std::input_iterator_tag;
-    };
-
-    // bidirectional_iterator_tag
-    template <>
-    struct minimum_category<std::bidirectional_iterator_tag,
-        std::bidirectional_iterator_tag>
-    {
-        using type = std::bidirectional_iterator_tag;
-    };
-
-    template <>
-    struct minimum_category<std::bidirectional_iterator_tag,
-        std::forward_iterator_tag>
-    {
-        using type = std::forward_iterator_tag;
-    };
-
-    template <>
-    struct minimum_category<std::forward_iterator_tag,
-        std::bidirectional_iterator_tag>
-    {
-        using type = std::forward_iterator_tag;
-    };
-
-    template <>
-    struct minimum_category<std::bidirectional_iterator_tag,
-        std::input_iterator_tag>
-    {
-        using type = std::input_iterator_tag;
-    };
-
-    template <>
-    struct minimum_category<std::input_iterator_tag,
-        std::bidirectional_iterator_tag>
-    {
-        using type = std::input_iterator_tag;
-    };
-
-    // forward_iterator_tag
-    template <>
-    struct minimum_category<std::forward_iterator_tag,
-        std::forward_iterator_tag>
-    {
-        using type = std::forward_iterator_tag;
-    };
-
-    template <>
-    struct minimum_category<std::input_iterator_tag, std::forward_iterator_tag>
-    {
-        using type = std::input_iterator_tag;
-    };
-
-    template <>
-    struct minimum_category<std::forward_iterator_tag, std::input_iterator_tag>
-    {
-        using type = std::input_iterator_tag;
-    };
-
-    // input_iterator_tag
-    template <>
-    struct minimum_category<std::input_iterator_tag, std::input_iterator_tag>
-    {
-        using type = std::input_iterator_tag;
+        // clang-format off
+        using type = decltype(
+            minimum_category_impl(std::declval<T>(), std::declval<U>()));
+        // clang-format on
     };
 }    // namespace hpx::util::detail

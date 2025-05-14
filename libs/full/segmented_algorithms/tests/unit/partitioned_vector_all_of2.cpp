@@ -5,7 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
+
+// CLang V19.1.1 ICE's while compiling this file
+#if !defined(HPX_COMPUTE_DEVICE_CODE) &&                                       \
+    (!defined(HPX_CLANG_VERSION) || HPX_CLANG_VERSION != 190101)
+
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/parallel_all_any_none_of.hpp>
 #include <hpx/include/partitioned_vector.hpp>
@@ -115,4 +119,12 @@ int main()
     all_of_tests<double>(localities);
     return hpx::util::report_errors();
 }
+
+#else
+
+int main()
+{
+    return 0;
+}
+
 #endif
