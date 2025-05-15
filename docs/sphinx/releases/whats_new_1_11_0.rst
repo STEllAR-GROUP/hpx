@@ -154,6 +154,7 @@ Closed pull requests
 * :hpx-pr:`6689` - Fix unreachable code warning in wait_all
 * :hpx-pr:`6687` - lci pp: change default ndevices=2 and progress_type=worker; improve document
 * :hpx-pr:`6686` - lci pp: upgrade LCI autofetch target to 1.7.9
+* :hpx-pr:`6685` - Improve run_on_all implementation and tests
 * :hpx-pr:`6683` - Fix bad element comparison for reduce_by_key
 * :hpx-pr:`6682` - Add C++23 std::generator equivalence test and fix missing semicolon
 * :hpx-pr:`6680` - Add oneapi device init workaround
