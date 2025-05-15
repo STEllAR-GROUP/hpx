@@ -16,6 +16,7 @@ set(tests
     stack_destructor
     stack_stress
     tagged_ptr
+    uint128_atomic
 )
 
 set(contiguous_index_queue_PARAMETERS THREADS_PER_LOCALITY 4)

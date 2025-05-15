@@ -1,6 +1,7 @@
 //  Copyright (C) 2008-2011 Tim Blechmann
 //  Copyright (C) 2011      Bryce Lelbach
 //  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2024      Jacob Tucker
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,46 +13,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/concurrency/detail/uint128_atomic.hpp>
 #include <hpx/type_support/bit_cast.hpp>
 
 #include <cstddef>    // for std::size_t
 #include <cstdint>
 
 namespace hpx::lockfree {
-
-    struct HPX_LOCKFREE_DCAS_ALIGNMENT uint128_type
-    {
-        std::uint64_t left = 0;
-        std::uint64_t right = 0;
-
-        uint128_type() = default;
-
-        constexpr uint128_type(std::size_t l, std::size_t r) noexcept
-          : left(l)
-          , right(r)
-        {
-        }
-
-        uint128_type(uint128_type const&) = default;
-        uint128_type(uint128_type&&) = default;
-        uint128_type& operator=(uint128_type const&) = default;
-        uint128_type& operator=(uint128_type&&) = default;
-
-        ~uint128_type() = default;
-
-        friend constexpr bool operator==(uint128_type const& lhs,    //-V835
-            uint128_type const& rhs) noexcept                        //-V835
-        {
-            return lhs.left == rhs.left && lhs.right == rhs.right;
-        }
-
-        friend constexpr bool operator!=(uint128_type const& lhs,    //-V835
-            uint128_type const& rhs) noexcept                        //-V835
-        {
-            return !(lhs == rhs);
-        }
-    };
-
     namespace detail {
 
         template <std::size_t Size>
