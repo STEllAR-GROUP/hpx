@@ -415,50 +415,8 @@ namespace hpx { namespace ranges {
 #include <type_traits>
 #include <utility>
 
-namespace hpx::parallel {
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_range_v<Rng>
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::rotate is deprecated, use hpx::ranges::rotate instead")
-        util::detail::algorithm_result_t<ExPolicy,
-            util::in_out_result<hpx::traits::range_iterator_t<Rng>,
-                hpx::traits::range_iterator_t<Rng>>> rotate(ExPolicy&& policy,
-            Rng&& rng, hpx::traits::range_iterator_t<Rng> middle)
-    {
-        return rotate(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-            middle, hpx::util::end(rng));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename OutIter,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_range_v<Rng> &&
-            hpx::traits::is_iterator_v<OutIter>
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::rotate_copy is deprecated, use "
-        "hpx::ranges::rotate_copy instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<hpx::traits::range_iterator_t<Rng>,
-                OutIter>>::type rotate_copy(ExPolicy&& policy, Rng&& rng,
-            hpx::traits::range_iterator_t<Rng> middle, OutIter dest_first)
-    {
-        return rotate_copy(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-            middle, hpx::util::end(rng), dest_first);
-    }
-}    // namespace hpx::parallel
-// namespace hpx::parallel
-
 namespace hpx::ranges {
+
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::rotate
     inline constexpr struct rotate_t final

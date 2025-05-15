@@ -64,8 +64,8 @@ string(TIMESTAMP HPX_COPYRIGHT_YEAR "%Y")
 set(HPX_VERSION_MAJOR 1)
 set(HPX_VERSION_MINOR 11)
 set(HPX_VERSION_SUBMINOR 0)
-set(HPX_VERSION_DATE 20240529)
-set(HPX_VERSION_TAG "-trunk")
+set(HPX_VERSION_DATE 20250513)
+set(HPX_VERSION_TAG "-rc1")
 
 set(HPX_VERSION
     "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}"
@@ -1007,7 +1007,7 @@ if(HPX_WITH_APEX)
     "Do not update code from remote APEX repository." OFF CATEGORY "Profiling"
   )
   hpx_option(
-    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.6.5"
+    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "develop"
     CATEGORY "Profiling"
   )
 endif()

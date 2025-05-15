@@ -82,26 +82,3 @@ namespace hpx::experimental {
         return reduction(var, identity, std::multiplies<T>());
     }
 }    // namespace hpx::experimental
-
-/// \cond IGNORE_DEPRECATED
-namespace hpx::parallel {
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::reduction_multiplies is deprecated. Please use "
-        "hpx::experimental::reduction_multiplies instead.")
-    constexpr decltype(auto) reduction_multiplies(T& var)
-    {
-        return hpx::experimental::reduction_multiplies(var);
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::reduction_multiplies is deprecated. Please use "
-        "hpx::experimental::reduction_multiplies instead.")
-    constexpr decltype(auto) reduction_multiplies(T& var, T const& identity)
-    {
-        return hpx::experimental::reduction_multiplies(var, identity);
-    }
-}    // namespace hpx::parallel
-/// \endcond

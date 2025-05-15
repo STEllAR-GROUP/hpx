@@ -296,25 +296,4 @@ namespace hpx {
     } when_all_n{};
 }    // namespace hpx
 
-namespace hpx::lcos {
-
-    template <typename... Args>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::when_all is deprecated. Use hpx::when_all instead.")
-    auto when_all(Args&&... args)
-    {
-        return hpx::when_all(HPX_FORWARD(Args, args)...);
-    }
-
-    template <typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::when_all_n is deprecated. Use hpx::when_all_n instead.")
-    auto when_all_n(Iterator begin, std::size_t count)
-    {
-        return hpx::when_all(begin, count);
-    }
-}    // namespace hpx::lcos
-
 #endif    // DOXYGEN

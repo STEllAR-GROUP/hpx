@@ -105,16 +105,6 @@ namespace hpx {
     using binary_semaphore = detail::binary_semaphore<>;
 }    // namespace hpx
 
-/// \cond NOINTERN
-namespace hpx::lcos::local {
-
-    template <typename Mutex = hpx::spinlock>
-    using cpp20_binary_semaphore HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::cpp20_binary_semaphore is deprecated, use "
-        "hpx::binary_semaphore instead") = hpx::detail::binary_semaphore<Mutex>;
-}
-/// \endcond
-
 #endif
 
 #include <hpx/config/warnings_suffix.hpp>

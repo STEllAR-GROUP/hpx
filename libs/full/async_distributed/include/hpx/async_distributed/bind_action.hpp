@@ -165,19 +165,6 @@ namespace hpx {
     }
 }    // namespace hpx
 
-namespace hpx::util {
-
-    template <typename Action, typename... Ts,
-        typename Enable =
-            std::enable_if_t<traits::is_action_v<std::decay_t<Action>>>>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::util::bind is deprecated, use hpx::bind instead")
-    decltype(auto) bind(Ts&&... vs)
-    {
-        return hpx::bind<Action>(Action(), HPX_FORWARD(Ts, vs)...);
-    }
-}    // namespace hpx::util
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
 
