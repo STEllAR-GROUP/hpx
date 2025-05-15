@@ -63,7 +63,7 @@ Breaking changes
   - ``hpx::assertion::source_location`` is now only available as
     ``hpx::source_location``
   - ``hpx::lcos::split_future`` is now only available as ``hpx::split_future``
-  - ``hpx::lcos::wait`` and friends have been removed alltogether
+  - ``hpx::lcos::wait`` and friends have been removed altogether
   - ``hpx::lcos::wait_any`` and friends are now only available as
     ``hpx::wait_any``
   - ``hpx::lcos::wait_some`` and friends are now only available as

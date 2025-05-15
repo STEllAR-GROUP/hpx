@@ -41,4 +41,3 @@ namespace hpx {
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif
-
