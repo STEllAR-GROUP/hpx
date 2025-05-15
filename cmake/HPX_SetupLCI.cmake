@@ -55,6 +55,14 @@ macro(hpx_setup_lci)
             OFF
             CACHE INTERNAL ""
         )
+        set(LCI_COMPILE_DREG
+            OFF
+            CACHE INTERNAL ""
+        )
+        set(LCI_USE_DREG_DEFAULT
+            OFF
+            CACHE INTERNAL ""
+        )
         enable_language(C)
         add_subdirectory(${lci_SOURCE_DIR} ${lci_BINARY_DIR})
         # Move LCI target into its own FOLDER
@@ -66,7 +74,7 @@ macro(hpx_setup_lci)
       endif()
 
       install(
-        TARGETS LCI LCT lci-ucx
+        TARGETS LCI LCT
         EXPORT HPXLCITarget
         COMPONENT core
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -83,7 +91,7 @@ macro(hpx_setup_lci)
       )
 
       export(
-        TARGETS LCI LCT lci-ucx
+        TARGETS LCI LCT
         NAMESPACE LCI::
         FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXLCITarget.cmake"
       )
