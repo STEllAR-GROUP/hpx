@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <ciso646>
+#include <version>
 
 #if defined(_LIBCPP_VERSION) && (_LIBCPP_VERSION < 6000)
 #  error "libc++ inplace_merge implementation is not stable"
