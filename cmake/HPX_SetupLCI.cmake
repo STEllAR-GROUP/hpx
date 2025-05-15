@@ -55,6 +55,10 @@ macro(hpx_setup_lci)
             OFF
             CACHE INTERNAL ""
         )
+        set(LCI_COMPILE_DREG
+            OFF
+            CACHE INTERNAL ""
+        )
         enable_language(C)
         add_subdirectory(${lci_SOURCE_DIR} ${lci_BINARY_DIR})
         # Move LCI target into its own FOLDER
