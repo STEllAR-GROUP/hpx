@@ -16,7 +16,6 @@
 
 #include <algorithm>
 #include <chrono>
-#include <ciso646>
 #include <iostream>
 #include <random>
 #include <stdio.h>
@@ -24,6 +23,7 @@
 #include <string>
 #include <time.h>
 #include <vector>
+#include <version>
 
 //---------------------------------------------------------------------------
 // Compare the speed with the implementation of the compiler, in a vector
