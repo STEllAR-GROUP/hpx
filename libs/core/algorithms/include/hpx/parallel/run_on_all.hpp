@@ -1,3 +1,4 @@
+//  Copyright (c) 2025 Harith Reddy
 //  Copyright (c) 2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -6,83 +7,146 @@
 
 /// \file run_on_all.hpp
 /// \page hpx::experimental::run_on_all
-/// \headerfile hpx/experimental/run_on_all.hpp
+/// \headerfile hpx/task_block.hpp
 
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/detail/execution_parameter_callbacks.hpp>
-#include <hpx/execution/execution.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/parallel_executor.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/parallel/algorithms/for_loop_reduction.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
+#include <memory>
+#include <tuple>
 #include <type_traits>
+#include <utility>
 
 namespace hpx::experimental {
 
-    template <typename T, typename Op, typename F, typename... Ts>
-    void run_on_all(std::size_t num_tasks,
-        hpx::parallel::detail::reduction_helper<T, Op>&& r, F&& f, Ts&&... ts)
+    /// \cond NOINTERNAL
+    namespace detail {
+
+        template <typename ExPolicy, typename F, typename... Reductions>
+        decltype(auto) run_on_all(
+            ExPolicy&& policy, F&& f, Reductions&&... reductions)
+        {
+            // Create executor with proper configuration
+            auto exec =
+                hpx::execution::experimental::with_processing_units_count(
+                    hpx::execution::parallel_executor(
+                        hpx::threads::thread_priority::bound,
+                        hpx::threads::thread_stacksize::default_),
+                    hpx::execution::experimental::processing_units_count(
+                        policy.executor()));
+
+            auto cores =
+                hpx::execution::experimental::processing_units_count(exec);
+
+            // Execute based on policy type
+            if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
+            {
+                // Initialize all reductions
+                auto all_reductions =
+                    std::make_tuple(HPX_FORWARD(Reductions, reductions)...);
+                auto sp = std::make_shared<decltype(all_reductions)>(
+                    HPX_MOVE(all_reductions));
+
+                // Create a lambda that captures all reductions
+                auto task = [sp, f = HPX_FORWARD(F, f)](std::size_t) {
+                    std::apply(
+                        [&](auto&... r) { f(r.iteration_value(0)...); }, *sp);
+                };
+
+                auto fut = hpx::parallel::execution::bulk_async_execute(
+                    HPX_MOVE(exec), HPX_MOVE(task), cores);
+
+                // Return a future that performs cleanup after all tasks
+                // complete
+                return fut.then([sp = HPX_MOVE(sp)](auto&& fut_inner) mutable {
+                    std::apply(
+                        [](auto&... r) { (r.exit_iteration(0), ...); }, *sp);
+                    return fut_inner.get();
+                });
+            }
+            else
+            {
+                // Initialize all reductions
+                auto&& all_reductions = std::forward_as_tuple(
+                    HPX_FORWARD(Reductions, reductions)...);
+
+                // Create a lambda that captures all reductions
+                auto task = [&all_reductions, &f](std::size_t) {
+                    std::apply([&](auto&... r) { f(r.iteration_value(0)...); },
+                        all_reductions);
+                };
+
+                hpx::parallel::execution::bulk_sync_execute(
+                    HPX_MOVE(exec), HPX_MOVE(task), cores);
+
+                // Clean up reductions
+                std::apply([](auto&... r) { (r.exit_iteration(0), ...); },
+                    all_reductions);
+            }
+        }
+
+        template <typename ExPolicy, std::size_t... Is, typename... Ts>
+        decltype(auto) run_on_all(
+            ExPolicy&& policy, hpx::util::index_pack<Is...>, Ts&&... ts)
+        {
+            auto&& t = std::forward_as_tuple(HPX_FORWARD(Ts, ts)...);
+            auto f = std::get<sizeof...(Ts) - 1>(t);
+
+            return run_on_all(
+                HPX_FORWARD(ExPolicy, policy), HPX_MOVE(f), std::get<Is>(t)...);
+        }
+    }    // namespace detail
+    /// \endcond
+
+    /// Run a function on all available worker threads with reduction support
+    /// using the given execution policy
+    ///
+    /// \tparam ExPolicy The execution policy type
+    /// \tparam T        The first type in a list of reduction types and the
+    ///                  function type to invoke (last argument)
+    /// \tparam Ts       The list of reduction types and the function type to
+    ///                  invoke (last argument)
+    /// \param policy    The execution policy to use
+    /// \param t         The first in a list of reductions and the function to
+    ///                  invoke (last argument)
+    /// \param ts        The list of reductions and the function to invoke (last
+    ///                  argument)
+    template <typename ExPolicy, typename T, typename... Ts,
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
+    decltype(auto) run_on_all(ExPolicy&& policy, T&& t, Ts&&... ts)
     {
-        // force using index_queue scheduler with given amount of threads
-        hpx::threads::thread_schedule_hint hint;
-        hint.sharing_mode(
-            hpx::threads::thread_sharing_hint::do_not_share_function);
-        auto exec = hpx::execution::experimental::with_processing_units_count(
-            hpx::execution::parallel_executor(
-                hpx::threads::thread_priority::bound,
-                hpx::threads::thread_stacksize::default_, hint),
-            num_tasks);
-        exec.set_hierarchical_threshold(0);
-
-        r.init_iteration(0, 0);
-        auto on_exit =
-            hpx::experimental::scope_exit([&] { r.exit_iteration(0); });
-
-        hpx::wait_all(hpx::parallel::execution::bulk_async_execute(
-            exec, [&](auto i) { f(r.iteration_value(i), ts...); }, num_tasks,
-            HPX_FORWARD(Ts, ts)...));
+        return detail::run_on_all(HPX_FORWARD(ExPolicy, policy),
+            hpx::util::make_index_pack_t<sizeof...(Ts)>(), HPX_FORWARD(T, t),
+            HPX_FORWARD(Ts, ts)...);
     }
 
-    template <typename T, typename Op, typename F, typename... Ts>
-    void run_on_all(
-        hpx::parallel::detail::reduction_helper<T, Op>&& r, F&& f, Ts&&... ts)
+    /// Run a function on all available worker threads with reduction support
+    /// using the \a hpx::execution::par execution policy
+    ///
+    /// \tparam T        The first type in a list of reduction types and the
+    ///                  function type to invoke (last argument)
+    /// \tparam Ts       The list of reduction types and the function type to
+    ///                  invoke (last argument)
+    /// \param t         The first in a list of reductions and the function to
+    ///                  invoke (last argument)
+    /// \param ts        The list of reductions and the function to invoke (last
+    ///                  argument)
+    template <typename T, typename... Ts,
+        HPX_CONCEPT_REQUIRES_(!hpx::is_execution_policy_v<T>)>
+    decltype(auto) run_on_all(T&& t, Ts&&... ts)
     {
-        std::size_t cores =
-            hpx::parallel::execution::detail::get_os_thread_count();
-        run_on_all(
-            cores, HPX_MOVE(r), HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-    }
-
-    template <typename F, typename... Ts>
-    void run_on_all(std::size_t num_tasks, F&& f, Ts&&... ts)
-    {
-        // force using index_queue scheduler with given amount of threads
-        hpx::threads::thread_schedule_hint hint;
-        hint.sharing_mode(
-            hpx::threads::thread_sharing_hint::do_not_share_function);
-        auto exec = hpx::execution::experimental::with_processing_units_count(
-            hpx::execution::parallel_executor(
-                hpx::threads::thread_priority::bound,
-                hpx::threads::thread_stacksize::default_, hint),
-            num_tasks);
-        exec.set_hierarchical_threshold(0);
-
-        hpx::wait_all(hpx::parallel::execution::bulk_async_execute(
-            exec, [&](auto) { f(ts...); }, num_tasks, HPX_FORWARD(Ts, ts)...));
-    }
-
-    template <typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(std::is_invocable_v<F&&, Ts&&...>)>
-    void run_on_all(F&& f, Ts&&... ts)
-    {
-        std::size_t cores =
-            hpx::parallel::execution::detail::get_os_thread_count();
-        run_on_all(cores, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        return detail::run_on_all(hpx::execution::par,
+            hpx::util::make_index_pack_t<sizeof...(Ts)>(), HPX_FORWARD(T, t),
+            HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx::experimental
