@@ -9,9 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_STDEXEC)
 #include <hpx/execution_base/stdexec_forward.hpp>
-#endif
 
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -34,6 +32,7 @@
 #include <utility>
 
 namespace hpx::execution::experimental {
+    namespace hpxexec = hpx::execution::experimental;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -45,88 +44,38 @@ namespace hpx::execution::experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
-#if defined(HPX_HAVE_STDEXEC)
-            using sender_concept = hpx::execution::experimental::sender_t;
+            using sender_concept = hpxexec::sender_t;
 
             template <typename... Args>
             using default_set_value =
-                hpx::execution::experimental::completion_signatures<
-                    hpx::execution::experimental::set_value_t(Args...)>;
+                hpxexec::completion_signatures<hpxexec::set_value_t(Args...)>;
 
             template <typename Arg>
             using default_set_error =
-                hpx::execution::experimental::completion_signatures<
-                    hpx::execution::experimental::set_error_t(Arg)>;
+                hpxexec::completion_signatures<hpxexec::set_error_t(Arg)>;
 
-            using disable_set_stopped =
-                hpx::execution::experimental::completion_signatures<>;
+            using disable_set_stopped = hpxexec::completion_signatures<>;
 
             // clang-format off
             template <typename Env>
             friend auto tag_invoke(get_completion_signatures_t,
                 bulk_sender const&, Env) noexcept -> hpx::execution::
                 experimental::transform_completion_signatures_of<Sender, Env,
-                    hpx::execution::experimental::completion_signatures<
-                        hpx::execution::experimental::set_error_t(
+                    hpxexec::completion_signatures<
+                        hpxexec::set_error_t(
                             std::exception_ptr)>,
                     default_set_value, default_set_error, disable_set_stopped>;
             // clang-format on
 
             friend constexpr auto tag_invoke(
-                hpx::execution::experimental::get_env_t,
-                bulk_sender const& s) noexcept
+                hpxexec::get_env_t, bulk_sender const& s) noexcept
             {
-                return hpx::execution::experimental::get_env(s.sender);
+                return hpxexec::get_env(s.sender);
             }
-#else
-            using is_sender = void;
-
-            template <typename Env>
-            struct generate_completion_signatures
-            {
-                template <template <typename...> typename Tuple,
-                    template <typename...> typename Variant>
-                using value_types =
-                    value_types_of_t<Sender, Env, Tuple, Variant>;
-
-                template <template <typename...> typename Variant>
-                using error_types = hpx::util::detail::unique_concat_t<
-                    error_types_of_t<Sender, Env, Variant>,
-                    Variant<std::exception_ptr>>;
-
-                static constexpr bool sends_stopped = false;
-            };
-
-            // clang-format off
-            template <typename Env>
-            friend auto tag_invoke(
-                get_completion_signatures_t, bulk_sender const&, Env) noexcept
-                -> generate_completion_signatures<Env>;
-            // clang-format on
-
-            // clang-format off
-            template <typename CPO,
-                HPX_CONCEPT_REQUIRES_(
-                    hpx::execution::experimental::detail::is_receiver_cpo_v<CPO> &&
-                    hpx::execution::experimental::detail::has_completion_scheduler_v<
-                        CPO, std::decay_t<Sender>>
-                )>
-            // clang-format on
-            friend constexpr auto tag_invoke(
-                hpx::execution::experimental::get_completion_scheduler_t<CPO>
-                    tag,
-                bulk_sender const& s)
-            {
-                return tag(s.sender);
-            }
-#endif
             template <typename Receiver>
             struct bulk_receiver
             {
-#if defined(HPX_HAVE_STDEXEC)
-                using receiver_concept =
-                    hpx::execution::experimental::receiver_t;
-#endif
+                using receiver_concept = hpxexec::receiver_t;
                 HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
                 HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
                 HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
@@ -143,23 +92,18 @@ namespace hpx::execution::experimental {
                 friend void tag_invoke(
                     set_error_t, bulk_receiver&& r, Error&& error) noexcept
                 {
-                    hpx::execution::experimental::set_error(
+                    hpxexec::set_error(
                         HPX_MOVE(r.receiver), HPX_FORWARD(Error, error));
                 }
 
                 friend void tag_invoke(
                     set_stopped_t, bulk_receiver&& r) noexcept
                 {
-                    hpx::execution::experimental::set_stopped(
-                        HPX_MOVE(r.receiver));
+                    hpxexec::set_stopped(HPX_MOVE(r.receiver));
                 }
 
                 template <typename... Ts>
-#if defined(HPX_HAVE_STDEXEC)
                 void set_value(Ts&&... ts) noexcept
-#else
-                void set_value(Ts&&... ts)
-#endif
                 {
                     hpx::detail::try_catch_exception_ptr(
                         [&]() {
@@ -167,11 +111,11 @@ namespace hpx::execution::experimental {
                             {
                                 HPX_INVOKE(f, s, ts...);
                             }
-                            hpx::execution::experimental::set_value(
+                            hpxexec::set_value(
                                 HPX_MOVE(receiver), HPX_FORWARD(Ts, ts)...);
                         },
                         [&](std::exception_ptr ep) {
-                            hpx::execution::experimental::set_error(
+                            hpxexec::set_error(
                                 HPX_MOVE(receiver), HPX_MOVE(ep));
                         });
                 }
@@ -179,7 +123,7 @@ namespace hpx::execution::experimental {
                 template <typename... Ts>
                 friend auto tag_invoke(
                     set_value_t, bulk_receiver&& r, Ts&&... ts) noexcept
-                    -> decltype(hpx::execution::experimental::set_value(
+                    -> decltype(hpxexec::set_value(
                                     std::declval<std::decay_t<Receiver>&&>(),
                                     HPX_FORWARD(Ts, ts)...),
                         void())
@@ -196,7 +140,7 @@ namespace hpx::execution::experimental {
             friend auto tag_invoke(
                 connect_t, bulk_sender&& s, Receiver&& receiver)
             {
-                return hpx::execution::experimental::connect(HPX_MOVE(s.sender),
+                return hpxexec::connect(HPX_MOVE(s.sender),
                     bulk_receiver<Receiver>(HPX_FORWARD(Receiver, receiver),
                         HPX_MOVE(s.shape), HPX_MOVE(s.f)));
             }
@@ -205,7 +149,7 @@ namespace hpx::execution::experimental {
             friend auto tag_invoke(
                 connect_t, bulk_sender& s, Receiver&& receiver)
             {
-                return hpx::execution::experimental::connect(s.sender,
+                return hpxexec::connect(s.sender,
                     bulk_receiver<Receiver>(
                         HPX_FORWARD(Receiver, receiver), s.shape, s.f));
             }
@@ -247,7 +191,7 @@ namespace hpx::execution::experimental {
             HPX_CONCEPT_REQUIRES_(
                 is_sender_v<Sender> &&
                 experimental::detail::is_completion_scheduler_tag_invocable_v<
-                    hpx::execution::experimental::set_value_t, Sender,
+                    hpxexec::set_value_t, Sender,
                     bulk_t, Shape, F
                 >
             )>
@@ -256,14 +200,8 @@ namespace hpx::execution::experimental {
             bulk_t, Sender&& sender, Shape const& shape, F&& f)
         {
             auto scheduler =
-                hpx::execution::experimental::get_completion_scheduler<
-                    hpx::execution::experimental::set_value_t>(
-#if defined(HPX_HAVE_STDEXEC)
-                    hpx::execution::experimental::get_env(sender)
-#else
-                    sender
-#endif
-                );
+                hpxexec::get_completion_scheduler<hpxexec::set_value_t>(
+                    hpxexec::get_env(sender));
 
             return hpx::functional::tag_invoke(bulk_t{}, HPX_MOVE(scheduler),
                 HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f));

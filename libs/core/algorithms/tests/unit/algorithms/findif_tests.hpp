@@ -69,7 +69,6 @@ void test_find_if(ExPolicy&& policy, IteratorTag)
     HPX_TEST(index == iterator(test_index));
 }
 
-#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_find_if_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
@@ -101,7 +100,6 @@ void test_find_if_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     HPX_TEST(index == iterator(test_index));
 }
-#endif
 
 template <typename ExPolicy, typename IteratorTag>
 void test_find_if_async(ExPolicy&& p, IteratorTag)

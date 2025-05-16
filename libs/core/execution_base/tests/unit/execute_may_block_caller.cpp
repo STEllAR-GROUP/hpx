@@ -14,7 +14,6 @@ namespace tt = hpx::this_thread::experimental;
 
 struct this_test_example_scheduler
 {
-#if defined(HPX_HAVE_STDEXEC)
     struct example_sender
     {
         using is_sender = void;
@@ -26,20 +25,12 @@ struct this_test_example_scheduler
             return {};
         }
     };
-#endif
 
-#if defined(HPX_HAVE_STDEXEC)
     friend constexpr example_sender tag_invoke(
         ex::schedule_t, this_test_example_scheduler) noexcept
     {
         return {};
     }
-#else
-    friend constexpr void tag_invoke(
-        ex::schedule_t, this_test_example_scheduler) noexcept
-    {
-    }
-#endif
 
     friend constexpr bool tag_invoke(
         tt::execute_may_block_caller_t, this_test_example_scheduler) noexcept
