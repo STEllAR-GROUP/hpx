@@ -250,17 +250,4 @@ int hpx_main()
     return hpx::local::finalize();
 }
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
-{
-#if !defined(HPX_HAVE_STDEXEC)
-    // Disable MPI tests because they
-    // hang due to sync_wait consuming the thread
-    MPI_Init(&argc, &argv);
-
-    auto result = hpx::local::init(hpx_main, argc, argv);
-
-    MPI_Finalize();
-
-    return result || hpx::util::report_errors();
-#endif
-}
+int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {}

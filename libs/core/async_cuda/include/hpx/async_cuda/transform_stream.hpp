@@ -132,9 +132,7 @@ namespace hpx { namespace cuda { namespace experimental {
         template <typename R, typename F>
         struct transform_stream_receiver
         {
-#if defined(HPX_HAVE_STDEXEC)
             using receiver_concept = hpx::execution::experimental::receiver_t;
-#endif
             std::decay_t<R> r;
             std::decay_t<F> f;
             cudaStream_t stream;
@@ -255,7 +253,6 @@ namespace hpx { namespace cuda { namespace experimental {
                     });
             }
 
-#if defined(HPX_HAVE_STDEXEC)
             template <typename... Ts>
             friend void tag_invoke(hpx::execution::experimental::set_value_t,
                 transform_stream_receiver&& r, Ts&&... ts) noexcept
@@ -266,21 +263,7 @@ namespace hpx { namespace cuda { namespace experimental {
                 // error.
                 r.set_value(HPX_FORWARD(Ts, ts)...);
             }
-#endif
         };
-
-#if !defined(HPX_HAVE_STDEXEC)
-        // This should be a hidden friend in transform_stream_receiver. However,
-        // nvcc does not know how to compile it with some argument types
-        // ("error: no instance of overloaded function std::forward matches the
-        // argument list").
-        template <typename R, typename F, typename... Ts>
-        void tag_invoke(hpx::execution::experimental::set_value_t,
-            transform_stream_receiver<R, F>&& r, Ts&&... ts)
-        {
-            r.set_value(HPX_FORWARD(Ts, ts)...);
-        }
-#endif
 
         template <typename S, typename F>
         struct transform_stream_sender
@@ -289,7 +272,6 @@ namespace hpx { namespace cuda { namespace experimental {
             std::decay_t<F> f;
             cudaStream_t stream{};
 
-#if defined(HPX_HAVE_STDEXEC)
             using sender_concept = hpx::execution::experimental::sender_t;
 
             template <typename... Args>
@@ -345,52 +327,6 @@ namespace hpx { namespace cuda { namespace experimental {
             {
                 return hpx::execution::experimental::get_env(s.s);
             }
-#else
-            template <typename Tuple>
-            struct invoke_result_helper;
-
-            template <template <typename...> class Tuple, typename... Ts>
-            struct invoke_result_helper<Tuple<Ts...>>
-            {
-                static_assert(hpx::is_invocable_v<F, Ts..., cudaStream_t>,
-                    "F not invocable with the value_types specified.");
-
-                using result_type =
-                    hpx::util::invoke_result_t<F, Ts..., cudaStream_t>;
-
-                using type = std::conditional_t<std::is_void_v<result_type>,
-                    Tuple<>, Tuple<result_type>>;
-            };
-
-            template <typename Env>
-            struct generate_completion_signatures
-            {
-                template <template <typename...> class Tuple,
-                    template <typename...> class Variant>
-                using value_types =
-                    hpx::util::detail::unique_t<hpx::util::detail::transform_t<
-                        hpx::execution::experimental::value_types_of_t<S, Env,
-                            Tuple, Variant>,
-                        invoke_result_helper>>;
-
-                template <template <typename...> class Variant>
-                using error_types =
-                    hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
-                        hpx::execution::experimental::error_types_of_t<S, Env,
-                            Variant>,
-                        std::exception_ptr>>;
-
-                static constexpr bool sends_stopped = false;
-            };
-
-            // clang-format off
-            template <typename Env>
-            friend auto tag_invoke(
-                hpx::execution::experimental::get_completion_signatures_t,
-                transform_stream_sender const&, Env) noexcept
-                -> generate_completion_signatures<Env>;
-            // clang-format on
-#endif
 
             template <typename R>
             friend auto tag_invoke(hpx::execution::experimental::connect_t,

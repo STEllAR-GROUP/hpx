@@ -143,7 +143,6 @@ void test_is_heap(
     }
 }
 
-#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_is_heap_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
@@ -272,7 +271,6 @@ void test_is_heap_until_sender(
         HPX_TEST(result.base() == solution);
     }
 }
-#endif
 
 template <typename IteratorTag, typename DataType, typename Pred>
 void test_is_heap_with_pred(

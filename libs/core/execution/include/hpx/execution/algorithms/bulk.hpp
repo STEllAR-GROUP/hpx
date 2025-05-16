@@ -9,9 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_STDEXEC)
 #include <hpx/execution_base/stdexec_forward.hpp>
-#endif
 
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -46,7 +44,6 @@ namespace hpx::execution::experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
-#if defined(HPX_HAVE_STDEXEC)
             using sender_concept = hpxexec::sender_t;
 
             template <typename... Args>
@@ -75,53 +72,10 @@ namespace hpx::execution::experimental {
             {
                 return hpxexec::get_env(s.sender);
             }
-#else
-            using is_sender = void;
-
-            template <typename Env>
-            struct generate_completion_signatures
-            {
-                template <template <typename...> typename Tuple,
-                    template <typename...> typename Variant>
-                using value_types =
-                    value_types_of_t<Sender, Env, Tuple, Variant>;
-
-                template <template <typename...> typename Variant>
-                using error_types = hpx::util::detail::unique_concat_t<
-                    error_types_of_t<Sender, Env, Variant>,
-                    Variant<std::exception_ptr>>;
-
-                static constexpr bool sends_stopped = false;
-            };
-
-            // clang-format off
-            template <typename Env>
-            friend auto tag_invoke(
-                get_completion_signatures_t, bulk_sender const&, Env) noexcept
-                -> generate_completion_signatures<Env>;
-            // clang-format on
-
-            // clang-format off
-            template <typename CPO,
-                HPX_CONCEPT_REQUIRES_(
-                    hpxexec::detail::is_receiver_cpo_v<CPO> &&
-                    hpxexec::detail::has_completion_scheduler_v<
-                        CPO, std::decay_t<Sender>>
-                )>
-            // clang-format on
-            friend constexpr auto tag_invoke(
-                hpxexec::get_completion_scheduler_t<CPO> tag,
-                bulk_sender const& s)
-            {
-                return tag(s.sender);
-            }
-#endif
             template <typename Receiver>
             struct bulk_receiver
             {
-#if defined(HPX_HAVE_STDEXEC)
                 using receiver_concept = hpxexec::receiver_t;
-#endif
                 HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
                 HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
                 HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
@@ -149,11 +103,7 @@ namespace hpx::execution::experimental {
                 }
 
                 template <typename... Ts>
-#if defined(HPX_HAVE_STDEXEC)
                 void set_value(Ts&&... ts) noexcept
-#else
-                void set_value(Ts&&... ts)
-#endif
                 {
                     hpx::detail::try_catch_exception_ptr(
                         [&]() {
@@ -249,13 +199,9 @@ namespace hpx::execution::experimental {
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
             bulk_t, Sender&& sender, Shape const& shape, F&& f)
         {
-            auto scheduler = hpxexec::get_completion_scheduler<hpxexec::set_value_t>(
-#if defined(HPX_HAVE_STDEXEC)
-                hpxexec::get_env(sender)
-#else
-                sender
-#endif
-            );
+            auto scheduler =
+                hpxexec::get_completion_scheduler<hpxexec::set_value_t>(
+                    hpxexec::get_env(sender));
 
             return hpx::functional::tag_invoke(bulk_t{}, HPX_MOVE(scheduler),
                 HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f));

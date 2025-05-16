@@ -76,9 +76,7 @@ namespace hpx { namespace mpi { namespace experimental {
         template <typename R, typename F>
         struct transform_mpi_receiver
         {
-#if defined(HPX_HAVE_STDEXEC)
             using is_receiver = void;
-#endif
             HPX_NO_UNIQUE_ADDRESS std::decay_t<R> r;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
@@ -149,7 +147,6 @@ namespace hpx { namespace mpi { namespace experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> s;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
-#if defined(HPX_HAVE_STDEXEC)
             using is_sender = void;
 
             template <typename... Args>
@@ -207,51 +204,6 @@ namespace hpx { namespace mpi { namespace experimental {
                 no_set_stopped_signature
             >;
             // clang-format on
-#else
-            template <typename Env>
-            struct generate_completion_signatures
-            {
-                template <typename Tuple>
-                struct invoke_result_helper;
-
-                template <template <typename...> class Tuple, typename... Ts>
-                struct invoke_result_helper<Tuple<Ts...>>
-                {
-                    static_assert(hpx::is_invocable_v<F, Ts..., MPI_Request*>,
-                        "F not invocable with the value_types specified.");
-                    using result_type =
-                        hpx::util::invoke_result_t<F, Ts..., MPI_Request*>;
-                    using type =
-                        std::conditional_t<std::is_void<result_type>::value,
-                            Tuple<>, Tuple<result_type>>;
-                };
-
-                template <template <typename...> class Tuple,
-                    template <typename...> class Variant>
-                using value_types =
-                    hpx::util::detail::unique_t<hpx::util::detail::transform_t<
-                        hpx::execution::experimental::value_types_of_t<Sender,
-                            Env, Tuple, Variant>,
-                        invoke_result_helper>>;
-
-                template <template <typename...> class Variant>
-                using error_types =
-                    hpx::util::detail::unique_t<hpx::util::detail::prepend_t<
-                        hpx::execution::experimental::error_types_of_t<Sender,
-                            Env, Variant>,
-                        std::exception_ptr>>;
-
-                static constexpr bool sends_stopped = false;
-            };
-
-            // clang-format off
-            template <typename Env>
-            friend auto tag_invoke(
-                hpx::execution::experimental::get_completion_signatures_t,
-                transform_mpi_sender const&, Env)
-            -> generate_completion_signatures<Env>;
-            // clang-format on
-#endif
 
             template <typename R>
             friend constexpr auto tag_invoke(

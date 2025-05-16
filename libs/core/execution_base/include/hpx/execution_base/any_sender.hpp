@@ -784,20 +784,10 @@ namespace hpx::execution::experimental {
         unique_any_sender& operator=(unique_any_sender&&) = default;
         unique_any_sender& operator=(unique_any_sender const&) = delete;
 
-#if defined(HPX_HAVE_STDEXEC)
         // TODO: Remove this
         using completion_signatures =
             hpxexec::completion_signatures<set_value_t(Ts...),
                 set_error_t(std::exception_ptr)>;
-#else
-        // clang-format off
-        template <typename Env>
-        friend auto tag_invoke(get_completion_signatures_t,
-            unique_any_sender const&,
-            Env) noexcept -> completion_signatures<set_value_t(Ts...),
-                              set_error_t(std::exception_ptr)>;
-        // clang-format on
-#endif
 
         template <typename R>
         friend detail::any_operation_state tag_invoke(
@@ -870,19 +860,10 @@ namespace hpx::execution::experimental {
         any_sender& operator=(any_sender&&) = default;
         any_sender& operator=(any_sender const&) = default;
 
-#if defined(HPX_HAVE_STDEXEC)
         // TODO: Remove this
         using completion_signatures =
             hpxexec::completion_signatures<set_value_t(Ts...),
                 set_error_t(std::exception_ptr)>;
-#else
-        // clang-format off
-        template <typename Env>
-        friend auto tag_invoke(get_completion_signatures_t, any_sender const&,
-            Env) noexcept -> completion_signatures<set_value_t(Ts...),
-                              set_error_t(std::exception_ptr)>;
-        // clang-format on
-#endif
 
         template <typename R>
         friend detail::any_operation_state tag_invoke(

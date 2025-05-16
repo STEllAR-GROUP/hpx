@@ -156,22 +156,14 @@ namespace hpx::execution::experimental {
             template <typename Sender>
             future_data_with_run_loop(init_no_addref no_addref,
                 other_allocator const& alloc,
-#if defined(HPX_HAVE_STDEXEC)
                 decltype(std::declval<hpxexec::run_loop>().get_scheduler())
                     const& sched,
-#else
-                hpxexec::run_loop_scheduler const& sched,
-#endif
                 Sender&& sender)
               : base_type(no_addref, alloc, HPX_FORWARD(Sender, sender))
-#if defined(HPX_HAVE_STDEXEC)
               //TODO: Keep an eye on this, it is based on the internal impl of
               // stdexec, so it is subect to change. This is currently relying
               // on the env struct to expose __loop_ as a public member.
               , loop(*hpxexec::get_env(schedule(sched)).__loop_)
-#else
-              , loop(sched.get_run_loop())
-#endif
             {
                 this->set_on_completed([this]() { loop.finish(); });
             }
@@ -230,12 +222,8 @@ namespace hpx::execution::experimental {
         ///////////////////////////////////////////////////////////////////////
         template <typename Sender, typename Allocator>
         auto make_future_with_run_loop(
-#if defined(HPX_HAVE_STDEXEC)
             decltype(std::declval<hpxexec::run_loop>().get_scheduler())
                 const& sched,
-#else
-            hpxexec::run_loop_scheduler const& sched,
-#endif
             Sender&& sender, Allocator const& allocator)
         {
             using allocator_type = Allocator;
@@ -334,14 +322,9 @@ namespace hpx::execution::experimental {
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(make_future_t,
             Sender&& sender, Allocator const& allocator = Allocator{})
         {
-#if defined(HPX_HAVE_STDEXEC)
             auto scheduler =
                 hpxexec::get_completion_scheduler<hpxexec::set_value_t>(
                     hpxexec::get_env(sender));
-#else
-            auto scheduler =
-                hpxexec::get_completion_scheduler<hpxexec::set_value_t>(sender);
-#endif
 
             return hpx::functional::tag_invoke(make_future_t{},
                 HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender), allocator);
@@ -355,11 +338,8 @@ namespace hpx::execution::experimental {
             )>
         // clang-format on
         friend auto tag_invoke(make_future_t,
-#if defined(HPX_HAVE_STDEXEC)
-            decltype(std::declval<hpxexec::run_loop>().get_scheduler()) const& sched,
-#else
-            hpxexec::run_loop_scheduler const& sched,
-#endif
+            decltype(std::declval<hpxexec::run_loop>().get_scheduler())
+                const& sched,
             Sender&& sender, Allocator const& allocator = Allocator{})
         {
             return detail::make_future_with_run_loop(

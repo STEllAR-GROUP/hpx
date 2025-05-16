@@ -66,24 +66,10 @@ namespace hpx::execution::experimental {
         struct keep_future_sender_base
         {
             std::decay_t<Future> future;
-#if defined(HPX_HAVE_STDEXEC)
             using completion_signatures =
                 hpxexec::completion_signatures<hpxexec::set_value_t(
                                                    std::decay_t<Future>),
                     hpxexec::set_error_t(std::exception_ptr)>;
-#else
-            struct completion_signatures
-            {
-                template <template <typename...> class Tuple,
-                    template <typename...> class Variant>
-                using value_types = Variant<Tuple<std::decay_t<Future>>>;
-
-                template <template <typename...> class Variant>
-                using error_types = Variant<std::exception_ptr>;
-
-                static constexpr bool sends_stopped = false;
-            };
-#endif
         };
 
         template <typename Future>

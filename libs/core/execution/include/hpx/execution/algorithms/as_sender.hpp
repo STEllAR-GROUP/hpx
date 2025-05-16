@@ -133,7 +133,6 @@ namespace hpx::execution::experimental {
 
             std::decay_t<Future> future_;
 
-#if defined(HPX_HAVE_STDEXEC)
             template <bool IsVoid, typename _result_type>
             struct set_value_void_checked
             {
@@ -150,33 +149,6 @@ namespace hpx::execution::experimental {
                 typename set_value_void_checked<std::is_void_v<result_type>,
                     result_type>::type,
                 hpxexec::set_error_t(std::exception_ptr)>;
-#else
-            // Sender compatibility
-            template <typename, typename T>
-            struct completion_signatures_base
-            {
-                template <template <typename...> typename Tuple,
-                    template <typename...> typename Variant>
-                using value_types = Variant<Tuple<result_type>>;
-            };
-
-            template <typename T>
-            struct completion_signatures_base<T, void>
-            {
-                template <template <typename...> typename Tuple,
-                    template <typename...> typename Variant>
-                using value_types = Variant<Tuple<>>;
-            };
-
-            struct completion_signatures
-              : completion_signatures_base<void, result_type>
-            {
-                template <template <typename...> typename Variant>
-                using error_types = Variant<std::exception_ptr>;
-
-                static constexpr bool sends_stopped = false;
-            };
-#endif
         };
 
         template <typename Future>

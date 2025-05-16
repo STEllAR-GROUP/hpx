@@ -7,8 +7,6 @@
 #pragma once
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_STDEXEC)
-
 /* TODO: Find out what diagnostics should be disabled for stdexec to compile.
  * currently it seems to need at least "-Wgnu-zero-variadic-macro-arguments"
  * and "-Wmissing-braces" even though they are explicitly disabled inside
@@ -313,4 +311,3 @@ namespace hpx::execution::experimental {
 // Leaving this as a placeholder
 namespace hpx::this_thread {
 }
-#endif

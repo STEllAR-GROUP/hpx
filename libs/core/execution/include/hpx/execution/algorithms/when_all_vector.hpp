@@ -10,9 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_STDEXEC)
 #include <hpx/execution_base/stdexec_forward.hpp>
-#endif
 
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -67,9 +65,7 @@ namespace hpx::when_all_vector_detail {
     struct when_all_vector_sender_impl<Sender>::when_all_vector_sender_type
     {
         using is_sender = void;
-#if defined(HPX_HAVE_STDEXEC)
         using sender_concept = hpx::execution::experimental::sender_t;
-#endif
         using senders_type = std::vector<Sender>;
         senders_type senders;
 
@@ -99,7 +95,6 @@ namespace hpx::when_all_vector_detail {
         {
         };
 
-#if defined(HPX_HAVE_STDEXEC)
         // Dummy parameter introduced to please GCC11 which enforces
         // explicit specialization in non-namespace scope as an error.
         // Reference: https://cplusplus.com/forum/general/58906/#msg318049
@@ -134,53 +129,17 @@ namespace hpx::when_all_vector_detail {
                 hpxexec::completion_signatures<hpxexec::set_error_t(
                     std::exception_ptr)>,
                 transformed_comp_sigs_identity, decay_set_error>;
-#else
-        // This sender sends a single vector of the type sent by the
-        // predecessor senders or nothing if the predecessor senders send
-        // nothing
-        template <typename Env>
-        struct generate_completion_signatures
-        {
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types = Variant<std::conditional_t<is_void_value_type,
-                Tuple<>, Tuple<std::vector<element_value_type>>>>;
-
-            // This sender sends any error types sent by the predecessor senders
-            // or std::exception_ptr
-            template <template <typename...> class Variant>
-            using error_types = hpx::util::detail::unique_concat_t<
-                hpx::util::detail::transform_t<
-                    hpxexec::error_types_of_t<Sender, Env, Variant>,
-                    std::decay>,
-                Variant<std::exception_ptr>>;
-
-            static constexpr bool sends_stopped = true;
-        };
-
-        // clang-format off
-        template <typename Env>
-        friend auto tag_invoke(
-            hpxexec::get_completion_signatures_t,
-            when_all_vector_sender_type const&,
-            Env) noexcept -> generate_completion_signatures<Env>;
-        // clang-format on
-#endif
 
         template <typename Receiver>
         struct operation_state
         {
             using receiver_type = std::decay_t<Receiver>;
-#if defined(HPX_HAVE_STDEXEC)
             using operation_state_concept =
                 hpx::execution::experimental::operation_state_t;
-#endif
 
             struct when_all_vector_receiver
             {
-#if defined(HPX_HAVE_STDEXEC)
                 using receiver_concept = hpxexec::receiver_t;
-#endif
                 operation_state& op_state;
                 std::size_t const i;
 
@@ -252,7 +211,6 @@ namespace hpx::when_all_vector_detail {
                 // TODO: Make this a method
                 friend auto tag_invoke(hpxexec::get_env_t,
                     when_all_vector_receiver const& r)
-#if defined(HPX_HAVE_STDEXEC)
                     noexcept
                     -> hpxexec::env<
                         hpxexec::env_of_t<receiver_type>,
@@ -275,21 +233,6 @@ namespace hpx::when_all_vector_detail {
                     return hpxexec::env(
                         std::move(e), std::move(p));
                 }
-#else
-                    -> hpxexec::make_env_t<
-                        hpxexec::get_stop_token_t,
-                        hpx::experimental::in_place_stop_token,
-                        hpxexec::env_of_t<receiver_type>>
-                {
-                    /* The old calling convention is:
-                     * make_env<tag>(val, old_env) */
-                    return hpxexec::make_env<
-                        hpxexec::get_stop_token_t>(
-                        r.op_state.stop_source_.get_token(),
-                        hpxexec::get_env(
-                            r.op_state.receiver));
-                }
-#endif
                 // clang-format on
             };
 
@@ -318,15 +261,10 @@ namespace hpx::when_all_vector_detail {
 
             // The first error sent by any predecessor sender is stored in a
             // optional of a variant of the error_types
-#if defined(HPX_HAVE_STDEXEC)
             using error_types = typename hpxexec::error_types_of_t<
                 when_all_vector_sender_impl<
                     Sender>::when_all_vector_sender_type,
                 hpxexec::empty_env, hpx::variant>;
-#else
-            using error_types = typename generate_completion_signatures<
-                hpxexec::empty_env>::template error_types<hpx::variant>;
-#endif
             std::optional<error_types> error;
 
             // Set to true when set_stopped or set_error has been called
@@ -409,7 +347,8 @@ namespace hpx::when_all_vector_detail {
                                 values.push_back(HPX_MOVE(t.value()));
 #endif
                             }
-                            hpxexec::set_value(HPX_MOVE(receiver), HPX_MOVE(values));
+                            hpxexec::set_value(
+                                HPX_MOVE(receiver), HPX_MOVE(values));
                         }
                     }
                     else if (error)
@@ -423,23 +362,20 @@ namespace hpx::when_all_vector_detail {
                     }
                     else
                     {
-#if defined(HPX_HAVE_STDEXEC)
                         if constexpr (hpxexec::sends_stopped<Sender>)
                         {
-#endif
                             hpxexec::set_stopped(HPX_MOVE(receiver));
-#if defined(HPX_HAVE_STDEXEC)
                         }
                         else
                         {
                             HPX_UNREACHABLE;
                         }
-#endif
                     }
                 }
             }
 
-            friend void tag_invoke(hpxexec::start_t, operation_state& os) noexcept
+            friend void tag_invoke(
+                hpxexec::start_t, operation_state& os) noexcept
             {
                 // register stop callback
                 os.on_stop_.emplace(
@@ -485,16 +421,16 @@ namespace hpx::when_all_vector_detail {
         };
 
         template <typename Receiver>
-        friend auto tag_invoke(
-            hpxexec::connect_t, when_all_vector_sender_type&& s, Receiver&& receiver)
+        friend auto tag_invoke(hpxexec::connect_t,
+            when_all_vector_sender_type&& s, Receiver&& receiver)
         {
             return operation_state<Receiver>(
                 HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.senders));
         }
 
         template <typename Receiver>
-        friend auto tag_invoke(
-            hpxexec::connect_t, when_all_vector_sender_type& s, Receiver&& receiver)
+        friend auto tag_invoke(hpxexec::connect_t,
+            when_all_vector_sender_type& s, Receiver&& receiver)
         {
             return operation_state<Receiver>(receiver, s.senders);
         }
