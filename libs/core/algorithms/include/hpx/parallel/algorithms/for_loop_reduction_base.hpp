@@ -161,18 +161,4 @@ namespace hpx::experimental {
             var, var, HPX_FORWARD(Op, combiner));
     }
 }    // namespace hpx::experimental
-
-/// \cond IGNORE_DEPRECATED
-namespace hpx::parallel {
-
-    template <typename T, typename Op>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::reduction is deprecated. Please use "
-        "hpx::experimental::reduction instead.")
-    constexpr decltype(auto) reduction(T& var, T const& identity, Op&& combiner)
-    {
-        return hpx::experimental::reduction(
-            var, identity, HPX_FORWARD(Op, combiner));
-    }
-}    // namespace hpx::parallel
 /// \endcond

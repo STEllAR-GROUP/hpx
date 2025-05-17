@@ -144,20 +144,3 @@ namespace hpx {
         }
     }
 }    // namespace hpx
-
-namespace hpx::lcos::local {
-
-    using once_flag HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::once_flag is deprecated, use hpx::once_flag "
-        "instead") = hpx::once_flag;
-
-    template <typename F, typename... Args>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::call_once is deprecated, use hpx::call_once "
-        "instead")
-    void call_once(hpx::once_flag& flag, F&& f, Args&&... args)
-    {
-        return hpx::call_once(
-            flag, HPX_FORWARD(F, f), HPX_FORWARD(Args, args)...);
-    }
-}    // namespace hpx::lcos::local

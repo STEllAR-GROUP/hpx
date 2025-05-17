@@ -463,25 +463,4 @@ namespace hpx {
     } when_each_n{};
 }    // namespace hpx
 
-namespace hpx::lcos {
-
-    template <typename F, typename... Ts>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::when_each is deprecated. Use hpx::when_each instead.")
-    auto when_each(F&& f, Ts&&... ts)
-    {
-        return hpx::when_each(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-    }
-
-    template <typename F, typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::when_each_n is deprecated. Use hpx::when_each_n instead.")
-    hpx::future<Iterator> when_each_n(F&& f, Iterator begin, std::size_t count)
-    {
-        return hpx::when_each_n(HPX_FORWARD(F, f), begin, count);
-    }
-}    // namespace hpx::lcos
-
 #endif    // DOXYGEN

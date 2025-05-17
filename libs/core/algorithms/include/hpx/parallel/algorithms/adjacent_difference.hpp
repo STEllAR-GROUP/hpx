@@ -343,41 +343,6 @@ namespace hpx::parallel {
 
         /// \endcond
     }    // namespace detail
-
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::adjacent_difference is deprecated, use "
-        "hpx::adjacent_difference instead")
-    inline std::enable_if_t<hpx::is_execution_policy_v<ExPolicy>,
-        util::detail::algorithm_result_t<ExPolicy,
-            FwdIter2>> adjacent_difference(ExPolicy&& policy, FwdIter1 first,
-        FwdIter1 last, FwdIter2 dest)
-    {
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, dest, std::minus<>());
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Op>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::adjacent_difference is deprecated, use "
-        "hpx::adjacent_difference instead")
-    inline std::enable_if_t<hpx::is_execution_policy_v<ExPolicy>,
-        util::detail::algorithm_result_t<ExPolicy,
-            FwdIter2>> adjacent_difference(ExPolicy&& policy, FwdIter1 first,
-        FwdIter1 last, FwdIter2 dest, Op&& op)
-    {
-        return detail::adjacent_difference<FwdIter2>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, dest,
-            HPX_FORWARD(Op, op));
-    }
 }    // namespace hpx::parallel
 
 namespace hpx {

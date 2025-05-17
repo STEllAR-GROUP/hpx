@@ -81,26 +81,3 @@ namespace hpx::experimental {
         return reduction(var, identity, std::bit_or<T>());
     }
 }    // namespace hpx::experimental
-
-/// \cond IGNORE_DEPRECATED
-namespace hpx::parallel {
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::reduction_bit_or is deprecated. Please use "
-        "hpx::experimental::reduction_bit_or instead.")
-    constexpr decltype(auto) reduction_bit_or(T& var)
-    {
-        return hpx::experimental::reduction_bit_or(var);
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::reduction_bit_or is deprecated. Please use "
-        "hpx::experimental::reduction_bit_or instead.")
-    constexpr decltype(auto) reduction_bit_or(T& var, T const& identity)
-    {
-        return hpx::experimental::reduction_bit_or(var, identity);
-    }
-}    // namespace hpx::parallel
-/// \endcond

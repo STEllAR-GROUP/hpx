@@ -13,25 +13,6 @@
 #include <hpx/preprocessor/expand.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Deprecate a given functionality starting HPX V1.8
-#if !defined(HPX_HAVE_DEPRECATION_WARNINGS_V1_8)
-#define HPX_HAVE_DEPRECATION_WARNINGS_V1_8 1
-#endif
-
-#if (HPX_VERSION_FULL >= 0x010800) && (HPX_HAVE_DEPRECATION_WARNINGS_V1_8 != 0)
-#define HPX_DEPRECATED_MSG_V1_8                                                \
-    "This functionality is deprecated starting HPX V1.8 and will be removed "  \
-    "in the future. You can define HPX_HAVE_DEPRECATION_WARNINGS_V1_8=0 to "   \
-    "acknowledge that you have received this warning."
-#define HPX_DEPRECATED_V1_8(x)                                                 \
-    [[deprecated(x " (" HPX_PP_EXPAND(HPX_DEPRECATED_MSG_V1_8) ")")]]
-#endif
-
-#if !defined(HPX_DEPRECATED_V1_8)
-#define HPX_DEPRECATED_V1_8(x)
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // Deprecate a given functionality starting HPX V1.9
 #if !defined(HPX_HAVE_DEPRECATION_WARNINGS_V1_9)
 #define HPX_HAVE_DEPRECATION_WARNINGS_V1_9 1

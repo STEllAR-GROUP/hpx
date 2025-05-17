@@ -947,18 +947,4 @@ namespace hpx::ranges::experimental {
     } for_loop_strided{};
 }    // namespace hpx::ranges::experimental
 
-namespace hpx::ranges {
-
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::ranges::for_loop is deprecated. Please use "
-        "hpx::ranges::experimental::for_loop instead.")
-    inline constexpr hpx::ranges::experimental::for_loop_t for_loop{};
-
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::ranges::for_loop_strided is deprecated. Please use "
-        "hpx::ranges::experimental::for_loop_strided instead.")
-    inline constexpr hpx::ranges::experimental::for_loop_strided_t
-        for_loop_strided{};
-}    // namespace hpx::ranges
-
 #endif    // DOXYGEN

@@ -212,10 +212,3 @@ namespace hpx {
     };
 #endif
 }    // namespace hpx
-
-namespace hpx::util {
-
-    using annotate_function HPX_DEPRECATED_V(1, 8,
-        "hpx::util::scoped_annotation has been deprecated, please use "
-        "hpx::scoped_annotation instead.") = hpx::scoped_annotation;
-}    // namespace hpx::util
