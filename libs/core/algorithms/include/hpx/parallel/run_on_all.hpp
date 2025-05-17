@@ -68,9 +68,9 @@ namespace hpx::experimental {
                     [&](auto&... r) { (r.init_iteration(0, 0), ...); }, *sp);
 
                 // Create a lambda that captures all reductions
-                auto task = [sp, f = HPX_FORWARD(F, f)](std::size_t) {
+                auto task = [sp, f = HPX_FORWARD(F, f)](std::size_t i) {
                     std::apply(
-                        [&](auto&... r) { f(r.iteration_value(0)...); }, *sp);
+                        [&](auto&... r) { f(r.iteration_value(i)...); }, *sp);
                 };
 
                 auto fut = hpx::parallel::execution::bulk_async_execute(
@@ -94,8 +94,8 @@ namespace hpx::experimental {
                     all_reductions);
 
                 // Create a lambda that captures all reductions
-                auto task = [&all_reductions, &f](std::size_t) {
-                    std::apply([&](auto&... r) { f(r.iteration_value(0)...); },
+                auto task = [&all_reductions, &f](std::size_t i) {
+                    std::apply([&](auto&... r) { f(r.iteration_value(i)...); },
                         all_reductions);
                 };
 
