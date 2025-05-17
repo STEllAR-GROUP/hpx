@@ -249,13 +249,14 @@ namespace hpx::execution::experimental {
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
             bulk_t, Sender&& sender, Shape const& shape, F&& f)
         {
-            auto scheduler = hpxexec::get_completion_scheduler<hpxexec::set_value_t>(
+            auto scheduler =
+                hpxexec::get_completion_scheduler<hpxexec::set_value_t>(
 #if defined(HPX_HAVE_STDEXEC)
-                hpxexec::get_env(sender)
+                    hpxexec::get_env(sender)
 #else
-                sender
+                    sender
 #endif
-            );
+                );
 
             return hpx::functional::tag_invoke(bulk_t{}, HPX_MOVE(scheduler),
                 HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f));

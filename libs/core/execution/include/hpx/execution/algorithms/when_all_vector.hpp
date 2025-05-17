@@ -409,7 +409,8 @@ namespace hpx::when_all_vector_detail {
                                 values.push_back(HPX_MOVE(t.value()));
 #endif
                             }
-                            hpxexec::set_value(HPX_MOVE(receiver), HPX_MOVE(values));
+                            hpxexec::set_value(
+                                HPX_MOVE(receiver), HPX_MOVE(values));
                         }
                     }
                     else if (error)
@@ -439,7 +440,8 @@ namespace hpx::when_all_vector_detail {
                 }
             }
 
-            friend void tag_invoke(hpxexec::start_t, operation_state& os) noexcept
+            friend void tag_invoke(
+                hpxexec::start_t, operation_state& os) noexcept
             {
                 // register stop callback
                 os.on_stop_.emplace(
@@ -485,16 +487,16 @@ namespace hpx::when_all_vector_detail {
         };
 
         template <typename Receiver>
-        friend auto tag_invoke(
-            hpxexec::connect_t, when_all_vector_sender_type&& s, Receiver&& receiver)
+        friend auto tag_invoke(hpxexec::connect_t,
+            when_all_vector_sender_type&& s, Receiver&& receiver)
         {
             return operation_state<Receiver>(
                 HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.senders));
         }
 
         template <typename Receiver>
-        friend auto tag_invoke(
-            hpxexec::connect_t, when_all_vector_sender_type& s, Receiver&& receiver)
+        friend auto tag_invoke(hpxexec::connect_t,
+            when_all_vector_sender_type& s, Receiver&& receiver)
         {
             return operation_state<Receiver>(receiver, s.senders);
         }

@@ -356,7 +356,8 @@ namespace hpx::execution::experimental {
         // clang-format on
         friend auto tag_invoke(make_future_t,
 #if defined(HPX_HAVE_STDEXEC)
-            decltype(std::declval<hpxexec::run_loop>().get_scheduler()) const& sched,
+            decltype(std::declval<hpxexec::run_loop>().get_scheduler())
+                const& sched,
 #else
             hpxexec::run_loop_scheduler const& sched,
 #endif
