@@ -87,20 +87,12 @@ namespace hpx::util {
                         throw std::bad_alloc();
                     }
                 }
-
-                ++allocated;
                 return p;
             }
 
             void deallocate(pointer p, size_type n) noexcept
             {
                 data.push(std::make_pair(p, n));
-                if (++deallocated > 2 * (allocated + 16))
-                {
-                    clear_cache();
-                    allocated = 0;
-                    deallocated = 0;
-                }
             }
 
         private:
@@ -115,8 +107,6 @@ namespace hpx::util {
 
             HPX_NO_UNIQUE_ADDRESS Allocator alloc;
             Stack<std::pair<T*, size_type>, Allocator> data;
-            std::size_t allocated = 0;
-            std::size_t deallocated = 0;
         };
 
         allocated_cache& cache()
