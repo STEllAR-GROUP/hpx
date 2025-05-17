@@ -36,17 +36,24 @@ namespace hpx::experimental {
         decltype(auto) run_on_all(
             ExPolicy&& policy, F&& f, Reductions&&... reductions)
         {
+            // force using index_queue scheduler with given amount of threads
+            hpx::threads::thread_schedule_hint hint;
+            hint.sharing_mode(
+                hpx::threads::thread_sharing_hint::do_not_share_function);
+
+            auto cores =
+                hpx::execution::experimental::processing_units_count(policy);
+
             // Create executor with proper configuration
             auto exec =
                 hpx::execution::experimental::with_processing_units_count(
                     hpx::execution::parallel_executor(
                         hpx::threads::thread_priority::bound,
-                        hpx::threads::thread_stacksize::default_),
-                    hpx::execution::experimental::processing_units_count(
-                        policy.executor()));
+                        hpx::threads::thread_stacksize::default_, hint),
+                    cores);
 
-            auto cores =
-                hpx::execution::experimental::processing_units_count(exec);
+            // ensure scheduling is done using the index_queue
+            exec.set_hierarchical_threshold(0);
 
             // Execute based on policy type
             if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
@@ -56,6 +63,9 @@ namespace hpx::experimental {
                     std::make_tuple(HPX_FORWARD(Reductions, reductions)...);
                 auto sp = std::make_shared<decltype(all_reductions)>(
                     HPX_MOVE(all_reductions));
+
+                std::apply(
+                    [&](auto&... r) { (r.init_iteration(0, 0), ...); }, *sp);
 
                 // Create a lambda that captures all reductions
                 auto task = [sp, f = HPX_FORWARD(F, f)](std::size_t) {
@@ -79,6 +89,9 @@ namespace hpx::experimental {
                 // Initialize all reductions
                 auto&& all_reductions = std::forward_as_tuple(
                     HPX_FORWARD(Reductions, reductions)...);
+
+                std::apply([](auto&... r) { (r.init_iteration(0, 0), ...); },
+                    all_reductions);
 
                 // Create a lambda that captures all reductions
                 auto task = [&all_reductions, &f](std::size_t) {
