@@ -11,6 +11,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/queries/get_scheduler.hpp>
@@ -19,10 +20,14 @@
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/modules/topology.hpp>
+#include <hpx/synchronization/stop_token.hpp>
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/register_thread.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#endif
 
 #include <cstddef>
 #include <exception>
@@ -364,20 +369,6 @@ namespace hpx::execution::experimental {
             }
         }
 
-        friend constexpr sender<thread_pool_policy_scheduler> tag_invoke(
-            hpx::execution::experimental::schedule_t,
-            thread_pool_policy_scheduler&& sched)
-        {
-            return {HPX_MOVE(sched)};
-        }
-
-        friend constexpr sender<thread_pool_policy_scheduler> tag_invoke(
-            hpx::execution::experimental::schedule_t,
-            thread_pool_policy_scheduler const& sched)
-        {
-            return {sched};
-        }
-
         void policy(Policy policy) noexcept
         {
             policy_ = HPX_MOVE(policy);
@@ -386,6 +377,276 @@ namespace hpx::execution::experimental {
         constexpr Policy const& policy() const noexcept
         {
             return policy_;
+        }
+        /// \endcond
+
+        // New additions for parallel_scheduler functionality
+        /// \cond NOINTERNAL
+        // Alias for sender to act as parallel_sender
+        template <typename Scheduler>
+        struct parallel_sender : public sender<Scheduler>
+        {
+            using sender_concept = hpx::execution::experimental::sender_t;
+
+            explicit parallel_sender(Scheduler scheduler) noexcept
+              : sender<Scheduler>{scheduler}
+            {
+            }
+
+#ifdef HPX_HAVE_STDEXEC
+            template <typename Func>
+            auto then(Func&& func) &&
+            {
+                return then_sender<parallel_sender, std::decay_t<Func>>{
+                    std::move(*this), std::forward<Func>(func)};
+            }
+
+            template <typename Func>
+            auto then(Func&& func) const&
+            {
+                return then_sender<parallel_sender, std::decay_t<Func>>{
+                    *this, std::forward<Func>(func)};
+            }
+#else
+            template <typename Func>
+            auto then(Func&&) &&
+            {
+                throw std::runtime_error("stdexec not enabled");
+            }
+
+            template <typename Func>
+            auto then(Func&&) const&
+            {
+                throw std::runtime_error("stdexec not enabled");
+            }
+#endif
+        };
+
+        // Wrapper for receiver to handle then() functionality
+        template <typename Receiver, typename Func>
+        struct wrapped_receiver
+        {
+            Receiver receiver_;
+            Func func_;
+
+            wrapped_receiver(Receiver&& receiver, Func&& func)
+              : receiver_(std::move(receiver))
+              , func_(std::move(func))
+            {
+            }
+
+#ifdef HPX_HAVE_STDEXEC
+            void set_value() &&
+            {
+                try
+                {
+                    func_();
+                    std::move(receiver_).set_value();
+                }
+                catch (...)
+                {
+                    std::move(receiver_).set_error(std::current_exception());
+                }
+            }
+
+            void set_error(std::exception_ptr ep) && noexcept
+            {
+                std::move(receiver_).set_error(ep);
+            }
+
+            void set_stopped() && noexcept
+            {
+                std::move(receiver_).set_stopped();
+            }
+#else
+            void set_value() &&
+            {
+                throw std::runtime_error("stdexec not enabled");
+            }
+
+            void set_error(std::exception_ptr) && noexcept
+            {
+                throw std::runtime_error("stdexec not enabled");
+            }
+
+            void set_stopped() && noexcept
+            {
+                throw std::runtime_error("stdexec not enabled");
+            }
+#endif
+        };
+
+        // then_sender for chaining computations
+        template <typename Sender, typename Func>
+        struct then_sender
+        {
+            using sender_concept = hpx::execution::experimental::sender_t;
+
+            Sender sender_;
+            Func func_;
+
+            then_sender(Sender&& sender, Func&& func)
+              : sender_(std::move(sender))
+              , func_(std::move(func))
+            {
+            }
+
+#ifdef HPX_HAVE_STDEXEC
+            auto get_env() const noexcept
+            {
+                return hpx::execution::experimental::get_env(sender_);
+            }
+
+            template <typename Receiver>
+            struct operation_state
+            {
+                using wrapped_receiver_t = wrapped_receiver<Receiver, Func>;
+                using wrapped_op_state_t =
+                    decltype(hpx::execution::experimental::connect(
+                        std::declval<Sender&&>(),
+                        std::declval<wrapped_receiver_t&&>()));
+
+                wrapped_op_state_t wrapped_op_;
+
+                operation_state(
+                    Sender&& sender, Func&& func, Receiver&& receiver)
+                  : wrapped_op_(
+                        hpx::execution::experimental::connect(std::move(sender),
+                            wrapped_receiver_t{
+                                std::move(receiver), std::move(func)}))
+                {
+                }
+
+                void start() noexcept
+                {
+                    hpx::execution::experimental::start(wrapped_op_);
+                }
+            };
+
+            template <typename Receiver>
+            auto connect(Receiver&& receiver) &&
+            {
+                return operation_state<Receiver>{std::move(sender_),
+                    std::move(func_), std::forward<Receiver>(receiver)};
+            }
+
+            template <typename Receiver>
+            auto connect(Receiver&& receiver) const&
+            {
+                return operation_state<Receiver>{
+                    sender_, func_, std::forward<Receiver>(receiver)};
+            }
+#else
+            auto get_env() const noexcept
+            {
+                throw std::runtime_error("stdexec not enabled");
+            }
+
+            template <typename Receiver>
+            auto connect(Receiver&&) &&
+            {
+                throw std::runtime_error("stdexec not enabled");
+            }
+
+            template <typename Receiver>
+            auto connect(Receiver&&) const&
+            {
+                throw std::runtime_error("stdexec not enabled");
+            }
+#endif
+        };
+
+        // Schedule returns parallel_sender
+        friend constexpr parallel_sender<thread_pool_policy_scheduler>
+        tag_invoke(hpx::execution::experimental::schedule_t,
+            thread_pool_policy_scheduler&& sched)
+        {
+#ifdef HPX_HAVE_STDEXEC
+            return parallel_sender<thread_pool_policy_scheduler>{
+                HPX_MOVE(sched)};
+#else
+            throw std::runtime_error("stdexec not enabled");
+#endif
+        }
+
+        friend constexpr parallel_sender<thread_pool_policy_scheduler>
+        tag_invoke(hpx::execution::experimental::schedule_t,
+            thread_pool_policy_scheduler const& sched)
+        {
+#ifdef HPX_HAVE_STDEXEC
+            return parallel_sender<thread_pool_policy_scheduler>{sched};
+#else
+            throw std::runtime_error("stdexec not enabled");
+#endif
+        }
+
+        // Extend operation_state to check stop token
+        template <typename Scheduler, typename Receiver>
+        struct parallel_operation_state
+        {
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
+
+            template <typename Scheduler_, typename Receiver_>
+            parallel_operation_state(
+                Scheduler_&& scheduler, Receiver_&& receiver)
+              : scheduler(HPX_FORWARD(Scheduler_, scheduler))
+              , receiver(HPX_FORWARD(Receiver_, receiver))
+            {
+            }
+
+            parallel_operation_state(parallel_operation_state&&) = delete;
+            parallel_operation_state(parallel_operation_state const&) = delete;
+            parallel_operation_state& operator=(
+                parallel_operation_state&&) = delete;
+            parallel_operation_state& operator=(
+                parallel_operation_state const&) = delete;
+
+            ~parallel_operation_state() = default;
+
+            friend void tag_invoke(
+                start_t, parallel_operation_state& os) noexcept
+            {
+#ifdef HPX_HAVE_STDEXEC
+                auto stop_token = hpx::execution::experimental::get_stop_token(
+                    hpx::execution::experimental::get_env(os.receiver));
+                if (stop_token.stop_requested())
+                {
+                    hpx::execution::experimental::set_stopped(
+                        HPX_MOVE(os.receiver));
+                    return;
+                }
+#endif
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() {
+                        os.scheduler.execute(
+                            [receiver = HPX_MOVE(os.receiver)]() mutable {
+                                hpx::execution::experimental::set_value(
+                                    HPX_MOVE(receiver));
+                            });
+                    },
+                    [&](std::exception_ptr ep) {
+                        hpx::execution::experimental::set_error(
+                            HPX_MOVE(os.receiver), HPX_MOVE(ep));
+                    });
+            }
+        };
+
+        // Connect for parallel_sender
+        template <typename Receiver>
+        friend parallel_operation_state<thread_pool_policy_scheduler, Receiver>
+        tag_invoke(connect_t, parallel_sender<thread_pool_policy_scheduler>&& s,
+            Receiver&& receiver)
+        {
+            return {HPX_MOVE(s.scheduler), HPX_FORWARD(Receiver, receiver)};
+        }
+
+        template <typename Receiver>
+        friend parallel_operation_state<thread_pool_policy_scheduler, Receiver>
+        tag_invoke(connect_t, parallel_sender<thread_pool_policy_scheduler>& s,
+            Receiver&& receiver)
+        {
+            return {s.scheduler, HPX_FORWARD(Receiver, receiver)};
         }
         /// \endcond
 
