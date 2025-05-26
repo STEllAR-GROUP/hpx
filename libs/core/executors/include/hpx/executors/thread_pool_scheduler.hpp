@@ -21,12 +21,12 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/synchronization/stop_token.hpp>
-#ifdef HPX_HAVE_STDEXEC
-#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/register_thread.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_forward.hpp>
 #endif
 
 #include <cstddef>
@@ -280,7 +280,7 @@ namespace hpx::execution::experimental {
         struct sender
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
-#if defined(HPX_HAVE_STDEXEC)
+#ifdef HPX_HAVE_STDEXEC
             using sender_concept = hpx::execution::experimental::sender_t;
 #endif
             using completion_signatures =
@@ -308,7 +308,7 @@ namespace hpx::execution::experimental {
             {
                 return {s.scheduler, HPX_FORWARD(Receiver, receiver)};
             }
-#if defined(HPX_HAVE_STDEXEC)
+#ifdef HPX_HAVE_STDEXEC
             struct env
             {
                 std::decay_t<Scheduler> const& sched;
@@ -386,7 +386,9 @@ namespace hpx::execution::experimental {
         template <typename Scheduler>
         struct parallel_sender : public sender<Scheduler>
         {
+#ifdef HPX_HAVE_STDEXEC
             using sender_concept = hpx::execution::experimental::sender_t;
+#endif
 
             explicit parallel_sender(Scheduler scheduler) noexcept
               : sender<Scheduler>{scheduler}
@@ -480,7 +482,9 @@ namespace hpx::execution::experimental {
         template <typename Sender, typename Func>
         struct then_sender
         {
+#ifdef HPX_HAVE_STDEXEC
             using sender_concept = hpx::execution::experimental::sender_t;
+#endif
 
             Sender sender_;
             Func func_;
@@ -559,7 +563,7 @@ namespace hpx::execution::experimental {
         // Schedule returns parallel_sender
         friend constexpr parallel_sender<thread_pool_policy_scheduler>
         tag_invoke(hpx::execution::experimental::schedule_t,
-            thread_pool_policy_scheduler&& sched)
+            [[maybe_unused]] thread_pool_policy_scheduler&& sched)
         {
 #ifdef HPX_HAVE_STDEXEC
             return parallel_sender<thread_pool_policy_scheduler>{
@@ -571,7 +575,7 @@ namespace hpx::execution::experimental {
 
         friend constexpr parallel_sender<thread_pool_policy_scheduler>
         tag_invoke(hpx::execution::experimental::schedule_t,
-            thread_pool_policy_scheduler const& sched)
+            [[maybe_unused]] thread_pool_policy_scheduler const& sched)
         {
 #ifdef HPX_HAVE_STDEXEC
             return parallel_sender<thread_pool_policy_scheduler>{sched};
