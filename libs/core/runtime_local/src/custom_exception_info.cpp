@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -66,6 +66,20 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // Extract the diagnostic information embedded in the given exception and
     // return a string holding a formatted message.
+    std::string default_diagnostic_information(std::exception_ptr const& e)
+    {
+        try
+        {
+            if (e)
+                std::rethrow_exception(e);
+        }
+        catch (std::exception const& ex)
+        {
+            return {ex.what()};
+        }
+        return {"<unknown>"};
+    }
+
     std::string diagnostic_information(hpx::exception_info const& xi)
     {
         int const verbosity = util::from_string<int>(
@@ -173,7 +187,7 @@ namespace hpx::util {
 
     // This is a local helper used to get the backtrace on a new stack if
     // possible.
-    std::string trace_on_new_stack(
+    static std::string trace_on_new_stack(
         std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)
     {
 #if defined(HPX_HAVE_STACKTRACES)
@@ -342,7 +356,7 @@ namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     //  Figure out the size of the given environment
-    inline std::size_t get_arraylen(char** array)
+    static std::size_t get_arraylen(char** array)
     {
         std::size_t count = 0;
         if (nullptr != array)

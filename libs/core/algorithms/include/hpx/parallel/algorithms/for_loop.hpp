@@ -182,7 +182,7 @@ namespace hpx { namespace experimental {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename... Args>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy> for_loop(
+    <unspecified> for_loop(
         ExPolicy&& policy, std::decay_t<I> first, I last, Args&&... args);
 
     /// The for_loop_strided implements loop functionality over a range
@@ -366,9 +366,8 @@ namespace hpx { namespace experimental {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename S, typename... Args>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy> for_loop_strided(
-        ExPolicy&& policy, std::decay_t<I> first, I last, S stride,
-        Args&&... args);
+    <unspecified> for_loop_strided(ExPolicy&& policy, std::decay_t<I> first,
+        I last, S stride, Args&&... args);
 
     /// The for_loop_n implements loop functionality over a range specified by
     /// integral or iterator bounds. For the iterator case, these algorithms
@@ -542,7 +541,7 @@ namespace hpx { namespace experimental {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename I, typename Size, typename... Args>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy> for_loop_n(
+    <unspecified> for_loop_n(
         ExPolicy&& policy, I first, Size size, Args&&... args);
 
     /// The for_loop_n_strided implements loop functionality over a range
@@ -730,8 +729,7 @@ namespace hpx { namespace experimental {
     ///
     template <typename ExPolicy, typename I, typename Size, typename S,
         typename... Args>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
-    for_loop_n_strided(
+    <unspecified> for_loop_n_strided(
         ExPolicy&& policy, I first, Size size, S stride, Args&&... args);
 }}    // namespace hpx::experimental
 
@@ -880,23 +878,31 @@ namespace hpx::parallel {
                 }
                 else
                 {
-                    while (part_steps >= static_cast<std::size_t>(-stride_))
+                    // Silence unary minus warning for unsigned types
+                    if constexpr (std::is_signed_v<S>)
                     {
-                        detail::invoke_iteration(
-                            args_, pack, f_, part_begin, current_thread);
+                        while (part_steps >= static_cast<std::size_t>(-stride_))
+                        {
+                            detail::invoke_iteration(
+                                args_, pack, f_, part_begin, current_thread);
 
-                        part_begin =
-                            parallel::detail::next(part_begin, stride_);
-                        part_steps += stride_;
+                            part_begin =
+                                parallel::detail::next(part_begin, stride_);
+                            part_steps += stride_;
 
-                        detail::next_iteration(args_, pack, current_thread);
+                            detail::next_iteration(args_, pack, current_thread);
+                        }
+
+                        if (part_steps != 0)
+                        {
+                            detail::invoke_iteration(
+                                args_, pack, f_, part_begin, current_thread);
+                            detail::next_iteration(args_, pack, current_thread);
+                        }
                     }
-
-                    if (part_steps != 0)
+                    else
                     {
-                        detail::invoke_iteration(
-                            args_, pack, f_, part_begin, current_thread);
-                        detail::next_iteration(args_, pack, current_thread);
+                        HPX_UNREACHABLE;
                     }
                 }
             }
@@ -978,18 +984,26 @@ namespace hpx::parallel {
                 }
                 else
                 {
-                    while (part_steps >= static_cast<std::size_t>(-stride_))
+                    // Silence unary minus warning for unsigned types
+                    if constexpr (std::is_signed_v<S>)
                     {
-                        HPX_INVOKE(f_, part_begin);
+                        while (part_steps >= static_cast<std::size_t>(-stride_))
+                        {
+                            HPX_INVOKE(f_, part_begin);
 
-                        part_begin =
-                            parallel::detail::next(part_begin, stride_);
-                        part_steps += stride_;
+                            part_begin =
+                                parallel::detail::next(part_begin, stride_);
+                            part_steps += stride_;
+                        }
+
+                        if (part_steps != 0)
+                        {
+                            HPX_INVOKE(f_, part_begin);
+                        }
                     }
-
-                    if (part_steps != 0)
+                    else
                     {
-                        HPX_INVOKE(f_, part_begin);
+                        HPX_UNREACHABLE;
                     }
                 }
             }
@@ -1222,7 +1236,7 @@ namespace hpx::parallel {
                     // any of the induction or reduction operations prevent us
                     // from sharing the part_iteration between threads
                     decltype(auto) hinted_policy =
-                        parallel::util::adapt_sharing_mode(
+                        hpx::execution::experimental::adapt_sharing_mode(
                             HPX_FORWARD(ExPolicy, policy),
                             hpx::threads::thread_sharing_hint::
                                 do_not_share_function);
@@ -1424,7 +1438,7 @@ namespace hpx::parallel {
                     // any of the induction or reduction operations prevent us
                     // from sharing the part_iteration between threads
                     decltype(auto) hinted_policy =
-                        parallel::util::adapt_sharing_mode(
+                        hpx::execution::experimental::adapt_sharing_mode(
                             HPX_FORWARD(ExPolicy, policy),
                             hpx::threads::thread_sharing_hint::
                                 do_not_share_function);

@@ -56,9 +56,10 @@ namespace hpx::parallel { namespace detail {
                 return util::detail::algorithm_result<ExPolicy, bool>::get(
                     false);
 
-            decltype(auto) policy = parallel::util::adapt_placement_mode(
-                HPX_FORWARD(ExPolicy, orgpolicy),
-                hpx::threads::thread_placement_hint::breadth_first);
+            decltype(auto) policy =
+                hpx::execution::experimental::adapt_placement_mode(
+                    HPX_FORWARD(ExPolicy, orgpolicy),
+                    hpx::threads::thread_placement_hint::breadth_first);
 
             using policy_type = std::decay_t<decltype(policy)>;
             util::cancellation_token<> tok;

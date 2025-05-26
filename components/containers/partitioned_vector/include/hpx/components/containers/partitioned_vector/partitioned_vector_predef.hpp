@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Anuj R. Sharma
-//  Copyright (c) 2014-2024 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -43,6 +43,10 @@ extern template hpx::partitioned_vector<double,
 extern template hpx::partitioned_vector<double,
     std::vector<double>>::partitioned_vector(size_type, double const&,
     hpx::explicit_container_distribution_policy const&, void*);
+extern template hpx::partitioned_vector<double, std::vector<double>>::
+    partitioned_vector(std::vector<double>::const_iterator,
+        std::vector<double>::const_iterator,
+        hpx::explicit_container_distribution_policy const&, void*);
 
 // partitioned_vector<int>
 HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(int)
@@ -61,6 +65,10 @@ extern template hpx::partitioned_vector<int,
     hpx::explicit_container_distribution_policy const&, void*);
 extern template hpx::partitioned_vector<int,
     std::vector<int>>::partitioned_vector(size_type, int const&,
+    hpx::explicit_container_distribution_policy const&, void*);
+extern template hpx::partitioned_vector<int,
+    std::vector<int>>::partitioned_vector(std::vector<int>::const_iterator,
+    std::vector<int>::const_iterator,
     hpx::explicit_container_distribution_policy const&, void*);
 
 // partitioned_vector<long long>
@@ -85,6 +93,10 @@ extern template hpx::partitioned_vector<long long,
 extern template hpx::partitioned_vector<long long,
     std::vector<long long>>::partitioned_vector(size_type, long long const&,
     hpx::explicit_container_distribution_policy const&, void*);
+extern template hpx::partitioned_vector<long long, std::vector<long long>>::
+    partitioned_vector(std::vector<long long>::const_iterator,
+        std::vector<long long>::const_iterator,
+        hpx::explicit_container_distribution_policy const&, void*);
 
 // partitioned_vector<std::string>
 using partitioned_vector_std_string_argument = std::string;
@@ -110,5 +122,9 @@ extern template hpx::partitioned_vector<std::string,
 extern template hpx::partitioned_vector<std::string,
     std::vector<std::string>>::partitioned_vector(size_type, std::string const&,
     hpx::explicit_container_distribution_policy const&, void*);
+extern template hpx::partitioned_vector<std::string, std::vector<std::string>>::
+    partitioned_vector(std::vector<std::string>::const_iterator,
+        std::vector<std::string>::const_iterator,
+        hpx::explicit_container_distribution_policy const&, void*);
 
 #endif

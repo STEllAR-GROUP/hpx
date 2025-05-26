@@ -1,9 +1,14 @@
 //  Copyright (c) 2021 Srinivas Yadav
-//  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <hpx/config.hpp>
+
+// CLang V19.1.1 ICE's while compiling this file
+#if !defined(HPX_CLANG_VERSION) || HPX_CLANG_VERSION != 190101
 
 #include <hpx/datapar.hpp>
 #include <hpx/init.hpp>
@@ -71,3 +76,12 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
+
+#else
+
+int main()
+{
+    return 0;
+}
+
+#endif

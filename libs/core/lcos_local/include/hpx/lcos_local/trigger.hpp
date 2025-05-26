@@ -55,7 +55,7 @@ namespace hpx::lcos::local {
           , generation_(rhs.generation_)
           , conditions_(HPX_MOVE(rhs.conditions_))
         {
-            rhs.generation_ = std::size_t(-1);
+            rhs.generation_ = static_cast<std::size_t>(-1);
         }
 
         base_trigger& operator=(base_trigger&& rhs) noexcept
@@ -66,7 +66,7 @@ namespace hpx::lcos::local {
                 mtx_ = mutex_type();
                 promise_ = HPX_MOVE(rhs.promise_);
                 generation_ = rhs.generation_;
-                rhs.generation_ = std::size_t(-1);
+                rhs.generation_ = static_cast<std::size_t>(-1);
                 conditions_ = HPX_MOVE(rhs.conditions_);
             }
             return *this;
@@ -77,8 +77,8 @@ namespace hpx::lcos::local {
         {
             bool triggered = false;
             error_code rc(throwmode::lightweight);
-            condition_list_entry* next = nullptr;
-            for (auto* c = conditions_.front(); c != nullptr; c = next)
+            condition_list_entry* next = conditions_.front();
+            for (auto* c = next; c != nullptr; c = next)
             {
                 // item me be deleted during processing
                 next = c->next;
@@ -99,7 +99,7 @@ namespace hpx::lcos::local {
         {
             std::lock_guard<mutex_type> l(mtx_);
 
-            HPX_ASSERT(generation_ != std::size_t(-1));
+            HPX_ASSERT(generation_ != static_cast<std::size_t>(-1));
             ++generation_;
 
             trigger_conditions(ec);    // re-check/trigger condition, if needed
@@ -123,7 +123,7 @@ namespace hpx::lcos::local {
                 ec = make_success_code();
 
             promise_.set_value();    // fire event
-            promise_ = promise<void>();
+            promise_ = hpx::promise<void>();
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -132,9 +132,9 @@ namespace hpx::lcos::local {
         }
 
     private:
-        bool test_condition(std::size_t generation_value) noexcept
+        bool test_condition(std::size_t const generation_value) const noexcept
         {
-            return !(generation_value > generation_);
+            return generation_value <= generation_;
         }
 
         struct manage_condition
@@ -212,7 +212,7 @@ namespace hpx::lcos::local {
         std::size_t next_generation()
         {
             std::lock_guard<mutex_type> l(mtx_);
-            HPX_ASSERT(generation_ != std::size_t(-1));
+            HPX_ASSERT(generation_ != static_cast<std::size_t>(-1));
             std::size_t retval = ++generation_;
 
             trigger_conditions();    // re-check/trigger condition, if needed

@@ -41,9 +41,25 @@ namespace hpx::collectives {
     {
     }
 
+    channel_communicator::channel_communicator(hpx::launch::sync_policy policy,
+        char const* basename, num_sites_arg num_sites, this_site_arg this_site,
+        components::client<detail::channel_communicator_server>&& here)
+      : comm_(std::make_shared<detail::channel_communicator>(policy, basename,
+            num_sites.argument_, this_site.argument_, HPX_MOVE(here)))
+    {
+    }
+
     void channel_communicator::free()
     {
         comm_.reset();
+    }
+
+    std::pair<num_sites_arg, this_site_arg> channel_communicator::get_info()
+        const noexcept
+    {
+        auto [num_localities, this_locality] = comm_->get_info();
+        return std::make_pair(
+            num_sites_arg(num_localities), this_site_arg(this_locality));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -87,11 +103,42 @@ namespace hpx::collectives {
             });
     }
 
-    channel_communicator create_channel_communicator(hpx::launch::sync_policy,
-        char const* basename, num_sites_arg num_sites, this_site_arg this_site)
+    channel_communicator create_channel_communicator(
+        hpx::launch::sync_policy policy, char const* basename,
+        num_sites_arg num_sites, this_site_arg this_site)
     {
-        return create_channel_communicator(basename, num_sites, this_site)
-            .get();
+        if (num_sites == static_cast<std::size_t>(-1))
+        {
+            num_sites = agas::get_num_localities(hpx::launch::sync);
+        }
+        if (this_site == static_cast<std::size_t>(-1))
+        {
+            this_site = agas::get_locality_id();
+        }
+
+        HPX_ASSERT(this_site < num_sites);
+
+        using client_type =
+            hpx::components::client<detail::channel_communicator_server>;
+
+        // create a new communicator on each locality
+        client_type c = hpx::local_new<client_type>(num_sites.argument_);
+
+        // register the communicator's id using the given basename,
+        // this keeps the communicator alive
+        auto f = c.register_as(
+            hpx::detail::name_from_basename(basename, this_site.argument_));
+
+        if (bool const result = f.get(); !result)
+        {
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::collectives::detail::create_channel_communicator",
+                "the given base name for the communicator operation "
+                "was already registered: {}",
+                c.registered_name());
+        }
+
+        return {policy, basename, num_sites, this_site, HPX_MOVE(c)};
     }
 
     ///////////////////////////////////////////////////////////////////////////

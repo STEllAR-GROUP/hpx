@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -94,24 +94,27 @@ void test_multi_use_set_first()
     for (std::size_t j = 0; j != 10; ++j)
     {
         // for each site, create new channel_communicator
-        std::vector<hpx::collectives::channel_communicator> comms;
-        comms.reserve(NUM_CHANNEL_COMMUNICATOR_SITES);
+        std::vector<hpx::future<hpx::collectives::channel_communicator>>
+            comm_fs;
+        comm_fs.reserve(NUM_CHANNEL_COMMUNICATOR_SITES);
 
         for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
         {
-            comms.push_back(create_channel_communicator(hpx::launch::sync,
-                channel_communicator_basename,
-                num_sites_arg(NUM_CHANNEL_COMMUNICATOR_SITES),
-                this_site_arg(i)));
+            comm_fs.push_back(
+                create_channel_communicator(channel_communicator_basename,
+                    num_sites_arg(NUM_CHANNEL_COMMUNICATOR_SITES),
+                    this_site_arg(i)));
         }
+
+        hpx::wait_all(comm_fs);
 
         std::vector<hpx::future<void>> tasks;
         tasks.reserve(NUM_CHANNEL_COMMUNICATOR_SITES);
 
         for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
         {
-            tasks.push_back(hpx::async(
-                test_channel_communicator_set_first_comm, i, comms[i], j));
+            tasks.push_back(hpx::async(test_channel_communicator_set_first_comm,
+                i, comm_fs[i].get(), j));
         }
 
         hpx::wait_all(tasks);
@@ -189,24 +192,27 @@ void test_multi_use_get_first()
     for (std::size_t j = 0; j != 10; ++j)
     {
         // for each site, create new channel_communicator
-        std::vector<hpx::collectives::channel_communicator> comms;
-        comms.reserve(NUM_CHANNEL_COMMUNICATOR_SITES);
+        std::vector<hpx::future<hpx::collectives::channel_communicator>>
+            comm_fs;
+        comm_fs.reserve(NUM_CHANNEL_COMMUNICATOR_SITES);
 
         for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
         {
-            comms.push_back(create_channel_communicator(hpx::launch::sync,
-                channel_communicator_basename,
-                num_sites_arg(NUM_CHANNEL_COMMUNICATOR_SITES),
-                this_site_arg(i)));
+            comm_fs.push_back(
+                create_channel_communicator(channel_communicator_basename,
+                    num_sites_arg(NUM_CHANNEL_COMMUNICATOR_SITES),
+                    this_site_arg(i)));
         }
+
+        hpx::wait_all(comm_fs);
 
         std::vector<hpx::future<void>> tasks;
         tasks.reserve(NUM_CHANNEL_COMMUNICATOR_SITES);
 
         for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
         {
-            tasks.push_back(hpx::async(
-                test_channel_communicator_get_first_comm, i, comms[i], j));
+            tasks.push_back(hpx::async(test_channel_communicator_get_first_comm,
+                i, comm_fs[i].get(), j));
         }
 
         hpx::wait_all(tasks);

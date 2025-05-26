@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,55 +18,59 @@
 #include <hpx/threading_base/threading_base_fwd.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 #include <utility>
 
 namespace hpx::threads::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_result_type set_active_state(thread_id_ref_type thrd,
-        thread_schedule_state newstate, thread_restart_state newstate_ex,
-        thread_priority priority, thread_state previous_state)
-    {
-        if (HPX_UNLIKELY(!thrd))
-        {
-            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
-                "threads::detail::set_active_state",
-                "null thread id encountered");
-        }
+    namespace {
 
-        // make sure that the thread has not been suspended and set active again
-        // in the meantime
-        thread_state const current_state =
-            get_thread_id_data(thrd)->get_state();
-
-        if (current_state.state() == previous_state.state() &&
-            current_state != previous_state)
+        thread_result_type set_active_state(thread_id_ref_type const& thrd,
+            thread_schedule_state const newstate,
+            thread_restart_state const newstate_ex,
+            thread_priority const priority, thread_state const previous_state,
+            thread_schedule_hint const schedulehint)
         {
-            LTM_(warning).format(
-                "set_active_state: thread is still active, however it was "
-                "non-active since the original set_state request was issued, "
-                "aborting state change, thread({}), description({}), new "
-                "state({})",
-                thrd, get_thread_id_data(thrd)->get_description(),
-                get_thread_state_name(newstate));
+            if (HPX_UNLIKELY(!thrd))
+            {
+                HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
+                    "threads::detail::set_active_state",
+                    "null thread id encountered");
+            }
+
+            // make sure that the thread has not been suspended and set active
+            // again in the meantime
+            thread_state const current_state =
+                get_thread_id_data(thrd)->get_state();
+
+            if (current_state.state() == previous_state.state() &&
+                current_state != previous_state)
+            {
+                LTM_(warning).format(
+                    "set_active_state: thread is still active, however it was "
+                    "non-active since the original set_state request was "
+                    "issued, aborting state change, thread({}), "
+                    "description({}), new state({})",
+                    thrd, get_thread_id_data(thrd)->get_description(),
+                    get_thread_state_name(newstate));
+                return {thread_schedule_state::terminated, invalid_thread_id};
+            }
+
+            // Just retry, set_state will create new thread if target is still
+            // active.
+            error_code ec(throwmode::lightweight);    // do not throw
+            detail::set_thread_state(thrd.noref(), newstate, newstate_ex,
+                priority, schedulehint, true, ec);
+
             return {thread_schedule_state::terminated, invalid_thread_id};
         }
-
-        // just retry, set_state will create new thread if target is still active
-        error_code ec(throwmode::lightweight);    // do not throw
-        detail::set_thread_state(thrd.noref(), newstate, newstate_ex, priority,
-            thread_schedule_hint(), true, ec);
-
-        return {thread_schedule_state::terminated, invalid_thread_id};
-    }
-
-    namespace {
 
         thread_state reschedule_active(thread_id_type const& thrd,
             thread_schedule_state new_state, thread_restart_state new_state_ex,
             thread_priority priority, thread_state previous_state,
-            error_code& ec)
+            thread_schedule_hint schedulehint, error_code& ec)
         {
             // schedule a new thread to set the state
             LTM_(warning).format(
@@ -78,8 +82,9 @@ namespace hpx::threads::detail {
 
             thread_init_data data(
                 hpx::bind(&set_active_state, thread_id_ref_type(thrd),
-                    new_state, new_state_ex, priority, previous_state),
-                "set state for active thread", priority);
+                    new_state, new_state_ex, priority, previous_state,
+                    schedulehint),
+                "set state for active thread", priority, schedulehint);
 
             create_work(
                 get_thread_id_data(thrd)->get_scheduler_base(), data, ec);
@@ -93,9 +98,10 @@ namespace hpx::threads::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     thread_state set_thread_state(thread_id_type const& thrd,
-        thread_schedule_state new_state, thread_restart_state new_state_ex,
-        thread_priority priority, thread_schedule_hint schedulehint,
-        bool retry_on_active, error_code& ec)
+        thread_schedule_state const new_state,
+        thread_restart_state const new_state_ex, thread_priority const priority,
+        thread_schedule_hint schedulehint, bool const retry_on_active,
+        error_code& ec)
     {
         if (HPX_UNLIKELY(!thrd))
         {
@@ -149,7 +155,7 @@ namespace hpx::threads::detail {
                 if (retry_on_active)
                 {
                     return reschedule_active(thrd, new_state, new_state_ex,
-                        priority, previous_state, ec);
+                        priority, previous_state, schedulehint, ec);
                 }
 
                 hpx::execution_base::this_thread::yield_k(
@@ -259,13 +265,28 @@ namespace hpx::threads::detail {
             (new_state == thread_schedule_state::pending ||
                 new_state == thread_schedule_state::pending_boost))
         {
-            // REVIEW: Passing a specific target thread may interfere with the
-            // round-robin queuing.
-
-            auto const* thrd_data = get_thread_id_data(thrd);
+            auto* thrd_data = get_thread_id_data(thrd);
             auto* scheduler = thrd_data->get_scheduler_base();
-            scheduler->schedule_thread(
-                thrd, schedulehint, false, thrd_data->get_priority());
+            if (auto const current_priority = thrd_data->get_priority();
+                current_priority == thread_priority::bound)
+            {
+                schedulehint.mode = thread_schedule_hint_mode::thread;
+                schedulehint.hint = static_cast<std::int16_t>(
+                    thrd_data->get_last_worker_thread_num());
+                scheduler->schedule_thread(
+                    thrd, schedulehint, false, thread_priority::bound);
+            }
+            else if (priority == thread_priority::bound)
+            {
+                thrd_data->set_priority(thread_priority::bound);
+                scheduler->schedule_thread(
+                    thrd, schedulehint, false, thread_priority::bound);
+            }
+            else
+            {
+                scheduler->schedule_thread(
+                    thrd, schedulehint, false, current_priority);
+            }
 
             // NOTE: Don't care if the hint is a NUMA hint, just want to wake up
             // a thread.

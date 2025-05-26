@@ -35,13 +35,13 @@
 namespace hpx::resource::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    [[noreturn]] void throw_runtime_error(
+    [[noreturn]] static void throw_runtime_error(
         std::string const& func, std::string const& message)
     {
         HPX_THROW_EXCEPTION(hpx::error::invalid_status, func, message);
     }
 
-    [[noreturn]] void throw_invalid_argument(
+    [[noreturn]] static void throw_invalid_argument(
         std::string const& func, std::string const& message)
     {
         HPX_THROW_EXCEPTION(hpx::error::bad_parameter, func, message);
@@ -1008,9 +1008,12 @@ namespace hpx::resource::detail {
     void partitioner::unassign_pu(
         std::string const& pool_name, std::size_t virt_core)
     {
-        std::unique_lock<mutex_type> l(mtx_);
-        detail::init_pool_data& data = get_pool_data(l, pool_name);
-        data.unassign_pu(virt_core);
+        std::unique_lock<mutex_type> l(mtx_, std::defer_lock);
+        if (l.try_lock())
+        {
+            detail::init_pool_data& data = get_pool_data(l, pool_name);
+            data.unassign_pu(virt_core);
+        }
     }
 
     std::size_t partitioner::shrink_pool(std::string const& pool_name,
@@ -1185,7 +1188,7 @@ namespace hpx::resource::detail {
            << static_cast<std::uint64_t>(initial_thread_pools_.size())
            << " pool(s) : \n";    // -V128
 
-        for (auto itp : initial_thread_pools_)
+        for (auto const& itp : initial_thread_pools_)
         {
             itp.print_pool(os);
         }

@@ -36,7 +36,8 @@ namespace hpx { namespace performance_counters {
 
         ~manage_counter_type()
         {
-            uninstall();
+            hpx::error_code ec;
+            uninstall(ec);
         }
 
         counter_status install(error_code& ec = throws)

@@ -175,6 +175,63 @@ namespace hpx::collectives {
             });
     }
 
+    communicator create_communicator(hpx::launch::sync_policy policy,
+        char const* basename, num_sites_arg num_sites, this_site_arg this_site,
+        generation_arg generation, root_site_arg root_site)
+    {
+        if (num_sites == static_cast<std::size_t>(-1))
+        {
+            num_sites = agas::get_num_localities(hpx::launch::sync);
+        }
+        if (this_site == static_cast<std::size_t>(-1))
+        {
+            this_site = agas::get_locality_id();
+            if (root_site == static_cast<std::size_t>(-1))    //-V1051
+            {
+                root_site = this_site;
+            }
+        }
+
+        HPX_ASSERT(this_site < num_sites);
+        HPX_ASSERT(
+            root_site != static_cast<std::size_t>(-1) && root_site < num_sites);
+
+        std::string name(basename);
+        if (generation != static_cast<std::size_t>(-1))
+        {
+            name += std::to_string(generation) + "/";
+        }
+
+        if (this_site == root_site)
+        {
+            // create a new communicator
+            auto c = hpx::local_new<communicator>(num_sites, basename);
+
+            // register the communicator's id using the given basename, this
+            // keeps the communicator alive
+            auto f = c.register_as(
+                hpx::detail::name_from_basename(HPX_MOVE(name), this_site));
+
+            if (bool const result = f.get(); !result)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "hpx::collectives::detail::create_communicator",
+                    "the given base name for the communicator "
+                    "operation was already registered: {}",
+                    c.registered_name());
+            }
+
+            c.set_info(num_sites, this_site, root_site);
+            return c;
+        }
+
+        // find existing communicator
+        auto c = hpx::find_from_basename<communicator>(
+            policy, HPX_MOVE(name), root_site);
+        c.set_info(num_sites, this_site, root_site);
+        return c;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     communicator create_local_communicator(char const* basename,
         num_sites_arg num_sites, this_site_arg this_site,
@@ -230,6 +287,59 @@ namespace hpx::collectives {
             });
     }
 
+    communicator create_local_communicator(hpx::launch::sync_policy policy,
+        char const* basename, num_sites_arg num_sites, this_site_arg this_site,
+        generation_arg generation, root_site_arg root_site)
+    {
+        if (root_site == static_cast<std::size_t>(-1))
+        {
+            root_site = this_site;
+        }
+
+        HPX_ASSERT(this_site < num_sites);
+        HPX_ASSERT(
+            root_site != static_cast<std::size_t>(-1) && root_site < num_sites);
+        HPX_ASSERT(basename != nullptr && basename[0] != '\0');
+
+        // make sure the communicator will be registered in the local AGAS
+        // symbol service instance
+        std::string name = hpx::util::format("/{}{}{}", agas::get_locality_id(),
+            basename[0] == '/' ? "" : "/", basename);
+        if (generation != static_cast<std::size_t>(-1))
+        {
+            name += std::to_string(generation) + "/";
+        }
+
+        if (this_site == root_site)
+        {
+            // create a new communicator
+            auto c = hpx::local_new<communicator>(num_sites, basename);
+
+            // register the communicator's id using the given basename, this
+            // keeps the communicator alive
+            bool const result = c.register_as(hpx::launch::sync,
+                hpx::detail::name_from_basename(HPX_MOVE(name), this_site));
+
+            if (!result)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "hpx::collectives::detail::create_local_communicator",
+                    "the given base name for the communicator operation was "
+                    "already registered: {}",
+                    c.registered_name());
+            }
+
+            c.set_info(num_sites, this_site, root_site);
+            return c;
+        }
+
+        // find existing communicator
+        auto c = hpx::find_from_basename<communicator>(
+            policy, HPX_MOVE(name), root_site);
+        c.set_info(num_sites, this_site, root_site);
+        return c;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Predefined global communicator
     namespace {
@@ -256,8 +366,9 @@ namespace hpx::collectives {
                 num_sites_arg(agas::get_num_localities(hpx::launch::sync));
             auto const this_site = this_site_arg(agas::get_locality_id());
 
-            world_communicator = create_communicator("/0/world_communicator",
-                num_sites, this_site, generation_arg(), root_site_arg(0));
+            world_communicator =
+                create_communicator(hpx::launch::sync, "/0/world_communicator",
+                    num_sites, this_site, generation_arg(), root_site_arg(0));
             world_communicator.set_info(num_sites, this_site, root_site_arg(0));
         }
 
@@ -291,8 +402,8 @@ namespace hpx::collectives {
                     this_site_arg(hpx::get_worker_thread_num());
 
                 local_communicator = collectives::create_local_communicator(
-                    "local_communicator", num_sites, this_site,
-                    generation_arg(), root_site_arg(0));
+                    hpx::launch::sync, "local_communicator", num_sites,
+                    this_site, generation_arg(), root_site_arg(0));
                 local_communicator.set_info(
                     num_sites, this_site, root_site_arg(0));
             }

@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Anuj R. Sharma
-//  Copyright (c) 2014-2024 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -535,6 +535,34 @@ namespace hpx {
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
+    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
+    partitioned_vector<T, Data>::partitioned_vector(
+        typename Data::const_iterator begin, typename Data::const_iterator end)
+      : size_(std::distance(begin, end))
+    {
+        if (size_ != 0)
+        {
+            // create all partitions
+            create(hpx::container_layout);
+
+            // fill partitions with their part of the data
+            std::vector<std::size_t> const empty;
+            std::vector<hpx::future<void>> futures;
+            futures.reserve(partitions_.size());
+            for (std::size_t i = 0; i != partitions_.size(); ++i)
+            {
+                HPX_ASSERT(static_cast<std::size_t>(std::distance(
+                               begin, end)) >= partitions_[i].size_);
+                auto const end_part = std::next(begin, partitions_[i].size_);
+                futures.push_back(set_values(i, empty, Data(begin, end_part)));
+                begin = end_part;
+            }
+            HPX_ASSERT(begin == end);
+            hpx::wait_all(HPX_MOVE(futures));
+        }
+    }
+
+    template <typename T, typename Data /*= std::vector<T> */>
     template <typename DistPolicy>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
     partitioned_vector<T, Data>::partitioned_vector(size_type size,
@@ -549,11 +577,10 @@ namespace hpx {
     template <typename T, typename Data /*= std::vector<T> */>
     template <typename DistPolicy>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
-    partitioned_vector<T, Data>::partitioned_vector(DistPolicy const& policy,
+    partitioned_vector<T, Data>::partitioned_vector(DistPolicy const&,
         std::enable_if_t<traits::is_distribution_policy_v<DistPolicy>>*)
       : size_(0)
     {
-        reserve(policy);
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -567,5 +594,36 @@ namespace hpx {
     {
         if (size != 0)
             create(val, policy);
+    }
+
+    template <typename T, typename Data /*= std::vector<T> */>
+    template <typename DistPolicy>
+    partitioned_vector<T, Data>::partitioned_vector(
+        typename Data::const_iterator begin, typename Data::const_iterator end,
+        DistPolicy const& policy,
+        std::enable_if_t<
+            traits::is_distribution_policy_v<DistPolicy>>* /*= nullptr*/)
+      : size_(std::distance(begin, end))
+    {
+        if (size_ != 0)
+        {
+            // create all partitions
+            create(policy);
+
+            // fill partitions with their part of the data
+            std::vector<std::size_t> const empty;
+            std::vector<hpx::future<void>> futures;
+            futures.reserve(partitions_.size());
+            for (std::size_t i = 0; i != partitions_.size(); ++i)
+            {
+                HPX_ASSERT(static_cast<std::size_t>(std::distance(
+                               begin, end)) >= partitions_[i].size_);
+                auto const end_part = std::next(begin, partitions_[i].size_);
+                futures.push_back(set_values(i, empty, Data(begin, end_part)));
+                begin = end_part;
+            }
+            HPX_ASSERT(begin == end);
+            hpx::wait_all(HPX_MOVE(futures));
+        }
     }
 }    // namespace hpx
