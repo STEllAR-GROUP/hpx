@@ -630,7 +630,6 @@ namespace hpx {
     void runtime::deinit_global_data()
     {
         runtime*& runtime_ = get_runtime_ptr();
-        HPX_ASSERT(runtime_);
         runtime_uptime() = 0;
         runtime_ = nullptr;
     }

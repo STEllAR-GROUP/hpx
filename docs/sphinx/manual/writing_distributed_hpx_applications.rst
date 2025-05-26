@@ -905,7 +905,7 @@ with distribution policies would be::
     HPX_REGISTER_PARTITIONED_VECTOR(double);
 
     std::size_t num_segments = 10;
-    std::vector<hpx::id_type> locs = hpx::find_all_localities()
+    std::vector<hpx::id_type> locs = hpx::find_all_localities();
 
     auto layout =
             hpx::container_layout( num_segments, locs );

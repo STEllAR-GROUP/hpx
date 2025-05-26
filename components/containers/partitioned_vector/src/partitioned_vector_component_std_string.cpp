@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -46,6 +46,11 @@ template HPX_PARTITIONED_VECTOR_EXPORT hpx::partitioned_vector<std::string,
 template HPX_PARTITIONED_VECTOR_EXPORT hpx::partitioned_vector<std::string,
     std::vector<std::string>>::partitioned_vector(size_type, std::string const&,
     hpx::explicit_container_distribution_policy const&, void*);
+template HPX_PARTITIONED_VECTOR_EXPORT
+hpx::partitioned_vector<std::string, std::vector<std::string>>::
+    partitioned_vector(std::vector<std::string>::const_iterator,
+        std::vector<std::string>::const_iterator,
+        hpx::explicit_container_distribution_policy const&, void*);
 
 #if defined(HPX_MSVC)
 #pragma warning(pop)

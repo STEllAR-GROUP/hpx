@@ -548,7 +548,10 @@ namespace hpx {
                     new frame_type(values), false);
                 return frame->wait_all();
             }
-            return false;
+            else
+            {
+                return false;
+            }
         }
 
         template <typename T>

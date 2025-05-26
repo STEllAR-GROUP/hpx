@@ -18,8 +18,10 @@ find_package(PkgConfig QUIET)
 pkg_check_modules(PC_Tbb QUIET libtbb)
 
 find_path(
-  Tbb_INCLUDE_DIR tbb/tbb.h
+  Tbb_INCLUDE_DIR
+  NAMES tbb/tbb.h
   HINTS ${Tbb_ROOT} ENV TBB_ROOT ${PC_Tbb_INCLUDEDIR} ${PC_Tbb_INCLUDE_DIRS}
+  PATHS /usr/include
   PATH_SUFFIXES include
 )
 
@@ -32,18 +34,17 @@ if(Tbb_PLATFORM STREQUAL "mic-knl")
 endif()
 
 find_library(
-  Tbb_PROXY_LIBRARY
+  TBB_LIBRARY
   NAMES tbb libtbb
   HINTS ${Tbb_ROOT} ENV TBB_ROOT ${PC_Tbb_LIBDIR} ${PC_Tbb_LIBRARY_DIRS}
+  PATHS /usr/lib /usr/lib/x86_64-linux-gnu
   PATH_SUFFIXES ${Tbb_PATH_SUFFIX} lib lib64
 )
 
 set(Tbb_LIBRARIES ${Tbb_LIBRARY} ${Tbb_PROXY_LIBRARY})
 set(Tbb_INCLUDE_DIRS ${Tbb_INCLUDE_DIR})
 
-find_package_handle_standard_args(
-  TBBmalloc DEFAULT_MSG Tbb_LIBRARY Tbb_PROXY_LIBRARY Tbb_INCLUDE_DIR
-)
+find_package_handle_standard_args(TBB DEFAULT_MSG TBB_LIBRARY TBB_INCLUDE_DIR)
 
 foreach(v Tbb_ROOT Tbb_PLATFORM)
   get_property(

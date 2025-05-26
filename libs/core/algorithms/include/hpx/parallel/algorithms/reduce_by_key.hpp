@@ -353,7 +353,8 @@ namespace hpx::parallel::detail {
                 // traversal as there is no prev/next for first/last
                 element_type elem0 = *key_first;
                 element_type elem1 = *std::next(key_first);
-                key_state[0] = reduce_key_series_states(true, elem0 != elem1);
+                key_state[0] =
+                    reduce_key_series_states(true, !comp(elem0, elem1));
                 // middle elements
                 reduce_stencil_generate<reduce_stencil_transformer, RanIter,
                     keystate_iter_type, Compare>

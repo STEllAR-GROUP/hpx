@@ -19,7 +19,7 @@
 
 #include <hpx/condition_variable.hpp>
 #include <hpx/functional.hpp>
-#include <hpx/init.hpp>
+#include <hpx/manage_runtime.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/mutex.hpp>
 #include <hpx/thread.hpp>
@@ -66,109 +66,6 @@ char** __argv = *_NSGetArgv();
 
 #endif
 
-class manage_global_runtime_impl
-{
-public:
-    manage_global_runtime_impl()
-      : running_(false)
-      , rts_(nullptr)
-    {
-#if defined(HPX_WINDOWS)
-        hpx::detail::init_winsocket();
-#endif
-
-        std::vector<std::string> const cfg = {
-            // make sure hpx_main is always executed
-            "hpx.run_hpx_main!=1",
-            // allow for unknown command line options
-            "hpx.commandline.allow_unknown!=1",
-            // disable HPX' short options
-            "hpx.commandline.aliasing!=0"};
-
-        using hpx::placeholders::_1;
-        using hpx::placeholders::_2;
-        hpx::function<int(int, char**)> start_function =
-            hpx::bind(&manage_global_runtime_impl::hpx_main, this, _1, _2);
-        hpx::init_params init_args;
-        init_args.cfg = cfg;
-        init_args.mode = hpx::runtime_mode::default_;
-
-        if (!hpx::start(start_function, __argc, __argv, init_args))
-        {
-            // Something went wrong while initializing the runtime.
-            // This early we can't generate any output, just bail out.
-            std::abort();
-        }
-
-        // Wait for the main HPX thread (hpx_main below) to have started running
-        std::unique_lock<std::mutex> lk(startup_mtx_);
-        while (!running_)
-            startup_cond_.wait(lk);
-    }
-
-    ~manage_global_runtime_impl()
-    {
-        // notify hpx_main above to tear down the runtime
-        {
-            std::lock_guard<hpx::spinlock> lk(mtx_);
-            rts_ = nullptr;    // reset pointer
-        }
-
-        cond_.notify_one();    // signal exit
-
-        // wait for the runtime to exit
-        hpx::stop();
-    }
-
-    // registration of external (to HPX) threads
-    void register_thread(char const* name)
-    {
-        hpx::register_thread(rts_, name);
-    }
-    void unregister_thread()
-    {
-        hpx::unregister_thread(rts_);
-    }
-
-protected:
-    // Main HPX thread, does nothing but wait for the application to exit
-    int hpx_main(int, char*[])
-    {
-        // Store a pointer to the runtime here.
-        rts_ = hpx::get_runtime_ptr();
-
-        // Signal to constructor that thread has started running.
-        {
-            std::lock_guard<std::mutex> lk(startup_mtx_);
-            running_ = true;
-        }
-
-        startup_cond_.notify_one();
-
-        // Here other HPX specific functionality could be invoked...
-
-        // Now, wait for destructor to be called.
-        {
-            std::unique_lock<hpx::spinlock> lk(mtx_);
-            if (rts_ != nullptr)
-                cond_.wait(lk);
-        }
-
-        // tell the runtime it's ok to exit
-        return hpx::finalize();
-    }
-
-private:
-    hpx::spinlock mtx_;
-    hpx::condition_variable_any cond_;
-
-    std::mutex startup_mtx_;
-    std::condition_variable startup_cond_;
-    bool running_;
-
-    hpx::runtime* rts_;
-};
-
 // This class demonstrates how to initialize a console instance of HPX
 // (locality 0). In order to create an HPX instance which connects to a running
 // HPX application two changes have to be made:
@@ -189,25 +86,61 @@ private:
 // sequencing of destructors.
 class manage_global_runtime
 {
-    manage_global_runtime_impl& get()
+    struct init
     {
-        static thread_local manage_global_runtime_impl m;
-        return m;
+        hpx::manage_runtime rts;
+
+        init()
+        {
+#if defined(HPX_WINDOWS)
+            hpx::detail::init_winsocket();
+#endif
+
+            hpx::init_params init_args;
+            init_args.cfg = {
+                // make sure hpx_main is always executed
+                "hpx.run_hpx_main!=1",
+                // allow for unknown command line options
+                "hpx.commandline.allow_unknown!=1",
+                // disable HPX' short options
+                "hpx.commandline.aliasing!=0",
+            };
+            init_args.mode = hpx::runtime_mode::default_;
+
+            if (!rts.start(__argc, __argv, init_args))
+            {
+                // Something went wrong while initializing the runtime.
+                // This early we can't generate any output, just bail out.
+                std::abort();
+            }
+        }
+
+        ~init()
+        {
+            // Something went wrong while stopping the runtime. Ignore.
+            (void) rts.stop();
+        }
+    };
+
+    hpx::manage_runtime& get()
+    {
+        static thread_local init m;
+        return m.rts;
     }
 
     hpx::execution_base::agent_base& agent =
         hpx::execution_base::detail::get_default_agent();
-    manage_global_runtime_impl& m = get();
+    hpx::manage_runtime& m = get();
 
 public:
     void register_thread(char const* name)
     {
-        m.register_thread(name);
+        hpx::register_thread(m.get_runtime_ptr(), name);
     }
 
     void unregister_thread()
     {
-        m.unregister_thread();
+        hpx::unregister_thread(m.get_runtime_ptr());
     }
 };
 

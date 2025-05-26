@@ -56,6 +56,14 @@ set(algorithms_headers
     hpx/parallel/algorithms/for_loop.hpp
     hpx/parallel/algorithms/for_loop_induction.hpp
     hpx/parallel/algorithms/for_loop_reduction.hpp
+    hpx/parallel/algorithms/for_loop_reduction_base.hpp
+    hpx/parallel/algorithms/for_loop_reduction_bit_and.hpp
+    hpx/parallel/algorithms/for_loop_reduction_bit_or.hpp
+    hpx/parallel/algorithms/for_loop_reduction_bit_xor.hpp
+    hpx/parallel/algorithms/for_loop_reduction_max.hpp
+    hpx/parallel/algorithms/for_loop_reduction_min.hpp
+    hpx/parallel/algorithms/for_loop_reduction_multiplies.hpp
+    hpx/parallel/algorithms/for_loop_reduction_plus.hpp
     hpx/parallel/algorithms/generate.hpp
     hpx/parallel/algorithms/includes.hpp
     hpx/parallel/algorithms/inclusive_scan.hpp
@@ -182,6 +190,7 @@ set(algorithms_headers
     hpx/parallel/datapar/zip_iterator.hpp
     hpx/parallel/memory.hpp
     hpx/parallel/numeric.hpp
+    hpx/parallel/run_on_all.hpp
     hpx/parallel/spmd_block.hpp
     hpx/parallel/task_block.hpp
     hpx/parallel/task_group.hpp

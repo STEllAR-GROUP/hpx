@@ -1,9 +1,14 @@
-//  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //                2017 Bruno Pitrus
 
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <hpx/config.hpp>
+
+// CLang V19.1.1 ICE's while compiling this file
+#if !defined(HPX_CLANG_VERSION) || HPX_CLANG_VERSION != 190101
 
 #include <hpx/algorithm.hpp>
 #include <hpx/init.hpp>
@@ -28,8 +33,10 @@ void test_any_of_seq(IteratorTag, Proj proj = Proj())
         std::vector<std::size_t> c =
             test::fill_all_any_none(10007, i);    //-V106
 
-        bool result = hpx::ranges::any_of(
-            c, [](std::size_t v) { return v != 0; }, proj);
+        // clang-format off
+        bool result =
+            hpx::ranges::any_of(c, [](std::size_t v) { return v != 0; }, proj);
+        // clang-format on
 
         // verify values
         bool expected = std::any_of(std::begin(c), std::end(c),
@@ -367,7 +374,7 @@ void any_of_bad_alloc_test()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int) std::time(nullptr);
+    unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -390,7 +397,7 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()("seed,s", value<unsigned int>(),
         "the random number generator seed to use for this run");
 
-    // By default this test should run on all available cores
+    // By default, this test should run on all available cores
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
@@ -403,3 +410,12 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
+
+#else
+
+int main()
+{
+    return 0;
+}
+
+#endif

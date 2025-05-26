@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -50,6 +50,11 @@ namespace hpx::threads::policies::detail {
             return num_threads_;
         }
 
+        constexpr bool affinities_disabled() const noexcept
+        {
+            return disable_affinities_;
+        }
+
         mask_type get_pu_mask(
             threads::topology const& topo, std::size_t global_thread_num) const;
 
@@ -90,6 +95,7 @@ namespace hpx::threads::policies::detail {
 
         ///< mask of processing units which have no affinity
         mask_type no_affinity_;
+        bool disable_affinities_;
 
         ///< use the process CPU mask to limit available PUs
         bool use_process_mask_;

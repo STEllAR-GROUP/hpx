@@ -109,6 +109,13 @@ namespace hpx::threads::detail {
                 std::unique_lock<std::mutex> l(mtx);
                 stop_locked(l);
             }
+
+            // avoid problems during fatal exceptions handling
+            for (auto& t : threads_)
+            {
+                if (t.joinable())
+                    t.join();
+            }
             threads_.clear();
         }
     }
@@ -366,16 +373,20 @@ namespace hpx::threads::detail {
     void scheduled_thread_pool<Scheduler>::resume_internal(
         bool blocking, error_code& ec)
     {
+        // clang-format off
         for (std::size_t virt_core = 0; virt_core != threads_.size();
-             ++virt_core)
+            ++virt_core)
+        // clang-format on
         {
             this->sched_->Scheduler::resume(virt_core);
         }
 
         if (blocking)
         {
+            // clang-format off
             for (std::size_t virt_core = 0; virt_core != threads_.size();
-                 ++virt_core)
+                ++virt_core)
+            // clang-format on
             {
                 if (threads_[virt_core].joinable())
                 {

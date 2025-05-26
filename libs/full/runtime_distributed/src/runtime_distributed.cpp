@@ -463,8 +463,7 @@ namespace hpx {
         // start the io pool
         io_pool_->run(false);
         lbt_ << "(1st stage) runtime_distributed::start: started the "
-                "application "
-                "I/O service pool";
+                "application I/O service pool";
 #endif
         // start the thread manager
         thread_manager_->run();
@@ -505,7 +504,9 @@ namespace hpx {
         {
             // wait for at least hpx::state::running
             util::yield_while(
-                [this]() { return get_state() < hpx::state::running; },
+                [this]() {
+                    return !exception_ && get_state() < hpx::state::running;
+                },
                 "runtime_impl::start");
         }
 
@@ -958,6 +959,7 @@ namespace hpx {
     ///        instance
     void runtime_distributed::register_counter_types()
     {
+        // clang-format off
         performance_counters::generic_counter_type_data const
             statistic_counter_types[] =
         {    // averaging counter
@@ -1117,6 +1119,8 @@ namespace hpx {
                 ""}
 #endif
         };
+        // clang-format on
+
         performance_counters::install_counter_types(
             statistic_counter_types, std::size(statistic_counter_types));
 
@@ -1697,7 +1701,6 @@ namespace hpx {
     {
         runtime_distributed*& runtime_distributed_ =
             get_runtime_distributed_ptr();
-        HPX_ASSERT(!runtime_distributed_);
         HPX_ASSERT(nullptr == threads::thread_self::get_self());
         runtime_distributed_ = this;
     }

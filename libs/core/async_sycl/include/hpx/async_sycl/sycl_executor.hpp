@@ -25,8 +25,21 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace hpx::sycl::experimental {
+    namespace detail {
+        /// type trait to identify basic sycl queue args (as in: no sycl indices / callable kernels)
+        /// Required for correct overloading later on
+        template <class T>
+        struct is_basic_queue_arg
+          : std::integral_constant<bool,
+                std::is_scalar<T>::value ||
+                    std::is_same<T, ::sycl::event>::value ||
+                    std::is_same<T, const std::vector<::sycl::event>&>::value>
+        {
+        };
+    }    // namespace detail
 
     struct sycl_executor
     {
@@ -34,8 +47,9 @@ namespace hpx::sycl::experimental {
 
         // --------------------------------------------------------------------
         /// Create a SYCL executor (based on a sycl queue)
-        explicit sycl_executor(cl::sycl::default_selector selector)
-          : command_queue(selector, cl::sycl::property::queue::in_order{})
+        template <typename sycl_device_selector>
+        explicit sycl_executor(const sycl_device_selector& selector)
+          : command_queue(selector, ::sycl::property::queue::in_order{})
         {
         }
 
@@ -54,7 +68,7 @@ namespace hpx::sycl::experimental {
         }
 
         /// Get future for that becomes ready when the given event completes
-        HPX_FORCEINLINE future_type get_future(cl::sycl::event event)
+        HPX_FORCEINLINE future_type get_future(::sycl::event event)
         {
             return detail::get_future(event);
         }
@@ -63,7 +77,7 @@ namespace hpx::sycl::experimental {
         /// parameter. Removes the reference for trivial types to make the
         /// function matching easier (see sycl_stream.cpp test)
         template <typename... Params>
-        using queue_function_ptr_t = cl::sycl::event (cl::sycl::queue::*)(
+        using queue_function_ptr_t = ::sycl::event (::sycl::queue::*)(
             std::conditional_t<
                 std::is_trivial_v<std::remove_reference_t<Params>>,
                 std::decay_t<Params>, Params>...);
@@ -73,7 +87,7 @@ namespace hpx::sycl::experimental {
         void post(queue_function_ptr_t<Params...>&& queue_member_function,
             Params&&... args)
         {
-            cl::sycl::event e =
+            ::sycl::event e =
                 HPX_INVOKE(HPX_FORWARD(queue_function_ptr_t<Params...>,
                                queue_member_function),
                     command_queue, HPX_FORWARD(Params, args)...);
@@ -89,7 +103,7 @@ namespace hpx::sycl::experimental {
             // into the future
             return hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    cl::sycl::event e =
+                    ::sycl::event e =
                         HPX_INVOKE(HPX_FORWARD(queue_function_ptr_t<Params...>,
                                        queue_member_function),
                             command_queue, HPX_FORWARD(Params, args)...);
@@ -133,42 +147,47 @@ namespace hpx::sycl::experimental {
         // using a default argument (code_location::current())
 
         /// sycl::queue::member_function type with code_location parameter
-        template <typename Param>
-        using queue_function_code_loc_ptr_t = cl::sycl::event (
-            cl::sycl::queue::*)(Param, cl::sycl::detail::code_location const&);
+        template <typename... Params>
+        using queue_function_code_loc_ptr_t = ::sycl::event (::sycl::queue::*)(
+            std::conditional_t<
+                std::is_trivial_v<std::remove_reference_t<Params>>,
+                std::decay_t<Params>, Params>...,
+            ::sycl::detail::code_location const&);
+
         /// Invoke member function given queue and parameters. Default
         /// code_location argument added automatically.
-        template <typename Param>
-        void post(queue_function_code_loc_ptr_t<Param>&& queue_member_function,
-            Param&& args)
+        template <typename... Params>
+        void post(
+            queue_function_code_loc_ptr_t<Params...>&& queue_member_function,
+            Params&&... args)
         {
             // for the intel version we need to actually pass the code
             // location.  Within the intel sycl api this is usually a default
             // argument, but for invoke we need to pass it manually
-            cl::sycl::event e =
-                HPX_INVOKE(HPX_FORWARD(queue_function_code_loc_ptr_t<Param>,
+            ::sycl::event e =
+                HPX_INVOKE(HPX_FORWARD(queue_function_code_loc_ptr_t<Params...>,
                                queue_member_function),
-                    command_queue, HPX_FORWARD(Param, args),
-                    cl::sycl::detail::code_location::current());
+                    command_queue, HPX_FORWARD(Params, args)...,
+                    ::sycl::detail::code_location::current());
         }
         /// Invoke queue member function given queue and parameters. Default
         /// code_location argument added automatically.  / Returns hpx::future
         /// tied to the sycl event returned by the asynchronous queue member
         /// function call (two way)
-        template <typename Param>
+        template <typename... Params>
         hpx::future<void> async_execute(
-            queue_function_code_loc_ptr_t<Param>&& queue_member_function,
-            Param&& args)
+            queue_function_code_loc_ptr_t<Params...>&& queue_member_function,
+            Params&&... args)
         {
             // launching a sycl member function may throw -- if it does put it
             // into the future
             return hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    cl::sycl::event e = HPX_INVOKE(
-                        HPX_FORWARD(queue_function_code_loc_ptr_t<Param>,
+                    ::sycl::event e = HPX_INVOKE(
+                        HPX_FORWARD(queue_function_code_loc_ptr_t<Params...>,
                             queue_member_function),
-                        command_queue, HPX_FORWARD(Param, args),
-                        cl::sycl::detail::code_location::current());
+                        command_queue, HPX_FORWARD(Params, args)...,
+                        ::sycl::detail::code_location::current());
                     return get_future(e);
                 },
                 [&](std::exception_ptr&& ep) {
@@ -200,20 +219,25 @@ namespace hpx::sycl::experimental {
         // Property interface:
 
         /// Return the device used by the underlying SYCL queue
-        HPX_FORCEINLINE cl::sycl::device get_device() const
+        HPX_FORCEINLINE ::sycl::device get_device() const
         {
             return command_queue.get_device();
         }
         /// Return the context used by the underlying SYCL queue
-        HPX_FORCEINLINE cl::sycl::context get_context() const
+        HPX_FORCEINLINE ::sycl::context get_context() const
         {
             return command_queue.get_context();
+        }
+        /// Return the underlying queue for direct access
+        HPX_FORCEINLINE ::sycl::queue& get_queue()
+        {
+            return command_queue;
         }
 
         // TODO Future work: Check if we want to expose any other (non-event)
         // queue methods
     protected:
-        cl::sycl::queue command_queue;
+        ::sycl::queue command_queue;
     };
 }    // namespace hpx::sycl::experimental
 
@@ -247,7 +271,16 @@ namespace hpx {
 
     /// hpx::async overload for launching sycl queue member functions with an
     /// sycl executor
+#if defined(__INTEL_LLVM_COMPILER) ||                                          \
+    (defined(__clang__) && defined(SYCL_IMPLEMENTATION_ONEAPI))
+    template <typename Executor, typename... Ts,
+        std::enable_if_t<!(std::conjunction_v<sycl::experimental::detail::
+                                 is_basic_queue_arg<Ts>...>),
+            bool>
+            guard = true>
+#else
     template <typename Executor, typename... Ts>
+#endif
     HPX_FORCEINLINE decltype(auto) async(Executor&& exec,
         hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts...>&& f,
         Ts&&... ts)
@@ -268,7 +301,16 @@ namespace hpx {
 
     /// hpx::apply overload for launching sycl queue member functions with an
     /// sycl executor
+#if defined(__INTEL_LLVM_COMPILER) ||                                          \
+    (defined(__clang__) && defined(SYCL_IMPLEMENTATION_ONEAPI))
+    template <typename Executor, typename... Ts,
+        std::enable_if_t<!(std::conjunction_v<sycl::experimental::detail::
+                                 is_basic_queue_arg<Ts>...>),
+            bool>
+            guard = true>
+#else
     template <typename Executor, typename... Ts>
+#endif
     HPX_FORCEINLINE bool apply(Executor&& exec,
         hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts...>&& f,
         Ts&&... ts)
@@ -290,11 +332,15 @@ namespace hpx {
     (defined(__clang__) && defined(SYCL_IMPLEMENTATION_ONEAPI))
     /// hpx::async overload for launching sycl queue member functions with an
     /// sycl executor and code location ptrs
-    template <typename Executor, typename Ts>
+    template <typename Executor, typename... Ts,
+        std::enable_if_t<(std::conjunction_v<sycl::experimental::detail::
+                                 is_basic_queue_arg<Ts>...>),
+            bool>
+            guard = true>
     HPX_FORCEINLINE decltype(auto) async(Executor&& exec,
         hpx::sycl::experimental::sycl_executor::queue_function_code_loc_ptr_t<
-            Ts>&& f,
-        Ts&& ts)
+            Ts...>&& f,
+        Ts&&... ts)
     {
         // Make sure we only use this for sycl executors
         static_assert(std::is_same<std::decay_t<Executor>,
@@ -304,18 +350,22 @@ namespace hpx {
             typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
                                                            exec),
             HPX_FORWARD(hpx::sycl::experimental::sycl_executor::
-                            queue_function_code_loc_ptr_t<Ts>,
+                            queue_function_code_loc_ptr_t<Ts...>,
                 f),
-            HPX_FORWARD(Ts, ts));
+            HPX_FORWARD(Ts, ts)...);
     }
 
     /// hpx::apply overload for launching sycl queue member functions with an
     /// sycl executor and code location ptrs
-    template <typename Executor, typename Ts>
+    template <typename Executor, typename... Ts,
+        std::enable_if_t<(std::conjunction_v<sycl::experimental::detail::
+                                 is_basic_queue_arg<Ts>...>),
+            bool>
+            guard = true>
     HPX_FORCEINLINE bool apply(Executor&& exec,
         hpx::sycl::experimental::sycl_executor::queue_function_code_loc_ptr_t<
-            Ts>&& f,
-        Ts&& ts)
+            Ts...>&& f,
+        Ts&&... ts)
     {
         // Make sure we only use this for sycl executors
         static_assert(std::is_same_v<std::decay_t<Executor>,
@@ -324,9 +374,55 @@ namespace hpx {
         return detail::post_dispatch<typename std::decay<Executor>::type>::call(
             HPX_FORWARD(Executor, exec),
             HPX_FORWARD(hpx::sycl::experimental::sycl_executor::
-                            queue_function_code_loc_ptr_t<Ts>,
+                            queue_function_code_loc_ptr_t<Ts...>,
                 f),
-            HPX_FORWARD(Ts, ts));
+            HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename Executor, typename... Ts, typename T,
+        std::enable_if_t<(std::conjunction_v<sycl::experimental::detail::
+                                 is_basic_queue_arg<Ts>...>),
+            bool>
+            guard = true>
+    HPX_FORCEINLINE decltype(auto) async(Executor&& exec,
+        hpx::sycl::experimental::sycl_executor::queue_function_code_loc_ptr_t<
+            Ts..., T>&& f,
+        Ts&&... ts, T&& t)
+    {
+        // Make sure we only use this for sycl executors
+        static_assert(std::is_same<std::decay_t<Executor>,
+            hpx::sycl::experimental::sycl_executor>::value);
+        // Use the same async_dispatch than the normal async otherwise
+        return detail::async_dispatch<
+            typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
+                                                           exec),
+            std::forward<hpx::sycl::experimental::sycl_executor::
+                    queue_function_code_loc_ptr_t<Ts..., T>>(f),
+            std::forward<Ts>(ts)..., std::forward<T>(t));
+    }
+
+    /// hpx::apply overload for launching sycl queue member functions with an
+    /// sycl executor and code location ptrs
+    /* template <typename Executor, typename T> */
+    template <typename Executor, typename... Ts, typename T,
+        std::enable_if_t<(std::conjunction_v<sycl::experimental::detail::
+                                 is_basic_queue_arg<Ts>...>),
+            bool>
+            guard = true>
+    HPX_FORCEINLINE bool apply(Executor&& exec,
+        hpx::sycl::experimental::sycl_executor::queue_function_code_loc_ptr_t<
+            Ts..., T>&& f,
+        Ts&&... ts, T&& t)
+    {
+        // Make sure we only use this for sycl executors
+        static_assert(std::is_same_v<std::decay_t<Executor>,
+            hpx::sycl::experimental::sycl_executor>);
+        // Use the same apply_dispatch than the normal apply otherwise
+        return detail::post_dispatch<typename std::decay<Executor>::type>::call(
+            HPX_FORWARD(Executor, exec),
+            std::forward<hpx::sycl::experimental::sycl_executor::
+                    queue_function_code_loc_ptr_t<Ts..., T>>(f),
+            std::forward<Ts>(ts)..., std::forward<T>(t));
     }
 #endif
 }    // namespace hpx
