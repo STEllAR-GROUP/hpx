@@ -114,7 +114,7 @@ int hpx_main(hpx::program_options::variables_map&)
     {
         // Scheduler type
         std::cout << "Testing scheduler type\n";
-        HPX_TEST(ex::scheduler<scheduler_t>);
+        HPX_TEST((stdexec::scheduler<scheduler_t>) );
 
         // Destructible
         std::cout << "Testing destructibility\n";
