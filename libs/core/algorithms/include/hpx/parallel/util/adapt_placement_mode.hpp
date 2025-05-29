@@ -14,11 +14,12 @@
 
 namespace hpx::execution::experimental {
 
+   
+    template <typename ExPolicy>
     // clang-format off
-    template <typename ExPolicy,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy>
-        )>
+        )
     // clang-format on
     decltype(auto) adapt_placement_mode(
         ExPolicy&& policy, hpx::threads::thread_placement_hint placement)
@@ -54,11 +55,12 @@ namespace hpx::execution::experimental {
 
 namespace hpx::parallel::util {
 
+   
+    template <typename ExPolicy>
     // clang-format off
-    template <typename ExPolicy,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy>
-        )>
+        )
     HPX_DEPRECATED_V(1, 11,
         "hpx::parallel::util::adapt_placement_mode is deprecated. Please use "
         "hpx::execution::experimental::adapt_placement_mode instead.")
