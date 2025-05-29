@@ -104,11 +104,11 @@ namespace hpx::parallel::detail {
         return result_type{hpx::get<0>(t), hpx::get<1>(t)};
     }
 
+    template <typename ZipIterSender>
     // clang-format off
-    template <typename ZipIterSender,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::execution::experimental::is_sender_v<ZipIterSender>
-        )>
+        )
     // clang-format on
     constexpr decltype(auto) get_iter_in_in_result(
         ZipIterSender&& zipiter_sender)

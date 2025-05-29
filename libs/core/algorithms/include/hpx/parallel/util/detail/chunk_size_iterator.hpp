@@ -261,21 +261,25 @@ namespace hpx::parallel::util::detail {
                 -static_cast<std::ptrdiff_t>(offset + chunk()), chunk());
         }
 
-        template <typename Iter = IterOrR,
-            HPX_CONCEPT_REQUIRES_(hpx::traits::is_bidirectional_iterator_v<
+        template <typename Iter = IterOrR>
+        // clang-format off
+            requires (hpx::traits::is_bidirectional_iterator_v<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
-                std::is_integral_v<Iter>)>
+                std::is_integral_v<Iter>)
+        // clang-format on 
         HPX_HOST_DEVICE void decrement() noexcept
         {
             decrement(0);
         }
 
-        template <typename Iter = IterOrR,
-            HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<
+        template <typename Iter = IterOrR>
+        // clang-format off
+            requires (hpx::traits::is_random_access_iterator_v<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
-                std::is_integral_v<Iter>)>
+                std::is_integral_v<Iter>)
+        // clang-format on 
         HPX_HOST_DEVICE void advance(std::ptrdiff_t n) noexcept
         {
             // prepare next value
@@ -289,11 +293,13 @@ namespace hpx::parallel::util::detail {
             }
         }
 
-        template <typename Iter = IterOrR,
-            HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<
+        template <typename Iter = IterOrR>
+        // clang-format off
+            requires (hpx::traits::is_random_access_iterator_v<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
-                std::is_integral_v<Iter>)>
+                std::is_integral_v<Iter>)
+        // clang-format on 
         HPX_HOST_DEVICE constexpr std::ptrdiff_t distance_to(
             chunk_size_iterator const& rhs) const noexcept
         {
@@ -498,21 +504,25 @@ namespace hpx::parallel::util::detail {
                 -static_cast<std::ptrdiff_t>(offset + chunk()), chunk());
         }
 
-        template <typename Iter = IterOrR,
-            HPX_CONCEPT_REQUIRES_(hpx::traits::is_bidirectional_iterator_v<
+        template <typename Iter = IterOrR>
+        // clang-format off
+            requires (hpx::traits::is_bidirectional_iterator_v<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
-                std::is_integral_v<Iter>)>
+                std::is_integral_v<Iter>)
+        // clang-format on 
         HPX_HOST_DEVICE void decrement() noexcept
         {
             decrement(0);
         }
 
-        template <typename Iter = IterOrR,
-            HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<
+        template <typename Iter = IterOrR>
+        // clang-format off
+            requires (hpx::traits::is_random_access_iterator_v<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
-                std::is_integral_v<Iter>)>
+                std::is_integral_v<Iter>)
+        // clang-format on 
         HPX_HOST_DEVICE void advance(std::ptrdiff_t n) noexcept
         {
             // prepare next value
@@ -526,11 +536,13 @@ namespace hpx::parallel::util::detail {
             }
         }
 
-        template <typename Iter = IterOrR,
-            HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<
+        template <typename Iter = IterOrR>
+        // clang-format off
+            requires (hpx::traits::is_random_access_iterator_v<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
-                std::is_integral_v<Iter>)>
+                std::is_integral_v<Iter>)
+        // clang-format on 
         HPX_HOST_DEVICE constexpr std::ptrdiff_t distance_to(
             chunk_size_idx_iterator const& rhs) const noexcept
         {
