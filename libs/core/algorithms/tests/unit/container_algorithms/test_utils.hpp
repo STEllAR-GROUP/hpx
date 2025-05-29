@@ -24,8 +24,10 @@ namespace test {
     ///////////////////////////////////////////////////////////////////////////
     // Sentinel constructed from an Iterator just for the purpose of the
     // overloads tests
-    template <typename IterType,
-        HPX_CONCEPT_REQUIRES_(hpx::traits::is_iterator<IterType>::value)>
+    template <typename IterType>
+     // clang-format off
+        requires (hpx::traits::is_iterator<IterType>::value)
+     // clang-format on 
     struct sentinel_from_iterator
     {
         explicit sentinel_from_iterator(IterType end_iter)
