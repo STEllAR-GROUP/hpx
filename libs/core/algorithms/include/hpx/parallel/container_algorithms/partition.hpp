@@ -1321,11 +1321,11 @@ namespace hpx::ranges {
                     HPX_MOVE(proj)));
         }
 
-        // clang-format off
         template <typename InIter, typename Sent, typename OutIter2,
             typename OutIter3, typename Pred,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, InIter> &&
                 hpx::traits::is_iterator_v<OutIter2> &&
@@ -1335,7 +1335,7 @@ namespace hpx::ranges {
                     hpx::execution::sequenced_policy, Pred,
                     parallel::traits::projected<Proj, InIter>
                 >
-            )>
+            )
         // clang-format on
         friend partition_copy_result<InIter, OutIter2, OutIter3>
         tag_fallback_invoke(hpx::ranges::partition_copy_t, InIter first,
@@ -1353,11 +1353,11 @@ namespace hpx::ranges {
                     HPX_MOVE(pred), HPX_MOVE(proj)));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename OutIter2, typename OutIter3, typename Pred,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -1368,7 +1368,7 @@ namespace hpx::ranges {
                     ExPolicy, Pred,
                     parallel::traits::projected<Proj, FwdIter>
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             partition_copy_result<FwdIter, OutIter2, OutIter3>>
