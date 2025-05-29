@@ -43,9 +43,11 @@ namespace hpx::parallel::util {
             }
 
             template <typename Begin, typename End, typename CancelToken,
-                typename F,
-                HPX_CONCEPT_REQUIRES_(hpx::traits::is_iterator_v<End>&&
-                        hpx::traits::is_forward_iterator_v<Begin>)>
+                typename F>
+            // clang-format off
+                requires (hpx::traits::is_iterator_v<End>&&
+                        hpx::traits::is_forward_iterator_v<Begin>)
+            // clang-format on 
             HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
                 Begin it, End end, CancelToken& tok, F&& f)
             {
@@ -54,10 +56,12 @@ namespace hpx::parallel::util {
             }
 
             template <typename ExPolicy, typename Begin, typename End,
-                typename F,
-                HPX_CONCEPT_REQUIRES_(    // forces hpx::execution::unseq
+                typename F>
+            // clang-format off
+                requires (    // forces hpx::execution::unseq
                     hpx::is_unsequenced_execution_policy_v<ExPolicy> &&
-                    !hpx::is_parallel_execution_policy_v<ExPolicy>)>
+                    !hpx::is_parallel_execution_policy_v<ExPolicy>)
+            // clang-format on 
             HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
                 ExPolicy&&, Begin it, End end, F&& f)
             {
@@ -73,9 +77,11 @@ namespace hpx::parallel::util {
             }
 
             template <typename ExPolicy, typename Begin, typename End,
-                typename F,
-                HPX_CONCEPT_REQUIRES_(
-                    !hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
+                typename F>
+            // clang-format off
+                requires (
+                    !hpx::is_unsequenced_execution_policy_v<ExPolicy>)
+            // clang-format on 
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 ExPolicy&&, Begin it, End end, F&& f)
             {
@@ -88,8 +94,10 @@ namespace hpx::parallel::util {
             }
 
             template <typename ExPolicy, typename Begin, typename End,
-                typename CancelToken, typename F,
-                HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
+                typename CancelToken, typename F>
+            // clang-format off
+                requires (hpx::is_execution_policy_v<ExPolicy>)
+            // clang-format on 
             HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
                 ExPolicy&& policy, Begin it, End end, CancelToken& tok, F&& f)
             {
@@ -1070,8 +1078,10 @@ namespace hpx::parallel::util {
             begin, n, dest, HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
     }
 
-    template <typename Iter, typename CancelToken, typename F, typename Cleanup,
-        HPX_CONCEPT_REQUIRES_(hpx::traits::is_iterator_v<Iter>)>
+    template <typename Iter, typename CancelToken, typename F, typename Cleanup>
+    // clang-format off
+        requires (hpx::traits::is_iterator_v<Iter>)
+    // clang-format on 
     HPX_FORCEINLINE constexpr Iter loop_with_cleanup_n_with_token(
         Iter it, std::size_t count, CancelToken& tok, F&& f, Cleanup&& cleanup)
     {
@@ -1081,9 +1091,11 @@ namespace hpx::parallel::util {
     }
 
     template <typename Iter, typename FwdIter, typename CancelToken, typename F,
-        typename Cleanup,
-        HPX_CONCEPT_REQUIRES_(hpx::traits::is_iterator_v<Iter>&&
-                hpx::traits::is_iterator_v<FwdIter>)>
+        typename Cleanup>
+    // clang-format off
+        requires (hpx::traits::is_iterator_v<Iter>&&
+                hpx::traits::is_iterator_v<FwdIter>)
+    // clang-format on 
     HPX_FORCEINLINE constexpr FwdIter loop_with_cleanup_n_with_token(Iter it,
         std::size_t count, FwdIter dest, CancelToken& tok, F&& f,
         Cleanup&& cleanup)
@@ -1094,9 +1106,11 @@ namespace hpx::parallel::util {
     }
 
     template <typename ExPolicy, typename Iter, typename CancelToken,
-        typename F, typename Cleanup,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>&&
-                hpx::traits::is_iterator_v<Iter>)>
+        typename F, typename Cleanup>
+    // clang-format off
+        requires (hpx::is_execution_policy_v<ExPolicy>&&
+                hpx::traits::is_iterator_v<Iter>)
+    // clang-format on 
     HPX_FORCEINLINE constexpr Iter loop_with_cleanup_n_with_token(
         ExPolicy&& policy, Iter it, std::size_t count, CancelToken& tok, F&& f,
         Cleanup&& cleanup)
@@ -1107,10 +1121,12 @@ namespace hpx::parallel::util {
     }
 
     template <typename ExPolicy, typename Iter, typename FwdIter,
-        typename CancelToken, typename F, typename Cleanup,
-        HPX_CONCEPT_REQUIRES_(
+        typename CancelToken, typename F, typename Cleanup>
+    // clang-format off
+        requires (
             hpx::is_execution_policy_v<ExPolicy>&& hpx::traits::is_iterator_v<
-                Iter>&& hpx::traits::is_iterator_v<FwdIter>)>
+                Iter>&& hpx::traits::is_iterator_v<FwdIter>)
+    // clang-format on 
     HPX_FORCEINLINE constexpr FwdIter loop_with_cleanup_n_with_token(
         ExPolicy&& policy, Iter it, std::size_t count, FwdIter dest,
         CancelToken& tok, F&& f, Cleanup&& cleanup)
