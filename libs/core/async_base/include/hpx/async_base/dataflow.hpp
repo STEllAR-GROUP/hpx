@@ -53,11 +53,11 @@ namespace hpx {
           : hpx::functional::detail::tag_fallback<dataflow_t>
         {
         private:
+            template <typename F, typename... Ts>
             // clang-format off
-            template <typename F, typename... Ts,
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     !hpx::traits::is_allocator_v<std::decay_t<F>>
-                )>
+                )
             // clang-format on
             friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
                 dataflow_t tag, F&& f, Ts&&... ts)
