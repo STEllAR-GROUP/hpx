@@ -1003,12 +1003,16 @@ hpx_option(
 if(HPX_WITH_APEX)
   hpx_add_config_define(HPX_HAVE_APEX) # tell HPX that we use APEX
   hpx_option(
-    HPX_WITH_APEX_NO_UPDATE BOOL
-    "Do not update code from remote APEX repository." OFF CATEGORY "Profiling"
+    HPX_WITH_APEX_REPOSITORY STRING "APEX repository"
+    "https://github.com/STEllAR-GROUP/apex.git" CATEGORY "Profiling"
   )
   hpx_option(
-    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "develop"
+    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "hpx_v1.11.0"
     CATEGORY "Profiling"
+  )
+  hpx_option(
+    HPX_WITH_APEX_NO_UPDATE BOOL
+    "Do not update code from remote APEX repository." OFF CATEGORY "Profiling"
   )
 endif()
 
