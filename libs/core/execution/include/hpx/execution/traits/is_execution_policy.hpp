@@ -75,6 +75,9 @@ namespace hpx {
     template <typename T>
     inline constexpr bool is_execution_policy_v = is_execution_policy<T>::value;
 
+    template <typename T>
+    concept execution_policy = is_execution_policy<T>::value;
+
     ///////////////////////////////////////////////////////////////////////////
     /// Extension: Detect whether given execution policy enables parallelization
     ///
