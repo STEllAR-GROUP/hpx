@@ -51,8 +51,8 @@ Breaking changes
 
 - Removed features that were long deprecated (starting V1.8):
   - ``hpx::flush``, ``hpx::endl``, ``hpx::async_flush``, ``hpx::async_endl``
-  - Various enumerator types are now only available as ``class enum``
-    requiring explicit scoped use of the enumerator values
+  - Various enumerator types are now only available as ``class enum`` requiring
+  explicit scoped use of the enumerator values
   - Various non-conforming overloads of parallel algorithms
   - ``hpx::for_loop`` and friends (now only available as
     ``hpx::experimental::for_loop``)
