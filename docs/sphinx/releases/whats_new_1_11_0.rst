@@ -8,10 +8,10 @@
 .. _hpx_1_11_0:
 
 ============================
-|hpx| V1.11.0 (May 31, 2025)
+|hpx| V1.11.0 (Jun 30, 2025)
 ============================
 
-This release is the last verision of HPX that supports C++17. Future versions
+This release is the last version of HPX that supports C++17. Future versions
 of HPX will require compilation using C++20 or above.
 
 General changes
