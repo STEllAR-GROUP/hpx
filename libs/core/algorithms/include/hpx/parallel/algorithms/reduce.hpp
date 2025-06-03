@@ -416,11 +416,41 @@ namespace hpx::parallel {
                             HPX_FORWARD(T_, init));
                     }
                 }
-
+                /*
                 auto f1 = [r](FwdIterB part_begin, std::size_t part_size) -> T {
-                    T val = *part_begin;
+                    //T val = *part_begin;
+                    //xio change
+                    T val = init;
+                    for (auto it = part_begin; it != part_end; ++it)
+                    {
+                        val = HPX_INVOKE(binary_op, val, *it);
+                    }
+                    //return detail::sequential_reduce<ExPolicy>(
+                      //  ++part_begin, --part_size, HPX_MOVE(val), r);
+                };
+                */
+                /*
+                auto f1 = [r, init](
+                              FwdIterB part_begin, std::size_t part_size) -> T {
+                    FwdIterB part_end = part_begin;
+                    std::advance(part_end,
+                        part_size);    // mueve el iterador a la posición final
+
+                    T val = init;
+                    for (auto it = part_begin; it != part_end; ++it)
+                    {
+                        val = HPX_INVOKE(r, val, *it);    // r es el binary_op
+                    }
+                    return val;
+                };*/
+                auto f1 = [r, init](FwdIterB part_begin, std::size_t part_size) -> T {
+                    if (part_size == 0) {
+                        return init;  // Optimización para partición vacía
+                    }
+    
+                    T val = init;  //  Iniciar con init
                     return detail::sequential_reduce<ExPolicy>(
-                        ++part_begin, --part_size, HPX_MOVE(val), r);
+                        part_begin, part_size, HPX_MOVE(val), r);
                 };
 
                 return util::partitioner<ExPolicy, T>::call(
