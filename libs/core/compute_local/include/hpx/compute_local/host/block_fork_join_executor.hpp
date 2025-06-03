@@ -11,7 +11,6 @@
 #include <hpx/config.hpp>
 #include <hpx/compute_local/host/numa_domains.hpp>
 #include <hpx/compute_local/host/target.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/this_thread.hpp>
@@ -243,11 +242,11 @@ namespace hpx::execution::experimental {
                 outer_shape, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
+        template <typename F, typename S, typename... Ts>
         // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !std::is_integral_v<S>
-            )>
+            )
         // clang-format on
         friend void tag_invoke(hpx::parallel::execution::bulk_sync_execute_t,
             block_fork_join_executor& exec, F&& f, S const& shape, Ts&&... ts)
@@ -256,11 +255,11 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
+        template <typename F, typename S, typename... Ts>
         // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires ( 
                 !std::is_integral_v<S>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
@@ -314,11 +313,11 @@ namespace hpx::execution::experimental {
             }
         }
 
+        template <typename F, typename... Fs>
         // clang-format off
-        template <typename F, typename... Fs,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...)
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::sync_invoke_t,
@@ -327,11 +326,11 @@ namespace hpx::execution::experimental {
             exec.sync_invoke_helper(HPX_FORWARD(F, f), HPX_FORWARD(Fs, fs)...);
         }
 
+        template <typename F, typename... Fs>
         // clang-format off
-        template <typename F, typename... Fs,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...)
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::async_invoke_t,
@@ -352,13 +351,14 @@ namespace hpx::execution::experimental {
         }
 
         // support all properties that are exposed by the fork_join_executor
+
+        template <typename Tag, typename Property>
         // clang-format off
-        template <typename Tag, typename Property,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_scheduling_property_v<Tag> &&
                 hpx::functional::is_tag_invocable_v<
                     Tag, fork_join_executor, Property>
-            )>
+            )
         // clang-format on
         friend block_fork_join_executor tag_invoke(Tag tag,
             block_fork_join_executor const& exec, Property&& prop) noexcept
@@ -369,12 +369,12 @@ namespace hpx::execution::experimental {
             return exec_with_prop;
         }
 
-        // clang-format off
-        template <typename Tag,
-            HPX_CONCEPT_REQUIRES_(
+        template <typename Tag>
+        // clang-format off 
+            requires (
                 hpx::execution::experimental::is_scheduling_property_v<Tag> &&
                 hpx::functional::is_tag_invocable_v<Tag, fork_join_executor>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             Tag tag, block_fork_join_executor const& exec) noexcept
