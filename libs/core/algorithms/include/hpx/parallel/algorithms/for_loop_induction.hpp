@@ -230,26 +230,4 @@ namespace hpx::experimental {
             HPX_FORWARD(T, value));
     }
 }    // namespace hpx::experimental
-
-/// \cond IGNORE_DEPRECATED
-namespace hpx::parallel {
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::induction is deprecated. Please use "
-        "hpx::experimental::induction instead.")
-    constexpr decltype(auto) induction(T&& value, std::size_t stride)
-    {
-        return hpx::experimental::induction(HPX_FORWARD(T, value), stride);
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::induction is deprecated. Please use "
-        "hpx::experimental::induction instead.")
-    constexpr decltype(auto) induction(T&& value)
-    {
-        return hpx::experimental::induction(HPX_FORWARD(T, value));
-    }
-}    // namespace hpx::parallel
 /// \endcond

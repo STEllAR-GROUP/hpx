@@ -140,17 +140,4 @@ namespace hpx {
     using sliding_semaphore = sliding_semaphore_var<>;
 }    // namespace hpx
 
-namespace hpx::lcos::local {
-
-    template <typename Mutex = hpx::spinlock>
-    using sliding_semaphore_var HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::sliding_semaphore_var is deprecated, use "
-        "hpx::sliding_semaphore_var instead") =
-        hpx::sliding_semaphore_var<Mutex>;
-
-    using sliding_semaphore HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::sliding_semaphore is deprecated, use "
-        "hpx::sliding_semaphore instead") = hpx::sliding_semaphore;
-}    // namespace hpx::lcos::local
-
 #include <hpx/config/warnings_suffix.hpp>

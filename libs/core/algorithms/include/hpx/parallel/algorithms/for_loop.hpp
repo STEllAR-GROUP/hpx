@@ -1842,30 +1842,6 @@ namespace hpx::experimental {
     } for_loop_n_strided{};
 }    // namespace hpx::experimental
 
-namespace hpx {
-
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::for_loop is deprecated. Please use "
-        "hpx::experimental::for_loop instead.")
-    inline constexpr hpx::experimental::for_loop_t for_loop{};
-
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::for_loop_n is deprecated. Please use "
-        "hpx::experimental::for_loop_n instead.")
-    inline constexpr hpx::experimental::for_loop_n_t for_loop_n{};
-
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::for_loop_strided is deprecated. Please use "
-        "hpx::experimental::for_loop_strided instead.")
-    inline constexpr hpx::experimental::for_loop_strided_t for_loop_strided{};
-
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::for_loop_n_strided is deprecated. Please use "
-        "hpx::experimental::for_loop_n_strided instead.")
-    inline constexpr hpx::experimental::for_loop_n_strided_t
-        for_loop_n_strided{};
-}    // namespace hpx
-
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 namespace hpx::traits {
 

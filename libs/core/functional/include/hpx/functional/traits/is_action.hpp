@@ -46,17 +46,3 @@ namespace hpx {
     template <typename T>
     inline constexpr bool is_bound_action_v = is_bound_action<T>::value;
 }    // namespace hpx
-
-namespace hpx::traits {
-
-    template <typename Action>
-    using is_bound_action HPX_DEPRECATED_V(1, 8,
-        "hpx::traits::is_bound_action is deprecated, use "
-        "hpx::is_bound_action instead") = hpx::is_bound_action<Action>;
-
-    template <typename Action>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::traits::is_bound_action_v is deprecated, use "
-        "hpx::is_bound_action_v instead")
-    inline constexpr bool is_bound_action_v = hpx::is_bound_action_v<Action>;
-}    // namespace hpx::traits

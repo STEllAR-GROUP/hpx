@@ -13,6 +13,13 @@
 
 int main()
 {
+    if (hpx::get_num_localities(hpx::launch::sync) < 2)
+    {
+        std::cout << "This example requires at least two localities."
+                  << std::endl;
+        return 0;
+    }
+
     using namespace hpx::collectives;
 
     std::uint32_t const locality_id = hpx::get_locality_id();

@@ -605,10 +605,3 @@ namespace hpx {
     ///          and \a StandardLayoutType.
     using shared_mutex = detail::shared_mutex<>;
 }    // namespace hpx
-
-namespace hpx::lcos::local {
-
-    using shared_mutex HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::shared_mutex is deprecated, use hpx::shared_mutex "
-        "instead") = hpx::shared_mutex;
-}

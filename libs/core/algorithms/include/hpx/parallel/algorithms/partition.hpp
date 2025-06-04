@@ -712,43 +712,6 @@ namespace hpx::parallel {
         /// \endcond
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename BidirIter, typename F,
-        typename Proj = hpx::identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<BidirIter> &&
-            traits::is_projected_v<Proj, BidirIter> &&
-            traits::is_indirect_callable_v<ExPolicy, F,
-                            traits::projected<Proj, BidirIter>>
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::stable_partition is deprecated, use "
-        "hpx::stable_partition instead")
-        util::detail::algorithm_result_t<ExPolicy, BidirIter> stable_partition(
-            ExPolicy&& policy, BidirIter first, BidirIter last, F&& f,
-            Proj&& proj = Proj())
-    {
-        static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
-            "Requires at least bidirectional iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        using is_seq = std::integral_constant<bool,
-            hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                !hpx::traits::is_random_access_iterator_v<BidirIter>>;
-
-        return detail::stable_partition<BidirIter>().call2(
-            HPX_FORWARD(ExPolicy, policy), is_seq(), first, last,
-            HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     /////////////////////////////////////////////////////////////////////////////
     // partition
     namespace detail {
@@ -1476,38 +1439,6 @@ namespace hpx::parallel {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename Pred,
-        typename Proj = hpx::identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<FwdIter> &&
-            traits::is_projected_v<Proj, FwdIter> &&
-            traits::is_indirect_callable_v<ExPolicy,
-                    Pred, traits::projected<Proj, FwdIter>>
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::partition is deprecated, use "
-        "hpx::partition instead")
-        util::detail::algorithm_result_t<ExPolicy, FwdIter> partition(
-            ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred,
-            Proj&& proj = Proj())
-    {
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-            "Required at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::partition<FwdIter>().call(HPX_FORWARD(ExPolicy, policy),
-            first, last, HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
 
     /////////////////////////////////////////////////////////////////////////////
     // partition_copy

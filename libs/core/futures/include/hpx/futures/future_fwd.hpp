@@ -50,17 +50,4 @@ namespace hpx {
     /// does it through its own copy of a shared_future object.
     template <typename R>
     class shared_future;
-
-    namespace lcos {
-
-        template <typename R>
-        using future HPX_DEPRECATED_V(
-            1, 8, "hpx::lcos::future is deprecated. Use hpx::future instead.") =
-            hpx::future<R>;
-
-        template <typename R>
-        using shared_future HPX_DEPRECATED_V(1, 8,
-            "hpx::lcos::shared_future is deprecated. Use hpx::shared_future "
-            "instead.") = hpx::shared_future<R>;
-    }    // namespace lcos
 }    // namespace hpx
