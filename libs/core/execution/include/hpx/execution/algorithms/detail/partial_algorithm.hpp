@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/member_pack.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
@@ -50,15 +49,15 @@ namespace hpx::execution::experimental::detail {
         partial_algorithm_base& operator=(
             partial_algorithm_base const&) = delete;
 
+        template <typename U>
         // clang-format off
-        template <typename U,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_sender_v<U> &&
                 hpx::execution::experimental::detail::
                     is_completion_scheduler_tag_invocable_v<
                         hpx::execution::experimental::set_value_t,
                         U, Tag, Ts...>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto operator|(
             U&& u, partial_algorithm_base p)
@@ -77,15 +76,15 @@ namespace hpx::execution::experimental::detail {
             return HPX_MOVE(p).invoke(HPX_MOVE(scheduler), HPX_FORWARD(U, u));
         }
 
+        template <typename U>
         // clang-format off
-        template <typename U,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_sender_v<U> &&
                !hpx::execution::experimental::detail::
                     is_completion_scheduler_tag_invocable_v<
                         hpx::execution::experimental::set_value_t,
                         U, Tag, Ts...>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto operator|(
             U&& u, partial_algorithm_base p)
