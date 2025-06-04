@@ -13,7 +13,6 @@
 #include <hpx/execution_base/stdexec_forward.hpp>
 #else
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -77,11 +76,12 @@ namespace hpx::execution::experimental {
                 schedule_from_sender const&,
                 Env) -> generate_completion_signatures<Env>;
 
-            template <typename CPO,
-                HPX_CONCEPT_REQUIRES_(
+            template <typename CPO>
+            // clang-format off
+                requires (
                     meta::value<meta::one_of<
                         std::decay_t<CPO>, set_value_t, set_stopped_t>>
-                )>
+                )
             // clang-format on
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
@@ -353,11 +353,11 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_fallback<schedule_from_t>
     {
     private:
+        template <typename Scheduler, typename Sender>
         // clang-format off
-        template <typename Scheduler, typename Sender,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 is_sender_v<Sender>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             schedule_from_t, Scheduler&& scheduler, Sender&& predecessor_sender)

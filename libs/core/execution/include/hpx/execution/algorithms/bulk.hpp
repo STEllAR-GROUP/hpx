@@ -13,7 +13,6 @@
 #include <hpx/execution_base/stdexec_forward.hpp>
 #endif
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
@@ -101,13 +100,13 @@ namespace hpx::execution::experimental {
                 -> generate_completion_signatures<Env>;
             // clang-format on
 
+            template <typename CPO>
             // clang-format off
-            template <typename CPO,
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     hpxexp::detail::is_receiver_cpo_v<CPO> &&
                     hpxexp::detail::has_completion_scheduler_v<
                         CPO, std::decay_t<Sender>>
-                )>
+                )
             // clang-format on
             friend constexpr auto tag_invoke(
                 hpxexp::get_completion_scheduler_t<CPO> tag,
@@ -235,15 +234,15 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_priority<bulk_t>
     {
     private:
+        template <typename Sender, typename Shape, typename F>
         // clang-format off
-        template <typename Sender, typename Shape, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 is_sender_v<Sender> &&
                 experimental::detail::is_completion_scheduler_tag_invocable_v<
                     hpxexp::set_value_t, Sender,
                     bulk_t, Shape, F
                 >
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
             bulk_t, Sender&& sender, Shape const& shape, F&& f)
@@ -261,12 +260,12 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f));
         }
 
+        template <typename Sender, typename Shape, typename F>
         // clang-format off
-        template <typename Sender, typename Shape, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 is_sender_v<Sender> &&
                 std::is_integral_v<Shape>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             bulk_t, Sender&& sender, Shape const& shape, F&& f)
@@ -276,12 +275,12 @@ namespace hpx::execution::experimental {
                 hpx::util::counting_shape(shape), HPX_FORWARD(F, f)};
         }
 
+        template <typename Sender, typename Shape, typename F>
         // clang-format off
-        template <typename Sender, typename Shape, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 is_sender_v<Sender> &&
                 !std::is_integral_v<std::decay_t<Shape>>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             bulk_t, Sender&& sender, Shape&& shape, F&& f)

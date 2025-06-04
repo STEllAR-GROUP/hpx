@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
@@ -159,11 +158,11 @@ namespace hpx::execution::experimental {
 
     inline constexpr struct keep_future_t final
     {
+        template <typename Future>
         // clang-format off
-        template <typename Future,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_future_v<std::decay_t<Future>>
-            )>
+            )
         // clang-format on
         constexpr HPX_FORCEINLINE auto operator()(Future&& future) const
         {

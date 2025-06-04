@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
@@ -33,11 +32,11 @@ namespace hpx::execution::experimental::detail {
             hpx::util::make_index_pack_t<sizeof...(Ts)>, Ts...>;
 
     public:
+        template <typename Scheduler_, typename... Ts_>
         // clang-format off
-        template <typename Scheduler_, typename... Ts_,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_scheduler_v<Scheduler_>
-            )>
+            )
         // clang-format on
         explicit constexpr inject_scheduler(Scheduler_&& scheduler, Ts_&&... ts)
           : base_type(HPX_FORWARD(Ts_, ts)...)
@@ -45,11 +44,11 @@ namespace hpx::execution::experimental::detail {
         {
         }
 
+        template <typename U> 
         // clang-format off
-        template <typename U,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_sender_v<U>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto operator|(
             U&& u, inject_scheduler p)

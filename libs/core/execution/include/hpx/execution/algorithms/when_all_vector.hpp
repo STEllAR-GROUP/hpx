@@ -15,7 +15,6 @@
 #endif
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
@@ -528,11 +527,11 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_fallback<when_all_vector_t>
     {
     private:
+        template <typename Sender>
         // clang-format off
-        template <typename Sender,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpxexp::is_sender_v<Sender>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             when_all_vector_t, std::vector<Sender>&& senders)
@@ -541,11 +540,11 @@ namespace hpx::execution::experimental {
                 HPX_MOVE(senders)};
         }
 
+        template <typename Sender>
         // clang-format off
-        template <typename Sender,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpxexp::is_sender_v<Sender>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             when_all_vector_t, std::vector<Sender> const& senders)
