@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution_base/get_env.hpp>
@@ -1008,9 +1007,11 @@ namespace hpx::execution::experimental {
         template <typename Value>
         struct receiver_base
         {
-            template <typename... Us,
-                HPX_CONCEPT_REQUIRES_(
-                    std::is_constructible_v<value_or_void_t<Value>, Us...>)>
+            template <typename... Us>
+            // clang-format off
+                requires (
+                    std::is_constructible_v<value_or_void_t<Value>, Us...>)
+            // clang-format on
             friend void tag_invoke(
                 set_value_t, receiver_base&& self, Us&&... us) noexcept
             try
