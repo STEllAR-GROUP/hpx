@@ -39,7 +39,6 @@ namespace hpx::execution::experimental { namespace detail {
 
 #else
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
@@ -104,11 +103,12 @@ namespace hpx::execution::experimental {
     //    2.   Otherwise, execution::get_completion_scheduler<CPO>(s) is
     //         ill-formed.
     //
+   
+    template <typename CPO>
     // clang-format off
-    template <typename CPO,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                     hpx::execution::experimental::detail::is_receiver_cpo_v<CPO>
-            )>
+            )
     // clang-format on
     struct get_completion_scheduler_t final
       : hpx::functional::tag<get_completion_scheduler_t<CPO>>
