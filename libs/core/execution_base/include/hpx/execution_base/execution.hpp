@@ -47,12 +47,6 @@ namespace hpx::execution {
     };
 }    // namespace hpx::execution
 
-namespace hpx {
-
-    HPX_CXX_EXPORT template <typename Executor>
-    concept executor_any = hpx::traits::is_executor_any_v<Executor>;
-}
-
 namespace hpx::parallel::execution {
 
     ///////////////////////////////////////////////////////////////////////////
