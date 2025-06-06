@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2023 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -47,10 +47,13 @@ namespace hpx::execution {
     };
 }    // namespace hpx::execution
 
-namespace hpx::parallel::execution {
+namespace hpx {
 
     HPX_CXX_EXPORT template <typename Executor>
     concept executor_any = hpx::traits::is_executor_any_v<Executor>;
+}
+
+namespace hpx::parallel::execution {
 
     ///////////////////////////////////////////////////////////////////////////
     // Executor customization points
@@ -114,7 +117,7 @@ namespace hpx::parallel::execution {
     {
     private:
         template <executor_any Executor, typename F, typename... Ts>
-            requires(std::invocable<F, Ts...>)
+            requires(std::invocable<F &&, Ts && ...>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             sync_execute_t, Executor&& exec, F&& f, Ts&&... ts)
         {
@@ -157,7 +160,7 @@ namespace hpx::parallel::execution {
     {
     private:
         template <executor_any Executor, typename F, typename... Ts>
-            requires(std::invocable<F, Ts...>)
+            requires(std::invocable<F &&, Ts && ...>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             async_execute_t, Executor&& exec, F&& f, Ts&&... ts)
         {
@@ -193,7 +196,7 @@ namespace hpx::parallel::execution {
     private:
         template <executor_any Executor, typename F, typename Future,
             typename... Ts>
-            requires(std::invocable<F, Ts...>)
+            requires(std::invocable<F &&, Future &&, Ts && ...>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             then_execute_t, Executor&& exec, F&& f, Future&& predecessor,
             Ts&&... ts)
@@ -230,7 +233,7 @@ namespace hpx::parallel::execution {
     {
     private:
         template <executor_any Executor, typename F, typename... Ts>
-            requires(std::invocable<F, Ts...>)
+            requires(std::invocable<F &&, Ts && ...>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             post_t, Executor&& exec, F&& f, Ts&&... ts)
         {
@@ -279,13 +282,13 @@ namespace hpx::parallel::execution {
     ///       exists; otherwise it executes sync_execute(f, shape, ts...)
     ///       as often as needed.
     ///
-    inline constexpr struct bulk_sync_execute_t final
+    HPX_CXX_EXPORT inline constexpr struct bulk_sync_execute_t final
       : hpx::functional::detail::tag_fallback<bulk_sync_execute_t>
     {
     private:
         template <executor_any Executor, typename F, typename Shape,
             typename... Ts>
-            requires(!std::is_integral_v<Shape>)
+            requires(!std::integral<Shape>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_sync_execute_t, Executor&& exec, F&& f, Shape const& shape,
             Ts&&... ts)
@@ -297,7 +300,7 @@ namespace hpx::parallel::execution {
 
         template <executor_any Executor, typename F, typename Shape,
             typename... Ts>
-            requires(std::is_integral_v<Shape>)
+            requires(std::integral<Shape>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_sync_execute_t tag, Executor&& exec, F&& f, Shape const& shape,
             Ts&&... ts)
@@ -346,7 +349,7 @@ namespace hpx::parallel::execution {
     private:
         template <executor_any Executor, typename F, typename Shape,
             typename... Ts>
-            requires(!std::is_integral_v<Shape>)
+            requires(!std::integral<Shape>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_async_execute_t, Executor&& exec, F&& f, Shape const& shape,
             Ts&&... ts)
@@ -358,7 +361,7 @@ namespace hpx::parallel::execution {
 
         template <executor_any Executor, typename F, typename Shape,
             typename... Ts>
-            requires(std::is_integral_v<Shape>)
+            requires(std::integral<Shape>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_async_execute_t tag, Executor&& exec, F&& f,
             Shape const& shape, Ts&&... ts)
@@ -411,7 +414,7 @@ namespace hpx::parallel::execution {
     private:
         template <executor_any Executor, typename F, typename Shape,
             typename Future, typename... Ts>
-            requires(!std::is_integral_v<Shape>)
+            requires(!std::integral<Shape>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_then_execute_t, Executor&& exec, F&& f, Shape const& shape,
             Future&& predecessor, Ts&&... ts)
@@ -424,7 +427,7 @@ namespace hpx::parallel::execution {
 
         template <executor_any Executor, typename F, typename Shape,
             typename Future, typename... Ts>
-            requires(std::is_integral_v<Shape>)
+            requires(std::integral<Shape>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_then_execute_t tag, Executor&& exec, F&& f, Shape const& shape,
             Future&& predecessor, Ts&&... ts)

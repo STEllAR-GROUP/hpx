@@ -291,6 +291,15 @@ namespace boost { namespace inspect {
             {"hpx/modules/errors.hpp"}},
         {"(\\HPX_THROWS_BAD_ALLOC_IF\\b)", "HPX_THROWS_BAD_ALLOC_IF",
             {"hpx/modules/errors.hpp"}},
+        //
+        // std concepts
+        {"(\\bstd\\s*::\\s*convertible_to\\b)", "std::convertible_to", {"concepts"}},
+        {"(\\bstd\\s*::\\s*derived_from\\b)", "std::derived_from", {"concepts"}},
+        {"(\\bstd\\s*::\\s*integral\\b)", "std::integral", {"concepts"}},
+        {"(\\bstd\\s*::\\s*invocable\\b)", "std::invocable", {"concepts"}},
+        {"(\\bstd\\s*::\\s*regular_invocable\\b)", "std::regular_invocable",
+            {"concepts"}},
+        {"(\\bstd\\s*::\\s*same_as\\b)", "std::same_as", {"concepts"}},
         {nullptr, nullptr, {nullptr}}};
 
     //  include_check constructor  -------------------------------------------//
@@ -329,9 +338,9 @@ namespace boost { namespace inspect {
 
     //  inspect ( C++ source files )  ---------------------------------------//
 
-    void include_check::inspect(const string& library_name,
-        const path& full_path,     // example: c:/foo/boost/filesystem/path.hpp
-        const string& contents)    // contents of file to be inspected
+    void include_check::inspect(string const& library_name,
+        path const& full_path,     // example: c:/foo/boost/filesystem/path.hpp
+        string const& contents)    // contents of file to be inspected
     {
         std::string::size_type p = contents.find("hpxinspect:"
                                                  "noinclude");

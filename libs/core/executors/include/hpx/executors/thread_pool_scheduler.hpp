@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -93,12 +93,9 @@ namespace hpx::execution::experimental {
             return pool_;
         }
 
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(
+                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>)
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_processing_units_count_t,
             Executor_ const& scheduler, std::size_t num_cores) noexcept
@@ -108,12 +105,7 @@ namespace hpx::execution::experimental {
             return scheduler_with_num_cores;
         }
 
-        // clang-format off
-        template <typename Parameters,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters>
-            )>
-        // clang-format on
+        template <executor_parameters Parameters>
         friend constexpr std::size_t tag_invoke(
             hpx::execution::experimental::processing_units_count_t,
             Parameters&&, thread_pool_policy_scheduler const& scheduler,
@@ -123,12 +115,9 @@ namespace hpx::execution::experimental {
             return scheduler.get_num_cores();
         }
 
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(
+                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>)
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_first_core_t,
             Executor_ const& exec, std::size_t first_core) noexcept
@@ -147,12 +136,9 @@ namespace hpx::execution::experimental {
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
         // support with_annotation property
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(
+                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>)
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             Executor_ const& scheduler, char const* annotation)
@@ -162,12 +148,9 @@ namespace hpx::execution::experimental {
             return sched_with_annotation;
         }
 
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(
+                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>)
         friend auto tag_invoke(hpx::execution::experimental::with_annotation_t,
             Executor_ const& scheduler, std::string annotation)
         {
@@ -300,12 +283,13 @@ namespace hpx::execution::experimental {
             struct env
             {
                 std::decay_t<Scheduler> const& sched;
+
+                template <typename CPO>
                 // clang-format off
-                template <typename CPO,
-                    HPX_CONCEPT_REQUIRES_(
+                    requires (
                         meta::value<meta::one_of<
                             CPO, set_value_t, set_stopped_t>>
-                    )>
+                    )
                 // clang-format on
                 friend constexpr auto tag_invoke(
                     hpx::execution::experimental::get_completion_scheduler_t<
@@ -323,12 +307,12 @@ namespace hpx::execution::experimental {
                 return {s.scheduler};
             };
 #else
+            template <typename CPO>
             // clang-format off
-            template <typename CPO,
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     meta::value<meta::one_of<
                         CPO, set_value_t, set_stopped_t>>
-                )>
+                )
             // clang-format on
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
@@ -428,12 +412,9 @@ namespace hpx::execution::experimental {
     };
 
     // support all properties exposed by the embedded policy
-    // clang-format off
     HPX_CXX_EXPORT template <typename Tag, typename Policy, typename Property,
         HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
-    // clang-format on
+            hpx::execution::experimental::is_scheduling_property_v<Tag>)>
     auto tag_invoke(Tag tag,
         thread_pool_policy_scheduler<Policy> const& scheduler, Property&& prop)
         -> decltype(std::declval<thread_pool_policy_scheduler<Policy>>().policy(
@@ -447,12 +428,9 @@ namespace hpx::execution::experimental {
         return scheduler_with_prop;
     }
 
-    // clang-format off
     HPX_CXX_EXPORT template <typename Tag, typename Policy,
         HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
-    // clang-format on
+            hpx::execution::experimental::is_scheduling_property_v<Tag>)>
     auto tag_invoke(
         Tag tag, thread_pool_policy_scheduler<Policy> const& scheduler)
         -> decltype(std::declval<Tag>()(std::declval<Policy>()))
