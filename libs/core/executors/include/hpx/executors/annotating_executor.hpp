@@ -208,11 +208,11 @@ namespace hpx::execution::experimental {
     };
 
     // support all properties exposed by the wrapped executor
+    template <typename Tag, typename BaseExecutor,typename Property>
     // clang-format off
-    template <typename Tag, typename BaseExecutor,typename Property,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
+        )
     // clang-format on
     auto tag_invoke(
         Tag tag, annotating_executor<BaseExecutor> const& exec, Property&& prop)
@@ -223,11 +223,11 @@ namespace hpx::execution::experimental {
             tag(exec.get_executor(), HPX_FORWARD(Property, prop)));
     }
 
+    template <typename Tag, typename BaseExecutor>
     // clang-format off
-    template <typename Tag, typename BaseExecutor,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
+        )
     // clang-format on
     auto tag_invoke(Tag tag, annotating_executor<BaseExecutor> const& exec)
         -> decltype(std::declval<Tag>()(std::declval<BaseExecutor>()))
@@ -255,11 +255,11 @@ namespace hpx::execution::experimental {
     // annotations. Those are wrapped into an annotating_executor if passed
     // to `with_annotation`.
     //
+    template <typename Executor>
     // clang-format off
-    template <typename Executor,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_executor_any_v<Executor>
-        )>
+        )
     // clang-format on
     constexpr auto tag_fallback_invoke(
         with_annotation_t, Executor&& exec, char const* annotation)
@@ -268,11 +268,11 @@ namespace hpx::execution::experimental {
             HPX_FORWARD(Executor, exec), annotation);
     }
 
+    template <typename Executor>
     // clang-format off
-    template <typename Executor,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_executor_any_v<Executor>
-        )>
+        )
     // clang-format on
     auto tag_fallback_invoke(
         with_annotation_t, Executor&& exec, std::string annotation)
