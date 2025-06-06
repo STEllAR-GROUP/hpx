@@ -182,11 +182,12 @@ namespace hpx::execution {
         // property implementations
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+        
+        template <typename Executor_>
         // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 std::is_convertible_v<Executor_, parallel_policy_executor>
-            )>
+            )
         // clang-format on
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_annotation_t,
@@ -197,11 +198,11 @@ namespace hpx::execution {
             return exec_with_annotation;
         }
 
+        template <typename Executor_>
         // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 std::is_convertible_v<Executor_, parallel_policy_executor>
-            )>
+            )
         // clang-format on
         friend auto tag_invoke(hpx::execution::experimental::with_annotation_t,
             Executor_ const& exec, std::string annotation)
@@ -220,11 +221,11 @@ namespace hpx::execution {
         }
 #endif
 
+        template <typename Executor_>
         // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 std::is_convertible_v<Executor_, parallel_policy_executor>
-            )>
+            )
         // clang-format on
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_processing_units_count_t,
@@ -235,11 +236,11 @@ namespace hpx::execution {
             return exec_with_num_cores;
         }
 
+        template <typename Parameters>
         // clang-format off
-        template <typename Parameters,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_executor_parameters_v<Parameters>
-            )>
+            )
         // clang-format on
         friend constexpr std::size_t tag_invoke(
             hpx::execution::experimental::processing_units_count_t,
@@ -250,11 +251,11 @@ namespace hpx::execution {
             return exec.get_num_cores();
         }
 
+        template <typename Executor_>
         // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 std::is_convertible_v<Executor_, parallel_policy_executor>
-            )>
+            )
         // clang-format on
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_first_core_t,
@@ -424,12 +425,12 @@ namespace hpx::execution {
             exec.post_impl(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
-        // BulkTwoWayExecutor interface
+        // BulkTwoWayExecutor interface 
+        template <typename F, typename S, typename... Ts>
         // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !std::is_integral_v<S>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
@@ -466,11 +467,11 @@ namespace hpx::execution {
                 shape, HPX_FORWARD(Ts, ts)...);
         }
 
+        template <typename F, typename S, typename Future, typename... Ts>
         // clang-format off
-        template <typename F, typename S, typename Future, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !std::is_integral_v<S>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_then_execute_t,
@@ -577,11 +578,11 @@ namespace hpx::execution {
     };
 
     // support all properties exposed by the embedded policy
+    template <typename Tag, typename Policy, typename Property>
     // clang-format off
-    template <typename Tag, typename Policy, typename Property,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
+        )
     // clang-format on
     auto tag_invoke(
         Tag tag, parallel_policy_executor<Policy> const& exec, Property&& prop)
@@ -595,11 +596,11 @@ namespace hpx::execution {
         return exec_with_prop;
     }
 
+    template <typename Tag,typename Policy>
     // clang-format off
-    template <typename Tag,typename Policy,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
+        )
     // clang-format on
     auto tag_invoke(Tag tag, parallel_policy_executor<Policy> const& exec)
         -> decltype(std::declval<Tag>()(std::declval<Policy>()))
