@@ -96,11 +96,11 @@ namespace hpx::execution::experimental {
             return sched_;
         }
 
+        template <typename Parameters>
         // clang-format off
-        template <typename Parameters,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_executor_parameters_v<Parameters>
-            )>
+            )
         // clang-format on
         friend auto tag_invoke(
             hpx::execution::experimental::processing_units_count_t tag,
@@ -178,11 +178,11 @@ namespace hpx::execution::experimental {
         }
 
         // BulkTwoWayExecutor interface
+        template <typename F, typename S, typename... Ts>
         // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                !std::is_integral_v<S>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
@@ -251,11 +251,11 @@ namespace hpx::execution::experimental {
             }
         }
 
+        template <typename F, typename S, typename... Ts>
         // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                !std::is_integral_v<S>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
@@ -267,11 +267,11 @@ namespace hpx::execution::experimental {
                     exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
         }
 
-        // clang-format off
-        template <typename F, typename S, typename Future, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+        template <typename F, typename S, typename Future, typename... Ts>
+         // clang-format off
+            requires (
                !std::is_integral_v<S>
-            )>
+            )
         // clang-format on
         friend auto tag_invoke(hpx::parallel::execution::bulk_then_execute_t,
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
@@ -301,11 +301,11 @@ namespace hpx::execution::experimental {
         -> explicit_scheduler_executor<std::decay_t<BaseScheduler>>;
 
     // support all properties exposed by the wrapped scheduler
+    template <typename Tag, typename BaseScheduler, typename Property>
     // clang-format off
-    template <typename Tag, typename BaseScheduler, typename Property,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
+        )
     auto tag_invoke(Tag tag,
         explicit_scheduler_executor<BaseScheduler> const& exec, Property&& prop)
         -> decltype(explicit_scheduler_executor<BaseScheduler>(
@@ -317,11 +317,11 @@ namespace hpx::execution::experimental {
     }
     // clang-format on
 
+    template <typename Tag, typename BaseScheduler>
     // clang-format off
-    template <typename Tag, typename BaseScheduler,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
+        )
     // clang-format on
     auto tag_invoke(
         Tag tag, explicit_scheduler_executor<BaseScheduler> const& exec)

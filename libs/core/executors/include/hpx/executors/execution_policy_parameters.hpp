@@ -26,14 +26,14 @@ namespace hpx::execution::experimental {
     // policies that simply forwards to the embedded executor (if that supports
     // the parameters type)
 
+    template <typename ExPolicy>
     // clang-format off
-    template <typename ExPolicy,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::is_invocable_v<
                 with_processing_units_count_t,
                 typename std::decay_t<ExPolicy>::executor_type, std::size_t>
-        )>
+        )
     // clang-format on
     constexpr decltype(auto) tag_invoke(
         with_processing_units_count_t, ExPolicy&& policy, std::size_t num_cores)
@@ -44,9 +44,9 @@ namespace hpx::execution::experimental {
             policy, HPX_MOVE(exec), policy.parameters());
     }
 
+    template <typename ExPolicy, typename Params>
     // clang-format off
-    template <typename ExPolicy, typename Params,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_executor_parameters_v<Params> &&
             hpx::is_invocable_v<
@@ -57,7 +57,7 @@ namespace hpx::execution::experimental {
                 std::decay_t<Params>,
                 typename std::decay_t<ExPolicy>::executor_type,
                 hpx::chrono::steady_duration const&, std::size_t>
-        )>
+        )
     // clang-format on
     constexpr decltype(auto) tag_invoke(
         with_processing_units_count_t, ExPolicy&& policy, Params&& params)
@@ -75,12 +75,12 @@ namespace hpx::execution::experimental {
     // general fallback for parameters types that are not directly supported by
     // the underlying executor
 
+    template <typename ParametersProperty, typename ExPolicy, typename Params>
     // clang-format off
-    template <typename ParametersProperty, typename ExPolicy, typename Params,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_executor_parameters_v<Params>
-        )>
+        )
     // clang-format on
     constexpr decltype(auto) tag_fallback_invoke(
         ParametersProperty, ExPolicy&& policy, Params&& params)
@@ -88,11 +88,11 @@ namespace hpx::execution::experimental {
         return policy.with(HPX_FORWARD(Params, params));
     }
 
+    template <typename ParametersProperty, typename ExPolicy, typename...Ts>
     // clang-format off
-    template <typename ParametersProperty, typename ExPolicy, typename...Ts,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy>
-        )>
+        )
     // clang-format on
     constexpr auto tag_fallback_invoke(
         ParametersProperty prop, ExPolicy&& policy, Ts&&... ts)

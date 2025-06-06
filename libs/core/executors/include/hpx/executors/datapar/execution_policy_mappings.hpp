@@ -28,11 +28,11 @@ namespace hpx::execution::experimental {
     {
     private:
         // any non-simd policy just returns itself
+        template <typename ExPolicy>
         // clang-format off
-        template <typename ExPolicy,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy>
-            )>
+            )
         // clang-format on
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_non_simd_t, ExPolicy&& policy) noexcept
@@ -54,12 +54,13 @@ namespace hpx::execution::experimental {
     {
     private:
         // any simd policy just returns itself
+
+        template <typename ExPolicy>
         // clang-format off
-        template <typename ExPolicy,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy>
-            )>
-        // clang-format on
+            )
+        // clang-format on 
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_simd_t, ExPolicy&& policy) noexcept
         {

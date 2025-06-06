@@ -1209,11 +1209,11 @@ namespace hpx::execution::experimental {
     private:
         std::shared_ptr<shared_data> shared_data_ = nullptr;
 
+        template <typename F, typename S, typename... Ts>
         // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !std::is_integral_v<S>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
@@ -1223,11 +1223,11 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
+        template <typename F, typename S, typename... Ts>
         // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !std::is_integral_v<S>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
@@ -1237,11 +1237,11 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
+        template <typename F, typename... Fs>
         // clang-format off
-        template <typename F, typename... Fs,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...)
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::async_invoke_t,
@@ -1251,11 +1251,11 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f), HPX_FORWARD(Fs, fs)...);
         }
 
+        template <typename F, typename... Fs>
         // clang-format off
-        template <typename F, typename... Fs,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...)
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::sync_invoke_t,

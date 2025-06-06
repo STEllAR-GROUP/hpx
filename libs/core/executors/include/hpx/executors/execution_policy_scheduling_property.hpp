@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/async_base/scheduling_properties.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/executors/rebind_executor.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/tag_invoke.hpp>
@@ -21,15 +20,15 @@ namespace hpx::execution::experimental {
     // Scheduling property implementations for execution policies that simply
     // forwards to the embedded executor
 
+    template <typename Tag, typename ExPolicy, typename Property>
     // clang-format off
-    template <typename Tag, typename ExPolicy, typename Property,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::execution::experimental::is_scheduling_property_v<Tag> &&
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::functional::is_tag_invocable_v<
                 Tag, typename std::decay_t<ExPolicy>::executor_type,
                 Property>
-        )>
+        )
     // clang-format on
     constexpr decltype(auto) tag_invoke(
         Tag tag, ExPolicy&& policy, Property prop)
@@ -38,14 +37,14 @@ namespace hpx::execution::experimental {
             policy, tag(policy.executor(), prop), policy.parameters());
     }
 
+    template <typename Tag, typename ExPolicy>
     // clang-format off
-    template <typename Tag, typename ExPolicy,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::execution::experimental::is_scheduling_property_v<Tag> &&
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::functional::is_tag_invocable_v<
                 Tag, typename std::decay_t<ExPolicy>::executor_type>
-        )>
+        )
     // clang-format on
     constexpr decltype(auto) tag_invoke(Tag tag, ExPolicy&& policy)
     {

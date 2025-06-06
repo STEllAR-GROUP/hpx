@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/config.hpp> 
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/execution.hpp>
@@ -320,14 +320,14 @@ namespace hpx::lcos::detail {
         // The overload for hpx::dataflow taking an executor simply forwards
         // to the corresponding executor customization point.
         //
+        template <typename Executor, typename Futures_>
         // clang-format off
-        template <typename Executor, typename Futures_,
-            HPX_CONCEPT_REQUIRES_((
+            requires ((
                 traits::is_one_way_executor_v<Executor> ||
                 traits::is_two_way_executor_v<Executor>) &&
                 !has_dataflow_finalize_v<
                     Executor, dataflow_frame, Func, Futures_>
-            )>
+            )
         // clang-format on
         HPX_FORCEINLINE void finalize(Executor&& exec, Futures_&& futures)
         {
@@ -337,14 +337,14 @@ namespace hpx::lcos::detail {
                 HPX_MOVE(this_f_), HPX_FORWARD(Futures_, futures));
         }
 
+        template <typename Executor, typename Futures_>
         // clang-format off
-        template <typename Executor, typename Futures_,
-            HPX_CONCEPT_REQUIRES_((
+            requires ((
                 traits::is_one_way_executor_v<Executor> ||
                 traits::is_two_way_executor_v<Executor>) &&
                 has_dataflow_finalize_v<
                     Executor, dataflow_frame, Func, Futures_>
-            )>
+            )
         // clang-format on
         HPX_FORCEINLINE void finalize(Executor&& exec, Futures_&& futures)
         {
@@ -459,13 +459,14 @@ namespace hpx::lcos::detail {
 
 namespace hpx::detail {
 
+    template <typename Allocator, typename Policy, typename F, typename... Ts>
     // clang-format off
-    template <typename Allocator, typename Policy, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_allocator_v<Allocator> &&
             hpx::traits::is_launch_policy_v<Policy> &&
            !hpx::traits::is_action_v<std::decay_t<F>>
-        )>
+        )
+    // clang-format on 
     auto tag_invoke(dataflow_t, Allocator const& alloc, Policy&& policy, F&& f,
         Ts&&... ts)
         -> decltype(
@@ -480,13 +481,14 @@ namespace hpx::detail {
             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 
+    template <typename Allocator, typename Policy, typename F, typename... Ts>
     // clang-format off
-    template <typename Allocator, typename Policy, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_allocator_v<Allocator> &&
             hpx::traits::is_launch_policy_v<Policy> &&
             hpx::traits::is_action_v<std::decay_t<F>>
-        )>
+        )
+    // clang-format on 
     auto tag_invoke(dataflow_t, Allocator const& alloc, Policy&& policy, F&& f,
         Ts&&... ts)
         -> decltype(
@@ -503,13 +505,13 @@ namespace hpx::detail {
 
     // executors
     //
+    template <typename Allocator, typename Executor, typename F, typename... Ts>
     // clang-format off
-    template <typename Allocator, typename Executor, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_allocator_v<Allocator> &&
            (hpx::traits::is_one_way_executor_v<Executor> ||
             hpx::traits::is_two_way_executor_v<Executor>)
-        )>
+        )
     // clang-format on
     HPX_FORCEINLINE decltype(auto) tag_invoke(
         dataflow_t, Allocator const& alloc, Executor&& exec, F&& f, Ts&&... ts)
@@ -521,14 +523,15 @@ namespace hpx::detail {
 
     // any action, plain function, or function object
     //
-    // clang-format off
-    template <typename Allocator, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(
+    template <typename Allocator, typename F, typename... Ts>
+    // clang-format off 
+        requires (
              hpx::traits::is_allocator_v<Allocator> &&
             !hpx::traits::is_launch_policy_v<F> &&
             !hpx::traits::is_one_way_executor_v<F> &&
             !hpx::traits::is_two_way_executor_v<F>
-        )>
+        )
+    // clang-format on 
     HPX_FORCEINLINE auto tag_invoke(
         dataflow_t, Allocator const& alloc, F&& f, Ts&&... ts)
         -> decltype(
