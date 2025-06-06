@@ -184,12 +184,12 @@ namespace hpx::resiliency::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // support all properties exposed by the wrapped executor
-    // clang-format off
     template <typename Tag, typename BaseExecutor,
-        typename Vote, typename Validate, typename Property,
-        HPX_CONCEPT_REQUIRES_(
+        typename Vote, typename Validate, typename Property>
+    // clang-format off
+        requires (
             hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
+        )
     // clang-format on
     auto tag_invoke(Tag tag,
         replicate_executor<BaseExecutor, Vote, Validate> const& exec,
@@ -205,12 +205,12 @@ namespace hpx::resiliency::experimental {
             exec.get_replicate_count(), exec.get_voter(), exec.get_validator());
     }
 
-    // clang-format off
     template <typename Tag, typename BaseExecutor,
-        typename Vote, typename Validate,
-        HPX_CONCEPT_REQUIRES_(
+        typename Vote, typename Validate>
+    // clang-format off
+        requires (
             hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
+        )
     // clang-format on
     auto tag_invoke(
         Tag tag, replicate_executor<BaseExecutor, Vote, Validate> const& exec)
