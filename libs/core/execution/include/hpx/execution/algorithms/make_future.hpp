@@ -323,17 +323,17 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_priority<make_future_t>
     {
     private:
-        // clang-format off
         template <typename Sender,
-            typename Allocator = hpx::util::internal_allocator<>,
-            HPX_CONCEPT_REQUIRES_(
+            typename Allocator = hpx::util::internal_allocator<>>
+        // clang-format off
+            requires (
                 is_sender_v<Sender> &&
                 hpx::traits::is_allocator_v<Allocator> &&
                 experimental::detail::is_completion_scheduler_tag_invocable_v<
                     hpx::execution::experimental::set_value_t,
                     Sender, make_future_t, Allocator
                 >
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(make_future_t,
             Sender&& sender, Allocator const& allocator = Allocator{})
@@ -353,12 +353,12 @@ namespace hpx::execution::experimental {
                 HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender), allocator);
         }
 
-        // clang-format off
         template <typename Sender,
-            typename Allocator = hpx::util::internal_allocator<>,
-            HPX_CONCEPT_REQUIRES_(
+            typename Allocator = hpx::util::internal_allocator<>>
+        // clang-format off
+            requires (
                 hpx::execution::experimental::is_sender_v<Sender>
-            )>
+            )
         // clang-format on
         friend auto tag_invoke(make_future_t,
 #if defined(HPX_HAVE_STDEXEC)
@@ -373,13 +373,14 @@ namespace hpx::execution::experimental {
                 sched, HPX_FORWARD(Sender, sender), allocator);
         }
 
-        // clang-format off
+      
         template <typename Sender,
-            typename Allocator = hpx::util::internal_allocator<>,
-            HPX_CONCEPT_REQUIRES_(
+            typename Allocator = hpx::util::internal_allocator<>>
+        // clang-format off
+            requires (
                 is_sender_v<Sender> &&
                 hpx::traits::is_allocator_v<Allocator>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(make_future_t,
             Sender&& sender, Allocator const& allocator = Allocator{})
@@ -387,13 +388,13 @@ namespace hpx::execution::experimental {
             return detail::make_future(HPX_FORWARD(Sender, sender), allocator);
         }
 
-        // clang-format off
         template <typename Scheduler,
-            typename Allocator = hpx::util::internal_allocator<>,
-            HPX_CONCEPT_REQUIRES_(
+            typename Allocator = hpx::util::internal_allocator<>>
+        // clang-format off
+            requires (
                 hpx::execution::experimental::is_scheduler_v<Scheduler> &&
                 hpx::traits::is_allocator_v<Allocator>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(make_future_t,
             Scheduler&& scheduler, Allocator const& allocator = Allocator{})
@@ -403,11 +404,11 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(Scheduler, scheduler), allocator};
         }
 
+        template <typename Allocator = hpx::util::internal_allocator<>>
         // clang-format off
-        template <typename Allocator = hpx::util::internal_allocator<>,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_allocator_v<Allocator>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             make_future_t, Allocator const& allocator = Allocator{})
