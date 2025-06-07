@@ -554,13 +554,13 @@ namespace hpx::parallel::execution {
         }
 
         // support all properties exposed by the wrapped executor
+        template <typename Tag, typename Property>
         // clang-format off
-        template <typename Tag, typename Property,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_scheduling_property_v<Tag> &&
                 hpx::functional::is_tag_invocable_v<
                     Tag, BaseExecutor, Property>
-            )>
+            )
         // clang-format on
         friend timed_executor tag_invoke(
             Tag tag, timed_executor const& exec, Property&& prop)
@@ -569,12 +569,12 @@ namespace hpx::parallel::execution {
                 tag, exec.exec_, HPX_FORWARD(Property, prop)));
         }
 
+        template <typename Tag>
         // clang-format off
-        template <typename Tag,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_scheduling_property_v<Tag> &&
                 hpx::functional::is_tag_invocable_v<Tag, BaseExecutor>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(Tag tag, timed_executor const& exec)
         {
