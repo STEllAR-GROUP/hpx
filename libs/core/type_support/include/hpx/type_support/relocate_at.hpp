@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/is_relocatable.hpp>
 #include <hpx/type_support/is_trivially_relocatable.hpp>
@@ -23,13 +22,16 @@ namespace hpx::detail {
 
 #if __cplusplus < 202002L
     // until c++20 std::destroy_at can be used only on non-array types
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T,
-        HPX_CONCEPT_REQUIRES_(std::is_destructible_v<T> && !std::is_array_v<T>)>
+    template <typename T>
+    // clang-format off
+        requires (std::is_destructible_v<T> && !std::is_array_v<T>)
+    // clang-format on 
 #else
-    // since c++20 std::destroy_at can be used on array types, destructing each
-    // element
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T,
-        HPX_CONCEPT_REQUIRES_(std::is_destructible_v<T>)>
+    // since c++20 std::destroy_at can be used on array types, destructing each element
+    template <typename T>
+    // clang-format off
+    requires (std::is_destructible_v<T>)
+    // clang-format on 
 #endif
     struct destroy_guard
     {
