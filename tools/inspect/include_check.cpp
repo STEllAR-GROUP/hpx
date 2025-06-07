@@ -293,8 +293,12 @@ namespace boost { namespace inspect {
             {"hpx/modules/errors.hpp"}},
         //
         // std concepts
-        {"(\\bstd\\s*::\\s*convertible_to\\b)", "std::convertible_to", {"concepts"}},
-        {"(\\bstd\\s*::\\s*derived_from\\b)", "std::derived_from", {"concepts"}},
+        {"(\\bstd\\s*::\\s*convertible_to\\b)", "std::convertible_to",
+            {"concepts"}},
+        {"(\\bstd\\s*::\\s*destructible\\b)", "std::destructible",
+            {"concepts"}},
+        {"(\\bstd\\s*::\\s*derived_from\\b)", "std::derived_from",
+            {"concepts"}},
         {"(\\bstd\\s*::\\s*integral\\b)", "std::integral", {"concepts"}},
         {"(\\bstd\\s*::\\s*invocable\\b)", "std::invocable", {"concepts"}},
         {"(\\bstd\\s*::\\s*regular_invocable\\b)", "std::regular_invocable",

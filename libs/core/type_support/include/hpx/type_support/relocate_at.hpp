@@ -7,11 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/concepts.hpp>
 #include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/is_relocatable.hpp>
 #include <hpx/type_support/is_trivially_relocatable.hpp>
 
+#include <concepts>
 #include <cstring>
 #include <type_traits>
 
@@ -21,16 +21,9 @@
 
 namespace hpx::detail {
 
-#if __cplusplus < 202002L
-    // until c++20 std::destroy_at can be used only on non-array types
-    HPX_CXX_EXPORT template <typename T,
-        HPX_CONCEPT_REQUIRES_(std::is_destructible_v<T> && !std::is_array_v<T>)>
-#else
     // since c++20 std::destroy_at can be used on array types, destructing each
     // element
-    HPX_CXX_EXPORT template <typename T,
-        HPX_CONCEPT_REQUIRES_(std::is_destructible_v<T>)>
-#endif
+    HPX_CXX_EXPORT template <std::destructible T>
     struct destroy_guard
     {
         T* t;
@@ -54,25 +47,22 @@ namespace hpx::experimental {
 
     namespace detail {
 
-        /*
-        The condition to use memmove is:
-                hpx::is_trivially_relocatable_v<T> &&
-                !std::is_volatile_v<T>
-
-        The reason for the volatile check is that memmove is not allowed to
-        change the value of a volatile object.
-        */
-
+        // The condition to use memmove is:
+        //         hpx::is_trivially_relocatable_v<T> &&
+        //         !std::is_volatile_v<T>
+        //
+        // The reason for the volatile check is that memmove is not allowed to
+        // change the value of a volatile object.
         HPX_CXX_EXPORT template <typename T>
-        constexpr bool relocate_using_memmove =
+        concept relocate_using_memmove =
             is_trivially_relocatable_v<T> && !std::is_volatile_v<T>;
 
-        HPX_CXX_EXPORT template <typename T,
-            std::enable_if_t<relocate_using_memmove<T>, int> = 0>
+        HPX_CXX_EXPORT template <typename T>
+            requires(relocate_using_memmove<T>)
         T* relocate_at_helper(T* src, T* dst) noexcept
         {
-            void* dst_void = const_cast<void*>(static_cast<void const*>(dst));
-            void* src_void = const_cast<void*>(static_cast<void const*>(src));
+            auto dst_void = const_cast<void*>(static_cast<void const*>(dst));
+            auto src_void = const_cast<void*>(static_cast<void const*>(src));
 
             std::memmove(dst_void, src_void, sizeof(T));
 
@@ -80,8 +70,8 @@ namespace hpx::experimental {
         };
 
         // this is move and destroy
-        HPX_CXX_EXPORT template <typename T,
-            std::enable_if_t<!relocate_using_memmove<T>, int> = 0>
+        HPX_CXX_EXPORT template <typename T>
+            requires(!relocate_using_memmove<T>)
         T* relocate_at_helper(T* src, T* dst) noexcept(
             std::is_nothrow_move_constructible_v<T>)
         {
@@ -97,32 +87,30 @@ namespace hpx::experimental {
             return HPX_MOVE(*src);
         }
 
-        /*
-        P1144 also proposes a version of relocate that does not call the
-        move constructor and instead memmoves the bytes of src to dest.
-
-        Giving an interface like:
-
-            T dest = relocate(std::addressof(src));
-
-        That results in a valid T object (dest) without calling any
-        constructor or destructor.
-
-        This is not possible to do with the current C++ standard.
-
-        One of the proposed ways to implement this uses a hypothetical
-        attribute "do_not_construct" and NRVO.
-
-        Implementation:
-
-        template <class T, std::enable_if_t<relocate_using_memmove<T>, int> = 0>
-        T relocate(T* source)
-        {
-            __attribute__((do_not_construct)) T t; // hypothetical attribute
-            std::memmove(std::addressof(t), source, sizeof(T));
-            return t;  // NRVO
-        }
-        */
+        // P1144 also proposes a version of relocate that does not call the
+        // move constructor and instead memmoves the bytes of src to dest.
+        // 
+        // Giving an interface like:
+        // 
+        //     T dest = relocate(std::addressof(src));
+        // 
+        // That results in a valid T object (dest) without calling any
+        // constructor or destructor.
+        // 
+        // This is not possible to do with the current C++ standard.
+        // 
+        // One of the proposed ways to implement this uses a hypothetical
+        // attribute "do_not_construct" and NRVO.
+        // 
+        // Implementation:
+        // 
+        // template <class T, std::enable_if_t<relocate_using_memmove<T>, int> = 0>
+        // T relocate(T* source)
+        // {
+        //     __attribute__((do_not_construct)) T t; // hypothetical attribute
+        //     std::memmove(std::addressof(t), source, sizeof(T));
+        //     return t;  // NRVO
+        // }
     }    // namespace detail
 
     HPX_CXX_EXPORT template <typename T>
