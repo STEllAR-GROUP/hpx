@@ -349,13 +349,12 @@ namespace hpx { namespace parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
 
+    template <typename InIter, typename T>
     // clang-format off
-    template <typename InIter,
-        typename T,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_iterator<InIter>::value &&
             hpx::traits::is_segmented_iterator<InIter>::value
-        )>
+        )
     // clang-format on
     typename std::iterator_traits<InIter>::difference_type tag_invoke(
         hpx::count_t, InIter first, InIter last, T const& value)
@@ -377,14 +376,13 @@ namespace hpx { namespace segmented {
             std::true_type());
     }
 
+    template <typename ExPolicy, typename SegIter, typename T>
     // clang-format off
-    template <typename ExPolicy, typename SegIter,
-        typename T,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
+        )
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename std::iterator_traits<SegIter>::difference_type>::type
@@ -411,13 +409,12 @@ namespace hpx { namespace segmented {
             is_seq());
     }
 
+    template <typename InIter, typename F>
     // clang-format off
-    template <typename InIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_iterator<InIter>::value &&
             hpx::traits::is_segmented_iterator<InIter>::value
-        )>
+        )
     // clang-format on
     typename std::iterator_traits<InIter>::difference_type tag_invoke(
         hpx::count_if_t, InIter first, InIter last, F&& f)
@@ -439,14 +436,13 @@ namespace hpx { namespace segmented {
             hpx::identity_v, std::true_type());
     }
 
+    template <typename ExPolicy, typename SegIter, typename F>
     // clang-format off
-    template <typename ExPolicy, typename SegIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
+        )
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename std::iterator_traits<SegIter>::difference_type>::type

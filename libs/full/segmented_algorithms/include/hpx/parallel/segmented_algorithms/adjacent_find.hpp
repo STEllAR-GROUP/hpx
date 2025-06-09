@@ -278,13 +278,13 @@ namespace hpx::parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx::segmented {
 
-    // clang-format off
     template<typename InIter,
-        typename Pred,
-        HPX_CONCEPT_REQUIRES_(
+        typename Pred>
+    // clang-format off
+        requires (
             hpx::traits::is_iterator<InIter>::value &&
             hpx::traits::is_segmented_iterator<InIter>::value
-        )>
+        )
     // clang-format on
     InIter tag_invoke(
         hpx::adjacent_find_t, InIter first, InIter last, Pred&& pred = Pred())
@@ -307,14 +307,14 @@ namespace hpx::segmented {
             hpx::identity_v, std::true_type());
     }
 
-    // clang-format off
     template<typename ExPolicy, typename SegIter,
-        typename Pred,
-        HPX_CONCEPT_REQUIRES_(
+        typename Pred>
+    // clang-format off
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
+        )
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         SegIter>::type

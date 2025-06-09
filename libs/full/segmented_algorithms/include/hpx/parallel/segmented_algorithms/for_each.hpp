@@ -186,13 +186,12 @@ namespace hpx::parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx::segmented {
 
+    template <typename InIter, typename F>
     // clang-format off
-    template <typename InIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_iterator_v<InIter> &&
             hpx::traits::is_segmented_iterator_v<InIter>
-        )>
+        )
     // clang-format on
     InIter tag_invoke(hpx::for_each_t, InIter first, InIter last, F&& f)
     {
@@ -213,14 +212,13 @@ namespace hpx::segmented {
             hpx::identity_v, std::true_type());
     }
 
+    template <typename ExPolicy, typename SegIter, typename F>
     // clang-format off
-    template <typename ExPolicy, typename SegIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
+        )
     // clang-format on
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
     tag_invoke(
@@ -248,13 +246,12 @@ namespace hpx::segmented {
             hpx::identity_v, is_seq());
     }
 
+    template <typename InIter, typename Size, typename F>
     // clang-format off
-    template <typename InIter, typename Size,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_iterator_v<InIter> &&
             hpx::traits::is_segmented_iterator_v<InIter>
-        )>
+        )
     // clang-format on
     InIter tag_invoke(hpx::for_each_n_t, InIter first, Size count, F&& f)
     {
@@ -277,14 +274,13 @@ namespace hpx::segmented {
             hpx::identity_v, std::true_type());
     }
 
+    template <typename ExPolicy, typename SegIter, typename Size, typename F>
     // clang-format off
-    template <typename ExPolicy, typename SegIter, typename Size,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
+        )
     // clang-format on
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
     tag_invoke(

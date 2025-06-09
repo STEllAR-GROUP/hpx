@@ -250,16 +250,16 @@ namespace hpx::parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx::segmented {
 
-    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Op,
-        HPX_CONCEPT_REQUIRES_(
+        typename Op>
+    // clang-format off
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<FwdIter1> &&
             hpx::traits::is_segmented_iterator_v<FwdIter1> &&
             hpx::traits::is_iterator_v<FwdIter2> &&
             hpx::traits::is_segmented_iterator_v<FwdIter2>
-        )>
+        )
     // clang-format on
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
     tag_invoke(hpx::adjacent_difference_t, ExPolicy&& policy, FwdIter1 first,
@@ -288,14 +288,14 @@ namespace hpx::segmented {
             HPX_FORWARD(Op, op), is_seq());
     }
 
+    template <typename InIter1, typename InIter2, typename Op>
     // clang-format off
-    template <typename InIter1, typename InIter2, typename Op,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_iterator_v<InIter1> &&
             hpx::traits::is_segmented_iterator_v<InIter1> &&
             hpx::traits::is_iterator_v<InIter2> &&
             hpx::traits::is_segmented_iterator_v<InIter2>
-        )>
+        )
     // clang-format on
     InIter2 tag_invoke(hpx::adjacent_difference_t, InIter1 first, InIter1 last,
         InIter2 dest, Op&& op)
