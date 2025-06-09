@@ -377,16 +377,14 @@ namespace hpx { namespace parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
 
+    template <typename SegIter, typename T, typename Reduce, typename Convert>
     // clang-format off
-    template <typename SegIter, typename T,
-        typename Reduce,
-        typename Convert,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
+        )
     // clang-format on
-    std::decay<T> tag_invoke(hpx::transform_reduce_t, SegIter first,
+    typename std::decay<T>::type tag_invoke(hpx::transform_reduce_t, SegIter first,
         SegIter last, T&& init, Reduce&& red_op, Convert&& conv_op)
     {
         static_assert(hpx::traits::is_input_iterator<SegIter>::value,
@@ -406,15 +404,13 @@ namespace hpx { namespace segmented {
             std::true_type{});
     }
 
+    template <typename ExPolicy, typename SegIter, typename T, typename Reduce, typename Convert>
     // clang-format off
-    template <typename ExPolicy, typename SegIter, typename T,
-        typename Reduce,
-        typename Convert,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
+        )
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy,
         typename std::decay<T>::type>::type
@@ -440,16 +436,14 @@ namespace hpx { namespace segmented {
             is_seq());
     }
 
+    template <typename FwdIter1, typename FwdIter2, typename T, typename Reduce, typename Convert>
     // clang-format off
-    template <typename FwdIter1, typename FwdIter2, typename T,
-        typename Reduce,
-        typename Convert,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_segmented_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value &&
             hpx::traits::is_segmented_iterator<FwdIter2>::value
-        )>
+        )
     // clang-format on
     T tag_invoke(hpx::transform_reduce_t, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
@@ -470,16 +464,16 @@ namespace hpx { namespace segmented {
             std::true_type{});
     }
 
-    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T, typename Reduce, typename Convert,
-        HPX_CONCEPT_REQUIRES_(
+        typename T, typename Reduce, typename Convert>
+    // clang-format off
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator<FwdIter1>::value &&
             hpx::traits::is_segmented_iterator<FwdIter1>::value &&
             hpx::traits::is_iterator<FwdIter2>::value &&
             hpx::traits::is_segmented_iterator<FwdIter2>::value
-        )>
+        )
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy, T>::type
     tag_invoke(hpx::transform_reduce_t, ExPolicy&& policy, FwdIter1 first1,
