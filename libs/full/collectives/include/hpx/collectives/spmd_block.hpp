@@ -336,8 +336,8 @@ namespace hpx { namespace lcos {
         };
     }    // namespace detail
 
-    template <typename F, typename... Args,
-        HPX_CONCEPT_REQUIRES_(hpx::traits::is_action<F>::value)>
+    template <typename F, typename... Args>
+        requires(hpx::traits::is_action_v<F>)
     hpx::future<void> define_spmd_block(std::string&& name,
         std::size_t images_per_locality, F&& /* f */, Args&&... args)
     {
@@ -370,4 +370,5 @@ namespace hpx { namespace lcos {
             HPX_FORWARD(Args, args)...);
     }
 }}    // namespace hpx::lcos
+
 #endif

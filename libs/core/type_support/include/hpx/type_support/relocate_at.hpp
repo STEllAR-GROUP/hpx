@@ -89,21 +89,21 @@ namespace hpx::experimental {
 
         // P1144 also proposes a version of relocate that does not call the
         // move constructor and instead memmoves the bytes of src to dest.
-        // 
+        //
         // Giving an interface like:
-        // 
+        //
         //     T dest = relocate(std::addressof(src));
-        // 
+        //
         // That results in a valid T object (dest) without calling any
         // constructor or destructor.
-        // 
+        //
         // This is not possible to do with the current C++ standard.
-        // 
+        //
         // One of the proposed ways to implement this uses a hypothetical
         // attribute "do_not_construct" and NRVO.
-        // 
+        //
         // Implementation:
-        // 
+        //
         // template <class T, std::enable_if_t<relocate_using_memmove<T>, int> = 0>
         // T relocate(T* source)
         // {
