@@ -121,13 +121,13 @@ namespace hpx::execution::experimental {
         // property implementations
 
         // support all properties exposed by the embedded executor
+        template <typename Tag, typename Property>
         // clang-format off
-        template <typename Tag, typename Property,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_scheduling_property_v<Tag> &&
                 hpx::functional::is_tag_invocable_v<
                     Tag, embedded_executor, Property>
-            )>
+            )
         // clang-format on
         friend restricted_policy_executor tag_invoke(
             Tag tag, restricted_policy_executor const& exec, Property&& prop)
@@ -139,12 +139,12 @@ namespace hpx::execution::experimental {
             return exec_with_prop;
         }
 
+        template <typename Tag>
         // clang-format off
-        template <typename Tag,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_scheduling_property_v<Tag> &&
                 hpx::functional::is_tag_invocable_v<Tag, embedded_executor>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             Tag tag, restricted_policy_executor const& exec)
@@ -152,11 +152,11 @@ namespace hpx::execution::experimental {
             return tag(exec.generate_executor(exec.get_current_thread_num()));
         }
 
+        template <typename Parameters>
         // clang-format off
-        template <typename Parameters,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_executor_parameters_v<Parameters>
-            )>
+            )
         // clang-format on
         friend constexpr std::size_t tag_invoke(
             hpx::execution::experimental::processing_units_count_t tag,
@@ -213,11 +213,11 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
+        template <typename F, typename S, typename... Ts>
         // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !std::is_integral_v<S>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
@@ -229,11 +229,11 @@ namespace hpx::execution::experimental {
                 shape, HPX_FORWARD(Ts, ts)...);
         }
 
+        template <typename F, typename S, typename Future, typename... Ts>
         // clang-format off
-        template <typename F, typename S, typename Future, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !std::is_integral_v<S>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_then_execute_t,

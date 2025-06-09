@@ -60,12 +60,12 @@ namespace hpx { namespace parallel {
 
 namespace hpx { namespace segmented {
 
+    template <typename SegIter, typename T>
     // clang-format off
-    template<typename SegIter, typename T,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
+        )
     // clang-format on
     SegIter tag_invoke(hpx::fill_t, SegIter first, SegIter last, T const& value)
     {
@@ -88,13 +88,13 @@ namespace hpx { namespace segmented {
             hpx::identity_v, std::true_type{});
     }
 
+    template <typename ExPolicy, typename SegIter, typename T>
     // clang-format off
-    template <typename ExPolicy, typename SegIter, typename T,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
+        )
     // clang-format on
     static typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         SegIter>::type

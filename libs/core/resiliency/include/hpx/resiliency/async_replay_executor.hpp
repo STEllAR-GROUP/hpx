@@ -15,7 +15,6 @@
 #include <hpx/resiliency/async_replay.hpp>
 #include <hpx/resiliency/resiliency_cpos.hpp>
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/modules/async_local.hpp>
@@ -218,12 +217,13 @@ namespace hpx::resiliency::experimental {
     // Asynchronously launch given function f. Verify the result of those
     // invocations using the given predicate pred. Repeat launching on error
     // exactly n times (except if abort_replay_exception is thrown).
+    
+    template <typename Executor, typename Pred, typename F, typename... Ts>
     // clang-format off
-    template <typename Executor, typename Pred, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_one_way_executor_v<Executor> ||
             hpx::traits::is_two_way_executor_v<Executor>
-        )>
+        )
     // clang-format on
     decltype(auto) tag_invoke(async_replay_validate_t, Executor&& exec,
         std::size_t n, Pred&& pred, F&& f, Ts&&... ts)
@@ -239,10 +239,11 @@ namespace hpx::resiliency::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // Asynchronously launch given function f. Repeat launching on error exactly
-    // n times (except if abort_replay_exception is thrown). clang-format off
-    template <typename Executor, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(hpx::traits::is_one_way_executor_v<Executor> ||
-            hpx::traits::is_two_way_executor_v<Executor>)>
+    // n times (except if abort_replay_exception is thrown). 
+    template <typename Executor, typename F, typename... Ts>
+    // clang-format off
+        requires (hpx::traits::is_one_way_executor_v<Executor> ||
+            hpx::traits::is_two_way_executor_v<Executor>)
     // clang-format on
     decltype(auto) tag_invoke(
         async_replay_t, Executor&& exec, std::size_t n, F&& f, Ts&&... ts)

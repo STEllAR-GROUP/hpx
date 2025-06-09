@@ -486,13 +486,12 @@ namespace hpx::parallel {
 namespace hpx::segmented {
 
     // clang-format off
-    template <typename InIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
+    template <typename InIter, typename F>
+    // clang-format on
+        requires (
             hpx::traits::is_iterator<InIter>::value &&
             hpx::traits::is_segmented_iterator<InIter>::value
-        )>
-    // clang-format on
+        )
     bool tag_invoke(hpx::none_of_t, InIter first, InIter last, F&& f)
     {
         static_assert(hpx::traits::is_input_iterator<InIter>::value,
@@ -503,14 +502,13 @@ namespace hpx::segmented {
             HPX_FORWARD(F, f), hpx::identity_v, std::true_type());
     }
 
+    template <typename ExPolicy, typename SegIter, typename F>
     // clang-format off
-    template <typename ExPolicy, typename SegIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
+        )
     // clang-format on
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> tag_invoke(
         hpx::none_of_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
@@ -525,14 +523,12 @@ namespace hpx::segmented {
             first, last, HPX_FORWARD(F, f), hpx::identity_v, is_seq());
     }
 
+    template <typename InIter, typename F>
     // clang-format off
-    template <typename InIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_iterator<InIter>::value &&
             hpx::traits::is_segmented_iterator<InIter>::value
-        )>
-    // clang-format on
+        )
     bool tag_invoke(hpx::any_of_t, InIter first, InIter last, F&& f)
     {
         static_assert(hpx::traits::is_input_iterator<InIter>::value,
@@ -543,14 +539,13 @@ namespace hpx::segmented {
             HPX_FORWARD(F, f), hpx::identity_v, std::true_type());
     }
 
+    template <typename ExPolicy, typename SegIter, typename F>
     // clang-format off
-    template <typename ExPolicy, typename SegIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
+        )
     // clang-format on
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> tag_invoke(
         hpx::any_of_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
@@ -565,14 +560,12 @@ namespace hpx::segmented {
             first, last, HPX_FORWARD(F, f), hpx::identity_v, is_seq());
     }
 
+    template <typename InIter, typename F>
     // clang-format off
-    template <typename InIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_iterator<InIter>::value &&
             hpx::traits::is_segmented_iterator<InIter>::value
-        )>
-    // clang-format on
+        )
     bool tag_invoke(hpx::all_of_t, InIter first, InIter last, F&& f)
     {
         static_assert(hpx::traits::is_input_iterator<InIter>::value,
@@ -583,14 +576,13 @@ namespace hpx::segmented {
             HPX_FORWARD(F, f), hpx::identity_v, std::true_type());
     }
 
+    template <typename ExPolicy, typename SegIter, typename F>
     // clang-format off
-    template <typename ExPolicy, typename SegIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
+        )
     // clang-format on
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> tag_invoke(
         hpx::all_of_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)

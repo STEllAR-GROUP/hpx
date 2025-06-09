@@ -673,14 +673,14 @@ namespace hpx { namespace parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
 
+    template <typename SegIter, typename OutIter, typename F>
     // clang-format off
-    template <typename SegIter, typename OutIter, typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter> &&
             hpx::traits::is_iterator<OutIter>::value &&
             hpx::traits::is_segmented_iterator<OutIter>::value
-        )>
+        )
     // clang-format on
     hpx::parallel::util::in_out_result<SegIter, OutIter> tag_invoke(
         hpx::transform_t, SegIter first, SegIter last, OutIter dest, F&& f)
@@ -707,16 +707,15 @@ namespace hpx { namespace segmented {
             hpx::identity_v, std::true_type{});
     }
 
+    template <typename ExPolicy, typename SegIter, typename OutIter, typename F>
     // clang-format off
-    template <typename ExPolicy, typename SegIter, typename OutIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter> &&
             hpx::traits::is_iterator<OutIter>::value &&
             hpx::traits::is_segmented_iterator<OutIter>::value
-        )>
+        )
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         hpx::parallel::util::in_out_result<SegIter, OutIter>>::type
@@ -750,17 +749,16 @@ namespace hpx { namespace segmented {
             hpx::identity_v, is_seq());
     }
 
+    template <typename InIter1, typename InIter2, typename OutIter, typename F>
     // clang-format off
-    template <typename InIter1, typename InIter2,
-        typename OutIter, typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_iterator<InIter1>::value &&
             hpx::traits::is_segmented_iterator<InIter1>::value &&
             hpx::traits::is_iterator<InIter2>::value &&
             hpx::traits::is_segmented_iterator<InIter2>::value &&
             hpx::traits::is_iterator<OutIter>::value &&
             hpx::traits::is_segmented_iterator<OutIter>::value
-        )>
+        )
     // clang-format on
     hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter> tag_invoke(
         hpx::transform_t, InIter1 first1, InIter1 last1, InIter2 first2,
@@ -797,10 +795,10 @@ namespace hpx { namespace segmented {
             proj_id{}, proj_id{}, std::true_type{});
     }
 
-    // clang-format off
     template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter, typename F,
-        HPX_CONCEPT_REQUIRES_(
+        typename OutIter, typename F>
+    // clang-format off
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator<InIter1>::value &&
             hpx::traits::is_segmented_iterator<InIter1>::value &&
@@ -808,7 +806,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<InIter2>::value &&
             hpx::traits::is_iterator<OutIter>::value &&
             hpx::traits::is_segmented_iterator<OutIter>::value
-        )>
+        )
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter>>::type
@@ -851,17 +849,16 @@ namespace hpx { namespace segmented {
             HPX_FORWARD(F, f), proj_id{}, proj_id{}, is_seq());
     }
 
+    template <typename InIter1, typename InIter2, typename OutIter, typename F>
     // clang-format off
-    template <typename InIter1, typename InIter2,
-        typename OutIter, typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_iterator<InIter1>::value &&
             hpx::traits::is_segmented_iterator<InIter1>::value &&
             hpx::traits::is_iterator<InIter2>::value &&
             hpx::traits::is_segmented_iterator<InIter2>::value &&
             hpx::traits::is_iterator<OutIter>::value &&
             hpx::traits::is_segmented_iterator<OutIter>::value
-        )>
+        )
     // clang-format on
     hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter> tag_invoke(
         hpx::transform_t, InIter1 first1, InIter1 last1, InIter2 first2,
@@ -895,10 +892,10 @@ namespace hpx { namespace segmented {
             HPX_FORWARD(F, f), proj_id{}, proj_id{}, std::true_type{});
     }
 
-    // clang-format off
     template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter, typename F,
-        HPX_CONCEPT_REQUIRES_(
+        typename OutIter, typename F>
+    // clang-format off
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator<InIter1>::value &&
             hpx::traits::is_segmented_iterator<InIter1>::value &&
@@ -906,7 +903,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<InIter2>::value &&
             hpx::traits::is_iterator<OutIter>::value &&
             hpx::traits::is_segmented_iterator<OutIter>::value
-        )>
+        )
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter>>::type
