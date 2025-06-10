@@ -734,25 +734,4 @@ namespace hpx {
 
 #undef HPX_WAIT_ALL_FORCEINLINE
 
-namespace hpx::lcos {
-
-    template <typename... Ts>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_all is deprecated. Use hpx::wait_all instead.")
-    void wait_all(Ts&&... ts)
-    {
-        hpx::wait_all(HPX_FORWARD(Ts, ts)...);
-    }
-
-    template <typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::wait_all_n is deprecated. Use hpx::wait_all_n instead.")
-    void wait_all_n(Iterator begin, std::size_t count)
-    {
-        hpx::wait_all_n(begin, count);
-    }
-}    // namespace hpx::lcos
-
 #endif    // DOXYGEN

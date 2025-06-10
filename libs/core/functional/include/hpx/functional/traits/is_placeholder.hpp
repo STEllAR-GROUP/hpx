@@ -52,17 +52,3 @@ namespace hpx {
     inline constexpr int is_placeholder_v = is_placeholder<T>::value;
 #endif
 }    // namespace hpx
-
-namespace hpx::traits {
-
-    template <typename T>
-    using is_placeholder HPX_DEPRECATED_V(1, 8,
-        "hpx::traits::is_placeholder is deprecated, use "
-        "hpx::is_placeholder instead") = hpx::is_placeholder<T>;
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::traits::is_placeholder_v is deprecated, use "
-        "hpx::is_placeholder_v instead")
-    inline constexpr bool is_placeholder_v = hpx::is_placeholder_v<T>;
-}    // namespace hpx::traits
