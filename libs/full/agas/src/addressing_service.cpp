@@ -770,7 +770,7 @@ namespace hpx::agas {
 
     bool addressing_service::is_local_address_cached(
         naming::gid_type const& gid, naming::address& addr,
-        std::pair<bool, components::pinned_ptr>& r,
+        [[maybe_unused]] std::pair<bool, components::pinned_ptr>& r,
         hpx::move_only_function<std::pair<bool, components::pinned_ptr>(
             naming::address const&)>&& f,
         error_code& ec)
