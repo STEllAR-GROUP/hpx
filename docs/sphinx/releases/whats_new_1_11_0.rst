@@ -144,7 +144,9 @@ Closed issues
 Closed pull requests
 ====================
 
-* :hpx-pr:`6701` - Attempting to fix shutdown hang on exception_info 
+* :hpx-pr:`6716` - Fixing some of the reported linker warnings
+* :hpx-pr:`6705` - Adding gcc/15 to jenkins
+* :hpx-pr:`6701` - Attempting to fix shutdown hang on exception_info
 * :hpx-pr:`6698` - Making sure .hpp.in files are not being installed
 * :hpx-pr:`6697` - Minor docs fix
 * :hpx-pr:`6695` - Adding missing ';'
