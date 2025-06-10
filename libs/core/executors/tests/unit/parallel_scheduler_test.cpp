@@ -5,7 +5,12 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/execution.hpp>
+<<<<<<< HEAD
 #include <hpx/executors/thread_pool_scheduler.hpp>
+=======
+#include <hpx/executors/experimental/parallel_scheduler.hpp>
+#include <hpx/executors/thread_pool_scheduler_bulk.hpp>
+>>>>>>> 778b6d9505 (added bulk_unchunked functionality to thread_pool_scheduler_bulk)
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/synchronization/stop_token.hpp>
@@ -16,6 +21,7 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 #ifdef HPX_HAVE_STDEXEC
 #include <hpx/execution_base/stdexec_forward.hpp>
@@ -48,6 +54,10 @@ struct test_receiver
         bool completed = false;
         bool error_called = false;
         bool stopped_called = false;
+        std::vector<std::thread::id>
+            task_thread_ids;    // Track thread IDs for bulk tasks
+        std::vector<uint32_t>
+            executed_indices;    // Track executed task indices
     };
 
     std::shared_ptr<state> state_ = std::make_shared<state>();
@@ -86,6 +96,25 @@ struct test_receiver
         state_->stopped_called = true;
         done_promise->set_value();
     }
+<<<<<<< HEAD
+=======
+#else
+    void set_value() noexcept
+    {
+        std::cerr << "set_value not supported without stdexec" << std::endl;
+    }
+
+    void set_error([[maybe_unused]] std::exception_ptr) noexcept
+    {
+        std::cerr << "set_error not supported without stdexec" << std::endl;
+    }
+
+    void set_stopped() noexcept
+    {
+        std::cerr << "set_stopped not supported without stdexec" << std::endl;
+    }
+#endif
+>>>>>>> 778b6d9505 (added bulk_unchunked functionality to thread_pool_scheduler_bulk)
 
     struct env
     {
@@ -209,11 +238,124 @@ int hpx_main(hpx::program_options::variables_map&)
     std::cout << "\n=== Completion Scheduler ===\n";
     {
 #ifdef HPX_HAVE_STDEXEC
+<<<<<<< HEAD
         std::cout << "Testing completion scheduler\n";
         bool is_same = ex::get_completion_scheduler<ex::set_value_t>(
                            ex::get_env(ex::schedule(sched))) == sched;
         std::cout << "Completion scheduler matches: " << is_same << "\n";
         HPX_TEST(is_same);
+=======
+    // Test single task (schedule)
+    std::cout << "\n=== Single Task ===" << std::endl;
+    {
+        test_receiver recv;
+        auto state = recv.state_;
+        auto future = recv.get_future();
+        auto sender = ex::schedule(sched);
+        {
+            auto op = ex::connect(std::move(sender), std::move(recv));
+            std::cout << "Calling start() for single task" << std::endl;
+            ex::start(op);
+        }
+        std::cout << "Waiting for single task to complete..." << std::endl;
+        future.get();
+        std::cout << "Single task completed: "
+                  << (state->completed ? "true" : "false") << std::endl;
+        HPX_TEST(state->completed);
+    }
+
+    // Test single task with cancellation
+    std::cout << "\n=== Single Task With Cancellation ===" << std::endl;
+    {
+        test_receiver recv;
+        auto state = recv.state_;
+        auto future = recv.get_future();
+        stdexec::inplace_stop_source stop_src;
+        recv.stop_token = stop_src.get_token();
+        auto sender = ex::schedule(sched);
+        {
+            auto op = ex::connect(std::move(sender), std::move(recv));
+            std::cout << "Requesting stop before start..." << std::endl;
+            stop_src.request_stop();
+            std::cout << "Calling start() for single task with cancellation"
+                      << std::endl;
+            ex::start(op);
+        }
+        std::cout << "Waiting for single task with cancellation to complete..."
+                  << std::endl;
+        future.get();
+        std::cout << "Single task with cancellation: stopped_called = "
+                  << state->stopped_called
+                  << ", completed = " << state->completed << std::endl;
+        HPX_TEST(state->stopped_called && !state->completed);
+    }
+
+    // Test single task with exception
+    std::cout << "\n=== Single Task With Exception ===" << std::endl;
+    {
+        test_receiver recv;
+        auto state = recv.state_;
+        auto future = recv.get_future();
+        auto sender = ex::then(ex::schedule(sched), []() {
+            std::cout << "Executing then functor" << std::endl;
+            throw std::runtime_error("Test exception");
+        });
+        {
+            auto op = ex::connect(std::move(sender), std::move(recv));
+            std::cout << "Calling start() for single task with exception"
+                      << std::endl;
+            ex::start(op);
+        }
+        std::cout << "Waiting for single task with exception to complete..."
+                  << std::endl;
+        future.get();
+        std::cout << "Single task with exception: error_called = "
+                  << state->error_called << std::endl;
+        HPX_TEST(state->error_called);
+    }
+
+    // Test bulk_unchunked
+    std::cout << "\n=== Bulk Unchunked Task ===" << std::endl;
+    {
+        constexpr uint32_t num_tasks = 16;
+        test_receiver recv;
+        auto state = recv.state_;
+        state->task_thread_ids.resize(num_tasks);
+        state->executed_indices.resize(num_tasks, 0);
+        auto future = recv.get_future();
+        std::thread::id this_id = std::this_thread::get_id();
+
+        auto sender = ex::schedule(sched) |
+            stdexec::bulk(stdexec::par, num_tasks, [&](uint32_t idx) {
+                state->task_thread_ids[idx] = std::this_thread::get_id();
+                state->executed_indices[idx] = idx + 1;    // Mark as executed
+                std::cout << "Bulk task " << idx << " on thread "
+                          << state->task_thread_ids[idx] << std::endl;
+            });
+
+        {
+            auto op = ex::connect(std::move(sender), std::move(recv));
+            std::cout << "Calling start() for bulk_unchunked task" << std::endl;
+            ex::start(op);
+        }
+        std::cout << "Waiting for bulk_unchunked task to complete..."
+                  << std::endl;
+        future.get();
+
+        std::cout << "Bulk unchunked task completed: completed = "
+                  << state->completed << std::endl;
+        HPX_TEST(state->completed);
+        for (uint32_t i = 0; i < num_tasks; ++i)
+        {
+            HPX_TEST(state->task_thread_ids[i] !=
+                std::thread::id{});    // Non-empty thread ID
+            HPX_TEST(state->task_thread_ids[i] !=
+                std::thread::id{});    // Only ensure non-empty
+            HPX_TEST(state->executed_indices[i] == i + 1);    // Task i executed
+        }
+    }
+
+>>>>>>> 778b6d9505 (added bulk_unchunked functionality to thread_pool_scheduler_bulk)
 #else
         std::cerr
             << "stdexec not enabled, skipping completion scheduler test\n";
