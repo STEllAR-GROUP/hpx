@@ -15,7 +15,6 @@
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
@@ -54,10 +53,9 @@ namespace hpx::execution::experimental {
             as_sender_operation_state& operator=(
                 as_sender_operation_state const&) = delete;
 
-            friend void tag_invoke(
-                hpxexp::start_t, as_sender_operation_state& os) noexcept
+            void start() & noexcept
             {
-                os.start_helper();
+                start_helper();
             }
 
         private:
@@ -146,10 +144,20 @@ namespace hpx::execution::experimental {
                 using type = hpxexp::set_value_t();
             };
 
-            using completion_signatures = hpxexp::completion_signatures<
+        private:
+            using _completion_signatures = hpxexp::completion_signatures<
                 typename set_value_void_checked<std::is_void_v<result_type>,
                     result_type>::type,
                 hpxexp::set_error_t(std::exception_ptr)>;
+
+        public:
+            // According to P3557R2
+            template <typename Self>
+            static constexpr auto get_completion_signatures()
+            {
+                return _completion_signatures();
+            }
+
 #else
             // Sender compatibility
             template <typename, typename T>
@@ -204,11 +212,13 @@ namespace hpx::execution::experimental {
             as_sender_sender(as_sender_sender const&) = delete;
             as_sender_sender& operator=(as_sender_sender const&) = delete;
 
+            // This is not a shared future, so this is only callable with u
+            // rvalues
             template <typename Receiver>
-            friend as_sender_operation_state<Receiver, future_type> tag_invoke(
-                connect_t, as_sender_sender&& s, Receiver&& receiver)
+            as_sender_operation_state<Receiver, future_type> connect(
+                Receiver&& receiver) &&
             {
-                return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.future_)};
+                return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(future_)};
             }
         };
 
@@ -235,17 +245,17 @@ namespace hpx::execution::experimental {
             as_sender_sender& operator=(as_sender_sender const&) = default;
 
             template <typename Receiver>
-            friend as_sender_operation_state<Receiver, future_type> tag_invoke(
-                connect_t, as_sender_sender&& s, Receiver&& receiver)
+            as_sender_operation_state<Receiver, future_type> connect(
+                Receiver&& receiver) &&
             {
-                return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.future_)};
+                return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(future_)};
             }
 
             template <typename Receiver>
-            friend as_sender_operation_state<Receiver, future_type> tag_invoke(
-                connect_t, as_sender_sender& s, Receiver&& receiver)
+            as_sender_operation_state<Receiver, future_type> connect(
+                Receiver&& receiver) &
             {
-                return {HPX_FORWARD(Receiver, receiver), s.future_};
+                return {HPX_FORWARD(Receiver, receiver), future_};
             }
         };
     }    // namespace detail
