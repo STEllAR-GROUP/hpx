@@ -236,7 +236,7 @@ namespace hpx::execution::experimental::detail {
         std::optional<P> try_query() noexcept
         {
             // Enable querying inplace_stop_token
-            if constexpr (std::is_same_v<P, inplace_stop_token>)
+            if constexpr (std::is_same_v<P, p2300_stop_token::in_place_stop_token>)
             {
                 return hpx::execution::experimental::get_stop_token(
                     hpx::execution::experimental::get_env(op_state->receiver));
