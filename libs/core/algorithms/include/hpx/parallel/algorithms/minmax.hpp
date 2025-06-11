@@ -706,33 +706,41 @@ namespace hpx::parallel {
         minmax_element_result<FwdIter> sequential_minmax_element(ExPolicy&&,
             FwdIter it, std::size_t count, F const& f, Proj const& proj)
         {
-            minmax_element_result<FwdIter> result = {it, it};
+            HPX_ASSERT(count != 0);
 
-            if (count == 0 || count == 1)
-                return result;
+            if (count == 1)
+                return minmax_element_result<FwdIter>{it, it};
 
             using element_type = hpx::traits::proxy_value_t<
                 typename std::iterator_traits<FwdIter>::value_type>;
 
-            element_type min_value = HPX_INVOKE(proj, *it);
-            element_type max_value = min_value;
-            util::loop_n<std::decay_t<ExPolicy>>(
-                ++it, count - 1, [&](FwdIter const& curr) -> void {
-                    element_type curr_value = HPX_INVOKE(proj, *curr);
-                    if (HPX_INVOKE(f, curr_value, min_value))
-                    {
-                        result.min = curr;
-                        min_value = curr_value;
-                    }
+            auto min = it;
+            auto max = it;
+            ++it;
 
-                    if (!HPX_INVOKE(f, curr_value, max_value))
-                    {
-                        result.max = curr;
-                        max_value = HPX_MOVE(curr_value);
-                    }
-                });
+            element_type min_value = HPX_INVOKE(proj, *min);
+            element_type max_value = HPX_INVOKE(proj, *max);
 
-            return result;
+            for (std::size_t i = 1; i < count; ++i, ++it)
+            {
+                element_type curr_value = HPX_INVOKE(proj, *it);
+
+                // Update min if curr_value < min_value
+                if (HPX_INVOKE(f, curr_value, min_value))
+                {
+                    min = it;
+                    min_value = curr_value;
+                }
+
+                // Update max if min_value <= curr_value (not curr_value < min_value)
+                if (!HPX_INVOKE(f, curr_value, max_value))
+                {
+                    max = it;
+                    max_value = curr_value;
+                }
+            }
+
+            return minmax_element_result<FwdIter>{min, max};
         }
 
         template <typename Iter>
@@ -771,7 +779,7 @@ namespace hpx::parallel {
 
                         element_type curr_max_value =
                             HPX_INVOKE(proj, *curr->max);
-                        if (!HPX_INVOKE(f, curr_max_value, max_value))
+                        if (HPX_INVOKE(f, curr_max_value, max_value))
                         {
                             result.max = curr->max;
                             max_value = HPX_MOVE(curr_max_value);
@@ -813,7 +821,7 @@ namespace hpx::parallel {
                             min_value = curr_value;
                         }
 
-                        if (!HPX_INVOKE(f, curr_value, max_value))
+                        if (HPX_INVOKE(f, curr_value, max_value))
                         {
                             max = curr;
                             max_value = HPX_MOVE(curr_value);
