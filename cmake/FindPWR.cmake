@@ -8,14 +8,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(NOT TARGET PWR::pwr)
-  # compatibility with older CMake versions
-  if(PWR_ROOT AND NOT Pwr_ROOT)
-    set(Pwr_ROOT
-        ${PWR_ROOT}
-        CACHE PATH "PWR base directory"
-    )
-    unset(PWR_ROOT CACHE)
-  endif()
 
   find_package(PkgConfig QUIET)
   pkg_check_modules(PC_Pwr QUIET pwr)
@@ -25,7 +17,7 @@ if(NOT TARGET PWR::pwr)
 
   find_path(
     Pwr_INCLUDE_DIR pwr.h
-    HINTS ${Pwr_ROOT}
+    HINTS ${PWR_ROOT}
           ENV
           PWR_ROOT
           ${HPX_Pwr_ROOT}
@@ -39,7 +31,7 @@ if(NOT TARGET PWR::pwr)
   find_library(
     Pwr_LIBRARY
     NAMES pwr libpwr
-    HINTS ${Pwr_ROOT}
+    HINTS ${PWR_ROOT}
           ENV
           PWR_ROOT
           ${HPX_Pwr_ROOT}
@@ -49,17 +41,6 @@ if(NOT TARGET PWR::pwr)
           ${PC_Pwr_LIBRARY_DIRS}
     PATH_SUFFIXES lib lib64
   )
-
-  # Set Pwr_ROOT in case the other hints are used
-  if(Pwr_ROOT)
-    # The call to file is for compatibility with windows paths
-    file(TO_CMAKE_PATH ${Pwr_ROOT} Pwr_ROOT)
-  elseif(DEFINED ENV{PWR_ROOT})
-    file(TO_CMAKE_PATH $ENV{PWR_ROOT} Pwr_ROOT)
-  else()
-    file(TO_CMAKE_PATH "${Pwr_INCLUDE_DIR}" Pwr_INCLUDE_DIR)
-    string(REPLACE "/include" "" Pwr_ROOT "${Pwr_INCLUDE_DIR}")
-  endif()
 
   set(Pwr_LIBRARIES ${Pwr_LIBRARY})
   set(Pwr_INCLUDE_DIRS ${Pwr_INCLUDE_DIR})

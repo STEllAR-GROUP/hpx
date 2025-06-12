@@ -8,21 +8,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(NOT TARGET Hwloc::hwloc)
-  # compatibility with older CMake versions
-  if(HWLOC_ROOT AND NOT Hwloc_ROOT)
-    set(Hwloc_ROOT
-        ${HWLOC_ROOT}
-        CACHE PATH "Hwloc base directory"
-    )
-    unset(HWLOC_ROOT CACHE)
-  endif()
 
   find_package(PkgConfig QUIET)
   pkg_check_modules(PC_HWLOC QUIET hwloc)
 
   find_path(
     Hwloc_INCLUDE_DIR hwloc.h
-    HINTS ${Hwloc_ROOT}
+    HINTS ${HWLOC_ROOT}
           ENV
           HWLOC_ROOT
           ${HPX_HWLOC_ROOT}
@@ -36,7 +28,7 @@ if(NOT TARGET Hwloc::hwloc)
   find_library(
     Hwloc_LIBRARY
     NAMES libhwloc.so libhwloc.lib hwloc
-    HINTS ${Hwloc_ROOT}
+    HINTS ${HWLOC_ROOT}
           ENV
           HWLOC_ROOT
           ${HPX_Hwloc_ROOT}
@@ -46,17 +38,8 @@ if(NOT TARGET Hwloc::hwloc)
           ${PC_Hwloc_LIBRARY_DIRS}
     PATH_SUFFIXES lib lib64
   )
-
-  # Set Hwloc_ROOT in case the other hints are used
-  if(Hwloc_ROOT)
-    # The call to file is for compatibility with windows paths
-    file(TO_CMAKE_PATH ${Hwloc_ROOT} Hwloc_ROOT)
-  elseif(DEFINED ENV{HWLOC_ROOT})
-    file(TO_CMAKE_PATH $ENV{HWLOC_ROOT} Hwloc_ROOT)
-  else()
-    file(TO_CMAKE_PATH "${Hwloc_INCLUDE_DIR}" Hwloc_INCLUDE_DIR)
-    string(REPLACE "/include" "" Hwloc_ROOT "${Hwloc_INCLUDE_DIR}")
-  endif()
+  # Set Hwloc_ROOT
+  get_filename_component(Hwloc_ROOT ${Hwloc_INCLUDE_DIR} DIRECTORY)
 
   set(Hwloc_LIBRARIES ${Hwloc_LIBRARY})
   set(Hwloc_INCLUDE_DIRS ${Hwloc_INCLUDE_DIR})
@@ -80,7 +63,6 @@ if(NOT TARGET Hwloc::hwloc)
   add_library(Hwloc::hwloc INTERFACE IMPORTED)
   target_include_directories(Hwloc::hwloc SYSTEM INTERFACE ${Hwloc_INCLUDE_DIR})
   target_link_libraries(Hwloc::hwloc INTERFACE ${Hwloc_LIBRARIES})
-  mark_as_advanced(HWLOC_ROOT HWLOC_LIBRARY HWLOC_INCLUDE_DIR)
 
-  mark_as_advanced(Hwloc_ROOT Hwloc_LIBRARY Hwloc_INCLUDE_DIR)
+  mark_as_advanced(Hwloc_LIBRARY Hwloc_INCLUDE_DIR)
 endif()

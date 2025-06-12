@@ -7,21 +7,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# compatibility with older CMake versions
-if(JEMALLOC_ROOT AND NOT Jemalloc_ROOT)
-  set(Jemalloc_ROOT
-      ${JEMALLOC_ROOT}
-      CACHE PATH "Jemalloc base directory"
-  )
-  unset(JEMALLOC_ROOT CACHE)
-endif()
-
 find_package(PkgConfig QUIET)
 pkg_check_modules(PC_JEMALLOC QUIET jemalloc)
 
 find_path(
   Jemalloc_INCLUDE_DIR jemalloc/jemalloc.h
-  HINTS ${Jemalloc_ROOT}
+  HINTS ${JEMALLOC_ROOT}
         ENV
         JEMALLOC_ROOT
         ${HPX_JEMALLOC_ROOT}
@@ -37,7 +28,7 @@ if(MSVC)
   # missing posix headers
   find_path(
     Jemalloc_ADDITIONAL_INCLUDE_DIR msvc_compat/strings.h
-    HINTS ${Jemalloc_ROOT}
+    HINTS ${JEMALLOC_ROOT}
           ENV
           JEMALLOC_ROOT
           ${HPX_JEMALLOC_ROOT}
@@ -49,21 +40,10 @@ if(MSVC)
   )
 endif()
 
-# Set Jemalloc_ROOT in case the other hints are used
-if(Jemalloc_ROOT)
-  # The call to file is for compatibility with windows paths
-  file(TO_CMAKE_PATH ${Jemalloc_ROOT} Jemalloc_ROOT)
-elseif(DEFINED ENV{JEMALLOC_ROOT})
-  file(TO_CMAKE_PATH $ENV{JEMALLOC_ROOT} Jemalloc_ROOT)
-else()
-  file(TO_CMAKE_PATH "${Jemalloc_INCLUDE_DIR}" Jemalloc_INCLUDE_DIR)
-  string(REPLACE "/include" "" Jemalloc_ROOT "${Jemalloc_INCLUDE_DIR}")
-endif()
-
 find_library(
   Jemalloc_LIBRARY
   NAMES jemalloc libjemalloc
-  HINTS ${Jemalloc_ROOT}
+  HINTS ${JEMALLOC_ROOT}
         ENV
         JEMALLOC_ROOT
         ${HPX_JEMALLOC_ROOT}
@@ -73,13 +53,6 @@ find_library(
         ${PC_Jemalloc_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64
 )
-
-# Set Jemalloc_ROOT in case the other hints are used
-if(NOT Jemalloc_ROOT AND DEFINED ENV{JEMALLOC_ROOT})
-  set(Jemalloc_ROOT $ENV{JEMALLOC_ROOT})
-elseif(NOT Jemalloc_ROOT)
-  string(REPLACE "/include" "" Jemalloc_ROOT "${Jemalloc_INCLUDE_DIR}")
-endif()
 
 set(Jemalloc_LIBRARIES ${Jemalloc_LIBRARY})
 set(Jemalloc_INCLUDE_DIRS ${Jemalloc_INCLUDE_DIR})

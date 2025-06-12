@@ -5,23 +5,13 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# compatibility with older CMake versions
-if(TBB_ROOT AND NOT Tbb_ROOT)
-  set(Tbb_ROOT
-      ${TBB_ROOT}
-      CACHE PATH "TBB base directory"
-  )
-  unset(TBB_ROOT CACHE)
-endif()
-
 find_package(PkgConfig QUIET)
 pkg_check_modules(PC_Tbb QUIET libtbb)
 
 find_path(
   Tbb_INCLUDE_DIR
   NAMES tbb/tbb.h
-  HINTS ${Tbb_ROOT} ENV TBB_ROOT ${PC_Tbb_INCLUDEDIR} ${PC_Tbb_INCLUDE_DIRS}
-  PATHS /usr/include
+  HINTS ${TBB_ROOT} ENV TBB_ROOT ${PC_Tbb_INCLUDEDIR} ${PC_Tbb_INCLUDE_DIRS}
   PATH_SUFFIXES include
 )
 
@@ -36,8 +26,7 @@ endif()
 find_library(
   TBB_LIBRARY
   NAMES tbb libtbb
-  HINTS ${Tbb_ROOT} ENV TBB_ROOT ${PC_Tbb_LIBDIR} ${PC_Tbb_LIBRARY_DIRS}
-  PATHS /usr/lib /usr/lib/x86_64-linux-gnu
+  HINTS ${TBB_ROOT} ENV TBB_ROOT ${PC_Tbb_LIBDIR} ${PC_Tbb_LIBRARY_DIRS}
   PATH_SUFFIXES ${Tbb_PATH_SUFFIX} lib lib64
 )
 
