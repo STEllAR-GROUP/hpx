@@ -7,7 +7,7 @@
 # Allow to disable caching allocator
 hpx_option(
   HPX_ALLOCATOR_SUPPORT_WITH_CACHING BOOL
-  "Enable caching allocator. (default: ON)" ON ADVANCED
+  "Enable caching allocator. (default: OFF)" OFF ADVANCED
   CATEGORY "Modules"
   MODULE ALLOCATOR_SUPPORT
 )
@@ -24,14 +24,8 @@ set(allocator_support_headers
     hpx/allocator_support/detail/new.hpp
     hpx/allocator_support/internal_allocator.hpp
     hpx/allocator_support/traits/is_allocator.hpp
+    hpx/allocator_support/thread_local_caching_allocator.hpp
 )
-
-if(HPX_ALLOCATOR_SUPPORT_WITH_CACHING)
-  set(allocator_support_headers
-      ${allocator_support_headers}
-      hpx/allocator_support/thread_local_caching_allocator.hpp
-  )
-endif()
 
 # cmake-format: off
 set(allocator_support_compat_headers
