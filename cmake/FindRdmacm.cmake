@@ -7,21 +7,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# compatibility with older CMake versions
-if(RDMACM_ROOT AND NOT Rdmacm_ROOT)
-  set(Rdmacm_ROOT
-      ${RDMACM_ROOT}
-      CACHE PATH "RDMACM base directory"
-  )
-  unset(RDMACM_ROOT CACHE)
-endif()
-
 find_package(PkgConfig QUIET)
 pkg_check_modules(PC_Rdmacm QUIET libibverbs)
 
 find_path(
   Rdmacm_INCLUDE_DIR rdma/rdma_cma.h
-  HINTS ${Rdmacm_ROOT} ENV RDMACM_ROOT ${PC_Rdmacm_INCLUDEDIR}
+  HINTS ${RDMACM_ROOT} ENV RDMACM_ROOT ${PC_Rdmacm_INCLUDEDIR}
         ${PC_Rdmacm_INCLUDE_DIRS}
   PATH_SUFFIXES include
 )
@@ -29,7 +20,7 @@ find_path(
 find_library(
   Rdmacm_LIBRARY
   NAMES rdmacm librdmacm
-  HINTS ${Rdmacm_ROOT} ENV RDMACM_ROOT ${PC_Rdmacm_LIBDIR}
+  HINTS ${RDMACM_ROOT} ENV RDMACM_ROOT ${PC_Rdmacm_LIBDIR}
         ${PC_Rdmacm_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64
 )
