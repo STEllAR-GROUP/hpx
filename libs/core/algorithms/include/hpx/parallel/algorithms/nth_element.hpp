@@ -146,6 +146,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/partition.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -263,84 +264,143 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename RandomIt, typename Sent,
                 typename Pred, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy, RandomIt>
-            parallel(ExPolicy&& policy, RandomIt first, RandomIt nth, Sent last,
-                Pred&& pred, Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, RandomIt first,
+                RandomIt nth, Sent last, Pred&& pred, Proj&& proj)
             {
                 using value_type =
                     typename std::iterator_traits<RandomIt>::value_type;
 
-                RandomIt partition_iter, return_last;
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                if (first == last)
+                if constexpr (has_scheduler_executor)
                 {
-                    return util::detail::algorithm_result<ExPolicy,
-                        RandomIt>::get(HPX_MOVE(first));
-                }
+                    return stdexec::just(first, nth, last) |
+                        stdexec::then([policy = HPX_FORWARD(ExPolicy, policy),
+                                    pred = HPX_FORWARD(Pred, pred),
+                                    proj = HPX_FORWARD(Proj, proj)](
+                                    RandomIt first, RandomIt nth,
+                                    RandomIt last) mutable -> RandomIt {
+                            auto last_iter = detail::advance_to_sentinel(first, last);
 
-                if (nth == last)
-                {
-                    return util::detail::algorithm_result<ExPolicy,
-                        RandomIt>::get(HPX_MOVE(nth));
-                }
+                            while (first != last_iter)
+                            {
+                                detail::pivot9(first, last_iter, pred);
 
-                try
-                {
-                    RandomIt last_iter =
-                        detail::advance_to_sentinel(first, last);
-                    return_last = last_iter;
+                                RandomIt partition_iter =
+                                    hpx::parallel::detail::partition<RandomIt>()
+                                        .sequential(hpx::execution::seq, first + 1, last_iter,
+                                            [val = HPX_INVOKE(proj, *first), &pred](
+                                                value_type const& elem) {
+                                                return HPX_INVOKE(pred, elem, val);
+                                            },
+                                            proj);
 
-                    while (first != last_iter)
-                    {
-                        detail::pivot9(first, last_iter, pred);
+                                --partition_iter;
 
-                        partition_iter =
-                            hpx::parallel::detail::partition<RandomIt>().call(
-                                policy(hpx::execution::non_task), first + 1,
-                                last_iter,
-                                [val = HPX_INVOKE(proj, *first), &pred](
-                                    value_type const& elem) {
-                                    return HPX_INVOKE(pred, elem, val);
-                                },
-                                proj);
-
-                        --partition_iter;
-
-                        // swap first element and partitionIter
-                        // (ending element of first group)
+                                // swap first element and partitionIter
+                                // (ending element of first group)
 #if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
-                        std::ranges::iter_swap(first, partition_iter);
+                                std::ranges::iter_swap(first, partition_iter);
 #else
-                        std::iter_swap(first, partition_iter);
+                                std::iter_swap(first, partition_iter);
 #endif
 
-                        // if nth element < partitioned index,
-                        // it lies in [first, partitionIter)
-                        if (partition_iter < nth)
+                                // if nth element < partitioned index,
+                                // it lies in [first, partitionIter)
+                                if (partition_iter < nth)
+                                {
+                                    first = partition_iter + 1;
+                                }
+                                // else it lies in [partitionIter + 1, last)
+                                else if (partition_iter > nth)
+                                {
+                                    last_iter = partition_iter;
+                                }
+                                // partitionIter == nth
+                                else
+                                {
+                                    break;
+                                }
+                            }
+
+                            return last_iter;
+                        });
+                }
+                else
+                {
+                    RandomIt partition_iter, return_last;
+
+                    if (first == last)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            RandomIt>::get(HPX_MOVE(first));
+                    }
+
+                    if (nth == last)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            RandomIt>::get(HPX_MOVE(nth));
+                    }
+
+                    try
+                    {
+                        RandomIt last_iter =
+                            detail::advance_to_sentinel(first, last);
+                        return_last = last_iter;
+
+                        while (first != last_iter)
                         {
-                            first = partition_iter + 1;
-                        }
-                        // else it lies in [partitionIter + 1, last)
-                        else if (partition_iter > nth)
-                        {
-                            last_iter = partition_iter;
-                        }
-                        // partitionIter == nth
-                        else
-                        {
-                            break;
+                            detail::pivot9(first, last_iter, pred);
+
+                            partition_iter =
+                                hpx::parallel::detail::partition<RandomIt>()
+                                    .call(policy(hpx::execution::non_task),
+                                        first + 1, last_iter,
+                                        [val = HPX_INVOKE(proj, *first), &pred](
+                                            value_type const& elem) {
+                                            return HPX_INVOKE(pred, elem, val);
+                                        },
+                                        proj);
+
+                            --partition_iter;
+
+                            // swap first element and partitionIter
+                            // (ending element of first group)
+#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
+                            std::ranges::iter_swap(first, partition_iter);
+#else
+                            std::iter_swap(first, partition_iter);
+#endif
+
+                            // if nth element < partitioned index,
+                            // it lies in [first, partitionIter)
+                            if (partition_iter < nth)
+                            {
+                                first = partition_iter + 1;
+                            }
+                            // else it lies in [partitionIter + 1, last)
+                            else if (partition_iter > nth)
+                            {
+                                last_iter = partition_iter;
+                            }
+                            // partitionIter == nth
+                            else
+                            {
+                                break;
+                            }
                         }
                     }
-                }
-                catch (...)
-                {
-                    return util::detail::algorithm_result<ExPolicy,
-                        RandomIt>::get(detail::handle_exception<ExPolicy,
-                        RandomIt>::call(std::current_exception()));
-                }
+                    catch (...)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            RandomIt>::get(detail::handle_exception<ExPolicy,
+                            RandomIt>::call(std::current_exception()));
+                    }
 
-                return util::detail::algorithm_result<ExPolicy, RandomIt>::get(
-                    HPX_MOVE(return_last));
+                    return util::detail::algorithm_result<ExPolicy,
+                        RandomIt>::get(HPX_MOVE(return_last));
+                }
             }
         };
         /// \endcond
@@ -388,9 +448,9 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy>
-        tag_fallback_invoke(hpx::nth_element_t, ExPolicy&& policy,
-            RandomIt first, RandomIt nth, RandomIt last, Pred pred = Pred())
+        friend decltype(auto) tag_fallback_invoke(hpx::nth_element_t,
+            ExPolicy&& policy, RandomIt first, RandomIt nth, RandomIt last,
+            Pred pred = Pred())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires at least random iterator.");
