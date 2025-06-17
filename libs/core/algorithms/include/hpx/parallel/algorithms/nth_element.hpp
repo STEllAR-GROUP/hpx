@@ -146,7 +146,6 @@ namespace hpx {
 #include <hpx/parallel/algorithms/partition.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/execution_base/stdexec_forward.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -275,13 +274,15 @@ namespace hpx::parallel {
 
                 if constexpr (has_scheduler_executor)
                 {
-                    return stdexec::just(first, nth, last) |
-                        stdexec::then([policy = HPX_FORWARD(ExPolicy, policy),
-                                    pred = HPX_FORWARD(Pred, pred),
-                                    proj = HPX_FORWARD(Proj, proj)](
-                                    RandomIt first, RandomIt nth,
-                                    RandomIt last) mutable -> RandomIt {
-                            auto last_iter = detail::advance_to_sentinel(first, last);
+                    namespace ex = hpx::execution::experimental;
+                    return ex::just(first, nth, last) |
+                        ex::then([policy = HPX_FORWARD(ExPolicy, policy),
+                                     pred = HPX_FORWARD(Pred, pred),
+                                     proj = HPX_FORWARD(Proj, proj)](
+                                     RandomIt first, RandomIt nth,
+                                     RandomIt last) mutable -> RandomIt {
+                            auto last_iter =
+                                detail::advance_to_sentinel(first, last);
 
                             while (first != last_iter)
                             {
@@ -289,17 +290,20 @@ namespace hpx::parallel {
 
                                 RandomIt partition_iter =
                                     hpx::parallel::detail::partition<RandomIt>()
-                                        .sequential(hpx::execution::seq, first + 1, last_iter,
-                                            [val = HPX_INVOKE(proj, *first), &pred](
-                                                value_type const& elem) {
-                                                return HPX_INVOKE(pred, elem, val);
+                                        .sequential(
+                                            hpx::execution::seq, first + 1,
+                                            last_iter,
+                                            [val = HPX_INVOKE(proj, *first),
+                                                &pred](value_type const& elem) {
+                                                return HPX_INVOKE(
+                                                    pred, elem, val);
                                             },
                                             proj);
 
                                 --partition_iter;
 
-                                // swap first element and partitionIter
-                                // (ending element of first group)
+                            // swap first element and partitionIter
+                            // (ending element of first group)
 #if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                                 std::ranges::iter_swap(first, partition_iter);
 #else
@@ -355,7 +359,8 @@ namespace hpx::parallel {
 
                             partition_iter =
                                 hpx::parallel::detail::partition<RandomIt>()
-                                    .call(policy(hpx::execution::non_task),
+                                    .call(
+                                        policy(hpx::execution::non_task),
                                         first + 1, last_iter,
                                         [val = HPX_INVOKE(proj, *first), &pred](
                                             value_type const& elem) {
