@@ -11,10 +11,12 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/synchronization/stop_token.hpp>
 #include <hpx/thread.hpp>
+#include <chrono>    // For sleep
 #include <exception>
 #include <future>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <utility>
 #include <vector>
 
@@ -23,7 +25,6 @@
 #endif
 
 namespace ex = hpx::execution::experimental;
-
 
 // Forward declaration
 struct test_receiver;
@@ -51,8 +52,11 @@ struct test_receiver
         bool completed = false;
         bool error_called = false;
         bool stopped_called = false;
-        std::vector<std::thread::id> task_thread_ids; // Track thread IDs for bulk tasks
-        std::vector<uint32_t> executed_indices; // Track executed task indices
+        std::vector<std::thread::id>
+            task_thread_ids;    // Track thread IDs for bulk tasks
+        std::vector<uint32_t>
+            executed_indices;              // Track executed task indices
+        uint32_t scheduling_events = 0;    // Count scheduling events
     };
 
     std::shared_ptr<state> state_ = std::make_shared<state>();
@@ -245,12 +249,25 @@ int hpx_main(hpx::program_options::variables_map&)
         auto future = recv.get_future();
         std::thread::id this_id = std::this_thread::get_id();
 
-        auto sender = ex::schedule(sched) | stdexec::bulk(stdexec::par, num_tasks,
-            [&](uint32_t idx) {
+        auto sender = ex::schedule(sched) |
+            stdexec::bulk(stdexec::par, num_tasks, [&](uint32_t idx) {
+                if (recv.stop_token.stop_requested())
+                {
+                    std::cout << "Stop requested for unchunked task " << idx
+                              << std::endl;
+                    return;
+                }
                 state->task_thread_ids[idx] = std::this_thread::get_id();
-                state->executed_indices[idx] = idx + 1; // Mark as executed
-                std::cout << "Bulk task " << idx << " on thread "
+                state->executed_indices[idx] = idx + 1;    // Mark as executed
+                ++state->scheduling_events;                // Count task call
+                std::cout << "Bulk unchunked task " << idx << " on thread "
                           << state->task_thread_ids[idx] << std::endl;
+                // Add light computation
+                volatile int dummy = 0;
+                for (int i = 0; i < 1000; ++i)
+                    dummy += i;
+                std::this_thread::sleep_for(
+                    std::chrono::microseconds(100));    // Increased delay
             });
 
         {
@@ -258,16 +275,92 @@ int hpx_main(hpx::program_options::variables_map&)
             std::cout << "Calling start() for bulk_unchunked task" << std::endl;
             ex::start(op);
         }
-        std::cout << "Waiting for bulk_unchunked task to complete..." << std::endl;
+        std::cout << "Waiting for bulk_unchunked task to complete..."
+                  << std::endl;
         future.get();
 
+        std::set<std::thread::id> unique_threads(
+            state->task_thread_ids.begin(), state->task_thread_ids.end());
         std::cout << "Bulk unchunked task completed: completed = "
-                  << state->completed << std::endl;
+                  << state->completed
+                  << ", unique threads = " << unique_threads.size()
+                  << ", scheduling_events = " << state->scheduling_events
+                  << std::endl;
         HPX_TEST(state->completed);
-        for (uint32_t i = 0; i < num_tasks; ++i) {
-            HPX_TEST(state->task_thread_ids[i] != std::thread::id{}); // Non-empty thread ID
-            HPX_TEST(state->task_thread_ids[i] != std::thread::id{}); // Only ensure non-empty
-            HPX_TEST(state->executed_indices[i] == i + 1); // Task i executed
+        for (uint32_t i = 0; i < num_tasks; ++i)
+        {
+            HPX_TEST(state->task_thread_ids[i] !=
+                std::thread::id{});    // Non-empty thread ID
+            HPX_TEST(state->executed_indices[i] == i + 1);    // Task i executed
+        }
+    }
+
+    // Test bulk_chunked
+    std::cout << "\n=== Bulk Chunked Task ===" << std::endl;
+    {
+        constexpr uint32_t num_tasks = 16;
+        constexpr uint32_t chunk_size = 4;    // Force 4 tasks per chunk
+        test_receiver recv;
+        auto state = recv.state_;
+        state->task_thread_ids.resize(num_tasks);
+        state->executed_indices.resize(num_tasks, 0);
+        auto future = recv.get_future();
+
+        auto sender = ex::schedule(sched) |
+            stdexec::bulk(
+                stdexec::par, num_tasks / chunk_size, [&](uint32_t chunk_idx) {
+                    if (recv.stop_token.stop_requested())
+                    {
+                        std::cout << "Stop requested for chunk " << chunk_idx
+                                  << std::endl;
+                        return;
+                    }
+                    uint32_t begin = chunk_idx * chunk_size;
+                    uint32_t end = std::min(begin + chunk_size, num_tasks);
+                    std::cout << "Processing chunk [" << begin << ", " << end
+                              << ") on thread " << std::this_thread::get_id()
+                              << std::endl;
+                    ++state->scheduling_events;    // Count chunk call
+                    for (uint32_t idx = begin; idx < end; ++idx)
+                    {
+                        state->task_thread_ids[idx] =
+                            std::this_thread::get_id();
+                        state->executed_indices[idx] =
+                            idx + 1;    // Mark as executed
+                        std::cout << "Bulk chunked task " << idx
+                                  << " on thread "
+                                  << state->task_thread_ids[idx] << std::endl;
+                    }
+                    // Add light computation
+                    volatile int dummy = 0;
+                    for (int i = 0; i < 1000; ++i)
+                        dummy += i;
+                    std::this_thread::sleep_for(
+                        std::chrono::microseconds(100));    // Increased delay
+                });
+
+        {
+            auto op = ex::connect(std::move(sender), std::move(recv));
+            std::cout << "Calling start() for bulk_chunked task" << std::endl;
+            ex::start(op);
+        }
+        std::cout << "Waiting for bulk_chunked task to complete..."
+                  << std::endl;
+        future.get();
+
+        std::set<std::thread::id> unique_threads(
+            state->task_thread_ids.begin(), state->task_thread_ids.end());
+        std::cout << "Bulk chunked task completed: completed = "
+                  << state->completed
+                  << ", unique threads = " << unique_threads.size()
+                  << ", scheduling_events = " << state->scheduling_events
+                  << std::endl;
+        HPX_TEST(state->completed);
+        for (uint32_t i = 0; i < num_tasks; ++i)
+        {
+            HPX_TEST(state->task_thread_ids[i] !=
+                std::thread::id{});    // Non-empty thread ID
+            HPX_TEST(state->executed_indices[i] == i + 1);    // Task i executed
         }
     }
 
