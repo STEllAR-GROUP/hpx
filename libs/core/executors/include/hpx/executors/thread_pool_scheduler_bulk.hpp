@@ -847,9 +847,10 @@ namespace hpx::execution::experimental::detail {
                 // Initialize queues for all worker threads
                 for (std::uint32_t i = 0; i < num_worker_threads; ++i)
                 {
-                    init_queue_depth_first(i,
-                        static_cast<std::uint32_t>(hpx::util::size(shape)),
-                        num_worker_threads);
+                    bulk_receiver<operation_state, F, Shape>{this}
+                        .init_queue_depth_first(i,
+                            static_cast<std::uint32_t>(hpx::util::size(shape)),
+                            num_worker_threads);
                 }
             }
 
