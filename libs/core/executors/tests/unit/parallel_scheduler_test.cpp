@@ -11,7 +11,7 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/synchronization/stop_token.hpp>
 #include <hpx/thread.hpp>
-#include <chrono>    // For sleep
+#include <chrono>
 #include <exception>
 #include <future>
 #include <iostream>
@@ -52,8 +52,8 @@ struct test_receiver
         bool completed = false;
         bool error_called = false;
         bool stopped_called = false;
-        std::vector<std::thread::id>
-            task_thread_ids;    // Track thread IDs for bulk tasks
+        std::vector<hpx::thread::id>
+            task_thread_ids;    // Track HPX thread IDs for bulk tasks
         std::vector<uint32_t>
             executed_indices;              // Track executed task indices
         uint32_t scheduling_events = 0;    // Count scheduling events
@@ -247,7 +247,7 @@ int hpx_main(hpx::program_options::variables_map&)
         state->task_thread_ids.resize(num_tasks);
         state->executed_indices.resize(num_tasks, 0);
         auto future = recv.get_future();
-        std::thread::id this_id = std::this_thread::get_id();
+        hpx::thread::id this_id = hpx::this_thread::get_id();
 
         auto sender = ex::schedule(sched) |
             stdexec::bulk(stdexec::par, num_tasks, [&](uint32_t idx) {
@@ -257,7 +257,7 @@ int hpx_main(hpx::program_options::variables_map&)
                               << std::endl;
                     return;
                 }
-                state->task_thread_ids[idx] = std::this_thread::get_id();
+                state->task_thread_ids[idx] = hpx::this_thread::get_id();
                 state->executed_indices[idx] = idx + 1;    // Mark as executed
                 ++state->scheduling_events;                // Count task call
                 std::cout << "Bulk unchunked task " << idx << " on thread "
@@ -279,7 +279,7 @@ int hpx_main(hpx::program_options::variables_map&)
                   << std::endl;
         future.get();
 
-        std::set<std::thread::id> unique_threads(
+        std::set<hpx::thread::id> unique_threads(
             state->task_thread_ids.begin(), state->task_thread_ids.end());
         std::cout << "Bulk unchunked task completed: completed = "
                   << state->completed
@@ -290,7 +290,7 @@ int hpx_main(hpx::program_options::variables_map&)
         for (uint32_t i = 0; i < num_tasks; ++i)
         {
             HPX_TEST(state->task_thread_ids[i] !=
-                std::thread::id{});    // Non-empty thread ID
+                hpx::thread::id{});    // Non-empty thread ID
             HPX_TEST(state->executed_indices[i] == i + 1);    // Task i executed
         }
     }
@@ -318,13 +318,13 @@ int hpx_main(hpx::program_options::variables_map&)
                     uint32_t begin = chunk_idx * chunk_size;
                     uint32_t end = std::min(begin + chunk_size, num_tasks);
                     std::cout << "Processing chunk [" << begin << ", " << end
-                              << ") on thread " << std::this_thread::get_id()
+                              << ") on thread " << hpx::this_thread::get_id()
                               << std::endl;
                     ++state->scheduling_events;    // Count chunk call
                     for (uint32_t idx = begin; idx < end; ++idx)
                     {
                         state->task_thread_ids[idx] =
-                            std::this_thread::get_id();
+                            hpx::this_thread::get_id();
                         state->executed_indices[idx] =
                             idx + 1;    // Mark as executed
                         std::cout << "Bulk chunked task " << idx
@@ -348,7 +348,7 @@ int hpx_main(hpx::program_options::variables_map&)
                   << std::endl;
         future.get();
 
-        std::set<std::thread::id> unique_threads(
+        std::set<hpx::thread::id> unique_threads(
             state->task_thread_ids.begin(), state->task_thread_ids.end());
         std::cout << "Bulk chunked task completed: completed = "
                   << state->completed
@@ -359,7 +359,7 @@ int hpx_main(hpx::program_options::variables_map&)
         for (uint32_t i = 0; i < num_tasks; ++i)
         {
             HPX_TEST(state->task_thread_ids[i] !=
-                std::thread::id{});    // Non-empty thread ID
+                hpx::thread::id{});    // Non-empty thread ID
             HPX_TEST(state->executed_indices[i] == i + 1);    // Task i executed
         }
     }
