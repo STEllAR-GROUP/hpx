@@ -38,7 +38,7 @@ namespace hpx::parallel::execution {
     // extensions
 
     // forward declare timed_executor wrapper
-    HPX_CXX_EXPORT template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <executor_any BaseExecutor>
     struct timed_executor;
 
     // define customization points
