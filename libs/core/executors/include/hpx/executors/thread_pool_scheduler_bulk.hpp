@@ -10,8 +10,6 @@
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_STDEXEC)
 #include <hpx/execution_base/stdexec_forward.hpp>
-#else
-static_assert(false, "This code requires HPX_HAVE_STDEXEC to be defined");
 #endif
 
 #include <hpx/assert.hpp>
