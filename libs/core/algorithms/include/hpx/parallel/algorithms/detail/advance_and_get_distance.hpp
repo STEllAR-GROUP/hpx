@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2023 Hartmut Kaiser
+//  Copyright (c) 2019-2025 Hartmut Kaiser
 //  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -41,8 +41,7 @@ namespace hpx::parallel::detail {
                 return offset;
             }
         }
-
-        if constexpr (hpx::traits::is_sized_sentinel_for_v<Sent, Iter>)
+        else if constexpr (hpx::traits::is_sized_sentinel_for_v<Sent, Iter>)
         {
             difference_type offset = last - first;
             std::advance(first, offset);
