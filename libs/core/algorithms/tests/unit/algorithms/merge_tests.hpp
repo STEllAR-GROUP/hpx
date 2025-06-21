@@ -121,6 +121,26 @@ struct random_fill
     std::uniform_int_distribution<> dist;
 };
 
+struct random_fill_tagged
+{
+    random_fill_tagged() = default;
+    random_fill_tagged(int tag, int rand_base, int range)
+      : tag(tag)
+      , gen(_gen())
+      , dist(rand_base - range / 2, rand_base + range / 2)
+    {
+    }
+
+    std::pair<int, int> operator()()
+    {
+        return {dist(gen), tag};
+    }
+
+    int tag = 1;
+    std::mt19937 gen;
+    std::uniform_int_distribution<> dist;
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag, typename DataType, typename Comp>
 void test_merge(IteratorTag, DataType, Comp comp, unsigned int rand_base)
@@ -161,22 +181,29 @@ void test_merge(
     using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size1 = 300007, size2 = 123456;
-    std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
-        dest_sol(size1 + size2);
+    std::vector<std::pair<DataType, int>> src1(size1), src2(size2),
+        dest_res(size1 + size2), dest_sol(size1 + size2);
 
-    std::generate(std::begin(src1), std::end(src1), random_fill(rand_base, 6));
-    std::generate(std::begin(src2), std::end(src2), random_fill(rand_base, 8));
-    std::sort(std::begin(src1), std::end(src1), comp);
-    std::sort(std::begin(src2), std::end(src2), comp);
+    auto op = [&](auto const& a, auto const& b) {
+        return comp(a.first, b.first);
+    };
+
+    std::generate(
+        std::begin(src1), std::end(src1), random_fill_tagged(1, rand_base, 6));
+    std::generate(
+        std::begin(src2), std::end(src2), random_fill_tagged(2, rand_base, 8));
+    std::sort(std::begin(src1), std::end(src1), op);
+    std::sort(std::begin(src2), std::end(src2), op);
 
     auto result = hpx::merge(policy, iterator(std::begin(src1)),
         iterator(std::end(src1)), iterator(std::begin(src2)),
-        iterator(std::end(src2)), iterator(std::begin(dest_res)), comp);
+        iterator(std::end(src2)), iterator(std::begin(dest_res)), op);
     auto solution = std::merge(std::begin(src1), std::end(src1),
-        std::begin(src2), std::end(src2), std::begin(dest_sol), comp);
+        std::begin(src2), std::end(src2), std::begin(dest_sol), op);
 
-    bool equality = test::equal(
-        std::begin(dest_res), result.base(), std::begin(dest_sol), solution);
+    bool equality = test::equal(std::begin(dest_res), result.base(),
+        std::begin(dest_sol), solution,
+        [&](auto const& a, auto const& b) { return a.first == b.first; });
 
     HPX_TEST(equality);
 }
