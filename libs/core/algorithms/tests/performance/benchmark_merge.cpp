@@ -123,6 +123,14 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     double const time_par = run_merge_benchmark_hpx(
         test_count, par, first1, last1, first2, last2, dest);
 
+    std::cout << "--- run_merge_benchmark_par_fork_join ---" << std::endl;
+    double time_par_fork_join = 0;
+    {
+        hpx::execution::experimental::fork_join_executor exec;
+        time_par_fork_join = run_merge_benchmark_hpx(
+            test_count, par.on(exec), first1, last1, first2, last2, dest);
+    }
+
     std::cout << "--- run_merge_benchmark_par_unseq ---" << std::endl;
     double const time_par_unseq = run_merge_benchmark_hpx(
         test_count, par_unseq, first1, last1, first2, last2, dest);
@@ -133,6 +141,8 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "par_fork_join", time_par_fork_join)
+        << std::endl;
     hpx::util::format_to(std::cout, fmt, "par_unseq", time_par_unseq)
         << std::endl;
     std::cout << "----------------------------------------------" << std::endl;

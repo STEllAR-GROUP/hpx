@@ -193,7 +193,7 @@ namespace hpx::parallel::util::detail {
 
         template <typename ExPolicy_, typename FwdIter, typename F1,
             typename F2>
-        static hpx::future<FwdIter> call(ExPolicy_&& policy, FwdIter first,
+        static decltype(auto) call(ExPolicy_&& policy, FwdIter first,
             std::size_t count, F1&& f1, F2&& f2)
         {
             // inform parameter traits
@@ -215,7 +215,8 @@ namespace hpx::parallel::util::detail {
             }
             catch (...)
             {
-                return hpx::make_exceptional_future<FwdIter>(
+                using return_type = std::invoke_result_t<F2, FwdIter>;
+                return hpx::make_exceptional_future<return_type>(
                     std::current_exception());
             }
         }
@@ -223,7 +224,7 @@ namespace hpx::parallel::util::detail {
     private:
         template <typename F, typename Items1, typename Items2,
             typename FwdIter>
-        static hpx::future<FwdIter> reduce(
+        static decltype(auto) reduce(
             [[maybe_unused]] std::shared_ptr<scoped_executor_parameters>&&
                 scoped_params,
             [[maybe_unused]] std::pair<Items1, Items2>&& items,
@@ -231,20 +232,19 @@ namespace hpx::parallel::util::detail {
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false);
-            return hpx::future<FwdIter>();
+            return hpx::future<std::invoke_result_t<F, FwdIter>>();
 #else
             // wait for all tasks to finish
             // Note: the lambda takes the vectors by value (dataflow
             //       moves those into the lambda) to ensure that they
             //       will be destroyed before the lambda exists.
-            //       Otherwise the vectors stay alive in the dataflow's
+            //       Otherwise, the vectors stay alive in the dataflow's
             //       shared state and may reference data that has gone
             //       out of scope.
             return hpx::dataflow(
                 hpx::launch::sync,
                 [last, scoped_params = HPX_MOVE(scoped_params),
-                    f = HPX_FORWARD(F, f)](
-                    auto&& r1, auto&& r2) mutable -> FwdIter {
+                    f = HPX_FORWARD(F, f)](auto&& r1, auto&& r2) mutable {
                     HPX_UNUSED(scoped_params);
 
                     handle_local_exceptions::call(r1);
@@ -259,7 +259,7 @@ namespace hpx::parallel::util::detail {
         template <typename F, typename Items, typename FwdIter,
             typename Enable =
                 std::enable_if_t<!hpx::traits::is_pair_v<std::decay_t<Items>>>>
-        static hpx::future<FwdIter> reduce(
+        static decltype(auto) reduce(
             [[maybe_unused]] std::shared_ptr<scoped_executor_parameters>&&
                 scoped_params,
             [[maybe_unused]] Items&& items, [[maybe_unused]] F&& f,
@@ -267,13 +267,13 @@ namespace hpx::parallel::util::detail {
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false);
-            return hpx::future<FwdIter>();
+            return hpx::future<std::invoke_result_t<F, FwdIter>>();
 #else
             // wait for all tasks to finish
             return hpx::dataflow(
                 hpx::launch::sync,
                 [last, scoped_params = HPX_MOVE(scoped_params),
-                    f = HPX_FORWARD(F, f)](auto&& r) mutable -> FwdIter {
+                    f = HPX_FORWARD(F, f)](auto&& r) mutable {
                     HPX_UNUSED(scoped_params);
 
                     handle_local_exceptions::call(r);
@@ -285,7 +285,7 @@ namespace hpx::parallel::util::detail {
         }
 
         template <typename F, typename FwdIter>
-        static hpx::future<FwdIter> reduce(
+        static decltype(auto) reduce(
             [[maybe_unused]] std::shared_ptr<scoped_executor_parameters>&&
                 scoped_params,
             [[maybe_unused]] hpx::future<void>&& item, [[maybe_unused]] F&& f,
@@ -293,13 +293,13 @@ namespace hpx::parallel::util::detail {
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false);
-            return hpx::future<FwdIter>();
+            return hpx::future<std::invoke_result_t<F, FwdIter>>();
 #else
             // wait for the task to finish, invoke the given function before
             // returning
             return item.then(hpx::launch::sync,
                 [last, scoped_params = HPX_MOVE(scoped_params),
-                    f = HPX_FORWARD(F, f)](auto&& r) mutable -> FwdIter {
+                    f = HPX_FORWARD(F, f)](auto&& r) mutable {
                     HPX_UNUSED(scoped_params);
 
                     handle_local_exceptions::call(HPX_MOVE(r));
