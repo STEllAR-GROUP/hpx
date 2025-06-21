@@ -38,6 +38,7 @@ set(executors_headers
     hpx/executors/thread_pool_executor.hpp
     hpx/executors/thread_pool_scheduler.hpp
     hpx/executors/thread_pool_scheduler_bulk.hpp
+    hpx/executors/experimental/parallel_scheduler.hpp
 )
 
 if(HPX_WITH_DATAPAR)
