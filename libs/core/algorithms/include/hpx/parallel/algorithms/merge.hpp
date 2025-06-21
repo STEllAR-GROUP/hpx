@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Taeguk Kwon
-//  Copyright (c) 2017-2024 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,7 @@ namespace hpx {
 
     /// Merges two sorted ranges [first1, last1) and [first2, last2)
     /// into one sorted range beginning at \a dest. The order of
-    /// equivalent elements in the each of original two ranges is preserved.
+    /// equivalent elements in each of the original two ranges is preserved.
     /// For equivalent elements in the original two ranges, the elements from
     /// the first range precede the elements from the second range.
     /// The destination range cannot overlap with either of the input ranges.
@@ -24,7 +24,7 @@ namespace hpx {
     ///
     /// \note   Complexity: Performs
     ///         O(std::distance(first1, last1) + std::distance(first2, last2))
-    ///         applications of the comparison \a comp and the each projection.
+    ///         applications of the comparison \a comp and each projection.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -32,15 +32,15 @@ namespace hpx {
     ///                     in which it executes the assignments.
     /// \tparam RandIter1   The type of the source iterators used (deduced)
     ///                     representing the first sorted range.
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     random access iterator.
     /// \tparam RandIter2   The type of the source iterators used (deduced)
     ///                     representing the second sorted range.
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     random access iterator.
     /// \tparam RandIter3   The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     random access iterator.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
@@ -100,26 +100,26 @@ namespace hpx {
 
     /// Merges two sorted ranges [first1, last1) and [first2, last2)
     /// into one sorted range beginning at \a dest. The order of
-    /// equivalent elements in the each of original two ranges is preserved.
+    /// equivalent elements in each of the original two ranges is preserved.
     /// For equivalent elements in the original two ranges, the elements from
     /// the first range precede the elements from the second range.
     /// The destination range cannot overlap with either of the input ranges.
     ///
     /// \note   Complexity: Performs
     ///         O(std::distance(first1, last1) + std::distance(first2, last2))
-    ///         applications of the comparison \a comp and the each projection.
+    ///         applications of the comparison \a comp and each projection.
     ///
     /// \tparam RandIter1   The type of the source iterators used (deduced)
     ///                     representing the first sorted range.
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     random access iterator.
     /// \tparam RandIter2   The type of the source iterators used (deduced)
     ///                     representing the second sorted range.
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     random access iterator.
     /// \tparam RandIter3   The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     random access iterator.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
@@ -161,21 +161,21 @@ namespace hpx {
 
     /// Merges two consecutive sorted ranges [first, middle) and
     /// [middle, last) into one sorted range [first, last). The order of
-    /// equivalent elements in the each of original two ranges is preserved.
+    /// equivalent elements in each of the original two ranges is preserved.
     /// For equivalent elements in the original two ranges, the elements from
     /// the first range precede the elements from the second range. Executed
     /// according to the policy.
     ///
     ///
     /// \note   Complexity: Performs O(std::distance(first, last))
-    ///         applications of the comparison \a comp and the each projection.
+    ///         applications of the comparison \a comp and each projection.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam RandIter    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     random access iterator.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
@@ -231,15 +231,15 @@ namespace hpx {
 
     /// Merges two consecutive sorted ranges [first, middle) and
     /// [middle, last) into one sorted range [first, last). The order of
-    /// equivalent elements in the each of original two ranges is preserved.
+    /// equivalent elements in each of the original two ranges is preserved.
     /// For equivalent elements in the original two ranges, the elements from
     /// the first range precede the elements from the second range.
     ///
     /// \note   Complexity: Performs O(std::distance(first, last))
-    ///         applications of the comparison \a comp and the each projection.
+    ///         applications of the comparison \a comp and each projection.
     ///
     /// \tparam RandIter    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     random access iterator.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
@@ -284,6 +284,7 @@ namespace hpx {
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -296,6 +297,7 @@ namespace hpx {
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
+#include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/type_support/identity.hpp>
 
@@ -304,7 +306,6 @@ namespace hpx {
 #include <exception>
 #include <iterator>
 #include <list>
-#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -331,7 +332,9 @@ namespace hpx::parallel {
                     if (HPX_INVOKE(comp, HPX_INVOKE(proj2, *first2),
                             HPX_INVOKE(proj1, *first1)))
                     {
-                        *dest++ = *first2++;
+                        *dest = *first2;
+                        ++dest;
+                        ++first2;
                         if (first2 == last2)
                         {
                             break;
@@ -339,7 +342,9 @@ namespace hpx::parallel {
                     }
                     else
                     {
-                        *dest++ = *first1++;
+                        *dest = *first1;
+                        ++dest;
+                        ++first1;
                         if (first1 == last1)
                         {
                             break;
@@ -352,6 +357,59 @@ namespace hpx::parallel {
             auto copy_result2 = util::copy(first2, last2, copy_result1.out);
 
             return {copy_result1.in, copy_result2.in, copy_result2.out};
+        }
+
+        // sequential merge without projection function.
+        template <typename Iter1, typename Sent1, typename Iter2,
+            typename Sent2, typename OutIter, typename Comp>
+        constexpr util::in_in_out_result<Iter1, Iter2, OutIter>
+        sequential_merge(Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
+            OutIter dest, Comp&& comp, hpx::identity, hpx::identity)
+        {
+            if (first1 != last1 && first2 != last2)
+            {
+                while (true)
+                {
+                    if (HPX_INVOKE(comp, *first2, *first1))
+                    {
+                        *dest = *first2;
+                        ++dest;
+                        ++first2;
+                        if (first2 == last2)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        *dest = *first1;
+                        ++dest;
+                        ++first1;
+                        if (first1 == last1)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            auto copy_result1 = util::copy(first1, last1, dest);
+            auto copy_result2 = util::copy(first2, last2, copy_result1.out);
+
+            return {copy_result1.in, copy_result2.in, copy_result2.out};
+        }
+
+        // sequential merge without projection function and with normal end
+        // iterators
+        template <typename Iter1, typename Iter2, typename OutIter,
+            typename Comp>
+        constexpr util::in_in_out_result<Iter1, Iter2, OutIter>
+        sequential_merge(Iter1 first1, Iter1 last1, Iter2 first2, Iter2 last2,
+            OutIter dest, Comp&& comp, hpx::identity, hpx::identity)
+        {
+            return {last1, last2,
+                std::merge(first1, last1, first2, last2, dest,
+                    HPX_FORWARD(Comp, comp))};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -390,132 +448,67 @@ namespace hpx::parallel {
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter1, typename Sent1,
             typename Iter2, typename Sent2, typename Iter3, typename Comp,
-            typename Proj1, typename Proj2, typename BinarySearchHelper>
-        void parallel_merge_helper(ExPolicy policy, Iter1 first1, Sent1 last1,
-            Iter2 first2, Sent2 last2, Iter3 dest, Comp&& comp, Proj1&& proj1,
-            Proj2&& proj2, bool range_reversal, BinarySearchHelper)
-        {
-            constexpr std::size_t threshold = 65536;
-
-            std::size_t const size1 = detail::distance(first1, last1);
-            std::size_t const size2 = detail::distance(first2, last2);
-
-            // Perform sequential merge if data size is smaller than threshold.
-            if (size1 + size2 <= threshold)
-            {
-                if (range_reversal)
-                {
-                    sequential_merge(first2, last2, first1, last1, dest,
-                        HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj2, proj2),
-                        HPX_FORWARD(Proj1, proj1));
-                }
-                else
-                {
-                    sequential_merge(first1, last1, first2, last2, dest,
-                        HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj1, proj1),
-                        HPX_FORWARD(Proj2, proj2));
-                }
-                return;
-            }
-
-            // Let size1 is bigger than size2 always.
-            if (size1 < size2)
-            {
-                // For stability of algorithm, must switch binary search methods
-                // when swapping size1 and size2.
-                parallel_merge_helper(policy, first2, last2, first1, last1,
-                    dest, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj2, proj2),
-                    HPX_FORWARD(Proj1, proj1), !range_reversal,
-                    typename BinarySearchHelper::another_type());
-                return;
-            }
-
-            HPX_ASSERT(size1 >= size2);
-            HPX_ASSERT(size1 >= 1ul);
-
-            Iter1 mid1 = first1 + size1 / 2;
-            Iter2 boundary2 = BinarySearchHelper::call(
-                first2, last2, HPX_INVOKE(proj1, *mid1), comp, proj2);
-            Iter3 target = dest + (mid1 - first1) + (boundary2 - first2);
-
-            *target = *mid1;
-
-            hpx::future<void> fut =
-                execution::async_execute(policy.executor(), [&]() -> void {
-                    // Process left side ranges.
-                    parallel_merge_helper(policy, first1, mid1, first2,
-                        boundary2, dest, comp, proj1, proj2, range_reversal,
-                        BinarySearchHelper());
-                });
-
-            try
-            {
-                // Process right side ranges.
-                parallel_merge_helper(policy, mid1 + 1, last1, boundary2, last2,
-                    target + 1, HPX_FORWARD(Comp, comp),
-                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2),
-                    range_reversal, BinarySearchHelper());
-            }
-            catch (...)
-            {
-                fut.wait();
-
-                std::vector<hpx::future<void>> futures;
-                futures.reserve(2);
-                futures.emplace_back(HPX_MOVE(fut));
-                futures.emplace_back(hpx::make_exceptional_future<void>(
-                    std::current_exception()));
-
-                std::list<std::exception_ptr> errors;
-                util::detail::handle_local_exceptions<ExPolicy>::call(
-                    futures, errors);
-
-                HPX_UNREACHABLE;
-            }
-
-            fut.get();
-        }
-
-        template <typename ExPolicy, typename Iter1, typename Sent1,
-            typename Iter2, typename Sent2, typename Iter3, typename Comp,
             typename Proj1, typename Proj2>
-        hpx::future<util::in_in_out_result<Iter1, Iter2, Iter3>> parallel_merge(
-            ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
-            Sent2 last2, Iter3 dest, Comp&& comp, Proj1&& proj1, Proj2&& proj2)
+        decltype(auto) parallel_merge(ExPolicy&& policy, Iter1 first1,
+            Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest, Comp&& comp,
+            Proj1&& proj1, Proj2&& proj2)
         {
+            auto const len1 = detail::distance(first1, last1);
+            auto const len2 = detail::distance(first2, last2);
+
             using result_type = util::in_in_out_result<Iter1, Iter2, Iter3>;
 
-            auto f1 = [first1, last1, first2, last2, dest,
-                          policy = HPX_FORWARD(ExPolicy, policy),
+            if (len1 > len2)
+            {
+                auto f1 = [first = first2, len = len2, dest,
+                              comp = HPX_FORWARD(Comp, comp),
+                              proj1 = HPX_FORWARD(Proj1, proj1),
+                              proj2 = HPX_FORWARD(Proj2, proj2)](
+                              Iter1 part_begin, std::size_t part_size,
+                              std::size_t base_index) {
+                    std::size_t const start = (std::min)(base_index, len);
+                    std::size_t const end =
+                        (std::min)(base_index + part_size, len);
+                    std::size_t const dest_start = base_index + start;
+
+                    sequential_merge(part_begin,
+                        std::next(part_begin, part_size),
+                        std::next(first, start), std::next(first, end),
+                        std::next(dest, dest_start), comp, proj1, proj2);
+                };
+
+                auto f2 = [first = first2, len1, len2, dest](Iter1 last) {
+                    return result_type{last, std::next(first, len2),
+                        std::next(dest, len1 + len2)};
+                };
+
+                return util::foreach_partitioner<ExPolicy>::call(
+                    HPX_FORWARD(ExPolicy, policy), first1, len1, HPX_MOVE(f1),
+                    HPX_MOVE(f2));
+            }
+
+            auto f1 = [first = first1, len = len1, dest,
                           comp = HPX_FORWARD(Comp, comp),
                           proj1 = HPX_FORWARD(Proj1, proj1),
-                          proj2 = HPX_FORWARD(
-                              Proj2, proj2)]() mutable -> result_type {
-                try
-                {
-                    parallel_merge_helper(HPX_MOVE(policy), first1, last1,
-                        first2, last2, dest, HPX_MOVE(comp), HPX_MOVE(proj1),
-                        HPX_MOVE(proj2), false, lower_bound_helper());
+                          proj2 = HPX_FORWARD(Proj2, proj2)](Iter2 part_begin,
+                          std::size_t part_size, std::size_t base_index) {
+                std::size_t const start = (std::min)(base_index, len);
+                std::size_t const end = (std::min)(base_index + part_size, len);
+                std::size_t const dest_start = base_index + start;
 
-                    auto const len1 = detail::distance(first1, last1);
-                    auto const len2 = detail::distance(first2, last2);
-                    return {std::next(first1, len1), std::next(first2, len2),
-                        std::next(dest, len1 + len2)};
-                }
-                catch (...)
-                {
-                    util::detail::handle_local_exceptions<ExPolicy>::call(
-                        std::current_exception());
-                    HPX_ASSERT(false);
-                    // To silence no return statement in all control blocks
-                    auto len1 = detail::distance(first1, last1);
-                    auto len2 = detail::distance(first2, last2);
-                    return {std::next(first1, len1), std::next(first2, len2),
-                        std::next(dest, len1 + len2)};
-                }
+                sequential_merge(std::next(first, start), std::next(first, end),
+                    part_begin, std::next(part_begin, part_size),
+                    std::next(dest, dest_start), comp, proj1, proj2);
             };
 
-            return execution::async_execute(policy.executor(), HPX_MOVE(f1));
+            auto f2 = [first = first1, len1, len2, dest](Iter1 last) {
+                return result_type{
+                    std::next(first, len1), last, std::next(dest, len1 + len2)};
+            };
+
+            return util::foreach_partitioner<ExPolicy>::call(
+                HPX_FORWARD(ExPolicy, policy), first2, len2, HPX_MOVE(f1),
+                HPX_MOVE(f2));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -582,7 +575,8 @@ namespace hpx::parallel {
         {
             std::inplace_merge(first, middle,
                 detail::advance_to_sentinel(middle, last),
-                util::compare_projected<Comp&, Proj&>(comp, proj));
+                util::compare_projected<Comp, Proj>(
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj)));
             return last;
         }
 
@@ -736,9 +730,9 @@ namespace hpx::parallel {
                     {
                         util::detail::handle_local_exceptions<ExPolicy>::call(
                             std::current_exception());
-                    }
 
-                    HPX_UNREACHABLE;
+                        HPX_UNREACHABLE;
+                    }
                 });
         }
 
