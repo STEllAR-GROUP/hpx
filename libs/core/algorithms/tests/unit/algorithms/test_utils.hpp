@@ -289,9 +289,8 @@ namespace test {
         if (std::distance(first1, last1) != std::distance(first2, last2))
             return false;
 
-        return std::equal(first1, last1, first2,
-            [&, count = 0](auto const& a, auto const& b) mutable {
-                ++count;
+        return std::equal(
+            first1, last1, first2, [&](auto const& a, auto const& b) mutable {
                 if (comp(a, b))
                     return true;
                 return false;
