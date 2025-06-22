@@ -466,15 +466,16 @@ namespace hpx::parallel {
                     Iter2 start = first2;
                     if (base != 0)
                     {
-                        start = detail::lower_bound(
-                            first2, last2, *it1, comp, proj2);
+                        start = detail::lower_bound(first2, last2,
+                            HPX_INVOKE(proj1, *it1), comp, proj2);
                     }
 
                     Iter2 end = last2;
                     if (base + size != len1)
                     {
-                        end = detail::lower_bound(
-                            start, last2, *std::next(it1, size), comp, proj2);
+                        end = detail::lower_bound(start, last2,
+                            HPX_INVOKE(proj1, *std::next(it1, size)), comp,
+                            proj2);
                     }
                     sequential_merge(it1, std::next(it1, size), start, end,
                         std::next(dest, base + std::distance(first2, start)),
@@ -496,15 +497,15 @@ namespace hpx::parallel {
                 Iter1 start = first1;
                 if (base != 0)
                 {
-                    start =
-                        detail::lower_bound(first1, last1, *it2, comp, proj2);
+                    start = detail::lower_bound(
+                        first1, last1, HPX_INVOKE(proj2, *it2), comp, proj2);
                 }
 
                 Iter1 end = last1;
                 if (base + size != len2)
                 {
-                    end = detail::lower_bound(
-                        start, last1, *std::next(it2, size), comp, proj2);
+                    end = detail::lower_bound(start, last1,
+                        HPX_INVOKE(proj2, *std::next(it2, size)), comp, proj2);
                 }
                 sequential_merge(it2, std::next(it2, size), start, end,
                     std::next(dest, base + std::distance(first1, start)), comp,
