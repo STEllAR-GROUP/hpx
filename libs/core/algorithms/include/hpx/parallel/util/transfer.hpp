@@ -180,8 +180,10 @@ namespace hpx::parallel::util {
             {
                 std::size_t count(
                     num & static_cast<std::size_t>(-4));    // -V112
+                // clang-format off
                 for (std::size_t i = 0; i < count;
                     (void) ++first, ++dest, i += 4)    //-V112
+                // clang-format on
                 {
                     *dest = *first;
                     *++dest = *++first;
@@ -324,8 +326,10 @@ namespace hpx::parallel::util {
             {
                 std::size_t count(
                     num & static_cast<std::size_t>(-4));    // -V112
+                // clang-format off
                 for (std::size_t i = 0; i < count;
                     (void) ++first, ++dest, i += 4)    //-V112
+                // clang-format on
                 {
                     *dest = HPX_MOVE(*first);
                     // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
