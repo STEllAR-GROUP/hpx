@@ -458,94 +458,67 @@ namespace hpx::parallel {
             auto const len2 = detail::distance(first2, last2);
 
             using result_type = util::in_in_out_result<Iter1, Iter2, Iter3>;
-            using merge_region =
-                hpx::tuple<Iter1, std::size_t, Iter2, std::size_t, std::size_t>;
-
-            auto f1 = [dest, comp, proj1, proj2](Iter1 it1, std::size_t size1,
-                          Iter2 it2, std::size_t size2, std::size_t dest_base) {
-                sequential_merge(it1, std::next(it1, size1), it2,
-                    std::next(it2, size2), std::next(dest, dest_base), comp,
-                    proj1, proj2);
-            };
 
             if (len1 > len2)
             {
+                auto f1 = [len1, first2, last2, dest, comp, proj1, proj2](
+                              Iter1 it1, std::size_t size, std::size_t base) {
+                    Iter2 start = first2;
+                    if (base != 0)
+                    {
+                        start = detail::lower_bound(
+                            first2, last2, *it1, comp, proj2);
+                    }
+
+                    Iter2 end = last2;
+                    if (base + size != len1)
+                    {
+                        end = detail::lower_bound(
+                            start, last2, *std::next(it1, size), comp, proj2);
+                    }
+                    sequential_merge(it1, std::next(it1, size), start, end,
+                        std::next(dest, base + std::distance(first2, start)),
+                        comp, proj1, proj2);
+                };
+
                 auto f2 = [first2, len1, len2, dest](Iter1 last1) {
                     return result_type{last1, std::next(first2, len2),
                         std::next(dest, len1 + len2)};
                 };
 
-                auto reshape = [first2, last2, last1, comp, proj2](
-                                   auto&& shape) {
-                    std::vector<merge_region> reshaped;
-                    reshaped.reserve(std::size(shape));
-
-                    Iter2 it2 = first2;
-                    std::size_t dest_start = 0;
-                    for (auto&& r : shape)
-                    {
-                        Iter1 it1 = hpx::get<0>(r);
-                        std::size_t const size1 = hpx::get<1>(r);
-
-                        Iter2 l2 = detail::lower_bound(it2, last2,
-                            *std::next(it1, size1 - 1), comp, proj2);
-
-                        std::size_t size2 = std::distance(it2, l2);
-                        if (std::next(it1, size1) == last1)
-                        {
-                            size2 += std::distance(l2, last2);
-                        }
-
-                        reshaped.emplace_back(
-                            it1, size1, it2, size2, dest_start);
-
-                        it2 = l2;
-                        dest_start += size1 + size2;
-                    }
-                    return reshaped;
-                };
-
                 return util::foreach_partitioner<ExPolicy>::call(
                     HPX_FORWARD(ExPolicy, policy), first1, len1, HPX_MOVE(f1),
-                    HPX_MOVE(f2), HPX_MOVE(reshape));
+                    HPX_MOVE(f2));
             }
+
+            auto f1 = [len2, first1, last1, dest, comp, proj1, proj2](
+                          Iter2 it2, std::size_t size, std::size_t base) {
+                Iter1 start = first1;
+                if (base != 0)
+                {
+                    start =
+                        detail::lower_bound(first1, last1, *it2, comp, proj2);
+                }
+
+                Iter1 end = last1;
+                if (base + size != len2)
+                {
+                    end = detail::lower_bound(
+                        start, last1, *std::next(it2, size), comp, proj2);
+                }
+                sequential_merge(it2, std::next(it2, size), start, end,
+                    std::next(dest, base + std::distance(first1, start)), comp,
+                    proj1, proj2);
+            };
 
             auto f2 = [first1, len1, len2, dest](Iter2 last2) {
                 return result_type{std::next(first1, len1), last2,
                     std::next(dest, len1 + len2)};
             };
 
-            auto reshape = [first1, last1, last2, comp, proj1](auto&& shape) {
-                std::vector<merge_region> reshaped;
-                reshaped.reserve(std::size(shape));
-
-                Iter1 it1 = first1;
-                std::size_t dest_start = 0;
-                for (auto&& r : shape)
-                {
-                    Iter2 it2 = hpx::get<0>(r);
-                    std::size_t const size2 = hpx::get<1>(r);
-
-                    Iter1 l1 = detail::lower_bound(
-                        it1, last1, *std::next(it2, size2 - 1), comp, proj1);
-
-                    std::size_t size1 = std::distance(it1, l1);
-                    if (std::next(it2, size2) == last2)
-                    {
-                        size1 += std::distance(l1, last1);
-                    }
-
-                    reshaped.emplace_back(it1, size1, it2, size2, dest_start);
-
-                    it1 = l1;
-                    dest_start += size1 + size2;
-                }
-                return reshaped;
-            };
-
             return util::foreach_partitioner<ExPolicy>::call(
                 HPX_FORWARD(ExPolicy, policy), first2, len2, HPX_MOVE(f1),
-                HPX_MOVE(f2), HPX_MOVE(reshape));
+                HPX_MOVE(f2));
         }
 
         ///////////////////////////////////////////////////////////////////////
