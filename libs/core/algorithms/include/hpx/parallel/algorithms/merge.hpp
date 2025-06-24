@@ -330,8 +330,9 @@ namespace hpx::parallel {
             {
                 while (true)
                 {
-                    if (HPX_INVOKE(comp, HPX_INVOKE(proj2, *first2),
-                            HPX_INVOKE(proj1, *first1)))
+                    if (static_cast<bool>(
+                            HPX_INVOKE(comp, HPX_INVOKE(proj2, *first2),
+                                HPX_INVOKE(proj1, *first1))))
                     {
                         *dest = *first2;
                         ++dest;
@@ -371,7 +372,7 @@ namespace hpx::parallel {
             {
                 while (true)
                 {
-                    if (HPX_INVOKE(comp, *first2, *first1))
+                    if (static_cast<bool>(HPX_INVOKE(comp, *first2, *first1)))
                     {
                         *dest = *first2;
                         ++dest;
@@ -398,19 +399,6 @@ namespace hpx::parallel {
             auto copy_result2 = util::copy(first2, last2, copy_result1.out);
 
             return {copy_result1.in, copy_result2.in, copy_result2.out};
-        }
-
-        // sequential merge without projection function and with normal end
-        // iterators
-        template <typename Iter1, typename Iter2, typename OutIter,
-            typename Comp>
-        constexpr util::in_in_out_result<Iter1, Iter2, OutIter>
-        sequential_merge(Iter1 first1, Iter1 last1, Iter2 first2, Iter2 last2,
-            OutIter dest, Comp&& comp, hpx::identity, hpx::identity)
-        {
-            return {last1, last2,
-                std::merge(first1, last1, first2, last2, dest,
-                    HPX_FORWARD(Comp, comp))};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -477,6 +465,7 @@ namespace hpx::parallel {
                             HPX_INVOKE(proj1, *std::next(it1, size)), comp,
                             proj2);
                     }
+
                     sequential_merge(it1, std::next(it1, size), start, end,
                         std::next(dest, base + std::distance(first2, start)),
                         comp, proj1, proj2);
@@ -507,6 +496,7 @@ namespace hpx::parallel {
                     end = detail::lower_bound(start, last1,
                         HPX_INVOKE(proj2, *std::next(it2, size)), comp, proj2);
                 }
+
                 sequential_merge(it2, std::next(it2, size), start, end,
                     std::next(dest, base + std::distance(first1, start)), comp,
                     proj1, proj2);
