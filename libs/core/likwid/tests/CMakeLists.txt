@@ -9,9 +9,7 @@ include(HPX_Message)
 if(HPX_WITH_TESTS)
   if(HPX_WITH_TESTS_UNIT)
     add_hpx_pseudo_target(tests.unit.modules.likwid)
-    add_hpx_pseudo_dependencies(
-      tests.unit.modules tests.unit.modules.likwid
-    )
+    add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.likwid)
     add_subdirectory(unit)
   endif()
 
