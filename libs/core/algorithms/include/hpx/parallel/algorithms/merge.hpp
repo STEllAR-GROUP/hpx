@@ -330,27 +330,32 @@ namespace hpx::parallel {
             {
                 while (true)
                 {
-                    if (static_cast<bool>(
+                    while (first2 != last2 &&
+                        static_cast<bool>(
                             HPX_INVOKE(comp, HPX_INVOKE(proj2, *first2),
                                 HPX_INVOKE(proj1, *first1))))
                     {
                         *dest = *first2;
                         ++dest;
                         ++first2;
-                        if (first2 == last2)
-                        {
-                            break;
-                        }
                     }
-                    else
+                    if (first2 == last2)
+                    {
+                        break;
+                    }
+
+                    while (first1 != last1 &&
+                        !static_cast<bool>(
+                            HPX_INVOKE(comp, HPX_INVOKE(proj2, *first2),
+                                HPX_INVOKE(proj1, *first1))))
                     {
                         *dest = *first1;
                         ++dest;
                         ++first1;
-                        if (first1 == last1)
-                        {
-                            break;
-                        }
+                    }
+                    if (first1 == last1)
+                    {
+                        break;
                     }
                 }
             }
@@ -372,25 +377,28 @@ namespace hpx::parallel {
             {
                 while (true)
                 {
-                    if (static_cast<bool>(HPX_INVOKE(comp, *first2, *first1)))
+                    while (first2 != last2 &&
+                        static_cast<bool>(HPX_INVOKE(comp, *first2, *first1)))
                     {
                         *dest = *first2;
                         ++dest;
                         ++first2;
-                        if (first2 == last2)
-                        {
-                            break;
-                        }
                     }
-                    else
+                    if (first2 == last2)
+                    {
+                        break;
+                    }
+
+                    while (first1 != last1 &&
+                        !static_cast<bool>(HPX_INVOKE(comp, *first2, *first1)))
                     {
                         *dest = *first1;
                         ++dest;
                         ++first1;
-                        if (first1 == last1)
-                        {
-                            break;
-                        }
+                    }
+                    if (first1 == last1)
+                    {
+                        break;
                     }
                 }
             }
