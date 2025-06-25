@@ -14,6 +14,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/client.hpp>
 #include <hpx/modules/threading_base.hpp>
+#ifdef HPX_HAVE_MODULE_LIKWID
+#include <hpx/likwid/likwid_tls.hpp>
+#endif
 
 #include "stubs/managed_refcnt_checker.hpp"
 
@@ -97,6 +100,10 @@ namespace hpx { namespace test {
             // Schedule a wakeup.
             threads::set_thread_state(
                 self_id.noref(), d, threads::thread_schedule_state::pending);
+
+#ifdef HPX_HAVE_MODULE_LIKWID
+            hpx::likwid::suspend_region region;
+#endif
 
             // Suspend this thread.
             threads::get_self().yield(threads::thread_result_type(
