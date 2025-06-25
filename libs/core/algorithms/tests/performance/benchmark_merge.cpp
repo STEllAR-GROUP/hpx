@@ -120,22 +120,23 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     double const time_seq = run_merge_benchmark_hpx(
         test_count, seq, first1, last1, first2, last2, dest);
 
-    HPX_ITT_RESUME();
-
     std::cout << "--- run_merge_benchmark_par ---" << std::endl;
     hpx::execution::experimental::max_num_chunks mnc(
         hpx::get_num_worker_threads() * 32);
     double const time_par = run_merge_benchmark_hpx(
-        test_count, par.with(mnc), first1, last1, first2, last2, dest);
-
-    HPX_ITT_PAUSE();
+        test_count, par, first1, last1, first2, last2, dest);
 
     std::cout << "--- run_merge_benchmark_par_fork_join ---" << std::endl;
     double time_par_fork_join = 0;
     {
         hpx::execution::experimental::fork_join_executor exec;
+
+        HPX_ITT_RESUME();
+
         time_par_fork_join = run_merge_benchmark_hpx(
             test_count, par.on(exec), first1, last1, first2, last2, dest);
+
+        HPX_ITT_PAUSE();
     }
 
     std::cout << "--- run_merge_benchmark_par_unseq ---" << std::endl;
