@@ -1,4 +1,5 @@
 # Copyright (c) 2022 Srinivas Yadav
+#
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,9 +13,7 @@ if(NOT TARGET LIKWID::likwid)
   )
 
   if(NOT LIKWID_INCLUDE_DIR)
-    hpx_error(
-    "Could not find likwid.h"
-    )
+    hpx_error("Could not find likwid.h")
   endif()
   message(STATUS "Found likwid header: ${LIKWID_INCLUDE_DIR}")
 
@@ -25,18 +24,16 @@ if(NOT TARGET LIKWID::likwid)
   )
 
   if(NOT LIKWID_LIBRARY)
-    hpx_error(
-    "Could not find likwid library"
-    )
+    hpx_error("Could not find likwid library")
   endif()
   message(STATUS "Found likwid library: ${LIKWID_LIBRARY}")
 
   if(LIKWID_ROOT)
-  # The call to file is for compatibility with windows paths
+    # The call to file is for compatibility with windows paths
     file(TO_CMAKE_PATH ${LIKWID_ROOT} LIKWID_ROOT)
-    elseif("$ENV{LIKWID_ROOT}")
+  elseif("$ENV{LIKWID_ROOT}")
     file(TO_CMAKE_PATH $ENV{LIKWID_ROOT} LIKWID_ROOT)
-    else()
+  else()
     file(TO_CMAKE_PATH "${LIKWID_INCLUDE_DIR}" LIKWID_INCLUDE_DIR)
     string(REPLACE "/include" "" LIKWID_ROOT "${LIKWID_INCLUDE_DIR}")
   endif()
