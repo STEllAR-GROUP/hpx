@@ -31,10 +31,11 @@ namespace hpx::execution::experimental {
             template <typename... Ts>
             decltype(auto) operator()(Ts&&... ts)
             {
-                exec_.on_start_();
+                hpx::likwid::start_region(exec_.name_.c_str());
 
-                auto on_exit = hpx::experimental::scoped_exit{
-                    [&exec_]() { exec_.on_stop_() }};
+                auto on_exit = hpx::experimental::scoped_exit{[&exec_]() {
+                    hpx::likwid::stop_region(exec_.name_.c_str());
+                }};
 
                 return hpx::util::invoke(f_, HPX_FORWARD(Ts, ts)...);
             }
@@ -50,17 +51,21 @@ namespace hpx::execution::experimental {
         using executor_parameters_type =
             hpx::parallel::execution::executor_parameters_type_t<BaseExecutor>;
 
-        likwid_executor(BaseExecutor& exec, std::string name)
-          : exec_(exec)
+        explicit likwid_executor(BaseExecutor const& exec)
+          : exec_(&exec)
+          , name_("likwid_executor")
+        {
+        }
+
+        likwid_executor(BaseExecutor const& exec, std::string name)
+          : exec_(&exec)
           , name_(HPX_MOVE(name))
-          , on_start_([&name_]() { hpx::likwid::start_region(name_.c_str()); })
-          , on_stop_([&name_]() { hpx::likwid::stop_region(name_.c_str()); })
         {
         }
 
         bool operator==(likwid_executor const& rhs) const noexcept
         {
-            return exec_ == rhs.exec_;
+            return *exec_ == *rhs.exec_;
         }
 
         bool operator!=(likwid_executor const& rhs) const noexcept
@@ -79,7 +84,7 @@ namespace hpx::execution::experimental {
             hpx::parallel::execution::sync_execute_t,
             likwid_executor const& exec, F&& f, Ts&&... ts)
         {
-            return hpx::parallel::execution::sync_execute(exec.exec_,
+            return hpx::parallel::execution::sync_execute(exec.base_executor(),
                 hook_wrapper<F>{exec, HPX_FORWARD(F, f)},
                 HPX_FORWARD(Ts, ts)...);
         }
@@ -90,7 +95,7 @@ namespace hpx::execution::experimental {
             hpx::parallel::execution::async_execute_t,
             likwid_executor const& exec, F&& f, Ts&&... ts)
         {
-            return hpx::parallel::execution::async_execute(exec.exec_,
+            return hpx::parallel::execution::async_execute(exec.base_executor(),
                 hook_wrapper<F>{exec, HPX_FORWARD(F, f)},
                 HPX_FORWARD(Ts, ts)...);
         }
@@ -101,7 +106,7 @@ namespace hpx::execution::experimental {
             likwid_executor const& exec, F&& f, Future&& predecessor,
             Ts&&... ts)
         {
-            return hpx::parallel::execution::then_execute(exec.exec_,
+            return hpx::parallel::execution::then_execute(exec.base_executor(),
                 hook_wrapper<F>{exec, HPX_FORWARD(F, f)},
                 HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
         }
@@ -111,7 +116,7 @@ namespace hpx::execution::experimental {
         friend void tag_invoke(hpx::parallel::execution::post_t,
             likwid_executor const& exec, F&& f, Ts&&... ts)
         {
-            hpx::parallel::execution::post(exec.exec_,
+            hpx::parallel::execution::post(exec.base_executor(),
                 hook_wrapper<F>{exec, HPX_FORWARD(F, f)},
                 HPX_FORWARD(Ts, ts)...);
         }
@@ -122,9 +127,9 @@ namespace hpx::execution::experimental {
             hpx::parallel::execution::bulk_sync_execute_t,
             likwid_executor const& exec, F&& f, S const& shape, Ts&&... ts)
         {
-            return hpx::parallel::execution::bulk_sync_execute(exec.exec_,
-                hook_wrapper<F>{exec, HPX_FORWARD(F, f)}, shape,
-                HPX_FORWARD(Ts, ts)...);
+            return hpx::parallel::execution::bulk_sync_execute(
+                exec.base_executor(), hook_wrapper<F>{exec, HPX_FORWARD(F, f)},
+                shape, HPX_FORWARD(Ts, ts)...);
         }
 
         // BulkTwoWayExecutor interface
@@ -133,9 +138,9 @@ namespace hpx::execution::experimental {
             hpx::parallel::execution::bulk_async_execute_t,
             likwid_executor const& exec, F&& f, S const& shape, Ts&&... ts)
         {
-            return hpx::parallel::execution::bulk_async_execute(exec.exec_,
-                hook_wrapper<F>{exec, HPX_FORWARD(F, f)}, shape,
-                HPX_FORWARD(Ts, ts)...);
+            return hpx::parallel::execution::bulk_async_execute(
+                exec.base_executor(), hook_wrapper<F>{exec, HPX_FORWARD(F, f)},
+                shape, HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename S, typename Future, typename... Ts>
@@ -144,18 +149,45 @@ namespace hpx::execution::experimental {
             likwid_executor const& exec, F&& f, S const& shape,
             Future&& predecessor, Ts&&... ts)
         {
-            return hpx::parallel::execution::bulk_then_execute(exec.exec_,
-                hook_wrapper<F>{exec, HPX_FORWARD(F, f)}, shape,
-                HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
+            return hpx::parallel::execution::bulk_then_execute(
+                exec.base_executor(), hook_wrapper<F>{exec, HPX_FORWARD(F, f)},
+                shape, HPX_FORWARD(Future, predecessor),
+                HPX_FORWARD(Ts, ts)...);
+        }
+
+        friend constexpr auto tag_invoke(
+            hpx::execution::experimental::with_annotation_t,
+            likwid_executor const& exec, char const* name)
+        {
+            auto exec_with_annotation = exec;
+            exec_with_annotation.name_ = name;
+            return exec_with_annotation;
+        }
+
+        friend auto tag_invoke(hpx::execution::experimental::with_annotation_t,
+            likwid_executor const& exec, std::string name)
+        {
+            auto exec_with_annotation = exec;
+            exec_with_annotation.name_ = HPX_MOVE(name);
+            return exec_with_annotation;
+        }
+
+        friend constexpr char const* tag_invoke(
+            hpx::execution::experimental::get_annotation_t,
+            likwid_executor const& exec) noexcept
+        {
+            return exec.name_.c_str();
         }
 
     private:
-        using thread_hook = hpx::function<void()>;
+        constexpr BaseExecutor const& base_executor() const noexcept
+        {
+            return *exec_;
+        }
 
-        BaseExecutor& exec_;
+    private:
+        BaseExecutor const* exec_;
         std::string name_;
-        thread_hook on_start_;
-        thread_hook on_stop_;
     };
 }    // namespace hpx::execution::experimental
 
