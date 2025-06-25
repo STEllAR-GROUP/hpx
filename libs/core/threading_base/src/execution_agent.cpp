@@ -27,6 +27,9 @@
 #include <hpx/modules/debugging.hpp>
 #include <hpx/threading_base/detail/reset_backtrace.hpp>
 #endif
+#ifdef HPX_HAVE_MODULE_LIKWID
+#include <hpx/likwid/likwid_tls.hpp>
+#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -182,6 +185,10 @@ namespace hpx::threads {
                     hpx::util::set_held_locks_data(HPX_MOVE(data));
                 });
 #endif
+#ifdef HPX_HAVE_MODULE_LIKWID
+            hpx::likwid::suspend_region region;
+#endif
+
             HPX_ASSERT(thrd_data != nullptr &&
                 thrd_data->get_state().state() ==
                     thread_schedule_state::active);
