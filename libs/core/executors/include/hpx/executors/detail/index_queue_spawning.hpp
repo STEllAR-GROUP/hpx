@@ -23,6 +23,7 @@
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
