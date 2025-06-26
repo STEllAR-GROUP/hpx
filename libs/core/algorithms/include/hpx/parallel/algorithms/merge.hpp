@@ -318,6 +318,19 @@ namespace hpx::parallel {
     namespace detail {
         /// \cond NOINTERNAL
 
+        template <typename T>
+        HPX_FORCEINLINE decltype(auto) init_value([[maybe_unused]] T&& val)
+        {
+            if constexpr (std::is_default_constructible_v<std::decay_t<T>>)
+            {
+                return std::decay_t<T>{};
+            }
+            else
+            {
+                return HPX_FORWARD(T, val);
+            }
+        }
+
         // sequential merge with projection function.
         template <typename Iter1, typename Sent1, typename Iter2,
             typename Sent2, typename OutIter, typename Comp, typename Proj1,
@@ -328,30 +341,44 @@ namespace hpx::parallel {
         {
             if (first1 != last1 && first2 != last2)
             {
+                auto val1 = HPX_INVOKE(proj1, *first1);
+                auto val2 = init_value(HPX_INVOKE(proj2, *first2));
                 while (true)
                 {
-                    while (first2 != last2 &&
-                        static_cast<bool>(
-                            HPX_INVOKE(comp, HPX_INVOKE(proj2, *first2),
-                                HPX_INVOKE(proj1, *first1))))
+                    while (first2 != last2)
                     {
-                        *dest = *first2;
-                        ++dest;
-                        ++first2;
+                        auto elem2 = *first2;
+                        val2 = HPX_INVOKE(proj2, elem2);
+                        if (static_cast<bool>(HPX_INVOKE(comp, val2, val1)))
+                        {
+                            *dest = HPX_MOVE(elem2);
+                            ++dest;
+                            ++first2;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                     if (first2 == last2)
                     {
                         break;
                     }
 
-                    while (first1 != last1 &&
-                        !static_cast<bool>(
-                            HPX_INVOKE(comp, HPX_INVOKE(proj2, *first2),
-                                HPX_INVOKE(proj1, *first1))))
+                    while (first1 != last1)
                     {
-                        *dest = *first1;
-                        ++dest;
-                        ++first1;
+                        auto elem1 = *first1;
+                        val1 = HPX_INVOKE(proj1, elem1);
+                        if (!static_cast<bool>(HPX_INVOKE(comp, val2, val1)))
+                        {
+                            *dest = HPX_MOVE(elem1);
+                            ++dest;
+                            ++first1;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                     if (first1 == last1)
                     {
@@ -375,26 +402,42 @@ namespace hpx::parallel {
         {
             if (first1 != last1 && first2 != last2)
             {
+                auto val1 = *first1;
+                auto val2 = init_value(*first2);
                 while (true)
                 {
-                    while (first2 != last2 &&
-                        static_cast<bool>(HPX_INVOKE(comp, *first2, *first1)))
+                    while (first2 != last2)
                     {
-                        *dest = *first2;
-                        ++dest;
-                        ++first2;
+                        val2 = *first2;
+                        if (static_cast<bool>(HPX_INVOKE(comp, val2, val1)))
+                        {
+                            *dest = val2;
+                            ++dest;
+                            ++first2;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                     if (first2 == last2)
                     {
                         break;
                     }
 
-                    while (first1 != last1 &&
-                        !static_cast<bool>(HPX_INVOKE(comp, *first2, *first1)))
+                    while (first1 != last1)
                     {
-                        *dest = *first1;
-                        ++dest;
-                        ++first1;
+                        val1 = *first1;
+                        if (!static_cast<bool>(HPX_INVOKE(comp, val2, val1)))
+                        {
+                            *dest = val1;
+                            ++dest;
+                            ++first1;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                     if (first1 == last1)
                     {
@@ -457,7 +500,10 @@ namespace hpx::parallel {
 
             if (len1 > len2)
             {
-                auto f1 = [len1, first2, last2, dest, comp, proj1, proj2](
+                auto f1 = [len1, first2, last2, dest,
+                              comp = HPX_FORWARD(Comp, comp),
+                              proj1 = HPX_FORWARD(Proj1, proj1),
+                              proj2 = HPX_FORWARD(Proj2, proj2)](
                               Iter1 it1, std::size_t size, std::size_t base) {
                     Iter2 start = first2;
                     if (base != 0)
@@ -489,7 +535,10 @@ namespace hpx::parallel {
                     HPX_MOVE(f2));
             }
 
-            auto f1 = [len2, first1, last1, dest, comp, proj1, proj2](
+            auto f1 = [len2, first1, last1, dest,
+                          comp = HPX_FORWARD(Comp, comp),
+                          proj1 = HPX_FORWARD(Proj1, proj1),
+                          proj2 = HPX_FORWARD(Proj2, proj2)](
                           Iter2 it2, std::size_t size, std::size_t base) {
                 Iter1 start = first1;
                 if (base != 0)
