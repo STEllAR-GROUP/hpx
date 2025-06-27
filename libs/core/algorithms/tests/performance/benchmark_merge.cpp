@@ -82,19 +82,20 @@ double run_merge_benchmark_hpx(int const test_count, ExPolicy policy,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
+template <typename IteratorTag, typename Allocator>
 void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
-    int test_count, std::size_t const random_range, IteratorTag)
+    int test_count, std::size_t const random_range, IteratorTag,
+    Allocator const& alloc, std::string const& type)
 {
-    std::cout << "* Preparing Benchmark..." << std::endl;
+    std::cout << "* Preparing Benchmark... (" << type << ")" << std::endl;
 
-    using test_container = test_container<IteratorTag>;
+    using test_container = test_container<IteratorTag, int, Allocator>;
     using container = typename test_container::type;
 
-    container src1 = test_container::get_container(vector_size1);
-    container src2 = test_container::get_container(vector_size2);
+    container src1 = test_container::get_container(vector_size1, alloc);
+    container src2 = test_container::get_container(vector_size2, alloc);
     container result =
-        test_container::get_container(vector_size1 + vector_size2);
+        test_container::get_container(vector_size1 + vector_size2, alloc);
 
     auto first1 = std::begin(src1);
     auto last1 = std::end(src1);
@@ -111,18 +112,29 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     hpx::sort(par, std::begin(src1), std::end(src1));
     hpx::sort(par, std::begin(src2), std::end(src2));
 
-    std::cout << "* Running Benchmark..." << std::endl;
+    std::cout << "* Running Benchmark... (" << type << ")" << std::endl;
     std::cout << "--- run_merge_benchmark_std ---" << std::endl;
+
+    HPX_ITT_RESUME();
+
     double const time_std =
         run_merge_benchmark_std(test_count, first1, last1, first2, last2, dest);
 
+    HPX_ITT_PAUSE();
+
+    hpx::this_thread::sleep_for(std::chrono::seconds(1));
+
     std::cout << "--- run_merge_benchmark_seq ---" << std::endl;
+
+    HPX_ITT_RESUME();
+
     double const time_seq = run_merge_benchmark_hpx(
         test_count, seq, first1, last1, first2, last2, dest);
 
+    HPX_ITT_PAUSE();
+
     std::cout << "--- run_merge_benchmark_par ---" << std::endl;
-    hpx::execution::experimental::max_num_chunks mnc(
-        hpx::get_num_worker_threads() * 32);
+
     double const time_par = run_merge_benchmark_hpx(
         test_count, par, first1, last1, first2, last2, dest);
 
@@ -130,13 +142,8 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     double time_par_fork_join = 0;
     {
         hpx::execution::experimental::fork_join_executor exec;
-
-        HPX_ITT_RESUME();
-
         time_par_fork_join = run_merge_benchmark_hpx(
             test_count, par.on(exec), first1, last1, first2, last2, dest);
-
-        HPX_ITT_PAUSE();
     }
 
     std::cout << "--- run_merge_benchmark_par_unseq ---" << std::endl;
@@ -157,17 +164,6 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-std::string correct_iterator_tag_str(std::string iterator_tag)
-{
-    if (iterator_tag != "random"/* &&
-        iterator_tag != "bidirectional" &&
-        iterator_tag != "forward"*/)
-        return "random";
-
-    return iterator_tag;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     HPX_ITT_PAUSE();
@@ -180,8 +176,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     double const vector_ratio = vm["vector_ratio"].as<double>();
     std::size_t random_range = vm["random_range"].as<std::size_t>();
     int const test_count = vm["test_count"].as<int>();
-    std::string const iterator_tag_str =
-        correct_iterator_tag_str(vm["iterator_tag"].as<std::string>());
 
     std::size_t const os_threads = hpx::get_os_thread_count();
 
@@ -197,21 +191,28 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "vector_size1 : " << vector_size1 << std::endl;
     std::cout << "vector_size2 : " << vector_size2 << std::endl;
     std::cout << "random_range : " << random_range << std::endl;
-    std::cout << "iterator_tag : " << iterator_tag_str << std::endl;
     std::cout << "test_count   : " << test_count << std::endl;
     std::cout << "os threads   : " << os_threads << std::endl;
     std::cout << "----------------------------------------------\n"
               << std::endl;
 
-    if (iterator_tag_str == "random")
+    {
+        using allocator_type = std::allocator<int>;
+        allocator_type alloc;
+
         run_benchmark(vector_size1, vector_size2, test_count, random_range,
-            std::random_access_iterator_tag());
-    //else if (iterator_tag_str == "bidirectional")
-    //    run_benchmark(vector_size1, vector_size2, test_count, random_range,
-    //        std::bidirectional_iterator_tag());
-    //else // forward
-    //    run_benchmark(vector_size1, vector_size2, test_count, random_range,
-    //        std::forward_iterator_tag());
+            std::random_access_iterator_tag(), alloc, "std::vector");
+    }
+
+    {
+        auto policy = hpx::execution::par;
+        using allocator_type =
+            hpx::compute::host::detail::policy_allocator<int, decltype(policy)>;
+        allocator_type alloc(policy);
+
+        run_benchmark(vector_size1, vector_size2, test_count, random_range,
+            std::random_access_iterator_tag(), alloc, "hpx::compute::vector");
+    }
 
     return hpx::local::finalize();
 }
@@ -222,16 +223,24 @@ int main(int const argc, char* argv[])
     options_description desc_commandline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
+#if defined(HPX_DEBUG)
+    constexpr std::size_t vector_size = 268435;
+#else
+    constexpr std::size_t vector_size = 268435456;
+#endif
+
+    std::string const vector_size_help =
+        "sum of sizes of two vectors (default: " + std::to_string(vector_size) +
+        ")";
+
     // clang-format off
     desc_commandline.add_options()
-        ("vector_size", value<std::size_t>()->default_value(268435456),
-         "sum of sizes of two vectors (default: 268435456)")
+        ("vector_size", value<std::size_t>()->default_value(vector_size),
+         vector_size_help.c_str())
         ("vector_ratio", value<double>()->default_value(0.7),
          "ratio of two vector sizes (default: 0.7)")
         ("random_range", value<std::size_t>()->default_value(65536),
          "range of random numbers [0, x) (default: 65536)")
-        ("iterator_tag", value<std::string>()->default_value("random"),
-         "the kind of iterator tag (random/bidirectional/forward)")
         ("test_count", value<int>()->default_value(10),
          "number of tests to be averaged (default: 10)")
         ("seed,s", value<unsigned int>(),
