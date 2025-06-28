@@ -289,6 +289,7 @@ namespace hpx {
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/iterator_support/unwrap_iterator.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
@@ -301,9 +302,7 @@ namespace hpx {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/type_support/bit_cast.hpp>
 #include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/is_contiguous_iterator.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -334,41 +333,6 @@ namespace hpx::parallel {
             }
         }
 
-        template <typename Iter,
-            HPX_CONCEPT_REQUIRES_(!std::is_pointer_v<Iter>)>
-        HPX_FORCEINLINE constexpr auto get_unwrapped_ptr(Iter it) noexcept
-        {
-            static_assert(hpx::traits::is_contiguous_iterator_v<Iter>,
-                "optimized merge is possible for contiguous-iterators "
-                "only");
-
-            using value_t = typename std::iterator_traits<Iter>::value_type;
-            return const_cast<value_t*>(
-                hpx::bit_cast<value_t const volatile*>(&*it));
-        }
-
-        template <typename T, HPX_CONCEPT_REQUIRES_(std::is_pointer_v<T>)>
-        HPX_FORCEINLINE constexpr auto get_unwrapped_ptr(T ptr) noexcept
-        {
-            using value_t = std::remove_pointer_t<T>;
-            return const_cast<value_t*>(
-                hpx::bit_cast<value_t const volatile*>(ptr));
-        }
-
-        template <typename Iter>
-        HPX_FORCEINLINE auto get_unwrapped(Iter it)
-        {
-            // is_contiguous_iterator_v is true for pointers
-            if constexpr (hpx::traits::is_contiguous_iterator_v<Iter>)
-            {
-                return get_unwrapped_ptr(it);
-            }
-            else
-            {
-                return it;
-            }
-        }
-
         // sequential merge with projection function.
         template <typename Iter1, typename Sent1, typename Iter2,
             typename Sent2, typename OutIter, typename Comp, typename Proj1,
@@ -377,17 +341,17 @@ namespace hpx::parallel {
         sequential_merge(Iter1 start1, Sent1 sent1, Iter2 start2, Sent2 sent2,
             OutIter out, Comp&& comp, Proj1&& proj1, Proj2&& proj2)
         {
-            auto first1 = get_unwrapped(start1);
-            auto first2 = get_unwrapped(start2);
-            auto dest = get_unwrapped(out);
+            auto first1 = hpx::util::get_unwrapped(start1);
+            auto first2 = hpx::util::get_unwrapped(start2);
+            auto dest = hpx::util::get_unwrapped(out);
 
             auto end1 = start1;
             auto const len1 = detail::advance_and_get_distance(end1, sent1);
-            auto const last1 = get_unwrapped(end1);
+            auto const last1 = hpx::util::get_unwrapped(end1);
 
             auto end2 = start2;
             auto const len2 = detail::advance_and_get_distance(end2, sent2);
-            auto const last2 = get_unwrapped(end2);
+            auto const last2 = hpx::util::get_unwrapped(end2);
 
             if (first1 != last1 && first2 != last2)
             {
@@ -458,17 +422,17 @@ namespace hpx::parallel {
         sequential_merge(Iter1 start1, Sent1 sent1, Iter2 start2, Sent2 sent2,
             OutIter out, Comp&& comp, hpx::identity, hpx::identity)
         {
-            auto first1 = get_unwrapped(start1);
-            auto first2 = get_unwrapped(start2);
-            auto dest = get_unwrapped(out);
+            auto first1 = hpx::util::get_unwrapped(start1);
+            auto first2 = hpx::util::get_unwrapped(start2);
+            auto dest = hpx::util::get_unwrapped(out);
 
             auto end1 = start1;
             auto const len1 = detail::advance_and_get_distance(end1, sent1);
-            auto const last1 = get_unwrapped(end1);
+            auto const last1 = hpx::util::get_unwrapped(end1);
 
             auto end2 = start2;
             auto const len2 = detail::advance_and_get_distance(end2, sent2);
-            auto const last2 = get_unwrapped(end2);
+            auto const last2 = hpx::util::get_unwrapped(end2);
 
             if (first1 != last1 && first2 != last2)
             {
