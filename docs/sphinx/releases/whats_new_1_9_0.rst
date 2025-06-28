@@ -158,7 +158,7 @@ Closed pull requests
 * :hpx-pr:`6130` - Remove the mutex lock in the critical path of get_partitioner.
 * :hpx-pr:`6129` - Modernize module from levels 22, 23
 * :hpx-pr:`6127` - Working around gccV9 problem that prevent us from storing enum classes in bit fields
-* :hpx-pr:`6126` - Deprecate hpx::parallel::task_block in favor of hpx::experimental::ta?
+* :hpx-pr:`6126` - Deprecate hpx::parallel::task_block in favor of hpx::experimental::task_block
 * :hpx-pr:`6125` - Making sure sync_wait compiles when used with an lvalue sender involving bulk
 * :hpx-pr:`6124` - Fixing use of any_sender in combination with when_all
 * :hpx-pr:`6123` - Fixed issues found by PVS-Studio

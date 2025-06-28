@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 
@@ -36,7 +37,8 @@ namespace hpx::parallel::detail {
             }
             else
             {
-                difference_type offset = detail::distance(first, last);
+                difference_type offset =
+                    parallel::detail::distance(first, last);
                 first = last;
                 return offset;
             }
