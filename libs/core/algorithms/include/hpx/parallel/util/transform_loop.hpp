@@ -11,6 +11,9 @@
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/iterator_support/unwrap_iterator.hpp>
+#include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
@@ -219,8 +222,10 @@ namespace hpx::parallel::util {
                 call(InIter1B first1, InIter1E last1, InIter2 first2,
                     InIter2 last2, OutIter dest, F&& f)
             {
+                // clang-format off
                 for (/* */; first1 != last1 && first2 != last2;
                     (void) ++first1, ++first2, ++dest)
+                // clang-format on
                 {
                     *dest = HPX_INVOKE(f, first1, first2);
                 }
@@ -481,6 +486,7 @@ namespace hpx::parallel::util {
 
                 for (std::size_t i = 0; i < count;
                     (void) ++it, i += 4)    // -V112
+                // clang-format on
                 {
                     *dest++ = HPX_INVOKE(f, it);
                     *dest++ = HPX_INVOKE(f, ++it);
@@ -584,7 +590,7 @@ namespace hpx::parallel::util {
             template <typename InIter, typename OutIter, typename F>
             HPX_HOST_DEVICE
                 HPX_FORCEINLINE static constexpr std::pair<InIter, OutIter>
-                call(InIter it, std::size_t num, OutIter dest, F&& f,
+                call(InIter start, std::size_t num, OutIter out, F&& f,
                     std::false_type)
             {
                 if (num == 0)
@@ -597,6 +603,7 @@ namespace hpx::parallel::util {
 
                 for (std::size_t i = 0; i < count;
                     (void) ++it, i += 4)    // -V112
+                // clang-format on
                 {
                     *dest++ = HPX_INVOKE(f, *it);
                     *dest++ = HPX_INVOKE(f, *++it);
@@ -734,6 +741,7 @@ namespace hpx::parallel::util {
                 {
                     *dest = HPX_INVOKE(f, first1, first2);
                 }
+                // clang-format on
 
                 return hpx::make_tuple(first1, first2, dest);
             }
@@ -790,6 +798,15 @@ namespace hpx::parallel::util {
             call_iteration(InIter1 first1, std::size_t num, InIter2 first2,
                 OutIter dest, F&& f)
             {
+                if (num == 0)
+                {
+                    return hpx::make_tuple(start1, start2, out);
+                }
+
+                auto first1 = hpx::util::get_unwrapped(start1);
+                auto first2 = hpx::util::get_unwrapped(start2);
+                auto dest = hpx::util::get_unwrapped(out);
+
                 std::size_t count(
                     num & static_cast<std::size_t>(-4));    // -V112
 
@@ -807,6 +824,7 @@ namespace hpx::parallel::util {
                 {
                     *dest = HPX_INVOKE(f, *first1, *first2);
                 }
+                // clang-format on
 
                 return hpx::make_tuple(first1, first2, dest);
             }

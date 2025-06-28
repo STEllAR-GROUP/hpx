@@ -371,6 +371,7 @@ namespace hpx::parallel::util {
                     num & static_cast<std::size_t>(-4));    // -V112
                 for (std::size_t i = 0; i < count;
                     (void) ++it, i += 4)    // -V112
+                // clang-format on
                 {
                     HPX_INVOKE(f, it);
                     HPX_INVOKE(f, ++it);
@@ -514,6 +515,7 @@ namespace hpx::parallel::util {
 
                 for (std::size_t i = 0; i < count;
                     (void) ++it, i += 4)    // -V112
+                // clang-format on
                 {
                     HPX_INVOKE(f, *it);
                     HPX_INVOKE(f, *++it);
@@ -526,13 +528,21 @@ namespace hpx::parallel::util {
                     HPX_INVOKE(f, *it);
                 }
 
-                return it;
+                return std::next(start, num);
             }
 
             template <typename Iter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter
             call_iteration(Iter it, std::size_t num, F&& f, std::true_type)
             {
+                if (num == 0)
+                {
+                    return start;
+                }
+
+                auto it = hpx::util::get_unwrapped(start);
+                std::size_t const len = num;
+
                 while (num >= 4)    //-V112
                 {
                     HPX_INVOKE(f, *it);
@@ -892,6 +902,7 @@ namespace hpx::parallel::util {
                         num & static_cast<std::size_t>(-4));    // -V112
                     for (std::size_t i = 0; i < count;
                         (void) ++it, ++dest, i += 4)    // -V112
+                    // clang-format on
                     {
                         HPX_INVOKE(f, it, dest);
                         HPX_INVOKE(f, ++it, ++dest);
@@ -927,6 +938,7 @@ namespace hpx::parallel::util {
                         num & static_cast<std::size_t>(-4));    // -V112
                     for (std::size_t i = 0; i < count;
                         (void) ++it, i += 4)    // -V112
+                    // clang-format on
                     {
                         HPX_INVOKE(f, it);
                         HPX_INVOKE(f, ++it);
@@ -1219,6 +1231,7 @@ namespace hpx::parallel::util {
 
                 for (std::size_t i = 0; i < count;
                     (void) ++it, i += 4)    // -V112
+                // clang-format on
                 {
                     HPX_INVOKE(f, *it, base_idx++);
                     HPX_INVOKE(f, *++it, base_idx++);
@@ -1280,11 +1293,13 @@ namespace hpx::parallel::util {
                     HPX_INVOKE(f, *(it + 1), base_idx++);
                     HPX_INVOKE(f, *(it + 2), base_idx);
                     it += 3;
+                    it += 3;
                     break;
 
                 case 2:
                     HPX_INVOKE(f, *it, base_idx++);
                     HPX_INVOKE(f, *(it + 1), base_idx);
+                    it += 2;
                     it += 2;
                     break;
 
