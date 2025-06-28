@@ -33,7 +33,9 @@ void test_transform_binary(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c1), std::end(c1), std::rand());
     std::iota(std::begin(c2), std::end(c2), std::rand());
 
-    auto add = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
+    auto add = [](std::size_t v1, std::size_t v2) {
+        return v1 + v2;
+    };
 
     auto result = hpx::ranges::transform(policy, c1, c2, std::begin(d1), add);
 

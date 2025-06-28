@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,12 +9,16 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/iterator_support/unwrap_iterator.hpp>
+#include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
@@ -59,11 +63,11 @@ namespace hpx::parallel::util {
                     hpx::is_unsequenced_execution_policy_v<ExPolicy> &&
                     !hpx::is_parallel_execution_policy_v<ExPolicy>)>
             HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
-                ExPolicy&&, Begin it, End end, F&& f)
+                ExPolicy&&, Begin it, End last, F&& f)
             {
                 // clang-format off
                 HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                for (Begin& iter = it; iter != end; ++iter)
+                for (Begin& iter = it; iter != last; ++iter)
                 {
                     HPX_INVOKE(f, iter);
                 }
@@ -77,13 +81,12 @@ namespace hpx::parallel::util {
                 HPX_CONCEPT_REQUIRES_(
                     !hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
-                ExPolicy&&, Begin it, End end, F&& f)
+                ExPolicy&&, Begin it, End last, F&& f)
             {
-                for (/**/; it != end; ++it)
+                for (/**/; it != last; ++it)
                 {
                     HPX_INVOKE(f, it);
                 }
-
                 return it;
             }
 
@@ -209,13 +212,22 @@ namespace hpx::parallel::util {
             ///////////////////////////////////////////////////////////////////
             template <typename Begin, typename End, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
-                Begin it, End end, F&& f)
+                Begin start, End sent, F&& f)
             {
-                for (/**/; it != end; ++it)
+                auto end = start;
+                auto const len =
+                    parallel::detail::advance_and_get_distance(end, sent);
+
+                if (len != 0)
                 {
-                    HPX_INVOKE(f, *it);
+                    auto it = hpx::util::get_unwrapped(start);
+                    for (auto count = len; count != 0; (void) ++it, --count)
+                    {
+                        HPX_INVOKE(f, *it);
+                    }
                 }
-                return it;
+
+                return std::next(start, len);
             }
 
             template <typename Begin, typename End, typename CancelToken,
@@ -292,14 +304,13 @@ namespace hpx::parallel::util {
                 typename F>
             HPX_HOST_DEVICE
                 HPX_FORCEINLINE static constexpr std::pair<Begin1, Begin2>
-                call(Begin1 it1, End1 end1, Begin2 it2, F&& f)
+                call(Begin1 it1, End1 last1, Begin2 it2, F&& f)
             {
-                for (/**/; it1 != end1; (void) ++it1, ++it2)
+                for (/**/; it1 != last1; (void) ++it1, ++it2)
                 {
                     HPX_INVOKE(f, it1, it2);
                 }
-
-                return std::make_pair(HPX_MOVE(it1), HPX_MOVE(it2));
+                return std::make_pair(it1, it2);
             }
         };
     }    // namespace detail
@@ -347,9 +358,13 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
                 Iter it, std::size_t num, F&& f, std::false_type)
             {
-                std::size_t count(num & std::size_t(-4));    // -V112
+                std::size_t count(
+                    num & static_cast<std::size_t>(-4));    // -V112
+
+                // clang-format off
                 for (std::size_t i = 0; i < count;
-                     (void) ++it, i += 4)    // -V112
+                    (void) ++it, i += 4)    // -V112
+                // clang-format on
                 {
                     HPX_INVOKE(f, it);
                     HPX_INVOKE(f, ++it);
@@ -360,6 +375,7 @@ namespace hpx::parallel::util {
                 {
                     HPX_INVOKE(f, it);
                 }
+
                 return it;
             }
 
@@ -384,22 +400,25 @@ namespace hpx::parallel::util {
                     HPX_INVOKE(f, it);
                     HPX_INVOKE(f, it + 1);
                     HPX_INVOKE(f, it + 2);
+                    it += 3;
                     break;
 
                 case 2:
                     HPX_INVOKE(f, it);
                     HPX_INVOKE(f, it + 1);
+                    it += 2;
                     break;
 
                 case 1:
                     HPX_INVOKE(f, it);
+                    ++it;
                     break;
 
                 default:
                     break;
                 }
 
-                return static_cast<Iter>(it + num);
+                return it;
             }
 
             template <typename Iter, typename CancelToken, typename F,
@@ -482,11 +501,22 @@ namespace hpx::parallel::util {
             // handle sequences of non-futures
             template <typename Iter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
-                Iter it, std::size_t num, F&& f, std::false_type)
+                Iter start, std::size_t num, F&& f, std::false_type)
             {
-                std::size_t count(num & std::size_t(-4));    // -V112
+                if (num == 0)
+                {
+                    return start;
+                }
+
+                auto it = hpx::util::get_unwrapped(start);
+
+                std::size_t count(
+                    num & static_cast<std::size_t>(-4));    // -V112
+
+                // clang-format off
                 for (std::size_t i = 0; i < count;
-                     (void) ++it, i += 4)    // -V112
+                    (void) ++it, i += 4)    // -V112
+                // clang-format on
                 {
                     HPX_INVOKE(f, *it);
                     HPX_INVOKE(f, *++it);
@@ -498,13 +528,21 @@ namespace hpx::parallel::util {
                     HPX_INVOKE(f, *it);
                 }
 
-                return it;
+                return std::next(start, num);
             }
 
             template <typename Iter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
-                Iter it, std::size_t num, F&& f, std::true_type)
+                Iter start, std::size_t num, F&& f, std::true_type)
             {
+                if (num == 0)
+                {
+                    return start;
+                }
+
+                auto it = hpx::util::get_unwrapped(start);
+                std::size_t const len = num;
+
                 while (num >= 4)    //-V112
                 {
                     HPX_INVOKE(f, *it);
@@ -522,22 +560,25 @@ namespace hpx::parallel::util {
                     HPX_INVOKE(f, *it);
                     HPX_INVOKE(f, *(it + 1));
                     HPX_INVOKE(f, *(it + 2));
+                    it += 3;
                     break;
 
                 case 2:
                     HPX_INVOKE(f, *it);
                     HPX_INVOKE(f, *(it + 1));
+                    it += 2;
                     break;
 
                 case 1:
                     HPX_INVOKE(f, *it);
+                    ++it;
                     break;
 
                 default:
                     break;
                 }
 
-                return static_cast<Iter>(it + num);
+                return parallel::detail::next(start, len);
             }
 
             template <typename Iter, typename CancelToken, typename F,
@@ -567,7 +608,7 @@ namespace hpx::parallel::util {
         {
             using pred = std::integral_constant<bool,
                 hpx::traits::is_random_access_iterator_v<Iter> ||
-                    std::is_integral<Iter>::value>;
+                    std::is_integral_v<Iter>>;
 
             return detail::loop_n_ind_helper::call(
                 it, count, HPX_FORWARD(F, f), pred());
@@ -580,7 +621,7 @@ namespace hpx::parallel::util {
         {
             using pred = std::integral_constant<bool,
                 hpx::traits::is_random_access_iterator_v<Iter> ||
-                    std::is_integral<Iter>::value>;
+                    std::is_integral_v<Iter>>;
 
             return detail::loop_n_ind_helper::call(
                 it, count, tok, HPX_FORWARD(F, f), pred());
@@ -625,11 +666,13 @@ namespace hpx::parallel::util {
             static FwdIter call(
                 ExPolicy&&, FwdIter first, Sent last, F&& f, Cleanup&& cleanup)
             {
-                FwdIter it = first;
+                auto it = first;
                 try
                 {
                     for (/**/; it != last; (void) ++it)
+                    {
                         HPX_INVOKE(f, it);
+                    }
                     return it;
                 }
                 catch (...)
@@ -641,6 +684,7 @@ namespace hpx::parallel::util {
                     throw;
                 }
             }
+
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename FwdIter, typename F, typename Cleanup>
             static FwdIter call(ExPolicy&&, Iter it, Sent last, FwdIter dest,
@@ -650,7 +694,9 @@ namespace hpx::parallel::util {
                 try
                 {
                     for (/**/; it != last; (void) ++it, ++dest)
-                        f(it, dest);
+                    {
+                        HPX_INVOKE(f, it, dest);
+                    }
                     return dest;
                 }
                 catch (...)
@@ -690,12 +736,13 @@ namespace hpx::parallel::util {
             static FwdIter unseq_call(
                 ExPolicy&&, FwdIter first, Sent last, F&& f, Cleanup&& cleanup)
             {
-                FwdIter it = first;
+                auto it = first;
                 try
                 {
                     // clang-format off
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                    for (FwdIter& iter = it; iter != last; ++iter){
+                    for (FwdIter& iter = it; iter != last; ++iter)
+                    {
                         HPX_INVOKE(f, iter);
                     }
                     // clang-format on
@@ -723,7 +770,9 @@ namespace hpx::parallel::util {
                     // clang-format off
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
                     for (Iter& iter = it; iter != last; ++iter)
-                        f(iter, dest++);
+                    {
+                        HPX_INVOKE(f, iter, dest++);
+                    }
                     // clang-format on
 
                     return dest;
@@ -824,9 +873,13 @@ namespace hpx::parallel::util {
                 FwdIter base = dest;
                 try
                 {
-                    std::size_t count(num & std::size_t(-4));    // -V112
+                    std::size_t count(
+                        num & static_cast<std::size_t>(-4));    // -V112
+
+                    // clang-format off
                     for (std::size_t i = 0; i < count;
-                         (void) ++it, ++dest, i += 4)    // -V112
+                        (void) ++it, ++dest, i += 4)    // -V112
+                    // clang-format on
                     {
                         HPX_INVOKE(f, it, dest);
                         HPX_INVOKE(f, ++it, ++dest);
@@ -837,6 +890,7 @@ namespace hpx::parallel::util {
                     {
                         HPX_INVOKE(f, it, dest);
                     }
+
                     return dest;
                 }
                 catch (...)
@@ -857,9 +911,13 @@ namespace hpx::parallel::util {
                 FwdIter base = it;
                 try
                 {
-                    std::size_t count(num & std::size_t(-4));    // -V112
+                    std::size_t count(
+                        num & static_cast<std::size_t>(-4));    // -V112
+
+                    // clang-format off
                     for (std::size_t i = 0; i < count;
-                         (void) ++it, i += 4)    // -V112
+                        (void) ++it, i += 4)    // -V112
+                    // clang-format on
                     {
                         HPX_INVOKE(f, it);
                         HPX_INVOKE(f, ++it);
@@ -910,7 +968,8 @@ namespace hpx::parallel::util {
                 FwdIter base = dest;
                 try
                 {
-                    std::size_t count(num & std::size_t(-4));    // -V112
+                    std::size_t const count(
+                        num & static_cast<std::size_t>(-4));    // -V112
 
                     // clang-format off
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
@@ -946,7 +1005,8 @@ namespace hpx::parallel::util {
                 FwdIter base = it;
                 try
                 {
-                    std::size_t count(num & std::size_t(-4));    // -V112
+                    std::size_t const count(
+                        num & static_cast<std::size_t>(-4));    // -V112
 
                     // clang-format off
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
@@ -1132,12 +1192,22 @@ namespace hpx::parallel::util {
             // handle sequences of non-futures
             template <typename Iter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
-                std::size_t base_idx, Iter it, std::size_t num, F&& f)
+                std::size_t base_idx, Iter start, std::size_t num, F&& f)
             {
-                std::size_t count(num & std::size_t(-4));    // -V112
+                if (num == 0)
+                {
+                    return start;
+                }
 
+                auto it = hpx::util::get_unwrapped(start);
+
+                std::size_t count(
+                    num & static_cast<std::size_t>(-4));    // -V112
+
+                // clang-format off
                 for (std::size_t i = 0; i < count;
-                     (void) ++it, i += 4)    // -V112
+                    (void) ++it, i += 4)    // -V112
+                // clang-format on
                 {
                     HPX_INVOKE(f, *it, base_idx++);
                     HPX_INVOKE(f, *++it, base_idx++);
@@ -1148,7 +1218,8 @@ namespace hpx::parallel::util {
                 {
                     HPX_INVOKE(f, *it, base_idx);
                 }
-                return it;
+
+                return std::next(start, num);
             }
 
             template <typename Iter, typename CancelToken, typename F>
@@ -1170,8 +1241,15 @@ namespace hpx::parallel::util {
             // handle sequences of non-futures
             template <typename Iter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
-                std::size_t base_idx, Iter it, std::size_t num, F&& f)
+                std::size_t base_idx, Iter start, std::size_t num, F&& f)
             {
+                if (num == 0)
+                {
+                    return start;
+                }
+
+                auto it = hpx::util::get_unwrapped(start);
+
                 while (num >= 4)    //-V112
                 {
                     HPX_INVOKE(f, *it, base_idx++);
@@ -1189,22 +1267,25 @@ namespace hpx::parallel::util {
                     HPX_INVOKE(f, *it, base_idx++);
                     HPX_INVOKE(f, *(it + 1), base_idx++);
                     HPX_INVOKE(f, *(it + 2), base_idx++);
+                    it += 3;
                     break;
 
                 case 2:
                     HPX_INVOKE(f, *it, base_idx++);
                     HPX_INVOKE(f, *(it + 1), base_idx++);
+                    it += 2;
                     break;
 
                 case 1:
                     HPX_INVOKE(f, *it, base_idx);
+                    ++it;
                     break;
 
                 default:
                     break;
                 }
 
-                return static_cast<Iter>(it + num);
+                return std::next(start, num);
             }
 
             template <typename Iter, typename CancelToken, typename F>
@@ -1286,7 +1367,7 @@ namespace hpx::parallel::util {
             {
                 for (/**/; count != 0; (void) --count, ++it)
                 {
-                    init = HPX_INVOKE(f, HPX_MOVE(init), *it);
+                    init = HPX_INVOKE(f, init, *it);
                 }
                 return init;
             }
@@ -1312,7 +1393,7 @@ namespace hpx::parallel::util {
         ++first;
         while (first != last)
         {
-            val = HPX_INVOKE(r, HPX_MOVE(val), HPX_INVOKE(conv, *first));
+            val = HPX_INVOKE(r, val, HPX_INVOKE(conv, *first));
             ++first;
         }
         return val;
@@ -1328,8 +1409,7 @@ namespace hpx::parallel::util {
         ++first2;
         while (first1 != last1)
         {
-            val = HPX_INVOKE(
-                r, HPX_MOVE(val), HPX_INVOKE(conv, *first1, *first2));
+            val = HPX_INVOKE(r, val, HPX_INVOKE(conv, *first1, *first2));
             ++first1;
             ++first2;
         }
