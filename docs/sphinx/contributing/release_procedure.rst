@@ -79,7 +79,7 @@ are completed to avoid confusion.
    keep them around in case (like Vc for example).
 
 #. Update the minimum required versions if necessary (compilers, dependencies,
-   etc.) in ``prerequisites.rst``.
+   etc.) in ``prerequisites.rst``. Update latest tested versions.
 
 #. Verify that the Jenkins setups for the release branch on Rostam
    are running and do not display any errors.
