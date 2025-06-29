@@ -48,19 +48,6 @@ namespace hpx {
         deferred,
         uninitialized
     };
-
-    namespace lcos {
-
-        enum class HPX_DEPRECATED_V(1, 8,
-            "hpx::lcos::future_status is deprecated. Use "
-            "hpx::future_status instead.") future_status
-        {
-            ready = static_cast<int>(hpx::future_status::ready),
-            timeout = static_cast<int>(hpx::future_status::timeout),
-            deferred = static_cast<int>(hpx::future_status::deferred),
-            uninitialized = static_cast<int>(hpx::future_status::uninitialized)
-        };
-    }    // namespace lcos
 }    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////

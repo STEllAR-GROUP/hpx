@@ -58,23 +58,6 @@ namespace hpx {
                                        ///< credits when sent
         };
 
-#define HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG                              \
-    "The unscoped id_type::management_type names are deprecated. Please use "  \
-    "id_type::management_type::state instead."
-
-        HPX_DEPRECATED_V(1, 8, HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
-        static constexpr management_type unknown_deleter =
-            management_type::unknown_deleter;
-        HPX_DEPRECATED_V(1, 8, HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
-        static constexpr management_type unmanaged = management_type::unmanaged;
-        HPX_DEPRECATED_V(1, 8, HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
-        static constexpr management_type managed = management_type::managed;
-        HPX_DEPRECATED_V(1, 8, HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
-        static constexpr management_type managed_move_credit =
-            management_type::managed_move_credit;
-
-#undef HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG
-
         friend constexpr bool operator<(
             management_type lhs, management_type rhs) noexcept
         {
@@ -421,13 +404,6 @@ namespace hpx {
         return {*impl(), management_type::unmanaged};
     }
 }    // namespace hpx
-
-namespace hpx::naming {
-
-    using id_type HPX_DEPRECATED_V(
-        1, 8, "hpx::naming::id_type is deprecated, use hpx::id_type instead") =
-        hpx::id_type;
-}    // namespace hpx::naming
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::traits {

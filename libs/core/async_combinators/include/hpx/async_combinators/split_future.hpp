@@ -440,22 +440,4 @@ namespace hpx {
     }
 }    // namespace hpx
 
-namespace hpx::lcos {
-
-    template <typename F>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::split_future is deprecated. Use hpx::split_future instead.")
-    decltype(auto) split_future(F&& future)
-    {
-        return hpx::split_future(HPX_FORWARD(F, future));
-    }
-
-    template <typename F>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::split_future is deprecated. Use hpx::split_future instead.")
-    decltype(auto) split_future(F&& future, std::size_t size)
-    {
-        return hpx::split_future(HPX_FORWARD(F, future), size);
-    }
-}    // namespace hpx::lcos
 #endif

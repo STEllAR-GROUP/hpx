@@ -64,8 +64,8 @@ string(TIMESTAMP HPX_COPYRIGHT_YEAR "%Y")
 set(HPX_VERSION_MAJOR 1)
 set(HPX_VERSION_MINOR 11)
 set(HPX_VERSION_SUBMINOR 0)
-set(HPX_VERSION_DATE 20240529)
-set(HPX_VERSION_TAG "-trunk")
+set(HPX_VERSION_DATE 20250630)
+set(HPX_VERSION_TAG "")
 
 set(HPX_VERSION
     "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}"
@@ -1003,12 +1003,16 @@ hpx_option(
 if(HPX_WITH_APEX)
   hpx_add_config_define(HPX_HAVE_APEX) # tell HPX that we use APEX
   hpx_option(
-    HPX_WITH_APEX_NO_UPDATE BOOL
-    "Do not update code from remote APEX repository." OFF CATEGORY "Profiling"
+    HPX_WITH_APEX_REPOSITORY STRING "APEX repository"
+    "https://github.com/STEllAR-GROUP/apex.git" CATEGORY "Profiling"
   )
   hpx_option(
-    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.6.5"
+    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "hpx_v1.11.0"
     CATEGORY "Profiling"
+  )
+  hpx_option(
+    HPX_WITH_APEX_NO_UPDATE BOOL
+    "Do not update code from remote APEX repository." OFF CATEGORY "Profiling"
   )
 endif()
 

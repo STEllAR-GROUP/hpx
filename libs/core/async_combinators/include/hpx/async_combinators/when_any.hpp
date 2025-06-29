@@ -480,30 +480,4 @@ namespace hpx {
     } when_any_n{};
 }    // namespace hpx
 
-namespace hpx::lcos {
-
-    template <typename... Ts>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::when_any is deprecated. Use hpx::when_any instead.")
-    auto when_any(Ts&&... ts)
-    {
-        return hpx::when_any(HPX_FORWARD(Ts, ts)...);
-    }
-
-    template <typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::when_any_n is deprecated. Use hpx::when_any_n instead.")
-    auto when_any_n(Iterator begin, std::size_t count)
-    {
-        return hpx::when_any_n(begin, count);
-    }
-
-    template <typename Container>
-    using when_any_result HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::when_all_result is deprecated. Use hpx::when_all_result "
-        "instead.") = hpx::when_any_result<Container>;
-}    // namespace hpx::lcos
-
 #endif    // DOXYGEN

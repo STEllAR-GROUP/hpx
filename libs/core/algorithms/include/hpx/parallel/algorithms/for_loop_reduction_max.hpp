@@ -79,26 +79,3 @@ namespace hpx::experimental {
         return reduction(var, identity, hpx::parallel::detail::max_of<T>());
     }
 }    // namespace hpx::experimental
-
-/// \cond IGNORE_DEPRECATED
-namespace hpx::parallel {
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::reduction_max is deprecated. Please use "
-        "hpx::experimental::reduction_max instead.")
-    constexpr decltype(auto) reduction_max(T& var)
-    {
-        return hpx::experimental::reduction_max(var);
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::reduction_max is deprecated. Please use "
-        "hpx::experimental::reduction_max instead.")
-    constexpr decltype(auto) reduction_max(T& var, T const& identity)
-    {
-        return hpx::experimental::reduction_max(var, identity);
-    }
-}    // namespace hpx::parallel
-/// \endcond
