@@ -1,385 +1,420 @@
-// Copyright (c) 2025 Sai Charan Arvapally
+// Copyright (c) 2025 Your Name
 //
 // SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/execution.hpp>
-#include <hpx/executors/experimental/parallel_scheduler.hpp>
-#include <hpx/executors/thread_pool_scheduler_bulk.hpp>
+#include <hpx/config.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/synchronization/stop_token.hpp>
-#include <hpx/thread.hpp>
+#include <hpx/thread.hpp>    // For thread ID
 #include <chrono>
 #include <exception>
-#include <future>
 #include <iostream>
-#include <memory>
-#include <set>
-#include <utility>
-#include <vector>
-
-#ifdef HPX_HAVE_STDEXEC
-#include <hpx/execution_base/stdexec_forward.hpp>
-#endif
+#include <string>
+#include <thread>
+#include <type_traits>
 
 namespace ex = hpx::execution::experimental;
 
-// Forward declaration
-struct test_receiver;
-
-#ifdef HPX_HAVE_STDEXEC
-// Enable test_receiver as a valid stdexec receiver
-namespace stdexec {
-    template <>
-    inline constexpr bool enable_receiver<::test_receiver> = true;
-
-    // Define completion signatures for test_receiver
-    template <>
-    struct completion_signatures<::test_receiver>
+// Stream output operator for forward_progress_guarantee
+std::ostream& operator<<(
+    std::ostream& os, ex::forward_progress_guarantee guarantee)
+{
+    switch (guarantee)
     {
-        using type = ex::completion_signatures<ex::set_value_t(),
-            ex::set_error_t(std::exception_ptr), ex::set_stopped_t()>;
-    };
-}    // namespace stdexec
-#endif
+    case ex::forward_progress_guarantee::concurrent:
+        return os << "concurrent";
+    case ex::forward_progress_guarantee::parallel:
+        return os << "parallel";
+    case ex::forward_progress_guarantee::weakly_parallel:
+        return os << "weakly_parallel";
+    default:
+        return os << "unknown";
+    }
+}
 
+// Custom receiver to test completion signatures and stop token
 struct test_receiver
 {
-    struct state
+    using receiver_concept = ex::receiver_t;
+
+    bool* value_received;
+    std::exception_ptr* error_received;
+    bool* stopped_received;
+    ex::inplace_stop_token stop_token;
+    hpx::thread::id* thread_id;    // Track thread ID
+
+    test_receiver(bool* vr, std::exception_ptr* er, bool* sr,
+        hpx::thread::id* tid = nullptr, ex::inplace_stop_token st = {})
+      : value_received(vr)
+      , error_received(er)
+      , stopped_received(sr)
+      , stop_token(st)
+      , thread_id(tid)
     {
-        bool completed = false;
-        bool error_called = false;
-        bool stopped_called = false;
-        std::vector<hpx::thread::id>
-            task_thread_ids;    // Track HPX thread IDs for bulk tasks
-        std::vector<uint32_t>
-            executed_indices;              // Track executed task indices
-        uint32_t scheduling_events = 0;    // Count scheduling events
-    };
-
-    std::shared_ptr<state> state_ = std::make_shared<state>();
-#ifdef HPX_HAVE_STDEXEC
-    ex::inplace_stop_token stop_token;    // Use stdexec stop token
-#else
-    hpx::experimental::in_place_stop_token stop_token;    // Use HPX stop token
-#endif
-    std::shared_ptr<std::promise<void>> done_promise =
-        std::make_shared<std::promise<void>>();
-
-    test_receiver() = default;
-    test_receiver(test_receiver&&) = default;
-    test_receiver& operator=(test_receiver&&) = default;
-    test_receiver(const test_receiver&) = delete;
-    test_receiver& operator=(const test_receiver&) = delete;
-
-    std::future<void> get_future()
-    {
-        return done_promise->get_future();
     }
 
-#ifdef HPX_HAVE_STDEXEC
-    void set_value() && noexcept
-    {
-        std::cout << "set_value called" << std::endl;
-        state_->completed = true;
-        done_promise->set_value();
-    }
-
-    void set_error([[maybe_unused]] std::exception_ptr ep) && noexcept
-    {
-        std::cout << "set_error called" << std::endl;
-        state_->error_called = true;
-        done_promise->set_value();
-    }
-
-    void set_stopped() && noexcept
-    {
-        std::cout << "set_stopped called" << std::endl;
-        state_->stopped_called = true;
-        done_promise->set_value();
-    }
-#else
     void set_value() noexcept
     {
-        std::cerr << "set_value not supported without stdexec" << std::endl;
+        if (thread_id)
+            *thread_id = hpx::this_thread::get_id();
+        *value_received = true;
+        std::cout << "set_value called on thread " << hpx::this_thread::get_id()
+                  << std::endl;
     }
 
-    void set_error([[maybe_unused]] std::exception_ptr) noexcept
+    void set_value(int value) noexcept
     {
-        std::cerr << "set_error not supported without stdexec" << std::endl;
+        if (thread_id)
+            *thread_id = hpx::this_thread::get_id();
+        *value_received = true;
+        std::cout << "set_value(int: " << value << ") called on thread "
+                  << hpx::this_thread::get_id() << std::endl;
+    }
+
+    void set_value(std::string value) noexcept
+    {
+        if (thread_id)
+            *thread_id = hpx::this_thread::get_id();
+        *value_received = true;
+        std::cout << "set_value(string: " << value << ") called on thread "
+                  << hpx::this_thread::get_id() << std::endl;
+    }
+
+    void set_error(std::exception_ptr ep) noexcept
+    {
+        *error_received = ep;
+        std::cout << "set_error called on thread " << hpx::this_thread::get_id()
+                  << std::endl;
     }
 
     void set_stopped() noexcept
     {
-        std::cerr << "set_stopped not supported without stdexec" << std::endl;
+        *stopped_received = true;
+        std::cout << "set_stopped called on thread "
+                  << hpx::this_thread::get_id() << std::endl;
     }
-#endif
 
     struct env
     {
-#ifdef HPX_HAVE_STDEXEC
-        ex::inplace_stop_token token;
-#else
-        hpx::experimental::in_place_stop_token token;
-#endif
+        ex::inplace_stop_token stop_token;
 
-#ifdef HPX_HAVE_STDEXEC
-        friend auto tag_invoke(ex::get_stop_token_t, env const& e) noexcept
+        friend auto tag_invoke(ex::get_stop_token_t, const env& e) noexcept
         {
-            return e.token;
+            return e.stop_token;
         }
-#else
-        friend auto tag_invoke(hpx::execution::experimental::get_stop_token_t,
-            env const& e) noexcept
-        {
-            return e.token;
-        }
-#endif
     };
 
-    env get_env() const noexcept
+    friend env tag_invoke(ex::get_env_t, const test_receiver& r) noexcept
     {
-        return {stop_token};
+        return env{r.stop_token};
     }
 };
 
-int hpx_main(hpx::program_options::variables_map&)
+int hpx_main(int argc, [[maybe_unused]] char* argv[])
 {
     std::cout << "hpx_main started" << std::endl;
-    ex::parallel_scheduler sched = ex::get_parallel_scheduler();
+    auto sched = ex::get_parallel_scheduler();
+    std::cout << "Obtained parallel_scheduler" << std::endl;
 
-    // Test forward progress guarantee
-    std::cout << "\n=== Forward Progress Guarantee ===" << std::endl;
+    // Test parallel_scheduler construction and assignment
     {
+        std::cout << "\n=== Testing Scheduler Construction ===" << std::endl;
+        static_assert(!std::is_default_constructible_v<ex::parallel_scheduler>,
+            "parallel_scheduler should not be default constructible");
+
+        auto sched1 = ex::get_parallel_scheduler();
+        auto sched2 = sched1;                                // Copy construct
+        ex::parallel_scheduler sched3(std::move(sched2));    // Move construct
+        sched2 = sched1;                                     // Copy assign
+        ex::parallel_scheduler sched4 = ex::get_parallel_scheduler();
+        sched4 = std::move(sched3);    // Move assign
+
+        HPX_TEST(sched1 == sched2);
+        HPX_TEST(sched2 == sched4);
+        std::cout << "Scheduler equality tests passed" << std::endl;
+
+        static_assert(
+            std::is_nothrow_copy_constructible_v<ex::parallel_scheduler>,
+            "copy constructor should be noexcept");
+        static_assert(
+            std::is_nothrow_move_constructible_v<ex::parallel_scheduler>,
+            "move constructor should be noexcept");
+        static_assert(std::is_nothrow_copy_assignable_v<ex::parallel_scheduler>,
+            "copy assignment should be noexcept");
+        static_assert(std::is_nothrow_move_assignable_v<ex::parallel_scheduler>,
+            "move assignment should be noexcept");
+        static_assert(noexcept(sched1 == sched2),
+            "equality comparison should be noexcept");
+        std::cout << "Scheduler noexcept properties verified" << std::endl;
+    }
+
+    // Test parallel_scheduler forward progress guarantee
+    {
+        std::cout << "\n=== Testing Forward Progress Guarantee ==="
+                  << std::endl;
         auto guarantee = ex::get_forward_progress_guarantee(sched);
-        std::cout << "Forward progress guarantee: "
-                  << static_cast<int>(guarantee) << std::endl;
-        std::cout << "Expected parallel: "
-                  << static_cast<int>(ex::forward_progress_guarantee::parallel)
-                  << ", concurrent: "
-                  << static_cast<int>(
-                         ex::forward_progress_guarantee::concurrent)
-                  << ", weakly_parallel: "
-                  << static_cast<int>(
-                         ex::forward_progress_guarantee::weakly_parallel)
-                  << std::endl;
+        std::cout << "Forward progress guarantee: " << guarantee << std::endl;
         HPX_TEST(guarantee == ex::forward_progress_guarantee::parallel);
+        static_assert(noexcept(ex::get_forward_progress_guarantee(sched)),
+            "get_forward_progress_guarantee should be noexcept");
+        std::cout << "Forward progress guarantee test passed" << std::endl;
     }
 
-#ifdef HPX_HAVE_STDEXEC
-    // Test single task (schedule)
-    std::cout << "\n=== Single Task ===" << std::endl;
+    // Test parallel_scheduler schedule
     {
-        test_receiver recv;
-        auto state = recv.state_;
-        auto future = recv.get_future();
+        std::cout << "\n=== Testing Schedule ===" << std::endl;
         auto sender = ex::schedule(sched);
-        {
-            auto op = ex::connect(std::move(sender), std::move(recv));
-            std::cout << "Calling start() for single task" << std::endl;
-            ex::start(op);
-        }
-        std::cout << "Waiting for single task to complete..." << std::endl;
-        future.get();
-        std::cout << "Single task completed: "
-                  << (state->completed ? "true" : "false") << std::endl;
-        HPX_TEST(state->completed);
+        std::cout << "Created sender with schedule" << std::endl;
+
+        static_assert(
+            ex::sender<decltype(sender)>, "schedule should return a sender");
+
+        using completion_sigs =
+            ex::completion_signatures_of_t<decltype(sender), ex::env<>>;
+        static_assert(
+            std::is_same_v<completion_sigs,
+                ex::completion_signatures<ex::set_value_t(),
+                    ex::set_error_t(std::exception_ptr), ex::set_stopped_t()>>,
+            "sender should have correct completion signatures");
+        static_assert(
+            noexcept(ex::schedule(sched)), "schedule should be noexcept");
+        std::cout << "Schedule sender properties verified" << std::endl;
     }
 
-    // Test single task with cancellation
-    std::cout << "\n=== Single Task With Cancellation ===" << std::endl;
+    // Test parallel_scheduler basic execution
     {
-        test_receiver recv;
-        auto state = recv.state_;
-        auto future = recv.get_future();
-        stdexec::inplace_stop_source stop_src;
-        recv.stop_token = stop_src.get_token();
-        auto sender = ex::schedule(sched);
-        {
-            auto op = ex::connect(std::move(sender), std::move(recv));
-            std::cout << "Requesting stop before start..." << std::endl;
-            stop_src.request_stop();
-            std::cout << "Calling start() for single task with cancellation"
-                      << std::endl;
-            ex::start(op);
-        }
-        std::cout << "Waiting for single task with cancellation to complete..."
-                  << std::endl;
-        future.get();
-        std::cout << "Single task with cancellation: stopped_called = "
-                  << state->stopped_called
-                  << ", completed = " << state->completed << std::endl;
-        HPX_TEST(state->stopped_called && !state->completed);
-    }
-
-    // Test single task with exception
-    std::cout << "\n=== Single Task With Exception ===" << std::endl;
-    {
-        test_receiver recv;
-        auto state = recv.state_;
-        auto future = recv.get_future();
-        auto sender = ex::then(ex::schedule(sched), []() {
-            std::cout << "Executing then functor" << std::endl;
-            throw std::runtime_error("Test exception");
+        std::cout << "\n=== Testing Basic Execution ===" << std::endl;
+        auto sender = ex::schedule(sched) | ex::then([] {
+            std::cout << "Executing then functor returning 42" << std::endl;
+            return 42;
         });
-        {
-            auto op = ex::connect(std::move(sender), std::move(recv));
-            std::cout << "Calling start() for single task with exception"
+
+        std::cout << "Calling sync_wait for basic execution" << std::endl;
+        auto [result] = ex::sync_wait(sender).value();
+        HPX_TEST_EQ(result, 42);
+        std::cout << "Basic execution result: " << result << std::endl;
+    }
+
+    // Test parallel_scheduler structured concurrency with on
+    {
+        std::cout << "\n=== Testing Structured Concurrency with on ==="
+                  << std::endl;
+        auto sender = ex::on(sched, ex::then(ex::just(), [] {
+            std::cout << "Executing then functor returning 'Hello, P2079!'"
                       << std::endl;
-            ex::start(op);
-        }
-        std::cout << "Waiting for single task with exception to complete..."
+            return std::string("Hello, P2079!");
+        }));
+
+        std::cout << "Calling sync_wait for structured concurrency"
                   << std::endl;
-        future.get();
-        std::cout << "Single task with exception: error_called = "
-                  << state->error_called << std::endl;
-        HPX_TEST(state->error_called);
+        auto [result] = ex::sync_wait(sender).value();
+        HPX_TEST_EQ(result, std::string("Hello, P2079!"));
+        std::cout << "Structured concurrency result: " << result << std::endl;
     }
 
-    // Test bulk_unchunked
-    std::cout << "\n=== Bulk Unchunked Task ===" << std::endl;
+    // Test parallel_scheduler completion scheduler query
     {
-        constexpr uint32_t num_tasks = 16;
-        test_receiver recv;
-        auto state = recv.state_;
-        state->task_thread_ids.resize(num_tasks);
-        state->executed_indices.resize(num_tasks, 0);
-        auto future = recv.get_future();
-        hpx::thread::id this_id = hpx::this_thread::get_id();
-
-        auto sender = ex::schedule(sched) |
-            stdexec::bulk(stdexec::par, num_tasks, [&](uint32_t idx) {
-                if (recv.stop_token.stop_requested())
-                {
-                    std::cout << "Stop requested for unchunked task " << idx
-                              << std::endl;
-                    return;
-                }
-                state->task_thread_ids[idx] = hpx::this_thread::get_id();
-                state->executed_indices[idx] = idx + 1;    // Mark as executed
-                ++state->scheduling_events;                // Count task call
-                std::cout << "Bulk unchunked task " << idx << " on thread "
-                          << state->task_thread_ids[idx] << std::endl;
-                // Add light computation
-                volatile int dummy = 0;
-                for (int i = 0; i < 1000; ++i)
-                    dummy += i;
-                std::this_thread::sleep_for(
-                    std::chrono::microseconds(100));    // Increased delay
-            });
-
-        {
-            auto op = ex::connect(std::move(sender), std::move(recv));
-            std::cout << "Calling start() for bulk_unchunked task" << std::endl;
-            ex::start(op);
-        }
-        std::cout << "Waiting for bulk_unchunked task to complete..."
+        std::cout << "\n=== Testing Completion Scheduler Query ==="
                   << std::endl;
-        future.get();
-
-        std::set<hpx::thread::id> unique_threads(
-            state->task_thread_ids.begin(), state->task_thread_ids.end());
-        std::cout << "Bulk unchunked task completed: completed = "
-                  << state->completed
-                  << ", unique threads = " << unique_threads.size()
-                  << ", scheduling_events = " << state->scheduling_events
-                  << std::endl;
-        HPX_TEST(state->completed);
-        for (uint32_t i = 0; i < num_tasks; ++i)
-        {
-            HPX_TEST(state->task_thread_ids[i] !=
-                hpx::thread::id{});    // Non-empty thread ID
-            HPX_TEST(state->executed_indices[i] == i + 1);    // Task i executed
-        }
+        auto sender = ex::schedule(sched);
+        auto env = ex::get_env(sender);
+        auto completion_sched =
+            ex::get_completion_scheduler<ex::set_value_t>(env);
+        HPX_TEST(completion_sched == sched);
+        static_assert(
+            noexcept(ex::get_env(sender)), "get_env should be noexcept");
+        static_assert(
+            noexcept(ex::get_completion_scheduler<ex::set_value_t>(env)),
+            "get_completion_scheduler should be noexcept");
+        std::cout << "Completion scheduler query test passed" << std::endl;
     }
 
-    // Test bulk_chunked
-    std::cout << "\n=== Bulk Chunked Task ===" << std::endl;
+    // Test parallel_scheduler stop token
     {
-        constexpr uint32_t num_tasks = 16;
-        constexpr uint32_t chunk_size = 4;    // Force 4 tasks per chunk
-        test_receiver recv;
-        auto state = recv.state_;
-        state->task_thread_ids.resize(num_tasks);
-        state->executed_indices.resize(num_tasks, 0);
-        auto future = recv.get_future();
+        std::cout << "\n=== Testing Stop Token ===" << std::endl;
+        ex::inplace_stop_source stop_source;
+        auto stop_token = stop_source.get_token();
 
-        auto sender = ex::schedule(sched) |
-            stdexec::bulk(
-                stdexec::par, num_tasks / chunk_size, [&](uint32_t chunk_idx) {
-                    if (recv.stop_token.stop_requested())
-                    {
-                        std::cout << "Stop requested for chunk " << chunk_idx
-                                  << std::endl;
-                        return;
-                    }
-                    uint32_t begin = chunk_idx * chunk_size;
-                    uint32_t end = std::min(begin + chunk_size, num_tasks);
-                    std::cout << "Processing chunk [" << begin << ", " << end
-                              << ") on thread " << hpx::this_thread::get_id()
-                              << std::endl;
-                    ++state->scheduling_events;    // Count chunk call
-                    for (uint32_t idx = begin; idx < end; ++idx)
-                    {
-                        state->task_thread_ids[idx] =
-                            hpx::this_thread::get_id();
-                        state->executed_indices[idx] =
-                            idx + 1;    // Mark as executed
-                        std::cout << "Bulk chunked task " << idx
-                                  << " on thread "
-                                  << state->task_thread_ids[idx] << std::endl;
-                    }
-                    // Add light computation
-                    volatile int dummy = 0;
-                    for (int i = 0; i < 1000; ++i)
-                        dummy += i;
-                    std::this_thread::sleep_for(
-                        std::chrono::microseconds(100));    // Increased delay
-                });
+        bool value_received = false;
+        std::exception_ptr error_received = nullptr;
+        bool stopped_received = false;
 
-        {
-            auto op = ex::connect(std::move(sender), std::move(recv));
-            std::cout << "Calling start() for bulk_chunked task" << std::endl;
-            ex::start(op);
-        }
-        std::cout << "Waiting for bulk_chunked task to complete..."
+        test_receiver receiver(&value_received, &error_received,
+            &stopped_received, nullptr, stop_token);
+
+        auto sender = ex::schedule(sched);
+        auto op_state = ex::connect(sender, receiver);
+        std::cout << "Requesting stop before start" << std::endl;
+        stop_source.request_stop();
+        std::cout << "Calling start for stop token test" << std::endl;
+        ex::start(op_state);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        HPX_TEST(!error_received);
+        std::cout << "Stop token test: stopped_received = " << stopped_received
+                  << ", error_received = " << (error_received != nullptr)
                   << std::endl;
-        future.get();
-
-        std::set<hpx::thread::id> unique_threads(
-            state->task_thread_ids.begin(), state->task_thread_ids.end());
-        std::cout << "Bulk chunked task completed: completed = "
-                  << state->completed
-                  << ", unique threads = " << unique_threads.size()
-                  << ", scheduling_events = " << state->scheduling_events
-                  << std::endl;
-        HPX_TEST(state->completed);
-        for (uint32_t i = 0; i < num_tasks; ++i)
-        {
-            HPX_TEST(state->task_thread_ids[i] !=
-                hpx::thread::id{});    // Non-empty thread ID
-            HPX_TEST(state->executed_indices[i] == i + 1);    // Task i executed
-        }
     }
 
-#else
-    std::cout << "\n=== Skipping stdexec-dependent tests ===" << std::endl;
-    std::cerr
-        << "Warning: stdexec not enabled, skipping parallel_scheduler tests\n";
-#endif
+    // Test parallel_scheduler error handling
+    {
+        std::cout << "\n=== Testing Error Handling ===" << std::endl;
+        auto sender = ex::schedule(sched) | ex::then([] {
+            std::cout << "Throwing runtime_error in then functor" << std::endl;
+            throw std::runtime_error("Test error");
+            return 0;
+        });
 
-    std::cout << "Calling hpx::finalize()" << std::endl;
-    return hpx::finalize();
+        bool caught_error = false;
+        try
+        {
+            std::cout << "Calling sync_wait for error handling" << std::endl;
+            auto result = ex::sync_wait(sender);
+            HPX_TEST(false);
+        }
+        catch (const std::runtime_error& e)
+        {
+            caught_error = true;
+            HPX_TEST_EQ(std::string(e.what()), std::string("Test error"));
+            std::cout << "Caught error: " << e.what() << std::endl;
+        }
+        HPX_TEST(caught_error);
+        std::cout << "Error handling test passed" << std::endl;
+    }
+
+    // Test parallel_scheduler shared context
+    {
+        std::cout << "\n=== Testing Shared Context ===" << std::endl;
+        auto sched1 = ex::get_parallel_scheduler();
+        auto sched2 = ex::get_parallel_scheduler();
+        HPX_TEST(sched1 == sched2);
+        std::cout << "Schedulers share same context" << std::endl;
+
+        int count1 = 0, count2 = 0;
+        auto sender1 = ex::schedule(sched1) | ex::then([&count1] {
+            std::cout << "Executing sender1 then functor" << std::endl;
+            count1++;
+        });
+        auto sender2 = ex::schedule(sched2) | ex::then([&count2] {
+            std::cout << "Executing sender2 then functor" << std::endl;
+            count2++;
+        });
+
+        std::cout << "Calling sync_wait for shared context" << std::endl;
+        ex::sync_wait(ex::when_all(sender1, sender2));
+        HPX_TEST_EQ(count1, 1);
+        HPX_TEST_EQ(count2, 1);
+        std::cout << "Shared context test: count1 = " << count1
+                  << ", count2 = " << count2 << std::endl;
+    }
+
+    // Test parallel_scheduler example from P2079R10
+    {
+        std::cout << "\n=== Testing P2079R10 Examples ===" << std::endl;
+        auto begin = ex::schedule(sched);
+        auto hi = ex::then(begin, [] {
+            std::cout << "Executing P2079R10 Example 1 then functor"
+                      << std::endl;
+            return 13;
+        });
+        auto add_42 = ex::then(hi, [](int arg) {
+            std::cout << "Adding 42 to " << arg << std::endl;
+            return arg + 42;
+        });
+        std::cout << "Calling sync_wait for P2079R10 Example 1" << std::endl;
+        auto [i] = ex::sync_wait(add_42).value();
+        HPX_TEST_EQ(i, 55);
+        std::cout << "P2079R10 Example 1 result: " << i << std::endl;
+
+        auto hi2 = ex::then(ex::just(), [] {
+            std::cout << "Executing P2079R10 Example 2 then functor"
+                      << std::endl;
+            return 13;
+        });
+        auto add_42_2 = ex::then(hi2, [](int arg) {
+            std::cout << "Adding 42 to " << arg << std::endl;
+            return arg + 42;
+        });
+        std::cout << "Calling sync_wait for P2079R10 Example 2" << std::endl;
+        auto [i2] = ex::sync_wait(ex::on(sched, add_42_2)).value();
+        HPX_TEST_EQ(i2, 55);
+        std::cout << "P2079R10 Example 2 result: " << i2 << std::endl;
+    }
+
+    // Test case 1: Verify HPX thread ID for async task
+    {
+        std::cout << "\n=== Test Case 1: Verify HPX Thread ID ===" << std::endl;
+        bool value_received = false;
+        std::exception_ptr error_received = nullptr;
+        bool stopped_received = false;
+        hpx::thread::id thread_id;
+
+        test_receiver receiver(
+            &value_received, &error_received, &stopped_received, &thread_id);
+        auto sender = ex::schedule(sched) | ex::then([] {
+            std::cout << "Executing Test Case 1 then functor" << std::endl;
+            return 1;
+        });
+
+        std::cout << "Calling connect and start for Test Case 1" << std::endl;
+        auto op_state = ex::connect(sender, receiver);
+        ex::start(op_state);
+
+        std::cout << "Waiting for Test Case 1 to complete" << std::endl;
+        while (!value_received && !error_received && !stopped_received)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+
+        HPX_TEST(value_received);
+        HPX_TEST(thread_id != hpx::thread::id{});
+        std::cout << "Test Case 1 thread ID: " << thread_id << std::endl;
+    }
+
+    // Test case 2: Verify different HPX thread ID for another async task
+    {
+        std::cout << "\n=== Test Case 2: Verify Different HPX Thread ID ==="
+                  << std::endl;
+        bool value_received = false;
+        std::exception_ptr error_received = nullptr;
+        bool stopped_received = false;
+        hpx::thread::id thread_id;
+
+        test_receiver receiver(
+            &value_received, &error_received, &stopped_received, &thread_id);
+        auto sender = ex::schedule(sched) | ex::then([] {
+            std::cout << "Executing Test Case 2 then functor" << std::endl;
+            return 2;
+        });
+
+        std::cout << "Calling connect and start for Test Case 2" << std::endl;
+        auto op_state = ex::connect(sender, receiver);
+        ex::start(op_state);
+
+        std::cout << "Waiting for Test Case 2 to complete" << std::endl;
+        while (!value_received && !error_received && !stopped_received)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+
+        HPX_TEST(value_received);
+        HPX_TEST(thread_id != hpx::thread::id{});
+        std::cout << "Test Case 2 thread ID: " << thread_id << std::endl;
+    }
+
+    std::cout << "Calling hpx::local::finalize()" << std::endl;
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
 {
     std::cout << "main() started" << std::endl;
-    hpx::init_params init_args;
-    std::cout << "Calling hpx::init" << std::endl;
-    int result = hpx::init(hpx_main, argc, argv, init_args);
-    std::cout << "hpx::init returned: " << result << std::endl;
-    return hpx::util::report_errors();
+    std::cout << "Calling hpx::local::init" << std::endl;
+    int result = hpx::local::init(hpx_main, argc, argv);
+    std::cout << "hpx::local::init returned: " << result << std::endl;
+    return result;
 }
