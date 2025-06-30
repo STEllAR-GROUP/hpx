@@ -17,6 +17,7 @@
 #endif
 #include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
+#include <asio/version.hpp>
 
 /* The asio support includes termios.h.
  * The termios.h file on ppc64le defines these macros, which
@@ -50,7 +51,12 @@ namespace hpx::util {
     [[nodiscard]] HPX_CORE_EXPORT std::string cleanup_ip_address(
         std::string const& addr);
 
+#if ASIO_VERSION >= 103400
+    using endpoint_iterator_type =
+        asio::ip::basic_resolver_iterator<asio::ip::tcp>;
+#else
     using endpoint_iterator_type = asio::ip::tcp::resolver::iterator;
+#endif
 
     [[nodiscard]] endpoint_iterator_type HPX_CORE_EXPORT connect_begin(
         std::string const& address, std::uint16_t port,
