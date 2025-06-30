@@ -288,7 +288,7 @@ namespace hpx::execution::experimental {
         struct sender
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
-            using sender_concept = hpx::execution::experimental::sender_t;
+            using sender_concept = ::hpx::execution::experimental::sender_t;
             using completion_signatures =
                 hpx::execution::experimental::completion_signatures<
                     hpx::execution::experimental::set_value_t(),
@@ -334,7 +334,7 @@ namespace hpx::execution::experimental {
                     hpx::execution::experimental::get_stop_token_t,
                     [[maybe_unused]] env const& e) noexcept
                 {
-                    return hpx::execution::experimental::inplace_stop_token{};
+                    return ::hpx::execution::experimental::inplace_stop_token{};
                 }
             };
 
@@ -556,7 +556,7 @@ namespace hpx::execution::experimental {
     struct parallel_scheduler_sender
     {
         parallel_scheduler scheduler;
-        using sender_concept = hpx::execution::experimental::sender_t;
+        using sender_concept = ::hpx::execution::experimental::sender_t;
         using completion_signatures =
             hpx::execution::experimental::completion_signatures<
                 hpx::execution::experimental::set_value_t(),
@@ -605,7 +605,7 @@ namespace hpx::execution::experimental {
                 hpx::execution::experimental::get_stop_token_t,
                 [[maybe_unused]] env const& e) noexcept
             {
-                return hpx::execution::experimental::inplace_stop_token{};
+                return ::hpx::execution::experimental::inplace_stop_token{};
             }
         };
 
