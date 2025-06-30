@@ -98,8 +98,13 @@ namespace hpx::parcelset::policies::lci {
         sender_p->run();
         for (std::size_t i = 0; i != io_service_pool_.size(); ++i)
         {
+#if ASIO_VERSION >= 103400
+            asio::post(io_service_pool_.get_io_service(static_cast<int>(i)),
+                hpx::bind(&parcelport::io_service_work, this));
+#else
             io_service_pool_.get_io_service(int(i)).post(
                 hpx::bind(&parcelport::io_service_work, this));
+#endif
         }
         return true;
     }
@@ -167,10 +172,10 @@ namespace hpx::parcelset::policies::lci {
                         static_cast<int>(hpx::get_local_worker_thread_num());
                     HPX_ASSERT(prg_thread_id < config_t::progress_thread_num);
                     for (int i = prg_thread_id * config_t::ndevices /
-                             config_t::progress_thread_num;
-                         i < (prg_thread_id + 1) * config_t::ndevices /
-                             config_t::progress_thread_num;
-                         ++i)
+                            config_t::progress_thread_num;
+                        i < (prg_thread_id + 1) * config_t::ndevices /
+                            config_t::progress_thread_num;
+                        ++i)
                     {
                         devices_to_progress.push_back(&devices[i]);
                     }

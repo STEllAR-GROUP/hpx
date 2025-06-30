@@ -259,7 +259,11 @@ namespace hpx::util {
             for (std::size_t i = 0; i < pool_size_; ++i)
             {
                 work_.emplace_back(initialize_work(*io_services_[i]));
+#if ASIO_VERSION >= 103400
+                io_services_[i]->restart();
+#else
                 io_services_[i]->reset();
+#endif
             }
 
             continue_barrier_->wait();
