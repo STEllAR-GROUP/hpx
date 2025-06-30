@@ -346,10 +346,9 @@ namespace hpx::parallel::execution::detail {
                 hint.hint == -1)
             {
                 // apply hint if none was given
-                hint.mode = hpx::threads::thread_schedule_hint_mode::thread;
-                hint.hint = static_cast<std::uint16_t>(
+                hint.schedule_hint(static_cast<std::uint16_t>(
                     wrapped_pu_num(worker_thread, needs_wraparound) +
-                    first_thread);
+                    first_thread));
 
                 hpx::detail::post_policy_dispatch<Launch>::call(
                     hpx::execution::experimental::with_hint(post_policy, hint),

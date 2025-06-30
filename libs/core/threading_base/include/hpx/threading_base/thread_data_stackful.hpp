@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -68,7 +68,7 @@ namespace hpx::threads {
             return coroutine_(set_state_ex(thread_restart_state::signaled));
         }
 
-        HPX_FORCEINLINE coroutine_type::result_type invoke_directly()
+        HPX_FORCEINLINE coroutine_type::result_type call_directly()
         {
             HPX_ASSERT(get_state().state() == thread_schedule_state::active);
             HPX_ASSERT(this == coroutine_.get_thread_id().get());
