@@ -6,21 +6,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(NOT TARGET Amplifier::amplifier)
-  # compatibility with older CMake versions
-  if(AMPLIFIER_ROOT AND NOT Amplifier_ROOT)
-    set(Amplifier_ROOT
-        ${AMPLIFIER_ROOT}
-        CACHE PATH "Amplifier base directory"
-    )
-    unset(AMPLIFIER_ROOT CACHE)
-  endif()
 
   find_package(PkgConfig QUIET)
   pkg_check_modules(PC_AMPLIFIER QUIET amplifier)
 
   find_path(
     Amplifier_INCLUDE_DIR ittnotify.h
-    HINTS ${Amplifier_ROOT} ENV AMPLIFIER_ROOT ${PC_Amplifier_INCLUDEDIR}
+    HINTS ${AMPLIFIER_ROOT} ENV AMPLIFIER_ROOT ${PC_Amplifier_INCLUDEDIR}
           ${PC_Amplifier_INCLUDE_DIRS}
     PATH_SUFFIXES include
   )
@@ -28,21 +20,10 @@ if(NOT TARGET Amplifier::amplifier)
   find_library(
     Amplifier_LIBRARY
     NAMES ittnotify libittnotify
-    HINTS ${Amplifier_ROOT} ENV AMPLIFIER_ROOT ${PC_Amplifier_LIBDIR}
+    HINTS ${AMPLIFIER_ROOT} ENV AMPLIFIER_ROOT ${PC_Amplifier_LIBDIR}
           ${PC_Amplifier_LIBRARY_DIRS}
     PATH_SUFFIXES lib lib64
   )
-
-  # Set Amplifier_ROOT in case the other hints are used
-  if(Amplifier_ROOT)
-    # The call to file is for compatibility for windows paths
-    file(TO_CMAKE_PATH ${Amplifier_ROOT} Amplifier_ROOT)
-  elseif(DEFINED ENV{AMPLIFIER_ROOT})
-    file(TO_CMAKE_PATH $ENV{AMPLIFIER_ROOT} Amplifier_ROOT)
-  else()
-    file(TO_CMAKE_PATH "${Amplifier_INCLUDE_DIR}" Amplifier_INCLUDE_DIR)
-    string(REPLACE "/include" "" Amplifier_ROOT "${Amplifier_INCLUDE_DIR}")
-  endif()
 
   set(Amplifier_LIBRARIES ${Amplifier_LIBRARY})
   set(Amplifier_INCLUDE_DIRS ${Amplifier_INCLUDE_DIR})
@@ -70,4 +51,8 @@ if(NOT TARGET Amplifier::amplifier)
     Amplifier::amplifier SYSTEM INTERFACE ${Amplifier_INCLUDE_DIR}
   )
   target_link_libraries(Amplifier::amplifier INTERFACE ${Amplifier_LIBRARIES})
+  mark_as_advanced(Amplifier_LIBRARIES, Amplifier_INCLUDE_DIRS)
+
+  # Set Amplifier_ROOT
+  get_filename_component(Amplifier_ROOT ${Amplifier_INCLUDE_DIR} DIRECTORY)
 endif()
