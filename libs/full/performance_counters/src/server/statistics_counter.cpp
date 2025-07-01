@@ -247,7 +247,7 @@ namespace hpx::performance_counters::server {
 
             double get_value() override
             {
-                return (boost::accumulators::max)(accum_);
+                return (boost::accumulators::max) (accum_);
             }
 
             void add_value(double value) override
@@ -277,7 +277,7 @@ namespace hpx::performance_counters::server {
 
             double get_value() override
             {
-                return (boost::accumulators::min)(accum_);
+                return (boost::accumulators::min) (accum_);
             }
 
             void add_value(double value) override

@@ -249,7 +249,7 @@ namespace hpx::parallel {
 
                 // handle all partitions
                 for (++sit_in, ++sit_out; sit_in != send_in;
-                     ++sit_in, ++sit_out)
+                    ++sit_in, ++sit_out)
                 {
                     beg_in = traits_in::begin(sit_in);
                     end_in = traits_in::end(sit_in);
@@ -372,7 +372,7 @@ namespace hpx::parallel {
 
                 // handle all partitions
                 for (++sit_in, ++sit_out; sit_in != send_in;
-                     ++sit_in, ++sit_out)
+                    ++sit_in, ++sit_out)
                 {
                     beg = traits_in::begin(sit_in);
                     end = traits_in::end(sit_in);
@@ -590,7 +590,7 @@ namespace hpx::parallel {
 
                 // handle all partitions
                 for (++sit_in, ++sit_out; sit_in != send_in;
-                     ++sit_in, ++sit_out)
+                    ++sit_in, ++sit_out)
                 {
                     beg = traits_in::begin(sit_in);
                     end = traits_in::end(sit_in);

@@ -159,8 +159,8 @@ namespace hpx::optional_ns {
             return *this;
         }
         optional& operator=(optional&& other) noexcept(
-            std::is_nothrow_move_assignable_v<T>&&
-                std::is_nothrow_move_constructible_v<T>)
+            std::is_nothrow_move_assignable_v<T> &&
+            std::is_nothrow_move_constructible_v<T>)
         {
             if (this == &other)
             {
@@ -356,8 +356,8 @@ namespace hpx::optional_ns {
 #endif
 
         void swap(optional& other) noexcept(
-            std::is_nothrow_move_constructible_v<T>&& noexcept(
-                _optional_swap::check_swap<T>()))
+            std::is_nothrow_move_constructible_v<T> &&
+            noexcept(_optional_swap::check_swap<T>()))
         {
             // do nothing if both are empty
             if (empty_ && other.empty_)

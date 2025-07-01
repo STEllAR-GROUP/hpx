@@ -27,7 +27,7 @@ struct A
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& a;
+        ar & a;
     }
     HPX_SERIALIZATION_POLYMORPHIC(A);
 };
@@ -52,7 +52,7 @@ struct B
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& b;
+        ar & b;
     }
     HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(B);
 };
@@ -77,7 +77,7 @@ struct D : B
     {
         b = 4711;
         ar& hpx::serialization::base_object<B>(*this);
-        ar& d;
+        ar & d;
     }
     HPX_SERIALIZATION_POLYMORPHIC(D, override);
 };

@@ -28,9 +28,9 @@ struct params
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& max_msg_size;
-        ar& iterations;
-        ar& fan_out;
+        ar & max_msg_size;
+        ar & iterations;
+        ar & fan_out;
     }
 };
 

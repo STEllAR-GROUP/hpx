@@ -128,7 +128,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_PLUGIN_EXPORT_LIST_(prefix, name, classname)                       \
     extern "C" HPX_PLUGIN_EXPORT_API std::map<std::string, hpx::any_nonser>*   \
-        HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME_(prefix, name, classname)()        \
+        HPX_PLUGIN_API                                                         \
+        HPX_PLUGIN_LIST_NAME_(prefix, name, classname)()                       \
     {                                                                          \
         static std::map<std::string, hpx::any_nonser> r;                       \
         return &r;                                                             \

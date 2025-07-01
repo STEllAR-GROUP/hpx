@@ -53,7 +53,7 @@ void test_shift_right_nonbidir(IteratorTag)
         std::next(std::begin(c), n), std::end(c), std::begin(d) + n));
 
     // ensure shift by more than n does not crash
-    hpx::shift_right(std::begin(c), std::end(c), (std::size_t)(ARR_SIZE + 1));
+    hpx::shift_right(std::begin(c), std::end(c), (std::size_t) (ARR_SIZE + 1));
 }
 
 template <typename IteratorTag>
@@ -80,7 +80,7 @@ void test_shift_right(IteratorTag)
     HPX_TEST(std::equal(std::begin(c) + n, std::end(c), std::begin(d) + n));
 
     // ensure shift by more than n does not crash
-    hpx::shift_right(std::begin(c), std::end(c), (std::size_t)(ARR_SIZE + 1));
+    hpx::shift_right(std::begin(c), std::end(c), (std::size_t) (ARR_SIZE + 1));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -111,7 +111,7 @@ void test_shift_right(ExPolicy policy, IteratorTag)
 
     // ensure shift by more than n does not crash
     hpx::shift_right(
-        policy, std::begin(c), std::end(c), (std::size_t)(ARR_SIZE + 1));
+        policy, std::begin(c), std::end(c), (std::size_t) (ARR_SIZE + 1));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -145,7 +145,7 @@ void test_shift_right_async(ExPolicy p, IteratorTag)
 
     // ensure shift by more than n does not crash
     auto f3 = hpx::shift_right(
-        p, std::begin(c), std::end(c), (std::size_t)(ARR_SIZE + 1));
+        p, std::begin(c), std::end(c), (std::size_t) (ARR_SIZE + 1));
     f3.wait();
 }
 

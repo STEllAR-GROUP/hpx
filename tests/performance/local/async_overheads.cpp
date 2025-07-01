@@ -47,7 +47,7 @@ hpx::future<void> spawn_level(std::size_t num_tasks)
         for (std::size_t i = 0; i != spread && spawn_hierarchically != 0; ++i)
         {
             std::size_t sub_spawn =
-                (std::min)(spawn_hierarchically, num_sub_tasks);
+                (std::min) (spawn_hierarchically, num_sub_tasks);
             spawn_hierarchically -= sub_spawn;
             num_tasks -= sub_spawn;
 

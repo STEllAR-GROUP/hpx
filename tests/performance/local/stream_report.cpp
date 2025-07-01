@@ -120,7 +120,7 @@ int checktick()
     for (std::size_t i = 1; i < M; i++)
     {
         int Delta = (int) (1.0E6 * (timesfound[i] - timesfound[i - 1]));
-        minDelta = (std::min)(minDelta, (std::max)(Delta, 0));
+        minDelta = (std::min) (minDelta, (std::max) (Delta, 0));
     }
 
     return (minDelta);

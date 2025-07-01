@@ -159,7 +159,7 @@ namespace hpx::parallel::util {
                     InIter2 last2, OutIter dest, F&& f)
             {
                 for (/* */; first1 != last1 && first2 != last2;
-                     (void) ++first1, ++first2, ++dest)
+                    (void) ++first1, ++first2, ++dest)
                 {
                     *dest = HPX_INVOKE(f, first1, first2);
                 }
@@ -260,7 +260,7 @@ namespace hpx::parallel::util {
                     InIter2 last2, OutIter dest, F&& f)
             {
                 for (/* */; first1 != last1 && first2 != last2;
-                     (void) ++first1, ++first2, ++dest)
+                    (void) ++first1, ++first2, ++dest)
                 {
                     *dest = HPX_INVOKE(f, *first1, *first2);
                 }
@@ -346,7 +346,7 @@ namespace hpx::parallel::util {
                 std::size_t count(
                     num & static_cast<std::size_t>(-4));    // -V112
                 for (std::size_t i = 0; i < count;
-                     (void) ++it, i += 4)    // -V112
+                    (void) ++it, i += 4)    // -V112
                 {
                     *dest++ = HPX_INVOKE(f, it);
                     *dest++ = HPX_INVOKE(f, ++it);
@@ -451,7 +451,7 @@ namespace hpx::parallel::util {
                 std::size_t count(
                     num & static_cast<std::size_t>(-4));    // -V112
                 for (std::size_t i = 0; i < count;
-                     (void) ++it, i += 4)    // -V112
+                    (void) ++it, i += 4)    // -V112
                 {
                     *dest++ = HPX_INVOKE(f, *it);
                     *dest++ = HPX_INVOKE(f, *++it);
@@ -558,7 +558,7 @@ namespace hpx::parallel::util {
                 std::size_t count(
                     num & static_cast<std::size_t>(-4));    // -V112
                 for (std::size_t i = 0; i < count;
-                     (void) ++first1, ++first2, i += 4)    // -V112
+                    (void) ++first1, ++first2, i += 4)    // -V112
                 {
                     *dest++ = HPX_INVOKE(f, first1, first2);
                     *dest++ = HPX_INVOKE(f, ++first1, ++first2);
@@ -566,7 +566,7 @@ namespace hpx::parallel::util {
                     *dest++ = HPX_INVOKE(f, ++first1, ++first2);
                 }
                 for (/**/; count < num;
-                     (void) ++count, ++first1, ++first2, ++dest)
+                    (void) ++count, ++first1, ++first2, ++dest)
                 {
                     *dest = HPX_INVOKE(f, first1, first2);
                 }
@@ -630,7 +630,7 @@ namespace hpx::parallel::util {
                 std::size_t count(
                     num & static_cast<std::size_t>(-4));    // -V112
                 for (std::size_t i = 0; i < count;
-                     (void) ++first1, ++first2, i += 4)    // -V112
+                    (void) ++first1, ++first2, i += 4)    // -V112
                 {
                     *dest++ = HPX_INVOKE(f, *first1, *first2);
                     *dest++ = HPX_INVOKE(f, *++first1, *++first2);
@@ -638,7 +638,7 @@ namespace hpx::parallel::util {
                     *dest++ = HPX_INVOKE(f, *++first1, *++first2);
                 }
                 for (/**/; count < num;
-                     (void) ++count, ++first1, ++first2, ++dest)
+                    (void) ++count, ++first1, ++first2, ++dest)
                 {
                     *dest = HPX_INVOKE(f, *first1, *first2);
                 }

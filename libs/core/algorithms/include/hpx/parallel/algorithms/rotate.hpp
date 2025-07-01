@@ -243,14 +243,14 @@ namespace hpx::parallel {
                     static_cast<double>(size_left + size_right);
 
                 // avoid cores_left == 0 after integer rounding
-                cores_left = (std::max)(static_cast<std::size_t>(1),
+                cores_left = (std::max) (static_cast<std::size_t>(1),
                     static_cast<std::size_t>(
                         partition_size_ratio * static_cast<double>(cores)));
             }
 
             // cores_right should be at least 1.
             std::size_t cores_right =
-                (std::max)(static_cast<std::size_t>(1), cores - cores_left);
+                (std::max) (static_cast<std::size_t>(1), cores - cores_left);
 
             // invoke the reverse operations on the left and right sections
             // concurrently

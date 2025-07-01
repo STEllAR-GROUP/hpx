@@ -228,7 +228,7 @@ namespace hpx::naming {
             HPX_ASSERT(overflow_credit >= 0);
 
             new_credit =
-                (std::min)(static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL),
+                (std::min) (static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL),
                     new_credit);
             naming::detail::set_credit_for_gid(gid, new_credit);
 

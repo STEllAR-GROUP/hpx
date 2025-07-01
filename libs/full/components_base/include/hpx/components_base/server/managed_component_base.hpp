@@ -261,16 +261,16 @@ namespace hpx::components {
         managed_component<Component, Derived>* p) noexcept
     {
         detail_adl_barrier::manage_lifetime<
-            traits::managed_component_dtor_policy_t<Component>>::
-            addref(p->component_);
+            traits::managed_component_dtor_policy_t<Component>>::addref(p
+                ->component_);
     }
     template <typename Component, typename Derived>
     void intrusive_ptr_release(
         managed_component<Component, Derived>* p) noexcept
     {
         detail_adl_barrier::manage_lifetime<
-            traits::managed_component_dtor_policy_t<Component>>::
-            release(p->component_);
+            traits::managed_component_dtor_policy_t<Component>>::release(p
+                ->component_);
     }
 
     namespace detail {

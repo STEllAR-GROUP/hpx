@@ -211,7 +211,7 @@ namespace hpx::parallel {
                 auto dist2 = detail::distance(first2, last2);
 
                 return parallel_swap_ranges(HPX_FORWARD(ExPolicy, policy),
-                    first1, first2, (std::min)(dist1, dist2));
+                    first1, first2, (std::min) (dist1, dist2));
             }
         };
         /// \endcond

@@ -136,8 +136,8 @@ namespace hpx { namespace lcos {
         {
             // Call some action for the fan_out first ids here ...
             std::vector<hpx::future<void>> broadcast_futures;
-            broadcast_futures.reserve((std::min)(ids.size(), fan_out));
-            for (std::size_t i = 0; i < (std::min)(fan_out, ids.size()); ++i)
+            broadcast_futures.reserve((std::min) (ids.size(), fan_out));
+            for (std::size_t i = 0; i < (std::min) (fan_out, ids.size()); ++i)
             {
                 broadcast_futures.push_back(hpx::async(fun, ids[i]));
             }
@@ -186,5 +186,5 @@ namespace hpx { namespace lcos {
             }
         }
     }    // namespace detail
-}}       // namespace hpx::lcos
+}}    // namespace hpx::lcos
 #endif

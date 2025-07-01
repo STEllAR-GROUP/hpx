@@ -861,7 +861,7 @@ namespace hpx::parallel {
 
                     std::size_t begin_index = left_;
                     std::size_t end_index =
-                        (std::min)(left_ + block_size_, right_);
+                        (std::min) (left_ + block_size_, right_);
 
                     left_ += end_index - begin_index;
 
@@ -882,7 +882,7 @@ namespace hpx::parallel {
                         return {first_, first_};
 
                     std::size_t begin_index =
-                        (std::max)(right_ - block_size_, left_);
+                        (std::max) (right_ - block_size_, left_);
                     std::size_t end_index = right_;
 
                     right_ -= end_index - begin_index;
@@ -1031,7 +1031,7 @@ namespace hpx::parallel {
                 {
                     while ((!left_block.empty() ||
                                !(left_block = block_manager.get_left_block())
-                                    .empty()) &&
+                                   .empty()) &&
                         HPX_INVOKE(pred, HPX_INVOKE(proj, *left_block.first)))
                     {
                         ++left_block.first;
@@ -1039,7 +1039,7 @@ namespace hpx::parallel {
 
                     while ((!right_block.empty() ||
                                !(right_block = block_manager.get_right_block())
-                                    .empty()) &&
+                                   .empty()) &&
                         !HPX_INVOKE(pred, HPX_INVOKE(proj, *right_block.first)))
                     {
                         ++right_block.first;
@@ -1159,7 +1159,7 @@ namespace hpx::parallel {
                 auto boundary_rbegin =
                     std::reverse_iterator<BidirIter>(boundary);
                 for (auto it = remaining_blocks.rbegin();
-                     it != remaining_blocks.rend(); ++it)
+                    it != remaining_blocks.rend(); ++it)
                 {
                     auto rbegin = std::reverse_iterator<BidirIter>(it->last);
                     auto rend = std::reverse_iterator<BidirIter>(it->first);
@@ -1237,7 +1237,7 @@ namespace hpx::parallel {
 
                 for (std::int64_t i =
                          static_cast<std::int64_t>(dest_iters.size() - 1);
-                     i >= 0; --i)
+                    i >= 0; --i)
                 {
                     if (remaining_blocks[i].first == dest_iters[i])
                         continue;

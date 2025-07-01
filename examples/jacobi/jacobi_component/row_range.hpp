@@ -57,7 +57,7 @@ namespace jacobi {
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
         {
-            ar& v_;
+            ar & v_;
         }
     };
 
@@ -119,7 +119,7 @@ namespace jacobi {
             HPX_ASSERT(values_);
             std::vector<double> tmp(
                 values_->v_.begin() + begin_, values_->v_.begin() + end_);
-            ar& tmp;
+            ar & tmp;
         }
 
         HPX_SERIALIZATION_SPLIT_MEMBER()

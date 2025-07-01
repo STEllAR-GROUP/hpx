@@ -54,7 +54,7 @@ void test_shift_right_sent(IteratorTag)
 
     // ensure shift by more than n does not crash
     hpx::ranges::shift_right(std::begin(c),
-        sentinel<std::size_t>{*std::rbegin(c)}, (std::size_t)(ARR_SIZE + 1));
+        sentinel<std::size_t>{*std::rbegin(c)}, (std::size_t) (ARR_SIZE + 1));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -88,7 +88,7 @@ void test_shift_right_sent(ExPolicy policy, IteratorTag)
 
     // ensure shift by more than n does not crash
     hpx::ranges::shift_right(policy, std::begin(c),
-        sentinel<std::size_t>{*std::rbegin(c)}, (std::size_t)(ARR_SIZE + 1));
+        sentinel<std::size_t>{*std::rbegin(c)}, (std::size_t) (ARR_SIZE + 1));
 }
 
 template <typename IteratorTag>
@@ -115,7 +115,7 @@ void test_shift_right(IteratorTag)
     HPX_TEST(std::equal(std::begin(c) + n, std::end(c), std::begin(d) + n));
 
     // ensure shift by more than n does not crash
-    hpx::ranges::shift_right(c, (std::size_t)(ARR_SIZE + 1));
+    hpx::ranges::shift_right(c, (std::size_t) (ARR_SIZE + 1));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -145,7 +145,7 @@ void test_shift_right(ExPolicy policy, IteratorTag)
     HPX_TEST(std::equal(std::begin(c) + n, std::end(c), std::begin(d) + n));
 
     // ensure shift by more than n does not crash
-    hpx::ranges::shift_right(policy, c, (std::size_t)(ARR_SIZE + 1));
+    hpx::ranges::shift_right(policy, c, (std::size_t) (ARR_SIZE + 1));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -179,7 +179,7 @@ void test_shift_right_async(ExPolicy policy, IteratorTag)
 
     // ensure shift by more than n does not crash
     auto fut4 =
-        hpx::ranges::shift_right(policy, c, (std::size_t)(ARR_SIZE + 1));
+        hpx::ranges::shift_right(policy, c, (std::size_t) (ARR_SIZE + 1));
     fut4.wait();
 }
 

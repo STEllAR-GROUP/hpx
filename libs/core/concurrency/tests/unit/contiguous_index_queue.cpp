@@ -45,7 +45,7 @@ void test_basic()
         hpx::concurrency::detail::contiguous_index_queue<> q{first, last};
 
         for (std::uint32_t curr_expected = first; curr_expected < last;
-             ++curr_expected)
+            ++curr_expected)
         {
             hpx::optional<std::uint32_t> curr = q.pop_left();
             HPX_TEST(curr);
@@ -64,7 +64,7 @@ void test_basic()
         hpx::concurrency::detail::contiguous_index_queue<> q{first, last};
 
         for (std::uint32_t curr_expected = last - 1; curr_expected >= first;
-             --curr_expected)
+            --curr_expected)
         {
             hpx::optional<std::uint32_t> curr = q.pop_right();
             HPX_TEST(curr);
@@ -80,7 +80,7 @@ void test_basic()
         q.reset(first, last);
 
         for (std::uint32_t curr_expected = last - 1; curr_expected >= first;
-             --curr_expected)
+            --curr_expected)
         {
             hpx::optional<std::uint32_t> curr = q.pop_right();
             HPX_TEST(curr);

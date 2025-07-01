@@ -59,10 +59,7 @@ namespace hpx::components {
 // clang-format on
 
 #define HPX_DEFINE_FACTORY_STATIC(module, name, base)                          \
-    {                                                                          \
-        HPX_PP_STRINGIZE(module), HPX_PLUGIN_LIST_NAME(name, base)             \
-    }                                                                          \
-    /**/
+    {HPX_PP_STRINGIZE(module), HPX_PLUGIN_LIST_NAME(name, base)} /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INIT_REGISTRY_MODULE_STATIC(name, base)                            \

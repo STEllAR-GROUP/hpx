@@ -182,13 +182,11 @@ void test_inplace_merge_stable(
 
     int no = 0;
     auto rf = random_fill(rand_base, 6);
-    std::generate(res_first, res_middle, [&no, &rf]() -> std::pair<int, int> {
-        return {rf(), no++};
-    });
+    std::generate(res_first, res_middle,
+        [&no, &rf]() -> std::pair<int, int> { return {rf(), no++}; });
     rf = random_fill(rand_base, 8);
-    std::generate(res_middle, res_last, [&no, &rf]() -> std::pair<int, int> {
-        return {rf(), no++};
-    });
+    std::generate(res_middle, res_last,
+        [&no, &rf]() -> std::pair<int, int> { return {rf(), no++}; });
     std::sort(res_first, res_middle);
     std::sort(res_middle, res_last);
 

@@ -166,8 +166,8 @@ int main()
             hpx::threads::policies::local_priority_queue_scheduler<>;
 
         // Choose all the parameters for the thread pool and scheduler.
-        std::size_t const num_threads = (std::min)(
-            std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
+        std::size_t const num_threads = (std::min) (std::size_t(4),
+            std::size_t(hpx::threads::hardware_concurrency()));
         std::size_t const max_cores = num_threads;
         hpx::threads::policies::detail::affinity_data ad{};
         ad.init(num_threads, max_cores, 0, 1, 0, "core", "balanced", true);

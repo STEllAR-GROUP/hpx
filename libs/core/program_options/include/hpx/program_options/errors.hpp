@@ -57,8 +57,8 @@ namespace hpx::program_options {
     public:
         explicit reading_file(char const* filename)
           : error(std::string("can not read options configuration file '")
-                      .append(filename)
-                      .append("'"))
+                    .append(filename)
+                    .append("'"))
         {
         }
     };

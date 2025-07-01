@@ -84,7 +84,7 @@ namespace {
                             std::size_t dec = 10;
                             // pad with zeros
                             for (std::size_t j = 0; j < range[0].length() - 1;
-                                 ++j)
+                                ++j)
                             {
                                 if (i < dec)
                                 {

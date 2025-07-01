@@ -691,7 +691,7 @@ struct custom_type_non_default_constructible
     int x;
     custom_type_non_default_constructible() = delete;
     explicit custom_type_non_default_constructible(int x)
-      : x(x){};
+      : x(x) {};
     custom_type_non_default_constructible(
         custom_type_non_default_constructible&&) = default;
     custom_type_non_default_constructible& operator=(
@@ -707,7 +707,7 @@ struct custom_type_non_default_constructible_non_copyable
     int x;
     custom_type_non_default_constructible_non_copyable() = delete;
     explicit custom_type_non_default_constructible_non_copyable(int x)
-      : x(x){};
+      : x(x) {};
     custom_type_non_default_constructible_non_copyable(
         custom_type_non_default_constructible_non_copyable&&) = default;
     custom_type_non_default_constructible_non_copyable& operator=(

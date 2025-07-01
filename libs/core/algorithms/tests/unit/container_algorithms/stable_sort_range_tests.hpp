@@ -97,7 +97,7 @@ int verify_(
     {
         IA temp = *(A.begin());
         for (typename std::vector<IA>::const_iterator it = A.begin();
-             it != A.end(); ++it)
+            it != A.end(); ++it)
         {
             if (comp((*it), temp))
             {

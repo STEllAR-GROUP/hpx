@@ -17,8 +17,8 @@
 #include <utility>
 #include <vector>
 
-std::size_t const max_threads = (std::min)(
-    std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
+std::size_t const max_threads = (std::min) (std::size_t(4),
+    std::size_t(hpx::threads::hardware_concurrency()));
 
 int hpx_main()
 {
@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
 
     hpx::local::init_params init_args;
     init_args.cfg = {"hpx.os_threads=" +
-        std::to_string(((std::min)(std::size_t(4),
+        std::to_string(((std::min) (std::size_t(4),
             std::size_t(hpx::threads::hardware_concurrency()))))};
 
     // now run the test

@@ -287,7 +287,7 @@ namespace hpx { namespace ranges {
         Pred&& pred = Pred(), Proj&& proj = Proj());
 
     // clang-format on
-}}       // namespace hpx::ranges
+}}    // namespace hpx::ranges
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>

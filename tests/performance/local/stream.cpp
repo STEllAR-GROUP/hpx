@@ -76,7 +76,7 @@ int checktick()
     for (std::size_t i = 1; i < M; i++)
     {
         int Delta = (int) (1.0E6 * (timesfound[i] - timesfound[i - 1]));
-        minDelta = (std::min)(minDelta, (std::max)(Delta, 0));
+        minDelta = (std::min) (minDelta, (std::max) (Delta, 0));
     }
 
     return (minDelta);
@@ -639,8 +639,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         for (std::size_t j = 0; j < num_stream_tests; j++)
         {
             avgtime[j] = avgtime[j] + timing[j][iteration];
-            mintime[j] = (std::min)(mintime[j], timing[j][iteration]);
-            maxtime[j] = (std::max)(maxtime[j], timing[j][iteration]);
+            mintime[j] = (std::min) (mintime[j], timing[j][iteration]);
+            maxtime[j] = (std::max) (maxtime[j], timing[j][iteration]);
         }
     }
 

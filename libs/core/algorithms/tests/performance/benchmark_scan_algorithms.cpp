@@ -47,7 +47,7 @@ void measureScanAlgorithms()
 #endif
 
     for (int alg = (int) ALGORITHM::EXCLUSIVE_SCAN;
-         alg <= (int) ALGORITHM::UNIQUE_COPY; alg++)
+        alg <= (int) ALGORITHM::UNIQUE_COPY; alg++)
     {
         std::size_t start = 32;
         std::size_t till = 1 << 10;

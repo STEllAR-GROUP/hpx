@@ -930,7 +930,7 @@ namespace hpx {
                     // contain --hpx:help or --hpx:version, on error result is < 0)
                     if (result != 0)
                     {
-                        result = (std::min)(result, 0);
+                        result = (std::min) (result, 0);
                         return result;
                     }
 

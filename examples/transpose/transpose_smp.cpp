@@ -81,8 +81,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 par, start, order + tile_size, tile_size, [&](std::uint64_t i) {
                     for (std::uint64_t j = 0; j < order; j += tile_size)
                     {
-                        std::uint64_t i_max = (std::min)(order, i + tile_size);
-                        std::uint64_t j_max = (std::min)(order, j + tile_size);
+                        std::uint64_t i_max = (std::min) (order, i + tile_size);
+                        std::uint64_t j_max = (std::min) (order, j + tile_size);
 
                         for (std::uint64_t it = i; it < i_max; ++it)
                         {
@@ -111,8 +111,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         if (iter > 0 || iterations == 1)    // Skip the first iteration
         {
             avgtime = avgtime + elapsed;
-            maxtime = (std::max)(maxtime, elapsed);
-            mintime = (std::min)(mintime, elapsed);
+            maxtime = (std::max) (maxtime, elapsed);
+            mintime = (std::min) (mintime, elapsed);
         }
 
         errsq += test_results(order, B);
@@ -126,7 +126,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::cout << "Solution validates\n";
         avgtime = avgtime /
             static_cast<double>(
-                (std::max)(iterations - 1, static_cast<std::uint64_t>(1)));
+                (std::max) (iterations - 1, static_cast<std::uint64_t>(1)));
         std::cout << "Rate (MB/s): " << 1.e-6 * bytes / mintime << ", "
                   << "Avg time (s): " << avgtime << ", "
                   << "Min time (s): " << mintime << ", "

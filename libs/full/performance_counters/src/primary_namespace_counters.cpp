@@ -37,7 +37,7 @@ namespace hpx { namespace agas { namespace server {
                 agas::server::primary_namespace_service_name));
 
         for (std::size_t i = 0;
-             i != agas::detail::num_primary_namespace_services; ++i)
+            i != agas::detail::num_primary_namespace_services; ++i)
         {
             // global counters are handled elsewhere
             if (agas::detail::primary_namespace_services[i].code_ ==
@@ -88,7 +88,7 @@ namespace hpx { namespace agas { namespace server {
                 agas::server::primary_namespace_service_name));
 
         for (std::size_t i = 0;
-             i != agas::detail::num_primary_namespace_services; ++i)
+            i != agas::detail::num_primary_namespace_services; ++i)
         {
             // local counters are handled elsewhere
             if (agas::detail::primary_namespace_services[i].code_ !=
@@ -153,7 +153,7 @@ namespace hpx { namespace agas { namespace server {
         namespace_action_code code = invalid_request;
         detail::counter_target target = agas::detail::counter_target_invalid;
         for (std::size_t i = 0;
-             i != agas::detail::num_primary_namespace_services; ++i)
+            i != agas::detail::num_primary_namespace_services; ++i)
         {
             if (p.countername_ ==
                 agas::detail::primary_namespace_services[i].name_)

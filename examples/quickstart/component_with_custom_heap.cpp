@@ -413,7 +413,7 @@ int main()
 
     std::size_t pagenum = 0;
     for (auto* page = heap.get_first_page(); page != nullptr;
-         page = page->next, ++pagenum)
+        page = page->next, ++pagenum)
     {
         auto blocks = page->allocated_blocks;
         for (std::size_t i = 0; i != blocks; ++i)

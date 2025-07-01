@@ -89,7 +89,7 @@ void test_for_loop_reduction_min(ExPolicy&& policy, IteratorTag)
         iterator(std::begin(c)), iterator(std::end(c)),
         hpx::experimental::reduction_min(minval),
         [](iterator it, std::size_t& minval) {
-            minval = (std::min)(minval, *it);
+            minval = (std::min) (minval, *it);
         });
 
     // verify values

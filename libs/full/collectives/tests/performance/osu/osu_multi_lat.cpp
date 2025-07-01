@@ -128,7 +128,7 @@ void run_benchmark(hpx::program_options::variables_map& vm)
         std::vector<hpx::future<double>> benchmarks;
 
         for (std::uint32_t locality_id = 0; locality_id != localities.size();
-             ++locality_id)
+            ++locality_id)
         {
             ireceive_action receive;
 

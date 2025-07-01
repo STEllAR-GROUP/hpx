@@ -102,8 +102,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         if (iter > 0 || iterations == 1)    // Skip the first iteration
         {
             avgtime = avgtime + elapsed;
-            maxtime = (std::max)(maxtime, elapsed);
-            mintime = (std::min)(mintime, elapsed);
+            maxtime = (std::max) (maxtime, elapsed);
+            mintime = (std::min) (mintime, elapsed);
         }
 
         errsq += test_results(order, block_order, B);
@@ -117,7 +117,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::cout << "Solution validates\n";
         avgtime = avgtime /
             static_cast<double>(
-                (std::max)(iterations - 1, static_cast<std::uint64_t>(1)));
+                (std::max) (iterations - 1, static_cast<std::uint64_t>(1)));
         std::cout << "Rate (MB/s): " << 1.e-6 * bytes / mintime << ", "
                   << "Avg time (s): " << avgtime << ", "
                   << "Min time (s): " << mintime << ", "
@@ -176,11 +176,11 @@ void transpose(sub_block A, sub_block B, std::uint64_t block_order,
         {
             for (std::uint64_t j = 0; j < block_order; j += tile_size)
             {
-                std::uint64_t i_max = (std::min)(block_order, i + tile_size);
+                std::uint64_t i_max = (std::min) (block_order, i + tile_size);
                 for (std::uint64_t it = i; it < i_max; ++it)
                 {
                     std::uint64_t j_max =
-                        (std::min)(block_order, j + tile_size);
+                        (std::min) (block_order, j + tile_size);
                     for (std::uint64_t jt = j; jt < j_max; ++jt)
                     {
                         B[it + block_order * jt] = A[jt + block_order * it];

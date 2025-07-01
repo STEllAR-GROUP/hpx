@@ -91,7 +91,7 @@ namespace hpx::util::detail {
     }
 
     template <typename T, typename C>
-    [[nodiscard]] constexpr bool is_empty_function(T C::*mp) noexcept
+    [[nodiscard]] constexpr bool is_empty_function(T C::* mp) noexcept
     {
         return mp == nullptr;
     }

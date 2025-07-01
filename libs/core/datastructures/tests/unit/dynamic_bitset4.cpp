@@ -71,10 +71,10 @@ void run_test_cases()
         {
             for (std::size_t si = 0; si < num_strings; ++si)
             {
-                std::streamsize slen = (std::streamsize)(strings[si].length());
+                std::streamsize slen = (std::streamsize) (strings[si].length());
 
                 HPX_ASSERT((std::numeric_limits<std::streamsize>::max)() >=
-                    (std::streamsize)(1 + slen * 2));
+                    (std::streamsize) (1 + slen * 2));
 
                 for (std::size_t ci = 0; ci < num_chars; ++ci)
                 {
@@ -121,7 +121,8 @@ void run_test_cases()
                         }
                         {
                             //NOTE: there are NO string stream tests
-                        } {
+                        }
+                        {
                             // test 1b - wide file stream
                             scoped_temp_file stf;
                             bitset_type b(strings[si]);
@@ -197,9 +198,9 @@ void run_test_cases()
             for (std::size_t si = 0; si < num_strings; ++si)
             {
                 std::streamsize const slen =
-                    (std::streamsize)(strings[si].length());
+                    (std::streamsize) (strings[si].length());
                 HPX_ASSERT((std::numeric_limits<std::streamsize>::max)() >=
-                    (std::streamsize)(1 + slen * 2));
+                    (std::streamsize) (1 + slen * 2));
 
                 std::streamsize widths[] = {
                     -1, 0, slen / 2, slen, 1 + slen * 2};

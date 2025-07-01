@@ -85,7 +85,7 @@ void test_for_loop_reduction_min(ExPolicy&& policy)
     auto f = hpx::ranges::experimental::for_loop(std::forward<ExPolicy>(policy),
         c, hpx::experimental::reduction_min(minval),
         [](iterator it, std::size_t& minval) {
-            minval = (std::min)(minval, *it);
+            minval = (std::min) (minval, *it);
         });
     f.wait();
 

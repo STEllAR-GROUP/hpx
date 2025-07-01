@@ -502,9 +502,9 @@ namespace hpx::compute::host {
                 std::size_t Nc = helper->array_size(0);
                 std::size_t const Nr = helper->array_size(1);
                 std::size_t xinc =
-                    (std::min)(helper->display_step(0), pagesize);
+                    (std::min) (helper->display_step(0), pagesize);
                 std::size_t const yinc =
-                    (std::min)(helper->display_step(1), pagesize);
+                    (std::min) (helper->display_step(1), pagesize);
                 std::size_t const xoff = helper->memory_step(0);
                 std::size_t const yoff = helper->memory_step(1);
                 std::size_t m = helper->memory_bytes();

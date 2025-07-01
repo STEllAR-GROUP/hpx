@@ -26,6 +26,7 @@
 #ifdef DUMP_VALUES
 #define DEBUG_OUT(x)                                                           \
     std::cout << x << std::endl;                                               \
+    /**/
 #endif
 #else
 #define DEBUG_OUT(x)

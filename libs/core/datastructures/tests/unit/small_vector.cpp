@@ -399,7 +399,7 @@ namespace test {
         HPX_TEST_EQ(dist2, cont_b.size());
 
         for (std::size_t i = 0; itcont_a != itcont_a_end;
-             ++itcont_a, ++itcont_b, ++i)
+            ++itcont_a, ++itcont_b, ++i)
         {
             HPX_TEST_EQ(*itcont_a, *itcont_b);
         }

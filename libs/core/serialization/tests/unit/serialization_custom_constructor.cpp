@@ -34,7 +34,7 @@ struct A
 template <typename Archive>
 void serialize(Archive& ar, A& a, unsigned)
 {
-    ar& a.a;
+    ar & a.a;
 }
 
 A* a_factory(hpx::serialization::input_archive& ar)
@@ -72,13 +72,13 @@ struct B
 template <typename Archive>
 void serialize(Archive& ar, B& b, unsigned)
 {
-    ar& b.b;
+    ar & b.b;
 }
 
 B* b_factory(hpx::serialization::input_archive& ar)
 {
     double b;
-    ar& b;
+    ar & b;
 
     bool flag = (b < 8);
     return new B(b, flag);
@@ -104,7 +104,7 @@ struct C
 template <typename Archive, typename T>
 void serialize(Archive& ar, C<T>& c, unsigned)
 {
-    ar& c.c;
+    ar & c.c;
 }
 
 template <typename T>

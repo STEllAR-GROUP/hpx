@@ -53,7 +53,7 @@ namespace jacobi_smp {
         {
             for (std::size_t y = 1, j = 0; y < n - 1; y += block_size, ++j)
             {
-                std::size_t y_end = (std::min)(y + block_size, n - 1);
+                std::size_t y_end = (std::min) (y + block_size, n - 1);
                 std::vector<hpx::shared_future<void>> trigger;
                 trigger.reserve(3);
                 trigger.push_back((*deps_old)[j]);

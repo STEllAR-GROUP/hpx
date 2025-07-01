@@ -550,5 +550,5 @@ namespace hpx {
                 return default_desc_;
             }
         }    // namespace detail
-    }        // namespace local
+    }    // namespace local
 }    // namespace hpx

@@ -707,7 +707,8 @@ namespace hpx::detail {
             using StrT = std::basic_string<CharT, Traits, Alloc>;
             using Tr = typename StrT::traits_type;
 
-            typename StrT::size_type const rlen = (std::min)(n, s.size() - pos);
+            typename StrT::size_type const rlen =
+                (std::min) (n, s.size() - pos);
             size_type const sz = (nubits != npos ? nubits : rlen);
 
             bits_.resize(calc_num_blocks(sz));
@@ -1533,7 +1534,7 @@ namespace hpx::detail {
         using result_type = unsigned long;
 
         size_type const maximum_size =
-            (std::min)(nubits_, static_cast<size_type>(ulong_width));
+            (std::min) (nubits_, static_cast<size_type>(ulong_width));
 
         size_type const last_block = block_index(maximum_size - 1);
 
@@ -1747,7 +1748,7 @@ namespace hpx::detail {
             return false;
         }
 
-        size_type leqsize((std::min)(asize, bsize));
+        size_type leqsize((std::min) (asize, bsize));
 
         for (size_type ii = 0; ii < leqsize; ++ii, --asize, --bsize)
         {
@@ -1784,7 +1785,7 @@ namespace hpx::detail {
             return true;
         }
 
-        size_type leqsize((std::min)(asize, bsize));
+        size_type leqsize((std::min) (asize, bsize));
         HPX_ASSERT(leqsize == 3);
 
         // Since we are storing the most significant bit at pos == size() - 1,

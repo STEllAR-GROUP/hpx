@@ -470,7 +470,7 @@ int RemoveCompletions()
             {
                 for (std::vector<hpx::future<int>>::iterator fut =
                          futvec.begin();
-                     fut != futvec.end();)
+                    fut != futvec.end();)
                 {
                     if (fut->is_ready())
                     {
@@ -904,7 +904,7 @@ void test_read(uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
             ActiveFutures[i].clear();
         }
         DEBUG_ONLY(double movetime = movetimer.elapsed();
-                   int numwait = static_cast<int>(final_list.size());)
+            int numwait = static_cast<int>(final_list.size());)
         hpx::chrono::high_resolution_timer futuretimer;
 
         DEBUG_OUTPUT(1, "Waiting for whena_all future on rank " << rank);

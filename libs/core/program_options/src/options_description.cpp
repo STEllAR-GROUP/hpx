@@ -33,7 +33,7 @@ namespace hpx::program_options {
         {
             std::basic_string<Char> result;
             for (typename std::basic_string<Char>::size_type i = 0;
-                 i < str.size(); ++i)
+                i < str.size(); ++i)
             {
                 result.append(1, static_cast<Char>(std::tolower(str[i])));
             }
@@ -599,7 +599,7 @@ namespace hpx::program_options {
                 else
                 {
                     for (std::size_t pad = first_column_width - ss.str().size();
-                         pad > 0; --pad)
+                        pad > 0; --pad)
                     {
                         os.put(' ');
                     }
@@ -620,19 +620,19 @@ namespace hpx::program_options {
             option_description const& opt = *m_options[i];
             std::stringstream ss;
             ss << "  " << opt.format_name() << ' ' << opt.format_parameter();
-            width = (std::max)(width, ss.str().size());
+            width = (std::max) (width, ss.str().size());
         }
 
         /* Get width of groups as well*/
         for (auto const& group : groups)
-            width = (std::max)(width, group->get_option_column_width());
+            width = (std::max) (width, group->get_option_column_width());
 
         /* this is the column were description should start, if first
            column is longer, we go to a new line */
         std::size_t const start_of_description_column =
             m_line_length - m_min_description_length;
 
-        width = (std::min)(width, start_of_description_column - 1);
+        width = (std::min) (width, start_of_description_column - 1);
 
         /* add an additional space to improve readability */
         ++width;

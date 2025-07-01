@@ -34,7 +34,7 @@ struct matrix_numa_binder : hpx::compute::host::numa_binding_helper<T>
     {
         int const cache_line_size = hpx::threads::get_cache_line_size();
         int const page_size = hpx::threads::get_memory_page_size();
-        int const alignment = (std::max)(page_size, cache_line_size);
+        int const alignment = (std::max) (page_size, cache_line_size);
         int const elems_align = (alignment / sizeof(T));
         rows_page_ = elems_align;
         leading_dim_ =

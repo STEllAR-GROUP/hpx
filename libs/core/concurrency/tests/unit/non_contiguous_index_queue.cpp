@@ -47,7 +47,7 @@ void test_basic(std::uint32_t placement_step)
 
         std::uint32_t count = 0;
         for (std::uint32_t curr_expected = first; curr_expected < last;
-             curr_expected += step, ++count)
+            curr_expected += step, ++count)
         {
             hpx::optional<std::uint32_t> curr = q.pop_left();
             HPX_TEST(curr);
@@ -70,7 +70,7 @@ void test_basic(std::uint32_t placement_step)
 
         std::uint32_t count = 0;
         for (std::uint32_t curr_expected = last - step; curr_expected >= first;
-             curr_expected -= step, ++count)
+            curr_expected -= step, ++count)
         {
             hpx::optional<std::uint32_t> curr = q.pop_right();
             HPX_TEST(curr);
@@ -88,7 +88,7 @@ void test_basic(std::uint32_t placement_step)
 
         count = 0;
         for (std::uint32_t curr_expected = last - step; curr_expected >= first;
-             curr_expected -= step, ++count)
+            curr_expected -= step, ++count)
         {
             hpx::optional<std::uint32_t> curr = q.pop_right();
             HPX_TEST(curr);

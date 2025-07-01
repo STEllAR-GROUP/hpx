@@ -163,7 +163,7 @@ namespace hpx::parallel::util::detail {
 
         while (count != 0)
         {
-            std::size_t chunk = (std::min)(count, *chunk_size_it);
+            std::size_t chunk = (std::min) (count, *chunk_size_it);
             HPX_ASSERT(chunk != 0);
 
             shape.emplace_back(*data_it, first, chunk);

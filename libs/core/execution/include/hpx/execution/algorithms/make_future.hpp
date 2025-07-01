@@ -158,7 +158,7 @@ namespace hpx::execution::experimental {
                 other_allocator const& alloc,
 #if defined(HPX_HAVE_STDEXEC)
                 decltype(std::declval<hpx::execution::experimental::run_loop>()
-                             .get_scheduler()) const& sched,
+                        .get_scheduler()) const& sched,
 #else
                 hpx::execution::experimental::run_loop_scheduler const& sched,
 #endif
@@ -169,7 +169,7 @@ namespace hpx::execution::experimental {
               // stdexec, so it is subect to change. This is currently relying
               // on the env struct to expose __loop_ as a public member.
               , loop(*hpx::execution::experimental::get_env(schedule(sched))
-                          .__loop_)
+                        .__loop_)
 #else
               , loop(sched.get_run_loop())
 #endif
@@ -234,7 +234,7 @@ namespace hpx::execution::experimental {
         auto make_future_with_run_loop(
 #if defined(HPX_HAVE_STDEXEC)
             decltype(std::declval<hpx::execution::experimental::run_loop>()
-                         .get_scheduler()) const& sched,
+                    .get_scheduler()) const& sched,
 #else
             hpx::execution::experimental::run_loop_scheduler const& sched,
 #endif
@@ -363,7 +363,7 @@ namespace hpx::execution::experimental {
         friend auto tag_invoke(make_future_t,
 #if defined(HPX_HAVE_STDEXEC)
             decltype(std::declval<hpx::execution::experimental::run_loop>()
-                         .get_scheduler()) const& sched,
+                    .get_scheduler()) const& sched,
 #else
             hpx::execution::experimental::run_loop_scheduler const& sched,
 #endif

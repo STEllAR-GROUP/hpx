@@ -136,7 +136,7 @@ namespace hpx::resiliency::experimental {
             {
                 // spawn hierarchical tasks
                 std::size_t chunk_size = (size + num_spread) / num_spread - 1;
-                chunk_size = (std::max)(chunk_size, num_tasks);
+                chunk_size = (std::max) (chunk_size, num_tasks);
 
                 while (size > chunk_size)
                 {

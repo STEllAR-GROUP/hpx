@@ -94,7 +94,7 @@ namespace hpx::performance_counters::server {
             template <typename Accumulator>
             static double call(Accumulator const& accum)
             {
-                return (boost::accumulators::min)(accum);
+                return (boost::accumulators::min) (accum);
             }
         };
 
@@ -104,7 +104,7 @@ namespace hpx::performance_counters::server {
             template <typename Accumulator>
             static double call(Accumulator const& accum)
             {
-                return (boost::accumulators::max)(accum);
+                return (boost::accumulators::max) (accum);
             }
         };
 

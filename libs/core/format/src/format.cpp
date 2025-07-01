@@ -29,7 +29,7 @@ namespace hpx::util::detail {
         static constexpr std::size_t digits10 =
             std::numeric_limits<std::size_t>::digits10 + 1;
         char buffer[digits10 + 1] = {};
-        std::memcpy(buffer, str.data(), (std::min)(str.size(), digits10));
+        std::memcpy(buffer, str.data(), (std::min) (str.size(), digits10));
 
         char const* first = buffer;
         char* last = buffer;
