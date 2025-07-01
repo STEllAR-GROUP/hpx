@@ -1987,12 +1987,6 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # is illegal in the current source character set
     hpx_add_compile_flag(-wd4828)
 
-    if(HPX_WITH_CXX_STANDARD LESS 20)
-      # support for attribute 'msvc::no_unique_address' in C++17 and earlier is
-      # a vendor extension
-      hpx_add_compile_flag(-wd4848)
-    endif()
-
     if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
       # unary minus operator applied to unsigned type, result still unsigned
       hpx_add_compile_flag(-wd4146)
