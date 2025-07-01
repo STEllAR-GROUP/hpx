@@ -1,5 +1,5 @@
 //  Copyright (c) 2011-2014 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //  Copyright (c) 2013-2014 Patricia Grubel
 //
@@ -96,7 +96,8 @@ private:
                 hpx::threads::thread_priority::normal
                 // Place in the target OS-thread's queue.
                 ,
-                hpx::threads::thread_schedule_hint(target_osthread));
+                hpx::threads::thread_schedule_hint(
+                    static_cast<std::int16_t>(target_osthread)));
             hpx::threads::register_work(data);
         }
 
@@ -111,7 +112,8 @@ private:
                 hpx::threads::thread_priority::normal
                 // Place in the target OS-thread's queue.
                 ,
-                hpx::threads::thread_schedule_hint(target_osthread));
+                hpx::threads::thread_schedule_hint(
+                    static_cast<std::int16_t>(target_osthread)));
             hpx::threads::register_work(data);
         }
     }
@@ -169,7 +171,8 @@ private:
                 nullptr,    // No HPX-thread name.
                 // Place in the target OS-thread's queue.
                 hpx::threads::thread_priority::normal,
-                hpx::threads::thread_schedule_hint(i));
+                hpx::threads::thread_schedule_hint(
+                    static_cast<std::int16_t>(i)));
             hpx::threads::register_work(data);
         }
 

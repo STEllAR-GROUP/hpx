@@ -1,5 +1,5 @@
 //  Copyright (C) 2020 ETH Zurich
-//  Copyright (C) 2022 Hartmut Kaiser
+//  Copyright (C) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -51,6 +51,7 @@ void test_basic(std::uint32_t placement_step)
         {
             hpx::optional<std::uint32_t> curr = q.pop_left();
             HPX_TEST(curr);
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             HPX_TEST_EQ(curr.value(), curr_expected);
         }
         HPX_TEST_EQ(count, (11u - 3u) / placement_step);
@@ -74,6 +75,7 @@ void test_basic(std::uint32_t placement_step)
         {
             hpx::optional<std::uint32_t> curr = q.pop_right();
             HPX_TEST(curr);
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             HPX_TEST_EQ(curr.value(), curr_expected);
         }
         HPX_TEST_EQ(count, (11u - 3u) / placement_step);
@@ -92,6 +94,7 @@ void test_basic(std::uint32_t placement_step)
         {
             hpx::optional<std::uint32_t> curr = q.pop_right();
             HPX_TEST(curr);
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             HPX_TEST_EQ(curr.value(), curr_expected);
         }
         HPX_TEST_EQ(count, (11u - 3u) / placement_step);

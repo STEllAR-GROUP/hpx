@@ -55,6 +55,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <type_traits>
@@ -214,7 +215,7 @@ namespace hpx::parallel::detail::rfa {
         static constexpr int FOLD = FOLD_;
 
     private:
-        std::array<ftype, 2 * FOLD> data = {{0}};
+        std::array<ftype, static_cast<std::size_t>(2) * FOLD> data = {{0}};
 
         ///Floating-point precision bin width
         static constexpr auto BIN_WIDTH =

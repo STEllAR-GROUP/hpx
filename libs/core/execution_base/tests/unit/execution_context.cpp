@@ -17,7 +17,7 @@
 
 std::size_t dummy_called = 0;
 
-struct dummy_context : hpx::execution_base::context_base
+struct dummy_context final : hpx::execution_base::context_base
 {
     hpx::execution_base::resource_base const& resource() const noexcept override
     {

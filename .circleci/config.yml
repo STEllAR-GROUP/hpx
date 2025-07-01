@@ -335,7 +335,7 @@ jobs:
   # We need a full clone here to be able to compare to master.
   spellcheck:
     docker:
-      - image: stellargroup/build_env:14
+      - image: stellargroup/build_env:17
     resource_class: large  # Increased memory allocation
     steps:
       - checkout:

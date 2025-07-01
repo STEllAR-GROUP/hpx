@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -35,7 +35,7 @@ void test_equal1(IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -51,7 +51,7 @@ void test_equal1(IteratorTag)
     }
 
     {
-        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
         ++c1[dis(gen)];    //-V104
         bool result = hpx::equal(
             iterator(std::begin(c1)), iterator(std::end(c1)), std::begin(c2));
@@ -76,7 +76,7 @@ void test_equal1(ExPolicy&& policy, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -92,7 +92,7 @@ void test_equal1(ExPolicy&& policy, IteratorTag)
     }
 
     {
-        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
         ++c1[dis(gen)];    //-V104
         bool result = hpx::equal(policy, iterator(std::begin(c1)),
             iterator(std::end(c1)), std::begin(c2));
@@ -122,7 +122,7 @@ void test_equal1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -143,7 +143,7 @@ void test_equal1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     }
 
     {
-        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
         ++c1[dis(gen)];    //-V104
 
         auto snd_result =
@@ -184,7 +184,7 @@ void test_equal1_async(ExPolicy&& p, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -201,7 +201,7 @@ void test_equal1_async(ExPolicy&& p, IteratorTag)
     }
 
     {
-        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
         ++c1[dis(gen)];    //-V104
 
         hpx::future<bool> result = hpx::equal(p, iterator(std::begin(c1)),
@@ -226,7 +226,7 @@ void test_equal2(IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -242,7 +242,7 @@ void test_equal2(IteratorTag)
     }
 
     {
-        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
         ++c1[dis(gen)];    //-V104
         bool result = hpx::equal(iterator(std::begin(c1)),
             iterator(std::end(c1)), std::begin(c2), std::equal_to<>());
@@ -267,7 +267,7 @@ void test_equal2(ExPolicy&& policy, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -283,7 +283,7 @@ void test_equal2(ExPolicy&& policy, IteratorTag)
     }
 
     {
-        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
         ++c1[dis(gen)];    //-V104
         bool result = hpx::equal(policy, iterator(std::begin(c1)),
             iterator(std::end(c1)), std::begin(c2), std::equal_to<>());
@@ -313,7 +313,7 @@ void test_equal2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -335,7 +335,7 @@ void test_equal2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     }
 
     {
-        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
         ++c1[dis(gen)];    //-V104
 
         auto snd_result = tt::sync_wait(
@@ -376,7 +376,7 @@ void test_equal2_async(ExPolicy&& p, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -393,7 +393,7 @@ void test_equal2_async(ExPolicy&& p, IteratorTag)
     }
 
     {
-        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
         ++c1[dis(gen)];    //-V104
 
         hpx::future<bool> result = hpx::equal(p, iterator(std::begin(c1)),
@@ -418,7 +418,7 @@ void test_equal_exception(IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -457,7 +457,7 @@ void test_equal_exception(ExPolicy&& policy, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -492,7 +492,7 @@ void test_equal_exception_async(ExPolicy&& p, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -535,7 +535,7 @@ void test_equal_bad_alloc(ExPolicy&& policy, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -569,7 +569,7 @@ void test_equal_bad_alloc_async(ExPolicy&& p, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 

@@ -100,7 +100,7 @@ struct almost_equal
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename ExPolicy, typename Tkey, typename Tval, typename Op,

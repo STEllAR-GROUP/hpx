@@ -485,17 +485,16 @@ namespace hpx::parallel {
         {
             using result_type = util::in_in_out_result<Iter1, Iter2, Iter3>;
 
-            auto f1 = [first1, last1, first2, last2, dest,
-                          policy = HPX_FORWARD(ExPolicy, policy),
+            auto f1 = [first1, last1, first2, last2, dest, policy,
                           comp = HPX_FORWARD(Comp, comp),
                           proj1 = HPX_FORWARD(Proj1, proj1),
                           proj2 = HPX_FORWARD(
                               Proj2, proj2)]() mutable -> result_type {
                 try
                 {
-                    parallel_merge_helper(HPX_MOVE(policy), first1, last1,
-                        first2, last2, dest, HPX_MOVE(comp), HPX_MOVE(proj1),
-                        HPX_MOVE(proj2), false, lower_bound_helper());
+                    parallel_merge_helper(policy, first1, last1, first2, last2,
+                        dest, HPX_MOVE(comp), HPX_MOVE(proj1), HPX_MOVE(proj2),
+                        false, lower_bound_helper());
 
                     auto const len1 = detail::distance(first1, last1);
                     auto const len2 = detail::distance(first2, last2);

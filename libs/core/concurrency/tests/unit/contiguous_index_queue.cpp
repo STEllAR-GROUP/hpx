@@ -49,6 +49,7 @@ void test_basic()
         {
             hpx::optional<std::uint32_t> curr = q.pop_left();
             HPX_TEST(curr);
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             HPX_TEST_EQ(curr.value(), curr_expected);
         }
 
@@ -68,6 +69,7 @@ void test_basic()
         {
             hpx::optional<std::uint32_t> curr = q.pop_right();
             HPX_TEST(curr);
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             HPX_TEST_EQ(curr.value(), curr_expected);
         }
 
@@ -84,6 +86,7 @@ void test_basic()
         {
             hpx::optional<std::uint32_t> curr = q.pop_right();
             HPX_TEST(curr);
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             HPX_TEST_EQ(curr.value(), curr_expected);
         }
 

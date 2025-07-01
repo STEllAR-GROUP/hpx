@@ -1007,8 +1007,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     DEBUG_OUTPUT(2, "Allocating local storage on rank " << rank);
     allocate_local_storage(options.local_storage_MB * 1024 * 1024);
     //
-    uint64_t num_transfer_slots =
-        1024 * 1024 * options.local_storage_MB / options.transfer_size_B;
+    std::uint64_t num_transfer_slots = static_cast<std::uint64_t>(1024) *
+        static_cast<std::uint64_t>(1024) * options.local_storage_MB /
+        options.transfer_size_B;
     DEBUG_OUTPUT(1,
         "num ranks " << nranks << ", num_transfer_slots " << num_transfer_slots
                      << " on rank " << rank);

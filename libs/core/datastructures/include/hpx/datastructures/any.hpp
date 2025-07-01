@@ -1,6 +1,6 @@
 /*=============================================================================
     Copyright (c) 2013 Shuangyang Yang
-    Copyright (c) 2007-2024 Hartmut Kaiser
+    Copyright (c) 2007-2025 Hartmut Kaiser
     Copyright (c) Christopher Diggins 2005
     Copyright (c) Pablo Aguilar 2005
     Copyright (c) Kevlin Henney 2001
@@ -259,6 +259,7 @@ namespace hpx::util::detail::any {
             }
             static T& construct(void** f)
             {
+                // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
                 new (f) T;
                 return *reinterpret_cast<T*>(f);
             }
@@ -282,6 +283,7 @@ namespace hpx::util::detail::any {
             }
             static void clone(void* const* src, void** dest)
             {
+                // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
                 new (dest) T(*reinterpret_cast<T const*>(src));
             }
             static void copy(void* const* src, void** dest)
@@ -747,6 +749,7 @@ namespace hpx::util {
         static void new_object(void*& object, std::true_type, Ts&&... ts)
         {
             using value_type = std::decay_t<T>;
+            // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             new (&object) value_type(HPX_FORWARD(Ts, ts)...);
         }
 
@@ -1116,6 +1119,7 @@ namespace hpx::util {
         static void new_object(void*& object, std::true_type, Ts&&... ts)
         {
             using value_type = std::decay_t<T>;
+            // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             new (&object) value_type(HPX_FORWARD(Ts, ts)...);
         }
 
@@ -1367,9 +1371,11 @@ namespace hpx::util {
             static T* call(
                 basic_any<IArch, OArch, Char, Copyable>* operand) noexcept
             {
+                // NOLINTBEGIN(bugprone-casting-through-void)
                 return get_table<T>::is_small::value ?
                     static_cast<T*>(reinterpret_cast<void*>(&operand->object)) :
                     static_cast<T*>(reinterpret_cast<void*>(operand->object));
+                // NOLINTEND(bugprone-casting-through-void)
             }
         };
 

@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -116,7 +116,8 @@ namespace hpx::execution::experimental {
                     future_data<T, Allocator, OperationState, Derived>,
                     Derived>>
         {
-            HPX_NON_COPYABLE(future_data);
+            future_data& operator=(future_data const&) = delete;
+            future_data& operator=(future_data&&) = delete;
 
             using derived_type = std::conditional_t<std::is_void_v<Derived>,
                 future_data, Derived>;
@@ -129,6 +130,10 @@ namespace hpx::execution::experimental {
 
             operation_state_type op_state;
 
+            // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
+            future_data(future_data const&) = delete;
+            future_data(future_data&&) = delete;
+
             template <typename Sender>
             future_data(init_no_addref no_addref, other_allocator const& alloc,
                 Sender&& sender)
@@ -139,6 +144,7 @@ namespace hpx::execution::experimental {
             {
                 hpx::execution::experimental::start(op_state);
             }
+            // NOLINTEND(bugprone-crtp-constructor-accessibility)
         };
 
         template <typename T, typename Allocator, typename OperationState>

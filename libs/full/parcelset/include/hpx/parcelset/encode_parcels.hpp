@@ -111,8 +111,12 @@ namespace hpx::parcelset {
             std::size_t index = 0;
             for (serialization::serialization_chunk& c : buffer.chunks_)
             {
-                if (c.type_ == serialization::chunk_type::chunk_type_pointer)
+                if (c.type_ == serialization::chunk_type::chunk_type_pointer ||
+                    c.type_ ==
+                        serialization::chunk_type::chunk_type_const_pointer)
+                {
                     chunks.push_back(transmission_chunk_type(index, c.size_));
+                }
                 ++index;
             }
 

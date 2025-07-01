@@ -122,14 +122,15 @@ namespace hpx::program_options {
         {
             std::string const& first_long_name = *m_long_names.begin();
             if (first_long_name.find('*') != std::string::npos)
+            {
                 // The '*' character means we're long_name
                 // matches only part of the input. So, returning
                 // long name will remove some of the information,
                 // and we have to return the option as specified
                 // in the source.
-                return option;
-            else
-                return first_long_name;
+                return option;    // NOLINT(bugprone-return-const-ref-from-parameter)
+            }
+            return first_long_name;
         }
         else
             return m_short_name;
@@ -480,7 +481,8 @@ namespace hpx::program_options {
                     auto remaining = static_cast<std::size_t>(
                         std::distance(line_begin, par_end));
                     auto line_end = line_begin +
-                        (remaining < line_length ? remaining : line_length);
+                        static_cast<std::ptrdiff_t>(
+                            remaining < line_length ? remaining : line_length);
 
                     // prevent chopped words
                     // Is line_end between two non-space characters?

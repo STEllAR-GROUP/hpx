@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2-25 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -257,8 +257,10 @@ namespace hpx::detail {
             // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
             storage<T>* ptr;
 
+            // NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
             // NOLINTNEXTLINE(bugprone-sizeof-expression)
             std::memcpy(&ptr, m_data.data(), sizeof(ptr));
+            // NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
             return ptr;
         }
 
@@ -270,8 +272,10 @@ namespace hpx::detail {
 
         void set_indirect(storage<T>* ptr) noexcept
         {
+            // NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
             // NOLINTNEXTLINE(bugprone-sizeof-expression)
             std::memcpy(m_data.data(), &ptr, sizeof(ptr));
+            // NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
 
             // safety check to guarantee the lowest bit is 0
             HPX_ASSERT(!is_direct());
@@ -498,6 +502,7 @@ namespace hpx::detail {
                     ++ptr)
                 {
                     hpx::construct_at(
+                        // NOLINTNEXTLINE(bugprone-use-after-move)
                         static_cast<T*>(ptr), HPX_FORWARD(Args, args)...);
                 }
             }

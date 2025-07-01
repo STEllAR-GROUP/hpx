@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013-2023 Hartmut Kaiser
+//  Copyright (c) 2013-2025 Hartmut Kaiser
 //  Copyright (c) 2014-2019 Agustin Berge
 //  Copyright (c) 2017 Google
 //
@@ -193,6 +193,7 @@ namespace hpx::util::detail {
                     buffer = vtable::template allocate<T>(
                         storage, function_storage_size);
                 }
+                // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
                 object = ::new (buffer) T(HPX_FORWARD(F, f));
             }
             else

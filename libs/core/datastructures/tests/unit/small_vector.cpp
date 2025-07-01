@@ -412,10 +412,11 @@ namespace test {
     {
         check_equal_containers(std_deque, seq_container);
 
-        std_deque.insert(
-            std_deque.begin() + index, input_deque.begin(), input_deque.end());
-        seq_container.insert(seq_container.begin() + index, input_deque.begin(),
-            input_deque.end());
+        std_deque.insert(std_deque.begin() + static_cast<std::ptrdiff_t>(index),
+            input_deque.begin(), input_deque.end());
+        seq_container.insert(
+            seq_container.begin() + static_cast<std::ptrdiff_t>(index),
+            input_deque.begin(), input_deque.end());
 
         check_equal_containers(std_deque, seq_container);
     }

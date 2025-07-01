@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -381,6 +381,7 @@ namespace hpx::lcos::detail {
           : base_type(no_addref)
         {
             auto* value_ptr = reinterpret_cast<result_type*>(&storage_);
+            // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             construct(value_ptr, HPX_FORWARD(Ts, ts)...);
             state_.store(value, std::memory_order_relaxed);
         }
@@ -450,6 +451,7 @@ namespace hpx::lcos::detail {
 
             // set the data
             auto* value_ptr = reinterpret_cast<result_type*>(&storage_);
+            // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             construct(value_ptr, HPX_FORWARD(Ts, ts)...);
 
             // At this point the lock needs to be acquired to safely access the
@@ -695,6 +697,7 @@ namespace hpx::lcos::detail {
         using init_no_addref =
             typename future_data_base<Result>::init_no_addref;
 
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         future_data() = default;
 
         explicit future_data(init_no_addref no_addref) noexcept
@@ -717,6 +720,8 @@ namespace hpx::lcos::detail {
 
         future_data(future_data const&) = delete;
         future_data(future_data&&) = delete;
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
+
         future_data& operator=(future_data const&) = delete;
         future_data& operator=(future_data&&) = delete;
 
@@ -735,6 +740,7 @@ namespace hpx::lcos::detail {
         using other_allocator = typename std::allocator_traits<
             Allocator>::template rebind_alloc<allocated_type>;
 
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         explicit future_data_allocator(other_allocator const& alloc) noexcept
           : future_data<Result>()
           , alloc_(alloc)
@@ -766,6 +772,8 @@ namespace hpx::lcos::detail {
         }
         // clang-format on
 
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
+
     protected:
         void destroy() noexcept override
         {
@@ -790,6 +798,7 @@ namespace hpx::lcos::detail {
         using init_no_addref = typename base_type::init_no_addref;
 
     public:
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         timed_future_data() = default;
 
         template <typename Result_>
@@ -833,6 +842,7 @@ namespace hpx::lcos::detail {
                     hpx::detail::access_exception(ec));
             }
         }
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -849,6 +859,7 @@ namespace hpx::lcos::detail {
         using base_type::mtx_;
 
     public:
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         task_base()
           : base_type()
           , started_(false)
@@ -860,6 +871,7 @@ namespace hpx::lcos::detail {
           , started_(false)
         {
         }
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
 
         void execute_deferred(error_code& /*ec*/ = throws) override
         {
@@ -1008,6 +1020,7 @@ namespace hpx::lcos::detail {
         }
 
     public:
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         cancelable_task_base() noexcept
           : id_(threads::invalid_thread_id)
         {
@@ -1018,6 +1031,7 @@ namespace hpx::lcos::detail {
           , id_(threads::invalid_thread_id)
         {
         }
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
 
     private:
         struct reset_id

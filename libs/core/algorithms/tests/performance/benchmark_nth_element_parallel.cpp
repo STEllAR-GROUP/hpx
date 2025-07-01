@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstddef>
 #include <iostream>
 #include <random>
 #include <stdio.h>
@@ -51,8 +52,8 @@ void function01(void)
     for (uint64_t i = 0; i < NELEM; ++i)
     {
         B = A;
-        hpx::nth_element(::hpx::execution::par, B.begin(), B.begin() + i,
-            B.end(), compare_t());
+        hpx::nth_element(::hpx::execution::par, B.begin(),
+            B.begin() + static_cast<std::ptrdiff_t>(i), B.end(), compare_t());
     }
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<long unsigned, std::nano> nanotime1 = end - start;
@@ -63,7 +64,8 @@ void function01(void)
     for (uint64_t i = 0; i < NELEM; ++i)
     {
         B = A;
-        std::nth_element(B.begin(), B.begin() + i, B.end(), compare_t());
+        std::nth_element(B.begin(), B.begin() + static_cast<std::ptrdiff_t>(i),
+            B.end(), compare_t());
     }
     end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<long unsigned, std::nano> nanotime2 = end - start;
@@ -100,8 +102,8 @@ void function02(void)
 
         B = A;
         auto start = std::chrono::high_resolution_clock::now();
-        hpx::nth_element(::hpx::execution::par, B.begin(), B.begin() + i,
-            B.end(), compare_t());
+        hpx::nth_element(::hpx::execution::par, B.begin(),
+            B.begin() + static_cast<std::ptrdiff_t>(i), B.end(), compare_t());
         //hpx::nth_element (B.begin(), B.begin() + i, B.end(),compare_t());
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<long unsigned, std::nano> nanotime1 = end - start;
@@ -112,7 +114,8 @@ void function02(void)
 
         B = A;
         start = std::chrono::high_resolution_clock::now();
-        std::nth_element(B.begin(), B.begin() + i, B.end(), compare_t());
+        std::nth_element(B.begin(), B.begin() + static_cast<std::ptrdiff_t>(i),
+            B.end(), compare_t());
         end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<long unsigned, std::nano> nanotime2 = end - start;
         ac2 += nanotime2.count();

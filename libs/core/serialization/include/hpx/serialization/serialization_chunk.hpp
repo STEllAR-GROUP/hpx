@@ -31,7 +31,8 @@ namespace hpx::serialization {
     enum class chunk_type : std::uint8_t
     {
         chunk_type_index = 0,
-        chunk_type_pointer = 1
+        chunk_type_const_pointer = 1,
+        chunk_type_pointer = 2
     };
 
     struct serialization_chunk
@@ -44,12 +45,14 @@ namespace hpx::serialization {
 
         [[nodiscard]] constexpr void const* data() const noexcept
         {
-            HPX_ASSERT(type_ == chunk_type::chunk_type_pointer);
+            HPX_ASSERT(type_ == chunk_type::chunk_type_pointer ||
+                type_ == chunk_type::chunk_type_const_pointer);
             return data_.cpos_;
         }
         [[nodiscard]] constexpr void* data() noexcept
         {
-            HPX_ASSERT(type_ == chunk_type::chunk_type_pointer);
+            HPX_ASSERT(type_ == chunk_type::chunk_type_pointer ||
+                type_ == chunk_type::chunk_type_const_pointer);
             return data_.pos_;
         }
         [[nodiscard]] constexpr std::size_t size() const noexcept

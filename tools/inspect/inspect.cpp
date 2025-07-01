@@ -456,7 +456,6 @@ namespace {
         {
             // display error messages with group indication
             error_msg current;
-            string sep;
             for (error_msg_vector::iterator itr(msgs.begin());
                  itr != msgs.end(); ++itr)
             {

@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -725,6 +725,7 @@ struct example_scheduler_template
     std::atomic<bool>& execute_called;
     std::atomic<bool>& tag_invoke_overload_called;
 
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     example_scheduler_template(std::atomic<bool>& schedule_called,
         std::atomic<bool>& execute_called,
         std::atomic<bool>& tag_invoke_overload_called)

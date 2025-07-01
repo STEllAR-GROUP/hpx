@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0 Distributed under the Boost Software
 //  License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -99,6 +99,7 @@ void run_test_cases()
                             {
                                 not_good_stream.exceptions(masks[mi]);
                             }
+                            // NOLINTNEXTLINE(bugprone-empty-catch)
                             catch (...)
                             {
                             }
@@ -221,6 +222,7 @@ void run_test_cases()
                         {
                             not_good_stream.exceptions(masks[mi]);
                         }
+                        // NOLINTNEXTLINE(bugprone-empty-catch)
                         catch (...)
                         {
                         }

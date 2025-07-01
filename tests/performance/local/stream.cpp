@@ -51,7 +51,8 @@ hpx::threads::topology& retrieve_topology()
 ///////////////////////////////////////////////////////////////////////////////
 double mysecond()
 {
-    return hpx::chrono::high_resolution_clock::now() * 1e-9;
+    return static_cast<double>(hpx::chrono::high_resolution_clock::now()) *
+        1e-9;
 }
 
 int checktick()
@@ -496,9 +497,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
             << "Array size = " << vector_size << " (elements), "
                "Offset = " << offset << " (elements)\n"
             << "Memory per array = "
-                << sizeof(STREAM_TYPE) * (vector_size / 1024. / 1024.) << " MiB "
+                << sizeof(STREAM_TYPE) *
+                    (static_cast<double>(vector_size) / 1024. / 1024.) << " MiB "
             << "(= "
-                <<  sizeof(STREAM_TYPE) * (vector_size / 1024. / 1024. / 1024.)
+                <<  sizeof(STREAM_TYPE) *
+                    (static_cast<double>(vector_size) / 1024. / 1024. / 1024.)
                 << " GiB).\n"
             << "Each kernel will be executed " << iterations << " times.\n"
             << " The *best* time for each kernel (excluding the first iteration)\n"
@@ -688,8 +691,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     if (!csv)
     {
-        std::cout << "\nTotal time: " << time_total
-                  << " (per iteration: " << time_total / iterations << ")\n";
+        std::cout << "\nTotal time: " << time_total << " (per iteration: "
+                  << time_total / static_cast<double>(iterations) << ")\n";
     }
 
     if (!csv)

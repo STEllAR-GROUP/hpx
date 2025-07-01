@@ -147,6 +147,7 @@ namespace hpx::parcelset::policies::tcp {
         if (acceptor_ != nullptr)
         {
             std::error_code ec;
+            // NOLINTNEXTLINE(bugprone-unused-return-value)
             acceptor_->close(ec);
             delete acceptor_;
             acceptor_ = nullptr;
@@ -180,6 +181,7 @@ namespace hpx::parcelset::policies::tcp {
                 {
                     asio::ip::tcp::socket& s = sender_connection->socket();
                     s.close();
+                    // NOLINTNEXTLINE(bugprone-unused-return-value)
                     s.connect(*it, error);
                     if (!error)
                         break;

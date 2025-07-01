@@ -13,7 +13,7 @@ module load boost/1.84.0-${build_type,,}
 #export CXX=hipcc
 
 export HPXRUN_RUNWRAPPER=srun
-export CXX_STD="23"
+export CXX_STD="20"
 
 configure_extra_options+=" -DHPX_WITH_CXX_STANDARD=${CXX_STD}"
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"

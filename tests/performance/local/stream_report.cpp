@@ -95,7 +95,8 @@ hpx::threads::topology& retrieve_topology()
 ///////////////////////////////////////////////////////////////////////////////
 double mysecond()
 {
-    return hpx::chrono::high_resolution_clock::now() * 1e-9;
+    return static_cast<double>(hpx::chrono::high_resolution_clock::now()) *
+        1e-9;
 }
 
 int checktick()

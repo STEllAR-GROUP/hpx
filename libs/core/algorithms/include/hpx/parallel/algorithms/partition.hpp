@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2024 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //  Copyright (c)      2017 Taeguk Kwon
 //  Copyright (c)      2021 Akhil J Nair
 //
@@ -505,8 +505,10 @@ namespace hpx::parallel {
             typename hpx::tuple_element<2, Tuple>::type>
         tuple_to_pair(Tuple&& t)
     {
-        return std::make_pair(
-            hpx::get<1>(HPX_MOVE(t)), hpx::get<2>(HPX_MOVE(t)));
+        // NOLINTBEGIN(bugprone-use-after-move)
+        return std::make_pair(hpx::get<1>(HPX_FORWARD(Tuple, t)),
+            hpx::get<2>(HPX_FORWARD(Tuple, t)));
+        // NOLINTEND(bugprone-use-after-move)
     }
 
     template <typename Tuple>
@@ -734,6 +736,7 @@ namespace hpx::parallel {
                 if (first == last)
                     break;
 
+                // NOLINTNEXTLINE(bugprone-inc-dec-in-conditions)
                 while (first != --last &&
                     !HPX_INVOKE(pred, HPX_INVOKE(proj, *last)))
                     ;
@@ -1098,6 +1101,7 @@ namespace hpx::parallel {
                         if (right_iter->empty())
                         {
                             if (right_iter == std::begin(remaining_blocks) ||
+                                // NOLINTNEXTLINE(bugprone-inc-dec-in-conditions)
                                 (--right_iter)->block_no < 0)
                                 break;
                         }
@@ -1542,6 +1546,7 @@ namespace hpx::parallel {
                             bool f = hpx::invoke(
                                 pred, hpx::invoke(proj, get<0>(*it)));
 
+                            // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
                             if ((get<1>(*it) = f))
                                 ++true_count;
                         });

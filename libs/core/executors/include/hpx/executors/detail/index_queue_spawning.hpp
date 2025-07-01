@@ -56,8 +56,10 @@ namespace hpx::parallel::execution::detail {
         HPX_FORCEINLINE static constexpr void bulk_invoke_helper(
             hpx::util::index_pack<Is...>, F&& f, T&& t, Ts&& ts)
         {
+            // NOLINTBEGIN(bugprone-use-after-move)
             HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t),
                 hpx::get<Is>(HPX_FORWARD(Ts, ts))...);
+            // NOLINTEND(bugprone-use-after-move)
         }
 
         // Perform the work in one element indexed by index. The index

@@ -1,5 +1,5 @@
 //  Copyright (c) 2013-2014 Thomas Heller
-//  Copyright (c) 2013-2017 Hartmut Kaiser
+//  Copyright (c) 2013-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -411,7 +411,8 @@ namespace hpx { namespace lcos {
 
                     std::size_t next_fan =
                         (std::min) (fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
+                    std::vector<hpx::id_type> ids_next(
+                        it, it + static_cast<std::ptrdiff_t>(next_fan));
 
                     hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
@@ -420,7 +421,7 @@ namespace hpx { namespace lcos {
                             std::true_type(), vs...));
 
                     applied += next_fan;
-                    it += next_fan;
+                    it += static_cast<std::ptrdiff_t>(next_fan);
                 }
             }
 
@@ -471,7 +472,8 @@ namespace hpx { namespace lcos {
 
                     std::size_t next_fan =
                         (std::min) (fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
+                    std::vector<hpx::id_type> ids_next(
+                        it, it + static_cast<std::ptrdiff_t>(next_fan));
 
                     hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
@@ -480,7 +482,7 @@ namespace hpx { namespace lcos {
                             std::false_type(), vs...));
 
                     applied += next_fan;
-                    it += next_fan;
+                    it += static_cast<std::ptrdiff_t>(next_fan);
                 }
             }
 
@@ -524,14 +526,15 @@ namespace hpx { namespace lcos {
 
                     std::size_t next_fan =
                         (std::min) (fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
+                    std::vector<hpx::id_type> ids_next(
+                        it, it + static_cast<std::ptrdiff_t>(next_fan));
 
                     hpx::id_type id(ids_next[0]);
                     hpx::detail::post_colocated<broadcast_impl_action>(id, act,
                         HPX_MOVE(ids_next), global_idx + applied, vs...);
 
                     applied += next_fan;
-                    it += next_fan;
+                    it += static_cast<std::ptrdiff_t>(next_fan);
                 }
             }
         }

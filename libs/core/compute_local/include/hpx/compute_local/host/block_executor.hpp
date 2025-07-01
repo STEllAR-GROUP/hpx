@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -179,9 +179,8 @@ namespace hpx::compute::host {
                     std::advance(part_begin, part_begin_offset);
                     std::advance(part_end, part_end_offset);
                     auto futures = hpx::parallel::execution::bulk_async_execute(
-                        executors_[i], HPX_FORWARD(F, f),
-                        util::iterator_range(part_begin, part_end),
-                        HPX_FORWARD(Ts, ts)...);
+                        executors_[i], f,
+                        util::iterator_range(part_begin, part_end), ts...);
 
                     if constexpr (hpx::traits::is_future_v<decltype(futures)>)
                     {

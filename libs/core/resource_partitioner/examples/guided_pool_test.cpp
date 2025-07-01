@@ -1,5 +1,5 @@
 //  Copyright (c) 2017-2018 John Biddiscombe
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -49,9 +49,11 @@ void async_guided(std::size_t n, bool printout, std::string const& message)
         std::cout << "[async_guided] <std::size_t, bool, const std::string> "
                   << message << " n=" << n << "\n";
     }
+
+    double convert = 2.0 * M_PI / static_cast<double>(n);
     for (std::size_t i(0); i < n; ++i)
     {
-        double f = std::sin(2 * M_PI * i / n);
+        double f = std::sin(convert * static_cast<double>(i));
         if (printout)
         {
             std::cout << "sin(" << i << ") = " << f << ", ";

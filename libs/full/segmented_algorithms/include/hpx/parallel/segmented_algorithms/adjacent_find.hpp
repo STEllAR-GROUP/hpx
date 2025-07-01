@@ -54,8 +54,7 @@ namespace hpx::parallel {
 
             FwdIter output = last;
 
-            util::invoke_projected<Pred, Proj> pred_projected{
-                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
+            util::invoke_projected<Pred, Proj> pred_projected{pred, proj};
 
             if (sit == send)
             {
@@ -94,7 +93,7 @@ namespace hpx::parallel {
                     output = traits::compose(sit, std::prev(end));
                 }
 
-                // handle all of the full partitions
+                // handle all the full partitions
                 if (!found)
                 {
                     for (++sit; sit != send; ++sit)
@@ -133,7 +132,6 @@ namespace hpx::parallel {
                         std::true_type(), beg, end, pred, proj);
                     if (out != end)
                     {
-                        found = true;
                         output = traits::compose(sit, out);
                     }
                 }
@@ -168,8 +166,7 @@ namespace hpx::parallel {
             std::vector<FwdIter> between_segments;
             between_segments.reserve(std::distance(sit, send));
 
-            util::invoke_projected<Pred, Proj> pred_projected{
-                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
+            util::invoke_projected<Pred, Proj> pred_projected{pred, proj};
 
             if (sit == send)
             {
@@ -180,13 +177,13 @@ namespace hpx::parallel {
                 {
                     segments.push_back(hpx::make_future<FwdIter>(
                         dispatch_async(traits::get_id(sit), algo, policy,
-                            forced_seq(), beg, end, pred, proj),
+                            forced_seq(), beg, end, HPX_FORWARD(Pred, pred),
+                            HPX_FORWARD(Proj, proj)),
                         [sit, end, last](
                             local_iterator_type const& out) -> FwdIter {
                             if (out != end)
                                 return traits::compose(sit, out);
-                            else
-                                return last;
+                            return last;
                         }));
                 }
             }
@@ -204,12 +201,11 @@ namespace hpx::parallel {
                             local_iterator_type const& out) -> FwdIter {
                             if (out != end)
                                 return traits::compose(sit, out);
-                            else
-                                return last;
+                            return last;
                         }));
                 }
 
-                // handle all of the full partitions
+                // handle all the full partitions
                 for (++sit; sit != send; ++sit)
                 {
                     beg = traits::begin(sit);
@@ -224,8 +220,7 @@ namespace hpx::parallel {
                                 local_iterator_type const& out) -> FwdIter {
                                 if (out != end)
                                     return traits::compose(sit, out);
-                                else
-                                    return last;
+                                return last;
                             }));
                     }
                 }
@@ -238,7 +233,8 @@ namespace hpx::parallel {
                     between_segments.push_back(traits::compose(sit, beg));
                     segments.push_back(hpx::make_future<FwdIter>(
                         dispatch_async(traits::get_id(sit), algo, policy,
-                            forced_seq(), beg, end, pred, proj),
+                            forced_seq(), beg, end, HPX_FORWARD(Pred, pred),
+                            HPX_FORWARD(Proj, proj)),
                         [sit, end, last](
                             local_iterator_type const& out) -> FwdIter {
                             if (out != end)

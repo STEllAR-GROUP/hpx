@@ -1,5 +1,5 @@
 //  Copyright (c) 2015-2017 Francisco Jose Tapia
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -164,7 +164,10 @@ namespace hpx::parallel::detail {
         std::size_t nelem = static_cast<std::size_t>(last - first);
 
         // Adjust when there are many threads and only a few elements
-        while (nelem > chunk_size && nthreads * nthreads > nelem >> 3)
+        while (nelem > chunk_size &&
+            static_cast<std::size_t>(nthreads) *
+                    static_cast<std::size_t>(nthreads) >
+                nelem >> 3)
         {
             nthreads /= 2;
         }

@@ -72,8 +72,7 @@ namespace hpx::detail {
         template <typename T>
         constexpr unsigned char const* object_representation(T* p) noexcept
         {
-            return static_cast<unsigned char const*>(
-                static_cast<void const*>(p));
+            return reinterpret_cast<unsigned char const*>(p);
         }
 
 #if defined(HPX_MSVC)

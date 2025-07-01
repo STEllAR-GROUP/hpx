@@ -43,7 +43,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     verbose = vm.count("verbose") ? true : false;
 
     std::uint64_t bytes =
-        static_cast<std::uint64_t>(2.0 * sizeof(double) * order * order);
+        static_cast<std::uint64_t>(2 * sizeof(double) * order * order);
 
     hpx::partitioned_vector<double> A(order * order);
     hpx::partitioned_vector<double> B(order * order);
@@ -61,7 +61,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     {
         for (std::uint64_t j = 0; j < order; ++j)
         {
-            A[i * order + j] = COL_SHIFT * j + ROW_SHIFT * i;
+            A[i * order + j] = COL_SHIFT * static_cast<double>(j) +
+                ROW_SHIFT * static_cast<double>(i);
             B[i * order + j] = -1.0;
         }
     }
@@ -126,7 +127,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         avgtime = avgtime /
             static_cast<double>(
                 (std::max) (iterations - 1, static_cast<std::uint64_t>(1)));
-        std::cout << "Rate (MB/s): " << 1.e-6 * bytes / mintime << ", "
+        std::cout << "Rate (MB/s): "
+                  << 1.e-6 * static_cast<double>(bytes) / mintime << ", "
                   << "Avg time (s): " << avgtime << ", "
                   << "Min time (s): " << mintime << ", "
                   << "Max time (s): " << maxtime << "\n";
@@ -181,8 +183,9 @@ double test_results(
     {
         for (std::uint64_t j = 0; j < order; ++j)
         {
-            double diff =
-                trans[i * order + j] - (COL_SHIFT * i + ROW_SHIFT * j);
+            double diff = trans[i * order + j] -
+                (COL_SHIFT * static_cast<double>(i) +
+                    ROW_SHIFT * static_cast<double>(j));
             errsq += diff * diff;
         }
     }

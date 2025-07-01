@@ -144,8 +144,8 @@ double wave(std::uint64_t t, std::uint64_t x)
         if (t == 0)    //first timestep are initial values
         {
             //        hpx::util::format_to(cout, "first timestep\n");
-            u[t][x].u_value =
-                std::sin(2. * pi * x * dx);    // initial u(x) value
+            u[t][x].u_value = std::sin(
+                2. * pi * static_cast<double>(x) * dx);    // initial u(x) value
             return u[t][x].u_value;
         }
     }
@@ -233,7 +233,7 @@ int hpx_main(variables_map& vm)
         outfile.open("output.dat");
 
         auto f = [&](std::size_t i, hpx::future<double>&& f) {
-            double x_here = i * dx;
+            double x_here = static_cast<double>(i) * dx;
             hpx::util::format_to(outfile, "{1} {2}\n", x_here, f.get())
                 << std::flush;
         };

@@ -177,7 +177,7 @@ namespace hpx::traits {
             get_shared_state(
                 hpx::intrusive_ptr<lcos::detail::future_data_base<R>> const& t)
         {
-            return t;
+            return t;    // NOLINT(bugprone-return-const-ref-from-parameter)
         }
 
         ///////////////////////////////////////////////////////////////////////

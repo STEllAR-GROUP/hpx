@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -372,10 +372,12 @@ namespace hpx::naming {
 
             gid_type newid = id;    // strips lock-bit
 
-            set_log2credit_for_gid(id, log2credits - 1);
+            set_log2credit_for_gid(
+                id, static_cast<std::int16_t>(log2credits - 1));
             set_credit_split_mask_for_gid(id);
 
-            set_log2credit_for_gid(newid, log2credits - 1);
+            set_log2credit_for_gid(
+                newid, static_cast<std::int16_t>(log2credits - 1));
             set_credit_split_mask_for_gid(newid);
 
             return newid;

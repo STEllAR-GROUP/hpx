@@ -161,7 +161,7 @@ void test_destroy_n_exception(IteratorTag)
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    std::uniform_int_distribution<> dis(0, data_size - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(data_size - 1));
     std::atomic<std::size_t> throw_after(dis(gen));    //-V104
     std::size_t throw_after_ = throw_after.load();
 
@@ -217,7 +217,7 @@ void test_destroy_n_exception(ExPolicy&& policy, IteratorTag)
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    std::uniform_int_distribution<> dis(0, data_size - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(data_size - 1));
     std::atomic<std::size_t> throw_after(dis(gen));    //-V104
     std::size_t throw_after_ = throw_after.load();
 
@@ -270,7 +270,7 @@ void test_destroy_n_exception_async(ExPolicy&& policy, IteratorTag)
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    std::uniform_int_distribution<> dis(0, data_size - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(data_size - 1));
     std::atomic<std::size_t> throw_after(dis(gen));    //-V104
     std::size_t throw_after_ = throw_after.load();
 
@@ -356,7 +356,7 @@ void test_destroy_n_bad_alloc(ExPolicy&& policy, IteratorTag)
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    std::uniform_int_distribution<> dis(0, data_size - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(data_size - 1));
     std::atomic<std::size_t> throw_after(dis(gen));    //-V104
     std::size_t throw_after_ = throw_after.load();
 
@@ -409,7 +409,7 @@ void test_destroy_n_bad_alloc_async(ExPolicy&& policy, IteratorTag)
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    std::uniform_int_distribution<> dis(0, data_size - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(data_size - 1));
     std::atomic<std::size_t> throw_after(dis(gen));    //-V104
     std::size_t throw_after_ = throw_after.load();
 

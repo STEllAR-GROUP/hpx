@@ -39,13 +39,12 @@ namespace boost { namespace inspect {
     void file_name_check::inspect(
         const string& library_name, const path& full_path)
     {
-        string::size_type pos;
-
         //  called for each file and directory, so only the leaf need be tested
         string const leaf(full_path.filename().string());
+        string::size_type pos = leaf.find_first_not_of(allowable);
 
         //  includes only allowable characters
-        if ((pos = leaf.find_first_not_of(allowable)) != string::npos)
+        if (pos != string::npos)
         {
             ++m_name_errors;
             error(library_name, full_path,

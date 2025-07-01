@@ -310,6 +310,7 @@ void test()
             uninitialized_relocate_backward(Ex{}, ptr1, ptr1 + M, ptr2 + M);
             HPX_UNREACHABLE;    // should have thrown
         }
+        // NOLINTNEXTLINE(bugprone-empty-catch)
         catch (...)
         {
         }
@@ -470,6 +471,7 @@ void test_overlapping()
                 Ex{}, ptr, ptr + M, ptr + M + offset);
             HPX_UNREACHABLE;    // should have thrown
         }
+        // NOLINTNEXTLINE(bugprone-empty-catch)
         catch (...)
         {
         }

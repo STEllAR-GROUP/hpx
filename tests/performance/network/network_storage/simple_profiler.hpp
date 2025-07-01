@@ -96,11 +96,15 @@ namespace hpx { namespace util {
                     {
                         if (_output)
                             hpx::cout << std::string(52, ' ')
-                                      << std::string(last_level * 9, ' ')
+                                      << std::string(static_cast<std::uint64_t>(
+                                                         last_level * 9),
+                                             ' ')
                                       << "------\n";
                         if (_output)
                             hpx::util::format_to(hpx::cout, fmt2,
-                                std::string(last_level * 9, ' '),
+                                std::string(
+                                    static_cast<std::uint64_t>(last_level * 9),
+                                    ' '),
                                 100.0 * level_totals[last_level] / elapsed)
                                 << "\n";
                         last_level = level;
@@ -112,25 +116,33 @@ namespace hpx { namespace util {
                     if (_output)
                         hpx::util::format_to(hpx::cout, fmt1, p->first, level,
                             std::get<2>(p->second), std::get<0>(p->second),
-                            std::string(level * 9, ' '),
+                            std::string(
+                                static_cast<std::uint64_t>(level * 9), ' '),
                             100.0 * std::get<0>(p->second) / elapsed)
                             << "\n";
                     if ((++p) == this->_profiles.end())
                     {
                         if (_output)
                             hpx::cout << std::string(52, ' ')
-                                      << std::string(last_level * 9, ' ')
+                                      << std::string(static_cast<std::uint64_t>(
+                                                         last_level * 9),
+                                             ' ')
                                       << "------\n";
                         if (_output)
                             hpx::util::format_to(hpx::cout, fmt2,
-                                std::string(last_level * 9, ' '),
+                                std::string(
+                                    static_cast<std::uint64_t>(last_level * 9),
+                                    ' '),
                                 100.0 * level_totals[last_level] / elapsed)
                                 << "\n";
                         last_level = level;
                     }
                 }
                 if (_output)
-                    hpx::cout << std::string(58 + maxlevel * 9, '-') << "\n";
+                    hpx::cout << std::string(static_cast<std::uint64_t>(
+                                                 58 + maxlevel * 9),
+                                     '-')
+                              << "\n";
             }
             this->_done = true;
         }

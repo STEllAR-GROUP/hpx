@@ -21,7 +21,7 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 _gen(seed);
 
 ////////////////////////////////////////////////////////////////////////////
@@ -77,9 +77,10 @@ const std::vector<std::string> user_defined_type::name_list{
 
 struct random_fill
 {
-    random_fill(int rand_base, int range)
+    random_fill(std::size_t rand_base, std::size_t range)
       : gen(_gen())
-      , dist(rand_base - range / 2, rand_base + range / 2)
+      , dist(static_cast<int>(rand_base - range / 2),
+            static_cast<int>(rand_base + range / 2))
     {
     }
 
@@ -199,7 +200,7 @@ void test_merge()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag, typename DataType>
-void test_merge_etc(IteratorTag, DataType, int rand_base)
+void test_merge_etc(IteratorTag, DataType, unsigned int rand_base)
 {
     typedef typename std::vector<DataType>::iterator base_iterator;
 
@@ -242,7 +243,8 @@ void test_merge_etc(IteratorTag, DataType, int rand_base)
 }
 
 template <typename ExPolicy, typename IteratorTag, typename DataType>
-void test_merge_etc(ExPolicy&& policy, IteratorTag, DataType, int rand_base)
+void test_merge_etc(
+    ExPolicy&& policy, IteratorTag, DataType, unsigned int rand_base)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -289,7 +291,7 @@ void test_merge_etc(ExPolicy&& policy, IteratorTag, DataType, int rand_base)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag, typename DataType>
-void test_merge_stable(IteratorTag, DataType, int rand_base)
+void test_merge_stable(IteratorTag, DataType, unsigned int rand_base)
 {
     typedef typename std::pair<DataType, int> ElemType;
     typedef typename std::vector<ElemType>::iterator base_iterator;
@@ -341,7 +343,8 @@ void test_merge_stable(IteratorTag, DataType, int rand_base)
 }
 
 template <typename ExPolicy, typename IteratorTag, typename DataType>
-void test_merge_stable(ExPolicy&& policy, IteratorTag, DataType, int rand_base)
+void test_merge_stable(
+    ExPolicy&& policy, IteratorTag, DataType, unsigned int rand_base)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -401,7 +404,7 @@ void test_merge_stable()
     ////////// Test cases for checking whether the algorithm is stable.
     using namespace hpx::execution;
 
-    int rand_base = _gen();
+    unsigned int rand_base = _gen();
 
     test_merge_stable(IteratorTag(), int(), rand_base);
     test_merge_stable(seq, IteratorTag(), int(), rand_base);
@@ -418,7 +421,7 @@ void test_merge_etc()
     ////////// Test cases for checking whether the algorithm is stable.
     using namespace hpx::execution;
 
-    int rand_base = _gen();
+    unsigned int rand_base = _gen();
 
     ////////// Another test cases for justifying the implementation.
     test_merge_etc(IteratorTag(), user_defined_type(), rand_base);

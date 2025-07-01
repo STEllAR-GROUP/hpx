@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +13,7 @@
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -99,16 +100,16 @@ void test_all_locality_thread_counters(char const* const* counter_names,
 
         // augment the counter path elements
         path.parentinstancename_ = "locality";
-        path.parentinstanceindex_ = locality_id;
+        path.parentinstanceindex_ = static_cast<std::int64_t>(locality_id);
         if (pool != std::size_t(-1))
         {
             path.instancename_ = "pool";
-            path.instanceindex_ = pool;
+            path.instanceindex_ = static_cast<std::int64_t>(pool);
 
             if (core != std::size_t(-1))
             {
                 path.subinstancename_ = "worker-thread";
-                path.subinstanceindex_ = core;
+                path.subinstanceindex_ = static_cast<std::int64_t>(core);
             }
             else
             {
@@ -119,7 +120,7 @@ void test_all_locality_thread_counters(char const* const* counter_names,
         else if (core != std::size_t(-1))
         {
             path.instancename_ = "worker-thread";
-            path.instanceindex_ = core;
+            path.instanceindex_ = static_cast<std::int64_t>(core);
         }
         else
         {

@@ -344,6 +344,7 @@ namespace hpx::compute::host {
 #endif
                 threads::create_topology().deallocate(p, n * sizeof(T));
             }
+            // NOLINTNEXTLINE(bugprone-empty-catch)
             catch (...)
             {
                 // just ignore errors from create_topology
@@ -403,7 +404,7 @@ namespace hpx::compute::host {
         {
 #if defined(NUMA_ALLOCATOR_LINUX)
             // @TODO replace with topology::page_size
-            int pagesize = threads::get_memory_page_size();
+            int pagesize = static_cast<int>(threads::get_memory_page_size());
             HPX_ASSERT((std::size_t(addr) & (pagesize - 1)) == 0);
 
             std::size_t count = (len + pagesize - 1) / pagesize;

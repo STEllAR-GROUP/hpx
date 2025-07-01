@@ -102,7 +102,8 @@ namespace hpx::parallel::execution {
 
             shape_iter& operator=(shape_iter const& rhs)
             {
-                impl_->copy(*rhs.impl_);
+                if (this != &rhs)
+                    impl_->copy(*rhs.impl_);
                 return *this;
             }
 

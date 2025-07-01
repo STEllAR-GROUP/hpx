@@ -41,7 +41,7 @@ namespace jacobi_smp {
         typedef std::vector<hpx::shared_future<void>> deps_vector;
 
         std::size_t n_block =
-            static_cast<std::size_t>(std::ceil(double(n) / block_size));
+            static_cast<std::size_t>(std::ceil(double(n) / double(block_size)));
 
         std::shared_ptr<deps_vector> deps_new(
             new deps_vector(n_block, hpx::make_ready_future()));

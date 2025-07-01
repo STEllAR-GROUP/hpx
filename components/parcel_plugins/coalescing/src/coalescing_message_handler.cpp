@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -79,7 +79,7 @@ namespace hpx::plugins::parcel {
 
         bool get_background_flush()
         {
-            std::string value = hpx::get_config_entry(
+            std::string const value = hpx::get_config_entry(
                 "hpx.plugins.coalescing_message_handler.allow_background_flush",
                 "1");
             return !value.empty() && value[0] != '0';
@@ -118,7 +118,8 @@ namespace hpx::plugins::parcel {
       , num_messages_(0)
       , reset_num_messages_(0)
       , reset_num_parcels_per_message_messages_(0)
-      , started_at_(hpx::chrono::high_resolution_clock::now())
+      , started_at_(static_cast<std::int64_t>(
+            hpx::chrono::high_resolution_clock::now()))
       , reset_time_num_parcels_(0)
       , last_parcel_time_(started_at_)
       , histogram_min_boundary_(-1)
@@ -157,15 +158,17 @@ namespace hpx::plugins::parcel {
         ++num_parcels_;
 
         // get time since last parcel
-        std::int64_t parcel_time = hpx::chrono::high_resolution_clock::now();
-        std::int64_t time_since_last_parcel = parcel_time - last_parcel_time_;
+        auto const parcel_time = static_cast<std::int64_t>(
+            hpx::chrono::high_resolution_clock::now());
+        std::int64_t const time_since_last_parcel =
+            parcel_time - last_parcel_time_;
         last_parcel_time_ = parcel_time;
 
         // collect data for time between parcels histogram
         if (time_between_parcels_)
             (*time_between_parcels_)(time_since_last_parcel);
 
-        std::chrono::microseconds interval(interval_);
+        std::chrono::microseconds const interval(interval_);
 
         // just send parcel if the coalescing was stopped or the buffer is
         // empty and time since last parcel is larger than coalescing interval.
@@ -181,7 +184,7 @@ namespace hpx::plugins::parcel {
             return;
         }
 
-        detail::message_buffer::message_buffer_append_state s =
+        detail::message_buffer::message_buffer_append_state const s =
             buffer_.append(dest, HPX_MOVE(p), HPX_MOVE(f));
 
         switch (s)
@@ -298,7 +301,8 @@ namespace hpx::plugins::parcel {
         bool reset)
     {
         std::lock_guard<mutex_type> l(mtx_);
-        std::int64_t now = hpx::chrono::high_resolution_clock::now();
+        auto const now = static_cast<std::int64_t>(
+            hpx::chrono::high_resolution_clock::now());
         if (num_parcels_ == 0)
         {
             if (reset)
@@ -306,7 +310,7 @@ namespace hpx::plugins::parcel {
             return 0;
         }
 
-        std::int64_t num_parcels = num_parcels_ - reset_time_num_parcels_;
+        std::int64_t const num_parcels = num_parcels_ - reset_time_num_parcels_;
         if (num_parcels == 0)
         {
             if (reset)
@@ -315,7 +319,7 @@ namespace hpx::plugins::parcel {
         }
 
         HPX_ASSERT(now >= started_at_);
-        std::int64_t value = (now - started_at_) / num_parcels;
+        std::int64_t const value = (now - started_at_) / num_parcels;
 
         if (reset)
         {
@@ -329,7 +333,7 @@ namespace hpx::plugins::parcel {
     std::int64_t coalescing_message_handler::get_parcels_count(bool reset)
     {
         std::unique_lock<mutex_type> l(mtx_);
-        std::int64_t num_parcels = num_parcels_ - reset_num_parcels_;
+        std::int64_t const num_parcels = num_parcels_ - reset_num_parcels_;
         if (reset)
             reset_num_parcels_ = num_parcels_;
         return num_parcels;
@@ -350,9 +354,9 @@ namespace hpx::plugins::parcel {
             return 0;
         }
 
-        std::int64_t num_parcels =
+        std::int64_t const num_parcels =
             num_parcels_ - reset_num_parcels_per_message_parcels_;
-        std::int64_t num_messages =
+        std::int64_t const num_messages =
             num_messages_ - reset_num_parcels_per_message_messages_;
 
         if (reset)
@@ -370,7 +374,7 @@ namespace hpx::plugins::parcel {
     std::int64_t coalescing_message_handler::get_messages_count(bool reset)
     {
         std::unique_lock<mutex_type> l(mtx_);
-        std::int64_t num_messages = num_messages_ - reset_num_messages_;
+        std::int64_t const num_messages = num_messages_ - reset_num_messages_;
         if (reset)
             reset_num_messages_ = num_messages_;
         return num_messages;
@@ -400,10 +404,10 @@ namespace hpx::plugins::parcel {
         result.push_back(histogram_max_boundary_);
         result.push_back(histogram_num_buckets_);
 
-        auto data = hpx::util::histogram(*time_between_parcels_);
+        auto const data = hpx::util::histogram(*time_between_parcels_);
         for (auto const& item : data)
         {
-            result.push_back(std::int64_t(item.second * 1000));
+            result.push_back(static_cast<std::int64_t>(item.second * 1000));
         }
 
         return result;
@@ -427,11 +431,15 @@ namespace hpx::plugins::parcel {
         histogram_max_boundary_ = max_boundary;
         histogram_num_buckets_ = num_buckets;
 
-        time_between_parcels_.reset(new histogram_collector_type(
-            hpx::util::tag::histogram::num_bins = double(num_buckets),
-            hpx::util::tag::histogram::min_range = double(min_boundary),
-            hpx::util::tag::histogram::max_range = double(max_boundary)));
-        last_parcel_time_ = hpx::chrono::high_resolution_clock::now();
+        time_between_parcels_.reset(
+            new histogram_collector_type(hpx::util::tag::histogram::num_bins =
+                                             static_cast<double>(num_buckets),
+                hpx::util::tag::histogram::min_range =
+                    static_cast<double>(min_boundary),
+                hpx::util::tag::histogram::max_range =
+                    static_cast<double>(max_boundary)));
+        last_parcel_time_ = static_cast<std::int64_t>(
+            hpx::chrono::high_resolution_clock::now());
 
         result = hpx::bind_front(
             &coalescing_message_handler::get_time_between_parcels_histogram,

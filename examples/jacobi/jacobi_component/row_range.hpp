@@ -109,7 +109,7 @@ namespace jacobi {
             values_.reset(new value_holder());
             ar & values_->v_;
             begin_ = 0;
-            end_ = values_->v_.size();
+            end_ = static_cast<std::ptrdiff_t>(values_->v_.size());
             HPX_ASSERT(end_ > begin_);
         }
 
