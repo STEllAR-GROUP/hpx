@@ -424,14 +424,3 @@ namespace hpx {
         }
     };
 }    // namespace hpx
-
-namespace hpx::lcos::local {
-
-    using mutex HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::local::mutex is deprecated, use hpx::mutex instead") =
-        hpx::mutex;
-
-    using timed_mutex HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::timed_mutex is deprecated, use hpx::timed_mutex "
-        "instead") = hpx::timed_mutex;
-}    // namespace hpx::lcos::local

@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2024 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,25 +11,6 @@
 #include <hpx/config/version.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
-// Deprecate a given functionality starting HPX V1.8
-#if !defined(HPX_HAVE_DEPRECATION_WARNINGS_V1_8)
-#define HPX_HAVE_DEPRECATION_WARNINGS_V1_8 1
-#endif
-
-#if (HPX_VERSION_FULL >= 0x010800) && (HPX_HAVE_DEPRECATION_WARNINGS_V1_8 != 0)
-#define HPX_DEPRECATED_MSG_V1_8                                                \
-    "This functionality is deprecated starting HPX V1.8 and will be removed "  \
-    "in the future. You can define HPX_HAVE_DEPRECATION_WARNINGS_V1_8=0 to "   \
-    "acknowledge that you have received this warning."
-#define HPX_DEPRECATED_V1_8(x)                                                 \
-    [[deprecated(x " (" HPX_PP_EXPAND(HPX_DEPRECATED_MSG_V1_8) ")")]]
-#endif
-
-#if !defined(HPX_DEPRECATED_V1_8)
-#define HPX_DEPRECATED_V1_8(x)
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Deprecate a given functionality starting HPX V1.9
@@ -86,6 +67,25 @@
 
 #if !defined(HPX_DEPRECATED_V1_11)
 #define HPX_DEPRECATED_V1_11(x)
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Deprecate a given functionality starting HPX V2.0
+#if !defined(HPX_HAVE_DEPRECATION_WARNINGS_V2_0)
+#define HPX_HAVE_DEPRECATION_WARNINGS_V2_0 1
+#endif
+
+#if (HPX_VERSION_FULL >= 0x020000) && (HPX_HAVE_DEPRECATION_WARNINGS_V2_0 != 0)
+#define HPX_DEPRECATED_MSG_V2_0                                                \
+    "This functionality is deprecated starting HPX V2.0 and will be removed "  \
+    "in the future. You can define HPX_HAVE_DEPRECATION_WARNINGS_V2_0=0 to "   \
+    "acknowledge that you have received this warning."
+#define HPX_DEPRECATED_V2_0(x)                                                 \
+    [[deprecated(x " (" HPX_PP_EXPAND(HPX_DEPRECATED_MSG_V2_0) ")")]]
+#endif
+
+#if !defined(HPX_DEPRECATED_V2_0)
+#define HPX_DEPRECATED_V2_0(x)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

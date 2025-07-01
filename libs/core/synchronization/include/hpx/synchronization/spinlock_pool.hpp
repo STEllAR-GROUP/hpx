@@ -77,11 +77,3 @@ namespace hpx {
     template <typename Tag, std::size_t N>
     util::cache_aligned_data<hpx::spinlock> spinlock_pool<Tag, N>::pool_[N];
 }    // namespace hpx
-
-namespace hpx::lcos::local {
-
-    template <typename Tag, std::size_t N = HPX_HAVE_SPINLOCK_POOL_NUM>
-    using spinlock_pool HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::spinlock_pool is deprecated, use hpx::spinlock_pool "
-        "instead") = hpx::spinlock_pool<Tag, N>;
-}    // namespace hpx::lcos::local

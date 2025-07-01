@@ -47,11 +47,13 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
     hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
 
     if(HPX_WITH_FETCH_APEX)
+      set(CMAKE_POLICY_VERSION_MINIMUM 3.10)
+
       # If Apex_ROOT not specified, local clone into hpx source dir
       include(FetchContent)
       fetchcontent_declare(
         apex
-        GIT_REPOSITORY https://github.com/UO-OACISS/apex.git
+        GIT_REPOSITORY ${HPX_WITH_APEX_REPOSITORY}
         GIT_TAG ${HPX_WITH_APEX_TAG}
       )
 
