@@ -28,6 +28,7 @@ set(executors_headers
     hpx/executors/limiting_executor.hpp
     hpx/executors/parallel_executor_aggregated.hpp
     hpx/executors/parallel_executor.hpp
+    hpx/executors/parallel_scheduler.hpp
     hpx/executors/post.hpp
     hpx/executors/restricted_thread_pool_executor.hpp
     hpx/executors/scheduler_executor.hpp

@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/executors/parallel_scheduler.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
