@@ -338,8 +338,6 @@ namespace hpx::execution::experimental {
                 {
                     #if defined(HPX_HAVE_STDEXEC)
                     return hpx::execution::experimental::inplace_stop_token{};
-                    #else
-                    return hpx::execution::experimental::never_stop_token{};
                     #endif
                 }
             };
@@ -615,8 +613,6 @@ namespace hpx::execution::experimental {
             {
                 #if defined(HPX_HAVE_STDEXEC)
                 return hpx::execution::experimental::inplace_stop_token{};
-                #else
-                return hpx::execution::experimental::never_stop_token{};
                 #endif
             }
         };
