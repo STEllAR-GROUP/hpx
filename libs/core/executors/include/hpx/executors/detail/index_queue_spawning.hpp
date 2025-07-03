@@ -23,6 +23,7 @@
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -68,7 +69,7 @@ namespace hpx::parallel::execution::detail {
         {
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
             static hpx::util::itt::event notify_event(
-                "set_value_loop_visitor_static::do_work_chunk(chunking)");
+                "set_value_loop_visitor::do_work_chunk");
 
             hpx::util::itt::mark_event e(notify_event);
 #endif
@@ -93,10 +94,10 @@ namespace hpx::parallel::execution::detail {
             auto f = state->f;
             auto ts = state->ts;
 
-            auto& local_queue = state->queues[worker_thread].data_;
+            hpx::optional<std::uint32_t> index;
 
             // Handle local queue first
-            hpx::optional<std::uint32_t> index;
+            auto& local_queue = state->queues[worker_thread].data_;
             while ((index = local_queue.template pop<Which>()))
             {
                 do_work_chunk(f, ts, *index);
@@ -108,15 +109,14 @@ namespace hpx::parallel::execution::detail {
                 constexpr auto opposite_end =
                     hpx::concurrency::detail::opposite_end_v<Which>;
 
-                // clang-format off
-                for (std::uint32_t offset = 1; offset != state->num_threads;
-                    ++offset)
-                // clang-format on
+                auto const num_threads = state->num_threads;
+                for (std::uint32_t offset = 1; offset != num_threads; ++offset)
                 {
-                    std::size_t neighbor_thread =
-                        (worker_thread + offset) % state->num_threads;
-                    auto& neighbor_queue = state->queues[neighbor_thread].data_;
+                    std::size_t neighbor_thread = worker_thread + offset;
+                    if (neighbor_thread >= num_threads)
+                        neighbor_thread -= num_threads;
 
+                    auto& neighbor_queue = state->queues[neighbor_thread].data_;
                     while (
                         (index = neighbor_queue.template pop<opposite_end>()))
                     {
@@ -226,7 +226,11 @@ namespace hpx::parallel::execution::detail {
         HPX_FORCEINLINE constexpr std::uint32_t wrapped_pu_num(
             std::uint32_t const pu, bool const needs_wraparound) const noexcept
         {
-            return needs_wraparound ? pu % available_threads : pu;
+            if (!needs_wraparound || pu < available_threads)
+            {
+                return pu;
+            }
+            return pu - available_threads;
         }
 
         hpx::threads::mask_type full_mask() const noexcept
