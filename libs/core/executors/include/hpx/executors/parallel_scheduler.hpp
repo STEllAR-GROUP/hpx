@@ -17,11 +17,13 @@ namespace hpx::execution::experimental {
         // Singleton-like shared thread pool for parallel_scheduler
         inline hpx::threads::thread_pool_base* get_default_parallel_pool()
         {
-            static hpx::threads::thread_pool_base* default_pool = 
+            // clang-format off
+            static hpx::threads::thread_pool_base* default_pool =
                 hpx::threads::detail::get_self_or_default_pool();
+            // clang-format on
             return default_pool;
         }
-    } // namespace detail
+    }    // namespace detail
 
     // Forward declarations
     class parallel_scheduler;
@@ -35,7 +37,9 @@ namespace hpx::execution::experimental {
         parallel_scheduler() = delete;
 
         // Constructor from thread_pool_policy_scheduler
-        explicit parallel_scheduler(thread_pool_policy_scheduler<hpx::launch::async_policy> sched) noexcept
+        explicit parallel_scheduler(
+            thread_pool_policy_scheduler<hpx::launch::async_policy>
+                sched) noexcept
           : scheduler_(sched)
         {
         }
@@ -73,8 +77,8 @@ namespace hpx::execution::experimental {
         }
 
         // Equality comparison
-        friend constexpr bool operator==(
-            parallel_scheduler const& lhs, parallel_scheduler const& rhs) noexcept
+        friend constexpr bool operator==(parallel_scheduler const& lhs,
+            parallel_scheduler const& rhs) noexcept
         {
             return lhs.scheduler_ == rhs.scheduler_;
         }
@@ -82,21 +86,21 @@ namespace hpx::execution::experimental {
         // Query for forward progress guarantee
         friend constexpr forward_progress_guarantee tag_invoke(
             get_forward_progress_guarantee_t,
-            parallel_scheduler const& sched) noexcept
+            [[maybe_unused]] parallel_scheduler const&) noexcept
         {
             return forward_progress_guarantee::parallel;
         }
 
         // Schedule method returning a sender
-        friend parallel_scheduler_sender tag_invoke(schedule_t, parallel_scheduler const& sched) noexcept;
+        friend parallel_scheduler_sender tag_invoke(
+            schedule_t, parallel_scheduler const& sched) noexcept;
 
         // Support get_completion_scheduler for scheduler concept
         template <typename CPO>
-        friend auto tag_invoke(
-            get_completion_scheduler_t<CPO>,
+        friend auto tag_invoke(get_completion_scheduler_t<CPO>,
             [[maybe_unused]] parallel_scheduler const& sched) noexcept
-            -> std::enable_if_t<
-                hpx::meta::value<hpx::meta::one_of<CPO, set_value_t, set_stopped_t>>,
+            -> std::enable_if_t<hpx::meta::value<hpx::meta::one_of<CPO,
+                                    set_value_t, set_stopped_t>>,
                 parallel_scheduler const&>
         {
             return sched;
@@ -119,31 +123,39 @@ namespace hpx::execution::experimental {
         using completion_signatures =
             hpx::execution::experimental::completion_signatures<
                 hpx::execution::experimental::set_value_t(),
-                hpx::execution::experimental::set_error_t(
-                    std::exception_ptr),
+                hpx::execution::experimental::set_error_t(std::exception_ptr),
                 hpx::execution::experimental::set_stopped_t()>;
 
         template <typename Env>
         friend auto tag_invoke(
             hpx::execution::experimental::get_completion_signatures_t,
-            parallel_scheduler_sender const&, Env) noexcept -> completion_signatures;
+            parallel_scheduler_sender const&, Env) noexcept
+            -> completion_signatures;
 
         template <typename Receiver>
         friend auto tag_invoke(
             connect_t, parallel_scheduler_sender&& s, Receiver&& receiver)
         {
-            return thread_pool_policy_scheduler<hpx::launch::async_policy>::operation_state<
-                thread_pool_policy_scheduler<hpx::launch::async_policy>, Receiver>{
-                s.scheduler.scheduler_, HPX_FORWARD(Receiver, receiver)};
+            // clang-format off
+            return thread_pool_policy_scheduler<hpx::launch::async_policy>::
+                operation_state<
+                    thread_pool_policy_scheduler<hpx::launch::async_policy>,
+                    Receiver>{
+                    s.scheduler.scheduler_, HPX_FORWARD(Receiver, receiver)};
+            // clang-format on
         }
 
         template <typename Receiver>
         friend auto tag_invoke(
             connect_t, parallel_scheduler_sender& s, Receiver&& receiver)
         {
-            return thread_pool_policy_scheduler<hpx::launch::async_policy>::operation_state<
-                thread_pool_policy_scheduler<hpx::launch::async_policy>, Receiver>{
-                s.scheduler.scheduler_, HPX_FORWARD(Receiver, receiver)};
+            // clang-format off
+            return thread_pool_policy_scheduler<hpx::launch::async_policy>::
+                operation_state<
+                    thread_pool_policy_scheduler<hpx::launch::async_policy>,
+                    Receiver>{
+                    s.scheduler.scheduler_, HPX_FORWARD(Receiver, receiver)};
+            // clang-format on
         }
 
         struct env
@@ -153,8 +165,8 @@ namespace hpx::execution::experimental {
             friend auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
                 env const& e) noexcept
-                -> std::enable_if_t<
-                    hpx::meta::value<hpx::meta::one_of<CPO, set_value_t, set_stopped_t>>,
+                -> std::enable_if_t<hpx::meta::value<hpx::meta::one_of<CPO,
+                                        set_value_t, set_stopped_t>>,
                     parallel_scheduler const&>
             {
                 return e.sched;
@@ -170,8 +182,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        friend env tag_invoke(
-            hpx::execution::experimental::get_env_t,
+        friend env tag_invoke(hpx::execution::experimental::get_env_t,
             parallel_scheduler_sender const& s) noexcept
         {
             return {s.scheduler};
@@ -179,7 +190,8 @@ namespace hpx::execution::experimental {
     };
 
     // Define schedule_t tag_invoke after parallel_scheduler_sender
-    inline parallel_scheduler_sender tag_invoke(schedule_t, parallel_scheduler const& sched) noexcept
+    inline parallel_scheduler_sender tag_invoke(
+        schedule_t, parallel_scheduler const& sched) noexcept
     {
         return {sched};
     }
@@ -197,11 +209,13 @@ namespace hpx::execution::experimental {
         auto pool = detail::get_default_parallel_pool();
         if (!pool)
         {
+            // clang-format off
             std::terminate(); // As per P2079R10, terminate if backend is unavailable
         }
         return parallel_scheduler(
             thread_pool_policy_scheduler<hpx::launch::async_policy>(pool));
     }
+        // clang-format on
 
 } // namespace hpx::execution::experimental
 
@@ -210,5 +224,6 @@ namespace hpx::execution::experimental::system_context_replaceability {
     struct bulk_item_receiver_proxy;
     struct parallel_scheduler_backend;
 
-    std::shared_ptr<parallel_scheduler_backend> query_parallel_scheduler_backend();
-}
+    std::shared_ptr<parallel_scheduler_backend>
+    query_parallel_scheduler_backend();
+}    // namespace hpx::execution::experimental::system_context_replaceability
