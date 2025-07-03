@@ -361,7 +361,7 @@ namespace hpx::parallel {
                 {
                     while (first2 != last2)
                     {
-                        auto elem2 = *first2;
+                        typename std::iterator_traits<Iter2>::value_type elem2 = *first2;
                         val2 = HPX_INVOKE(proj2, elem2);
                         if (static_cast<bool>(HPX_INVOKE(comp, val2, val1)))
                         {
@@ -381,7 +381,7 @@ namespace hpx::parallel {
 
                     while (first1 != last1)
                     {
-                        auto elem1 = *first1;
+                        typename std::iterator_traits<Iter1>::value_type elem1 = *first1;
                         val1 = HPX_INVOKE(proj1, elem1);
                         if (!static_cast<bool>(HPX_INVOKE(comp, val2, val1)))
                         {
@@ -436,8 +436,8 @@ namespace hpx::parallel {
 
             if (first1 != last1 && first2 != last2)
             {
-                auto val1 = *first1;
-                auto val2 = init_value(*first2);
+                typename std::iterator_traits<Iter1>::value_type val1 = *first1;
+                typename std::iterator_traits<Iter2>::value_type val2 = init_value(*first2);
                 while (true)
                 {
                     while (first2 != last2)
