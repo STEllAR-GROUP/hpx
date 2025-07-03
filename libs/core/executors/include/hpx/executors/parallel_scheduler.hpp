@@ -9,6 +9,7 @@
 #include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>
+#include <exception>
 #include <memory>
 
 namespace hpx::execution::experimental {
@@ -211,13 +212,13 @@ namespace hpx::execution::experimental {
         {
             // clang-format off
             std::terminate(); // As per P2079R10, terminate if backend is unavailable
+            // clang-format on
         }
         return parallel_scheduler(
             thread_pool_policy_scheduler<hpx::launch::async_policy>(pool));
     }
-        // clang-format on
 
-} // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental
 
 namespace hpx::execution::experimental::system_context_replaceability {
     struct receiver_proxy;
