@@ -196,6 +196,42 @@ namespace hpx::detail {
             return p.get_future();
         }
 
+        template <typename Policy, typename Result, typename F,
+            typename Executor>
+        HPX_FORCEINLINE static hpx::future<Result> call(Policy policy,
+            hpx::threads::thread_description const& desc,
+            threads::thread_pool_base* pool,
+            lcos::local::detail::task_object<Result, F, Executor>& task)
+        {
+            HPX_ASSERT(pool);
+
+            lcos::local::futures_factory<Result()> p(task);
+
+            auto hint = policy.hint();
+            if (threads::thread_id_ref_type tid =
+                    p.post(pool, desc.get_description(), HPX_MOVE(policy)))
+            {
+                auto runs_as_child = hint.runs_as_child_mode();
+                if (runs_as_child ==
+                        hpx::threads::thread_execution_hint::run_as_child &&
+                    !pool->get_scheduler()->supports_direct_execution())
+                {
+                    runs_as_child = hpx::threads::thread_execution_hint::none;
+                }
+
+                if (runs_as_child == hpx::threads::thread_execution_hint::none)
+                {
+                    // keep thread alive, if needed
+                    auto result = p.get_future();
+                    traits::detail::get_shared_state(result)->set_on_completed(
+                        [tid = HPX_MOVE(tid)]() { (void) tid; });
+                    return result;
+                }
+            }
+
+            return p.get_future();
+        }
+
         template <typename Policy, typename F, typename... Ts>
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
@@ -351,6 +387,17 @@ namespace hpx::detail {
             return async_launch_policy_dispatch<
                 hpx::launch::async_policy>::call(HPX_MOVE(policy), desc, pool,
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        }
+
+        template <typename Result, typename F, typename Executor>
+        HPX_FORCEINLINE static hpx::future<Result> call(launch policy,
+            hpx::threads::thread_description const& desc,
+            threads::thread_pool_base* pool,
+            lcos::local::detail::task_object<Result, F, Executor>& task)
+        {
+            return async_launch_policy_dispatch<
+                hpx::launch::async_policy>::call(HPX_MOVE(policy), desc, pool,
+                task);
         }
 
         template <typename F, typename... Ts>

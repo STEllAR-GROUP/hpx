@@ -750,6 +750,13 @@ namespace hpx::lcos::local {
         // construction and destruction
         futures_factory() = default;
 
+        template <typename F, typename Executor>
+        explicit futures_factory(
+            lcos::local::detail::task_object<Result, F, Executor>& task)
+          : task_(&task, true)
+        {
+        }
+
         template <typename Executor, typename F>
         explicit futures_factory(Executor& exec, F&& f)
           : task_(

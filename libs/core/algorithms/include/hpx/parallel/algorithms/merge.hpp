@@ -440,13 +440,19 @@ namespace hpx::parallel {
 
             *target = *mid1;
 
+            auto f = [&]() -> void {
+                // Process left side ranges.
+                parallel_merge_helper(policy, first1, mid1, first2, boundary2,
+                    dest, comp, proj1, proj2, range_reversal,
+                    BinarySearchHelper());
+            };
+
+            lcos::local::detail::task_object<void, std::decay_t<decltype(f)>,
+                void>
+                task{lcos::detail::future_data_refcnt_base::init_no_addref{},
+                    std::move(f)};
             hpx::future<void> fut =
-                execution::async_execute(policy.executor(), [&]() -> void {
-                    // Process left side ranges.
-                    parallel_merge_helper(policy, first1, mid1, first2,
-                        boundary2, dest, comp, proj1, proj2, range_reversal,
-                        BinarySearchHelper());
-                });
+                execution::async_execute(policy.executor(), task);
 
             try
             {
