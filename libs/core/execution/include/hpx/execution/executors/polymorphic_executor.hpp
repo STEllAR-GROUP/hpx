@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2024 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,7 @@
 #include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/type_support/aligned_storage.hpp>
 #include <hpx/type_support/construct_at.hpp>
 
 #include <algorithm>
@@ -239,7 +240,7 @@ namespace hpx::parallel::execution {
                 if (sizeof(T) > storage_size)
                 {
                     using storage_t =
-                        std::aligned_storage_t<sizeof(T), alignof(T)>;
+                        hpx::aligned_storage_t<sizeof(T), alignof(T)>;
                     return new storage_t;
                 }
                 return storage;
@@ -257,7 +258,7 @@ namespace hpx::parallel::execution {
                 if (sizeof(T) > storage_size)
                 {
                     using storage_t =
-                        std::aligned_storage_t<sizeof(T), alignof(T)>;
+                        hpx::aligned_storage_t<sizeof(T), alignof(T)>;
                     delete static_cast<storage_t*>(obj);
                 }
             }

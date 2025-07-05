@@ -23,6 +23,7 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/type_support/aligned_storage.hpp>
 #include <hpx/type_support/assert_owns_lock.hpp>
 #include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -197,7 +198,7 @@ namespace hpx::lcos::detail {
             (sizeof(value_type) > sizeof(error_type)) ? sizeof(value_type) :
                                                         sizeof(error_type);
 
-        using type = std::aligned_storage_t<max_size, max_alignment>;
+        using type = hpx::aligned_storage_t<max_size, max_alignment>;
     };
 
     template <typename Result>
