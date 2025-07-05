@@ -5,9 +5,11 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/executors/parallel_scheduler.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
+#include <hpx/synchronization/stop_token.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/thread.hpp>    // For thread ID

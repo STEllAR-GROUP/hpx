@@ -6,8 +6,10 @@
 
 #pragma once
 
+#include <hpx/execution.hpp>
 #include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
+#include <hpx/synchronization/stop_token.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <exception>
 #include <memory>
