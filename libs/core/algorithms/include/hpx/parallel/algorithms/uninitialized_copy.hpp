@@ -229,16 +229,21 @@ namespace hpx::parallel {
         ///////////////////////////////////////////////////////////////////////
 
         template <typename ExPolicy, typename Iter, typename FwdIter2>
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<Iter, FwdIter2>>::type
+        decltype(auto)
         parallel_uninitialized_copy_n(
             ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
         {
-            if (count == 0)
+            constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+            if constexpr (!has_scheduler_executor)
             {
-                return util::detail::algorithm_result<ExPolicy,
-                    util::in_out_result<Iter, FwdIter2>>::
-                    get(util::in_out_result<Iter, FwdIter2>{first, dest});
+                if (count == 0)
+                {
+                    return util::detail::algorithm_result<ExPolicy,
+                        util::in_out_result<Iter, FwdIter2>>::
+                        get(HPX_MOVE(first), HPX_MOVE(dest));
+                }
             }
 
             using zip_iterator = hpx::util::zip_iterator<Iter, FwdIter2>;
@@ -304,8 +309,7 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename FwdIter2>
-            static typename util::detail::algorithm_result<ExPolicy,
-                util::in_out_result<Iter, FwdIter2>>::type
+            static decltype(auto)
             parallel(ExPolicy&& policy, Iter first, Sent last, FwdIter2 dest)
             {
                 return parallel_uninitialized_copy_n(
@@ -347,8 +351,7 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent1,
                 typename FwdIter2, typename Sent2>
-            static typename util::detail::algorithm_result<ExPolicy,
-                util::in_out_result<Iter, FwdIter2>>::type
+            static decltype(auto)
             parallel(ExPolicy&& policy, Iter first, Sent1 last, FwdIter2 dest,
                 Sent2 last_d)
             {
@@ -392,8 +395,7 @@ namespace hpx::parallel {
             }
 
             template <typename ExPolicy, typename Iter, typename FwdIter2>
-            static util::detail::algorithm_result_t<ExPolicy,
-                util::in_out_result<Iter, FwdIter2>>
+            static decltype(auto)
             parallel(
                 ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
             {
@@ -441,7 +443,7 @@ namespace hpx {
                 hpx::traits::is_forward_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
+        friend decltype(auto)
         tag_fallback_invoke(hpx::uninitialized_copy_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
@@ -502,8 +504,7 @@ namespace hpx {
                 std::is_integral_v<Size>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
+        friend decltype(auto)
         tag_fallback_invoke(hpx::uninitialized_copy_n_t, ExPolicy&& policy,
             FwdIter1 first, Size count, FwdIter2 dest)
         {

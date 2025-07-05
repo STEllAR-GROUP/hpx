@@ -17,6 +17,7 @@
 #include <hpx/parallel/util/detail/select_partitioner.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/type_support/unused.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -24,6 +25,7 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include <tuple>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util {
@@ -47,8 +49,8 @@ namespace hpx::parallel::util {
 
             template <typename ExPolicy_, typename FwdIter, typename F1,
                 typename F2, typename Cleanup>
-            static R call(ExPolicy_&& policy, FwdIter first, std::size_t count,
-                F1&& f1, F2&& f2, Cleanup&& cleanup)
+            static decltype(auto) call(ExPolicy_&& policy, FwdIter first,
+                std::size_t count, F1&& f1, F2&& f2, Cleanup&& cleanup)
             {
                 // inform parameter traits
                 using scoped_executor_parameters =
@@ -79,22 +81,74 @@ namespace hpx::parallel::util {
 
         private:
             template <typename Items, typename F, typename Cleanup>
-            static R reduce(Items&& workitems, F&& f, Cleanup&& cleanup)
+            static decltype(auto) reduce(Items&& workitems, F&& f, Cleanup&& cleanup)
             {
-                // wait for all tasks to finish
-                if (hpx::wait_all_nothrow(workitems))
+                namespace ex = hpx::execution::experimental;
+                if constexpr (ex::is_sender_v<std::decay_t<Items>> &&
+                    !hpx::traits::is_future_v<std::decay_t<Items>>)
                 {
-                    // always rethrow if 'errors' is not empty or workitems has
-                    // exceptional future
-                    handle_local_exceptions::call_with_cleanup(
-                        workitems, HPX_FORWARD(Cleanup, cleanup));
+                    return ex::let_value(
+                        HPX_FORWARD(Items, workitems),
+                        [f = HPX_FORWARD(F, f),
+                         cleanup = HPX_FORWARD(Cleanup, cleanup)]
+                        (auto&&... results) mutable
+                        {
+                            // Put all results into a shared_ptr for later use
+                            auto captured =
+                                std::make_shared<std::tuple<decltype(results)...>>(
+                                    HPX_FORWARD(decltype(results), results)...);
+
+                            // Normal path: call f
+                            auto normal_sender = ex::then(
+                                ex::just(captured),
+                                [f = HPX_MOVE(f)]
+                                (auto const& tup_ptr) mutable
+                                {
+                                    return std::apply(f, *tup_ptr);
+                                });
+
+                            // Use let_error to handle errors while keeping normal path unaffected
+                            return ex::let_error(
+                                HPX_MOVE(normal_sender),
+                                [cleanup = HPX_MOVE(cleanup), captured]
+                                (auto&& error) mutable
+                                {
+                                    // Perform cleanup operation
+                                    if constexpr (std::tuple_size_v<typename std::remove_reference_t<decltype(*captured)>> == 1)
+                                    {
+                                        // single element in tuple (likely a container)
+                                        auto&& element = std::get<0>(*captured);
+                                        for (auto&& item : element)
+                                        {
+                                            cleanup(HPX_MOVE(item));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        std::apply(cleanup, *captured);
+                                    }
+                                    // Re-propagate error
+                                    return ex::just_error(HPX_FORWARD(decltype(error), error));
+                                });
+                        });
                 }
-                return f(HPX_MOVE(workitems));
+                else
+                {
+                    // wait for all tasks to finish
+                    if (hpx::wait_all_nothrow(workitems))
+                    {
+                        // always rethrow if 'errors' is not empty or workitems has
+                        // exceptional future
+                        handle_local_exceptions::call_with_cleanup(
+                            workitems, HPX_FORWARD(Cleanup, cleanup));
+                    }
+                    return f(HPX_MOVE(workitems));
+                }
             }
 
             template <typename Items1, typename Items2, typename F,
                 typename Cleanup>
-            static R reduce(
+            static decltype(auto) reduce(
                 std::pair<Items1, Items2>&& items, F&& f, Cleanup&& cleanup)
             {
                 if (items.first.empty())
@@ -103,9 +157,17 @@ namespace hpx::parallel::util {
                         HPX_FORWARD(Cleanup, cleanup));
                 }
 
-                items.first.insert(items.first.end(),
-                    std::make_move_iterator(items.second.begin()),
-                    std::make_move_iterator(items.second.end()));
+                if constexpr (hpx::traits::is_future_v<Items2>)
+                {
+                    items.first.emplace_back(HPX_MOVE(items.second));
+                }
+                else
+                {
+                    items.first.insert(items.first.end(),
+                        std::make_move_iterator(items.second.begin()),
+                        std::make_move_iterator(items.second.end()));
+                }
+
                 return reduce(HPX_MOVE(items.first), HPX_FORWARD(F, f),
                     HPX_FORWARD(Cleanup, cleanup));
             }
@@ -167,9 +229,17 @@ namespace hpx::parallel::util {
                         HPX_FORWARD(Cleanup, cleanup));
                 }
 
-                items.first.insert(items.first.end(),
-                    std::make_move_iterator(items.second.begin()),
-                    std::make_move_iterator(items.second.end()));
+                if constexpr (hpx::traits::is_future_v<Items2>)
+                {
+                    items.first.emplace_back(HPX_MOVE(items.second));
+                }
+                else
+                {
+                    items.first.insert(items.first.end(),
+                        std::make_move_iterator(items.second.begin()),
+                        std::make_move_iterator(items.second.end()));
+                }
+
                 return reduce(HPX_MOVE(scoped_params), HPX_MOVE(items.first),
                     HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
             }
