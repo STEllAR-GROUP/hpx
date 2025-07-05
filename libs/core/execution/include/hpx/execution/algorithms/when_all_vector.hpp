@@ -415,6 +415,7 @@ namespace hpx::when_all_vector_detail {
 #if defined(__NVCC__)
                                 values.push_back(std::move(t.value()));
 #else
+                                // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                                 values.push_back(HPX_MOVE(t.value()));
 #endif
                             }
@@ -497,6 +498,7 @@ namespace hpx::when_all_vector_detail {
                     for (std::size_t i = 0; i < os.num_predecessors; ++i)
                     {
                         hpx::execution::experimental::start(
+                            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                             os.op_states.get()[i].value());
                     }
                 }

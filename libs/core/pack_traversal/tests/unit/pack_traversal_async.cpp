@@ -74,6 +74,7 @@ private:
     mutable counter_type ref_counter;
 
 public:
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     intrusive_ref_counter() noexcept
       : ref_counter(1)
     {
@@ -115,6 +116,7 @@ class async_counter_base : public intrusive_ref_counter<Child>
     std::size_t counter_ = 0;
 
 public:
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     async_counter_base() = default;
 
     virtual ~async_counter_base() {}

@@ -217,7 +217,7 @@ namespace hpx::detail {
             // block until it finishes executing.
             for (std::size_t k = 0; !cb->callback_finished_executing_.load(
                      std::memory_order_relaxed);
-                 ++k)
+                ++k)
             {
                 hpx::execution_base::this_thread::yield_k(
                     k, "stop_state::remove_callback");

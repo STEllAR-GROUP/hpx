@@ -50,9 +50,9 @@ int hpx_main()
 {
     for (hpx::threads::thread_stacksize stacksize =
              hpx::threads::thread_stacksize::minimal;
-         stacksize < hpx::threads::thread_stacksize::maximal;
-         stacksize = static_cast<hpx::threads::thread_stacksize>(
-             static_cast<std::size_t>(stacksize) + 1))
+        stacksize < hpx::threads::thread_stacksize::maximal;
+        stacksize = static_cast<hpx::threads::thread_stacksize>(
+            static_cast<std::size_t>(stacksize) + 1))
     {
         test(stacksize);
     }

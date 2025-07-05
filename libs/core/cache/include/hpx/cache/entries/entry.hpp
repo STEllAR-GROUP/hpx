@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -35,6 +35,7 @@ namespace hpx::util::cache::entries {
         };
 
         template <typename Derived>
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         struct less_than_comparable
         {
             friend bool
@@ -81,6 +82,8 @@ namespace hpx::util::cache::entries {
         using value_type = Value;
 
     public:
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
+
         /// \brief Any cache entry has to be default constructible
         entry() = default;
 
@@ -98,6 +101,7 @@ namespace hpx::util::cache::entries {
           : value_(HPX_MOVE(val))
         {
         }
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
 
         /// \brief    The function \a touch is called by a cache holding this
         ///           instance whenever it has been requested (touched).

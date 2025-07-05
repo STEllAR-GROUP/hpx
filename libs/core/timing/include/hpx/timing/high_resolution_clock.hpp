@@ -49,7 +49,7 @@ namespace hpx::chrono {
         {
             using duration_values =
                 std::chrono::duration_values<std::chrono::nanoseconds>;
-            return (duration_values::min)().count();
+            return (duration_values::min) ().count();
         }
 
         // This function returns the largest representable time unit as
@@ -58,7 +58,7 @@ namespace hpx::chrono {
         {
             using duration_values =
                 std::chrono::duration_values<std::chrono::nanoseconds>;
-            return (duration_values::max)().count();
+            return (duration_values::max) ().count();
         }
     };
 }    // namespace hpx::chrono

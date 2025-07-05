@@ -12,6 +12,8 @@ Checks: >
     -bugprone-forward-declaration-namespace,
     -bugprone-macro-parentheses,
     -bugprone-branch-clone,
+    -bugprone-easily-swappable-parameters,
+    -bugprone-reserved-identifier,
     modernize-use-nullptr,
     misc-assert-side-effect
     misc-dangling-handle

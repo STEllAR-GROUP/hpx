@@ -76,6 +76,7 @@ namespace hpx {
 #endif
 
             return HPX_INVOKE(
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 HPX_FORWARD(F, f), hpx::get<Is>(HPX_FORWARD(Tuple, t))...);
 
 #if defined(HPX_MSVC)

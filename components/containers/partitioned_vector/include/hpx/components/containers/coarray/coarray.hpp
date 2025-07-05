@@ -140,9 +140,12 @@ namespace hpx {
             const_iterator i_end = in.cend();
             const_iterator i = i_begin;
 
-            for (iterator o = out.begin(); o < o_end; o += unroll)
+            for (iterator o = out.begin(); o < o_end;
+                o += static_cast<std::ptrdiff_t>(unroll))
             {
-                std::fill(o, (std::min)(o + unroll, o_end), *i);
+                std::fill(o,
+                    (std::min) (o + static_cast<std::ptrdiff_t>(unroll), o_end),
+                    *i);
                 i = (++i != i_end) ? i : i_begin;
             }
 

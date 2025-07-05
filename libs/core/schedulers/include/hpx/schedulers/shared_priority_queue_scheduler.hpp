@@ -984,7 +984,7 @@ namespace hpx::threads::policies {
 
                 std::map<std::size_t, std::size_t> domain_map;
                 for (std::size_t local_id = 0; local_id != num_workers_;
-                     ++local_id)
+                    ++local_id)
                 {
                     std::size_t const global_id =
                         local_to_global_thread_index(local_id);
@@ -1010,7 +1010,7 @@ namespace hpx::threads::policies {
                 // unusual numa topologies with (e.g.) High Bandwidth Memory on
                 // numa nodes with no processors
                 for (std::size_t local_id = 0; local_id < num_workers_;
-                     ++local_id)
+                    ++local_id)
                 {
                     d_lookup_[local_id] = static_cast<std::size_t>(
                         domain_map[d_lookup_[local_id]]);

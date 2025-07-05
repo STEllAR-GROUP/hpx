@@ -88,30 +88,30 @@ void test_segmented_iteration(
     typedef typename const_traits::local_raw_iterator const_local_raw_iterator;
 
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
-             segment_iterator>::is_segmented_iterator::value);
+        segment_iterator>::is_segmented_iterator::value);
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
-             const_segment_iterator>::is_segmented_iterator::value);
+        const_segment_iterator>::is_segmented_iterator::value);
 
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
-             local_segment_iterator>::is_segmented_iterator::value);
+        local_segment_iterator>::is_segmented_iterator::value);
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
-             const_local_segment_iterator>::is_segmented_iterator::value);
+        const_local_segment_iterator>::is_segmented_iterator::value);
 
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
-             local_iterator>::is_segmented_iterator::value);
+        local_iterator>::is_segmented_iterator::value);
     HPX_TEST(!hpx::traits::segmented_iterator_traits<
-             const_local_iterator>::is_segmented_iterator::value);
+        const_local_iterator>::is_segmented_iterator::value);
 
     // test segmented and local iteration
     std::size_t seg_count = 0;
     std::size_t count = 0;
     segment_iterator seg_end = traits::segment(v.end());
     for (segment_iterator seg_it = traits::segment(v.begin());
-         seg_it != seg_end; ++seg_it, ++seg_count)
+        seg_it != seg_end; ++seg_it, ++seg_count)
     {
         local_iterator loc_end = traits::end(seg_it);
         for (local_iterator lit = traits::begin(seg_it); lit != loc_end;
-             ++lit, ++count)
+            ++lit, ++count)
         {
         }
     }
@@ -123,11 +123,11 @@ void test_segmented_iteration(
     seg_count = 0;
     const_segment_iterator seg_cend = const_traits::segment(v.cend());
     for (const_segment_iterator seg_cit = const_traits::segment(v.cbegin());
-         seg_cit != seg_cend; ++seg_cit, ++seg_count)
+        seg_cit != seg_cend; ++seg_cit, ++seg_count)
     {
         const_local_iterator loc_cend = const_traits::end(seg_cit);
         for (const_local_iterator lcit = const_traits::begin(seg_cit);
-             lcit != loc_cend; ++lcit, ++count)
+            lcit != loc_cend; ++lcit, ++count)
         {
         }
     }
@@ -145,7 +145,7 @@ void test_segmented_iteration(
             std::size_t i = 42;
             local_iterator loc_end = traits::end(traits::segment(it));
             for (local_iterator lit = traits::begin(traits::segment(it));
-                 lit != loc_end; ++lit, ++i)
+                lit != loc_end; ++lit, ++i)
             {
                 *lit = T(i);
                 HPX_TEST_EQ(*lit, T(i));
@@ -160,14 +160,14 @@ void test_segmented_iteration(
         std::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         const_iterator end = v.cend(locality_id);
         for (const_iterator it = v.cbegin(locality_id); it != end;
-             ++it, ++count)
+            ++it, ++count)
         {
             std::size_t i = 42;
             const_local_iterator loc_end =
                 const_traits::end(const_traits::segment(it));
             for (const_local_iterator lcit =
                      const_traits::begin(const_traits::segment(it));
-                 lcit != loc_end; ++lcit, ++i)
+                lcit != loc_end; ++lcit, ++i)
             {
                 HPX_TEST_EQ(*lcit, T(i));
             }
@@ -182,7 +182,7 @@ void test_segmented_iteration(
         std::uint32_t locality_id = hpx::naming::get_locality_id_from_id(loc);
         local_segment_iterator seg_end = v.segment_end(locality_id);
         for (local_segment_iterator seg_it = v.segment_begin(locality_id);
-             seg_it != seg_end; ++seg_it, ++seg_count)
+            seg_it != seg_end; ++seg_it, ++seg_count)
         {
             // local raw iterators are valid locally only
             if (loc != hpx::find_here())
@@ -190,7 +190,7 @@ void test_segmented_iteration(
 
             local_raw_iterator loc_end = traits::end(seg_it);
             for (local_raw_iterator lit = traits::begin(seg_it); lit != loc_end;
-                 ++lit, ++count)
+                ++lit, ++count)
             {
             }
         }
@@ -204,7 +204,7 @@ void test_segmented_iteration(
         const_local_segment_iterator seg_cend = v.segment_cend(locality_id);
         for (const_local_segment_iterator seg_cit =
                  v.segment_cbegin(locality_id);
-             seg_cit != seg_cend; ++seg_cit, ++seg_count)
+            seg_cit != seg_cend; ++seg_cit, ++seg_count)
         {
             // local raw iterators are valid locally only
             if (loc != hpx::find_here())
@@ -212,7 +212,7 @@ void test_segmented_iteration(
 
             const_local_raw_iterator loc_cend = const_traits::end(seg_cit);
             for (const_local_raw_iterator lcit = const_traits::begin(seg_cit);
-                 lcit != loc_cend; ++lcit, ++count)
+                lcit != loc_cend; ++lcit, ++count)
             {
             }
         }

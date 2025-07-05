@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -54,6 +54,7 @@ namespace hpx::execution::experimental::detail {
         friend constexpr HPX_FORCEINLINE auto operator|(
             U&& u, inject_scheduler p)
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             return HPX_MOVE(p).invoke(HPX_MOVE(p.scheduler), HPX_FORWARD(U, u));
         }
     };

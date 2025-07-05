@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0 Distributed under the Boost Software
 //  License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -131,7 +131,7 @@ void run_test_cases()
         // test with both multiple and
         // non multiple of bits_per_block
         int const how_many = 10;
-        for (int i = 1; i <= how_many; ++i)
+        for (std::size_t i = 1; i <= how_many; ++i)
         {
             std::size_t multiple = i * bits_per_block;
             std::size_t non_multiple = multiple - 1;
@@ -172,7 +172,7 @@ void run_test_cases()
         // test with both multiple and
         // non multiple of bits_per_block
         int const how_many = 10;
-        for (int i = 1; i <= how_many; ++i)
+        for (std::size_t i = 1; i <= how_many; ++i)
         {
             std::size_t multiple = i * bits_per_block;
             std::size_t non_multiple = multiple - 1;

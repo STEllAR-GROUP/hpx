@@ -89,6 +89,7 @@ namespace hpx {
             }
 
             HPX_ASSERT(result);
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             return HPX_MOVE(*result);
         }
 

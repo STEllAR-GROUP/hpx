@@ -1,7 +1,7 @@
 //  Copyright (c) 2022 Bhumit Attarde
 //  Copyright (c) 2014 Grant Mercer
 //  Copyright (c) 2015 Daniel Bourgeois
-//  Copyright (c) 2016-2023 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -603,6 +603,7 @@ namespace hpx::parallel {
                             bool f = hpx::invoke(
                                 pred, hpx::invoke(proj, get<0>(*it)));
 
+                            // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
                             if ((get<1>(*it) = f))
                                 ++curr;
                         });

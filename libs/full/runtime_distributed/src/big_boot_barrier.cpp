@@ -85,7 +85,7 @@ namespace hpx::agas::detail {
                 hpx::serialization::detail::id_registry::instance()
                     .get_unassigned_typenames())
           , action_typenames(hpx::actions::detail::action_registry::instance()
-                                 .get_unassigned_typenames())
+                    .get_unassigned_typenames())
         {
         }
 

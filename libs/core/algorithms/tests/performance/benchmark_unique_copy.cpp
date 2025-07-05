@@ -29,7 +29,7 @@ struct random_fill
 {
     random_fill(std::size_t random_range)
       : gen(seed)
-      , dist(0, random_range - 1)
+      , dist(0, static_cast<int>(random_range - 1))
     {
     }
 
@@ -56,7 +56,7 @@ double run_unique_copy_benchmark_std(
 
     time = hpx::chrono::high_resolution_clock::now() - time;
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ double run_unique_copy_benchmark_hpx(int test_count, ExPolicy policy,
 
     time = hpx::chrono::high_resolution_clock::now() - time;
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

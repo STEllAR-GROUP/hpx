@@ -30,7 +30,7 @@ struct A
 template <typename Archive>
 void serialize(Archive& ar, A& a, unsigned)
 {
-    ar& a.a;
+    ar & a.a;
 }
 
 HPX_SERIALIZATION_REGISTER_CLASS(A)
@@ -57,7 +57,7 @@ struct B
 template <class Archive>
 void serialize(Archive& ar, B& b, unsigned)
 {
-    ar& b.b;
+    ar & b.b;
 }
 
 HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(B)
@@ -83,7 +83,7 @@ void serialize(Archive& ar, D& d, unsigned)
 {
     d.b = 4711;
     ar& hpx::serialization::base_object<B>(d);
-    ar& d.d;
+    ar & d.d;
 }
 
 HPX_SERIALIZATION_REGISTER_CLASS(D)
@@ -104,7 +104,7 @@ struct C
 template <typename Archive, typename T>
 void serialize(Archive& ar, C<T>& c, unsigned)
 {
-    ar& c.c;
+    ar & c.c;
 }
 
 template <typename T>
@@ -141,7 +141,7 @@ namespace hpx { namespace serialization {
     void serialize(Archive& archive, E<T>& s, unsigned)
     {
         archive& hpx::serialization::base_object<A>(s);
-        archive& s.c;
+        archive & s.c;
     }
 }}    // namespace hpx::serialization
 

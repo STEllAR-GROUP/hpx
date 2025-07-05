@@ -1,4 +1,4 @@
-//  Copyright (c) 2013-2019 Hartmut Kaiser
+//  Copyright (c) 2013-201925 Hartmut Kaiser
 //  Copyright (c) 2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -132,7 +132,9 @@ void run_benchmark(hpx::program_options::variables_map&)
             recv.wait();
         }
 
-        double bw = (size / 1e6 * loop * window_size * 2) / t.elapsed();
+        double bw = (static_cast<double>(size) / 1e6 *
+                        static_cast<double>(loop * window_size * 2)) /
+            t.elapsed();
 
         std::cout << std::left << std::setw(10) << size << bw << std::endl;
     }

@@ -51,7 +51,9 @@ double null_function() noexcept
         {
             for (std::uint64_t j = 0; j < array_size; ++j)
             {
-                dummy[j] = 1.0 / (2.0 * i * j + 1.0);
+                dummy[j] = 1.0 /
+                    (2.0 * static_cast<double>(i) * static_cast<double>(j) +
+                        1.0);
             }
         }
         return dummy[0];
@@ -94,7 +96,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
     hpx::util::perftests_report(
         "future overhead - create_thread_hierarchical - latch", "no-executor",
         repetitions, [&]() -> void {
-            hpx::latch l(count);
+            hpx::latch l(static_cast<std::int64_t>(count));
 
             auto const func = [&l]() {
                 null_function();

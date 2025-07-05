@@ -21,6 +21,7 @@ namespace hpx::serialization {
         ar << valid;
         if (valid)
         {
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             ar << *o;
         }
     }

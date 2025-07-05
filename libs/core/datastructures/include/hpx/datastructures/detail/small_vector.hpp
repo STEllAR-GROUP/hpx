@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2-25 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -136,7 +136,7 @@ namespace hpx::detail {
     {
         static constexpr auto alignment_of_t = std::alignment_of_v<T>;
         static constexpr auto max_Alignment =
-            (std::max)(std::alignment_of_v<header>, std::alignment_of_v<T>);
+            (std::max) (std::alignment_of_v<header>, std::alignment_of_v<T>);
         static constexpr auto offset_to_data =
             round_up(sizeof(header), alignment_of_t);
         static_assert(max_Alignment <= __STDCPP_DEFAULT_NEW_ALIGNMENT__);
@@ -257,8 +257,10 @@ namespace hpx::detail {
             // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
             storage<T>* ptr;
 
+            // NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
             // NOLINTNEXTLINE(bugprone-sizeof-expression)
             std::memcpy(&ptr, m_data.data(), sizeof(ptr));
+            // NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
             return ptr;
         }
 
@@ -270,8 +272,10 @@ namespace hpx::detail {
 
         void set_indirect(storage<T>* ptr) noexcept
         {
+            // NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
             // NOLINTNEXTLINE(bugprone-sizeof-expression)
             std::memcpy(m_data.data(), &ptr, sizeof(ptr));
+            // NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
 
             // safety check to guarantee the lowest bit is 0
             HPX_ASSERT(!is_direct());
@@ -388,7 +392,7 @@ namespace hpx::detail {
                 // got an overflow, set capacity to max
                 new_capacity = max_size();
             }
-            return (std::min)(new_capacity, max_size());
+            return (std::min) (new_capacity, max_size());
         }
 
         template <direction D>
@@ -495,9 +499,10 @@ namespace hpx::detail {
             {
                 auto* d = data<D>();
                 for (auto ptr = d + current_size, end = d + count; ptr != end;
-                     ++ptr)
+                    ++ptr)
                 {
                     hpx::construct_at(
+                        // NOLINTNEXTLINE(bugprone-use-after-move)
                         static_cast<T*>(ptr), HPX_FORWARD(Args, args)...);
                 }
             }
@@ -513,7 +518,7 @@ namespace hpx::detail {
             auto* const container_end = data<D>() + size<D>();
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
             auto* const erase_end =
-                (std::min)(const_cast<T*>(to), container_end);
+                (std::min) (const_cast<T*>(to), container_end);
 
             std::move(erase_end, container_end, erase_begin);
             auto const num_erased = std::distance(erase_begin, erase_end);
@@ -585,13 +590,13 @@ namespace hpx::detail {
             auto const num_moves = std::distance(source_begin, source_end);
             auto const target_end = target_begin + num_moves;
             auto const num_uninitialized_move =
-                (std::min)(num_moves, std::distance(source_end, target_end));
+                (std::min) (num_moves, std::distance(source_end, target_end));
             std::uninitialized_move(source_end - num_uninitialized_move,
                 source_end, target_end - num_uninitialized_move);
             std::move_backward(source_begin,
                 source_end - num_uninitialized_move,
                 target_end - num_uninitialized_move);
-            std::destroy(source_begin, (std::min)(source_end, target_begin));
+            std::destroy(source_begin, (std::min) (source_end, target_begin));
         }
 
         // makes space for uninitialized data of cout elements. Also updates

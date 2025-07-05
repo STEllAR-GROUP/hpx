@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -78,7 +78,7 @@ namespace hpx::detail {
         //   don't fit in the embedded storage.
         union storage
         {
-            std::aligned_storage_t<embedded_storage_size, alignment_size>
+            hpx::aligned_storage_t<embedded_storage_size, alignment_size>
                 embedded_storage;
             base_type* heap_storage = nullptr;
 

@@ -583,8 +583,8 @@ namespace hpx {
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
                 FwdIter>::get(hpx::parallel::detail::for_each<FwdIter>()
-                                  .call(HPX_FORWARD(ExPolicy, policy), first,
-                                      last, HPX_MOVE(f), hpx::identity_v));
+                    .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                        HPX_MOVE(f), hpx::identity_v));
         }
     } for_each{};
 

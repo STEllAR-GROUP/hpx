@@ -72,6 +72,7 @@ namespace hpx::serialization {
         static constexpr std::uint64_t npos = static_cast<std::uint64_t>(-1);
 
     protected:
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         explicit constexpr basic_archive(std::uint32_t flags) noexcept
           : flags_(flags)
           , size_(0)
@@ -79,6 +80,7 @@ namespace hpx::serialization {
         }
 
     public:
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         basic_archive(basic_archive const&) = delete;
         basic_archive& operator=(basic_archive const&) = delete;
 

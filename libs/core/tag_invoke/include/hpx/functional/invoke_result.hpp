@@ -24,8 +24,8 @@ namespace hpx::util {
 
         template <typename F, typename... Ts>
         struct invoke_result_impl<F(Ts...),
-            std::void_t<decltype(
-                HPX_INVOKE(std::declval<F>(), std::declval<Ts>()...))>>
+            std::void_t<decltype(HPX_INVOKE(
+                std::declval<F>(), std::declval<Ts>()...))>>
         {
             using type =
                 decltype(HPX_INVOKE(std::declval<F>(), std::declval<Ts>()...));

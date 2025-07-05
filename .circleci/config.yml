@@ -11,7 +11,7 @@ working_dir_default: &working_dir_default
 
 docker_default: &docker_default
     docker:
-      - image: stellargroup/build_env:14
+      - image: stellargroup/build_env:17
 
 defaults: &defaults
     <<: *working_dir_default
@@ -170,12 +170,12 @@ jobs:
           name: Check that the modules are well clang-formatted
           command: |
               cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
-              clang-format-11 --version
-              clang-format-11 -i **/*.{cpp,hpp}
+              clang-format-20 --version
+              clang-format-20 -i **/*.{cpp,hpp}
               cd /hpx/source/examples
-              clang-format-11 -i **/*.{cpp,hpp}
+              clang-format-20 -i **/*.{cpp,hpp}
               cd /hpx/source/tests
-              clang-format-11 -i **/*.{cpp,hpp}
+              clang-format-20 -i **/*.{cpp,hpp}
               git diff --exit-code > /tmp/modified_clang_format_files.txt
       - store_artifacts:
           path: /tmp/modified_clang_format_files.txt
@@ -234,7 +234,7 @@ jobs:
                 -DHPX_WITH_COMPILER_WARNINGS=On \
                 -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=On \
                 -DHPX_WITH_DEPRECATION_WARNINGS=On \
-                -DCMAKE_CXX_CLANG_TIDY=clang-tidy \
+                -DCMAKE_CXX_CLANG_TIDY=clang-tidy-20 \
                 -DHPX_WITH_THREAD_LOCAL_STORAGE=On \
                 -DHPX_WITH_STACKTRACES_STATIC_SYMBOLS=On \
                 -DHPX_WITH_STACKTRACES_DEMANGLE_SYMBOLS=Off \
@@ -335,7 +335,7 @@ jobs:
   # We need a full clone here to be able to compare to master.
   spellcheck:
     docker:
-      - image: stellargroup/build_env:14
+      - image: stellargroup/build_env:17
     resource_class: large  # Increased memory allocation
     steps:
       - checkout:

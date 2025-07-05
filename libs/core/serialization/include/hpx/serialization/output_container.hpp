@@ -227,7 +227,9 @@ namespace hpx::serialization {
 
             // make sure there is a current serialization_chunk descriptor
             // available
-            if (chunker_.get_chunk_type() == chunk_type::chunk_type_pointer ||
+            if ((chunker_.get_chunk_type() == chunk_type::chunk_type_pointer ||
+                    chunker_.get_chunk_type() ==
+                        chunk_type::chunk_type_const_pointer) ||
                 chunker_.get_chunk_size() != 0)
             {
                 // add a new serialization_chunk,

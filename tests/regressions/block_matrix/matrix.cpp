@@ -27,8 +27,9 @@ std::ostream& operator<<(std::ostream& os, const vector_t& x)
 }
 
 matrix_t::matrix_t(std::initializer_list<std::initializer_list<double>> a)
-  : NI(a.size())
-  , NJ(a.end() == a.begin() ? 0 : a.begin()->size())
+  : NI(static_cast<std::ptrdiff_t>(a.size()))
+  , NJ(static_cast<std::ptrdiff_t>(
+        a.end() == a.begin() ? 0 : a.begin()->size()))
   , elts(NI * NJ)
 {
     HPX_ASSERT(std::ptrdiff_t(a.size()) == NI);

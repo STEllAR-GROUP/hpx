@@ -159,7 +159,7 @@ namespace hpx::threads::policies::detail {
         cores.erase(it, cores.end());
 
         std::size_t const num_unique_cores = cores.size();
-        num_pus_needed_ = (std::max)(num_unique_cores, max_cores);
+        num_pus_needed_ = (std::max) (num_unique_cores, max_cores);
     }
 
     void affinity_data::set_num_threads(size_t const num_threads) noexcept
@@ -325,7 +325,7 @@ namespace hpx::threads::policies::detail {
         for (std::size_t i = 0; i != num_threads_; ++i)
         {
             std::size_t first = threads::find_first(affinity_masks_[i]);
-            first_pu = (std::min)(first_pu, first);
+            first_pu = (std::min) (first_pu, first);
         }
         if (first_pu != static_cast<std::size_t>(-1))
             pu_offset_ = first_pu;

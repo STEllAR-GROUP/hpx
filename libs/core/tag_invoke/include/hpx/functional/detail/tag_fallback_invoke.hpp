@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 Thomas Heller
-//  Copyright (c) 2020-2021 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -264,6 +264,7 @@ namespace hpx::functional::detail {
         /// tag_fallback_invoke only if there are no matching tag_invoke
         /// overloads.
         template <typename Tag, typename Enable>
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         struct tag_fallback
         {
             // is tag-invocable
@@ -302,6 +303,7 @@ namespace hpx::functional::detail {
         // fall back to directly invoke its fallback. Either invocation has to
         // be noexcept.
         template <typename Tag, typename Enable>
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         struct tag_fallback_noexcept
         {
             // is nothrow tag-invocable

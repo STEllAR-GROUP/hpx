@@ -48,10 +48,10 @@ namespace hpx::util::detail {
     template <typename T, typename C>
     struct invoke_mem_obj
     {
-        T C::*pm;
+        T C::* pm;
 
     public:
-        explicit constexpr invoke_mem_obj(T C::*pm) noexcept
+        explicit constexpr invoke_mem_obj(T C::* pm) noexcept
           : pm(pm)
         {
         }
@@ -79,10 +79,10 @@ namespace hpx::util::detail {
     template <typename T, typename C>
     struct invoke_mem_fun
     {
-        T C::*pm;
+        T C::* pm;
 
     public:
-        explicit constexpr invoke_mem_fun(T C::*pm) noexcept
+        explicit constexpr invoke_mem_fun(T C::* pm) noexcept
           : pm(pm)
         {
         }

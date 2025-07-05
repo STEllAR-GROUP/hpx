@@ -268,8 +268,8 @@ namespace hpx::lcos::detail {
         };
 
     public:
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         future_base() noexcept = default;
-        ~future_base() = default;
 
         explicit future_base(hpx::intrusive_ptr<shared_state_type> const& p)
           : shared_state_(p)
@@ -283,6 +283,9 @@ namespace hpx::lcos::detail {
 
         future_base(future_base const& other) = default;
         future_base(future_base&& other) noexcept = default;
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
+
+        ~future_base() = default;
 
         void swap(future_base& other) noexcept
         {
@@ -1202,7 +1205,7 @@ namespace hpx {
     hpx::shared_future<R> const& make_shared_future(
         hpx::shared_future<R> const& f) noexcept
     {
-        return f;
+        return f;    // NOLINT(bugprone-return-const-ref-from-parameter)
     }
 }    // namespace hpx
 

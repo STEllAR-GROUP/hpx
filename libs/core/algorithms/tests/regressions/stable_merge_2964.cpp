@@ -58,15 +58,11 @@ void test_merge_stable(ExPolicy policy, DataType, int rand_base)
 
     int no = 0;
     auto rf = random_fill(rand_base, 6);
-    std::generate(
-        std::begin(src1), std::end(src1), [&no, &rf]() -> std::pair<int, int> {
-            return {rf(), no++};
-        });
+    std::generate(std::begin(src1), std::end(src1),
+        [&no, &rf]() -> std::pair<int, int> { return {rf(), no++}; });
     rf = random_fill(rand_base, 8);
-    std::generate(
-        std::begin(src2), std::end(src2), [&no, &rf]() -> std::pair<int, int> {
-            return {rf(), no++};
-        });
+    std::generate(std::begin(src2), std::end(src2),
+        [&no, &rf]() -> std::pair<int, int> { return {rf(), no++}; });
     std::sort(std::begin(src1), std::end(src1));
     std::sort(std::begin(src2), std::end(src2));
 

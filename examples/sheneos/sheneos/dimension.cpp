@@ -14,12 +14,12 @@ namespace hpx { namespace serialization {
     void serialize(
         input_archive& ar, sheneos::dimension& dim, unsigned int const)
     {
-        ar& dim.offset_& dim.count_& dim.size_;
+        ar & dim.offset_ & dim.count_ & dim.size_;
     }
 
     void serialize(
         output_archive& ar, sheneos::dimension& dim, unsigned int const)
     {
-        ar& dim.offset_& dim.count_& dim.size_;
+        ar & dim.offset_ & dim.count_ & dim.size_;
     }
 }}    // namespace hpx::serialization

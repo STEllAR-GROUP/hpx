@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2015 Daniel Bourgeois
 //  Copyright (c)      2017 Taeguk Kwon
 //  Copyright (c)      2021 Akhil J Nair
@@ -213,15 +213,14 @@ namespace hpx::parallel::util {
                 std::size_t count, T&& init, F1&& f1, F2&& f2, F3&& f3, F4&& f4)
             {
                 return execution::async_execute(policy.executor(),
-                    [first, count, policy = HPX_FORWARD(ExPolicy_, policy),
-                        init = HPX_FORWARD(T, init), f1 = HPX_FORWARD(F1, f1),
-                        f2 = HPX_FORWARD(F2, f2), f3 = HPX_FORWARD(F3, f3),
+                    [first, count, policy, init = HPX_FORWARD(T, init),
+                        f1 = HPX_FORWARD(F1, f1), f2 = HPX_FORWARD(F2, f2),
+                        f3 = HPX_FORWARD(F3, f3),
                         f4 = HPX_FORWARD(F4, f4)]() mutable -> R {
                         using partitioner_type =
                             scan_static_partitioner<ExPolicy, R, Result1,
                                 Result2>;
-                        return partitioner_type::call(
-                            HPX_FORWARD(ExPolicy_, policy), first, count,
+                        return partitioner_type::call(policy, first, count,
                             HPX_MOVE(init), f1, f2, f3, f4);
                     });
             }

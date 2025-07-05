@@ -80,7 +80,7 @@ namespace hpx::parallel::execution::detail {
                     desc, pool,
                     [&, part_begin, part_end, part_size, f, it]() mutable {
                         for (std::size_t part_i = part_begin;
-                             part_i != part_end; ++part_i)
+                            part_i != part_end; ++part_i)
                         {
                             results[part_i] =
                                 hpx::detail::async_launch_policy_dispatch<
@@ -96,7 +96,7 @@ namespace hpx::parallel::execution::detail {
             else
             {
                 for (std::size_t part_i = part_begin; part_i != part_end;
-                     ++part_i)
+                    ++part_i)
                 {
                     results[part_i] =
                         hpx::detail::async_launch_policy_dispatch<Launch>::call(
@@ -174,7 +174,7 @@ namespace hpx::parallel::execution::detail {
                         // launch N-1 tasks
                         auto iter = it;
                         for (std::size_t i = begin + direct; i != end;
-                             (void) ++iter, ++i)
+                            (void) ++iter, ++i)
                         {
                             hpx::detail::post_policy_dispatch<Launch>::call(
                                 inner_post_policy, desc, pool, wrapped, *iter,

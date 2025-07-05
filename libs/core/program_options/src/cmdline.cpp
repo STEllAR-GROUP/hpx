@@ -477,8 +477,8 @@ namespace hpx::program_options::detail {
                     std::vector<option> followed_option;
                     std::vector next_token(1, other_tokens[0]);
                     for (std::size_t i = 0;
-                         followed_option.empty() && i < style_parsers.size();
-                         ++i)
+                        followed_option.empty() && i < style_parsers.size();
+                        ++i)
                     {
                         followed_option = style_parsers[i](next_token);
                     }

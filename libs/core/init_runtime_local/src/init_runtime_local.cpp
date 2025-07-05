@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -447,7 +447,8 @@ namespace hpx {
                 int result;
                 try
                 {
-                    if ((result = ensure_no_runtime_is_up()) != 0)
+                    result = ensure_no_runtime_is_up();
+                    if (result != 0)
                     {
                         return result;
                     }
@@ -550,5 +551,5 @@ namespace hpx {
                 return default_desc_;
             }
         }    // namespace detail
-    }        // namespace local
+    }    // namespace local
 }    // namespace hpx

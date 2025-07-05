@@ -364,6 +364,7 @@ namespace hpx {
             }
 
             explicit counting_semaphore(std::ptrdiff_t value) noexcept
+              // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new)
               : data_(new data_type(value), false)
             {
             }

@@ -36,7 +36,7 @@ namespace hpx {
     runtime_mode get_runtime_mode_from_name(std::string const& mode)
     {
         for (std::size_t i = 0;
-             static_cast<runtime_mode>(i) <= runtime_mode::last; ++i)
+            static_cast<runtime_mode>(i) <= runtime_mode::last; ++i)
         {
             if (mode == strings::runtime_mode_names[i])
                 return static_cast<runtime_mode>(i - 1);

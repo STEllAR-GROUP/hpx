@@ -204,7 +204,7 @@ namespace hpx::parallel {
                 for (;;)
                 {
                     for (auto mid = first; mid != result;
-                         ++lead, void(++trail), ++mid)
+                        ++lead, void(++trail), ++mid)
                     {
                         if (lead == last)
                         {

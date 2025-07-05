@@ -110,7 +110,8 @@ used CMake options.
 
 .. option:: HPX_WITH_CXX_STANDARD
 
-   Set a specific C++ standard version e.g. ``HPX_WITH_CXX_STANDARD=20``. The default and minimum value is 17.
+   Set a specific C++ standard version e.g. ``HPX_WITH_CXX_STANDARD=23``.
+   The default and minimum value is ``20``. Possible values are ``20``, ``23``, or ``26``.
 
 .. option:: HPX_WITH_EXAMPLES
 

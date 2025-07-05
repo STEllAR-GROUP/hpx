@@ -66,7 +66,7 @@ double run_partition_copy_benchmark_std(int test_count, InIter first,
 
     time = hpx::chrono::high_resolution_clock::now() - time;
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ double run_partition_copy_benchmark_hpx(int test_count, ExPolicy policy,
 
     time = hpx::chrono::high_resolution_clock::now() - time;
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ void run_benchmark(std::size_t vector_size, int test_count, IteratorTag)
 
     std::cout << "* Running Benchmark..." << std::endl;
 
-    int rand_base = _rand();
+    int rand_base = static_cast<int>(_rand());
 
     auto pred = [rand_base](int t) { return t < rand_base; };
 

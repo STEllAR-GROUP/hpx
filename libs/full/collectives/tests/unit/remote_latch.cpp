@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2022 Hartmut Kaiser
+//  Copyright (c) 2015-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,7 +30,7 @@ hpx::distributed::latch create_latch(
     {
         // Create the latch on locality zero, let it synchronize as many
         // threads as we have localities.
-        l = hpx::distributed::latch(num_threads);
+        l = hpx::distributed::latch(static_cast<std::ptrdiff_t>(num_threads));
 
         // Register the new instance so that the other localities can connect
         // to it.

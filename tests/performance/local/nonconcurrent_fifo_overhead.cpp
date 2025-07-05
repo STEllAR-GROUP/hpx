@@ -137,7 +137,7 @@ std::pair<double, double> bench_fifo(Fifo& fifo, std::uint64_t local_iterations)
     high_resolution_timer t;
 
     for (std::uint64_t block = 0; block < (local_iterations / blocksize);
-         ++block)
+        ++block)
     {
         // Restart the clock.
         t.restart();

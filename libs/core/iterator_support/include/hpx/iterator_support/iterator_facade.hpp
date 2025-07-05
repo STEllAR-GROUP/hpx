@@ -154,6 +154,7 @@ namespace hpx::util {
                 arrow_dispatch_t<Reference>, Pointer>;
             using reference = Reference;
 
+            // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
             HPX_HOST_DEVICE iterator_facade_base() = default;
 
         protected:
@@ -410,6 +411,7 @@ namespace hpx::util {
         using pointer = typename base_type::pointer;
         using reference = typename base_type::reference;
 
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         HPX_HOST_DEVICE iterator_facade() = default;
     };
 
@@ -482,7 +484,7 @@ namespace hpx::util {
             HPX_HOST_DEVICE T const& operator=(T const& x) const
             {
                 *this->stored_iterator = x;
-                return x;
+                return x;    // NOLINT(bugprone-return-const-ref-from-parameter)
             }
 
             // This overload just in case only non-const objects are writable

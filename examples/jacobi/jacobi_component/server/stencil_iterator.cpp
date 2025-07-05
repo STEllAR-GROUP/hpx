@@ -33,7 +33,7 @@ namespace jacobi { namespace server {
         std::vector<hpx::future<void>> fs;
         for (std::size_t x = 1; x < nx - 1; x += line_block)
         {
-            std::size_t x_end = (std::min)(nx - 1, x + line_block);
+            std::size_t x_end = (std::min) (nx - 1, x + line_block);
             fs.push_back(hpx::async(&stencil_iterator::update, this,
                 rows[dst].get(x, x_end), rows[src].get(x - 1, x_end + 1),
                 top.get(x, x_end), bottom.get(x, x_end)));

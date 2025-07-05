@@ -286,7 +286,7 @@ namespace hpx { namespace parallel {
 
                 // handle all of the full partitions
                 for (++sit1, ++sit2, ++sdest; sit1 != send1;
-                     ++sit1, ++sit2, ++sdest)
+                    ++sit1, ++sit2, ++sdest)
                 {
                     beg1 = traits1::begin(sit1);
                     end1 = traits1::end(sit1);
@@ -395,7 +395,7 @@ namespace hpx { namespace parallel {
 
                 // handle all of the full partitions
                 for (++sit1, ++sit2, ++sdest; sit1 != send1;
-                     ++sit1, ++sit2, ++sdest)
+                    ++sit1, ++sit2, ++sdest)
                 {
                     beg1 = traits1::begin(sit1);
                     end1 = traits1::end(sit1);
@@ -511,7 +511,7 @@ namespace hpx { namespace parallel {
 
                 // handle all of the full partitions
                 for (++sit1, ++sit2, ++sdest; sit1 != send1 && sit2 != send2;
-                     ++sit1, ++sit2, ++sdest)
+                    ++sit1, ++sit2, ++sdest)
                 {
                     beg1 = traits1::begin(sit1);
                     end1 = traits1::end(sit1);
@@ -621,7 +621,7 @@ namespace hpx { namespace parallel {
 
                 // handle all of the full partitions
                 for (++sit1, ++sit2, ++sdest; sit1 != send1 && sit2 != send2;
-                     ++sit1, ++sit2, ++sdest)
+                    ++sit1, ++sit2, ++sdest)
                 {
                     beg1 = traits1::begin(sit1);
                     beg2 = traits2::begin(sit2);
@@ -668,7 +668,7 @@ namespace hpx { namespace parallel {
         }
         /// \endcond
     }    // namespace detail
-}}       // namespace hpx::parallel
+}}    // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {

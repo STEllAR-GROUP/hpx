@@ -238,8 +238,8 @@ namespace hpx::debug {
            << " CRC32:" << hpx::debug::hex<8>(crc32(p.addr_, p.len_)) << "\n";
 
         auto const max_value =
-            (std::min)(static_cast<std::size_t>(
-                           std::ceil(static_cast<double>(p.len_) / 8.0)),
+            (std::min) (static_cast<std::size_t>(
+                            std::ceil(static_cast<double>(p.len_) / 8.0)),
                 static_cast<std::size_t>(128));
         for (std::size_t i = 0; i < max_value; i++)
         {

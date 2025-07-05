@@ -577,8 +577,6 @@ namespace hpx::threads::policies {
 
             if (/*HPX_UNLIKELY*/ (!p.second))
             {
-                std::string const map_size = std::to_string(thread_map_.size());
-
                 tq_deb.error(debug::str<>("map add"),
                     "Couldn't add new thread to the thread map",
                     queue_data_print(this),

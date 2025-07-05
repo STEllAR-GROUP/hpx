@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2024 Hartmut Kaiser
+//  Copyright (c) 2011-2025 Hartmut Kaiser
 //  Copyright (c) 2016 Parsa Amini
 //  Copyright (c) 2016 Thomas Heller
 //
@@ -873,7 +873,8 @@ namespace hpx::agas {
             if (naming::refers_to_local_lva(id))
             {
                 // handle (non-migratable) components located on this locality first
-                addr.type_ = naming::detail::get_component_type_from_gid(msb);
+                addr.type_ = static_cast<components::component_type>(
+                    naming::detail::get_component_type_from_gid(msb));
                 addr.address_ =
                     reinterpret_cast<naming::address::address_type>(lsb);
                 return true;

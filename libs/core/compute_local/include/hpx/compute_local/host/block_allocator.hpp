@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2016-2024 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -112,6 +112,7 @@ namespace hpx::compute::host {
                 {
                     hpx::threads::create_topology().deallocate(p, n);
                 }
+                // NOLINTNEXTLINE(bugprone-empty-catch)
                 catch (...)
                 {
                     // just ignore errors from create_topology

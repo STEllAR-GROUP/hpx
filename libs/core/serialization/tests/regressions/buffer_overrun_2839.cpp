@@ -33,7 +33,7 @@ struct my_struct
     template <typename Archive>
     inline void serialize(Archive& ar, const unsigned int)
     {
-        ar& x;
+        ar & x;
     }
     template <class Archive>
     inline void friend load_construct_data(

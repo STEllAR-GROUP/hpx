@@ -26,7 +26,7 @@ namespace hpx::program_options::detail {
 
         std::vector<std::basic_string<Char>> result;
         for (auto cur_token(tok.begin()), end_token(tok.end());
-             cur_token != end_token; ++cur_token)
+            cur_token != end_token; ++cur_token)
         {
             if (!cur_token->empty())
                 result.push_back(*cur_token);

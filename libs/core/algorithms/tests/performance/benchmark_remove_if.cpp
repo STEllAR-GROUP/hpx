@@ -26,6 +26,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 unsigned int seed = std::random_device{}();
+
 ///////////////////////////////////////////////////////////////////////////////
 struct random_fill
 {
@@ -99,7 +100,7 @@ double run_remove_if_benchmark_std(int test_count, OrgIter org_first,
         time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,7 +120,7 @@ double run_remove_if_benchmark_hpx(int test_count, ExPolicy policy,
         time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

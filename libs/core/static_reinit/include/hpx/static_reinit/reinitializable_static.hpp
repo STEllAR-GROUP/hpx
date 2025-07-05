@@ -11,6 +11,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/static_reinit/static_reinit.hpp>
+#include <hpx/type_support/aligned_storage.hpp>
 #include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
@@ -146,7 +147,7 @@ namespace hpx::util {
             return reinterpret_cast<pointer>(data_ + item);
         }
 
-        using storage_type = std::aligned_storage_t<sizeof(value_type),
+        using storage_type = hpx::aligned_storage_t<sizeof(value_type),
             std::alignment_of_v<value_type>>;
 
         static storage_type data_[N];

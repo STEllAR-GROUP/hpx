@@ -17,7 +17,7 @@
 int hpx_main()
 {
     std::size_t const max_targets =
-        (std::min)(2 * hpx::get_num_worker_threads(), std::size_t(10));
+        (std::min) (2 * hpx::get_num_worker_threads(), std::size_t(10));
     ;
     auto targets = hpx::compute::host::get_local_targets();
 
@@ -32,7 +32,7 @@ int hpx_main()
             }
 
             auto local_targets = targets;
-            local_targets.resize((std::min)(targets.size(), num_targets));
+            local_targets.resize((std::min) (targets.size(), num_targets));
             hpx::compute::host::block_executor<> exec(local_targets);
 
             std::vector<int> v(num_elems, 0);

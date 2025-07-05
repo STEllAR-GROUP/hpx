@@ -56,7 +56,8 @@ struct user_defined_type
     user_defined_type(int rand_no)
       : val(rand_no)
     {
-        std::uniform_int_distribution<> dis(0, name_list.size() - 1);
+        std::uniform_int_distribution<> dis(
+            0, static_cast<int>(name_list.size() - 1));
         name = name_list[dis(_gen)];
     }
 
@@ -92,21 +93,22 @@ struct user_defined_type
         return t;
     }
 
-    static const std::vector<std::string> name_list;
+    static std::vector<std::string> const name_list;
 
     int val;
     std::string name;
 };
 
-const std::vector<std::string> user_defined_type::name_list{
+std::vector<std::string> const user_defined_type::name_list{
     "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"};
 
 struct random_fill
 {
     random_fill() = default;
-    random_fill(int rand_base, int range)
+    random_fill(std::size_t rand_base, std::size_t range)
       : gen(_gen())
-      , dist(rand_base - range / 2, rand_base + range / 2)
+      , dist(static_cast<int>(rand_base - range / 2),
+            static_cast<int>(rand_base + range / 2))
     {
     }
 
@@ -121,10 +123,10 @@ struct random_fill
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag, typename DataType, typename Comp>
-void test_merge(IteratorTag, DataType, Comp comp, int rand_base)
+void test_merge(IteratorTag, DataType, Comp comp, unsigned int rand_base)
 {
-    typedef typename std::vector<DataType>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = typename std::vector<DataType>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
@@ -150,13 +152,13 @@ void test_merge(IteratorTag, DataType, Comp comp, int rand_base)
 template <typename ExPolicy, typename IteratorTag, typename DataType,
     typename Comp>
 void test_merge(
-    ExPolicy&& policy, IteratorTag, DataType, Comp comp, int rand_base)
+    ExPolicy&& policy, IteratorTag, DataType, Comp comp, unsigned int rand_base)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef typename std::vector<DataType>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = typename std::vector<DataType>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
@@ -182,13 +184,13 @@ void test_merge(
 template <typename ExPolicy, typename IteratorTag, typename DataType,
     typename Comp>
 void test_merge_async(
-    ExPolicy&& policy, IteratorTag, DataType, Comp comp, int rand_base)
+    ExPolicy&& policy, IteratorTag, DataType, Comp comp, unsigned int rand_base)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef typename std::vector<DataType>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = typename std::vector<DataType>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
@@ -216,8 +218,8 @@ void test_merge_async(
 template <typename IteratorTag>
 void test_merge_exception(IteratorTag)
 {
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<int> src1(size1), src2(size2), dest(size1 + size2);
@@ -258,8 +260,8 @@ void test_merge_exception(ExPolicy&& policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<int> src1(size1), src2(size2), dest(size1 + size2);
@@ -296,8 +298,8 @@ void test_merge_exception(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_merge_exception_async(ExPolicy&& policy, IteratorTag)
 {
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<int> src1(size1), src2(size2), dest(size1 + size2);
@@ -338,8 +340,8 @@ void test_merge_exception_async(ExPolicy&& policy, IteratorTag)
 template <typename IteratorTag>
 void test_merge_bad_alloc(IteratorTag)
 {
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<int> src1(size1), src2(size2), dest(size1 + size2);
@@ -378,8 +380,8 @@ void test_merge_bad_alloc(ExPolicy&& policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<int> src1(size1), src2(size2), dest(size1 + size2);
@@ -415,8 +417,8 @@ void test_merge_bad_alloc(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_merge_bad_alloc_async(ExPolicy&& policy, IteratorTag)
 {
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<int> src1(size1), src2(size2), dest(size1 + size2);
@@ -454,9 +456,9 @@ void test_merge_bad_alloc_async(ExPolicy&& policy, IteratorTag)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag, typename DataType>
-void test_merge_etc(IteratorTag, DataType, int rand_base)
+void test_merge_etc(IteratorTag, DataType, unsigned int rand_base)
 {
-    typedef typename std::vector<DataType>::iterator base_iterator;
+    using base_iterator = typename std::vector<DataType>::iterator;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
@@ -469,7 +471,7 @@ void test_merge_etc(IteratorTag, DataType, int rand_base)
 
     // Test default comparison.
     {
-        typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+        using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
         auto result = hpx::merge(iterator(std::begin(src1)),
             iterator(std::end(src1)), iterator(std::begin(src2)),
@@ -485,11 +487,12 @@ void test_merge_etc(IteratorTag, DataType, int rand_base)
 
     // Test sequential_merge with input_iterator_tag.
     {
-        typedef test::test_iterator<base_iterator, std::input_iterator_tag>
-            input_iterator;
-        typedef test::test_iterator<base_iterator, std::output_iterator_tag>
-            output_iterator;
+        using input_iterator =
+            test::test_iterator<base_iterator, std::input_iterator_tag>;
+        using output_iterator =
+            test::test_iterator<base_iterator, std::output_iterator_tag>;
 
+        // NOLINTBEGIN(bugprone-return-const-ref-from-parameter)
         auto result = hpx::parallel::detail::sequential_merge(
             input_iterator(std::begin(src1)), input_iterator(std::end(src1)),
             input_iterator(std::begin(src2)), input_iterator(std::end(src2)),
@@ -497,6 +500,7 @@ void test_merge_etc(IteratorTag, DataType, int rand_base)
             [](DataType const& a, DataType const& b) -> bool { return a < b; },
             [](DataType const& t) -> DataType const& { return t; },
             [](DataType const& t) -> DataType const& { return t; });
+        // NOLINTEND(bugprone-return-const-ref-from-parameter)
         auto solution = std::merge(std::begin(src1), std::end(src1),
             std::begin(src2), std::end(src2), std::begin(dest_sol));
 
@@ -508,12 +512,13 @@ void test_merge_etc(IteratorTag, DataType, int rand_base)
 }
 
 template <typename ExPolicy, typename IteratorTag, typename DataType>
-void test_merge_etc(ExPolicy&& policy, IteratorTag, DataType, int rand_base)
+void test_merge_etc(
+    ExPolicy&& policy, IteratorTag, DataType, unsigned int rand_base)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef typename std::vector<DataType>::iterator base_iterator;
+    using base_iterator = typename std::vector<DataType>::iterator;
 
     std::size_t const size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
@@ -526,7 +531,7 @@ void test_merge_etc(ExPolicy&& policy, IteratorTag, DataType, int rand_base)
 
     // Test default comparison.
     {
-        typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+        using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
         auto result = hpx::merge(policy, iterator(std::begin(src1)),
             iterator(std::end(src1)), iterator(std::begin(src2)),
@@ -542,18 +547,20 @@ void test_merge_etc(ExPolicy&& policy, IteratorTag, DataType, int rand_base)
 
     // Test sequential_merge with input_iterator_tag.
     {
-        typedef test::test_iterator<base_iterator, std::input_iterator_tag>
-            input_iterator;
-        typedef test::test_iterator<base_iterator, std::output_iterator_tag>
-            output_iterator;
+        using input_iterator =
+            test::test_iterator<base_iterator, std::input_iterator_tag>;
+        using output_iterator =
+            test::test_iterator<base_iterator, std::output_iterator_tag>;
 
         auto result = hpx::parallel::detail::sequential_merge(
             input_iterator(std::begin(src1)), input_iterator(std::end(src1)),
             input_iterator(std::begin(src2)), input_iterator(std::end(src2)),
             output_iterator(std::begin(dest_res)),
             [](DataType const& a, DataType const& b) -> bool { return a < b; },
+            // NOLINTBEGIN(bugprone-return-const-ref-from-parameter)
             [](DataType const& t) -> DataType const& { return t; },
             [](DataType const& t) -> DataType const& { return t; });
+        // NOLINTEND(bugprone-return-const-ref-from-parameter)
         auto solution = std::merge(std::begin(src1), std::end(src1),
             std::begin(src2), std::end(src2), std::begin(dest_sol));
 
@@ -570,21 +577,33 @@ void test_merge()
 {
     using namespace hpx::execution;
 
-    int rand_base = _gen();
+    unsigned int rand_base = _gen();
 
     ////////// Test cases for 'int' type.
     test_merge(
         IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a < b; }, rand_base);
+        [](unsigned int const a, unsigned int const b) -> bool {
+            return a < b;
+        },
+        rand_base);
     test_merge(
         seq, IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a < b; }, rand_base);
+        [](unsigned int const a, unsigned int const b) -> bool {
+            return a < b;
+        },
+        rand_base);
     test_merge(
         par, IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a < b; }, rand_base);
+        [](unsigned int const a, unsigned int const b) -> bool {
+            return a < b;
+        },
+        rand_base);
     test_merge(
         par_unseq, IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a > b; }, rand_base);
+        [](unsigned int const a, unsigned int const b) -> bool {
+            return a > b;
+        },
+        rand_base);
 
     ////////// Test cases for user defined type.
     test_merge(
@@ -615,10 +634,16 @@ void test_merge()
     ////////// Asynchronous test cases for 'int' type.
     test_merge_async(
         seq(task), IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a > b; }, rand_base);
+        [](unsigned int const a, unsigned int const b) -> bool {
+            return a > b;
+        },
+        rand_base);
     test_merge_async(
         par(task), IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a > b; }, rand_base);
+        [](unsigned int const a, unsigned int const b) -> bool {
+            return a > b;
+        },
+        rand_base);
 
     ////////// Asynchronous test cases for user defined type.
     test_merge_async(

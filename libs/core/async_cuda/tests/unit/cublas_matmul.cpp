@@ -272,8 +272,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
 
     //
-    sizeMult = (std::min)(sizeMult, std::size_t(100));
-    sizeMult = (std::max)(sizeMult, std::size_t(1));
+    sizeMult = (std::min) (sizeMult, std::size_t(100));
+    sizeMult = (std::max) (sizeMult, std::size_t(1));
     //
     // use a larger block size for Fermi and above, query default cuda target properties
     hpx::cuda::experimental::target target(device);

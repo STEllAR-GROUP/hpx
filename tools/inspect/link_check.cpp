@@ -87,9 +87,7 @@ namespace {
         {
             result.append(url_path, pos, next - pos);
             pos = next;
-            switch (url_path[pos])
-            {
-            case '%':
+            if (url_path[pos] == '%')
             {
                 if (url_path.length() - next < 3)
                     return "";
@@ -99,8 +97,6 @@ namespace {
                 if (*end_ptr)
                     return "";
                 pos = next + 3;
-                break;
-            }
             }
         }
 
@@ -320,9 +316,7 @@ namespace boost { namespace inspect {
              //query_matched = m[7].matched,
             fragment_matched = m[9].matched;
 
-        std::string scheme(m[2]), authority(m[4]), url_path(m[5]),
-            //query(m[7]),
-            fragment(m[9]);
+        std::string url_path(m[5]), fragment(m[9]);
 
         // Check for external content
         if (!allow_external_content && (authority_matched || scheme_matched))
@@ -340,6 +334,7 @@ namespace boost { namespace inspect {
         // Protocol checks
         if (scheme_matched)
         {
+            std::string scheme(m[2]);
             if (scheme == "http" || scheme == "https")
             {
                 // All http links should have a hostname. Generally if they don't
@@ -549,7 +544,7 @@ namespace boost { namespace inspect {
     void link_check::close()
     {
         for (m_path_map::const_iterator itr = m_paths.begin();
-             itr != m_paths.end(); ++itr)
+            itr != m_paths.end(); ++itr)
         {
             // std::clog << itr->first << " " << itr->second << "\n";
             if ((itr->second & m_linked_to) != m_linked_to &&

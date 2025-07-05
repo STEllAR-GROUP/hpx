@@ -420,12 +420,14 @@ namespace hpx::threads::policies {
             else
             {
                 // delete only this many threads
-                std::int64_t delete_count = (std::min)(
-                    static_cast<std::int64_t>(terminated_items_count_ / 10),
-                    static_cast<std::int64_t>(parameters_.max_delete_count_));
+                std::int64_t delete_count =
+                    (std::min) (static_cast<std::int64_t>(
+                                    terminated_items_count_ / 10),
+                        static_cast<std::int64_t>(
+                            parameters_.max_delete_count_));
 
                 // delete at least this many threads
-                delete_count = (std::max)(delete_count,
+                delete_count = (std::max) (delete_count,
                     static_cast<std::int64_t>(parameters_.min_delete_count_));
 
                 thread_data* todelete;
@@ -898,9 +900,10 @@ namespace hpx::threads::policies {
         std::size_t get_next_threads(Iterator it, std::int64_t max_items,
             bool allow_stealing = false, bool steal = false)
         {
-            std::int64_t const work_items_count = (std::min)(
-                work_items_count_.data_.load(std::memory_order_relaxed),
-                max_items);
+            std::int64_t const work_items_count =
+                (std::min) (work_items_count_.data_.load(
+                                std::memory_order_relaxed),
+                    max_items);
 
             if (work_items_count == 0)
             {

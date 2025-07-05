@@ -190,7 +190,7 @@ namespace hpx { namespace performance_counters {
             counter_type_map_type::const_iterator end = countertypes_.end();
             for (counter_type_map_type::const_iterator it =
                      countertypes_.begin();
-                 it != end; ++it)
+                it != end; ++it)
             {
                 if (!std::regex_match(it->first, rx))
                     continue;

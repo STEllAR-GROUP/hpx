@@ -45,7 +45,7 @@ jobs:
               -DCMAKE_CXX_COMPILER=g++ \
               -DBOOST_ROOT="C:\Boost" \
               -DHWLOC_ROOT="C:\projects\hwloc-win64-build-2.8.0" \
-              -DHPX_WITH_CXX_STANDARD=20 \
+              -DHPX_WITH_CXX_STANDARD=23 \
               -DHPX_WITH_STATIC_LINKING=ON \
               -DHPX_WITH_MALLOC=system \
               -DHPX_WITH_FETCH_ASIO=ON \

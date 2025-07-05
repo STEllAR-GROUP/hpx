@@ -53,20 +53,6 @@ this can be solved by adding ``COMPONENT_DEPENDENCIES iostreams`` to a call to
 ``add_hpx_library/add_hpx_executable/hpx_setup_target`` if using |cmake|_. See
 :ref:`creating_hpx_projects` for more details.
 
-``Fail compiling for examples with hpx::future and co_await``
--------------------------------------------------------------
-
-You may see an error message that looks a bit like this:
-
-.. code-block:: text
-
-   error: coroutines require a traits template; cannot find 'std::coroutine_traits'
-
-This can be resolved by using ``-DHPX_WITH_CXX_STANDARD=20`` to the cmake command line.
-Note that a compiler that supports C++20 is needed.
-
-See also the corresponding closed :hpx-issue:`5784`.
-
 ``Build fails with ASIO error``
 -------------------------------
 

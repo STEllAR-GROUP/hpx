@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -140,7 +140,7 @@ void calculate_histogram(
         hpx::util::tag::histogram::min_range = *minmax.first,
         hpx::util::tag::histogram::max_range = *minmax.second);
 
-    for (std::int64_t t : timings)
+    for (std::uint64_t t : timings)
     {
         hist(t);
     }

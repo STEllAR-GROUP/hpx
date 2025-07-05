@@ -371,7 +371,7 @@ namespace hpx::parallel::detail {
         constexpr T operator()(T const& t1, T const& t2) const
             noexcept(noexcept(std::declval<T>() > std::declval<T>()))
         {
-            return (std::max)(t1, t2);
+            return (std::max) (t1, t2);
         }
     };
 

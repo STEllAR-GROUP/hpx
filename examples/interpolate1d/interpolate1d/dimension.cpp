@@ -15,7 +15,7 @@ namespace hpx { namespace serialization {
     void serialize(
         Archive& ar, interpolate1d::dimension& dim, unsigned int const)
     {
-        ar& dim.offset_& dim.count_& dim.size_;
+        ar & dim.offset_ & dim.count_ & dim.size_;
     }
 
     ///////////////////////////////////////////////////////////////////////////

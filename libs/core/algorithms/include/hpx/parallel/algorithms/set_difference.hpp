@@ -313,9 +313,7 @@ namespace hpx::parallel {
                 // construct return value
                 return util::detail::convert_to_result(HPX_MOVE(last),
                     [](util::in_in_out_result<Iter1, Iter2, Iter3> const& p)
-                        -> result_type {
-                        return {p.in1, p.out};
-                    });
+                        -> result_type { return {p.in1, p.out}; });
             }
         };
     }    // namespace detail

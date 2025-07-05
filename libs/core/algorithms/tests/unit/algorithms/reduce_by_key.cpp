@@ -100,7 +100,7 @@ struct almost_equal
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename ExPolicy, typename Tkey, typename Tval, typename Op,
@@ -148,7 +148,7 @@ void test_reduce_by_key1(ExPolicy&& policy, Tkey, Tval, bool benchmark,
         //
         Tval sum = 0;
         for (int i = 0; i < numkeys && keysize < HPX_REDUCE_BY_KEY_TEST_SIZE;
-             ++i)
+            ++i)
         {
             Tval value = static_cast<Tval>(distr(eng));
             keys.push_back(key);
@@ -246,7 +246,7 @@ void test_reduce_by_key_const(ExPolicy&& policy, Tkey, Tval, bool benchmark,
         //
         Tval sum = 0;
         for (int i = 0; i < numkeys && keysize < HPX_REDUCE_BY_KEY_TEST_SIZE;
-             ++i)
+            ++i)
         {
             Tval value = static_cast<Tval>(distr(eng));
             keys.push_back(key);
@@ -347,7 +347,7 @@ void test_reduce_by_key_async(
         //
         Tval sum = 0;
         for (int i = 0; i < numkeys && keysize < HPX_REDUCE_BY_KEY_TEST_SIZE;
-             ++i)
+            ++i)
         {
             Tval value = static_cast<Tval>(distr(eng));
             keys.push_back(key);

@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,7 +19,7 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -30,9 +30,10 @@ void test_includes1(IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c1(10007);
-    std::uniform_int_distribution<> dis(0, c1.size() - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
     std::size_t start = dis(gen);
-    std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
+    std::uniform_int_distribution<> dist(
+        0, static_cast<int>(c1.size() - start - 1));
     std::size_t end = start + dist(gen);
 
     std::size_t first_value = gen();    //-V101
@@ -40,8 +41,10 @@ void test_includes1(IteratorTag)
 
     HPX_TEST_LTE(start, end);
 
-    base_iterator start_it = std::next(std::begin(c1), start);
-    base_iterator end_it = std::next(std::begin(c1), end);
+    base_iterator start_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(start));
+    base_iterator end_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(end));
 
     {
         bool result = hpx::includes(
@@ -65,7 +68,8 @@ void test_includes1(IteratorTag)
 
         if (!c2.empty())
         {
-            std::uniform_int_distribution<> dis(0, c2.size() - 1);
+            std::uniform_int_distribution<> dis(
+                0, static_cast<int>(c2.size() - 1));
             ++c2[dis(gen)];    //-V104
 
             bool result = hpx::includes(iterator(std::begin(c1)),
@@ -90,9 +94,10 @@ void test_includes1(ExPolicy&& policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c1(10007);
-    std::uniform_int_distribution<> dis(0, c1.size() - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
     std::size_t start = dis(gen);
-    std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
+    std::uniform_int_distribution<> dist(
+        0, static_cast<int>(c1.size() - start - 1));
     std::size_t end = start + dist(gen);
 
     std::size_t first_value = gen();    //-V101
@@ -100,8 +105,10 @@ void test_includes1(ExPolicy&& policy, IteratorTag)
 
     HPX_TEST_LTE(start, end);
 
-    base_iterator start_it = std::next(std::begin(c1), start);
-    base_iterator end_it = std::next(std::begin(c1), end);
+    base_iterator start_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(start));
+    base_iterator end_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(end));
 
     {
         bool result = hpx::includes(policy, iterator(std::begin(c1)),
@@ -125,7 +132,8 @@ void test_includes1(ExPolicy&& policy, IteratorTag)
 
         if (!c2.empty())
         {
-            std::uniform_int_distribution<> dis(0, c2.size() - 1);
+            std::uniform_int_distribution<> dis(
+                0, static_cast<int>(c2.size() - 1));
             ++c2[dis(gen)];    //-V104
 
             bool result = hpx::includes(policy, iterator(std::begin(c1)),
@@ -149,15 +157,18 @@ void test_includes1_async(ExPolicy&& p, IteratorTag)
     std::vector<std::size_t> c1(10007);
     std::size_t first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
-    std::uniform_int_distribution<> dis(0, c1.size() - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
     std::size_t start = dis(gen);
-    std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
+    std::uniform_int_distribution<> dist(
+        0, static_cast<int>(c1.size() - start - 1));
     std::size_t end = start + dist(gen);
 
     HPX_TEST_LTE(start, end);
 
-    base_iterator start_it = std::next(std::begin(c1), start);
-    base_iterator end_it = std::next(std::begin(c1), end);
+    base_iterator start_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(start));
+    base_iterator end_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(end));
 
     {
         hpx::future<bool> result = hpx::includes(p, iterator(std::begin(c1)),
@@ -182,7 +193,8 @@ void test_includes1_async(ExPolicy&& p, IteratorTag)
 
         if (!c2.empty())
         {
-            std::uniform_int_distribution<> dis(0, c2.size() - 1);
+            std::uniform_int_distribution<> dis(
+                0, static_cast<int>(c2.size() - 1));
             ++c2[dis(gen)];    //-V104
 
             hpx::future<bool> result =
@@ -231,15 +243,18 @@ void test_includes2(IteratorTag)
     std::size_t first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::uniform_int_distribution<> dis(0, c1.size() - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
     std::size_t start = dis(gen);
-    std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
+    std::uniform_int_distribution<> dist(
+        0, static_cast<int>(c1.size() - start - 1));
     std::size_t end = start + dist(gen);
 
     HPX_TEST_LTE(start, end);
 
-    base_iterator start_it = std::next(std::begin(c1), start);
-    base_iterator end_it = std::next(std::begin(c1), end);
+    base_iterator start_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(start));
+    base_iterator end_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(end));
 
     {
         bool result = hpx::includes(iterator(std::begin(c1)),
@@ -263,7 +278,8 @@ void test_includes2(IteratorTag)
 
         if (!c2.empty())
         {
-            std::uniform_int_distribution<> dis(0, c2.size() - 1);
+            std::uniform_int_distribution<> dis(
+                0, static_cast<int>(c2.size() - 1));
             ++c2[dis(gen)];    //-V104
 
             bool result =
@@ -292,15 +308,18 @@ void test_includes2(ExPolicy&& policy, IteratorTag)
     std::size_t first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::uniform_int_distribution<> dis(0, c1.size() - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
     std::size_t start = dis(gen);
-    std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
+    std::uniform_int_distribution<> dist(
+        0, static_cast<int>(c1.size() - start - 1));
     std::size_t end = start + dist(gen);
 
     HPX_TEST_LTE(start, end);
 
-    base_iterator start_it = std::next(std::begin(c1), start);
-    base_iterator end_it = std::next(std::begin(c1), end);
+    base_iterator start_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(start));
+    base_iterator end_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(end));
 
     {
         bool result = hpx::includes(policy, iterator(std::begin(c1)),
@@ -324,7 +343,8 @@ void test_includes2(ExPolicy&& policy, IteratorTag)
 
         if (!c2.empty())
         {
-            std::uniform_int_distribution<> dis(0, c2.size() - 1);
+            std::uniform_int_distribution<> dis(
+                0, static_cast<int>(c2.size() - 1));
             ++c2[dis(gen)];    //-V104
 
             bool result = hpx::includes(policy, iterator(std::begin(c1)),
@@ -350,15 +370,18 @@ void test_includes2_async(ExPolicy&& p, IteratorTag)
     std::size_t first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::uniform_int_distribution<> dis(0, c1.size() - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
     std::size_t start = dis(gen);
-    std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
+    std::uniform_int_distribution<> dist(
+        0, static_cast<int>(c1.size() - start - 1));
     std::size_t end = start + dist(gen);
 
     HPX_TEST_LTE(start, end);
 
-    base_iterator start_it = std::next(std::begin(c1), start);
-    base_iterator end_it = std::next(std::begin(c1), end);
+    base_iterator start_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(start));
+    base_iterator end_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(end));
 
     {
         hpx::future<bool> result = hpx::includes(p, iterator(std::begin(c1)),
@@ -383,7 +406,8 @@ void test_includes2_async(ExPolicy&& p, IteratorTag)
 
         if (!c2.empty())
         {
-            std::uniform_int_distribution<> dis(0, c2.size() - 1);
+            std::uniform_int_distribution<> dis(
+                0, static_cast<int>(c2.size() - 1));
             ++c2[dis(gen)];    //-V104
 
             hpx::future<bool> result = hpx::includes(p,
@@ -432,9 +456,10 @@ void test_includes_exception(IteratorTag)
     std::size_t first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::uniform_int_distribution<> dis(0, c1.size() - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
     std::size_t start = dis(gen);
-    std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
+    std::uniform_int_distribution<> dist(
+        0, static_cast<int>(c1.size() - start - 1));
     std::size_t end = start + dist(gen);
 
     HPX_TEST_LTE(start, end);
@@ -444,8 +469,10 @@ void test_includes_exception(IteratorTag)
 
     HPX_TEST_LTE(end, c1.size());
 
-    base_iterator start_it = std::next(std::begin(c1), start);
-    base_iterator end_it = std::next(std::begin(c1), end);
+    base_iterator start_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(start));
+    base_iterator end_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(end));
 
     bool caught_exception = false;
     try
@@ -484,9 +511,10 @@ void test_includes_exception(ExPolicy&& policy, IteratorTag)
     std::size_t first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::uniform_int_distribution<> dis(0, c1.size() - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
     std::size_t start = dis(gen);
-    std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
+    std::uniform_int_distribution<> dist(
+        0, static_cast<int>(c1.size() - start - 1));
     std::size_t end = start + dist(gen);
 
     HPX_TEST_LTE(start, end);
@@ -496,8 +524,10 @@ void test_includes_exception(ExPolicy&& policy, IteratorTag)
 
     HPX_TEST_LTE(end, c1.size());
 
-    base_iterator start_it = std::next(std::begin(c1), start);
-    base_iterator end_it = std::next(std::begin(c1), end);
+    base_iterator start_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(start));
+    base_iterator end_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(end));
 
     bool caught_exception = false;
     try
@@ -532,9 +562,10 @@ void test_includes_exception_async(ExPolicy&& p, IteratorTag)
     std::size_t first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::uniform_int_distribution<> dis(0, c1.size() - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
     std::size_t start = dis(gen);
-    std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
+    std::uniform_int_distribution<> dist(
+        0, static_cast<int>(c1.size() - start - 1));
     std::size_t end = start + dist(gen);
 
     HPX_TEST_LTE(start, end);
@@ -544,8 +575,10 @@ void test_includes_exception_async(ExPolicy&& p, IteratorTag)
 
     HPX_TEST_LTE(end, c1.size());
 
-    base_iterator start_it = std::next(std::begin(c1), start);
-    base_iterator end_it = std::next(std::begin(c1), end);
+    base_iterator start_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(start));
+    base_iterator end_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(end));
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -609,9 +642,10 @@ void test_includes_bad_alloc(IteratorTag)
     std::size_t first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::uniform_int_distribution<> dis(0, c1.size() - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
     std::size_t start = dis(gen);
-    std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
+    std::uniform_int_distribution<> dist(
+        0, static_cast<int>(c1.size() - start - 1));
     std::size_t end = start + dist(gen);
 
     HPX_TEST_LTE(start, end);
@@ -621,8 +655,10 @@ void test_includes_bad_alloc(IteratorTag)
 
     HPX_TEST_LTE(end, c1.size());
 
-    base_iterator start_it = std::next(std::begin(c1), start);
-    base_iterator end_it = std::next(std::begin(c1), end);
+    base_iterator start_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(start));
+    base_iterator end_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(end));
 
     bool caught_bad_alloc = false;
     try
@@ -659,9 +695,10 @@ void test_includes_bad_alloc(ExPolicy&& policy, IteratorTag)
     std::size_t first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::uniform_int_distribution<> dis(0, c1.size() - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
     std::size_t start = dis(gen);
-    std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
+    std::uniform_int_distribution<> dist(
+        0, static_cast<int>(c1.size() - start - 1));
     std::size_t end = start + dist(gen);
 
     HPX_TEST_LTE(start, end);
@@ -671,8 +708,10 @@ void test_includes_bad_alloc(ExPolicy&& policy, IteratorTag)
 
     HPX_TEST_LTE(end, c1.size());
 
-    base_iterator start_it = std::next(std::begin(c1), start);
-    base_iterator end_it = std::next(std::begin(c1), end);
+    base_iterator start_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(start));
+    base_iterator end_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(end));
 
     bool caught_bad_alloc = false;
     try
@@ -706,9 +745,10 @@ void test_includes_bad_alloc_async(ExPolicy&& p, IteratorTag)
     std::size_t first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::uniform_int_distribution<> dis(0, c1.size() - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
     std::size_t start = dis(gen);
-    std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
+    std::uniform_int_distribution<> dist(
+        0, static_cast<int>(c1.size() - start - 1));
     std::size_t end = start + dist(gen);
 
     HPX_TEST_LTE(start, end);
@@ -718,8 +758,10 @@ void test_includes_bad_alloc_async(ExPolicy&& p, IteratorTag)
 
     HPX_TEST_LTE(end, c1.size());
 
-    base_iterator start_it = std::next(std::begin(c1), start);
-    base_iterator end_it = std::next(std::begin(c1), end);
+    base_iterator start_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(start));
+    base_iterator end_it =
+        std::next(std::begin(c1), static_cast<std::ptrdiff_t>(end));
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;

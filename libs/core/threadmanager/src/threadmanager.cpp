@@ -737,7 +737,7 @@ namespace hpx::threads {
                 }
 
                 max_background_threads =
-                    (std::max)(num_threads_in_pool, max_background_threads);
+                    (std::max) (num_threads_in_pool, max_background_threads);
             }
             else
             {
@@ -1612,7 +1612,7 @@ namespace hpx::threads {
         for (auto& pool_iter : pools_)
         {
             hpx::state s = pool_iter->get_state();
-            result = (std::min)(result, s);
+            result = (std::min) (result, s);
         }
 
         return result;

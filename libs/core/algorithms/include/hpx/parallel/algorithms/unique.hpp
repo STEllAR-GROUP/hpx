@@ -429,6 +429,7 @@ namespace hpx::parallel {
                             bool r = hpx::invoke(pred, hpx::invoke(proj, *base),
                                 hpx::invoke(proj, get<0>(*it)));
 
+                            // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
                             if (!((get<1>(*it) = r)))
                                 base = get<0>(it.get_iterator_tuple());
                         });
@@ -631,6 +632,7 @@ namespace hpx::parallel {
                             bool r = HPX_INVOKE(pred, HPX_INVOKE(proj, *base),
                                 HPX_INVOKE(proj, get<0>(*it)));
 
+                            // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
                             if (!((get<1>(*it) = r)))
                             {
                                 base = get<0>(it.get_iterator_tuple());

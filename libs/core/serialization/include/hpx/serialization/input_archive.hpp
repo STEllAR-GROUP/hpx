@@ -102,6 +102,7 @@ namespace hpx::serialization {
             load(t);
         }
 
+        // NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
         template <typename T>
         void load(T& t)
         {
@@ -250,6 +251,7 @@ namespace hpx::serialization {
             load_binary(&p, sizeof(std::size_t));
         }
 #endif
+        // NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
 
         [[nodiscard]] constexpr std::size_t bytes_read() const noexcept
         {

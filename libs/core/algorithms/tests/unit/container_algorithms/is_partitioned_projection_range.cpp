@@ -19,7 +19,7 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 std::uniform_int_distribution<> dis(0, 99);
 
@@ -61,8 +61,11 @@ void test_partitioned1(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c), std::begin(c) + c.size() / 2, 2 * (dis(gen)));
-    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
+    std::fill(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        2 * (dis(gen)));
+    std::fill(std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        std::end(c), 2 * (dis(gen)) + 1);
 
     bool parted1 = hpx::ranges::is_partitioned(policy, iterator(std::begin(c)),
         iterator(std::end(c)), is_even(), identity());
@@ -88,8 +91,11 @@ void test_partitioned1_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c), std::begin(c) + c.size() / 2, 2 * (dis(gen)));
-    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
+    std::fill(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        2 * (dis(gen)));
+    std::fill(std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        std::end(c), 2 * (dis(gen)) + 1);
 
     hpx::future<bool> f1 = hpx::ranges::is_partitioned(p,
         iterator(std::begin(c)), iterator(std::end(c)), is_even(), identity());
@@ -119,8 +125,11 @@ void test_partitioned1(ExPolicy policy)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c), std::begin(c) + c.size() / 2, 2 * (dis(gen)));
-    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
+    std::fill(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        2 * (dis(gen)));
+    std::fill(std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        std::end(c), 2 * (dis(gen)) + 1);
 
     bool parted1 =
         hpx::ranges::is_partitioned(policy, c, is_even(), identity());
@@ -140,8 +149,11 @@ void test_partitioned1_async(ExPolicy p)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c), std::begin(c) + c.size() / 2, 2 * (dis(gen)));
-    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
+    std::fill(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        2 * (dis(gen)));
+    std::fill(std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        std::end(c), 2 * (dis(gen)) + 1);
 
     hpx::future<bool> f1 =
         hpx::ranges::is_partitioned(p, c, is_even(), identity());
@@ -420,10 +432,15 @@ void test_partitioned3(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c_beg(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c_beg), std::begin(c_beg) + c_beg.size() / 2,
+    std::fill(std::begin(c_beg),
+        std::begin(c_beg) +
+            static_cast<std::ptrdiff_t>(
+                static_cast<std::ptrdiff_t>(c_beg.size() / 2)),
         2 * (dis(gen)));
-    std::fill(std::begin(c_beg) + c_beg.size() / 2, std::end(c_beg),
-        2 * (dis(gen)) + 1);
+    std::fill(std::begin(c_beg) +
+            static_cast<std::ptrdiff_t>(
+                static_cast<std::ptrdiff_t>(c_beg.size() / 2)),
+        std::end(c_beg), 2 * (dis(gen)) + 1);
     std::vector<size_t> c_end = c_beg;
     //add odd number to the beginning
     c_beg[0] -= 1;
@@ -480,10 +497,11 @@ void test_partitioned3_async(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c_beg(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c_beg), std::begin(c_beg) + c_beg.size() / 2,
+    std::fill(std::begin(c_beg),
+        std::begin(c_beg) + static_cast<std::ptrdiff_t>(c_beg.size() / 2),
         2 * (dis(gen)));
-    std::fill(std::begin(c_beg) + c_beg.size() / 2, std::end(c_beg),
-        2 * (dis(gen)) + 1);
+    std::fill(std::begin(c_beg) + static_cast<std::ptrdiff_t>(c_beg.size() / 2),
+        std::end(c_beg), 2 * (dis(gen)) + 1);
     std::vector<size_t> c_end = c_beg;
     //add odd number to the beginning
     c_beg[0] -= 1;
@@ -542,10 +560,11 @@ void test_partitioned3(ExPolicy policy)
     std::vector<std::size_t> c_beg(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c_beg), std::begin(c_beg) + c_beg.size() / 2,
+    std::fill(std::begin(c_beg),
+        std::begin(c_beg) + static_cast<std::ptrdiff_t>(c_beg.size() / 2),
         2 * (dis(gen)));
-    std::fill(std::begin(c_beg) + c_beg.size() / 2, std::end(c_beg),
-        2 * (dis(gen)) + 1);
+    std::fill(std::begin(c_beg) + static_cast<std::ptrdiff_t>(c_beg.size() / 2),
+        std::end(c_beg), 2 * (dis(gen)) + 1);
     std::vector<size_t> c_end = c_beg;
     //add odd number to the beginning
     c_beg[0] -= 1;
@@ -588,10 +607,11 @@ void test_partitioned3_async(ExPolicy p)
     std::vector<std::size_t> c_beg(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c_beg), std::begin(c_beg) + c_beg.size() / 2,
+    std::fill(std::begin(c_beg),
+        std::begin(c_beg) + static_cast<std::ptrdiff_t>(c_beg.size() / 2),
         2 * (dis(gen)));
-    std::fill(std::begin(c_beg) + c_beg.size() / 2, std::end(c_beg),
-        2 * (dis(gen)) + 1);
+    std::fill(std::begin(c_beg) + static_cast<std::ptrdiff_t>(c_beg.size() / 2),
+        std::end(c_beg), 2 * (dis(gen)) + 1);
     std::vector<size_t> c_end = c_beg;
     //add odd number to the beginning
     c_beg[0] -= 1;

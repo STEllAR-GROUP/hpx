@@ -38,6 +38,7 @@ namespace hpx::execution::experimental {
         template <typename Tag, typename... Ts>
         struct property_not_supported;
 
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         template <typename Tag>
         struct property_base : hpx::functional::detail::tag_fallback<Tag>
         {
@@ -47,6 +48,7 @@ namespace hpx::execution::experimental {
             friend constexpr auto tag_fallback_invoke(Tag, Ts&&...) noexcept
                 -> decltype(property_not_supported<Tag, Ts...>());
         };
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////

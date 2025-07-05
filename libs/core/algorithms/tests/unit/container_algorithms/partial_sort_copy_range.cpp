@@ -13,6 +13,7 @@
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <list>
@@ -56,7 +57,9 @@ void test_partial_sort_range_sent(IteratorTag)
 
         hpx::ranges::partial_sort_copy(lst.begin(),
             sentinel<std::uint64_t>{SIZE}, A.begin(),
-            sentinel<std::uint64_t>{*(A.begin() + i)}, compare_t());
+            sentinel<std::uint64_t>{
+                *(A.begin() + static_cast<std::ptrdiff_t>(i))},
+            compare_t());
 
         for (std::uint64_t j = 0; j < i; ++j)
         {
@@ -89,7 +92,9 @@ void test_partial_sort_range_sent(ExPolicy policy, IteratorTag)
 
         hpx::ranges::partial_sort_copy(policy, lst.begin(),
             sentinel<std::uint64_t>{SIZE}, A.begin(),
-            sentinel<std::uint64_t>{*(A.begin() + i)}, compare_t());
+            sentinel<std::uint64_t>{
+                *(A.begin() + static_cast<std::ptrdiff_t>(i))},
+            compare_t());
 
         for (std::uint64_t j = 0; j < i; ++j)
         {
@@ -122,7 +127,9 @@ void test_partial_sort_range_async_sent(ExPolicy p, IteratorTag)
 
         auto result = hpx::ranges::partial_sort_copy(p, lst.begin(),
             sentinel<std::uint64_t>{SIZE}, A.begin(),
-            sentinel<std::uint64_t>{*(A.begin() + i)}, compare_t());
+            sentinel<std::uint64_t>{
+                *(A.begin() + static_cast<std::ptrdiff_t>(i))},
+            compare_t());
         result.get();
 
         for (std::uint64_t j = 0; j < i; ++j)

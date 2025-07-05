@@ -1,6 +1,6 @@
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2015 Daniel Bourgeois
-//  Copyright (c) 2017-2023 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -229,7 +229,8 @@ namespace hpx::parallel {
                 auto f2 = [tok](auto&& results) -> bool {
                     if (tok.was_cancelled())
                         return false;
-                    return sequential_is_partitioned(HPX_MOVE(results));
+                    return sequential_is_partitioned(
+                        HPX_FORWARD(decltype(results), results));
                 };
 
                 return util::partitioner<ExPolicy, bool,

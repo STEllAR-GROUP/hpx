@@ -119,7 +119,7 @@ void f_rvalue_ref(counter&&) {}
 
 void test_by_rvalue_ref()
 {
-    hpx::function<void(counter &&)> f = f_rvalue_ref;
+    hpx::function<void(counter&&)> f = f_rvalue_ref;
 
     counter::reset();
 

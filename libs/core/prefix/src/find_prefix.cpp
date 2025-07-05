@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2012 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2022 Hartmut Kaiser
+//  Copyright (c) 2012-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -76,6 +76,7 @@ namespace hpx::util {
 
             return prefix;
         }
+        // NOLINTNEXTLINE(bugprone-empty-catch)
         catch (std::logic_error const&)
         {
             // just ignore loader problems

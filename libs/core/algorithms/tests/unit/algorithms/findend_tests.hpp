@@ -307,7 +307,8 @@ void test_find_end3(IteratorTag)
     std::fill(std::begin(c), std::end(c), dis(gen));
 
     // create subsequence large enough to always be split into multiple partitions
-    std::iota(std::begin(c), std::begin(c) + c.size() / 16 + 1, 1);
+    std::iota(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 16 + 1), 1);
     std::size_t sub_size = c.size() / 16 + 1;
 
     std::vector<int> h(sub_size);
@@ -336,7 +337,8 @@ void test_find_end3(ExPolicy&& policy, IteratorTag)
     std::fill(std::begin(c), std::end(c), dis(gen));
 
     // create subsequence large enough to always be split into multiple partitions
-    std::iota(std::begin(c), std::begin(c) + c.size() / 16 + 1, 1);
+    std::iota(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 16 + 1), 1);
     std::size_t sub_size = c.size() / 16 + 1;
 
     std::vector<int> h(sub_size);
@@ -362,7 +364,8 @@ void test_find_end3_async(ExPolicy&& p, IteratorTag)
     std::fill(std::begin(c), std::end(c), dist(gen));
 
     // create subsequence large enough to always be split into multiple partitions
-    std::iota(std::begin(c), std::begin(c) + c.size() / 16 + 1, 1);
+    std::iota(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 16 + 1), 1);
     std::size_t sub_size = c.size() / 16 + 1;
 
     std::vector<int> h(sub_size);

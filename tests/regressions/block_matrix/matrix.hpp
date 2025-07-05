@@ -46,7 +46,7 @@ struct vector_t
     {
     }
     explicit vector_t(std::initializer_list<double> x)
-      : N(x.size())
+      : N(static_cast<std::ptrdiff_t>(x.size()))
       , elts(x)
     {
     }

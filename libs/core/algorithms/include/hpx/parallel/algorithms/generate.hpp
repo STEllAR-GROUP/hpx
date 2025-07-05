@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2017-2023 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -252,8 +252,7 @@ namespace hpx::parallel {
                               Iter part_begin, std::size_t part_size) mutable {
                     auto part_end = part_begin;
                     std::advance(part_end, part_size);
-                    return sequential_generate(
-                        HPX_MOVE(policy), part_begin, part_end, HPX_MOVE(f));
+                    return sequential_generate(policy, part_begin, part_end, f);
                 };
 
                 return util::partitioner<ExPolicy, Iter>::call(
@@ -293,7 +292,7 @@ namespace hpx::parallel {
                 auto f1 = [policy, f = HPX_FORWARD(F, f)](FwdIter part_begin,
                               std::size_t part_size) mutable {
                     return sequential_generate_n(
-                        HPX_MOVE(policy), part_begin, part_size, HPX_MOVE(f));
+                        policy, part_begin, part_size, f);
                 };
 
                 return util::partitioner<ExPolicy, FwdIter>::call(

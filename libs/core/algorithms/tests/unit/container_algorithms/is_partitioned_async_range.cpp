@@ -35,7 +35,8 @@ void test_partitioned1_async(ExPolicy p, IteratorTag)
     // fill first half of array with even numbers and second half
     // with odd numbers
     std::fill_n(std::begin(c), c.size() / 2, 2 * (dis(gen)));
-    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
+    std::fill(std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        std::end(c), 2 * (dis(gen)) + 1);
 
     hpx::future<bool> f =
         hpx::ranges::is_partitioned(p, iterator(std::begin(c)),
@@ -53,7 +54,8 @@ void test_partitioned1_async(ExPolicy p)
     // fill first half of array with even numbers and second half
     // with odd numbers
     std::fill_n(std::begin(c), c.size() / 2, 2 * (dis(gen)));
-    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
+    std::fill(std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        std::end(c), 2 * (dis(gen)) + 1);
 
     hpx::future<bool> f = hpx::ranges::is_partitioned(
         p, c, [](std::size_t n) { return n % 2 == 0; });
@@ -158,8 +160,8 @@ void test_partitioned3_async(ExPolicy p, IteratorTag)
     //  fill first half of array with even numbers and second half
     // with odd numbers
     std::fill_n(std::begin(c_beg), c_beg.size() / 2, 2 * (dis(gen)));
-    std::fill(std::begin(c_beg) + c_beg.size() / 2, std::end(c_beg),
-        2 * (dis(gen)) + 1);
+    std::fill(std::begin(c_beg) + static_cast<std::ptrdiff_t>(c_beg.size() / 2),
+        std::end(c_beg), 2 * (dis(gen)) + 1);
     std::vector<size_t> c_end = c_beg;
     // add odd number to the beginning
     c_beg[0] -= 1;
@@ -190,8 +192,8 @@ void test_partitioned3_async(ExPolicy p)
     // fill first half of array with even numbers and second half
     // with odd numbers
     std::fill_n(std::begin(c_beg), c_beg.size() / 2, 2 * (dis(gen)));
-    std::fill(std::begin(c_beg) + c_beg.size() / 2, std::end(c_beg),
-        2 * (dis(gen)) + 1);
+    std::fill(std::begin(c_beg) + static_cast<std::ptrdiff_t>(c_beg.size() / 2),
+        std::end(c_beg), 2 * (dis(gen)) + 1);
     std::vector<size_t> c_end = c_beg;
     // add odd number to the beginning
     c_beg[0] -= 1;
@@ -236,7 +238,8 @@ void test_partitioned_async_exception(ExPolicy p, IteratorTag)
     // fill first half of array with even numbers and second half
     // with odd numbers
     std::fill_n(std::begin(c), c.size() / 2, 2 * (dis(gen)));
-    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
+    std::fill(std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        std::end(c), 2 * (dis(gen)) + 1);
 
     bool caught_exception = false;
     try
@@ -290,7 +293,8 @@ void test_partitioned_async_bad_alloc(ExPolicy p, IteratorTag)
     // fill first half of array with even numbers and second half
     // with odd numbers
     std::fill_n(std::begin(c), c.size() / 2, 2 * (dis(gen)));
-    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
+    std::fill(std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        std::end(c), 2 * (dis(gen)) + 1);
 
     bool caught_bad_alloc = false;
     try

@@ -55,8 +55,8 @@ namespace hpx { namespace parallel {
             }
         };
     }    // namespace detail
-         /// \endcond
-}}       // namespace hpx::parallel
+    /// \endcond
+}}    // namespace hpx::parallel
 
 namespace hpx { namespace segmented {
 

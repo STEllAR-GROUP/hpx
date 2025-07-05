@@ -21,7 +21,7 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,9 +40,10 @@ void test_includes1_sender(
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
 
     std::vector<std::size_t> c1(10007);
-    std::uniform_int_distribution<> dis(0, c1.size() - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
     std::size_t start = dis(gen);
-    std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
+    std::uniform_int_distribution<> dist(
+        0, static_cast<int>(c1.size() - start - 1));
     std::size_t end = start + dist(gen);
 
     std::size_t first_value = gen();    //-V101
@@ -81,7 +82,8 @@ void test_includes1_sender(
 
         if (!c2.empty())
         {
-            std::uniform_int_distribution<> dis(0, c2.size() - 1);
+            std::uniform_int_distribution<> dis(
+                0, static_cast<int>(c2.size() - 1));
             ++c2[dis(gen)];    //-V104
 
             auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
@@ -120,9 +122,10 @@ void test_includes2_sender(
     std::size_t first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
 
-    std::uniform_int_distribution<> dis(0, c1.size() - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
     std::size_t start = dis(gen);
-    std::uniform_int_distribution<> dist(0, c1.size() - start - 1);
+    std::uniform_int_distribution<> dist(
+        0, static_cast<int>(c1.size() - start - 1));
     std::size_t end = start + dist(gen);
 
     HPX_TEST_LTE(start, end);
@@ -158,7 +161,8 @@ void test_includes2_sender(
 
         if (!c2.empty())
         {
-            std::uniform_int_distribution<> dis(0, c2.size() - 1);
+            std::uniform_int_distribution<> dis(
+                0, static_cast<int>(c2.size() - 1));
             ++c2[dis(gen)];    //-V104
 
             auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));

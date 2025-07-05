@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2023 Hartmut Kaiser
+//  Copyright (c) 2011-2025 Hartmut Kaiser
 //  Copyright (c) 2010 Artyom Beilis (Tonkikh)
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -130,7 +130,7 @@ namespace hpx::util::stack_trace {
 
     [[nodiscard]] std::size_t trace(void** array, std::size_t n)
     {
-        return ::backtrace(array, n);
+        return ::backtrace(array, static_cast<int>(n));
     }
 
 #elif defined(HPX_MSVC)
@@ -164,12 +164,14 @@ namespace hpx::util::stack_trace {
             if (ptr == nullptr)
                 return std::string("???");
             std::string res = ptr[0];
+            // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             free(ptr);
             ptr = nullptr;
             return res;
         }
         catch (...)
         {
+            // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             free(ptr);
             throw;
         }

@@ -166,6 +166,7 @@ namespace hpx::execution::experimental {
         friend auto tag_invoke(hpx::parallel::execution::sync_execute_t,
             scheduler_executor const& exec, F&& f, Ts&&... ts)
         {
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             return *hpx::this_thread::experimental::sync_wait(
                 then(schedule(exec.sched_),
                     hpx::util::deferred_call(

@@ -144,7 +144,7 @@ namespace hpx::threads::policies {
                         new thread_queue_type(thread_queue_init_);
                 }
                 for (std::size_t i = num_high_priority_queues_;
-                     i != num_queues_; ++i)
+                    i != num_queues_; ++i)
                 {
                     high_priority_queues_[i].data_ = nullptr;
                 }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -24,7 +24,7 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 std::uniform_int_distribution<> dis(0, 10006);
 
@@ -37,7 +37,7 @@ void test_mismatch_binary1(IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -80,7 +80,7 @@ void test_mismatch_binary1(ExPolicy&& policy, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -122,7 +122,7 @@ void test_mismatch_binary1_async(ExPolicy&& p, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -167,7 +167,7 @@ void test_mismatch_binary2(IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -212,7 +212,7 @@ void test_mismatch_binary2(ExPolicy&& policy, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -254,7 +254,7 @@ void test_mismatch_binary2_async(ExPolicy&& p, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -301,7 +301,7 @@ void test_mismatch_binary_exception(IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -340,7 +340,7 @@ void test_mismatch_binary_exception(ExPolicy&& policy, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -375,7 +375,7 @@ void test_mismatch_binary_exception_async(ExPolicy&& p, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -418,7 +418,7 @@ void test_mismatch_binary_bad_alloc(ExPolicy&& policy, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -452,7 +452,7 @@ void test_mismatch_binary_bad_alloc_async(ExPolicy&& p, IteratorTag)
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -502,7 +502,7 @@ void test_mismatch_binary1_sender(
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
@@ -557,7 +557,7 @@ void test_mismatch_binary2_sender(
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
 
-    int first_value = gen();    //-V101
+    unsigned int first_value = gen();    //-V101
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 

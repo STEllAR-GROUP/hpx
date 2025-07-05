@@ -56,8 +56,10 @@ namespace hpx::parallel::execution::detail {
         HPX_FORCEINLINE static constexpr void bulk_invoke_helper(
             hpx::util::index_pack<Is...>, F&& f, T&& t, Ts&& ts)
         {
+            // NOLINTBEGIN(bugprone-use-after-move)
             HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t),
                 hpx::get<Is>(HPX_FORWARD(Ts, ts))...);
+            // NOLINTEND(bugprone-use-after-move)
         }
 
         // Perform the work in one element indexed by index. The index
@@ -76,8 +78,8 @@ namespace hpx::parallel::execution::detail {
                 hpx::detail::fused_index_pack_t<std::decay_t<Ts>>;
 
             auto const i_begin = index * chunk_size;
-            auto const i_end = (std::min)(
-                i_begin + chunk_size, static_cast<std::uint32_t>(size));
+            auto const i_end = (std::min) (i_begin + chunk_size,
+                static_cast<std::uint32_t>(size));
 
             auto it = std::next(hpx::util::begin(state->shape), i_begin);
             for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
@@ -294,8 +296,9 @@ namespace hpx::parallel::execution::detail {
             auto& queue = queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
             auto const part_begin = worker_thread;
-            auto part_end = static_cast<std::uint32_t>((std::min)(
-                size + num_threads - 1, part_begin + num_steps * num_threads));
+            auto part_end =
+                static_cast<std::uint32_t>((std::min) (size + num_threads - 1,
+                    part_begin + num_steps * num_threads));
             auto const remainder = static_cast<std::uint32_t>(
                 (part_end - part_begin) % num_threads);
             if (remainder != 0)
@@ -371,8 +374,9 @@ namespace hpx::parallel::execution::detail {
           : base_type(init_no_addref{})
           , first_thread(static_cast<std::uint32_t>(first_thread_))
           , num_threads(static_cast<std::uint32_t>(num_threads_))
-          , available_threads((std::min)(
-                static_cast<std::uint32_t>(available_threads_), num_threads))
+          , available_threads(
+                (std::min) (static_cast<std::uint32_t>(available_threads_),
+                    num_threads))
           , policy(HPX_MOVE(l))
           , f(HPX_FORWARD(F_, f))
           , shape(shape)
@@ -403,7 +407,7 @@ namespace hpx::parallel::execution::detail {
                 tasks_remaining.data_ = num_chunks;
                 pu_mask = limit_mask(pu_mask, num_chunks);    //-V106
 
-                available_threads = (std::min)(available_threads, num_threads);
+                available_threads = (std::min) (available_threads, num_threads);
             }
 
             HPX_ASSERT(hpx::threads::count(pu_mask) == available_threads);

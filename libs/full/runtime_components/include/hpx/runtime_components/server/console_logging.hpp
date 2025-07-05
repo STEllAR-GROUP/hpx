@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -76,6 +76,7 @@ namespace hpx::components::server {
                 // call the function, ignoring the return value
                 console_logging(HPX_FORWARD(T, v));
             }
+            // NOLINTNEXTLINE(bugprone-empty-catch)
             catch (...)
             {
                 // no logging!

@@ -1,5 +1,5 @@
 //  Copyright (c) ETH Zurich 2021
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -120,6 +120,7 @@ namespace hpx::detail {
     //      based executor that is re-wrapped into an execution policy that is
     //      then passed on to the underlying algorithm APIs.
     template <typename Tag>
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     struct tag_parallel_algorithm : hpx::functional::detail::tag_fallback<Tag>
     {
         // clang-format off

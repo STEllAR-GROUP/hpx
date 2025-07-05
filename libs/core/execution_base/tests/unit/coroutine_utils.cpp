@@ -241,7 +241,7 @@ int main()
         static_assert(ex::is_awaiter_v<awaiter>);
 
         static_assert(!ex::detail::has_free_operator_co_await_v<
-                      awaitable_sender_1<awaiter>>);
+            awaitable_sender_1<awaiter>>);
 #if !defined(HPX_HAVE_STDEXEC)
         static_assert(
             ex::detail::has_free_operator_co_await_v<awaitable_sender_2>);

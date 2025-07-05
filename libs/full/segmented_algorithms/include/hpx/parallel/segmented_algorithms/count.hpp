@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -226,8 +226,7 @@ namespace hpx { namespace parallel {
                 if (beg != end)
                 {
                     overall_result += dispatch(traits::get_id(sit), algo,
-                        policy, std::true_type(), beg, end, HPX_FORWARD(F, f),
-                        HPX_FORWARD(Proj, proj));
+                        policy, std::true_type(), beg, end, f, proj);
                 }
 
                 // handle all of the full partitions
@@ -238,8 +237,7 @@ namespace hpx { namespace parallel {
                     if (beg != end)
                     {
                         overall_result += dispatch(traits::get_id(sit), algo,
-                            policy, std::true_type(), beg, end,
-                            HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
+                            policy, std::true_type(), beg, end, f, proj);
                     }
                 }
 
@@ -303,11 +301,10 @@ namespace hpx { namespace parallel {
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit), algo,
-                        policy, forced_seq(), beg, end, HPX_FORWARD(F, f),
-                        HPX_FORWARD(Proj, proj)));
+                        policy, forced_seq(), beg, end, f, proj));
                 }
 
-                // handle all of the full partitions
+                // handle all the full partitions
                 for (++sit; sit != send; ++sit)
                 {
                     beg = traits::begin(sit);
@@ -315,8 +312,7 @@ namespace hpx { namespace parallel {
                     if (beg != end)
                     {
                         segments.push_back(dispatch_async(traits::get_id(sit),
-                            algo, policy, forced_seq(), beg, end,
-                            HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj)));
+                            algo, policy, forced_seq(), beg, end, f, proj));
                     }
                 }
 
@@ -348,7 +344,7 @@ namespace hpx { namespace parallel {
         }
         /// \endcond
     }    // namespace detail
-}}       // namespace hpx::parallel
+}}    // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {

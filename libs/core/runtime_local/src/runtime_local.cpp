@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -87,6 +87,7 @@ namespace hpx::detail {
                         return true;
                     });
         }
+        // NOLINTNEXTLINE(bugprone-empty-catch)
         catch (...)
         {
         }
@@ -636,10 +637,8 @@ namespace hpx {
 
     std::uint64_t runtime::get_system_uptime()
     {
-        std::int64_t const diff =
-            static_cast<std::int64_t>(
-                hpx::chrono::high_resolution_clock::now()) -
-            runtime_uptime();
+        auto const diff = static_cast<std::int64_t>(
+            hpx::chrono::high_resolution_clock::now() - runtime_uptime());
         return diff < 0LL ? 0ULL : static_cast<std::uint64_t>(diff);
     }
 

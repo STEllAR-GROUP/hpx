@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //  Copyright (c) 2014 Patricia Grubel
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -32,7 +32,7 @@ void print_time_results(std::uint32_t num_localities,
 
     hpx::util::format_to(std::cout,
         "{:-6} {:-6} {:.14g}, {:-21} {:-21} {:-21}\n", locs_str, threads_str,
-        elapsed / 1e9, nx_str, np_str, nt_str)
+        static_cast<double>(elapsed) / 1e9, nx_str, np_str, nt_str)
         << std::flush;
 }
 
@@ -51,7 +51,7 @@ void print_time_results(std::uint64_t num_os_threads, std::uint64_t elapsed,
     std::string const nt_str = hpx::util::format("{} ", nt);
 
     hpx::util::format_to(std::cout, "{:-21} {:.14g}, {:-21} {:-21} {:-21}\n",
-        threads_str, elapsed / 1e9, nx_str, np_str, nt_str)
+        threads_str, static_cast<double>(elapsed) / 1e9, nx_str, np_str, nt_str)
         << std::flush;
 }
 
@@ -68,6 +68,6 @@ void print_time_results(std::uint64_t num_os_threads, std::uint64_t elapsed,
     std::string const nt_str = hpx::util::format("{} ", nt);
 
     hpx::util::format_to(std::cout, "{:-21} {:10.12}, {:-21} {:-21}\n",
-        threads_str, elapsed / 1e9, nx_str, nt_str)
+        threads_str, static_cast<double>(elapsed) / 1e9, nx_str, nt_str)
         << std::flush;
 }

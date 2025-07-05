@@ -160,7 +160,7 @@ void member_function_pointers()
 
 void member_object_pointers()
 {
-    typedef int(X::*f);
+    typedef int(X::* f);
     HPX_TEST_MSG((hpx::is_invocable_v<f, X*> == true), "mem-obj-ptr/ptr");
     HPX_TEST_MSG(
         (hpx::is_invocable_v<f, X const*> == true), "mem-obj-ptr/const-ptr");

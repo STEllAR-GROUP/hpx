@@ -56,7 +56,8 @@ struct user_defined_type
     user_defined_type(int rand_no)
       : val(rand_no)
     {
-        std::uniform_int_distribution<> dist(0, name_list.size() - 1);
+        std::uniform_int_distribution<> dist(
+            0, static_cast<int>(name_list.size() - 1));
         name = name_list[dist(_gen)];
     }
 
@@ -104,9 +105,10 @@ const std::vector<std::string> user_defined_type::name_list{
 struct random_fill
 {
     random_fill() = default;
-    random_fill(int rand_base, int range)
+    random_fill(std::size_t rand_base, std::size_t range)
       : gen(_gen())
-      , dist(rand_base - range / 2, rand_base + range / 2)
+      , dist(static_cast<int>(rand_base - range / 2),
+            static_cast<int>(rand_base + range / 2))
     {
     }
 
@@ -477,7 +479,7 @@ void test_inplace_merge_bad_alloc_async(ExPolicy&& policy, IteratorTag)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag, typename DataType>
-void test_inplace_merge_etc(IteratorTag, DataType, int rand_base)
+void test_inplace_merge_etc(IteratorTag, DataType, unsigned int rand_base)
 {
     typedef typename std::vector<DataType>::iterator base_iterator;
 
@@ -514,7 +516,7 @@ void test_inplace_merge_etc(IteratorTag, DataType, int rand_base)
 
 template <typename ExPolicy, typename IteratorTag, typename DataType>
 void test_inplace_merge_etc(
-    ExPolicy&& policy, IteratorTag, DataType, int rand_base)
+    ExPolicy&& policy, IteratorTag, DataType, unsigned int rand_base)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -558,21 +560,33 @@ void test_inplace_merge()
 {
     using namespace hpx::execution;
 
-    int rand_base = _gen();
+    unsigned int rand_base = _gen();
 
     ////////// Test cases for 'int' type.
     test_inplace_merge(
         IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a < b; }, rand_base);
+        [](const unsigned int a, const unsigned int b) -> bool {
+            return a < b;
+        },
+        rand_base);
     test_inplace_merge(
         seq, IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a < b; }, rand_base);
+        [](const unsigned int a, const unsigned int b) -> bool {
+            return a < b;
+        },
+        rand_base);
     test_inplace_merge(
         par, IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a < b; }, rand_base);
+        [](const unsigned int a, const unsigned int b) -> bool {
+            return a < b;
+        },
+        rand_base);
     test_inplace_merge(
         par_unseq, IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a > b; }, rand_base);
+        [](const unsigned int a, const unsigned int b) -> bool {
+            return a > b;
+        },
+        rand_base);
 
     ////////// Test cases for user defined type.
     test_inplace_merge(
@@ -603,10 +617,16 @@ void test_inplace_merge()
     ////////// Asynchronous test cases for 'int' type.
     test_inplace_merge_async(
         seq(task), IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a > b; }, rand_base);
+        [](const unsigned int a, const unsigned int b) -> bool {
+            return a > b;
+        },
+        rand_base);
     test_inplace_merge_async(
         par(task), IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a > b; }, rand_base);
+        [](const unsigned int a, const unsigned int b) -> bool {
+            return a > b;
+        },
+        rand_base);
 
     ////////// Asynchronous test cases for user defined type.
     test_inplace_merge_async(

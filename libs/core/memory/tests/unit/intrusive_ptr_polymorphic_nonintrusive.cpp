@@ -34,12 +34,12 @@ HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(D)
 template <class Archive>
 void load(Archive& ar, D& d, unsigned)
 {
-    ar& d.a;
+    ar & d.a;
 }
 template <class Archive>
 void save(Archive& ar, const D& d, unsigned)
 {
-    ar& d.a;
+    ar & d.a;
 }
 HPX_SERIALIZATION_SPLIT_FREE(D)
 
@@ -75,13 +75,13 @@ template <class Archive>
 void load(Archive& ar, E& e, unsigned)
 {
     ar& hpx::serialization::base_object<D>(e);
-    ar& e.b;
+    ar & e.b;
 }
 template <class Archive>
 void save(Archive& ar, const E& e, unsigned)
 {
     ar& hpx::serialization::base_object<D>(e);
-    ar& e.b;
+    ar & e.b;
 }
 HPX_SERIALIZATION_SPLIT_FREE(E)
 HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(E)
@@ -110,7 +110,7 @@ template <class Archive>
 void serialize(Archive& ar, F& f, unsigned)
 {
     ar& hpx::serialization::base_object<E>(f);
-    ar& f.c;
+    ar & f.c;
 }
 HPX_SERIALIZATION_REGISTER_CLASS(F)
 

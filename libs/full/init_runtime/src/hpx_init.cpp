@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -872,7 +872,8 @@ namespace hpx {
             try
             {
                 // make sure the runtime system is not active yet
-                if ((result = ensure_no_runtime_is_up()) != 0)
+                result = ensure_no_runtime_is_up();
+                if (result != 0)
                 {
                     return result;
                 }
@@ -930,7 +931,7 @@ namespace hpx {
                     // contain --hpx:help or --hpx:version, on error result is < 0)
                     if (result != 0)
                     {
-                        result = (std::min)(result, 0);
+                        result = (std::min) (result, 0);
                         return result;
                     }
 
@@ -1022,6 +1023,7 @@ namespace hpx {
                     return hpx::util::from_string<T>(
                         get_runtime().get_config().get_entry(config, default_));
                 }
+                // NOLINTNEXTLINE(bugprone-empty-catch)
                 catch (hpx::util::bad_lexical_cast const&)
                 {
                     // do nothing

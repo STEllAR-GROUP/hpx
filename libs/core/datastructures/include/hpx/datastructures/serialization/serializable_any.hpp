@@ -1,6 +1,6 @@
 /*=============================================================================
     Copyright (c) 2013 Shuangyang Yang
-    Copyright (c) 2007-2024 Hartmut Kaiser
+    Copyright (c) 2007-2025 Hartmut Kaiser
     Copyright (c) Christopher Diggins 2005
     Copyright (c) Pablo Aguilar 2005
     Copyright (c) Kevlin Henney 2001
@@ -243,6 +243,7 @@ namespace hpx::util {
         static void new_object(void*& object, std::true_type, Ts&&... ts)
         {
             using value_type = std::decay_t<T>;
+            // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             new (&object) value_type(HPX_FORWARD(Ts, ts)...);
         }
 

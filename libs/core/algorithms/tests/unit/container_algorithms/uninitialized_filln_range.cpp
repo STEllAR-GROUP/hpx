@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,7 +29,8 @@ void test_uninitialized_fill_n_sent(IteratorTag)
     hpx::ranges::uninitialized_fill_n(std::begin(c), sent_len, 10);
 
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::begin(c) + sent_len,
+    std::for_each(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(sent_len),
         [&count](std::size_t v) -> void {
             HPX_TEST_EQ(v, std::size_t(10));
             ++count;
@@ -49,7 +50,8 @@ void test_uninitialized_fill_n_sent(ExPolicy&& policy, IteratorTag)
     hpx::ranges::uninitialized_fill_n(policy, std::begin(c), sent_len, 10);
 
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::begin(c) + sent_len,
+    std::for_each(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(sent_len),
         [&count](std::size_t v) -> void {
             HPX_TEST_EQ(v, std::size_t(10));
             ++count;
@@ -67,7 +69,8 @@ void test_uninitialized_fill_n_sent_async(ExPolicy&& p, IteratorTag)
     f.wait();
 
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::begin(c) + sent_len,
+    std::for_each(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(sent_len),
         [&count](std::size_t v) -> void {
             HPX_TEST_EQ(v, std::size_t(10));
             ++count;

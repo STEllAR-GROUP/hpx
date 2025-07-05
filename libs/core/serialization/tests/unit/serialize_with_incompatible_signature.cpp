@@ -23,8 +23,8 @@ struct A
 template <class Ar>
 void serialize(Ar& ar, A& a, unsigned)
 {
-    ar& a.a;
-    ar& a.p;
+    ar & a.a;
+    ar & a.p;
 }
 
 int main()

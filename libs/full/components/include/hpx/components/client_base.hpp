@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -307,6 +307,7 @@ namespace hpx::components {
         using future_type = shared_future<hpx::id_type>;
         using extra_data_type = Data;
 
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         client_base(hpx::intrusive_ptr<base_shared_state_type> const& state)
           : shared_state_(state)
         {
@@ -387,6 +388,7 @@ namespace hpx::components {
                 d.valid() ? lcos::detail::unwrap(HPX_MOVE(d)) : nullptr)
         {
         }
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
 
         ~client_base() = default;
 

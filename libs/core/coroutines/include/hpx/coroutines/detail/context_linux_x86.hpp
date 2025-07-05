@@ -206,8 +206,10 @@ namespace hpx::threads::coroutines::detail::lx {
             static_assert(sizeof(void*) == 4);
 #endif
 
-            __builtin_prefetch(m_sp, 1, 3);
-            __builtin_prefetch(m_sp, 0, 3);
+            // NOLINTBEGIN(bugprone-sizeof-expression)
+            // NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
+            __builtin_prefetch(static_cast<void*>(m_sp), 1, 3);
+            __builtin_prefetch(static_cast<void*>(m_sp), 0, 3);
             __builtin_prefetch(
                 static_cast<void**>(m_sp) + 64 / sizeof(void*), 1, 3);
             __builtin_prefetch(
@@ -226,6 +228,8 @@ namespace hpx::threads::coroutines::detail::lx {
                 static_cast<void**>(m_sp) - 64 / sizeof(void*), 1, 3);
             __builtin_prefetch(
                 static_cast<void**>(m_sp) - 64 / sizeof(void*), 0, 3);
+            // NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
+            // NOLINTEND(bugprone-sizeof-expression)
         }
 
         // Free function. Saves the current context in @p from and restores the
@@ -278,12 +282,13 @@ namespace hpx::threads::coroutines::detail::lx {
     {
     public:
         static constexpr std::size_t const default_stack_size =
-            4 * EXEC_PAGESIZE;
+            static_cast<std::size_t>(4) * EXEC_PAGESIZE;
 
         using context_impl_base = x86_linux_context_impl_base;
 
         // Create a context that on restore invokes Functor on a new stack. The
         // stack size can be optionally specified.
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         explicit x86_linux_context_impl(std::ptrdiff_t stack_size = -1)
           : m_stack_size(stack_size == -1 ?
                     static_cast<std::ptrdiff_t>(default_stack_size) :
@@ -324,6 +329,7 @@ namespace hpx::threads::coroutines::detail::lx {
             using fun_type = void(void*);
             fun_type* funp = trampoline<CoroutineImpl>;
 
+            // NOLINTNEXTLINE(bugprone-sizeof-expression)
             m_sp = (static_cast<void**>(m_stack) +
                        static_cast<std::size_t>(m_stack_size) / sizeof(void*)) -
                 context_size;
@@ -391,6 +397,7 @@ namespace hpx::threads::coroutines::detail::lx {
 #endif
 
             // On rebind, we initialize our stack to ensure a virgin stack
+            // NOLINTNEXTLINE(bugprone-sizeof-expression)
             m_sp = (static_cast<void**>(m_stack) +
                        static_cast<std::size_t>(m_stack_size) / sizeof(void*)) -
                 context_size;

@@ -179,6 +179,7 @@ namespace hpx {
 #pragma warning(disable : 26800)    //  Use of a moved from object: '(*<vs_0>)'
 #endif
 
+            // NOLINTBEGIN(bugprone-use-after-move)
             template <typename... Us>
             constexpr HPX_HOST_DEVICE
                 invoke_bound_result_t<F&, util::pack<Ts&...>, Us&&...>
@@ -220,6 +221,7 @@ namespace hpx {
                         HPX_MOVE(_args).template get<Is>(),
                         HPX_FORWARD(Us, vs)...)...);
             }
+            // NOLINTEND(bugprone-use-after-move)
 
 #if defined(HPX_MSVC)
 #pragma warning(pop)

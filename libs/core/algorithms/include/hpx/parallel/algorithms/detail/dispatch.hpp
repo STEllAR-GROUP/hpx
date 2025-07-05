@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -93,6 +93,7 @@ namespace hpx::parallel::detail {
         using result_type = Result;
         using local_result_type = local_algorithm_result_t<result_type>;
 
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         explicit constexpr algorithm(char const* const name) noexcept
           : name_(name)
         {

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -89,7 +89,7 @@ namespace hpx::parallel::util {
                     handle_local_exceptions::call_with_cleanup(
                         workitems, HPX_FORWARD(Cleanup, cleanup));
                 }
-                return f(HPX_MOVE(workitems));
+                return f(HPX_FORWARD(Items, workitems));
             }
 
             template <typename Items1, typename Items2, typename F,
@@ -197,9 +197,9 @@ namespace hpx::parallel::util {
                         handle_local_exceptions::call_with_cleanup(
                             r, HPX_FORWARD(Cleanup, cleanup));
 
-                        return f(HPX_MOVE(r));
+                        return f(HPX_FORWARD(decltype(r), r));
                     },
-                    HPX_MOVE(workitems));
+                    HPX_FORWARD(Items, workitems));
 #endif
             }
         };

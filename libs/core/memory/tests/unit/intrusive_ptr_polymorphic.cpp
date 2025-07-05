@@ -35,12 +35,12 @@ private:
     template <class Archive>
     void load(Archive& ar, unsigned)
     {
-        ar& a;
+        ar & a;
     }
     template <class Archive>
     void save(Archive& ar, unsigned) const
     {
-        ar& a;
+        ar & a;
     }
     HPX_SERIALIZATION_SPLIT_MEMBER();
     HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT_SPLITTED(D);
@@ -77,13 +77,13 @@ struct E : D
     void load(Archive& ar, unsigned)
     {
         ar& hpx::serialization::base_object<D>(*this);
-        ar& b;
+        ar & b;
     }
     template <class Archive>
     void save(Archive& ar, unsigned) const
     {
         ar& hpx::serialization::base_object<D>(*this);
-        ar& b;
+        ar & b;
     }
     HPX_SERIALIZATION_SPLIT_MEMBER();
     HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(E, override);
@@ -98,7 +98,7 @@ class F : public E
     void serialize(Archive& ar, unsigned)
     {
         ar& hpx::serialization::base_object<E>(*this);
-        ar& c;
+        ar & c;
     }
     HPX_SERIALIZATION_POLYMORPHIC(F, override)
 

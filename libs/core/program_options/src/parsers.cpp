@@ -175,7 +175,7 @@ namespace hpx::program_options {
                 if (s.find(prefix) == 0)
                 {
                     for (std::string::size_type n = prefix.size(); n < s.size();
-                         ++n)
+                        ++n)
                     {
                         // Intel-Win-7.1 does not understand push_back on
                         // string.

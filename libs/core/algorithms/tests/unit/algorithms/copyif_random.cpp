@@ -31,7 +31,7 @@ void test_copy_if_seq()
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    auto middle = std::begin(c) + c.size() / 2;
+    auto middle = std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
     std::iota(std::begin(c), middle, dis(gen));
     std::fill(middle, std::end(c), -1);
 
@@ -68,7 +68,7 @@ void test_copy_if(ExPolicy&& policy)
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    auto middle = std::begin(c) + c.size() / 2;
+    auto middle = std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
     std::iota(std::begin(c), middle, dis(gen));
     std::fill(middle, std::end(c), -1);
 
@@ -102,7 +102,7 @@ void test_copy_if_async(ExPolicy&& p)
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    auto middle = std::begin(c) + c.size() / 2;
+    auto middle = std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
     std::iota(std::begin(c), middle, dis(gen));
     std::fill(middle, std::end(c), -1);
 

@@ -73,10 +73,8 @@ int fib(Executor&& exec, int n)
     int x = 0, y = 0;
 
     hpx::experimental::task_group g;
-    g.run(
-        exec, [&](int n) { x = fib(exec, n); }, n - 1);
-    g.run(
-        exec, [&](int n) { y = fib(exec, n); }, n - 2);
+    g.run(exec, [&](int n) { x = fib(exec, n); }, n - 1);
+    g.run(exec, [&](int n) { y = fib(exec, n); }, n - 2);
     g.wait();    // wait for both tasks to complete
 
     return x + y;

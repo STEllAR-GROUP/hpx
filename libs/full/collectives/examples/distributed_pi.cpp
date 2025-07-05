@@ -33,11 +33,11 @@ int main(int argc, char* argv[])
     std::size_t const blocksize = N / num_localities;
     std::size_t const begin = blocksize * locality_id;
     std::size_t const end = blocksize * (locality_id + 1);
-    double h = 1.0 / N;
+    double h = 1.0 / static_cast<double>(N);
 
     double pi = 0.0;
     for (std::size_t i = begin; i != end; ++i)
-        pi += h * 4.0 / (1 + sqr(i * h));
+        pi += h * 4.0 / (1 + sqr(static_cast<double>(i) * h));
 
     hpx::collectives::reduce(
         hpx::collectives::get_world_communicator(), pi, std::plus{});

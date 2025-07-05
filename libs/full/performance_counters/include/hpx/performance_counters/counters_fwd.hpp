@@ -698,4 +698,4 @@ namespace hpx { namespace performance_counters {
         HPX_EXPORT naming::gid_type create_counter_local(
             counter_info const& info);
     }    // namespace detail
-}}       // namespace hpx::performance_counters
+}}    // namespace hpx::performance_counters

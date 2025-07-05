@@ -315,7 +315,7 @@ namespace hpx { namespace agas { namespace server {
 
         partition_table_type::iterator end = partitions_.end();
         for (partition_table_type::iterator it = partitions_.begin(); it != end;
-             ++it)
+            ++it)
         {
             using hpx::get;
             num_threads.push_back(get<1>(it->second));
@@ -336,7 +336,7 @@ namespace hpx { namespace agas { namespace server {
 
         partition_table_type::iterator end = partitions_.end();
         for (partition_table_type::iterator it = partitions_.begin(); it != end;
-             ++it)
+            ++it)
         {
             using hpx::get;
             num_threads += get<1>(it->second);

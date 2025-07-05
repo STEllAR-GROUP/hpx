@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <random>
@@ -44,8 +45,8 @@ void function01()
     for (std::uint64_t i = 0; i <= NELEM; ++i)
     {
         B = A;
-        hpx::partial_sort(::hpx::execution::par, B.begin(), B.begin() + i,
-            B.end(), compare_t());
+        hpx::partial_sort(::hpx::execution::par, B.begin(),
+            B.begin() + static_cast<std::ptrdiff_t>(i), B.end(), compare_t());
     }
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<long unsigned, std::nano> nanotime1 = end - start;
@@ -56,7 +57,8 @@ void function01()
     for (std::uint64_t i = 0; i <= NELEM; ++i)
     {
         B = A;
-        std::partial_sort(B.begin(), B.begin() + i, B.end(), compare_t());
+        std::partial_sort(B.begin(), B.begin() + static_cast<std::ptrdiff_t>(i),
+            B.end(), compare_t());
     }
     end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<long unsigned, std::nano> nanotime2 = end - start;
@@ -152,8 +154,8 @@ void function03()
 
         B = A;
         auto start = std::chrono::high_resolution_clock::now();
-        hpx::partial_sort(hpx::execution::par, B.begin(), B.begin() + i,
-            B.end(), compare_t());
+        hpx::partial_sort(hpx::execution::par, B.begin(),
+            B.begin() + static_cast<std::ptrdiff_t>(i), B.end(), compare_t());
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<long unsigned, std::nano> nanotime1 = end - start;
         ac1 += nanotime1.count();
@@ -161,7 +163,8 @@ void function03()
 
         B = A;
         start = std::chrono::high_resolution_clock::now();
-        std::partial_sort(B.begin(), B.begin() + i, B.end(), compare_t());
+        std::partial_sort(B.begin(), B.begin() + static_cast<std::ptrdiff_t>(i),
+            B.end(), compare_t());
         end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<long unsigned, std::nano> nanotime2 = end - start;
         ac2 += nanotime2.count();

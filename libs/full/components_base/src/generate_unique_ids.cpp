@@ -27,7 +27,7 @@ namespace hpx::util {
             lower_ = naming::invalid_gid;
 
             naming::gid_type lower;
-            std::size_t const count_ = (std::max)(range_delta, count);
+            std::size_t const count_ = (std::max) (range_delta, count);
 
             {
                 hpx::unlock_guard ul(l);

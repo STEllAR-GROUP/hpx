@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,13 +31,17 @@ void test_uninitialized_copy_sent(IteratorTag)
     std::copy(std::begin(c), std::end(c), std::rbegin(d));
     std::size_t sent_len = (std::rand() % 10007) + 1;
     hpx::ranges::uninitialized_copy(std::begin(c),
-        sentinel<std::size_t>{*(std::begin(c) + sent_len)}, std::begin(d),
-        sentinel<std::size_t>{*(std::begin(d) + sent_len)});
+        sentinel<std::size_t>{
+            *(std::begin(c) + static_cast<std::ptrdiff_t>(sent_len))},
+        std::begin(d),
+        sentinel<std::size_t>{
+            *(std::begin(d) + static_cast<std::ptrdiff_t>(sent_len))});
 
     std::size_t count = 0;
     // loop till for sent_len since either the sentinel for the input or output iterator
     // will be reached by then
-    HPX_TEST(std::equal(std::begin(c), std::begin(c) + sent_len, std::begin(d),
+    HPX_TEST(std::equal(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(sent_len), std::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -59,13 +63,17 @@ void test_uninitialized_copy_sent(ExPolicy&& policy, IteratorTag)
     std::copy(std::begin(c), std::end(c), std::rbegin(d));
     std::size_t sent_len = (std::rand() % 10007) + 1;
     hpx::ranges::uninitialized_copy(policy, std::begin(c),
-        sentinel<std::size_t>{*(std::begin(c) + sent_len)}, std::begin(d),
-        sentinel<std::size_t>{*(std::begin(d) + sent_len)});
+        sentinel<std::size_t>{
+            *(std::begin(c) + static_cast<std::ptrdiff_t>(sent_len))},
+        std::begin(d),
+        sentinel<std::size_t>{
+            *(std::begin(d) + static_cast<std::ptrdiff_t>(sent_len))});
 
     std::size_t count = 0;
     // loop till for sent_len since either the sentinel for the input or output iterator
     // will be reached by then
-    HPX_TEST(std::equal(std::begin(c), std::begin(c) + sent_len, std::begin(d),
+    HPX_TEST(std::equal(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(sent_len), std::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;
@@ -84,12 +92,16 @@ void test_uninitialized_copy_sent_async(ExPolicy&& p, IteratorTag)
     std::copy(std::begin(c), std::end(c), std::rbegin(d));
     std::size_t sent_len = (std::rand() % 10007) + 1;
     auto f = hpx::ranges::uninitialized_copy(p, std::begin(c),
-        sentinel<std::size_t>{*(std::begin(c) + sent_len)}, std::begin(d),
-        sentinel<std::size_t>{*(std::begin(d) + sent_len)});
+        sentinel<std::size_t>{
+            *(std::begin(c) + static_cast<std::ptrdiff_t>(sent_len))},
+        std::begin(d),
+        sentinel<std::size_t>{
+            *(std::begin(d) + static_cast<std::ptrdiff_t>(sent_len))});
     f.wait();
 
     std::size_t count = 0;
-    HPX_TEST(std::equal(std::begin(c), std::begin(c) + sent_len, std::begin(d),
+    HPX_TEST(std::equal(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(sent_len), std::begin(d),
         [&count](std::size_t v1, std::size_t v2) -> bool {
             HPX_TEST_EQ(v1, v2);
             ++count;

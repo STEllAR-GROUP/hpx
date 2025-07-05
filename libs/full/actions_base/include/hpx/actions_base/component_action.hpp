@@ -47,7 +47,7 @@ namespace hpx::actions {
         ///////////////////////////////////////////////////////////////////////
         template <typename Component, typename R, typename F, typename... Ts>
         R component_invoke(naming::address_type lva,
-            naming::component_type /*comptype*/, F Component::*f, Ts&&... vs)
+            naming::component_type /*comptype*/, F Component::* f, Ts&&... vs)
         {
             Component* component = get_lva<Component>::call(lva);
             if constexpr (traits::is_future_v<R> || traits::is_client_v<R>)

@@ -82,7 +82,7 @@ namespace hpx::parallel::detail {
             Proj1&& proj1, Proj2&& proj2)
         {
             for (/* */; first1 != last1 && first2 != last2;
-                 (void) ++first1, ++first2)
+                (void) ++first1, ++first2)
             {
                 if (!HPX_INVOKE(f, HPX_INVOKE(proj1, *first1),
                         HPX_INVOKE(proj2, *first2)))

@@ -150,6 +150,7 @@ namespace hpx::execution::experimental {
             }
             else
             {
+                // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                 return hpx::get<0>(HPX_MOVE(*result));
             }
         }

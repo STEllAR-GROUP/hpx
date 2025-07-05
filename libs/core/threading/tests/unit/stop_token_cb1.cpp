@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -409,8 +409,12 @@ void test_cancellation_single_thread_performance()
     };
 
     report("Individual", time1, iteration_count);
-    report("Batch10", time2, 10 * iteration_count);
-    report("Batch50", time3, 50 * iteration_count);
+    report("Batch10", time2,
+        static_cast<std::uint64_t>(10) *
+            static_cast<std::uint64_t>(iteration_count));
+    report("Batch50", time3,
+        static_cast<std::uint64_t>(50) *
+            static_cast<std::uint64_t>(iteration_count));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -1,17 +1,20 @@
-//  Copyright (c) 2023 Hartmut Kaiser
+//  Copyright (c) 2023-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// see: Casey Carter, Lewis Baker, Corentin Jabot. hpx::generator
+// see: Casey Carter, Lewis Baker, Corentin Jabot. std::generator
 // implementation. https://godbolt.org/z/5hcaPcfvP
 
 #include <hpx/config.hpp>
 
-// clang up to V12 refuses to compile the code below
+// clang up to V12 (Apple clang up to v15) and gcc above V13 refuse to compile
+// the code below
 #if defined(HPX_HAVE_CXX20_COROUTINES) &&                                      \
-    (!defined(HPX_CLANG_VERSION) || HPX_CLANG_VERSION >= 130000)
+    (!defined(HPX_CLANG_VERSION) || HPX_CLANG_VERSION >= 130000) &&            \
+    (!defined(HPX_GCC_VERSION) || HPX_GCC_VERSION < 140000) &&                 \
+    (!defined(HPX_APPLE_CLANG_VERSION) || HPX_APPLE_CLANG_VERSION >= 160000)
 
 #include <hpx/generator.hpp>
 #include <hpx/modules/testing.hpp>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -207,9 +207,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::cout << "datasize,testcount,average_time[s]\n" << std::flush;
 
     hpx::util::format_to(hpx::cout, "{},{},{}\n", data_size, iterations,
-        overall_time / concurrency)
+        overall_time / static_cast<double>(concurrency))
         << std::flush;
-    hpx::util::print_cdash_timing("Serialization", overall_time / concurrency);
+    hpx::util::print_cdash_timing(
+        "Serialization", overall_time / static_cast<double>(concurrency));
 
     return hpx::finalize();
 }
