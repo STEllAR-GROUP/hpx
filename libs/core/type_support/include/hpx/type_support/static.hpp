@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/type_support/aligned_storage.hpp>
 
 #include <memory>
 #include <type_traits>
@@ -158,7 +159,7 @@ namespace hpx::util {
             return reinterpret_cast<pointer>(data_);
         }
 
-        using storage_type = std::aligned_storage_t<sizeof(value_type),
+        using storage_type = hpx::aligned_storage_t<sizeof(value_type),
             std::alignment_of_v<value_type>>;
 
         static storage_type data_;

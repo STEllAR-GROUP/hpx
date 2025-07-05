@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013-2023 Hartmut Kaiser
+//  Copyright (c) 2013-2025 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/type_support/aligned_storage.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -56,7 +57,7 @@ namespace hpx::util::detail {
         template <typename T>
         static void* allocate(void* storage, std::size_t storage_size)
         {
-            using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
+            using storage_t = hpx::aligned_storage_t<sizeof(T), alignof(T)>;
 
             if (sizeof(T) > storage_size)
             {
@@ -69,7 +70,7 @@ namespace hpx::util::detail {
         static void _deallocate(
             void* obj, std::size_t storage_size, bool destroy) noexcept
         {
-            using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
+            using storage_t = hpx::aligned_storage_t<sizeof(T), alignof(T)>;
 
             if (destroy)
             {

@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2024 Hartmut Kaiser
+//  Copyright (c) 1998-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,9 @@
 #include <hpx/components_base/server/one_size_heap_list.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
+#include <hpx/type_support/aligned_storage.hpp>
 
+#include <cstddef>
 #include <mutex>
 #include <shared_mutex>
 #include <type_traits>
@@ -26,7 +28,7 @@ namespace hpx::components::detail {
         using base_type = util::one_size_heap_list;
         using value_type = typename Heap::value_type;
 
-        using storage_type = std::aligned_storage_t<sizeof(value_type),
+        using storage_type = hpx::aligned_storage_t<sizeof(value_type),
             std::alignment_of_v<value_type>>;
 
         enum

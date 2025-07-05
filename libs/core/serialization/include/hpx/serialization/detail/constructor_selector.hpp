@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2023 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
@@ -11,6 +11,7 @@
 #include <hpx/serialization/detail/non_default_constructible.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/type_support/aligned_storage.hpp>
 
 #include <type_traits>
 
@@ -33,7 +34,7 @@ namespace hpx::serialization::detail {
             else
             {
                 using storage_type =
-                    std::aligned_storage_t<sizeof(T), alignof(T)>;
+                    hpx::aligned_storage_t<sizeof(T), alignof(T)>;
 
                 storage_type storage;
                 T* t = reinterpret_cast<T*>(&storage);
