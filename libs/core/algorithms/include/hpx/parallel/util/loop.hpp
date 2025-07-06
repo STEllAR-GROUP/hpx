@@ -349,7 +349,7 @@ namespace hpx::parallel::util {
             {
                 std::size_t count(num & std::size_t(-4));    // -V112
                 for (std::size_t i = 0; i < count;
-                     (void) ++it, i += 4)    // -V112
+                    (void) ++it, i += 4)    // -V112
                 {
                     HPX_INVOKE(f, it);
                     HPX_INVOKE(f, ++it);
@@ -486,7 +486,7 @@ namespace hpx::parallel::util {
             {
                 std::size_t count(num & std::size_t(-4));    // -V112
                 for (std::size_t i = 0; i < count;
-                     (void) ++it, i += 4)    // -V112
+                    (void) ++it, i += 4)    // -V112
                 {
                     HPX_INVOKE(f, *it);
                     HPX_INVOKE(f, *++it);
@@ -826,7 +826,7 @@ namespace hpx::parallel::util {
                 {
                     std::size_t count(num & std::size_t(-4));    // -V112
                     for (std::size_t i = 0; i < count;
-                         (void) ++it, ++dest, i += 4)    // -V112
+                        (void) ++it, ++dest, i += 4)    // -V112
                     {
                         HPX_INVOKE(f, it, dest);
                         HPX_INVOKE(f, ++it, ++dest);
@@ -859,7 +859,7 @@ namespace hpx::parallel::util {
                 {
                     std::size_t count(num & std::size_t(-4));    // -V112
                     for (std::size_t i = 0; i < count;
-                         (void) ++it, i += 4)    // -V112
+                        (void) ++it, i += 4)    // -V112
                     {
                         HPX_INVOKE(f, it);
                         HPX_INVOKE(f, ++it);
@@ -1137,7 +1137,7 @@ namespace hpx::parallel::util {
                 std::size_t count(num & std::size_t(-4));    // -V112
 
                 for (std::size_t i = 0; i < count;
-                     (void) ++it, i += 4)    // -V112
+                    (void) ++it, i += 4)    // -V112
                 {
                     HPX_INVOKE(f, *it, base_idx++);
                     HPX_INVOKE(f, *++it, base_idx++);

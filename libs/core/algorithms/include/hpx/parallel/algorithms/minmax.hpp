@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2023 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -794,6 +794,7 @@ namespace hpx::parallel {
             {
                 auto min = first, max = first;
 
+                // NOLINTNEXTLINE(bugprone-inc-dec-in-conditions)
                 if (first == last || ++first == last)
                 {
                     return minmax_element_result<FwdIter>{min, max};
@@ -836,6 +837,7 @@ namespace hpx::parallel {
 
                 if constexpr (!has_scheduler_executor)
                 {
+                    // NOLINTNEXTLINE(bugprone-inc-dec-in-conditions)
                     if (first == last || ++first == last)
                     {
                         return util::detail::algorithm_result<ExPolicy,

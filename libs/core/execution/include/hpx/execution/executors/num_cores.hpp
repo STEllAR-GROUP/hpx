@@ -51,7 +51,7 @@ namespace hpx::execution::experimental {
             std::size_t const available_pus =
                 hpx::execution::experimental::processing_units_count(
                     exec, duration, num_tasks);
-            return (std::min)(this_.num_cores_, available_pus);
+            return (std::min) (this_.num_cores_, available_pus);
         }
         /// \endcond
 

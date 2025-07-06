@@ -1008,7 +1008,7 @@ static void output_module_level_report(module_level_actions& actions)
 
                 for (auto j = i->second.begin(); j != i->second.end(); ++j)
                 {
-                    level = (std::max)(level, level_map[*j] + 1);
+                    level = (std::max) (level, level_map[*j] + 1);
                 }
 
                 if (level == k)
@@ -1049,7 +1049,7 @@ static void output_module_level_report(module_level_actions& actions)
 
                     if (jl < unknown_level)
                     {
-                        level = (std::max)(level, jl + 1);
+                        level = (std::max) (level, jl + 1);
                     }
                     else
                     {
@@ -1064,7 +1064,7 @@ static void output_module_level_report(module_level_actions& actions)
                             ++ml;
                         }
 
-                        level = (std::max)(level, ml);
+                        level = (std::max) (level, ml);
                     }
                 }
 
@@ -1585,7 +1585,7 @@ static void output_module_weight_report(module_weight_actions& actions)
                 actions.module_primary_start();
 
                 for (auto k = s_module_deps[*j].begin();
-                     k != s_module_deps[*j].end(); ++k)
+                    k != s_module_deps[*j].end(); ++k)
                 {
                     std::size_t w =
                         s_module_deps[*k].size() + secondary_deps[*k].size();
@@ -1600,7 +1600,7 @@ static void output_module_weight_report(module_weight_actions& actions)
                 actions.module_secondary_start();
 
                 for (auto k = secondary_deps[*j].begin();
-                     k != secondary_deps[*j].end(); ++k)
+                    k != secondary_deps[*j].end(); ++k)
                 {
                     std::size_t w =
                         s_module_deps[*k].size() + secondary_deps[*k].size();
@@ -1717,7 +1717,8 @@ struct module_weight_html_actions : public module_weight_actions
     {
         std::cout << " ";
 
-        bool heavy = weight >= 0.8 * weight_;
+        bool heavy =
+            static_cast<double>(weight) >= 0.8 * static_cast<double>(weight_);
 
         if (heavy)
         {
@@ -1900,7 +1901,7 @@ static void output_module_subset_report_(std::string const& module,
         int k = 0;
 
         for (auto j = i->second.begin(); j != i->second.end() && k < 4;
-             ++j, ++k)
+            ++j, ++k)
         {
             actions.from_path(j->second);
         }
@@ -2363,7 +2364,7 @@ static void output_module_cmake_report(std::string module)
 
         for (auto i = um.begin(); i != um.end(); ++i)
         {
-            *i = std::toupper(static_cast<unsigned char>(*i));
+            *i = static_cast<char>(std::toupper(*i));
         }
 
         std::cout << "target_compile_definitions(hpx_" << lm
@@ -2802,8 +2803,8 @@ public:
 private:
     virtual int overflow(int c)
     {
-        int r1 = sb1_->sputc(c);
-        int r2 = sb2_->sputc(c);
+        int r1 = sb1_->sputc(static_cast<char>(c));
+        int r2 = sb2_->sputc(static_cast<char>(c));
 
         return r1 == EOF || r2 == EOF ? EOF : c;
     }

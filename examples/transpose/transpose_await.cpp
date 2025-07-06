@@ -102,7 +102,7 @@ struct sub_block
 
     void load(hpx::serialization::input_archive& ar, unsigned)
     {
-        ar& size_;
+        ar & size_;
         if (size_ > 0)
         {
             data_ = new double[size_];
@@ -114,7 +114,7 @@ struct sub_block
 
     void save(hpx::serialization::output_archive& ar, unsigned) const
     {
-        ar& size_;
+        ar & size_;
         if (size_ > 0)
         {
             hpx::serialization::array<double> arr(data_, size_);
@@ -333,8 +333,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
             if (iter > 0 || iterations == 1)    // Skip the first iteration
             {
                 avgtime = avgtime + elapsed;
-                maxtime = (std::max)(maxtime, elapsed);
-                mintime = (std::min)(mintime, elapsed);
+                maxtime = (std::max) (maxtime, elapsed);
+                mintime = (std::min) (mintime, elapsed);
             }
 
             if (root)
@@ -351,8 +351,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
             {
                 std::cout << "Solution validates\n";
                 avgtime = avgtime /
-                    static_cast<double>((std::max)(
-                        iterations - 1, static_cast<std::uint64_t>(1)));
+                    static_cast<double>((std::max) (iterations - 1,
+                        static_cast<std::uint64_t>(1)));
                 std::cout << "Rate (MB/s): " << 1.e-6 * bytes / mintime << ", "
                           << "Avg time (s): " << avgtime << ", "
                           << "Min time (s): " << mintime << ", "
@@ -414,8 +414,8 @@ void transpose(sub_block const A, sub_block B, std::uint64_t block_order,
         {
             for (std::uint64_t j = 0; j != block_order; j += tile_size)
             {
-                std::uint64_t max_i = (std::min)(block_order, i + tile_size);
-                std::uint64_t max_j = (std::min)(block_order, j + tile_size);
+                std::uint64_t max_i = (std::min) (block_order, i + tile_size);
+                std::uint64_t max_j = (std::min) (block_order, j + tile_size);
 
                 for (std::uint64_t it = i; it != max_i; ++it)
                 {

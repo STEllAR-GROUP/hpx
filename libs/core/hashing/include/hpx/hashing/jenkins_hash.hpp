@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2022 Hartmut Kaiser
+//  Copyright (c) 2005-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -107,19 +107,20 @@ namespace hpx::util {
         {
         }
 
-        static unsigned int random_seed(size_type size)
+        static unsigned int random_seed(size_type const size)
         {
             unsigned int const seed = std::random_device{}();
             std::mt19937 gen{seed};
-            return std::uniform_int_distribution<>(0, size - 1)(gen);
+            return std::uniform_int_distribution<>(
+                0, static_cast<int>(size - 1))(gen);
         }
 
-        explicit jenkins_hash(size_type size)
+        explicit jenkins_hash(size_type const size)
           : seed_(random_seed(size))
         {
         }
 
-        explicit jenkins_hash(size_type seedval, seedenum) noexcept
+        explicit jenkins_hash(size_type const seedval, seedenum) noexcept
           : seed_(seedval)
         {
         }
@@ -138,20 +139,20 @@ namespace hpx::util {
         }
 
         constexpr size_type operator()(
-            char const* key, std::size_t len) const noexcept
+            char const* key, std::size_t const len) const noexcept
         {
             return hash(key, len);
         }
 
         /// re-seed the hash generator
-        bool reset(size_type size)
+        bool reset(size_type const size)
         {
             seed_ = random_seed(size);
             return true;
         }
 
         /// initialize the hash generator to a specific seed
-        void set_seed(size_type seedval) noexcept
+        void set_seed(size_type const seedval) noexcept
         {
             seed_ = seedval;
         }
@@ -186,7 +187,7 @@ namespace hpx::util {
         // Use for hash table lookup, or anything where one collision in 2^^32 is
         // acceptable.  Do NOT use for cryptographic purposes.
         constexpr size_type hash(
-            char const* k, std::size_t length) const noexcept
+            char const* k, std::size_t const length) const noexcept
         {
             /* Set up the internal state */
             size_type a = 0x9e3779b9; /* the golden ratio; an arbitrary value */

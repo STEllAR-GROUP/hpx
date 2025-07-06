@@ -86,6 +86,7 @@ namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     class component_base : public detail::base_component
     {
     protected:
@@ -98,6 +99,8 @@ namespace hpx::components {
         using base_type_holder = this_component_type;
         using wrapping_type = component<this_component_type>;
 
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
+
         // Construct an empty component
         constexpr component_base() = default;
 
@@ -106,6 +109,8 @@ namespace hpx::components {
 
         component_base(component_base const&) = default;
         component_base(component_base&& rhs) noexcept = default;
+
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
 
         component_base& operator=(component_base const&) = default;
         component_base& operator=(component_base&& rhs) noexcept = default;

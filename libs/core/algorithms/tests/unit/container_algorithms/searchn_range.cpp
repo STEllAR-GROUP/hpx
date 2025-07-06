@@ -51,7 +51,7 @@ void test_search_n1_without_expolicy(IteratorTag)
     std::size_t h[] = {1, 2};
 
     auto index = hpx::ranges::search_n(c, c.size(), h);
-    auto test_index = std::begin(c) + c.size() / 2;
+    auto test_index = std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == test_index);
 }
@@ -72,7 +72,7 @@ void test_search_n1(ExPolicy policy, IteratorTag)
     std::size_t h[] = {1, 2};
 
     auto index = hpx::ranges::search_n(policy, c, c.size(), h);
-    auto test_index = std::begin(c) + c.size() / 2;
+    auto test_index = std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == test_index);
 }
@@ -93,7 +93,7 @@ void test_search_n1_async(ExPolicy p, IteratorTag)
     f.wait();
 
     // create iterator at position of value to be found
-    auto test_index = std::begin(c) + c.size() / 2;
+    auto test_index = std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(f.get() == test_index);
 }
@@ -194,7 +194,8 @@ void test_search_n3(ExPolicy policy, IteratorTag)
     // fill vector with random values above 2
     std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
     // create subsequence large enough to always be split into multiple partitions
-    std::iota(std::begin(c), std::begin(c) + c.size() / 16 + 1, 1);
+    std::iota(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 16 + 1), 1);
     std::size_t sub_size = c.size() / 16 + 1;
     std::vector<std::size_t> h(sub_size);
     std::iota(std::begin(h), std::end(h), 1);
@@ -213,7 +214,8 @@ void test_search_n3_async(ExPolicy p, IteratorTag)
     // fill vector with random values above 6
     std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 7);
     // create subsequence large enough to always be split into multiple partitions
-    std::iota(std::begin(c), std::begin(c) + c.size() / 16 + 1, 1);
+    std::iota(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 16 + 1), 1);
     std::size_t sub_size = c.size() / 16 + 1;
     std::vector<std::size_t> h(sub_size);
     std::iota(std::begin(h), std::end(h), 1);
@@ -266,7 +268,7 @@ void test_search_n4(ExPolicy policy, IteratorTag)
 
     auto index = hpx::ranges::search_n(policy, c, c.size(), h, op);
 
-    auto test_index = std::begin(c) + c.size() / 2;
+    auto test_index = std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == test_index);
 }
@@ -290,7 +292,7 @@ void test_search_n4_async(ExPolicy p, IteratorTag)
     f.wait();
 
     // create iterator at position of value to be found
-    auto test_index = std::begin(c) + c.size() / 2;
+    auto test_index = std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(f.get() == test_index);
 }
@@ -340,7 +342,7 @@ void test_search_n5(ExPolicy policy, IteratorTag)
     auto index =
         hpx::ranges::search_n(policy, c, c.size(), h, op, proj1, proj2);
 
-    auto test_index = std::begin(c) + c.size() / 2;
+    auto test_index = std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == test_index);
 }
@@ -370,7 +372,7 @@ void test_search_n5_async(ExPolicy p, IteratorTag)
     f.wait();
 
     // create iterator at position of value to be found
-    auto test_index = std::begin(c) + c.size() / 2;
+    auto test_index = std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(f.get() == test_index);
 }

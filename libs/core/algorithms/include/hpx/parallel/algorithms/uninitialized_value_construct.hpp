@@ -242,7 +242,7 @@ namespace hpx::parallel {
                 call(
                     HPX_FORWARD(ExPolicy, policy), first, count,
                     [policy](FwdIter it, std::size_t part_size) mutable
-                    -> partition_result_type {
+                        -> partition_result_type {
                         return std::make_pair(it,
                             sequential_uninitialized_value_construct_n(
                                 HPX_FORWARD(ExPolicy, policy), it, part_size));

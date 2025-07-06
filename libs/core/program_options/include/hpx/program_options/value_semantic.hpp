@@ -85,8 +85,8 @@ namespace hpx::program_options {
         or with UTF8->ascii conversion.
     */
     template <>
-    class HPX_CORE_EXPORT value_semantic_codecvt_helper<char>
-      : public value_semantic
+    class HPX_CORE_EXPORT
+        value_semantic_codecvt_helper<char> : public value_semantic
     {
     private:    // base overrides
         void parse(hpx::any_nonser& value_store,
@@ -106,8 +106,8 @@ namespace hpx::program_options {
         pass it unmodified.
     */
     template <>
-    class HPX_CORE_EXPORT value_semantic_codecvt_helper<wchar_t>
-      : public value_semantic
+    class HPX_CORE_EXPORT
+        value_semantic_codecvt_helper<wchar_t> : public value_semantic
     {
     private:    // base overrides
         void parse(hpx::any_nonser& value_store,

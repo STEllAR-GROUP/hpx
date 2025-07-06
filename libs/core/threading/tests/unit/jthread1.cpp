@@ -81,7 +81,7 @@ void test_jthread_with_token()
 
                 // wait until interrupt is signaled
                 for ([[maybe_unused]] int i = 0; !stoptoken.stop_requested();
-                     ++i)
+                    ++i)
                 {
                     hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
                 }

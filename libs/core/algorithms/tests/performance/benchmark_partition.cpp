@@ -25,7 +25,7 @@
 #include "utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-const int random_fill_range = (std::min)(100000, RAND_MAX);
+const int random_fill_range = (std::min) (100000, RAND_MAX);
 unsigned int seed = std::random_device{}();
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ double run_partition_benchmark_std(int test_count, OrgIter org_first,
         time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ double run_partition_benchmark_hpx(int test_count, ExPolicy policy,
         time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

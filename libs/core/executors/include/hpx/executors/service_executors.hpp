@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -123,7 +123,7 @@ namespace hpx::parallel::execution::detail {
             for (auto const& elem : shape)
             {
                 results.push_back(hpx::parallel::execution::async_execute(
-                    exec, HPX_FORWARD(F, f), elem, ts...));
+                    exec, f, elem, ts...));
             }
 
             return results;
@@ -155,7 +155,8 @@ namespace hpx::parallel::execution::detail {
                     HPX_FORWARD(Future, predecessor), exec_current,
                     [func = HPX_MOVE(func)](
                         auto&& predecessor) mutable -> vector_result_type {
-                        return hpx::unwrap(func(HPX_MOVE(predecessor)));
+                        return hpx::unwrap(func(
+                            HPX_FORWARD(decltype(predecessor), predecessor)));
                     });
 
             return hpx::traits::future_access<result_future_type>::create(

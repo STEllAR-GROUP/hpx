@@ -31,12 +31,14 @@ namespace hpx {
         using tag = Tag;
         using type = Type;
 
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         explicit error_info(Type const& value) noexcept(
             std::is_nothrow_copy_constructible_v<Type>)
           : _value(value)
         {
         }
 
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         explicit error_info(Type&& value) noexcept
           : _value(HPX_MOVE(value))
         {
@@ -241,6 +243,7 @@ namespace hpx {
         -> decltype(HPX_FORWARD(F, f)(std::declval<exception_info const*>()))
     // clang-format on
     {
+        // NOLINTBEGIN(bugprone-empty-catch)
         try
         {
             if (p)
@@ -253,6 +256,7 @@ namespace hpx {
         catch (...)
         {    //-V565
         }
+        // NOLINTEND(bugprone-empty-catch)
         return HPX_FORWARD(F, f)(nullptr);
     }
 

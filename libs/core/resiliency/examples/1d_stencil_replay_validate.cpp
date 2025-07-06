@@ -139,7 +139,9 @@ chk_vector update(subdomain_future left_input, subdomain_future center_input,
     std::vector<double> workspace(3 * subdomain_width + 1);
     std::copy(begin(left), end(left) - 1, &workspace[0]);
     std::copy(begin(center), end(center) - 1, &workspace[subdomain_width]);
-    std::copy(begin(right), end(right), &workspace[2 * subdomain_width]);
+    std::copy(begin(right), end(right),
+        // NOLINTNEXTLINE(bugprone-misplaced-widening-cast)
+        &workspace[static_cast<std::size_t>(2 * subdomain_width)]);
     double checksum = left.chk() - *begin(center) + center.chk() -
         *begin(right) + right.chk();
     for (int t = 0; t < subdomain_width; ++t)

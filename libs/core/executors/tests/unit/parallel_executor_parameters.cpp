@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -92,7 +92,8 @@ void test_hint()
     {
         for (auto hint : {0, 1})
         {
-            hpx::threads::thread_schedule_hint newhint(mode, hint);
+            hpx::threads::thread_schedule_hint newhint(
+                mode, static_cast<std::int16_t>(hint));
             auto newexec =
                 hpx::execution::experimental::with_hint(exec, newhint);
 

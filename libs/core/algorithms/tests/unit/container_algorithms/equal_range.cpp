@@ -47,7 +47,7 @@ void test_equal1(IteratorTag)
     }
 
     {
-        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
         ++c1[dis(gen)];    //-V104
         bool result = hpx::ranges::equal(iterator(std::begin(c1)),
             iterator(std::end(c1)), std::begin(c2), std::end(c2));
@@ -88,7 +88,7 @@ void test_equal1(ExPolicy&& policy, IteratorTag)
     }
 
     {
-        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
         ++c1[dis(gen)];    //-V104
         bool result = hpx::ranges::equal(policy, iterator(std::begin(c1)),
             iterator(std::end(c1)), std::begin(c2), std::end(c2));
@@ -128,7 +128,7 @@ void test_equal1_async(ExPolicy&& p, IteratorTag)
     }
 
     {
-        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
         ++c1[dis(gen)];    //-V104
 
         hpx::future<bool> result =
@@ -192,7 +192,7 @@ void test_equal2(IteratorTag)
     }
 
     {
-        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
         ++c1[dis(gen)];    //-V104
         bool result =
             hpx::ranges::equal(iterator(std::begin(c1)), iterator(std::end(c1)),
@@ -235,7 +235,7 @@ void test_equal2(ExPolicy&& policy, IteratorTag)
     }
 
     {
-        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
         ++c1[dis(gen)];    //-V104
         bool result = hpx::ranges::equal(policy, iterator(std::begin(c1)),
             iterator(std::end(c1)), std::begin(c2), std::end(c2),
@@ -276,7 +276,7 @@ void test_equal2_async(ExPolicy&& p, IteratorTag)
     }
 
     {
-        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        std::uniform_int_distribution<> dis(0, static_cast<int>(c1.size() - 1));
         ++c1[dis(gen)];    //-V104
 
         hpx::future<bool> result = hpx::ranges::equal(p,

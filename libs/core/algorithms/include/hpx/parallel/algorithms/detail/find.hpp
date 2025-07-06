@@ -327,7 +327,7 @@ namespace hpx::parallel::detail {
                         ++mid2;
 
                         for (; local_count != diff;
-                             ++local_count, ++mid, ++mid2)
+                            ++local_count, ++mid, ++mid2)
                         {
                             // Note: replacing the invoke() with HPX_INVOKE()
                             // below makes gcc generate errors

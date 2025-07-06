@@ -28,7 +28,7 @@ struct DummyContainer
     template <typename Archive>
     void serialize(Archive& archive, unsigned)
     {
-        archive& cargo;
+        archive & cargo;
     }
 
     bool operator<(const DummyContainer<Cargo> other) const
@@ -105,7 +105,7 @@ void test(T min, T max)
 
         typename std::set<DummyContainer<T>>::iterator j = is.begin();
         for (typename std::set<DummyContainer<T>>::iterator i = os.begin();
-             i != os.end(); ++i)
+            i != os.end(); ++i)
         {
             HPX_TEST_EQ(i->cargo, j->cargo);
             ++j;
@@ -153,7 +153,7 @@ void test_fp(T min, T max)
 
         typename std::set<DummyContainer<T>>::iterator j = is.begin();
         for (typename std::set<DummyContainer<T>>::iterator i = os.begin();
-             i != os.end(); ++i)
+            i != os.end(); ++i)
         {
             HPX_TEST_EQ(i->cargo, j->cargo);
             ++j;

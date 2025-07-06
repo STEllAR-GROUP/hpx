@@ -834,7 +834,7 @@ namespace hpx::threads::policies {
                 bool suspended_only = true;
 
                 for (std::size_t i = 0; suspended_only && i != queues_.size();
-                     ++i)
+                    ++i)
                 {
                     suspended_only = queues_[i]->dump_suspended_threads(
                         i, idle_loop_count, running);

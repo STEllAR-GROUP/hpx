@@ -28,7 +28,7 @@ void bulk_test_function(
 
     // Test sync_all()
     for (std::size_t i = 0, test_count = num_images; i < iterations;
-         i++, test_count += num_images)
+        i++, test_count += num_images)
     {
         ++c[0];
         block.sync_all();

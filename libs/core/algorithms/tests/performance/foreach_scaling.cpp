@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2021-2022 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -418,9 +418,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         if (csvoutput)
         {
-            std::cout << "," << seq_time_foreach / 1e9 << ","
-                      << par_time_foreach / 1e9 << ","
-                      << task_time_foreach / 1e9 << "\n"
+            std::cout << "," << static_cast<double>(seq_time_foreach) / 1e9
+                      << "," << static_cast<double>(par_time_foreach) / 1e9
+                      << "," << static_cast<double>(task_time_foreach) / 1e9
+                      << "\n"
                       << std::flush;
         }
         else
@@ -446,55 +447,71 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::cout << "-------------Average-(for)---------------------\n"
                       << std::left
                       << "Average execution time (unrolled) : " << std::right
-                      << std::setw(8) << plain_time_for / 1e9 << "\n"
+                      << std::setw(8)
+                      << static_cast<double>(plain_time_for) / 1e9 << "\n"
                       << std::left
                       << "Average execution time (iter)     : " << std::right
-                      << std::setw(8) << plain_time_for_iter / 1e9 << "\n";
+                      << std::setw(8)
+                      << static_cast<double>(plain_time_for_iter) / 1e9 << "\n";
 
             std::cout << "-------------Average-(for_each)----------------\n"
                       << std::left
                       << "Average parallel execution time   : " << std::right
-                      << std::setw(8) << par_time_foreach / 1e9 << "\n"
+                      << std::setw(8)
+                      << static_cast<double>(par_time_foreach) / 1e9 << "\n"
                       << std::left
                       << "Average task execution time       : " << std::right
-                      << std::setw(8) << task_time_foreach / 1e9 << "\n"
+                      << std::setw(8)
+                      << static_cast<double>(task_time_foreach) / 1e9 << "\n"
                       << std::left
                       << "Average sequential execution time : " << std::right
-                      << std::setw(8) << seq_time_foreach / 1e9 << "\n"
+                      << std::setw(8)
+                      << static_cast<double>(seq_time_foreach) / 1e9 << "\n"
                       << std::flush;
 
             std::cout << "-----Execution Time Difference-(for_each)------\n"
                       << std::left
                       << "Parallel Scale                    : " << std::right
                       << std::setw(8)
-                      << (double(seq_time_foreach) / par_time_foreach) << "\n"
+                      << (static_cast<double>(seq_time_foreach) /
+                             static_cast<double>(par_time_foreach))
+                      << "\n"
                       << std::left
                       << "Task Scale                        : " << std::right
                       << std::setw(8)
-                      << (double(seq_time_foreach) / task_time_foreach) << "\n"
+                      << (static_cast<double>(seq_time_foreach) /
+                             static_cast<double>(task_time_foreach))
+                      << "\n"
                       << std::flush;
 
             std::cout << "-------------Average-(for_loop)----------------\n"
                       << std::left
                       << "Average parallel execution time   : " << std::right
-                      << std::setw(8) << par_time_forloop / 1e9 << "\n"
+                      << std::setw(8)
+                      << static_cast<double>(par_time_forloop) / 1e9 << "\n"
                       << std::left
                       << "Average task execution time       : " << std::right
-                      << std::setw(8) << task_time_forloop / 1e9 << "\n"
+                      << std::setw(8)
+                      << static_cast<double>(task_time_forloop) / 1e9 << "\n"
                       << std::left
                       << "Average sequential execution time : " << std::right
-                      << std::setw(8) << seq_time_forloop / 1e9 << "\n"
+                      << std::setw(8)
+                      << static_cast<double>(seq_time_forloop) / 1e9 << "\n"
                       << std::flush;
 
             std::cout << "-----Execution Time Difference-(for_loop)------\n"
                       << std::left
                       << "Parallel Scale                    : " << std::right
                       << std::setw(8)
-                      << (double(seq_time_forloop) / par_time_forloop) << "\n"
+                      << (static_cast<double>(seq_time_forloop) /
+                             static_cast<double>(par_time_forloop))
+                      << "\n"
                       << std::left
                       << "Task Scale                        : " << std::right
                       << std::setw(8)
-                      << (double(seq_time_forloop) / task_time_forloop) << "\n";
+                      << (static_cast<double>(seq_time_forloop) /
+                             static_cast<double>(task_time_forloop))
+                      << "\n";
         }
     }
 

@@ -78,9 +78,9 @@ int main()
     foo::baq b3;
     foo::bap b4;
     oarchive << b1 << b2 << b3 << b4;
-    oarchive& b1& b2& b3& b4;
+    oarchive & b1 & b2 & b3 & b4;
 
     hpx::serialization::input_archive iarchive(buffer);
     iarchive >> b1 >> b2 >> b3 >> b4;
-    iarchive& b1& b2& b3& b4;
+    iarchive & b1 & b2 & b3 & b4;
 }

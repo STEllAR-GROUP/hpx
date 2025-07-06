@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -339,6 +339,10 @@ namespace hpx::execution::experimental {
                             std::declval<std::decay_t<operation_state>&>())))>;
                 operation_state_type op_state;
 
+                // NOLINTBEGIN(bugprone-use-after-move)
+                //
+                // Each recursion level touches only one of the senders from the
+                // pack.
                 template <typename Receiver_, typename Senders_>
                 operation_state(Receiver_&& receiver, Senders_&& senders)
                   : receiver(HPX_FORWARD(Receiver_, receiver))
@@ -351,6 +355,7 @@ namespace hpx::execution::experimental {
                         when_all_receiver<operation_state>(*this)))
                 {
                 }
+                // NOLINTEND(bugprone-use-after-move)
 
                 operation_state(operation_state&&) = delete;
                 operation_state& operator=(operation_state&&) = delete;
@@ -368,6 +373,7 @@ namespace hpx::execution::experimental {
                         t) noexcept
                 {
                     hpx::execution::experimental::set_value(
+                        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                         HPX_MOVE(receiver), HPX_MOVE(*t.template get<Is>())...);
                 }
 
@@ -436,6 +442,10 @@ namespace hpx::execution::experimental {
                             std::declval<std::decay_t<operation_state>&>())))>;
                 operation_state_type op_state;
 
+                // NOLINTBEGIN(bugprone-use-after-move)
+                //
+                // Each recursion level touches only one of the senders from the
+                // pack.
                 template <typename Receiver_, typename SendersPack_>
                 operation_state(Receiver_&& receiver, SendersPack_&& senders)
                   : base_type(HPX_FORWARD(Receiver_, receiver),
@@ -449,6 +459,7 @@ namespace hpx::execution::experimental {
                         when_all_receiver<operation_state>(*this)))
                 {
                 }
+                // NOLINTEND(bugprone-use-after-move)
 
                 operation_state(operation_state&&) = delete;
                 operation_state& operator=(operation_state&&) = delete;

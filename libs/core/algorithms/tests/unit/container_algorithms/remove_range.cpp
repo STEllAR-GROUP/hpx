@@ -55,9 +55,10 @@ const std::vector<std::string> user_defined_type::name_list{
 
 struct random_fill
 {
-    random_fill(int rand_base, int range)
+    random_fill(std::size_t rand_base, std::size_t range)
       : gen(std::rand())
-      , dist(rand_base - range / 2, rand_base + range / 2)
+      , dist(static_cast<int>(rand_base - range / 2),
+            static_cast<int>(rand_base + range / 2))
     {
     }
 
@@ -184,8 +185,8 @@ void test_remove_async(ExPolicy policy, DataType)
 }
 
 template <typename ExPolicy, typename DataType>
-void test_remove_proj(
-    ExPolicy policy, DataType, int rand_base, bool test_for_remove_if = false)
+void test_remove_proj(ExPolicy policy, DataType, unsigned int rand_base,
+    bool test_for_remove_if = false)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -242,7 +243,7 @@ void test_remove()
     test_remove_sent(par_unseq);
 
     // test projection
-    int rand_base = g();
+    unsigned int rand_base = g();
     test_remove_proj(seq, DataType(), rand_base);
     test_remove_proj(seq, DataType(), rand_base, true);
     test_remove_proj(par, DataType(), rand_base);

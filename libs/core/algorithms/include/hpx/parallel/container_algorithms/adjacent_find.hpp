@@ -386,7 +386,8 @@ namespace hpx::ranges {
             return hpx::parallel::detail::adjacent_find<iterator_type,
                 iterator_type>()
                 .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
-                    std::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
+                    std::end(rng), HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
         }
     } adjacent_find{};
 }    // namespace hpx::ranges

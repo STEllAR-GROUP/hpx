@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 Thomas Heller
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -230,7 +230,7 @@ namespace hpx::functional {
         ///////////////////////////////////////////////////////////////////////////
         // helper base class implementing the tag_invoke logic for CPOs
         template <typename Tag, typename Enable>
-        struct tag
+        struct tag    // NOLINT(bugprone-crtp-constructor-accessibility)
         {
             template <typename... Args,
                 typename = std::enable_if_t<meta::value<
@@ -246,6 +246,7 @@ namespace hpx::functional {
         };
 
         template <typename Tag, typename Enable>
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         struct tag_noexcept
         {
             template <typename... Args,

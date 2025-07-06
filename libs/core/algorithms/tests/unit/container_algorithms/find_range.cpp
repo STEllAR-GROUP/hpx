@@ -37,7 +37,8 @@ void test_find(IteratorTag)
     iterator index = hpx::ranges::find(
         iterator(std::begin(c)), iterator(std::end(c)), std::size_t(1));
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -59,7 +60,8 @@ void test_find(ExPolicy&& policy, IteratorTag)
     iterator index = hpx::ranges::find(
         policy, iterator(std::begin(c)), iterator(std::end(c)), std::size_t(1));
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -80,7 +82,8 @@ void test_find_async(ExPolicy&& p, IteratorTag)
     f.wait();
 
     //create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(f.get() == iterator(test_index));
 }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2025 Hartmut Kaiser
 //  Copyright (c) 2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -238,7 +238,7 @@ namespace hpx { namespace lcos {
                 return result_type();
 
             std::size_t const local_fanout = HPX_REDUCE_FANOUT;
-            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t local_size = (std::min) (ids.size(), local_fanout);
             std::size_t fanout =
                 util::calculate_fanout(ids.size(), local_fanout);
 
@@ -265,8 +265,9 @@ namespace hpx { namespace lcos {
                     HPX_ASSERT(ids.size() >= applied);
 
                     std::size_t next_fan =
-                        (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
+                        (std::min) (fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(
+                        it, it + static_cast<std::ptrdiff_t>(next_fan));
 
                     hpx::id_type id(ids_next[0]);
                     reduce_futures.push_back(
@@ -275,7 +276,7 @@ namespace hpx { namespace lcos {
                             global_idx + applied, vs...));
 
                     applied += next_fan;
-                    it += next_fan;
+                    it += static_cast<std::ptrdiff_t>(next_fan);
                 }
             }
 

@@ -10,12 +10,11 @@
 
 namespace hpx::detail {
 
-    // clang-format off
     template <typename T>
     HPX_HOST_DEVICE constexpr T const&(min) (T const& a, T const& b) noexcept(
         noexcept(a < b))
     {
+        // NOLINTNEXTLINE(bugprone-return-const-ref-from-parameter)
         return a < b ? a : b;
     }
-    // clang-format on
 }    // namespace hpx::detail

@@ -76,7 +76,7 @@ namespace hpx {
         }
 
         template <typename T, typename C>
-        [[nodiscard]] constexpr bool is_empty_function_ptr(T C::*mp) noexcept
+        [[nodiscard]] constexpr bool is_empty_function_ptr(T C::* mp) noexcept
         {
             return mp == nullptr;
         }

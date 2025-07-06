@@ -778,7 +778,7 @@ namespace hpx::threads::detail {
         }
 
         std::size_t const num_cores =
-            (std::min)(max_cores, t.get_number_of_cores());
+            (std::min) (max_cores, t.get_number_of_cores());
         num_pus.resize(num_threads);
 
         for (std::size_t num_thread = 0; num_thread < num_threads; /**/)
@@ -832,7 +832,7 @@ namespace hpx::threads::detail {
         }
 
         std::size_t const num_cores =
-            (std::min)(max_cores, t.get_number_of_cores());
+            (std::min) (max_cores, t.get_number_of_cores());
 
         std::vector<std::size_t> next_pu_index(num_cores, 0);
         num_pus.resize(num_threads);
@@ -903,7 +903,7 @@ namespace hpx::threads::detail {
         }
 
         std::size_t const num_cores =
-            (std::min)(max_cores, t.get_number_of_cores());
+            (std::min) (max_cores, t.get_number_of_cores());
 
         std::vector<std::size_t> num_pus_cores(num_cores, 0);
         std::vector<std::size_t> next_pu_index(num_cores, 0);
@@ -955,7 +955,7 @@ namespace hpx::threads::detail {
         for (std::size_t num_core = 0; num_core < num_cores; ++num_core)
         {
             for (std::size_t num_pu = 0; num_pu < num_pus_cores[num_core];
-                 ++num_pu)
+                ++num_pu)
             {
                 if (any(affinities[num_thread]))
                 {
@@ -994,8 +994,8 @@ namespace hpx::threads::detail {
         num_pus.resize(num_threads);
 
         // numa nodes
-        std::size_t const num_numas = (std::max)(
-            static_cast<std::size_t>(1), t.get_number_of_numa_nodes());
+        std::size_t const num_numas = (std::max) (static_cast<std::size_t>(1),
+            t.get_number_of_numa_nodes());
         std::vector<std::size_t> num_cores_numa(num_numas, 0);
         std::vector<std::size_t> num_pus_numa(num_numas, 0);
         std::vector<std::size_t> num_threads_numa(num_numas, 0);
@@ -1009,7 +1009,7 @@ namespace hpx::threads::detail {
         for (std::size_t n = 0; n < num_numas; ++n)
         {
             for (std::size_t num_core = 0; num_core < num_cores_numa[n];
-                 ++num_core)
+                ++num_core)
             {
                 std::size_t const pus =
                     t.get_number_of_core_pus(num_core + core_offset);
@@ -1057,11 +1057,11 @@ namespace hpx::threads::detail {
 
             // iterate once and count pus/core
             for (std::size_t num_thread_numa = 0;
-                 num_thread_numa < num_threads_numa[n];
+                num_thread_numa < num_threads_numa[n];
                 /**/)
             {
                 for (std::size_t num_core = 0; num_core < num_cores_numa[n];
-                     ++num_core)
+                    ++num_core)
                 {
                     std::size_t const num_core_pus =
                         t.get_number_of_core_pus(num_core);
@@ -1099,10 +1099,10 @@ namespace hpx::threads::detail {
             // Iterate over the cores and assigned pus per core. this additional
             // loop is needed so that we have consecutive worker thread numbers
             for (std::size_t num_core = 0; num_core < num_cores_numa[n];
-                 ++num_core)
+                ++num_core)
             {
                 for (std::size_t num_pu = 0; num_pu < num_pus_cores[num_core];
-                     ++num_pu)
+                    ++num_pu)
                 {
                     if (any(affinities[num_thread]))
                     {

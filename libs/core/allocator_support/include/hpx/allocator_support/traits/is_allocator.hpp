@@ -61,8 +61,8 @@ namespace hpx::traits {
             static auto test(Alloc const& a, Pointer&& p) -> std::false_type;
 
         public:
-            static constexpr bool value = decltype(
-                test<T>(std::declval<T>(), std::declval<pointer>()))::value;
+            static constexpr bool value = decltype(test<T>(
+                std::declval<T>(), std::declval<pointer>()))::value;
         };
 
         template <typename T>

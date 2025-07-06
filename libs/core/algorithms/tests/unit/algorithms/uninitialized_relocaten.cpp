@@ -146,7 +146,7 @@ static_assert(
 static_assert(
     !is_trivially_relocatable_v<non_trivially_relocatable_struct_throwing>);
 static_assert(!is_trivially_relocatable_v<
-              non_trivially_relocatable_struct_throwing_overlapping>);
+    non_trivially_relocatable_struct_throwing_overlapping>);
 
 void clear()
 {
@@ -250,7 +250,7 @@ void test()
 
         // make sure the memory beyond M is untouched
         for (std::byte* p = reinterpret_cast<std::byte*>(ptr2 + M);
-             p < reinterpret_cast<std::byte*>(ptr2 + N); p++)
+            p < reinterpret_cast<std::byte*>(ptr2 + N); p++)
         {
             HPX_TEST(*p == std::byte{0});
         }
@@ -288,7 +288,7 @@ void test()
 
         // make sure the memory beyond M is untouched
         for (std::byte* p = reinterpret_cast<std::byte*>(ptr2 + M);
-             p < reinterpret_cast<std::byte*>(ptr2 + N); p++)
+            p < reinterpret_cast<std::byte*>(ptr2 + N); p++)
         {
             HPX_TEST(*p == std::byte{0});
         }
@@ -310,6 +310,7 @@ void test()
             uninitialized_relocate_n(Ex{}, ptr1, M, ptr2);
             HPX_UNREACHABLE;    // should have thrown
         }
+        // NOLINTNEXTLINE(bugprone-empty-catch)
         catch (...)
         {
         }
@@ -344,7 +345,7 @@ void test()
 
         // make sure the memory beyond M is untouched
         for (std::byte* p = reinterpret_cast<std::byte*>(ptr2 + M);
-             p < reinterpret_cast<std::byte*>(ptr2 + N); p++)
+            p < reinterpret_cast<std::byte*>(ptr2 + N); p++)
         {
             HPX_TEST(*p == std::byte{0});
         }
@@ -471,6 +472,7 @@ void test_overlapping()
             uninitialized_relocate_n(Ex{}, ptr + offset, M, ptr);
             HPX_UNREACHABLE;    // should have thrown
         }
+        // NOLINTNEXTLINE(bugprone-empty-catch)
         catch (...)
         {
         }
@@ -499,7 +501,7 @@ void test_overlapping()
         std::destroy(ptr + M + offset, ptr + N);
 
         HPX_TEST(non_trivially_relocatable_struct_throwing_overlapping::made
-                     .empty());
+                .empty());
 
         std::free(ptr);
     }

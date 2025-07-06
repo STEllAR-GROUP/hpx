@@ -36,7 +36,8 @@ void blocker(std::shared_ptr<hpx::barrier<>> exit_barrier,
                 hpx::bind(&blocker, exit_barrier, std::ref(entered),
                     std::ref(started), std::ref(blocked_threads), worker)),
             "blocker", hpx::threads::thread_priority::normal,
-            hpx::threads::thread_schedule_hint(worker));
+            hpx::threads::thread_schedule_hint(
+                static_cast<std::int16_t>(worker)));
         hpx::threads::register_work(data);
         return;
     }
@@ -86,7 +87,8 @@ int hpx_main()
                     hpx::bind(&blocker, exit_barrier, std::ref(entered),
                         std::ref(started), std::ref(blocked_threads), i)),
                 "blocker", hpx::threads::thread_priority::normal,
-                hpx::threads::thread_schedule_hint(i));
+                hpx::threads::thread_schedule_hint(
+                    static_cast<std::int16_t>(i)));
             hpx::threads::register_work(data);
             ++scheduled;
         }
@@ -96,7 +98,7 @@ int hpx_main()
             continue;
 
         {
-            double delay_sec = delay * 1e-6;
+            double delay_sec = static_cast<double>(delay) * 1e-6;
             hpx::chrono::high_resolution_timer td;
 
             while (true)

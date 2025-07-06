@@ -306,7 +306,7 @@ namespace hpx::parallel {
                 cores, count, max_chunks, chunk_size);
 
             // we should not get smaller than our sort_limit_per_task
-            chunk_size = (std::max)(chunk_size, sort_limit_per_task);
+            chunk_size = (std::max) (chunk_size, sort_limit_per_task);
 
             std::ptrdiff_t const N = last - first;
             HPX_ASSERT(N >= 0);

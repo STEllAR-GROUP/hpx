@@ -55,6 +55,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <type_traits>
@@ -214,7 +215,7 @@ namespace hpx::parallel::detail::rfa {
         static constexpr int FOLD = FOLD_;
 
     private:
-        std::array<ftype, 2 * FOLD> data = {{0}};
+        std::array<ftype, static_cast<std::size_t>(2) * FOLD> data = {{0}};
 
         ///Floating-point precision bin width
         static constexpr auto BIN_WIDTH =
@@ -399,7 +400,7 @@ namespace hpx::parallel::detail::rfa {
                 else
                 {
                     std::frexp(x, &exp);
-                    return (std::max)((MAX_EXP - exp) / BIN_WIDTH, MAXINDEX);
+                    return (std::max) ((MAX_EXP - exp) / BIN_WIDTH, MAXINDEX);
                 }
             }
             return ((MAX_EXP + EXP_BIAS) - exp) / BIN_WIDTH;
@@ -607,8 +608,9 @@ namespace hpx::parallel::detail::rfa {
             {
                 scale_down = std::ldexp(0.5, 1 - (2 * MANT_DIG - BIN_WIDTH));
                 scale_up = std::ldexp(0.5, 1 + (2 * MANT_DIG - BIN_WIDTH));
-                scaled = (std::max)(
-                    (std::min)(FOLD, (3 * MANT_DIG) / BIN_WIDTH - X_index), 0);
+                scaled = (std::max) ((std::min) (FOLD,
+                                         (3 * MANT_DIG) / BIN_WIDTH - X_index),
+                    0);
                 if (X_index == 0)
                 {
                     Y += ((double) carry(0)) *
@@ -952,7 +954,7 @@ namespace hpx::parallel::detail::rfa {
             const double X = std::abs(max_abs_val);
             const double S = std::abs(binned_sum);
             return static_cast<ftype>(
-                (std::max)(X, std::ldexp(0.5, MIN_EXP - 1)) *
+                (std::max) (X, std::ldexp(0.5, MIN_EXP - 1)) *
                     std::ldexp(0.5, (1 - FOLD) * BIN_WIDTH + 1) * N +
                 ((7.0 * EPSILON) /
                     (1.0 - 6.0 * std::sqrt(static_cast<double>(EPSILON)) -
@@ -1037,7 +1039,7 @@ namespace hpx::parallel::detail::rfa {
             T max_abs_val = input[0];
             for (size_t i = 0; i < N; i++)
             {
-                max_abs_val = (std::max)(max_abs_val, std::abs(input[i]));
+                max_abs_val = (std::max) (max_abs_val, std::abs(input[i]));
             }
             add(input, N, max_abs_val);
         }

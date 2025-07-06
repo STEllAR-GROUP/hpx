@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -51,12 +51,16 @@ template <typename ExPolicy>
 std::int64_t measure_inner_product(int count, ExPolicy&& policy,
     std::vector<float> const& data1, std::vector<float> const& data2)
 {
-    std::int64_t start = hpx::chrono::high_resolution_clock::now();
+    std::int64_t start =
+        static_cast<std::int64_t>(hpx::chrono::high_resolution_clock::now());
 
     for (int i = 0; i != count; ++i)
         measure_inner_product(policy, data1, data2);
 
-    return (hpx::chrono::high_resolution_clock::now() - start) / count;
+    return (static_cast<std::int64_t>(
+                hpx::chrono::high_resolution_clock::now()) -
+               start) /
+        count;
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
@@ -95,16 +99,18 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         if (csvoutput)
         {
-            std::cout << "," << tr_time_par / 1e9 << ","
-                      << tr_time_datapar / 1e9 << "\n"
+            std::cout << "," << static_cast<double>(tr_time_par) / 1e9 << ","
+                      << static_cast<double>(tr_time_datapar) / 1e9 << "\n"
                       << std::flush;
         }
         else
         {
             std::cout << "transform_reduce(execution::par): " << std::right
-                      << std::setw(15) << tr_time_par / 1e9 << "\n"
+                      << std::setw(15) << static_cast<double>(tr_time_par) / 1e9
+                      << "\n"
                       << "transform_reduce(datapar): " << std::right
-                      << std::setw(15) << tr_time_datapar / 1e9 << "\n"
+                      << std::setw(15)
+                      << static_cast<double>(tr_time_datapar) / 1e9 << "\n"
                       << std::flush;
         }
     }

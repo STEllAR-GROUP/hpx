@@ -42,7 +42,7 @@ The table below shows the supported compilers for |hpx|.
    =================== ================== ==================
    |gcc|_              11.0               15.0
    |clang|_            16.0               20.0
-   |visual_cxx|_ (x64) 2019               2022
+   |visual_cxx|_ (x64) 2022               2022
    =================== ================== ==================
 
 Software and libraries

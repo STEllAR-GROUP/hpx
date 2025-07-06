@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //  Copyright (c) 2022 Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -31,6 +31,7 @@ std::optional<std::variant<std::tuple<>>> tag_invoke(
     return {};
 }
 
+// NOLINTBEGIN(bugprone-unchecked-optional-access)
 int hpx_main()
 {
 #if defined(HPX_HAVE_STDEXEC)
@@ -325,6 +326,7 @@ int hpx_main()
 
     return hpx::local::finalize();
 }
+// NOLINTEND(bugprone-unchecked-optional-access)
 
 int main(int argc, char* argv[])
 {

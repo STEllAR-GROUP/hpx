@@ -167,10 +167,10 @@ namespace hpx::parcelset::policies::lci {
                         static_cast<int>(hpx::get_local_worker_thread_num());
                     HPX_ASSERT(prg_thread_id < config_t::progress_thread_num);
                     for (int i = prg_thread_id * config_t::ndevices /
-                             config_t::progress_thread_num;
-                         i < (prg_thread_id + 1) * config_t::ndevices /
-                             config_t::progress_thread_num;
-                         ++i)
+                            config_t::progress_thread_num;
+                        i < (prg_thread_id + 1) * config_t::ndevices /
+                            config_t::progress_thread_num;
+                        ++i)
                     {
                         devices_to_progress.push_back(&devices[i]);
                     }

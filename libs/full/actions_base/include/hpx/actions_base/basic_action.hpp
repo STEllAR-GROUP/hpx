@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -113,6 +113,7 @@ namespace hpx::actions {
                     hpx::invoke_fused(action_invoke<Action>{lva_, comptype_},
                         HPX_MOVE(args_));
                 }
+                // NOLINTNEXTLINE(bugprone-empty-catch)
                 catch (hpx::thread_interrupted const&)
                 {    //-V565
                      /* swallow this exception */
@@ -483,6 +484,7 @@ namespace hpx::actions {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename TF, TF F, typename Derived = void>
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     struct direct_action
       : action<TF, F,
             detail::action_type_t<direct_action<TF, F, Derived>, Derived>>

@@ -42,7 +42,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     verbose = vm.count("verbose") ? true : false;
 
     std::uint64_t bytes =
-        static_cast<std::uint64_t>(2.0 * sizeof(double) * order * order);
+        static_cast<std::uint64_t>(2 * sizeof(double) * order * order);
 
     std::uint64_t block_order = order / num_blocks;
     std::uint64_t col_block_size = order * block_order;
@@ -74,7 +74,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 double col_val =
                     COL_SHIFT * static_cast<double>(b * block_order + j);
 
-                A[b][i * block_order + j] = col_val + ROW_SHIFT * i;
+                A[b][i * block_order + j] =
+                    col_val + ROW_SHIFT * static_cast<double>(i);
                 B[b][i * block_order + j] = -1.0;
             }
         }
@@ -116,8 +117,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         if (iter > 0 || iterations == 1)    // Skip the first iteration
         {
             avgtime = avgtime + elapsed;
-            maxtime = (std::max)(maxtime, elapsed);
-            mintime = (std::min)(mintime, elapsed);
+            maxtime = (std::max) (maxtime, elapsed);
+            mintime = (std::min) (mintime, elapsed);
         }
 
         errsq += test_results(order, block_order, B);
@@ -131,8 +132,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::cout << "Solution validates\n";
         avgtime = avgtime /
             static_cast<double>(
-                (std::max)(iterations - 1, static_cast<std::uint64_t>(1)));
-        std::cout << "Rate (MB/s): " << 1.e-6 * bytes / mintime << ", "
+                (std::max) (iterations - 1, static_cast<std::uint64_t>(1)));
+        std::cout << "Rate (MB/s): "
+                  << 1.e-6 * static_cast<double>(bytes) / mintime << ", "
                   << "Avg time (s): " << avgtime << ", "
                   << "Min time (s): " << mintime << ", "
                   << "Max time (s): " << maxtime << "\n";
@@ -186,8 +188,8 @@ void transpose(sub_block A, sub_block B, std::uint64_t block_order,
         {
             for (std::uint64_t j = 0; j < block_order; j += tile_size)
             {
-                std::uint64_t i_max = (std::min)(block_order, i + tile_size);
-                std::uint64_t j_max = (std::min)(block_order, j + tile_size);
+                std::uint64_t i_max = (std::min) (block_order, i + tile_size);
+                std::uint64_t j_max = (std::min) (block_order, j + tile_size);
 
                 for (std::uint64_t it = i; it < i_max; ++it)
                 {
@@ -229,7 +231,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
             double errsq = 0.0;
             for (std::uint64_t i = 0; i < order; ++i)
             {
-                double col_val = COL_SHIFT * i;
+                double col_val = COL_SHIFT * static_cast<double>(i);
                 for (std::uint64_t j = 0; j < block_order; ++j)
                 {
                     double diff = trans[b][i * block_order + j] -

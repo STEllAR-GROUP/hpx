@@ -177,7 +177,7 @@ namespace hpx::threads::detail {
         {
             std::size_t active_os_thread_count = 0;
             for (std::size_t thread_num = 0; thread_num < threads_.size();
-                 ++thread_num)
+                ++thread_num)
             {
                 if (sched_->Scheduler::get_state(thread_num).load() ==
                     hpx::state::running)

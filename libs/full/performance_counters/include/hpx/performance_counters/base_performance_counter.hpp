@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -39,6 +39,7 @@ namespace hpx::performance_counters {
         using base_type_holder =
             hpx::performance_counters::server::base_performance_counter;
 
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         base_performance_counter() = default;
 
         explicit base_performance_counter(
@@ -46,6 +47,7 @@ namespace hpx::performance_counters {
           : base_type_holder(info)
         {
         }
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
 
         // Disambiguate finalize() which is implemented in both base classes
         void finalize()

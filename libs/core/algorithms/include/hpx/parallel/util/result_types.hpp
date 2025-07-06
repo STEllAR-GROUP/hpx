@@ -555,4 +555,4 @@ namespace hpx::ranges {
     using hpx::parallel::util::in_out_result;
     using hpx::parallel::util::min_max_result;
 }    // namespace hpx::ranges
-     // namespace hpx::ranges
+// namespace hpx::ranges

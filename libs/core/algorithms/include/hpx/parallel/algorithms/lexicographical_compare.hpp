@@ -263,7 +263,7 @@ namespace hpx::parallel {
 
                 using policy_type = std::decay_t<decltype(policy)>;
 
-                std::size_t count = (std::min)(count1, count2);
+                std::size_t count = (std::min) (count1, count2);
                 hpx::parallel::util::cancellation_token<std::size_t> tok(count);
 
                 auto f1 = [tok, pred, proj1, proj2](zip_iterator it,

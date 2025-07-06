@@ -40,7 +40,7 @@ namespace hpx::execution_base {
 
     namespace {
 
-        struct default_context : execution_base::context_base
+        struct default_context final : execution_base::context_base
         {
             resource_base const& resource() const noexcept override
             {

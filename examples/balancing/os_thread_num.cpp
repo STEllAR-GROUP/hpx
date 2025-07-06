@@ -42,7 +42,7 @@ double delay()
 {
     double d = 0.;
     for (std::uint64_t i = 0; i < num_iterations; ++i)
-        d += 1 / (2. * i + 1);
+        d += 1 / (2. * static_cast<double>(i + 1));
     return d;
 }
 

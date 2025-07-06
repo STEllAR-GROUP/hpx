@@ -399,7 +399,7 @@ namespace test {
         HPX_TEST_EQ(dist2, cont_b.size());
 
         for (std::size_t i = 0; itcont_a != itcont_a_end;
-             ++itcont_a, ++itcont_b, ++i)
+            ++itcont_a, ++itcont_b, ++i)
         {
             HPX_TEST_EQ(*itcont_a, *itcont_b);
         }
@@ -412,10 +412,11 @@ namespace test {
     {
         check_equal_containers(std_deque, seq_container);
 
-        std_deque.insert(
-            std_deque.begin() + index, input_deque.begin(), input_deque.end());
-        seq_container.insert(seq_container.begin() + index, input_deque.begin(),
-            input_deque.end());
+        std_deque.insert(std_deque.begin() + static_cast<std::ptrdiff_t>(index),
+            input_deque.begin(), input_deque.end());
+        seq_container.insert(
+            seq_container.begin() + static_cast<std::ptrdiff_t>(index),
+            input_deque.begin(), input_deque.end());
 
         check_equal_containers(std_deque, seq_container);
     }

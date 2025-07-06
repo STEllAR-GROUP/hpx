@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -74,6 +74,7 @@ namespace hpx::experimental {
                 {
                     // The current state has now finished all accesses to the
                     // wrapped value, so we move the value to the next state.
+                    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                     next_state->set_value(HPX_MOVE(value.value()));
 
                     for (auto& continuation : continuations)
@@ -191,6 +192,7 @@ namespace hpx::experimental {
             {
                 HPX_ASSERT(state);
                 HPX_ASSERT(state->value);
+                // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                 return state->value.value();
             }
 
@@ -238,6 +240,7 @@ namespace hpx::experimental {
             {
                 HPX_ASSERT(state);
                 HPX_ASSERT(state->value);
+                // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                 return state->value.value();
             }
 

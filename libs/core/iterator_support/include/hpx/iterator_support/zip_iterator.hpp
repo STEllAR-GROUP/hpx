@@ -226,6 +226,7 @@ namespace hpx::util {
                 typename zip_iterator_reference<IteratorTuple>::type>;
 
         public:
+            // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
             HPX_HOST_DEVICE constexpr zip_iterator_base() noexcept {}
 
             HPX_HOST_DEVICE explicit constexpr zip_iterator_base(
@@ -238,6 +239,7 @@ namespace hpx::util {
               : iterators_(HPX_MOVE(iterators))
             {
             }
+            // NOLINTEND(bugprone-crtp-constructor-accessibility)
 
             HPX_HOST_DEVICE
             constexpr zip_iterator_base& operator=(

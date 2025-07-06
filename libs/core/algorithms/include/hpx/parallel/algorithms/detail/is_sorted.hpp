@@ -22,9 +22,9 @@ namespace hpx::parallel::detail {
         if (first != last)
         {
             for (Iter it1 = first, it2 = ++first; it2 != last &&
-                 ((sorted = !HPX_INVOKE(
-                       comp, HPX_INVOKE(proj, *it2), HPX_INVOKE(proj, *it1))));
-                 it1 = it2++)
+                ((sorted = !HPX_INVOKE(
+                      comp, HPX_INVOKE(proj, *it2), HPX_INVOKE(proj, *it1))));
+                it1 = it2++)
             {
                 /**/
             }
@@ -42,9 +42,9 @@ namespace hpx::parallel::detail {
             Iter it1 = first;
             Iter it2 = ++first;
             for (; it2 != last &&
-                 !HPX_INVOKE(
-                     comp, HPX_INVOKE(proj, *it2), HPX_INVOKE(proj, *it1));
-                 it1 = it2++)
+                !HPX_INVOKE(
+                    comp, HPX_INVOKE(proj, *it2), HPX_INVOKE(proj, *it1));
+                it1 = it2++)
             {
                 /**/
             }

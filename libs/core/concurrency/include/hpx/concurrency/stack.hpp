@@ -321,7 +321,7 @@ namespace hpx::lockfree {
             catch (...)
             {
                 for (node* current_node = new_top_node;
-                     current_node != nullptr;)
+                    current_node != nullptr;)
                 {
                     node* next = current_node->next;
                     pool.template destruct<Threadsafe>(current_node);

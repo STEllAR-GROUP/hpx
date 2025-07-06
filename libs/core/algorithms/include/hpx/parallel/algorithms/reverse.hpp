@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -222,8 +222,9 @@ namespace hpx::parallel {
                 ExPolicy, BidirIter first, Sent last)
             {
                 auto last2 = detail::advance_to_sentinel(first, last);
+                // NOLINTNEXTLINE(bugprone-inc-dec-in-conditions)
                 for (auto tail = last2; !(first == tail || first == --tail);
-                     ++first)
+                    ++first)
                 {
 #if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                     std::ranges::iter_swap(first, tail);
