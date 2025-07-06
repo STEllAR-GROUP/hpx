@@ -13,7 +13,8 @@
 #include <memory>
 
 #if !defined(HPX_HAVE_STDEXEC)
-#include <hpx/synchronization/stop_token.hpp>    // Fallback for stop token types
+#include <hpx/execution/queries/get_stop_token.hpp>
+#include <hpx/synchronization/stop_token.hpp>
 #endif
 
 namespace hpx::execution::experimental {
@@ -191,10 +192,10 @@ namespace hpx::execution::experimental {
                 return hpx::execution::experimental::inplace_stop_token{};
             }
 #else
-            friend auto tag_invoke(hpx::experimental::get_stop_token_t,
+            friend auto tag_invoke(hpx::execution::queries::get_stop_token_t,
                 [[maybe_unused]] env const& e) noexcept
             {
-                return hpx::experimental::in_place_stop_token{};
+                return hpx::execution::experimental::in_place_stop_token{};
             }
 #endif
         };
