@@ -183,17 +183,6 @@ namespace hpx::execution::experimental {
             {
                 return e.sched;
             }
-
-            friend auto tag_invoke(
-                hpx::execution::experimental::get_stop_token_t,
-                [[maybe_unused]] env const& e) noexcept
-            {
-#if defined(HPX_HAVE_STDEXEC)
-                return hpx::execution::experimental::inplace_stop_token{};
-#else
-                return hpx::execution::experimental::never_stop_token{};
-#endif
-            }
         };
 
         friend env tag_invoke(hpx::execution::experimental::get_env_t,

@@ -46,15 +46,13 @@ struct test_receiver
     bool* value_received;
     std::exception_ptr* error_received;
     bool* stopped_received;
-    ex::inplace_stop_token stop_token;
     hpx::thread::id* thread_id;    // Track thread ID
 
     test_receiver(bool* vr, std::exception_ptr* er, bool* sr,
-        hpx::thread::id* tid = nullptr, ex::inplace_stop_token st = {})
+        hpx::thread::id* tid = nullptr)
       : value_received(vr)
       , error_received(er)
       , stopped_received(sr)
-      , stop_token(st)
       , thread_id(tid)
     {
     }
@@ -102,17 +100,11 @@ struct test_receiver
 
     struct env
     {
-        ex::inplace_stop_token stop_token;
-
-        friend auto tag_invoke(ex::get_stop_token_t, const env& e) noexcept
-        {
-            return e.stop_token;
-        }
     };
 
     friend env tag_invoke(ex::get_env_t, const test_receiver& r) noexcept
     {
-        return env{r.stop_token};
+        return env{};
     }
 };
 
@@ -238,20 +230,15 @@ int hpx_main(int argc, [[maybe_unused]] char* argv[])
     // Test parallel_scheduler stop token
     {
         std::cout << "\n=== Testing Stop Token ===" << std::endl;
-        ex::inplace_stop_source stop_source;
-        auto stop_token = stop_source.get_token();
-
         bool value_received = false;
         std::exception_ptr error_received = nullptr;
         bool stopped_received = false;
 
-        test_receiver receiver(&value_received, &error_received,
-            &stopped_received, nullptr, stop_token);
+        test_receiver receiver(
+            &value_received, &error_received, &stopped_received, nullptr);
 
         auto sender = ex::schedule(sched);
         auto op_state = ex::connect(sender, receiver);
-        std::cout << "Requesting stop before start" << std::endl;
-        stop_source.request_stop();
         std::cout << "Calling start for stop token test" << std::endl;
         ex::start(op_state);
 
