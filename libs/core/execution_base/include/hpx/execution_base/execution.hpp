@@ -195,7 +195,8 @@ namespace hpx::parallel::execution {
       : hpx::functional::detail::tag_fallback<then_execute_t>
     {
     private:
-        template <typename Executor, typename F, typename Future, typename... Ts>
+        template <typename Executor, typename F, typename Future,
+            typename... Ts>
         // clang-format off
             requires (
                 hpx::traits::is_executor_any_v<Executor>

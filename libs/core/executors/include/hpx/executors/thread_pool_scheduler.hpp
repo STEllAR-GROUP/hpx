@@ -306,7 +306,7 @@ namespace hpx::execution::experimental {
             struct env
             {
                 std::decay_t<Scheduler> const& sched;
-            
+
                 template <typename CPO>
                 // clang-format off
                     requires (

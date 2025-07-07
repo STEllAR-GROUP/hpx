@@ -44,7 +44,7 @@ namespace hpx::execution::experimental::detail {
         {
         }
 
-        template <typename U> 
+        template <typename U>
         // clang-format off
             requires (
                 hpx::execution::experimental::is_sender_v<U>

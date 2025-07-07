@@ -208,7 +208,7 @@ namespace hpx::execution::experimental {
     };
 
     // support all properties exposed by the wrapped executor
-    template <typename Tag, typename BaseExecutor,typename Property>
+    template <typename Tag, typename BaseExecutor, typename Property>
     // clang-format off
         requires (
             hpx::execution::experimental::is_scheduling_property_v<Tag>

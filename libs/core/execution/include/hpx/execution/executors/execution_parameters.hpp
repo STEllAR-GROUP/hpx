@@ -48,8 +48,8 @@ namespace hpx::execution::experimental::detail {
         template <typename T>
         using check_for_property = CheckForProperty<std::decay_t<T>>;
 
-            template <typename Executor, typename Parameters>
-            // clang-format off
+        template <typename Executor, typename Parameters>
+        // clang-format off
                 requires (
                     !hpx::traits::is_executor_parameters_v<Parameters> ||
                     !check_for_property<Parameters>::value
@@ -64,8 +64,8 @@ namespace hpx::execution::experimental::detail {
 
         ///////////////////////////////////////////////////////////////////
         // Parameters directly supports property
-            template <typename Executor, typename Parameters>
-            // clang-format off
+        template <typename Executor, typename Parameters>
+        // clang-format off
                 requires (
                     hpx::traits::is_executor_parameters_v<Parameters> &&
                     check_for_property<Parameters>::value
@@ -81,8 +81,8 @@ namespace hpx::execution::experimental::detail {
 
         ///////////////////////////////////////////////////////////////////
         // Executor directly supports property
-            template <typename Executor, typename Parameters>
-            // clang-format off
+        template <typename Executor, typename Parameters>
+        // clang-format off
                 requires (
                     hpx::traits::is_executor_any_v<Executor> &&
                     check_for_property<Executor>::value

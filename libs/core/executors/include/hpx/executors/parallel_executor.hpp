@@ -182,7 +182,7 @@ namespace hpx::execution {
         // property implementations
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-        
+
         template <typename Executor_>
         // clang-format off
             requires (
@@ -425,7 +425,7 @@ namespace hpx::execution {
             exec.post_impl(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
-        // BulkTwoWayExecutor interface 
+        // BulkTwoWayExecutor interface
         template <typename F, typename S, typename... Ts>
         // clang-format off
             requires (
@@ -596,7 +596,7 @@ namespace hpx::execution {
         return exec_with_prop;
     }
 
-    template <typename Tag,typename Policy>
+    template <typename Tag, typename Policy>
     // clang-format off
         requires (
             hpx::execution::experimental::is_scheduling_property_v<Tag>

@@ -105,7 +105,7 @@ namespace hpx::execution::experimental {
                 topo, thread_num);
         }
 
-        template <typename Executor> 
+        template <typename Executor>
         // clang-format off
             requires (
                 hpx::traits::is_executor_any_v<Executor> &&
@@ -132,7 +132,7 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_fallback<set_scheduler_mode_t>
     {
     private:
-        template <typename Executor, typename Mode> 
+        template <typename Executor, typename Mode>
         // clang-format off
             requires (
                 hpx::traits::is_executor_any_v<Executor>

@@ -432,7 +432,6 @@ namespace hpx::this_thread::experimental {
             return state.get_value();
         }
 
-      
         template <typename Sender>
         // clang-format off
             requires (

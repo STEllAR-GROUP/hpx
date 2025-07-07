@@ -279,7 +279,7 @@ namespace hpx { namespace mpi { namespace experimental {
     {
     private:
         template <typename Sender, typename F>
-            requires (hpx::execution::experimental::is_sender_v<Sender>)
+            requires(hpx::execution::experimental::is_sender_v<Sender>)
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             transform_mpi_t, Sender&& s, F&& f)
         {

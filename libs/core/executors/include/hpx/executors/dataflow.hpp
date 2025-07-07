@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp> 
+#include <hpx/config.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/execution.hpp>
@@ -524,21 +524,17 @@ namespace hpx::detail {
     // any action, plain function, or function object
     //
     template <typename Allocator, typename F, typename... Ts>
-    // clang-format off 
-        requires (
-             hpx::traits::is_allocator_v<Allocator> &&
+    // clang-format off
+        requires(hpx::traits::is_allocator_v<Allocator> &&
             !hpx::traits::is_launch_policy_v<F> &&
             !hpx::traits::is_one_way_executor_v<F> &&
-            !hpx::traits::is_two_way_executor_v<F>
-        )
-    // clang-format on 
+            !hpx::traits::is_two_way_executor_v<F>)
+    // clang-format on
     HPX_FORCEINLINE auto tag_invoke(
         dataflow_t, Allocator const& alloc, F&& f, Ts&&... ts)
-        -> decltype(
-                hpx::lcos::detail::dataflow_dispatch_impl<
-                    traits::is_action_v<std::decay_t<F>>, launch
-                >::call(alloc, launch::async, HPX_FORWARD(F, f),
-                    HPX_FORWARD(Ts, ts)...))
+        -> decltype(hpx::lcos::detail::dataflow_dispatch_impl<
+            traits::is_action_v<std::decay_t<F>>, launch>::call(alloc,
+            launch::async, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
     // clang-format on
     {
         return hpx::lcos::detail::dataflow_dispatch_impl<

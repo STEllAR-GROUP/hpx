@@ -371,7 +371,6 @@ namespace hpx::execution::experimental {
                 sched, HPX_FORWARD(Sender, sender), allocator);
         }
 
-      
         template <typename Sender,
             typename Allocator = hpx::util::internal_allocator<>>
         // clang-format off
