@@ -23,7 +23,6 @@ namespace hpx::this_thread::experimental {
 #else
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -384,9 +383,9 @@ namespace hpx::this_thread::experimental {
       : hpx::functional::detail::tag_priority<sync_wait_t>
     {
     private:
+        template <typename Sender>
         // clang-format off
-        template <typename Sender,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_sender_v<Sender,
                     hpx::execution::experimental::detail::sync_wait_receiver_env> &&
                 hpx::execution::experimental::detail::
@@ -394,7 +393,7 @@ namespace hpx::this_thread::experimental {
                         hpx::execution::experimental::set_value_t,
                         Sender, sync_wait_t
                     >
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
             sync_wait_t, Sender&& sender)
@@ -407,12 +406,12 @@ namespace hpx::this_thread::experimental {
                 HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender));
         }
 
+        template <typename Sender>
         // clang-format off
-        template <typename Sender,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_sender_v<Sender,
                     hpx::execution::experimental::detail::sync_wait_receiver_env>
-            )>
+            )
         // clang-format on
         friend auto tag_invoke(sync_wait_t,
             hpx::execution::experimental::run_loop_scheduler const& sched,
@@ -435,12 +434,12 @@ namespace hpx::this_thread::experimental {
             return state.get_value();
         }
 
+        template <typename Sender>
         // clang-format off
-        template <typename Sender,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_sender_v<Sender,
                     hpx::execution::experimental::detail::sync_wait_receiver_env>
-            )>
+            )
         // clang-format on
         friend HPX_FORCEINLINE auto tag_fallback_invoke(
             sync_wait_t, Sender&& sender)
@@ -462,11 +461,11 @@ namespace hpx::this_thread::experimental {
             return state.get_value();
         }
 
+        template <typename Scheduler>
         // clang-format off
-        template <typename Scheduler,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_scheduler_v<Scheduler>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             sync_wait_t, Scheduler&& scheduler)
@@ -495,16 +494,16 @@ namespace hpx::this_thread::experimental {
       : hpx::functional::detail::tag_priority<sync_wait_with_variant_t>
     {
     private:
+        template <typename Sender>
         // clang-format off
-        template <typename Sender,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_sender_v<Sender> &&
                 hpx::execution::experimental::detail::
                     is_completion_scheduler_tag_invocable_v<
                         hpx::execution::experimental::set_value_t,
                         Sender, sync_wait_with_variant_t
                     >
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
             sync_wait_with_variant_t, Sender&& sender)
@@ -517,11 +516,11 @@ namespace hpx::this_thread::experimental {
                 HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender));
         }
 
+        template <typename Sender>
         // clang-format off
-        template <typename Sender,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_sender_v<Sender>
-            )>
+            )
         // clang-format on
         friend auto tag_invoke(sync_wait_with_variant_t,
             hpx::execution::experimental::run_loop_scheduler const& sched,
@@ -545,11 +544,11 @@ namespace hpx::this_thread::experimental {
             return state.get_value();
         }
 
+        template <typename Sender>
         // clang-format off
-        template <typename Sender,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_sender_v<Sender>
-            )>
+            )
         // clang-format on
         friend HPX_FORCEINLINE auto tag_fallback_invoke(
             sync_wait_with_variant_t, Sender&& sender)
@@ -572,11 +571,11 @@ namespace hpx::this_thread::experimental {
             return state.get_value();
         }
 
+        template <typename Scheduler>
         // clang-format off
-        template <typename Scheduler,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_scheduler_v<Scheduler>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             sync_wait_with_variant_t, Scheduler&& scheduler)

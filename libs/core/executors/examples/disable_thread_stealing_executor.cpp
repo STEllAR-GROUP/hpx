@@ -67,11 +67,12 @@ namespace executor_example {
     };
 
     // support all properties exposed by the wrapped executor
+    template <typename Tag, typename BaseExecutor,typename Property>
     // clang-format off
-    template <typename Tag, typename BaseExecutor,typename Property,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
+        )
+    // clang-format on 
     auto tag_invoke(Tag tag,
         disable_thread_stealing_executor<BaseExecutor> const& exec,
         Property&& prop)
@@ -85,11 +86,11 @@ namespace executor_example {
                 HPX_FORWARD(Property, prop)));
     }
 
+    template <typename Tag, typename BaseExecutor>
     // clang-format off
-    template <typename Tag, typename BaseExecutor,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
+        )
     // clang-format on
     auto tag_invoke(
         Tag tag, disable_thread_stealing_executor<BaseExecutor> const& exec)

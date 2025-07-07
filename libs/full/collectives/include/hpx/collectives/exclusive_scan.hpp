@@ -279,7 +279,6 @@ namespace hpx { namespace collectives {
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/parallel/algorithms/exclusive_scan.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -542,11 +541,12 @@ namespace hpx::collectives {
 
     ////////////////////////////////////////////////////////////////////////////
     // Version of exclusive scan that takes an initial value for element 0.
+  
+    template <typename T, typename Init, typename F>
     // clang-format off
-    template <typename T, typename Init, typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             !std::is_same_v<this_site_arg, std::decay_t<F>>
-        )>
+        )
     // clang-format on
     hpx::future<std::decay_t<T>> exclusive_scan(communicator fid,
         T&& local_result, Init&& init, F&& op,
@@ -596,11 +596,11 @@ namespace hpx::collectives {
         return fid.then(hpx::launch::sync, HPX_MOVE(exclusive_scan_data));
     }
 
+    template <typename T, typename Init, typename F>
     // clang-format off
-    template <typename T, typename Init, typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             !std::is_same_v<generation_arg, std::decay_t<F>>
-        )>
+        )
     // clang-format on
     hpx::future<std::decay_t<T>> exclusive_scan(communicator fid,
         T&& local_result, Init&& init, F&& op, generation_arg generation,
@@ -610,11 +610,11 @@ namespace hpx::collectives {
             HPX_FORWARD(Init, init), HPX_FORWARD(F, op), this_site, generation);
     }
 
+    template <typename T, typename Init, typename F>
     // clang-format off
-    template <typename T, typename Init, typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             !std::is_same_v<num_sites_arg, std::decay_t<F>>
-        )>
+        )
     // clang-format on
     hpx::future<std::decay_t<T>> exclusive_scan(char const* basename,
         T&& local_result, Init&& init, F&& op,
@@ -629,11 +629,11 @@ namespace hpx::collectives {
             HPX_FORWARD(F, op), this_site);
     }
 
+    template <typename T, typename Init, typename F>
     // clang-format off
-    template <typename T, typename Init, typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             !std::is_same_v<this_site_arg, std::decay_t<F>>
-        )>
+        )
     // clang-format on
     decltype(auto) exclusive_scan(hpx::launch::sync_policy, communicator fid,
         T&& local_result, Init&& init, F&& op,
@@ -645,11 +645,11 @@ namespace hpx::collectives {
             .get();
     }
 
+    template <typename T, typename Init, typename F>
     // clang-format off
-    template <typename T, typename Init, typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             !std::is_same_v<generation_arg, std::decay_t<F>>
-        )>
+        )
     // clang-format on
     decltype(auto) exclusive_scan(hpx::launch::sync_policy, communicator fid,
         T&& local_result, Init&& init, F&& op, generation_arg generation,
@@ -660,11 +660,11 @@ namespace hpx::collectives {
             .get();
     }
 
+    template <typename T, typename Init, typename F>
     // clang-format off
-    template <typename T, typename Init, typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             !std::is_same_v<num_sites_arg, std::decay_t<F>>
-        )>
+        )
     // clang-format on
     decltype(auto) exclusive_scan(hpx::launch::sync_policy,
         char const* basename, T&& local_result, Init&& init, F&& op,

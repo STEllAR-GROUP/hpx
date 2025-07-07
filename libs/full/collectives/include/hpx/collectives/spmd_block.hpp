@@ -13,7 +13,6 @@
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/broadcast_direct.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/execution.hpp>
 #include <hpx/functional/first_argument.hpp>
 #include <hpx/functional/traits/is_action.hpp>
@@ -331,8 +330,10 @@ namespace hpx { namespace lcos {
         };
     }    // namespace detail
 
-    template <typename F, typename... Args,
-        HPX_CONCEPT_REQUIRES_(hpx::traits::is_action<F>::value)>
+    template <typename F, typename... Args>
+    // clang-format off
+        requires (hpx::traits::is_action<F>::value)
+    // clang-format on 
     hpx::future<void> define_spmd_block(std::string&& name,
         std::size_t images_per_locality, F&& /* f */, Args&&... args)
     {
