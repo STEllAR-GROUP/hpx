@@ -838,7 +838,7 @@ namespace hpx::ranges {
     {
     private:
         template <typename InIter, typename Sent, typename OutIter,
-             typename BinOp, typename UnOp>
+            typename BinOp, typename UnOp>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<InIter> &&
@@ -873,7 +873,6 @@ namespace hpx::ranges {
                     HPX_MOVE(unary_op), HPX_MOVE(binary_op));
         }
 
-    
         template <typename ExPolicy, typename FwdIter1, typename Sent,
             typename FwdIter2, typename BinOp, typename UnOp>
         // clang-format off
@@ -912,7 +911,6 @@ namespace hpx::ranges {
                     HPX_MOVE(unary_op), HPX_MOVE(binary_op));
         }
 
-        
         template <typename Rng, typename O, typename BinOp, typename UnOp>
         // clang-format off
             requires (
@@ -947,9 +945,8 @@ namespace hpx::ranges {
                     HPX_MOVE(unary_op), HPX_MOVE(binary_op));
         }
 
-       
-        template <typename ExPolicy, typename Rng,  typename O,
-            typename BinOp, typename UnOp>
+        template <typename ExPolicy, typename Rng, typename O, typename BinOp,
+            typename UnOp>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -987,7 +984,6 @@ namespace hpx::ranges {
                     HPX_MOVE(binary_op));
         }
 
-        
         template <typename InIter, typename Sent, typename OutIter,
             typename BinOp, typename UnOp,
             typename T = typename std::iterator_traits<InIter>::value_type>
@@ -1025,7 +1021,6 @@ namespace hpx::ranges {
                     HPX_MOVE(unary_op), HPX_MOVE(init), HPX_MOVE(binary_op));
         }
 
-      
         template <typename ExPolicy, typename FwdIter1, typename Sent,
             typename FwdIter2, typename BinOp, typename UnOp,
             typename T = typename std::iterator_traits<FwdIter1>::value_type>
@@ -1065,7 +1060,6 @@ namespace hpx::ranges {
                     HPX_MOVE(unary_op), HPX_MOVE(init), HPX_MOVE(binary_op));
         }
 
-       
         template <typename Rng, typename O, typename BinOp, typename UnOp,
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type>
@@ -1102,9 +1096,8 @@ namespace hpx::ranges {
                     HPX_MOVE(unary_op), HPX_MOVE(init), HPX_MOVE(binary_op));
         }
 
-        
-        template <typename ExPolicy, typename Rng,  typename O,
-            typename BinOp, typename UnOp,
+        template <typename ExPolicy, typename Rng, typename O, typename BinOp,
+            typename UnOp,
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type>
         // clang-format off

@@ -912,7 +912,6 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<transform_reduce_t>
     {
     private:
-       
         template <typename ExPolicy, typename Iter, typename Sent, typename T,
             typename Reduce, typename Convert>
         // clang-format off
@@ -944,7 +943,6 @@ namespace hpx::ranges {
                 HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
-        
         template <typename Iter, typename Sent, typename T, typename Reduce,
             typename Convert>
         // clang-format off
@@ -974,7 +972,6 @@ namespace hpx::ranges {
                 HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
-        
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Iter2, typename T>
         // clang-format off
@@ -999,7 +996,6 @@ namespace hpx::ranges {
                 hpx::parallel::detail::multiplies());
         }
 
-      
         template <typename Iter, typename Sent, typename Iter2, typename T>
         // clang-format off
             requires (
@@ -1021,7 +1017,6 @@ namespace hpx::ranges {
                 hpx::parallel::detail::multiplies());
         }
 
-        
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Iter2, typename T, typename Reduce, typename Convert>
         // clang-format off
@@ -1059,7 +1054,6 @@ namespace hpx::ranges {
                 HPX_MOVE(init), HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
-    
         template <typename Iter, typename Sent, typename Iter2, typename T,
             typename Reduce, typename Convert>
         // clang-format off
@@ -1096,7 +1090,7 @@ namespace hpx::ranges {
         }
 
         // range based versions
-       
+
         template <typename ExPolicy, typename Rng, typename T, typename Reduce,
             typename Convert>
         // clang-format off
@@ -1131,7 +1125,6 @@ namespace hpx::ranges {
                 HPX_MOVE(conv_op));
         }
 
-   
         template <typename Rng, typename T, typename Reduce, typename Convert>
         // clang-format off
             requires (
@@ -1162,7 +1155,6 @@ namespace hpx::ranges {
                 HPX_MOVE(init), HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
-      
         template <typename ExPolicy, typename Rng, typename Iter2, typename T>
         // clang-format off
             requires (
@@ -1189,7 +1181,6 @@ namespace hpx::ranges {
                 hpx::parallel::detail::multiplies());
         }
 
-    
         template <typename Rng, typename Iter2, typename T>
         // clang-format off
             requires (
@@ -1213,9 +1204,8 @@ namespace hpx::ranges {
                 hpx::parallel::detail::multiplies());
         }
 
-       
-        template <typename ExPolicy, typename Rng, typename Iter2,
-            typename T, typename Reduce, typename Convert>
+        template <typename ExPolicy, typename Rng, typename Iter2, typename T,
+            typename Reduce, typename Convert>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&

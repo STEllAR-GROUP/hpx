@@ -1249,8 +1249,7 @@ namespace hpx::ranges {
         }
 
         template <typename InIter, typename Sent, typename OutIter2,
-            typename OutIter3, typename Pred,
-            typename Proj = hpx::identity>
+            typename OutIter3, typename Pred, typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<InIter> &&

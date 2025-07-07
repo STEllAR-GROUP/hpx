@@ -705,11 +705,10 @@ namespace hpx::ranges {
     inline constexpr struct search_t final
       : hpx::detail::tag_parallel_algorithm<search_t>
     {
-    private: 
+    private:
         template <typename FwdIter, typename Sent, typename FwdIter2,
             typename Sent2, typename Pred = hpx::ranges::equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
@@ -734,12 +733,10 @@ namespace hpx::ranges {
                 HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-  
         template <typename ExPolicy, typename FwdIter, typename Sent,
-                 typename FwdIter2, typename Sent2,
+            typename FwdIter2, typename Sent2,
             typename Pred = hpx::ranges::equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -766,11 +763,9 @@ namespace hpx::ranges {
                 HPX_MOVE(op), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-    
         template <typename Rng1, typename Rng2,
             typename Pred = hpx::ranges::equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_range_v<Rng1> &&
@@ -798,11 +793,9 @@ namespace hpx::ranges {
                     HPX_MOVE(proj2));
         }
 
-        
         template <typename ExPolicy, typename Rng1, typename Rng2,
             typename Pred = hpx::ranges::equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -839,8 +832,7 @@ namespace hpx::ranges {
     private:
         template <typename FwdIter, typename FwdIter2, typename Sent2,
             typename Pred = hpx::ranges::equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
@@ -864,12 +856,9 @@ namespace hpx::ranges {
                 HPX_MOVE(op), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-       
         template <typename ExPolicy, typename FwdIter, typename FwdIter2,
-            typename Sent2,
-            typename Pred = hpx::ranges::equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+            typename Sent2, typename Pred = hpx::ranges::equal_to,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -898,8 +887,7 @@ namespace hpx::ranges {
 
         template <typename Rng1, typename Rng2,
             typename Pred = hpx::ranges::equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_range_v<Rng1> &&
@@ -927,11 +915,9 @@ namespace hpx::ranges {
                     HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-     
         template <typename ExPolicy, typename Rng1, typename Rng2,
             typename Pred = hpx::ranges::equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&

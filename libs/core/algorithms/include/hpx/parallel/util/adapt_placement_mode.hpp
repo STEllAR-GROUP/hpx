@@ -14,7 +14,6 @@
 
 namespace hpx::execution::experimental {
 
-   
     template <typename ExPolicy>
     // clang-format off
         requires (
@@ -55,7 +54,6 @@ namespace hpx::execution::experimental {
 
 namespace hpx::parallel::util {
 
-   
     template <typename ExPolicy>
     // clang-format off
         requires (

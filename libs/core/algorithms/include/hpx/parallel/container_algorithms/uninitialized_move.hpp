@@ -340,7 +340,8 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<uninitialized_move_t>
     {
     private:
-        template <typename InIter, typename Sent1, typename FwdIter, typename Sent2>
+        template <typename InIter, typename Sent1, typename FwdIter,
+            typename Sent2>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<InIter> &&
@@ -363,7 +364,6 @@ namespace hpx::ranges {
                 .call(hpx::execution::seq, first1, last1, first2, last2);
         }
 
-        
         template <typename ExPolicy, typename FwdIter1, typename Sent1,
             typename FwdIter2, typename Sent2>
         // clang-format off
@@ -392,7 +392,6 @@ namespace hpx::ranges {
                     last2);
         }
 
-        
         template <typename Rng1, typename Rng2>
         // clang-format off
             requires (
@@ -423,7 +422,6 @@ namespace hpx::ranges {
                     std::begin(rng2), std::end(rng2));
         }
 
-    
         template <typename ExPolicy, typename Rng1, typename Rng2>
         // clang-format off
             requires (
@@ -461,8 +459,8 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<uninitialized_move_n_t>
     {
     private:
-        
-        template <typename InIter, typename Size, typename FwdIter, typename Sent2>
+        template <typename InIter, typename Size, typename FwdIter,
+            typename Sent2>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<InIter> &&

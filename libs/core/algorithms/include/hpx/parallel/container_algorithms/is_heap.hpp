@@ -502,11 +502,10 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<is_heap_t>
     {
     private:
-       
         template <typename ExPolicy, typename Rng,
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
@@ -532,11 +531,10 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
-       
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
@@ -558,11 +556,9 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        
-        template <typename Rng,
-            typename Comp = hpx::parallel::detail::less,
+        template <typename Rng, typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -587,11 +583,10 @@ namespace hpx::ranges {
                 HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
-      
         template <typename Iter, typename Sent,
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -619,11 +614,10 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<is_heap_until_t>
     {
     private:
-       
         template <typename ExPolicy, typename Rng,
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
@@ -654,7 +648,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
@@ -676,10 +670,9 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        template <typename Rng,
-            typename Comp = hpx::parallel::detail::less,
+        template <typename Rng, typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -705,11 +698,10 @@ namespace hpx::ranges {
                 HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
-       
         template <typename Iter, typename Sent,
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<

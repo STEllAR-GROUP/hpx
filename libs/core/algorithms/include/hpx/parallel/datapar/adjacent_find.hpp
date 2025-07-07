@@ -69,7 +69,6 @@ namespace hpx::parallel::detail {
         }
     };
 
-    
     template <typename ExPolicy, typename InIter, typename Sent_,
         typename PredProj>
     // clang-format off
@@ -98,7 +97,6 @@ namespace hpx::parallel::detail {
         }
     }
 
-   
     template <typename ExPolicy, typename ZipIter, typename Token,
         typename PredProj>
     // clang-format off

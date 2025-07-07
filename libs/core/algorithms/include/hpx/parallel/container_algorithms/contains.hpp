@@ -152,13 +152,11 @@ namespace hpx::ranges {
     private:
         template <typename Iterator, typename Sentinel, typename T,
             typename Proj = hpx::identity>
-        // clang-format off 
-            requires (
-                hpx::traits::is_iterator_v<Iterator> &&
+        // clang-format off
+            requires(hpx::traits::is_iterator_v<Iterator> &&
                 hpx::traits::is_iterator_v<Iterator> &&
                 hpx::is_invocable_v<Proj,
-                    typename std::iterator_traits<Iterator>::value_type>
-                )
+                    typename std::iterator_traits<Iterator>::value_type>)
 
         // clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::contains_t, Iterator first,

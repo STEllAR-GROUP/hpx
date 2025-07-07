@@ -671,7 +671,7 @@ namespace hpx::ranges {
     {
     private:
         template <typename InIter, typename Sent, typename OutIter,
-            typename Op = std::plus<> >
+            typename Op = std::plus<>>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<InIter> &&

@@ -61,7 +61,7 @@ namespace hpx::experimental {
         /// \param f          The user defined function to invoke inside the task
         ///                   group.
         /// \param ts         Additional arguments to use to invoke \c f().
-      
+
         template <typename Executor, typename F, typename... Ts>
         // clang-format off
             requires (
@@ -101,7 +101,7 @@ namespace hpx::experimental {
         /// \param f   The user defined function to invoke inside the task
         ///            group.
         /// \param ts  Additional arguments to use to invoke \c f().
-      
+
         template <typename F, typename... Ts>
         // clang-format off
             requires (

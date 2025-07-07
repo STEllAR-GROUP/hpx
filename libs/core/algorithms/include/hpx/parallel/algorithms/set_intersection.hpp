@@ -311,10 +311,9 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<set_intersection_t>
     {
     private:
-        
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename FwdIter3, typename Pred = hpx::parallel::detail::less>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
@@ -356,10 +355,9 @@ namespace hpx {
                     hpx::identity_v));
         }
 
-    
         template <typename FwdIter1, typename FwdIter2, typename FwdIter3,
             typename Pred = hpx::parallel::detail::less>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&

@@ -415,15 +415,12 @@ namespace hpx::parallel {
 
         ///////////////////////////////////////////////////////////////////////
 
-        
         template <typename ExPolicy, typename InIter, typename FwdIter,
-        typename Size>
-        // clang-format off 
-        requires (
-                hpx::traits::is_input_iterator_v<InIter> &&
+            typename Size>
+        // clang-format off
+            requires(hpx::traits::is_input_iterator_v<InIter> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
-                std::is_integral_v<Size>
-            )
+                std::is_integral_v<Size>)
         // clang-format on
         typename util::detail::algorithm_result<ExPolicy,
             util::in_out_result<InIter, FwdIter>>::type
@@ -495,7 +492,7 @@ namespace hpx::parallel {
             }
 
             // non vectorized overload
-            
+
             template <typename ExPolicy, typename InIter, typename FwdIter>
             // clang-format off
                 requires (
@@ -517,7 +514,6 @@ namespace hpx::parallel {
                     first_advanced, dest_advanced};
             }
 
-           
             template <typename ExPolicy, typename InIter, typename FwdIter>
             // clang-format off
                 requires (
@@ -555,7 +551,7 @@ namespace hpx::parallel {
             // non vectorized overload
             template <typename ExPolicy, typename InIter1, typename InIter2,
                 typename FwdIter>
-                // clang-format off
+            // clang-format off
                 requires (
                     hpx::is_sequenced_execution_policy_v<ExPolicy>&&
                     hpx::traits::is_input_iterator_v<InIter1>&&
@@ -617,7 +613,7 @@ namespace hpx::parallel {
 
             // non vectorized overload
             template <typename ExPolicy, typename BiIter1, typename BiIter2>
-                // clang-format off
+            // clang-format off
                 requires (
                     hpx::is_sequenced_execution_policy_v<ExPolicy> &&
                     hpx::traits::is_bidirectional_iterator_v<BiIter1> &&
@@ -672,16 +668,14 @@ namespace hpx::experimental {
     inline constexpr struct uninitialized_relocate_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_n_t>
     {
-       
-        template <typename InIter, typename Size,
-            typename FwdIter>
-            // clang-format off
+        template <typename InIter, typename Size, typename FwdIter>
+        // clang-format off
             requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
             )
-             // clang-format on
+        // clang-format on
         friend FwdIter tag_fallback_invoke(uninitialized_relocate_n_t,
             InIter first, Size count,
             FwdIter dest) noexcept(util::detail::relocation_traits<InIter,
@@ -711,10 +705,9 @@ namespace hpx::experimental {
                         static_cast<std::size_t>(count), dest));
         }
 
-        
         template <typename ExPolicy, typename InIter, typename Size,
             typename FwdIter>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<InIter> &&
@@ -787,7 +780,6 @@ namespace hpx::experimental {
     inline constexpr struct uninitialized_relocate_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_t>
     {
-        
         template <typename InIter1, typename InIter2, typename FwdIter>
         // clang-format off
             requires (
@@ -824,10 +816,9 @@ namespace hpx::experimental {
                     .call(hpx::execution::seq, first, last, dest));
         }
 
-        
         template <typename ExPolicy, typename InIter1, typename InIter2,
             typename FwdIter>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<InIter1> &&
@@ -902,7 +893,6 @@ namespace hpx::experimental {
     inline constexpr struct uninitialized_relocate_backward_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_backward_t>
     {
-        
         template <typename BiIter1, typename BiIter2>
         // clang-format off
             requires (
@@ -937,7 +927,6 @@ namespace hpx::experimental {
                     .call(hpx::execution::seq, first, last, dest_last));
         }
 
-        
         template <typename ExPolicy, typename BiIter1, typename BiIter2>
         // clang-format off
             requires (

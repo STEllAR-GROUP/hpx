@@ -14,7 +14,6 @@
 
 namespace hpx::execution::experimental {
 
-    
     template <typename ExPolicy>
     // clang-format off
         requires (
@@ -54,7 +53,6 @@ namespace hpx::execution::experimental {
 
 namespace hpx::parallel::util {
 
-   
     template <typename ExPolicy>
     // clang-format off
         requires (
@@ -64,9 +62,9 @@ namespace hpx::parallel::util {
     HPX_DEPRECATED_V(1, 11,
         "hpx::parallel::util::adapt_thread_priority is deprecated. Please use "
         "hpx::execution::experimental::adapt_thread_priority instead.")
-    // clang-format on
-    decltype(auto) adapt_thread_priority(
-        ExPolicy&& policy, hpx::threads::thread_priority new_priority)
+        // clang-format on
+        decltype(auto) adapt_thread_priority(
+            ExPolicy&& policy, hpx::threads::thread_priority new_priority)
     {
         return hpx::execution::experimental::adapt_thread_priority(
             HPX_FORWARD(ExPolicy, policy), new_priority);

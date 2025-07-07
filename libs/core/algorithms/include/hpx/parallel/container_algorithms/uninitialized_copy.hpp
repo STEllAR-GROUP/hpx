@@ -327,8 +327,9 @@ namespace hpx::ranges {
     inline constexpr struct uninitialized_copy_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_t>
     {
-    private: 
-        template <typename InIter, typename Sent1, typename FwdIter, typename Sent2>
+    private:
+        template <typename InIter, typename Sent1, typename FwdIter,
+            typename Sent2>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<InIter> &&
@@ -379,7 +380,6 @@ namespace hpx::ranges {
                     last2);
         }
 
-       
         template <typename Rng1, typename Rng2>
         // clang-format off
             requires (
@@ -410,7 +410,6 @@ namespace hpx::ranges {
                     std::begin(rng2), std::end(rng2));
         }
 
-   
         template <typename ExPolicy, typename Rng1, typename Rng2>
         // clang-format off
             requires (
@@ -448,7 +447,8 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_n_t>
     {
     private:
-        template <typename InIter, typename Size, typename FwdIter, typename Sent2>
+        template <typename InIter, typename Size, typename FwdIter,
+            typename Sent2>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<InIter> &&
@@ -473,7 +473,6 @@ namespace hpx::ranges {
                     first2);
         }
 
-     
         template <typename ExPolicy, typename FwdIter1, typename Size,
             typename FwdIter2, typename Sent2>
         // clang-format off

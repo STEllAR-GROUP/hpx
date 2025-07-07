@@ -20,9 +20,9 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    
+
     template <typename ExPolicy, typename InIterB, typename InIterE, typename T,
-        typename Reduce> 
+        typename Reduce>
     // clang-format off
         requires (
             hpx::is_unsequenced_execution_policy_v<ExPolicy>
@@ -46,7 +46,6 @@ namespace hpx::parallel::detail {
         }
     }
 
-   
     template <typename ExPolicy, typename T, typename FwdIter, typename Reduce>
     // clang-format off
         requires (
@@ -70,7 +69,6 @@ namespace hpx::parallel::detail {
         }
     }
 
-    
     template <typename ExPolicy, typename Iter, typename Sent, typename T,
         typename Reduce, typename Convert>
     // clang-format off
@@ -97,7 +95,6 @@ namespace hpx::parallel::detail {
         }
     }
 
-   
     template <typename ExPolicy, typename T, typename Iter, typename Reduce,
         typename Convert>
     // clang-format off
@@ -122,7 +119,6 @@ namespace hpx::parallel::detail {
         }
     }
 
-  
     template <typename ExPolicy, typename Iter1, typename Sent, typename Iter2,
         typename T, typename Reduce, typename Convert>
     // clang-format off

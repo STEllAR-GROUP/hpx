@@ -229,7 +229,6 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<destroy_t>
     {
     private:
-        
         template <typename ExPolicy, typename Rng>
         // clang-format off
             requires ( 
@@ -251,7 +250,6 @@ namespace hpx::ranges {
                 hpx::util::end(rng));
         }
 
-        
         template <typename ExPolicy, typename Iter, typename Sent>
         // clang-format off
             requires (
@@ -269,12 +267,9 @@ namespace hpx::ranges {
                 HPX_FORWARD(ExPolicy, policy), first, last);
         }
 
-       
-        template <typename Rng> 
-        // clang-format off 
-            requires (
-                hpx::traits::is_range_v<Rng>
-            )
+        template <typename Rng>
+        // clang-format off
+            requires(hpx::traits::is_range_v<Rng>)
         // clang-format on
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             destroy_t, Rng&& rng)
@@ -289,7 +284,6 @@ namespace hpx::ranges {
                 hpx::util::end(rng));
         }
 
-      
         template <typename Iter, typename Sent>
         // clang-format off
             requires (
@@ -312,7 +306,6 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<destroy_n_t>
     {
     private:
-        
         template <typename ExPolicy, typename FwdIter, typename Size>
         // clang-format off
             requires (
@@ -341,7 +334,6 @@ namespace hpx::ranges {
                 static_cast<std::size_t>(count));
         }
 
-        
         template <typename FwdIter, typename Size>
         // clang-format off
             requires (

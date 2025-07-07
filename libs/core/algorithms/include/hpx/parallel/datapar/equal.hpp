@@ -61,7 +61,7 @@ namespace hpx { namespace parallel { namespace detail {
     template <typename ExPolicy, typename ZipIterator, typename Token,
         typename F>
     // clang-format off
-        requires (hpx::is_vectorpack_execution_policy_v<ExPolicy>) 
+        requires (hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     // clang-format on
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_equal_t<ExPolicy>, ZipIterator it, std::size_t part_count,

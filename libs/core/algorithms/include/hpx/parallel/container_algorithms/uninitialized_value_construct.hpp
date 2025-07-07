@@ -271,7 +271,6 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_t>
     {
     private:
-      
         template <typename FwdIter, typename Sent>
         // clang-format off
             requires (
@@ -291,7 +290,6 @@ namespace hpx::ranges {
                 .call(hpx::execution::seq, first, last);
         }
 
-      
         template <typename ExPolicy, typename FwdIter, typename Sent>
         // clang-format off
             requires (
@@ -312,7 +310,6 @@ namespace hpx::ranges {
                 .call(HPX_FORWARD(ExPolicy, policy), first, last);
         }
 
-        
         template <typename Rng>
         // clang-format off
             requires (
@@ -334,7 +331,6 @@ namespace hpx::ranges {
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng));
         }
 
-        
         template <typename ExPolicy, typename Rng>
         // clang-format off
             requires (
@@ -383,7 +379,6 @@ namespace hpx::ranges {
                 .call(hpx::execution::seq, first, count);
         }
 
-   
         template <typename ExPolicy, typename FwdIter, typename Size>
         // clang-format off
             requires (

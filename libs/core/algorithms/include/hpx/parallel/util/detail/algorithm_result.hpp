@@ -257,7 +257,7 @@ namespace hpx::parallel::util::detail {
     using algorithm_result_t = typename algorithm_result<ExPolicy, T>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    
+
     template <typename U, typename Conv>
     // clang-format off
         requires (
@@ -271,7 +271,6 @@ namespace hpx::parallel::util::detail {
         return HPX_INVOKE(conv, val);
     }
 
-    
     template <typename Sender, typename Conv>
     // clang-format off
         requires (
@@ -287,7 +286,7 @@ namespace hpx::parallel::util::detail {
     }
 
     template <typename U, typename Conv>
-        requires (hpx::is_invocable_v<Conv, U>)
+        requires(hpx::is_invocable_v<Conv, U>)
     hpx::future<hpx::util::invoke_result_t<Conv, U>> convert_to_result(
         hpx::future<U>&& f, Conv&& conv)
     {

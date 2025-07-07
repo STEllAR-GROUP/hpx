@@ -303,10 +303,9 @@ namespace hpx::ranges {
       : hpx::functional::detail::tag_fallback<starts_with_t>
     {
     private:
-        template <typename Iter1, typename Sent1, typename Iter2, typename Sent2,
-            typename Pred = ranges::equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+        template <typename Iter1, typename Sent1, typename Iter2,
+            typename Sent2, typename Pred = ranges::equal_to,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<Iter1> &&
@@ -335,11 +334,9 @@ namespace hpx::ranges {
                 HPX_MOVE(pred), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-        
-        template <typename ExPolicy, typename FwdIter1, typename Sent1, typename FwdIter2,
-            typename Sent2, typename Pred = ranges::equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+        template <typename ExPolicy, typename FwdIter1, typename Sent1,
+            typename FwdIter2, typename Sent2, typename Pred = ranges::equal_to,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -370,10 +367,8 @@ namespace hpx::ranges {
                 HPX_MOVE(pred), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-       
         template <typename Rng1, typename Rng2,
-            typename Pred = ranges::equal_to,
-            typename Proj1 = hpx::identity,
+            typename Pred = ranges::equal_to, typename Proj1 = hpx::identity,
             typename Proj2 = hpx::identity>
         // clang-format off
             requires (
@@ -411,10 +406,8 @@ namespace hpx::ranges {
                 HPX_MOVE(proj2));
         }
 
-       
         template <typename ExPolicy, typename Rng1, typename Rng2,
-            typename Pred = ranges::equal_to,
-            typename Proj1 = hpx::identity,
+            typename Pred = ranges::equal_to, typename Proj1 = hpx::identity,
             typename Proj2 = hpx::identity>
         // clang-format off
             requires (

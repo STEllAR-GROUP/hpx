@@ -266,10 +266,9 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<starts_with_t>
     {
     private:
-      
         template <typename InIter1, typename InIter2,
             typename Pred = hpx::parallel::detail::equal_to>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::traits::is_iterator_v<InIter1> &&
                 hpx::traits::is_iterator_v<InIter2> &&
@@ -293,10 +292,9 @@ namespace hpx {
                 HPX_MOVE(pred), hpx::identity_v, hpx::identity_v);
         }
 
-      
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred = ranges::equal_to>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&

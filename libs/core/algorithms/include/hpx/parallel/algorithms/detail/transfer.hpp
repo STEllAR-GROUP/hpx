@@ -103,7 +103,7 @@ namespace hpx::parallel {
         //           element in the destination range, one past the last element
         //           transferred.
         //
-       
+
         template <typename Algo, typename ExPolicy, typename FwdIter1,
             typename Sent1, typename FwdIter2>
         // clang-format off
