@@ -468,7 +468,6 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f), detail::no_scheduler{}};
         }
 
-     
         template <typename F, typename Scheduler>
         // clang-format off
             requires (

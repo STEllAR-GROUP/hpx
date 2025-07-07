@@ -270,7 +270,7 @@ namespace hpx::resiliency::experimental {
     ///////////////////////////////////////////////////////////////////////////
     // Asynchronously launch given function f exactly n times. Verify the result
     // of those invocations using the given predicate pred. Return the first
-    // valid result. 
+    // valid result.
     template <typename Executor, typename Pred, typename F, typename... Ts>
     // clang-format off
         requires (hpx::traits::is_one_way_executor_v<Executor> ||

@@ -98,7 +98,7 @@ namespace hpx::execution::experimental {
 
     ////////////////////////////////////////////////////////////////////////////
     // support all scheduling properties exposed by the embedded scheduler
-  
+
     template <typename Tag, typename Scheduler, typename ExPolicy,
         typename Property>
     // clang-format off

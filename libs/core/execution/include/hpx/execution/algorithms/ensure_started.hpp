@@ -59,7 +59,7 @@ namespace hpx::execution::experimental {
     {
     private:
         template <typename Sender,
-            typename Allocator = hpx::util::internal_allocator<> >
+            typename Allocator = hpx::util::internal_allocator<>>
         // clang-format off
             requires (
                 is_sender_v<Sender> &&
@@ -82,7 +82,7 @@ namespace hpx::execution::experimental {
         }
 
         template <typename Sender,
-            typename Allocator = hpx::util::internal_allocator<> >
+            typename Allocator = hpx::util::internal_allocator<>>
         // clang-format off
             requires (
                 hpx::execution::experimental::is_sender_v<Sender> &&
@@ -103,7 +103,7 @@ namespace hpx::execution::experimental {
         }
 
         template <typename Sender,
-            typename Allocator = hpx::util::internal_allocator<> >
+            typename Allocator = hpx::util::internal_allocator<>>
         // clang-format off
             requires (
                 is_sender_v<Sender> &&
@@ -146,10 +146,8 @@ namespace hpx::execution::experimental {
         }
 
         template <typename Allocator = hpx::util::internal_allocator<>>
-        // clang-format off 
-            requires (
-                hpx::traits::is_allocator_v<Allocator>
-            )
+        // clang-format off
+            requires(hpx::traits::is_allocator_v<Allocator>)
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             ensure_started_t, Allocator const& allocator = {})
