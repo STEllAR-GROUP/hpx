@@ -12,20 +12,20 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_local/dataflow.hpp>
 #endif
+#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/detail/select_partitioner.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/type_support/unused.hpp>
-#include <hpx/execution_base/stdexec_forward.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <exception>
 #include <memory>
+#include <tuple>
 #include <type_traits>
 #include <utility>
-#include <tuple>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util {
@@ -81,7 +81,8 @@ namespace hpx::parallel::util {
 
         private:
             template <typename Items, typename F, typename Cleanup>
-            static decltype(auto) reduce(Items&& workitems, F&& f, Cleanup&& cleanup)
+            static decltype(auto) reduce(
+                Items&& workitems, F&& f, Cleanup&& cleanup)
             {
                 namespace ex = hpx::execution::experimental;
                 if constexpr (ex::is_sender_v<std::decay_t<Items>> &&

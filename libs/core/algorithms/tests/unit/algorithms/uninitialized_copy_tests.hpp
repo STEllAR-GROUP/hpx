@@ -51,7 +51,8 @@ void test_uninitialized_copy(ExPolicy&& policy, IteratorTag)
 
 #if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_uninitialized_copy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+void test_uninitialized_copy_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -154,8 +155,60 @@ void test_uninitialized_copy_exception(ExPolicy policy, IteratorTag)
     HPX_TEST_EQ(test::count_instances::instance_count.load(), std::size_t(0));
 }
 
-template <typename ExPolicy, typename IteratorTag>
-void test_uninitialized_copy_exception_async(ExPolicy p, IteratorTag)
+#if defined(HPX_HAVE_STDEXEC)
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_uninitialized_copy_exception_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<test::count_instances>::iterator;
+    using decorated_iterator = test::decorated_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    std::vector<test::count_instances> c(10007);
+    std::vector<test::count_instances> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    std::atomic<std::size_t> throw_after(std::rand() % c.size());    //-V104
+    test::count_instances::instance_count.store(0);
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+    bool caught_exception = false;
+    try
+    {
+        tt::sync_wait(ex::just(decorated_iterator(std::begin(c),
+            [&throw_after]() {
+                if (throw_after-- == 0)
+                    throw std::runtime_error("test");
+            }),
+            decorated_iterator(std::end(c)), std::begin(d)) |
+            hpx::uninitialized_copy(ex_policy.on(exec)));
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(ex_policy, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+    HPX_TEST_EQ(test::count_instances::instance_count.load(), std::size_t(0));
+}
+#endif
+
+    template <typename ExPolicy, typename IteratorTag>
+    void test_uninitialized_copy_exception_async(ExPolicy p, IteratorTag)
 {
     typedef std::vector<test::count_instances>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -243,6 +296,57 @@ void test_uninitialized_copy_bad_alloc(ExPolicy policy, IteratorTag)
     HPX_TEST(caught_bad_alloc);
     HPX_TEST_EQ(test::count_instances::instance_count.load(), std::size_t(0));
 }
+
+#if defined(HPX_HAVE_STDEXEC)
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_uninitialized_copy_bad_alloc_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<test::count_instances>::iterator;
+    using decorated_iterator = test::decorated_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    std::vector<test::count_instances> c(10007);
+    std::vector<test::count_instances> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    std::atomic<std::size_t> throw_after(std::rand() % c.size());    //-V104
+    test::count_instances::instance_count.store(0);
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+    bool caught_bad_alloc = false;
+    try
+    {
+        tt::sync_wait(ex::just(decorated_iterator(std::begin(c),
+            [&throw_after]() {
+                if (throw_after-- == 0)
+                    throw std::bad_alloc();
+            }),
+            decorated_iterator(std::end(c)), std::begin(d)) |
+            hpx::uninitialized_copy(ex_policy.on(exec)));
+        HPX_TEST(false);
+    }
+    catch (std::bad_alloc const&)
+    {
+        caught_bad_alloc = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+    HPX_TEST_EQ(test::count_instances::instance_count.load(), std::size_t(0));
+}
+#endif
 
 template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_copy_bad_alloc_async(ExPolicy p, IteratorTag)
