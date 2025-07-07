@@ -1638,7 +1638,7 @@ namespace hpx::execution::experimental {
             };
         };
     }    // namespace detail
-#endif     // HPX_HAVE_CXX20_COROUTINES
+#endif    // HPX_HAVE_CXX20_COROUTINES
 
     /// End definitions from coroutine_utils and sender
 
