@@ -698,8 +698,8 @@ namespace hpx::ranges {
     inline constexpr struct reduce_t final
       : hpx::detail::tag_parallel_algorithm<reduce_t>
     {
-       
-        template <typename ExPolicy, typename FwdIter, typename Sent, typename F,
+        template <typename ExPolicy, typename FwdIter, typename Sent,
+            typename F,
             typename T = typename std::iterator_traits<FwdIter>::value_type>
         // clang-format off
             requires (
@@ -720,7 +720,6 @@ namespace hpx::ranges {
                 HPX_MOVE(f));
         }
 
-        
         template <typename ExPolicy, typename Rng, typename F,
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type>
@@ -745,7 +744,6 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(init), HPX_MOVE(f));
         }
 
-        
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename T = typename std::iterator_traits<FwdIter>::value_type>
         // clang-format off
@@ -767,7 +765,6 @@ namespace hpx::ranges {
                 std::plus<T>{});
         }
 
-       
         template <typename ExPolicy, typename Rng,
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type>
@@ -815,7 +812,6 @@ namespace hpx::ranges {
                 std::plus<value_type>{});
         }
 
-        
         template <typename ExPolicy, typename Rng>
         // clang-format off
             requires (
@@ -842,7 +838,7 @@ namespace hpx::ranges {
         }
 
         ////////////////////////////////////////////////////////////////////////
-        
+
         template <typename FwdIter, typename Sent, typename F,
             typename T = typename std::iterator_traits<FwdIter>::value_type>
         // clang-format off
@@ -860,7 +856,6 @@ namespace hpx::ranges {
                 hpx::execution::seq, first, last, HPX_MOVE(init), HPX_MOVE(f));
         }
 
-        
         template <typename Rng, typename F,
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type>
@@ -881,7 +876,6 @@ namespace hpx::ranges {
                 HPX_MOVE(f));
         }
 
-        
         template <typename FwdIter, typename Sent,
             typename T = typename std::iterator_traits<FwdIter>::value_type>
         // clang-format off
@@ -898,9 +892,9 @@ namespace hpx::ranges {
             return hpx::parallel::detail::reduce<T>().call(hpx::execution::seq,
                 first, last, HPX_MOVE(init), std::plus<T>{});
         }
- 
+
         template <typename Rng,
-             typename T = typename std::iterator_traits<
+            typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type>
         // clang-format off
             requires (
@@ -918,7 +912,6 @@ namespace hpx::ranges {
                 std::plus<T>{});
         }
 
-        
         template <typename FwdIter, typename Sent>
         // clang-format off
             requires (
@@ -939,7 +932,6 @@ namespace hpx::ranges {
                 std::plus<value_type>{});
         }
 
-        
         template <typename Rng>
         // clang-format off
             requires (

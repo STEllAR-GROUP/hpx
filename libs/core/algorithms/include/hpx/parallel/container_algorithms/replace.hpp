@@ -1135,9 +1135,7 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-      
-        template <typename Rng, typename Pred,
-            typename Proj = hpx::identity,
+        template <typename Rng, typename Pred, typename Proj = hpx::identity,
             typename T = typename hpx::parallel::traits::projected<
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
         // clang-format off
@@ -1166,9 +1164,8 @@ namespace hpx::ranges {
                     HPX_MOVE(proj));
         }
 
-        
-        template <typename ExPolicy, typename Iter, typename Sent, typename Pred,
-            typename Proj = hpx::identity,
+        template <typename ExPolicy, typename Iter, typename Sent,
+            typename Pred, typename Proj = hpx::identity,
             typename T = typename hpx::parallel::traits::projected<Iter,
                 Proj>::value_type>
         // clang-format off
@@ -1195,7 +1192,6 @@ namespace hpx::ranges {
                 new_value, HPX_MOVE(proj));
         }
 
-       
         template <typename ExPolicy, typename Rng, typename Pred,
             typename Proj = hpx::identity,
             typename T = typename hpx::parallel::traits::projected<
@@ -1232,8 +1228,7 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<replace_t>
     {
     private:
-        template <typename Iter, typename Sent,
-            typename Proj = hpx::identity,
+        template <typename Iter, typename Sent, typename Proj = hpx::identity,
             typename T1 = typename hpx::parallel::traits::projected<Iter,
                 Proj>::value_type,
             typename T2 = T1>
@@ -1259,9 +1254,7 @@ namespace hpx::ranges {
                 new_value, HPX_MOVE(proj));
         }
 
-       
-        template <typename Rng,
-            typename Proj = hpx::identity,
+        template <typename Rng, typename Proj = hpx::identity,
             typename T1 = typename hpx::parallel::traits::projected<
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             typename T2 = T1>
@@ -1288,7 +1281,6 @@ namespace hpx::ranges {
                 new_value, HPX_MOVE(proj));
         }
 
-       
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Proj = hpx::identity,
             typename T1 = typename hpx::parallel::traits::projected<Iter,
@@ -1388,21 +1380,16 @@ namespace hpx::ranges {
                     new_value, HPX_MOVE(proj));
         }
 
-     
         template <typename Rng, typename OutIter, typename Pred,
             typename T = typename std::iterator_traits<OutIter>::value_type,
             typename Proj = hpx::identity>
-        // clang-format off    
-            requires (
-                hpx::traits::is_range_v<Rng> &&
+        // clang-format off
+            requires(hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<
-                        hpx::traits::range_iterator_t<Rng>
-                    >::value_type
-                >
-            )
+                        hpx::traits::range_iterator_t<Rng>>::value_type>)
         // clang-format on
         friend replace_copy_if_result<hpx::traits::range_iterator_t<Rng>,
             OutIter>
@@ -1424,7 +1411,6 @@ namespace hpx::ranges {
                     HPX_MOVE(proj));
         }
 
-       
         template <typename ExPolicy, typename FwdIter1, typename Sent,
             typename FwdIter2, typename Pred,
             typename T = typename std::iterator_traits<FwdIter2>::value_type,
@@ -1459,8 +1445,8 @@ namespace hpx::ranges {
                     HPX_MOVE(pred), new_value, HPX_MOVE(proj));
         }
 
-      
-        template <typename ExPolicy, typename Rng, typename FwdIter, typename Pred,
+        template <typename ExPolicy, typename Rng, typename FwdIter,
+            typename Pred,
             typename T = typename std::iterator_traits<FwdIter>::value_type,
             typename Proj = hpx::identity>
         // clang-format off
@@ -1502,11 +1488,11 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<replace_copy_t>
     {
     private:
-        template <typename InIter, typename Sent,
-            typename OutIter,
+        template <typename InIter, typename Sent, typename OutIter,
             typename Proj = hpx::identity,
             typename T1 = typename hpx::parallel::traits::projected<InIter,
-                Proj>::value_type, typename T2 = T1>
+                Proj>::value_type,
+            typename T2 = T1>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<InIter> &&
@@ -1532,9 +1518,7 @@ namespace hpx::ranges {
                 new_value, HPX_MOVE(proj));
         }
 
-        
-        template <typename Rng, typename OutIter,
-            typename Proj = hpx::identity,
+        template <typename Rng, typename OutIter, typename Proj = hpx::identity,
             typename T1 = typename hpx::parallel::traits::projected<
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             typename T2 = T1>
@@ -1566,12 +1550,11 @@ namespace hpx::ranges {
                 new_value, HPX_MOVE(proj));
         }
 
-      
-        template <typename ExPolicy, typename FwdIter1,
-            typename Sent, typename FwdIter2,
-            typename Proj = hpx::identity,
+        template <typename ExPolicy, typename FwdIter1, typename Sent,
+            typename FwdIter2, typename Proj = hpx::identity,
             typename T1 = typename hpx::parallel::traits::projected<FwdIter1,
-                Proj>::value_type, typename T2 = T1>
+                Proj>::value_type,
+            typename T2 = T1>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -1601,7 +1584,6 @@ namespace hpx::ranges {
                 new_value, HPX_MOVE(proj));
         }
 
-    
         template <typename ExPolicy, typename Rng, typename FwdIter,
             typename Proj = hpx::identity,
             typename T1 = typename hpx::parallel::traits::projected<

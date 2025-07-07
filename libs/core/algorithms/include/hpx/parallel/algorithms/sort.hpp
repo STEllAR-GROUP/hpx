@@ -387,10 +387,9 @@ namespace hpx {
     inline constexpr struct sort_t final
       : hpx::detail::tag_parallel_algorithm<sort_t>
     {
-        
         template <typename RandomIt,
             typename Comp = hpx::parallel::detail::less>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::is_invocable_v<Comp,
@@ -409,10 +408,9 @@ namespace hpx {
                 first, last, HPX_MOVE(comp), hpx::identity_v);
         }
 
-      
         template <typename ExPolicy, typename RandomIt,
             typename Comp = hpx::parallel::detail::less>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandomIt> &&

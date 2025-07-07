@@ -713,8 +713,7 @@ namespace hpx::ranges {
     {
     private:
         template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename F,
-            typename Proj = hpx::identity>
+            typename FwdIter2, typename F, typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -736,9 +735,8 @@ namespace hpx::ranges {
                     HPX_MOVE(f), HPX_MOVE(proj));
         }
 
-    
-        template <typename ExPolicy, typename Rng, typename FwdIter,
-            typename F, typename Proj = hpx::identity>
+        template <typename ExPolicy, typename Rng, typename FwdIter, typename F,
+            typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -761,11 +759,9 @@ namespace hpx::ranges {
                     hpx::util::end(rng), dest, HPX_MOVE(f), HPX_MOVE(proj));
         }
 
-        
         template <typename ExPolicy, typename FwdIter1, typename Sent1,
             typename FwdIter2, typename Sent2, typename FwdIter3, typename F,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -791,9 +787,8 @@ namespace hpx::ranges {
                     last2, dest, HPX_MOVE(f), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-      
-        template <typename ExPolicy, typename Rng1, typename Rng2, typename FwdIter,
-            typename F, typename Proj1 = hpx::identity,
+        template <typename ExPolicy, typename Rng1, typename Rng2,
+            typename FwdIter, typename F, typename Proj1 = hpx::identity,
             typename Proj2 = hpx::identity>
         // clang-format off
             requires (
@@ -824,10 +819,8 @@ namespace hpx::ranges {
                     HPX_MOVE(proj2));
         }
 
-        
         template <typename FwdIter1, typename Sent1, typename FwdIter2,
-            typename F,
-            typename Proj = hpx::identity>
+            typename F, typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
@@ -848,9 +841,8 @@ namespace hpx::ranges {
                     HPX_MOVE(proj));
         }
 
-      
-        template <typename Rng, typename FwdIter,
-            typename F, typename Proj = hpx::identity>
+        template <typename Rng, typename FwdIter, typename F,
+            typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_range_v<Rng> &&
@@ -874,11 +866,9 @@ namespace hpx::ranges {
                     hpx::util::end(rng), dest, HPX_MOVE(f), HPX_MOVE(proj));
         }
 
-        
-        template <typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename Sent2, typename FwdIter3, typename F,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+        template <typename FwdIter1, typename Sent1, typename FwdIter2,
+            typename Sent2, typename FwdIter3, typename F,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
@@ -903,16 +893,12 @@ namespace hpx::ranges {
                     HPX_MOVE(f), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-        
-        template <typename Rng1, typename Rng2, typename FwdIter,
-            typename F, typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
-        // clang-format off 
-            requires (
-                hpx::traits::is_range_v<Rng1> &&
+        template <typename Rng1, typename Rng2, typename FwdIter, typename F,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
+        // clang-format off
+            requires(hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&
-                hpx::traits::is_iterator_v<FwdIter>
-            )
+                hpx::traits::is_iterator_v<FwdIter>)
         // clang-format on
         friend ranges::binary_transform_result<
             hpx::traits::range_iterator_t<Rng1>,

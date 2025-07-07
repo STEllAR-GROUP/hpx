@@ -259,7 +259,6 @@ namespace hpx::ranges {
                 .call(hpx::execution::seq, first1, last1, first2, last2);
         }
 
-     
         template <typename ExPolicy, typename FwdIter1, typename Sent1,
             typename FwdIter2, typename Sent2>
         // clang-format off
@@ -287,7 +286,6 @@ namespace hpx::ranges {
                     last2);
         }
 
-        
         template <typename Rng1, typename Rng2>
         // clang-format off
             requires (
@@ -314,7 +312,6 @@ namespace hpx::ranges {
                     std::begin(rng2), std::end(rng2));
         }
 
-       
         template <typename ExPolicy, typename Rng1, typename Rng2>
         // clang-format off
             requires (

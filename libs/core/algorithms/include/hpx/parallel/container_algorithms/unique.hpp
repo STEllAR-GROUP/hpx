@@ -624,10 +624,8 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<unique_t>
     {
     private:
-   
         template <typename FwdIter, typename Sent,
-            typename Pred = ranges::equal_to,
-            typename Proj = hpx::identity>
+            typename Pred = ranges::equal_to, typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
@@ -654,10 +652,8 @@ namespace hpx::ranges {
                 last);
         }
 
-    
         template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename Pred = ranges::equal_to,
-            typename Proj = hpx::identity>
+            typename Pred = ranges::equal_to, typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -686,9 +682,7 @@ namespace hpx::ranges {
                 last);
         }
 
-        
-        template <typename Rng,
-            typename Pred = ranges::equal_to,
+        template <typename Rng, typename Pred = ranges::equal_to,
             typename Proj = hpx::identity>
         // clang-format off
             requires (
@@ -721,10 +715,8 @@ namespace hpx::ranges {
                 hpx::util::end(rng));
         }
 
-        
         template <typename ExPolicy, typename Rng,
-            typename Pred = ranges::equal_to,
-            typename Proj = hpx::identity>
+            typename Pred = ranges::equal_to, typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -768,10 +760,8 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<unique_copy_t>
     {
     private:
-       
         template <typename InIter, typename Sent, typename O,
-            typename Pred = ranges::equal_to,
-            typename Proj = hpx::identity>
+            typename Pred = ranges::equal_to, typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<InIter> &&
@@ -798,10 +788,8 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-    
         template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename O,
-            typename Pred = ranges::equal_to,
+            typename O, typename Pred = ranges::equal_to,
             typename Proj = hpx::identity>
         // clang-format off
             requires (
@@ -832,9 +820,7 @@ namespace hpx::ranges {
                 HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
-     
-        template <typename Rng, typename O,
-            typename Pred = ranges::equal_to,
+        template <typename Rng, typename O, typename Pred = ranges::equal_to,
             typename Proj = hpx::identity>
         // clang-format off
             requires (
@@ -863,10 +849,8 @@ namespace hpx::ranges {
                 dest, HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
-     
         template <typename ExPolicy, typename Rng, typename O,
-            typename Pred = ranges::equal_to,
-            typename Proj = hpx::identity>
+            typename Pred = ranges::equal_to, typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&

@@ -522,9 +522,7 @@ namespace hpx::ranges {
                 sent);
         }
 
-        
-        template <typename Rng, typename Pred,
-            typename Proj = hpx::identity>
+        template <typename Rng, typename Pred, typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_range_v<Rng> &&
@@ -554,9 +552,8 @@ namespace hpx::ranges {
                 hpx::util::end(rng));
         }
 
-    
-        template <typename ExPolicy, typename FwdIter, typename Sent, typename Pred,
-        typename Proj = hpx::identity>
+        template <typename ExPolicy, typename FwdIter, typename Sent,
+            typename Pred, typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -583,7 +580,6 @@ namespace hpx::ranges {
                 sent);
         }
 
-      
         template <typename ExPolicy, typename Rng, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
@@ -622,8 +618,7 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<remove_t>
     {
     private:
-        template <typename Iter, typename Sent,
-            typename Proj = hpx::identity,
+        template <typename Iter, typename Sent, typename Proj = hpx::identity,
             typename T = typename hpx::parallel::traits::projected<Iter,
                 Proj>::value_type>
         // clang-format off
@@ -647,8 +642,7 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        template <typename Rng,
-            typename Proj = hpx::identity,
+        template <typename Rng, typename Proj = hpx::identity,
             typename T = typename hpx::parallel::traits::projected<
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
         // clang-format off
@@ -674,7 +668,6 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename Proj = hpx::identity,
             typename T = typename hpx::parallel::traits::projected<FwdIter,

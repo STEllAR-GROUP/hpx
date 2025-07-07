@@ -407,7 +407,6 @@ namespace hpx::ranges {
                 hpx::execution::sequenced_policy{}, first, sent);
         }
 
-        
         template <typename Rng>
         // clang-format off
         requires (
@@ -427,14 +426,11 @@ namespace hpx::ranges {
                     hpx::util::end(rng));
         }
 
-       
         template <typename ExPolicy, typename Iter, typename Sent>
-        // clang-format off 
-        requires (
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<Iter> &&
-            hpx::traits::is_sentinel_for_v<Sent, Iter>
-        )
+        // clang-format off
+            requires(hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<Iter> &&
+                hpx::traits::is_sentinel_for_v<Sent, Iter>)
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
@@ -448,7 +444,6 @@ namespace hpx::ranges {
                 HPX_FORWARD(ExPolicy, policy), first, sent);
         }
 
-       
         template <typename ExPolicy, typename Rng>
         // clang-format off
         requires (
@@ -478,7 +473,6 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<reverse_copy_t>
     {
     private:
-        
         template <typename Iter, typename Sent, typename OutIter>
         // clang-format off
         requires (
@@ -501,7 +495,6 @@ namespace hpx::ranges {
                 .call(hpx::execution::sequenced_policy{}, first, last, result);
         }
 
-       
         template <typename Rng, typename OutIter>
         // clang-format off
         requires (
@@ -527,8 +520,8 @@ namespace hpx::ranges {
                     hpx::util::end(rng), result);
         }
 
-      
-        template <typename ExPolicy, typename Iter, typename Sent, typename FwdIter>
+        template <typename ExPolicy, typename Iter, typename Sent,
+            typename FwdIter>
         // clang-format off
         requires (
             hpx::is_execution_policy_v<ExPolicy> &&

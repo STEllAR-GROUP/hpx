@@ -227,7 +227,6 @@ namespace hpx::ranges {
                 hpx::execution::seq, first, last, n);
         }
 
-        
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename Size>
         // clang-format off
@@ -250,7 +249,6 @@ namespace hpx::ranges {
                 HPX_FORWARD(ExPolicy, policy), first, last, n);
         }
 
-      
         template <typename Rng, typename Size>
         // clang-format off
             requires (
@@ -270,8 +268,7 @@ namespace hpx::ranges {
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng), n);
         }
 
-      
-        template <typename ExPolicy, typename Rng,  typename Size>
+        template <typename ExPolicy, typename Rng, typename Size>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&

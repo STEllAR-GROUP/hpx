@@ -261,11 +261,9 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<is_partitioned_t>
     {
     private:
-        
-        template <typename FwdIter, typename Sent,
-            typename Pred,
+        template <typename FwdIter, typename Sent, typename Pred,
             typename Proj = hpx::identity>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -284,11 +282,9 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-       
         template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename Pred,
-            typename Proj = hpx::identity>
-            // clang-format off
+            typename Pred, typename Proj = hpx::identity>
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
@@ -309,11 +305,8 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-       
-        template <typename Rng,
-            typename Pred,
-            typename Proj = hpx::identity>
-            // clang-format off
+        template <typename Rng, typename Pred, typename Proj = hpx::identity>
+        // clang-format off
             requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -335,11 +328,9 @@ namespace hpx::ranges {
                     HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
-       
-        template <typename ExPolicy, typename Rng,
-            typename Pred,
+        template <typename ExPolicy, typename Rng, typename Pred,
             typename Proj = hpx::identity>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&

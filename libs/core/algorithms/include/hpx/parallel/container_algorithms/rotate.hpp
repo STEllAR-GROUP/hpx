@@ -422,7 +422,7 @@ namespace hpx::ranges {
     inline constexpr struct rotate_t final
       : hpx::detail::tag_parallel_algorithm<rotate_t>
     {
-    private: 
+    private:
         template <typename FwdIter, typename Sent>
         // clang-format off
             requires (
@@ -442,7 +442,6 @@ namespace hpx::ranges {
                     .call(hpx::execution::seq, first, middle, last));
         }
 
-       
         template <typename ExPolicy, typename FwdIter, typename Sent>
         // clang-format off
             requires (
@@ -470,7 +469,6 @@ namespace hpx::ranges {
                         middle, last));
         }
 
-        
         template <typename Rng>
         // clang-format off
             requires (hpx::traits::is_range_v<Rng>)
@@ -490,7 +488,6 @@ namespace hpx::ranges {
                         hpx::util::end(rng)));
         }
 
-      
         template <typename ExPolicy, typename Rng>
         // clang-format off
             requires (
@@ -529,7 +526,6 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<rotate_copy_t>
     {
     private:
-        
         template <typename FwdIter, typename Sent, typename OutIter>
         // clang-format off
             requires (
@@ -552,7 +548,6 @@ namespace hpx::ranges {
                 .call(hpx::execution::seq, first, middle, last, dest_first);
         }
 
-        
         template <typename ExPolicy, typename FwdIter1, typename Sent,
             typename FwdIter2>
         // clang-format off
@@ -583,7 +578,6 @@ namespace hpx::ranges {
                     last, dest_first);
         }
 
-        
         template <typename Rng, typename OutIter>
         // clang-format off
             requires (
@@ -601,7 +595,6 @@ namespace hpx::ranges {
                     hpx::util::end(rng), dest_first);
         }
 
-        
         template <typename ExPolicy, typename Rng, typename OutIter>
         // clang-format off
             requires (

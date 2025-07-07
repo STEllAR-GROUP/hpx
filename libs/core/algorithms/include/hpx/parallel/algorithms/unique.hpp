@@ -696,10 +696,9 @@ namespace hpx {
     inline constexpr struct unique_t final
       : hpx::detail::tag_parallel_algorithm<unique_t>
     {
-        
         template <typename FwdIter,
             typename Pred = hpx::parallel::detail::equal_to>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<Pred,
@@ -719,10 +718,9 @@ namespace hpx {
                 hpx::identity_v);
         }
 
-      
         template <typename ExPolicy, typename FwdIter,
             typename Pred = hpx::parallel::detail::equal_to>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
@@ -749,10 +747,9 @@ namespace hpx {
     inline constexpr struct unique_copy_t final
       : hpx::detail::tag_parallel_algorithm<unique_copy_t>
     {
-        
         template <typename InIter, typename OutIter,
-            typename Pred = hpx::parallel::detail::equal_to> 
-            // clang-format off
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
             requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
@@ -761,7 +758,7 @@ namespace hpx {
                     hpx::traits::iter_value_t<OutIter>
                 >
             )
-             // clang-format on
+        // clang-format on
         friend OutIter tag_fallback_invoke(hpx::unique_copy_t, InIter first,
             InIter last, OutIter dest, Pred pred = Pred())
         {
@@ -776,10 +773,9 @@ namespace hpx {
                     hpx::identity_v));
         }
 
-       
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred = hpx::parallel::detail::equal_to>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&

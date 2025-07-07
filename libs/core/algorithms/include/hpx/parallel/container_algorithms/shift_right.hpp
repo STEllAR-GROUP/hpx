@@ -209,7 +209,6 @@ namespace hpx::ranges {
       : hpx::functional::detail::tag_fallback<shift_right_t>
     {
     private:
-       
         template <typename FwdIter, typename Sent, typename Size>
         // clang-format off
             requires (
@@ -269,8 +268,7 @@ namespace hpx::ranges {
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng), n);
         }
 
-      
-        template <typename ExPolicy, typename Rng,  typename Size>
+        template <typename ExPolicy, typename Rng, typename Size>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&

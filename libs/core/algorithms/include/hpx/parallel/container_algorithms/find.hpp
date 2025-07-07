@@ -1464,19 +1464,17 @@ namespace hpx::ranges {
                 hpx::util::end(rng), val, HPX_MOVE(proj));
         }
 
-        
-            template <typename Iter, typename Sent,
-                typename Proj = hpx::identity,
-                typename T = typename hpx::parallel::traits::projected<Iter,
-                    Proj>::value_type>
-            // clang-format off
+        template <typename Iter, typename Sent, typename Proj = hpx::identity,
+            typename T = typename hpx::parallel::traits::projected<Iter,
+                Proj>::value_type>
+        // clang-format off
             requires (
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter>
             )
-            // clang-format on
-            friend Iter tag_fallback_invoke(find_t, Iter first, Sent last,
-                T const& val, Proj&& proj = Proj())
+        // clang-format on
+        friend Iter tag_fallback_invoke(
+            find_t, Iter first, Sent last, T const& val, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_input_iterator_v<Iter>,
                 "Requires at least input iterator.");

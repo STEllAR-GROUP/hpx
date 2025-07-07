@@ -353,7 +353,7 @@ namespace hpx::ranges {
     private:
         template <typename InIter, typename Sent, typename OutIter,
             typename T = typename std::iterator_traits<InIter>::value_type,
-            typename Op = std::plus<> >
+            typename Op = std::plus<>>
         // clang-format off
             requires ( 
                 hpx::traits::is_iterator_v<InIter> &&
@@ -383,7 +383,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter1, typename Sent,
             typename FwdIter2,
             typename T = typename std::iterator_traits<FwdIter1>::value_type,
-            typename Op = std::plus<> >
+            typename Op = std::plus<>>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -416,7 +416,7 @@ namespace hpx::ranges {
         template <typename Rng, typename O,
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type,
-            typename Op = std::plus<> >
+            typename Op = std::plus<>>
         // clang-format off
             requires (
                 hpx::traits::is_range_v<Rng> &&
@@ -445,7 +445,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename O,
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type,
-            typename Op = std::plus<> >
+            typename Op = std::plus<>>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&

@@ -299,8 +299,7 @@ namespace hpx::ranges {
     {
     private:
         template <typename RandomIt, typename Sent,
-            typename Comp = ranges::less,
-            typename Proj = hpx::identity>
+            typename Comp = ranges::less, typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<RandomIt> &&
@@ -324,10 +323,8 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-       
         template <typename ExPolicy, typename RandomIt, typename Sent,
-            typename Comp = ranges::less,
-            typename Proj = hpx::identity>
+            typename Comp = ranges::less, typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -352,8 +349,7 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        template <typename Rng,
-            typename Comp = ranges::less,
+        template <typename Rng, typename Comp = ranges::less,
             typename Proj = hpx::identity>
         // clang-format off
             requires (
@@ -382,9 +378,7 @@ namespace hpx::ranges {
                 HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
-       
-        template <typename ExPolicy, typename Rng,
-            typename Comp = ranges::less,
+        template <typename ExPolicy, typename Rng, typename Comp = ranges::less,
             typename Proj = hpx::identity>
         // clang-format off
             requires (

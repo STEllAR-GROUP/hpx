@@ -338,7 +338,6 @@ namespace hpx {
     inline constexpr struct uninitialized_value_construct_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_t>
     {
-      
         template <typename FwdIter>
         // clang-format off
             requires (
@@ -355,7 +354,6 @@ namespace hpx {
                 .call(hpx::execution::seq, first, last);
         }
 
-        
         template <typename ExPolicy, typename FwdIter>
         // clang-format off
             requires (
@@ -387,7 +385,6 @@ namespace hpx {
     inline constexpr struct uninitialized_value_construct_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_n_t>
     {
-        
         template <typename FwdIter, typename Size>
         // clang-format off
             requires (
@@ -413,7 +410,6 @@ namespace hpx {
                     static_cast<std::size_t>(count));
         }
 
-        
         template <typename ExPolicy, typename FwdIter, typename Size>
         // clang-format off
             requires (

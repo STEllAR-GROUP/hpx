@@ -447,8 +447,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Iter1, typename Sent1,
             typename Iter2, typename Sent2, typename Iter3,
             typename Pred = hpx::parallel::detail::less,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -491,11 +490,9 @@ namespace hpx::ranges {
                 last2, dest, HPX_MOVE(op), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-        
-        template <typename ExPolicy, typename Rng1, typename Rng2, typename Iter3,
-            typename Pred = hpx::parallel::detail::less,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+        template <typename ExPolicy, typename Rng1, typename Rng2,
+            typename Iter3, typename Pred = hpx::parallel::detail::less,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -543,11 +540,10 @@ namespace hpx::ranges {
                 HPX_MOVE(proj2));
         }
 
-    
-        template <typename Iter1, typename Sent1, typename Iter2, typename Sent2,
-            typename Iter3, typename Pred = hpx::parallel::detail::less,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+        template <typename Iter1, typename Sent1, typename Iter2,
+            typename Sent2, typename Iter3,
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
@@ -581,11 +577,9 @@ namespace hpx::ranges {
                 HPX_MOVE(op), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-    
         template <typename Rng1, typename Rng2, typename Iter3,
             typename Pred = hpx::parallel::detail::less,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity>
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_range_v<Rng1> &&

@@ -155,7 +155,7 @@ namespace hpx::detail {
         // matching execution policy. Forward call to algorithm by passing the
         // resulting re-wrapped execution policy.
         //
-       
+
         template <typename Scheduler, typename... Ts>
         // clang-format off
             requires (
@@ -178,7 +178,7 @@ namespace hpx::detail {
         // policy_aware_scheduler, re-wrap those and forward the resulting
         // execution policy to the underlying algorithm.
         //
-        
+
         template <typename Scheduler, typename... Ts>
         // clang-format off
             requires (

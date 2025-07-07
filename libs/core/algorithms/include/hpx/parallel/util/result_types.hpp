@@ -68,7 +68,6 @@ namespace hpx::parallel::util {
             HPX_MOVE(f), [](util::in_in_result<I1, I2>&& p) { return p.in2; });
     }
 
- 
     template <typename InInResultSender>
     // clang-format off
         requires (
@@ -164,7 +163,6 @@ namespace hpx::parallel::util {
         };
     }    // namespace functional
 
-   
     template <typename Sender>
     // clang-format off
         requires (
@@ -275,7 +273,6 @@ namespace hpx::parallel::util {
             HPX_MOVE(f), [](in_in_out_result<I1, I2, O>&& p) { return p.out; });
     }
 
-  
     template <typename InInOutResultSender>
     // clang-format off
         requires (
@@ -424,7 +421,6 @@ namespace hpx::parallel::util {
             return result_type{hpx::get<0>(t), hpx::get<1>(t)};
         }
 
-        
         template <typename ZipIterSender>
         // clang-format off
             requires (
@@ -510,7 +506,6 @@ namespace hpx::parallel::util {
             return result_type{hpx::get<0>(t), hpx::get<1>(t), hpx::get<2>(t)};
         }
 
-      
         template <typename ZipIterSender>
         // clang-format off
             requires (
