@@ -250,7 +250,6 @@ namespace hpx::execution::experimental {
                     }
                 };
 
-            
                 template <typename Sender_>
                 // clang-format off
                     requires (
@@ -442,7 +441,6 @@ namespace hpx::execution::experimental {
             {
                 run_loop& loop;
 
-            
                 template <typename Sender_>
                 // clang-format off
                     requires (

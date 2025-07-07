@@ -103,7 +103,7 @@ namespace hpx::execution::experimental {
     //    2.   Otherwise, execution::get_completion_scheduler<CPO>(s) is
     //         ill-formed.
     //
-   
+
     template <typename CPO>
     // clang-format off
             requires (

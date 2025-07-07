@@ -88,7 +88,7 @@ namespace hpx::execution::experimental {
         return policy.with(HPX_FORWARD(Params, params));
     }
 
-    template <typename ParametersProperty, typename ExPolicy, typename...Ts>
+    template <typename ParametersProperty, typename ExPolicy, typename... Ts>
     // clang-format off
         requires (
             hpx::is_execution_policy_v<ExPolicy>

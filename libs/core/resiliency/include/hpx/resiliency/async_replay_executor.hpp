@@ -217,7 +217,7 @@ namespace hpx::resiliency::experimental {
     // Asynchronously launch given function f. Verify the result of those
     // invocations using the given predicate pred. Repeat launching on error
     // exactly n times (except if abort_replay_exception is thrown).
-    
+
     template <typename Executor, typename Pred, typename F, typename... Ts>
     // clang-format off
         requires (
@@ -239,7 +239,7 @@ namespace hpx::resiliency::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // Asynchronously launch given function f. Repeat launching on error exactly
-    // n times (except if abort_replay_exception is thrown). 
+    // n times (except if abort_replay_exception is thrown).
     template <typename Executor, typename F, typename... Ts>
     // clang-format off
         requires (hpx::traits::is_one_way_executor_v<Executor> ||

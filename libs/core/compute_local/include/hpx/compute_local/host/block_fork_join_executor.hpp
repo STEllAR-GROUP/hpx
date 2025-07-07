@@ -370,11 +370,10 @@ namespace hpx::execution::experimental {
         }
 
         template <typename Tag>
-        // clang-format off 
-            requires (
+        // clang-format off
+            requires(
                 hpx::execution::experimental::is_scheduling_property_v<Tag> &&
-                hpx::functional::is_tag_invocable_v<Tag, fork_join_executor>
-            )
+                hpx::functional::is_tag_invocable_v<Tag, fork_join_executor>)
         // clang-format on
         friend decltype(auto) tag_invoke(
             Tag tag, block_fork_join_executor const& exec) noexcept
