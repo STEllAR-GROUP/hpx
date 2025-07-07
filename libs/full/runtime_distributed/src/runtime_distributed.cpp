@@ -889,7 +889,7 @@ namespace hpx {
             active_counters_->stop_evaluating_counters(terminate);
     }
 
-    naming::resolver_client& runtime_distributed::get_agas_client()
+    agas::addressing_service& runtime_distributed::get_agas_client()
     {
         return agas_client_;
     }
@@ -1881,13 +1881,13 @@ namespace hpx {
 namespace hpx::naming {
 
     // shortcut for get_runtime().get_agas_client()
-    resolver_client& get_agas_client()
+    agas::addressing_service& get_agas_client()
     {
         return get_runtime_distributed().get_agas_client();
     }
 
     // shortcut for get_runtime_ptr()->get_agas_client()
-    resolver_client* get_agas_client_ptr()
+    agas::addressing_service* get_agas_client_ptr()
     {
         auto* rtd = get_runtime_distributed_ptr();
         return rtd ? &rtd->get_agas_client() : nullptr;
