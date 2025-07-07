@@ -333,26 +333,15 @@ namespace hpx::parallel {
             }
         }
 
-        // sequential merge with projection function.
+        // sequential merge helper with projection function.
         template <typename Iter1, typename Sent1, typename Iter2,
             typename Sent2, typename OutIter, typename Comp, typename Proj1,
             typename Proj2>
         constexpr util::in_in_out_result<Iter1, Iter2, OutIter>
-        sequential_merge(Iter1 start1, Sent1 sent1, Iter2 start2, Sent2 sent2,
-            OutIter out, Comp&& comp, Proj1&& proj1, Proj2&& proj2)
+        sequential_merge_helper(Iter1 first1, Sent1 last1, Iter2 first2,
+            Sent2 last2, OutIter dest, Comp&& comp, Proj1&& proj1,
+            Proj2&& proj2)
         {
-            auto first1 = hpx::util::get_unwrapped(start1);
-            auto first2 = hpx::util::get_unwrapped(start2);
-            auto dest = hpx::util::get_unwrapped(out);
-
-            auto end1 = start1;
-            auto const len1 = detail::advance_and_get_distance(end1, sent1);
-            auto const last1 = hpx::util::get_unwrapped(end1);
-
-            auto end2 = start2;
-            auto const len2 = detail::advance_and_get_distance(end2, sent2);
-            auto const last2 = hpx::util::get_unwrapped(end2);
-
             if (first1 != last1 && first2 != last2)
             {
                 auto val1 = HPX_INVOKE(proj1, *first1);
@@ -361,7 +350,8 @@ namespace hpx::parallel {
                 {
                     while (first2 != last2)
                     {
-                        typename std::iterator_traits<Iter2>::value_type elem2 = *first2;
+                        typename std::iterator_traits<Iter2>::value_type elem2 =
+                            *first2;
                         val2 = HPX_INVOKE(proj2, elem2);
                         if (static_cast<bool>(HPX_INVOKE(comp, val2, val1)))
                         {
@@ -381,7 +371,8 @@ namespace hpx::parallel {
 
                     while (first1 != last1)
                     {
-                        typename std::iterator_traits<Iter1>::value_type elem1 = *first1;
+                        typename std::iterator_traits<Iter1>::value_type elem1 =
+                            *first1;
                         val1 = HPX_INVOKE(proj1, elem1);
                         if (!static_cast<bool>(HPX_INVOKE(comp, val2, val1)))
                         {
@@ -401,43 +392,21 @@ namespace hpx::parallel {
                 }
             }
 
-            auto copy_result1 = util::copy(first1, last1, dest);
-            [[maybe_unused]] auto copy_result2 =
-                util::copy(first2, last2, copy_result1.out);
-
-            if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
-            {
-                return {end1, end2, copy_result2.out};
-            }
-            else
-            {
-                return {end1, end2, std::next(out, len1 + len2)};
-            }
+            return {first1, first2, dest};
         }
 
-        // sequential merge without projection function.
+        // sequential merge helper without projection function.
         template <typename Iter1, typename Sent1, typename Iter2,
             typename Sent2, typename OutIter, typename Comp>
         constexpr util::in_in_out_result<Iter1, Iter2, OutIter>
-        sequential_merge(Iter1 start1, Sent1 sent1, Iter2 start2, Sent2 sent2,
-            OutIter out, Comp&& comp, hpx::identity, hpx::identity)
+        sequential_merge_helper(Iter1 first1, Sent1 last1, Iter2 first2,
+            Sent2 last2, OutIter dest, Comp&& comp)
         {
-            auto first1 = hpx::util::get_unwrapped(start1);
-            auto first2 = hpx::util::get_unwrapped(start2);
-            auto dest = hpx::util::get_unwrapped(out);
-
-            auto end1 = start1;
-            auto const len1 = detail::advance_and_get_distance(end1, sent1);
-            auto const last1 = hpx::util::get_unwrapped(end1);
-
-            auto end2 = start2;
-            auto const len2 = detail::advance_and_get_distance(end2, sent2);
-            auto const last2 = hpx::util::get_unwrapped(end2);
-
             if (first1 != last1 && first2 != last2)
             {
                 typename std::iterator_traits<Iter1>::value_type val1 = *first1;
-                typename std::iterator_traits<Iter2>::value_type val2 = init_value(*first2);
+                typename std::iterator_traits<Iter2>::value_type val2 =
+                    init_value(*first2);
                 while (true)
                 {
                     while (first2 != last2)
@@ -480,17 +449,115 @@ namespace hpx::parallel {
                 }
             }
 
-            auto copy_result1 = util::copy(first1, last1, dest);
-            [[maybe_unused]] auto copy_result2 =
-                util::copy(first2, last2, copy_result1.out);
+            return {first1, first2, dest};
+        }
 
-            if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+        // sequential merge with projection function.
+        template <typename Iter1, typename Sent1, typename Iter2,
+            typename Sent2, typename OutIter, typename Comp, typename Proj1,
+            typename Proj2>
+        constexpr util::in_in_out_result<Iter1, Iter2, OutIter>
+        sequential_merge(Iter1 start1, Sent1 sent1, Iter2 start2, Sent2 sent2,
+            OutIter out, Comp&& comp, Proj1&& proj1, Proj2&& proj2)
+        {
+            if constexpr (hpx::traits::is_random_access_iterator_v<Iter1> &&
+                hpx::traits::is_random_access_iterator_v<Iter2>)
             {
-                return {end1, end2, copy_result2.out};
+                auto first1 = hpx::util::get_unwrapped(start1);
+                auto first2 = hpx::util::get_unwrapped(start2);
+                auto dest = hpx::util::get_unwrapped(out);
+
+                auto end1 = start1;
+                auto const len1 = detail::advance_and_get_distance(end1, sent1);
+                auto const last1 = hpx::util::get_unwrapped(end1);
+
+                auto end2 = start2;
+                auto const len2 = detail::advance_and_get_distance(end2, sent2);
+                auto const last2 = hpx::util::get_unwrapped(end2);
+
+                auto merge_result = sequential_merge_helper(first1, last1,
+                    first2, last2, dest, HPX_FORWARD(Comp, comp),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+
+                auto copy_result1 =
+                    util::copy(merge_result.in1, last1, merge_result.out);
+                [[maybe_unused]] auto copy_result2 =
+                    util::copy(merge_result.in2, last2, copy_result1.out);
+
+                if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                {
+                    return {end1, end2, copy_result2.out};
+                }
+                else
+                {
+                    return {end1, end2, std::next(out, len1 + len2)};
+                }
             }
             else
             {
-                return {end1, end2, std::next(out, len1 + len2)};
+                auto merge_result = sequential_merge_helper(start1, sent1,
+                    start2, sent2, out, HPX_FORWARD(Comp, comp),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+
+                auto copy_result1 =
+                    util::copy(merge_result.in1, sent1, merge_result.out);
+                [[maybe_unused]] auto copy_result2 =
+                    util::copy(merge_result.in2, sent2, copy_result1.out);
+
+                return {copy_result1.in, copy_result2.in, copy_result2.out};
+            }
+        }
+
+        // sequential merge without projection function.
+        template <typename Iter1, typename Sent1, typename Iter2,
+            typename Sent2, typename OutIter, typename Comp>
+        constexpr util::in_in_out_result<Iter1, Iter2, OutIter>
+        sequential_merge(Iter1 start1, Sent1 sent1, Iter2 start2, Sent2 sent2,
+            OutIter out, Comp&& comp, hpx::identity, hpx::identity)
+        {
+            if constexpr (hpx::traits::is_random_access_iterator_v<Iter1> &&
+                hpx::traits::is_random_access_iterator_v<Iter2>)
+            {
+                auto first1 = hpx::util::get_unwrapped(start1);
+                auto first2 = hpx::util::get_unwrapped(start2);
+                auto dest = hpx::util::get_unwrapped(out);
+
+                auto end1 = start1;
+                auto const len1 = detail::advance_and_get_distance(end1, sent1);
+                auto const last1 = hpx::util::get_unwrapped(end1);
+
+                auto end2 = start2;
+                auto const len2 = detail::advance_and_get_distance(end2, sent2);
+                auto const last2 = hpx::util::get_unwrapped(end2);
+
+                auto merge_result = sequential_merge_helper(first1, last1,
+                    first2, last2, dest, HPX_FORWARD(Comp, comp));
+
+                auto copy_result1 =
+                    util::copy(merge_result.in1, last1, merge_result.out);
+                [[maybe_unused]] auto copy_result2 =
+                    util::copy(merge_result.in2, last2, copy_result1.out);
+
+                if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                {
+                    return {end1, end2, copy_result2.out};
+                }
+                else
+                {
+                    return {end1, end2, std::next(out, len1 + len2)};
+                }
+            }
+            else
+            {
+                auto merge_result = sequential_merge_helper(
+                    start1, sent1, start2, sent2, out, HPX_FORWARD(Comp, comp));
+
+                auto copy_result1 =
+                    util::copy(merge_result.in1, sent1, merge_result.out);
+                [[maybe_unused]] auto copy_result2 =
+                    util::copy(merge_result.in2, sent2, copy_result1.out);
+
+                return {copy_result1.in, copy_result2.in, copy_result2.out};
             }
         }
 
