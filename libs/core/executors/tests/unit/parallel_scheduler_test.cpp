@@ -41,7 +41,9 @@ std::ostream& operator<<(
 // Custom receiver to test completion signatures and stop token
 struct test_receiver
 {
+#if defined(HPX_HAVE_STDEXEC)
     using receiver_concept = ex::receiver_t;
+#endif
 
     bool* value_received;
     std::exception_ptr* error_received;
@@ -102,7 +104,7 @@ struct test_receiver
     {
     };
 
-    friend env tag_invoke(ex::get_env_t, const test_receiver& r) noexcept
+    friend env tag_invoke(ex::get_env_t, const test_receiver&) noexcept
     {
         return env{};
     }
@@ -164,6 +166,7 @@ int hpx_main(int argc, [[maybe_unused]] char* argv[])
         auto sender = ex::schedule(sched);
         std::cout << "Created sender with schedule" << std::endl;
 
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(
             ex::sender<decltype(sender)>, "schedule should return a sender");
 
@@ -174,40 +177,10 @@ int hpx_main(int argc, [[maybe_unused]] char* argv[])
                 ex::completion_signatures<ex::set_value_t(),
                     ex::set_error_t(std::exception_ptr), ex::set_stopped_t()>>,
             "sender should have correct completion signatures");
+#endif
         static_assert(
             noexcept(ex::schedule(sched)), "schedule should be noexcept");
         std::cout << "Schedule sender properties verified" << std::endl;
-    }
-
-    // Test parallel_scheduler basic execution
-    {
-        std::cout << "\n=== Testing Basic Execution ===" << std::endl;
-        auto sender = ex::schedule(sched) | ex::then([] {
-            std::cout << "Executing then functor returning 42" << std::endl;
-            return 42;
-        });
-
-        std::cout << "Calling sync_wait for basic execution" << std::endl;
-        auto [result] = ex::sync_wait(sender).value();
-        HPX_TEST_EQ(result, 42);
-        std::cout << "Basic execution result: " << result << std::endl;
-    }
-
-    // Test parallel_scheduler structured concurrency with on
-    {
-        std::cout << "\n=== Testing Structured Concurrency with on ==="
-                  << std::endl;
-        auto sender = ex::on(sched, ex::then(ex::just(), [] {
-            std::cout << "Executing then functor returning 'Hello, P2079!'"
-                      << std::endl;
-            return std::string("Hello, P2079!");
-        }));
-
-        std::cout << "Calling sync_wait for structured concurrency"
-                  << std::endl;
-        auto [result] = ex::sync_wait(sender).value();
-        HPX_TEST_EQ(result, std::string("Hello, P2079!"));
-        std::cout << "Structured concurrency result: " << result << std::endl;
     }
 
     // Test parallel_scheduler completion scheduler query
@@ -249,6 +222,47 @@ int hpx_main(int argc, [[maybe_unused]] char* argv[])
                   << std::endl;
     }
 
+    // Test parallel_scheduler shared context
+    {
+        std::cout << "\n=== Testing Shared Context ===" << std::endl;
+        auto sched1 = ex::get_parallel_scheduler();
+        auto sched2 = ex::get_parallel_scheduler();
+        HPX_TEST(sched1 == sched2);
+        std::cout << "Schedulers share same context" << std::endl;
+    }
+
+#if defined(HPX_HAVE_STDEXEC)
+    // Test parallel_scheduler basic execution
+    {
+        std::cout << "\n=== Testing Basic Execution ===" << std::endl;
+        auto sender = ex::schedule(sched) | ex::then([] {
+            std::cout << "Executing then functor returning 42" << std::endl;
+            return 42;
+        });
+
+        std::cout << "Calling sync_wait for basic execution" << std::endl;
+        auto [result] = ex::sync_wait(sender).value();
+        HPX_TEST_EQ(result, 42);
+        std::cout << "Basic execution result: " << result << std::endl;
+    }
+
+    // Test parallel_scheduler structured concurrency with on
+    {
+        std::cout << "\n=== Testing Structured Concurrency with on ==="
+                  << std::endl;
+        auto sender = ex::on(sched, ex::then(ex::just(), [] {
+            std::cout << "Executing then functor returning 'Hello, P2079!'"
+                      << std::endl;
+            return std::string("Hello, P2079!");
+        }));
+
+        std::cout << "Calling sync_wait for structured concurrency"
+                  << std::endl;
+        auto [result] = ex::sync_wait(sender).value();
+        HPX_TEST_EQ(result, std::string("Hello, P2079!"));
+        std::cout << "Structured concurrency result: " << result << std::endl;
+    }
+
     // Test parallel_scheduler error handling
     {
         std::cout << "\n=== Testing Error Handling ===" << std::endl;
@@ -275,9 +289,10 @@ int hpx_main(int argc, [[maybe_unused]] char* argv[])
         std::cout << "Error handling test passed" << std::endl;
     }
 
-    // Test parallel_scheduler shared context
+    // Test parallel_scheduler shared context with algorithms
     {
-        std::cout << "\n=== Testing Shared Context ===" << std::endl;
+        std::cout << "\n=== Testing Shared Context with Algorithms ==="
+                  << std::endl;
         auto sched1 = ex::get_parallel_scheduler();
         auto sched2 = ex::get_parallel_scheduler();
         HPX_TEST(sched1 == sched2);
@@ -394,6 +409,7 @@ int hpx_main(int argc, [[maybe_unused]] char* argv[])
         HPX_TEST(thread_id != hpx::thread::id{});
         std::cout << "Test Case 2 thread ID: " << thread_id << std::endl;
     }
+#endif    // HPX_HAVE_STDEXEC
 
     std::cout << "Calling hpx::local::finalize()" << std::endl;
     return hpx::local::finalize();
