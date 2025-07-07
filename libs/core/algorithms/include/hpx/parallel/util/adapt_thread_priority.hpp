@@ -14,11 +14,11 @@
 
 namespace hpx::execution::experimental {
 
+    template <typename ExPolicy>
     // clang-format off
-    template <typename ExPolicy,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy>
-        )>
+        )
     // clang-format on
     decltype(auto) adapt_thread_priority(
         ExPolicy&& policy, hpx::threads::thread_priority new_priority)
@@ -53,17 +53,18 @@ namespace hpx::execution::experimental {
 
 namespace hpx::parallel::util {
 
+    template <typename ExPolicy>
     // clang-format off
-    template <typename ExPolicy,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy>
-        )>
+        )
+    // clang-format on 
     HPX_DEPRECATED_V(1, 11,
         "hpx::parallel::util::adapt_thread_priority is deprecated. Please use "
         "hpx::execution::experimental::adapt_thread_priority instead.")
-    // clang-format on
-    decltype(auto) adapt_thread_priority(
-        ExPolicy&& policy, hpx::threads::thread_priority new_priority)
+        // clang-format on
+        decltype(auto) adapt_thread_priority(
+            ExPolicy&& policy, hpx::threads::thread_priority new_priority)
     {
         return hpx::execution::experimental::adapt_thread_priority(
             HPX_FORWARD(ExPolicy, policy), new_priority);

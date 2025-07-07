@@ -248,11 +248,11 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<is_partitioned_t>
     {
     private:
+        template <typename FwdIter, typename Pred>
         // clang-format off
-        template <typename FwdIter, typename Pred,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_forward_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(
             hpx::is_partitioned_t, FwdIter first, FwdIter last, Pred pred)
@@ -262,13 +262,12 @@ namespace hpx {
                     hpx::identity_v);
         }
 
+        template <typename ExPolicy, typename FwdIter, typename Pred>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter,
-            typename Pred,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::is_partitioned_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred)

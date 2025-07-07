@@ -216,14 +216,14 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<move_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename Iter1, typename Sent1,
-            typename Iter2,
-            HPX_CONCEPT_REQUIRES_(
+            typename Iter2>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::traits::is_iterator_v<Iter2>
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             move_result<Iter1, Iter2>>
@@ -235,13 +235,13 @@ namespace hpx::ranges {
                 HPX_FORWARD(ExPolicy, policy), first, last, dest);
         }
 
+        template <typename ExPolicy, typename Rng, typename Iter2>
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename Iter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2>
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             move_result<hpx::traits::range_iterator_t<Rng>, Iter2>>
@@ -255,12 +255,12 @@ namespace hpx::ranges {
                 hpx::util::end(rng), dest);
         }
 
+        template <typename Iter1, typename Sent1, typename Iter2>
         // clang-format off
-        template <typename Iter1, typename Sent1, typename Iter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::traits::is_iterator_v<Iter2>
-            )>
+            )
         // clang-format on
         friend move_result<Iter1, Iter2> tag_fallback_invoke(
             move_t, Iter1 first, Sent1 last, Iter2 dest)
@@ -270,12 +270,12 @@ namespace hpx::ranges {
                 hpx::execution::seq, first, last, dest);
         }
 
+        template <typename Rng, typename Iter2>
         // clang-format off
-        template <typename Rng, typename Iter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2>
-            )>
+            )
         // clang-format on
         friend move_result<hpx::traits::range_iterator_t<Rng>, Iter2>
         tag_fallback_invoke(move_t, Rng&& rng, Iter2 dest)

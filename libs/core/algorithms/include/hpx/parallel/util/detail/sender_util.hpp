@@ -123,13 +123,13 @@ namespace hpx::detail {
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     struct tag_parallel_algorithm : hpx::functional::detail::tag_fallback<Tag>
     {
+        template <typename Sender, typename ExPolicy>
         // clang-format off
-        template <typename Sender, typename ExPolicy,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                !detail::is_bound_algorithm_v<Sender> &&
                 hpx::execution::experimental::is_sender_v<Sender>
-            )>
+            )
         // clang-format on
         friend auto tag_fallback_invoke(Tag, Sender&& sender, ExPolicy&& policy)
         {
@@ -137,11 +137,11 @@ namespace hpx::detail {
                 HPX_FORWARD(Sender, sender), HPX_FORWARD(ExPolicy, policy));
         }
 
+        template <typename ExPolicy>
         // clang-format off
-        template <typename ExPolicy,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy>
-            )>
+            )
         // clang-format on
         friend auto tag_fallback_invoke(Tag, ExPolicy&& policy)
         {
@@ -155,11 +155,12 @@ namespace hpx::detail {
         // matching execution policy. Forward call to algorithm by passing the
         // resulting re-wrapped execution policy.
         //
+
+        template <typename Scheduler, typename... Ts>
         // clang-format off
-        template <typename Scheduler, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_scheduler_v<Scheduler>
-            )>
+            )
         // clang-format on
         friend auto tag_fallback_invoke(
             Tag tag, Scheduler&& scheduler, Ts&&... ts)
@@ -177,12 +178,13 @@ namespace hpx::detail {
         // policy_aware_scheduler, re-wrap those and forward the resulting
         // execution policy to the underlying algorithm.
         //
+
+        template <typename Scheduler, typename... Ts>
         // clang-format off
-        template <typename Scheduler, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_policy_aware_scheduler_v<
                     std::decay_t<Scheduler>>
-            )>
+            )
         // clang-format on
         friend auto tag_invoke(Tag tag, Scheduler&& scheduler, Ts&&... ts)
         {
