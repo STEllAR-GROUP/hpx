@@ -177,7 +177,8 @@ void test_merge(
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    using base_iterator = typename std::vector<DataType>::iterator;
+    using base_iterator =
+        typename std::vector<std::pair<DataType, int>>::iterator;
     using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::size_t const size1 = 300007, size2 = 123456;
