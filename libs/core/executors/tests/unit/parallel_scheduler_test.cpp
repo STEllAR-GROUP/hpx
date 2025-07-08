@@ -114,7 +114,7 @@ struct test_receiver
     }
 };
 
-int hpx_main(int, char* argv[])
+int hpx_main(int, char*[])
 {
     std::cout << "hpx_main started" << std::endl;
     auto sched = ex::get_parallel_scheduler();
