@@ -59,43 +59,47 @@ struct test_receiver
     {
     }
 
-    void set_value() noexcept
+    // Tag invoke implementations for stdexec
+    friend void tag_invoke(ex::set_value_t, test_receiver&& r) noexcept
     {
-        if (thread_id)
-            *thread_id = hpx::this_thread::get_id();
-        *value_received = true;
+        if (r.thread_id)
+            *r.thread_id = hpx::this_thread::get_id();
+        *r.value_received = true;
         std::cout << "set_value called on thread " << hpx::this_thread::get_id()
                   << std::endl;
     }
 
-    void set_value(int value) noexcept
+    friend void tag_invoke(
+        ex::set_value_t, test_receiver&& r, int value) noexcept
     {
-        if (thread_id)
-            *thread_id = hpx::this_thread::get_id();
-        *value_received = true;
+        if (r.thread_id)
+            *r.thread_id = hpx::this_thread::get_id();
+        *r.value_received = true;
         std::cout << "set_value(int: " << value << ") called on thread "
                   << hpx::this_thread::get_id() << std::endl;
     }
 
-    void set_value(std::string value) noexcept
+    friend void tag_invoke(
+        ex::set_value_t, test_receiver&& r, std::string value) noexcept
     {
-        if (thread_id)
-            *thread_id = hpx::this_thread::get_id();
-        *value_received = true;
+        if (r.thread_id)
+            *r.thread_id = hpx::this_thread::get_id();
+        *r.value_received = true;
         std::cout << "set_value(string: " << value << ") called on thread "
                   << hpx::this_thread::get_id() << std::endl;
     }
 
-    void set_error(std::exception_ptr ep) noexcept
+    friend void tag_invoke(
+        ex::set_error_t, test_receiver&& r, std::exception_ptr ep) noexcept
     {
-        *error_received = ep;
+        *r.error_received = ep;
         std::cout << "set_error called on thread " << hpx::this_thread::get_id()
                   << std::endl;
     }
 
-    void set_stopped() noexcept
+    friend void tag_invoke(ex::set_stopped_t, test_receiver&& r) noexcept
     {
-        *stopped_received = true;
+        *r.stopped_received = true;
         std::cout << "set_stopped called on thread "
                   << hpx::this_thread::get_id() << std::endl;
     }
@@ -110,7 +114,7 @@ struct test_receiver
     }
 };
 
-int hpx_main(int argc, [[maybe_unused]] char* argv[])
+int hpx_main(int, char* argv[])
 {
     std::cout << "hpx_main started" << std::endl;
     auto sched = ex::get_parallel_scheduler();
@@ -165,6 +169,7 @@ int hpx_main(int argc, [[maybe_unused]] char* argv[])
         std::cout << "\n=== Testing Schedule ===" << std::endl;
         auto sender = ex::schedule(sched);
         std::cout << "Created sender with schedule" << std::endl;
+        (void) sender;    // Suppress unused variable warning
 
 #if defined(HPX_HAVE_STDEXEC)
         static_assert(
