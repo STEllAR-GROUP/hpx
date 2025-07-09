@@ -115,6 +115,13 @@ namespace hpx::execution::experimental {
         // Friend declaration to allow parallel_scheduler_sender access
         friend struct parallel_scheduler_sender;
 
+        // Public getter for the underlying scheduler
+        thread_pool_policy_scheduler<hpx::launch::async_policy> const&
+        get_underlying_scheduler() const noexcept
+        {
+            return scheduler_;
+        }
+
     private:
         thread_pool_policy_scheduler<hpx::launch::async_policy> scheduler_;
     };
@@ -146,6 +153,19 @@ namespace hpx::execution::experimental {
 
         template <typename Receiver>
         friend auto tag_invoke(
+            connect_t, parallel_scheduler_sender const& s, Receiver&& receiver)
+        {
+            // clang-format off
+            return thread_pool_policy_scheduler<hpx::launch::async_policy>::
+                operation_state<
+                    thread_pool_policy_scheduler<hpx::launch::async_policy>,
+                    Receiver>{
+                    s.scheduler.get_underlying_scheduler(), HPX_FORWARD(Receiver, receiver)};
+            // clang-format on
+        }
+
+        template <typename Receiver>
+        friend auto tag_invoke(
             connect_t, parallel_scheduler_sender&& s, Receiver&& receiver)
         {
             // clang-format off
@@ -153,7 +173,8 @@ namespace hpx::execution::experimental {
                 operation_state<
                     thread_pool_policy_scheduler<hpx::launch::async_policy>,
                     Receiver>{
-                    s.scheduler.scheduler_, HPX_FORWARD(Receiver, receiver)};
+                    s.scheduler.get_underlying_scheduler(),
+                    HPX_FORWARD(Receiver, receiver)};
             // clang-format on
         }
 
@@ -166,7 +187,8 @@ namespace hpx::execution::experimental {
                 operation_state<
                     thread_pool_policy_scheduler<hpx::launch::async_policy>,
                     Receiver>{
-                    s.scheduler.scheduler_, HPX_FORWARD(Receiver, receiver)};
+                    s.scheduler.get_underlying_scheduler(),
+                    HPX_FORWARD(Receiver, receiver)};
             // clang-format on
         }
 
