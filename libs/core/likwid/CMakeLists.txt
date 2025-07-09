@@ -31,6 +31,7 @@ add_hpx_module(
   GLOBAL_HEADER_GEN ON
   SOURCES ${likwid_sources}
   HEADERS ${likwid_headers}
+  MODULE_DEPENDENCIES hpx_config
   DEPENDENCIES LIKWID::likwid
   CMAKE_SUBDIRS examples tests
 )

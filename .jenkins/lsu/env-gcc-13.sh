@@ -17,6 +17,7 @@ export CXX_STD="23"
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
 export CXXFLAGS="-fopenmp ${CXXFLAGS:-}"
 
+configure_extra_options+=" -DCMAKE_BUILD_TYPE=${build_type}"
 configure_extra_options+=" -DHPX_WITH_CXX_STANDARD=${CXX_STD}"
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"
 configure_extra_options+=" -DHPX_WITH_FETCH_ASIO=ON"

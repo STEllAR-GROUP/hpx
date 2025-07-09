@@ -1,4 +1,5 @@
 //  Copyright (c) 2022 Srinivas Yadav
+//  Copyright (c) 2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,8 +15,31 @@
 #include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
-int hpx_main()
+unsigned int seed = std::random_device{}();
+std::mt19937 gen(seed);
+
+template <typename ExPolicy>
+void test_likwid_executor(ExPolicy policy)
 {
+    std::vector<int> c(10007);
+    std::iota(std::begin(c), std::end(c), gen());
+
+    hpx::for_each(policy.on(hpx::execution::likwid_executor(
+                      policy.executor(), "compute")),
+        std::begin(c), std::end(c), [](auto t) { return t * t * t; });
+}
+
+void test_for_each()
+{
+    using namespace hpx::execution;
+
+    test_likwid_executor(seq);
+    test_likwid_executor(par);
+}
+
+int hpx_main(int argc, char* argv[])
+{
+    test_for_each();
     return hpx::local::finalize();
 }
 
