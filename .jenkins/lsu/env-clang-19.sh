@@ -11,6 +11,7 @@ module load llvm/19
 module load boost/1.87.0-${build_type,,}
 module load hwloc
 module load openmpi
+module load likwid/5.4.1
 
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="23"
@@ -31,6 +32,7 @@ configure_extra_options+=" -DCMAKE_C_FLAGS=-fPIC"
 configure_extra_options+=" -DHPX_WITH_LOGGING=OFF"
 configure_extra_options+=" -DHPX_WITH_DATAPAR_BACKEND=EVE"
 configure_extra_options+=" -DHPX_WITH_FETCH_EVE=ON"
+configure_extra_options+=" -DHPX_LIKWID_WITH_LIKWID=ON"
 
 # The pwrapi library still needs to be set up properly on rostam
 # configure_extra_options+=" -DHPX_WITH_POWER_COUNTER=ON"

@@ -31,12 +31,7 @@ namespace hpx::execution::experimental {
             template <typename... Ts>
             decltype(auto) operator()(Ts&&... ts)
             {
-                hpx::likwid::start_region(exec_.name_.c_str());
-
-                auto on_exit = hpx::experimental::scoped_exit{[&exec_]() {
-                    hpx::likwid::stop_region(exec_.name_.c_str());
-                }};
-
+                hpx::likwid::region r(exec_.name_.c_str());
                 return hpx::util::invoke(f_, HPX_FORWARD(Ts, ts)...);
             }
 
