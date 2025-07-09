@@ -44,8 +44,7 @@ namespace hpx::execution::experimental {
 
         // Constructor from thread_pool_policy_scheduler
         explicit parallel_scheduler(
-            thread_pool_policy_scheduler<hpx::launch>
-                sched) noexcept
+            thread_pool_policy_scheduler<hpx::launch> sched) noexcept
           : scheduler_(sched)
         {
         }
@@ -239,8 +238,8 @@ namespace hpx::execution::experimental {
             std::terminate(); // As per P2079R10, terminate if backend is unavailable
             // clang-format on
         }
-        return parallel_scheduler(
-            thread_pool_policy_scheduler<hpx::launch>(pool, hpx::launch::async));
+        return parallel_scheduler(thread_pool_policy_scheduler<hpx::launch>(
+            pool, hpx::launch::async));
     }
 
 }    // namespace hpx::execution::experimental
