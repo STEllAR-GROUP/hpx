@@ -44,7 +44,7 @@ namespace hpx::execution::experimental {
 
         // Constructor from thread_pool_policy_scheduler
         explicit parallel_scheduler(
-            thread_pool_policy_scheduler<hpx::launch::async_policy>
+            thread_pool_policy_scheduler<hpx::launch>
                 sched) noexcept
           : scheduler_(sched)
         {
@@ -116,14 +116,14 @@ namespace hpx::execution::experimental {
         friend struct parallel_scheduler_sender;
 
         // Public getter for the underlying scheduler
-        thread_pool_policy_scheduler<hpx::launch::async_policy> const&
+        thread_pool_policy_scheduler<hpx::launch> const&
         get_underlying_scheduler() const noexcept
         {
             return scheduler_;
         }
 
     private:
-        thread_pool_policy_scheduler<hpx::launch::async_policy> scheduler_;
+        thread_pool_policy_scheduler<hpx::launch> scheduler_;
     };
 
     // Sender for parallel_scheduler
@@ -156,11 +156,12 @@ namespace hpx::execution::experimental {
             connect_t, parallel_scheduler_sender const& s, Receiver&& receiver)
         {
             // clang-format off
-            return thread_pool_policy_scheduler<hpx::launch::async_policy>::
+            return thread_pool_policy_scheduler<hpx::launch>::
                 operation_state<
-                    thread_pool_policy_scheduler<hpx::launch::async_policy>,
+                    thread_pool_policy_scheduler<hpx::launch>,
                     Receiver>{
-                    s.scheduler.get_underlying_scheduler(), HPX_FORWARD(Receiver, receiver)};
+                    s.scheduler.get_underlying_scheduler(),
+                    HPX_FORWARD(Receiver, receiver)};
             // clang-format on
         }
 
@@ -169,9 +170,9 @@ namespace hpx::execution::experimental {
             connect_t, parallel_scheduler_sender&& s, Receiver&& receiver)
         {
             // clang-format off
-            return thread_pool_policy_scheduler<hpx::launch::async_policy>::
+            return thread_pool_policy_scheduler<hpx::launch>::
                 operation_state<
-                    thread_pool_policy_scheduler<hpx::launch::async_policy>,
+                    thread_pool_policy_scheduler<hpx::launch>,
                     Receiver>{
                     s.scheduler.get_underlying_scheduler(),
                     HPX_FORWARD(Receiver, receiver)};
@@ -183,9 +184,9 @@ namespace hpx::execution::experimental {
             connect_t, parallel_scheduler_sender& s, Receiver&& receiver)
         {
             // clang-format off
-            return thread_pool_policy_scheduler<hpx::launch::async_policy>::
+            return thread_pool_policy_scheduler<hpx::launch>::
                 operation_state<
-                    thread_pool_policy_scheduler<hpx::launch::async_policy>,
+                    thread_pool_policy_scheduler<hpx::launch>,
                     Receiver>{
                     s.scheduler.get_underlying_scheduler(),
                     HPX_FORWARD(Receiver, receiver)};
@@ -239,7 +240,7 @@ namespace hpx::execution::experimental {
             // clang-format on
         }
         return parallel_scheduler(
-            thread_pool_policy_scheduler<hpx::launch::async_policy>(pool));
+            thread_pool_policy_scheduler<hpx::launch>(pool, hpx::launch::async));
     }
 
 }    // namespace hpx::execution::experimental
