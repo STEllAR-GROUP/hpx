@@ -10,15 +10,6 @@
 #  Rdma_CM_INCLUDE_DIRS - The RDMA CM include directories
 #  Rdma_CM_LIBRARIES - The libraries needed to use RDMA CM
 
-# compatibility with older CMake versions
-if(RDMA_ROOT AND NOT Rdma_ROOT)
-  set(Rdma_ROOT
-      ${RDMA_ROOT}
-      CACHE PATH "RDMA base directory"
-  )
-  unset(RDMA_ROOT CACHE)
-endif()
-
 find_path(Rdma_CM_INCLUDE_DIR rdma_cma.h HINTS /usr/local/include
                                                /usr/include/rdma
 )
