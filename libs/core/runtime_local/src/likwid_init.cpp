@@ -17,12 +17,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::likwid {
 
-    void likwid_thread_init();
+    void likwid_thread_init()
     {
         auto prev = hpx::get_thread_on_start_func();
         hpx::register_thread_on_start_func(
-            [prev](std::size_t local_thread_num, std::size_t global_thread_num,
-                char const* pool_name, char const* name_postfix) {
+            [prev = HPX_MOVE(prev)](std::size_t local_thread_num,
+                std::size_t global_thread_num, char const* pool_name,
+                char const* name_postfix) {
                 likwid_markerThreadInit();
                 if (!prev.empty())
                 {
