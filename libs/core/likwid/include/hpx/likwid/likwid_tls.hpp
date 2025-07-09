@@ -1,4 +1,5 @@
 //  Copyright (c) 2022 Srinivas Yadav
+//  Copyright (c) 2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,24 +14,41 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::likwid {
 
-    HPX_EXPORT_CORE char const* start_region(char const*) noexcept;
-    HPX_EXPORT_CORE char const* stop_region() noexcept;
+    HPX_CORE_EXPORT char const* start_region(char const*) noexcept;
+    HPX_CORE_EXPORT char const* stop_region() noexcept;
+
+    struct region
+    {
+        region(char const* name) noexcept
+          : surrounding_region(start_region(name))
+        {
+        }
+        ~region() noexcept
+        {
+            if (surrounding_region != nullptr)
+            {
+                stop_region(surrounding_region);
+            }
+        }
+
+        char const* surrounding_region;
+    };
 
     struct suspend_region
     {
         suspend_region() noexcept
-          : region(stop_region())
+          : suspended_region(stop_region())
         {
         }
         ~suspend_region() noexcept
         {
-            if (region != nullptr)
+            if (suspended_region != nullptr)
             {
-                start_region(region);
+                start_region(suspended_region);
             }
         }
 
-        char const* region = nullptr;
+        char const* suspended_region;
     };
 }    // namespace hpx::likwid
 
