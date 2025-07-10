@@ -216,6 +216,7 @@ if(HPX_WITH_STDEXEC)
       transform_binary2_sender
       transform_reduce_sender
       transform_reduce_binary_sender
+      uninitialized_copy_sender
       unique_sender
   )
 endif()
