@@ -160,13 +160,4 @@ namespace hpx::distributed {
     };
 }    // namespace hpx::distributed
 
-namespace hpx::lcos {
-
-    /// \cond NOINTERNAL
-    using latch HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::latch is deprecated, use hpx::distributed::latch instead") =
-        hpx::distributed::latch;
-    /// \endcond
-}    // namespace hpx::lcos
-
 #include <hpx/config/warnings_suffix.hpp>

@@ -98,7 +98,7 @@ void test_dense()
 
 void test_blocked()
 {
-    int nlocs = hpx::get_num_localities().get();
+    int nlocs = static_cast<int>(hpx::get_num_localities().get());
     std::vector<hpx::id_type> locs = hpx::find_all_localities();
     hpx::id_type here = hpx::find_here();
     std::cout << "test_blocked: running on " << here << std::endl;

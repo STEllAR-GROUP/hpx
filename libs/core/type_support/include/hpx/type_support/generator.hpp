@@ -104,7 +104,7 @@ namespace hpx {
                 {
                     // store stateful allocator and size of block
                     static constexpr std::size_t align =
-                        (std::max)(alignof(Allocator), sizeof(aligned_block));
+                        (std::max) (alignof(Allocator), sizeof(aligned_block));
 
                     std::size_t const count =
                         (size + sizeof(Allocator) + sizeof(std::size_t) +
@@ -156,7 +156,7 @@ namespace hpx {
                     stored_allocator.~Allocator();
 
                     static constexpr std::size_t align =
-                        (std::max)(alignof(Allocator), sizeof(aligned_block));
+                        (std::max) (alignof(Allocator), sizeof(aligned_block));
                     std::size_t const count =
                         (size + sizeof(std::size_t) + sizeof(Allocator) +
                             align - 1) /
@@ -264,7 +264,7 @@ namespace hpx {
                 {
                     // store stateful allocator and size of allocated block
                     static constexpr std::size_t align =
-                        (std::max)(alignof(Allocator), sizeof(aligned_block));
+                        (std::max) (alignof(Allocator), sizeof(aligned_block));
 
                     dealloc_fn const dealloc = [](void* const ptr,
                                                    std::size_t s) {

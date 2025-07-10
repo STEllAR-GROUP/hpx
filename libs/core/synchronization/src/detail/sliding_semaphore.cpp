@@ -68,7 +68,7 @@ namespace hpx::lcos::local::detail {
 
         mutex_type* mtx = l.mutex();
 
-        lower_limit_ = (std::max)(lower_limit, lower_limit_);
+        lower_limit_ = (std::max) (lower_limit, lower_limit_);
 
         // touch upon all threads
         std::int64_t count = static_cast<std::int64_t>(cond_.size(l));

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2017-2018 Agustin Berge
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,7 +29,7 @@ namespace hpx::util::detail {
         static constexpr std::size_t digits10 =
             std::numeric_limits<std::size_t>::digits10 + 1;
         char buffer[digits10 + 1] = {};
-        std::memcpy(buffer, str.data(), (std::min)(str.size(), digits10));
+        std::memcpy(buffer, str.data(), (std::min) (str.size(), digits10));
 
         char const* first = buffer;
         char* last = buffer;
@@ -82,6 +82,7 @@ namespace hpx::util::detail {
             {
                 if (format_str[1] == format_str[0])
                 {
+                    // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
                     os.write(format_str.data(), 1);    // '{' or '}'
                 }
                 else
@@ -115,7 +116,8 @@ namespace hpx::util::detail {
                 std::size_t const cnt =
                     next != std::string_view::npos ? next : format_str.size();
 
-                os.write(format_str.data(), cnt);
+                // NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
+                os.write(format_str.data(), static_cast<std::streamsize>(cnt));
                 format_str.remove_prefix(cnt);
             }
         }

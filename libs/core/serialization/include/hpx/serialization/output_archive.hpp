@@ -201,6 +201,7 @@ namespace hpx::serialization {
             save(t);
         }
 
+        // NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
         template <typename T>
         void save(T const& t)
         {
@@ -343,6 +344,7 @@ namespace hpx::serialization {
             save_binary(&p, sizeof(std::size_t));
         }
 #endif
+        // NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
 
     private:
         friend struct basic_archive<output_archive>;

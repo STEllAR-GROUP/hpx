@@ -152,8 +152,8 @@ namespace hpx::execution::experimental {
                 auto const ns =
                     std::chrono::duration_cast<std::chrono::nanoseconds>(
                         iteration_duration.value());
-                return (std::min)(
-                    count, (std::size_t)(this_.min_time_ / ns.count()));
+                return (std::min) (count,
+                    (std::size_t) (this_.min_time_ / ns.count()));
             }
             return (count + cores - 1) / cores;
         }

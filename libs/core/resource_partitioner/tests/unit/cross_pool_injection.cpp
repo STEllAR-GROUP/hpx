@@ -237,8 +237,8 @@ void init_resource_partitioner_handler(hpx::resource::partitioner& rp,
                 if (threads_in_pool == 0)
                 {
                     // pick a random number of threads less than the max
-                    threads_in_pool =
-                        (std::max)(std::size_t(1), st_rand(0, max_threads / 2));
+                    threads_in_pool = (std::max) (std::size_t(1),
+                        st_rand(0, max_threads / 2));
                     pool_name = "pool-" + std::to_string(num_pools);
                     rp.create_thread_pool(pool_name, policy);
                     num_pools++;

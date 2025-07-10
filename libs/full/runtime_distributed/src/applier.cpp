@@ -61,7 +61,7 @@ namespace hpx { namespace applier {
 
     void applier::initialize(std::uint64_t rts)
     {
-        naming::resolver_client& agas_client = naming::get_agas_client();
+        agas::addressing_service& agas_client = naming::get_agas_client();
         runtime_support_id_ =
             hpx::id_type(agas_client.get_local_locality().get_msb(), rts,
                 hpx::id_type::management_type::unmanaged);

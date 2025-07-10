@@ -1,7 +1,7 @@
 //  Taken from the Boost.Function library
 
 //  Copyright Douglas Gregor 2001-2003.
-//  Copyright 2013 Hartmut Kaiser
+//  Copyright 2013-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Use, modification and
@@ -757,6 +757,7 @@ static void test_empty_ref()
         HPX_TEST_MSG(
             false, "Exception didn't throw for reference to empty function.");
     }
+    // NOLINTNEXTLINE(bugprone-empty-catch)
     catch (std::runtime_error const& /*e*/)
     {
     }
@@ -781,6 +782,7 @@ static void test_exception()
         f(5, 4);
         HPX_TEST(false);
     }
+    // NOLINTNEXTLINE(bugprone-empty-catch)
     catch (std::runtime_error const&)
     {
         // okay

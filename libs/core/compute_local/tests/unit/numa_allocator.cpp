@@ -66,8 +66,8 @@ template <template <typename> class Binder, typename T, typename Allocator>
 void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator& allocator)
 {
     // num_numa_domains is only correct when using the default pool
-    int num_numa_domains =
-        hpx::resource::get_partitioner().numa_domains().size();
+    int num_numa_domains = static_cast<int>(
+        hpx::resource::get_partitioner().numa_domains().size());
 
     // create a container
     std::vector<T, Allocator> data(allocator);

@@ -19,7 +19,7 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 std::uniform_int_distribution<> dis(0, 99);
 
@@ -235,7 +235,8 @@ void test_sorted_until3(ExPolicy policy, IteratorTag)
         policy, iterator(std::begin(c2)), iterator(std::end(c2)));
 
     base_iterator test_index1 = std::begin(c1) + 1;
-    base_iterator test_index2 = std::begin(c2) + c2.size() / 3;
+    base_iterator test_index2 =
+        std::begin(c2) + static_cast<std::ptrdiff_t>(c2.size() / 3);
 
     HPX_TEST(until1 == iterator(test_index1));
     HPX_TEST(until2 == iterator(test_index2));
@@ -268,7 +269,8 @@ void test_sorted_until3_async(ExPolicy p, IteratorTag)
         p, iterator(std::begin(c2)), iterator(std::end(c2)));
 
     base_iterator test_index1 = std::begin(c1) + 1;
-    base_iterator test_index2 = std::begin(c2) + c2.size() / 3;
+    base_iterator test_index2 =
+        std::begin(c2) + static_cast<std::ptrdiff_t>(c2.size() / 3);
 
     f1.wait();
     HPX_TEST(f1.get() == iterator(test_index1));
@@ -300,7 +302,8 @@ void test_sorted_until3_seq(IteratorTag)
         hpx::is_sorted_until(iterator(std::begin(c2)), iterator(std::end(c2)));
 
     base_iterator test_index1 = std::begin(c1) + 1;
-    base_iterator test_index2 = std::begin(c2) + c2.size() / 3;
+    base_iterator test_index2 =
+        std::begin(c2) + static_cast<std::ptrdiff_t>(c2.size() / 3);
 
     HPX_TEST(until1 == iterator(test_index1));
     HPX_TEST(until2 == iterator(test_index2));
@@ -469,8 +472,11 @@ void test_sorted_until_bad_alloc(ExPolicy policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c), std::begin(c) + c.size() / 2, 2 * (dis(gen)));
-    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
+    std::fill(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        2 * (dis(gen)));
+    std::fill(std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        std::end(c), 2 * (dis(gen)) + 1);
 
     bool caught_bad_alloc = false;
     try
@@ -502,8 +508,11 @@ void test_sorted_until_async_bad_alloc(ExPolicy p, IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c), std::begin(c) + c.size() / 2, 2 * (dis(gen)));
-    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
+    std::fill(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        2 * (dis(gen)));
+    std::fill(std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        std::end(c), 2 * (dis(gen)) + 1);
 
     bool caught_bad_alloc = false;
     try
@@ -537,8 +546,11 @@ void test_sorted_until_seq_bad_alloc(IteratorTag)
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c), std::begin(c) + c.size() / 2, 2 * (dis(gen)));
-    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
+    std::fill(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        2 * (dis(gen)));
+    std::fill(std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        std::end(c), 2 * (dis(gen)) + 1);
 
     bool caught_bad_alloc = false;
     try

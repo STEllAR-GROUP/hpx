@@ -232,7 +232,7 @@ void test_rotate_copy_exception(IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max)(std::rand() % c.size(), std::size_t(1));    //-V104
+        (std::max) (std::rand() % c.size(), std::size_t(1));    //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
@@ -276,7 +276,7 @@ void test_rotate_copy_exception(ExPolicy policy, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max)(std::rand() % c.size(), std::size_t(1));    //-V104
+        (std::max) (std::rand() % c.size(), std::size_t(1));    //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
@@ -318,7 +318,7 @@ void test_rotate_copy_exception_async(ExPolicy p, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max)(std::rand() % c.size(), std::size_t(1));    //-V104
+        (std::max) (std::rand() % c.size(), std::size_t(1));    //-V104
     std::advance(mid, delta);
 
     bool caught_exception = false;
@@ -388,7 +388,7 @@ void test_rotate_copy_bad_alloc(IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max)(std::rand() % c.size(), std::size_t(1));    //-V104
+        (std::max) (std::rand() % c.size(), std::size_t(1));    //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
@@ -431,7 +431,7 @@ void test_rotate_copy_bad_alloc(ExPolicy policy, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max)(std::rand() % c.size(), std::size_t(1));    //-V104
+        (std::max) (std::rand() % c.size(), std::size_t(1));    //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;
@@ -471,7 +471,7 @@ void test_rotate_copy_bad_alloc_async(ExPolicy p, IteratorTag)
 
     // move at least one element to guarantee an exception to be thrown
     std::size_t delta =
-        (std::max)(std::rand() % c.size(), std::size_t(1));    //-V104
+        (std::max) (std::rand() % c.size(), std::size_t(1));    //-V104
     std::advance(mid, delta);
 
     bool caught_bad_alloc = false;

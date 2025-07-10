@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -343,7 +343,7 @@ namespace hpx::parcelset {
         std::int64_t count = 0;
         for (auto&& p : pending_parcels_)
         {
-            count += hpx::get<0>(p.second).size();
+            count += static_cast<std::int64_t>(hpx::get<0>(p.second).size());
             HPX_ASSERT(
                 hpx::get<0>(p.second).size() == hpx::get<1>(p.second).size());
         }

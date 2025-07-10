@@ -26,7 +26,7 @@ private:
     template <typename Archive>
     void serialize(Archive& ar, unsigned const)
     {
-        ar& x_;
+        ar & x_;
         std::cout << "small_object: serialize(" << x_ << ")\n";
     }
 
@@ -80,8 +80,8 @@ private:
     template <typename Archive>
     void serialize(Archive& ar, unsigned const)
     {
-        ar& x_;
-        ar& y_;
+        ar & x_;
+        ar & y_;
         std::cout << "big_object: serialize(" << x_ << ", " << y_ << ")\n";
     }
 

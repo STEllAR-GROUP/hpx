@@ -32,7 +32,8 @@ void global_barrier()
 
     if (hpx::get_locality_id() == 0)
     {
-        std::cout << "Barrier: " << elapsed / iterations << " (seconds)\n";
+        std::cout << "Barrier: " << elapsed / static_cast<double>(iterations)
+                  << " (seconds)\n";
     }
 }
 

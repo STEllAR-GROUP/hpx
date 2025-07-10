@@ -130,6 +130,8 @@ namespace hpx::parcelset {
         }
 
     public:
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
+
         /// Construct the parcelport on the given locality.
         parcelport_impl(util::runtime_configuration const& ini,
             locality const& here,
@@ -188,6 +190,8 @@ namespace hpx::parcelset {
 
         parcelport_impl(parcelport_impl const&) = delete;
         parcelport_impl(parcelport_impl&&) = delete;
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
+
         parcelport_impl& operator=(parcelport_impl const&) = delete;
         parcelport_impl& operator=(parcelport_impl&&) = delete;
 

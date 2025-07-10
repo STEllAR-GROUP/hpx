@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-std::size_t const max_threads = (std::min)(static_cast<std::size_t>(4),
+std::size_t const max_threads = (std::min) (static_cast<std::size_t>(4),
     static_cast<std::size_t>(hpx::threads::hardware_concurrency()));
 
 int hpx_main()
@@ -115,7 +115,7 @@ int hpx_main()
         while (t.elapsed() < 1)
         {
             for (std::size_t thread_num = 0;
-                 thread_num < worker_pool_threads - 1; ++thread_num)
+                thread_num < worker_pool_threads - 1; ++thread_num)
             {
                 hpx::threads::suspend_processing_unit(worker_pool, thread_num);
             }
@@ -123,7 +123,7 @@ int hpx_main()
             std::vector<hpx::future<void>> fs;
 
             for (std::size_t i = 0;
-                 i < hpx::resource::get_num_threads("default") * 10000; ++i)
+                i < hpx::resource::get_num_threads("default") * 10000; ++i)
             {
                 fs.push_back(hpx::async(worker_exec, []() {}));
             }

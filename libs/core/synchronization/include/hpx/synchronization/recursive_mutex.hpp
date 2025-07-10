@@ -137,10 +137,3 @@ namespace hpx {
 
     using recursive_mutex = detail::recursive_mutex_impl<>;
 }    // namespace hpx
-
-namespace hpx::lcos::local {
-
-    using recursive_mutex HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::recursive_mutex is deprecated, use "
-        "hpx::recursive_mutex instead") = hpx::recursive_mutex;
-}    // namespace hpx::lcos::local

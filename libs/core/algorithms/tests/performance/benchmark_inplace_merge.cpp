@@ -32,7 +32,7 @@ struct random_fill
 {
     random_fill(std::size_t random_range)
       : gen(_rand())
-      , dist(0, random_range - 1)
+      , dist(0, static_cast<int>(random_range - 1))
     {
     }
 
@@ -62,7 +62,7 @@ double run_inplace_merge_benchmark_std(int test_count, OrgIter org_first,
         time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ double run_inplace_merge_benchmark_hpx(int test_count, ExPolicy policy,
         time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -175,7 +175,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (random_range < 1)
         random_range = 1;
 
-    std::size_t vector_left_size = std::size_t(vector_size * vector_ratio);
+    std::size_t vector_left_size =
+        std::size_t(static_cast<double>(vector_size) * vector_ratio);
     std::size_t vector_right_size = vector_size - vector_left_size;
 
     std::cout << "-------------- Benchmark Config --------------" << std::endl;

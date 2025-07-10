@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2022 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -98,6 +98,7 @@ void test_for_each_execute_on_async(Policy l, ExPolicy&& policy, IteratorTag)
     auto result = tt::sync_wait(hpx::for_each(
         ex::execute_on(scheduler_t(l), std::forward<ExPolicy>(policy)),
         iterator(std::begin(c)), iterator(std::end(c)), f));
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     HPX_TEST(hpx::get<0>(*result) == iterator(std::end(c)));
 
     // verify values
@@ -133,6 +134,7 @@ void test_for_each_execute_on_sender(Policy l, ExPolicy&& policy, IteratorTag)
         ex::just(iterator(std::begin(c)), iterator(std::end(c)), f) |
         hpx::for_each(
             ex::execute_on(scheduler_t(l), std::forward<ExPolicy>(policy))));
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     HPX_TEST(hpx::get<0>(*result) == iterator(std::end(c)));
 
     // verify values

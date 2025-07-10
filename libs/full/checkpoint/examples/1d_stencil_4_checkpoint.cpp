@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2022 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //  Copyright (c) 2014 Patricia Grubel
 //  Copyright (c) 2018 Adrian Serio
 //
@@ -79,7 +79,7 @@ public:
       : data_(new double[size], size, buffer_type::take)
       , size_(size)
     {
-        double const base_value = static_cast<double>(initial_value * size);
+        double const base_value = initial_value * static_cast<double>(size);
         for (std::size_t i = 0; i != size; ++i)
             data_[i] = base_value + static_cast<double>(i);
     }
@@ -368,13 +368,13 @@ struct stepper
             {
                 next[0].then([sem, t](partition&&) {
                     // inform semaphore about new lower limit
-                    sem->signal(t);
+                    sem->signal(static_cast<std::int64_t>(t));
                 });
             }
 
             // suspend if the tree has become too deep, the continuation above
             // will resume this thread once the computation has caught up
-            sem->wait(t);
+            sem->wait(static_cast<std::int64_t>(t));
         }
 
         // Wait on Checkpoint Printing

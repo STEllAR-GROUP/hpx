@@ -176,14 +176,3 @@ namespace hpx {
     using spinlock = detail::spinlock<true>;
     using spinlock_no_backoff = detail::spinlock<false>;
 }    // namespace hpx
-
-namespace hpx::lcos::local {
-
-    using spinlock HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::spinlock is deprecated, use hpx::spinlock instead") =
-        hpx::spinlock;
-
-    using spinlock_no_backoff HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::spinlock_no_backoff is deprecated, use "
-        "hpx::spinlock_no_backoff instead") = hpx::spinlock_no_backoff;
-}    // namespace hpx::lcos::local

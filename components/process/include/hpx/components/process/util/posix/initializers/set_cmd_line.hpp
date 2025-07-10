@@ -59,7 +59,7 @@ namespace hpx::components::process::posix::initializers {
         void init_command_line_arguments()
         {
             cmd_line_.reset(new char*[args_.size() + 1]);
-            std::size_t i = 0;
+            std::ptrdiff_t i = 0;
             for (std::string const& s : args_)
                 cmd_line_[i++] = const_cast<char*>(s.c_str());
             cmd_line_[i] = nullptr;

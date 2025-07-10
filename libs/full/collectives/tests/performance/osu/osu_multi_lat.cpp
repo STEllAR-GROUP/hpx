@@ -1,4 +1,4 @@
-//  Copyright (c) 2013-2015 Hartmut Kaiser
+//  Copyright (c) 2013-2025 Hartmut Kaiser
 //  Copyright (c) 2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -105,7 +105,8 @@ double ireceive(hpx::id_type dest, std::size_t size, std::size_t window_size)
     }
 
     double elapsed = t.elapsed();
-    return (elapsed * 1e6) / static_cast<double>(2 * loop * window_size);
+    return (elapsed * 1e6) /
+        static_cast<double>(static_cast<std::size_t>(2) * loop * window_size);
 }
 HPX_PLAIN_ACTION(ireceive)
 
@@ -128,7 +129,7 @@ void run_benchmark(hpx::program_options::variables_map& vm)
         std::vector<hpx::future<double>> benchmarks;
 
         for (std::uint32_t locality_id = 0; locality_id != localities.size();
-             ++locality_id)
+            ++locality_id)
         {
             ireceive_action receive;
 
@@ -147,7 +148,8 @@ void run_benchmark(hpx::program_options::variables_map& vm)
             [](double sum, hpx::future<double>& f) { return sum + f.get(); });
 
         std::cout << std::left << std::setw(10) << size
-                  << total_latency / (2. * pairs) << std::endl;
+                  << total_latency / (2. * static_cast<double>(pairs))
+                  << std::endl;
     }
 }
 #endif

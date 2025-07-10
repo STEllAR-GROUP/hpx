@@ -26,7 +26,7 @@
 ////////////////////////////////////////////////////////////////////////////
 #define SIZE 10007
 
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename IteratorTag>

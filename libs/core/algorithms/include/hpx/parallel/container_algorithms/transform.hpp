@@ -682,7 +682,7 @@ namespace hpx { namespace ranges {
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     // clang-format on
-}}       // namespace hpx::ranges
+}}    // namespace hpx::ranges
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +15,7 @@
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
+#include <cstddef>
 #include <numeric>
 #include <string>
 #include <utility>
@@ -39,9 +40,13 @@ void calculate_sum(hpx::id_type const& loc)
     hpx::lcos::channel<int> c(loc);
 
     hpx::post(sum_action(), loc,
-        std::vector<int>(s.begin(), s.begin() + s.size() / 2), c);
+        std::vector<int>(
+            s.begin(), s.begin() + static_cast<std::ptrdiff_t>(s.size() / 2)),
+        c);
     hpx::post(sum_action(), loc,
-        std::vector<int>(s.begin() + s.size() / 2, s.end()), c);
+        std::vector<int>(
+            s.begin() + static_cast<std::ptrdiff_t>(s.size() / 2), s.end()),
+        c);
 
     int x = c.get(hpx::launch::sync);    // receive from c
     int y = c.get(hpx::launch::sync);

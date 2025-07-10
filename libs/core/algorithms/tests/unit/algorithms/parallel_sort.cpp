@@ -1,5 +1,5 @@
 //  Copyright (c) 2015-2019 Francisco Jose Tapia
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <ctime>

@@ -583,14 +583,6 @@ namespace hpx {
     };
 }    // namespace hpx
 
-namespace hpx::lcos::local {
-
-    template <typename R>
-    using promise HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::promise is deprecated, use hpx::promise instead") =
-        hpx::promise<R>;
-}
-
 namespace std {
 
     // Requires: Allocator shall be an allocator (17.6.3.5)

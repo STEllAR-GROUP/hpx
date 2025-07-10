@@ -217,7 +217,7 @@ struct default_awaiter_context<void>
         }
         else if (auto token = hpx::execution::experimental::get_stop_token(
                      hpx::execution::experimental::get_env(parent));
-                 token.stop_possible())
+            token.stop_possible())
         {
             stop_callback_.emplace<stop_callback_t>(
                 std::move(token), forward_stop_request{stop_source_});

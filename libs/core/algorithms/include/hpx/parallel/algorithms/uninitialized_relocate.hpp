@@ -443,7 +443,7 @@ namespace hpx::parallel {
                 call(
                     HPX_FORWARD(ExPolicy, policy), zip_iter(first, dest), count,
                     [](zip_iter t, std::size_t part_size) mutable
-                    -> partition_result_type {
+                        -> partition_result_type {
                         using hpx::get;
 
                         auto iters = t.get_iterator_tuple();
@@ -461,7 +461,7 @@ namespace hpx::parallel {
                     },
                     // finalize, called once if no error occurred
                     [first, dest, count](auto&& data) mutable
-                    -> util::in_out_result<InIter, FwdIter> {
+                        -> util::in_out_result<InIter, FwdIter> {
                         // make sure iterators embedded in function object that is
                         // attached to futures are invalidated
                         util::detail::clear_container(data);

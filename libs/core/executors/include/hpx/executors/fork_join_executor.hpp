@@ -497,7 +497,8 @@ namespace hpx::execution::experimental {
               , stacksize_(stacksize)
               , schedule_(schedule)
               , yield_delay_(static_cast<std::uint64_t>(
-                    yield_delay.count() / pool_->timestamp_scale()))
+                    static_cast<double>(yield_delay.count()) /
+                    pool_->timestamp_scale()))
               , num_threads_(pool_->get_os_thread_count())
               , pu_mask_(full_mask(num_threads_))
               , region_data_(num_threads_)
@@ -517,7 +518,8 @@ namespace hpx::execution::experimental {
               , stacksize_(stacksize)
               , schedule_(schedule)
               , yield_delay_(static_cast<std::uint64_t>(
-                    yield_delay.count() / pool_->timestamp_scale()))
+                    static_cast<double>(yield_delay.count()) /
+                    pool_->timestamp_scale()))
               , num_threads_(hpx::threads::count(pu_mask))
               , pu_mask_(pu_mask)
               , region_data_(num_threads_)
@@ -589,8 +591,10 @@ namespace hpx::execution::experimental {
                 static constexpr decltype(auto) invoke_helper(
                     hpx::util::index_pack<Is_...>, F_&& f, A_&& a, Tuple_&& t)
                 {
+                    // NOLINTBEGIN(bugprone-use-after-move)
                     return HPX_INVOKE(HPX_FORWARD(F_, f), HPX_FORWARD(A_, a),
                         hpx::get<Is_>(HPX_FORWARD(Tuple_, t))...);
+                    // NOLINTEND(bugprone-use-after-move)
                 }
 
                 static void set_state(std::atomic<thread_state>& tstate,
@@ -847,11 +851,13 @@ namespace hpx::execution::experimental {
                 {
                     region_data& data = region_data_[t].data_;
 
+                    // NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
                     data.element_function_ = &f;
                     data.shape_ = &shape;
                     data.argument_pack_ = &argument_pack;
                     data.thread_function_helper_ = func;
                     data.results_ = results;
+                    // NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
 
                     data.state_.store(state, std::memory_order_release);
                 }
@@ -870,10 +876,12 @@ namespace hpx::execution::experimental {
                 {
                     region_data& data = region_data_[t].data_;
 
+                    // NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
                     data.element_function_ = &function_pack;
                     data.shape_ = nullptr;
                     data.argument_pack_ = &args;
                     data.thread_function_helper_ = func;
+                    // NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
 
                     data.state_.store(state, std::memory_order_release);
                 }

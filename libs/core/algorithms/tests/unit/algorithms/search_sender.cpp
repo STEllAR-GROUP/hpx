@@ -50,7 +50,8 @@ void test_search_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
             hpx::search(ex_policy.on(exec)));
         iterator index = hpx::get<0>(*snd_result);
 
-        base_iterator test_index = std::begin(c) + c.size() / 2;
+        base_iterator test_index =
+            std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
         HPX_TEST(index == iterator(test_index));
     }

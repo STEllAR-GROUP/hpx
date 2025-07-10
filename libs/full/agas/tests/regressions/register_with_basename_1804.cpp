@@ -52,7 +52,7 @@ std::string gen_name(int source, int target)
 
 void test()
 {
-    int rank = hpx::get_locality_id();
+    int rank = static_cast<int>(hpx::get_locality_id());
 
     std::vector<hpx::id_type> boundingBoxReceivers;
     for (int i = 0; i < 2; ++i)

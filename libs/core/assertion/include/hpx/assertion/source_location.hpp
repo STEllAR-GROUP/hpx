@@ -83,14 +83,6 @@ namespace hpx {
         std::ostream& os, source_location const& loc);
 }    // namespace hpx
 
-namespace hpx::assertion {
-
-    using source_location HPX_DEPRECATED_V(1, 8,
-        "hpx::assertion::source_location is deprecated, use "
-        "hpx::source_location "
-        "instead") = hpx::source_location;
-}
-
 #if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
 #define HPX_CURRENT_SOURCE_LOCATION() std::source_location::current()
 #else

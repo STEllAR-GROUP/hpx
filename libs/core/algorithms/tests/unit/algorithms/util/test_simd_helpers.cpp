@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 using hpx::parallel::util::unseq_first_n, hpx::parallel::util::unseq2_first_n;

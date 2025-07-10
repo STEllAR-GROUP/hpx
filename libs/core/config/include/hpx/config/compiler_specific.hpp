@@ -14,6 +14,9 @@
 /// Returns the Clang version HPX is compiled with. Only set if compiled with
 /// Clang.
 #define HPX_CLANG_VERSION
+/// Returns the Apple Clang version HPX is compiled with. Only set if compiled
+/// with Apple Clang.
+#define HPX_APPLE_CLANG_VERSION
 /// Returns the Intel Compiler version HPX is compiled with. Only set if
 /// compiled with the Intel Compiler.
 #define HPX_INTEL_VERSION
@@ -36,6 +39,7 @@
 #  define HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS 1
 
 #  undef HPX_CLANG_VERSION
+#  undef HPX_APPLE_CLANG_VERSION
 #  undef HPX_INTEL_VERSION
 
 #else
@@ -51,9 +55,16 @@
 
 #  undef HPX_INTEL_VERSION
 
+#if defined(__apple_build_version__)
+#  define HPX_APPLE_CLANG_VERSION HPX_CLANG_VERSION
+#else
+#  undef HPX_APPLE_CLANG_VERSION
+#endif
+
 #else
 
 #  undef HPX_CLANG_VERSION
+#  undef HPX_APPLE_CLANG_VERSION
 
 #endif
 

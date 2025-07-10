@@ -18,7 +18,7 @@ namespace hpx::parcelset::policies::lci {
     struct completion_manager_base
     {
         completion_manager_base(parcelport* pp) noexcept
-          : pp_(pp){};
+          : pp_(pp) {};
         virtual ~completion_manager_base() {}
         virtual LCI_comp_t alloc_completion() = 0;
         virtual void enqueue_completion(LCI_comp_t comp) = 0;

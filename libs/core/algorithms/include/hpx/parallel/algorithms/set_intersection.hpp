@@ -283,7 +283,7 @@ namespace hpx::parallel {
                 // calculate approximate destination index
                 auto f1 = [](difference_type1 idx1,
                               difference_type2 idx2) -> difference_type1 {
-                    return (std::min)(idx1, idx2);
+                    return (std::min) (idx1, idx2);
                 };
 
                 // perform required set operation for one chunk

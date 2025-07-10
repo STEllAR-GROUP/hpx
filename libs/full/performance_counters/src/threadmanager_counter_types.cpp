@@ -319,13 +319,13 @@ namespace hpx::performance_counters::detail {
             // /threads{locality#%d/total}/count/stack-recycles
             {"count/stack-recycles",
                 hpx::bind_front(&threads::coroutine_type::impl_type::
-                                    get_stack_recycle_count),
+                        get_stack_recycle_count),
                 hpx::function<std::uint64_t(bool)>(), "", 0},
 #if !defined(HPX_WINDOWS) && !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
             // /threads{locality#%d/total}/count/stack-unbinds
             {"count/stack-unbinds",
                 hpx::bind_front(&threads::coroutine_type::impl_type::
-                                    get_stack_unbind_count),
+                        get_stack_unbind_count),
                 hpx::function<std::uint64_t(bool)>(), "", 0},
 #endif
         };
@@ -700,8 +700,7 @@ namespace hpx::performance_counters {
                 hpx::bind_front(
                     &detail::locality_pool_thread_no_total_counter_creator, &tm,
                     &threads::thread_pool_base::get_busy_loop_count),
-                &locality_pool_thread_no_total_counter_discoverer, ""}
-        };
+                &locality_pool_thread_no_total_counter_discoverer, ""}};
 
         install_counter_types(
             counter_types, sizeof(counter_types) / sizeof(counter_types[0]));

@@ -211,36 +211,11 @@ namespace hpx::parallel {
                 auto dist2 = detail::distance(first2, last2);
 
                 return parallel_swap_ranges(HPX_FORWARD(ExPolicy, policy),
-                    first1, first2, (std::min)(dist1, dist2));
+                    first1, first2, (std::min) (dist1, dist2));
             }
         };
         /// \endcond
     }    // namespace detail
-
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::swap_ranges is deprecated, use "
-        "hpx::swap_ranges instead")
-    std::enable_if_t<hpx::is_execution_policy_v<ExPolicy>,
-        util::detail::algorithm_result_t<ExPolicy,
-            FwdIter2>> swap_ranges(ExPolicy&& policy, FwdIter1 first1,
-        FwdIter1 last1, FwdIter2 first2)
-    {
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-            "Requires at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-            "Requires at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::swap_ranges<FwdIter2>().call(
-            HPX_FORWARD(ExPolicy, policy), first1, last1, first2);
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
 }    // namespace hpx::parallel
 
 namespace hpx {

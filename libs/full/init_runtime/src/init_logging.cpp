@@ -88,6 +88,6 @@ namespace hpx { namespace util {
                 define_formatters);
         }
     }    // namespace detail
-}}       // namespace hpx::util
+}}    // namespace hpx::util
 
 #endif

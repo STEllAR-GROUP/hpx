@@ -189,4 +189,4 @@ namespace hpx { namespace sycl { namespace experimental {
         }
 #endif
     }    // namespace detail
-}}}      // namespace hpx::sycl::experimental
+}}}    // namespace hpx::sycl::experimental

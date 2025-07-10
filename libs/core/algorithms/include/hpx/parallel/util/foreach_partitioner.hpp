@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -247,8 +247,10 @@ namespace hpx::parallel::util::detail {
                     auto&& r1, auto&& r2) mutable -> FwdIter {
                     HPX_UNUSED(scoped_params);
 
-                    handle_local_exceptions::call(r1);
-                    handle_local_exceptions::call(r2);
+                    handle_local_exceptions::call(
+                        HPX_FORWARD(decltype(r1), r1));
+                    handle_local_exceptions::call(
+                        HPX_FORWARD(decltype(r2), r2));
 
                     return f(HPX_MOVE(last));
                 },
@@ -276,11 +278,11 @@ namespace hpx::parallel::util::detail {
                     f = HPX_FORWARD(F, f)](auto&& r) mutable -> FwdIter {
                     HPX_UNUSED(scoped_params);
 
-                    handle_local_exceptions::call(r);
+                    handle_local_exceptions::call(HPX_FORWARD(decltype(r), r));
 
                     return f(HPX_MOVE(last));
                 },
-                HPX_MOVE(items));
+                HPX_FORWARD(Items, items));
 #endif
         }
 
@@ -302,7 +304,7 @@ namespace hpx::parallel::util::detail {
                     f = HPX_FORWARD(F, f)](auto&& r) mutable -> FwdIter {
                     HPX_UNUSED(scoped_params);
 
-                    handle_local_exceptions::call(HPX_MOVE(r));
+                    handle_local_exceptions::call(HPX_FORWARD(decltype(r), r));
 
                     return f(HPX_MOVE(last));
                 });

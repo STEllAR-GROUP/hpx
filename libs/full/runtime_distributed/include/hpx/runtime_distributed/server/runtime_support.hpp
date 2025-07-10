@@ -271,7 +271,7 @@ namespace hpx::components::server {
     protected:
         // Load all components from the ini files found in the configuration
         int load_components(util::section& ini, naming::gid_type const& prefix,
-            naming::resolver_client& agas_client,
+            agas::addressing_service& agas_client,
             hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 
@@ -279,13 +279,13 @@ namespace hpx::components::server {
         bool load_component(hpx::util::plugin::dll& d, util::section& ini,
             std::string const& instance, std::string const& component,
             filesystem::path const& lib, naming::gid_type const& prefix,
-            naming::resolver_client& agas_client, bool isdefault,
+            agas::addressing_service& agas_client, bool isdefault,
             bool isenabled, hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
         bool load_component_dynamic(util::section& ini,
             std::string const& instance, std::string const& component,
             filesystem::path lib, naming::gid_type const& prefix,
-            naming::resolver_client& agas_client, bool isdefault,
+            agas::addressing_service& agas_client, bool isdefault,
             bool isenabled, hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 
@@ -298,7 +298,7 @@ namespace hpx::components::server {
         bool load_component_static(util::section& ini,
             std::string const& instance, std::string const& component,
             filesystem::path const& lib, naming::gid_type const& prefix,
-            naming::resolver_client& agas_client, bool isdefault,
+            agas::addressing_service& agas_client, bool isdefault,
             bool isenabled, hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
         bool load_startup_shutdown_functions_static(

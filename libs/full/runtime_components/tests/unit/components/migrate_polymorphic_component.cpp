@@ -1,5 +1,5 @@
 //  Copyright (c) 2019 Maximilian Bremer
-//  Copyright (c) 2019-2023 Hartmut Kaiser
+//  Copyright (c) 2019-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -214,15 +214,14 @@ struct test_server
     // MoveConstructable in which case the serialized data is moved into the
     // component's constructor.
     test_server(test_server&& rhs) noexcept
-      : base_type(std::move(rhs))
+      : base_type(static_cast<base_type&&>(rhs))
       , data_(rhs.data_)
     {
     }
 
     test_server& operator=(test_server&& rhs) noexcept
     {
-        this->test_server_base::operator=(
-            std::move(static_cast<test_server_base&>(rhs)));
+        this->base_type::operator=(static_cast<base_type&&>(rhs));
         data_ = rhs.data_;
         return *this;
     }

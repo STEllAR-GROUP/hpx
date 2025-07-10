@@ -1,5 +1,5 @@
 ..
-    Copyright (c) 2007-2022 Louisiana State University
+    Copyright (c) 2007-2025 Louisiana State University
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,7 +33,7 @@ converging onto a stable API which will provide a smooth migration path for
 developers.
 
 The API exposed by HPX is not only modeled after the interfaces defined by the
-C++11/14/17/20 ISO standard, it also adheres to the programming guidelines used
+C++11/14/17/20/23 ISO standard, it also adheres to the programming guidelines used
 by the Boost collection of C++ libraries. We aim to improve the scalability of
 today's applications and to expose new levels of parallelism which are necessary
 to take advantage of the exascale systems of the future.

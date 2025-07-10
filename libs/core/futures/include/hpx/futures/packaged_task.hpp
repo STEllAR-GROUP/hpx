@@ -148,14 +148,6 @@ namespace hpx {
     };
 }    // namespace hpx
 
-namespace hpx::lcos::local {
-
-    template <typename Sig>
-    using packaged_task HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::packaged_task is deprecated, use hpx::packaged_task "
-        "instead") = hpx::packaged_task<Sig>;
-}
-
 namespace std {    //-V1061
 
     // Requires: Allocator shall be an allocator (17.6.3.5)

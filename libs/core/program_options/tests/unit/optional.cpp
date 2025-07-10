@@ -44,10 +44,10 @@ void test_optional()
     po::notify(vm);
 
     HPX_TEST(!!foo);
-    HPX_TEST_EQ(*foo, 12);
+    HPX_TEST_EQ(*foo, 12);    // NOLINT(bugprone-unchecked-optional-access)
 
     HPX_TEST(!!bar);
-    HPX_TEST_EQ(*bar, 1);
+    HPX_TEST_EQ(*bar, 1);    // NOLINT(bugprone-unchecked-optional-access)
 
     HPX_TEST(!baz);
 }

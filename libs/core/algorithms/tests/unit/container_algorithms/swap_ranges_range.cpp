@@ -36,12 +36,16 @@ void test_swap_ranges_sent(IteratorTag)
     std::size_t len = std::rand() % 10005 + 1;
     std::size_t begin_num = std::rand();
 
-    std::iota(std::begin(c), std::begin(c) + len, begin_num);
+    std::iota(std::begin(c), std::begin(c) + static_cast<std::ptrdiff_t>(len),
+        begin_num);
     d = c;
-    std::reverse(std::begin(d), std::begin(d) + len);
+    std::reverse(
+        std::begin(d), std::begin(d) + static_cast<std::ptrdiff_t>(len));
 
-    std::fill(std::begin(c) + len, std::end(c), 100);
-    std::fill(std::begin(d) + len, std::end(d), 200);
+    std::fill(
+        std::begin(c) + static_cast<std::ptrdiff_t>(len), std::end(c), 100);
+    std::fill(
+        std::begin(d) + static_cast<std::ptrdiff_t>(len), std::end(d), 200);
 
     hpx::ranges::swap_ranges(std::begin(c), sentinel<std::size_t>{100},
         std::begin(d), sentinel<std::size_t>{200});
@@ -86,12 +90,16 @@ void test_swap_ranges_sent(ExPolicy policy, IteratorTag)
     std::size_t len = std::rand() % 10005 + 1;
     std::size_t begin_num = std::rand();
 
-    std::iota(std::begin(c), std::begin(c) + len, begin_num);
+    std::iota(std::begin(c), std::begin(c) + static_cast<std::ptrdiff_t>(len),
+        begin_num);
     d = c;
-    std::reverse(std::begin(d), std::begin(d) + len);
+    std::reverse(
+        std::begin(d), std::begin(d) + static_cast<std::ptrdiff_t>(len));
 
-    std::fill(std::begin(c) + len, std::end(c), 100);
-    std::fill(std::begin(d) + len, std::end(d), 200);
+    std::fill(
+        std::begin(c) + static_cast<std::ptrdiff_t>(len), std::end(c), 100);
+    std::fill(
+        std::begin(d) + static_cast<std::ptrdiff_t>(len), std::end(d), 200);
 
     hpx::ranges::swap_ranges(policy, std::begin(c), sentinel<std::size_t>{100},
         std::begin(d), sentinel<std::size_t>{200});

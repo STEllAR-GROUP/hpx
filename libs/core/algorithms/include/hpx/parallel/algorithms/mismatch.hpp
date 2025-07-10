@@ -612,7 +612,7 @@ namespace hpx::parallel {
 
                 auto count1 = detail::distance(first1, last1);
                 auto count2 = detail::distance(first2, last2);
-                auto count = (std::min)(count1, count2);
+                auto count = (std::min) (count1, count2);
 
                 using zip_iterator = hpx::util::zip_iterator<Iter1, Iter2>;
 

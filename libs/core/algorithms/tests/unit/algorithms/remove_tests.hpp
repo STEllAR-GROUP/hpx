@@ -52,7 +52,8 @@ struct user_defined_type
     user_defined_type(int rand_no)
       : val(rand_no)
     {
-        std::uniform_int_distribution<> dis(0, name_list.size() - 1);
+        std::uniform_int_distribution<> dis(
+            0, static_cast<int>(name_list.size() - 1));
         name = name_list[dis(g)];
     }
 
@@ -98,9 +99,10 @@ const std::vector<std::string> user_defined_type::name_list{
 struct random_fill
 {
     random_fill() = default;
-    random_fill(int rand_base, int range)
+    random_fill(std::size_t rand_base, std::size_t half_range /* >= 0 */)
       : gen(g())
-      , dist(rand_base - range / 2, rand_base + range / 2)
+      , dist(static_cast<int>(rand_base - half_range),
+            static_cast<int>(rand_base + half_range))
     {
     }
 
@@ -190,7 +192,7 @@ void test_remove_async(
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag, typename DataType, typename Pred>
-void test_remove_if(IteratorTag, DataType, Pred pred, int rand_base)
+void test_remove_if(IteratorTag, DataType, Pred pred, unsigned int rand_base)
 {
     typedef typename std::vector<DataType>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -213,7 +215,7 @@ void test_remove_if(IteratorTag, DataType, Pred pred, int rand_base)
 template <typename ExPolicy, typename IteratorTag, typename DataType,
     typename Pred>
 void test_remove_if(
-    ExPolicy policy, IteratorTag, DataType, Pred pred, int rand_base)
+    ExPolicy policy, IteratorTag, DataType, Pred pred, unsigned int rand_base)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -646,7 +648,7 @@ void test_remove_if(IteratorTag, int rand_base)
 template <typename IteratorTag>
 void test_remove(bool test_for_remove_if = false)
 {
-    int rand_base = g();
+    unsigned int rand_base = g();
 
     if (test_for_remove_if)
     {
