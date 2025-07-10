@@ -32,7 +32,7 @@ struct random_fill
 {
     explicit random_fill(std::size_t const random_range)
       : gen(seed)
-      , dist(0, static_cast<int>(random_range - 1))
+      , dist(0, static_cast<unsigned int>(random_range - 1))
     {
     }
 
@@ -59,7 +59,7 @@ double run_merge_benchmark_std(int const test_count, InIter1 first1,
 
     time = hpx::chrono::high_resolution_clock::now() - time;
 
-    return (static_cast<double>(time) * 1e-9) / test_count;
+    return (time * 1e-6) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,13 +73,43 @@ double run_merge_benchmark_hpx(int const test_count, ExPolicy policy,
 
     for (int i = 0; i < test_count; ++i)
     {
+        //std::uint64_t time = hpx::chrono::high_resolution_clock::now();
         hpx::merge(policy, first1, last1, first2, last2, dest);
+        //time = hpx::chrono::high_resolution_clock::now() - time;
+        //std::cout << (time * 1e-6) << std::endl;
     }
 
     time = hpx::chrono::high_resolution_clock::now() - time;
 
-    return (static_cast<double>(time) * 1e-9) / test_count;
+    return (time * 1e-6) / test_count;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename T>
+struct random_to_item_t
+{
+    double m_min;
+    double m_max;
+
+    random_to_item_t(T min, T max)
+      : m_min(static_cast<double>(min))
+      , m_max(static_cast<double>(max))
+    {
+    }
+
+    T operator()(double random_value) const
+    {
+        if constexpr (std::is_floating_point_v<T>)
+        {
+            return static_cast<T>((m_max - m_min) * random_value + m_min);
+        }
+        else
+        {
+            return static_cast<T>(
+                floor((m_max - m_min + 1) * random_value + m_min));
+        }
+    }
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag, typename Allocator>
@@ -89,41 +119,63 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
 {
     std::cout << "* Preparing Benchmark... (" << type << ")" << std::endl;
 
+    ///
+    std::vector<double> uniform_distribution(vector_size1 + vector_size2);
+
+    std::default_random_engine re(seed);
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+
+    for (auto& v : uniform_distribution)
+    {
+        v = dist(re);
+    }
+    ///
+
     using test_container = test_container<IteratorTag, int, Allocator>;
     using container = typename test_container::type;
+    using T = typename container::value_type;
 
-    container src1 = test_container::get_container(vector_size1, alloc);
-    container src2 = test_container::get_container(vector_size2, alloc);
-    container result =
+    container src =
         test_container::get_container(vector_size1 + vector_size2, alloc);
 
-    auto first1 = std::begin(src1);
-    auto last1 = std::end(src1);
-    auto first2 = std::begin(src2);
-    auto last2 = std::end(src2);
-    auto dest = std::begin(result);
+    const T min = (std::numeric_limits<T>::min)();
+    const T max = (std::numeric_limits<T>::max)();
+
+    std::transform(uniform_distribution.begin(), uniform_distribution.end(),
+        src.data(), random_to_item_t<T>(min, max));
+    std::sort(src.begin(), src.begin() + vector_size1);
+    std::sort(src.begin() + vector_size1, src.end());
+
+    auto first1 = std::begin(src);
+    auto last1 = std::begin(src) + vector_size1;
+    auto first2 = std::begin(src) + vector_size1;
+    auto last2 = std::end(src);
 
     // initialize data
     using namespace hpx::execution;
-    hpx::generate(
-        par, std::begin(src1), std::end(src1), random_fill(random_range));
-    hpx::generate(
-        par, std::begin(src2), std::end(src2), random_fill(random_range));
-    hpx::sort(par, std::begin(src1), std::end(src1));
-    hpx::sort(par, std::begin(src2), std::end(src2));
+    //hpx::generate(
+    //    par, std::begin(src1), std::end(src1), random_fill(random_range));
+    //hpx::generate(
+    //    par, std::begin(src2), std::end(src2), random_fill(random_range));
+    //hpx::sort(par, std::begin(src1), std::end(src1));
+    //hpx::sort(par, std::begin(src2), std::end(src2));
+
+    container result =
+        test_container::get_container(vector_size1 + vector_size2, alloc);
+
+    auto dest = std::begin(result);
 
     std::cout << "* Running Benchmark... (" << type << ")" << std::endl;
-    std::cout << "--- run_merge_benchmark_std ---" << std::endl;
+    //std::cout << "--- run_merge_benchmark_std ---" << std::endl;
 
-    HPX_ITT_RESUME();
+    //HPX_ITT_RESUME();
 
-    double const time_std =
-        run_merge_benchmark_std(test_count, first1, last1, first2, last2, dest);
+    //double const time_std =
+    //    run_merge_benchmark_std(test_count, first1, last1, first2, last2, dest);
 
-    HPX_ITT_PAUSE();
+    //HPX_ITT_PAUSE();
 
     hpx::this_thread::sleep_for(std::chrono::seconds(1));
-
     std::cout << "--- run_merge_benchmark_seq ---" << std::endl;
 
     HPX_ITT_RESUME();
@@ -132,34 +184,38 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
         test_count, seq, first1, last1, first2, last2, dest);
 
     HPX_ITT_PAUSE();
-
+    
+    hpx::this_thread::sleep_for(std::chrono::seconds(1));
     std::cout << "--- run_merge_benchmark_par ---" << std::endl;
 
     double const time_par = run_merge_benchmark_hpx(
         test_count, par, first1, last1, first2, last2, dest);
-
-    std::cout << "--- run_merge_benchmark_par_fork_join ---" << std::endl;
-    double time_par_fork_join = 0;
-    {
-        hpx::execution::experimental::fork_join_executor exec;
-        time_par_fork_join = run_merge_benchmark_hpx(
-            test_count, par.on(exec), first1, last1, first2, last2, dest);
-    }
-
-    std::cout << "--- run_merge_benchmark_par_unseq ---" << std::endl;
-    double const time_par_unseq = run_merge_benchmark_hpx(
-        test_count, par_unseq, first1, last1, first2, last2, dest);
+    std::cout << std::is_sorted(result.begin(), result.end()) << std::endl;
+    
+    //hpx::this_thread::sleep_for(std::chrono::seconds(1));
+    //std::cout << "--- run_merge_benchmark_par_fork_join ---" << std::endl;
+    //double time_par_fork_join = 0;
+    //{
+    //    hpx::execution::experimental::fork_join_executor exec;
+    //    time_par_fork_join = run_merge_benchmark_hpx(
+    //        test_count, par.on(exec), first1, last1, first2, last2, dest);
+    //}
+    
+    //hpx::this_thread::sleep_for(std::chrono::seconds(1));
+    //std::cout << "--- run_merge_benchmark_par_unseq ---" << std::endl;
+    //double const time_par_unseq = run_merge_benchmark_hpx(
+    //    test_count, par_unseq, first1, last1, first2, last2, dest);
 
     std::cout << "\n-------------- Benchmark Result --------------"
               << std::endl;
     auto const fmt = "merge ({1}) : {2}(sec)";
-    hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
-    hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
+    //hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
+    //hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
-    hpx::util::format_to(std::cout, fmt, "par_fork_join", time_par_fork_join)
-        << std::endl;
-    hpx::util::format_to(std::cout, fmt, "par_unseq", time_par_unseq)
-        << std::endl;
+    //hpx::util::format_to(std::cout, fmt, "par_fork_join", time_par_fork_join)
+    //    << std::endl;
+    //hpx::util::format_to(std::cout, fmt, "par_unseq", time_par_unseq)
+    //    << std::endl;
     std::cout << "----------------------------------------------" << std::endl;
 }
 
@@ -204,15 +260,15 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::random_access_iterator_tag(), alloc, "std::vector");
     }
 
-    {
-        auto policy = hpx::execution::par;
-        using allocator_type =
-            hpx::compute::host::detail::policy_allocator<int, decltype(policy)>;
-        allocator_type alloc(policy);
+    //{
+    //    auto policy = hpx::execution::par;
+    //    using allocator_type =
+    //        hpx::compute::host::detail::policy_allocator<int, decltype(policy)>;
+    //    allocator_type alloc(policy);
 
-        run_benchmark(vector_size1, vector_size2, test_count, random_range,
-            std::random_access_iterator_tag(), alloc, "hpx::compute::vector");
-    }
+    //    run_benchmark(vector_size1, vector_size2, test_count, random_range,
+    //        std::random_access_iterator_tag(), alloc, "hpx::compute::vector");
+    //}
 
     return hpx::local::finalize();
 }
