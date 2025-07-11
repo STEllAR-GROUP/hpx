@@ -416,6 +416,211 @@ int hpx_main(int, char*[])
     }
 #endif    // HPX_HAVE_STDEXEC
 
+    // Test bulk execution with parallel scheduler
+    {
+        std::cout << "\n=== Testing Bulk Execution ===" << std::endl;
+        const std::size_t n = 100;
+        std::atomic<std::size_t> counter{0};
+        std::mutex info_mutex;
+        std::map<hpx::thread::id, std::vector<std::size_t>> thread_work_map;
+        std::vector<std::pair<std::size_t, hpx::thread::id>> execution_order;
+
+        auto bulk_sender =
+            ex::schedule(sched) | ex::bulk(n, [&](std::size_t i) {
+                auto tid = hpx::this_thread::get_id();
+                counter.fetch_add(1, std::memory_order_relaxed);
+
+                {
+                    std::lock_guard<std::mutex> lock(info_mutex);
+                    thread_work_map[tid].push_back(i);
+                    execution_order.emplace_back(i, tid);
+                }
+
+                // Add some work to potentially trigger multi-threading
+                volatile double dummy = 0.0;
+                for (int j = 0; j < 1000; ++j)
+                {
+                    dummy += std::sin(i * j * 0.001);
+                }
+            });
+
+        std::cout << "Calling sync_wait for bulk execution" << std::endl;
+        auto start_time = std::chrono::high_resolution_clock::now();
+        ex::sync_wait(bulk_sender);
+        auto end_time = std::chrono::high_resolution_clock::now();
+
+        HPX_TEST_EQ(counter.load(), n);
+        std::cout << "Bulk execution completed: counter = " << counter.load()
+                  << ", expected = " << n << std::endl;
+
+        // Display detailed execution information
+        std::cout << "\nExecution Details:" << std::endl;
+        std::cout << "Total execution time: "
+                  << std::chrono::duration<double, std::milli>(
+                         end_time - start_time)
+                         .count()
+                  << " ms" << std::endl;
+
+        std::cout << "\nThread-wise work distribution:" << std::endl;
+        for (const auto& [tid, indices] : thread_work_map)
+        {
+            std::cout << "Thread " << tid << " executed " << indices.size()
+                      << " items: ";
+
+            // Find ranges of consecutive indices
+            if (!indices.empty())
+            {
+                std::vector<std::pair<std::size_t, std::size_t>> ranges;
+                std::size_t start = indices[0];
+                std::size_t end = indices[0];
+
+                for (std::size_t i = 1; i < indices.size(); ++i)
+                {
+                    if (indices[i] == end + 1)
+                    {
+                        end = indices[i];
+                    }
+                    else
+                    {
+                        ranges.emplace_back(start, end);
+                        start = end = indices[i];
+                    }
+                }
+                ranges.emplace_back(start, end);
+
+                // Print ranges
+                for (std::size_t i = 0; i < ranges.size(); ++i)
+                {
+                    if (i > 0)
+                        std::cout << ", ";
+                    if (ranges[i].first == ranges[i].second)
+                    {
+                        std::cout << ranges[i].first;
+                    }
+                    else
+                    {
+                        std::cout << "[" << ranges[i].first << "-"
+                                  << ranges[i].second << "]";
+                    }
+                }
+            }
+            std::cout << std::endl;
+        }
+
+        std::cout << "Number of unique threads used: " << thread_work_map.size()
+                  << std::endl;
+
+        // Show first few execution order items
+        std::cout << "\nFirst 10 executions:" << std::endl;
+        for (std::size_t i = 0;
+            i < std::min<std::size_t>(10, execution_order.size()); ++i)
+        {
+            std::cout << "  Index " << execution_order[i].first << " on thread "
+                      << execution_order[i].second << std::endl;
+        }
+    }
+
+    // Test bulk with value propagation
+    {
+        std::cout << "\n=== Testing Bulk with Value Propagation ==="
+                  << std::endl;
+        const std::size_t n = 50;
+        std::atomic<int> sum{0};
+        std::mutex info_mutex;
+        std::map<hpx::thread::id, int> thread_sum_map;
+
+        auto bulk_sender = ex::just(10) |    // Start with value 10
+            ex::bulk(n, [&](std::size_t i, int base_value) {
+                auto tid = hpx::this_thread::get_id();
+                sum.fetch_add(base_value, std::memory_order_relaxed);
+
+                {
+                    std::lock_guard<std::mutex> lock(info_mutex);
+                    thread_sum_map[tid] += base_value;
+                }
+            });
+
+        std::cout << "Calling sync_wait for bulk with value" << std::endl;
+        ex::sync_wait(bulk_sender);
+
+        HPX_TEST_EQ(sum.load(), static_cast<int>(n * 10));
+        std::cout << "Bulk with value completed: sum = " << sum.load()
+                  << ", expected = " << (n * 10) << std::endl;
+
+        std::cout << "Per-thread contributions:" << std::endl;
+        for (const auto& [tid, thread_sum] : thread_sum_map)
+        {
+            std::cout << "  Thread " << tid << " contributed: " << thread_sum
+                      << std::endl;
+        }
+    }
+
+    // Test small bulk operation (edge case)
+    {
+        std::cout << "\n=== Testing Small Bulk Operation ===" << std::endl;
+        const std::size_t n = 4;    // Very small to test edge cases
+        std::atomic<std::size_t> executions{0};
+        std::mutex info_mutex;
+
+        auto bulk_sender =
+            ex::schedule(sched) | ex::bulk(n, [&](std::size_t i) {
+                auto tid = hpx::this_thread::get_id();
+                {
+                    std::lock_guard<std::mutex> lock(info_mutex);
+                    std::cout << "Small bulk executing index " << i
+                              << " on thread " << tid << std::endl;
+                }
+                executions.fetch_add(1, std::memory_order_relaxed);
+            });
+
+        std::cout << "Calling sync_wait for small bulk operation" << std::endl;
+        ex::sync_wait(bulk_sender);
+
+        HPX_TEST_EQ(executions.load(), n);
+        std::cout << "Small bulk completed with " << executions.load()
+                  << " executions" << std::endl;
+    }
+
+    // Test bulk error handling
+    {
+        std::cout << "\n=== Testing Bulk Error Handling ===" << std::endl;
+        const std::size_t n = 20;
+        bool caught_error = false;
+        std::atomic<std::size_t> executed_before_error{0};
+
+        auto bulk_sender =
+            ex::schedule(sched) | ex::bulk(n, [&](std::size_t i) {
+                if (i < 10)
+                {
+                    executed_before_error.fetch_add(
+                        1, std::memory_order_relaxed);
+                }
+                if (i == 10)
+                {    // Throw on a specific index
+                    std::cout << "Throwing error from index " << i
+                              << " on thread " << hpx::this_thread::get_id()
+                              << std::endl;
+                    throw std::runtime_error("Bulk error");
+                }
+            });
+
+        try
+        {
+            std::cout << "Calling sync_wait for bulk error test" << std::endl;
+            ex::sync_wait(bulk_sender);
+            HPX_TEST(false);    // Should not reach here
+        }
+        catch (const std::runtime_error& e)
+        {
+            caught_error = true;
+            std::cout << "Caught expected error: " << e.what() << std::endl;
+            std::cout << "Executed " << executed_before_error.load()
+                      << " items before error" << std::endl;
+        }
+
+        HPX_TEST(caught_error);
+    }
+
     std::cout << "Calling hpx::local::finalize()" << std::endl;
     return hpx::local::finalize();
 }

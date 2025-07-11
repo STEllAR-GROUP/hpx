@@ -6,8 +6,10 @@
 
 #pragma once
 
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
+#include <hpx/executors/thread_pool_scheduler_bulk.hpp>    // Added for P2079R10 compliance: include bulk_t
 #include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <exception>
 #include <memory>
@@ -18,6 +20,11 @@
 #endif
 
 namespace hpx::execution::experimental {
+
+    // Added for P2079R10 compliance: bulk_chunked_t tag
+    struct bulk_chunked_t
+    {
+    };
 
     namespace detail {
         // Singleton-like shared thread pool for parallel_scheduler
@@ -219,6 +226,15 @@ namespace hpx::execution::experimental {
         schedule_t, parallel_scheduler const& sched) noexcept
     {
         return {sched};
+    }
+
+    // Added for P2079R10 compliance: bulk_chunked customization
+    template <typename Sender, typename Policy, typename Shape, typename F>
+    auto tag_invoke(bulk_chunked_t, parallel_scheduler scheduler,
+        Sender&& sender, Shape const& shape, F&& f)
+    {
+        return tag_invoke(bulk_t{}, scheduler.get_underlying_scheduler(),
+            HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f));
     }
 
     // Stream output operator for parallel_scheduler
