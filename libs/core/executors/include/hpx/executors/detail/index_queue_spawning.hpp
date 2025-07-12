@@ -278,6 +278,17 @@ namespace hpx::parallel::execution::detail {
             return mask;
         }
 
+        static std::uint32_t get_first_core(hpx::threads::mask_cref_type mask)
+        {
+            auto size = hpx::threads::mask_size(mask);
+            for (std::uint32_t i = 0; i != size; ++i)
+            {
+                if (hpx::threads::test(mask, i))
+                    return i;
+            }
+            return 0;
+        }
+
         // Initialize a queue for a worker thread.
         void init_queue_depth_first(std::uint32_t const worker_thread,
             std::uint32_t const size) noexcept
@@ -447,8 +458,13 @@ namespace hpx::parallel::execution::detail {
             bool const needs_wraparound = num_threads > available_threads;
 
             auto const& rp = hpx::resource::get_partitioner();
-            std::size_t main_pu_num = rp.get_pu_num(wrapped_pu_num(
-                local_worker_thread, needs_wraparound));    //-V106
+            std::size_t main_pu_num = get_first_core(pu_mask);
+            if (local_worker_thread != static_cast<std::uint32_t>(~0x0))
+            {
+                main_pu_num = rp.get_pu_num(wrapped_pu_num(
+                    local_worker_thread, needs_wraparound));    //-V106
+            }
+
             if (!hpx::threads::test(pu_mask, main_pu_num) || num_threads == 1)
             {
                 main_thread_ok = true;

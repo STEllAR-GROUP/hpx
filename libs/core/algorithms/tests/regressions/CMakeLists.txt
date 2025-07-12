@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2023 Hartmut Kaiser
+# Copyright (c) 2014-2025 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@ set(tests
     fill_executor_5016
     findfirstof_more_searched_for
     for_each_annotated_function
+    for_each_on_main_thread
     for_loop_2281
     for_loop_5735
     for_loop_with_auto_chunk_size
