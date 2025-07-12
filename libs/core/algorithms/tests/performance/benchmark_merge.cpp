@@ -182,8 +182,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (random_range < 1)
         random_range = 1;
 
-    std::size_t const vector_size1 =
-        static_cast<std::size_t>(vector_size * vector_ratio);
+    std::size_t const vector_size1 = static_cast<std::size_t>(
+        static_cast<double>(vector_size) * vector_ratio);
     std::size_t const vector_size2 = vector_size - vector_size1;
 
     std::cout << "-------------- Benchmark Config --------------" << std::endl;
