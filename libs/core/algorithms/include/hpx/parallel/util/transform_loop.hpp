@@ -374,7 +374,7 @@ namespace hpx::parallel::util {
                     auto const len2 =
                         parallel::detail::advance_and_get_distance(end2, sent2);
 
-                    auto len = (std::min)(len1, len2);
+                    auto len = (std::min) (len1, len2);
                     if (len == 0)
                     {
                         return {start1, start2, out};

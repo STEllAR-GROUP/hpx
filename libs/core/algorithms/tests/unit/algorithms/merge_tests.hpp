@@ -124,10 +124,11 @@ struct random_fill
 struct random_fill_tagged
 {
     random_fill_tagged() = default;
-    random_fill_tagged(int tag, int rand_base, int range)
+    random_fill_tagged(int tag, std::size_t rand_base, std::size_t range)
       : tag(tag)
       , gen(_gen())
-      , dist(rand_base - range / 2, rand_base + range / 2)
+      , dist(static_cast<int>(rand_base - range / 2),
+            static_cast<int>(rand_base + range / 2))
     {
     }
 
