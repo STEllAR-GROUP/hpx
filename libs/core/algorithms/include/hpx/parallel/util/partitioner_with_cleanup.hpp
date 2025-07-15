@@ -87,8 +87,7 @@ namespace hpx::parallel::util {
                 Items&& workitems, F&& f, Cleanup&& cleanup)
             {
                 namespace ex = hpx::execution::experimental;
-                if constexpr (ex::is_sender_v<std::decay_t<Items>> &&
-                    !hpx::traits::is_future_v<std::decay_t<Items>>)
+                if constexpr (ex::is_sender_v<std::decay_t<Items>>)
                 {
                     std::cout << "[PARTITIONER_WITH_CLEANUP] reduce is called" << std::endl;
 

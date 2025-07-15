@@ -268,6 +268,7 @@ namespace hpx::parallel {
                     [dest, first, count](auto&& data) mutable
                         -> util::in_out_result<Iter, FwdIter2> {
                         std::cout << "[FINALIZE] Called with data size: " << std::size(data) << std::endl;
+
                         // make sure iterators embedded in function object that is
                         // attached to futures are invalidated
                         util::detail::clear_container(data);
