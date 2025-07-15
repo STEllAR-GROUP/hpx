@@ -85,8 +85,7 @@ namespace hpx::parallel::util {
                 Items&& workitems, F&& f, Cleanup&& cleanup)
             {
                 namespace ex = hpx::execution::experimental;
-                if constexpr (ex::is_sender_v<std::decay_t<Items>> &&
-                    !hpx::traits::is_future_v<std::decay_t<Items>>)
+                if constexpr (ex::is_sender_v<std::decay_t<Items>>)
                 {
                     return ex::let_value(workitems,
                         [f = HPX_MOVE(f), cleanup = HPX_MOVE(cleanup)](
@@ -136,9 +135,17 @@ namespace hpx::parallel::util {
                         HPX_FORWARD(Cleanup, cleanup));
                 }
 
-                items.first.insert(items.first.end(),
-                    std::make_move_iterator(items.second.begin()),
-                    std::make_move_iterator(items.second.end()));
+                if constexpr (hpx::traits::is_future_v<Items2>)
+                {
+                    items.first.emplace_back(HPX_MOVE(items.second));
+                }
+                else
+                {
+                    items.first.insert(items.first.end(),
+                        std::make_move_iterator(items.second.begin()),
+                        std::make_move_iterator(items.second.end()));
+                }
+
                 return reduce(HPX_MOVE(items.first), HPX_FORWARD(F, f),
                     HPX_FORWARD(Cleanup, cleanup));
             }
@@ -200,9 +207,17 @@ namespace hpx::parallel::util {
                         HPX_FORWARD(Cleanup, cleanup));
                 }
 
-                items.first.insert(items.first.end(),
-                    std::make_move_iterator(items.second.begin()),
-                    std::make_move_iterator(items.second.end()));
+                if constexpr (hpx::traits::is_future_v<Items2>)
+                {
+                    items.first.emplace_back(HPX_MOVE(items.second));
+                }
+                else
+                {
+                    items.first.insert(items.first.end(),
+                        std::make_move_iterator(items.second.begin()),
+                        std::make_move_iterator(items.second.end()));
+                }
+
                 return reduce(HPX_MOVE(scoped_params), HPX_MOVE(items.first),
                     HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
             }
@@ -214,26 +229,56 @@ namespace hpx::parallel::util {
                 [[maybe_unused]] Items&& workitems, [[maybe_unused]] F&& f,
                 [[maybe_unused]] Cleanup&& cleanup)
             {
-                // wait for all tasks to finish
+                namespace ex = hpx::execution::experimental;
+                if constexpr (ex::is_sender_v<std::decay_t<Items>>)
+                {
+                    auto result = ex::let_value(workitems,
+                        [f = HPX_MOVE(f), cleanup = HPX_MOVE(cleanup)](
+                            auto&& all_parts) mutable {
+                            // First, put all_parts (partition list) into a shared_ptr
+                            auto captured = std::make_shared<
+                                std::decay_t<decltype(all_parts)>>(all_parts);
+
+                            // Then, run f's logic normally
+                            auto normal = ex::then(ex::just(captured),
+                                [f = HPX_MOVE(f)](auto const& ptr) mutable {
+                                    return f(*ptr);
+                                });
+
+                            // If f throws, clean up each part in captured
+                            return ex::let_error(HPX_MOVE(normal),
+                                [cleanup, captured](
+                                    std::exception_ptr const& err) {
+                                    for (auto&& p : *captured)
+                                        cleanup(HPX_MOVE(p));
+                                    return ex::just_error(err);
+                                });
+                        });
+                    return ex::make_future(HPX_MOVE(result));
+                }
+                else
+                {
+                    // wait for all tasks to finish
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-                HPX_ASSERT(false);
-                return hpx::future<R>{};
+                    HPX_ASSERT(false);
+                    return hpx::future<R>{};
 #else
-                return hpx::dataflow(
-                    hpx::launch::sync,
-                    [scoped_params = HPX_MOVE(scoped_params),
-                        f = HPX_FORWARD(F, f),
-                        cleanup = HPX_FORWARD(Cleanup, cleanup)](
-                        auto&& r) mutable -> R {
-                        HPX_UNUSED(scoped_params);
+                    return hpx::dataflow(
+                        hpx::launch::sync,
+                        [scoped_params = HPX_MOVE(scoped_params),
+                            f = HPX_FORWARD(F, f),
+                            cleanup = HPX_FORWARD(Cleanup, cleanup)](
+                            auto&& r) mutable -> R {
+                            HPX_UNUSED(scoped_params);
 
-                        handle_local_exceptions::call_with_cleanup(
-                            r, HPX_FORWARD(Cleanup, cleanup));
+                            handle_local_exceptions::call_with_cleanup(
+                                r, HPX_FORWARD(Cleanup, cleanup));
 
-                        return f(HPX_FORWARD(decltype(r), r));
-                    },
-                    HPX_FORWARD(Items, workitems));
+                            return f(HPX_FORWARD(decltype(r), r));
+                        },
+                        HPX_FORWARD(Items, workitems));
 #endif
+                }
             }
         };
     }    // namespace detail

@@ -254,7 +254,7 @@ namespace hpx::parallel {
                     HPX_FORWARD(ExPolicy, policy), zip_iterator(first, dest),
                     count,
                     [policy](zip_iterator t, std::size_t part_size) mutable
-                    -> partition_result_type {
+                        -> partition_result_type {
                         using hpx::get;
                         auto iters = t.get_iterator_tuple();
                         FwdIter2 dest = get<1>(iters);
@@ -266,7 +266,7 @@ namespace hpx::parallel {
                     },
                     // finalize, called once if no error occurred
                     [dest, first, count](auto&& data) mutable
-                    -> util::in_out_result<Iter, FwdIter2> {
+                        -> util::in_out_result<Iter, FwdIter2> {
                         // make sure iterators embedded in function object that is
                         // attached to futures are invalidated
                         util::detail::clear_container(data);
@@ -508,11 +508,21 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::detail::is_negative(count))
             {
-                return parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter2>::get(HPX_MOVE(dest));
+                if constexpr (has_scheduler_executor)
+                {
+                    count = static_cast<Size>(0);
+                }
+                else
+                {
+                    return parallel::util::detail::algorithm_result<ExPolicy,
+                        FwdIter2>::get(HPX_MOVE(dest));
+                }
             }
 
             return parallel::util::get_second_element(
