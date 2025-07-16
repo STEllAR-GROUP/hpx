@@ -402,49 +402,83 @@ namespace hpx::parallel {
         sequential_merge_helper(Iter1 first1, Sent1 last1, Iter2 first2,
             Sent2 last2, OutIter dest, Comp&& comp)
         {
-            if (first1 != last1 && first2 != last2)
+            using value_type1 =
+                typename std::iterator_traits<Iter1>::value_type;
+            using value_type2 =
+                typename std::iterator_traits<Iter2>::value_type;
+
+            if constexpr (std::is_same_v<value_type1, value_type2>)
             {
-                typename std::iterator_traits<Iter1>::value_type val1 = *first1;
-                typename std::iterator_traits<Iter2>::value_type val2 =
-                    init_value(*first2);
-                while (true)
+                while (HPX_LIKELY(first1 != last1 && first2 != last2))
                 {
-                    while (first2 != last2)
+                    // This code enables the compiler to generate conditional
+                    // mov operations instead of branches
+                    Iter1 const next1 = std::next(first1);
+                    Iter2 const next2 = std::next(first2);
+
+                    value_type1 val1 = *first1;
+                    value_type2 const val2 = *first2;
+
+                    if (static_cast<bool>(HPX_INVOKE(comp, val2, val1)))
                     {
-                        val2 = *first2;
-                        if (static_cast<bool>(HPX_INVOKE(comp, val2, val1)))
-                        {
-                            *dest = val2;
-                            ++dest;
-                            ++first2;
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        val1 = HPX_MOVE(val2);
+                        first2 = next2;
                     }
-                    if (first2 == last2)
+                    else
                     {
-                        break;
+                        first1 = next1;
                     }
 
-                    while (first1 != last1)
+                    *dest = HPX_MOVE(val1);
+                    ++dest;
+                }
+            }
+            else
+            {
+                if (HPX_LIKELY(first1 != last1 && first2 != last2))
+                {
+                    value_type1 val1 = *first1;
+                    value_type2 val2 = init_value(*first2);
+                    while (true)
                     {
-                        val1 = *first1;
-                        if (!static_cast<bool>(HPX_INVOKE(comp, val2, val1)))
+                        while (first2 != last2)
                         {
-                            *dest = val1;
-                            ++dest;
-                            ++first1;
+                            val2 = *first2;
+                            if (static_cast<bool>(HPX_INVOKE(comp, val2, val1)))
+                            {
+                                *dest = HPX_MOVE(val2);
+                                ++dest;
+                                ++first2;
+                            }
+                            else
+                            {
+                                break;
+                            }
                         }
-                        else
+                        if (HPX_UNLIKELY(first2 == last2))
                         {
                             break;
                         }
-                    }
-                    if (first1 == last1)
-                    {
-                        break;
+
+                        while (first1 != last1)
+                        {
+                            val1 = *first1;
+                            if (!static_cast<bool>(
+                                    HPX_INVOKE(comp, val2, val1)))
+                            {
+                                *dest = HPX_MOVE(val1);
+                                ++dest;
+                                ++first1;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        if (HPX_UNLIKELY(first1 == last1))
+                        {
+                            break;
+                        }
                     }
                 }
             }
@@ -622,14 +656,14 @@ namespace hpx::parallel {
                     }
 
                     Iter2 end = last2;
+                    Iter1 end1 = std::next(it1, size);
                     if (base + size != len1)
                     {
                         end = detail::lower_bound(start, last2,
-                            HPX_INVOKE(proj1, *std::next(it1, size)), comp,
-                            proj2);
+                            HPX_INVOKE(proj1, *end1), comp, proj2);
                     }
 
-                    sequential_merge(it1, std::next(it1, size), start, end,
+                    sequential_merge(it1, end1, start, end,
                         std::next(dest, base + std::distance(first2, start)),
                         comp, proj1, proj2);
                 };
@@ -657,13 +691,14 @@ namespace hpx::parallel {
                 }
 
                 Iter1 end = last1;
+                Iter2 end2 = std::next(it2, size);
                 if (base + size != len2)
                 {
-                    end = detail::lower_bound(start, last1,
-                        HPX_INVOKE(proj2, *std::next(it2, size)), comp, proj2);
+                    end = detail::lower_bound(
+                        start, last1, HPX_INVOKE(proj2, *end2), comp, proj2);
                 }
 
-                sequential_merge(it2, std::next(it2, size), start, end,
+                sequential_merge(it2, end2, start, end,
                     std::next(dest, base + std::distance(first1, start)), comp,
                     proj1, proj2);
             };

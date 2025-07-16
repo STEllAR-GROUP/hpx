@@ -458,7 +458,7 @@ namespace hpx::lcos::detail {
             // At this point the lock needs to be acquired to safely access the
             // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
-            [[maybe_unused]] util::ignore_while_checking il(&l);
+            [[maybe_unused]] util::ignore_while_checking<decltype(l)> il(&l);
 
             // handle all threads waiting for the future to become ready
             auto on_completed = HPX_MOVE(on_completed_);
@@ -540,7 +540,7 @@ namespace hpx::lcos::detail {
             // At this point the lock needs to be acquired to safely access the
             // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
-            [[maybe_unused]] util::ignore_while_checking il(&l);
+            [[maybe_unused]] util::ignore_while_checking<decltype(l)> il(&l);
 
             // handle all threads waiting for the future to become ready
             auto on_completed = HPX_MOVE(on_completed_);

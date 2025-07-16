@@ -54,18 +54,19 @@ namespace hpx::execution::experimental {
             }
 
             // Return a chunk size that ensures that each core ends up with the
-            // same number of chunks the sizes are equal (except for the last
-            // chunk, which may be smaller not more than the by number of chunks
-            // in terms of elements).
+            // same number of chunks the sizes of which are equal (except for
+            // the last chunk, which may be smaller by not more than the number
+            // of chunks in terms of elements).
             std::size_t const cores_times_4 = 4 * cores;    // -V112
             std::size_t chunk_size = num_iterations / cores_times_4;
 
-            std::size_t const remainder =
-                num_iterations - chunk_size * cores_times_4;
-            if (remainder != 0)
-            {
-                chunk_size += (remainder + cores_times_4 - 1) / cores_times_4;
-            }
+            // we should not consider more chunks than we have elements
+            auto const max_chunks = (std::min) (cores_times_4, num_iterations);
+
+            // we should not make chunks smaller than what's determined by
+            // the max chunk size
+            chunk_size = (std::max) (chunk_size,
+                (num_iterations + max_chunks - 1) / max_chunks);
 
             HPX_ASSERT(chunk_size * cores_times_4 >= num_iterations);
 
