@@ -13,6 +13,7 @@
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/program_options.hpp>
+#include <hpx/schedulers/local_priority_queue_scheduler.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -82,6 +83,47 @@ double run_merge_benchmark_hpx(int const test_count, ExPolicy policy,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+struct compute_chunk_size
+{
+    template <typename Executor>
+    friend std::size_t tag_override_invoke(
+        hpx::execution::experimental::get_chunk_size_t, compute_chunk_size&,
+        Executor&, hpx::chrono::steady_duration const&, std::size_t const cores,
+        std::size_t const num_iterations)
+    {
+        if (cores == 1)
+        {
+            return num_iterations;
+        }
+
+        // Return a chunk size that ensures that each core ends up with the same
+        // number of chunks the sizes of which are equal (except for the last
+        // chunk, which may be smaller by not more than the number of chunks in
+        // terms of elements).
+        std::size_t const num_chunks = 8 * cores;
+        std::size_t chunk_size = (num_iterations + num_chunks - 1) / num_chunks;
+
+        // we should not consider more chunks than we have elements
+        auto const max_chunks = (std::min) (num_chunks, num_iterations);
+
+        // we should not make chunks smaller than what's determined by the max
+        // chunk size
+        chunk_size = (std::max) (chunk_size,
+            (num_iterations + max_chunks - 1) / max_chunks);
+
+        HPX_ASSERT(chunk_size * num_chunks >= num_iterations);
+
+        return chunk_size;
+    }
+};
+
+template <>
+struct hpx::execution::experimental::is_executor_parameters<compute_chunk_size>
+  : std::true_type
+{
+};
+
+///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag, typename Allocator>
 void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     int test_count, std::size_t const random_range, IteratorTag,
@@ -115,28 +157,27 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     std::cout << "* Running Benchmark... (" << type << ")" << std::endl;
     std::cout << "--- run_merge_benchmark_std ---" << std::endl;
 
-    HPX_ITT_RESUME();
-
     double const time_std =
         run_merge_benchmark_std(test_count, first1, last1, first2, last2, dest);
-
-    HPX_ITT_PAUSE();
 
     hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
     std::cout << "--- run_merge_benchmark_seq ---" << std::endl;
 
-    HPX_ITT_RESUME();
-
     double const time_seq = run_merge_benchmark_hpx(
         test_count, seq, first1, last1, first2, last2, dest);
 
-    HPX_ITT_PAUSE();
-
     std::cout << "--- run_merge_benchmark_par ---" << std::endl;
 
+    HPX_ITT_RESUME();
+
+    auto policy = hpx::execution::experimental::with_priority(
+        par, hpx::threads::thread_priority::bound);
+    compute_chunk_size ccs;
     double const time_par = run_merge_benchmark_hpx(
-        test_count, par, first1, last1, first2, last2, dest);
+        test_count, par.with(ccs), first1, last1, first2, last2, dest);
+
+    HPX_ITT_PAUSE();
 
     std::cout << "--- run_merge_benchmark_par_fork_join ---" << std::endl;
     double time_par_fork_join = 0;
