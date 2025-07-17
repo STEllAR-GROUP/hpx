@@ -25,6 +25,8 @@ set(async_cuda_headers
     hpx/async_cuda/get_targets.hpp
     hpx/async_cuda/target.hpp
     hpx/async_cuda/transform_stream.hpp
+    hpx/async_cuda/thrust/policy.hpp
+    hpx/async_cuda/thrust/algorithms.hpp
 )
 
 # Default location is $HPX_ROOT/libs/async_cuda/include_compatibility
