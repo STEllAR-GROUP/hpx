@@ -288,6 +288,7 @@ namespace hpx {
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
+#include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/rotate.hpp>
@@ -324,27 +325,20 @@ namespace hpx::parallel {
         sequential_merge(Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
             OutIter dest, Comp&& comp, Proj1&& proj1, Proj2&& proj2)
         {
-            if (first1 != last1 && first2 != last2)
+            while (first1 != last1 && first2 != last2)
             {
-                while (true)
+                while (first2 != last2 &&
+                    HPX_INVOKE(comp, HPX_INVOKE(proj2, *first2),
+                        HPX_INVOKE(proj1, *first1)))
                 {
-                    if (HPX_INVOKE(comp, HPX_INVOKE(proj2, *first2),
-                            HPX_INVOKE(proj1, *first1)))
-                    {
-                        *dest++ = *first2++;
-                        if (first2 == last2)
-                        {
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        *dest++ = *first1++;
-                        if (first1 == last1)
-                        {
-                            break;
-                        }
-                    }
+                    *dest++ = *first2++;
+                }
+
+                while (first1 != last1 &&
+                    !HPX_INVOKE(comp, HPX_INVOKE(proj2, *first2),
+                        HPX_INVOKE(proj1, *first1)))
+                {
+                    *dest++ = *first1++;
                 }
             }
 
@@ -390,10 +384,10 @@ namespace hpx::parallel {
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter1, typename Sent1,
             typename Iter2, typename Sent2, typename Iter3, typename Comp,
-            typename Proj1, typename Proj2, typename BinarySearchHelper>
+            typename Proj1, typename Proj2>
         void parallel_merge_helper(ExPolicy policy, Iter1 first1, Sent1 last1,
             Iter2 first2, Sent2 last2, Iter3 dest, Comp&& comp, Proj1&& proj1,
-            Proj2&& proj2, bool range_reversal, BinarySearchHelper)
+            Proj2&& proj2, std::int16_t thread, std::int16_t cores)
         {
             constexpr std::size_t threshold = 65536;
 
@@ -403,77 +397,61 @@ namespace hpx::parallel {
             // Perform sequential merge if data size is smaller than threshold.
             if (size1 + size2 <= threshold)
             {
-                if (range_reversal)
-                {
-                    sequential_merge(first2, last2, first1, last1, dest,
-                        HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj2, proj2),
-                        HPX_FORWARD(Proj1, proj1));
-                }
-                else
-                {
-                    sequential_merge(first1, last1, first2, last2, dest,
-                        HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj1, proj1),
-                        HPX_FORWARD(Proj2, proj2));
-                }
+                sequential_merge(
+                    first1, last1, first2, last2, dest, comp, proj1, proj2);
                 return;
             }
 
-            // Let size1 is bigger than size2 always.
-            if (size1 < size2)
+            Iter1 mid1 = first1;
+            Iter2 mid2 = first2;
+            if (size1 > size2)
             {
-                // For stability of algorithm, must switch binary search methods
-                // when swapping size1 and size2.
-                parallel_merge_helper(policy, first2, last2, first1, last1,
-                    dest, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj2, proj2),
-                    HPX_FORWARD(Proj1, proj1), !range_reversal,
-                    typename BinarySearchHelper::another_type());
-                return;
+                mid1 += size1 / 2;
+                mid2 = lower_bound_helper::call(
+                    first2, last2, HPX_INVOKE(proj1, *mid1), comp, proj2);
+            }
+            else
+            {
+                mid2 += size2 / 2;
+                mid1 = upper_bound_helper::call(
+                    first1, last1, HPX_INVOKE(proj2, *mid2), comp, proj1);
             }
 
-            HPX_ASSERT(size1 >= size2);
-            HPX_ASSERT(size1 >= 1ul);
+            hpx::threads::thread_schedule_hint hint(
+                hpx::threads::thread_schedule_hint_mode::thread,
+                static_cast<std::int16_t>(thread + cores / 2));
 
-            Iter1 mid1 = first1 + size1 / 2;
-            Iter2 boundary2 = BinarySearchHelper::call(
-                first2, last2, HPX_INVOKE(proj1, *mid1), comp, proj2);
-            Iter3 target = dest + (mid1 - first1) + (boundary2 - first2);
+            hpx::future<void> fut = execution::async_execute(
+                hpx::execution::experimental::with_priority(
+                    policy.executor(), hpx::threads::thread_priority::bound),
+                //hpx::execution::experimental::with_hint(
+                //    hpx::execution::experimental::with_priority(
+                //        policy.executor(),
+                //        hpx::threads::thread_priority::bound),
+                //    hint),
+                [&]() -> void {
+                    Iter3 target = dest + (mid1 - first1) + (mid2 - first2);
 
-            *target = *mid1;
-
-            hpx::future<void> fut =
-                execution::async_execute(policy.executor(), [&]() -> void {
-                    // Process left side ranges.
-                    parallel_merge_helper(policy, first1, mid1, first2,
-                        boundary2, dest, comp, proj1, proj2, range_reversal,
-                        BinarySearchHelper());
+                    // Process right side ranges.
+                    parallel_merge_helper(policy, mid1, last1, mid2, last2,
+                        target, HPX_FORWARD(Comp, comp),
+                        HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2),
+                        thread + cores / 2, cores / 2);
                 });
 
             try
             {
-                // Process right side ranges.
-                parallel_merge_helper(policy, mid1 + 1, last1, boundary2, last2,
-                    target + 1, HPX_FORWARD(Comp, comp),
-                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2),
-                    range_reversal, BinarySearchHelper());
+                // Process left side ranges.
+                parallel_merge_helper(policy, first1, mid1, first2, mid2, dest,
+                    comp, proj1, proj2, thread, cores / 2);
             }
             catch (...)
             {
                 fut.wait();
-
-                std::vector<hpx::future<void>> futures;
-                futures.reserve(2);
-                futures.emplace_back(HPX_MOVE(fut));
-                futures.emplace_back(hpx::make_exceptional_future<void>(
-                    std::current_exception()));
-
-                std::list<std::exception_ptr> errors;
-                util::detail::handle_local_exceptions<ExPolicy>::call(
-                    futures, errors);
-
                 HPX_UNREACHABLE;
             }
 
-            fut.get();
+            fut.wait();
         }
 
         template <typename ExPolicy, typename Iter1, typename Sent1,
@@ -492,26 +470,25 @@ namespace hpx::parallel {
                               Proj2, proj2)]() mutable -> result_type {
                 try
                 {
+                    auto cores =
+                        hpx::execution::experimental::processing_units_count(
+                            policy);
+
                     parallel_merge_helper(policy, first1, last1, first2, last2,
                         dest, HPX_MOVE(comp), HPX_MOVE(proj1), HPX_MOVE(proj2),
-                        false, lower_bound_helper());
-
-                    auto const len1 = detail::distance(first1, last1);
-                    auto const len2 = detail::distance(first2, last2);
-                    return {std::next(first1, len1), std::next(first2, len2),
-                        std::next(dest, len1 + len2)};
+                        0, cores);
                 }
                 catch (...)
                 {
                     util::detail::handle_local_exceptions<ExPolicy>::call(
                         std::current_exception());
                     HPX_ASSERT(false);
-                    // To silence no return statement in all control blocks
-                    auto len1 = detail::distance(first1, last1);
-                    auto len2 = detail::distance(first2, last2);
-                    return {std::next(first1, len1), std::next(first2, len2),
-                        std::next(dest, len1 + len2)};
                 }
+
+                // To silence no return statement in all control blocks
+                auto len1 = detail::advance_and_get_distance(first1, last1);
+                auto len2 = detail::advance_and_get_distance(first2, last2);
+                return {first1, first2, std::next(dest, len1 + len2)};
             };
 
             return execution::async_execute(policy.executor(), HPX_MOVE(f1));
