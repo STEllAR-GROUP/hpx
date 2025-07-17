@@ -290,6 +290,7 @@ namespace hpx {
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/unwrap_iterator.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
@@ -628,6 +629,95 @@ namespace hpx::parallel {
             using another_type = upper_bound_helper;
         };
 
+        template <typename Iter1, typename Iter2, typename Comp, typename Proj1,
+            typename Proj2>
+        auto get_reshape_chunks(std::size_t len1, Iter2 first2, Iter2 last2,
+            Comp&& comp, Proj1&& proj1, Proj2&& proj2)
+        {
+            using merge_region =
+                hpx::tuple<Iter1, std::size_t, Iter2, std::size_t, std::size_t>;
+
+            auto reshape = [len1, first2, last2, comp, proj1, proj2](
+                               auto&& shape) {
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+                static hpx::util::itt::event notify_event("reshape");
+                hpx::util::itt::mark_event e(notify_event);
+#endif
+                std::vector<merge_region> reshaped;
+                reshaped.reserve(2 * std::size(shape));
+
+                Iter2 it2 = first2;
+                std::size_t dest_start = 0;
+                for (auto [it1, size1, base] : shape)
+                {
+                    Iter2 l2 = last2;
+                    if (base + size1 != len1)
+                    {
+                        l2 = detail::lower_bound(it2, last2,
+                            HPX_INVOKE(proj1, *std::next(it1, size1)), comp,
+                            proj2);
+                    }
+
+                    std::size_t size2 = detail::distance(it2, l2);
+
+                    // prevent chunks from growing too large
+                    if (size2 <= static_cast<std::size_t>(
+                                     1.2 * static_cast<double>(size1)))
+                    {
+                        reshaped.emplace_back(
+                            it1, size1, it2, size2, dest_start);
+
+                        it2 = l2;
+                        dest_start += size1 + size2;
+                    }
+                    else
+                    {
+                        // split first sequence into smaller pieces based
+                        // on chunks of the second (sub-)sequence
+                        Iter1 begin1 = it1;
+                        Iter1 end1 = std::next(it1, size1);
+
+                        std::size_t chunk_size2 = size1;
+                        std::size_t remainder2 = size2 - chunk_size2;
+
+                        Iter2 begin2 = it2;
+                        Iter2 end2 = std::next(begin2, chunk_size2);
+
+                        while (chunk_size2 != 0)
+                        {
+                            Iter1 end_chunk1 = end1;
+                            if (end2 != l2)
+                            {
+                                end_chunk1 = detail::lower_bound(begin1, end1,
+                                    HPX_INVOKE(proj2, *end2), comp, proj1);
+                            }
+
+                            auto chunk_size1 =
+                                detail::distance(begin1, end_chunk1);
+
+                            reshaped.emplace_back(begin1, chunk_size1, begin2,
+                                chunk_size2, dest_start);
+
+                            dest_start += chunk_size1 + chunk_size2;
+
+                            chunk_size2 = (std::min) (size1, remainder2);
+                            remainder2 -= chunk_size2;
+
+                            begin1 = end_chunk1;
+
+                            begin2 = end2;
+                            end2 = std::next(begin2, chunk_size2);
+                        }
+
+                        it2 = l2;
+                    }
+                }
+                return reshaped;
+            };
+
+            return reshape;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter1, typename Sent1,
             typename Iter2, typename Sent2, typename Iter3, typename Comp,
@@ -636,81 +726,47 @@ namespace hpx::parallel {
             Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest, Comp&& comp,
             Proj1&& proj1, Proj2&& proj2)
         {
-            auto const len1 = detail::distance(first1, last1);
-            auto const len2 = detail::distance(first2, last2);
+            auto end1 = first1;
+            auto const len1 = detail::advance_and_get_distance(end1, last1);
+
+            auto end2 = first2;
+            auto const len2 = detail::advance_and_get_distance(end2, last2);
 
             using result_type = util::in_in_out_result<Iter1, Iter2, Iter3>;
 
-            if (len1 > len2)
-            {
-                auto f1 = [len1, first2, last2, dest,
-                              comp = HPX_FORWARD(Comp, comp),
-                              proj1 = HPX_FORWARD(Proj1, proj1),
-                              proj2 = HPX_FORWARD(Proj2, proj2)](
-                              Iter1 it1, std::size_t size, std::size_t base) {
-                    Iter2 start = first2;
-                    if (base != 0)
-                    {
-                        start = detail::lower_bound(first2, last2,
-                            HPX_INVOKE(proj1, *it1), comp, proj2);
-                    }
-
-                    Iter2 end = last2;
-                    Iter1 end1 = std::next(it1, size);
-                    if (base + size != len1)
-                    {
-                        end = detail::lower_bound(start, last2,
-                            HPX_INVOKE(proj1, *end1), comp, proj2);
-                    }
-
-                    sequential_merge(it1, end1, start, end,
-                        std::next(dest, base + std::distance(first2, start)),
-                        comp, proj1, proj2);
-                };
-
-                auto f2 = [first2, len1, len2, dest](Iter1 last1) {
-                    return result_type{last1, std::next(first2, len2),
-                        std::next(dest, len1 + len2)};
-                };
-
-                return util::foreach_partitioner<ExPolicy>::call(
-                    HPX_FORWARD(ExPolicy, policy), first1, len1, HPX_MOVE(f1),
-                    HPX_MOVE(f2));
-            }
-
-            auto f1 = [len2, first1, last1, dest,
-                          comp = HPX_FORWARD(Comp, comp),
-                          proj1 = HPX_FORWARD(Proj1, proj1),
-                          proj2 = HPX_FORWARD(Proj2, proj2)](
-                          Iter2 it2, std::size_t size, std::size_t base) {
-                Iter1 start = first1;
-                if (base != 0)
-                {
-                    start = detail::lower_bound(
-                        first1, last1, HPX_INVOKE(proj2, *it2), comp, proj2);
-                }
-
-                Iter1 end = last1;
-                Iter2 end2 = std::next(it2, size);
-                if (base + size != len2)
-                {
-                    end = detail::lower_bound(
-                        start, last1, HPX_INVOKE(proj2, *end2), comp, proj2);
-                }
-
-                sequential_merge(it2, end2, start, end,
-                    std::next(dest, base + std::distance(first1, start)), comp,
+            auto f1 = [dest, comp, proj1, proj2](Iter1 it1, std::size_t size1,
+                          Iter2 it2, std::size_t size2, std::size_t dest_base) {
+                sequential_merge(it1, std::next(it1, size1), it2,
+                    std::next(it2, size2), std::next(dest, dest_base), comp,
                     proj1, proj2);
             };
 
-            auto f2 = [first1, len1, len2, dest](Iter2 last2) {
-                return result_type{std::next(first1, len1), last2,
-                    std::next(dest, len1 + len2)};
+            if (len1 > len2)
+            {
+                auto f2 = [first2, len1, len2, dest](Iter1 l1) {
+                    return result_type{l1, std::next(first2, len2),
+                        std::next(dest, len1 + len2)};
+                };
+
+                auto reshape = get_reshape_chunks<Iter1>(
+                    len1, first2, end2, comp, proj1, proj2);
+
+                return util::foreach_partitioner<ExPolicy>::call(
+                    HPX_FORWARD(ExPolicy, policy), first1, len1, HPX_MOVE(f1),
+                    HPX_MOVE(f2), HPX_MOVE(reshape));
+            }
+
+            auto f2 = [first1, len1, len2, dest](Iter2 l2) {
+                return result_type{
+                    std::next(first1, len1), l2, std::next(dest, len1 + len2)};
             };
+
+            auto reshape = get_reshape_chunks<Iter2>(
+                len2, first1, end1, comp, proj2, proj1);
 
             return util::foreach_partitioner<ExPolicy>::call(
                 HPX_FORWARD(ExPolicy, policy), first2, len2, HPX_MOVE(f1),
-                HPX_MOVE(f2));
+                HPX_MOVE(f2), HPX_MOVE(reshape));
         }
 
         ///////////////////////////////////////////////////////////////////////

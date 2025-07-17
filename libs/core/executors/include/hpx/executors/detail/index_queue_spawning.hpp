@@ -26,6 +26,7 @@
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
+#include <hpx/threading/thread.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/type_support/pack.hpp>
@@ -215,13 +216,12 @@ namespace hpx::parallel::execution::detail {
         using init_no_addref = base_type::init_no_addref;
 
         // Compute a chunk size given a number of worker threads and a total
-        // number of items n. Returns a power-of-2 chunk size that produces at
-        // most 8 and at least 4 chunks per worker thread.
+        // number of items n.
         constexpr std::uint32_t get_chunk_size(
             std::uint32_t const n) const noexcept
         {
             std::uint32_t chunk_size = 1;
-            while (chunk_size * num_threads * 8 < n)
+            while (chunk_size * num_threads * 32 < n)
             {
                 chunk_size *= 2;
             }
@@ -366,7 +366,7 @@ namespace hpx::parallel::execution::detail {
             {
                 // apply hint if none was given
                 hint.mode = hpx::threads::thread_schedule_hint_mode::thread;
-                hint.hint = static_cast<std::uint16_t>(
+                hint.hint = static_cast<std::int16_t>(
                     wrapped_pu_num(worker_thread, needs_wraparound) +
                     first_thread);
 
@@ -407,6 +407,12 @@ namespace hpx::parallel::execution::detail {
         void execute(hpx::threads::thread_description const& desc,
             threads::thread_pool_base* pool)
         {
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            static hpx::util::itt::event notify_event(
+                "index_queue_spawning::execute");
+            hpx::util::itt::mark_event e(notify_event);
+#endif
+
             auto const size =
                 static_cast<std::uint32_t>(hpx::util::size(shape));
 
@@ -462,7 +468,7 @@ namespace hpx::parallel::execution::detail {
 
             auto const& rp = hpx::resource::get_partitioner();
             std::size_t main_pu_num = get_first_core(pu_mask);
-            if (local_worker_thread != static_cast<std::uint32_t>(~0x0))
+            if (local_worker_thread != static_cast<std::uint32_t>(-1))
             {
                 main_pu_num = rp.get_pu_num(
                     wrapped_pu_num(local_worker_thread, needs_wraparound));
@@ -576,8 +582,7 @@ namespace hpx::parallel::execution::detail {
         HPX_ASSERT(pool);
 
         // Don't spawn tasks if there is no work to be done
-        std::size_t const size = hpx::util::size(shape);
-        if (size == 0)
+        if (hpx::util::begin(shape) == hpx::util::end(shape))
         {
             return hpx::make_ready_future();
         }

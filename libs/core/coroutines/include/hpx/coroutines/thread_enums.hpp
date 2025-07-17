@@ -376,6 +376,39 @@ namespace hpx::threads {
         {
         }
 
+        /// Construct a hint with the given placement hint.
+        explicit constexpr thread_schedule_hint(
+            thread_placement_hint placement) noexcept
+          : placement_mode_bits(static_cast<std::int8_t>(placement))
+          , sharing_mode_bits(
+                static_cast<std::int8_t>(thread_sharing_hint::none))
+          , runs_as_child_mode_bits(
+                static_cast<std::int8_t>(default_runs_as_child_hint))
+        {
+        }
+
+        /// Construct a hint with the given execution hint.
+        explicit constexpr thread_schedule_hint(
+            thread_execution_hint runs_as_child) noexcept
+          : placement_mode_bits(
+                static_cast<std::int8_t>(thread_placement_hint::none))
+          , sharing_mode_bits(
+                static_cast<std::int8_t>(thread_sharing_hint::none))
+          , runs_as_child_mode_bits(static_cast<std::int8_t>(runs_as_child))
+        {
+        }
+
+        /// Construct a hint with the given sharing hint.
+        explicit constexpr thread_schedule_hint(
+            thread_sharing_hint sharing) noexcept
+          : placement_mode_bits(
+                static_cast<std::int8_t>(thread_placement_hint::none))
+          , sharing_mode_bits(static_cast<std::int8_t>(sharing))
+          , runs_as_child_mode_bits(
+                static_cast<std::int8_t>(default_runs_as_child_hint))
+        {
+        }
+
         /// \cond NOINTERNAL
         constexpr bool operator==(
             thread_schedule_hint const& rhs) const noexcept
