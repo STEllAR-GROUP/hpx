@@ -196,6 +196,7 @@ if(HPX_WITH_STDEXEC)
       mismatch_sender
       mismatch_binary_sender
       move_sender
+      nth_element_sender
       none_of_sender
       reduce_sender
       remove_sender
