@@ -7,21 +7,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# compatibility with older CMake versions
-if(VALGRIND_ROOT AND NOT Valgrind_ROOT)
-  set(Valgrind_ROOT
-      ${VALGRIND_ROOT}
-      CACHE PATH "Valgrind base directory"
-  )
-  unset(VALGRIND_ROOT CACHE)
-endif()
-
 find_package(PkgConfig QUIET)
 pkg_check_modules(PC_VALGRIND QUIET valgrind)
 
 find_path(
   Valgrind_INCLUDE_DIR valgrind/valgrind.h
-  HINTS ${Valgrind_ROOT} ENV VALGRIND_ROOT ${PC_Valgrind_INCLUDEDIR}
+  HINTS ${VALGRIND_ROOT} ENV VALGRIND_ROOT ${PC_Valgrind_INCLUDEDIR}
         ${PC_Valgrind_INCLUDE_DIRS}
   PATH_SUFFIXES include
 )
