@@ -391,67 +391,72 @@ namespace hpx::parallel {
         {
             constexpr std::size_t threshold = 65536;
 
-            std::size_t const size1 = detail::distance(first1, last1);
-            std::size_t const size2 = detail::distance(first2, last2);
+            std::size_t size1 = detail::distance(first1, last1);
+            std::size_t size2 = detail::distance(first2, last2);
 
-            // Perform sequential merge if data size is smaller than threshold.
-            if (size1 + size2 <= threshold)
+            std::vector<hpx::future<void>> futs;
+            while (size1 + size2 > threshold)
             {
-                sequential_merge(
-                    first1, last1, first2, last2, dest, comp, proj1, proj2);
-                return;
-            }
+                Iter1 mid1 = first1;
+                Iter2 mid2 = first2;
+                if (size1 > size2)
+                {
+                    mid1 += size1 / 2;
+                    mid2 = lower_bound_helper::call(
+                        first2, last2, HPX_INVOKE(proj1, *mid1), comp, proj2);
+                }
+                else
+                {
+                    mid2 += size2 / 2;
+                    mid1 = upper_bound_helper::call(
+                        first1, last1, HPX_INVOKE(proj2, *mid2), comp, proj1);
+                }
+                Iter3 target = dest + (mid1 - first1) + (mid2 - first2);
 
-            Iter1 mid1 = first1;
-            Iter2 mid2 = first2;
-            if (size1 > size2)
-            {
-                mid1 += size1 / 2;
-                mid2 = lower_bound_helper::call(
-                    first2, last2, HPX_INVOKE(proj1, *mid1), comp, proj2);
-            }
-            else
-            {
-                mid2 += size2 / 2;
-                mid1 = upper_bound_helper::call(
-                    first1, last1, HPX_INVOKE(proj2, *mid2), comp, proj1);
-            }
+                hpx::threads::thread_schedule_hint hint(
+                    hpx::threads::thread_schedule_hint_mode::thread,
+                    static_cast<std::int16_t>(thread + cores / 2));
 
-            hpx::threads::thread_schedule_hint hint(
-                hpx::threads::thread_schedule_hint_mode::thread,
-                static_cast<std::int16_t>(thread + cores / 2));
+                hpx::future<void> fut = execution::async_execute(
+                    //hpx::execution::experimental::with_priority(
+                    //    policy.executor(),
+                    //    hpx::threads::thread_priority::bound),
+                    hpx::execution::experimental::with_hint(
+                        hpx::execution::experimental::with_priority(
+                            policy.executor(),
+                            hpx::threads::thread_priority::bound),
+                        hint),
+                    [&policy, mid1, last1, mid2, last2, target, thread, cores,
+                        &comp, &proj1, &proj2]() -> void {
+                        // Process right side ranges.
+                        parallel_merge_helper(policy, mid1, last1, mid2, last2,
+                            target, HPX_FORWARD(Comp, comp),
+                            HPX_FORWARD(Proj1, proj1),
+                            HPX_FORWARD(Proj2, proj2), thread + cores / 2,
+                            cores / 2);
+                    });
+                futs.push_back(std::move(fut));
 
-            hpx::future<void> fut = execution::async_execute(
-                hpx::execution::experimental::with_priority(
-                    policy.executor(), hpx::threads::thread_priority::bound),
-                //hpx::execution::experimental::with_hint(
-                //    hpx::execution::experimental::with_priority(
-                //        policy.executor(),
-                //        hpx::threads::thread_priority::bound),
-                //    hint),
-                [&]() -> void {
-                    Iter3 target = dest + (mid1 - first1) + (mid2 - first2);
-
-                    // Process right side ranges.
-                    parallel_merge_helper(policy, mid1, last1, mid2, last2,
-                        target, HPX_FORWARD(Comp, comp),
-                        HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2),
-                        thread + cores / 2, cores / 2);
-                });
-
-            try
-            {
                 // Process left side ranges.
-                parallel_merge_helper(policy, first1, mid1, first2, mid2, dest,
-                    comp, proj1, proj2, thread, cores / 2);
-            }
-            catch (...)
-            {
-                fut.wait();
-                HPX_UNREACHABLE;
+                first1 = first1;
+                last1 = mid1;
+                first2 = first2;
+                last2 = mid2;
+                dest = dest;
+
+                thread = thread;
+                cores = cores / 2;
+
+                size1 = detail::distance(first1, last1);
+                size2 = detail::distance(first2, last2);
             }
 
-            fut.wait();
+            // Perform sequential merge
+            assert(size1 + size2 <= threshold);
+            sequential_merge(
+                first1, last1, first2, last2, dest, comp, proj1, proj2);
+
+            hpx::wait_all(futs);
         }
 
         template <typename ExPolicy, typename Iter1, typename Sent1,
