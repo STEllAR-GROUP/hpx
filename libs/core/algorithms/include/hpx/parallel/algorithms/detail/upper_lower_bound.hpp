@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2023 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/type_support/identity.hpp>
 
+#include <algorithm>
 #include <iterator>
 
 namespace hpx::parallel::detail {
@@ -72,6 +74,39 @@ namespace hpx::parallel::detail {
         return first;
     }
 
+    template <typename Iter, typename Sent, typename T, typename F>
+    constexpr Iter lower_bound(
+        Iter first, Sent last, T&& value, F&& f, hpx::identity)
+    {
+        using difference_type =
+            typename std::iterator_traits<Iter>::difference_type;
+
+        difference_type count = detail::distance(first, last);
+        while (count > 0)
+        {
+            difference_type step = count / 2;
+            Iter it = std::next(first, step);
+
+            if (HPX_INVOKE(f, *it, value))
+            {
+                first = ++it;
+                count -= step + 1;
+            }
+            else
+            {
+                count = step;
+            }
+        }
+        return first;
+    }
+
+    template <typename Iter, typename T, typename F>
+    constexpr Iter lower_bound(
+        Iter first, Iter last, T const& value, F&& f, hpx::identity)
+    {
+        return std::lower_bound(first, last, value, HPX_FORWARD(F, f));
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Sent, typename T, typename F,
         typename Proj, typename CancelToken>
@@ -128,5 +163,38 @@ namespace hpx::parallel::detail {
             }
         }
         return first;
+    }
+
+    template <typename Iter, typename Sent, typename T, typename F>
+    constexpr Iter upper_bound(
+        Iter first, Sent last, T&& value, F&& f, hpx::identity)
+    {
+        using difference_type =
+            typename std::iterator_traits<Iter>::difference_type;
+
+        difference_type count = detail::distance(first, last);
+        while (count > 0)
+        {
+            difference_type step = count / 2;
+            Iter it = std::next(first, step);
+
+            if (!HPX_INVOKE(f, value, *it))
+            {
+                first = ++it;
+                count -= step + 1;
+            }
+            else
+            {
+                count = step;
+            }
+        }
+        return first;
+    }
+
+    template <typename Iter, typename T, typename F>
+    constexpr Iter upper_bound(
+        Iter first, Iter last, T const& value, F&& f, hpx::identity)
+    {
+        return std::upper_bound(first, last, value, HPX_FORWARD(F, f));
     }
 }    // namespace hpx::parallel::detail

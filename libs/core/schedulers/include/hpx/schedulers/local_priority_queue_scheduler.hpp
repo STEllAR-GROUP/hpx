@@ -31,6 +31,7 @@
 #include <mutex>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -50,7 +51,7 @@ namespace hpx::threads::policies {
     ///////////////////////////////////////////////////////////////////////////
     /// The local_priority_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
-    /// from. Additionally it maintains separate queues: several for high
+    /// from. Additionally, it maintains separate queues: several for high
     /// priority threads and one for low priority threads. High priority threads
     /// are executed by the first N OS threads before any other work is
     /// executed. Low priority threads are executed by the last OS thread
@@ -544,10 +545,17 @@ namespace hpx::threads::policies {
             error_code& ec) override
         {
             // NOTE: This scheduler ignores NUMA hints.
-            std::size_t num_thread =
-                data.schedulehint.mode == thread_schedule_hint_mode::thread ?
-                data.schedulehint.hint :
-                static_cast<std::size_t>(-1);
+            std::size_t num_thread = static_cast<std::size_t>(-1);
+            threads::thread_priority priority = data.priority;
+
+            // If the user specified a concrete thread to use, schedule the
+            // thread as initially bound to make sure the thread starts running
+            // on the specified core.
+            if (data.schedulehint.mode == thread_schedule_hint_mode::thread)
+            {
+                num_thread = data.schedulehint.hint;
+                priority = threads::thread_priority::bound;
+            }
 
             if (static_cast<std::size_t>(-1) == num_thread)
             {
@@ -564,7 +572,7 @@ namespace hpx::threads::policies {
             data.schedulehint.hint = static_cast<std::int16_t>(num_thread);
 
             // now create the thread
-            switch (data.priority)
+            switch (priority)
             {
             case thread_priority::boost:
                 data.priority = thread_priority::normal;
