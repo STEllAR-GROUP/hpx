@@ -849,6 +849,7 @@ namespace hpx::execution::experimental::detail {
 
 namespace hpx::execution::experimental {
 
+#if !defined(HPX_HAVE_STDEXEC)
     // clang-format off
     template <typename Policy, typename Sender, typename Shape, typename F,
         HPX_CONCEPT_REQUIRES_(
@@ -886,15 +887,9 @@ namespace hpx::execution::experimental {
         if constexpr (std::is_same_v<Policy, launch::sync_policy>)
         {
             // fall back to non-bulk scheduling if sync execution was requested
-#if defined(HPX_HAVE_STDEXEC)
-            return hpx::execution::experimental::bulk(
-                HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
-                HPX_FORWARD(F, f));
-#else
             return detail::bulk_sender<Sender, hpx::util::counting_shape<Count>,
                 F>{HPX_FORWARD(Sender, sender),
                 hpx::util::counting_shape(count), HPX_FORWARD(F, f)};
-#endif
         }
         else
         {
@@ -904,4 +899,5 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f)};
         }
     }
+#endif
 }    // namespace hpx::execution::experimental
