@@ -135,9 +135,9 @@ namespace hpx::execution::experimental {
     using stdexec::transfer_just;
     using stdexec::transfer_just_t;
 
-    // Bulk (NOT FORWARDED)
-    //    using stdexec::bulk_t;
-    //    using stdexec::bulk;
+    // Bulk
+    using stdexec::bulk_t;
+    using stdexec::bulk;
 
     // Split
     using stdexec::split;
