@@ -408,6 +408,7 @@ namespace hpx::parallel {
             using value_type2 =
                 typename std::iterator_traits<Iter2>::value_type;
 
+#if !defined(HPX_MSVC)
             if constexpr (std::is_same_v<value_type1, value_type2>)
             {
                 while (HPX_LIKELY(first1 != last1 && first2 != last2))
@@ -435,6 +436,7 @@ namespace hpx::parallel {
                 }
             }
             else
+#endif
             {
                 if (HPX_LIKELY(first1 != last1 && first2 != last2))
                 {
@@ -675,7 +677,7 @@ namespace hpx::parallel {
                         // split first sequence into smaller pieces based
                         // on chunks of the second (sub-)sequence
                         Iter1 begin1 = it1;
-                        Iter1 end1 = std::next(it1, size1);
+                        std::size_t remainder1 = size1;
 
                         std::size_t chunk_size2 = size1;
                         std::size_t remainder2 = size2 - chunk_size2;
@@ -685,11 +687,17 @@ namespace hpx::parallel {
 
                         while (chunk_size2 != 0)
                         {
-                            Iter1 end_chunk1 = end1;
+                            Iter1 end_chunk1;
                             if (end2 != l2)
                             {
-                                end_chunk1 = detail::lower_bound(begin1, end1,
-                                    HPX_INVOKE(proj2, *end2), comp, proj1);
+                                // gcc complains about using HPX_INVOKE here
+                                end_chunk1 =
+                                    detail::lower_bound_n(begin1, remainder1,
+                                        std::invoke(proj2, *end2), comp, proj1);
+                            }
+                            else
+                            {
+                                end_chunk1 = std::next(it1, size1);
                             }
 
                             auto chunk_size1 =
@@ -704,6 +712,7 @@ namespace hpx::parallel {
                             remainder2 -= chunk_size2;
 
                             begin1 = end_chunk1;
+                            remainder1 -= chunk_size1;
 
                             begin2 = end2;
                             end2 = std::next(begin2, chunk_size2);

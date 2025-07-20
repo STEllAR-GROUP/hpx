@@ -226,6 +226,8 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     double const time_seq = run_merge_benchmark_hpx(
         test_count, seq, first1, last1, first2, last2, dest);
 
+    hpx::this_thread::sleep_for(std::chrono::seconds(1));
+
     std::cout << "--- run_merge_benchmark_par ---" << std::endl;
 
     HPX_ITT_RESUME();
