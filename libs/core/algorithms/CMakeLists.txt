@@ -204,6 +204,7 @@ set(algorithms_headers
     hpx/parallel/util/invoke_projected.hpp
     hpx/parallel/util/loop.hpp
     hpx/parallel/util/low_level.hpp
+    hpx/parallel/util/memoizing_range.hpp
     hpx/parallel/util/merge_four.hpp
     hpx/parallel/util/merge_vector.hpp
     hpx/parallel/util/nbits.hpp
@@ -265,6 +266,7 @@ add_hpx_module(
   ADD_TO_GLOBAL_HEADER "hpx/parallel/util/detail/handle_remote_exceptions.hpp"
   SOURCES ${algorithms_sources}
   MODULE_DEPENDENCIES
+    hpx_assertion
     hpx_async_combinators
     hpx_async_local
     hpx_config
@@ -272,10 +274,13 @@ add_hpx_module(
     hpx_executors
     hpx_futures
     hpx_iterator_support
+    hpx_memory
     hpx_lcos_local
     hpx_pack_traversal
     hpx_properties
     hpx_serialization
+    hpx_synchronization
+    hpx_thread_support
     hpx_util
   CMAKE_SUBDIRS examples tests
 )
