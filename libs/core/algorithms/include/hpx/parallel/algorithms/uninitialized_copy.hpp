@@ -229,16 +229,20 @@ namespace hpx::parallel {
         ///////////////////////////////////////////////////////////////////////
 
         template <typename ExPolicy, typename Iter, typename FwdIter2>
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<Iter, FwdIter2>>::type
-        parallel_uninitialized_copy_n(
+        decltype(auto) parallel_uninitialized_copy_n(
             ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
         {
-            if (count == 0)
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+            if constexpr (!has_scheduler_executor)
             {
-                return util::detail::algorithm_result<ExPolicy,
-                    util::in_out_result<Iter, FwdIter2>>::
-                    get(util::in_out_result<Iter, FwdIter2>{first, dest});
+                if (count == 0)
+                {
+                    return util::detail::algorithm_result<ExPolicy,
+                        util::in_out_result<Iter, FwdIter2>>::
+                        get(util::in_out_result<Iter, FwdIter2>{first, dest});
+                }
             }
 
             using zip_iterator = hpx::util::zip_iterator<Iter, FwdIter2>;
@@ -263,22 +267,27 @@ namespace hpx::parallel {
                     // finalize, called once if no error occurred
                     [dest, first, count](auto&& data) mutable
                         -> util::in_out_result<Iter, FwdIter2> {
+                        std::cout << "[FINALIZE] Called with data size: " << std::size(data) << std::endl;
+
                         // make sure iterators embedded in function object that is
                         // attached to futures are invalidated
                         util::detail::clear_container(data);
 
                         std::advance(first, count);
                         std::advance(dest, count);
+                        std::cout << "[FINALIZE] Completed successfully" << std::endl;
                         return util::in_out_result<Iter, FwdIter2>{first, dest};
                     },
                     // cleanup function, called for each partition which
                     // didn't fail, but only if at least one failed
                     [](partition_result_type&& r) -> void {
+                        std::cout << "[CLEANUP] Cleaning up partition from " << std::distance(r.first, r.second) << " objects" << std::endl;
                         while (r.first != r.second)
                         {
                             std::destroy_at(std::addressof(*r.first));
                             ++r.first;
                         }
+                        std::cout << "[CLEANUP] Cleanup completed" << std::endl;
                     });
         }
 
@@ -304,9 +313,8 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename FwdIter2>
-            static typename util::detail::algorithm_result<ExPolicy,
-                util::in_out_result<Iter, FwdIter2>>::type
-            parallel(ExPolicy&& policy, Iter first, Sent last, FwdIter2 dest)
+            static decltype(auto) parallel(
+                ExPolicy&& policy, Iter first, Sent last, FwdIter2 dest)
             {
                 return parallel_uninitialized_copy_n(
                     HPX_FORWARD(ExPolicy, policy), first,
@@ -347,10 +355,8 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent1,
                 typename FwdIter2, typename Sent2>
-            static typename util::detail::algorithm_result<ExPolicy,
-                util::in_out_result<Iter, FwdIter2>>::type
-            parallel(ExPolicy&& policy, Iter first, Sent1 last, FwdIter2 dest,
-                Sent2 last_d)
+            static decltype(auto) parallel(ExPolicy&& policy, Iter first,
+                Sent1 last, FwdIter2 dest, Sent2 last_d)
             {
                 std::size_t const dist1 = detail::distance(first, last);
                 std::size_t const dist2 = detail::distance(dest, last_d);
@@ -392,9 +398,7 @@ namespace hpx::parallel {
             }
 
             template <typename ExPolicy, typename Iter, typename FwdIter2>
-            static util::detail::algorithm_result_t<ExPolicy,
-                util::in_out_result<Iter, FwdIter2>>
-            parallel(
+            static decltype(auto) parallel(
                 ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
             {
                 return parallel_uninitialized_copy_n(
@@ -441,9 +445,8 @@ namespace hpx {
                 hpx::traits::is_forward_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
-        tag_fallback_invoke(hpx::uninitialized_copy_t, ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 last, FwdIter2 dest)
+        friend decltype(auto) tag_fallback_invoke(hpx::uninitialized_copy_t,
+            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -502,21 +505,29 @@ namespace hpx {
                 std::is_integral_v<Size>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
-        tag_fallback_invoke(hpx::uninitialized_copy_n_t, ExPolicy&& policy,
-            FwdIter1 first, Size count, FwdIter2 dest)
+        friend decltype(auto) tag_fallback_invoke(hpx::uninitialized_copy_n_t,
+            ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::detail::is_negative(count))
             {
-                return parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter2>::get(HPX_MOVE(dest));
+                if constexpr (has_scheduler_executor)
+                {
+                    count = static_cast<Size>(0);
+                }
+                else
+                {
+                    return parallel::util::detail::algorithm_result<ExPolicy,
+                        FwdIter2>::get(HPX_MOVE(dest));
+                }
             }
 
             return parallel::util::get_second_element(
