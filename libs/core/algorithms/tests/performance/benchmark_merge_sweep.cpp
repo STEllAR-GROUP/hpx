@@ -151,7 +151,7 @@ struct random_to_item_t
     }
 };
 
-using data_type = int;
+using data_type = char;
 
 constexpr std::size_t max_chunks = 64;
 
@@ -161,16 +161,16 @@ void run_merge_benchmark_sweep(std::string label, int const test_count,
     ExPolicy policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
     FwdIter2 last2, FwdIter3 dest)
 {
-    std::size_t all_cores = hpx::get_num_worker_threads();
+    std::size_t const all_cores = hpx::get_num_worker_threads();
 
     std::cout << label << "\t";
 
-    std::ptrdiff_t size =
+    std::ptrdiff_t const size =
         (std::max) (std::distance(first1, last1), std::distance(first2, last2));
 
     for (std::size_t chunks = 1; chunks != max_chunks * 2; chunks *= 2)
     {
-        std::size_t chunk_size =
+        std::size_t const chunk_size =
             sizeof(typename std::iterator_traits<FwdIter1>::value_type) *
             (size + chunks - 1) / chunks;
 
@@ -179,15 +179,14 @@ void run_merge_benchmark_sweep(std::string label, int const test_count,
 
     std::vector<std::size_t> num_cores;
     {
-        std::size_t cores = 1;
-        for (; cores < all_cores; cores *= 2)
+        for (std::size_t cores = 1; cores < all_cores; cores *= 2)
         {
             num_cores.push_back(cores);
         }
         num_cores.push_back(all_cores);
     }
 
-    for (auto cores : num_cores)
+    for (auto const cores : num_cores)
     {
         hpx::execution::experimental::num_cores nc(cores);
 
@@ -202,7 +201,7 @@ void run_merge_benchmark_sweep(std::string label, int const test_count,
         }
 
         std::cout << cores << "\t";
-        std::size_t log_cores = static_cast<std::size_t>(std::log2(cores));
+        std::size_t const log_cores = static_cast<std::size_t>(std::log2(cores));
         for (std::size_t chunks = 1; chunks <= log_cores; ++chunks)
         {
             std::cout << "-\t";
@@ -346,8 +345,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "----------------------------------------------\n\n";
 
     {
-        using allocator_type = std::allocator<int>;
-        allocator_type alloc;
+        using allocator_type = std::allocator<data_type>;
+        allocator_type const alloc;
 
         run_benchmark(vector_size1, vector_size2, test_count,
             std::random_access_iterator_tag(), alloc, "std::vector", entropy);
@@ -358,7 +357,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         using allocator_type =
             hpx::compute::host::detail::policy_allocator<data_type,
                 decltype(policy)>;
-        allocator_type alloc(policy);
+        allocator_type const alloc(policy);
 
         run_benchmark(vector_size1, vector_size2, test_count,
             std::random_access_iterator_tag(), alloc, "hpx::compute::vector",
