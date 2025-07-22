@@ -52,6 +52,8 @@ namespace hpx::parallel::util {
             static decltype(auto) call(ExPolicy_&& policy, FwdIter first,
                 std::size_t count, F1&& f1, F2&& f2, Cleanup&& cleanup)
             {
+                std::cout << "[PARTITIONER_WITH_CLEANUP] call() invoked with count=" << count << std::endl;
+                
                 // inform parameter traits
                 using scoped_executor_parameters =
                     detail::scoped_executor_parameters_ref<parameters_type,
@@ -85,11 +87,17 @@ namespace hpx::parallel::util {
                 Items&& workitems, F&& f, Cleanup&& cleanup)
             {
                 namespace ex = hpx::execution::experimental;
-                if constexpr (ex::is_sender_v<std::decay_t<Items>>)
+                if constexpr (ex::is_sender_v<std::decay_t<Items>> &&
+                    !hpx::traits::is_future_v<std::decay_t<Items>>)
                 {
+                    std::cout << "[PARTITIONER_WITH_CLEANUP] reduce is called" << std::endl;
+
                     return ex::let_value(workitems,
                         [f = HPX_MOVE(f), cleanup = HPX_MOVE(cleanup)](
                             auto&& all_parts) mutable {
+                            std::cout << "[PARTITIONER_WITH_CLEANUP] all_parts size: "
+                                      << std::size(all_parts) << std::endl;
+
                             // First, put all_parts (partition list) into a shared_ptr
                             auto captured = std::make_shared<
                                 std::decay_t<decltype(all_parts)>>(all_parts);
@@ -108,7 +116,13 @@ namespace hpx::parallel::util {
                                         cleanup(HPX_MOVE(p));
                                     return ex::just_error(err);
                                 });
+                        })
+                        | ex::let_error(
+                        [](std::exception_ptr const& err) {
+                            std::cout << "[reduce] exception in workitems (partition stage); no cleanup needed\n";
+                            return ex::just_error(err);
                         });
+                    
                 }
                 else
                 {
@@ -230,7 +244,8 @@ namespace hpx::parallel::util {
                 [[maybe_unused]] Cleanup&& cleanup)
             {
                 namespace ex = hpx::execution::experimental;
-                if constexpr (ex::is_sender_v<std::decay_t<Items>>)
+                if constexpr (ex::is_sender_v<std::decay_t<Items>> &&
+                    !hpx::traits::is_future_v<std::decay_t<Items>>)
                 {
                     auto result = ex::let_value(workitems,
                         [f = HPX_MOVE(f), cleanup = HPX_MOVE(cleanup)](

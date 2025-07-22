@@ -1,55 +1,50 @@
 #include <hpx/init.hpp>
 
-#include <cstdlib>
-#include <ctime>
 #include <iostream>
-#include <iterator>
 #include <string>
 #include <vector>
 
-#include "uninitialized_copy_tests.hpp"
+#include "uninitialized_move_tests.hpp"
 
 template <typename IteratorTag>
-void uninitialized_copy_sender_test()
+void uninitialized_move_sender_test()
 {
     using namespace hpx::execution;
-    // test_uninitialized_copy_sender(hpx::launch::sync, seq(task), IteratorTag());
-    // test_uninitialized_copy_sender(
-    //     hpx::launch::sync, unseq(task), IteratorTag());
+    test_uninitialized_move_sender(hpx::launch::sync, seq(task), IteratorTag());
+    test_uninitialized_move_sender(
+        hpx::launch::sync, unseq(task), IteratorTag());
 
-    test_uninitialized_copy_sender(
+    test_uninitialized_move_sender(
         hpx::launch::async, par(task), IteratorTag());
-    test_uninitialized_copy_sender(
+    test_uninitialized_move_sender(
         hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 template <typename IteratorTag>
-void uninitialized_copy_exception_sender_test()
+void uninitialized_move_exception_sender_test()
 {
     using namespace hpx::execution;
-    // test_uninitialized_copy_exception_sender(
-    //     hpx::launch::sync, seq(task), IteratorTag());
-    // test_uninitialized_copy_exception_sender(
-    //     hpx::launch::sync, unseq(task), IteratorTag());
+    test_uninitialized_move_exception_sender(hpx::launch::sync, seq(task), IteratorTag());
+    test_uninitialized_move_exception_sender(
+        hpx::launch::sync, unseq(task), IteratorTag());
 
-    test_uninitialized_copy_exception_sender(
-        hpx::launch::async, par(task), IteratorTag());
-    // test_uninitialized_copy_exception_sender(
+    // test_uninitialized_move_exception_sender(
+    //     hpx::launch::async, par(task), IteratorTag());
+    // test_uninitialized_move_exception_sender(
     //     hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 template <typename IteratorTag>
-void uninitialized_copy_bad_alloc_sender_test()
+void uninitialized_move_bad_alloc_sender_tests()
 {
     using namespace hpx::execution;
-    test_uninitialized_copy_bad_alloc_sender(
-        hpx::launch::sync, seq(task), IteratorTag());
-    test_uninitialized_copy_bad_alloc_sender(
+    test_uninitialized_move_bad_alloc_sender(hpx::launch::sync, seq(task), IteratorTag());
+    test_uninitialized_move_bad_alloc_sender(
         hpx::launch::sync, unseq(task), IteratorTag());
 
-    // test_uninitialized_copy_bad_alloc_sender(
+    // test_uninitialized_move_bad_alloc_sender(
     //     hpx::launch::async, par(task), IteratorTag());
-    // test_uninitialized_copy_bad_alloc_sender(
+    // test_uninitialized_move_bad_alloc_sender(
     //     hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
@@ -62,14 +57,14 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    uninitialized_copy_sender_test<std::forward_iterator_tag>();
-    // uninitialized_copy_sender_test<std::random_access_iterator_tag>();
+    uninitialized_move_sender_test<std::random_access_iterator_tag>();
+    uninitialized_move_sender_test<std::forward_iterator_tag>();
 
-    // uninitialized_copy_exception_sender_test<std::forward_iterator_tag>();
-    // uninitialized_copy_exception_sender_test<std::random_access_iterator_tag>();
+    uninitialized_move_exception_sender_test<std::random_access_iterator_tag>();
+    uninitialized_move_exception_sender_test<std::forward_iterator_tag>();
 
-    // uninitialized_copy_bad_alloc_sender_test<std::forward_iterator_tag>();
-    // uninitialized_copy_bad_alloc_sender_test<std::random_access_iterator_tag>();
+    uninitialized_move_bad_alloc_sender_tests<std::random_access_iterator_tag>();
+    uninitialized_move_bad_alloc_sender_tests<std::forward_iterator_tag>();
 
     return hpx::local::finalize();
 }
