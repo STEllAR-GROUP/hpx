@@ -310,6 +310,7 @@ namespace hpx {
 #include <exception>
 #include <iterator>
 #include <list>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -320,6 +321,55 @@ namespace hpx::parallel {
     // merge
     namespace detail {
         /// \cond NOINTERNAL
+
+        ///////////////////////////////////////////////////////////////////////
+        struct lower_bound_helper;
+
+        struct upper_bound_helper
+        {
+            template <typename Iter, typename Sent, typename T, typename Comp,
+                typename Proj>
+            static constexpr Iter call(
+                Iter first, Sent last, T const& value, Comp&& comp, Proj&& proj)
+            {
+                return detail::upper_bound(first, last, value,
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+            }
+
+            template <typename Iter, typename T, typename Comp, typename Proj>
+            static constexpr Iter call_n(Iter first,
+                typename std::iterator_traits<Iter>::difference_type count,
+                T const& value, Comp&& comp, Proj&& proj)
+            {
+                return detail::upper_bound_n(first, count, value,
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+            }
+
+            using another_type = lower_bound_helper;
+        };
+
+        struct lower_bound_helper
+        {
+            template <typename Iter, typename Sent, typename T, typename Comp,
+                typename Proj>
+            static constexpr Iter call(
+                Iter first, Sent last, T const& value, Comp&& comp, Proj&& proj)
+            {
+                return detail::lower_bound(first, last, value,
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+            }
+
+            template <typename Iter, typename T, typename Comp, typename Proj>
+            static constexpr Iter call_n(Iter first,
+                typename std::iterator_traits<Iter>::difference_type count,
+                T const& value, Comp&& comp, Proj&& proj)
+            {
+                return detail::lower_bound_n(first, count, value,
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+            }
+
+            using another_type = upper_bound_helper;
+        };
 
         template <typename T>
         HPX_FORCEINLINE decltype(auto) init_value([[maybe_unused]] T&& val)
@@ -343,6 +393,11 @@ namespace hpx::parallel {
             Sent2 last2, OutIter dest, Comp&& comp, Proj1&& proj1,
             Proj2&& proj2)
         {
+            using value_type1 =
+                typename std::iterator_traits<Iter1>::value_type;
+            using value_type2 =
+                typename std::iterator_traits<Iter2>::value_type;
+
             if (first1 != last1 && first2 != last2)
             {
                 auto val1 = HPX_INVOKE(proj1, *first1);
@@ -351,8 +406,7 @@ namespace hpx::parallel {
                 {
                     while (first2 != last2)
                     {
-                        typename std::iterator_traits<Iter2>::value_type elem2 =
-                            *first2;
+                        value_type2 elem2 = *first2;
                         val2 = HPX_INVOKE(proj2, elem2);
                         if (static_cast<bool>(HPX_INVOKE(comp, val2, val1)))
                         {
@@ -372,8 +426,7 @@ namespace hpx::parallel {
 
                     while (first1 != last1)
                     {
-                        typename std::iterator_traits<Iter1>::value_type elem1 =
-                            *first1;
+                        value_type1 elem1 = *first1;
                         val1 = HPX_INVOKE(proj1, elem1);
                         if (!static_cast<bool>(HPX_INVOKE(comp, val2, val1)))
                         {
@@ -598,43 +651,10 @@ namespace hpx::parallel {
             }
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        struct lower_bound_helper;
-
-        struct upper_bound_helper
-        {
-            // upper_bound with projection function.
-            template <typename Iter, typename Sent, typename T, typename Comp,
-                typename Proj>
-            static constexpr Iter call(
-                Iter first, Sent last, T const& value, Comp&& comp, Proj&& proj)
-            {
-                return detail::upper_bound(first, last, value,
-                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
-            }
-
-            using another_type = lower_bound_helper;
-        };
-
-        struct lower_bound_helper
-        {
-            // lower_bound with projection function.
-            template <typename Iter, typename Sent, typename T, typename Comp,
-                typename Proj>
-            static constexpr Iter call(
-                Iter first, Sent last, T const& value, Comp&& comp, Proj&& proj)
-            {
-                return detail::lower_bound(first, last, value,
-                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
-            }
-
-            using another_type = upper_bound_helper;
-        };
-
         template <typename Iter1, typename Iter2, typename Comp, typename Proj1,
-            typename Proj2>
+            typename Proj2, typename BinarySearchHelper>
         auto get_reshape_chunks(std::size_t len1, Iter2 first2, Iter2 last2,
-            Comp&& comp, Proj1&& proj1, Proj2&& proj2)
+            Comp&& comp, Proj1&& proj1, Proj2&& proj2, BinarySearchHelper)
         {
             using merge_region =
                 hpx::tuple<Iter1, std::size_t, Iter2, std::size_t, std::size_t>;
@@ -655,7 +675,7 @@ namespace hpx::parallel {
                     Iter2 l2 = last2;
                     if (base + size1 != len1)
                     {
-                        l2 = detail::lower_bound(it2, last2,
+                        l2 = BinarySearchHelper::call(it2, last2,
                             HPX_INVOKE(proj1, *std::next(it1, size1)), comp,
                             proj2);
                     }
@@ -690,9 +710,12 @@ namespace hpx::parallel {
                             Iter1 end_chunk1;
                             if (end2 != l2)
                             {
+                                using binary_search =
+                                    typename BinarySearchHelper::another_type;
+
                                 // gcc complains about using HPX_INVOKE here
                                 end_chunk1 =
-                                    detail::lower_bound_n(begin1, remainder1,
+                                    binary_search::call_n(begin1, remainder1,
                                         std::invoke(proj2, *end2), comp, proj1);
                             }
                             else
@@ -745,9 +768,12 @@ namespace hpx::parallel {
 
             auto f1 = [dest, comp, proj1, proj2](Iter1 it1, std::size_t size1,
                           Iter2 it2, std::size_t size2, std::size_t dest_base) {
-                sequential_merge(it1, std::next(it1, size1), it2,
-                    std::next(it2, size2), std::next(dest, dest_base), comp,
-                    proj1, proj2);
+                if (size1 != 0 || size2 != 0)
+                {
+                    sequential_merge(it1, std::next(it1, size1), it2,
+                        std::next(it2, size2), std::next(dest, dest_base), comp,
+                        proj1, proj2);
+                }
             };
 
             if (len1 > len2)
@@ -757,8 +783,8 @@ namespace hpx::parallel {
                         std::next(dest, len1 + len2)};
                 };
 
-                auto reshape = get_reshape_chunks<Iter1>(
-                    len1, first2, end2, comp, proj1, proj2);
+                auto reshape = get_reshape_chunks<Iter1>(len1, first2, end2,
+                    comp, proj1, proj2, lower_bound_helper{});
 
                 return util::foreach_partitioner<ExPolicy>::call(
                     HPX_FORWARD(ExPolicy, policy), first1, len1, HPX_MOVE(f1),
@@ -771,7 +797,7 @@ namespace hpx::parallel {
             };
 
             auto reshape = get_reshape_chunks<Iter2>(
-                len2, first1, end1, comp, proj2, proj1);
+                len2, first1, end1, comp, proj2, proj1, upper_bound_helper{});
 
             return util::foreach_partitioner<ExPolicy>::call(
                 HPX_FORWARD(ExPolicy, policy), first2, len2, HPX_MOVE(f1),

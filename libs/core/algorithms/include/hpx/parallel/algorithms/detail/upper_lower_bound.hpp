@@ -216,8 +216,8 @@ namespace hpx::parallel::detail {
             auto it = begin;
             while (count > 0)
             {
-                difference_type step = count / 2;
-                Iter const mid = std::next(it, step);
+                difference_type const step = count / 2;
+                auto const mid = std::next(it, step);
 
                 auto next_it = it;
                 auto next_count = step;
