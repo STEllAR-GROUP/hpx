@@ -155,6 +155,13 @@ void test_num_cores()
     }
 }
 
+void test_collect_execution_parameters()
+{
+    hpx::execution::experimental::chunking_parameters ep;
+    hpx::execution::experimental::collect_chunking_parameters cep(ep);
+    parameters_test(cep);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 struct timer_hooks_parameters
 {
