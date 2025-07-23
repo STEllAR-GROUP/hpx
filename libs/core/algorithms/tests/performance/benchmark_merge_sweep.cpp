@@ -1,10 +1,9 @@
-///////////////////////////////////////////////////////////////////////////////
+//  Copyright (c) 2025 Hartmut Kaiser
 //  Copyright (c) 2017 Taeguk Kwon
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-///////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/algorithm.hpp>
 #include <hpx/assert.hpp>
@@ -16,6 +15,7 @@
 #include <hpx/program_options.hpp>
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -24,6 +24,7 @@
 #include <random>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include "utils.hpp"
@@ -68,27 +69,50 @@ double run_merge_benchmark_hpx(int const test_count, ExPolicy policy,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-struct compute_chunk_size
+using picoseconds = std::chrono::duration<long long, std::pico>;
+
+struct adaptive_chunk_size
 {
-    explicit constexpr compute_chunk_size(std::size_t times_cores = 4)
-      : times_cores_(times_cores)
+    template <typename Rep1, typename Period1, typename Rep2, typename Period2>
+    explicit constexpr adaptive_chunk_size(
+        std::chrono::duration<Rep1, Period1> const time_per_iteration,
+        std::chrono::duration<Rep2, Period2> const overhead_time =
+            std::chrono::microseconds(1))
+      : time_per_iteration_(
+            std::chrono::duration_cast<picoseconds>(time_per_iteration))
+      , overhead_time_(std::chrono::duration_cast<picoseconds>(overhead_time))
     {
     }
 
-    //template <typename Executor>
-    //friend std::size_t tag_override_invoke(
-    //    hpx::execution::experimental::maximal_number_of_chunks_t,
-    //    compute_chunk_size& this_, Executor&, std::size_t const cores,
-    //    std::size_t const)
-    //{
-    //    return this_.times_cores_ * cores;
-    //}
+    // calculate number of cores
+    template <typename Executor>
+    friend std::size_t tag_override_invoke(
+        hpx::execution::experimental::processing_units_count_t,
+        adaptive_chunk_size& this_, Executor&& exec,
+        hpx::chrono::steady_duration const&, std::size_t count) noexcept
+    {
+        std::size_t const cores_baseline =
+            hpx::execution::experimental::processing_units_count(
+                exec, this_.time_per_iteration_, count);
+
+        auto const overall_time = static_cast<double>(
+            (count + 1) * this_.time_per_iteration_.count());
+
+        constexpr double efficiency_factor = 0.052;    // see paper: 1 / 19
+        auto const optimal_num_cores =
+            static_cast<std::size_t>(efficiency_factor * overall_time /
+                static_cast<double>(this_.overhead_time_.count()));
+
+        std::size_t num_cores = (std::min) (cores_baseline, optimal_num_cores);
+        num_cores = (std::max) (num_cores, static_cast<std::size_t>(1));
+
+        return num_cores;
+    }
 
     template <typename Executor>
     friend std::size_t tag_override_invoke(
-        hpx::execution::experimental::get_chunk_size_t,
-        compute_chunk_size& this_, Executor&,
-        hpx::chrono::steady_duration const&, std::size_t const cores,
+        hpx::execution::experimental::get_chunk_size_t, adaptive_chunk_size&,
+        Executor&, hpx::chrono::steady_duration const&, std::size_t const cores,
         std::size_t const num_iterations)
     {
         if (cores == 1)
@@ -96,11 +120,17 @@ struct compute_chunk_size
             return num_iterations;
         }
 
+        std::size_t times_cores = 8;
+        if (cores == 2)
+        {
+            times_cores = 4;
+        }
+
         // Return a chunk size that ensures that each core ends up with the same
         // number of chunks the sizes of which are equal (except for the last
         // chunk, which may be smaller by not more than the number of chunks in
         // terms of elements).
-        std::size_t const num_chunks = this_.times_cores_ * cores;
+        std::size_t const num_chunks = times_cores * cores;
         std::size_t chunk_size = (num_iterations + num_chunks - 1) / num_chunks;
 
         // we should not consider more chunks than we have elements
@@ -116,11 +146,12 @@ struct compute_chunk_size
         return chunk_size;
     }
 
-    std::size_t times_cores_;
+    picoseconds time_per_iteration_;
+    picoseconds overhead_time_;
 };
 
 template <>
-struct hpx::execution::experimental::is_executor_parameters<compute_chunk_size>
+struct hpx::execution::experimental::is_executor_parameters<adaptive_chunk_size>
   : std::true_type
 {
 };
@@ -160,23 +191,9 @@ template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
     typename FwdIter3>
 void run_merge_benchmark_sweep(std::string label, int const test_count,
     ExPolicy policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
-    FwdIter2 last2, FwdIter3 dest)
+    FwdIter2 last2, FwdIter3 dest, double seq_time)
 {
     std::size_t const all_cores = hpx::get_num_worker_threads();
-
-    std::cout << label << "\t";
-
-    std::ptrdiff_t const size =
-        (std::max) (std::distance(first1, last1), std::distance(first2, last2));
-
-    //for (std::size_t chunks = 1; chunks != max_chunks * 2; chunks *= 2)
-    //{
-    //    std::size_t const chunk_size =
-    //        sizeof(typename std::iterator_traits<FwdIter1>::value_type) *
-    //        (size + chunks - 1) / chunks;
-
-    //    std::cout << chunk_size << (chunks != max_chunks ? "\t" : "\n");
-    //}
 
     std::vector<std::size_t> num_cores;
     {
@@ -186,6 +203,11 @@ void run_merge_benchmark_sweep(std::string label, int const test_count,
         }
         num_cores.push_back(all_cores);
     }
+
+    double overhead_time = 0.0;
+    double const time_per_iteration = seq_time /
+        static_cast<double>((std::max) (std::distance(first1, last1),
+            std::distance(first2, last2)));
 
     bool first_line = true;
     for (auto const cores : num_cores)
@@ -211,10 +233,46 @@ void run_merge_benchmark_sweep(std::string label, int const test_count,
             chunking_params.emplace(chunks, std::make_pair(time, params));
         }
 
+        // calculate overhead time as the difference between the sequential time
+        // and the parallel time with one core and one chunk
+        if (cores == 1)
+        {
+            overhead_time = (chunking_params[1].first - seq_time) /
+                static_cast<double>(all_cores);
+        }
+
+        // now run with adaptive_chunk_size to compare against sweep results
+        hpx::execution::experimental::chunking_parameters adaptive_params = {};
+        double adaptive_time;
+
+        {
+            hpx::execution::experimental::collect_chunking_parameters
+                collect_params(adaptive_params);
+
+            picoseconds time_per_iteration_ps(
+                static_cast<std::int64_t>(time_per_iteration * 1e12));
+            picoseconds overhead_time_ps(
+                static_cast<std::int64_t>(overhead_time * 1e12));
+
+            adaptive_chunk_size acs(time_per_iteration_ps, overhead_time_ps);
+
+            adaptive_time = run_merge_benchmark_hpx(test_count,
+                policy.with(acs, collect_params), first1, last1, first2, last2,
+                dest);
+        }
+
         if (first_line)
         {
             first_line = false;
 
+            std::cout << "iteration time:      " << time_per_iteration << "\n";
+            std::cout << "overhead:            " << overhead_time << "\n";
+            std::cout << "adaptive chunk size: " << adaptive_params.chunk_size
+                      << ", chunks: " << adaptive_params.num_chunks
+                      << ", cores: " << adaptive_params.num_cores
+                      << ", time: " << adaptive_time << "\n";
+
+            std::cout << label << "\t";
             for (std::size_t chunks = 1; chunks != max_chunks * 2; chunks *= 2)
             {
                 if (auto it = chunking_params.find(chunks);
@@ -225,8 +283,8 @@ void run_merge_benchmark_sweep(std::string label, int const test_count,
                             FwdIter1>::value_type) *
                         it->second.second.chunk_size;
 
-                    std::cout << chunk_size
-                              << (chunks != max_chunks ? "\t" : "\n");
+                    hpx::util::format_to(std::cout, "{1:8}{2}", chunk_size,
+                        chunks != max_chunks ? "\t" : "\n");
                 }
             }
         }
@@ -236,7 +294,7 @@ void run_merge_benchmark_sweep(std::string label, int const test_count,
             static_cast<std::size_t>(std::log2(cores));
         for (std::size_t chunks = 1; chunks <= log_cores; ++chunks)
         {
-            std::cout << "-\t";
+            std::cout << "       -\t";
         }
 
         for (std::size_t chunks = cores; chunks < max_chunks * 2; chunks *= 2)
@@ -244,8 +302,8 @@ void run_merge_benchmark_sweep(std::string label, int const test_count,
             if (auto it = chunking_params.find(chunks);
                 it != chunking_params.end())
             {
-                hpx::util::format_to(std::cout, "{1}", it->second.first);
-                std::cout << (chunks != max_chunks ? "\t" : "\n");
+                hpx::util::format_to(std::cout, "{1}{2}", it->second.first,
+                    chunks != max_chunks ? "\t" : "\n");
             }
         }
     }
@@ -334,7 +392,7 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
 
     std::cout << "--- run_merge_benchmark_sweep_par ---\n";
     run_merge_benchmark_sweep(
-        "par", test_count, par, first1, last1, first2, last2, dest);
+        "par", test_count, par, first1, last1, first2, last2, dest, time_seq);
 
     hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
@@ -342,7 +400,7 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     {
         hpx::execution::experimental::fork_join_executor exec;
         run_merge_benchmark_sweep("fj_par", test_count, par.on(exec), first1,
-            last1, first2, last2, dest);
+            last1, first2, last2, dest, time_seq);
     }
 
     std::cout << "----------------------------------------------\n";
@@ -379,7 +437,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     {
         using allocator_type = std::allocator<data_type>;
-        allocator_type const alloc;
+        allocator_type alloc;
 
         run_benchmark(vector_size1, vector_size2, test_count,
             std::random_access_iterator_tag(), alloc, "std::vector", entropy);
