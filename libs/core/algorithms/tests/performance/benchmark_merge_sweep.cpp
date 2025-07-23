@@ -20,6 +20,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <map>
 #include <random>
 #include <string>
 #include <type_traits>
@@ -168,14 +169,14 @@ void run_merge_benchmark_sweep(std::string label, int const test_count,
     std::ptrdiff_t const size =
         (std::max) (std::distance(first1, last1), std::distance(first2, last2));
 
-    for (std::size_t chunks = 1; chunks != max_chunks * 2; chunks *= 2)
-    {
-        std::size_t const chunk_size =
-            sizeof(typename std::iterator_traits<FwdIter1>::value_type) *
-            (size + chunks - 1) / chunks;
+    //for (std::size_t chunks = 1; chunks != max_chunks * 2; chunks *= 2)
+    //{
+    //    std::size_t const chunk_size =
+    //        sizeof(typename std::iterator_traits<FwdIter1>::value_type) *
+    //        (size + chunks - 1) / chunks;
 
-        std::cout << chunk_size << (chunks != max_chunks ? "\t" : "\n");
-    }
+    //    std::cout << chunk_size << (chunks != max_chunks ? "\t" : "\n");
+    //}
 
     std::vector<std::size_t> num_cores;
     {
@@ -186,22 +187,53 @@ void run_merge_benchmark_sweep(std::string label, int const test_count,
         num_cores.push_back(all_cores);
     }
 
+    bool first_line = true;
     for (auto const cores : num_cores)
     {
         hpx::execution::experimental::num_cores nc(cores);
 
-        std::map<std::size_t, double> timings;
+        std::map<std::size_t,
+            std::pair<double,
+                hpx::execution::experimental::chunking_parameters>>
+            chunking_params;
+
         for (std::size_t chunks = cores; chunks < max_chunks * 2; chunks *= 2)
         {
+            hpx::execution::experimental::chunking_parameters params = {};
+            hpx::execution::experimental::collect_chunking_parameters
+                collect_params(params);
+
             hpx::execution::experimental::max_num_chunks mnc(chunks);
             double const time = run_merge_benchmark_hpx(test_count,
-                policy.with(nc, mnc), first1, last1, first2, last2, dest);
+                policy.with(nc, mnc, collect_params), first1, last1, first2,
+                last2, dest);
 
-            timings.emplace(chunks, time);
+            chunking_params.emplace(chunks, std::make_pair(time, params));
+        }
+
+        if (first_line)
+        {
+            first_line = false;
+
+            for (std::size_t chunks = 1; chunks != max_chunks * 2; chunks *= 2)
+            {
+                if (auto it = chunking_params.find(chunks);
+                    it != chunking_params.end())
+                {
+                    std::size_t const chunk_size =
+                        sizeof(typename std::iterator_traits<
+                            FwdIter1>::value_type) *
+                        it->second.second.chunk_size;
+
+                    std::cout << chunk_size
+                              << (chunks != max_chunks ? "\t" : "\n");
+                }
+            }
         }
 
         std::cout << cores << "\t";
-        std::size_t const log_cores = static_cast<std::size_t>(std::log2(cores));
+        std::size_t const log_cores =
+            static_cast<std::size_t>(std::log2(cores));
         for (std::size_t chunks = 1; chunks <= log_cores; ++chunks)
         {
             std::cout << "-\t";
@@ -209,9 +241,10 @@ void run_merge_benchmark_sweep(std::string label, int const test_count,
 
         for (std::size_t chunks = cores; chunks < max_chunks * 2; chunks *= 2)
         {
-            if (auto it = timings.find(chunks); it != timings.end())
+            if (auto it = chunking_params.find(chunks);
+                it != chunking_params.end())
             {
-                hpx::util::format_to(std::cout, "{1}", it->second);
+                hpx::util::format_to(std::cout, "{1}", it->second.first);
                 std::cout << (chunks != max_chunks ? "\t" : "\n");
             }
         }
