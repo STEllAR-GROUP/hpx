@@ -675,8 +675,9 @@ namespace hpx::parallel {
                     Iter2 l2 = last2;
                     if (base + size1 != len1)
                     {
+                        // gcc complains about using HPX_INVOKE here
                         l2 = BinarySearchHelper::call(it2, last2,
-                            HPX_INVOKE(proj1, *std::next(it1, size1)), comp,
+                            std::invoke(proj1, *std::next(it1, size1)), comp,
                             proj2);
                     }
 

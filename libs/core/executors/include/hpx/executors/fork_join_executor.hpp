@@ -1324,8 +1324,9 @@ namespace hpx::execution::experimental {
             threads::thread_priority priority = threads::thread_priority::bound,
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize::small_,
-            loop_schedule sched = loop_schedule::static_,
-            std::chrono::nanoseconds yield_delay = std::chrono::milliseconds(1))
+            loop_schedule sched = loop_schedule::dynamic,
+            std::chrono::nanoseconds yield_delay = std::chrono::microseconds(
+                300))
         {
             if (stacksize == threads::thread_stacksize::nostack)
             {
