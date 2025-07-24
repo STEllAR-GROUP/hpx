@@ -175,6 +175,8 @@ namespace hpx::execution::experimental {
                 {
                     HPX_SMT_PAUSE;
 
+                    auto const this_ctx =
+                        hpx::execution_base::this_thread::agent();
                     std::uint64_t const base_time = util::hardware::timestamp();
                     current = tstate.load(std::memory_order_acquire);
                     while (HPX_LIKELY(op(current, state)))
@@ -199,7 +201,7 @@ namespace hpx::execution::experimental {
                                 (util::hardware::timestamp() - base_time) >
                                     yield_delay))
                         {
-                            hpx::this_thread::yield();
+                            this_ctx.yield();
                         }
 
                         current = tstate.load(std::memory_order_acquire);
@@ -209,10 +211,22 @@ namespace hpx::execution::experimental {
             }
 
             std::string generate_annotation(
-                std::size_t index, char const* default_name) const
+                std::size_t const index, char const* default_name) const
             {
                 return hpx::util::format("{}: thread ({})",
                     annotation_ ? annotation_ : default_name, index);
+            }
+
+            static std::uint32_t get_first_core(
+                hpx::threads::mask_cref_type mask)
+            {
+                auto const size = hpx::threads::mask_size(mask);
+                for (std::uint32_t i = 0; i != size; ++i)
+                {
+                    if (hpx::threads::test(mask, i))
+                        return i;
+                }
+                return 0;
             }
 
             // Entry point for each worker HPX thread. Holds references to the
@@ -300,7 +314,7 @@ namespace hpx::execution::experimental {
 
             void wait_state_all(thread_state const state) const noexcept
             {
-                for (std::size_t t = 0; t != num_threads_; ++t)
+                for (std::size_t t = 0; t != region_data_.size(); ++t)
                 {
                     if (t != main_thread_)
                     {
@@ -345,7 +359,12 @@ namespace hpx::execution::experimental {
                 // will be associated with the corresponding PU. If the current
                 // thread is not part of the PU-mask, then it will be associated
                 // with the first queue.
+
+                // Note the current thread could also be the main thread, in
+                // which case its number will be equal to the number of worker
+                // threads.
                 main_thread_ = hpx::get_worker_thread_num();
+                HPX_ASSERT(main_thread_ <= pool_->get_os_thread_count());
 
                 if (rp.get_affinity_data().affinities_disabled() ||
                     priority_ != threads::thread_priority::bound)
@@ -354,8 +373,9 @@ namespace hpx::execution::experimental {
                 }
                 else
                 {
+                    auto const* thread_data = threads::get_self_id_data();
                     main_priority_ =
-                        threads::get_self_id_data()->get_priority();
+                        thread_data ? thread_data->get_priority() : priority_;
                     if (main_priority_ != priority_)
                     {
                         // Make sure the main thread runs with the required
@@ -385,13 +405,28 @@ namespace hpx::execution::experimental {
                 std::size_t t = 0;
                 bool main_thread_ok = false;
 
-                std::size_t main_pu_num = rp.get_pu_num(main_thread_);
+                std::size_t main_pu_num = get_first_core(pu_mask_);
+                if (main_thread_ != static_cast<std::size_t>(-1) &&
+                    main_thread_ != pool_->get_os_thread_count())
+                {
+                    main_pu_num = rp.get_pu_num(main_thread_);
+                }
+
                 if (!hpx::threads::test(pu_mask_, main_pu_num) ||
                     num_threads_ == 1)
                 {
                     main_thread_ok = true;
-                    main_thread_ = t++;
+                    if (main_thread_ == static_cast<std::size_t>(-1))
+                    {
+                        main_thread_ = t++;
+                    }
                     main_pu_num = rp.get_pu_num(main_thread_);
+                    set_state_main_thread(thread_state::idle);
+                }
+
+                // explicitly make the main thread ready, if needed
+                if (main_thread_ == pool_->get_os_thread_count())
+                {
                     set_state_main_thread(thread_state::idle);
                 }
 
@@ -399,10 +434,8 @@ namespace hpx::execution::experimental {
                 {
                     std::size_t const num_pus = pool_->get_os_thread_count();
 
-                    // clang-format off
                     for (std::size_t pu = 0; t != num_threads_ && pu != num_pus;
                         ++pu)
-                    // clang-format on
                     {
                         std::size_t const pu_num = rp.get_pu_num(pu);
                         if (!main_thread_ok && pu == main_thread_)
@@ -443,16 +476,23 @@ namespace hpx::execution::experimental {
                             generate_annotation(pu_num, "fork_join_executor"));
                         hpx::detail::post_policy_dispatch<
                             launch::async_policy>::call(policy, desc, pool_,
-                            thread_function{num_threads_, t, schedule_,
-                                exception_mutex_, exception_, yield_delay_,
-                                region_data_, queues_, priority_bound});
+                            thread_function{.num_threads_ = num_threads_,
+                                .thread_index_ = t,
+                                .schedule_ = schedule_,
+                                .exception_mutex_ = exception_mutex_,
+                                .exception_ = exception_,
+                                .yield_delay_ = yield_delay_,
+                                .region_data_ = region_data_,
+                                .queues_ = queues_,
+                                .priority_bound_ = priority_bound});
 
                         ++t;
                     }
                 }
 
                 // the main thread should have been associated with a queue
-                HPX_ASSERT(main_thread_ok);
+                HPX_ASSERT(main_thread_ok ||
+                    main_thread_ == pool_->get_os_thread_count());
 
                 // there have to be as many HPX threads as there are set bits in
                 // the PU-mask
@@ -486,22 +526,32 @@ namespace hpx::execution::experimental {
                 return mask;
             }
 
+            static std::size_t get_region_data_size(
+                std::size_t const num_threads,
+                threads::thread_pool_base const* pool)
+            {
+                return hpx::get_worker_thread_num() ==
+                        pool->get_os_thread_count() ?
+                    num_threads + 1 :
+                    num_threads;
+            }
+
         public:
             /// \cond NOINTERNAL
             explicit shared_data(threads::thread_priority const priority,
                 threads::thread_stacksize const stacksize,
-                loop_schedule const schedule,
+                loop_schedule const sched,
                 std::chrono::nanoseconds const yield_delay)
-              : pool_(this_thread::get_pool())
+              : pool_(threads::detail::get_self_or_default_pool())
               , priority_(priority)
               , stacksize_(stacksize)
-              , schedule_(schedule)
+              , schedule_(sched)
               , yield_delay_(static_cast<std::uint64_t>(
                     static_cast<double>(yield_delay.count()) /
                     pool_->timestamp_scale()))
               , num_threads_(pool_->get_os_thread_count())
               , pu_mask_(full_mask(num_threads_))
-              , region_data_(num_threads_)
+              , region_data_(get_region_data_size(num_threads_, pool_))
             {
                 HPX_ASSERT(pool_);
 
@@ -510,19 +560,19 @@ namespace hpx::execution::experimental {
 
             explicit shared_data(threads::thread_priority const priority,
                 threads::thread_stacksize const stacksize,
-                loop_schedule const schedule,
+                loop_schedule const sched,
                 std::chrono::nanoseconds const yield_delay,
                 hpx::threads::mask_cref_type pu_mask)
-              : pool_(this_thread::get_pool())
+              : pool_(threads::detail::get_self_or_default_pool())
               , priority_(priority)
               , stacksize_(stacksize)
-              , schedule_(schedule)
+              , schedule_(sched)
               , yield_delay_(static_cast<std::uint64_t>(
                     static_cast<double>(yield_delay.count()) /
                     pool_->timestamp_scale()))
               , num_threads_(hpx::threads::count(pu_mask))
               , pu_mask_(pu_mask)
-              , region_data_(num_threads_)
+              , region_data_(get_region_data_size(num_threads_, pool_))
             {
                 HPX_ASSERT(pool_);
                 if (pool_ == nullptr ||
@@ -611,6 +661,12 @@ namespace hpx::execution::experimental {
                     hpx::spinlock& exception_mutex,
                     std::exception_ptr& exception) noexcept
                 {
+                    // exit right away if the main thread is not participating
+                    if (num_threads == thread_index)
+                    {
+                        return;
+                    }
+
                     region_data& data = rdata[thread_index].data_;
                     hpx::detail::try_catch_exception_ptr(
                         [&] {
@@ -672,6 +728,12 @@ namespace hpx::execution::experimental {
                     hpx::spinlock& exception_mutex,
                     std::exception_ptr& exception) noexcept
                 {
+                    // exit right away if the main thread is not participating
+                    if (num_threads == thread_index)
+                    {
+                        return;
+                    }
+
                     region_data& data = rdata[thread_index].data_;
                     hpx::detail::try_catch_exception_ptr(
                         [&] {
@@ -715,11 +777,8 @@ namespace hpx::execution::experimental {
 
                             // As loop schedule is dynamic, steal from neighboring
                             // threads.
-
-                            // clang-format off
                             for (std::size_t offset = 1; offset < num_threads;
                                 ++offset)
-                            // clang-format on
                             {
                                 std::size_t const neighbor_index =
                                     (thread_index + offset) % num_threads;
@@ -1151,17 +1210,17 @@ namespace hpx::execution::experimental {
 
         /// \brief Construct a fork_join_executor.
         ///
-        /// \param priority The priority of the worker threads.
+        /// \param priority  The priority of the worker threads.
         /// \param stacksize The stacksize of the worker threads. Must not be
         ///                  nostack.
-        /// \param schedule The loop schedule of the parallel regions.
+        /// \param sched     The loop schedule of the parallel regions.
         /// \param yield_delay The time after which the executor yields to other
         ///        work if it has not received any new work for execution.
         explicit fork_join_executor(
             threads::thread_priority priority = threads::thread_priority::bound,
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize::small_,
-            loop_schedule schedule = loop_schedule::static_,
+            loop_schedule sched = loop_schedule::static_,
             std::chrono::nanoseconds yield_delay = std::chrono::milliseconds(1))
         {
             if (stacksize == threads::thread_stacksize::nostack)
@@ -1174,23 +1233,23 @@ namespace hpx::execution::experimental {
             }
 
             shared_data_ = std::make_shared<shared_data>(
-                priority, stacksize, schedule, yield_delay);
+                priority, stacksize, sched, yield_delay);
         }
 
         /// \brief Construct a fork_join_executor.
         ///
-        /// \param pu_mask The PU-mask to use for placing the created threads
-        /// \param priority The priority of the worker threads.
+        /// \param pu_mask   The PU-mask to use for placing the created threads
+        /// \param priority  The priority of the worker threads.
         /// \param stacksize The stacksize of the worker threads. Must not be
         ///                  nostack.
-        /// \param schedule The loop schedule of the parallel regions.
+        /// \param sched     The loop schedule of the parallel regions.
         /// \param yield_delay The time after which the executor yields to other
         ///        work if it has not received any new work for execution.
         explicit fork_join_executor(hpx::threads::mask_cref_type pu_mask,
             threads::thread_priority priority = threads::thread_priority::bound,
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize::small_,
-            loop_schedule schedule = loop_schedule::static_,
+            loop_schedule sched = loop_schedule::static_,
             std::chrono::nanoseconds yield_delay = std::chrono::milliseconds(1))
         {
             if (stacksize == threads::thread_stacksize::nostack)
@@ -1203,7 +1262,7 @@ namespace hpx::execution::experimental {
             }
 
             shared_data_ = std::make_shared<shared_data>(
-                priority, stacksize, schedule, yield_delay, pu_mask);
+                priority, stacksize, sched, yield_delay, pu_mask);
         }
 
         friend fork_join_executor tag_invoke(
