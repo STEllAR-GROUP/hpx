@@ -65,15 +65,14 @@ class manage_global_runtime
 #endif
 
             hpx::init_params init_args;
-            init_args.cfg = {
-                // make sure hpx_main is always executed
+            init_args.cfg = {// make sure hpx_main is always executed
                 "hpx.run_hpx_main!=1",
                 // allow for unknown command line options
                 "hpx.commandline.allow_unknown!=1",
                 // disable HPX' short options
                 "hpx.commandline.aliasing!=0",
-                "hpx.os_threads=4"
-            };
+                // run on two threads
+                "hpx.os_threads=2"};
             init_args.mode = hpx::runtime_mode::default_;
 
             if (!rts.start(__argc, __argv, init_args))
@@ -97,8 +96,6 @@ class manage_global_runtime
         return m.rts;
     }
 
-    hpx::execution_base::agent_base& agent =
-        hpx::execution_base::detail::get_default_agent();
     hpx::manage_runtime& m = get();
 };
 
@@ -106,7 +103,7 @@ class manage_global_runtime
 // stops running in its destructor.
 manage_global_runtime init;
 
-int main(int argc, char* argv[])
+int main()
 {
     constexpr int num_iterations = 65536;
     std::atomic<int> invoked(0);

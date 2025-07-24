@@ -30,6 +30,7 @@
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
+#include <hpx/synchronization/latch.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading/thread.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
@@ -125,6 +126,7 @@ namespace hpx::execution::experimental {
                 void const* shape_;
                 void* argument_pack_;
                 void* results_;
+                hpx::latch* sync_with_main_thread_;
             };
 
             // Can't apply 'using' here as the type needs to be forward
@@ -175,8 +177,6 @@ namespace hpx::execution::experimental {
                 {
                     HPX_SMT_PAUSE;
 
-                    auto const this_ctx =
-                        hpx::execution_base::this_thread::agent();
                     std::uint64_t const base_time = util::hardware::timestamp();
                     current = tstate.load(std::memory_order_acquire);
                     while (HPX_LIKELY(op(current, state)))
@@ -201,7 +201,7 @@ namespace hpx::execution::experimental {
                                 (util::hardware::timestamp() - base_time) >
                                     yield_delay))
                         {
-                            this_ctx.yield();
+                            hpx::this_thread::yield();
                         }
 
                         current = tstate.load(std::memory_order_acquire);
@@ -364,7 +364,6 @@ namespace hpx::execution::experimental {
                 // which case its number will be equal to the number of worker
                 // threads.
                 main_thread_ = hpx::get_worker_thread_num();
-                HPX_ASSERT(main_thread_ <= pool_->get_os_thread_count());
 
                 if (rp.get_affinity_data().affinities_disabled() ||
                     priority_ != threads::thread_priority::bound)
@@ -405,9 +404,11 @@ namespace hpx::execution::experimental {
                 std::size_t t = 0;
                 bool main_thread_ok = false;
 
+                bool const main_thread_is_waiting =
+                    main_thread_ >= num_threads_;
                 std::size_t main_pu_num = get_first_core(pu_mask_);
                 if (main_thread_ != static_cast<std::size_t>(-1) &&
-                    main_thread_ != pool_->get_os_thread_count())
+                    !main_thread_is_waiting)
                 {
                     main_pu_num = rp.get_pu_num(main_thread_);
                 }
@@ -416,16 +417,13 @@ namespace hpx::execution::experimental {
                     num_threads_ == 1)
                 {
                     main_thread_ok = true;
-                    if (main_thread_ == static_cast<std::size_t>(-1))
-                    {
-                        main_thread_ = t++;
-                    }
+                    main_thread_ = t++;
                     main_pu_num = rp.get_pu_num(main_thread_);
                     set_state_main_thread(thread_state::idle);
                 }
 
                 // explicitly make the main thread ready, if needed
-                if (main_thread_ == pool_->get_os_thread_count())
+                if (main_thread_is_waiting)
                 {
                     set_state_main_thread(thread_state::idle);
                 }
@@ -491,8 +489,7 @@ namespace hpx::execution::experimental {
                 }
 
                 // the main thread should have been associated with a queue
-                HPX_ASSERT(main_thread_ok ||
-                    main_thread_ == pool_->get_os_thread_count());
+                HPX_ASSERT(main_thread_ok || main_thread_ >= num_threads_);
 
                 // there have to be as many HPX threads as there are set bits in
                 // the PU-mask
@@ -661,12 +658,6 @@ namespace hpx::execution::experimental {
                     hpx::spinlock& exception_mutex,
                     std::exception_ptr& exception) noexcept
                 {
-                    // exit right away if the main thread is not participating
-                    if (num_threads == thread_index)
-                    {
-                        return;
-                    }
-
                     region_data& data = rdata[thread_index].data_;
                     hpx::detail::try_catch_exception_ptr(
                         [&] {
@@ -718,6 +709,10 @@ namespace hpx::execution::experimental {
                         });
 
                     set_state(data.state_, thread_state::idle);
+                    if (data.sync_with_main_thread_)
+                    {
+                        data.sync_with_main_thread_->count_down(1);
+                    }
                 }
 
                 // Main entry point for a single parallel region (dynamic
@@ -728,12 +723,6 @@ namespace hpx::execution::experimental {
                     hpx::spinlock& exception_mutex,
                     std::exception_ptr& exception) noexcept
                 {
-                    // exit right away if the main thread is not participating
-                    if (num_threads == thread_index)
-                    {
-                        return;
-                    }
-
                     region_data& data = rdata[thread_index].data_;
                     hpx::detail::try_catch_exception_ptr(
                         [&] {
@@ -825,6 +814,10 @@ namespace hpx::execution::experimental {
                         });
 
                     set_state(data.state_, thread_state::idle);
+                    if (data.sync_with_main_thread_)
+                    {
+                        data.sync_with_main_thread_->count_down(1);
+                    }
                 }
             };
 
@@ -844,8 +837,8 @@ namespace hpx::execution::experimental {
 
                 // Main entry point for a single parallel invoke region
                 static void call(region_data_type& rdata,
-                    std::size_t thread_index, std::size_t num_threads,
-                    queues_type&, hpx::spinlock& exception_mutex,
+                    std::size_t const thread_index, std::size_t, queues_type&,
+                    hpx::spinlock& exception_mutex,
                     std::exception_ptr& exception) noexcept
                 {
                     region_data& data = rdata[thread_index].data_;
@@ -858,14 +851,8 @@ namespace hpx::execution::experimental {
                             auto& args =
                                 *static_cast<Args*>(data.argument_pack_);
 
-                            auto part_begin =
-                                static_cast<std::uint32_t>(hpx::get<0>(args) +
-                                    (thread_index * hpx::get<1>(args)) /
-                                        num_threads);
-                            auto const part_end =
-                                static_cast<std::uint32_t>(hpx::get<0>(args) +
-                                    ((thread_index + 1) * hpx::get<1>(args)) /
-                                        num_threads);
+                            auto part_begin = hpx::get<0>(args);
+                            auto const part_end = hpx::get<1>(args);
 
                             set_state(data.state_, thread_state::active);
 
@@ -886,13 +873,17 @@ namespace hpx::execution::experimental {
                         });
 
                     set_state(data.state_, thread_state::idle);
+                    if (data.sync_with_main_thread_)
+                    {
+                        data.sync_with_main_thread_->count_down(1);
+                    }
                 }
             };
 
             template <typename Result, typename F, typename S, typename Args>
             thread_function_helper_type* set_all_states_and_region_data(
                 void* results, thread_state const state, F& f, S const& shape,
-                Args& argument_pack) noexcept
+                Args& argument_pack, hpx::latch* sync_with_main_thread) noexcept
             {
                 thread_function_helper_type* func;
                 if (schedule_ == loop_schedule::static_ || num_threads_ == 1)
@@ -916,6 +907,7 @@ namespace hpx::execution::experimental {
                     data.argument_pack_ = &argument_pack;
                     data.thread_function_helper_ = func;
                     data.results_ = results;
+                    data.sync_with_main_thread_ = sync_with_main_thread;
                     // NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
 
                     data.state_.store(state, std::memory_order_release);
@@ -924,28 +916,38 @@ namespace hpx::execution::experimental {
             }
 
             template <typename Fs, typename Args>
-            thread_function_helper_type* set_all_states_and_region_data_invoke(
-                thread_state const state, Fs& function_pack,
-                Args& args) noexcept
+            std::size_t set_all_states_and_region_data_invoke(
+                thread_state const state, Fs& function_pack, Args& args,
+                hpx::latch* sync_with_main_thread) noexcept
             {
                 constexpr thread_function_helper_type* func =
                     &thread_function_helper_invoke<Fs, Args>::call;
 
                 for (std::size_t t = 0; t != num_threads_; ++t)
                 {
+                    if (t == main_thread_)
+                    {
+                        continue;    // don't run sync task on main thread
+                    }
+
                     region_data& data = region_data_[t].data_;
+                    if (data.state_.load(std::memory_order_acquire) ==
+                        thread_state::idle)
+                    {
+                        // NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
+                        data.element_function_ = &function_pack;
+                        data.shape_ = nullptr;
+                        data.argument_pack_ = &args;
+                        data.thread_function_helper_ = func;
+                        data.sync_with_main_thread_ = sync_with_main_thread;
+                        // NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
 
-                    // NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
-                    data.element_function_ = &function_pack;
-                    data.shape_ = nullptr;
-                    data.argument_pack_ = &args;
-                    data.thread_function_helper_ = func;
-                    // NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
-
-                    data.state_.store(state, std::memory_order_release);
+                        data.state_.store(state, std::memory_order_release);
+                        return t;
+                    }
                 }
 
-                return func;
+                return static_cast<std::size_t>(-1);
             }
 
             template <typename F>
@@ -994,29 +996,57 @@ namespace hpx::execution::experimental {
                     hpx::parallel::execution::detail::bulk_execute_result_t<F,
                         S, Ts...>;
 
+                // do things differently if the main thread is not participating
+                hpx::latch* sync_with_main_thread = nullptr;
+                if (main_thread_ >= num_threads_)
+                {
+                    sync_with_main_thread = new hpx::latch(
+                        static_cast<std::ptrdiff_t>(num_threads_ + 1));
+                }
+
                 if constexpr (std::is_void_v<result_type>)
                 {
-                    // Signal all worker threads to start partitioning work for
-                    // themselves, and then starting the actual work.
+                    // Signal all worker threads to start partitioning work
+                    // for themselves, and then starting the actual work.
                     thread_function_helper_type* func =
                         set_all_states_and_region_data<void>(nullptr,
                             thread_state::partitioning_work, f, shape,
-                            argument_pack);
+                            argument_pack, sync_with_main_thread);
 
-                    invoke_work(func);
+                    if (sync_with_main_thread == nullptr)
+                    {
+                        invoke_work(func);
+                    }
+                    else
+                    {
+                        // the main thread must be put to sleep to avoid
+                        // over-subscription of the cores
+                        sync_with_main_thread->arrive_and_wait();
+                        delete sync_with_main_thread;
+                    }
                 }
                 else
                 {
                     result_type results(hpx::util::size(shape));
 
-                    // Signal all worker threads to start partitioning work for
-                    // themselves, and then starting the actual work.
+                    // Signal all worker threads to start partitioning work
+                    // for themselves, and then starting the actual work.
                     thread_function_helper_type* func =
                         set_all_states_and_region_data<result_type>(&results,
                             thread_state::partitioning_work, f, shape,
-                            argument_pack);
+                            argument_pack, sync_with_main_thread);
 
-                    invoke_work(func);
+                    if (sync_with_main_thread == nullptr)
+                    {
+                        invoke_work(func);
+                    }
+                    else
+                    {
+                        // the main thread must be put to sleep to avoid
+                        // over-subscription of the cores
+                        sync_with_main_thread->arrive_and_wait();
+                        delete sync_with_main_thread;
+                    }
 
                     return results;
                 }
@@ -1077,19 +1107,47 @@ namespace hpx::execution::experimental {
 
                 auto args = hpx::make_tuple(first, size);
 
-                // Signal all worker threads to start partitioning work for
-                // themselves, and then starting the actual work.
-                thread_function_helper_type* func =
+                // do things differently if the main thread is not participating
+                hpx::latch* sync_with_main_thread = nullptr;
+                if (main_thread_ >= num_threads_)
+                {
+                    sync_with_main_thread =
+                        new hpx::latch(static_cast<std::ptrdiff_t>(2));
+                }
+
+                // Find a worker thread and signal it to start partitioning work
+                // for itself, and then start the actual work.
+                std::size_t const worker_thread =
                     set_all_states_and_region_data_invoke(
-                        thread_state::partitioning_work, function_pack, args);
+                        thread_state::partitioning_work, function_pack, args,
+                        sync_with_main_thread);
 
-                // Start work on the main thread.
-                func(region_data_, main_thread_, num_threads_, queues_,
-                    exception_mutex_, exception_);
+                if (worker_thread == static_cast<std::size_t>(-1))
+                {
+                    delete sync_with_main_thread;
 
-                // Wait for all threads to finish their work assigned to
-                // them in this parallel region.
-                wait_state_all(thread_state::idle);
+                    HPX_THROW_EXCEPTION(error::bad_request,
+                        "sync_invoke_helper",
+                        "no available worker threads, is this instance of "
+                        "fork_join_executor being used in nested ways?");
+                }
+
+                if (sync_with_main_thread == nullptr)
+                {
+                    // Wait for the thread to finish their work assigned to
+                    // them in this parallel region.
+                    wait_state_this_thread_while(
+                        region_data_[worker_thread].data_.state_,
+                        thread_state::idle, yield_delay_,
+                        std::not_equal_to<>());
+                }
+                else
+                {
+                    // the main thread must be put to sleep to avoid
+                    // over-subscription of the cores
+                    sync_with_main_thread->arrive_and_wait();
+                    delete sync_with_main_thread;
+                }
 
                 // rethrow exception, if any
                 if (exception_)
