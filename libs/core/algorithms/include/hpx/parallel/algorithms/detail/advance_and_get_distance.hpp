@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2023 Hartmut Kaiser
+//  Copyright (c) 2019-2025 Hartmut Kaiser
 //  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 
@@ -36,13 +37,13 @@ namespace hpx::parallel::detail {
             }
             else
             {
-                difference_type offset = detail::distance(first, last);
+                difference_type offset =
+                    parallel::detail::distance(first, last);
                 first = last;
                 return offset;
             }
         }
-
-        if constexpr (hpx::traits::is_sized_sentinel_for_v<Sent, Iter>)
+        else if constexpr (hpx::traits::is_sized_sentinel_for_v<Sent, Iter>)
         {
             difference_type offset = last - first;
             std::advance(first, offset);

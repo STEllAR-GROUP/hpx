@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,6 +18,7 @@ set(iterator_support_headers
     hpx/iterator_support/iterator_range.hpp
     hpx/iterator_support/range.hpp
     hpx/iterator_support/transform_iterator.hpp
+    hpx/iterator_support/unwrap_iterator.hpp
     hpx/iterator_support/zip_iterator.hpp
 )
 
