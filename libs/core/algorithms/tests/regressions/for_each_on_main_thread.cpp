@@ -6,7 +6,7 @@
 
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
-#include <hpx/hpx_start.hpp>
+#include <hpx/manage_runtime.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
@@ -14,29 +14,115 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main()
+// Store the command line arguments in global variables to make them available
+// to the startup code.
+
+#if defined(linux) || defined(__linux) || defined(__linux__)
+
+int __argc = 0;
+char** __argv = nullptr;
+
+void set_argc_argv(int argc, char* argv[], char*[])
 {
-    return hpx::finalize();
+    __argc = argc;
+    __argv = argv;
 }
 
-int main(int argc, char* argv[])
+__attribute__((section(".preinit_array"))) void (*set_global_argc_argv)(
+    int, char*[], char*[]) = &set_argc_argv;
+
+#elif defined(__APPLE__)
+
+#include <crt_externs.h>
+
+inline int get_arraylen(char** argv)
 {
-    std::vector<std::string> const cfg = {"hpx.os_threads=4"};
+    int count = 0;
+    if (nullptr != argv)
+    {
+        while (nullptr != argv[count])
+            ++count;
+    }
+    return count;
+}
 
-    hpx::init_params init_args;
-    init_args.cfg = cfg;
+int __argc = get_arraylen(*_NSGetArgv());
+char** __argv = *_NSGetArgv();
 
-    hpx::start(argc, argv, init_args);
+#endif
 
-    std::atomic_bool invoked(false);
+///////////////////////////////////////////////////////////////////////////////
+class manage_global_runtime
+{
+    struct init
+    {
+        hpx::manage_runtime rts;
 
-    std::vector<int> vs(65536);
-    hpx::for_each(hpx::execution::par, vs.begin(), vs.end(),
-        [&](int) { invoked = true; });
+        init()
+        {
+#if defined(HPX_WINDOWS)
+            hpx::detail::init_winsocket();
+#endif
 
-    hpx::stop();
+            hpx::init_params init_args;
+            init_args.cfg = {// make sure hpx_main is always executed
+                "hpx.run_hpx_main!=1",
+                // allow for unknown command line options
+                "hpx.commandline.allow_unknown!=1",
+                // disable HPX' short options
+                "hpx.commandline.aliasing!=0",
+                // run on two threads
+                "hpx.os_threads=2"};
+            init_args.mode = hpx::runtime_mode::default_;
 
-    HPX_TEST(invoked.load());
+            if (!rts.start(__argc, __argv, init_args))
+            {
+                // Something went wrong while initializing the runtime.
+                // This early we can't generate any output, just bail out.
+                std::abort();
+            }
+        }
+
+        ~init()
+        {
+            // Something went wrong while stopping the runtime. Ignore.
+            (void) rts.stop();
+        }
+    };
+
+    static hpx::manage_runtime& get()
+    {
+        thread_local init m;
+        return m.rts;
+    }
+
+    hpx::manage_runtime& m = get();
+};
+
+// This global object will initialize HPX in its constructor and make sure HPX
+// stops running in its destructor.
+manage_global_runtime init;
+
+int main()
+{
+    constexpr int num_iterations = 65536;
+    std::atomic<int> invoked(0);
+
+    std::vector<int> vs(num_iterations);
+    hpx::for_each(
+        hpx::execution::par, vs.begin(), vs.end(), [&](int) { ++invoked; });
+
+    HPX_TEST_EQ(invoked.load(), num_iterations);
+
+    {
+        invoked.store(0);
+
+        hpx::execution::experimental::fork_join_executor exec;
+        hpx::for_each(hpx::execution::par.on(exec), vs.begin(), vs.end(),
+            [&](int) { ++invoked; });
+    }
+
+    HPX_TEST_EQ(invoked.load(), num_iterations);
 
     return hpx::util::report_errors();
 }

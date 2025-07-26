@@ -110,6 +110,7 @@ add_hpx_module(
     hpx_memory
     hpx_properties
     hpx_resource_partitioner
+    hpx_synchronization
     hpx_threading
     hpx_topology
   CMAKE_SUBDIRS examples tests
