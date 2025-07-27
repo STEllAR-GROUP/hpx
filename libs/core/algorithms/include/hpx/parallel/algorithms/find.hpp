@@ -1358,13 +1358,11 @@ namespace hpx {
     private:
         template <typename ExPolicy, typename FwdIter, typename F>
         // clang-format off
-            requires (
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
-                hpx::is_invocable_v<F,
-                    typename std::iterator_traits<FwdIter>::value_type
-                >
-            )
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter> &&
+            hpx::is_invocable_v<F, hpx::traits::iter_value_t<FwdIter>>
+        )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             find_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
@@ -1379,13 +1377,11 @@ namespace hpx {
 
         template <typename InIter, typename F>
         // clang-format off
-            requires (
-                hpx::traits::is_iterator_v<InIter> &&
-                hpx::is_invocable_v<F,
-                    typename std::iterator_traits<InIter>::value_type
-                >
-            )
-            // clang-format on 
+        requires (
+            hpx::traits::is_iterator_v<InIter> &&
+            hpx::is_invocable_v<F, hpx::traits::iter_value_t<InIter>>
+        )
+        // clang-format on
         friend InIter tag_fallback_invoke(
             find_if_t, InIter first, InIter last, F f)
         {
@@ -1402,16 +1398,14 @@ namespace hpx {
     inline constexpr struct find_if_not_t final
       : hpx::detail::tag_parallel_algorithm<find_if_not_t>
     {
-    private: 
+    private:
         template <typename ExPolicy, typename FwdIter, typename F>
-            // clang-format off
-            requires (
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
-                hpx::is_invocable_v<F,
-                    typename std::iterator_traits<FwdIter>::value_type
-                >
-            )
+        // clang-format off
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter> &&
+            hpx::is_invocable_v<F, hpx::traits::iter_value_t<FwdIter>>
+        )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             find_if_not_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
@@ -1426,12 +1420,10 @@ namespace hpx {
 
         template <typename FwdIter, typename F>
         // clang-format off
-            requires (
-                hpx::traits::is_iterator_v<FwdIter> &&
-                hpx::is_invocable_v<F,
-                    typename std::iterator_traits<FwdIter>::value_type
-                >
-            )
+        requires (
+            hpx::traits::is_iterator_v<FwdIter> &&
+            hpx::is_invocable_v<F, hpx::traits::iter_value_t<FwdIter>>
+        )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             find_if_not_t, FwdIter first, FwdIter last, F f)
@@ -1453,15 +1445,14 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred>
         // clang-format off
-            requires (
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type
-                >
-            )
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2> &&
+            hpx::is_invocable_v<Pred,
+                hpx::traits::iter_value_t<FwdIter1>, hpx::traits::iter_value_t<FwdIter2>
+            >
+        )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(find_end_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
@@ -1479,11 +1470,11 @@ namespace hpx {
 
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
         // clang-format off
-            requires (
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2>
-            )
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2>
+        )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(find_end_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
@@ -1501,14 +1492,13 @@ namespace hpx {
 
         template <typename FwdIter1, typename FwdIter2, typename Pred>
         // clang-format off
-            requires (
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type
-                >
-            )
+        requires (
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2> &&
+            hpx::is_invocable_v<Pred,
+                hpx::traits::iter_value_t<FwdIter1>, hpx::traits::iter_value_t<FwdIter2>
+            >
+        )
         // clang-format on
         friend FwdIter1 tag_fallback_invoke(find_end_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred op)
@@ -1525,10 +1515,10 @@ namespace hpx {
 
         template <typename FwdIter1, typename FwdIter2>
         // clang-format off
-            requires (
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2>
-            )
+        requires (
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2>
+        )
         // clang-format on
         friend FwdIter1 tag_fallback_invoke(find_end_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
@@ -1554,15 +1544,14 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred>
         // clang-format off
-            requires (
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type
-                >
-            )
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2> &&
+            hpx::is_invocable_v<Pred,
+                hpx::traits::iter_value_t<FwdIter1>, hpx::traits::iter_value_t<FwdIter2>
+            >
+        )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(find_first_of_t,
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 s_first,
@@ -1580,11 +1569,11 @@ namespace hpx {
 
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
         // clang-format off
-            requires (
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2>
-            )
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2>
+        )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(find_first_of_t,
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 s_first,
@@ -1603,14 +1592,13 @@ namespace hpx {
 
         template <typename FwdIter1, typename FwdIter2, typename Pred>
         // clang-format off
-            requires (
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type
-                >
-            )
+        requires (
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2> &&
+            hpx::is_invocable_v<Pred,
+                hpx::traits::iter_value_t<FwdIter1>, hpx::traits::iter_value_t<FwdIter2>
+            >
+        )
         // clang-format on
         friend FwdIter1 tag_fallback_invoke(find_first_of_t, FwdIter1 first,
             FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last, Pred op)
@@ -1627,10 +1615,10 @@ namespace hpx {
 
         template <typename FwdIter1, typename FwdIter2>
         // clang-format off
-            requires (
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2>
-            )
+        requires (
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2>
+        )
         // clang-format on
         friend FwdIter1 tag_fallback_invoke(find_first_of_t, FwdIter1 first,
             FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last)

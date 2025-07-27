@@ -1012,7 +1012,7 @@ namespace hpx::ranges {
         template <typename Iter, typename Sent, typename F,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (   
+            requires (
                 hpx::traits::is_iterator_v<Iter> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&

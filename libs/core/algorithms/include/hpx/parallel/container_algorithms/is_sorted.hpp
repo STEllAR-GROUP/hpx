@@ -575,7 +575,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >
             )
-        // clang-format on 
+        // clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::is_sorted_t, Rng&& rng,
             Pred pred = Pred(), Proj proj = Proj())
         {
@@ -589,7 +589,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng,
             typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
-            // clang-format off
+        // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&

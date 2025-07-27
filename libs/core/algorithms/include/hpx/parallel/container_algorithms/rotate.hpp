@@ -601,8 +601,8 @@ namespace hpx::ranges {
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<OutIter>
-                )
-        // clang-format on 
+            )
+        // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             rotate_copy_result<hpx::traits::range_iterator_t<Rng>, OutIter>>
         tag_fallback_invoke(hpx::ranges::rotate_copy_t, ExPolicy&& policy,

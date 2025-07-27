@@ -231,7 +231,7 @@ namespace hpx::ranges {
     private:
         template <typename ExPolicy, typename Rng>
         // clang-format off
-            requires ( 
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng>
             )
@@ -268,9 +268,7 @@ namespace hpx::ranges {
         }
 
         template <typename Rng>
-        // clang-format off
             requires(hpx::traits::is_range_v<Rng>)
-        // clang-format on
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             destroy_t, Rng&& rng)
         {
@@ -285,11 +283,7 @@ namespace hpx::ranges {
         }
 
         template <typename Iter, typename Sent>
-        // clang-format off
-            requires (
-                hpx::traits::is_iterator_v<Iter>
-            )
-        // clang-format on
+            requires(hpx::traits::is_iterator_v<Iter>)
         friend Iter tag_fallback_invoke(destroy_t, Iter first, Sent last)
         {
             static_assert(hpx::traits::is_forward_iterator_v<Iter>,

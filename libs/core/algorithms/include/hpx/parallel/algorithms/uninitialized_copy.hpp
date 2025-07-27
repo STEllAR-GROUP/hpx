@@ -380,11 +380,7 @@ namespace hpx::parallel {
 
             // non vectorized overload
             template <typename ExPolicy, typename InIter, typename FwdIter2>
-            // clang-format off
-                requires (
-                    hpx::is_sequenced_execution_policy_v<ExPolicy>
-                )
-                // clang-format on 
+                requires(hpx::is_sequenced_execution_policy_v<ExPolicy>)
             static util::in_out_result<InIter, FwdIter2> sequential(
                 ExPolicy&& policy, InIter first, std::size_t count,
                 FwdIter2 dest)
@@ -414,7 +410,6 @@ namespace hpx {
     inline constexpr struct uninitialized_copy_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_t>
     {
-        
         template <typename InIter, typename FwdIter>
         // clang-format off
             requires (

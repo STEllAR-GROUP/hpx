@@ -514,7 +514,7 @@ namespace hpx::experimental {
 
         template <typename ExPolicy, typename FwdIter>
         // clang-format off
-            requires ( 
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
             )
@@ -537,11 +537,7 @@ namespace hpx::experimental {
 
         template <typename InIter, typename F,
             typename T = typename std::iterator_traits<InIter>::value_type>
-        // clang-format off
-            requires (
-                hpx::traits::is_iterator_v<InIter>
-            )
-        // clang-format on
+            requires(hpx::traits::is_iterator_v<InIter>)
         friend T tag_fallback_invoke(hpx::experimental::reduce_deterministic_t,
             InIter first, InIter last, T init, F f)
         {
@@ -554,11 +550,7 @@ namespace hpx::experimental {
 
         template <typename InIter,
             typename T = typename std::iterator_traits<InIter>::value_type>
-        // clang-format off
-            requires (
-                hpx::traits::is_iterator_v<InIter>
-            )
-        // clang-format on
+            requires(hpx::traits::is_iterator_v<InIter>)
         friend T tag_fallback_invoke(hpx::experimental::reduce_deterministic_t,
             InIter first, InIter last, T init)
         {
@@ -571,11 +563,7 @@ namespace hpx::experimental {
         }
 
         template <typename InIter>
-        // clang-format off
-            requires (
-                hpx::traits::is_iterator_v<InIter>
-            )
-        // clang-format on
+            requires(hpx::traits::is_iterator_v<InIter>)
         friend typename std::iterator_traits<InIter>::value_type
         tag_fallback_invoke(hpx::experimental::reduce_deterministic_t,
             InIter first, InIter last)

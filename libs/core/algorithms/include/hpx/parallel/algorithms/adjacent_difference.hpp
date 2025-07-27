@@ -223,6 +223,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_difference.hpp>
@@ -353,7 +354,8 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<adjacent_difference_t>
     {
     private:
-        template <std::input_iterator FwdIter1, std::output_iterator FwdIter2>
+        template <std::input_iterator FwdIter1,
+            std::output_iterator<hpx::traits::iter_value_t<FwdIter1>> FwdIter2>
         friend FwdIter2 tag_fallback_invoke(hpx::adjacent_difference_t,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
@@ -372,7 +374,8 @@ namespace hpx {
                 std::minus<>());
         }
 
-        template <std::input_iterator FwdIter1, std::output_iterator FwdIter2,
+        template <std::input_iterator FwdIter1,
+            std::output_iterator<hpx::traits::iter_value_t<FwdIter1>> FwdIter2,
             typename Op>
         friend FwdIter2 tag_fallback_invoke(hpx::adjacent_difference_t,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op op)

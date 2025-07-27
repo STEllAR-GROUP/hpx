@@ -759,10 +759,10 @@ namespace hpx::parallel {
         // sequential partition with projection function for forward iterator.
         template <typename FwdIter, typename Pred, typename Proj>
         // clang-format off
-            requires (hpx::traits::is_forward_iterator_v<FwdIter> &&
-                !hpx::traits::is_bidirectional_iterator_v<FwdIter>
-            )
-        // clang-format on 
+        requires (hpx::traits::is_forward_iterator_v<FwdIter> &&
+            !hpx::traits::is_bidirectional_iterator_v<FwdIter>
+        )
+        // clang-format on
         constexpr FwdIter sequential_partition(
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
         {
@@ -1152,13 +1152,8 @@ namespace hpx::parallel {
             // blocks to the adjacent left of the boundary. In the end, all
             // remaining blocks are merged into one block which is adjacent to
             // the left of boundary.
-
-          
             template <typename BidirIter>
-                requires (
-                    hpx::traits::is_bidirectional_iterator_v<BidirIter>
-                )
-            // clang-format on
+                requires(hpx::traits::is_bidirectional_iterator_v<BidirIter>)
             static block<BidirIter> merge_leftside_remaining_blocks(
                 std::vector<block<BidirIter>>& remaining_blocks,
                 BidirIter boundary, BidirIter first)

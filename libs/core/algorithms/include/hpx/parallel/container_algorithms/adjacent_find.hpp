@@ -363,7 +363,7 @@ namespace hpx::ranges {
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
-                hpx::parallel::traits::is_projected_range_v<Proj, Rng> && 
+                hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable<
                     ExPolicy, Pred,
                     hpx::parallel::traits::projected_range<Proj, Rng>,

@@ -264,11 +264,7 @@ namespace hpx {
     private:
         template <typename InIter,
             typename Pred = hpx::parallel::detail::equal_to>
-        // clang-format off
-            requires (
-                hpx::traits::is_input_iterator_v<InIter>  
-            )
-        // clang-format on
+            requires(hpx::traits::is_input_iterator_v<InIter>)
         friend InIter tag_fallback_invoke(
             hpx::adjacent_find_t, InIter first, InIter last, Pred pred = Pred())
         {
@@ -283,10 +279,10 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter,
             typename Pred = hpx::parallel::detail::equal_to>
         // clang-format off
-            requires (
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
-            )
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_forward_iterator_v<FwdIter>
+        )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::adjacent_find_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())

@@ -355,7 +355,7 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<InIter>::value_type,
             typename Op = std::plus<>>
         // clang-format off
-            requires ( 
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&

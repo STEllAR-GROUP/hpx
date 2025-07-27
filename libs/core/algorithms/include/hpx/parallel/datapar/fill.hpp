@@ -66,9 +66,10 @@ namespace hpx { namespace parallel { namespace detail {
     template <typename ExPolicy, typename Iter, typename T>
     // clang-format off
         requires (
-            hpx::is_vectorpack_execution_policy_v<ExPolicy>&& hpx::parallel::
-                util::detail::iterator_datapar_compatible<Iter>::value)
-    // clang-format on 
+            hpx::is_vectorpack_execution_policy_v<ExPolicy> &&
+            parallel::util::detail::iterator_datapar_compatible<Iter>::value
+        )
+    // clang-format on
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter tag_invoke(sequential_fill_n_t,
         ExPolicy&& policy, Iter first, std::size_t count, T const& value)
     {
@@ -76,4 +77,5 @@ namespace hpx { namespace parallel { namespace detail {
             HPX_FORWARD(ExPolicy, policy), first, count, value);
     }
 }}}    // namespace hpx::parallel::detail
+
 #endif
