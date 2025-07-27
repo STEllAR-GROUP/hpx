@@ -28,7 +28,9 @@
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
-    template <typename InIter, typename OutIter, typename T, typename Op, typename Conv>
+
+    template <typename InIter, typename OutIter, typename T, typename Op,
+        typename Conv>
     // clang-format off
         requires (
             hpx::traits::is_iterator<InIter>::value &&
@@ -54,7 +56,8 @@ namespace hpx { namespace segmented {
             HPX_FORWARD(Op, op), std::true_type{}, HPX_FORWARD(Conv, conv));
     }
 
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T, typename Op, typename Conv>
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename T, typename Op, typename Conv>
     // clang-format off
         requires (
             hpx::is_execution_policy_v<ExPolicy> &&

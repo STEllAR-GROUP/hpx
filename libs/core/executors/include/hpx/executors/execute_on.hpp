@@ -101,19 +101,14 @@ namespace hpx::execution::experimental {
 
     template <typename Tag, typename Scheduler, typename ExPolicy,
         typename Property>
-    // clang-format off
-        requires (
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )
-    // clang-format on 
+        requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(Tag tag,
         scheduler_and_policy<Scheduler, ExPolicy> const& scheduler,
         Property&& prop)
         -> decltype(scheduler_and_policy<Scheduler, ExPolicy>(
-                std::declval<Tag>()(
-                    std::declval<Scheduler>(), std::declval<Property>()),
-                std::declval<ExPolicy>()))
-    // clang-format on
+            std::declval<Tag>()(
+                std::declval<Scheduler>(), std::declval<Property>()),
+            std::declval<ExPolicy>()))
     {
         return scheduler_and_policy<Scheduler, ExPolicy>(
             tag(scheduler.get_scheduler(), HPX_FORWARD(Property, prop)),
@@ -121,11 +116,7 @@ namespace hpx::execution::experimental {
     }
 
     template <typename Tag, typename Scheduler, typename ExPolicy>
-    // clang-format off
-        requires (
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )
-    // clang-format on
+        requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(
         Tag tag, scheduler_and_policy<Scheduler, ExPolicy> const& scheduler)
         -> decltype(std::declval<Tag>()(std::declval<Scheduler>()))

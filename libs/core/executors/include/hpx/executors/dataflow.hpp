@@ -391,6 +391,7 @@ namespace hpx::lcos::detail {
         typename... Ts,
         typename Frame = dataflow_frame<std::decay_t<Policy>,
             std::decay_t<Func>, hpx::tuple<std::decay_t<Ts>...>>>
+        requires(hpx::traits::is_allocator_v<Allocator>)
     typename Frame::type create_dataflow(
         Allocator const& alloc, Policy&& policy, Func&& func, Ts&&... ts)
     {
@@ -430,6 +431,7 @@ namespace hpx::lcos::detail {
     {
         template <typename Allocator, typename Policy_, typename F,
             typename... Ts>
+            requires(hpx::traits::is_allocator_v<Allocator>)
         HPX_FORCEINLINE static decltype(auto) call(
             Allocator const& alloc, Policy_&& policy, F&& f, Ts&&... ts)
         {
@@ -447,6 +449,7 @@ namespace hpx::lcos::detail {
             !traits::is_two_way_executor_v<FD>>>
     {
         template <typename Allocator, typename F, typename... Ts>
+            requires(hpx::traits::is_allocator_v<Allocator>)
         HPX_FORCEINLINE static decltype(auto) call(
             Allocator const& alloc, F&& f, Ts&&... ts)
         {
@@ -466,14 +469,12 @@ namespace hpx::detail {
             hpx::traits::is_launch_policy_v<Policy> &&
            !hpx::traits::is_action_v<std::decay_t<F>>
         )
-    // clang-format on 
-    auto tag_invoke(dataflow_t, Allocator const& alloc, Policy&& policy, F&& f,
-        Ts&&... ts)
-        -> decltype(
-                hpx::lcos::detail::dataflow_dispatch_impl<
-                    false, std::decay_t<Policy>
-                >::call(alloc, HPX_FORWARD(Policy, policy),
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+    // clang-format on
+    decltype(auto) tag_invoke(
+        dataflow_t, Allocator const& alloc, Policy&& policy, F&& f, Ts&&... ts)
+    //-> decltype(hpx::lcos::detail::dataflow_dispatch_impl<false,
+    //    std::decay_t<Policy>>::call(alloc, HPX_FORWARD(Policy, policy),
+    //    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
     // clang-format on
     {
         return hpx::lcos::detail::dataflow_dispatch_impl<false,
@@ -488,14 +489,12 @@ namespace hpx::detail {
             hpx::traits::is_launch_policy_v<Policy> &&
             hpx::traits::is_action_v<std::decay_t<F>>
         )
-    // clang-format on 
-    auto tag_invoke(dataflow_t, Allocator const& alloc, Policy&& policy, F&& f,
-        Ts&&... ts)
-        -> decltype(
-                hpx::lcos::detail::dataflow_dispatch_impl<
-                    true, std::decay_t<Policy>
-                >::call(alloc, HPX_FORWARD(Policy, policy),
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+    // clang-format on
+    decltype(auto) tag_invoke(
+        dataflow_t, Allocator const& alloc, Policy&& policy, F&& f, Ts&&... ts)
+    //-> decltype(hpx::lcos::detail::dataflow_dispatch_impl<true,
+    //    std::decay_t<Policy>>::call(alloc, HPX_FORWARD(Policy, policy),
+    //    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
     // clang-format on
     {
         return hpx::lcos::detail::dataflow_dispatch_impl<true,

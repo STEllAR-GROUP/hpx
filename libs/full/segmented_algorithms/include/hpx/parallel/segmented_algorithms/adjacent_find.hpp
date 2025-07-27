@@ -278,8 +278,7 @@ namespace hpx::parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx::segmented {
 
-    template<typename InIter,
-        typename Pred>
+    template <typename InIter, typename Pred>
     // clang-format off
         requires (
             hpx::traits::is_iterator<InIter>::value &&
@@ -307,8 +306,7 @@ namespace hpx::segmented {
             hpx::identity_v, std::true_type());
     }
 
-    template<typename ExPolicy, typename SegIter,
-        typename Pred>
+    template <typename ExPolicy, typename SegIter, typename Pred>
     // clang-format off
         requires (
             hpx::is_execution_policy_v<ExPolicy> &&

@@ -488,10 +488,8 @@ namespace hpx::segmented {
     // clang-format off
     template <typename InIter, typename F>
     // clang-format on
-        requires (
-            hpx::traits::is_iterator<InIter>::value &&
-            hpx::traits::is_segmented_iterator<InIter>::value
-        )
+        requires(hpx::traits::is_iterator<InIter>::value &&
+            hpx::traits::is_segmented_iterator<InIter>::value)
     bool tag_invoke(hpx::none_of_t, InIter first, InIter last, F&& f)
     {
         static_assert(hpx::traits::is_input_iterator<InIter>::value,

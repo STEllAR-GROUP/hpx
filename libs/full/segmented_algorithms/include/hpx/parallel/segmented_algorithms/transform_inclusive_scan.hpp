@@ -56,7 +56,8 @@ namespace hpx { namespace segmented {
             HPX_FORWARD(Op, op), std::true_type{}, HPX_FORWARD(Conv, conv));
     }
 
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename Op, typename Conv>
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename Op, typename Conv>
     // clang-format off
         requires (
             hpx::is_execution_policy_v<ExPolicy> &&
@@ -88,7 +89,8 @@ namespace hpx { namespace segmented {
             HPX_FORWARD(Op, op), is_seq(), HPX_FORWARD(Conv, conv));
     }
 
-    template <typename InIter, typename OutIter, typename T, typename Op, typename Conv>
+    template <typename InIter, typename OutIter, typename T, typename Op,
+        typename Conv>
     // clang-format off
         requires (
             hpx::traits::is_iterator<InIter>::value &&
@@ -114,7 +116,8 @@ namespace hpx { namespace segmented {
             HPX_FORWARD(Op, op), std::true_type{}, HPX_FORWARD(Conv, conv));
     }
 
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T, typename Op, typename Conv>
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename T, typename Op, typename Conv>
     // clang-format off
         requires (
             hpx::is_execution_policy_v<ExPolicy> &&
@@ -126,7 +129,8 @@ namespace hpx { namespace segmented {
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     tag_invoke(hpx::transform_inclusive_scan_t, ExPolicy&& policy,
-        FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op, Conv&& conv, T init)
+        FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op, Conv&& conv,
+        T init)
     {
         static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
             "Requires at least forward iterator.");

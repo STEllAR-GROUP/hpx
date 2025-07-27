@@ -251,7 +251,8 @@ namespace hpx { namespace parallel {
 namespace hpx { namespace segmented {
 
     template <typename InIter, typename OutIter,
-        typename Op = std::plus<typename std::iterator_traits<InIter>::value_type>>
+        typename Op =
+            std::plus<typename std::iterator_traits<InIter>::value_type>>
     // clang-format off
         requires (
             hpx::traits::is_iterator_v<InIter> &&
@@ -280,7 +281,8 @@ namespace hpx { namespace segmented {
     }
 
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Op = std::plus<typename std::iterator_traits<FwdIter1>::value_type>>
+        typename Op =
+            std::plus<typename std::iterator_traits<FwdIter1>::value_type>>
     // clang-format off
         requires (
             hpx::is_execution_policy_v<ExPolicy> &&
@@ -312,8 +314,7 @@ namespace hpx { namespace segmented {
             HPX_FORWARD(Op, op), is_seq(), hpx::identity_v);
     }
 
-    template <typename InIter, typename OutIter,
-        typename Op, typename T>
+    template <typename InIter, typename OutIter, typename Op, typename T>
     // clang-format off
         requires (
             hpx::traits::is_iterator_v<InIter> &&
