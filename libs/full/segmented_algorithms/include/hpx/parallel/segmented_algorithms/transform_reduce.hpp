@@ -384,8 +384,9 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator_v<SegIter>
         )
     // clang-format on
-    typename std::decay<T>::type tag_invoke(hpx::transform_reduce_t, SegIter first,
-        SegIter last, T&& init, Reduce&& red_op, Convert&& conv_op)
+    typename std::decay<T>::type tag_invoke(hpx::transform_reduce_t,
+        SegIter first, SegIter last, T&& init, Reduce&& red_op,
+        Convert&& conv_op)
     {
         static_assert(hpx::traits::is_input_iterator<SegIter>::value,
             "Requires at least input iterator.");
@@ -404,7 +405,8 @@ namespace hpx { namespace segmented {
             std::true_type{});
     }
 
-    template <typename ExPolicy, typename SegIter, typename T, typename Reduce, typename Convert>
+    template <typename ExPolicy, typename SegIter, typename T, typename Reduce,
+        typename Convert>
     // clang-format off
         requires (
             hpx::is_execution_policy_v<ExPolicy> &&
@@ -436,7 +438,8 @@ namespace hpx { namespace segmented {
             is_seq());
     }
 
-    template <typename FwdIter1, typename FwdIter2, typename T, typename Reduce, typename Convert>
+    template <typename FwdIter1, typename FwdIter2, typename T, typename Reduce,
+        typename Convert>
     // clang-format off
         requires (
             hpx::traits::is_iterator<FwdIter1>::value &&

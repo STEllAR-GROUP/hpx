@@ -20,19 +20,9 @@
 
 namespace hpx::detail {
 
-#if __cplusplus < 202002L
-    // until c++20 std::destroy_at can be used only on non-array types
-    template <typename T>
-    // clang-format off
-        requires (std::is_destructible_v<T> && !std::is_array_v<T>)
-    // clang-format on 
-#else
     // since c++20 std::destroy_at can be used on array types, destructing each element
     template <typename T>
-    // clang-format off
-    requires (std::is_destructible_v<T>)
-    // clang-format on 
-#endif
+        requires(std::is_destructible_v<T>)
     struct destroy_guard
     {
         T* t;

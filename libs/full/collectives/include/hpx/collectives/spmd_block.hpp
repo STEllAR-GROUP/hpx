@@ -331,9 +331,7 @@ namespace hpx { namespace lcos {
     }    // namespace detail
 
     template <typename F, typename... Args>
-    // clang-format off
-        requires (hpx::traits::is_action<F>::value)
-    // clang-format on 
+        requires(hpx::traits::is_action<F>::value)
     hpx::future<void> define_spmd_block(std::string&& name,
         std::size_t images_per_locality, F&& /* f */, Args&&... args)
     {
@@ -366,4 +364,5 @@ namespace hpx { namespace lcos {
             HPX_FORWARD(Args, args)...);
     }
 }}    // namespace hpx::lcos
+
 #endif

@@ -238,9 +238,7 @@ namespace hpx::execution::experimental {
         // --------------------------------------------------------------------
         // BulkTwoWayExecutor interface
         template <typename F, typename S, typename... Ts>
-        // clang-format off
-            requires (!std::is_integral_v<S>)
-        // clang-format on  
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             limiting_executor& exec, F&& f, S const& shape, Ts&&... ts)
@@ -253,9 +251,7 @@ namespace hpx::execution::experimental {
 
         // --------------------------------------------------------------------
         template <typename F, typename S, typename Future, typename... Ts>
-        // clang-format off
-            requires (!std::is_integral_v<S>)
-        // clang-format on 
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_then_execute_t,
             limiting_executor& exec, F&& f, S const& shape,

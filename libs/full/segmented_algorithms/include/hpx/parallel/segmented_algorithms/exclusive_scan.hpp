@@ -238,8 +238,8 @@ namespace hpx { namespace parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
 
-    template <typename InIter, typename OutIter,
-        typename T, typename Op = std::plus<T>>
+    template <typename InIter, typename OutIter, typename T,
+        typename Op = std::plus<T>>
     // clang-format off
         requires (
             hpx::traits::is_iterator_v<InIter> &&
