@@ -464,11 +464,7 @@ int main(int const argc, char* argv[])
     options_description desc_commandline(
         "usage: " HPX_APPLICATION_STRING " [options]");
 
-#if defined(HPX_DEBUG)
     constexpr std::size_t vector_size = 268435;
-#else
-    constexpr std::size_t vector_size = 268435456;
-#endif
 
     std::string const vector_size_help =
         "sum of sizes of two vectors (default: " + std::to_string(vector_size) +
