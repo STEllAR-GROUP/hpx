@@ -1199,11 +1199,11 @@ namespace hpx::parallel::util {
             // handle sequences of non-futures
             template <typename Iter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
-                std::size_t base_idx, Iter it, std::size_t num, F&& f)
+                std::size_t base_idx, Iter start, std::size_t num, F&& f)
             {
                 if (num == 0)
                 {
-                    return it;
+                    return start;
                 }
 
                 std::size_t count(
