@@ -51,6 +51,7 @@ namespace hpx::parallel::util {
         struct uninit_move_n_helper;
 
         ///////////////////////////////////////////////////////////////////////
+        // NOLINTBEGIN(bugprone-bitwise-pointer-cast)
         template <typename T>
         HPX_FORCEINLINE constexpr std::enable_if_t<std::is_pointer_v<T>, char*>
         to_ptr(T ptr) noexcept
@@ -92,6 +93,7 @@ namespace hpx::parallel::util {
             return const_cast<char const*>(
                 hpx::bit_cast<char const volatile*>(&*ptr));
         }
+        // NOLINTEND(bugprone-bitwise-pointer-cast)
 
         ///////////////////////////////////////////////////////////////////////
         template <typename InIter, typename OutIter>
