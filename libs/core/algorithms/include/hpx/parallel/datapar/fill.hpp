@@ -31,7 +31,7 @@ namespace hpx { namespace parallel { namespace detail {
         call(ExPolicy&&, Iter first, Sent last, T const& val)
         {
             hpx::parallel::util::loop_ind<std::decay_t<ExPolicy>>(
-                first, last, [&val](auto& v) { v = val; });
+                first, last, [&val](auto&& v) { v = val; });
             return first;
         }
     };
@@ -56,7 +56,7 @@ namespace hpx { namespace parallel { namespace detail {
         call(ExPolicy&&, Iter first, std::size_t count, T const& val)
         {
             hpx::parallel::util::loop_n_ind<std::decay_t<ExPolicy>>(
-                first, count, [&val](auto& v) { v = val; });
+                first, count, [&val](auto&& v) { v = val; });
             return first;
         }
     };
