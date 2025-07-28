@@ -38,7 +38,7 @@ namespace hpx { namespace parallel { namespace detail {
             if constexpr (hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 return util::loop_ind<ExPolicy>(
-                    first, last, [old_value, new_value, &proj](auto& v) {
+                    first, last, [old_value, new_value, &proj](auto&& v) {
                         using var_type = std::decay_t<decltype(v)>;
                         traits::mask_assign(
                             HPX_INVOKE(proj, v) == var_type(old_value), v,
@@ -99,7 +99,7 @@ namespace hpx { namespace parallel { namespace detail {
             if constexpr (hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 return util::loop_ind<ExPolicy>(
-                    first, last, [&f, new_value, &proj](auto& v) {
+                    first, last, [&f, new_value, &proj](auto&& v) {
                         using var_type = std::decay_t<decltype(v)>;
                         traits::mask_assign(HPX_INVOKE(f, HPX_INVOKE(proj, v)),
                             v, var_type(new_value));
