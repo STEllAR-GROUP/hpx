@@ -664,6 +664,7 @@ if(APPLE
    OR HPX_WITH_CUDA
    OR HPX_WITH_HIP
    OR HPX_WITH_PARCELPORT_LCI
+   OR HPX_WITH_PARCELPORT_LCW
 )
   set(HPX_WITH_PKGCONFIG_DEFAULT OFF)
 endif()
@@ -1305,6 +1306,47 @@ if(HPX_WITH_NETWORKING)
   endif()
 
   hpx_option(
+    HPX_WITH_PARCELPORT_LCW BOOL "Enable the LCW based parcelport." OFF
+    CATEGORY "Parcelport"
+  )
+  if(HPX_WITH_PARCELPORT_LCW)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_LCW)
+  endif()
+  # Options for automatically fetching LCI
+  hpx_option(
+    HPX_WITH_FETCH_LCW
+    BOOL
+    "Use FetchContent to fetch LCW. By default an installed LCW will be used. (default: OFF)"
+    OFF
+    CATEGORY "Build Targets"
+    ADVANCED
+  )
+  hpx_option(
+    HPX_WITH_LCW_TAG STRING "LCW repository tag or branch"
+    "f26fdd068110ec62a56ecb364254c3ce0b101174" # latest commit as of 2025-12-10
+    CATEGORY "Build Targets"
+    ADVANCED
+  )
+  hpx_option(
+    HPX_WITH_PARCELPORT_LCW_LOG STRING
+    "Enable the LCW-parcelport-specific logger" OFF
+    CATEGORY "Parcelport"
+    ADVANCED
+  )
+  if(HPX_WITH_PARCELPORT_LCW_LOG)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_LCW_LOG)
+  endif()
+  hpx_option(
+    HPX_WITH_PARCELPORT_LCW_PCOUNTER STRING
+    "Enable the LCW-parcelport-specific performance counter" OFF
+    CATEGORY "Parcelport"
+    ADVANCED
+  )
+  if(HPX_WITH_PARCELPORT_LCW_PCOUNTER)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_LCW_PCOUNTER)
+  endif()
+
+  hpx_option(
     HPX_WITH_PARCELPORT_GASNET BOOL "Enable the GASNET based parcelport." OFF
     CATEGORY "Parcelport"
   )
@@ -1439,7 +1481,32 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
   endif()
 endif()
 
-# External libraries/frameworks used by some of the examples and benchmarks
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCW)
+  # lcw parcelport settings
+  hpx_option(
+    HPX_WITH_PARCELPORT_LCW_ENV
+    STRING
+    "List of environment variables checked to detect LCW (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID;LCT_PMI_FILE_NRANKS)."
+    "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID;LCT_PMI_FILE_NRANKS"
+    CATEGORY "Parcelport"
+    ADVANCED
+  )
+
+  # This list is to detect whether we run inside an lcw environment. If one of
+  # those environment variables is set, the LCW parcelport is enabled by
+  # default. PMI_RANK: Intel MPI and MVAPICH2 OMPI_COMM_WORLD_SIZE: OpenMPI
+  # starting at version 1.3
+  if(HPX_WITH_PARCELPORT_LCW_ENV)
+    string(REPLACE ";" "," hpx_parcelport_lcw_env_
+                   "${HPX_WITH_PARCELPORT_LCW_ENV}"
+    )
+    hpx_add_config_define(
+      HPX_HAVE_PARCELPORT_LCW_ENV "\"${hpx_parcelport_lcw_env_}\""
+    )
+  endif()
+endif()
+
+# External libraries/frameworks used by sme of the examples and benchmarks
 hpx_option(
   HPX_WITH_EXAMPLES_OPENMP BOOL
   "Enable examples requiring OpenMP support (default: OFF)." OFF
@@ -2372,6 +2439,10 @@ endif()
 if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
   include(HPX_SetupLCI)
   hpx_setup_lci()
+endif()
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCW)
+  include(HPX_SetupLCW)
+  hpx_setup_lcw()
 endif()
 if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_GASNET)
   include(HPX_SetupGasnet)

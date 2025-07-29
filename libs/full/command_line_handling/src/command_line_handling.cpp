@@ -20,6 +20,9 @@
 #if defined(HPX_HAVE_MODULE_LCI_BASE)
 #include <hpx/modules/lci_base.hpp>
 #endif
+#if defined(HPX_HAVE_MODULE_LCW_BASE)
+#include <hpx/modules/lcw_base.hpp>
+#endif
 #if defined(HPX_HAVE_MODULE_GASNET_BASE)
 #include <hpx/modules/gasnet_base.hpp>
 #endif
@@ -1002,14 +1005,22 @@ namespace hpx::util {
 #endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)) ||      \
     defined(HPX_HAVE_MODULE_LCI_BASE)
-        // better to put LCI init after MPI init, since LCI will also
-        // initialize MPI if MPI is not already initialized.
         if (util::lci_environment::check_lci_environment(rtcfg_))
         {
             util::lci_environment::init(&argc, &argv, rtcfg_);
             num_localities_ =
                 static_cast<std::size_t>(util::lci_environment::size());
             node_ = static_cast<std::size_t>(util::lci_environment::rank());
+        }
+#endif
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCW)) ||      \
+    defined(HPX_HAVE_MODULE_LCW_BASE)
+        if (util::lcw_environment::check_lcw_environment(rtcfg_))
+        {
+            util::lcw_environment::init(&argc, &argv, rtcfg_);
+            num_localities_ =
+                static_cast<std::size_t>(util::lcw_environment::size());
+            node_ = static_cast<std::size_t>(util::lcw_environment::rank());
         }
 #endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
