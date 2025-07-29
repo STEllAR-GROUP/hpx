@@ -561,9 +561,7 @@ namespace hpx::threads::policies {
         // ----------------------------------------------------------------
         static void deallocate(threads::thread_data* p) noexcept
         {
-            using threads::thread_data;
-            std::destroy_at(p);
-            thread_alloc_.deallocate(p, 1);
+            p->destroy();
         }
 
         // ----------------------------------------------------------------
