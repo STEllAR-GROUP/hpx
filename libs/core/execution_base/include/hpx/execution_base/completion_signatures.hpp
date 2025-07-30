@@ -1309,6 +1309,7 @@ namespace hpx::execution::experimental {
     // clang-format on
 
     template <typename Promise>
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     struct with_awaitable_senders : detail::with_awaitable_senders_base
     {
         template <typename Value>

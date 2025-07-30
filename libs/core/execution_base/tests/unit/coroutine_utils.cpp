@@ -369,6 +369,8 @@ int main()
     try
     {
         // Awaitables are implicitly senders:
+
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         auto i = hpx::this_thread::experimental::sync_wait(
             async_answer(hpx::execution::experimental::just(42),
                 hpx::execution::experimental::just()))
