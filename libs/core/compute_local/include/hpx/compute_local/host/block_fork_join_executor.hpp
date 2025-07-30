@@ -11,7 +11,6 @@
 #include <hpx/config.hpp>
 #include <hpx/compute_local/host/numa_domains.hpp>
 #include <hpx/compute_local/host/target.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
@@ -243,12 +242,8 @@ namespace hpx::execution::experimental {
                 outer_shape, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend void tag_invoke(hpx::parallel::execution::bulk_sync_execute_t,
             block_fork_join_executor& exec, F&& f, S const& shape, Ts&&... ts)
         {
@@ -256,12 +251,8 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             block_fork_join_executor& exec, F&& f, S const& shape, Ts&&... ts)
@@ -314,12 +305,8 @@ namespace hpx::execution::experimental {
             }
         }
 
-        // clang-format off
-        template <typename F, typename... Fs,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...)
-            )>
-        // clang-format on
+        template <typename F, typename... Fs>
+            requires(std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...))
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::sync_invoke_t,
             block_fork_join_executor const& exec, F&& f, Fs&&... fs)
@@ -327,12 +314,8 @@ namespace hpx::execution::experimental {
             exec.sync_invoke_helper(HPX_FORWARD(F, f), HPX_FORWARD(Fs, fs)...);
         }
 
-        // clang-format off
-        template <typename F, typename... Fs,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...)
-            )>
-        // clang-format on
+        template <typename F, typename... Fs>
+            requires(std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...))
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::async_invoke_t,
             block_fork_join_executor const& exec, F&& f, Fs&&... fs)
@@ -352,14 +335,12 @@ namespace hpx::execution::experimental {
         }
 
         // support all properties that are exposed by the fork_join_executor
-        // clang-format off
-        template <typename Tag, typename Property,
-            HPX_CONCEPT_REQUIRES_(
+
+        template <typename Tag, typename Property>
+            requires(
                 hpx::execution::experimental::is_scheduling_property_v<Tag> &&
-                hpx::functional::is_tag_invocable_v<
-                    Tag, fork_join_executor, Property>
-            )>
-        // clang-format on
+                hpx::functional::is_tag_invocable_v<Tag, fork_join_executor,
+                    Property>)
         friend block_fork_join_executor tag_invoke(Tag tag,
             block_fork_join_executor const& exec, Property&& prop) noexcept
         {
@@ -369,13 +350,10 @@ namespace hpx::execution::experimental {
             return exec_with_prop;
         }
 
-        // clang-format off
-        template <typename Tag,
-            HPX_CONCEPT_REQUIRES_(
+        template <typename Tag>
+            requires(
                 hpx::execution::experimental::is_scheduling_property_v<Tag> &&
-                hpx::functional::is_tag_invocable_v<Tag, fork_join_executor>
-            )>
-        // clang-format on
+                hpx::functional::is_tag_invocable_v<Tag, fork_join_executor>)
         friend decltype(auto) tag_invoke(
             Tag tag, block_fork_join_executor const& exec) noexcept
         {

@@ -14,31 +14,30 @@
 #include <hpx/execution_base/stdexec_forward.hpp>
 
 namespace hpx::execution::experimental {
+
+    namespace hpxexp = hpx::execution::experimental;
+
     template <typename F, typename Sender, typename... Senders>
     constexpr HPX_FORCEINLINE auto tag_invoke(
         hpx::detail::dataflow_t, F&& f, Sender&& sender, Senders&&... senders)
-        -> decltype(hpx::execution::experimental::then(
-            hpx::execution::experimental::when_all(
-                HPX_FORWARD(Sender, sender), HPX_FORWARD(Senders, senders)...),
+        -> decltype(hpxexp::then(hpxexp::when_all(HPX_FORWARD(Sender, sender),
+                                     HPX_FORWARD(Senders, senders)...),
             HPX_FORWARD(F, f)))
     {
-        return hpx::execution::experimental::then(
-            hpx::execution::experimental::when_all(
-                HPX_FORWARD(Sender, sender), HPX_FORWARD(Senders, senders)...),
+        return hpxexp::then(hpxexp::when_all(HPX_FORWARD(Sender, sender),
+                                HPX_FORWARD(Senders, senders)...),
             HPX_FORWARD(F, f));
     }
 
     template <typename F, typename Sender, typename... Senders>
     constexpr HPX_FORCEINLINE auto tag_invoke(hpx::detail::dataflow_t,
         hpx::launch, F&& f, Sender&& sender, Senders&&... senders)
-        -> decltype(hpx::execution::experimental::then(
-            hpx::execution::experimental::when_all(
-                HPX_FORWARD(Sender, sender), HPX_FORWARD(Senders, senders)...),
+        -> decltype(hpxexp::then(hpxexp::when_all(HPX_FORWARD(Sender, sender),
+                                     HPX_FORWARD(Senders, senders)...),
             HPX_FORWARD(F, f)))
     {
-        return hpx::execution::experimental::then(
-            hpx::execution::experimental::when_all(
-                HPX_FORWARD(Sender, sender), HPX_FORWARD(Senders, senders)...),
+        return hpxexp::then(hpxexp::when_all(HPX_FORWARD(Sender, sender),
+                                HPX_FORWARD(Senders, senders)...),
             HPX_FORWARD(F, f));
     }
 }    // namespace hpx::execution::experimental
@@ -541,11 +540,11 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_fallback<when_all_t>
     {
     private:
+        template <typename... Senders>
         // clang-format off
-        template <typename... Senders,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::util::all_of_v<is_sender<Senders>...>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             when_all_t, Senders&&... senders)
@@ -572,12 +571,12 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_fallback<transfer_when_all_t>
     {
     private:
+        template <typename Sched, typename... Senders>
         // clang-format off
-        template <typename Sched, typename... Senders,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 is_scheduler_v<Sched> &&
                 hpx::util::all_of_v<is_sender<Senders>...>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             transfer_when_all_t, Sched&& sched, Senders&&... senders)
