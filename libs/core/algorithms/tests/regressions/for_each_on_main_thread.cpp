@@ -123,6 +123,23 @@ int main()
     }
 
     {
+        // The thread created by run_as_hpx_thread needs to have at least the
+        // same priority as the threads created by the fork-join executor.
+        constexpr hpx::launch::async_policy policy(
+            hpx::threads::thread_priority::bound);
+
+        hpx::execution::experimental::fork_join_executor exec;
+        hpx::run_as_hpx_thread(policy, [&]() {
+            invoked.store(0);
+
+            hpx::for_each(hpx::execution::par.on(exec), vs.begin(), vs.end(),
+                [&](int) { ++invoked; });
+
+            HPX_TEST_EQ(invoked.load(), num_iterations);
+        });
+    }
+
+    {
         invoked.store(0);
 
         hpx::execution::experimental::fork_join_executor exec;
