@@ -7,6 +7,7 @@
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/manage_runtime.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
@@ -107,12 +108,19 @@ int main()
 {
     constexpr int num_iterations = 65536;
     std::atomic<int> invoked(0);
-
     std::vector<int> vs(num_iterations);
-    hpx::for_each(
-        hpx::execution::par, vs.begin(), vs.end(), [&](int) { ++invoked; });
 
-    HPX_TEST_EQ(invoked.load(), num_iterations);
+    {
+        hpx::run_as_hpx_thread([&]() {
+            invoked.store(0);
+
+            hpx::execution::experimental::fork_join_executor exec;
+            hpx::for_each(hpx::execution::par.on(exec), vs.begin(), vs.end(),
+                [&](int) { ++invoked; });
+
+            HPX_TEST_EQ(invoked.load(), num_iterations);
+        });
+    }
 
     {
         invoked.store(0);
@@ -120,9 +128,18 @@ int main()
         hpx::execution::experimental::fork_join_executor exec;
         hpx::for_each(hpx::execution::par.on(exec), vs.begin(), vs.end(),
             [&](int) { ++invoked; });
+
+        HPX_TEST_EQ(invoked.load(), num_iterations);
     }
 
-    HPX_TEST_EQ(invoked.load(), num_iterations);
+    {
+        invoked.store(0);
+
+        hpx::for_each(
+            hpx::execution::par, vs.begin(), vs.end(), [&](int) { ++invoked; });
+
+        HPX_TEST_EQ(invoked.load(), num_iterations);
+    }
 
     return hpx::util::report_errors();
 }
