@@ -23,6 +23,7 @@
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/detail/runtime_get.hpp>
+#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/modules/format.hpp>
@@ -172,12 +173,14 @@ namespace hpx::execution::experimental {
                 std::atomic<thread_state> const& tstate, thread_state state,
                 std::uint64_t const yield_delay, Op&& op)
             {
+                auto const context = hpx::execution_base::this_thread::agent();
+
                 auto current = tstate.load(std::memory_order_acquire);
                 if (HPX_UNLIKELY(op(current, state)))
                 {
                     HPX_SMT_PAUSE;
 
-                    std::uint64_t const base_time = util::hardware::timestamp();
+                    std::uint64_t base_time = util::hardware::timestamp();
                     current = tstate.load(std::memory_order_acquire);
                     while (HPX_LIKELY(op(current, state)))
                     {
@@ -197,11 +200,15 @@ namespace hpx::execution::experimental {
                             }
                         }
 
-                        if (HPX_UNLIKELY(!continue_outer &&
-                                (util::hardware::timestamp() - base_time) >
-                                    yield_delay))
+                        if (HPX_UNLIKELY(!continue_outer))
                         {
-                            hpx::this_thread::yield();
+                            std::uint64_t const base_time2 =
+                                util::hardware::timestamp();
+                            if ((base_time2 - base_time) > yield_delay)
+                            {
+                                base_time = base_time2;
+                                context.yield();
+                            }
                         }
 
                         current = tstate.load(std::memory_order_acquire);
@@ -998,6 +1005,9 @@ namespace hpx::execution::experimental {
 
                 // do things differently if the main thread is not participating
                 hpx::latch* sync_with_main_thread = nullptr;
+                auto on_exit = hpx::experimental::scope_exit(
+                    [&] { delete sync_with_main_thread; });
+
                 if (main_thread_ >= num_threads_)
                 {
                     sync_with_main_thread = new hpx::latch(
@@ -1022,7 +1032,6 @@ namespace hpx::execution::experimental {
                         // the main thread must be put to sleep to avoid
                         // over-subscription of the cores
                         sync_with_main_thread->arrive_and_wait();
-                        delete sync_with_main_thread;
                     }
                 }
                 else
@@ -1045,7 +1054,6 @@ namespace hpx::execution::experimental {
                         // the main thread must be put to sleep to avoid
                         // over-subscription of the cores
                         sync_with_main_thread->arrive_and_wait();
-                        delete sync_with_main_thread;
                     }
 
                     return results;
@@ -1278,8 +1286,9 @@ namespace hpx::execution::experimental {
             threads::thread_priority priority = threads::thread_priority::bound,
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize::small_,
-            loop_schedule sched = loop_schedule::static_,
-            std::chrono::nanoseconds yield_delay = std::chrono::milliseconds(1))
+            loop_schedule sched = loop_schedule::dynamic,
+            std::chrono::nanoseconds yield_delay = std::chrono::microseconds(
+                300))
         {
             if (stacksize == threads::thread_stacksize::nostack)
             {
