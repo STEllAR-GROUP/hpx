@@ -156,7 +156,6 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -188,15 +187,7 @@ namespace hpx::parallel {
             std::decay_t<T> val_;
 
             template <typename U>
-            HPX_HOST_DEVICE std::enable_if_t<!hpx::traits::is_value_proxy_v<U>>
-            operator()(U& u) const
-            {
-                u = val_;
-            }
-
-            template <typename U>
-            HPX_HOST_DEVICE std::enable_if_t<hpx::traits::is_value_proxy_v<U>>
-            operator()(U u) const
+            HPX_HOST_DEVICE void operator()(U&& u) const
             {
                 u = val_;
             }
@@ -271,7 +262,7 @@ namespace hpx::parallel {
             {
                 return for_each_n<FwdIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first, count,
-                    [val](auto& v) -> void { v = val; }, hpx::identity_v);
+                    [val](auto&& v) -> void { v = val; }, hpx::identity_v);
             }
         };
         /// \endcond

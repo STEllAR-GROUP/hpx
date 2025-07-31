@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { namespace detail {
         {
             util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, part_begin,
                 part_count, tok,
-                [&val, &proj, &tok](auto& v, std::size_t i) -> void {
+                [&val, &proj, &tok](auto&& v, std::size_t i) -> void {
                     auto msk = HPX_INVOKE(proj, v) == val;
                     int offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
@@ -128,7 +128,7 @@ namespace hpx { namespace parallel { namespace detail {
         {
             util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, part_begin,
                 part_count, tok,
-                [&f, &proj, &tok](auto& v, std::size_t i) -> void {
+                [&f, &proj, &tok](auto&& v, std::size_t i) -> void {
                     auto msk = HPX_INVOKE(f, HPX_INVOKE(proj, v));
                     int offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
@@ -219,7 +219,7 @@ namespace hpx { namespace parallel { namespace detail {
         {
             util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, part_begin,
                 part_count, tok,
-                [&f, &proj, &tok](auto& v, std::size_t i) -> void {
+                [&f, &proj, &tok](auto&& v, std::size_t i) -> void {
                     auto msk = !HPX_INVOKE(f, HPX_INVOKE(proj, v));
                     int offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
