@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2024 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -59,6 +59,10 @@ namespace hpx::execution::experimental {
         template <typename Parameters, typename Executor,
             typename Enable = void>
         struct mark_end_execution_fn_helper;
+
+        template <typename Parameters, typename Executor,
+            typename Enable = void>
+        struct collect_execution_parameters_fn_helper;
         /// \endcond
     }    // namespace detail
 
@@ -245,6 +249,8 @@ namespace hpx::execution::experimental {
     ///
     /// \param params [in] The executor parameters object to use as a
     ///              fallback if the executor does not expose
+    /// \param exec   [in] The executor object which will be used
+    ///               for scheduling of the loop iterations.
     /// \param iteration_duration [in] The time one of the tasks require to be
     ///                 executed.
     /// \param num_tasks [in] The number of tasks the number of cores should be
@@ -335,7 +341,9 @@ namespace hpx::execution::experimental {
     /// Mark the begin of a parallel algorithm execution
     ///
     /// \param params [in] The executor parameters object to use as a
-    ///              fallback if the executor does not expose
+    ///               fallback if the executor does not expose
+    /// \param exec   [in] The executor object which will be used
+    ///               for scheduling of the loop iterations.
     ///
     /// \note This calls params.mark_begin_execution(exec) if it exists;
     ///       otherwise it does nothing.
@@ -364,7 +372,9 @@ namespace hpx::execution::experimental {
     /// Mark the end of scheduling tasks during parallel algorithm execution
     ///
     /// \param params [in] The executor parameters object to use as a
-    ///              fallback if the executor does not expose
+    ///               fallback if the executor does not expose
+    /// \param exec   [in] The executor object which will be used
+    ///               for scheduling of the loop iterations.
     ///
     /// \note This calls params.mark_begin_execution(exec) if it exists;
     ///       otherwise it does nothing.
@@ -394,6 +404,8 @@ namespace hpx::execution::experimental {
     ///
     /// \param params [in] The executor parameters object to use as a
     ///              fallback if the executor does not expose
+    /// \param exec   [in] The executor object which will be used
+    ///               for scheduling of the loop iterations.
     ///
     /// \note This calls params.mark_end_execution(exec) if it exists;
     ///       otherwise it does nothing.
@@ -418,6 +430,49 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(Executor, exec));
         }
     } mark_end_execution{};
+
+    /// Collect various parameters of the chunking for this parallel algorithm
+    /// execution
+    ///
+    /// \param params [in] The executor parameters object to use as a
+    ///              fallback if the executor does not expose
+    /// \param exec   [in] The executor object which will be used
+    ///               for scheduling of the loop iterations.
+    /// \param num_elements [in] The overall number of elements for the
+    ///                     algorithm.
+    /// \param num_cores    [in] The overall number of cores to utilize
+    ///                     for the algorithm.
+    /// \param num_chunks   [in] The overall number of chunks for the
+    ///                     algorithm.
+    /// \param chunk_size   [in] The size of the chunks created for the
+    ///                     algorithm.
+    ///
+    /// \note This calls params.mark_begin_execution(exec) if it exists;
+    ///       otherwise it does nothing.
+    ///
+    inline constexpr struct collect_execution_parameters_t final
+      : hpx::functional::detail::tag_priority<collect_execution_parameters_t>
+    {
+    private:
+        // clang-format off
+        template <typename Parameters, typename Executor,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_parameters_v<Parameters> &&
+                hpx::traits::is_executor_any_v<Executor>
+            )>
+        // clang-format on
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+            collect_execution_parameters_t, Parameters&& params,
+            Executor&& exec, std::size_t num_elements, std::size_t num_cores,
+            std::size_t num_chunks, std::size_t chunk_size)
+        {
+            return detail::collect_execution_parameters_fn_helper<
+                hpx::util::decay_unwrap_t<Parameters>,
+                std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
+                HPX_FORWARD(Executor, exec), num_elements, num_cores,
+                num_chunks, chunk_size);
+        }
+    } collect_execution_parameters{};
 
     template <>
     struct is_scheduling_property<with_processing_units_count_t>
