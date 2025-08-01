@@ -820,11 +820,11 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<min_element_t>
     {
     private:
-        // clang-format off
         template <typename FwdIter, typename Sent,
             typename F = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -833,7 +833,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected<Proj, FwdIter>,
                     hpx::parallel::traits::projected<Proj, FwdIter>
                 >
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(hpx::ranges::min_element_t,
             FwdIter first, Sent last, F f = F(), Proj proj = Proj())
@@ -845,11 +845,10 @@ namespace hpx::ranges {
                 hpx::execution::seq, first, last, HPX_MOVE(f), HPX_MOVE(proj));
         }
 
+        template <typename Rng, typename F = hpx::parallel::detail::less,
+            typename Proj = hpx::identity>
         // clang-format off
-        template <typename Rng,
-            typename F = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -857,7 +856,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::min_element_t, Rng&& rng, F f = F(),
@@ -873,11 +872,11 @@ namespace hpx::ranges {
                     hpx::util::end(rng), HPX_MOVE(f), HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename F = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
@@ -887,7 +886,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected<Proj, FwdIter>,
                     hpx::parallel::traits::projected<Proj, FwdIter>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             FwdIter>
@@ -902,11 +901,11 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Rng,
             typename F = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -915,7 +914,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             hpx::traits::range_iterator_t<Rng>>
@@ -939,11 +938,11 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<max_element_t>
     {
     private:
-        // clang-format off
         template <typename FwdIter, typename Sent,
             typename F = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -952,7 +951,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected<Proj, FwdIter>,
                     hpx::parallel::traits::projected<Proj, FwdIter>
                 >
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(hpx::ranges::max_element_t,
             FwdIter first, Sent last, F f = F(), Proj proj = Proj())
@@ -964,11 +963,10 @@ namespace hpx::ranges {
                 hpx::execution::seq, first, last, HPX_MOVE(f), HPX_MOVE(proj));
         }
 
+        template <typename Rng, typename F = hpx::parallel::detail::less,
+            typename Proj = hpx::identity>
         // clang-format off
-        template <typename Rng,
-            typename F = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -976,7 +974,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::max_element_t, Rng&& rng, F f = F(),
@@ -992,11 +990,11 @@ namespace hpx::ranges {
                     hpx::util::end(rng), HPX_MOVE(f), HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename F = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
@@ -1006,7 +1004,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected<Proj, FwdIter>,
                     hpx::parallel::traits::projected<Proj, FwdIter>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             FwdIter>
@@ -1021,11 +1019,11 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Rng,
             typename F = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -1034,7 +1032,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             hpx::traits::range_iterator_t<Rng>>
@@ -1058,11 +1056,11 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<minmax_element_t>
     {
     private:
-        // clang-format off
         template <typename FwdIter, typename Sent,
             typename F = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -1071,7 +1069,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected<Proj, FwdIter>,
                     hpx::parallel::traits::projected<Proj, FwdIter>
                 >
-            )>
+            )
         // clang-format on
         friend minmax_element_result<FwdIter> tag_fallback_invoke(
             hpx::ranges::minmax_element_t, FwdIter first, Sent last, F f = F(),
@@ -1084,11 +1082,10 @@ namespace hpx::ranges {
                 hpx::execution::seq, first, last, HPX_MOVE(f), HPX_MOVE(proj));
         }
 
+        template <typename Rng, typename F = hpx::parallel::detail::less,
+            typename Proj = hpx::identity>
         // clang-format off
-        template <typename Rng,
-            typename F = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -1096,7 +1093,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >
-            )>
+            )
         // clang-format on
         friend minmax_element_result<hpx::traits::range_iterator_t<Rng>>
         tag_fallback_invoke(hpx::ranges::minmax_element_t, Rng&& rng, F f = F(),
@@ -1112,11 +1109,11 @@ namespace hpx::ranges {
                     hpx::util::end(rng), HPX_MOVE(f), HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename F = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
@@ -1126,7 +1123,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected<Proj, FwdIter>,
                     hpx::parallel::traits::projected<Proj, FwdIter>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             minmax_element_result<FwdIter>>
@@ -1141,11 +1138,11 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Rng,
             typename F = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -1154,7 +1151,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             minmax_element_result<hpx::traits::range_iterator_t<Rng>>>

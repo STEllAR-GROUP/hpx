@@ -294,12 +294,12 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<destroy_t>
     {
     private:
+        template <typename ExPolicy, typename FwdIter>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             destroy_t, ExPolicy&& policy, FwdIter first, FwdIter last)
@@ -312,11 +312,11 @@ namespace hpx {
                     HPX_FORWARD(ExPolicy, policy), first, last));
         }
 
+        template <typename FwdIter>
         // clang-format off
-        template <typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend void tag_fallback_invoke(destroy_t, FwdIter first, FwdIter last)
         {
@@ -334,12 +334,12 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<destroy_n_t>
     {
     private:
+        template <typename ExPolicy, typename FwdIter, typename Size>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename Size,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             destroy_n_t, ExPolicy&& policy, FwdIter first, Size count)
@@ -368,11 +368,11 @@ namespace hpx {
                 static_cast<std::size_t>(count));
         }
 
+        template <typename FwdIter, typename Size>
         // clang-format off
-        template <typename FwdIter, typename Size,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             destroy_n_t, FwdIter first, Size count)

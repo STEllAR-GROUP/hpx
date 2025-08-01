@@ -507,17 +507,17 @@ namespace hpx::experimental {
     }
 #endif
 
-    // clang-format off
     template <typename ExPolicy, typename RanIter, typename RanIter2,
         typename FwdIter1, typename FwdIter2,
-        typename Compare = std::equal_to<>, typename Func = std::plus<>,
-        HPX_CONCEPT_REQUIRES_(
+        typename Compare = std::equal_to<>, typename Func = std::plus<>>
+    // clang-format off
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<RanIter> &&
             hpx::traits::is_iterator_v<RanIter2> &&
             hpx::traits::is_iterator_v<FwdIter1> &&
             hpx::traits::is_iterator_v<FwdIter2>
-        )>
+        )
     // clang-format on
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
         hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>
