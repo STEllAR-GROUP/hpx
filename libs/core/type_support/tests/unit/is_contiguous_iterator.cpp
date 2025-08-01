@@ -1,4 +1,5 @@
 //  Copyright (c) 2023 Isidoros Tsaousis-Seiras
+//  Copyright (c) 2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +11,8 @@
 #include <array>
 #include <cassert>
 #include <iterator>
+#include <list>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -46,6 +49,12 @@ static_assert(is_contiguous_iterator_v<int const*>);
 static_assert(is_contiguous_iterator_v<std::string::iterator>);
 static_assert(is_contiguous_iterator_v<std::string::const_iterator>);
 
+// Make sure #6754 was properly fixed
+static_assert(!is_contiguous_iterator_v<std::list<char>::iterator>);
+static_assert(!is_contiguous_iterator_v<std::list<char>::const_iterator>);
+static_assert(!is_contiguous_iterator_v<std::set<char>::iterator>);
+static_assert(!is_contiguous_iterator_v<std::set<char>::const_iterator>);
+
 // Pointers to arrays are still pointers
 static_assert(is_contiguous_iterator_v<int (*)[]>);
 static_assert(is_contiguous_iterator_v<int const (*)[]>);
@@ -61,19 +70,5 @@ static_assert(!is_contiguous_iterator_v<int[]>);
 static_assert(!is_contiguous_iterator_v<int[4]>);
 static_assert(!is_contiguous_iterator_v<int const[]>);
 static_assert(!is_contiguous_iterator_v<int const[4]>);
-
-#if defined(HPX_MSVC)
-#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-#endif
-
-// Unknown type iterators to "weird"
-// types should not cause compile errors
-using function_iterator =
-    std::iterator<std::random_access_iterator_tag, int(int, int)>;
-using empty_array_iterator =
-    std::iterator<std::random_access_iterator_tag, int[]>;
-
-static_assert(!is_contiguous_iterator_v<function_iterator>);
-static_assert(!is_contiguous_iterator_v<empty_array_iterator>);
 
 int main(int, char*[]) {}

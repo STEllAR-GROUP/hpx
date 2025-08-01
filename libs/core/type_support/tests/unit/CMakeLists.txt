@@ -1,4 +1,4 @@
-# Copyright (c) 2023 The STE||AR-Group
+# Copyright (c) 2023-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,8 +32,8 @@ endforeach()
 
 if(HPX_WITH_COMPILE_ONLY_TESTS)
   # add compile time tests
-  set(compile_tests is_relocatable is_trivially_relocatable
-                    is_contiguous_iterator
+  set(compile_tests is_contiguous_iterator is_relocatable
+                    is_trivially_relocatable
   )
 
   if(HPX_WITH_FAIL_COMPILE_TESTS)
