@@ -336,8 +336,13 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
+    std::vector<std::string> const cfg = {"hpx.force_min_os_threads!=4"};
+
+    hpx::local::init_params init_args;
+    init_args.cfg = cfg;
+
     // Initialize and run HPX
-    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv, init_args), 0,
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();

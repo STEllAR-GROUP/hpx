@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 The STE||AR-Group
+# Copyright (c) 2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -38,6 +38,7 @@ add_hpx_module(
   MODULE_DEPENDENCIES hpx_config hpx_config_registry hpx_format hpx_prefix
   DEPENDENCIES Hwloc::hwloc ${additional_dependencies}
   MODULE_DEPENDENCIES hpx_config hpx_format hpx_prefix
+  CMAKE_SUBDIRS tests
 )
 
 target_include_directories(

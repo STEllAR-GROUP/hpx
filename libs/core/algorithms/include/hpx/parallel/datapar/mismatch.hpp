@@ -69,8 +69,8 @@ namespace hpx { namespace parallel { namespace detail {
     };
 
     template <typename ExPolicy, typename ZipIterator, typename Token,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+        typename F>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_mismatch_t<ExPolicy>, std::size_t base_idx, ZipIterator it,
         std::size_t part_count, Token& tok, F&& f)
@@ -92,8 +92,8 @@ namespace hpx { namespace parallel { namespace detail {
     }
 
     template <typename ExPolicy, typename Iter1, typename Sent, typename Iter2,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+        typename F>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_invoke(
         sequential_mismatch_t<ExPolicy>, Iter1 first1, Sent last1, Iter2 first2,
         F&& f)
@@ -169,8 +169,8 @@ namespace hpx { namespace parallel { namespace detail {
     };
 
     template <typename ExPolicy, typename ZipIterator, typename Token,
-        typename F, typename Proj1, typename Proj2,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+        typename F, typename Proj1, typename Proj2>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_mismatch_binary_t<ExPolicy>, std::size_t base_idx,
         ZipIterator it, std::size_t part_count, Token& tok, F&& f,
@@ -195,8 +195,8 @@ namespace hpx { namespace parallel { namespace detail {
     }
 
     template <typename ExPolicy, typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename F, typename Proj1, typename Proj2,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+        typename Sent2, typename F, typename Proj1, typename Proj2>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE util::in_in_result<Iter1, Iter2> tag_invoke(
         sequential_mismatch_binary_t<ExPolicy>, Iter1 first1, Sent1 last1,
         Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
@@ -221,4 +221,5 @@ namespace hpx { namespace parallel { namespace detail {
         }
     }
 }}}    // namespace hpx::parallel::detail
+
 #endif

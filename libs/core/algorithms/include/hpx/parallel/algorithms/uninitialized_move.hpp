@@ -424,12 +424,12 @@ namespace hpx {
     inline constexpr struct uninitialized_move_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_move_t>
     {
+        template <typename InIter, typename FwdIter>
         // clang-format off
-        template <typename InIter, typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_forward_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::uninitialized_move_t, InIter first, InIter last, FwdIter dest)
@@ -445,13 +445,13 @@ namespace hpx {
                     .call(hpx::execution::seq, first, last, dest));
         }
 
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter1> &&
                 hpx::traits::is_forward_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend decltype(auto)
         tag_fallback_invoke(hpx::uninitialized_move_t, ExPolicy&& policy,
@@ -474,14 +474,11 @@ namespace hpx {
     inline constexpr struct uninitialized_move_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_move_n_t>
     {
+        template <typename InIter, typename Size, typename FwdIter>
         // clang-format off
-        template <typename InIter, typename Size,
-            typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator_v<InIter> &&
+            requires(hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
-                std::is_integral_v<Size>
-            )>
+                std::is_integral_v<Size>)
         // clang-format on
         friend std::pair<InIter, FwdIter> tag_fallback_invoke(
             hpx::uninitialized_move_n_t, InIter first, Size count, FwdIter dest)
@@ -504,15 +501,15 @@ namespace hpx {
                         static_cast<std::size_t>(count), dest));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Size,
-            typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            typename FwdIter2>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter1> &&
                 hpx::traits::is_forward_iterator_v<FwdIter2> &&
                 std::is_integral_v<Size>
-            )>
+            )
         // clang-format on
         friend decltype(auto)
         tag_fallback_invoke(hpx::uninitialized_move_n_t, ExPolicy&& policy,

@@ -21,8 +21,8 @@ namespace hpx::parallel::detail {
     template <typename Iter, typename Sent, typename F>
     constexpr Iter sequential_generate_helper(Iter first, Sent last, F&& f)
     {
-        return util::loop_ind<hpx::execution::sequenced_policy>(
-            first, last, [f = HPX_FORWARD(F, f)](auto& v) mutable { v = f(); });
+        return util::loop_ind<hpx::execution::sequenced_policy>(first, last,
+            [f = HPX_FORWARD(F, f)](auto&& v) mutable { v = f(); });
     }
 
     struct sequential_generate_t

@@ -271,16 +271,16 @@ namespace hpx {
     inline constexpr struct stable_sort_t final
       : hpx::detail::tag_parallel_algorithm<stable_sort_t>
     {
-        // clang-format off
         template <typename RandomIt,
-            typename Comp = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::is_invocable_v<Comp,
                     hpx::traits::iter_value_t<RandomIt>,
                     hpx::traits::iter_value_t<RandomIt>
                 >
-            )>
+            )
         // clang-format on
         friend void tag_fallback_invoke(hpx::stable_sort_t, RandomIt first,
             RandomIt last, Comp comp = Comp())
@@ -293,17 +293,17 @@ namespace hpx {
                 hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename RandomIt,
-            typename Comp = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::is_invocable_v<Comp,
                     hpx::traits::iter_value_t<RandomIt>,
                     hpx::traits::iter_value_t<RandomIt>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::stable_sort_t, ExPolicy&& policy,

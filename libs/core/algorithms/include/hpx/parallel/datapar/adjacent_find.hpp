@@ -69,12 +69,12 @@ namespace hpx::parallel::detail {
         }
     };
 
-    // clang-format off
     template <typename ExPolicy, typename InIter, typename Sent_,
-        typename PredProj,
-        HPX_CONCEPT_REQUIRES_(
+        typename PredProj>
+    // clang-format off
+        requires (
             hpx::is_vectorpack_execution_policy_v<ExPolicy>
-        )>
+        )
     // clang-format on
     constexpr InIter tag_invoke(sequential_adjacent_find_t<ExPolicy>,
         InIter first, Sent_ last, PredProj&& pred_projected)
@@ -97,12 +97,12 @@ namespace hpx::parallel::detail {
         }
     }
 
-    // clang-format off
     template <typename ExPolicy, typename ZipIter, typename Token,
-        typename PredProj,
-        HPX_CONCEPT_REQUIRES_(
+        typename PredProj>
+    // clang-format off
+        requires (
             hpx::is_vectorpack_execution_policy_v<ExPolicy>
-        )>
+        )
     // clang-format on
     constexpr void tag_invoke(sequential_adjacent_find_t<ExPolicy>,
         std::size_t base_idx, ZipIter part_begin, std::size_t part_count,

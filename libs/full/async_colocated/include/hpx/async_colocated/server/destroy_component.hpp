@@ -52,6 +52,8 @@ namespace hpx::components::server {
         --instance_count(type);
 
         // delete the local instances
+
+        // NOLINTNEXTLINE(bugprone-bitwise-pointer-cast)
         Component* c = hpx::bit_cast<Component*>(addr.address_);
         c->finalize();
         std::destroy_at(c);

@@ -14,12 +14,8 @@
 
 namespace hpx::execution::experimental {
 
-    // clang-format off
-    template <typename ExPolicy,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy>
-        )>
-    // clang-format on
+    template <typename ExPolicy>
+        requires(hpx::is_execution_policy_v<ExPolicy>)
     decltype(auto) adapt_sharing_mode(
         ExPolicy&& policy, hpx::threads::thread_sharing_hint sharing)
     {
@@ -54,17 +50,15 @@ namespace hpx::execution::experimental {
 
 namespace hpx::parallel::util {
 
+    template <typename ExPolicy>
+        requires(hpx::is_execution_policy_v<ExPolicy>)
     // clang-format off
-    template <typename ExPolicy,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy>
-        )>
     HPX_DEPRECATED_V(1, 11,
         "hpx::parallel::util::adapt_sharing_mode is deprecated. Please use "
         "hpx::execution::experimental::adapt_sharing_mode instead.")
-    // clang-format on
-    decltype(auto) adapt_sharing_mode(
-        ExPolicy&& policy, hpx::threads::thread_sharing_hint sharing)
+        // clang-format on
+        decltype(auto) adapt_sharing_mode(
+            ExPolicy&& policy, hpx::threads::thread_sharing_hint sharing)
     {
         return hpx::execution::experimental::adapt_sharing_mode(
             HPX_FORWARD(ExPolicy, policy), sharing);
