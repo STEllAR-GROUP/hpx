@@ -216,6 +216,14 @@ if(HPX_WITH_STDEXEC)
       transform_binary2_sender
       transform_reduce_sender
       transform_reduce_binary_sender
+      uninitialized_copy_sender
+      uninitialized_copyn_sender
+      uninitialized_default_construct_sender
+      uninitialized_default_constructn_sender
+      uninitialized_fill_sender
+      uninitialized_filln_sender
+      uninitialized_move_sender
+      uninitialized_moven_sender
       unique_sender
   )
 endif()
