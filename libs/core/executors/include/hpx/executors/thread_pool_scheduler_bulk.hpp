@@ -849,6 +849,7 @@ namespace hpx::execution::experimental::detail {
 
 namespace hpx::execution::experimental {
 
+#if defined(HPX_HAVE_STDEXEC)
     // clang-format off
     template <typename Policy, typename Sender, typename Shape, typename F,
         HPX_CONCEPT_REQUIRES_(
@@ -861,9 +862,10 @@ namespace hpx::execution::experimental {
     {
         if constexpr (std::is_same_v<Policy, launch::sync_policy>)
         {
-            // fall back to non-bulk scheduling if sync execution was requested
-            return detail::bulk_sender<Sender, Shape, F>{
-                HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f)};
+            // When stdexec is available, delegate sync execution to stdexec's bulk
+            // This will use stdexec's default implementation which executes sequentially
+            return hpx::execution::experimental::bulk(
+                HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f));
         }
         else
         {
@@ -885,16 +887,10 @@ namespace hpx::execution::experimental {
     {
         if constexpr (std::is_same_v<Policy, launch::sync_policy>)
         {
-            // fall back to non-bulk scheduling if sync execution was requested
-#if defined(HPX_HAVE_STDEXEC)
+            // When stdexec is available, delegate sync execution to stdexec's bulk
             return hpx::execution::experimental::bulk(
                 HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
                 HPX_FORWARD(F, f));
-#else
-            return detail::bulk_sender<Sender, hpx::util::counting_shape<Count>,
-                F>{HPX_FORWARD(Sender, sender),
-                hpx::util::counting_shape(count), HPX_FORWARD(F, f)};
-#endif
         }
         else
         {
@@ -904,4 +900,108 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f)};
         }
     }
+
+    // Additional customizations for stdexec bulk operations
+    // These handle bulk_chunked and bulk_unchunked when they complete on thread_pool_scheduler
+
+    // clang-format off
+    template <typename Policy, typename Sender, typename Shape, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            !std::is_integral_v<Shape>
+        )>
+    // clang-format on
+    constexpr auto tag_invoke(bulk_chunked_t,
+        thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
+        Shape const& shape, F&& f)
+    {
+        if constexpr (std::is_same_v<Policy, launch::sync_policy>)
+        {
+            // Delegate sync execution to stdexec's bulk_chunked
+            return hpx::execution::experimental::bulk_chunked(
+                HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f));
+        }
+        else
+        {
+            return detail::thread_pool_bulk_sender<Policy, Sender, Shape, F>{
+                HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender), shape,
+                HPX_FORWARD(F, f)};
+        }
+    }
+
+    // clang-format off
+    template <typename Policy, typename Sender, typename Count, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            std::is_integral_v<Count>
+        )>
+    // clang-format on
+    constexpr decltype(auto) tag_invoke(bulk_chunked_t,
+        thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
+        Count const& count, F&& f)
+    {
+        if constexpr (std::is_same_v<Policy, launch::sync_policy>)
+        {
+            return hpx::execution::experimental::bulk_chunked(
+                HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
+                HPX_FORWARD(F, f));
+        }
+        else
+        {
+            return detail::thread_pool_bulk_sender<Policy, Sender,
+                hpx::util::counting_shape<Count>, F>{HPX_MOVE(scheduler),
+                HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
+                HPX_FORWARD(F, f)};
+        }
+    }
+
+    // clang-format off
+    template <typename Policy, typename Sender, typename Shape, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            !std::is_integral_v<Shape>
+        )>
+    // clang-format on
+    constexpr auto tag_invoke(bulk_unchunked_t,
+        thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
+        Shape const& shape, F&& f)
+    {
+        if constexpr (std::is_same_v<Policy, launch::sync_policy>)
+        {
+            // Delegate sync execution to stdexec's bulk_unchunked
+            return hpx::execution::experimental::bulk_unchunked(
+                HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f));
+        }
+        else
+        {
+            return detail::thread_pool_bulk_sender<Policy, Sender, Shape, F>{
+                HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender), shape,
+                HPX_FORWARD(F, f)};
+        }
+    }
+
+    // clang-format off
+    template <typename Policy, typename Sender, typename Count, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            std::is_integral_v<Count>
+        )>
+    // clang-format on
+    constexpr decltype(auto) tag_invoke(bulk_unchunked_t,
+        thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
+        Count const& count, F&& f)
+    {
+        if constexpr (std::is_same_v<Policy, launch::sync_policy>)
+        {
+            return hpx::execution::experimental::bulk_unchunked(
+                HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
+                HPX_FORWARD(F, f));
+        }
+        else
+        {
+            return detail::thread_pool_bulk_sender<Policy, Sender,
+                hpx::util::counting_shape<Count>, F>{HPX_MOVE(scheduler),
+                HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
+                HPX_FORWARD(F, f)};
+        }
+    }
+
+#endif // HPX_HAVE_STDEXEC
+
 }    // namespace hpx::execution::experimental
