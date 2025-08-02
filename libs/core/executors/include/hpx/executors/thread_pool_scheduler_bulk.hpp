@@ -849,13 +849,7 @@ namespace hpx::execution::experimental::detail {
 
 namespace hpx::execution::experimental {
 
-    // ================================================================================================
-    // FIXED: stdexec-compatible bulk customizations with correct signatures and syntax
-    // ================================================================================================
-
-    // Key insight: stdexec calls bulk(sender, policy, shape, function) and extracts scheduler from environment
-    // NOT tag_invoke(bulk_t, scheduler, sender, shape, function) as before
-
+#if defined(HPX_HAVE_STDEXEC)
     // clang-format off
     template <typename Policy, typename Sender, typename Shape, typename F,
         HPX_CONCEPT_REQUIRES_(
@@ -868,16 +862,10 @@ namespace hpx::execution::experimental {
     {
         if constexpr (std::is_same_v<Policy, launch::sync_policy>)
         {
-#if defined(HPX_HAVE_STDEXEC)
             // When stdexec is available, delegate sync execution to stdexec's bulk
             // This will use stdexec's default implementation which executes sequentially
             return hpx::execution::experimental::bulk(
                 HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f));
-#else
-            // fall back to HPX's bulk_sender when stdexec not available
-            return detail::bulk_sender<Sender, Shape, F>{
-                HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f)};
-#endif
         }
         else
         {
@@ -899,17 +887,10 @@ namespace hpx::execution::experimental {
     {
         if constexpr (std::is_same_v<Policy, launch::sync_policy>)
         {
-#if defined(HPX_HAVE_STDEXEC)
             // When stdexec is available, delegate sync execution to stdexec's bulk
             return hpx::execution::experimental::bulk(
                 HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
                 HPX_FORWARD(F, f));
-#else
-            // fall back to HPX's bulk_sender when stdexec not available
-            return detail::bulk_sender<Sender, hpx::util::counting_shape<Count>,
-                F>{HPX_FORWARD(Sender, sender),
-                hpx::util::counting_shape(count), HPX_FORWARD(F, f)};
-#endif
         }
         else
         {
@@ -920,7 +901,6 @@ namespace hpx::execution::experimental {
         }
     }
 
-#if defined(HPX_HAVE_STDEXEC)
     // Additional customizations for stdexec bulk operations
     // These handle bulk_chunked and bulk_unchunked when they complete on thread_pool_scheduler
 
@@ -1021,6 +1001,7 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f)};
         }
     }
-#endif
+
+#endif // HPX_HAVE_STDEXEC
 
 }    // namespace hpx::execution::experimental
