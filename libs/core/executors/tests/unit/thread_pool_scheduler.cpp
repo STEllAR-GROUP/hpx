@@ -1951,8 +1951,8 @@ void test_bulk()
         hpx::thread::id parent_id = hpx::this_thread::get_id();
 
 #if defined(HPX_HAVE_STDEXEC)
-        tt::sync_wait(
-            ex::schedule(ex::thread_pool_scheduler{}) | ex::bulk(n, [&](int i) {
+        tt::sync_wait(ex::schedule(ex::thread_pool_scheduler{}) |
+            ex::bulk(ex::par, n, [&](int i) {
                 ++v[i];
                 HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             }));
@@ -1977,7 +1977,7 @@ void test_bulk()
 #if defined(HPX_HAVE_STDEXEC)
         auto v_out = hpx::get<0>(*(tt::sync_wait(
             ex::transfer_just(ex::thread_pool_scheduler{}, std::move(v)) |
-            ex::bulk(n, [&parent_id](int i, std::vector<int>& v) {
+            ex::bulk(ex::par, n, [&parent_id](int i, std::vector<int>& v) {
                 v[i] = i;
                 HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             }))));
@@ -1998,6 +1998,7 @@ void test_bulk()
         }
     }
 
+    // For the vector case, we need to handle it differently since stdexec only supports integral shapes
     {
         std::unordered_set<std::string> string_map;
         std::vector<std::string> v = {"hello", "brave", "new", "world"};
@@ -2005,10 +2006,11 @@ void test_bulk()
 
         hpx::mutex mtx;
 #if defined(HPX_HAVE_STDEXEC)
+        // Use the size of the vector as the shape and index into the original vector
         tt::sync_wait(ex::schedule(ex::thread_pool_scheduler{}) |
-            ex::bulk(std::move(v), [&](std::string const& s) {
+            ex::bulk(ex::par, v.size(), [&, v = std::move(v)](std::size_t i) {
                 std::lock_guard lk(mtx);
-                string_map.insert(s);
+                string_map.insert(v[i]);
             }));
 #else
         ex::schedule(ex::thread_pool_scheduler{}) |
@@ -2037,7 +2039,7 @@ void test_bulk()
         {
 #if defined(HPX_HAVE_STDEXEC)
             tt::sync_wait(ex::transfer_just(ex::thread_pool_scheduler{}) |
-                ex::bulk(n, [&v, i_fail](int i) {
+                ex::bulk(ex::par, n, [&v, i_fail](int i) {
                     if (i == i_fail)
                     {
                         throw std::runtime_error("error");
@@ -2144,8 +2146,13 @@ void test_completion_scheduler()
     }
 
     {
+#if defined(HPX_HAVE_STDEXEC)
+        auto sender = ex::bulk(
+            ex::schedule(ex::thread_pool_scheduler{}), ex::par, 10, [](int) {});
+#else
         auto sender =
             ex::bulk(ex::schedule(ex::thread_pool_scheduler{}), 10, [](int) {});
+#endif
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(
 #if defined(HPX_HAVE_STDEXEC)
@@ -2161,10 +2168,21 @@ void test_completion_scheduler()
     }
 
     {
+#if defined(HPX_HAVE_STDEXEC)
+        auto sender = ex::then(
+            ex::bulk(ex::transfer_just(ex::thread_pool_scheduler{}, 42),
+                ex::par, 10,
+                [](int i, int& value) {
+                    (void) i;
+                    (void) value;
+                }),
+            [](int value) { return value; });
+#else
         auto sender = ex::then(
             ex::bulk(ex::transfer_just(ex::thread_pool_scheduler{}, 42), 10,
                 [](int, int) {}),
             [](int) {});
+#endif
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(
 #if defined(HPX_HAVE_STDEXEC)
@@ -2180,10 +2198,20 @@ void test_completion_scheduler()
     }
 
     {
+#if defined(HPX_HAVE_STDEXEC)
+        auto sender = ex::bulk(
+            ex::then(ex::transfer_just(ex::thread_pool_scheduler{}, 42),
+                [](int x) { return x + 1; }),
+            ex::par, 10, [](int i, int& value) {
+                (void) i;
+                (void) value;
+            });
+#else
         auto sender = ex::bulk(
             ex::then(
                 ex::transfer_just(ex::thread_pool_scheduler{}, 42), [](int) {}),
             10, [](int, int) {});
+#endif
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(
 #if defined(HPX_HAVE_STDEXEC)
