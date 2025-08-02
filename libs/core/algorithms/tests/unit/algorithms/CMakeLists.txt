@@ -223,6 +223,7 @@ if(HPX_WITH_STDEXEC)
       uninitialized_fill_sender
       uninitialized_filln_sender
       uninitialized_move_sender
+      uninitialized_moven_sender
       unique_sender
   )
 endif()

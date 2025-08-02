@@ -62,7 +62,8 @@ void test_uninitialized_fill_exception_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     using base_iterator = std::vector<test::count_instances>::iterator;
-    using decorated_iterator = test::decorated_iterator<base_iterator, IteratorTag>;
+    using decorated_iterator =
+        test::decorated_iterator<base_iterator, IteratorTag>;
 
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
@@ -79,14 +80,14 @@ void test_uninitialized_fill_exception_sender(
     bool caught_exception = false;
     bool returned_from_algorithm = false;
     try
-    {       
-        tt::sync_wait(ex::just(decorated_iterator(std::begin(c),
-                                   [&throw_after]() {
-                                       if (throw_after-- == 0)
-                                           throw std::runtime_error("test");
-                                   }),
-                          decorated_iterator(std::end(c)),
-                          test::count_instances()) |
+    {
+        tt::sync_wait(
+            ex::just(decorated_iterator(std::begin(c),
+                         [&throw_after]() {
+                             if (throw_after-- == 0)
+                                 throw std::runtime_error("test");
+                         }),
+                decorated_iterator(std::end(c)), test::count_instances()) |
             hpx::uninitialized_fill(ex_policy.on(exec)));
 
         HPX_TEST(false);
@@ -115,10 +116,10 @@ void uninitialized_fill_exception_sender_test()
     test_uninitialized_fill_exception_sender(
         hpx::launch::sync, unseq(task), IteratorTag());
 
-    // test_uninitialized_fill_exception_sender(
-    //     hpx::launch::async, par(task), IteratorTag());
-    // test_uninitialized_fill_exception_sender(
-    //     hpx::launch::async, par_unseq(task), IteratorTag());
+    test_uninitialized_fill_exception_sender(
+        hpx::launch::async, par(task), IteratorTag());
+    test_uninitialized_fill_exception_sender(
+        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 #if defined(HPX_HAVE_STDEXEC)
@@ -127,7 +128,8 @@ void test_uninitialized_fill_bad_alloc_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     using base_iterator = std::vector<test::count_instances>::iterator;
-    using decorated_iterator = test::decorated_iterator<base_iterator, IteratorTag>;
+    using decorated_iterator =
+        test::decorated_iterator<base_iterator, IteratorTag>;
 
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
@@ -143,14 +145,14 @@ void test_uninitialized_fill_bad_alloc_sender(
 
     bool caught_bad_alloc = false;
     try
-    {       
-        tt::sync_wait(ex::just(decorated_iterator(std::begin(c),
-                                   [&throw_after]() {
-                                       if (throw_after-- == 0)
-                                           throw std::bad_alloc();
-                                   }),
-                          decorated_iterator(std::end(c)),
-                          test::count_instances()) |
+    {
+        tt::sync_wait(
+            ex::just(decorated_iterator(std::begin(c),
+                         [&throw_after]() {
+                             if (throw_after-- == 0)
+                                 throw std::bad_alloc();
+                         }),
+                decorated_iterator(std::end(c)), test::count_instances()) |
             hpx::uninitialized_fill(ex_policy.on(exec)));
 
         HPX_TEST(false);
@@ -178,10 +180,10 @@ void uninitialized_fill_bad_alloc_sender_test()
     test_uninitialized_fill_bad_alloc_sender(
         hpx::launch::sync, unseq(task), IteratorTag());
 
-    // test_uninitialized_fill_bad_alloc_sender(
-    //     hpx::launch::async, par(task), IteratorTag());
-    // test_uninitialized_fill_bad_alloc_sender(
-    //     hpx::launch::async, par_unseq(task), IteratorTag());
+    test_uninitialized_fill_bad_alloc_sender(
+        hpx::launch::async, par(task), IteratorTag());
+    test_uninitialized_fill_bad_alloc_sender(
+        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

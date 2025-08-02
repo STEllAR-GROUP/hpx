@@ -112,7 +112,8 @@ void test_uninitialized_move_sender(
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)), std::begin(d)) |
+    tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                      std::begin(d)) |
         hpx::uninitialized_move(ex_policy.on(exec)));
 
     std::size_t count = 0;
@@ -222,7 +223,8 @@ void test_uninitialized_move_exception_sender(
     LnPolicy ln_policy, ExPolicy ex_policy, IteratorTag)
 {
     using base_iterator = std::vector<test::count_instances>::iterator;
-    using decorated_iterator = test::decorated_iterator<base_iterator, IteratorTag>;
+    using decorated_iterator =
+        test::decorated_iterator<base_iterator, IteratorTag>;
 
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
@@ -240,15 +242,12 @@ void test_uninitialized_move_exception_sender(
     {
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-        tt::sync_wait(ex::just(
-            decorated_iterator(std::begin(c),
-                [&throw_after]() {
-                    std::cout << "[TEST] Throwing exception in sender with " << throw_after << "\n";
-                    if (throw_after-- == 0)
-                        throw std::runtime_error("test");
-                }),
-            decorated_iterator(std::end(c)),
-            std::begin(d)) |
+        tt::sync_wait(ex::just(decorated_iterator(std::begin(c),
+                                   [&throw_after]() {
+                                       if (throw_after-- == 0)
+                                           throw std::runtime_error("test");
+                                   }),
+                          decorated_iterator(std::end(c)), std::begin(d)) |
             hpx::uninitialized_move(ex_policy.on(exec)));
 
         HPX_TEST(false);
@@ -363,7 +362,8 @@ void test_uninitialized_move_bad_alloc_sender(
     LnPolicy ln_policy, ExPolicy ex_policy, IteratorTag)
 {
     using base_iterator = std::vector<test::count_instances>::iterator;
-    using decorated_iterator = test::decorated_iterator<base_iterator, IteratorTag>;
+    using decorated_iterator =
+        test::decorated_iterator<base_iterator, IteratorTag>;
 
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
@@ -381,14 +381,12 @@ void test_uninitialized_move_bad_alloc_sender(
     {
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-        tt::sync_wait(ex::just(
-            decorated_iterator(std::begin(c),
-                [&throw_after]() {
-                    if (throw_after-- == 0)
-                        throw std::bad_alloc();
-                }),
-            decorated_iterator(std::end(c)),
-            std::begin(d)) |
+        tt::sync_wait(ex::just(decorated_iterator(std::begin(c),
+                                   [&throw_after]() {
+                                       if (throw_after-- == 0)
+                                           throw std::bad_alloc();
+                                   }),
+                          decorated_iterator(std::end(c)), std::begin(d)) |
             hpx::uninitialized_move(ex_policy.on(exec)));
 
         HPX_TEST(false);

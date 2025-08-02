@@ -254,7 +254,7 @@ namespace hpx::parallel {
                     HPX_FORWARD(ExPolicy, policy), zip_iterator(first, dest),
                     count,
                     [policy](zip_iterator t, std::size_t part_size) mutable
-                        -> partition_result_type {
+                    -> partition_result_type {
                         using hpx::get;
                         auto iters = t.get_iterator_tuple();
                         FwdIter2 dest = get<1>(iters);
@@ -266,28 +266,23 @@ namespace hpx::parallel {
                     },
                     // finalize, called once if no error occurred
                     [dest, first, count](auto&& data) mutable
-                        -> util::in_out_result<Iter, FwdIter2> {
-                        std::cout << "[FINALIZE] Called with data size: " << std::size(data) << std::endl;
-
+                    -> util::in_out_result<Iter, FwdIter2> {
                         // make sure iterators embedded in function object that is
                         // attached to futures are invalidated
                         util::detail::clear_container(data);
 
                         std::advance(first, count);
                         std::advance(dest, count);
-                        std::cout << "[FINALIZE] Completed successfully" << std::endl;
                         return util::in_out_result<Iter, FwdIter2>{first, dest};
                     },
                     // cleanup function, called for each partition which
                     // didn't fail, but only if at least one failed
                     [](partition_result_type&& r) -> void {
-                        std::cout << "[CLEANUP] Cleaning up partition from " << std::distance(r.first, r.second) << " objects" << std::endl;
                         while (r.first != r.second)
                         {
                             std::destroy_at(std::addressof(*r.first));
                             ++r.first;
                         }
-                        std::cout << "[CLEANUP] Cleanup completed" << std::endl;
                     });
         }
 

@@ -5,10 +5,9 @@
 
 #include <atomic>
 #include <cstddef>
-#include <cstdlib>
-#include <ctime>
 #include <iostream>
 #include <iterator>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -16,7 +15,7 @@
 
 #if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_uninitialized_fill_n_sender(
+void test_uninitialized_move_n_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     using base_iterator = std::vector<std::size_t>::iterator;
@@ -29,38 +28,41 @@ void test_uninitialized_fill_n_sender(
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    tt::sync_wait(ex::just(iterator(std::begin(c)), c.size(), std::size_t(10)) |
-        hpx::uninitialized_fill_n(ex_policy.on(exec)));
+    tt::sync_wait(ex::just(iterator(std::begin(c)), c.size(), std::begin(d)) |
+        hpx::uninitialized_move_n(ex_policy.on(exec)));
 
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(10));
-        ++count;
-    });
-    HPX_TEST_EQ(count, c.size());
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size());
 }
 #endif
 
 template <typename IteratorTag>
-void uninitialized_fill_n_sender_test()
+void uninitialized_move_n_sender_test()
 {
     using namespace hpx::execution;
-    test_uninitialized_fill_n_sender(
+    test_uninitialized_move_n_sender(
         hpx::launch::sync, seq(task), IteratorTag());
-    test_uninitialized_fill_n_sender(
+    test_uninitialized_move_n_sender(
         hpx::launch::sync, unseq(task), IteratorTag());
 
-    test_uninitialized_fill_n_sender(
+    test_uninitialized_move_n_sender(
         hpx::launch::async, par(task), IteratorTag());
-    test_uninitialized_fill_n_sender(
+    test_uninitialized_move_n_sender(
         hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 #if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_uninitialized_fill_n_exception_sender(
+void test_uninitialized_move_n_exception_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     using base_iterator = std::vector<test::count_instances>::iterator;
@@ -88,8 +90,8 @@ void test_uninitialized_fill_n_exception_sender(
                                        if (throw_after-- == 0)
                                            throw std::runtime_error("test");
                                    }),
-                          c.size(), test::count_instances()) |
-            hpx::uninitialized_fill_n(ex_policy.on(exec)));
+                          c.size(), std::begin(d)) |
+            hpx::uninitialized_move_n(ex_policy.on(exec)));
 
         HPX_TEST(false);
     }
@@ -109,23 +111,23 @@ void test_uninitialized_fill_n_exception_sender(
 #endif
 
 template <typename IteratorTag>
-void uninitialized_fill_n_exception_sender_test()
+void uninitialized_move_n_exception_sender_test()
 {
     using namespace hpx::execution;
-    test_uninitialized_fill_n_exception_sender(
+    test_uninitialized_move_n_exception_sender(
         hpx::launch::sync, seq(task), IteratorTag());
-    test_uninitialized_fill_n_exception_sender(
+    test_uninitialized_move_n_exception_sender(
         hpx::launch::sync, unseq(task), IteratorTag());
 
-    test_uninitialized_fill_n_exception_sender(
+    test_uninitialized_move_n_exception_sender(
         hpx::launch::async, par(task), IteratorTag());
-    test_uninitialized_fill_n_exception_sender(
+    test_uninitialized_move_n_exception_sender(
         hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 #if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_uninitialized_fill_n_bad_alloc_sender(
+void test_uninitialized_move_n_bad_alloc_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     using base_iterator = std::vector<test::count_instances>::iterator;
@@ -139,6 +141,7 @@ void test_uninitialized_fill_n_bad_alloc_sender(
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     std::vector<test::count_instances> c(10007);
+    std::vector<test::count_instances> d(c.size());
     std::iota(std::begin(c), std::end(c), std::rand());
 
     std::atomic<std::size_t> throw_after(std::rand() % c.size());    //-V104
@@ -152,8 +155,8 @@ void test_uninitialized_fill_n_bad_alloc_sender(
                                        if (throw_after-- == 0)
                                            throw std::bad_alloc();
                                    }),
-                          c.size(), test::count_instances()) |
-            hpx::uninitialized_fill_n(ex_policy.on(exec)));
+                          c.size(), std::begin(d)) |
+            hpx::uninitialized_move_n(ex_policy.on(exec)));
 
         HPX_TEST(false);
     }
@@ -172,17 +175,17 @@ void test_uninitialized_fill_n_bad_alloc_sender(
 #endif
 
 template <typename IteratorTag>
-void uninitialized_fill_n_bad_alloc_sender_test()
+void uninitialized_move_n_bad_alloc_sender_test()
 {
     using namespace hpx::execution;
-    test_uninitialized_fill_n_bad_alloc_sender(
+    test_uninitialized_move_n_bad_alloc_sender(
         hpx::launch::sync, seq(task), IteratorTag());
-    test_uninitialized_fill_n_bad_alloc_sender(
+    test_uninitialized_move_n_bad_alloc_sender(
         hpx::launch::sync, unseq(task), IteratorTag());
 
-    test_uninitialized_fill_n_bad_alloc_sender(
+    test_uninitialized_move_n_bad_alloc_sender(
         hpx::launch::async, par(task), IteratorTag());
-    test_uninitialized_fill_n_bad_alloc_sender(
+    test_uninitialized_move_n_bad_alloc_sender(
         hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
@@ -195,15 +198,15 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    uninitialized_fill_n_sender_test<std::forward_iterator_tag>();
-    uninitialized_fill_n_sender_test<std::random_access_iterator_tag>();
+    uninitialized_move_n_sender_test<std::forward_iterator_tag>();
+    uninitialized_move_n_sender_test<std::random_access_iterator_tag>();
 
-    uninitialized_fill_n_exception_sender_test<std::forward_iterator_tag>();
-    uninitialized_fill_n_exception_sender_test<
+    uninitialized_move_n_exception_sender_test<std::forward_iterator_tag>();
+    uninitialized_move_n_exception_sender_test<
         std::random_access_iterator_tag>();
 
-    uninitialized_fill_n_bad_alloc_sender_test<std::forward_iterator_tag>();
-    uninitialized_fill_n_bad_alloc_sender_test<
+    uninitialized_move_n_bad_alloc_sender_test<std::forward_iterator_tag>();
+    uninitialized_move_n_bad_alloc_sender_test<
         std::random_access_iterator_tag>();
 
     return hpx::local::finalize();

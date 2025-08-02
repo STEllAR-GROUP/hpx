@@ -133,6 +133,20 @@ namespace hpx::parallel::util {
             });
     }
 
+    // clang-format off
+    template <typename Sender,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_sender_v<Sender>
+        )>
+    // clang-format on
+    decltype(auto) get_pair(Sender&& sender)
+    {
+        return hpx::execution::experimental::then(
+            HPX_FORWARD(Sender, sender), [](auto&& in_out_result) {
+                return std::pair{in_out_result.in, in_out_result.out};
+            });
+    }
+
     ///////////////////////////////////////////////////////////////////////
     template <typename I, typename O>
     O get_second_element(util::in_out_result<I, O>&& p)
