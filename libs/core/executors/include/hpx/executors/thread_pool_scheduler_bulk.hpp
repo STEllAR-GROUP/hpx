@@ -857,25 +857,16 @@ namespace hpx::execution::experimental {
     // NOT tag_invoke(bulk_t, scheduler, sender, shape, function) as before
 
     // clang-format off
-    template <typename Sender, typename Policy, typename Shape, typename F,
+    template <typename Policy, typename Sender, typename Shape, typename F,
         HPX_CONCEPT_REQUIRES_(
             !std::is_integral_v<Shape>
         )>
     // clang-format on
-    constexpr auto tag_invoke(bulk_t, Sender&& sender, Policy policy,
-        Shape const& shape, F&& f) -> std::enable_if_t<requires {
-        get_completion_scheduler<set_value_t>(get_env(sender));
-        requires std::is_same_v<std::decay_t<decltype(get_completion_scheduler<
-                                    set_value_t>(get_env(sender)))>,
-            thread_pool_scheduler>;
-    },
-        detail::thread_pool_bulk_sender<std::decay_t<Policy>,
-            std::decay_t<Sender>, Shape, std::decay_t<F>>>
+    constexpr auto tag_invoke(bulk_t,
+        thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
+        Shape const& shape, F&& f)
     {
-        // Extract scheduler from sender's environment (stdexec pattern)
-        auto scheduler = get_completion_scheduler<set_value_t>(get_env(sender));
-
-        if constexpr (std::is_same_v<std::decay_t<Policy>, launch::sync_policy>)
+        if constexpr (std::is_same_v<Policy, launch::sync_policy>)
         {
 #if defined(HPX_HAVE_STDEXEC)
             // When stdexec is available, delegate sync execution to stdexec's bulk
@@ -890,34 +881,23 @@ namespace hpx::execution::experimental {
         }
         else
         {
-            return detail::thread_pool_bulk_sender<std::decay_t<Policy>,
-                std::decay_t<Sender>, Shape, std::decay_t<F>>{
+            return detail::thread_pool_bulk_sender<Policy, Sender, Shape, F>{
                 HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender), shape,
                 HPX_FORWARD(F, f)};
         }
     }
 
     // clang-format off
-    template <typename Sender, typename Policy, typename Count, typename F,
+    template <typename Policy, typename Sender, typename Count, typename F,
         HPX_CONCEPT_REQUIRES_(
             std::is_integral_v<Count>
         )>
     // clang-format on
-    constexpr auto tag_invoke(bulk_t, Sender&& sender, Policy policy,
-        Count const& count, F&& f) -> std::enable_if_t<requires {
-        get_completion_scheduler<set_value_t>(get_env(sender));
-        requires std::is_same_v<std::decay_t<decltype(get_completion_scheduler<
-                                    set_value_t>(get_env(sender)))>,
-            thread_pool_scheduler>;
-    },
-        detail::thread_pool_bulk_sender<std::decay_t<Policy>,
-            std::decay_t<Sender>, hpx::util::counting_shape<Count>,
-            std::decay_t<F>>>
+    constexpr decltype(auto) tag_invoke(bulk_t,
+        thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
+        Count const& count, F&& f)
     {
-        // Extract scheduler from sender's environment (stdexec pattern)
-        auto scheduler = get_completion_scheduler<set_value_t>(get_env(sender));
-
-        if constexpr (std::is_same_v<std::decay_t<Policy>, launch::sync_policy>)
+        if constexpr (std::is_same_v<Policy, launch::sync_policy>)
         {
 #if defined(HPX_HAVE_STDEXEC)
             // When stdexec is available, delegate sync execution to stdexec's bulk
@@ -933,9 +913,8 @@ namespace hpx::execution::experimental {
         }
         else
         {
-            return detail::thread_pool_bulk_sender<std::decay_t<Policy>,
-                std::decay_t<Sender>, hpx::util::counting_shape<Count>,
-                std::decay_t<F>>{HPX_MOVE(scheduler),
+            return detail::thread_pool_bulk_sender<Policy, Sender,
+                hpx::util::counting_shape<Count>, F>{HPX_MOVE(scheduler),
                 HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
                 HPX_FORWARD(F, f)};
         }
@@ -946,27 +925,16 @@ namespace hpx::execution::experimental {
     // These handle bulk_chunked and bulk_unchunked when they complete on thread_pool_scheduler
 
     // clang-format off
-    template <typename Sender, typename Policy, typename Shape, typename F,
+    template <typename Policy, typename Sender, typename Shape, typename F,
         HPX_CONCEPT_REQUIRES_(
             !std::is_integral_v<Shape>
         )>
     // clang-format on
-    constexpr auto tag_invoke(bulk_chunked_t, Sender&& sender, Policy policy,
-        Shape const& shape, F&& f) -> std::enable_if_t<requires {
-        get_completion_scheduler<set_value_t>(get_env(sender));
-        requires std::is_same_v<std::decay_t<decltype(get_completion_scheduler<
-                                    set_value_t>(get_env(sender)))>,
-            thread_pool_scheduler>;
-    },
-        detail::thread_pool_bulk_sender<std::decay_t<Policy>,
-            std::decay_t<Sender>, Shape, std::decay_t<F>>>
+    constexpr auto tag_invoke(bulk_chunked_t,
+        thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
+        Shape const& shape, F&& f)
     {
-        ;
-
-        // Extract scheduler from sender's environment (stdexec pattern)
-        auto scheduler = get_completion_scheduler<set_value_t>(get_env(sender));
-
-        if constexpr (std::is_same_v<std::decay_t<Policy>, launch::sync_policy>)
+        if constexpr (std::is_same_v<Policy, launch::sync_policy>)
         {
             // Delegate sync execution to stdexec's bulk_chunked
             return hpx::execution::experimental::bulk_chunked(
@@ -974,33 +942,23 @@ namespace hpx::execution::experimental {
         }
         else
         {
-            return detail::thread_pool_bulk_sender<std::decay_t<Policy>,
-                std::decay_t<Sender>, Shape, std::decay_t<F>>{
+            return detail::thread_pool_bulk_sender<Policy, Sender, Shape, F>{
                 HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender), shape,
                 HPX_FORWARD(F, f)};
         }
     }
 
     // clang-format off
-    template <typename Sender, typename Policy, typename Count, typename F,
+    template <typename Policy, typename Sender, typename Count, typename F,
         HPX_CONCEPT_REQUIRES_(
             std::is_integral_v<Count>
         )>
     // clang-format on
-    constexpr auto tag_invoke(bulk_chunked_t, Sender&& sender, Policy policy,
-        Count const& count, F&& f) -> std::enable_if_t<requires {
-        get_completion_scheduler<set_value_t>(get_env(sender));
-        requires std::is_same_v<std::decay_t<decltype(get_completion_scheduler<
-                                    set_value_t>(get_env(sender)))>,
-            thread_pool_scheduler>;
-    },
-        detail::thread_pool_bulk_sender<std::decay_t<Policy>,
-            std::decay_t<Sender>, hpx::util::counting_shape<Count>,
-            std::decay_t<F>>>
+    constexpr decltype(auto) tag_invoke(bulk_chunked_t,
+        thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
+        Count const& count, F&& f)
     {
-        auto scheduler = get_completion_scheduler<set_value_t>(get_env(sender));
-
-        if constexpr (std::is_same_v<std::decay_t<Policy>, launch::sync_policy>)
+        if constexpr (std::is_same_v<Policy, launch::sync_policy>)
         {
             return hpx::execution::experimental::bulk_chunked(
                 HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
@@ -1008,36 +966,24 @@ namespace hpx::execution::experimental {
         }
         else
         {
-            return detail::thread_pool_bulk_sender<std::decay_t<Policy>,
-                std::decay_t<Sender>, hpx::util::counting_shape<Count>,
-                std::decay_t<F>>{HPX_MOVE(scheduler),
+            return detail::thread_pool_bulk_sender<Policy, Sender,
+                hpx::util::counting_shape<Count>, F>{HPX_MOVE(scheduler),
                 HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
                 HPX_FORWARD(F, f)};
         }
     }
 
     // clang-format off
-    template <typename Sender, typename Policy, typename Shape, typename F,
+    template <typename Policy, typename Sender, typename Shape, typename F,
         HPX_CONCEPT_REQUIRES_(
             !std::is_integral_v<Shape>
         )>
     // clang-format on
-    constexpr auto tag_invoke(bulk_unchunked_t, Sender&& sender, Policy policy,
-        Shape const& shape, F&& f) -> std::enable_if_t<requires {
-        get_completion_scheduler<set_value_t>(get_env(sender));
-        requires std::is_same_v<std::decay_t<decltype(get_completion_scheduler<
-                                    set_value_t>(get_env(sender)))>,
-            thread_pool_scheduler>;
-    },
-        detail::thread_pool_bulk_sender<std::decay_t<Policy>,
-            std::decay_t<Sender>, Shape, std::decay_t<F>>>
+    constexpr auto tag_invoke(bulk_unchunked_t,
+        thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
+        Shape const& shape, F&& f)
     {
-        ;
-
-        // Extract scheduler from sender's environment (stdexec pattern)
-        auto scheduler = get_completion_scheduler<set_value_t>(get_env(sender));
-
-        if constexpr (std::is_same_v<std::decay_t<Policy>, launch::sync_policy>)
+        if constexpr (std::is_same_v<Policy, launch::sync_policy>)
         {
             // Delegate sync execution to stdexec's bulk_unchunked
             return hpx::execution::experimental::bulk_unchunked(
@@ -1045,34 +991,23 @@ namespace hpx::execution::experimental {
         }
         else
         {
-            return detail::thread_pool_bulk_sender<std::decay_t<Policy>,
-                std::decay_t<Sender>, Shape, std::decay_t<F>>{
+            return detail::thread_pool_bulk_sender<Policy, Sender, Shape, F>{
                 HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender), shape,
                 HPX_FORWARD(F, f)};
         }
     }
 
     // clang-format off
-    template <typename Sender, typename Policy, typename Count, typename F,
+    template <typename Policy, typename Sender, typename Count, typename F,
         HPX_CONCEPT_REQUIRES_(
             std::is_integral_v<Count>
         )>
     // clang-format on
-    constexpr auto tag_invoke(bulk_unchunked_t, Sender&& sender, Policy policy,
-        Count const& count, F&& f) -> std::enable_if_t<requires {
-        get_completion_scheduler<set_value_t>(get_env(sender));
-        requires std::is_same_v<std::decay_t<decltype(get_completion_scheduler<
-                                    set_value_t>(get_env(sender)))>,
-            thread_pool_scheduler>;
-    },
-        detail::thread_pool_bulk_sender<std::decay_t<Policy>,
-            std::decay_t<Sender>, hpx::util::counting_shape<Count>,
-            std::decay_t<F>>>
+    constexpr decltype(auto) tag_invoke(bulk_unchunked_t,
+        thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
+        Count const& count, F&& f)
     {
-        // Extract scheduler from sender's environment (stdexec pattern)
-        auto scheduler = get_completion_scheduler<set_value_t>(get_env(sender));
-
-        if constexpr (std::is_same_v<std::decay_t<Policy>, launch::sync_policy>)
+        if constexpr (std::is_same_v<Policy, launch::sync_policy>)
         {
             return hpx::execution::experimental::bulk_unchunked(
                 HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
@@ -1080,9 +1015,8 @@ namespace hpx::execution::experimental {
         }
         else
         {
-            return detail::thread_pool_bulk_sender<std::decay_t<Policy>,
-                std::decay_t<Sender>, hpx::util::counting_shape<Count>,
-                std::decay_t<F>>{HPX_MOVE(scheduler),
+            return detail::thread_pool_bulk_sender<Policy, Sender,
+                hpx::util::counting_shape<Count>, F>{HPX_MOVE(scheduler),
                 HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
                 HPX_FORWARD(F, f)};
         }
