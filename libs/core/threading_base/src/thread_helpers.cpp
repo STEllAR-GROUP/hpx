@@ -29,6 +29,9 @@
 #include <hpx/debugging/backtrace.hpp>
 #include <hpx/threading_base/detail/reset_backtrace.hpp>
 #endif
+#ifdef HPX_HAVE_MODULE_LIKWID
+#include <hpx/likwid/likwid_tls.hpp>
+#endif
 
 #include <atomic>
 #include <cstddef>
@@ -290,7 +293,6 @@ namespace hpx::threads {
         return get_thread_id_data(id)->set_libcds_dynamic_hazard_pointer_data(
             data);
     }
-
 #endif
 
     ////////////////////////////////////////////////////////////////////////////
@@ -467,7 +469,9 @@ namespace hpx::this_thread {
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             threads::detail::reset_backtrace bt(id, ec);
 #endif
-
+#ifdef HPX_HAVE_MODULE_LIKWID
+            hpx::likwid::suspend_region region;
+#endif
             // We might need to dispatch 'nextid' to it's correct scheduler only
             // if our current scheduler is the same, we should yield to the id
             if (nextid &&
@@ -544,6 +548,9 @@ namespace hpx::this_thread {
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             threads::detail::reset_backtrace bt(id, ec);
+#endif
+#ifdef HPX_HAVE_MODULE_LIKWID
+            hpx::likwid::suspend_region region;
 #endif
 
             std::atomic<bool> timer_started(false);
