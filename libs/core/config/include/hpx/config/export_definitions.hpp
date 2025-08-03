@@ -51,6 +51,18 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// C++20 module export definitions
+#if defined(HPX_BUILD_MODULE)
+#undef HPX_CORE_EXPORT
+# define HPX_CORE_EXPORT         /* empty */
+# define HPX_EXPORT_TEMPLATE     export
+# define HPX_EXPORT_NON_TEMPLATE extern "C++" export
+#else
+# define HPX_EXPORT_TEMPLATE     /* empty */
+# define HPX_EXPORT_NON_TEMPLATE /* empty */
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_EXPORTS) || defined(HPX_FULL_EXPORTS)
 # define  HPX_EXPORT             HPX_SYMBOL_EXPORT
 #else

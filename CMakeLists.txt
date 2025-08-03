@@ -312,6 +312,22 @@ if(HPX_WITH_UNITY_BUILD)
   set(HPX_WITH_UNITY_BUILD_OPTION UNITY_BUILD)
 endif()
 
+# ##############################################################################
+# C++20 modules configuration
+# ##############################################################################
+hpx_option(
+  HPX_USE_MODULES BOOL "Enable C++20 modules mode (default: OFF)." OFF
+  ADVANCED
+)
+if(HPX_USE_MODULES)
+  hpx_info("Building HPX with C++20 modules")
+  set(CMAKE_CXX_SCAN_FOR_MODULES ON)
+  add_compile_definitions(HPX_USE_MODULES)
+else()
+  hpx_info("Building HPX with traditional headers")
+endif()
+
+
 hpx_option(
   HPX_WITH_PRECOMPILED_HEADERS
   BOOL
