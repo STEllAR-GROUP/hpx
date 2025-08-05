@@ -309,7 +309,7 @@ foreach(lib ${HPX_LIBS})
     add_library(hpx_${lib} ${hpx_library_link_mode} src/empty.cpp)
     target_compile_definitions(hpx_${lib} PRIVATE HPX_${uppercase_lib}_EXPORTS)
 
-    if(HPX_USE_MODULES) 
+    if(HPX_WITH_CXX_MODULES) 
       target_sources(hpx_${lib}
         PUBLIC
           FILE_SET hpx_${lib}_public_sources TYPE CXX_MODULES FILES
@@ -317,27 +317,27 @@ foreach(lib ${HPX_LIBS})
       )
     endif()
 
+    # if(HPX_WITH_CXX_MODULES AND lib STREQUAL "core")
+    #   set_property(TARGET hpx_${lib} PROPERTY CXX_SCAN_FOR_MODULES ON)
+    # endif()
+
+
     set_target_properties(hpx_${lib} PROPERTIES FOLDER "Core")
 
-    if(lib STREQUAL "core" AND HPX_USE_MODULES)
-      install(
-        TARGETS hpx_${lib}
-        EXPORT HPXInternalTargets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
+    if(lib STREQUAL "core" AND HPX_WITH_CXX_MODULES)
+      set(module_installation
         FILE_SET hpx_core_public_sources DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-      )
-    else()
-      install(
-        TARGETS hpx_${lib}
-        EXPORT HPXInternalTargets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
       )
     endif()
 
+    install(
+      TARGETS hpx_${lib}
+      EXPORT HPXInternalTargets
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
+      ${module_installation}
+    )
 
     # install PDB if needed
     if(MSVC AND NOT HPX_WITH_STATIC_LINKING)
