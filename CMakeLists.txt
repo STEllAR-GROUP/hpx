@@ -17,6 +17,10 @@
 
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
+if(HPX_WITH_CXX_MODULES)
+  cmake_minimum_required(VERSION 3.29...3.29.99 FATAL_ERROR)
+endif()
+
 # Overrides must go before the project() statement, otherwise they are ignored.
 
 # ##############################################################################
@@ -316,15 +320,15 @@ endif()
 # C++20 modules configuration
 # ##############################################################################
 hpx_option(
-  HPX_USE_MODULES BOOL "Enable C++20 modules mode (default: OFF)." OFF
+  HPX_WITH_CXX_MODULES BOOL "Enable C++20 modules mode (default: OFF)." OFF
   ADVANCED
 )
-if(HPX_USE_MODULES)
-  hpx_info("Building HPX with C++20 modules")
-  set(CMAKE_CXX_SCAN_FOR_MODULES ON)
-  add_compile_definitions(HPX_USE_MODULES)
+if(HPX_WITH_CXX_MODULES)
+  hpx_info("HPX will build and install C++20 module interface units for downstream users.")
+  hpx_info("Note: HPX itself will still be built using traditional headers.")
+  add_compile_definitions(HPX_HAVE_CXX_MODULES)
 else()
-  hpx_info("Building HPX with traditional headers")
+  hpx_info("HPX will be built and used with traditional headers only.")
 endif()
 
 
