@@ -525,16 +525,11 @@ namespace hpx::execution::experimental::detail {
                 return;
             }
 
-            std::cout << "*** HPX: Processing " << size
-                      << " items with "
 
                 // Calculate chunk size and number of chunks
                 std::uint32_t chunk_size = get_bulk_scheduler_chunk_size(
                 op_state->num_worker_threads, size);
             std::uint32_t num_chunks = (size + chunk_size - 1) / chunk_size;
-
-            std::cout << "*** HPX: Chunk size: "
-                      << chunk_size
 
                              // launch only as many tasks as we have chunks
                              std::size_t const num_pus =
@@ -547,7 +542,6 @@ namespace hpx::execution::experimental::detail {
                 op_state->pu_mask =
                     detail::limit_mask(op_state->pu_mask, num_chunks);
 
-                std::cout << "*** HPX: Limited worker threads to "
             }
 
             HPX_ASSERT(hpx::threads::count(op_state->pu_mask) ==
