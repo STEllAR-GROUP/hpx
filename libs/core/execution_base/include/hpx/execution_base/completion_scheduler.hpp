@@ -15,13 +15,14 @@
 #include <utility>
 
 namespace hpx::execution::experimental { namespace detail {
+    namespace hpxexp = hpx::execution::experimental;
     // clang-format off
     template <typename CPO, typename Sender>
     concept has_completion_scheduler_v = requires(Sender&& s) {
         {
-            hpx::execution::experimental::get_completion_scheduler<CPO>(
-                hpx::execution::experimental::get_env(std::forward<Sender>(s)))
-        } -> hpx::execution::experimental::scheduler;
+            hpxexp::get_completion_scheduler<CPO>(
+                hpxexp::get_env(std::forward<Sender>(s)))
+        } -> hpxexp::scheduler;
     };
 
     template <typename ReceiverCPO, typename Sender, typename AlgorithmCPO,
@@ -29,8 +30,8 @@ namespace hpx::execution::experimental { namespace detail {
     concept is_completion_scheduler_tag_invocable_v = requires(
         AlgorithmCPO alg, Sender&& snd, Ts&&... ts) {
         tag_invoke(alg,
-            hpx::execution::experimental::get_completion_scheduler<ReceiverCPO>(
-                hpx::execution::experimental::get_env(snd)),
+            hpxexp::get_completion_scheduler<ReceiverCPO>(
+                hpxexp::get_env(snd)),
             std::forward<Sender>(snd), std::forward<Ts>(ts)...);
     };
     // clang-format on
@@ -38,7 +39,6 @@ namespace hpx::execution::experimental { namespace detail {
 
 #else
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
@@ -103,11 +103,12 @@ namespace hpx::execution::experimental {
     //    2.   Otherwise, execution::get_completion_scheduler<CPO>(s) is
     //         ill-formed.
     //
+
+    template <typename CPO>
     // clang-format off
-    template <typename CPO,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                     hpx::execution::experimental::detail::is_receiver_cpo_v<CPO>
-            )>
+            )
     // clang-format on
     struct get_completion_scheduler_t final
       : hpx::functional::tag<get_completion_scheduler_t<CPO>>

@@ -49,12 +49,12 @@ namespace hpx::execution::experimental::detail {
         template <typename T>
         using check_for_property = CheckForProperty<std::decay_t<T>>;
 
+        template <typename Executor, typename Parameters>
         // clang-format off
-            template <typename Executor, typename Parameters,
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     !hpx::traits::is_executor_parameters_v<Parameters> ||
                     !check_for_property<Parameters>::value
-                )>
+                )
         // clang-format on
         friend HPX_FORCEINLINE constexpr decltype(auto) tag_fallback_invoke(
             derived_property_t, Executor&& /*exec*/, Parameters&& /*params*/,
@@ -65,12 +65,12 @@ namespace hpx::execution::experimental::detail {
 
         ///////////////////////////////////////////////////////////////////
         // Parameters directly supports property
+        template <typename Executor, typename Parameters>
         // clang-format off
-            template <typename Executor, typename Parameters,
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     hpx::traits::is_executor_parameters_v<Parameters> &&
                     check_for_property<Parameters>::value
-                )>
+                )
         // clang-format on
         friend HPX_FORCEINLINE constexpr decltype(auto) tag_fallback_invoke(
             derived_property_t, Executor&& exec, Parameters&& params,
@@ -82,12 +82,12 @@ namespace hpx::execution::experimental::detail {
 
         ///////////////////////////////////////////////////////////////////
         // Executor directly supports property
+        template <typename Executor, typename Parameters>
         // clang-format off
-            template <typename Executor, typename Parameters,
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     hpx::traits::is_executor_any_v<Executor> &&
                     check_for_property<Executor>::value
-                )>
+                )
         // clang-format on
         friend HPX_FORCEINLINE constexpr decltype(auto) tag_invoke(
             derived_property_t, Executor&& exec, Parameters&& params,
