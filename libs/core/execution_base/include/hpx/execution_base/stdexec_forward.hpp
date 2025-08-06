@@ -136,19 +136,18 @@ namespace hpx::execution::experimental {
     using stdexec::transfer_just_t;
 
     // Bulk
-    using stdexec::bulk_t;
     using stdexec::bulk;
+    using stdexec::bulk_t;
 
-    using stdexec::bulk_chunked_t;
     using stdexec::bulk_chunked;      // the chunked CPO
+    using stdexec::bulk_chunked_t;
 
-    using stdexec::bulk_unchunked_t;
     using stdexec::bulk_unchunked;    // the unchunked CPO
-
+    using stdexec::bulk_unchunked_t;
 
     using stdexec::par;
-    using stdexec::seq;
     using stdexec::par_unseq;
+    using stdexec::seq;
     using stdexec::unseq;
 
     // Split

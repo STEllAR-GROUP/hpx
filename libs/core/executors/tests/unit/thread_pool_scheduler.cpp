@@ -2005,14 +2005,13 @@ void test_bulk()
         std::vector<std::string> v_ref = v;
 
         hpx::mutex mtx;
-#if defined(HPX_HAVE_STDEXEC)
-        // Use the size of the vector as the shape and index into the original vector
+        #if defined(HPX_HAVE_STDEXEC)
         tt::sync_wait(ex::schedule(ex::thread_pool_scheduler{}) |
-            ex::bulk(ex::par, v.size(), [&, v = std::move(v)](std::size_t i) {
+            ex::bulk(ex::par, v.size(), [&](std::size_t i) {
                 std::lock_guard lk(mtx);
-                string_map.insert(v[i]);
+                string_map.insert(v_ref[i]);
             }));
-#else
+        #else
         ex::schedule(ex::thread_pool_scheduler{}) |
             ex::bulk(std::move(v),
                 [&](std::string const& s) {
@@ -2225,6 +2224,8 @@ void test_completion_scheduler()
                 ex::thread_pool_scheduler>,
             "the completion scheduler should be a thread_pool_scheduler");
     }
+
+    
 }
 
 ///////////////////////////////////////////////////////////////////////////////
