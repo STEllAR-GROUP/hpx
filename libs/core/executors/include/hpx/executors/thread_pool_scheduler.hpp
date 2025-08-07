@@ -19,6 +19,9 @@
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/modules/topology.hpp>
+#if defined(HPX_HAVE_STDEXEC)
+#include <hpx/execution_base/stdexec_forward.hpp>
+#endif
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/register_thread.hpp>
@@ -26,11 +29,20 @@
 
 #include <cstddef>
 #include <exception>
+#include <iostream>
 #include <string>
 #include <type_traits>
 #include <utility>
 
 namespace hpx::execution::experimental {
+
+#if defined(HPX_HAVE_STDEXEC)
+    // Forward declaration for domain support
+    namespace detail {
+        template <typename Policy>
+        struct thread_pool_domain;
+    }
+#endif
 
     namespace detail {
 
@@ -99,6 +111,16 @@ namespace hpx::execution::experimental {
             HPX_ASSERT(pool_);
             return pool_;
         }
+
+#if defined(HPX_HAVE_STDEXEC)
+        // Return our custom domain for bulk interception
+        friend constexpr auto tag_invoke(
+            stdexec::get_domain_t, thread_pool_policy_scheduler const&) noexcept
+            -> detail::thread_pool_domain<Policy>
+        {
+            return {};
+        }
+#endif
 
         // clang-format off
         template <typename Executor_,
@@ -253,6 +275,23 @@ namespace hpx::execution::experimental {
 
             ~operation_state() = default;
 
+#if defined(HPX_HAVE_STDEXEC)
+            friend void tag_invoke(
+                stdexec::start_t, operation_state& os) noexcept
+            {
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() {
+                        os.scheduler.execute(
+                            [receiver = HPX_MOVE(os.receiver)]() mutable {
+                                stdexec::set_value(HPX_MOVE(receiver));
+                            });
+                    },
+                    [&](std::exception_ptr ep) {
+                        // FIXME: set_error is called on a moved-from object
+                        stdexec::set_error(HPX_MOVE(os.receiver), HPX_MOVE(ep));
+                    });
+            }
+#else
             friend void tag_invoke(start_t, operation_state& os) noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
@@ -269,6 +308,7 @@ namespace hpx::execution::experimental {
                             HPX_MOVE(os.receiver), HPX_MOVE(ep));
                     });
             }
+#endif
         };
 
         template <typename Scheduler>
@@ -276,20 +316,46 @@ namespace hpx::execution::experimental {
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
 #if defined(HPX_HAVE_STDEXEC)
-            using sender_concept = hpx::execution::experimental::sender_t;
-#endif
+            using sender_concept = stdexec::sender_t;
+            using completion_signatures =
+                stdexec::completion_signatures<stdexec::set_value_t(),
+                    stdexec::set_error_t(std::exception_ptr),
+                    stdexec::set_stopped_t()>;
+#else
             using completion_signatures =
                 hpx::execution::experimental::completion_signatures<
                     hpx::execution::experimental::set_value_t(),
                     hpx::execution::experimental::set_error_t(
                         std::exception_ptr),
                     hpx::execution::experimental::set_stopped_t()>;
+#endif
 
+#if defined(HPX_HAVE_STDEXEC)
+            template <typename Env>
+            friend auto tag_invoke(stdexec::get_completion_signatures_t,
+                sender const&, Env) noexcept -> completion_signatures;
+#else
             template <typename Env>
             friend auto tag_invoke(
                 hpx::execution::experimental::get_completion_signatures_t,
                 sender const&, Env) noexcept -> completion_signatures;
+#endif
 
+#if defined(HPX_HAVE_STDEXEC)
+            template <typename Receiver>
+            friend operation_state<Scheduler, Receiver> tag_invoke(
+                stdexec::connect_t, sender&& s, Receiver&& receiver)
+            {
+                return {HPX_MOVE(s.scheduler), HPX_FORWARD(Receiver, receiver)};
+            }
+
+            template <typename Receiver>
+            friend operation_state<Scheduler, Receiver> tag_invoke(
+                stdexec::connect_t, sender& s, Receiver&& receiver)
+            {
+                return {s.scheduler, HPX_FORWARD(Receiver, receiver)};
+            }
+#else
             template <typename Receiver>
             friend operation_state<Scheduler, Receiver> tag_invoke(
                 connect_t, sender&& s, Receiver&& receiver)
@@ -303,6 +369,8 @@ namespace hpx::execution::experimental {
             {
                 return {s.scheduler, HPX_FORWARD(Receiver, receiver)};
             }
+#endif
+
 #if defined(HPX_HAVE_STDEXEC)
             struct env
             {
@@ -311,12 +379,11 @@ namespace hpx::execution::experimental {
                 template <typename CPO,
                     HPX_CONCEPT_REQUIRES_(
                         meta::value<meta::one_of<
-                            CPO, set_value_t, set_stopped_t>>
+                            CPO, stdexec::set_value_t, stdexec::set_stopped_t>>
                     )>
                 // clang-format on
                 friend constexpr auto tag_invoke(
-                    hpx::execution::experimental::get_completion_scheduler_t<
-                        CPO>,
+                    stdexec::get_completion_scheduler_t<CPO>,
                     env const& e) noexcept
                 {
                     return e.sched;
@@ -324,8 +391,7 @@ namespace hpx::execution::experimental {
             };
 
             friend constexpr env tag_invoke(
-                hpx::execution::experimental::get_env_t,
-                sender const& s) noexcept
+                stdexec::get_env_t, sender const& s) noexcept
             {
                 return {s.scheduler};
             };
@@ -364,6 +430,19 @@ namespace hpx::execution::experimental {
             }
         }
 
+#if defined(HPX_HAVE_STDEXEC)
+        friend constexpr sender<thread_pool_policy_scheduler> tag_invoke(
+            stdexec::schedule_t, thread_pool_policy_scheduler&& sched)
+        {
+            return {HPX_MOVE(sched)};
+        }
+
+        friend constexpr sender<thread_pool_policy_scheduler> tag_invoke(
+            stdexec::schedule_t, thread_pool_policy_scheduler const& sched)
+        {
+            return {sched};
+        }
+#else
         friend constexpr sender<thread_pool_policy_scheduler> tag_invoke(
             hpx::execution::experimental::schedule_t,
             thread_pool_policy_scheduler&& sched)
@@ -377,6 +456,7 @@ namespace hpx::execution::experimental {
         {
             return {sched};
         }
+#endif
 
         void policy(Policy policy) noexcept
         {
