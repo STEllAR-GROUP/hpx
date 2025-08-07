@@ -378,11 +378,6 @@ namespace hpx::execution::experimental::detail {
     template <typename OperationState, typename F, typename Shape>
     struct bulk_receiver
     {
-#if defined(HPX_HAVE_STDEXEC)
-        using receiver_concept = stdexec::receiver_t;
-#else
-        using receiver_concept = hpx::execution::experimental::receiver_t;
-#endif
         OperationState* op_state;
 
         template <typename E>
