@@ -330,6 +330,9 @@ namespace thrust {
             template <typename Executor, typename Parameters>
             struct is_thrust_execution_policy<hpx::async_cuda::thrust::thrust_task_policy_shim<Executor, Parameters>> : std::true_type {} ;
 
+            template <typename T>
+            inline constexpr bool is_thrust_execution_policy_v = is_thrust_execution_policy<T>::value;
+
             namespace detail {
                 template <typename ExecutionPolicy, typename Enable = void>
                 struct get_policy_result ;
