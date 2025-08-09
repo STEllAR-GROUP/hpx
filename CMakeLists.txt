@@ -331,7 +331,6 @@ else()
   hpx_info("HPX will be built and used with traditional headers only.")
 endif()
 
-
 hpx_option(
   HPX_WITH_PRECOMPILED_HEADERS
   BOOL

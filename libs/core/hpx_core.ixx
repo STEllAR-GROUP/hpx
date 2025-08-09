@@ -18,4 +18,4 @@ module;
 
 export module HPX.Core;
 
-#include "version/include/hpx/version.hpp" 
+#include "version/include/hpx/version.hpp"
