@@ -10,7 +10,7 @@ include(HPX_PrintSummary)
 function(add_hpx_module libname modulename)
   # Retrieve arguments
   set(options CUDA CONFIG_FILES NO_CONFIG_IN_GENERATED_HEADERS)
-  set(one_value_args GLOBAL_HEADER_GEN)
+  set(one_value_args GLOBAL_HEADER_GEN GLOBAL_HEADER_MODULE_GEN)
   set(multi_value_args
       SOURCES
       HEADERS
@@ -154,10 +154,27 @@ function(add_hpx_module libname modulename)
     if(NOT ${modulename}_NO_CONFIG_IN_GENERATED_HEADERS)
       set(module_headers "${module_headers}#endif\n")
     endif()
-    configure_file(
-      "${PROJECT_SOURCE_DIR}/cmake/templates/global_module_header.hpp.in"
-      "${global_header}"
+
+    # Decide output path and template file
+    if(DEFINED ${modulename}_GLOBAL_HEADER_MODULE_GEN
+       AND ${modulename}_GLOBAL_HEADER_MODULE_GEN
     )
+      set(global_header
+          "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/global_module.hpp"
+      )
+      set(template_file
+          "${HPX_SOURCE_DIR}/cmake/templates/global_module_header_modules.hpp.in"
+      )
+    else()
+      set(global_header
+          "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/modules/${modulename}.hpp"
+      )
+      set(template_file
+          "${PROJECT_SOURCE_DIR}/cmake/templates/global_module_header.hpp.in"
+      )
+    endif()
+
+    configure_file(${template_file} ${global_header} @ONLY)
     set(generated_headers ${global_header})
   endif()
 

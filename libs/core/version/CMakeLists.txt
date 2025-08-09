@@ -32,7 +32,8 @@ endif()
 include(HPX_AddModule)
 add_hpx_module(
   core version
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN TRUE
   SOURCES ${version_sources}
   HEADERS ${version_headers}
   MODULE_DEPENDENCIES hpx_config hpx_config_registry hpx_format hpx_prefix
