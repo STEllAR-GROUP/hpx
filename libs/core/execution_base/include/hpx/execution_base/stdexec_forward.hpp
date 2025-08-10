@@ -98,6 +98,9 @@ namespace hpx::execution::experimental {
     using stdexec::get_completion_signatures;
     using stdexec::get_completion_signatures_t;
 
+    // Operation State
+    using stdexec::operation_state_t;
+
     // Sender
     using stdexec::connect;
     using stdexec::connect_result_t;
@@ -136,19 +139,22 @@ namespace hpx::execution::experimental {
     using stdexec::transfer_just_t;
 
     // Bulk
-    using stdexec::bulk;
     using stdexec::bulk_t;
-
-    using stdexec::bulk_chunked;      // the chunked CPO
+    using stdexec::bulk;
     using stdexec::bulk_chunked_t;
-
-    using stdexec::bulk_unchunked;    // the unchunked CPO
+    using stdexec::bulk_chunked;
     using stdexec::bulk_unchunked_t;
+    using stdexec::bulk_unchunked;
 
+    // Execution policies (required for stdexec bulk)
     using stdexec::par;
     using stdexec::par_unseq;
     using stdexec::seq;
     using stdexec::unseq;
+    using stdexec::parallel_policy;
+    using stdexec::parallel_unsequenced_policy;
+    using stdexec::sequenced_policy;
+    using stdexec::unsequenced_policy;
 
     // Split
     using stdexec::split;

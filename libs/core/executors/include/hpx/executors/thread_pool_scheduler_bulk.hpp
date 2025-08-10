@@ -22,7 +22,6 @@
 #include <hpx/errors/exception.hpp>
 #include <hpx/errors/exception_list.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
@@ -116,29 +115,6 @@ namespace hpx::execution::experimental::detail {
         return mask;
     }
 
-#if defined(HPX_HAVE_STDEXEC)
-    // Forward declarations
-    template <typename Policy>
-    struct thread_pool_bulk_transformer;
-
-    template <typename Policy, typename Sender, typename Shape, typename F>
-    class thread_pool_bulk_sender;
-
-    // Domain for thread pool schedulers - intercepts bulk operations via transform_sender
-    template <typename Policy>
-    struct thread_pool_domain : stdexec::default_domain
-    {
-    private:
-        using scheduler_type = thread_pool_policy_scheduler<Policy>;
-
-    public:
-        // Intercepts bulk operations via transform_sender - this is the key method
-        template <stdexec::sender _Sender, class _Env>
-        auto transform_sender(
-            _Sender&& __sndr, const _Env& __env) const noexcept;
-    };
-#endif    // HPX_HAVE_STDEXEC
-
     template <typename OperationState>
     struct task_function;
 
@@ -170,7 +146,7 @@ namespace hpx::execution::experimental::detail {
             auto const i_begin =
                 static_cast<std::size_t>(index) * task_f->chunk_size;
             auto const i_end =
-                (std::min) (i_begin + task_f->chunk_size, task_f->size);
+                (std::min)(i_begin + task_f->chunk_size, task_f->size);
 
             auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
             for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
@@ -263,16 +239,10 @@ namespace hpx::execution::experimental::detail {
         // clang-format on
         void operator()(Ts&& ts) const
         {
-#if defined(HPX_HAVE_STDEXEC)
-            hpx::invoke_fused(hpx::bind_front(stdexec::set_value,
-                                  HPX_MOVE(op_state->receiver)),
-                HPX_FORWARD(Ts, ts));
-#else
             hpx::invoke_fused(
                 hpx::bind_front(hpx::execution::experimental::set_value,
                     HPX_MOVE(op_state->receiver)),
                 HPX_FORWARD(Ts, ts));
-#endif
         }
     };
 
@@ -321,28 +291,17 @@ namespace hpx::execution::experimental::detail {
                     }
                     catch (...)
                     {
-#if defined(HPX_HAVE_STDEXEC)
-                        stdexec::set_error(HPX_MOVE(op_state->receiver),
-                            std::current_exception());
-#else
                         hpx::execution::experimental::set_error(
                             HPX_MOVE(op_state->receiver),
                             std::current_exception());
-#endif
                     }
                 }
                 else if (op_state->exceptions.size() != 0)
                 {
-#if defined(HPX_HAVE_STDEXEC)
-                    stdexec::set_error(HPX_MOVE(op_state->receiver),
-                        hpx::detail::construct_lightweight_exception(
-                            HPX_MOVE(op_state->exceptions)));
-#else
                     hpx::execution::experimental::set_error(
                         HPX_MOVE(op_state->receiver),
                         hpx::detail::construct_lightweight_exception(
                             HPX_MOVE(op_state->exceptions)));
-#endif
                 }
                 else
                 {
@@ -370,6 +329,7 @@ namespace hpx::execution::experimental::detail {
             {
                 store_exception(std::current_exception());
             }
+
             finish();
         }
     };
@@ -378,40 +338,24 @@ namespace hpx::execution::experimental::detail {
     template <typename OperationState, typename F, typename Shape>
     struct bulk_receiver
     {
+#if defined(HPX_HAVE_STDEXEC)
+        using receiver_concept = hpx::execution::experimental::receiver_t;
+#endif
         OperationState* op_state;
 
         template <typename E>
-        friend void tag_invoke(
-#if defined(HPX_HAVE_STDEXEC)
-            stdexec::set_error_t,
-#else
-            hpx::execution::experimental::set_error_t,
-#endif
+        friend void tag_invoke(hpx::execution::experimental::set_error_t,
             bulk_receiver&& r, E&& e) noexcept
         {
-#if defined(HPX_HAVE_STDEXEC)
-            stdexec::set_error(
-                HPX_MOVE(r.op_state->receiver), HPX_FORWARD(E, e));
-#else
             hpx::execution::experimental::set_error(
                 HPX_MOVE(r.op_state->receiver), HPX_FORWARD(E, e));
-#endif
         }
 
-        friend void tag_invoke(
-#if defined(HPX_HAVE_STDEXEC)
-            stdexec::set_stopped_t,
-#else
-            hpx::execution::experimental::set_stopped_t,
-#endif
+        friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
             bulk_receiver&& r) noexcept
         {
-#if defined(HPX_HAVE_STDEXEC)
-            stdexec::set_stopped(HPX_MOVE(r.op_state->receiver));
-#else
             hpx::execution::experimental::set_stopped(
                 HPX_MOVE(r.op_state->receiver));
-#endif
         }
 
         // Initialize a queue for a worker thread.
@@ -432,8 +376,8 @@ namespace hpx::execution::experimental::detail {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
             auto const part_begin = worker_thread;
-            auto part_end = (std::min) (size + num_threads - 1,
-                part_begin + num_steps * num_threads);
+            auto part_end = (std::min)(
+                size + num_threads - 1, part_begin + num_steps * num_threads);
             auto const remainder = (part_end - part_begin) % num_threads;
             if (remainder != 0)
             {
@@ -510,25 +454,18 @@ namespace hpx::execution::experimental::detail {
                 static_cast<std::uint32_t>(hpx::util::size(op_state->shape));
             if (size == 0)
             {
-#if defined(HPX_HAVE_STDEXEC)
-                stdexec::set_value(
-                    HPX_MOVE(op_state->receiver), HPX_FORWARD(Ts, ts)...);
-#else
                 hpx::execution::experimental::set_value(
                     HPX_MOVE(op_state->receiver), HPX_FORWARD(Ts, ts)...);
-#endif
                 return;
             }
 
-
-                // Calculate chunk size and number of chunks
-                std::uint32_t chunk_size = get_bulk_scheduler_chunk_size(
+            // Calculate chunk size and number of chunks
+            std::uint32_t chunk_size = get_bulk_scheduler_chunk_size(
                 op_state->num_worker_threads, size);
             std::uint32_t num_chunks = (size + chunk_size - 1) / chunk_size;
 
-                             // launch only as many tasks as we have chunks
-                             std::size_t const num_pus =
-                op_state->num_worker_threads;
+            // launch only as many tasks as we have chunks
+            std::size_t const num_pus = op_state->num_worker_threads;
             if (num_chunks <
                 static_cast<std::uint32_t>(op_state->num_worker_threads))
             {
@@ -536,7 +473,6 @@ namespace hpx::execution::experimental::detail {
                 op_state->tasks_remaining.data_ = num_chunks;
                 op_state->pu_mask =
                     detail::limit_mask(op_state->pu_mask, num_chunks);
-
             }
 
             HPX_ASSERT(hpx::threads::count(op_state->pu_mask) ==
@@ -595,7 +531,6 @@ namespace hpx::execution::experimental::detail {
             bool allow_stealing =
                 !hpx::threads::do_not_share_function(hint.sharing_mode());
 
-            std::uint32_t spawned_tasks = 0;
             for (std::uint32_t pu = 0;
                 worker_thread != op_state->num_worker_threads && pu != num_pus;
                 ++pu)
@@ -633,7 +568,6 @@ namespace hpx::execution::experimental::detail {
                         worker_thread, reverse_placement, allow_stealing});
 
                 ++worker_thread;
-                ++spawned_tasks;
             }
 
             // there have to be as many HPX threads as there are set bits in
@@ -656,24 +590,14 @@ namespace hpx::execution::experimental::detail {
                     std::add_lvalue_reference_t<Ts>...>
             )>
         // clang-format on
-        friend void tag_invoke(
-#if defined(HPX_HAVE_STDEXEC)
-            stdexec::set_value_t,
-#else
-            hpx::execution::experimental::set_value_t,
-#endif
+        friend void tag_invoke(hpx::execution::experimental::set_value_t,
             bulk_receiver&& r, Ts&&... ts) noexcept
         {
             hpx::detail::try_catch_exception_ptr(
                 [&]() { r.execute(HPX_FORWARD(Ts, ts)...); },
                 [&](std::exception_ptr ep) {
-#if defined(HPX_HAVE_STDEXEC)
-                    stdexec::set_error(
-                        HPX_MOVE(r.op_state->receiver), HPX_MOVE(ep));
-#else
                     hpx::execution::experimental::set_error(
                         HPX_MOVE(r.op_state->receiver), HPX_MOVE(ep));
-#endif
                 });
         }
     };
@@ -739,14 +663,17 @@ namespace hpx::execution::experimental::detail {
             thread_pool_bulk_sender const&) = default;
 
 #if defined(HPX_HAVE_STDEXEC)
-        using sender_concept = stdexec::sender_t;
+        using sender_concept = hpx::execution::experimental::sender_t;
 
         template <typename Env>
-        friend auto tag_invoke(stdexec::get_completion_signatures_t,
+        friend auto tag_invoke(
+            hpx::execution::experimental::get_completion_signatures_t,
             thread_pool_bulk_sender const&, Env const&)
-            -> stdexec::transform_completion_signatures_of<Sender, Env,
-                stdexec::completion_signatures<stdexec::set_error_t(
-                    std::exception_ptr)>>;
+            -> hpx::execution::experimental::transform_completion_signatures_of<
+                Sender, Env,
+                hpx::execution::experimental::completion_signatures<
+                    hpx::execution::experimental::set_error_t(
+                        std::exception_ptr)>>;
 
         struct env
         {
@@ -757,21 +684,23 @@ namespace hpx::execution::experimental::detail {
             template <typename CPO,
                 HPX_CONCEPT_REQUIRES_(
                     meta::value<meta::one_of<CPO,
-                        stdexec::set_error_t,
-                        stdexec::set_stopped_t>> &&
+                        hpx::execution::experimental::set_error_t,
+                        hpx::execution::experimental::set_stopped_t>> &&
                     hpx::execution::experimental::detail::has_completion_scheduler_v<
                         CPO, std::decay_t<Sender>>
                 )>
             // clang-format on
             friend constexpr auto tag_invoke(
-                stdexec::get_completion_scheduler_t<CPO> tag,
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>
+                    tag,
                 env const& e) noexcept
             {
-                return tag(stdexec::get_env(e.pred_snd));
+                return tag(hpx::execution::experimental::get_env(e.pred_snd));
             }
 
             friend constexpr auto tag_invoke(
-                stdexec::get_completion_scheduler_t<stdexec::set_value_t>,
+                hpx::execution::experimental::get_completion_scheduler_t<
+                    hpx::execution::experimental::set_value_t>,
                 env const& e) noexcept
             {
                 return e.sch;
@@ -781,7 +710,8 @@ namespace hpx::execution::experimental::detail {
         // It may be also be correct to forward the entire env of the
         // pred. sender.
         friend constexpr auto tag_invoke(
-            stdexec::get_env_t, thread_pool_bulk_sender const& s) noexcept
+            hpx::execution::experimental::get_env_t,
+            thread_pool_bulk_sender const& s) noexcept
         {
             return env{s.sender, s.scheduler};
         }
@@ -838,14 +768,9 @@ namespace hpx::execution::experimental::detail {
         template <typename Receiver>
         struct operation_state
         {
-#if defined(HPX_HAVE_STDEXEC)
-            using operation_state_type = stdexec::connect_result_t<Sender,
-                bulk_receiver<operation_state, F, Shape>>;
-#else
             using operation_state_type =
                 hpx::execution::experimental::connect_result_t<Sender,
                     bulk_receiver<operation_state, F, Shape>>;
-#endif
 
             thread_pool_policy_scheduler<Policy> scheduler;
             operation_state_type op_state;
@@ -861,12 +786,8 @@ namespace hpx::execution::experimental::detail {
             hpx::util::cache_aligned_data<std::atomic<std::size_t>>
                 tasks_remaining;
 
-            // Use HPX's completion signature utilities for both stdexec and non-stdexec builds
-            using value_types =
-                hpx::execution::experimental::value_types_of_t<Sender,
-                    hpx::execution::experimental::empty_env,
-                    hpx::execution::experimental::detail::decayed_tuple,
-                    hpx::variant>;
+            using value_types = value_types_of_t<Sender, empty_env,
+                decayed_tuple, hpx::variant>;
             hpx::util::detail::prepend_t<value_types, hpx::monostate> ts;
             std::atomic<bool> bad_alloc_thrown{false};
             hpx::exception_list exceptions;
@@ -877,14 +798,9 @@ namespace hpx::execution::experimental::detail {
                 Shape_&& shape, F_&& f, hpx::threads::mask_type pumask,
                 Receiver_&& receiver)
               : scheduler(HPX_FORWARD(Scheduler_, scheduler))
-#if defined(HPX_HAVE_STDEXEC)
-              , op_state(stdexec::connect(HPX_FORWARD(Sender_, sender),
-                    bulk_receiver<operation_state, F, Shape>{this}))
-#else
               , op_state(hpx::execution::experimental::connect(
                     HPX_FORWARD(Sender_, sender),
                     bulk_receiver<operation_state, F, Shape>{this}))
-#endif
               , first_thread(
                     hpx::execution::experimental::get_first_core(scheduler))
               , num_worker_threads(
@@ -902,41 +818,13 @@ namespace hpx::execution::experimental::detail {
                 HPX_ASSERT(hpx::threads::count(pu_mask) == num_worker_threads);
             }
 
-#if defined(HPX_HAVE_STDEXEC)
-            friend void tag_invoke(
-                stdexec::start_t, operation_state& os) noexcept
-            {
-                stdexec::start(os.op_state);
-            }
-#else
             friend void tag_invoke(start_t, operation_state& os) noexcept
             {
                 hpx::execution::experimental::start(os.op_state);
             }
-#endif
         };
 
     public:
-#if defined(HPX_HAVE_STDEXEC)
-        template <typename Receiver>
-        friend auto tag_invoke(stdexec::connect_t, thread_pool_bulk_sender&& s,
-            Receiver&& receiver)
-        {
-            return operation_state<std::decay_t<Receiver>>{
-                HPX_MOVE(s.scheduler), HPX_MOVE(s.sender), HPX_MOVE(s.shape),
-                HPX_MOVE(s.f), HPX_MOVE(s.pu_mask),
-                HPX_FORWARD(Receiver, receiver)};
-        }
-
-        template <typename Receiver>
-        friend auto tag_invoke(
-            stdexec::connect_t, thread_pool_bulk_sender& s, Receiver&& receiver)
-        {
-            return operation_state<std::decay_t<Receiver>>{s.scheduler,
-                s.sender, s.shape, s.f, s.pu_mask,
-                HPX_FORWARD(Receiver, receiver)};
-        }
-#else
         template <typename Receiver>
         friend auto tag_invoke(
             connect_t, thread_pool_bulk_sender&& s, Receiver&& receiver)
@@ -955,146 +843,11 @@ namespace hpx::execution::experimental::detail {
                 s.sender, s.shape, s.f, s.pu_mask,
                 HPX_FORWARD(Receiver, receiver)};
         }
-#endif
     };
-
-#if defined(HPX_HAVE_STDEXEC)
-    // Transforms stdexec bulk sender expressions into thread pool bulk senders
-    template <typename Policy>
-    struct thread_pool_bulk_transformer
-    {
-        thread_pool_policy_scheduler<Policy> __sched_;
-
-        // Handle bulk_chunked transformation
-        template <class _Data, class _Previous>
-        auto operator()(stdexec::bulk_chunked_t, _Data&& __data,
-            _Previous&& __previous) const noexcept
-        {
-            // Extract policy, shape, and function from stdexec's data structure
-            auto __pol = __data.__pol_;    // This is __policy_wrapper<Policy>
-            auto __shape = __data.__shape_;
-            auto __fn = std::move(__data.__fun_);
-
-            // Get the actual policy from the wrapper
-            auto actual_policy = __pol.__get();
-
-            // Handle sync policy specially
-            if constexpr (std::is_same_v<Policy, launch::sync_policy>)
-            {
-                // Delegate to stdexec's default implementation for sync
-                return stdexec::bulk_chunked(
-                    static_cast<_Previous&&>(__previous), actual_policy,
-                    __shape, std::move(__fn));
-            }
-            else
-            {
-                // Use our thread pool implementation
-                return thread_pool_bulk_sender<Policy, _Previous,
-                    decltype(__shape), decltype(__fn)>{__sched_,
-                    static_cast<_Previous&&>(__previous), __shape,
-                    std::move(__fn)};
-            }
-        }
-
-        // Handle bulk_unchunked transformation
-        template <class _Data, class _Previous>
-        auto operator()(stdexec::bulk_unchunked_t, _Data&& __data,
-            _Previous&& __previous) const noexcept
-        {
-            auto __pol = __data.__pol_;    // This is __policy_wrapper<Policy>
-            auto __shape = __data.__shape_;
-            auto __fn = std::move(__data.__fun_);
-
-            // Get the actual policy from the wrapper
-            auto actual_policy = __pol.__get();
-
-            // Handle sync policy specially
-            if constexpr (std::is_same_v<Policy, launch::sync_policy>)
-            {
-                // Delegate to stdexec's default implementation for sync
-                return stdexec::bulk_unchunked(
-                    static_cast<_Previous&&>(__previous), actual_policy,
-                    __shape, std::move(__fn));
-            }
-            else
-            {
-                // Unchunked always processes individual items with thread pool
-                return thread_pool_bulk_sender<Policy, _Previous,
-                    decltype(__shape), decltype(__fn)>{__sched_,
-                    static_cast<_Previous&&>(__previous), __shape,
-                    std::move(__fn)};
-            }
-        }
-    };
-
-    // Now implement the domain transform_sender method
-    template <typename Policy>
-    template <stdexec::sender _Sender, class _Env>
-    auto thread_pool_domain<Policy>::transform_sender(
-        _Sender&& __sndr, const _Env& __env) const noexcept
-    {
-        // Use stdexec's tag_of_t to properly extract the tag from __sexpr types
-        if constexpr (stdexec::sender_expr<_Sender>)
-        {
-            using _Tag = stdexec::tag_of_t<_Sender>;
-
-            // Check if this is a bulk_chunked operation
-            if constexpr (std::same_as<_Tag, stdexec::bulk_chunked_t>)
-            {
-                // Check if it completes on our scheduler type
-                if constexpr (stdexec::__completes_on<_Sender, scheduler_type>)
-                {
-                    auto __sched =
-                        stdexec::get_completion_scheduler<stdexec::set_value_t>(
-                            stdexec::get_env(__sndr));
-
-                    return stdexec::__sexpr_apply(
-                        static_cast<_Sender&&>(__sndr),
-                        thread_pool_bulk_transformer<Policy>{__sched});
-                }
-                else if constexpr (stdexec::__starts_on<_Sender, scheduler_type,
-                                       _Env>)
-                {
-                    auto __sched = stdexec::get_scheduler(__env);
-                    return stdexec::__sexpr_apply(
-                        static_cast<_Sender&&>(__sndr),
-                        thread_pool_bulk_transformer<Policy>{__sched});
-                }
-            }
-            // Check if this is a bulk_unchunked operation
-            else if constexpr (std::same_as<_Tag, stdexec::bulk_unchunked_t>)
-            {
-                if constexpr (stdexec::__completes_on<_Sender, scheduler_type>)
-                {
-                    auto __sched =
-                        stdexec::get_completion_scheduler<stdexec::set_value_t>(
-                            stdexec::get_env(__sndr));
-
-                    return stdexec::__sexpr_apply(
-                        static_cast<_Sender&&>(__sndr),
-                        thread_pool_bulk_transformer<Policy>{__sched});
-                }
-                else if constexpr (stdexec::__starts_on<_Sender, scheduler_type,
-                                       _Env>)
-                {
-                    auto __sched = stdexec::get_scheduler(__env);
-                    return stdexec::__sexpr_apply(
-                        static_cast<_Sender&&>(__sndr),
-                        thread_pool_bulk_transformer<Policy>{__sched});
-                }
-            }
-        }
-
-        // Not a bulk operation or not our scheduler - delegate to default domain
-        return stdexec::default_domain::transform_sender(
-            static_cast<_Sender&&>(__sndr), __env);
-    }
-#endif    // HPX_HAVE_STDEXEC
-
 }    // namespace hpx::execution::experimental::detail
 
-namespace hpx::execution::experimental {
-    // Now bulk operations will be intercepted by the domain's transform_sender method
-    // No direct tag_invoke customizations needed - stdexec will create sender expressions
-    // and our domain will transform them via the thread_pool_bulk_transformer
-}    // namespace hpx::execution::experimental
+// Note: With stdexec integration, bulk operations are now customized
+// through the domain system in thread_pool_scheduler.hpp rather than
+// direct tag_invoke customizations. The thread_pool_domain<Policy>
+// intercepts stdexec::bulk_chunked_t operations and creates
+// thread_pool_bulk_sender instances for parallel execution.

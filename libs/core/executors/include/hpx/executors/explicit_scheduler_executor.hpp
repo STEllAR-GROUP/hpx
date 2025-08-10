@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution/algorithms/bulk.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/execution/algorithms/keep_future.hpp>
 #include <hpx/execution/algorithms/start_detached.hpp>
 #include <hpx/execution/algorithms/sync_wait.hpp>
