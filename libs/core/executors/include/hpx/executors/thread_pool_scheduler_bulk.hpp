@@ -146,7 +146,7 @@ namespace hpx::execution::experimental::detail {
             auto const i_begin =
                 static_cast<std::size_t>(index) * task_f->chunk_size;
             auto const i_end =
-                (std::min)(i_begin + task_f->chunk_size, task_f->size);
+                (std::min) (i_begin + task_f->chunk_size, task_f->size);
 
             auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
             for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
@@ -376,8 +376,8 @@ namespace hpx::execution::experimental::detail {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
             auto const part_begin = worker_thread;
-            auto part_end = (std::min)(
-                size + num_threads - 1, part_begin + num_steps * num_threads);
+            auto part_end = (std::min) (size + num_threads - 1,
+                part_begin + num_steps * num_threads);
             auto const remainder = (part_end - part_begin) % num_threads;
             if (remainder != 0)
             {

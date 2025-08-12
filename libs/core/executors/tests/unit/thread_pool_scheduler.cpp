@@ -2118,7 +2118,7 @@ void test_stdexec_bulk_domain_customization()
     std::vector<int> results(10, 0);
     auto bulk_sender = stdexec::bulk(
         ex::schedule(scheduler) | stdexec::then([]() { return 42; }),
-        std::execution::par, 10,
+        stdexec::par, 10,
         [&](int idx, int value) { results[idx] = value + idx; });
 
     stdexec::sync_wait(std::move(bulk_sender));
@@ -2138,7 +2138,7 @@ void test_stdexec_bulk_chunked_customization()
     std::atomic<int> total_processed{0};
     auto bulk_chunked_sender = stdexec::bulk_chunked(
         ex::schedule(scheduler) | stdexec::then([]() { return 1; }),
-        std::execution::par, 20, [&](int begin, int end, int value) {
+        stdexec::par, 20, [&](int begin, int end, int value) {
             for (int i = begin; i < end; ++i)
             {
                 total_processed.fetch_add(value, std::memory_order_relaxed);
@@ -2158,7 +2158,7 @@ void test_stdexec_bulk_unchunked_customization()
     std::vector<int> results(15, 0);
     auto bulk_unchunked_sender = stdexec::bulk_unchunked(
         ex::schedule(scheduler) | stdexec::then([]() { return 5; }),
-        std::execution::par, 15,
+        stdexec::par, 15,
         [&](int idx, int value) { results[idx] = value * idx; });
 
     stdexec::sync_wait(std::move(bulk_unchunked_sender));
@@ -2181,7 +2181,7 @@ void test_stdexec_thread_distribution()
 
     auto bulk_sender = stdexec::bulk(
         ex::schedule(scheduler) | stdexec::then([]() { return 0; }),
-        std::execution::par, 8, [&](int idx, int value) {
+        stdexec::par, 8, [&](int idx, int value) {
             worker_threads.insert(std::this_thread::get_id());
             task_count.fetch_add(1, std::memory_order_relaxed);
         });
@@ -2206,7 +2206,7 @@ void test_stdexec_execution_policies()
     std::vector<int> seq_results(5, 0);
     auto seq_sender = stdexec::bulk(
         ex::schedule(scheduler) | stdexec::then([]() { return 10; }),
-        std::execution::seq, 5,
+        stdexec::seq, 5,
         [&](int idx, int value) { seq_results[idx] = value + idx; });
 
     stdexec::sync_wait(std::move(seq_sender));
@@ -2220,7 +2220,7 @@ void test_stdexec_execution_policies()
     std::vector<int> par_unseq_results(5, 0);
     auto par_unseq_sender = stdexec::bulk(
         ex::schedule(scheduler) | stdexec::then([]() { return 20; }),
-        std::execution::par_unseq, 5,
+        stdexec::par_unseq, 5,
         [&](int idx, int value) { par_unseq_results[idx] = value + idx; });
 
     stdexec::sync_wait(std::move(par_unseq_sender));

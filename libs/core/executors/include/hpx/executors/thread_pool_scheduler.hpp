@@ -72,37 +72,14 @@ namespace hpx::execution::experimental {
     template <typename Policy>
     struct thread_pool_policy_scheduler;
 
-    // Concept to check if a sender is any bulk operation (CORRECTED)
+    // Concept to check if a sender is any bulk operation
     template <typename Sender>
     concept __bulk_chunked_or_unchunked =
         stdexec::sender_expr_for<Sender, stdexec::bulk_t> ||
         stdexec::sender_expr_for<Sender, stdexec::bulk_chunked_t> ||
         stdexec::sender_expr_for<Sender, stdexec::bulk_unchunked_t>;
 
-    // Transform function object for bulk operations (from memory pattern)
-    template <typename Policy>
-    struct __transform_bulk_sender
-    {
-        thread_pool_policy_scheduler<Policy> __sched;
-
-        template <typename Sender, typename Data>
-        auto operator()(stdexec::__ignore, Data&& data, Sender&& sndr) const
-        {
-            // For stdexec bulk, extract the bulk parameters from the data structure
-            // The data contains __pol_, __shape_, and __fun_ members
-            auto policy = data.__pol_.__get();
-            auto shape = data.__shape_;
-            auto fun = std::move(data.__fun_);
-
-            // Create HPX's thread pool bulk sender with proper parameters
-            return detail::thread_pool_bulk_sender<Policy, std::decay_t<Sender>,
-                std::decay_t<decltype(shape)>, std::decay_t<decltype(fun)>>{
-                std::move(__sched), std::forward<Sender>(sndr), shape,
-                std::move(fun)};
-        }
-    };
-
-    // Domain customization for stdexec bulk operations (PROPER IMPLEMENTATION)
+    // Domain customization for stdexec bulk operations
     template <typename Policy>
     struct thread_pool_domain : stdexec::default_domain
     {
@@ -116,27 +93,26 @@ namespace hpx::execution::experimental {
         {
         }
 
-        // CRITICAL: Only intercept stdexec bulk expressions using concept constraints
+        // Only intercept stdexec bulk expressions using concept constraints
         template <__bulk_chunked_or_unchunked Sender, typename Env>
-        auto transform_sender(Sender&& sndr, const Env& env) const noexcept
+        auto transform_sender(
+            Sender&& sndr, const Env& /* env */) const noexcept
         {
             // Extract bulk parameters using structured binding
             auto [tag, data, child] = sndr;
 
             // Create HPX thread_pool_bulk_sender with extracted parameters
-            using bulk_sender_type =
-                hpx::execution::experimental::detail::thread_pool_bulk_sender<
-                    Policy, std::decay_t<decltype(child)>,
+            return hpx::execution::experimental::detail::
+                thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
                     std::decay_t<decltype(data.__shape_)>,
-                    std::decay_t<decltype(data.__fun_)>>;
-
-            return bulk_sender_type{
-                std::move(sched_),                       // scheduler
-                std::forward<decltype(child)>(child),    // child sender
-                std::forward<decltype(data.__shape_)>(
-                    data.__shape_),                                 // shape
-                std::forward<decltype(data.__fun_)>(data.__fun_)    // function
-            };
+                    std::decay_t<decltype(data.__fun_)>>{
+                    sched_,                                  // scheduler
+                    std::forward<decltype(child)>(child),    // child sender
+                    std::forward<decltype(data.__shape_)>(
+                        data.__shape_),    // shape
+                    std::forward<decltype(data.__fun_)>(
+                        data.__fun_)    // function
+                };
         }
 
         // FALLBACK: Handle non-bulk senders by delegating to default domain
@@ -158,65 +134,6 @@ namespace hpx::execution::experimental {
             return stdexec::default_domain::transform_sender(
                 std::forward<Sender>(sndr));
         }
-
-    private:
-        // Transform function object for HPX bulk operations (following system_context.hpp pattern)
-        template <typename Scheduler>
-        struct __transform_hpx_bulk_sender
-        {
-            Scheduler sched;
-
-            // Handle bulk_t senders
-            template <typename Tag, typename Data, typename Child>
-                requires std::same_as<Tag, stdexec::bulk_t>
-            auto operator()(Tag, Data&& data, Child&& child) const
-            {
-                // Extract bulk parameters using structured binding
-                auto shape = data.__shape_;
-                auto fun = std::move(data.__fun_);
-
-                // Create HPX thread_pool_bulk_sender (using 4-parameter constructor)
-                return hpx::execution::experimental::detail::
-                    thread_pool_bulk_sender<Policy, std::decay_t<Child>,
-                        std::decay_t<decltype(shape)>,
-                        std::decay_t<decltype(fun)>>{std::move(sched),
-                        std::forward<Child>(child), shape, std::move(fun)};
-            }
-
-            // Handle bulk_chunked_t senders
-            template <typename Tag, typename Data, typename Child>
-                requires std::same_as<Tag, stdexec::bulk_chunked_t>
-            auto operator()(Tag, Data&& data, Child&& child) const
-            {
-                // Extract bulk parameters using structured binding
-                auto shape = data.__shape_;
-                auto fun = std::move(data.__fun_);
-
-                // Create HPX thread_pool_bulk_sender (using 4-parameter constructor)
-                return hpx::execution::experimental::detail::
-                    thread_pool_bulk_sender<Policy, std::decay_t<Child>,
-                        std::decay_t<decltype(shape)>,
-                        std::decay_t<decltype(fun)>>{std::move(sched),
-                        std::forward<Child>(child), shape, std::move(fun)};
-            }
-
-            // Handle bulk_unchunked_t senders
-            template <typename Tag, typename Data, typename Child>
-                requires std::same_as<Tag, stdexec::bulk_unchunked_t>
-            auto operator()(Tag, Data&& data, Child&& child) const
-            {
-                // Extract bulk parameters using structured binding
-                auto shape = data.__shape_;
-                auto fun = std::move(data.__fun_);
-
-                // Create HPX thread_pool_bulk_sender (using 4-parameter constructor)
-                return hpx::execution::experimental::detail::
-                    thread_pool_bulk_sender<Policy, std::decay_t<Child>,
-                        std::decay_t<decltype(shape)>,
-                        std::decay_t<decltype(fun)>>{std::move(sched),
-                        std::forward<Child>(child), shape, std::move(fun)};
-            }
-        };
     };
 
 #endif
