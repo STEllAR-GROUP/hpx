@@ -14,7 +14,7 @@ jobs:
     container: stellargroup/build_env:17
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Configure
       shell: bash
       run: |
