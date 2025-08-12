@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/execution/algorithms/keep_future.hpp>
 #include <hpx/execution/algorithms/make_future.hpp>
 #include <hpx/execution/algorithms/schedule_from.hpp>
@@ -24,6 +23,7 @@
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>

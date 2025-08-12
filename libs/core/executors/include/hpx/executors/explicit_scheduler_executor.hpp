@@ -10,20 +10,19 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/execution/algorithms/keep_future.hpp>
 #include <hpx/execution/algorithms/start_detached.hpp>
 #include <hpx/execution/algorithms/sync_wait.hpp>
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/algorithms/transfer.hpp>
 #include <hpx/execution/algorithms/transfer_just.hpp>
-#include <hpx/execution/executors/default_parameters.hpp>
+#include <hpx/execution/algorithms/when_all.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/tag_invoke.hpp>
