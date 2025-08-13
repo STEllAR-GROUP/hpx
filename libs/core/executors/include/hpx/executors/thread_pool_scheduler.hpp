@@ -415,11 +415,11 @@ namespace hpx::execution::experimental {
                 }
             };
 
-            friend constexpr env tag_invoke(
+            friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_env_t,
                 sender const& s) noexcept
             {
-                return {s.scheduler};
+                return hpx::execution::experimental::env{s.scheduler};
             };
 
             // clang-format off
@@ -436,11 +436,11 @@ namespace hpx::execution::experimental {
                 return s.scheduler;
             }
 #else
-            friend constexpr env tag_invoke(
+            friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_env_t,
                 sender const& s) noexcept
             {
-                return {s.scheduler};
+                return hpx::execution::experimental::env{s.scheduler};
             };
 #endif
         };
