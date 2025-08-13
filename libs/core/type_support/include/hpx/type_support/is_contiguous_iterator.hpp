@@ -9,6 +9,7 @@
 
 #include <array>
 #include <iterator>
+#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -135,8 +136,15 @@ namespace hpx::traits {
 
         template <typename Iter>
         struct is_std_basic_string_iterator<Iter,
-            std::enable_if_t<has_value_type_helper<Iter>::value>>
-          : is_valid_char_type<iter_value_type_t<Iter>>
+            std::enable_if_t<has_value_type_helper<Iter>::value &&
+                is_valid_char_type<iter_value_type_t<Iter>>::value>>
+          : std::bool_constant<
+                std::is_same_v<typename std::basic_string<
+                                   iter_value_type_t<Iter>>::iterator,
+                    Iter> ||
+                std::is_same_v<typename std::basic_string<
+                                   iter_value_type_t<Iter>>::const_iterator,
+                    Iter>>
         {
         };
 
