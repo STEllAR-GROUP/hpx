@@ -438,6 +438,7 @@ namespace hpx::execution::experimental {
 #endif
         };
 
+#if defined(HPX_HAVE_STDEXEC)
         friend constexpr hpx::execution::experimental::
             forward_progress_guarantee
             tag_invoke(
@@ -455,6 +456,7 @@ namespace hpx::execution::experimental {
                     forward_progress_guarantee::concurrent;
             }
         }
+#endif
 
         friend constexpr sender<thread_pool_policy_scheduler> tag_invoke(
             hpx::execution::experimental::schedule_t,
