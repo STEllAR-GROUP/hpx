@@ -639,12 +639,12 @@ namespace hpx {
     inline constexpr struct inclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<inclusive_scan_t>
     {
+        template <typename InIter, typename OutIter>
         // clang-format off
-        template <typename InIter, typename OutIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter>
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(
             hpx::inclusive_scan_t, InIter first, InIter last, OutIter dest)
@@ -664,13 +664,13 @@ namespace hpx {
                     std::plus<value_type>()));
         }
 
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
         tag_fallback_invoke(hpx::inclusive_scan_t, ExPolicy&& policy,
@@ -692,16 +692,16 @@ namespace hpx {
                     std::plus<value_type>()));
         }
 
+        template <typename InIter, typename OutIter, typename Op>
         // clang-format off
-        template <typename InIter, typename OutIter, typename Op,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<Op,
                     typename std::iterator_traits<InIter>::value_type,
                     typename std::iterator_traits<InIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::inclusive_scan_t, InIter first,
             InIter last, OutIter dest, Op op)
@@ -718,10 +718,10 @@ namespace hpx {
                     hpx::execution::seq, first, last, dest, HPX_MOVE(op)));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Op,
-            HPX_CONCEPT_REQUIRES_(
+            typename Op>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -729,7 +729,7 @@ namespace hpx {
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter1>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
         tag_fallback_invoke(hpx::inclusive_scan_t, ExPolicy&& policy,
@@ -749,17 +749,17 @@ namespace hpx {
                     HPX_MOVE(op)));
         }
 
-        // clang-format off
         template <typename InIter, typename OutIter, typename Op,
-            typename T = typename std::iterator_traits<InIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<InIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<Op,
                     typename std::iterator_traits<InIter>::value_type,
                     typename std::iterator_traits<InIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::inclusive_scan_t, InIter first,
             InIter last, OutIter dest, Op op, T init)
@@ -777,11 +777,11 @@ namespace hpx {
                     HPX_MOVE(op)));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Op,
-            typename T = typename std::iterator_traits<FwdIter1>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter1>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -789,7 +789,7 @@ namespace hpx {
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter1>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
         tag_fallback_invoke(hpx::inclusive_scan_t, ExPolicy&& policy,

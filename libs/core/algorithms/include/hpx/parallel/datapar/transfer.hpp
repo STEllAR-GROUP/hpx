@@ -38,7 +38,7 @@ namespace hpx { namespace parallel { namespace util {
             {
                 auto ret =
                     util::transform_loop_n_ind<hpx::execution::simd_policy>(
-                        first, count, dest, [](auto& v) { return v; });
+                        first, count, dest, [](auto&& v) { return v; });
 
                 return util::in_out_result<InIter, OutIter>{
                     HPX_MOVE(ret.first), HPX_MOVE(ret.second)};

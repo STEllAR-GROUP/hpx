@@ -95,6 +95,8 @@ namespace hpx::lockfree::detail {
                 freelist_node* current_ptr = current.get_ptr();
                 if (current_ptr)
                     current = current_ptr->next;
+
+                // NOLINTNEXTLINE(bugprone-bitwise-pointer-cast)
                 Alloc::deallocate(hpx::bit_cast<T*>(current_ptr), 1);
             }
         }

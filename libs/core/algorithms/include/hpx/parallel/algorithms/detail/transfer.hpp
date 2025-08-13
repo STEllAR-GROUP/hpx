@@ -103,15 +103,16 @@ namespace hpx::parallel {
         //           element in the destination range, one past the last element
         //           transferred.
         //
-        // clang-format off
+
         template <typename Algo, typename ExPolicy, typename FwdIter1,
-            typename Sent1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            typename Sent1, typename FwdIter2>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         decltype(auto) transfer(
             ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest)

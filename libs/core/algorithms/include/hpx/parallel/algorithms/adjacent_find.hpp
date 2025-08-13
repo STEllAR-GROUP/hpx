@@ -262,13 +262,9 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<adjacent_find_t>
     {
     private:
-        // clang-format off
         template <typename InIter,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_input_iterator_v<InIter>
-            )>
-        // clang-format on
+            typename Pred = hpx::parallel::detail::equal_to>
+            requires(hpx::traits::is_input_iterator_v<InIter>)
         friend InIter tag_fallback_invoke(
             hpx::adjacent_find_t, InIter first, InIter last, Pred pred = Pred())
         {
@@ -280,13 +276,13 @@ namespace hpx {
                 hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
-            )>
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_forward_iterator_v<FwdIter>
+        )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::adjacent_find_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())

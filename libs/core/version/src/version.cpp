@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2024 Hartmut Kaiser
+//  Copyright (c) 2011-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -156,7 +156,7 @@ namespace hpx {
             "(A general purpose parallel C++ runtime system for distributed "
             "applications\n"
             "of any scale).\n\n"
-            "Copyright (c) 2007-2024, The STE||AR Group,\n"
+            "Copyright (c) 2007-2025, The STE||AR Group,\n"
             "http://stellar-group.org, email:hpx-users@stellar-group.org\n\n"
             "Distributed under the Boost Software License, "
             "Version 1.0. (See accompanying\n"
@@ -215,7 +215,7 @@ namespace hpx {
             HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY);
 #endif
 
-        const char* prefix = util::hpx_prefix();
+        char const* prefix = util::hpx_prefix();
         if (prefix == nullptr)
         {
             strm << "  HPX_PREFIX (configured)=unknown\n";

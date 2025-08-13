@@ -555,16 +555,16 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<make_heap_t>
     {
     private:
+        template <typename ExPolicy, typename RndIter, typename Comp>
         // clang-format off
-        template <typename ExPolicy, typename RndIter, typename Comp,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RndIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RndIter>::value_type,
                     typename std::iterator_traits<RndIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(make_heap_t, ExPolicy&& policy, RndIter first,
@@ -579,12 +579,12 @@ namespace hpx {
                     hpx::identity_v));
         }
 
+        template <typename ExPolicy, typename RndIter>
         // clang-format off
-        template <typename ExPolicy, typename RndIter,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<RndIter>
-            )>
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<RndIter>
+        )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(
@@ -602,15 +602,15 @@ namespace hpx {
                     std::less<value_type>(), hpx::identity_v));
         }
 
+        template <typename RndIter, typename Comp>
         // clang-format off
-        template <typename RndIter, typename Comp,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator_v<RndIter> &&
-                hpx::is_invocable_v<Comp,
-                    typename std::iterator_traits<RndIter>::value_type,
-                    typename std::iterator_traits<RndIter>::value_type
-                >
-            )>
+        requires (
+            hpx::traits::is_iterator_v<RndIter> &&
+            hpx::is_invocable_v<Comp,
+                hpx::traits::iter_value_t<RndIter>,
+                hpx::traits::iter_value_t<RndIter>
+            >
+        )
         // clang-format on
         friend void tag_fallback_invoke(
             make_heap_t, RndIter first, RndIter last, Comp comp)
@@ -623,12 +623,8 @@ namespace hpx {
                 hpx::identity_v);
         }
 
-        // clang-format off
-        template <typename RndIter,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator_v<RndIter>
-            )>
-        // clang-format on
+        template <typename RndIter>
+            requires(hpx::traits::is_iterator_v<RndIter>)
         friend void tag_fallback_invoke(
             make_heap_t, RndIter first, RndIter last)
         {

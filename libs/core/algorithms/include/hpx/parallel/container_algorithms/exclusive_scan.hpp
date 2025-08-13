@@ -351,19 +351,18 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<exclusive_scan_t>
     {
     private:
-        // clang-format off
         template <typename InIter, typename Sent, typename OutIter,
             typename T = typename std::iterator_traits<InIter>::value_type,
-            typename Op = std::plus<>,
-            HPX_CONCEPT_REQUIRES_(
+            typename Op = std::plus<>>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<Op,
                     typename std::iterator_traits<InIter>::value_type,
-                    typename std::iterator_traits<InIter>::value_type
-                >
-            )>
+                    typename std::iterator_traits<InIter>::value_type>
+                )
         // clang-format on
         friend exclusive_scan_result<InIter, OutIter> tag_fallback_invoke(
             hpx::ranges::exclusive_scan_t, InIter first, Sent last,
@@ -381,12 +380,12 @@ namespace hpx::ranges {
                 HPX_MOVE(op));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent,
             typename FwdIter2,
             typename T = typename std::iterator_traits<FwdIter1>::value_type,
-            typename Op = std::plus<>,
-            HPX_CONCEPT_REQUIRES_(
+            typename Op = std::plus<>>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
@@ -395,7 +394,7 @@ namespace hpx::ranges {
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter1>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             exclusive_scan_result<FwdIter1, FwdIter2>>
@@ -414,18 +413,18 @@ namespace hpx::ranges {
                 HPX_MOVE(init), HPX_MOVE(op));
         }
 
-        // clang-format off
         template <typename Rng, typename O,
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type,
-            typename Op = std::plus<>,
-            HPX_CONCEPT_REQUIRES_(
+            typename Op = std::plus<>>
+        // clang-format off
+            requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<Op,
                     typename hpx::traits::range_traits<Rng>::value_type,
                     typename hpx::traits::range_traits<Rng>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend exclusive_scan_result<traits::range_iterator_t<Rng>, O>
         tag_fallback_invoke(hpx::ranges::exclusive_scan_t, Rng&& rng, O dest,
@@ -443,19 +442,19 @@ namespace hpx::ranges {
                 HPX_MOVE(init), HPX_MOVE(op));
         }
 
-        // clang-format off
-        template <typename ExPolicy, typename Rng,  typename O,
+        template <typename ExPolicy, typename Rng, typename O,
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type,
-            typename Op = std::plus<>,
-            HPX_CONCEPT_REQUIRES_(
+            typename Op = std::plus<>>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<Op,
                     typename hpx::traits::range_traits<Rng>::value_type,
                     typename hpx::traits::range_traits<Rng>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             exclusive_scan_result<traits::range_iterator_t<Rng>, O>>

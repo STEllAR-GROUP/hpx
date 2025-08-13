@@ -696,16 +696,16 @@ namespace hpx {
     inline constexpr struct unique_t final
       : hpx::detail::tag_parallel_algorithm<unique_t>
     {
-        // clang-format off
         template <typename FwdIter,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     hpx::traits::iter_value_t<FwdIter>,
                     hpx::traits::iter_value_t<FwdIter>
                 >
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::unique_t, FwdIter first, FwdIter last, Pred pred = Pred())
@@ -718,17 +718,17 @@ namespace hpx {
                 hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     hpx::traits::iter_value_t<FwdIter>,
                     hpx::traits::iter_value_t<FwdIter>
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::unique_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())
@@ -747,17 +747,17 @@ namespace hpx {
     inline constexpr struct unique_copy_t final
       : hpx::detail::tag_parallel_algorithm<unique_copy_t>
     {
-        // clang-format off
         template <typename InIter, typename OutIter,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<Pred,
                     hpx::traits::iter_value_t<InIter>,
                     hpx::traits::iter_value_t<OutIter>
                 >
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::unique_copy_t, InIter first,
             InIter last, OutIter dest, Pred pred = Pred())
@@ -773,10 +773,10 @@ namespace hpx {
                     hpx::identity_v));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -784,7 +784,7 @@ namespace hpx {
                     hpx::traits::iter_value_t<FwdIter1>,
                     hpx::traits::iter_value_t<FwdIter2>
                 >
-            )>
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type

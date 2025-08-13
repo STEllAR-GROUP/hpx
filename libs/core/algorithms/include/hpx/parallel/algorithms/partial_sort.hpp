@@ -562,16 +562,16 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<partial_sort_t>
     {
     private:
-        // clang-format off
         template <typename RandIter,
-            typename Comp = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend RandIter tag_fallback_invoke(hpx::partial_sort_t, RandIter first,
             RandIter middle, RandIter last, Comp comp = Comp())
@@ -583,17 +583,17 @@ namespace hpx {
                 first, middle, last, HPX_MOVE(comp), hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename RandIter,
-            typename Comp = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, RandIter>
         tag_fallback_invoke(hpx::partial_sort_t, ExPolicy&& policy,

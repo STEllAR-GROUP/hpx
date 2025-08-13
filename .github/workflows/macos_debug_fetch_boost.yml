@@ -13,7 +13,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Install dependencies
       run: |
           brew install --overwrite python-tk && \
@@ -74,4 +74,5 @@ jobs:
           tests.unit.threads.distributed.tcp.thread_stacksize|\
           tests.unit.topology.numa_allocator|\
           tests.unit.modules.runtime_components.distributed.tcp.migrate_polymorphic_component|\
-          tests.unit.modules.executors.limiting_executor"
+          tests.unit.modules.executors.limiting_executor|\
+          tests.unit.modules.compute_local.block_fork_join_executor"

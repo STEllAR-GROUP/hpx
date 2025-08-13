@@ -137,6 +137,8 @@ namespace hpx::lcos::detail {
         using allocator_type = hpx::util::internal_allocator<char>;
 
         // the shared state is held alive by the coroutine
+
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         coroutine_promise_base() noexcept
           : base_type(init_no_addref{})
         {

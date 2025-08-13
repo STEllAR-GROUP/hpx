@@ -156,7 +156,6 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -188,15 +187,7 @@ namespace hpx::parallel {
             std::decay_t<T> val_;
 
             template <typename U>
-            HPX_HOST_DEVICE std::enable_if_t<!hpx::traits::is_value_proxy_v<U>>
-            operator()(U& u) const
-            {
-                u = val_;
-            }
-
-            template <typename U>
-            HPX_HOST_DEVICE std::enable_if_t<hpx::traits::is_value_proxy_v<U>>
-            operator()(U u) const
+            HPX_HOST_DEVICE void operator()(U&& u) const
             {
                 u = val_;
             }
@@ -271,7 +262,7 @@ namespace hpx::parallel {
             {
                 return for_each_n<FwdIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first, count,
-                    [val](auto& v) -> void { v = val; }, hpx::identity_v);
+                    [val](auto&& v) -> void { v = val; }, hpx::identity_v);
             }
         };
         /// \endcond
@@ -286,13 +277,11 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<fill_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter>
-            )>
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires(hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter>)
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(fill_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T const& value)
@@ -309,12 +298,12 @@ namespace hpx {
                        HPX_FORWARD(ExPolicy, policy), first, last, value);
         }
 
-        // clang-format off
         template <typename FwdIter,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_forward_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend void tag_fallback_invoke(
             fill_t, FwdIter first, FwdIter last, T const& value)
@@ -333,13 +322,13 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<fill_n_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Size,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(fill_n_t, ExPolicy&& policy,
             FwdIter first, Size count, T const& value)
@@ -369,12 +358,12 @@ namespace hpx {
                 static_cast<std::size_t>(count), value);
         }
 
-        // clang-format off
         template <typename FwdIter, typename Size,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_forward_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             fill_n_t, FwdIter first, Size count, T const& value)

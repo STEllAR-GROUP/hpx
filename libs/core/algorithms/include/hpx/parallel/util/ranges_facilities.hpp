@@ -20,12 +20,13 @@
 namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
+
+    template <typename Iter>
     // clang-format off
-    template <typename Iter,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_input_iterator_v<Iter> ||
             hpx::traits::is_output_iterator_v<Iter>
-        )>
+        )
     // clang-format on
     constexpr Iter next(
         Iter first, hpx::traits::iter_difference_t<Iter> dist = 1)
@@ -34,26 +35,24 @@ namespace hpx::ranges {
         return first;
     }
 
-    // clang-format off
-    template <typename Iter, typename Sent,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+    template <typename Iter, typename Sent>
+    // clang-format on
+        requires(hpx::traits::is_sentinel_for_v<Sent, Iter> &&
             (hpx::traits::is_input_iterator_v<Iter> ||
-            hpx::traits::is_output_iterator_v<Iter>)
-        )>
+                hpx::traits::is_output_iterator_v<Iter>) )
     // clang-format on
     constexpr Iter next(Iter first, Sent bound)
     {
         return hpx::parallel::detail::advance_to_sentinel(first, bound);
     }
 
+    template <typename Iter, typename Sent>
     // clang-format off
-    template <typename Iter, typename Sent,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::traits::is_sentinel_for_v<Sent, Iter> &&
             (hpx::traits::is_input_iterator_v<Iter> ||
             hpx::traits::is_output_iterator_v<Iter>)
-        )>
+        )
     // clang-format on
     constexpr Iter next(
         Iter first, hpx::traits::iter_difference_t<Iter> n, Sent bound)

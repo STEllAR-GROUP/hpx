@@ -803,10 +803,10 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<merge_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename RandIter1, typename RandIter2,
-            typename RandIter3, typename Comp = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename RandIter3, typename Comp = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandIter1> &&
                 hpx::traits::is_iterator_v<RandIter2> &&
@@ -815,7 +815,7 @@ namespace hpx {
                     typename std::iterator_traits<RandIter1>::value_type,
                     typename std::iterator_traits<RandIter2>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             RandIter3>
@@ -839,10 +839,10 @@ namespace hpx {
                     dest, HPX_MOVE(comp), hpx::identity_v, hpx::identity_v));
         }
 
-        // clang-format off
         template <typename RandIter1, typename RandIter2, typename RandIter3,
-            typename Comp = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<RandIter1> &&
                 hpx::traits::is_iterator_v<RandIter2> &&
                 hpx::traits::is_iterator_v<RandIter3> &&
@@ -850,7 +850,7 @@ namespace hpx {
                     typename std::iterator_traits<RandIter1>::value_type,
                     typename std::iterator_traits<RandIter2>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend RandIter3 tag_fallback_invoke(merge_t, RandIter1 first1,
             RandIter1 last1, RandIter2 first2, RandIter2 last2, RandIter3 dest,
@@ -879,17 +879,17 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<inplace_merge_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename RandIter,
-            typename Comp = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(inplace_merge_t, ExPolicy&& policy, RandIter first,
@@ -904,16 +904,16 @@ namespace hpx {
                     HPX_MOVE(comp), hpx::identity_v));
         }
 
-        // clang-format off
         template <typename RandIter,
-            typename Comp = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend void tag_fallback_invoke(inplace_merge_t, RandIter first,
             RandIter middle, RandIter last, Comp comp = Comp())

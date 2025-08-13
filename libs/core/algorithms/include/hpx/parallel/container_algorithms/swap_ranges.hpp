@@ -235,15 +235,15 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<swap_ranges_t>
     {
     private:
-        // clang-format off
         template <typename InIter1, typename Sent1, typename InIter2,
-            typename Sent2,
-            HPX_CONCEPT_REQUIRES_(
+            typename Sent2>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, InIter1> &&
                 hpx::traits::is_iterator_v<InIter2> &&
                 hpx::traits::is_sentinel_for_v<Sent2, InIter2>
-            )>
+            )
         // clang-format on
         friend swap_ranges_result<InIter1, InIter2> tag_fallback_invoke(
             hpx::ranges::swap_ranges_t, InIter1 first1, Sent1 last1,
@@ -259,16 +259,16 @@ namespace hpx::ranges {
                 .call(hpx::execution::seq, first1, last1, first2, last2);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename Sent2,
-            HPX_CONCEPT_REQUIRES_(
+            typename FwdIter2, typename Sent2>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::traits::is_sentinel_for_v<Sent2, FwdIter2>
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             swap_ranges_result<FwdIter1, FwdIter2>>
@@ -286,12 +286,12 @@ namespace hpx::ranges {
                     last2);
         }
 
+        template <typename Rng1, typename Rng2>
         // clang-format off
-        template <typename Rng1, typename Rng2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2>
-            )>
+            )
         // clang-format on
         friend swap_ranges_result<hpx::traits::range_iterator_t<Rng1>,
             hpx::traits::range_iterator_t<Rng2>>
@@ -312,13 +312,13 @@ namespace hpx::ranges {
                     std::begin(rng2), std::end(rng2));
         }
 
+        template <typename ExPolicy, typename Rng1, typename Rng2>
         // clang-format off
-        template <typename ExPolicy, typename Rng1, typename Rng2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2>
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             swap_ranges_result<hpx::traits::range_iterator_t<Rng1>,

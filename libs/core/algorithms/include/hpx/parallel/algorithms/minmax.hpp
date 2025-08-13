@@ -891,12 +891,9 @@ namespace hpx {
     inline constexpr struct min_element_t final
       : hpx::detail::tag_parallel_algorithm<min_element_t>
     {
+        template <typename FwdIter, typename F = hpx::parallel::detail::less>
         // clang-format off
-        template <typename FwdIter,
-            typename F = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator_v<FwdIter>
-            )>
+            requires(hpx::traits::is_iterator_v<FwdIter>)
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::min_element_t, FwdIter first, FwdIter last, F f = F())
@@ -908,13 +905,13 @@ namespace hpx {
                 hpx::execution::seq, first, last, HPX_MOVE(f), hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename F = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename F = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::min_element_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, F f = F())
@@ -933,12 +930,11 @@ namespace hpx {
     inline constexpr struct max_element_t final
       : hpx::detail::tag_parallel_algorithm<max_element_t>
     {
+        template <typename FwdIter, typename F = hpx::parallel::detail::less>
         // clang-format off
-        template <typename FwdIter,
-            typename F = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::max_element_t, FwdIter first, FwdIter last, F f = F())
@@ -950,13 +946,13 @@ namespace hpx {
                 hpx::execution::seq, first, last, HPX_MOVE(f), hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename F = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename F = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::max_element_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, F f = F())
@@ -975,12 +971,11 @@ namespace hpx {
     inline constexpr struct minmax_element_t final
       : hpx::detail::tag_parallel_algorithm<minmax_element_t>
     {
+        template <typename FwdIter, typename F = hpx::parallel::detail::less>
         // clang-format off
-        template <typename FwdIter,
-            typename F = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend minmax_element_result<FwdIter> tag_fallback_invoke(
             hpx::minmax_element_t, FwdIter first, FwdIter last, F f = F())
@@ -992,13 +987,13 @@ namespace hpx {
                 hpx::execution::seq, first, last, HPX_MOVE(f), hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename F = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename F = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::minmax_element_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, F f = F())
