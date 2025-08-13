@@ -4,6 +4,10 @@
 #include <hpx/memory.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <atomic>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <ctime>
 #include <iostream>
 #include <string>

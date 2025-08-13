@@ -186,14 +186,13 @@ void test_uninitialized_copy_exception_sender(
     bool caught_exception = false;
     try
     {
-        auto first = decorated_iterator(std::begin(c),
-                         [&throw_after]() {
-                             if (throw_after-- == 0)
-                                 throw std::runtime_error("test");
-                         });
+        auto first = decorated_iterator(std::begin(c), [&throw_after]() {
+            if (throw_after-- == 0)
+                throw std::runtime_error("test");
+        });
         auto last = decorated_iterator(std::end(c));
         auto dest = std::begin(d);
-        
+
         tt::sync_wait(ex::just(first, last, dest) |
             hpx::uninitialized_copy(ex_policy.on(exec)));
 

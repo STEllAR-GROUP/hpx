@@ -3,6 +3,8 @@
 #include <hpx/memory.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <atomic>
+#include <cstddef>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>

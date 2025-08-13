@@ -23,10 +23,12 @@
 #include <cstddef>
 #include <exception>
 #include <memory>
+#include <optional>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <variant>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util {
@@ -63,45 +65,64 @@ namespace hpx::parallel::util {
 
                 try
                 {
-                    // Wrap f1 in a variant type to handle exceptions
-                    auto wrapped_f1 = [f1 = HPX_FORWARD(F1, f1)](
-                                          auto&&... args) mutable noexcept {
-                        using result_type = std::decay_t<decltype(f1(
-                            HPX_FORWARD(decltype(args), args)...))>;
-                        using variant_type =
-                            std::variant<result_type, std::exception_ptr>;
+                    const bool has_scheduler_executor =
+                        hpx::execution_policy_has_scheduler_executor_v<
+                            ExPolicy_>;
 
-                        try
-                        {
-                            if constexpr (std::is_void_v<result_type>)
+                    if constexpr (has_scheduler_executor)
+                    {
+                        // Wrap f1 in a variant type to handle exceptions
+                        auto wrapped_f1 = [f1 = HPX_FORWARD(F1, f1)](
+                                              auto&&... args) mutable noexcept {
+                            using result_type = std::decay_t<decltype(f1(
+                                HPX_FORWARD(decltype(args), args)...))>;
+                            using variant_type =
+                                std::variant<result_type, std::exception_ptr>;
+
+                            try
                             {
-                                f1(HPX_FORWARD(decltype(args), args)...);
-                                return variant_type{std::in_place_index<0>};
+                                if constexpr (std::is_void_v<result_type>)
+                                {
+                                    f1(HPX_FORWARD(decltype(args), args)...);
+                                    return variant_type{std::in_place_index<0>};
+                                }
+                                else
+                                {
+                                    return variant_type{std::in_place_index<0>,
+                                        f1(HPX_FORWARD(
+                                            decltype(args), args)...)};
+                                }
                             }
-                            else
+                            catch (...)
                             {
-                                return variant_type{std::in_place_index<0>,
-                                    f1(HPX_FORWARD(decltype(args), args)...)};
+                                return variant_type{std::in_place_index<1>,
+                                    std::current_exception()};
                             }
-                        }
-                        catch (...)
-                        {
-                            return variant_type{std::in_place_index<1>,
-                                std::current_exception()};
-                        }
-                    };
+                        };
 
-                    // Use variant type as the Result template parameter
-                    using variant_result_type =
-                        std::variant<Result, std::exception_ptr>;
-                    auto&& items = detail::partition<variant_result_type>(
-                        HPX_FORWARD(ExPolicy_, policy), first, count,
-                        wrapped_f1);
+                        // Use variant type as the Result template parameter
+                        using variant_result_type =
+                            std::variant<Result, std::exception_ptr>;
+                        auto&& items = detail::partition<variant_result_type>(
+                            HPX_FORWARD(ExPolicy_, policy), first, count,
+                            wrapped_f1);
 
-                    scoped_params.mark_end_of_scheduling();
+                        scoped_params.mark_end_of_scheduling();
 
-                    return reduce(HPX_MOVE(items), HPX_FORWARD(F2, f2),
-                        HPX_FORWARD(Cleanup, cleanup));
+                        return reduce(HPX_MOVE(items), HPX_FORWARD(F2, f2),
+                            HPX_FORWARD(Cleanup, cleanup));
+                    }
+                    else
+                    {
+                        auto&& items = detail::partition<Result>(
+                            HPX_FORWARD(ExPolicy_, policy), first, count,
+                            HPX_FORWARD(F1, f1));
+
+                        scoped_params.mark_end_of_scheduling();
+
+                        return reduce(HPX_MOVE(items), HPX_FORWARD(F2, f2),
+                            HPX_FORWARD(Cleanup, cleanup));
+                    }
                 }
                 catch (...)
                 {
@@ -120,23 +141,24 @@ namespace hpx::parallel::util {
                 if constexpr (ex::is_sender_v<std::decay_t<Items>>)
                 {
                     return ex::let_value(workitems,
-                        [f = HPX_MOVE(f), cleanup = HPX_MOVE(cleanup)](
+                        [f = HPX_FORWARD(F, f),
+                            cleanup = HPX_FORWARD(Cleanup, cleanup)](
                             auto&& all_parts) mutable {
                             using item_type =
                                 std::decay_t<decltype(*all_parts.begin())>;
-                            constexpr bool is_variant_with_exception = requires
-                            {
-                                std::holds_alternative<std::exception_ptr>(
-                                    std::declval<item_type>());
-                            };
+                            constexpr bool is_variant_with_exception =
+                                requires {
+                                    std::holds_alternative<std::exception_ptr>(
+                                        std::declval<item_type>());
+                                };
 
                             if constexpr (!is_variant_with_exception)
                             {
                                 return ex::just(f(all_parts));
                             }
 
-                            auto first_exception = std::exception_ptr{};
-                            auto has_exceptions = false;
+                            auto first_exception =
+                                std::optional<std::exception_ptr>{};
                             for (auto&& item : all_parts)
                             {
                                 if (std::holds_alternative<std::exception_ptr>(
@@ -147,12 +169,11 @@ namespace hpx::parallel::util {
                                         first_exception =
                                             std::get<std::exception_ptr>(item);
                                     }
-                                    has_exceptions = true;
                                     break;
                                 }
                             }
 
-                            if (has_exceptions)
+                            if (first_exception.has_value())
                             {
                                 for (auto&& item : all_parts)
                                 {
@@ -172,15 +193,18 @@ namespace hpx::parallel::util {
 
                                 try
                                 {
-                                    std::rethrow_exception(first_exception);
+                                    std::rethrow_exception(
+                                        first_exception.value());
                                 }
                                 catch (std::bad_alloc const&)
                                 {
-                                    std::rethrow_exception(first_exception);
+                                    std::rethrow_exception(
+                                        first_exception.value());
                                 }
                                 catch (...)
                                 {
-                                    throw hpx::exception_list{first_exception};
+                                    throw hpx::exception_list{
+                                        first_exception.value()};
                                 }
                             }
 
