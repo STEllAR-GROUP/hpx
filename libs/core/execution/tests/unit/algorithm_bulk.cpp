@@ -7,7 +7,6 @@
 
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
-#include <iostream>
 
 #include "algorithm_test_utils.hpp"
 
@@ -52,9 +51,6 @@ auto tag_invoke(ex::bulk_t, S&& s, int num, custom_bulk_operation t)
 
 int main()
 {
-    // Debug: Check which bulk implementation we're using
-    std::cout << "bulk type: " << typeid(ex::bulk).name() << std::endl;
-
     // Success path
     {
         std::atomic<bool> set_value_called{false};
