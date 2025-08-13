@@ -421,7 +421,7 @@ namespace hpx::execution::experimental {
             {
                 return {s.scheduler};
             };
-#else
+
             // clang-format off
             template <typename CPO,
                 HPX_CONCEPT_REQUIRES_(
@@ -435,6 +435,13 @@ namespace hpx::execution::experimental {
             {
                 return s.scheduler;
             }
+#else
+            friend constexpr env tag_invoke(
+                hpx::execution::experimental::get_env_t,
+                sender const& s) noexcept
+            {
+                return {s.scheduler};
+            };
 #endif
         };
 
