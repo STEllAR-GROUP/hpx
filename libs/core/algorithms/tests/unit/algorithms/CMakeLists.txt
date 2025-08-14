@@ -227,6 +227,8 @@ if(HPX_WITH_STDEXEC)
       uninitialized_relocate_sender
       uninitialized_relocate_backward_sender
       uninitialized_relocaten_sender
+      uninitialized_value_construct_sender
+      uninitialized_value_constructn_sender
       unique_sender
   )
 endif()

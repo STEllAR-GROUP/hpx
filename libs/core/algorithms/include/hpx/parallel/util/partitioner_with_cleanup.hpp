@@ -13,6 +13,8 @@
 #include <hpx/async_local/dataflow.hpp>
 #endif
 #include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/execution/algorithms/just.hpp>
+#include <hpx/execution/algorithms/let_value.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/detail/select_partitioner.hpp>
