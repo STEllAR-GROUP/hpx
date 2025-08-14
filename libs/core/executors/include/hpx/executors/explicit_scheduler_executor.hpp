@@ -211,8 +211,20 @@ namespace hpx::execution::experimental {
 
             if constexpr (std::is_void_v<result_type>)
             {
+#if defined(HPX_HAVE_STDEXEC)
                 return bulk(schedule(exec.sched_), shape,
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+#else
+                // When stdexec is not available, fall back to sync execution
+                auto sender = schedule(exec.sched_);
+                for (auto&& elem : shape)
+                {
+                    sender = then(HPX_MOVE(sender), [f = HPX_FORWARD(F, f), elem, ts...](auto&&...) mutable {
+                        HPX_INVOKE(f, elem, ts...);
+                    });
+                }
+                return sender;
+#endif
             }
             else
             {
@@ -242,10 +254,19 @@ namespace hpx::execution::experimental {
                     bulk(shape_size, HPX_MOVE(f_wrapper)) |
                     then(HPX_MOVE(get_result));
 #else
-                return transfer_just(exec.sched_, HPX_MOVE(result_vector),
-                           shape, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...) |
-                    bulk(shape_size, HPX_MOVE(f_wrapper)) |
-                    then(HPX_MOVE(get_result));
+                // When stdexec is not available, execute sequentially
+                auto sender = transfer_just(exec.sched_, HPX_MOVE(result_vector),
+                           shape, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+                
+                for (size_type i = 0; i < shape_size; ++i)
+                {
+                    sender = then(HPX_MOVE(sender), [i, f_wrapper](auto&& result_vector, auto&& shape, auto&& f, auto&&... ts) mutable {
+                        f_wrapper(i, result_vector, shape, f, ts...);
+                        return HPX_FORWARD(decltype(result_vector), result_vector);
+                    });
+                }
+                
+                return then(HPX_MOVE(sender), HPX_MOVE(get_result));
 #endif
             }
         }
