@@ -786,7 +786,7 @@ namespace hpx::execution::experimental::detail {
             hpx::util::cache_aligned_data<std::atomic<std::size_t>>
                 tasks_remaining;
 
-            using value_types = value_types_of_t<Sender, empty_env,
+            using value_types = value_types_of_t<Sender, hpx::execution::experimental::env<>,
                 decayed_tuple, hpx::variant>;
             hpx::util::detail::prepend_t<value_types, hpx::monostate> ts;
             std::atomic<bool> bad_alloc_thrown{false};

@@ -322,6 +322,11 @@ namespace hpx::execution::experimental {
 
         using stdexec::__connect_awaitable_t;
     }    // namespace stdexec_internal
+
+    // Additional stdexec concepts and utilities needed for domain customization
+    using stdexec::sender_expr_for;
+    using stdexec::__completes_on;
+    using stdexec::__starts_on;
 }    // namespace hpx::execution::experimental
 
 // Leaving this as a placeholder

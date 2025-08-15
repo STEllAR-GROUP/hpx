@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution/algorithms/keep_future.hpp>
 #include <hpx/execution/algorithms/start_detached.hpp>
 #include <hpx/execution/algorithms/sync_wait.hpp>
@@ -169,7 +170,7 @@ namespace hpx::execution::experimental {
             explicit_scheduler_executor const& exec, F&& f,
             Future&& predecessor, Ts&&... ts)
         {
-            auto&& predecessor_transfer_sched = transfer(
+            auto&& predecessor_transfer_sched = continues_on(
                 keep_future(HPX_FORWARD(Future, predecessor)), exec.sched_);
 
             return then(HPX_MOVE(predecessor_transfer_sched),
@@ -215,15 +216,9 @@ namespace hpx::execution::experimental {
                 return bulk(schedule(exec.sched_), shape,
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 #else
-                // When stdexec is not available, fall back to sync execution
-                auto sender = schedule(exec.sched_);
-                for (auto&& elem : shape)
-                {
-                    sender = then(HPX_MOVE(sender), [f = HPX_FORWARD(F, f), elem, ts...](auto&&...) mutable {
-                        HPX_INVOKE(f, elem, ts...);
-                    });
-                }
-                return sender;
+                // When stdexec is not available, use HPX's original bulk implementation
+                return bulk(schedule(exec.sched_), shape,
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 #endif
             }
             else
@@ -254,19 +249,12 @@ namespace hpx::execution::experimental {
                     bulk(shape_size, HPX_MOVE(f_wrapper)) |
                     then(HPX_MOVE(get_result));
 #else
-                // When stdexec is not available, execute sequentially
-                auto sender = transfer_just(exec.sched_, HPX_MOVE(result_vector),
-                           shape, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-                
-                for (size_type i = 0; i < shape_size; ++i)
-                {
-                    sender = then(HPX_MOVE(sender), [i, f_wrapper](auto&& result_vector, auto&& shape, auto&& f, auto&&... ts) mutable {
-                        f_wrapper(i, result_vector, shape, f, ts...);
-                        return HPX_FORWARD(decltype(result_vector), result_vector);
-                    });
-                }
-                
-                return then(HPX_MOVE(sender), HPX_MOVE(get_result));
+                // When stdexec is not available, use HPX's original bulk implementation
+                return just(HPX_MOVE(result_vector), shape, HPX_FORWARD(F, f),
+                           HPX_FORWARD(Ts, ts)...) |
+                    continue_on(exec.sched_) |
+                    bulk(shape_size, HPX_MOVE(f_wrapper)) |
+                    then(HPX_MOVE(get_result));
 #endif
             }
         }
@@ -307,7 +295,7 @@ namespace hpx::execution::experimental {
             auto pre_req =
                 when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
-            return bulk(transfer(HPX_MOVE(pre_req), exec.sched_), shape,
+            return bulk(continues_on(HPX_MOVE(pre_req), exec.sched_), shape,
                 hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
         }
 
