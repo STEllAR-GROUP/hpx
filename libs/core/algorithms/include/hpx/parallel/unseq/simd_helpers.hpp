@@ -20,7 +20,6 @@
 #include <type_traits>
 #include <utility>
 
-// Please use static assert and enforce Iter to be Random Access Iterator
 namespace hpx::parallel::util {
     /*
         Compiler and Hardware should also support vector operations for IterDiff,
@@ -42,7 +41,7 @@ namespace hpx::parallel::util {
         HPX_PRAGMA_VECTOR_UNALIGNED HPX_PRAGMA_SIMD_EARLYEXIT
         for (; i < n; ++i)
         {
-            if (f(*(first + i)))
+            if (f(first + i))
             {
                 break;
             }
@@ -64,7 +63,7 @@ namespace hpx::parallel::util {
             HPX_PRAGMA_VECTOR_UNALIGNED HPX_VECTOR_REDUCTION(| : found_flag)
             for (IterDiff j = i; j < i + num_blocks; ++j)
             {
-                std::int32_t const t = f(*(first + j));
+                std::int32_t const t = f(first + j);
                 simd_lane[j - i] = t;
                 found_flag |= t;
             }
@@ -88,7 +87,7 @@ namespace hpx::parallel::util {
         //Keep remainder scalar
         while (i != n)
         {
-            if (f(*(first + i)))
+            if (f(first + i))
             {
                 break;
             }
@@ -108,7 +107,7 @@ namespace hpx::parallel::util {
         // clang-format off
         HPX_PRAGMA_VECTOR_UNALIGNED HPX_PRAGMA_SIMD_EARLYEXIT
         for (; i < n; ++i)
-            if (f(*(first1 + i), *(first2 + i)))
+            if (f(first1 + i, first2 + i))
                 break;
         // clang-format on
 
@@ -129,8 +128,8 @@ namespace hpx::parallel::util {
             HPX_PRAGMA_VECTOR_UNALIGNED HPX_VECTOR_REDUCTION(| : found_flag)
             for (i = 0; i < num_blocks; ++i)
             {
-                IterDiff const t = f(*(first1 + outer_loop_ind + i),
-                    *(first2 + outer_loop_ind + i));
+                IterDiff const t = f(first1 + outer_loop_ind + i,
+                    first2 + outer_loop_ind + i);
                 simd_lane[i] = t;
                 found_flag |= t;
             }
@@ -152,7 +151,7 @@ namespace hpx::parallel::util {
 
         //Keep remainder scalar
         for (; outer_loop_ind != n; ++outer_loop_ind)
-            if (f(*(first1 + outer_loop_ind), *(first2 + outer_loop_ind)))
+            if (f(first1 + outer_loop_ind, first2 + outer_loop_ind))
                 break;
 
         return std::make_pair(first1 + outer_loop_ind, first2 + outer_loop_ind);
