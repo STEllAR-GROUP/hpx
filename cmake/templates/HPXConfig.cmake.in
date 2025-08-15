@@ -8,6 +8,7 @@
 
 set(HPX_FIND_PACKAGE ON)
 cmake_policy(VERSION 3.18)
+cmake_policy(SET CMP0144 NEW)
 
 include(CMakeFindDependencyMacro)
 
