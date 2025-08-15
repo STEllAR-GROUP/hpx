@@ -117,12 +117,8 @@ namespace hpx { namespace lcos { namespace detail {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
 
-    // clang-format off
-    template <typename Action, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(
-            traits::is_action_v<Action> &&
-           !traits::is_launch_policy_v<F>
-        )>
+    template <typename Action, typename F, typename... Ts>
+        requires(traits::is_action_v<Action> && !traits::is_launch_policy_v<F>)
     HPX_DEPRECATED_V(1, 9,
         "hpx::dataflow<Action>(...) is deprecated, use hpx::dataflow(Action{}, "
         "...) instead")
@@ -134,12 +130,8 @@ namespace hpx {
             HPX_FORWARD(Ts, ts)...);
     }
 
-    // clang-format off
-    template <typename Action, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(
-            traits::is_action_v<Action> &&
-            traits::is_launch_policy_v<F>
-        )>
+    template <typename Action, typename F, typename... Ts>
+        requires(traits::is_action_v<Action> && traits::is_launch_policy_v<F>)
     HPX_DEPRECATED_V(1, 9,
         "hpx::dataflow<Action>(policy, ...) is deprecated, use "
         "hpx::dataflow(policy, Action{}, ...) instead")

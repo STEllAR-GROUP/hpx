@@ -12,7 +12,6 @@
 #include <hpx/execution_base/stdexec_forward.hpp>
 #else
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/schedule_from.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
@@ -44,16 +43,16 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_priority<transfer_t>
     {
     private:
+        template <typename Sender, typename Scheduler>
         // clang-format off
-        template <typename Sender, typename Scheduler,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 is_sender_v<Sender> &&
                 is_scheduler_v<Scheduler> &&
                 experimental::detail::is_completion_scheduler_tag_invocable_v<
                     hpx::execution::experimental::set_value_t, Sender,
                     transfer_t, Scheduler
                 >
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
             transfer_t, Sender&& sender, Scheduler&& scheduler)
@@ -67,12 +66,12 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(Scheduler, scheduler));
         }
 
+        template <typename Sender, typename Scheduler>
         // clang-format off
-        template <typename Sender, typename Scheduler,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 is_sender_v<Sender> &&
                 is_scheduler_v<Scheduler>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             transfer_t, Sender&& predecessor_sender, Scheduler&& scheduler)

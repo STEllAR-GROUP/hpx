@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/explicit_scheduler_executor.hpp>
@@ -99,32 +98,25 @@ namespace hpx::execution::experimental {
 
     ////////////////////////////////////////////////////////////////////////////
     // support all scheduling properties exposed by the embedded scheduler
-    // clang-format off
+
     template <typename Tag, typename Scheduler, typename ExPolicy,
-        typename Property,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
+        typename Property>
+        requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(Tag tag,
         scheduler_and_policy<Scheduler, ExPolicy> const& scheduler,
         Property&& prop)
         -> decltype(scheduler_and_policy<Scheduler, ExPolicy>(
-                std::declval<Tag>()(
-                    std::declval<Scheduler>(), std::declval<Property>()),
-                std::declval<ExPolicy>()))
-    // clang-format on
+            std::declval<Tag>()(
+                std::declval<Scheduler>(), std::declval<Property>()),
+            std::declval<ExPolicy>()))
     {
         return scheduler_and_policy<Scheduler, ExPolicy>(
             tag(scheduler.get_scheduler(), HPX_FORWARD(Property, prop)),
             scheduler.get_policy());
     }
 
-    // clang-format off
-    template <typename Tag, typename Scheduler, typename ExPolicy,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
-    // clang-format on
+    template <typename Tag, typename Scheduler, typename ExPolicy>
+        requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(
         Tag tag, scheduler_and_policy<Scheduler, ExPolicy> const& scheduler)
         -> decltype(std::declval<Tag>()(std::declval<Scheduler>()))
@@ -172,13 +164,13 @@ namespace hpx::execution::experimental {
           : hpx::functional::detail::tag_fallback<execute_on_t>
         {
         private:
+            template <typename Scheduler, typename ExPolicy>
             // clang-format off
-            template <typename Scheduler, typename ExPolicy,
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     hpx::execution::experimental::is_scheduler_v<
                         std::decay_t<Scheduler>> &&
                     hpx::is_execution_policy_v<ExPolicy>
-                )>
+                )
             // clang-format on
             friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
                 execute_on_t, Scheduler&& scheduler, ExPolicy&& policy)

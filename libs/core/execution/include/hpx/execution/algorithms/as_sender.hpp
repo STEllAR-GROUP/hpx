@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
@@ -25,7 +24,7 @@
 #include <utility>
 
 namespace hpx::execution::experimental {
-
+    namespace hpxexp = hpx::execution::experimental;
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////////
@@ -54,8 +53,8 @@ namespace hpx::execution::experimental {
             as_sender_operation_state& operator=(
                 as_sender_operation_state const&) = delete;
 
-            friend void tag_invoke(hpx::execution::experimental::start_t,
-                as_sender_operation_state& os) noexcept
+            friend void tag_invoke(
+                hpxexp::start_t, as_sender_operation_state& os) noexcept
             {
                 os.start_helper();
             }
@@ -79,19 +78,17 @@ namespace hpx::execution::experimental {
                             {
                                 if constexpr (std::is_void_v<result_type>)
                                 {
-                                    hpx::execution::experimental::set_value(
-                                        HPX_MOVE(receiver_));
+                                    hpxexp::set_value(HPX_MOVE(receiver_));
                                 }
                                 else
                                 {
-                                    hpx::execution::experimental::set_value(
+                                    hpxexp::set_value(
                                         HPX_MOVE(receiver_), future_.get());
                                 }
                             }
                             else if (future_.has_exception())
                             {
-                                hpx::execution::experimental::set_error(
-                                    HPX_MOVE(receiver_),
+                                hpxexp::set_error(HPX_MOVE(receiver_),
                                     future_.get_exception_ptr());
                             }
                         };
@@ -120,8 +117,7 @@ namespace hpx::execution::experimental {
                         }
                     },
                     [&](std::exception_ptr ep) {
-                        hpx::execution::experimental::set_error(
-                            HPX_MOVE(receiver_), HPX_MOVE(ep));
+                        hpxexp::set_error(HPX_MOVE(receiver_), HPX_MOVE(ep));
                     });
             }
 
@@ -140,22 +136,19 @@ namespace hpx::execution::experimental {
             template <bool IsVoid, typename _result_type>
             struct set_value_void_checked
             {
-                using type = hpx::execution::experimental::set_value_t(
-                    _result_type);
+                using type = hpxexp::set_value_t(_result_type);
             };
 
             template <typename _result_type>
             struct set_value_void_checked<true, _result_type>
             {
-                using type = hpx::execution::experimental::set_value_t();
+                using type = hpxexp::set_value_t();
             };
 
-            using completion_signatures =
-                hpx::execution::experimental::completion_signatures<
-                    typename set_value_void_checked<std::is_void_v<result_type>,
-                        result_type>::type,
-                    hpx::execution::experimental::set_error_t(
-                        std::exception_ptr)>;
+            using completion_signatures = hpxexp::completion_signatures<
+                typename set_value_void_checked<std::is_void_v<result_type>,
+                    result_type>::type,
+                hpxexp::set_error_t(std::exception_ptr)>;
 #else
             // Sender compatibility
             template <typename, typename T>
@@ -266,11 +259,11 @@ namespace hpx::execution::experimental {
     // itself.
     inline constexpr struct as_sender_t final
     {
+        template <typename Future>
         // clang-format off
-        template <typename Future,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_future_v<std::decay_t<Future>>
-            )>
+            )
         // clang-format on
         constexpr HPX_FORCEINLINE auto operator()(Future&& future) const
         {
