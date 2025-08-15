@@ -1009,8 +1009,9 @@ namespace hpx::execution::experimental {
             value_or_void_t<Value>, std::exception_ptr>;
 
         template <typename Promise>
-        using coroutine_env_t = hpx::util::detected_or<hpx::execution::experimental::empty_env,
-            hpx::functional::tag_invoke_result_t, get_env_t, Promise>;
+        using coroutine_env_t =
+            hpx::util::detected_or<hpx::execution::experimental::empty_env,
+                hpx::functional::tag_invoke_result_t, get_env_t, Promise>;
 
         template <typename Value>
         struct receiver_base

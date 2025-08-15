@@ -75,9 +75,12 @@ namespace hpx::execution::experimental {
     // Concept to check if a sender is any bulk operation
     template <typename Sender>
     concept __bulk_chunked_or_unchunked =
-        hpx::execution::experimental::sender_expr_for<Sender, hpx::execution::experimental::bulk_t> ||
-        hpx::execution::experimental::sender_expr_for<Sender, hpx::execution::experimental::bulk_chunked_t> ||
-        hpx::execution::experimental::sender_expr_for<Sender, hpx::execution::experimental::bulk_unchunked_t>;
+        hpx::execution::experimental::sender_expr_for<Sender,
+            hpx::execution::experimental::bulk_t> ||
+        hpx::execution::experimental::sender_expr_for<Sender,
+            hpx::execution::experimental::bulk_chunked_t> ||
+        hpx::execution::experimental::sender_expr_for<Sender,
+            hpx::execution::experimental::bulk_unchunked_t>;
 
     // Domain customization for stdexec bulk operations
     template <typename Policy>
@@ -85,49 +88,58 @@ namespace hpx::execution::experimental {
     {
         // Only intercept stdexec bulk expressions using concept constraints
         template <__bulk_chunked_or_unchunked Sender, typename Env>
-        auto transform_sender(
-            Sender&& sndr, const Env& env) const noexcept
+        auto transform_sender(Sender&& sndr, const Env& env) const noexcept
         {
             // Extract scheduler from sender environment, following stdexec pattern
-            if constexpr (hpx::execution::experimental::__completes_on<Sender, thread_pool_policy_scheduler<Policy>>) {
-                auto sched = hpx::execution::experimental::get_completion_scheduler<
-                    hpx::execution::experimental::set_value_t>(
-                    hpx::execution::experimental::get_env(sndr));
-                
+            if constexpr (hpx::execution::experimental::__completes_on<Sender,
+                              thread_pool_policy_scheduler<Policy>>)
+            {
+                auto sched =
+                    hpx::execution::experimental::get_completion_scheduler<
+                        hpx::execution::experimental::set_value_t>(
+                        hpx::execution::experimental::get_env(sndr));
+
                 // Extract bulk parameters using structured binding
                 auto [tag, data, child] = sndr;
 
                 // Create HPX thread_pool_bulk_sender with extracted parameters
                 return hpx::execution::experimental::detail::
-                    thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
+                    thread_pool_bulk_sender<Policy,
+                        std::decay_t<decltype(child)>,
                         std::decay_t<decltype(data.__shape_)>,
                         std::decay_t<decltype(data.__fun_)>>{
-                        sched,                                   // scheduler from environment
+                        sched,    // scheduler from environment
                         std::forward<decltype(child)>(child),    // child sender
                         std::forward<decltype(data.__shape_)>(
                             data.__shape_),    // shape
                         std::forward<decltype(data.__fun_)>(
                             data.__fun_)    // function
                     };
-            } else if constexpr (hpx::execution::experimental::__starts_on<Sender, thread_pool_policy_scheduler<Policy>, Env>) {
+            }
+            else if constexpr (hpx::execution::experimental::__starts_on<Sender,
+                                   thread_pool_policy_scheduler<Policy>, Env>)
+            {
                 auto sched = hpx::execution::experimental::get_scheduler(env);
-                
+
                 // Extract bulk parameters using structured binding
                 auto [tag, data, child] = sndr;
 
                 // Create HPX thread_pool_bulk_sender with extracted parameters
                 return hpx::execution::experimental::detail::
-                    thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
+                    thread_pool_bulk_sender<Policy,
+                        std::decay_t<decltype(child)>,
                         std::decay_t<decltype(data.__shape_)>,
                         std::decay_t<decltype(data.__fun_)>>{
-                        sched,                                   // scheduler from environment
+                        sched,    // scheduler from environment
                         std::forward<decltype(child)>(child),    // child sender
                         std::forward<decltype(data.__shape_)>(
                             data.__shape_),    // shape
                         std::forward<decltype(data.__fun_)>(
                             data.__fun_)    // function
                     };
-            } else {
+            }
+            else
+            {
                 // If no matching scheduler found, return original sender
                 return std::forward<Sender>(sndr);
             }
@@ -462,9 +474,19 @@ namespace hpx::execution::experimental {
                 {
                     thread_pool_policy_scheduler<Policy> sched;
 
-                    template <typename CPO>
                     friend constexpr auto tag_invoke(
-                        hpx::execution::experimental::get_completion_scheduler_t<CPO>,
+                        hpx::execution::experimental::
+                            get_completion_scheduler_t<
+                                hpx::execution::experimental::set_value_t>,
+                        env const& e) noexcept
+                    {
+                        return e.sched;
+                    }
+
+                    friend constexpr auto tag_invoke(
+                        hpx::execution::experimental::
+                            get_completion_scheduler_t<
+                                hpx::execution::experimental::set_stopped_t>,
                         env const& e) noexcept
                     {
                         return e.sched;

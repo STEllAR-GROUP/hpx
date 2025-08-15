@@ -324,9 +324,9 @@ namespace hpx::execution::experimental {
     }    // namespace stdexec_internal
 
     // Additional stdexec concepts and utilities needed for domain customization
-    using stdexec::sender_expr_for;
     using stdexec::__completes_on;
     using stdexec::__starts_on;
+    using stdexec::sender_expr_for;
 }    // namespace hpx::execution::experimental
 
 // Leaving this as a placeholder
