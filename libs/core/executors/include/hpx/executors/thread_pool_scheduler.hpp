@@ -466,7 +466,6 @@ namespace hpx::execution::experimental {
                     friend constexpr auto tag_invoke(
                         hpx::execution::experimental::get_completion_scheduler_t<CPO>,
                         env const& e) noexcept
-                        -> thread_pool_policy_scheduler<Policy>
                     {
                         return e.sched;
                     }
