@@ -136,16 +136,28 @@ namespace hpx::collectives {
         HPX_ASSERT(
             root_site != static_cast<std::size_t>(-1) && root_site < num_sites);
 
-        std::string name(basename);
-        if (generation != static_cast<std::size_t>(-1))
+        std::string name;
+        if (num_sites != 1)
         {
-            name += std::to_string(generation) + "/";
+            name = basename;
+            if (generation != static_cast<std::size_t>(-1))
+            {
+                name += std::to_string(generation) + "/";
+            }
         }
 
         if (this_site == root_site)
         {
             // create a new communicator
             auto c = hpx::local_new<communicator>(num_sites, basename);
+
+            // Return communicator object right away if there is only one site
+            // involved.
+            if (num_sites == 1)
+            {
+                c.set_info(num_sites, this_site);
+                return c;
+            }
 
             // register the communicator's id using the given basename, this
             // keeps the communicator alive
@@ -249,17 +261,29 @@ namespace hpx::collectives {
 
         // make sure the communicator will be registered in the local AGAS
         // symbol service instance
-        std::string name = hpx::util::format("/{}{}{}", agas::get_locality_id(),
-            basename[0] == '/' ? "" : "/", basename);
-        if (generation != static_cast<std::size_t>(-1))
+        std::string name;
+        if (num_sites != 1)
         {
-            name += std::to_string(generation) + "/";
+            name = hpx::util::format("/{}{}{}", agas::get_locality_id(),
+                basename[0] == '/' ? "" : "/", basename);
+            if (generation != static_cast<std::size_t>(-1))
+            {
+                name += std::to_string(generation) + "/";
+            }
         }
 
         if (this_site == root_site)
         {
             // create a new communicator
             auto c = hpx::local_new<communicator>(num_sites, basename);
+
+            // Return communicator object right away if there is only one site
+            // involved.
+            if (num_sites == 1)
+            {
+                c.set_info(num_sites, this_site);
+                return c;
+            }
 
             // register the communicator's id using the given basename, this
             // keeps the communicator alive
@@ -270,8 +294,8 @@ namespace hpx::collectives {
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::collectives::detail::create_local_communicator",
-                    "the given base name for the communicator operation was "
-                    "already registered: {}",
+                    "the given base name for the communicator operation "
+                    "was already registered: {}",
                     c.registered_name());
             }
 
