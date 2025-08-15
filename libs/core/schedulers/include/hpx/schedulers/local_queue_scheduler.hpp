@@ -577,6 +577,7 @@ namespace hpx::threads::policies {
                 {
                 case thread_priority::default_:
                 case thread_priority::low:
+                case thread_priority::initially_bound:
                 case thread_priority::bound:
                 case thread_priority::normal:
                 case thread_priority::boost:
@@ -602,6 +603,7 @@ namespace hpx::threads::policies {
             {
             case thread_priority::default_:
             case thread_priority::low:
+            case thread_priority::initially_bound:
             case thread_priority::bound:
             case thread_priority::normal:
             case thread_priority::boost:

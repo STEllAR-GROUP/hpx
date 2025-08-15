@@ -546,15 +546,22 @@ namespace hpx::threads::policies {
         {
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = static_cast<std::size_t>(-1);
-            threads::thread_priority priority = data.priority;
+            thread_priority priority = data.priority;
 
-            // If the user specified a concrete thread to use, schedule the
-            // thread as initially bound to make sure the thread starts running
-            // on the specified core.
+            // If the user specified a concrete thread to use, and the initial
+            // priority is initially_bound, then schedule the thread as
+            // initially bound to make sure the thread starts running on the
+            // specified core.
             if (data.schedulehint.mode == thread_schedule_hint_mode::thread)
             {
+                HPX_ASSERT(data.schedulehint.hint >= 0);
                 num_thread = data.schedulehint.hint;
-                priority = threads::thread_priority::bound;
+
+                if (data.priority == thread_priority::initially_bound)
+                {
+                    priority = thread_priority::bound;
+                    data.priority = thread_priority::normal;
+                }
             }
 
             if (static_cast<std::size_t>(-1) == num_thread)
@@ -615,6 +622,8 @@ namespace hpx::threads::policies {
             }
 
             case thread_priority::bound:
+                [[fallthrough]];
+            case thread_priority::initially_bound:
             {
                 HPX_ASSERT(num_thread < num_queues_);
                 bound_queues_[num_thread].data_->create_thread(data, id, ec);
@@ -666,7 +675,7 @@ namespace hpx::threads::policies {
             [[maybe_unused]] thread_queue_type* this_high_priority_queue,
             [[maybe_unused]] thread_queue_type* this_queue)
         {
-            thread_queue_type* q = nullptr;
+            thread_queue_type* q;
             if (num_thread < num_high_priority_queues_)
             {
                 for (std::size_t idx : victim_threads_[num_thread].data_)
@@ -864,6 +873,8 @@ namespace hpx::threads::policies {
             }
             break;
 
+            case thread_priority::initially_bound:
+                [[fallthrough]];
             case thread_priority::bound:
             {
                 HPX_ASSERT(num_thread < num_queues_);
@@ -886,8 +897,7 @@ namespace hpx::threads::policies {
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "local_priority_queue_scheduler::schedule_thread",
-                    "unknown thread priority value "
-                    "(thread_priority::unknown)");
+                    "unknown thread priority value (thread_priority::unknown)");
             }
             }
         }
@@ -898,10 +908,21 @@ namespace hpx::threads::policies {
             thread_priority priority = thread_priority::default_) override
         {
             // NOTE: This scheduler ignores NUMA hints.
-            auto num_thread = static_cast<std::size_t>(-1);
+            std::size_t num_thread = static_cast<std::size_t>(-1);
+
+            // If the user specified a concrete thread to use, and the initial
+            // priority is initially_bound, then schedule the thread as
+            // initially bound to make sure the thread starts running on the
+            // specified core.
             if (schedulehint.mode == thread_schedule_hint_mode::thread)
             {
+                HPX_ASSERT(schedulehint.hint >= 0);
                 num_thread = schedulehint.hint;
+
+                if (priority == thread_priority::initially_bound)
+                {
+                    priority = thread_priority::bound;
+                }
             }
             else
             {
@@ -936,6 +957,7 @@ namespace hpx::threads::policies {
                 low_priority_queue_.schedule_thread(HPX_MOVE(thrd), true);
             }
             break;
+
             case thread_priority::default_:
                 [[fallthrough]];
             case thread_priority::normal:
@@ -945,6 +967,9 @@ namespace hpx::threads::policies {
                     HPX_MOVE(thrd), true);
             }
             break;
+
+            case thread_priority::initially_bound:
+                [[fallthrough]];
             case thread_priority::bound:
             {
                 HPX_ASSERT(num_thread < num_queues_);
@@ -956,10 +981,8 @@ namespace hpx::threads::policies {
             case thread_priority::unknown:
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                    "local_priority_queue_scheduler::schedule_thread_"
-                    "last",
-                    "unknown thread priority value "
-                    "(thread_priority::unknown)");
+                    "local_priority_queue_scheduler::schedule_thread_last",
+                    "unknown thread priority value (thread_priority::unknown)");
             }
             }
         }
@@ -1049,6 +1072,8 @@ namespace hpx::threads::policies {
                     break;
                 }
 
+                case thread_priority::initially_bound:
+                    [[fallthrough]];
                 case thread_priority::bound:
                     return bound_queues_[num_thread].data_->get_thread_count(
                         state);
@@ -1072,8 +1097,7 @@ namespace hpx::threads::policies {
                 case thread_priority::unknown:
                 {
                     HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                        "local_priority_queue_scheduler::get_thread_"
-                        "count",
+                        "local_priority_queue_scheduler::get_thread_count",
                         "unknown thread priority value "
                         "(thread_priority::unknown)");
                 }
@@ -1104,6 +1128,8 @@ namespace hpx::threads::policies {
             case thread_priority::low:
                 return low_priority_queue_.get_thread_count(state);
 
+            case thread_priority::initially_bound:
+                [[fallthrough]];
             case thread_priority::bound:
             {
                 for (std::size_t i = 0; i != num_queues_; ++i)
@@ -1139,8 +1165,7 @@ namespace hpx::threads::policies {
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "local_priority_queue_scheduler::get_thread_count",
-                    "unknown thread priority value "
-                    "(thread_priority::unknown)");
+                    "unknown thread priority value (thread_priority::unknown)");
             }
             }
             return count;
