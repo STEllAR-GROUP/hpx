@@ -116,6 +116,25 @@ namespace hpx::parallel::util {
         }
     };
 
+    template <typename Iter, typename T>
+    struct in_value_result
+    {
+        HPX_NO_UNIQUE_ADDRESS Iter in;
+        HPX_NO_UNIQUE_ADDRESS T value;
+
+        template <class I2, class T2>
+        constexpr operator in_value_result<I2, T2>() const&
+        {
+            return {in, value};
+        }
+
+        template <class I2, class T2>
+        constexpr operator in_value_result<I2, T2>() &&
+        {
+            return {HPX_MOVE(in), HPX_MOVE(value)};
+        }
+    };
+
     ///////////////////////////////////////////////////////////////////////
     template <typename I, typename O>
     std::pair<I, O> get_pair(util::in_out_result<I, O>&& p)
@@ -553,6 +572,7 @@ namespace hpx::ranges {
     using hpx::parallel::util::in_in_result;
     using hpx::parallel::util::in_out_out_result;
     using hpx::parallel::util::in_out_result;
+    using hpx::parallel::util::in_value_result;
     using hpx::parallel::util::min_max_result;
 }    // namespace hpx::ranges
 // namespace hpx::ranges
