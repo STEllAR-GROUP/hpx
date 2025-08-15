@@ -236,9 +236,12 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     //    hpx::threads::thread_sharing_hint::do_not_share_function);
     //auto policy = hpx::execution::experimental::with_hint(par, hint);
 
+    auto const policy = hpx::execution::experimental::with_priority(
+        par, hpx::threads::thread_priority::initially_bound);
+
     compute_chunk_size ccs(num_chunks);
     double const time_par = run_merge_benchmark_hpx(
-        test_count, par.with(ccs), first1, last1, first2, last2, dest);
+        test_count, policy.with(ccs), first1, last1, first2, last2, dest);
 
     HPX_ITT_PAUSE();
 

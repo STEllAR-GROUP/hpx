@@ -755,6 +755,7 @@ namespace hpx::threads::policies {
                     owns_lp_queue() ? lp_queue_->get_queue_length_staged() : 0;
                 return count;
             }
+            case thread_priority::initially_bound:
             case thread_priority::bound:
             {
                 return owns_bp_queue() ? bp_queue_->get_queue_length_staged() :
@@ -805,6 +806,7 @@ namespace hpx::threads::policies {
                     owns_lp_queue() ? lp_queue_->get_queue_length_pending() : 0;
                 return count;
             }
+            case thread_priority::initially_bound:
             case thread_priority::bound:
             {
                 return owns_bp_queue() ? bp_queue_->get_queue_length_pending() :

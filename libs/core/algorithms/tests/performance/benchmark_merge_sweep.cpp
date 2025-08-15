@@ -391,8 +391,11 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
     std::cout << "--- run_merge_benchmark_sweep_par ---\n";
-    run_merge_benchmark_sweep(
-        "par", test_count, par, first1, last1, first2, last2, dest, time_seq);
+    auto const policy = hpx::execution::experimental::with_priority(
+        par, hpx::threads::thread_priority::initially_bound);
+
+    run_merge_benchmark_sweep("par", test_count, policy, first1, last1, first2,
+        last2, dest, time_seq);
 
     hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
