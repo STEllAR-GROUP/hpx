@@ -466,33 +466,34 @@ namespace hpx::execution::experimental {
                 return s.scheduler;
             }
 #else
+            struct env_no_stdexec
+            {
+                thread_pool_policy_scheduler<Policy> sched;
+
+                friend constexpr auto tag_invoke(
+                    hpx::execution::experimental::
+                        get_completion_scheduler_t<
+                            hpx::execution::experimental::set_value_t>,
+                    env_no_stdexec const& e) noexcept
+                {
+                    return e.sched;
+                }
+
+                friend constexpr auto tag_invoke(
+                    hpx::execution::experimental::
+                        get_completion_scheduler_t<
+                            hpx::execution::experimental::set_stopped_t>,
+                    env_no_stdexec const& e) noexcept
+                {
+                    return e.sched;
+                }
+            };
+
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_env_t,
                 sender const& s) noexcept
             {
-                struct env
-                {
-                    thread_pool_policy_scheduler<Policy> sched;
-
-                    friend constexpr auto tag_invoke(
-                        hpx::execution::experimental::
-                            get_completion_scheduler_t<
-                                hpx::execution::experimental::set_value_t>,
-                        env const& e) noexcept
-                    {
-                        return e.sched;
-                    }
-
-                    friend constexpr auto tag_invoke(
-                        hpx::execution::experimental::
-                            get_completion_scheduler_t<
-                                hpx::execution::experimental::set_stopped_t>,
-                        env const& e) noexcept
-                    {
-                        return e.sched;
-                    }
-                };
-                return env{s.scheduler};
+                return env_no_stdexec{s.scheduler};
             };
 #endif
         };
