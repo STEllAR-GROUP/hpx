@@ -17,56 +17,56 @@
 namespace hpx {
 
     // Returns the major HPX version.
-    [[nodiscard]] HPX_CORE_EXPORT std::uint8_t major_version();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::uint8_t major_version();
 
     // Returns the minor HPX version.
-    [[nodiscard]] HPX_CORE_EXPORT std::uint8_t minor_version();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::uint8_t minor_version();
 
     // Returns the sub-minor/patch-level HPX version.
-    [[nodiscard]] HPX_CORE_EXPORT std::uint8_t subminor_version();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::uint8_t subminor_version();
 
     // Returns the full HPX version.
-    [[nodiscard]] HPX_CORE_EXPORT std::uint32_t full_version();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::uint32_t full_version();
 
     // Returns the full HPX version.
-    [[nodiscard]] HPX_CORE_EXPORT std::string full_version_as_string();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::string full_version_as_string();
 
     // Returns the AGAS subsystem version.
-    [[nodiscard]] HPX_CORE_EXPORT std::uint8_t agas_version();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::uint8_t agas_version();
 
     // Returns the tag.
-    [[nodiscard]] HPX_CORE_EXPORT std::string tag();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::string tag();
 
     // Returns the HPX full build information string.
-    [[nodiscard]] HPX_CORE_EXPORT std::string full_build_string();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::string full_build_string();
 
     // Returns the HPX version string.
-    [[nodiscard]] HPX_CORE_EXPORT std::string build_string();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::string build_string();
 
     // Returns the Boost version string.
-    [[nodiscard]] HPX_CORE_EXPORT std::string boost_version();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::string boost_version();
 
     // Returns the Boost platform string.
-    [[nodiscard]] HPX_CORE_EXPORT std::string boost_platform();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::string boost_platform();
 
     // Returns the Boost compiler string.
-    [[nodiscard]] HPX_CORE_EXPORT std::string boost_compiler();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::string boost_compiler();
 
     // Returns the Boost standard library string.
-    [[nodiscard]] HPX_CORE_EXPORT std::string boost_stdlib();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::string boost_stdlib();
 
     // Returns the copyright string.
-    [[nodiscard]] HPX_CORE_EXPORT std::string copyright();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::string copyright();
 
     // Returns the full version string.
-    [[nodiscard]] HPX_CORE_EXPORT std::string complete_version();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::string complete_version();
 
     // Returns the HPX build type ('Debug', 'Release', etc.)
-    [[nodiscard]] HPX_CORE_EXPORT std::string build_type();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::string build_type();
 
     // Returns the HPX build date and time
-    [[nodiscard]] HPX_CORE_EXPORT std::string build_date_time();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::string build_date_time();
 
     // Return the HPX configuration information
-    [[nodiscard]] HPX_CORE_EXPORT std::string configuration_string();
+    [[nodiscard]] HPX_MODULE_EXTERN_CORE std::string configuration_string();
 }    // namespace hpx
