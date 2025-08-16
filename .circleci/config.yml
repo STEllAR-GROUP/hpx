@@ -1302,7 +1302,6 @@ workflows:
             # Force docs to be built after examples so that workspace doesn't
             # have conflicts
             - tests.examples1
-            - tests.examples2
           <<: *gh_pages_filter
       - depreport:
           requires:
@@ -1314,7 +1313,6 @@ workflows:
             # Force docs to be built after examples so that workspace doesn't
             # have conflicts
             - tests.examples1
-            - tests.examples2
           <<: *additional_docs_filter
       - docs-latexpdf:
           requires:
@@ -1322,7 +1320,6 @@ workflows:
             # Force docs to be built after examples so that workspace doesn't
             # have conflicts
             - tests.examples1
-            - tests.examples2
           <<: *additional_docs_filter
       - docs_push:
           requires:
