@@ -156,19 +156,14 @@ function(add_hpx_module libname modulename)
     endif()
 
     # Decide output path and template file
-    if(DEFINED ${modulename}_GLOBAL_HEADER_MODULE_GEN
-       AND ${modulename}_GLOBAL_HEADER_MODULE_GEN
+    set(global_header
+        "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/modules/${modulename}.hpp"
     )
-      set(global_header
-          "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/global_module.hpp"
-      )
+    if(${modulename}_GLOBAL_HEADER_MODULE_GEN)
       set(template_file
           "${HPX_SOURCE_DIR}/cmake/templates/global_module_header_modules.hpp.in"
       )
     else()
-      set(global_header
-          "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/modules/${modulename}.hpp"
-      )
       set(template_file
           "${PROJECT_SOURCE_DIR}/cmake/templates/global_module_header.hpp.in"
       )

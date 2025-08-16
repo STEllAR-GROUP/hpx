@@ -14,8 +14,8 @@ module;
 
 // Define module-specific macros before including config
 #define HPX_BUILD_MODULE
-#include "config/include/hpx/config.hpp"
+#include <hpx/config.hpp>
 
 export module HPX.Core;
 
-#include "version/include/hpx/version.hpp"
+#include <hpx/modules/version.hpp>
