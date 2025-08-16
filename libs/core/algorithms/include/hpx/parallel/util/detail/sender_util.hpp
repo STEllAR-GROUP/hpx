@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/let_value.hpp>
 #include <hpx/execution/algorithms/then.hpp>
@@ -116,7 +117,7 @@ namespace hpx::detail {
     //   3. In the context of the experimental support for p2500
     //      (wg21.link/p2500) this also adds two overloads that take either a
     //      scheduler or a policy_aware_scheduler as its first argument (instead
-    //      of the usual execution policy). These overloads use an scheduler
+    //      of the usual execution policy). These overloads use a scheduler
     //      based executor that is re-wrapped into an execution policy that is
     //      then passed on to the underlying algorithm APIs.
     template <typename Tag>
@@ -125,7 +126,7 @@ namespace hpx::detail {
     {
         template <typename Sender, typename ExPolicy>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                !detail::is_bound_algorithm_v<Sender> &&
                 hpx::execution::experimental::is_sender_v<Sender>
@@ -138,11 +139,7 @@ namespace hpx::detail {
         }
 
         template <typename ExPolicy>
-        // clang-format off
-            requires (
-                hpx::is_execution_policy_v<ExPolicy>
-            )
-        // clang-format on
+            requires(hpx::is_execution_policy_v<ExPolicy>)
         friend auto tag_fallback_invoke(Tag, ExPolicy&& policy)
         {
             return hpx::execution::experimental::detail::partial_algorithm<Tag,
@@ -155,13 +152,8 @@ namespace hpx::detail {
         // matching execution policy. Forward call to algorithm by passing the
         // resulting re-wrapped execution policy.
         //
-
         template <typename Scheduler, typename... Ts>
-        // clang-format off
-            requires (
-                hpx::execution::experimental::is_scheduler_v<Scheduler>
-            )
-        // clang-format on
+            requires(hpx::execution::experimental::is_scheduler_v<Scheduler>)
         friend auto tag_fallback_invoke(
             Tag tag, Scheduler&& scheduler, Ts&&... ts)
         {
@@ -179,12 +171,12 @@ namespace hpx::detail {
         // execution policy to the underlying algorithm.
         //
 
-        template <typename Scheduler, typename... Ts>
         // clang-format off
-            requires (
+        template <typename Scheduler, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
                 hpx::execution::experimental::is_policy_aware_scheduler_v<
                     std::decay_t<Scheduler>>
-            )
+            )>
         // clang-format on
         friend auto tag_invoke(Tag tag, Scheduler&& scheduler, Ts&&... ts)
         {
