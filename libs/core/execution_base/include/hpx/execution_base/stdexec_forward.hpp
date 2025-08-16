@@ -133,6 +133,8 @@ namespace hpx::execution::experimental {
     // Continue on
     using stdexec::continue_on;
     using stdexec::continue_on_t;
+    using stdexec::continues_on;
+    using stdexec::continues_on_t;
 
     // Transfer just
     using stdexec::transfer_just;

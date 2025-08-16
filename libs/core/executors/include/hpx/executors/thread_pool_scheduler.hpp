@@ -34,7 +34,7 @@
 #include <string>
 #include <utility>
 
-// Forward declaration - we'll include the full definition at the end to avoid circular dependency
+// Forward declaration
 namespace hpx::execution::experimental::detail {
     template <typename Policy, typename Sender, typename Shape, typename F>
     class thread_pool_bulk_sender;

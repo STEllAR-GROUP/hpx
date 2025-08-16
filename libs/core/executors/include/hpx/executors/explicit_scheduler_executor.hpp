@@ -259,6 +259,7 @@ namespace hpx::execution::experimental {
             }
         }
 
+#if !defined(HPX_HAVE_STDEXEC)
         // clang-format off
         template <typename F, typename S, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
@@ -274,7 +275,9 @@ namespace hpx::execution::experimental {
                 hpx::parallel::execution::bulk_async_execute(
                     exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
         }
+#endif
 
+#if !defined(HPX_HAVE_STDEXEC)
         // clang-format off
         template <typename F, typename S, typename Future, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
@@ -295,9 +298,10 @@ namespace hpx::execution::experimental {
             auto pre_req =
                 when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
-            return bulk(continues_on(HPX_MOVE(pre_req), exec.sched_), shape,
-                hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+            return continues_on(HPX_MOVE(pre_req), exec.sched_) |
+                   bulk(shape, hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
         }
+#endif
 
     private:
         std::decay_t<BaseScheduler> sched_;
