@@ -170,7 +170,7 @@ namespace hpx::execution::experimental {
             explicit_scheduler_executor const& exec, F&& f,
             Future&& predecessor, Ts&&... ts)
         {
-            auto&& predecessor_transfer_sched = hpx::execution::experimental::continues_on(
+            auto&& predecessor_transfer_sched = continues_on(
                 keep_future(HPX_FORWARD(Future, predecessor)), exec.sched_);
 
             return then(HPX_MOVE(predecessor_transfer_sched),
