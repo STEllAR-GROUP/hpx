@@ -18,7 +18,11 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 if(HPX_WITH_CXX_MODULES)
-  cmake_minimum_required(VERSION 3.29...3.29.99 FATAL_ERROR)
+  if(NOT (CMAKE_VERSION VERSION_GREATER_EQUAL "3.29"))
+    hpx_fatal(
+      "Please use a version of CMake newer than V3.28 in order to enable C++ module support for HPX"
+    )
+  endif()
 endif()
 
 # Overrides must go before the project() statement, otherwise they are ignored.
@@ -324,9 +328,11 @@ hpx_option(
   ADVANCED
 )
 if(HPX_WITH_CXX_MODULES)
-  hpx_info("HPX will build and install C++20 module interface units for downstream users.")
+  hpx_info(
+    "HPX will build and install C++20 module interface units for downstream users."
+  )
   hpx_info("Note: HPX itself will still be built using traditional headers.")
-  add_compile_definitions(HPX_HAVE_CXX_MODULES)
+  hpx_add_config_define(HPX_HAVE_CXX_MODULES)
 else()
   hpx_info("HPX will be built and used with traditional headers only.")
 endif()

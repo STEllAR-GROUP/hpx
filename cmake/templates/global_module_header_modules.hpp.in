@@ -10,7 +10,9 @@
 #pragma once
 
 #if defined(HPX_HAVE_CXX_MODULES)
+#if !defined(HPX_BUILD_MODULE)
 import HPX.Core;
+#endif
 #else
-#include <hpx/version.hpp>
+@module_headers@
 #endif
