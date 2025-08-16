@@ -24,6 +24,7 @@
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -190,7 +191,7 @@ namespace hpx::execution::experimental {
             scheduler_executor const& exec, F&& f, Future&& predecessor,
             Ts&&... ts)
         {
-            auto&& predecessor_transfer_sched = transfer(
+            auto&& predecessor_transfer_sched = hpx::execution::experimental::continues_on(
                 keep_future(HPX_FORWARD(Future, predecessor)), exec.sched_);
 
             return make_future(then(HPX_MOVE(predecessor_transfer_sched),
@@ -270,7 +271,7 @@ namespace hpx::execution::experimental {
             scheduler_executor const& exec, F&& f, S const& shape, Ts&&... ts)
         {
             hpx::this_thread::experimental::sync_wait(
-                bulk(schedule(exec.sched_), shape,
+                bulk(schedule(exec.sched_), hpx::util::size(shape),
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
@@ -295,8 +296,8 @@ namespace hpx::execution::experimental {
                 auto pre_req =
                     when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
-                auto loop = bulk(transfer(HPX_MOVE(pre_req), exec.sched_),
-                    shape,
+                auto loop = bulk(hpx::execution::experimental::continues_on(HPX_MOVE(pre_req), exec.sched_),
+                    hpx::util::size(shape),
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
                 return make_future(HPX_MOVE(loop));
@@ -309,7 +310,8 @@ namespace hpx::execution::experimental {
                         just(std::vector<result_type>(hpx::util::size(shape))));
 
                 auto loop =
-                    bulk(transfer(HPX_MOVE(pre_req), exec.sched_), shape,
+                    bulk(hpx::execution::experimental::continues_on(HPX_MOVE(pre_req), exec.sched_), 
+                        hpx::util::size(shape),
                         detail::captured_args_then(
                             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
