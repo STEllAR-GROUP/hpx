@@ -141,21 +141,21 @@ void test_bulk_async_void(Executor&& exec)
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
 
-    hpx::future<void> f = hpx::this_thread::experimental::sync_wait(
+    auto result = hpx::this_thread::experimental::sync_wait(
         hpx::parallel::execution::bulk_async_execute(
             exec, hpx::bind(&bulk_test_void, _1, _2), 107, 42));
 
-    f.get();    // propagate exceptions
+    HPX_UNUSED(result);    // sync_wait already waits for completion
 
     HPX_TEST(executed);
 
     executed = false;
 
-    f = hpx::this_thread::experimental::sync_wait(
+    auto result2 = hpx::this_thread::experimental::sync_wait(
         hpx::parallel::execution::bulk_async_execute(
             exec, &bulk_test_void, 107, 42));
 
-    f.get();    // propagate exceptions
+    HPX_UNUSED(result2);    // sync_wait already waits for completion
 
     HPX_TEST(executed);
 }
