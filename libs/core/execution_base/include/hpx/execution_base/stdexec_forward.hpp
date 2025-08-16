@@ -131,19 +131,12 @@ namespace hpx::execution::experimental {
     using stdexec::on_t;
 
     // Continue on
-<<<<<<< HEAD
-    using stdexec::continues_on_t;
-    
-    // Declare continues_on to avoid multiple definition errors
-    inline constexpr stdexec::continues_on_t continues_on{};
-=======
     using stdexec::continue_on;
     using stdexec::continue_on_t;
     
     // Backward compatibility alias for continues_on
     inline constexpr stdexec::continue_on_t continues_on{};
     using continues_on_t = stdexec::continue_on_t;
->>>>>>> 31bf3b62aa (fix continue on errors)
 
     // Transfer just
     using stdexec::transfer_just;
