@@ -170,7 +170,7 @@ namespace hpx::execution::experimental {
             explicit_scheduler_executor const& exec, F&& f,
             Future&& predecessor, Ts&&... ts)
         {
-            auto&& predecessor_transfer_sched = continues_on(
+            auto&& predecessor_transfer_sched = transfer(
                 keep_future(HPX_FORWARD(Future, predecessor)), exec.sched_);
 
             return then(HPX_MOVE(predecessor_transfer_sched),
@@ -245,14 +245,14 @@ namespace hpx::execution::experimental {
 #if defined(HPX_HAVE_STDEXEC)
                 return just(HPX_MOVE(result_vector), shape, HPX_FORWARD(F, f),
                            HPX_FORWARD(Ts, ts)...) |
-                    continue_on(exec.sched_) |
+                    transfer(exec.sched_) |
                     bulk(shape_size, HPX_MOVE(f_wrapper)) |
                     then(HPX_MOVE(get_result));
 #else
                 // When stdexec is not available, use HPX's original bulk implementation
                 return just(HPX_MOVE(result_vector), shape, HPX_FORWARD(F, f),
                            HPX_FORWARD(Ts, ts)...) |
-                    continue_on(exec.sched_) |
+                    transfer(exec.sched_) |
                     bulk(shape_size, HPX_MOVE(f_wrapper)) |
                     then(HPX_MOVE(get_result));
 #endif
@@ -298,7 +298,7 @@ namespace hpx::execution::experimental {
             auto pre_req =
                 when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
-            return continue_on(HPX_MOVE(pre_req), exec.sched_) |
+            return transfer(HPX_MOVE(pre_req), exec.sched_) |
                    bulk(shape,
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
         }

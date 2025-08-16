@@ -191,7 +191,7 @@ namespace hpx::execution::experimental {
             scheduler_executor const& exec, F&& f, Future&& predecessor,
             Ts&&... ts)
         {
-            auto&& predecessor_transfer_sched = continues_on(
+            auto&& predecessor_transfer_sched = transfer(
                 keep_future(HPX_FORWARD(Future, predecessor)), exec.sched_);
 
             return make_future(then(HPX_MOVE(predecessor_transfer_sched),
@@ -310,7 +310,7 @@ namespace hpx::execution::experimental {
                         just(std::vector<result_type>(hpx::util::size(shape))));
 
                 auto loop =
-                    bulk(continues_on(HPX_MOVE(pre_req), exec.sched_), 
+                    bulk(transfer(HPX_MOVE(pre_req), exec.sched_), shape,
                         hpx::util::size(shape),
                         detail::captured_args_then(
                             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
