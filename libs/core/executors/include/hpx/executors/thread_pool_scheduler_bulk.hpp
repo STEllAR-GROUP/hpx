@@ -375,7 +375,7 @@ namespace hpx::execution::experimental::detail {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
             auto const part_begin = worker_thread;
-            auto part_end = (std::min)(size + num_threads - 1,
+            auto part_end = (std::min) (size + num_threads - 1,
                 part_begin + num_steps * num_threads);
             auto const remainder = (part_end - part_begin) % num_threads;
             if (remainder != 0)
