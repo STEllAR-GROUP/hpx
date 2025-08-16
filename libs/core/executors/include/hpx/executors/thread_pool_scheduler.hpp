@@ -11,6 +11,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
@@ -27,6 +28,10 @@
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/type_support/detail/with_result_of.hpp>
 #include <hpx/type_support/pack.hpp>
+
+#include <cstddef>
+#include <exception>
+#include <string>
 #include <utility>
 
 // Forward declaration - we'll include the full definition at the end to avoid circular dependency
@@ -437,7 +442,7 @@ namespace hpx::execution::experimental {
                     return e.sched;
                 }
 
-                // Add domain query to sender environment (CRITICAL for stdexec bulk domain customization)
+                // Add domain query to sender environment
                 friend constexpr auto tag_invoke(
                     stdexec::get_domain_t, env const& e) noexcept
                 {
@@ -471,18 +476,16 @@ namespace hpx::execution::experimental {
                 thread_pool_policy_scheduler<Policy> sched;
 
                 friend constexpr auto tag_invoke(
-                    hpx::execution::experimental::
-                        get_completion_scheduler_t<
-                            hpx::execution::experimental::set_value_t>,
+                    hpx::execution::experimental::get_completion_scheduler_t<
+                        hpx::execution::experimental::set_value_t>,
                     env_no_stdexec const& e) noexcept
                 {
                     return e.sched;
                 }
 
                 friend constexpr auto tag_invoke(
-                    hpx::execution::experimental::
-                        get_completion_scheduler_t<
-                            hpx::execution::experimental::set_stopped_t>,
+                    hpx::execution::experimental::get_completion_scheduler_t<
+                        hpx::execution::experimental::set_stopped_t>,
                     env_no_stdexec const& e) noexcept
                 {
                     return e.sched;
