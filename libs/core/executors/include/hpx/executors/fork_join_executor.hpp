@@ -284,9 +284,17 @@ namespace hpx::execution::experimental {
                         thread_index_ == hpx::get_worker_thread_num());
                     while (HPX_LIKELY(state != thread_state::stopping))
                     {
-                        data.thread_function_helper_(region_data_,
-                            thread_index_, num_threads_, queues_,
-                            exception_mutex_, exception_);
+                        {
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+                            static hpx::util::itt::event notify_event(
+                                "fork_join_executor::invoke_work");
+
+                            hpx::util::itt::mark_event e(notify_event);
+#endif
+                            data.thread_function_helper_(region_data_,
+                                thread_index_, num_threads_, queues_,
+                                exception_mutex_, exception_);
+                        }
 
                         // wait as long the state is 'idle'
                         state = shared_data::wait_state_this_thread_while(
@@ -1316,8 +1324,9 @@ namespace hpx::execution::experimental {
             threads::thread_priority priority = threads::thread_priority::bound,
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize::small_,
-            loop_schedule sched = loop_schedule::static_,
-            std::chrono::nanoseconds yield_delay = std::chrono::milliseconds(1))
+            loop_schedule sched = loop_schedule::dynamic,
+            std::chrono::nanoseconds yield_delay = std::chrono::microseconds(
+                300))
         {
             if (stacksize == threads::thread_stacksize::nostack)
             {

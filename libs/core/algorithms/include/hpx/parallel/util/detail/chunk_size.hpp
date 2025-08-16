@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -55,9 +55,10 @@ namespace hpx::parallel::util::detail {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    constexpr void adjust_chunk_size_and_max_chunks(std::size_t cores,
-        std::size_t count, std::size_t& max_chunks, std::size_t& chunk_size,
-        bool has_variable_chunk_size = false) noexcept
+    constexpr void adjust_chunk_size_and_max_chunks(std::size_t const cores,
+        std::size_t const count, std::size_t& max_chunks,
+        std::size_t& chunk_size,
+        bool const has_variable_chunk_size = false) noexcept
     {
         if (max_chunks == 0)
         {
@@ -68,9 +69,6 @@ namespace hpx::parallel::util::detail {
                 // try to calculate chunk-size and maximum number of chunks
                 chunk_size = (count + cores_times_4 - 1) / cores_times_4;
 
-                // different versions of clang-format do different things
-                // clang-format off
-
                 // we should not consider more chunks than we have elements
                 max_chunks = (std::min) (cores_times_4, count);    // -V112
 
@@ -78,7 +76,6 @@ namespace hpx::parallel::util::detail {
                 // the max chunk size
                 chunk_size = (std::max) (chunk_size,
                     (count + max_chunks - 1) / max_chunks);
-                // clang-format on
             }
             else
             {
@@ -164,12 +161,15 @@ namespace hpx::parallel::util::detail {
 
         if (stride != 1)
         {
-            // different versions of clang-format do different things
-            // clang-format off
             chunk_size = (std::max) (static_cast<std::size_t>(stride),
                 (chunk_size + stride - 1) / stride * stride);
-            // clang-format on
         }
+
+        // Report the calculated parameters to the corresponding parameters
+        // object.
+        hpx::execution::experimental::collect_execution_parameters(
+            policy.parameters(), policy.executor(), count, cores, max_chunks,
+            chunk_size);
 
         // update executor with new values
         policy = hpx::experimental::prefer(
@@ -202,21 +202,14 @@ namespace hpx::parallel::util::detail {
 
             if (stride != 1)
             {
-                // different versions of clang-format do different things
-                // clang-format off
-
                 // rounding up
                 test_chunk_size = (std::max) (static_cast<std::size_t>(stride),
                     (test_chunk_size + stride - 1) / stride * stride);
-                // clang-format on
             }
 
             add_ready_future(workitems, f1, it_or_r, test_chunk_size);
 
-            // different versions of clang-format do different things
-            // clang-format off
             test_chunk_size = (std::min) (count, test_chunk_size);
-            // clang-format on
 
             count -= test_chunk_size;
             it_or_r = next_or_subrange(it_or_r, test_chunk_size, count);
@@ -249,12 +242,15 @@ namespace hpx::parallel::util::detail {
 
         if (stride != 1)
         {
-            // different versions of clang-format do different things
-            // clang-format off
             chunk_size = (std::max) (static_cast<std::size_t>(stride),
                 (chunk_size + stride - 1) / stride * stride);
-            // clang-format on
         }
+
+        // Report the calculated parameters to the corresponding parameters
+        // object.
+        hpx::execution::experimental::collect_execution_parameters(
+            policy.parameters(), policy.executor(), count, cores, max_chunks,
+            chunk_size);
 
         // update executor with new values
         policy = hpx::experimental::prefer(
@@ -293,9 +289,6 @@ namespace hpx::parallel::util::detail {
 
         Stride stride = parallel::detail::abs(s);
 
-        // different versions of clang-format do different things
-        // clang-format off
-
         // we should not consider more chunks than we have elements
         if (max_chunks != 0)
         {
@@ -329,7 +322,12 @@ namespace hpx::parallel::util::detail {
 
             it_or_r = next_or_subrange(it_or_r, count, chunk);
         }
-        // clang-format on
+
+        // Report the calculated parameters to the corresponding parameters
+        // object.
+        hpx::execution::experimental::collect_execution_parameters(
+            policy.parameters(), policy.executor(), count, cores, max_chunks,
+            static_cast<std::size_t>(-1));
 
         // update executor with new values
         policy = hpx::experimental::prefer(
@@ -421,12 +419,16 @@ namespace hpx::parallel::util::detail {
 
         if (stride != 1)
         {
-            // different versions of clang-format do different things
-            // clang-format off
             chunk_size = (std::max) (static_cast<std::size_t>(stride),
-                static_cast<std::size_t>((chunk_size + stride - 1) / stride * stride));
-            // clang-format on
+                static_cast<std::size_t>(
+                    (chunk_size + stride - 1) / stride * stride));
         }
+
+        // Report the calculated parameters to the corresponding parameters
+        // object.
+        hpx::execution::experimental::collect_execution_parameters(
+            policy.parameters(), policy.executor(), count, cores, max_chunks,
+            chunk_size);
 
         // update executor with new values
         policy = hpx::experimental::prefer(
@@ -468,11 +470,8 @@ namespace hpx::parallel::util::detail {
 
             if (stride != 1)
             {
-                // different versions of clang-format do different things
-                // clang-format off
-                test_chunk_size = (std::max)(static_cast<std::size_t>(stride),
+                test_chunk_size = (std::max) (static_cast<std::size_t>(stride),
                     (test_chunk_size + stride - 1) / stride * stride);
-                // clang-format on
             }
 
             add_ready_future_idx(
@@ -512,12 +511,15 @@ namespace hpx::parallel::util::detail {
 
         if (stride != 1)
         {
-            // different versions of clang-format do different things
-            // clang-format off
             chunk_size = (std::max) (static_cast<std::size_t>(stride),
                 (chunk_size + stride - 1) / stride * stride);
-            // clang-format on
         }
+
+        // Report the calculated parameters to the corresponding parameters
+        // object.
+        hpx::execution::experimental::collect_execution_parameters(
+            policy.parameters(), policy.executor(), count, cores, max_chunks,
+            chunk_size);
 
         // update executor with new values
         policy = hpx::experimental::prefer(
@@ -558,9 +560,6 @@ namespace hpx::parallel::util::detail {
 
         Stride stride = parallel::detail::abs(s);
 
-        // different versions of clang-format do different things
-        // clang-format off
-
         // we should not consider more chunks than we have elements
         if (max_chunks != 0)
         {
@@ -573,7 +572,7 @@ namespace hpx::parallel::util::detail {
             std::size_t chunk_size =
                 hpx::execution::experimental::get_chunk_size(
                     policy.parameters(), policy.executor(),
-                    hpx::chrono::null_duration,  cores, count);
+                    hpx::chrono::null_duration, cores, count);
 
             // make sure, chunk size and max_chunks are consistent
             adjust_chunk_size_and_max_chunks(
@@ -596,7 +595,12 @@ namespace hpx::parallel::util::detail {
             count -= chunk;
             base_idx += chunk;
         }
-        // clang-format on
+
+        // Report the calculated parameters to the corresponding parameters
+        // object.
+        hpx::execution::experimental::collect_execution_parameters(
+            policy.parameters(), policy.executor(), count, cores, max_chunks,
+            static_cast<std::size_t>(-1));
 
         // update executor with new values
         policy = hpx::experimental::prefer(
