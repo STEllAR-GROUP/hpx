@@ -119,11 +119,11 @@ namespace hpx::collectives {
         num_sites_arg num_sites, this_site_arg this_site,
         generation_arg generation, root_site_arg root_site)
     {
-        if (num_sites == static_cast<std::size_t>(-1))
+        if (num_sites.is_default())
         {
             num_sites = agas::get_num_localities(hpx::launch::sync);
         }
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
             if (root_site == static_cast<std::size_t>(-1))    //-V1051
@@ -140,7 +140,7 @@ namespace hpx::collectives {
         if (num_sites != 1)
         {
             name = basename;
-            if (generation != static_cast<std::size_t>(-1))
+            if (!generation.is_default())
             {
                 name += std::to_string(generation) + "/";
             }
@@ -191,11 +191,11 @@ namespace hpx::collectives {
         char const* basename, num_sites_arg num_sites, this_site_arg this_site,
         generation_arg generation, root_site_arg root_site)
     {
-        if (num_sites == static_cast<std::size_t>(-1))
+        if (num_sites.is_default())
         {
             num_sites = agas::get_num_localities(hpx::launch::sync);
         }
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
             if (root_site == static_cast<std::size_t>(-1))    //-V1051
@@ -209,7 +209,7 @@ namespace hpx::collectives {
             root_site != static_cast<std::size_t>(-1) && root_site < num_sites);
 
         std::string name(basename);
-        if (generation != static_cast<std::size_t>(-1))
+        if (!generation.is_default())
         {
             name += std::to_string(generation) + "/";
         }
@@ -266,7 +266,7 @@ namespace hpx::collectives {
         {
             name = hpx::util::format("/{}{}{}", agas::get_locality_id(),
                 basename[0] == '/' ? "" : "/", basename);
-            if (generation != static_cast<std::size_t>(-1))
+            if (!generation.is_default())
             {
                 name += std::to_string(generation) + "/";
             }
@@ -329,7 +329,7 @@ namespace hpx::collectives {
         // symbol service instance
         std::string name = hpx::util::format("/{}{}{}", agas::get_locality_id(),
             basename[0] == '/' ? "" : "/", basename);
-        if (generation != static_cast<std::size_t>(-1))
+        if (!generation.is_default())
         {
             name += std::to_string(generation) + "/";
         }

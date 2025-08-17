@@ -467,7 +467,7 @@ namespace hpx::collectives {
         this_site_arg this_site = this_site_arg(),
         generation_arg const generation = generation_arg())
     {
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
         }
@@ -558,7 +558,7 @@ namespace hpx::collectives {
         this_site_arg this_site = this_site_arg(),
         generation_arg const generation = generation_arg())
     {
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
         }
