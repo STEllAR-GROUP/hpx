@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Ste||ar-Group
+# Copyright (c) 2019-2025 Ste||ar-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,20 +10,20 @@ if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
     set(HPX_WITH_CLANG_CUDA ON)
   endif()
 
-  # cuda_std_17 not recognized for previous versions
-  cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
+  # cuda_std_20 not recognized for previous versions
+  cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
   # Check CUDA standard
   if(NOT DEFINED CMAKE_CUDA_STANDARD)
     if(DEFINED CMAKE_CXX_STANDARD)
       set(CMAKE_CUDA_STANDARD ${CMAKE_CXX_STANDARD})
     else()
-      set(CMAKE_CUDA_STANDARD 17)
+      set(CMAKE_CUDA_STANDARD 20)
     endif()
   else()
-    if(CMAKE_CUDA_STANDARD LESS 17)
+    if(CMAKE_CUDA_STANDARD LESS 20)
       hpx_error(
-        "You've set CMAKE_CUDA_STANDARD to ${CMAKE_CUDA_STANDARD}, which is less than 17 (the minimum required by HPX)"
+        "You've set CMAKE_CUDA_STANDARD to ${CMAKE_CUDA_STANDARD}, which is less than 20 (the minimum required by HPX)"
       )
     endif()
   endif()
@@ -57,6 +57,7 @@ if(HPX_WITH_CUDA AND NOT TARGET Cuda::cuda)
   set_target_properties(
     Cuda::cuda PROPERTIES INTERFACE_POSITION_INDEPENDENT_CODE ON
   )
+  hpx_info("Using CUDA C++${CMAKE_CUDA_STANDARD}")
 
   if(NOT HPX_WITH_CLANG_CUDA)
     if(NOT MSVC)

@@ -1106,9 +1106,18 @@ namespace hpx::threads::policies {
         inline bool wait_or_add_new(
             bool, std::size_t& added, bool steal = false) HPX_HOT
         {
-            if (0 == new_tasks_count_.data_.load(std::memory_order_relaxed))
+            // no need to try converting from other queue if that has no staged
+            // threads
+            auto const new_tasks_count =
+                new_tasks_count_.data_.load(std::memory_order_relaxed);
+            if (HPX_LIKELY(0 == new_tasks_count))
             {
                 return true;
+            }
+
+            if (new_tasks_count < parameters_.min_tasks_to_steal_staged_)
+            {
+                return false;
             }
 
             // No obvious work has to be done, so a lock won't hurt too much.

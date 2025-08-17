@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,6 +18,11 @@ struct ___itt_domain;
 struct ___itt_id;
 using __itt_heap_function = void*;
 struct ___itt_counter;
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_ITT_PAUSE() itt_pause()
+#define HPX_ITT_RESUME() itt_resume()
+#define HPX_ITT_DETACH() itt_detach()
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ITT_SYNC_CREATE(obj, type, name) itt_sync_create(obj, type, name)
@@ -86,6 +91,11 @@ struct ___itt_counter;
 
 #if HPX_HAVE_ITTNOTIFY != 0
 HPX_CORE_EXPORT extern bool use_ittnotify_api;
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_CORE_EXPORT void itt_pause() noexcept;
+HPX_CORE_EXPORT void itt_resume() noexcept;
+HPX_CORE_EXPORT void itt_detach() noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_CORE_EXPORT void itt_sync_create(
@@ -388,20 +398,14 @@ namespace hpx::util::itt {
           , size_(size)
           , init_(init)
         {
-            if (use_ittnotify_api)
-            {
-                HPX_ITT_HEAP_ALLOCATE_BEGIN(
-                    heap_function_.heap_function_, size_, init_);
-            }
+            HPX_ITT_HEAP_ALLOCATE_BEGIN(
+                heap_function_.heap_function_, size_, init_);
         }
 
         ~heap_allocate()
         {
-            if (use_ittnotify_api)
-            {
-                HPX_ITT_HEAP_ALLOCATE_END(
-                    heap_function_.heap_function_, addr_, size_, init_);
-            }
+            HPX_ITT_HEAP_ALLOCATE_END(
+                heap_function_.heap_function_, addr_, size_, init_);
         }
 
     private:
@@ -507,6 +511,10 @@ namespace hpx::util::itt {
 }    // namespace hpx::util::itt
 
 #else
+
+constexpr void itt_pause() noexcept {}
+constexpr void itt_resume() noexcept {}
+constexpr void itt_detach() noexcept {}
 
 constexpr void itt_sync_create(void*, char const*, char const*) noexcept {}
 constexpr void itt_sync_rename(void*, char const*) noexcept {}
