@@ -1936,7 +1936,7 @@ void test_keep_future_sender()
 #else
         HPX_TEST_EQ(hpx::get<0>(*(ex::when_all(ex::keep_future(std::move(f)),
                                       ex::keep_future(sf)) |
-                        ex::continues_on(ex::thread_pool_scheduler{}) |
+                        ex::transfer(ex::thread_pool_scheduler{}) |
                         ex::then(fun) | tt::sync_wait())),
             85);
 #endif
@@ -2234,6 +2234,7 @@ void test_stdexec_execution_policies()
 }
 #endif    // HPX_HAVE_STDEXEC
 
+#if defined(HPX_HAVE_STDEXEC)
 void test_completion_scheduler()
 {
     namespace ex = hpx::execution::experimental;
@@ -2241,11 +2242,7 @@ void test_completion_scheduler()
         auto sender = ex::schedule(ex::thread_pool_scheduler{});
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(
-#if defined(HPX_HAVE_STDEXEC)
                 ex::get_env(sender)
-#else
-                sender
-#endif
             );
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
@@ -2261,11 +2258,7 @@ void test_completion_scheduler()
         using hpx::functional::tag_invoke;
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(
-#if defined(HPX_HAVE_STDEXEC)
                 ex::get_env(sender)
-#else
-                sender
-#endif
             );
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
@@ -2277,11 +2270,7 @@ void test_completion_scheduler()
         auto sender = ex::transfer_just(ex::thread_pool_scheduler{}, 42);
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(
-#if defined(HPX_HAVE_STDEXEC)
                 ex::get_env(sender)
-#else
-                sender
-#endif
             );
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
@@ -2294,11 +2283,7 @@ void test_completion_scheduler()
             ex::schedule(ex::thread_pool_scheduler{}), ex::par, 10, [](int) {});
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(
-#if defined(HPX_HAVE_STDEXEC)
                 ex::get_env(sender)
-#else
-                sender
-#endif
             );
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
@@ -2313,11 +2298,7 @@ void test_completion_scheduler()
             [](int) {});
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(
-#if defined(HPX_HAVE_STDEXEC)
                 ex::get_env(sender)
-#else
-                sender
-#endif
             );
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
@@ -2332,11 +2313,7 @@ void test_completion_scheduler()
             ex::par, 10, [](int idx, int val) {});
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(
-#if defined(HPX_HAVE_STDEXEC)
                 ex::get_env(sender)
-#else
-                sender
-#endif
             );
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
@@ -2344,6 +2321,7 @@ void test_completion_scheduler()
             "the completion scheduler should be a thread_pool_scheduler");
     }
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
@@ -2382,8 +2360,8 @@ int hpx_main()
     test_stdexec_bulk_unchunked_customization();
     test_stdexec_thread_distribution();
     test_stdexec_execution_policies();
-#endif
     test_completion_scheduler();
+#endif
 
     return hpx::local::finalize();
 }
