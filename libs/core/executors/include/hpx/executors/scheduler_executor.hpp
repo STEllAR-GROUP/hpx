@@ -296,8 +296,9 @@ namespace hpx::execution::experimental {
                 auto pre_req =
                     when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
-                auto loop = bulk(transfer(HPX_MOVE(pre_req), exec.sched_), hpx::util::size(shape),
-                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+                auto loop = bulk(transfer(HPX_MOVE(pre_req), exec.sched_),
+                hpx::util::size(shape),
+                hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
                 return make_future(HPX_MOVE(loop));
             }

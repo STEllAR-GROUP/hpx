@@ -133,7 +133,6 @@ namespace hpx::execution::experimental {
     // Continue on
     using stdexec::continue_on;
     using stdexec::continue_on_t;
-    
     // Backward compatibility alias for continues_on
     inline constexpr stdexec::continue_on_t continues_on{};
     using continues_on_t = stdexec::continue_on_t;
@@ -156,12 +155,10 @@ namespace hpx::execution::experimental {
     using stdexec::parallel_policy;
     using stdexec::parallel_unsequenced_policy;
     using stdexec::unsequenced_policy;
-    
     using stdexec::seq;
     using stdexec::par;
     using stdexec::par_unseq;
     using stdexec::unseq;
-    
     using stdexec::is_execution_policy;
     using stdexec::is_execution_policy_v;
 

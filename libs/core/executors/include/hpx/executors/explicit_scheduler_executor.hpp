@@ -299,7 +299,7 @@ namespace hpx::execution::experimental {
                 when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
             return transfer(HPX_MOVE(pre_req), exec.sched_) |
-                   bulk(shape,
+                bulk(shape,
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
         }
 #endif

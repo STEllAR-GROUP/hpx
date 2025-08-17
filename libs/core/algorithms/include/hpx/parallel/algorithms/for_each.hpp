@@ -347,7 +347,7 @@ namespace hpx::parallel {
               : f_(HPX_FORWARD(F_, f))
             {
                 // proj parameter is ignored in this specialization for hpx::identity
-                (void)proj;
+                (void) proj;
             }
 
 #if !defined(__NVCC__) && !defined(__CUDACC__)
