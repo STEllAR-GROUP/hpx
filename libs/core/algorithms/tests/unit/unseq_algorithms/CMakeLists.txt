@@ -8,6 +8,7 @@ set(tests
     foreach_unseq
     foreach_unseq_zipiter
     foreachn_unseq
+    generaten_unseq
     reduce_unseq
     transform_binary2_unseq
     transform_binary_unseq
