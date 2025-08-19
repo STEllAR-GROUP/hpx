@@ -22,6 +22,31 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
+// Global function objects for sender tests to avoid local lambda linkage issues
+struct set_value_42
+{
+    void operator()(std::size_t& v) const
+    {
+        v = 42;
+    }
+};
+
+struct throw_runtime_error_func
+{
+    void operator()(std::size_t&) const
+    {
+        throw std::runtime_error("test");
+    }
+};
+
+struct throw_bad_alloc_func
+{
+    void operator()(std::size_t&) const
+    {
+        throw std::bad_alloc();
+    }
+};
+
 struct counter
 {
     std::size_t count = 0;
@@ -347,7 +372,7 @@ void test_for_each_sender(Policy l, ExPolicy&& p, IteratorTag)
 
     auto rng = hpx::util::iterator_range(
         iterator(std::begin(c)), iterator(std::end(c)));
-    auto f = [](std::size_t& v) { v = 42; };
+    set_value_42 f;
 
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
@@ -380,7 +405,7 @@ void test_for_each_exception_sender(Policy l, ExPolicy&& p, IteratorTag)
 
     auto rng = hpx::util::iterator_range(
         iterator(std::begin(c)), iterator(std::end(c)));
-    auto f = [](std::size_t&) { throw std::runtime_error("test"); };
+    throw_runtime_error_func f;
 
     bool caught_exception = false;
     try
@@ -419,7 +444,7 @@ void test_for_each_bad_alloc_sender(Policy l, ExPolicy&& p, IteratorTag)
 
     auto rng = hpx::util::iterator_range(
         iterator(std::begin(c)), iterator(std::end(c)));
-    auto f = [](std::size_t&) { throw std::bad_alloc(); };
+    throw_bad_alloc_func f;
 
     bool caught_exception = false;
     try

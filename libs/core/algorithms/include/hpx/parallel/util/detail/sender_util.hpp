@@ -180,13 +180,11 @@ namespace hpx::detail {
         //
 
         template <typename Scheduler, typename... Ts>
-        // clang-format off
-            requires (
-                hpx::execution::experimental::is_policy_aware_scheduler_v<
-                    std::decay_t<Scheduler>>
-            )
-        // clang-format on
         friend auto tag_invoke(Tag tag, Scheduler&& scheduler, Ts&&... ts)
+            -> std::enable_if_t<
+                hpx::execution::experimental::is_policy_aware_scheduler_v<
+                    std::decay_t<Scheduler>>,
+                decltype(tag(scheduler.get_policy(), HPX_FORWARD(Ts, ts)...))>
         {
             using namespace hpx::execution::experimental;
             using scheduler_type = std::decay_t<Scheduler>;
