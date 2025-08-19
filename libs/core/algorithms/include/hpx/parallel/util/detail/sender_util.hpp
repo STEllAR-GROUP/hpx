@@ -184,7 +184,12 @@ namespace hpx::detail {
             -> std::enable_if_t<
                 hpx::execution::experimental::is_policy_aware_scheduler_v<
                     std::decay_t<Scheduler>>,
-                decltype(tag(scheduler.get_policy(), HPX_FORWARD(Ts, ts)...))>
+                decltype(tag(
+                    scheduler.get_policy().on(std::declval<
+                        hpx::execution::experimental::
+                            explicit_scheduler_executor<
+                                std::decay_t<Scheduler>>>()),
+                    HPX_FORWARD(Ts, ts)...))>
         {
             using namespace hpx::execution::experimental;
             using scheduler_type = std::decay_t<Scheduler>;
