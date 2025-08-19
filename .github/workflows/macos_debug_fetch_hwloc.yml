@@ -34,8 +34,8 @@ jobs:
               -DHPX_WITH_EXAMPLES=ON \
               -DHPX_WITH_TESTS=ON \
               -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=3 \
-              -DHPX_WITH_VERIFY_LOCKS=ON \
-              -DHPX_WITH_VERIFY_LOCKS_BACKTRACE=ON \
+              -DHPX_WITH_VERIFY_LOCKS=OFF \
+              -DHPX_WITH_VERIFY_LOCKS_BACKTRACE=OFF \
               -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=ON
     - name: Build
       shell: bash

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,6 +22,26 @@
 ///////////////////////////////////////////////////////////////////////////////
 // decide whether to use the ITT notify API if it's available
 bool use_ittnotify_api = false;
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_INTERNAL_ITT_PAUSE()                                               \
+    if (use_ittnotify_api && __itt_pause_ptr)                                  \
+    {                                                                          \
+        __itt_pause_ptr();                                                     \
+    }                                                                          \
+    /**/
+#define HPX_INTERNAL_ITT_RESUME()                                              \
+    if (use_ittnotify_api && __itt_resume_ptr)                                 \
+    {                                                                          \
+        __itt_resume_ptr();                                                    \
+    }                                                                          \
+    /**/
+#define HPX_INTERNAL_ITT_DETACH()                                              \
+    if (use_ittnotify_api && __itt_detach_ptr)                                 \
+    {                                                                          \
+        __itt_detach_ptr();                                                    \
+    }                                                                          \
+    /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INTERNAL_ITT_SYNC_CREATE(obj, type, name)                          \
@@ -476,6 +496,22 @@ namespace hpx::util::itt {
         }
     }
 }    // namespace hpx::util::itt
+
+///////////////////////////////////////////////////////////////////////////////
+void itt_pause() noexcept
+{
+    HPX_INTERNAL_ITT_PAUSE();
+}
+
+void itt_resume() noexcept
+{
+    HPX_INTERNAL_ITT_RESUME();
+}
+
+void itt_detach() noexcept
+{
+    HPX_INTERNAL_ITT_DETACH();
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 void itt_sync_create(

@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2023 Hartmut Kaiser
+//  Copyright (c) 2019-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -123,10 +123,8 @@ void test_multiple_use_with_generation()
     }
 }
 
-void test_local_use()
+void test_local_use(std::uint32_t num_sites)
 {
-    constexpr std::uint32_t num_sites = 10;
-
     std::vector<hpx::future<void>> sites;
     sites.reserve(num_sites);
 
@@ -183,7 +181,8 @@ int hpx_main()
 
     if (hpx::get_locality_id() == 0)
     {
-        test_local_use();
+        test_local_use(1);
+        test_local_use(10);
     }
 
     return hpx::finalize();
