@@ -343,11 +343,9 @@ namespace hpx::parallel {
             }
 
             template <typename F_, typename Proj_>
-            HPX_HOST_DEVICE for_each_iteration(F_&& f, Proj_&& proj)
+            HPX_HOST_DEVICE for_each_iteration(F_&& f, Proj_&&)
               : f_(HPX_FORWARD(F_, f))
             {
-                // proj parameter is ignored in this specialization for hpx::identity
-                (void) proj;
             }
 
 #if !defined(__NVCC__) && !defined(__CUDACC__)
