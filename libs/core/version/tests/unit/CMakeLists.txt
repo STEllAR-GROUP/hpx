@@ -20,12 +20,5 @@ foreach(test ${tests})
     FOLDER ${folder_name}
   )
 
-  if(HPX_WITH_CXX_MODULES)
-    if(TARGET hpx_core)
-      target_link_libraries(${test}_test PRIVATE hpx_core)
-    endif()
-    set_property(TARGET ${test}_test PROPERTY CXX_SCAN_FOR_MODULES ON)
-  endif()
-
   add_hpx_unit_test("modules.version" ${test} ${${test}_PARAMETERS})
 endforeach()

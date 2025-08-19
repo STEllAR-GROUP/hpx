@@ -62,6 +62,13 @@
 # define HPX_MODULE_EXTERN_CORE  HPX_CORE_EXPORT
 #endif
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#  define HPX_NODISCARD_CORE [[nodiscard]] HPX_MODULE_EXTERN_CORE
+#else
+#  define HPX_NODISCARD_CORE HPX_MODULE_EXTERN_CORE [[nodiscard]]
+#endif
+
+
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_EXPORTS) || defined(HPX_FULL_EXPORTS)
 # define  HPX_EXPORT             HPX_SYMBOL_EXPORT

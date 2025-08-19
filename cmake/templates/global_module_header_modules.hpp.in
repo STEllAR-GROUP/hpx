@@ -9,10 +9,8 @@
 
 #pragma once
 
-#if defined(HPX_HAVE_CXX_MODULES)
-#if !defined(HPX_BUILD_MODULE)
+#if defined(HPX_HAVE_CXX_MODULES) && !defined(HPX_BUILD_MODULE)
 import HPX.Core;
-#endif
 #else
 @module_headers@
 #endif
