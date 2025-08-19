@@ -30,6 +30,7 @@ set(_hpx_core_modules
     concurrency
     config
     config_registry
+    contracts
     coroutines
     datastructures
     debugging
