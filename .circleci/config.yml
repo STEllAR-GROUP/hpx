@@ -1300,8 +1300,10 @@ workflows:
           requires:
             - configure
             # Force docs to be built after examples so that workspace doesn't
-            # have conflicts
-            - tests.examples1
+            # have conflicts.
+            #
+            # We make this depend on example2 only as this takes longer to run
+            # than example1. Making it depend on both causes workspace conflicts.
             - tests.examples2
           <<: *gh_pages_filter
       - depreport:
@@ -1312,16 +1314,20 @@ workflows:
           requires:
             - configure
             # Force docs to be built after examples so that workspace doesn't
-            # have conflicts
-            - tests.examples1
+            # have conflicts.
+            #
+            # We make this depend on example2 only as this takes longer to run
+            # than example1. Making it depend on both causes workspace conflicts.
             - tests.examples2
           <<: *additional_docs_filter
       - docs-latexpdf:
           requires:
             - configure
             # Force docs to be built after examples so that workspace doesn't
-            # have conflicts
-            - tests.examples1
+            # have conflicts.
+            #
+            # We make this depend on example2 only as this takes longer to run
+            # than example1. Making it depend on both causes workspace conflicts.
             - tests.examples2
           <<: *additional_docs_filter
       - docs_push:
@@ -1334,7 +1340,6 @@ workflows:
       - install:
           requires:
             - core
-            - tests.examples1
             - tests.examples2
             - tests.unit1.algorithms
             - tests.unit2.algorithms

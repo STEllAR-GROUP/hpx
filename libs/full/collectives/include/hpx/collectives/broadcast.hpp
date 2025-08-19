@@ -461,11 +461,11 @@ namespace hpx::collectives {
     template <typename T>
     hpx::future<std::decay_t<T>> broadcast_to(communicator fid,
         T&& local_result, this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        generation_arg const generation = generation_arg())
     {
         using arg_type = std::decay_t<T>;
 
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = static_cast<std::size_t>(agas::get_locality_id());
         }
@@ -474,6 +474,20 @@ namespace hpx::collectives {
             return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
                 hpx::error::bad_parameter, "hpx::collectives::broadcast_to",
                 "the generation number shouldn't be zero"));
+        }
+
+        // Handle operation right away if there is only one value.
+        if (auto [num_sites, _] = fid.get_info(); num_sites == 1)
+        {
+            if (this_site != 0)
+            {
+                return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
+                    hpx::error::bad_parameter, "hpx::collectives::broadcast_to",
+                    "the local site should be zero if only one site is "
+                    "involved"));
+            }
+
+            return hpx::make_ready_future(HPX_FORWARD(T, local_result));
         }
 
         auto broadcast_data =
@@ -503,8 +517,8 @@ namespace hpx::collectives {
 
     template <typename T>
     hpx::future<std::decay_t<T>> broadcast_to(communicator fid,
-        T&& local_result, generation_arg generation,
-        this_site_arg this_site = this_site_arg())
+        T&& local_result, generation_arg const generation,
+        this_site_arg const this_site = this_site_arg())
     {
         return broadcast_to(
             HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation);
@@ -512,9 +526,9 @@ namespace hpx::collectives {
 
     template <typename T>
     hpx::future<std::decay_t<T>> broadcast_to(char const* basename,
-        T&& local_result, num_sites_arg num_sites = num_sites_arg(),
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        T&& local_result, num_sites_arg const num_sites = num_sites_arg(),
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
         return broadcast_to(create_communicator(basename, num_sites, this_site,
                                 generation, root_site_arg(this_site.argument_)),
@@ -524,8 +538,8 @@ namespace hpx::collectives {
     ////////////////////////////////////////////////////////////////////////////
     template <typename T>
     decltype(auto) broadcast_to(hpx::launch::sync_policy, communicator fid,
-        T&& local_result, this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        T&& local_result, this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
         return broadcast_to(
             HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
@@ -534,8 +548,8 @@ namespace hpx::collectives {
 
     template <typename T>
     decltype(auto) broadcast_to(hpx::launch::sync_policy, communicator fid,
-        T&& local_result, generation_arg generation,
-        this_site_arg this_site = this_site_arg())
+        T&& local_result, generation_arg const generation,
+        this_site_arg const this_site = this_site_arg())
     {
         return broadcast_to(
             HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
@@ -544,9 +558,9 @@ namespace hpx::collectives {
 
     template <typename T>
     decltype(auto) broadcast_to(hpx::launch::sync_policy, char const* basename,
-        T&& local_result, num_sites_arg num_sites = num_sites_arg(),
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        T&& local_result, num_sites_arg const num_sites = num_sites_arg(),
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
         return broadcast_to(hpx::launch::sync,
             create_communicator(basename, num_sites, this_site, generation,
@@ -558,7 +572,7 @@ namespace hpx::collectives {
     template <typename T>
     hpx::future<T> broadcast_from(communicator fid,
         this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        generation_arg const generation = generation_arg())
     {
         if (this_site == static_cast<std::size_t>(-1))
         {
@@ -595,17 +609,18 @@ namespace hpx::collectives {
     }
 
     template <typename T>
-    hpx::future<T> broadcast_from(communicator fid, generation_arg generation,
-        this_site_arg this_site = this_site_arg())
+    hpx::future<T> broadcast_from(communicator fid,
+        generation_arg const generation,
+        this_site_arg const this_site = this_site_arg())
     {
         return broadcast_from<T>(HPX_MOVE(fid), this_site, generation);
     }
 
     template <typename T>
     hpx::future<T> broadcast_from(char const* basename,
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg())
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg(),
+        root_site_arg const root_site = root_site_arg())
     {
         HPX_ASSERT(this_site != root_site);
         return broadcast_from<T>(create_communicator(basename, num_sites_arg(),
@@ -616,24 +631,25 @@ namespace hpx::collectives {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     T broadcast_from(hpx::launch::sync_policy, communicator fid,
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
         return broadcast_from<T>(HPX_MOVE(fid), this_site, generation).get();
     }
 
     template <typename T>
     T broadcast_from(hpx::launch::sync_policy, communicator fid,
-        generation_arg generation, this_site_arg this_site = this_site_arg())
+        generation_arg const generation,
+        this_site_arg const this_site = this_site_arg())
     {
         return broadcast_from<T>(HPX_MOVE(fid), this_site, generation).get();
     }
 
     template <typename T>
     T broadcast_from(hpx::launch::sync_policy, char const* basename,
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg())
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg(),
+        root_site_arg const root_site = root_site_arg())
     {
         HPX_ASSERT(this_site != root_site);
         return broadcast_from<T>(create_communicator(basename, num_sites_arg(),
@@ -646,7 +662,7 @@ namespace hpx::collectives {
     template <typename T>
     void broadcast(communicator fid, T& value,
         this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        generation_arg const generation = generation_arg())
     {
         if (this_site == static_cast<std::size_t>(-1))
         {

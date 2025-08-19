@@ -305,11 +305,11 @@ namespace hpx::collectives {
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> inclusive_scan(communicator fid,
         T&& local_result, F&& op, this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        generation_arg const generation = generation_arg())
     {
         using arg_type = std::decay_t<T>;
 
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
         }
@@ -318,6 +318,21 @@ namespace hpx::collectives {
             return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
                 hpx::error::bad_parameter, "hpx::collectives::inclusive_scan",
                 "the generation number shouldn't be zero"));
+        }
+
+        // Handle operation right away if there is only one value.
+        if (auto [num_sites, comm_site] = fid.get_info(); num_sites == 1)
+        {
+            if (this_site != comm_site)
+            {
+                return hpx::make_exceptional_future<arg_type>(
+                    HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                        "hpx::collectives::inclusive_scan",
+                        "the local site should be zero if only one site is "
+                        "involved"));
+            }
+
+            return hpx::make_ready_future(HPX_FORWARD(T, local_result));
         }
 
         auto inclusive_scan_data =
@@ -349,8 +364,8 @@ namespace hpx::collectives {
 
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> inclusive_scan(communicator fid,
-        T&& local_result, F&& op, generation_arg generation,
-        this_site_arg this_site = this_site_arg())
+        T&& local_result, F&& op, generation_arg const generation,
+        this_site_arg const this_site = this_site_arg())
     {
         return inclusive_scan(HPX_MOVE(fid), HPX_FORWARD(T, local_result),
             HPX_FORWARD(F, op), this_site, generation);
@@ -358,10 +373,11 @@ namespace hpx::collectives {
 
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> inclusive_scan(char const* basename,
-        T&& local_result, F&& op, num_sites_arg num_sites = num_sites_arg(),
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg())
+        T&& local_result, F&& op,
+        num_sites_arg const num_sites = num_sites_arg(),
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg(),
+        root_site_arg const root_site = root_site_arg())
     {
         return inclusive_scan(create_communicator(basename, num_sites,
                                   this_site, generation, root_site),
@@ -371,8 +387,9 @@ namespace hpx::collectives {
     ////////////////////////////////////////////////////////////////////////////
     template <typename T, typename F>
     decltype(auto) inclusive_scan(hpx::launch::sync_policy, communicator fid,
-        T&& local_result, F&& op, this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        T&& local_result, F&& op,
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
         return inclusive_scan(HPX_MOVE(fid), HPX_FORWARD(T, local_result),
             HPX_FORWARD(F, op), this_site, generation)
@@ -381,8 +398,8 @@ namespace hpx::collectives {
 
     template <typename T, typename F>
     decltype(auto) inclusive_scan(hpx::launch::sync_policy, communicator fid,
-        T&& local_result, F&& op, generation_arg generation,
-        this_site_arg this_site = this_site_arg())
+        T&& local_result, F&& op, generation_arg const generation,
+        this_site_arg const this_site = this_site_arg())
     {
         return inclusive_scan(HPX_MOVE(fid), HPX_FORWARD(T, local_result),
             HPX_FORWARD(F, op), this_site, generation)
@@ -392,10 +409,10 @@ namespace hpx::collectives {
     template <typename T, typename F>
     decltype(auto) inclusive_scan(hpx::launch::sync_policy,
         char const* basename, T&& local_result, F&& op,
-        num_sites_arg num_sites = num_sites_arg(),
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg())
+        num_sites_arg const num_sites = num_sites_arg(),
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg(),
+        root_site_arg const root_site = root_site_arg())
     {
         return inclusive_scan(create_communicator(basename, num_sites,
                                   this_site, generation, root_site),
