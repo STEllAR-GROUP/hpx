@@ -362,8 +362,8 @@ void test_for_each_sender(Policy l, ExPolicy&& p, IteratorTag)
             ex::just(rng, f) | ex::let_value([](auto&& rng, auto&& f) {
                 auto begin_it = rng.begin();
                 return ex::bulk(ex::just(), rng.size(),
-                    [begin_it, f = HPX_FORWARD(decltype(f), f)]
-                    (std::size_t i) mutable {
+                    [begin_it, f = HPX_FORWARD(decltype(f), f)](
+                        std::size_t i) mutable {
                         auto it = begin_it;
                         std::advance(it, i);
                         f(*it);
@@ -405,8 +405,8 @@ void test_for_each_exception_sender(Policy l, ExPolicy&& p, IteratorTag)
             ex::just(rng, f) | ex::let_value([](auto&& rng, auto&& f) {
                 auto begin_it = rng.begin();
                 return ex::bulk(ex::just(), rng.size(),
-                    [begin_it, f = HPX_FORWARD(decltype(f), f)]
-                    (std::size_t i) mutable {
+                    [begin_it, f = HPX_FORWARD(decltype(f), f)](
+                        std::size_t i) mutable {
                         auto it = begin_it;
                         std::advance(it, i);
                         f(*it);
@@ -464,8 +464,8 @@ void test_for_each_bad_alloc_sender(Policy l, ExPolicy&& p, IteratorTag)
             ex::just(rng, f) | ex::let_value([](auto&& rng, auto&& f) {
                 auto begin_it = rng.begin();
                 return ex::bulk(ex::just(), rng.size(),
-                    [begin_it, f = HPX_FORWARD(decltype(f), f)]
-                    (std::size_t i) mutable {
+                    [begin_it, f = HPX_FORWARD(decltype(f), f)](
+                        std::size_t i) mutable {
                         auto it = begin_it;
                         std::advance(it, i);
                         f(*it);

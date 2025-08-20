@@ -2240,9 +2240,7 @@ void test_completion_scheduler()
     {
         auto sender = ex::schedule(ex::thread_pool_scheduler{});
         auto completion_scheduler =
-            ex::get_completion_scheduler<ex::set_value_t>(
-                ex::get_env(sender)
-            );
+            ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(sender));
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
                 ex::thread_pool_scheduler>,
@@ -2256,9 +2254,7 @@ void test_completion_scheduler()
             ex::then(ex::schedule(ex::thread_pool_scheduler{}), []() {});
         using hpx::functional::tag_invoke;
         auto completion_scheduler =
-            ex::get_completion_scheduler<ex::set_value_t>(
-                ex::get_env(sender)
-            );
+            ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(sender));
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
                 ex::thread_pool_scheduler>,
@@ -2268,9 +2264,7 @@ void test_completion_scheduler()
     {
         auto sender = ex::transfer_just(ex::thread_pool_scheduler{}, 42);
         auto completion_scheduler =
-            ex::get_completion_scheduler<ex::set_value_t>(
-                ex::get_env(sender)
-            );
+            ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(sender));
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
                 ex::thread_pool_scheduler>,
@@ -2281,9 +2275,7 @@ void test_completion_scheduler()
         auto sender = ex::bulk(
             ex::schedule(ex::thread_pool_scheduler{}), ex::par, 10, [](int) {});
         auto completion_scheduler =
-            ex::get_completion_scheduler<ex::set_value_t>(
-                ex::get_env(sender)
-            );
+            ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(sender));
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
                 ex::thread_pool_scheduler>,
@@ -2296,9 +2288,7 @@ void test_completion_scheduler()
                 ex::par, 10, [](int, int) {}),
             [](int) {});
         auto completion_scheduler =
-            ex::get_completion_scheduler<ex::set_value_t>(
-                ex::get_env(sender)
-            );
+            ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(sender));
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
                 ex::thread_pool_scheduler>,
@@ -2311,9 +2301,7 @@ void test_completion_scheduler()
                 [](int i) { return i; }),
             ex::par, 10, [](int idx, int val) {});
         auto completion_scheduler =
-            ex::get_completion_scheduler<ex::set_value_t>(
-                ex::get_env(sender)
-            );
+            ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(sender));
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
                 ex::thread_pool_scheduler>,
