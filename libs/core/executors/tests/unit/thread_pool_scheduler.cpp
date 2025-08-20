@@ -1930,8 +1930,7 @@ void test_keep_future_sender()
             hpx::get<0>(*(tt::sync_wait(
                 ex::when_all(
                     ex::keep_future(std::move(f)), ex::keep_future(sf)) |
-                ex::transfer(ex::thread_pool_scheduler{}) |
-                ex::then(fun)))),
+                ex::transfer(ex::thread_pool_scheduler{}) | ex::then(fun))),
             85);
 #else
         HPX_TEST_EQ(hpx::get<0>(*(ex::when_all(ex::keep_future(std::move(f)),

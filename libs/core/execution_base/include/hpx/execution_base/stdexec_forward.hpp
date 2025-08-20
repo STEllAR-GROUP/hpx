@@ -151,16 +151,16 @@ namespace hpx::execution::experimental {
 
     // Execution policies for stdexec bulk operations
     // Use stdexec's own execution policy types
-    using stdexec::sequenced_policy;
-    using stdexec::parallel_policy;
-    using stdexec::parallel_unsequenced_policy;
-    using stdexec::unsequenced_policy;
-    using stdexec::seq;
-    using stdexec::par;
-    using stdexec::par_unseq;
-    using stdexec::unseq;
     using stdexec::is_execution_policy;
     using stdexec::is_execution_policy_v;
+    using stdexec::par;
+    using stdexec::par_unseq;
+    using stdexec::parallel_policy;
+    using stdexec::parallel_unsequenced_policy;
+    using stdexec::seq;
+    using stdexec::sequenced_policy;
+    using stdexec::unseq;
+    using stdexec::unsequenced_policy;
 
     // Split
     using stdexec::split;
@@ -260,7 +260,6 @@ namespace hpx::execution::experimental {
     using stdexec::transform_completion_signatures;
     using stdexec::transform_completion_signatures_of;
 
-    
     // Transform sender
     using stdexec::transform_env;
     using stdexec::transform_sender;

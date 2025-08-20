@@ -359,10 +359,9 @@ void test_for_each_sender(Policy l, ExPolicy&& p, IteratorTag)
     auto result = hpx::get<0>(
         // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         *tt::sync_wait(
-            ex::just(rng, f) |
-            ex::let_value([](auto&& rng, auto&& f) {
+            ex::just(rng, f) | ex::let_value([](auto&& rng, auto&& f) {
                 auto begin_it = rng.begin();
-                return ex::bulk(ex::just(), ex::par, rng.size(), 
+                return ex::bulk(ex::just(), rng.size(),
                     [begin_it, f = HPX_FORWARD(decltype(f), f)]
                     (std::size_t i) mutable {
                         auto it = begin_it;
@@ -403,10 +402,9 @@ void test_for_each_exception_sender(Policy l, ExPolicy&& p, IteratorTag)
     {
         using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
         auto result = tt::sync_wait(
-            ex::just(rng, f) |
-            ex::let_value([](auto&& rng, auto&& f) {
+            ex::just(rng, f) | ex::let_value([](auto&& rng, auto&& f) {
                 auto begin_it = rng.begin();
-                return ex::bulk(ex::just(), ex::par, rng.size(), 
+                return ex::bulk(ex::just(), rng.size(),
                     [begin_it, f = HPX_FORWARD(decltype(f), f)]
                     (std::size_t i) mutable {
                         auto it = begin_it;
@@ -416,9 +414,12 @@ void test_for_each_exception_sender(Policy l, ExPolicy&& p, IteratorTag)
             }));
 
         // If sync_wait returns without exception, check if result indicates error
-        if (!result.has_value()) {
+        if (!result.has_value())
+        {
             caught_exception = true;
-        } else {
+        }
+        else
+        {
             HPX_TEST(false);
         }
     }
@@ -460,10 +461,9 @@ void test_for_each_bad_alloc_sender(Policy l, ExPolicy&& p, IteratorTag)
     {
         using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
         tt::sync_wait(
-            ex::just(rng, f) |
-            ex::let_value([](auto&& rng, auto&& f) {
+            ex::just(rng, f) | ex::let_value([](auto&& rng, auto&& f) {
                 auto begin_it = rng.begin();
-                return ex::bulk(ex::just(), ex::par, rng.size(), 
+                return ex::bulk(ex::just(), rng.size(),
                     [begin_it, f = HPX_FORWARD(decltype(f), f)]
                     (std::size_t i) mutable {
                         auto it = begin_it;
