@@ -38,8 +38,8 @@ namespace hpx::detail {
         {
             try
             {
-                return Tag{}(
-                    HPX_MOVE(policy), HPX_FORWARD(T1, t1), HPX_FORWARD(Ts, ts)...);
+                return Tag{}(HPX_MOVE(policy), HPX_FORWARD(T1, t1),
+                    HPX_FORWARD(Ts, ts)...);
             }
             catch (std::bad_alloc const&)
             {
@@ -202,7 +202,7 @@ namespace hpx::detail {
                     std::decay_t<Scheduler>>,
                 decltype(tag(
                     scheduler.get_policy().on(std::declval<hpx::execution::
-                        experimental::explicit_scheduler_executor<
+                            experimental::explicit_scheduler_executor<
                                 std::decay_t<Scheduler>>>()),
                     HPX_FORWARD(Ts, ts)...))>
         {
