@@ -26,6 +26,7 @@
 #include <thrust/unique.h>
 #include <thrust/reverse.h>
 #include <thrust/scan.h>
+#include <thrust/system/cuda/execution_policy.h>
 
 #include <type_traits>
 #include <utility>
@@ -35,14 +36,8 @@ namespace async_cuda {
 namespace thrust {
 namespace detail {
 
-
 template<typename HPXTag>
 struct algorithm_map; // No definition = compilation error for unmapped algorithms
-
-
-// Each specialization maps one HPX algorithm tag to its Thrust equivalent
-// Pattern: template<> struct algorithm_map<hpx::tag_t> { static invoke(...) }
-
 
 template<>
 struct algorithm_map<hpx::fill_t> {
@@ -52,6 +47,14 @@ struct algorithm_map<hpx::fill_t> {
     }
     
     static constexpr char const* name() { return "thrust::fill"; }
+};
+
+template<>
+struct algorithm_map<hpx::fill_n_t> {
+    template<typename Policy, typename... Args>
+    static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args) {
+        return ::thrust::fill_n(policy.get(), std::forward<Args>(args)...);
+    }
 };
 
 template<>
