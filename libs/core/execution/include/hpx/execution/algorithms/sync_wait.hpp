@@ -84,7 +84,7 @@ namespace hpx::execution::experimental::detail {
         void operator()(Error& error) const
         {
             if constexpr (std::is_same_v<Error, std::bad_alloc> ||
-                          std::is_same_v<Error, hpx::exception_list>)
+                std::is_same_v<Error, hpx::exception_list>)
             {
                 throw error;
             }
