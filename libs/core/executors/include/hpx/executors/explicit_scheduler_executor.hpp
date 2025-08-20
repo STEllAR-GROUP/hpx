@@ -212,14 +212,8 @@ namespace hpx::execution::experimental {
 
             if constexpr (std::is_void_v<result_type>)
             {
-#if defined(HPX_HAVE_STDEXEC)
                 return bulk(schedule(exec.sched_), shape,
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
-#else
-                // When stdexec is not available, use HPX's original bulk implementation
-                return bulk(schedule(exec.sched_), shape,
-                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
-#endif
             }
             else
             {

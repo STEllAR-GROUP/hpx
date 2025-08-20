@@ -62,13 +62,36 @@ namespace hpx::execution::experimental::detail {
     {
         void operator()(std::exception_ptr ep) const
         {
-            std::rethrow_exception(HPX_MOVE(ep));
+            try
+            {
+                std::rethrow_exception(HPX_MOVE(ep));
+            }
+            catch (std::bad_alloc const&)
+            {
+                throw;
+            }
+            catch (hpx::exception_list const&)
+            {
+                throw;
+            }
+            catch (...)
+            {
+                throw hpx::exception_list(std::current_exception());
+            }
         }
 
         template <typename Error>
         void operator()(Error& error) const
         {
-            throw error;
+            if constexpr (std::is_same_v<Error, std::bad_alloc> ||
+                std::is_same_v<Error, hpx::exception_list>)
+            {
+                throw error;
+            }
+            else
+            {
+                throw hpx::exception_list(std::make_exception_ptr(error));
+            }
         }
     };
 

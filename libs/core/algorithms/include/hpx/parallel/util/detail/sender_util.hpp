@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <hpx/errors/exception_list.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/let_value.hpp>
 #include <hpx/execution/algorithms/then.hpp>
@@ -35,8 +36,23 @@ namespace hpx::detail {
         auto operator()(T1&& t1, Ts&&... ts) -> decltype(Tag{}(
             HPX_MOVE(policy), HPX_FORWARD(T1, t1), HPX_FORWARD(Ts, ts)...))
         {
-            return Tag{}(
-                HPX_MOVE(policy), HPX_FORWARD(T1, t1), HPX_FORWARD(Ts, ts)...);
+            try
+            {
+                return Tag{}(
+                    HPX_MOVE(policy), HPX_FORWARD(T1, t1), HPX_FORWARD(Ts, ts)...);
+            }
+            catch (std::bad_alloc const&)
+            {
+                throw;
+            }
+            catch (hpx::exception_list const&)
+            {
+                throw;
+            }
+            catch (...)
+            {
+                throw hpx::exception_list(std::current_exception());
+            }
         }
     };
 
@@ -116,7 +132,7 @@ namespace hpx::detail {
     //   3. In the context of the experimental support for p2500
     //      (wg21.link/p2500) this also adds two overloads that take either a
     //      scheduler or a policy_aware_scheduler as its first argument (instead
-    //      of the usual execution policy). These overloads use an scheduler
+    //      of the usual execution policy). These overloads use a scheduler
     //      based executor that is re-wrapped into an execution policy that is
     //      then passed on to the underlying algorithm APIs.
     template <typename Tag>
@@ -125,7 +141,7 @@ namespace hpx::detail {
     {
         template <typename Sender, typename ExPolicy>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                !detail::is_bound_algorithm_v<Sender> &&
                 hpx::execution::experimental::is_sender_v<Sender>
@@ -185,9 +201,8 @@ namespace hpx::detail {
                 hpx::execution::experimental::is_policy_aware_scheduler_v<
                     std::decay_t<Scheduler>>,
                 decltype(tag(
-                    scheduler.get_policy().on(std::declval<
-                        hpx::execution::experimental::
-                            explicit_scheduler_executor<
+                    scheduler.get_policy().on(std::declval<hpx::execution::
+                        experimental::explicit_scheduler_executor<
                                 std::decay_t<Scheduler>>>()),
                     HPX_FORWARD(Ts, ts)...))>
         {
