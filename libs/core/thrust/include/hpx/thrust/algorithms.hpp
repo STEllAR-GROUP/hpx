@@ -3,18 +3,25 @@
 
 #pragma once
 
-#include <hpx/async_cuda/thrust/detail/algorithm_map.hpp>
-#include <hpx/async_cuda/thrust/policy.hpp>
+//
+// SPDX-License-Identifier: BSL-1.0
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+//
+
+#include <hpx/thrust/detail/algorithm_map.hpp>
+#include <hpx/thrust/policy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/fill.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/config/forward.hpp>   // HPX_FORWARD
+#include <hpx/config/move.hpp>      // HPX_MOVE
 #include <cuda_runtime.h>
 
-#include <iostream>
 #include <type_traits>
 
-namespace hpx { namespace async_cuda { namespace thrust {
+namespace hpx::thrust {
 
     template <typename HPXTag, typename ThrustPolicy, typename... Args,
         HPX_CONCEPT_REQUIRES_(
@@ -22,30 +29,34 @@ namespace hpx { namespace async_cuda { namespace thrust {
         typename = detail::is_algorithm_mapped<HPXTag, ThrustPolicy, Args...>>
     auto tag_invoke(HPXTag tag, ThrustPolicy&& policy, Args&&... args)
     {
-        if constexpr (hpx::detail::is_async_execution_policy<
-                          std::decay_t<ThrustPolicy>>::value)
+        if constexpr (hpx::is_async_execution_policy_v<
+                          std::decay_t<ThrustPolicy>>)
         {
             if constexpr (std::is_void_v<decltype(detail::algorithm_map<
                               HPXTag>::invoke(std::declval<ThrustPolicy>(),
                               std::declval<Args>()...))>)
             {
                 detail::algorithm_map<HPXTag>::invoke(
-                    policy, std::forward<Args>(args)...);
+                    HPX_FORWARD(ThrustPolicy, policy),
+                    HPX_FORWARD(Args, args)...);
                 return policy.get_future();    // future<void>
             }
             else
             {
                 auto result = detail::algorithm_map<HPXTag>::invoke(
-                    policy, std::forward<Args>(args)...);
-                return policy.get_future().then([result](auto&&) mutable {
-                    return result;
-                });    // future<T>
+                    HPX_FORWARD(ThrustPolicy, policy),
+                    HPX_FORWARD(Args, args)...);
+                return policy.get_future().then(
+                    [result = HPX_MOVE(result)](auto&& f) mutable {
+                        f.get();
+                        return HPX_MOVE(result);
+                    });    // future<T>
             }
         }
         else
         {
             return detail::algorithm_map<HPXTag>::invoke(
-                policy, std::forward<Args>(args)...);
+                HPX_FORWARD(ThrustPolicy, policy), HPX_FORWARD(Args, args)...);
         }
     }
-}}}    // namespace hpx::async_cuda::thrust
+}    // namespace hpx::thrust

@@ -1,7 +1,7 @@
 #include <hpx/config.hpp>
 #include <hpx/algorithm.hpp>
-#include <hpx/async_cuda/thrust/algorithms.hpp>
-#include <hpx/async_cuda/thrust/policy.hpp>
+#include <hpx/thrust/algorithms.hpp>
+#include <hpx/thrust/policy.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/futures.hpp>
@@ -49,7 +49,7 @@ int hpx_main(hpx::program_options::variables_map&)
 
     // Test 2: Thrust Host Policy
     std::cout << "\n--- Test 2: Thrust Host Policy ---" << std::endl;
-    hpx::async_cuda::thrust::thrust_host_policy host_policy{};
+    hpx::thrust::thrust_host_policy host_policy{};
     std::vector<int> host_vec(size, 0);
     std::vector<int> host_vec2(size, 1);
     std::vector<int> host_result(size, 0);
@@ -84,7 +84,7 @@ int hpx_main(hpx::program_options::variables_map&)
     std::cout
         << "\n--- Test 3: Thrust Device Policy (GPU Multi-Algorithm Test) ---"
         << std::endl;
-    hpx::async_cuda::thrust::thrust_device_policy device_policy{};
+    hpx::thrust::thrust_device_policy device_policy{};
     thrust::device_vector<int> device_vec(size, 0);
     thrust::device_vector<int> device_vec2(size, 2);
     thrust::device_vector<int> device_result(size, 0);
@@ -161,7 +161,7 @@ int hpx_main(hpx::program_options::variables_map&)
 
     // Test global thrust_host instance
     std::vector<int> global_host_vec(1000, 0);
-    hpx::fill(hpx::async_cuda::thrust::thrust_host, global_host_vec.begin(),
+    hpx::fill(hpx::thrust::thrust_host, global_host_vec.begin(),
         global_host_vec.end(), 99);
     bool global_host_success =
         (global_host_vec[0] == 99) && (global_host_vec[999] == 99);
@@ -170,7 +170,7 @@ int hpx_main(hpx::program_options::variables_map&)
 
     // Test global thrust_device instance
     thrust::device_vector<int> global_device_vec(1000, 0);
-    hpx::fill(hpx::async_cuda::thrust::thrust_device, global_device_vec.begin(),
+    hpx::fill(hpx::thrust::thrust_device, global_device_vec.begin(),
         global_device_vec.end(), 88);
     int first_device = global_device_vec[0];
     int last_device = global_device_vec[999];
@@ -196,7 +196,7 @@ int hpx_main(hpx::program_options::variables_map&)
               << std::endl;
     hpx::cuda::experimental::target tgt =
         hpx::cuda::experimental::get_default_target();
-    hpx::async_cuda::thrust::thrust_task_policy task_policy{};
+    hpx::thrust::thrust_task_policy task_policy{};
     auto p_task = task_policy.on(tgt);
     thrust::device_vector<int> dev_task_vec(size, 0);
     auto f_fill =
@@ -216,7 +216,7 @@ int hpx_main(hpx::program_options::variables_map&)
     thrust::host_vector<int> h_small(10);
     std::iota(h_small.begin(), h_small.end(), 1);
     thrust::device_vector<int> d_small = h_small;
-    hpx::async_cuda::thrust::thrust_task_policy
+    hpx::thrust::thrust_task_policy
         default_task{};    // no .on(target) -> uses default target
     auto f_rev = hpx::reverse(default_task, d_small.begin(), d_small.end());
     f_rev.get();
