@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests cuda_future cuda_multi_device_polling transform_stream thrust_policy_test)
+set(tests cuda_future cuda_multi_device_polling transform_stream)
 if(HPX_WITH_GPUBLAS)
   set(benchmarks ${benchmarks} cublas_matmul)
 endif()
@@ -13,13 +13,11 @@ set(cublas_matmul_PARAMETERS THREADS_PER_LOCALITY 4)
 set(cuda_future_PARAMETERS THREADS_PER_LOCALITY 4)
 set(cuda_multi_device_polling_PARAMETERS THREADS_PER_LOCALITY 4)
 set(transform_stream_PARAMETERS THREADS_PER_LOCALITY 4)
-set(thrust_policy_test_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(cuda_future_CUDA_SOURCE saxpy trivial_demo)
 set(cuda_multi_device_polling_CUDA_SOURCE trivial_demo)
 
 set(transform_stream_CUDA ON)
-set(thrust_policy_test_CUDA ON)
 
 foreach(test ${tests})
   if(${${test}_CUDA})
