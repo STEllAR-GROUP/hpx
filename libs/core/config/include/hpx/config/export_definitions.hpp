@@ -62,7 +62,8 @@
 # define HPX_MODULE_EXTERN_CORE  HPX_CORE_EXPORT
 #endif
 
-#if defined(_MSC_VER) && !defined(__clang__)
+// [[nodiscard]] must come first for clang-cl/MSVC
+#if defined(_WIN32)
 #  define HPX_NODISCARD_CORE [[nodiscard]] HPX_MODULE_EXTERN_CORE
 #else
 #  define HPX_NODISCARD_CORE HPX_MODULE_EXTERN_CORE [[nodiscard]]
