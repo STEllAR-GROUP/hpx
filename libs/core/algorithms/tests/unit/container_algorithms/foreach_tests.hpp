@@ -338,7 +338,7 @@ void test_for_each_bad_alloc_async(ExPolicy&& p, IteratorTag)
 }
 
 template <typename Policy, typename ExPolicy, typename IteratorTag>
-void test_for_each_sender(Policy l, ExPolicy&& p, IteratorTag)
+void test_for_each_sender([[maybe_unused]] Policy l, [[maybe_unused]] ExPolicy&& p, IteratorTag)
 {
     using base_iterator = std::vector<std::size_t>::iterator;
     using iterator = test::test_iterator<base_iterator, IteratorTag>;
@@ -382,7 +382,7 @@ void test_for_each_sender(Policy l, ExPolicy&& p, IteratorTag)
 }
 
 template <typename Policy, typename ExPolicy, typename IteratorTag>
-void test_for_each_exception_sender(Policy l, ExPolicy&& p, IteratorTag)
+void test_for_each_exception_sender([[maybe_unused]] Policy l, ExPolicy&& p, IteratorTag)
 {
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
@@ -441,7 +441,7 @@ void test_for_each_exception_sender(Policy l, ExPolicy&& p, IteratorTag)
 }
 
 template <typename Policy, typename ExPolicy, typename IteratorTag>
-void test_for_each_bad_alloc_sender(Policy l, ExPolicy&& p, IteratorTag)
+void test_for_each_bad_alloc_sender([[maybe_unused]] Policy l, [[maybe_unused]] ExPolicy&& p, IteratorTag)
 {
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
