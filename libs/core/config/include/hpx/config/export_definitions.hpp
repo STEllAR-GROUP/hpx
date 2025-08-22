@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -53,22 +53,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 // C++20 module export definitions
 #if defined(HPX_BUILD_MODULE)
-#undef HPX_CORE_EXPORT
+# undef HPX_CORE_EXPORT
 # define HPX_CORE_EXPORT         /* empty */
-# define HPX_MODULE_EXPORT      export
-# define HPX_MODULE_EXTERN_CORE extern "C++" export
+# define HPX_MODULE_EXPORT       export
+# if defined(_MSC_VER)
+#  define HPX_MODULE_EXTERN_CORE export extern "C++"
+# else
+#  define HPX_MODULE_EXTERN_CORE extern "C++" export
+# endif
+# define HPX_NODISCARD_CORE      HPX_MODULE_EXTERN_CORE [[nodiscard]]
 #else
 # define HPX_MODULE_EXPORT       /* empty */
 # define HPX_MODULE_EXTERN_CORE  HPX_CORE_EXPORT
+# define HPX_NODISCARD_CORE      [[nodiscard]] HPX_CORE_EXPORT
 #endif
-
-// [[nodiscard]] must come first for clang-cl/MSVC
-#if defined(_WIN32)
-#  define HPX_NODISCARD_CORE [[nodiscard]] HPX_MODULE_EXTERN_CORE
-#else
-#  define HPX_NODISCARD_CORE HPX_MODULE_EXTERN_CORE [[nodiscard]]
-#endif
-
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_EXPORTS) || defined(HPX_FULL_EXPORTS)

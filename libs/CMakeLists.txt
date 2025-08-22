@@ -311,18 +311,22 @@ foreach(lib ${HPX_LIBS})
 
     if(HPX_WITH_CXX_MODULES)
       target_sources(
-        hpx_${lib} PUBLIC FILE_SET hpx_${lib}_public_sources TYPE CXX_MODULES
-                          FILES ${CMAKE_CURRENT_SOURCE_DIR}/core/hpx_core.ixx
+        hpx_${lib}
+        PUBLIC FILE_SET hpx_${lib}_public_sources TYPE CXX_MODULES FILES
+               ${CMAKE_CURRENT_SOURCE_DIR}/${lib}/hpx_${lib}.ixx
       )
+      # cmake-format: off
+      set(module_installation
+          FILE_SET hpx_${lib}_public_sources
+                   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx/miu
+          CXX_MODULES_BMI
+                   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx/bmi
+                   COMPONENT runtime
+      )
+      # cmake-format: on
     endif()
 
     set_target_properties(hpx_${lib} PROPERTIES FOLDER "Core")
-
-    if(lib STREQUAL "core" AND HPX_WITH_CXX_MODULES)
-      set(module_installation FILE_SET hpx_core_public_sources DESTINATION
-                              ${CMAKE_INSTALL_INCLUDEDIR}
-      )
-    endif()
 
     install(
       TARGETS hpx_${lib}
