@@ -353,7 +353,7 @@ void test_for_each_sender([[maybe_unused]] Policy l, [[maybe_unused]] ExPolicy&&
         iterator(std::begin(c)), iterator(std::end(c)));
     auto f = [](std::size_t& v) { v = 42; };
 
-    using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+    // using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     // Use stdexec bulk instead of HPX for_each for sender tests
     auto result = hpx::get<0>(
@@ -400,7 +400,7 @@ void test_for_each_exception_sender([[maybe_unused]] Policy l, ExPolicy&& p, Ite
     bool caught_exception = false;
     try
     {
-        using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+        // using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
         auto result = tt::sync_wait(
             ex::just(rng, f) | ex::let_value([](auto&& rng, auto&& f) {
                 auto begin_it = rng.begin();
@@ -459,7 +459,7 @@ void test_for_each_bad_alloc_sender([[maybe_unused]] Policy l, [[maybe_unused]] 
     bool caught_exception = false;
     try
     {
-        using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+        // using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
         tt::sync_wait(
             ex::just(rng, f) | ex::let_value([](auto&& rng, auto&& f) {
                 auto begin_it = rng.begin();
