@@ -338,7 +338,8 @@ void test_for_each_bad_alloc_async(ExPolicy&& p, IteratorTag)
 }
 
 template <typename Policy, typename ExPolicy, typename IteratorTag>
-void test_for_each_sender([[maybe_unused]] Policy l, [[maybe_unused]] ExPolicy&& p, IteratorTag)
+void test_for_each_sender(
+    [[maybe_unused]] Policy l, [[maybe_unused]] ExPolicy&& p, IteratorTag)
 {
     using base_iterator = std::vector<std::size_t>::iterator;
     using iterator = test::test_iterator<base_iterator, IteratorTag>;
@@ -362,12 +363,12 @@ void test_for_each_sender([[maybe_unused]] Policy l, [[maybe_unused]] ExPolicy&&
             ex::just(rng, f) | ex::let_value([](auto&& rng, auto&& f) {
                 auto begin_it = rng.begin();
                 return ex::bulk(ex::just(), rng.size(),
-                    [begin_it, f = HPX_FORWARD(decltype(f), f)](
-                        std::size_t i) mutable {
-                        auto it = begin_it;
-                        std::advance(it, i);
-                        f(*it);
-                    }) |
+                           [begin_it, f = HPX_FORWARD(decltype(f), f)](
+                               std::size_t i) mutable {
+                               auto it = begin_it;
+                               std::advance(it, i);
+                               f(*it);
+                           }) |
                     ex::then([rng]() { return rng.end(); });
             })));
     HPX_TEST(result == iterator(std::end(c)));
@@ -382,7 +383,8 @@ void test_for_each_sender([[maybe_unused]] Policy l, [[maybe_unused]] ExPolicy&&
 }
 
 template <typename Policy, typename ExPolicy, typename IteratorTag>
-void test_for_each_exception_sender([[maybe_unused]] Policy l, ExPolicy&& p, IteratorTag)
+void test_for_each_exception_sender(
+    [[maybe_unused]] Policy l, ExPolicy&& p, IteratorTag)
 {
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
@@ -441,7 +443,8 @@ void test_for_each_exception_sender([[maybe_unused]] Policy l, ExPolicy&& p, Ite
 }
 
 template <typename Policy, typename ExPolicy, typename IteratorTag>
-void test_for_each_bad_alloc_sender([[maybe_unused]] Policy l, [[maybe_unused]] ExPolicy&& p, IteratorTag)
+void test_for_each_bad_alloc_sender(
+    [[maybe_unused]] Policy l, [[maybe_unused]] ExPolicy&& p, IteratorTag)
 {
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;

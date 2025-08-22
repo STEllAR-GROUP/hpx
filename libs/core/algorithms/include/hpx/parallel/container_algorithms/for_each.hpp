@@ -550,8 +550,10 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::execution::experimental::sender<Sender> &&
-                std::invocable<F, typename hpx::execution::experimental::value_types_of_t<
-                    Sender, hpx::execution::experimental::empty_env>::template apply<std::tuple>>
+                std::invocable<F,
+                    typename hpx::execution::experimental::value_types_of_t<
+                        Sender, hpx::execution::experimental::empty_env>::
+                        template apply<std::tuple>>
             )
         // clang-format on
         friend auto tag_fallback_invoke(hpx::ranges::for_each_t,
