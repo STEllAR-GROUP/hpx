@@ -728,6 +728,7 @@ namespace boost { namespace inspect {
         register_signature(".hxx.in");
         register_signature(".inc.in");
         register_signature(".ipp.in");
+        register_signature(".ixx");
     }
 
     source_inspector::source_inspector()
