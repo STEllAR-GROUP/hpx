@@ -20,12 +20,13 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    // clang-format off
+
     template <typename ExPolicy, typename InIterB, typename InIterE, typename T,
-        typename Reduce,
-        HPX_CONCEPT_REQUIRES_(
+        typename Reduce>
+    // clang-format off
+        requires (
             hpx::is_unsequenced_execution_policy_v<ExPolicy>
-        )>
+        )
     // clang-format on
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T tag_invoke(
         sequential_reduce_t<ExPolicy>, ExPolicy&&, InIterB first, InIterE last,
@@ -45,11 +46,11 @@ namespace hpx::parallel::detail {
         }
     }
 
+    template <typename ExPolicy, typename T, typename FwdIter, typename Reduce>
     // clang-format off
-    template <typename ExPolicy, typename T, typename FwdIter, typename Reduce,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_unsequenced_execution_policy_v<ExPolicy>
-        )>
+        )
     // clang-format on
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T tag_invoke(
         sequential_reduce_t<ExPolicy>, FwdIter part_begin,
@@ -68,12 +69,12 @@ namespace hpx::parallel::detail {
         }
     }
 
-    // clang-format off
     template <typename ExPolicy, typename Iter, typename Sent, typename T,
-        typename Reduce, typename Convert,
-        HPX_CONCEPT_REQUIRES_(
+        typename Reduce, typename Convert>
+    // clang-format off
+        requires (
             hpx::is_unsequenced_execution_policy_v<ExPolicy>
-        )>
+        )
     // clang-format on
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T tag_invoke(
         sequential_reduce_t<ExPolicy>, ExPolicy&&, Iter first, Sent last,
@@ -94,12 +95,12 @@ namespace hpx::parallel::detail {
         }
     }
 
-    // clang-format off
     template <typename ExPolicy, typename T, typename Iter, typename Reduce,
-        typename Convert,
-        HPX_CONCEPT_REQUIRES_(
+        typename Convert>
+    // clang-format off
+        requires (
             hpx::is_unsequenced_execution_policy_v<ExPolicy>
-        )>
+        )
     // clang-format on
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T tag_invoke(
         sequential_reduce_t<ExPolicy>, Iter part_begin, std::size_t part_size,
@@ -118,12 +119,12 @@ namespace hpx::parallel::detail {
         }
     }
 
-    // clang-format off
     template <typename ExPolicy, typename Iter1, typename Sent, typename Iter2,
-        typename T, typename Reduce, typename Convert,
-        HPX_CONCEPT_REQUIRES_(
+        typename T, typename Reduce, typename Convert>
+    // clang-format off
+        requires (
             hpx::is_unsequenced_execution_policy_v<ExPolicy>
-        )>
+        )
     // clang-format on
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T tag_invoke(
         sequential_reduce_t<ExPolicy>, Iter1 first1, Sent last1, Iter2 first2,

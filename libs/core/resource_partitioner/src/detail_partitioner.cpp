@@ -152,6 +152,12 @@ namespace hpx::resource::detail {
         case resource::scheduling_policy::local_workrequesting_mc:
             sched = "local_workrequesting_mc";
             break;
+#else
+        case resource::scheduling_policy::local_workrequesting_fifo:
+        case resource::scheduling_policy::local_workrequesting_lifo:
+        case resource::scheduling_policy::local_workrequesting_mc:
+            sched = "unknown";
+            break;
 #endif
         case resource::scheduling_policy::static_:
             sched = "static";

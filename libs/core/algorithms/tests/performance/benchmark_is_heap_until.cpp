@@ -67,7 +67,7 @@ double run_is_heap_until_benchmark_std(
     auto heap_range = std::distance(std::begin(v), result);
     std::cout << "Heap Range : " << heap_range << std::endl;
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@ double run_is_heap_until_benchmark_seq(
     auto heap_range = std::distance(std::begin(v), result);
     std::cout << "Heap Range : " << heap_range << std::endl;
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -111,7 +111,7 @@ double run_is_heap_until_benchmark_par(
     auto heap_range = std::distance(std::begin(v), result);
     std::cout << "Heap Range : " << heap_range << std::endl;
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -133,7 +133,7 @@ double run_is_heap_until_benchmark_par_unseq(
     auto heap_range = std::distance(std::begin(v), result);
     std::cout << "Heap Range : " << heap_range << std::endl;
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -170,7 +170,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // initialize data
     using namespace hpx::execution;
     hpx::generate(par, std::begin(v), std::end(v), random_fill());
-    std::make_heap(std::begin(v), std::next(std::begin(v), break_pos));
+    std::make_heap(std::begin(v),
+        std::next(std::begin(v), static_cast<std::ptrdiff_t>(break_pos)));
     if (break_pos < vector_size)
         v[break_pos] =
             static_cast<int>((std::numeric_limits<std::size_t>::max)());

@@ -825,13 +825,13 @@ namespace hpx::parallel {
 
                 // different versions of clang-format do different things
                 // clang-format off
-                    return util::detail::get_in_in_out_result(
-                        util::foreach_partitioner<ExPolicy>::call(
-                            HPX_FORWARD(ExPolicy, policy),
-                            hpx::util::zip_iterator(first1, first2, dest),
-                            (std::min) (detail::distance(first1, last1),
-                                detail::distance(first2, last2)),
-                            HPX_MOVE(f1), hpx::identity_v));
+                return util::detail::get_in_in_out_result(
+                    util::foreach_partitioner<ExPolicy>::call(
+                        HPX_FORWARD(ExPolicy, policy),
+                        hpx::util::zip_iterator(first1, first2, dest),
+                        (std::min) (detail::distance(first1, last1),
+                            detail::distance(first2, last2)),
+                        HPX_MOVE(f1), hpx::identity_v));
                 // clang-format on
             }
         };
@@ -927,13 +927,12 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<transform_t>
     {
     private:
+        template <typename FwdIter1, typename FwdIter2, typename F>
         // clang-format off
-        template <typename FwdIter1, typename FwdIter2,
-            typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(
             hpx::transform_t, FwdIter1 first, FwdIter1 last, FwdIter2 dest, F f)
@@ -948,14 +947,14 @@ namespace hpx {
                         hpx::identity_v));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename F,
-            HPX_CONCEPT_REQUIRES_(
+            typename F>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::transform_t,
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
@@ -971,14 +970,11 @@ namespace hpx {
                         HPX_MOVE(f), hpx::identity_v));
         }
 
-        // clang-format off
         template <typename FwdIter1, typename FwdIter2, typename FwdIter3,
-            typename F,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator_v<FwdIter1> &&
+            typename F>
+            requires(hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::traits::is_iterator_v<FwdIter3>
-            )>
+                hpx::traits::is_iterator_v<FwdIter3>)
         // clang-format on
         friend FwdIter3 tag_fallback_invoke(hpx::transform_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter3 dest, F f)
@@ -997,16 +993,15 @@ namespace hpx {
                     HPX_MOVE(f), proj_id(), proj_id()));
         }
 
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename FwdIter3, typename F>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter1,
-            typename FwdIter2, typename FwdIter3,
-            typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::traits::is_iterator_v<FwdIter3>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::transform_t,
             ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,

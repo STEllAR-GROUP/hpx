@@ -279,11 +279,11 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<adjacent_find_t>
     {
     private:
-        // clang-format off
         template <typename FwdIter, typename Sent,
             typename Proj = hpx::identity,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
@@ -292,7 +292,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected<Proj, FwdIter>,
                     hpx::parallel::traits::projected<Proj, FwdIter>
                 >::value
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(hpx::ranges::adjacent_find_t,
             FwdIter first, Sent last, Pred pred = Pred(), Proj proj = Proj())
@@ -302,11 +302,11 @@ namespace hpx::ranges {
                     HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename Proj = hpx::identity,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -316,7 +316,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected<Proj, FwdIter>,
                     hpx::parallel::traits::projected<Proj, FwdIter>
                 >::value
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
         tag_fallback_invoke(hpx::ranges::adjacent_find_t, ExPolicy&& policy,
@@ -327,11 +327,10 @@ namespace hpx::ranges {
                     HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
+        template <typename Rng, typename Proj = hpx::identity,
+            typename Pred = hpx::parallel::detail::equal_to>
         // clang-format off
-        template <typename Rng,
-            typename Proj = hpx::identity,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -339,7 +338,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >::value
-            )>
+            )
         // clang-format on
         friend typename hpx::traits::range_traits<Rng>::iterator_type
         tag_fallback_invoke(hpx::ranges::adjacent_find_t, Rng&& rng,
@@ -357,11 +356,11 @@ namespace hpx::ranges {
                     HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Rng,
             typename Proj = hpx::identity,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -370,7 +369,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >::value
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             typename hpx::traits::range_traits<Rng>::iterator_type>
@@ -386,7 +385,8 @@ namespace hpx::ranges {
             return hpx::parallel::detail::adjacent_find<iterator_type,
                 iterator_type>()
                 .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
-                    std::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
+                    std::end(rng), HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
         }
     } adjacent_find{};
 }    // namespace hpx::ranges

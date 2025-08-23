@@ -106,7 +106,7 @@ namespace hpx::serialization {
                     ar >> name;
 
                     Pointer t(polymorphic_intrusive_factory::instance()
-                                  .create<referred_type>(name));
+                            .create<referred_type>(name));
                     ar >> *t;
                     return t;
                 }
@@ -143,7 +143,7 @@ namespace hpx::serialization {
                 static Pointer call(input_archive& ar)
                 {
                     return Pointer(polymorphic_nonintrusive_factory::instance()
-                                       .load<referred_type>(ar));
+                            .load<referred_type>(ar));
                 }
             };
 

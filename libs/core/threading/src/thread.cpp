@@ -123,6 +123,7 @@ namespace hpx {
             // Now notify our calling thread that we started execution.
             func();
         }
+        // NOLINTNEXTLINE(bugprone-empty-catch)
         catch (hpx::thread_interrupted const&)
         {    //-V565
             /* swallow this exception */

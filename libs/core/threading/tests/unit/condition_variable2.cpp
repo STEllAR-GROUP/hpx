@@ -514,14 +514,14 @@ void test_many_cvs(bool call_notify, bool call_interrupt)
             for (int idx = 0; idx < NumExtraCV; ++idx)
             {
                 hpx::this_thread::sleep_for(std::chrono::microseconds(100));
-                hpx::jthread t([idx, t0stoken = t0ssource.get_token(),
-                                   &arr_ready, &arr_ready_mtx, &arr_ready_cv,
-                                   call_notify] {
-                    // use interrupt token of t0 instead
-                    // NOTE: disables signaling interrupts directly to the thread
-                    cv_wait(t0stoken, idx + 1, arr_ready[idx],
-                        arr_ready_mtx[idx], arr_ready_cv[idx], call_notify);
-                });
+                hpx::jthread t(
+                    [idx, t0stoken = t0ssource.get_token(), &arr_ready,
+                        &arr_ready_mtx, &arr_ready_cv, call_notify] {
+                        // use interrupt token of t0 instead
+                        // NOTE: disables signaling interrupts directly to the thread
+                        cv_wait(t0stoken, idx + 1, arr_ready[idx],
+                            arr_ready_mtx[idx], arr_ready_cv[idx], call_notify);
+                    });
                 vthreads.push_back(std::move(t));
             }
 
@@ -560,7 +560,7 @@ void test_many_cvs(bool call_notify, bool call_interrupt)
                 vthreads_deferred = std::move(vthreads);
             }
         }    // leave scope of additional threads (already notified/interrupted
-             // or detached)
+        // or detached)
     }    // leave scope of t0 without join() or detach() (signals cancellation)
 }
 

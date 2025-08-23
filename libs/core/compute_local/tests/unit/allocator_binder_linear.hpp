@@ -25,7 +25,7 @@ struct linear_numa_binder : hpx::compute::host::numa_binding_helper<T>
     {
         std::size_t const cache_line_size = hpx::threads::get_cache_line_size();
         std::size_t const page_size = hpx::threads::get_memory_page_size();
-        std::size_t const alignment = (std::max)(page_size, cache_line_size);
+        std::size_t const alignment = (std::max) (page_size, cache_line_size);
         elements_page_ = (alignment / sizeof(T));
         N_ = num_pages * elements_page_;
     }

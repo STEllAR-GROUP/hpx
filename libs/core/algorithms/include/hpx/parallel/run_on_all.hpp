@@ -36,17 +36,24 @@ namespace hpx::experimental {
         decltype(auto) run_on_all(
             ExPolicy&& policy, F&& f, Reductions&&... reductions)
         {
+            // force using index_queue scheduler with given amount of threads
+            hpx::threads::thread_schedule_hint hint;
+            hint.sharing_mode(
+                hpx::threads::thread_sharing_hint::do_not_share_function);
+
+            auto cores =
+                hpx::execution::experimental::processing_units_count(policy);
+
             // Create executor with proper configuration
             auto exec =
                 hpx::execution::experimental::with_processing_units_count(
                     hpx::execution::parallel_executor(
                         hpx::threads::thread_priority::bound,
-                        hpx::threads::thread_stacksize::default_),
-                    hpx::execution::experimental::processing_units_count(
-                        policy.executor()));
+                        hpx::threads::thread_stacksize::default_, hint),
+                    cores);
 
-            auto cores =
-                hpx::execution::experimental::processing_units_count(exec);
+            // ensure scheduling is done using the index_queue
+            exec.set_hierarchical_threshold(0);
 
             // Execute based on policy type
             if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
@@ -57,10 +64,13 @@ namespace hpx::experimental {
                 auto sp = std::make_shared<decltype(all_reductions)>(
                     HPX_MOVE(all_reductions));
 
+                std::apply(
+                    [&](auto&... r) { (r.init_iteration(0, 0), ...); }, *sp);
+
                 // Create a lambda that captures all reductions
-                auto task = [sp, f = HPX_FORWARD(F, f)](std::size_t) {
+                auto task = [sp, f = HPX_FORWARD(F, f)](std::size_t i) {
                     std::apply(
-                        [&](auto&... r) { f(r.iteration_value(0)...); }, *sp);
+                        [&](auto&... r) { f(r.iteration_value(i)...); }, *sp);
                 };
 
                 auto fut = hpx::parallel::execution::bulk_async_execute(
@@ -80,9 +90,12 @@ namespace hpx::experimental {
                 auto&& all_reductions = std::forward_as_tuple(
                     HPX_FORWARD(Reductions, reductions)...);
 
+                std::apply([](auto&... r) { (r.init_iteration(0, 0), ...); },
+                    all_reductions);
+
                 // Create a lambda that captures all reductions
-                auto task = [&all_reductions, &f](std::size_t) {
-                    std::apply([&](auto&... r) { f(r.iteration_value(0)...); },
+                auto task = [&all_reductions, &f](std::size_t i) {
+                    std::apply([&](auto&... r) { f(r.iteration_value(i)...); },
                         all_reductions);
                 };
 
@@ -121,8 +134,8 @@ namespace hpx::experimental {
     ///                  invoke (last argument)
     /// \param ts        The list of reductions and the function to invoke (last
     ///                  argument)
-    template <typename ExPolicy, typename T, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
+    template <typename ExPolicy, typename T, typename... Ts>
+        requires(hpx::is_execution_policy_v<ExPolicy>)
     decltype(auto) run_on_all(ExPolicy&& policy, T&& t, Ts&&... ts)
     {
         return detail::run_on_all(HPX_FORWARD(ExPolicy, policy),
@@ -141,8 +154,8 @@ namespace hpx::experimental {
     ///                  invoke (last argument)
     /// \param ts        The list of reductions and the function to invoke (last
     ///                  argument)
-    template <typename T, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(!hpx::is_execution_policy_v<T>)>
+    template <typename T, typename... Ts>
+        requires(!hpx::is_execution_policy_v<T>)
     decltype(auto) run_on_all(T&& t, Ts&&... ts)
     {
         return detail::run_on_all(hpx::execution::par,

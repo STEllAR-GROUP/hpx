@@ -45,10 +45,11 @@ void test_basic()
         hpx::concurrency::detail::contiguous_index_queue<> q{first, last};
 
         for (std::uint32_t curr_expected = first; curr_expected < last;
-             ++curr_expected)
+            ++curr_expected)
         {
             hpx::optional<std::uint32_t> curr = q.pop_left();
             HPX_TEST(curr);
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             HPX_TEST_EQ(curr.value(), curr_expected);
         }
 
@@ -64,10 +65,11 @@ void test_basic()
         hpx::concurrency::detail::contiguous_index_queue<> q{first, last};
 
         for (std::uint32_t curr_expected = last - 1; curr_expected >= first;
-             --curr_expected)
+            --curr_expected)
         {
             hpx::optional<std::uint32_t> curr = q.pop_right();
             HPX_TEST(curr);
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             HPX_TEST_EQ(curr.value(), curr_expected);
         }
 
@@ -80,10 +82,11 @@ void test_basic()
         q.reset(first, last);
 
         for (std::uint32_t curr_expected = last - 1; curr_expected >= first;
-             --curr_expected)
+            --curr_expected)
         {
             hpx::optional<std::uint32_t> curr = q.pop_right();
             HPX_TEST(curr);
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             HPX_TEST_EQ(curr.value(), curr_expected);
         }
 

@@ -37,7 +37,7 @@ namespace hpx::threads {
         depleted = 4,                 /*!< thread has been depleted (deeply
                                            suspended, it is not known to the
                                            thread-manager) */
-        terminated = 5,               /*!< thread has been stopped an may be
+        terminated = 5,               /*!< thread has been stopped and may be
                                            garbage collected */
         staged = 6,                   /*!< this is not a real thread state, but
                                            allows to reference staged task
@@ -102,6 +102,10 @@ namespace hpx::threads {
             high priority queue and will never be stolen by another thread
             after initial assignment. This should be used for thread placement
             tasks such as OpenMP type for loops. */
+        initially_bound = 7,          /*!< Task initially goes onto a special
+            high priority queue and will never be stolen by another thread
+            after initial assignment. If the thread is rescheduled later, it
+            will use normal priority. */
 
         /// \cond NOINTERNAL
         // obsolete, kept for compatibility only
@@ -354,7 +358,8 @@ namespace hpx::threads {
             thread_execution_hint runs_as_child = default_runs_as_child_hint,
             thread_sharing_hint sharing = thread_sharing_hint::none) noexcept
           : hint(thread_hint)
-          , mode(thread_schedule_hint_mode::thread)
+          , mode(thread_hint >= 0 ? thread_schedule_hint_mode::thread :
+                                    thread_schedule_hint_mode::none)
           , placement_mode_bits(static_cast<std::int8_t>(placement))
           , sharing_mode_bits(static_cast<std::int8_t>(sharing))
           , runs_as_child_mode_bits(static_cast<std::int8_t>(runs_as_child))
@@ -373,6 +378,39 @@ namespace hpx::threads {
           , placement_mode_bits(static_cast<std::int8_t>(placement))
           , sharing_mode_bits(static_cast<std::int8_t>(sharing))
           , runs_as_child_mode_bits(static_cast<std::int8_t>(runs_as_child))
+        {
+        }
+
+        /// Construct a hint with the given placement hint.
+        explicit constexpr thread_schedule_hint(
+            thread_placement_hint placement) noexcept
+          : placement_mode_bits(static_cast<std::int8_t>(placement))
+          , sharing_mode_bits(
+                static_cast<std::int8_t>(thread_sharing_hint::none))
+          , runs_as_child_mode_bits(
+                static_cast<std::int8_t>(default_runs_as_child_hint))
+        {
+        }
+
+        /// Construct a hint with the given execution hint.
+        explicit constexpr thread_schedule_hint(
+            thread_execution_hint runs_as_child) noexcept
+          : placement_mode_bits(
+                static_cast<std::int8_t>(thread_placement_hint::none))
+          , sharing_mode_bits(
+                static_cast<std::int8_t>(thread_sharing_hint::none))
+          , runs_as_child_mode_bits(static_cast<std::int8_t>(runs_as_child))
+        {
+        }
+
+        /// Construct a hint with the given sharing hint.
+        explicit constexpr thread_schedule_hint(
+            thread_sharing_hint sharing) noexcept
+          : placement_mode_bits(
+                static_cast<std::int8_t>(thread_placement_hint::none))
+          , sharing_mode_bits(static_cast<std::int8_t>(sharing))
+          , runs_as_child_mode_bits(
+                static_cast<std::int8_t>(default_runs_as_child_hint))
         {
         }
 

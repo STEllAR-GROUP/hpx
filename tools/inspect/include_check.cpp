@@ -251,6 +251,17 @@ namespace boost { namespace inspect {
             {"system_error"}},
         {"(\\bstd\\s*::\\s*system_error\\b)", "std::system_error",
             {"system_error"}},
+        // c++20
+        {"(\\bstd\\s*::\\s*cmp_equal\\b)", "std::cmp_equal", {"utility"}},
+        {"(\\bstd\\s*::\\s*cmp_less\\b)", "std::cmp_less", {"utility"}},
+        {"(\\bstd\\s*::\\s*cmp_less_equal\\b)", "std::cmp_less_equal",
+            {"utility"}},
+        {"(\\bstd\\s*::\\s*cmp_greater\\b)", "std::cmp_greater", {"utility"}},
+        {"(\\bstd\\s*::\\s*cmp_greater_equal\\b)", "std::cmp_greater_equal",
+            {"utility"}},
+        {"(\\bstd\\s*::\\s*cmp_not_equal\\b)", "std::cmp_not_equal",
+            {"utility"}},
+        {"(\\bstd\\s*::\\s*in_range\\b)", "std::in_range", {"utility"}},
         // boost
         {"(\\bhpx\\s*::\\s*intrusive_ptr\\b)", "hpx::intrusive_ptr",
             {"hpx/modules/memory.hpp"}},
@@ -290,9 +301,10 @@ namespace boost { namespace inspect {
         register_signature(".hxx");
         register_signature(".inc");
         register_signature(".ipp");
+        register_signature(".ixx");
 
         for (names_includes const* names_it = &names[0];
-             names_it->name_regex != nullptr; ++names_it)
+            names_it->name_regex != nullptr; ++names_it)
         {
             std::string rx(names_it->name_regex);
             rx += "|"    // or (ignored)

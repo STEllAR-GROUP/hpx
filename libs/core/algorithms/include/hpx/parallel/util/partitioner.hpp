@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -163,7 +163,7 @@ namespace hpx::parallel::util::detail {
 
         while (count != 0)
         {
-            std::size_t chunk = (std::min)(count, *chunk_size_it);
+            std::size_t chunk = (std::min) (count, *chunk_size_it);
             HPX_ASSERT(chunk != 0);
 
             shape.emplace_back(*data_it, first, chunk);
@@ -507,9 +507,10 @@ namespace hpx::parallel::util::detail {
 
                     handle_local_exceptions::call(r);
 
-                    return hpx::util::void_guard<R>(), f(HPX_MOVE(r));
+                    return hpx::util::void_guard<R>(),
+                           f(HPX_FORWARD(decltype(r), r));
                 },
-                HPX_MOVE(workitems));
+                HPX_FORWARD(Items, workitems));
 #endif
         }
     };

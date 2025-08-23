@@ -29,7 +29,7 @@ namespace jacobi {
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
         {
-            ar& rows;
+            ar & rows;
         }
     };
 }    // namespace jacobi

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -123,7 +123,7 @@ namespace throttle { namespace server {
                 hpx::bind(&throttle::throttle_controller, this, shepherd)),
             description.c_str(), hpx::threads::thread_priority::high,
             hpx::threads::thread_schedule_hint(
-                static_cast<std::uint16_t>(shepherd)));
+                static_cast<std::int16_t>(shepherd)));
         hpx::threads::register_thread(data);
     }
 
@@ -138,7 +138,7 @@ namespace throttle { namespace server {
                 hpx::bind(&throttle::suspend, this, shepherd)),
             description.c_str(), hpx::threads::thread_priority::high,
             hpx::threads::thread_schedule_hint(
-                static_cast<std::uint16_t>(shepherd)));
+                static_cast<std::int16_t>(shepherd)));
         hpx::threads::register_thread(data);
     }
 }}    // namespace throttle::server

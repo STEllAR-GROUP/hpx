@@ -279,9 +279,9 @@ namespace hpx::collectives {
     hpx::future<std::vector<T>> all_to_all(communicator fid,
         std::vector<T>&& local_result,
         this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        generation_arg const generation = generation_arg())
     {
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
         }
@@ -291,6 +291,20 @@ namespace hpx::collectives {
                 HPX_GET_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::collectives::all_to_all",
                     "the generation number shouldn't be zero"));
+        }
+
+        // Handle operation right away if there is only one value.
+        if (auto [num_sites, comm_site] = fid.get_info(); num_sites == 1)
+        {
+            if (this_site != comm_site)
+            {
+                return hpx::make_exceptional_future<std::vector<T>>(
+                    HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                        "hpx::collectives::all_to_all",
+                        "the local site should be zero if only one site is "
+                        "involved"));
+            }
+            return hpx::make_ready_future(HPX_MOVE(local_result));
         }
 
         auto all_to_all_data =
@@ -320,8 +334,8 @@ namespace hpx::collectives {
 
     template <typename T>
     hpx::future<std::vector<T>> all_to_all(communicator fid,
-        std::vector<T>&& local_result, generation_arg generation,
-        this_site_arg this_site = this_site_arg())
+        std::vector<T>&& local_result, generation_arg const generation,
+        this_site_arg const this_site = this_site_arg())
     {
         return all_to_all(
             HPX_MOVE(fid), HPX_MOVE(local_result), this_site, generation);
@@ -330,10 +344,10 @@ namespace hpx::collectives {
     template <typename T>
     hpx::future<std::vector<T>> all_to_all(char const* basename,
         std::vector<T>&& local_result,
-        num_sites_arg num_sites = num_sites_arg(),
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg())
+        num_sites_arg const num_sites = num_sites_arg(),
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg(),
+        root_site_arg const root_site = root_site_arg())
     {
         return all_to_all(create_communicator(basename, num_sites, this_site,
                               generation, root_site),
@@ -344,8 +358,8 @@ namespace hpx::collectives {
     template <typename T>
     std::vector<T> all_to_all(hpx::launch::sync_policy, communicator fid,
         std::vector<T>&& local_result,
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
         return all_to_all(
             HPX_MOVE(fid), HPX_MOVE(local_result), this_site, generation)
@@ -354,8 +368,8 @@ namespace hpx::collectives {
 
     template <typename T>
     std::vector<T> all_to_all(hpx::launch::sync_policy, communicator fid,
-        std::vector<T>&& local_result, generation_arg generation,
-        this_site_arg this_site = this_site_arg())
+        std::vector<T>&& local_result, generation_arg const generation,
+        this_site_arg const this_site = this_site_arg())
     {
         return all_to_all(
             HPX_MOVE(fid), HPX_MOVE(local_result), this_site, generation)
@@ -365,10 +379,10 @@ namespace hpx::collectives {
     template <typename T>
     std::vector<T> all_to_all(hpx::launch::sync_policy, char const* basename,
         std::vector<T>&& local_result,
-        num_sites_arg num_sites = num_sites_arg(),
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg())
+        num_sites_arg const num_sites = num_sites_arg(),
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg(),
+        root_site_arg const root_site = root_site_arg())
     {
         return all_to_all(create_communicator(basename, num_sites, this_site,
                               generation, root_site),

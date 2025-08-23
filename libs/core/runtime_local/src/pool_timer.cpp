@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Bibek Wagle
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -146,7 +146,7 @@ namespace hpx::util::detail {
             }
 
             HPX_ASSERT(timer_ != nullptr);
-            timer_->expires_from_now(time_duration.value());
+            timer_->expires_at(time_duration.from_now());
             timer_->async_wait(hpx::bind_front(    //-V779
                 &pool_timer::timer_handler, this->shared_from_this()));
 
@@ -199,6 +199,7 @@ namespace hpx::util::detail {
         {
             terminate();
         }
+        // NOLINTNEXTLINE(bugprone-empty-catch)
         catch (...)
         {
         }

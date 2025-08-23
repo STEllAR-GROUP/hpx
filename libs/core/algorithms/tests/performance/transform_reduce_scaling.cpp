@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -87,17 +87,17 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         if (csvoutput)
         {
-            std::cout << "," << tr_time / 1e9 << "," << tr_old_time / 1e9
-                      << "\n"
+            std::cout << "," << static_cast<double>(tr_time) / 1e9 << ","
+                      << static_cast<double>(tr_old_time) / 1e9 << "\n"
                       << std::flush;
         }
         else
         {
             std::cout << "transform_reduce: " << std::right << std::setw(30)
-                      << tr_time / 1e9 << "\n"
+                      << static_cast<double>(tr_time) / 1e9 << "\n"
                       << std::flush;
             std::cout << "old_transform_reduce" << std::right << std::setw(30)
-                      << tr_old_time / 1e9 << "\n"
+                      << static_cast<double>(tr_old_time) / 1e9 << "\n"
                       << std::flush;
         }
     }

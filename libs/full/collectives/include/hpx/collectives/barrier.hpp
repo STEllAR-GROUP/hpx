@@ -153,13 +153,6 @@ namespace hpx::distributed {
     };
 }    // namespace hpx::distributed
 
-namespace hpx::lcos {
-
-    using barrier HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::barrier is deprecated, use hpx::distributed::barrier "
-        "instead") = hpx::distributed::barrier;
-}
-
 #include <hpx/config/warnings_suffix.hpp>
 
 #endif    // DOXYGEN

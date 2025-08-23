@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -63,6 +63,7 @@ namespace hpx {
         /// \param lower_limit  [in] The initial lower limit.
         explicit sliding_semaphore_var(
             std::int64_t max_difference, std::int64_t lower_limit = 0) noexcept
+          // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new)
           : data_(new data_type(max_difference, lower_limit), false)
         {
         }
@@ -139,18 +140,5 @@ namespace hpx {
 
     using sliding_semaphore = sliding_semaphore_var<>;
 }    // namespace hpx
-
-namespace hpx::lcos::local {
-
-    template <typename Mutex = hpx::spinlock>
-    using sliding_semaphore_var HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::sliding_semaphore_var is deprecated, use "
-        "hpx::sliding_semaphore_var instead") =
-        hpx::sliding_semaphore_var<Mutex>;
-
-    using sliding_semaphore HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::sliding_semaphore is deprecated, use "
-        "hpx::sliding_semaphore instead") = hpx::sliding_semaphore;
-}    // namespace hpx::lcos::local
 
 #include <hpx/config/warnings_suffix.hpp>

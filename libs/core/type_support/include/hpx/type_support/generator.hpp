@@ -104,7 +104,7 @@ namespace hpx {
                 {
                     // store stateful allocator and size of block
                     static constexpr std::size_t align =
-                        (std::max)(alignof(Allocator), sizeof(aligned_block));
+                        (std::max) (alignof(Allocator), sizeof(aligned_block));
 
                     std::size_t const count =
                         (size + sizeof(Allocator) + sizeof(std::size_t) +
@@ -156,7 +156,7 @@ namespace hpx {
                     stored_allocator.~Allocator();
 
                     static constexpr std::size_t align =
-                        (std::max)(alignof(Allocator), sizeof(aligned_block));
+                        (std::max) (alignof(Allocator), sizeof(aligned_block));
                     std::size_t const count =
                         (size + sizeof(std::size_t) + sizeof(Allocator) +
                             align - 1) /
@@ -255,6 +255,7 @@ namespace hpx {
                     char* address = static_cast<char*>(ptr);
                     *reinterpret_cast<std::size_t*>(address) = size;
 
+                    // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
                     std::memcpy(address + size + sizeof(std::size_t), &dealloc,
                         sizeof(dealloc));
 
@@ -264,7 +265,7 @@ namespace hpx {
                 {
                     // store stateful allocator and size of allocated block
                     static constexpr std::size_t align =
-                        (std::max)(alignof(Allocator), sizeof(aligned_block));
+                        (std::max) (alignof(Allocator), sizeof(aligned_block));
 
                     dealloc_fn const dealloc = [](void* const ptr,
                                                    std::size_t s) {
@@ -299,6 +300,8 @@ namespace hpx {
                     *reinterpret_cast<std::size_t*>(address) = size;
 
                     // store deleter
+
+                    // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
                     std::memcpy(address + sizeof(std::size_t) + size, &dealloc,
                         sizeof(dealloc));
 
@@ -335,6 +338,7 @@ namespace hpx {
                 char* address = static_cast<char*>(ptr);
                 *reinterpret_cast<std::size_t*>(address) = size;
 
+                // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
                 std::memcpy(address + sizeof(std::size_t) + size, &dealloc,
                     sizeof(dealloc_fn));
 
@@ -367,6 +371,8 @@ namespace hpx {
                     *reinterpret_cast<std::size_t*>(address);
 
                 dealloc_fn dealloc;
+
+                // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
                 std::memcpy(&dealloc, static_cast<char*>(ptr) + size,
                     sizeof(dealloc_fn));
                 dealloc(address, size);
@@ -380,6 +386,8 @@ namespace hpx {
                 HPX_ASSERT(size == *reinterpret_cast<std::size_t*>(address));
 
                 dealloc_fn dealloc;
+
+                // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
                 std::memcpy(&dealloc, static_cast<char*>(ptr) + size,
                     sizeof(dealloc_fn));
                 dealloc(address, size);

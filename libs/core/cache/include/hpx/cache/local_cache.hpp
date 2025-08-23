@@ -651,7 +651,7 @@ namespace hpx::util::cache {
 
             size_type erased = 0;
             for (heap_iterator it = entry_heap_.begin();
-                 it != entry_heap_.end();
+                it != entry_heap_.end();
                 /**/)
             {
                 iterator sit = *it;
@@ -748,7 +748,7 @@ namespace hpx::util::cache {
 
             bool is_heap = true;
             for (heap_iterator it = entry_heap_.begin();
-                 num_free > 0 && it != entry_heap_.end();
+                num_free > 0 && it != entry_heap_.end();
                 /**/)
             {
                 iterator sit = *it;

@@ -276,12 +276,12 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<uninitialized_fill_t>
     {
     private:
+        template <typename FwdIter, typename Sent, typename T>
         // clang-format off
-        template <typename FwdIter, typename Sent, typename T,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(hpx::ranges::uninitialized_fill_t,
             FwdIter first, Sent last, T const& value)
@@ -293,14 +293,14 @@ namespace hpx::ranges {
                 hpx::execution::seq, first, last, value);
         }
 
+        template <typename ExPolicy, typename FwdIter, typename Sent,
+            typename T>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter,
-            typename Sent, typename T,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
-            )>
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
@@ -314,11 +314,11 @@ namespace hpx::ranges {
                 HPX_FORWARD(ExPolicy, policy), first, last, value);
         }
 
+        template <typename Rng, typename T>
         // clang-format off
-        template <typename Rng, typename T,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng>
-            )>
+            )
         // clang-format on
         friend typename hpx::traits::range_traits<Rng>::iterator_type
         tag_fallback_invoke(
@@ -335,12 +335,12 @@ namespace hpx::ranges {
                     hpx::execution::seq, std::begin(rng), std::end(rng), value);
         }
 
+        template <typename ExPolicy, typename Rng, typename T>
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename T,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng>
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             typename hpx::traits::range_traits<Rng>::iterator_type>
@@ -363,12 +363,12 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<uninitialized_fill_n_t>
     {
     private:
+        template <typename FwdIter, typename Size, typename T>
         // clang-format off
-        template <typename FwdIter, typename Size, typename T,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(hpx::ranges::uninitialized_fill_n_t,
             FwdIter first, Size count, T const& value)
@@ -380,14 +380,14 @@ namespace hpx::ranges {
                 hpx::execution::seq, first, count, value);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Size,
-            typename T,
-            HPX_CONCEPT_REQUIRES_(
+            typename T>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
         tag_fallback_invoke(hpx::ranges::uninitialized_fill_n_t,

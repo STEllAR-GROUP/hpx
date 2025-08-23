@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Hartmut Kaiser
+//  Copyright (c) 2023-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,8 +32,8 @@ namespace hpx::threads::detail {
           , inner_(HPX_MOVE(inner))
           , background_(HPX_MOVE(background))
           , max_background_threads_(max_background_threads)
-          , max_idle_loop_count_(max_idle_loop_count)
-          , max_busy_loop_count_(max_busy_loop_count)
+          , max_idle_loop_count_(static_cast<std::int64_t>(max_idle_loop_count))
+          , max_busy_loop_count_(static_cast<std::int64_t>(max_busy_loop_count))
         {
         }
 

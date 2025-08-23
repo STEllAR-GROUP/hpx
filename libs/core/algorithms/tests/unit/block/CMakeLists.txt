@@ -5,9 +5,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests run_on_all spmd_block task_block task_block_executor task_block_par
-          task_group
-)
+set(tests spmd_block task_block task_block_executor task_block_par task_group)
+
+# MacOS doesn't support binding threads to cores, so run_on_all would fail
+if(NOT APPLE)
+  set(tests ${tests} run_on_all)
+endif()
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

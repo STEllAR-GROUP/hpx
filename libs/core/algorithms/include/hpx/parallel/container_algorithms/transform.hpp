@@ -682,7 +682,7 @@ namespace hpx { namespace ranges {
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     // clang-format on
-}}       // namespace hpx::ranges
+}}    // namespace hpx::ranges
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
@@ -712,16 +712,15 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<transform_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename F,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename FwdIter2, typename F, typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::ranges::transform_t,
             ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest, F f,
@@ -736,14 +735,14 @@ namespace hpx::ranges {
                     HPX_MOVE(f), HPX_MOVE(proj));
         }
 
+        template <typename ExPolicy, typename Rng, typename FwdIter, typename F,
+            typename Proj = hpx::identity>
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename FwdIter,
-            typename F, typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::ranges::transform_t,
             ExPolicy&& policy, Rng&& rng, FwdIter dest, F f, Proj proj = Proj())
@@ -760,19 +759,18 @@ namespace hpx::ranges {
                     hpx::util::end(rng), dest, HPX_MOVE(f), HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent1,
             typename FwdIter2, typename Sent2, typename FwdIter3, typename F,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::traits::is_sentinel_for_v<Sent2, FwdIter2> &&
                 hpx::traits::is_iterator_v<FwdIter3>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::ranges::transform_t,
             ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
@@ -789,16 +787,16 @@ namespace hpx::ranges {
                     last2, dest, HPX_MOVE(f), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
+        template <typename ExPolicy, typename Rng1, typename Rng2,
+            typename FwdIter, typename F, typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity>
         // clang-format off
-        template <typename ExPolicy, typename Rng1, typename Rng2, typename FwdIter,
-            typename F, typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::ranges::transform_t,
             ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, FwdIter dest, F f,
@@ -821,15 +819,14 @@ namespace hpx::ranges {
                     HPX_MOVE(proj2));
         }
 
-        // clang-format off
         template <typename FwdIter1, typename Sent1, typename FwdIter2,
-            typename F,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename F, typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend ranges::unary_transform_result<FwdIter1, FwdIter2>
         tag_fallback_invoke(hpx::ranges::transform_t, FwdIter1 first,
@@ -844,13 +841,13 @@ namespace hpx::ranges {
                     HPX_MOVE(proj));
         }
 
+        template <typename Rng, typename FwdIter, typename F,
+            typename Proj = hpx::identity>
         // clang-format off
-        template <typename Rng, typename FwdIter,
-            typename F, typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend ranges::unary_transform_result<
             hpx::traits::range_iterator_t<Rng>, FwdIter>
@@ -869,18 +866,17 @@ namespace hpx::ranges {
                     hpx::util::end(rng), dest, HPX_MOVE(f), HPX_MOVE(proj));
         }
 
+        template <typename FwdIter1, typename Sent1, typename FwdIter2,
+            typename Sent2, typename FwdIter3, typename F,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-        template <typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename Sent2, typename FwdIter3, typename F,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::traits::is_sentinel_for_v<Sent2, FwdIter2> &&
                 hpx::traits::is_iterator_v<FwdIter3>
-            )>
+            )
         // clang-format on
         friend ranges::binary_transform_result<FwdIter1, FwdIter2, FwdIter3>
         tag_fallback_invoke(hpx::ranges::transform_t, FwdIter1 first1,
@@ -897,15 +893,12 @@ namespace hpx::ranges {
                     HPX_MOVE(f), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
+        template <typename Rng1, typename Rng2, typename FwdIter, typename F,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-        template <typename Rng1, typename Rng2, typename FwdIter,
-            typename F, typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range_v<Rng1> &&
+            requires(hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&
-                hpx::traits::is_iterator_v<FwdIter>
-            )>
+                hpx::traits::is_iterator_v<FwdIter>)
         // clang-format on
         friend ranges::binary_transform_result<
             hpx::traits::range_iterator_t<Rng1>,

@@ -7,6 +7,7 @@
 set(type_support_headers
     hpx/type_support/detail/with_result_of.hpp
     hpx/type_support/detail/wrap_int.hpp
+    hpx/type_support/aligned_storage.hpp
     hpx/type_support/assert_owns_lock.hpp
     hpx/type_support/bit_cast.hpp
     hpx/type_support/construct_at.hpp

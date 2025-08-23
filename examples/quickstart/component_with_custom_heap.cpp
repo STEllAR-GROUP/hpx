@@ -1,4 +1,4 @@
-//  Copyright (c) 2019 Hartmut Kaiser
+//  Copyright (c) 2019-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -188,6 +188,7 @@ namespace allocator {
             // block_size must match allocation size of requested type
             HPX_ASSERT(block_size == alloc_block<T>::allocation_size);
 
+            // NOLINTNEXTLINE(bugprone-casting-through-void)
             return *reinterpret_cast<T*>(static_cast<void*>(
                 static_cast<alloc_block_header*>((*get_block<T>())[i]) + 1));
         }
@@ -200,6 +201,7 @@ namespace allocator {
             // block_size must match allocation size of requested type
             HPX_ASSERT(block_size == alloc_block<T>::allocation_size);
 
+            // NOLINTNEXTLINE(bugprone-casting-through-void)
             return *reinterpret_cast<T const*>(static_cast<void const*>(
                 static_cast<alloc_block_header const*>((*get_block<T>())[i]) +
                 1));
@@ -210,7 +212,7 @@ namespace allocator {
         static constexpr std::size_t page_size =
             PAGE_SIZE_ - sizeof(void*) - 2 * sizeof(std::size_t);
 
-        typename std::aligned_storage<page_size>::type data;
+        hpx::aligned_storage_t<page_size> data;
 
         alloc_page* next;
         std::size_t allocated_blocks;
@@ -413,7 +415,7 @@ int main()
 
     std::size_t pagenum = 0;
     for (auto* page = heap.get_first_page(); page != nullptr;
-         page = page->next, ++pagenum)
+        page = page->next, ++pagenum)
     {
         auto blocks = page->allocated_blocks;
         for (std::size_t i = 0; i != blocks; ++i)

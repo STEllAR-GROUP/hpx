@@ -1226,9 +1226,8 @@ namespace hpx::execution::experimental {
         struct env_promise
         {
             template <typename Ty,
-                typename =
-                    std::enable_if_t<!hpx::functional::is_tag_invocable_v<
-                        as_awaitable_t, Ty, env_promise&>>>
+                typename = std::enable_if_t<!hpx::functional::
+                        is_tag_invocable_v<as_awaitable_t, Ty, env_promise&>>>
             Ty&& await_transform(Ty&& value) noexcept
             {
                 return HPX_FORWARD(Ty, value);
@@ -1310,6 +1309,7 @@ namespace hpx::execution::experimental {
     // clang-format on
 
     template <typename Promise>
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     struct with_awaitable_senders : detail::with_awaitable_senders_base
     {
         template <typename Value>
@@ -1644,7 +1644,7 @@ namespace hpx::execution::experimental {
                 connect_result_t<sender_type, receiver> op_state_;
             };
         };
-    }     // namespace detail
+    }    // namespace detail
 #endif    // HPX_HAVE_CXX20_COROUTINES
 
     /// End definitions from coroutine_utils and sender

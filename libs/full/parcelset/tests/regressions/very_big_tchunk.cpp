@@ -31,7 +31,7 @@ public:
     template <typename Archive>
     friend auto serialize(Archive& archive, Data& object, unsigned int)
     {
-        archive& object._data;
+        archive & object._data;
         return;
     }
 

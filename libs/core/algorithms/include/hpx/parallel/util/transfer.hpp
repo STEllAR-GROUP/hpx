@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2023 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +15,7 @@
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/result_types.hpp>
+#include <hpx/type_support/bit_cast.hpp>
 #include <hpx/type_support/is_contiguous_iterator.hpp>
 
 #include <algorithm>
@@ -50,24 +51,26 @@ namespace hpx::parallel::util {
         struct uninit_move_n_helper;
 
         ///////////////////////////////////////////////////////////////////////
+        // NOLINTBEGIN(bugprone-bitwise-pointer-cast)
         template <typename T>
-        HPX_FORCEINLINE std::enable_if_t<std::is_pointer_v<T>, char*> to_ptr(
-            T ptr) noexcept
+        HPX_FORCEINLINE constexpr std::enable_if_t<std::is_pointer_v<T>, char*>
+        to_ptr(T ptr) noexcept
         {
-            return const_cast<char*>(
-                reinterpret_cast<char const volatile*>(ptr));
+            return const_cast<char*>(hpx::bit_cast<char const volatile*>(ptr));
         }
 
         template <typename T>
-        HPX_FORCEINLINE std::enable_if_t<std::is_pointer_v<T>, char const*>
+        HPX_FORCEINLINE constexpr std::enable_if_t<std::is_pointer_v<T>,
+            char const*>
         to_const_ptr(T ptr) noexcept
         {
             return const_cast<char const*>(
-                reinterpret_cast<char const volatile*>(ptr));
+                hpx::bit_cast<char const volatile*>(ptr));
         }
 
         template <typename Iter>
-        HPX_FORCEINLINE std::enable_if_t<!std::is_pointer_v<Iter>, char*>
+        HPX_FORCEINLINE constexpr std::enable_if_t<!std::is_pointer_v<Iter>,
+            char*>
         to_ptr(Iter ptr) noexcept
         {
             static_assert(hpx::traits::is_contiguous_iterator_v<Iter>,
@@ -75,11 +78,12 @@ namespace hpx::parallel::util {
                 "only");
 
             return const_cast<char*>(
-                reinterpret_cast<char const volatile*>(&*ptr));
+                hpx::bit_cast<char const volatile*>(&*ptr));
         }
 
         template <typename Iter>
-        HPX_FORCEINLINE std::enable_if_t<!std::is_pointer_v<Iter>, char const*>
+        HPX_FORCEINLINE constexpr std::enable_if_t<!std::is_pointer_v<Iter>,
+            char const*>
         to_const_ptr(Iter ptr) noexcept
         {
             static_assert(hpx::traits::is_contiguous_iterator_v<Iter>,
@@ -87,12 +91,13 @@ namespace hpx::parallel::util {
                 "only");
 
             return const_cast<char const*>(
-                reinterpret_cast<char const volatile*>(&*ptr));
+                hpx::bit_cast<char const volatile*>(&*ptr));
         }
+        // NOLINTEND(bugprone-bitwise-pointer-cast)
 
         ///////////////////////////////////////////////////////////////////////
         template <typename InIter, typename OutIter>
-        HPX_FORCEINLINE static in_out_result<InIter, OutIter> copy_memmove(
+        HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> copy_memmove(
             InIter first, std::size_t count, OutIter dest) noexcept
         {
             using data_type = hpx::traits::iter_value_t<InIter>;
@@ -115,8 +120,7 @@ namespace hpx::parallel::util {
                 std::advance(first, count);
                 std::advance(dest, count);
             }
-            return in_out_result<InIter, OutIter>{
-                HPX_MOVE(first), HPX_MOVE(dest)};
+            return {first, dest};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -131,8 +135,7 @@ namespace hpx::parallel::util {
             {
                 while (first != last)
                     *dest++ = *first++;
-                return in_out_result<InIter, OutIter>{
-                    HPX_MOVE(first), HPX_MOVE(dest)};
+                return {first, dest};
             }
         };
 
@@ -140,23 +143,28 @@ namespace hpx::parallel::util {
         struct copy_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
             template <typename InIter, typename Sent, typename OutIter>
-            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
-                InIter first, Sent last, OutIter dest) noexcept
+            HPX_FORCEINLINE static constexpr in_out_result<InIter, OutIter>
+            call(InIter first, Sent last, OutIter dest) noexcept
             {
                 return copy_memmove(
                     first, parallel::detail::distance(first, last), dest);
             }
         };
-    }    // namespace detail
 
-    template <typename InIter, typename Sent, typename OutIter>
-    HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> copy(
-        InIter first, Sent last, OutIter dest)
-    {
-        using category = hpx::traits::pointer_copy_category_t<
+        template <typename InIter, typename OutIter>
+        using pointer_category_t = hpx::traits::pointer_copy_category_t<
             std::decay_t<
                 hpx::traits::remove_const_iterator_value_type_t<InIter>>,
             std::decay_t<OutIter>>;
+    }    // namespace detail
+
+    template <typename InIter, typename Sent, typename OutIter>
+    HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter>
+    copy(InIter first, Sent last, OutIter dest) noexcept(noexcept(
+        detail::copy_helper<detail::pointer_category_t<InIter, OutIter>>::call(
+            first, last, dest)))
+    {
+        using category = detail::pointer_category_t<InIter, OutIter>;
         return detail::copy_helper<category>::call(first, last, dest);
     }
 
@@ -174,8 +182,10 @@ namespace hpx::parallel::util {
             {
                 std::size_t count(
                     num & static_cast<std::size_t>(-4));    // -V112
+                // clang-format off
                 for (std::size_t i = 0; i < count;
-                     (void) ++first, ++dest, i += 4)    //-V112
+                    (void) ++first, ++dest, i += 4)    //-V112
+                // clang-format on
                 {
                     *dest = *first;
                     *++dest = *++first;
@@ -318,8 +328,10 @@ namespace hpx::parallel::util {
             {
                 std::size_t count(
                     num & static_cast<std::size_t>(-4));    // -V112
+                // clang-format off
                 for (std::size_t i = 0; i < count;
-                     (void) ++first, ++dest, i += 4)    //-V112
+                    (void) ++first, ++dest, i += 4)    //-V112
+                // clang-format on
                 {
                     *dest = HPX_MOVE(*first);
                     // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)

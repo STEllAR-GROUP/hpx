@@ -30,7 +30,7 @@ struct non_default_ctor
     template <typename Archive>
     void serialize(Archive& ar, const unsigned int)
     {
-        ar& i;
+        ar & i;
     }
 
     template <typename Archive>

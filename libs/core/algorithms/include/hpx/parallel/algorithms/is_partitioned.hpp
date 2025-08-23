@@ -1,6 +1,6 @@
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2015 Daniel Bourgeois
-//  Copyright (c) 2017-2023 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -229,7 +229,8 @@ namespace hpx::parallel {
                 auto f2 = [tok](auto&& results) -> bool {
                     if (tok.was_cancelled())
                         return false;
-                    return sequential_is_partitioned(HPX_MOVE(results));
+                    return sequential_is_partitioned(
+                        HPX_FORWARD(decltype(results), results));
                 };
 
                 return util::partitioner<ExPolicy, bool,
@@ -247,11 +248,11 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<is_partitioned_t>
     {
     private:
+        template <typename FwdIter, typename Pred>
         // clang-format off
-        template <typename FwdIter, typename Pred,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_forward_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(
             hpx::is_partitioned_t, FwdIter first, FwdIter last, Pred pred)
@@ -261,13 +262,12 @@ namespace hpx {
                     hpx::identity_v);
         }
 
+        template <typename ExPolicy, typename FwdIter, typename Pred>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter,
-            typename Pred,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::is_partitioned_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred)

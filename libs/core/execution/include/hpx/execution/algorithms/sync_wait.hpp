@@ -237,7 +237,7 @@ namespace hpx::execution::experimental::detail {
                 else if constexpr (std::is_same_v<error_t, std::error_code>)
                 {
                     r.state.value.template emplace<error_type>(
-                        std::exception_ptr(std::system_error(error)));
+                        std::make_exception_ptr(std::system_error(error)));
                 }
                 else
                 {

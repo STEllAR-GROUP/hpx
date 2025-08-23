@@ -79,9 +79,9 @@ are completed to avoid confusion.
    keep them around in case (like Vc for example).
 
 #. Update the minimum required versions if necessary (compilers, dependencies,
-   etc.) in ``prerequisites.rst``.
+   etc.) in ``prerequisites.rst``. Update latest tested versions.
 
-#. Verify that the Jenkins setups for the release branch on Rostam and Piz Daint
+#. Verify that the Jenkins setups for the release branch on Rostam
    are running and do not display any errors.
 
 #. Repeat the following steps until satisfied with the release.
@@ -160,7 +160,7 @@ are completed to avoid confusion.
 
 #. Announce the release on hpx-users@stellar-group.org, stellar@cct.lsu.edu,
    allcct@cct.lsu.edu, faculty@csc.lsu.edu, faculty@ece.lsu.edu,
-   the |hpx| Slack channel, the IRC channel,
+   the |hpx| Slack channel, the STEllAR-GROUP Discord channel,
    our list of external collaborators, isocpp.org, reddit.com, HPC Wire, Inside
    HPC, Heise Online, and a CCT press release.
 

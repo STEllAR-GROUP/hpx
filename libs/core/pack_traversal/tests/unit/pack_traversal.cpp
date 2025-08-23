@@ -488,7 +488,7 @@ static void test_strategic_traverse()
 
         std::unique_ptr<int> const& ref = map_pack(
             [](std::unique_ptr<int> const& ref) -> std::unique_ptr<int> const& {
-                // ...
+                // NOLINTNEXTLINE(bugprone-return-const-ref-from-parameter)
                 return ref;
             },
             ptr);
@@ -509,7 +509,7 @@ static void test_strategic_traverse()
             ref = map_pack(
                 [](std::unique_ptr<int> const& ref)
                     -> std::unique_ptr<int> const& {
-                    // ...
+                    // NOLINTNEXTLINE(bugprone-return-const-ref-from-parameter)
                     return ref;
                 },
                 ptr1, ptr2);
@@ -721,7 +721,7 @@ static void test_strategic_tuple_like_traverse()
             ref = map_pack(
                 [](std::unique_ptr<int> const& ref)
                     -> std::unique_ptr<int> const& {
-                    // ...
+                    // NOLINTNEXTLINE(bugprone-return-const-ref-from-parameter)
                     return ref;
                 },
                 value);

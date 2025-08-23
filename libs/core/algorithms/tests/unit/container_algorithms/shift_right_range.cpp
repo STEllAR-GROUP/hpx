@@ -1,5 +1,5 @@
 //  Copyright (c) 2018 Christopher Ogle
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -47,14 +47,16 @@ void test_shift_right_sent(IteratorTag)
     hpx::ranges::shift_right(
         std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, n);
 
-    std::move_backward(std::begin(d), std::end(d) - n - 1, std::end(d) - 1);
+    std::move_backward(std::begin(d),
+        std::end(d) - static_cast<std::ptrdiff_t>(n + 1), std::end(d) - 1);
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c) + n, std::end(c) - 1, std::begin(d) + n));
+    HPX_TEST(std::equal(std::begin(c) + static_cast<std::ptrdiff_t>(n),
+        std::end(c) - 1, std::begin(d) + static_cast<std::ptrdiff_t>(n)));
 
     // ensure shift by more than n does not crash
     hpx::ranges::shift_right(std::begin(c),
-        sentinel<std::size_t>{*std::rbegin(c)}, (std::size_t)(ARR_SIZE + 1));
+        sentinel<std::size_t>{*std::rbegin(c)}, (std::size_t) (ARR_SIZE + 1));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -81,14 +83,16 @@ void test_shift_right_sent(ExPolicy policy, IteratorTag)
     hpx::ranges::shift_right(
         policy, std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, n);
 
-    std::move_backward(std::begin(d), std::end(d) - n - 1, std::end(d) - 1);
+    std::move_backward(std::begin(d),
+        std::end(d) - static_cast<std::ptrdiff_t>(n + 1), std::end(d) - 1);
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c) + n, std::end(c) - 1, std::begin(d) + n));
+    HPX_TEST(std::equal(std::begin(c) + static_cast<std::ptrdiff_t>(n),
+        std::end(c) - 1, std::begin(d) + n));
 
     // ensure shift by more than n does not crash
     hpx::ranges::shift_right(policy, std::begin(c),
-        sentinel<std::size_t>{*std::rbegin(c)}, (std::size_t)(ARR_SIZE + 1));
+        sentinel<std::size_t>{*std::rbegin(c)}, (std::size_t) (ARR_SIZE + 1));
 }
 
 template <typename IteratorTag>
@@ -109,13 +113,15 @@ void test_shift_right(IteratorTag)
     std::size_t n = (std::rand() % (std::size_t) ARR_SIZE) + 1;
     hpx::ranges::shift_right(c, n);
 
-    std::move_backward(std::begin(d), std::end(d) - n, std::end(d));
+    std::move_backward(std::begin(d),
+        std::end(d) - static_cast<std::ptrdiff_t>(n), std::end(d));
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c) + n, std::end(c), std::begin(d) + n));
+    HPX_TEST(std::equal(std::begin(c) + static_cast<std::ptrdiff_t>(n),
+        std::end(c), std::begin(d) + static_cast<std::ptrdiff_t>(n)));
 
     // ensure shift by more than n does not crash
-    hpx::ranges::shift_right(c, (std::size_t)(ARR_SIZE + 1));
+    hpx::ranges::shift_right(c, (std::size_t) (ARR_SIZE + 1));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -139,13 +145,15 @@ void test_shift_right(ExPolicy policy, IteratorTag)
     std::size_t n = (std::rand() % (std::size_t) ARR_SIZE) + 1;
     hpx::ranges::shift_right(policy, c, n);
 
-    std::move_backward(std::begin(d), std::end(d) - n, std::end(d));
+    std::move_backward(std::begin(d),
+        std::end(d) - static_cast<std::ptrdiff_t>(n), std::end(d));
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c) + n, std::end(c), std::begin(d) + n));
+    HPX_TEST(std::equal(std::begin(c) + static_cast<std::ptrdiff_t>(n),
+        std::end(c), std::begin(d) + static_cast<std::ptrdiff_t>(n)));
 
     // ensure shift by more than n does not crash
-    hpx::ranges::shift_right(policy, c, (std::size_t)(ARR_SIZE + 1));
+    hpx::ranges::shift_right(policy, c, (std::size_t) (ARR_SIZE + 1));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -172,14 +180,16 @@ void test_shift_right_async(ExPolicy policy, IteratorTag)
     auto fut3 = hpx::ranges::shift_right(policy, c, n);
     fut3.wait();
 
-    std::move_backward(std::begin(d), std::end(d) - n, std::end(d));
+    std::move_backward(std::begin(d),
+        std::end(d) - static_cast<std::ptrdiff_t>(n), std::end(d));
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c) + n, std::end(c), std::begin(d) + n));
+    HPX_TEST(std::equal(std::begin(c) + static_cast<std::ptrdiff_t>(n),
+        std::end(c), std::begin(d) + static_cast<std::ptrdiff_t>(n)));
 
     // ensure shift by more than n does not crash
     auto fut4 =
-        hpx::ranges::shift_right(policy, c, (std::size_t)(ARR_SIZE + 1));
+        hpx::ranges::shift_right(policy, c, (std::size_t) (ARR_SIZE + 1));
     fut4.wait();
 }
 

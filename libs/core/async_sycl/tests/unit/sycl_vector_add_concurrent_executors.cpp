@@ -50,7 +50,7 @@ void VectorAdd(std::vector<size_t> const& a_vector,
                 sycl::default_selector_v);
             sycl::range<1> num_items{slice_size_per_executor};
             for (size_t repetition = 0; repetition < number_repetitions - 1;
-                 repetition++)
+                repetition++)
             {
                 size_t const current_chunk_id = slice_size_per_executor *
                     (exec_id * number_repetitions + repetition);

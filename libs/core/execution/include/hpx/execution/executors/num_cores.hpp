@@ -1,11 +1,11 @@
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //  Copyright (c) 2022 Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/executors/numcores.hpp
+/// \file parallel/executors/num_cores.hpp
 /// \page hpx::execution::experimental::num_cores
 /// \headerfile hpx/execution.hpp
 
@@ -51,7 +51,7 @@ namespace hpx::execution::experimental {
             std::size_t const available_pus =
                 hpx::execution::experimental::processing_units_count(
                     exec, duration, num_tasks);
-            return (std::min)(this_.num_cores_, available_pus);
+            return (std::min) (this_.num_cores_, available_pus);
         }
         /// \endcond
 

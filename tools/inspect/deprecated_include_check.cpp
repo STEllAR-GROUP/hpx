@@ -72,6 +72,7 @@ namespace boost { namespace inspect {
         register_signature(".hxx");
         register_signature(".inc");
         register_signature(".ipp");
+        register_signature(".ixx");
 
         for (deprecated_includes const* includes_it = &names[0];
              includes_it->include_regex != nullptr; ++includes_it)

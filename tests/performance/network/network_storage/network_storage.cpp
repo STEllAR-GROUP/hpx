@@ -470,7 +470,7 @@ int RemoveCompletions()
             {
                 for (std::vector<hpx::future<int>>::iterator fut =
                          futvec.begin();
-                     fut != futvec.end();)
+                    fut != futvec.end();)
                 {
                     if (fut->is_ready())
                     {
@@ -904,7 +904,7 @@ void test_read(uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
             ActiveFutures[i].clear();
         }
         DEBUG_ONLY(double movetime = movetimer.elapsed();
-                   int numwait = static_cast<int>(final_list.size());)
+            int numwait = static_cast<int>(final_list.size());)
         hpx::chrono::high_resolution_timer futuretimer;
 
         DEBUG_OUTPUT(1, "Waiting for whena_all future on rank " << rank);
@@ -1007,8 +1007,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     DEBUG_OUTPUT(2, "Allocating local storage on rank " << rank);
     allocate_local_storage(options.local_storage_MB * 1024 * 1024);
     //
-    uint64_t num_transfer_slots =
-        1024 * 1024 * options.local_storage_MB / options.transfer_size_B;
+    std::uint64_t num_transfer_slots = static_cast<std::uint64_t>(1024) *
+        static_cast<std::uint64_t>(1024) * options.local_storage_MB /
+        options.transfer_size_B;
     DEBUG_OUTPUT(1,
         "num ranks " << nranks << ", num_transfer_slots " << num_transfer_slots
                      << " on rank " << rank);

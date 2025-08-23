@@ -42,7 +42,16 @@ namespace hpx::parallel::traits {
     HPX_HOST_DEVICE HPX_FORCEINLINE auto set(
         Vector& vec, std::size_t index, T val) noexcept
     {
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
+#endif
+
         vec.set(index, val);
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
     }
 
     template <typename Scalar, typename T,

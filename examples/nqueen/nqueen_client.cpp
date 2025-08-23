@@ -57,7 +57,7 @@ int hpx_main(hpx::program_options::variables_map&)
 
             i = 0;
             for (std::list<nqueen::board>::iterator iter = b.begin();
-                 iter != b.end(); ++iter)
+                iter != b.end(); ++iter)
             {
                 iter->init_board(sz);
                 soln_count_total +=
@@ -80,7 +80,7 @@ int hpx_main(hpx::program_options::variables_map&)
             }
             i = 0;
             for (std::vector<nqueen::board>::iterator iter = b.begin();
-                 iter != b.end(); ++iter)
+                iter != b.end(); ++iter)
             {
                 iter->init_board(default_size);
                 soln_count_total +=

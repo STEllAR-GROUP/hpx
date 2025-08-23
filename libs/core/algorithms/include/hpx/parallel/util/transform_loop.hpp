@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/detail/invoke.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/iterator_support/unwrap_iterator.hpp>
+#include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
@@ -29,15 +32,45 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE
                 HPX_FORCEINLINE static constexpr util::in_out_result<InIterB,
                     OutIter>
-                call(InIterB first, InIterE last, OutIter dest, F&& f)
+                call(InIterB start, InIterE sent, OutIter out, F&& f)
             {
-                for (/* */; first != last; (void) ++first, ++dest)
+                if constexpr (hpx::traits::is_random_access_iterator_v<InIterB>)
                 {
-                    *dest = HPX_INVOKE(f, first);
-                }
+                    auto end = start;
+                    auto const len =
+                        parallel::detail::advance_and_get_distance(end, sent);
 
-                return util::in_out_result<InIterB, OutIter>{
-                    HPX_MOVE(first), HPX_MOVE(dest)};
+                    if (len == 0)
+                    {
+                        return {start, out};
+                    }
+
+                    auto first = hpx::util::get_unwrapped(start);
+                    auto dest = hpx::util::get_unwrapped(out);
+
+                    for (auto count = len; count != 0;
+                        (void) ++first, ++dest, --count)
+                    {
+                        *dest = HPX_INVOKE(f, first);
+                    }
+
+                    if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                    {
+                        return {end, dest};
+                    }
+                    else
+                    {
+                        return {end, std::next(out, len)};
+                    }
+                }
+                else
+                {
+                    for (/* */; start != sent; (void) ++start, ++sent)
+                    {
+                        *out = HPX_INVOKE(f, start);
+                    }
+                    return {start, out};
+                }
             }
         };
     }    // namespace detail
@@ -84,15 +117,45 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE
                 HPX_FORCEINLINE static constexpr util::in_out_result<InIterB,
                     OutIter>
-                call(InIterB first, InIterE last, OutIter dest, F&& f)
+                call(InIterB start, InIterE sent, OutIter out, F&& f)
             {
-                for (/* */; first != last; (void) ++first, ++dest)
+                if constexpr (hpx::traits::is_random_access_iterator_v<InIterB>)
                 {
-                    *dest = HPX_INVOKE(f, *first);
-                }
+                    auto end = start;
+                    auto const len =
+                        parallel::detail::advance_and_get_distance(end, sent);
 
-                return util::in_out_result<InIterB, OutIter>{
-                    HPX_MOVE(first), HPX_MOVE(dest)};
+                    if (len == 0)
+                    {
+                        return {start, out};
+                    }
+
+                    auto first = hpx::util::get_unwrapped(start);
+                    auto dest = hpx::util::get_unwrapped(out);
+
+                    for (auto count = len; count != 0;
+                        (void) ++first, ++dest, --count)
+                    {
+                        *dest = HPX_INVOKE(f, *first);
+                    }
+
+                    if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                    {
+                        return {end, dest};
+                    }
+                    else
+                    {
+                        return {end, std::next(out, len)};
+                    }
+                }
+                else
+                {
+                    for (/* */; start != sent; (void) ++start, ++out)
+                    {
+                        *out = HPX_INVOKE(f, *start);
+                    }
+                    return {start, out};
+                }
             }
         };
     }    // namespace detail
@@ -146,9 +209,7 @@ namespace hpx::parallel::util {
                 {
                     *dest = HPX_INVOKE(f, first1, first2);
                 }
-
-                return util::in_in_out_result<InIter1B, InIter2, OutIter>{
-                    HPX_MOVE(first1), HPX_MOVE(first2), HPX_MOVE(dest)};
+                return {first1, first2, dest};
             }
 
             template <typename InIter1B, typename InIter1E, typename InIter2,
@@ -159,13 +220,11 @@ namespace hpx::parallel::util {
                     InIter2 last2, OutIter dest, F&& f)
             {
                 for (/* */; first1 != last1 && first2 != last2;
-                     (void) ++first1, ++first2, ++dest)
+                    (void) ++first1, ++first2, ++dest)
                 {
                     *dest = HPX_INVOKE(f, first1, first2);
                 }
-
-                return util::in_in_out_result<InIter1B, InIter2, OutIter>{
-                    first1, first2, dest};
+                return {first1, first2, dest};
             }
         };
     }    // namespace detail
@@ -240,33 +299,105 @@ namespace hpx::parallel::util {
                 typename OutIter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr util::
                 in_in_out_result<InIter1B, InIter2, OutIter>
-                call(InIter1B first1, InIter1E last1, InIter2 first2,
-                    OutIter dest, F&& f)
+                call(InIter1B start1, InIter1E sent1, InIter2 start2,
+                    OutIter out, F&& f)
             {
-                for (/* */; first1 != last1; (void) ++first1, ++first2, ++dest)
+                if constexpr (hpx::traits::is_random_access_iterator_v<
+                                  InIter1B>)
                 {
-                    *dest = HPX_INVOKE(f, *first1, *first2);
-                }
+                    auto end1 = start1;
+                    auto const len =
+                        parallel::detail::advance_and_get_distance(end1, sent1);
 
-                return util::in_in_out_result<InIter1B, InIter2, OutIter>{
-                    HPX_MOVE(first1), HPX_MOVE(first2), HPX_MOVE(dest)};
+                    if (len == 0)
+                    {
+                        return {start1, start2, out};
+                    }
+
+                    auto first1 = hpx::util::get_unwrapped(start1);
+                    auto first2 = hpx::util::get_unwrapped(start2);
+                    auto dest = hpx::util::get_unwrapped(out);
+
+                    for (auto count = len; count != 0;
+                        (void) ++first1, ++first2, ++dest, --count)
+                    {
+                        *dest = HPX_INVOKE(f, *first1, *first2);
+                    }
+
+                    if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                    {
+                        return {end1, std::next(start2, len), dest};
+                    }
+                    else
+                    {
+                        return {
+                            end1, std::next(start2, len), std::next(out, len)};
+                    }
+                }
+                else
+                {
+                    for (/* */; start1 != sent1;
+                        (void) ++start1, ++start2, ++out)
+                    {
+                        *out = HPX_INVOKE(f, *start1, *start2);
+                    }
+
+                    return {start1, start2, out};
+                }
             }
 
             template <typename InIter1B, typename InIter1E, typename InIter2,
                 typename OutIter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr util::
                 in_in_out_result<InIter1B, InIter2, OutIter>
-                call(InIter1B first1, InIter1E last1, InIter2 first2,
-                    InIter2 last2, OutIter dest, F&& f)
+                call(InIter1B start1, InIter1E sent1, InIter2 start2,
+                    InIter2 sent2, OutIter out, F&& f)
             {
-                for (/* */; first1 != last1 && first2 != last2;
-                     (void) ++first1, ++first2, ++dest)
+                if constexpr (hpx::traits::is_random_access_iterator_v<
+                                  InIter1B>)
                 {
-                    *dest = HPX_INVOKE(f, *first1, *first2);
-                }
+                    auto end1 = start1;
+                    auto const len1 =
+                        parallel::detail::advance_and_get_distance(end1, sent1);
 
-                return util::in_in_out_result<InIter1B, InIter2, OutIter>{
-                    first1, first2, dest};
+                    auto end2 = start2;
+                    auto const len2 =
+                        parallel::detail::advance_and_get_distance(end2, sent2);
+
+                    auto len = (std::min) (len1, len2);
+                    if (len == 0)
+                    {
+                        return {start1, start2, out};
+                    }
+
+                    auto first1 = hpx::util::get_unwrapped(start1);
+                    auto first2 = hpx::util::get_unwrapped(start2);
+                    auto dest = hpx::util::get_unwrapped(out);
+
+                    for (auto count = len; count != 0;
+                        (void) ++first1, ++first2, ++dest, --count)
+                    {
+                        *dest = HPX_INVOKE(f, *first1, *first2);
+                    }
+
+                    if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                    {
+                        return {end1, end2, dest};
+                    }
+                    else
+                    {
+                        return {end1, end2, std::next(out, len)};
+                    }
+                }
+                else
+                {
+                    for (/* */; start1 != sent1 && start2 != sent2;
+                        (void) ++start1, ++start2, ++out)
+                    {
+                        *out = HPX_INVOKE(f, *start1, *start2);
+                    }
+                    return {start1, start2, out};
+                }
             }
         };
     }    // namespace detail
@@ -345,20 +476,22 @@ namespace hpx::parallel::util {
             {
                 std::size_t count(
                     num & static_cast<std::size_t>(-4));    // -V112
+
                 for (std::size_t i = 0; i < count;
-                     (void) ++it, i += 4)    // -V112
+                    (void) ++it, i += 4)    // -V112
                 {
                     *dest++ = HPX_INVOKE(f, it);
                     *dest++ = HPX_INVOKE(f, ++it);
                     *dest++ = HPX_INVOKE(f, ++it);
                     *dest++ = HPX_INVOKE(f, ++it);
                 }
+
                 for (/**/; count < num; (void) ++count, ++it, ++dest)
                 {
                     *dest = HPX_INVOKE(f, it);
                 }
 
-                return std::make_pair(HPX_MOVE(it), HPX_MOVE(dest));
+                return std::make_pair(it, dest);
             }
 
             template <typename InIter, typename OutIter, typename F>
@@ -384,22 +517,25 @@ namespace hpx::parallel::util {
                     *dest++ = HPX_INVOKE(f, it);
                     *dest++ = HPX_INVOKE(f, it + 1);
                     *dest++ = HPX_INVOKE(f, it + 2);
+                    it += 3;
                     break;
 
                 case 2:
                     *dest++ = HPX_INVOKE(f, it);
                     *dest++ = HPX_INVOKE(f, it + 1);
+                    it += 2;
                     break;
 
                 case 1:
                     *dest++ = HPX_INVOKE(f, it);
+                    ++it;
                     break;
 
                 default:
                     break;
                 }
 
-                return std::make_pair(it + num, HPX_MOVE(dest));
+                return std::make_pair(it, dest);
             }
         };
     }    // namespace detail
@@ -448,30 +584,45 @@ namespace hpx::parallel::util {
                 call(InIter it, std::size_t num, OutIter dest, F&& f,
                     std::false_type)
             {
+                if (num == 0)
+                {
+                    return {it, dest};
+                }
+
                 std::size_t count(
                     num & static_cast<std::size_t>(-4));    // -V112
+
                 for (std::size_t i = 0; i < count;
-                     (void) ++it, i += 4)    // -V112
+                    (void) ++it, i += 4)    // -V112
                 {
                     *dest++ = HPX_INVOKE(f, *it);
                     *dest++ = HPX_INVOKE(f, *++it);
                     *dest++ = HPX_INVOKE(f, *++it);
                     *dest++ = HPX_INVOKE(f, *++it);
                 }
+
                 for (/**/; count < num; (void) ++count, ++it, ++dest)
                 {
                     *dest = HPX_INVOKE(f, *it);
                 }
 
-                return std::make_pair(HPX_MOVE(it), HPX_MOVE(dest));
+                return {it, dest};
             }
 
             template <typename InIter, typename OutIter, typename F>
             HPX_HOST_DEVICE
                 HPX_FORCEINLINE static constexpr std::pair<InIter, OutIter>
-                call(InIter it, std::size_t num, OutIter dest, F&& f,
+                call(InIter start, std::size_t num, OutIter out, F&& f,
                     std::true_type)
             {
+                if (num == 0)
+                {
+                    return {start, out};
+                }
+
+                auto it = hpx::util::get_unwrapped(start);
+                auto dest = hpx::util::get_unwrapped(out);
+
                 while (num >= 4)
                 {
                     *dest++ = HPX_INVOKE(f, *it);
@@ -504,7 +655,14 @@ namespace hpx::parallel::util {
                     break;
                 }
 
-                return std::make_pair(it + num, HPX_MOVE(dest));
+                if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                {
+                    return {std::next(start, num), dest};
+                }
+                else
+                {
+                    return {std::next(start, num), std::next(out, num)};
+                }
             }
         };
     }    // namespace detail
@@ -557,22 +715,23 @@ namespace hpx::parallel::util {
             {
                 std::size_t count(
                     num & static_cast<std::size_t>(-4));    // -V112
+
                 for (std::size_t i = 0; i < count;
-                     (void) ++first1, ++first2, i += 4)    // -V112
+                    (void) ++first1, ++first2, i += 4)    // -V112
                 {
                     *dest++ = HPX_INVOKE(f, first1, first2);
                     *dest++ = HPX_INVOKE(f, ++first1, ++first2);
                     *dest++ = HPX_INVOKE(f, ++first1, ++first2);
                     *dest++ = HPX_INVOKE(f, ++first1, ++first2);
                 }
+
                 for (/**/; count < num;
-                     (void) ++count, ++first1, ++first2, ++dest)
+                    (void) ++count, ++first1, ++first2, ++dest)
                 {
                     *dest = HPX_INVOKE(f, first1, first2);
                 }
 
-                return hpx::make_tuple(
-                    HPX_MOVE(first1), HPX_MOVE(first2), HPX_MOVE(dest));
+                return hpx::make_tuple(first1, first2, dest);
             }
         };
     }    // namespace detail
@@ -624,27 +783,69 @@ namespace hpx::parallel::util {
                 typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr hpx::tuple<InIter1,
                 InIter2, OutIter>
-            call(InIter1 first1, std::size_t num, InIter2 first2, OutIter dest,
-                F&& f)
+            call_iteration(InIter1 first1, std::size_t num, InIter2 first2,
+                OutIter dest, F&& f)
             {
                 std::size_t count(
                     num & static_cast<std::size_t>(-4));    // -V112
+
                 for (std::size_t i = 0; i < count;
-                     (void) ++first1, ++first2, i += 4)    // -V112
+                    (void) ++first1, ++first2, i += 4)    // -V112
                 {
                     *dest++ = HPX_INVOKE(f, *first1, *first2);
                     *dest++ = HPX_INVOKE(f, *++first1, *++first2);
                     *dest++ = HPX_INVOKE(f, *++first1, *++first2);
                     *dest++ = HPX_INVOKE(f, *++first1, *++first2);
                 }
+
                 for (/**/; count < num;
-                     (void) ++count, ++first1, ++first2, ++dest)
+                    (void) ++count, ++first1, ++first2, ++dest)
                 {
                     *dest = HPX_INVOKE(f, *first1, *first2);
                 }
 
-                return hpx::make_tuple(
-                    HPX_MOVE(first1), HPX_MOVE(first2), HPX_MOVE(dest));
+                return hpx::make_tuple(first1, first2, dest);
+            }
+
+            template <typename InIter1, typename InIter2, typename OutIter,
+                typename F>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr hpx::tuple<InIter1,
+                InIter2, OutIter>
+            call(InIter1 start1, std::size_t num, InIter2 start2, OutIter out,
+                F&& f)
+            {
+                if (num == 0)
+                {
+                    return hpx::make_tuple(start1, start2, out);
+                }
+
+                if constexpr (hpx::traits::is_random_access_iterator_v<
+                                  InIter1> &&
+                    hpx::traits::is_random_access_iterator_v<InIter2>)
+                {
+                    auto first1 = hpx::util::get_unwrapped(start1);
+                    auto first2 = hpx::util::get_unwrapped(start2);
+                    auto dest = hpx::util::get_unwrapped(out);
+
+                    call_iteration(
+                        first1, num, first2, dest, HPX_FORWARD(F, f));
+
+                    if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                    {
+                        return hpx::make_tuple(std::next(start1, num),
+                            std::next(start2, num), dest);
+                    }
+                    else
+                    {
+                        return hpx::make_tuple(std::next(start1, num),
+                            std::next(start2, num), std::next(out, num));
+                    }
+                }
+                else
+                {
+                    return call_iteration(
+                        start1, num, start2, out, HPX_FORWARD(F, f));
+                }
             }
         };
     }    // namespace detail

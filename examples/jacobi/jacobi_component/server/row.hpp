@@ -35,7 +35,8 @@ namespace jacobi { namespace server {
         {
             //std::cout << this->get_id() << "row::get ...\n";
             HPX_ASSERT(values);
-            return row_range(values, begin, end);
+            return row_range(values, static_cast<std::ptrdiff_t>(begin),
+                static_cast<std::ptrdiff_t>(end));
         }
 
         HPX_DEFINE_COMPONENT_ACTION(row, get, get_action)

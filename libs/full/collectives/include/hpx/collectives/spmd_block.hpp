@@ -301,8 +301,7 @@ namespace hpx { namespace lcos {
                 hpx::lcos::spmd_block block(
                     name_, images_per_locality_, num_images_, image_id);
 
-                F()
-                (hpx::launch::sync,
+                F()(hpx::launch::sync,
                     naming::get_id_from_locality_id(agas::get_locality_id()),
                     HPX_MOVE(block), HPX_FORWARD(Ts, ts)...);
             }

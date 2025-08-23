@@ -20,7 +20,7 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 std::uniform_int_distribution<> dis(0, 99);
 
@@ -41,8 +41,11 @@ void test_is_partitioned_sender(
     std::vector<std::size_t> c(10007);
     //fill first half of array with even numbers and second half
     //with odd numbers
-    std::fill(std::begin(c), std::begin(c) + c.size() / 2, 2 * (dis(gen)));
-    std::fill(std::begin(c) + c.size() / 2, std::end(c), 2 * (dis(gen)) + 1);
+    std::fill(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        2 * (dis(gen)));
+    std::fill(std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2),
+        std::end(c), 2 * (dis(gen)) + 1);
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 

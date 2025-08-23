@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,6 +23,7 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/type_support/aligned_storage.hpp>
 #include <hpx/type_support/assert_owns_lock.hpp>
 #include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -48,19 +49,6 @@ namespace hpx {
         deferred,
         uninitialized
     };
-
-    namespace lcos {
-
-        enum class HPX_DEPRECATED_V(1, 8,
-            "hpx::lcos::future_status is deprecated. Use "
-            "hpx::future_status instead.") future_status
-        {
-            ready = static_cast<int>(hpx::future_status::ready),
-            timeout = static_cast<int>(hpx::future_status::timeout),
-            deferred = static_cast<int>(hpx::future_status::deferred),
-            uninitialized = static_cast<int>(hpx::future_status::uninitialized)
-        };
-    }    // namespace lcos
 }    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -210,7 +198,7 @@ namespace hpx::lcos::detail {
             (sizeof(value_type) > sizeof(error_type)) ? sizeof(value_type) :
                                                         sizeof(error_type);
 
-        using type = std::aligned_storage_t<max_size, max_alignment>;
+        using type = hpx::aligned_storage_t<max_size, max_alignment>;
     };
 
     template <typename Result>
@@ -394,6 +382,7 @@ namespace hpx::lcos::detail {
           : base_type(no_addref)
         {
             auto* value_ptr = reinterpret_cast<result_type*>(&storage_);
+            // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             construct(value_ptr, HPX_FORWARD(Ts, ts)...);
             state_.store(value, std::memory_order_relaxed);
         }
@@ -463,12 +452,13 @@ namespace hpx::lcos::detail {
 
             // set the data
             auto* value_ptr = reinterpret_cast<result_type*>(&storage_);
+            // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             construct(value_ptr, HPX_FORWARD(Ts, ts)...);
 
             // At this point the lock needs to be acquired to safely access the
             // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
-            [[maybe_unused]] util::ignore_while_checking il(&l);
+            [[maybe_unused]] util::ignore_while_checking<decltype(l)> il(&l);
 
             // handle all threads waiting for the future to become ready
             auto on_completed = HPX_MOVE(on_completed_);
@@ -550,7 +540,7 @@ namespace hpx::lcos::detail {
             // At this point the lock needs to be acquired to safely access the
             // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
-            [[maybe_unused]] util::ignore_while_checking il(&l);
+            [[maybe_unused]] util::ignore_while_checking<decltype(l)> il(&l);
 
             // handle all threads waiting for the future to become ready
             auto on_completed = HPX_MOVE(on_completed_);
@@ -708,6 +698,7 @@ namespace hpx::lcos::detail {
         using init_no_addref =
             typename future_data_base<Result>::init_no_addref;
 
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         future_data() = default;
 
         explicit future_data(init_no_addref no_addref) noexcept
@@ -730,6 +721,8 @@ namespace hpx::lcos::detail {
 
         future_data(future_data const&) = delete;
         future_data(future_data&&) = delete;
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
+
         future_data& operator=(future_data const&) = delete;
         future_data& operator=(future_data&&) = delete;
 
@@ -748,6 +741,7 @@ namespace hpx::lcos::detail {
         using other_allocator = typename std::allocator_traits<
             Allocator>::template rebind_alloc<allocated_type>;
 
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         explicit future_data_allocator(other_allocator const& alloc) noexcept
           : future_data<Result>()
           , alloc_(alloc)
@@ -779,6 +773,8 @@ namespace hpx::lcos::detail {
         }
         // clang-format on
 
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
+
     protected:
         void destroy() noexcept override
         {
@@ -803,6 +799,7 @@ namespace hpx::lcos::detail {
         using init_no_addref = typename base_type::init_no_addref;
 
     public:
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         timed_future_data() = default;
 
         template <typename Result_>
@@ -846,6 +843,7 @@ namespace hpx::lcos::detail {
                     hpx::detail::access_exception(ec));
             }
         }
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -862,6 +860,7 @@ namespace hpx::lcos::detail {
         using base_type::mtx_;
 
     public:
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         task_base()
           : base_type()
           , started_(false)
@@ -873,6 +872,7 @@ namespace hpx::lcos::detail {
           , started_(false)
         {
         }
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
 
         void execute_deferred(error_code& /*ec*/ = throws) override
         {
@@ -1021,6 +1021,7 @@ namespace hpx::lcos::detail {
         }
 
     public:
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         cancelable_task_base() noexcept
           : id_(threads::invalid_thread_id)
         {
@@ -1031,6 +1032,7 @@ namespace hpx::lcos::detail {
           , id_(threads::invalid_thread_id)
         {
         }
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
 
     private:
         struct reset_id

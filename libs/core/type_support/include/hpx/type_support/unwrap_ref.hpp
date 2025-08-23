@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -37,6 +37,6 @@ namespace hpx::util {
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr unwrap_reference_t<T>& unwrap_ref(
         T& t) noexcept
     {
-        return t;
+        return t;    // NOLINT(bugprone-return-const-ref-from-parameter)
     }
 }    // namespace hpx::util

@@ -1,4 +1,4 @@
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -351,6 +351,7 @@ namespace hpx::execution::experimental {
     public:
         // [exec.run_loop.ctor] construct/copy/destroy
         run_loop() noexcept
+          // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new)
           : mtx(new detail::run_loop_data(), false)
           , head(&head)    //-V546
         {

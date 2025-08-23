@@ -90,7 +90,7 @@ int test_saxpy(hpx::cuda::experimental::cuda_executor& cudaexec)
             float max_error = 0.0f;
             for (int jdx = 0; jdx < N; jdx++)
             {
-                max_error = (std::max)(max_error, abs(h_B[jdx] - 4.0f));
+                max_error = (std::max) (max_error, abs(h_B[jdx] - 4.0f));
             }
             std::cout << "Max Error: " << max_error << std::endl;
         })

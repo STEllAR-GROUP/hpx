@@ -78,13 +78,13 @@ namespace hpx::program_options::detail {
     void common_config_file_iterator::get()
     {
         std::string s;
-        std::string::size_type n;
         bool found = false;
 
         while (this->getline(s))
         {
             // strip '#' comments and whitespace
-            if ((n = s.find('#')) != std::string::npos)
+            std::string::size_type n = s.find('#');
+            if (n != std::string::npos)
                 s = s.substr(0, n);
             s = trim_ws(s);
 
@@ -97,6 +97,7 @@ namespace hpx::program_options::detail {
                     if (*m_prefix.rbegin() != '.')
                         m_prefix += '.';
                 }
+                // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
                 else if ((n = s.find('=')) != std::string::npos)
                 {
                     std::string name = m_prefix + trim_ws(s.substr(0, n));
@@ -138,6 +139,7 @@ namespace hpx::program_options::detail {
         // lower_bound should find the element after "p".
         // This depends on 'allowed_prefixes' invariant.
         i = allowed_prefixes.lower_bound(s);
+        // NOLINTNEXTLINE(bugprone-inc-dec-in-conditions)
         if (i != allowed_prefixes.begin() && s.find(*--i) == 0)
             return true;
         return false;

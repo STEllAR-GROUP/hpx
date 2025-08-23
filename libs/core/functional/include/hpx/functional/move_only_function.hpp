@@ -105,20 +105,6 @@ namespace hpx {
     }    // namespace distributed
 }    // namespace hpx
 
-namespace hpx::util {
-
-    template <typename Sig, bool Serializable = true>
-    using unique_function HPX_DEPRECATED_V(1, 8,
-        "hpx::util::unique_function is deprecated. Please use "
-        "hpx::move_only_function instead.") =
-        hpx::move_only_function<Sig, Serializable>;
-
-    template <typename Sig>
-    using unique_function_nonser HPX_DEPRECATED_V(1, 8,
-        "hpx::util::unique_function_nonser is deprecated. Please use "
-        "hpx::move_only_function instead.") = hpx::move_only_function<Sig>;
-}    // namespace hpx::util
-
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::traits {

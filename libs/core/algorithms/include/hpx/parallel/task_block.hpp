@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -116,6 +116,7 @@ namespace hpx::experimental {
             {
                 wait_for_completion();
             }
+            // NOLINTNEXTLINE(bugprone-empty-catch)
             catch (...)
             {
             }
@@ -355,12 +356,8 @@ namespace hpx::experimental {
     /// \note It is expected (but not mandated) that f will (directly or
     ///       indirectly) call tr.run(_callable_object_).
     ///
-    // clang-format off
-    template <typename ExPolicy, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<std::decay_t<ExPolicy>>
-        )>
-    // clang-format on
+    template <typename ExPolicy, typename F>
+        requires(hpx::is_execution_policy_v<std::decay_t<ExPolicy>>)
     decltype(auto) define_task_block(ExPolicy&& policy, F&& f)
     {
         if constexpr (hpx::is_async_execution_policy_v<std::decay_t<ExPolicy>>)
@@ -384,7 +381,7 @@ namespace hpx::experimental {
     ///             MoveConstructible.
     ///
     /// \param f    The user defined function to invoke inside the task block.
-    ///             Given an lvalue \a tr of type \a task_block, the expression,
+    ///             Given a lvalue \a tr of type \a task_block, the expression,
     ///             (void)f(tr), shall be well-formed.
     ///
     /// Postcondition: All tasks spawned from \a f have finished execution.
@@ -434,7 +431,7 @@ namespace hpx::experimental {
         static_assert(hpx::is_execution_policy_v<ExPolicy>,
             "hpx::is_execution_policy_v<ExPolicy>");
 
-        // By design we always return on the same (HPX-) thread as we started
+        // By design, we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.
         return define_task_block(
             HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(F, f));
@@ -466,7 +463,7 @@ namespace hpx::experimental {
     template <typename F>
     void define_task_block_restore_thread(F&& f)
     {
-        // By design we always return on the same (HPX-) thread as we started
+        // By design, we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.
         define_task_block_restore_thread(
             hpx::execution::par, HPX_FORWARD(F, f));
@@ -495,9 +492,8 @@ namespace hpx::parallel {
         "hpx::experimental::task_block instead") =
         hpx::experimental::task_block<ExPolicy>;
 
-    template <typename ExPolicy, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_async_execution_policy<std::decay_t<ExPolicy>>::value)>
+    template <typename ExPolicy, typename F>
+        requires(hpx::is_async_execution_policy_v<std::decay_t<ExPolicy>>)
     HPX_DEPRECATED_V(1, 9,
         "hpx::parallel:v2::define_task_block is deprecated, use "
         "hpx::experimental::define_task_block instead")
@@ -506,9 +502,8 @@ namespace hpx::parallel {
         return hpx::experimental::define_task_block(policy, f);
     }
 
-    template <typename ExPolicy, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            !hpx::is_async_execution_policy<std::decay_t<ExPolicy>>::value)>
+    template <typename ExPolicy, typename F>
+        requires(!hpx::is_async_execution_policy_v<std::decay_t<ExPolicy>>)
     HPX_DEPRECATED_V(1, 9,
         "hpx::parallel:v2::define_task_block is deprecated, use "
         "hpx::experimental::define_task_block instead")

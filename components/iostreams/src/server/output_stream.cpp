@@ -34,7 +34,7 @@ namespace hpx::iostreams::detail {
         ar << valid;
         if (valid)
         {
-            ar& data_;
+            ar & data_;
         }
     }
 
@@ -44,7 +44,7 @@ namespace hpx::iostreams::detail {
         ar >> valid;
         if (valid)
         {
-            ar& data_;
+            ar & data_;
         }
     }
 }    // namespace hpx::iostreams::detail
@@ -53,23 +53,29 @@ namespace hpx::iostreams::server {
     ///////////////////////////////////////////////////////////////////////////
     void output_stream::call_write_async(std::uint32_t locality_id,
         std::uint64_t count, detail::buffer const& in, hpx::id_type /*this_id*/)
-    {    // {{{
+    {
         // Perform the IO operation.
         pending_output_.output(locality_id, count, in, write_f, mtx_);
-    }    // }}}
+    }
 
     void output_stream::write_async(std::uint32_t locality_id,
         std::uint64_t count, detail::buffer const& buf_in)
-    {    // {{{
+    {
         // Perform the IO in another OS thread.
         detail::buffer in(buf_in);
         // we need to capture the GID of the component to keep it alive long
         // enough.
         hpx::id_type this_id = this->get_id();
+#if ASIO_VERSION >= 103400
+        asio::post(hpx::get_thread_pool("io_pool")->get_io_service(),
+            hpx::bind_front(&output_stream::call_write_async, this, locality_id,
+                count, HPX_MOVE(in), HPX_MOVE(this_id)));
+#else
         hpx::get_thread_pool("io_pool")->get_io_service().post(
             hpx::bind_front(&output_stream::call_write_async, this, locality_id,
                 count, HPX_MOVE(in), HPX_MOVE(this_id)));
-    }    // }}}
+#endif
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     void output_stream::call_write_sync(std::uint32_t locality_id,
@@ -86,16 +92,22 @@ namespace hpx::iostreams::server {
 
     void output_stream::write_sync(std::uint32_t locality_id,
         std::uint64_t count, detail::buffer const& buf_in)
-    {    // {{{
+    {
         // Perform the IO in another OS thread.
         detail::buffer in(buf_in);
+#if ASIO_VERSION >= 103400
+        asio::post(hpx::get_thread_pool("io_pool")->get_io_service(),
+            hpx::bind_front(&output_stream::call_write_sync, this, locality_id,
+                count, std::ref(in),
+                threads::thread_id_ref_type(threads::get_outer_self_id())));
+#else
         hpx::get_thread_pool("io_pool")->get_io_service().post(
             hpx::bind_front(&output_stream::call_write_sync, this, locality_id,
                 count, std::ref(in),
                 threads::thread_id_ref_type(threads::get_outer_self_id())));
-
+#endif
         // Sleep until the worker thread wakes us up.
         this_thread::suspend(threads::thread_schedule_state::suspended,
             "output_stream::write_sync");
-    }    // }}}
+    }
 }    // namespace hpx::iostreams::server

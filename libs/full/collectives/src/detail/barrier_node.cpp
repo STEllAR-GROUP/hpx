@@ -23,9 +23,8 @@
 #include <utility>
 #include <vector>
 
-typedef hpx::components::managed_component<
-    hpx::distributed::detail::barrier_node>
-    barrier_type;
+using barrier_type =
+    hpx::components::managed_component<hpx::distributed::detail::barrier_node>;
 
 HPX_REGISTER_COMPONENT_HEAP(barrier_type)
 HPX_DEFINE_COMPONENT_NAME(
@@ -51,20 +50,20 @@ namespace hpx::distributed::detail {
     }
 
     barrier_node::barrier_node(
-        std::string base_name, std::size_t num, std::size_t rank)
+        std::string base_name, std::size_t const num, std::size_t const rank)
       : count_(0)
-      , base_name_(base_name)
+      , base_name_(HPX_MOVE(base_name))
       , rank_(rank)
       , num_(num)
       , arity_(hpx::util::from_string<std::size_t>(
             get_config_entry("hpx.lcos.collectives.arity", 32)))    //-V112
-      , cut_off_(hpx::util::from_string<std::size_t>(
-            get_config_entry("hpx.lcos.collectives.cut_off", std::size_t(-1))))
-      , local_barrier_(num)
+      , cut_off_(hpx::util::from_string<std::size_t>(get_config_entry(
+            "hpx.lcos.collectives.cut_off", static_cast<std::size_t>(-1))))
+      , local_barrier_(static_cast<std::ptrdiff_t>(num))
     {
         LRT_(info).format("creating barrier_node: base_name({}), num({}), "
                           "rank({}), cutoff({}), arity({})",
-            base_name, num, rank, cut_off_, arity_);
+            base_name_, num, rank, cut_off_, arity_);
 
         if (num_ >= cut_off_)
         {
@@ -90,7 +89,7 @@ namespace hpx::distributed::detail {
         }
     }
 
-    hpx::future<void> barrier_node::wait(bool async)
+    hpx::future<void> barrier_node::wait(bool const async)
     {
         LRT_(info).format(
             "barrier_node::wait: async({}), rank_({})", async, rank_);
@@ -210,7 +209,7 @@ namespace hpx::distributed::detail {
             traits::detail::get_shared_state(result)->set_on_completed(
                 [this_ = HPX_MOVE(this_)] {
                     LRT_(info).format(
-                        "barrier_node::do_wait: rank_({}): alldone",
+                        "barrier_node::do_wait: rank_({}): all done",
                         this_->rank_);
                 });
 
@@ -268,7 +267,7 @@ namespace hpx::distributed::detail {
         hpx::intrusive_ptr<barrier_node> this_(this);
 
         // Once we know that all our children entered the barrier, we
-        // flag ourself
+        // flag ourselves
         hpx::future<void> result = hpx::when_all(futures).then(
             hpx::launch::sync, [this_](hpx::future<void>&& f) {
                 LRT_(info).format(
@@ -326,7 +325,7 @@ namespace hpx::distributed::detail {
             futures.push_back(hpx::async(action, id));
         }
 
-        // Once we notified our children, we mark ourself ready.
+        // Once we notified our children, we mark ourselves ready.
         hpx::intrusive_ptr<barrier_node> this_(this);
         hpx::future<void> result = hpx::when_all(futures).then(
             hpx::launch::sync, [this_](hpx::future<void>&& f) {

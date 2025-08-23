@@ -94,19 +94,6 @@ namespace hpx {
     }    // namespace distributed
 }    // namespace hpx
 
-namespace hpx::util {
-
-    template <typename Sig, bool Serializable = true>
-    using function HPX_DEPRECATED_V(1, 8,
-        "hpx::util::function is deprecated. Please use hpx::function "
-        "instead.") = hpx::function<Sig, Serializable>;
-
-    template <typename Sig>
-    using function_nonser HPX_DEPRECATED_V(1, 8,
-        "hpx::util::function_nonser is deprecated. Please use hpx::function "
-        "instead.") = hpx::function<Sig>;
-}    // namespace hpx::util
-
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::traits {

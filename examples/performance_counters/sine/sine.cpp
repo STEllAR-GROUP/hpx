@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -36,7 +36,8 @@ namespace performance_counters { namespace sine {
 
         std::uint64_t up_time =
             hpx::chrono::high_resolution_clock::now() - started_at;
-        return std::int64_t(std::sin(up_time / 1e10) * 100000.);
+        return std::int64_t(
+            std::sin(static_cast<double>(up_time) / 1e10) * 100000.);
     }
 
     ///////////////////////////////////////////////////////////////////////////

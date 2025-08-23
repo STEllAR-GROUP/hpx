@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2024 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
@@ -31,8 +33,9 @@ namespace hpx {
 
         // This is the overload for running functions that return a value.
         template <typename F, typename... Ts>
+            requires(!std::is_void_v<util::invoke_result_t<F, Ts...>>)
         util::invoke_result_t<F, Ts...> run_as_hpx_thread(
-            std::false_type, F&& f, Ts&&... ts)
+            hpx::launch const policy, F&& f, Ts&&... ts)
         {
             // NOTE: The condition variable needs be able to live past the scope
             // of this function. The mutex and boolean are guaranteed to live
@@ -73,7 +76,9 @@ namespace hpx {
 
                     cond->notify_all();
                 }),
-                "run_as_hpx_thread (non-void)");
+                "run_as_hpx_thread (non-void)", policy.get_priority(),
+                policy.get_hint(), policy.get_stacksize());
+
             hpx::threads::register_work(data);
 
             // wait for the HPX thread to exit
@@ -89,12 +94,14 @@ namespace hpx {
             }
 
             HPX_ASSERT(result);
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
             return HPX_MOVE(*result);
         }
 
         // This is the overload for running functions that return void.
         template <typename F, typename... Ts>
-        void run_as_hpx_thread(std::true_type, F&& f, Ts&&... ts)
+            requires(std::is_void_v<util::invoke_result_t<F, Ts...>>)
+        void run_as_hpx_thread(hpx::launch const policy, F&& f, Ts&&... ts)
         {
             // NOTE: The condition variable needs be able to live past the scope
             // of this function. The mutex and boolean are guaranteed to live
@@ -128,7 +135,9 @@ namespace hpx {
 
                     cond->notify_all();
                 }),
-                "run_as_hpx_thread (void)");
+                "run_as_hpx_thread (void)", policy.get_priority(),
+                policy.get_hint(), policy.get_stacksize());
+
             hpx::threads::register_work(data);
 
             // wait for the HPX thread to exit
@@ -147,16 +156,25 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
+    util::invoke_result_t<F, Ts...> run_as_hpx_thread(
+        hpx::launch policy, F&& f, Ts&&... vs)
+    {
+        // This shouldn't be used on a HPX-thread
+        HPX_ASSERT(hpx::threads::get_self_ptr() == nullptr);
+
+        return detail::run_as_hpx_thread(
+            policy, HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
+    }
+
+    template <typename F, typename... Ts>
+        requires(!hpx::traits::is_launch_policy_v<std::decay_t<F>>)
     util::invoke_result_t<F, Ts...> run_as_hpx_thread(F&& f, Ts&&... vs)
     {
         // This shouldn't be used on a HPX-thread
         HPX_ASSERT(hpx::threads::get_self_ptr() == nullptr);
 
-        using result_is_void =
-            typename std::is_void<util::invoke_result_t<F, Ts...>>::type;
-
         return detail::run_as_hpx_thread(
-            result_is_void(), HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
+            hpx::launch::async, HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
     }
 }    // namespace hpx
 
