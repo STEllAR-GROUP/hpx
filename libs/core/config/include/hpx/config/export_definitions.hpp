@@ -56,11 +56,7 @@
 # undef HPX_CORE_EXPORT
 # define HPX_CORE_EXPORT         /* empty */
 # define HPX_MODULE_EXPORT       export
-# if defined(_MSC_VER)
-#  define HPX_MODULE_EXTERN_CORE export extern "C++"
-# else
-#  define HPX_MODULE_EXTERN_CORE extern "C++" export
-# endif
+# define HPX_MODULE_EXTERN_CORE  export extern "C++"
 # define HPX_NODISCARD_CORE      HPX_MODULE_EXTERN_CORE [[nodiscard]]
 #else
 # define HPX_MODULE_EXPORT       /* empty */
