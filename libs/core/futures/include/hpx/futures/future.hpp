@@ -268,8 +268,8 @@ namespace hpx::lcos::detail {
         };
 
     public:
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         future_base() noexcept = default;
-        ~future_base() = default;
 
         explicit future_base(hpx::intrusive_ptr<shared_state_type> const& p)
           : shared_state_(p)
@@ -283,6 +283,9 @@ namespace hpx::lcos::detail {
 
         future_base(future_base const& other) = default;
         future_base(future_base&& other) noexcept = default;
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
+
+        ~future_base() = default;
 
         void swap(future_base& other) noexcept
         {
@@ -1202,7 +1205,7 @@ namespace hpx {
     hpx::shared_future<R> const& make_shared_future(
         hpx::shared_future<R> const& f) noexcept
     {
-        return f;
+        return f;    // NOLINT(bugprone-return-const-ref-from-parameter)
     }
 }    // namespace hpx
 
@@ -1545,237 +1548,6 @@ namespace hpx::serialization {
         hpx::lcos::detail::serialize_future(ar, f, version);
     }
 }    // namespace hpx::serialization
-
-///////////////////////////////////////////////////////////////////////////////
-// hoist deprecated names into old namespace
-namespace hpx::lcos {
-
-    template <typename R, typename U>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_future is deprecated. Use hpx::make_future instead.")
-    hpx::future<R> make_future(hpx::future<U>&& f)
-    {
-        return hpx::make_future<R>(HPX_MOVE(f));
-    }
-
-    template <typename R, typename U, typename Conv>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_future is deprecated. Use hpx::make_future instead.")
-    hpx::future<R> make_future(hpx::future<U>&& f, Conv&& conv)
-    {
-        return hpx::make_future<R>(HPX_MOVE(f), HPX_FORWARD(Conv, conv));
-    }
-
-    template <typename R, typename U>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_future is deprecated. Use hpx::make_future instead.")
-    hpx::future<R> make_future(hpx::shared_future<U> f)
-    {
-        return hpx::make_future<R>(HPX_MOVE(f));
-    }
-
-    template <typename R, typename U, typename Conv>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_future is deprecated. Use hpx::make_future instead.")
-    hpx::future<R> make_future(hpx::shared_future<U> f, Conv&& conv)
-    {
-        return hpx::make_future<R>(HPX_MOVE(f), HPX_FORWARD(Conv, conv));
-    }
-
-    template <typename T, typename Allocator, typename... Ts>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_ready_future_alloc is deprecated. Use "
-        "hpx::make_ready_future_alloc instead.")
-    std::enable_if_t<std::is_constructible_v<T, Ts&&...> || std::is_void_v<T>,
-        hpx::future<T>> make_ready_future_alloc(Allocator const& a, Ts&&... ts)
-    {
-        return hpx::make_ready_future_alloc<T>(a, HPX_FORWARD(Ts, ts)...);
-    }
-
-    template <typename T, typename... Ts>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_ready_future is deprecated. Use "
-        "hpx::make_ready_future instead.")
-    std::enable_if_t<std::is_constructible_v<T, Ts&&...> || std::is_void_v<T>,
-        hpx::future<T>> make_ready_future(Ts&&... ts)
-    {
-        using allocator_type = hpx::util::thread_local_caching_allocator<
-            hpx::lockfree::variable_size_stack, char,
-            hpx::util::internal_allocator<>>;
-        return hpx::make_ready_future_alloc<T>(
-            allocator_type{}, HPX_FORWARD(Ts, ts)...);
-    }
-
-    template <int DeductionGuard = 0, typename Allocator, typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_ready_future_alloc is deprecated. Use "
-        "hpx::make_ready_future_alloc instead.")
-    hpx::future<hpx::util::decay_unwrap_t<T>> make_ready_future_alloc(
-        Allocator const& a, T&& init)
-    {
-        return hpx::make_ready_future_alloc<hpx::util::decay_unwrap_t<T>>(
-            a, HPX_FORWARD(T, init));
-    }
-
-    template <int DeductionGuard = 0, typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_ready_future is deprecated. Use "
-        "hpx::make_ready_future instead.")
-    hpx::future<hpx::util::decay_unwrap_t<T>> make_ready_future(T&& init)
-    {
-        using allocator_type = hpx::util::thread_local_caching_allocator<
-            hpx::lockfree::variable_size_stack, char,
-            hpx::util::internal_allocator<>>;
-        return hpx::make_ready_future_alloc<hpx::util::decay_unwrap_t<T>>(
-            allocator_type{}, HPX_FORWARD(T, init));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_exceptional_future is deprecated. Use "
-        "hpx::make_exceptional_future instead.")
-    hpx::future<T> make_exceptional_future(std::exception_ptr const& e)
-    {
-        return hpx::make_exceptional_future<T>(e);
-    }
-
-    template <typename T, typename E>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_exceptional_future is deprecated. Use "
-        "hpx::make_exceptional_future instead.")
-    hpx::future<T> make_exceptional_future(E e)
-    {
-        return hpx::make_exceptional_future<T>(HPX_MOVE(e));
-    }
-
-    template <int DeductionGuard = 0, typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_ready_future_at is deprecated. Use "
-        "hpx::make_ready_future_at instead.")
-    hpx::future<hpx::util::decay_unwrap_t<T>> make_ready_future_at(
-        hpx::chrono::steady_time_point const& abs_time, T&& init)
-    {
-        return hpx::make_ready_future_at(abs_time, HPX_FORWARD(T, init));
-    }
-
-    template <int DeductionGuard = 0, typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_ready_future_after is deprecated. Use "
-        "hpx::make_ready_future_after instead.")
-    hpx::future<hpx::util::decay_unwrap_t<T>> make_ready_future_after(
-        hpx::chrono::steady_duration const& rel_time, T&& init)
-    {
-        return hpx::make_ready_future_at(
-            rel_time.from_now(), HPX_FORWARD(T, init));
-    }
-
-    template <typename Allocator>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_ready_future_alloc is deprecated. Use "
-        "hpx::make_ready_future_alloc instead.")
-    hpx::future<void> make_ready_future_alloc(Allocator const& a)
-    {
-        return hpx::make_ready_future_alloc<void>(a, util::unused);
-    }
-
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_ready_future is deprecated. Use "
-        "hpx::make_ready_future instead.")
-    inline hpx::future<void> make_ready_future()
-    {
-        using allocator_type = hpx::util::thread_local_caching_allocator<
-            hpx::lockfree::variable_size_stack, char,
-            hpx::util::internal_allocator<>>;
-        return hpx::make_ready_future_alloc<void>(
-            allocator_type{}, util::unused);
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_ready_future is deprecated. Use "
-        "hpx::make_ready_future instead.")
-    std::enable_if_t<std::is_void_v<T>, hpx::future<void>> make_ready_future()
-    {
-        return hpx::make_ready_future();
-    }
-
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_ready_future_at is deprecated. Use "
-        "hpx::make_ready_future_at instead.")
-    inline hpx::future<void> make_ready_future_at(
-        hpx::chrono::steady_time_point const& abs_time)
-    {
-        return hpx::make_ready_future_at(abs_time);
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_ready_future_at is deprecated. Use "
-        "hpx::make_ready_future_at instead.")
-    std::enable_if_t<std::is_void_v<T>, hpx::future<void>> make_ready_future_at(
-        hpx::chrono::steady_time_point const& abs_time)
-    {
-        return hpx::make_ready_future_at(abs_time);
-    }
-
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_ready_future_after is deprecated. Use "
-        "hpx::make_ready_future_after instead.")
-    inline hpx::future<void> make_ready_future_after(
-        hpx::chrono::steady_duration const& rel_time)
-    {
-        return hpx::make_ready_future_at(rel_time.from_now());
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_ready_future_after is deprecated. Use "
-        "hpx::make_ready_future_after instead.")
-    std::enable_if_t<std::is_void_v<T>,
-        hpx::future<void>> make_ready_future_after(hpx::chrono::
-            steady_duration const& rel_time)
-    {
-        return hpx::make_ready_future_at(rel_time.from_now());
-    }
-
-    template <typename R>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_shared_future is deprecated. Use "
-        "hpx::make_shared_future instead.")
-    hpx::shared_future<R> make_shared_future(hpx::future<R>&& f) noexcept
-    {
-        return f.share();
-    }
-
-    template <typename R>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_shared_future is deprecated. Use "
-        "hpx::make_shared_future instead.")
-    hpx::shared_future<R>& make_shared_future(hpx::shared_future<R>& f) noexcept
-    {
-        return f;
-    }
-
-    template <typename R>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_shared_future is deprecated. Use "
-        "hpx::make_shared_future instead.")
-    hpx::shared_future<R>&& make_shared_future(
-        hpx::shared_future<R>&& f) noexcept
-    {
-        return HPX_MOVE(f);
-    }
-
-    template <typename R>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::make_shared_future is deprecated. Use "
-        "hpx::make_shared_future instead.")
-    hpx::shared_future<R> const& make_shared_future(
-        hpx::shared_future<R> const& f) noexcept
-    {
-        return f;
-    }
-}    // namespace hpx::lcos
 
 #include <hpx/futures/packaged_continuation.hpp>
 

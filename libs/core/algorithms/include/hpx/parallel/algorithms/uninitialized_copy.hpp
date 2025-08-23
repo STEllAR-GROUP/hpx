@@ -250,7 +250,7 @@ namespace hpx::parallel {
                     HPX_FORWARD(ExPolicy, policy), zip_iterator(first, dest),
                     count,
                     [policy](zip_iterator t, std::size_t part_size) mutable
-                    -> partition_result_type {
+                        -> partition_result_type {
                         using hpx::get;
                         auto iters = t.get_iterator_tuple();
                         FwdIter2 dest = get<1>(iters);
@@ -262,7 +262,7 @@ namespace hpx::parallel {
                     },
                     // finalize, called once if no error occurred
                     [dest, first, count](auto&& data) mutable
-                    -> util::in_out_result<Iter, FwdIter2> {
+                        -> util::in_out_result<Iter, FwdIter2> {
                         // make sure iterators embedded in function object that is
                         // attached to futures are invalidated
                         util::detail::clear_container(data);
@@ -379,10 +379,8 @@ namespace hpx::parallel {
             }
 
             // non vectorized overload
-            template <typename ExPolicy, typename InIter, typename FwdIter2,
-                HPX_CONCEPT_REQUIRES_(
-                    hpx::is_sequenced_execution_policy_v<ExPolicy>)>
-
+            template <typename ExPolicy, typename InIter, typename FwdIter2>
+                requires(hpx::is_sequenced_execution_policy_v<ExPolicy>)
             static util::in_out_result<InIter, FwdIter2> sequential(
                 ExPolicy&& policy, InIter first, std::size_t count,
                 FwdIter2 dest)
@@ -412,12 +410,12 @@ namespace hpx {
     inline constexpr struct uninitialized_copy_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_t>
     {
+        template <typename InIter, typename FwdIter>
         // clang-format off
-        template <typename InIter, typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_forward_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::uninitialized_copy_t, InIter first, InIter last, FwdIter dest)
@@ -433,13 +431,13 @@ namespace hpx {
                     .call(hpx::execution::seq, first, last, dest));
         }
 
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter1> &&
                 hpx::traits::is_forward_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
         tag_fallback_invoke(hpx::uninitialized_copy_t, ExPolicy&& policy,
@@ -462,14 +460,13 @@ namespace hpx {
     inline constexpr struct uninitialized_copy_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_n_t>
     {
+        template <typename InIter, typename Size, typename FwdIter>
         // clang-format off
-        template <typename InIter, typename Size,
-            typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::uninitialized_copy_n_t, InIter first, Size count, FwdIter dest)
@@ -492,15 +489,13 @@ namespace hpx {
                         static_cast<std::size_t>(count), dest));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Size,
-            typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy> &&
+            typename FwdIter2>
+        // clang-format off
+            requires(hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter1> &&
                 hpx::traits::is_forward_iterator_v<FwdIter2> &&
-                std::is_integral_v<Size>
-            )>
+                std::is_integral_v<Size>)
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type

@@ -179,6 +179,7 @@ namespace hpx {
 #pragma warning(disable : 26800)    //  Use of a moved from object: '(*<vs_0>)'
 #endif
 
+            // NOLINTBEGIN(bugprone-use-after-move)
             template <typename... Us>
             constexpr HPX_HOST_DEVICE
                 invoke_bound_result_t<F&, util::pack<Ts&...>, Us&&...>
@@ -220,6 +221,7 @@ namespace hpx {
                         HPX_MOVE(_args).template get<Is>(),
                         HPX_FORWARD(Us, vs)...)...);
             }
+            // NOLINTEND(bugprone-use-after-move)
 
 #if defined(HPX_MSVC)
 #pragma warning(pop)
@@ -295,57 +297,6 @@ namespace hpx {
         return result_type(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
     }
 }    // namespace hpx
-
-namespace hpx::util {
-
-    template <typename F, typename... Ts>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::util::bind is deprecated, use hpx::bind instead")
-    constexpr decltype(auto) bind(F&& f, Ts&&... ts)
-    {
-        return hpx::bind(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-    }
-
-    namespace placeholders {
-
-        HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_1 is deprecated, use hpx::placeholders::_1 "
-            "instead")
-        inline constexpr hpx::detail::placeholder<1> _1 = {};
-        HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_2 is deprecated, use hpx::placeholders::_2 "
-            "instead")
-        inline constexpr hpx::detail::placeholder<2> _2 = {};
-        HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_3 is deprecated, use hpx::placeholders::_3 "
-            "instead")
-        inline constexpr hpx::detail::placeholder<3> _3 = {};
-        HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_4 is deprecated, use hpx::placeholders::_4 "
-            "instead")
-        inline constexpr hpx::detail::placeholder<4> _4 = {};    //-V112
-        HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_5 is deprecated, use hpx::placeholders::_5 "
-            "instead")
-        inline constexpr hpx::detail::placeholder<5> _5 = {};
-        HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_6 is deprecated, use hpx::placeholders::_6 "
-            "instead")
-        inline constexpr hpx::detail::placeholder<6> _6 = {};
-        HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_7 is deprecated, use hpx::placeholders::_7 "
-            "instead")
-        inline constexpr hpx::detail::placeholder<7> _7 = {};
-        HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_8 is deprecated, use hpx::placeholders::_8 "
-            "instead")
-        inline constexpr hpx::detail::placeholder<8> _8 = {};
-        HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_9 is deprecated, use hpx::placeholders::_9 "
-            "instead")
-        inline constexpr hpx::detail::placeholder<9> _9 = {};
-    }    // namespace placeholders
-}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {

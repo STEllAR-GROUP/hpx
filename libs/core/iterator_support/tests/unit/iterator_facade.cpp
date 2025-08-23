@@ -60,7 +60,7 @@ struct proxy
     {
     }
 
-    operator int const &() const
+    operator int const&() const
     {
         return state;
     }

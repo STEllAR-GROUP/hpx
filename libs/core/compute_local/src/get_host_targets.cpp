@@ -24,7 +24,7 @@ namespace hpx::compute::host {
 
         auto const& rp = hpx::resource::get_partitioner();
         for (std::size_t num_thread = 0; num_thread != num_os_threads;
-             ++num_thread)
+            ++num_thread)
         {
             targets.emplace_back(rp.get_pu_mask(num_thread));
         }

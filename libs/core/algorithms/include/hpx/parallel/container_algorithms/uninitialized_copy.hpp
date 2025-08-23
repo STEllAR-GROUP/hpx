@@ -328,14 +328,15 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_t>
     {
     private:
+        template <typename InIter, typename Sent1, typename FwdIter,
+            typename Sent2>
         // clang-format off
-        template <typename InIter, typename Sent1, typename FwdIter, typename Sent2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_sentinel_for_v<Sent1, InIter> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent2, FwdIter>
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::in_out_result<InIter, FwdIter>
         tag_fallback_invoke(hpx::ranges::uninitialized_copy_t, InIter first1,
@@ -351,16 +352,16 @@ namespace hpx::ranges {
                 .call(hpx::execution::seq, first1, last1, first2, last2);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename Sent2,
-            HPX_CONCEPT_REQUIRES_(
+            typename FwdIter2, typename Sent2>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
                 hpx::traits::is_forward_iterator_v<FwdIter2> &&
                 hpx::traits::is_sentinel_for_v<Sent2, FwdIter2>
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             parallel::util::in_out_result<FwdIter1, FwdIter2>>
@@ -379,12 +380,12 @@ namespace hpx::ranges {
                     last2);
         }
 
+        template <typename Rng1, typename Rng2>
         // clang-format off
-        template <typename Rng1, typename Rng2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2>
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::in_out_result<
             typename hpx::traits::range_traits<Rng1>::iterator_type,
@@ -409,13 +410,13 @@ namespace hpx::ranges {
                     std::begin(rng2), std::end(rng2));
         }
 
+        template <typename ExPolicy, typename Rng1, typename Rng2>
         // clang-format off
-        template <typename ExPolicy, typename Rng1, typename Rng2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2>
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             hpx::parallel::util::in_out_result<
@@ -446,14 +447,15 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_n_t>
     {
     private:
+        template <typename InIter, typename Size, typename FwdIter,
+            typename Sent2>
         // clang-format off
-        template <typename InIter, typename Size, typename FwdIter, typename Sent2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent2, FwdIter> &&
                 std::is_integral_v<Size>
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::in_out_result<InIter, FwdIter>
         tag_fallback_invoke(hpx::ranges::uninitialized_copy_n_t, InIter first1,
@@ -471,16 +473,16 @@ namespace hpx::ranges {
                     first2);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Size,
-            typename FwdIter2, typename Sent2,
-            HPX_CONCEPT_REQUIRES_(
+            typename FwdIter2, typename Sent2>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter1> &&
                 hpx::traits::is_forward_iterator_v<FwdIter2> &&
                 hpx::traits::is_sentinel_for_v<Sent2, FwdIter2> &&
                 std::is_integral_v<Size>
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>

@@ -236,7 +236,7 @@ namespace hpx { namespace cuda { namespace experimental {
         HPX_CORE_EXPORT hpx::future<void> get_future_with_event(
             cudaStream_t stream, int device = -1);
     }    // namespace detail
-}}}      // namespace hpx::cuda::experimental
+}}}    // namespace hpx::cuda::experimental
 
 namespace hpx { namespace traits { namespace detail {
 

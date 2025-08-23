@@ -26,7 +26,7 @@ struct A
 
     A() = default;
 
-    virtual ~A(){};
+    virtual ~A() {};
 
     virtual void foo() const = 0;
 };
@@ -46,7 +46,7 @@ struct B : A<T>
 
     B() = default;
 
-    virtual ~B(){};
+    virtual ~B() {};
 
     void foo() const override {}
 
@@ -85,22 +85,22 @@ namespace hpx { namespace serialization {
     template <class Archive, class T>
     void serialize(Archive& archive, A<T>& s, unsigned)
     {
-        archive& s.a;
+        archive & s.a;
     }
 
     template <class Archive, class T>
     void serialize(Archive& archive, B<T>& s, unsigned)
     {
         archive& hpx::serialization::base_object<A<T>>(s);
-        archive& s.b;
+        archive & s.b;
     }
 
     template <class Archive, class S, class T>
     void serialize(Archive& archive, C<S, T>& s, unsigned)
     {
         archive& hpx::serialization::base_object<A<T>>(s);
-        archive& s.b;
-        archive& s.c;
+        archive & s.b;
+        archive & s.c;
     }
 
 }}    // namespace hpx::serialization

@@ -18,7 +18,7 @@
 #include <execution>
 #endif
 
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 // returns random integer in range (rangeMin, rangeMax]
@@ -27,7 +27,7 @@ struct RandomIntInRange
     int rangeMin, rangeMax;
     RandomIntInRange(int rangeMin, int rangeMax)
       : rangeMin(rangeMin)
-      , rangeMax(rangeMax){};
+      , rangeMax(rangeMax) {};
     int operator()()
     {
         return (static_cast<int>(gen()) % (rangeMax - rangeMin + 1)) + rangeMin;
@@ -41,9 +41,9 @@ void set_difference_randomized(int rounds, int maxLen)
         std::size_t len_a = gen() % maxLen, len_b = gen() % maxLen;
         std::vector<int> set_a(len_a), set_b(len_b);
 
-        std::size_t rangeMin = 0;
+        int rangeMin = 0;
         // rangeMax is set to increase probability of common elements
-        std::size_t rangeMax = (std::min)(len_a, len_b) * 2;
+        int rangeMax = static_cast<int>((std::min) (len_a, len_b) * 2);
 
 #ifdef HPX_WITH_CXX17_STD_EXECUTION_POLICES
         std::generate(std::execution::par_unseq, set_a.begin(), set_a.end(),
@@ -66,8 +66,8 @@ void set_difference_randomized(int rounds, int maxLen)
         set_b.resize(len_b);
 
         // rand always gives non negative values, rangeMin >= 0
-        std::vector<int> perfect((std::max)(len_a, len_b), -1);
-        std::vector<int> a_minus_b((std::max)(len_a, len_b), -1);
+        std::vector<int> perfect((std::max) (len_a, len_b), -1);
+        std::vector<int> a_minus_b((std::max) (len_a, len_b), -1);
 
         std::set_difference(set_a.begin(), set_a.end(), set_b.begin(),
             set_b.end(), perfect.begin());

@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2023 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/type_support/aligned_storage.hpp>
 #include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
@@ -159,8 +160,8 @@ namespace hpx::optional_ns {
             return *this;
         }
         optional& operator=(optional&& other) noexcept(
-            std::is_nothrow_move_assignable_v<T>&&
-                std::is_nothrow_move_constructible_v<T>)
+            std::is_nothrow_move_assignable_v<T> &&
+            std::is_nothrow_move_constructible_v<T>)
         {
             if (this == &other)
             {
@@ -356,8 +357,8 @@ namespace hpx::optional_ns {
 #endif
 
         void swap(optional& other) noexcept(
-            std::is_nothrow_move_constructible_v<T>&& noexcept(
-                _optional_swap::check_swap<T>()))
+            std::is_nothrow_move_constructible_v<T> &&
+            noexcept(_optional_swap::check_swap<T>()))
         {
             // do nothing if both are empty
             if (empty_ && other.empty_)
@@ -527,7 +528,7 @@ namespace hpx::optional_ns {
         }
 
     private:
-        std::aligned_storage_t<sizeof(T), alignof(T)> storage_;
+        hpx::aligned_storage_t<sizeof(T), alignof(T)> storage_;
         bool empty_;
     };
 

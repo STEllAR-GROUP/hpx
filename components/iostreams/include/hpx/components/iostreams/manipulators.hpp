@@ -47,20 +47,3 @@ namespace hpx::iostreams {
         return os << std::endl;
     }
 }    // namespace hpx::iostreams
-
-namespace hpx {
-
-    HPX_DEPRECATED_V(1, 8, "hpx::flush is deprecated, use std::flush instead")
-    HPX_IOSTREAMS_EXPORT extern hpx::iostreams::flush_type flush;
-
-    HPX_DEPRECATED_V(1, 8, "hpx::endl is deprecated, use std::endl instead")
-    HPX_IOSTREAMS_EXPORT extern hpx::iostreams::endl_type endl;
-
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::async_flush is deprecated, use std::flush instead")
-    HPX_IOSTREAMS_EXPORT extern hpx::iostreams::async_flush_type async_flush;
-
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::async_endl is deprecated, use std::endl instead")
-    HPX_IOSTREAMS_EXPORT extern hpx::iostreams::async_endl_type async_endl;
-}    // namespace hpx

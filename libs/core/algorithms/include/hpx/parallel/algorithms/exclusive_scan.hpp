@@ -452,82 +452,6 @@ namespace hpx::parallel {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T, typename Op,
-        HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::is_invocable_v<Op,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter1>::value_type
-                >
-            )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::exclusive_scan is deprecated, use hpx::exclusive_scan "
-        "instead")
-        util::detail::algorithm_result_t<ExPolicy, FwdIter2> exclusive_scan(
-            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
-            T init, Op&& op)
-    {
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-            "Requires at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-            "Requires at least forward iterator.");
-
-        using result_type = parallel::util::in_out_result<FwdIter1, FwdIter2>;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return parallel::util::get_second_element(
-            detail::exclusive_scan<result_type>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                HPX_MOVE(init), HPX_FORWARD(Op, op)));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T,
-        HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2>
-            )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::exclusive_scan is deprecated, use hpx::exclusive_scan "
-        "instead")
-        util::detail::algorithm_result_t<ExPolicy, FwdIter2> exclusive_scan(
-            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
-            T init)
-    {
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-            "Requires at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-            "Requires at least forward iterator.");
-
-        using result_type = parallel::util::in_out_result<FwdIter1, FwdIter2>;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return parallel::util::get_second_element(
-            detail::exclusive_scan<result_type>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                HPX_MOVE(init), std::plus<T>()));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
 }    // namespace hpx::parallel
 
 namespace hpx {
@@ -537,13 +461,13 @@ namespace hpx {
     inline constexpr struct exclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<exclusive_scan_t>
     {
-        // clang-format off
         template <typename InIter, typename OutIter,
-            typename T = typename std::iterator_traits<InIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<InIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter>
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::exclusive_scan_t, InIter first,
             InIter last, OutIter dest, T init)
@@ -561,14 +485,14 @@ namespace hpx {
                     std::plus<T>()));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T = typename std::iterator_traits<FwdIter1>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter1>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
@@ -589,17 +513,17 @@ namespace hpx {
                     HPX_MOVE(init), std::plus<T>()));
         }
 
-        // clang-format off
         template <typename InIter, typename OutIter, typename Op,
-            typename T = typename std::iterator_traits<InIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<InIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<Op,
                     typename std::iterator_traits<InIter>::value_type,
                     typename std::iterator_traits<InIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::exclusive_scan_t, InIter first,
             InIter last, OutIter dest, T init, Op op)
@@ -617,11 +541,11 @@ namespace hpx {
                     HPX_MOVE(op)));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Op,
-            typename T = typename std::iterator_traits<FwdIter1>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter1>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -629,7 +553,7 @@ namespace hpx {
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter1>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type

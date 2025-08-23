@@ -171,22 +171,3 @@ struct hpx::traits::get_function_annotation<hpx::detail::annotated_function<F>>
     }
 };
 #endif
-
-namespace hpx::util {
-
-    template <typename F>
-    HPX_DEPRECATED_V(1, 8, "Please use hpx::annotated_function instead.")
-    constexpr decltype(auto)
-        annotated_function(F&& f, char const* name = nullptr) noexcept
-    {
-        return hpx::annotated_function(HPX_FORWARD(F, f), name);
-    }
-
-    template <typename F>
-    HPX_DEPRECATED_V(1, 8, "Please use hpx::annotated_function instead.")
-    constexpr decltype(auto)
-        annotated_function(F&& f, std::string const& name) noexcept
-    {
-        return hpx::annotated_function(HPX_FORWARD(F, f), name);
-    }
-}    // namespace hpx::util

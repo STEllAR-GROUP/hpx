@@ -29,6 +29,7 @@ std::optional<std::tuple<>> tag_invoke(tt::sync_wait_t, custom_sender2 s)
     return {};
 }
 
+// NOLINTBEGIN(bugprone-unchecked-optional-access)
 int hpx_main()
 {
     // Success path
@@ -158,6 +159,7 @@ int hpx_main()
 
     return hpx::local::finalize();
 }
+// NOLINTEND(bugprone-unchecked-optional-access)
 
 int main(int argc, char* argv[])
 {

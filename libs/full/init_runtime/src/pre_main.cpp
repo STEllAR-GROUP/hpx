@@ -102,7 +102,7 @@ namespace hpx { namespace detail {
 
         using components::stubs::runtime_support;
 
-        naming::resolver_client& agas_client = naming::get_agas_client();
+        agas::addressing_service& agas_client = naming::get_agas_client();
         runtime& rt = get_runtime();
 
         int exit_code = 0;

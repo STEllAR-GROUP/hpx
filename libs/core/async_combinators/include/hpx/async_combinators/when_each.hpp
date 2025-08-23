@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //  Copyright (c) 2016 Lukas Troska
 //
@@ -239,11 +239,13 @@ namespace hpx::lcos::detail {
                         // Attach a continuation to this future which will
                         // re-evaluate it and continue to the next argument
                         // (if any).
+                        Iter next_ = HPX_FORWARD(Iter, next);
+                        Iter end_ = HPX_FORWARD(Iter, end);
                         next_future_data->set_on_completed(
-                            [this_ = HPX_MOVE(this_), next = HPX_MOVE(next),
-                                end = HPX_MOVE(end)]() mutable -> void {
+                            [this_ = HPX_MOVE(this_), next_,
+                                end_]() mutable -> void {
                                 this_->template await_range<I>(
-                                    HPX_MOVE(next), HPX_MOVE(end));
+                                    HPX_MOVE(next_), HPX_MOVE(end_));
                             });
 
                         // explicitly destruct iterators as those might
@@ -360,9 +362,10 @@ namespace hpx {
             std::transform(lazy_values.begin(), lazy_values.end(),
                 std::back_inserter(values), traits::acquire_future_disp());
 
+            auto const tuple_size = values.size();
             hpx::intrusive_ptr<frame_type> p(
                 new frame_type(hpx::forward_as_tuple(HPX_MOVE(values)),
-                    HPX_FORWARD(F, func), values.size()));
+                    HPX_FORWARD(F, func), tuple_size));
 
             p->template do_await<0>();
 
@@ -462,26 +465,5 @@ namespace hpx {
         }
     } when_each_n{};
 }    // namespace hpx
-
-namespace hpx::lcos {
-
-    template <typename F, typename... Ts>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::when_each is deprecated. Use hpx::when_each instead.")
-    auto when_each(F&& f, Ts&&... ts)
-    {
-        return hpx::when_each(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-    }
-
-    template <typename F, typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::when_each_n is deprecated. Use hpx::when_each_n instead.")
-    hpx::future<Iterator> when_each_n(F&& f, Iterator begin, std::size_t count)
-    {
-        return hpx::when_each_n(HPX_FORWARD(F, f), begin, count);
-    }
-}    // namespace hpx::lcos
 
 #endif    // DOXYGEN

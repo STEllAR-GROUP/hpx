@@ -204,7 +204,7 @@ namespace hpx::parallel {
                 for (;;)
                 {
                     for (auto mid = first; mid != result;
-                         ++lead, void(++trail), ++mid)
+                        ++lead, void(++trail), ++mid)
                     {
                         if (lead == last)
                         {
@@ -274,12 +274,12 @@ namespace hpx {
       : hpx::functional::detail::tag_fallback<shift_right_t>
     {
     private:
+        template <typename FwdIter, typename Size>
         // clang-format off
-        template <typename FwdIter, typename Size,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             shift_right_t, FwdIter first, FwdIter last, Size n)
@@ -291,13 +291,13 @@ namespace hpx {
                 hpx::execution::seq, first, last, n);
         }
 
+        template <typename ExPolicy, typename FwdIter, typename Size>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename Size,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
-            )>
+            )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type

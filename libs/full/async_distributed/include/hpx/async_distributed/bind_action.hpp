@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2025 Hartmut Kaiser
 //  Copyright (c) 2011 Thomas Heller
 //  Copyright (c) 2013 Agustin Berge
 //
@@ -80,6 +80,7 @@ namespace hpx {
             {
                 return hpx::post<Action>(
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
+                        // NOLINTNEXTLINE(bugprone-use-after-move)
                         _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
 
@@ -89,6 +90,7 @@ namespace hpx {
             {
                 return hpx::post_c<Action>(cont,
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
+                        // NOLINTNEXTLINE(bugprone-use-after-move)
                         _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
 
@@ -99,6 +101,7 @@ namespace hpx {
             {
                 return hpx::post<Action>(HPX_FORWARD(Continuation, cont),
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
+                        // NOLINTNEXTLINE(bugprone-use-after-move)
                         _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
 
@@ -107,6 +110,7 @@ namespace hpx {
             {
                 return hpx::async<Action>(
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
+                        // NOLINTNEXTLINE(bugprone-use-after-move)
                         _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
 
@@ -164,19 +168,6 @@ namespace hpx {
             static_cast<Derived const&>(action), HPX_FORWARD(Ts, vs)...);
     }
 }    // namespace hpx
-
-namespace hpx::util {
-
-    template <typename Action, typename... Ts,
-        typename Enable =
-            std::enable_if_t<traits::is_action_v<std::decay_t<Action>>>>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::util::bind is deprecated, use hpx::bind instead")
-    decltype(auto) bind(Ts&&... vs)
-    {
-        return hpx::bind<Action>(Action(), HPX_FORWARD(Ts, vs)...);
-    }
-}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {

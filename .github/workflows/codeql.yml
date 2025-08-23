@@ -39,7 +39,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
@@ -51,8 +51,6 @@ jobs:
 
     - name: Install CMake
       uses: jwlawson/actions-setup-cmake@v2.0
-      with:
-        cmake-version: '3.22.x'
 
     - name: Install Ninja
       uses: seanmiddleditch/gha-setup-ninja@master

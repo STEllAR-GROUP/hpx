@@ -1,6 +1,6 @@
 //  Copyright (c) 2021 Srinivas Yadav
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -44,7 +44,8 @@ void test_find(IteratorTag)
     iterator index =
         hpx::find(iterator(std::begin(c)), iterator(std::end(c)), int(1));
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -66,7 +67,8 @@ void test_find(ExPolicy&& policy, IteratorTag)
     iterator index = hpx::find(
         policy, iterator(std::begin(c)), iterator(std::end(c)), int(1));
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -95,7 +97,8 @@ void test_find_explicit_sender_direct(Policy l, ExPolicy&& policy, IteratorTag)
     iterator index = hpx::find(policy.on(exec), iterator(std::begin(c)),
         iterator(std::end(c)), int(1));
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -125,7 +128,8 @@ void test_find_explicit_sender(Policy l, ExPolicy&& policy, IteratorTag)
         ex::just(iterator(std::begin(c)), iterator(std::end(c)), int(1)) |
         hpx::find(policy.on(exec)));
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(hpx::get<0>(*result) == iterator(test_index));
 }
@@ -150,7 +154,8 @@ void test_find_async(ExPolicy&& p, IteratorTag)
     f.wait();
 
     // create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(f.get() == iterator(test_index));
 }
@@ -182,7 +187,8 @@ void test_find_explicit_sender_direct_async(Policy l, ExPolicy&& p, IteratorTag)
     auto result = hpx::get<0>(*snd_result);
 
     // create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(result == iterator(test_index));
 }

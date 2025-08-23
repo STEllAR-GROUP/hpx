@@ -743,13 +743,14 @@ namespace hpx::ranges::experimental {
       : hpx::detail::tag_parallel_algorithm<for_loop_t>
     {
     private:
+        template <typename ExPolicy, typename Iter, typename Sent,
+            typename... Args>
         // clang-format off
-        template <typename ExPolicy, typename Iter, typename Sent, typename... Args,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<Iter> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter>
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::ranges::experimental::for_loop_t,
@@ -765,12 +766,12 @@ namespace hpx::ranges::experimental {
                 HPX_FORWARD(Args, args)...);
         }
 
+        template <typename Iter, typename Sent, typename... Args>
         // clang-format off
-        template <typename Iter, typename Sent, typename... Args,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<Iter> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter>
-            )>
+            )
         // clang-format on
         friend void tag_fallback_invoke(hpx::ranges::experimental::for_loop_t,
             Iter first, Sent last, Args&&... args)
@@ -784,13 +785,13 @@ namespace hpx::ranges::experimental {
                 HPX_FORWARD(Args, args)...);
         }
 
+        template <typename ExPolicy, typename R, typename... Args>
         // clang-format off
-        template <typename ExPolicy, typename R, typename... Args,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 (hpx::traits::is_range_v<R> ||
                  hpx::traits::is_range_generator_v<R>)
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::ranges::experimental::for_loop_t,
@@ -817,12 +818,12 @@ namespace hpx::ranges::experimental {
             }
         }
 
+        template <typename Rng, typename... Args>
         // clang-format off
-        template <typename Rng, typename... Args,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng> ||
                 hpx::traits::is_range_generator_v<Rng>
-            )>
+            )
         // clang-format on
         friend void tag_fallback_invoke(
             hpx::ranges::experimental::for_loop_t, Rng&& rng, Args&&... args)
@@ -852,15 +853,15 @@ namespace hpx::ranges::experimental {
       : hpx::detail::tag_parallel_algorithm<for_loop_strided_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent, typename S,
-            typename... Args,
-            HPX_CONCEPT_REQUIRES_(
+            typename... Args>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 std::is_integral_v<S> &&
                 hpx::traits::is_iterator_v<Iter> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter>
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::ranges::experimental::for_loop_strided_t,
@@ -877,13 +878,13 @@ namespace hpx::ranges::experimental {
                 HPX_FORWARD(Args, args)...);
         }
 
+        template <typename Iter, typename Sent, typename S, typename... Args>
         // clang-format off
-        template <typename Iter, typename Sent, typename S, typename... Args,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 std::is_integral_v<S> &&
                 hpx::traits::is_iterator_v<Iter> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter>
-            )>
+            )
         // clang-format on
         friend void tag_fallback_invoke(
             hpx::ranges::experimental::for_loop_strided_t, Iter first,
@@ -899,13 +900,13 @@ namespace hpx::ranges::experimental {
                 HPX_FORWARD(Args, args)...);
         }
 
+        template <typename ExPolicy, typename Rng, typename S, typename... Args>
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename S, typename... Args,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 std::is_integral_v<S> &&
                 hpx::traits::is_range_v<Rng>
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::ranges::experimental::for_loop_strided_t,
@@ -923,12 +924,12 @@ namespace hpx::ranges::experimental {
                 HPX_FORWARD(Args, args)...);
         }
 
+        template <typename Rng, typename S, typename... Args>
         // clang-format off
-        template <typename Rng, typename S, typename... Args,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 std::is_integral_v<S> &&
                 hpx::traits::is_range_v<Rng>
-            )>
+            )
         // clang-format on
         friend void tag_fallback_invoke(
             hpx::ranges::experimental::for_loop_strided_t, Rng&& rng, S stride,
@@ -946,19 +947,5 @@ namespace hpx::ranges::experimental {
         }
     } for_loop_strided{};
 }    // namespace hpx::ranges::experimental
-
-namespace hpx::ranges {
-
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::ranges::for_loop is deprecated. Please use "
-        "hpx::ranges::experimental::for_loop instead.")
-    inline constexpr hpx::ranges::experimental::for_loop_t for_loop{};
-
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::ranges::for_loop_strided is deprecated. Please use "
-        "hpx::ranges::experimental::for_loop_strided instead.")
-    inline constexpr hpx::ranges::experimental::for_loop_strided_t
-        for_loop_strided{};
-}    // namespace hpx::ranges
 
 #endif    // DOXYGEN

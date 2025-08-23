@@ -48,7 +48,8 @@ void test_shift_left_sent(IteratorTag)
     hpx::ranges::shift_left(
         std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, n);
 
-    std::move(std::begin(d) + n, std::end(d) - 1, std::begin(d));
+    std::move(std::begin(d) + static_cast<std::ptrdiff_t>(n), std::end(d) - 1,
+        std::begin(d));
 
     // verify values
     HPX_TEST(std::equal(
@@ -83,7 +84,8 @@ void test_shift_left_sent(ExPolicy policy, IteratorTag)
     hpx::ranges::shift_left(
         policy, std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, n);
 
-    std::move(std::begin(d) + n, std::end(d) - 1, std::begin(d));
+    std::move(std::begin(d) + static_cast<std::ptrdiff_t>(n), std::end(d) - 1,
+        std::begin(d));
 
     // verify values
     HPX_TEST(std::equal(
@@ -112,7 +114,8 @@ void test_shift_left(IteratorTag)
     std::size_t n = (std::rand() % ARR_SIZE) + 1;
     hpx::ranges::shift_left(c, n);
 
-    std::move(std::begin(d) + n, std::end(d), std::begin(d));
+    std::move(std::begin(d) + static_cast<std::ptrdiff_t>(n), std::end(d),
+        std::begin(d));
 
     // verify values
     HPX_TEST(std::equal(
@@ -143,7 +146,8 @@ void test_shift_left(ExPolicy policy, IteratorTag)
     std::size_t n = (std::rand() % ARR_SIZE) + 1;
     hpx::ranges::shift_left(policy, c, n);
 
-    std::move(std::begin(d) + n, std::end(d), std::begin(d));
+    std::move(std::begin(d) + static_cast<std::ptrdiff_t>(n), std::end(d),
+        std::begin(d));
 
     // verify values
     HPX_TEST(std::equal(
@@ -177,7 +181,8 @@ void test_shift_left_async(ExPolicy policy, IteratorTag)
     auto fut3 = hpx::ranges::shift_left(policy, c, n);
     fut3.wait();
 
-    std::move(std::begin(d) + n, std::end(d), std::begin(d));
+    std::move(std::begin(d) + static_cast<std::ptrdiff_t>(n), std::end(d),
+        std::begin(d));
 
     // verify values
     HPX_TEST(std::equal(

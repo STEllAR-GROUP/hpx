@@ -86,7 +86,7 @@ namespace hpx {
                     (num_partitions_ == static_cast<std::size_t>(-1)) ?
                     localities_->size() :
                     num_partitions_;
-                return (std::max)(num_parts, static_cast<std::size_t>(1));
+                return (std::max) (num_parts, static_cast<std::size_t>(1));
             }
             return static_cast<std::size_t>(1);
         }

@@ -14,7 +14,7 @@ jobs:
     container: stellargroup/crosscompile_arm_sve_build_env:1
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Configure
       shell: bash
       run: |
@@ -33,7 +33,7 @@ jobs:
               -DHPX_WITH_TESTS=ON \
               -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
               -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On \
-              -DHPX_WITH_CXX_STANDARD=20 \
+              -DHPX_WITH_CXX_STANDARD=23 \
               -DCMAKE_CXX_FLAGS="-march=armv8-a+sve -msve-vector-bits=512" \
               -DBOOST_ROOT=/opt/install/boost/release/boost \
               -DHWLOC_ROOT=/opt/install/hwloc \

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011-2013 Thomas Heller
-//  Copyright (c) 2011-2022 Hartmut Kaiser
+//  Copyright (c) 2011-2025 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -192,25 +192,22 @@ namespace hpx {
     using hpx::std_adl_barrier::get;
 }    // namespace hpx
 
-#if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE)
-// Adapt hpx::tuple to be usable with std::tuple
+// Adapt hpx::tuple to be usable with structured binding contexts
 namespace std {
 
     template <typename... Ts>
-    struct tuple_size<hpx::tuple<Ts...>>
-      : public hpx::tuple_size<hpx::tuple<Ts...>>
+    struct tuple_size<hpx::tuple<Ts...>> : hpx::tuple_size<hpx::tuple<Ts...>>
     {
     };
 
     template <std::size_t I, typename... Ts>
     struct tuple_element<I, hpx::tuple<Ts...>>
-      : public hpx::tuple_element<I, hpx::tuple<Ts...>>
+      : hpx::tuple_element<I, hpx::tuple<Ts...>>
     {
     };
 
     using hpx::std_adl_barrier::get;
 }    // namespace std
-#endif
 
 namespace hpx {
 
@@ -379,12 +376,14 @@ namespace hpx {
 #pragma warning(disable : 26800)    //  Use of a moved from object: '(*other)'
 #endif
 
+        // NOLINTBEGIN(bugprone-use-after-move)
         template <std::size_t... Is, typename UTuple>
         constexpr HPX_HOST_DEVICE tuple(util::index_pack<Is...>, UTuple&& other)
           : _members(std::piecewise_construct,
                 hpx::get<Is>(HPX_FORWARD(UTuple, other))...)
         {
         }
+        // NOLINTEND(bugprone-use-after-move)
 
 #if defined(HPX_MSVC)
 #pragma warning(pop)
@@ -431,6 +430,7 @@ namespace hpx {
                 HPX_MOVE(other)._members.template get<I>();
         }
 
+        // NOLINTBEGIN(bugprone-use-after-move)
         template <std::size_t... Is>
         HPX_HOST_DEVICE void assign_(
             util::index_pack<Is...>, tuple&& other) noexcept
@@ -451,6 +451,7 @@ namespace hpx {
         {
             (assign_one_other_<Is>(HPX_FORWARD(UTuple, other)), ...);
         }
+        // NOLINTEND(bugprone-use-after-move)
 
     public:
         // tuple& operator=(const tuple& u);
@@ -517,6 +518,7 @@ namespace hpx {
         template <std::size_t... Is, typename UTuple>
         std::tuple<Ts...> make_tuple_(util::index_pack<Is...>, UTuple&& t)
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             return std::make_tuple(hpx::get<Is>(HPX_FORWARD(UTuple, t))...);
         }
 
@@ -954,10 +956,12 @@ namespace hpx {
 #pragma warning(disable : 26800)
 #endif
 
+            // NOLINTBEGIN(bugprone-use-after-move)
             return tuple_cat_result_of_t<decltype(is_pack),
                 decltype(tuple_pack)>{
                 tuple_cat_element<Is, util::pack<Tuples...>>::get(
                     HPX_FORWARD(Tuples_, tuples)...)...};
+            // NOLINTEND(bugprone-use-after-move)
 
 #if defined(HPX_MSVC)
 #pragma warning(pop)

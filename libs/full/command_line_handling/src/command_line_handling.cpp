@@ -312,7 +312,7 @@ namespace hpx::util {
             }
 #endif
 
-            threads = (std::max)(threads, min_os_threads);
+            threads = (std::max) (threads, min_os_threads);
 
             if (!initial && env.found_batch_environment() && using_nodelist &&
                 (threads > batch_threads))

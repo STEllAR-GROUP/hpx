@@ -1652,12 +1652,12 @@ namespace hpx::experimental {
       : hpx::detail::tag_parallel_algorithm<for_loop_t>
     {
     private:
+        template <typename ExPolicy, typename I, typename... Args>
         // clang-format off
-        template <typename ExPolicy, typename I, typename... Args,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy> &&
-                (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
-            )>
+        requires(
+            hpx::is_execution_policy_v<ExPolicy> &&
+            (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
+        )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::experimental::for_loop_t,
             ExPolicy&& policy, std::decay_t<I> first, I last, Args&&... args)
@@ -1672,12 +1672,8 @@ namespace hpx::experimental {
                 HPX_FORWARD(Args, args)...);
         }
 
-        // clang-format off
-        template <typename I, typename... Args,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator_v<I> || std::is_integral_v<I>
-            )>
-        // clang-format on
+        template <typename I, typename... Args>
+            requires(hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
         friend void tag_fallback_invoke(hpx::experimental::for_loop_t,
             std::decay_t<I> first, I last, Args&&... args)
         {
@@ -1696,13 +1692,13 @@ namespace hpx::experimental {
       : hpx::detail::tag_parallel_algorithm<for_loop_strided_t>
     {
     private:
+        template <typename ExPolicy, typename I, typename S, typename... Args>
         // clang-format off
-        template <typename ExPolicy, typename I, typename S, typename... Args,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy> &&
-                std::is_integral_v<S> &&
-                (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
-            )>
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            std::is_integral_v<S> &&
+            (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
+        )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::experimental::for_loop_strided_t,
@@ -1720,12 +1716,12 @@ namespace hpx::experimental {
                 HPX_FORWARD(Args, args)...);
         }
 
+        template <typename I, typename S, typename... Args>
         // clang-format off
-        template <typename I, typename S, typename... Args,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_integral_v<S> &&
-                (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
-            )>
+        requires (
+            std::is_integral_v<S> &&
+            (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
+        )
         // clang-format on
         friend void tag_fallback_invoke(hpx::experimental::for_loop_strided_t,
             std::decay_t<I> first, I last, S stride, Args&&... args)
@@ -1746,14 +1742,14 @@ namespace hpx::experimental {
       : hpx::detail::tag_parallel_algorithm<for_loop_n_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename I, typename Size,
-            typename... Args,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy> &&
-                std::is_integral_v<Size> &&
-                (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
-            )>
+            typename... Args>
+        // clang-format off
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            std::is_integral_v<Size> &&
+            (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
+        )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::experimental::for_loop_n_t, ExPolicy&& policy,
@@ -1769,12 +1765,12 @@ namespace hpx::experimental {
                 HPX_FORWARD(Args, args)...);
         }
 
+        template <typename I, typename Size, typename... Args>
         // clang-format off
-        template <typename I, typename Size, typename... Args,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_integral_v<Size> &&
-                (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
-            )>
+        requires (
+            std::is_integral_v<Size> &&
+            (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
+        )
         // clang-format on
         friend void tag_fallback_invoke(
             hpx::experimental::for_loop_n_t, I first, Size size, Args&&... args)
@@ -1794,15 +1790,15 @@ namespace hpx::experimental {
       : hpx::detail::tag_parallel_algorithm<for_loop_n_strided_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename I, typename Size, typename S,
-            typename... Args,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy> &&
-                std::is_integral_v<Size> &&
-                std::is_integral_v<S> &&
-                (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
-            )>
+            typename... Args>
+        // clang-format off
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            std::is_integral_v<Size> &&
+            std::is_integral_v<S> &&
+            (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
+        )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::experimental::for_loop_n_strided_t,
@@ -1819,13 +1815,13 @@ namespace hpx::experimental {
                 HPX_FORWARD(Args, args)...);
         }
 
+        template <typename I, typename Size, typename S, typename... Args>
         // clang-format off
-        template <typename I, typename Size, typename S, typename... Args,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_integral_v<Size> &&
-                std::is_integral_v<S> &&
-                (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
-            )>
+        requires (
+            std::is_integral_v<Size> &&
+            std::is_integral_v<S> &&
+            (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
+        )
         // clang-format on
         friend void tag_fallback_invoke(hpx::experimental::for_loop_n_strided_t,
             I first, Size size, S stride, Args&&... args)
@@ -1841,30 +1837,6 @@ namespace hpx::experimental {
         }
     } for_loop_n_strided{};
 }    // namespace hpx::experimental
-
-namespace hpx {
-
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::for_loop is deprecated. Please use "
-        "hpx::experimental::for_loop instead.")
-    inline constexpr hpx::experimental::for_loop_t for_loop{};
-
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::for_loop_n is deprecated. Please use "
-        "hpx::experimental::for_loop_n instead.")
-    inline constexpr hpx::experimental::for_loop_n_t for_loop_n{};
-
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::for_loop_strided is deprecated. Please use "
-        "hpx::experimental::for_loop_strided instead.")
-    inline constexpr hpx::experimental::for_loop_strided_t for_loop_strided{};
-
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::for_loop_n_strided is deprecated. Please use "
-        "hpx::experimental::for_loop_n_strided instead.")
-    inline constexpr hpx::experimental::for_loop_n_strided_t
-        for_loop_n_strided{};
-}    // namespace hpx
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 namespace hpx::traits {

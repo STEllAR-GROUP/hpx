@@ -1,5 +1,5 @@
 //  Copyright (c) 2011      Bryce Lelbach
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -26,6 +26,7 @@ namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     class fixed_component_base : public traits::detail::fixed_component_tag
     {
         using this_component_type =
@@ -47,6 +48,7 @@ namespace hpx::components {
         using wrapping_type = fixed_component<this_component_type>;
 
         // Construct an empty fixed_component
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         constexpr fixed_component_base(
             std::uint64_t msb, std::uint64_t lsb) noexcept
           : msb_(msb)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -36,7 +36,7 @@ namespace on {
 #if __cplusplus >= 202302L
 namespace cexpr {
 
-    constexpr bool is_called_exit()
+    bool is_called_exit()
     {
         bool result = false;
         {
@@ -45,7 +45,7 @@ namespace cexpr {
         return result;
     }
 
-    constexpr bool is_not_called_fail()
+    bool is_not_called_fail()
     {
         bool result = false;
         {
@@ -54,7 +54,7 @@ namespace cexpr {
         return result;
     }
 
-    constexpr bool is_called_success()
+    bool is_called_success()
     {
         bool result = false;
         {
@@ -101,6 +101,7 @@ void scope_exit_called_exception()
         auto guard = hpx::experimental::scope_exit(on::exit);
         throw std::exception();
     }
+    // NOLINTNEXTLINE(bugprone-empty-catch)
     catch (...)
     {
     }
@@ -131,6 +132,7 @@ void scope_fail_called_exception()
         auto guard = hpx::experimental::scope_fail(on::fail);
         throw std::exception();
     }
+    // NOLINTNEXTLINE(bugprone-empty-catch)
     catch (...)
     {
     }
@@ -148,6 +150,7 @@ void scope_fail_called_exception_lambda()
         auto guard = hpx::experimental::scope_fail([]() { is_called = true; });
         throw std::exception();
     }
+    // NOLINTNEXTLINE(bugprone-empty-catch)
     catch (...)
     {
     }
@@ -164,6 +167,7 @@ void scope_fail_not_called_no_exception()
     {
         auto guard = hpx::experimental::scope_fail(on::fail);
     }
+    // NOLINTNEXTLINE(bugprone-empty-catch)
     catch (...)
     {
     }
@@ -183,6 +187,7 @@ void scope_fail_not_called_released()
 
         throw std::exception();
     }
+    // NOLINTNEXTLINE(bugprone-empty-catch)
     catch (...)
     {
     }
@@ -199,6 +204,7 @@ void scope_success_called_no_exception()
     {
         auto guard = hpx::experimental::scope_success(on::success);
     }
+    // NOLINTNEXTLINE(bugprone-empty-catch)
     catch (...)
     {
     }
@@ -216,6 +222,7 @@ void scope_success_called_no_exception_lambda()
         auto guard =
             hpx::experimental::scope_success([]() { is_called = true; });
     }
+    // NOLINTNEXTLINE(bugprone-empty-catch)
     catch (...)
     {
     }
@@ -233,6 +240,7 @@ void scope_success_not_called_exception()
         auto guard = hpx::experimental::scope_success(on::success);
         throw std::exception();
     }
+    // NOLINTNEXTLINE(bugprone-empty-catch)
     catch (...)
     {
     }
@@ -250,6 +258,7 @@ void scope_success_not_called_released()
         auto guard = hpx::experimental::scope_success(on::success);
         guard.release();
     }
+    // NOLINTNEXTLINE(bugprone-empty-catch)
     catch (...)
     {
     }
@@ -274,6 +283,7 @@ void scope_success_exit_throws()
             throw std::exception();
         });
     }
+    // NOLINTNEXTLINE(bugprone-empty-catch)
     catch (...)
     {
     }

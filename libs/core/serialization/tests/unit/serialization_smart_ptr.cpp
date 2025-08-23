@@ -110,7 +110,7 @@ struct A
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& i;
+        ar & i;
     }
 };
 

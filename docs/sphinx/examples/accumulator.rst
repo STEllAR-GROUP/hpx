@@ -261,7 +261,7 @@ Note that ``this->get_id()`` references a data member of the
 :cpp:class:`hpx::components::client_base` base class which identifies the server
 accumulator instance.
 
-:cpp:class:`hpx::naming::id_type` is a type which represents a global identifier
+:cpp:class:`hpx::id_type` is a type which represents a global identifier
 in |hpx|. This type specifies the target of an action. This is the type that is
 returned by :cpp:func:`hpx::find_here` in which case it represents the
 :term:`locality` the code is running on.

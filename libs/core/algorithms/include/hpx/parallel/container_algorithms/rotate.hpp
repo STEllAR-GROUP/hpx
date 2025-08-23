@@ -415,62 +415,20 @@ namespace hpx { namespace ranges {
 #include <type_traits>
 #include <utility>
 
-namespace hpx::parallel {
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_range_v<Rng>
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::rotate is deprecated, use hpx::ranges::rotate instead")
-        util::detail::algorithm_result_t<ExPolicy,
-            util::in_out_result<hpx::traits::range_iterator_t<Rng>,
-                hpx::traits::range_iterator_t<Rng>>> rotate(ExPolicy&& policy,
-            Rng&& rng, hpx::traits::range_iterator_t<Rng> middle)
-    {
-        return rotate(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-            middle, hpx::util::end(rng));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename OutIter,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_range_v<Rng> &&
-            hpx::traits::is_iterator_v<OutIter>
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::rotate_copy is deprecated, use "
-        "hpx::ranges::rotate_copy instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<hpx::traits::range_iterator_t<Rng>,
-                OutIter>>::type rotate_copy(ExPolicy&& policy, Rng&& rng,
-            hpx::traits::range_iterator_t<Rng> middle, OutIter dest_first)
-    {
-        return rotate_copy(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-            middle, hpx::util::end(rng), dest_first);
-    }
-}    // namespace hpx::parallel
-// namespace hpx::parallel
-
 namespace hpx::ranges {
+
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::rotate
     inline constexpr struct rotate_t final
       : hpx::detail::tag_parallel_algorithm<rotate_t>
     {
     private:
+        template <typename FwdIter, typename Sent>
         // clang-format off
-        template <typename FwdIter, typename Sent,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
-            )>
+            )
         // clang-format on
         friend subrange_t<FwdIter, Sent> tag_fallback_invoke(
             hpx::ranges::rotate_t, FwdIter first, FwdIter middle, Sent last)
@@ -484,13 +442,13 @@ namespace hpx::ranges {
                     .call(hpx::execution::seq, first, middle, last));
         }
 
+        template <typename ExPolicy, typename FwdIter, typename Sent>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename Sent,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
-            )>
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             subrange_t<FwdIter, Sent>>::type
@@ -511,9 +469,9 @@ namespace hpx::ranges {
                         middle, last));
         }
 
+        template <typename Rng>
         // clang-format off
-        template <typename Rng,
-            HPX_CONCEPT_REQUIRES_(hpx::traits::is_range_v<Rng>)>
+            requires (hpx::traits::is_range_v<Rng>)
         // clang-format on
         friend subrange_t<hpx::traits::range_iterator_t<Rng>,
             hpx::traits::range_iterator_t<Rng>>
@@ -530,12 +488,12 @@ namespace hpx::ranges {
                         hpx::util::end(rng)));
         }
 
+        template <typename ExPolicy, typename Rng>
         // clang-format off
-        template <typename ExPolicy, typename Rng,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng>
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             subrange_t<hpx::traits::range_iterator_t<Rng>,
@@ -568,13 +526,13 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<rotate_copy_t>
     {
     private:
+        template <typename FwdIter, typename Sent, typename OutIter>
         // clang-format off
-        template <typename FwdIter, typename Sent, typename OutIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
                 hpx::traits::is_iterator_v<OutIter>
-            )>
+            )
         // clang-format on
         friend rotate_copy_result<FwdIter, OutIter> tag_fallback_invoke(
             hpx::ranges::rotate_copy_t, FwdIter first, FwdIter middle,
@@ -590,14 +548,15 @@ namespace hpx::ranges {
                 .call(hpx::execution::seq, first, middle, last, dest_first);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent,
-            typename FwdIter2, HPX_CONCEPT_REQUIRES_(
+            typename FwdIter2>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             rotate_copy_result<FwdIter1, FwdIter2>>
@@ -619,12 +578,12 @@ namespace hpx::ranges {
                     last, dest_first);
         }
 
+        template <typename Rng, typename OutIter>
         // clang-format off
-        template <typename Rng, typename OutIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<OutIter>
-            )>
+            )
         // clang-format on
         friend rotate_copy_result<hpx::traits::range_iterator_t<Rng>, OutIter>
         tag_fallback_invoke(hpx::ranges::rotate_copy_t, Rng&& rng,
@@ -636,13 +595,13 @@ namespace hpx::ranges {
                     hpx::util::end(rng), dest_first);
         }
 
+        template <typename ExPolicy, typename Rng, typename OutIter>
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename OutIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<OutIter>
-                )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             rotate_copy_result<hpx::traits::range_iterator_t<Rng>, OutIter>>

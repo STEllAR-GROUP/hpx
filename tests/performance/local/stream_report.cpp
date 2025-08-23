@@ -95,7 +95,8 @@ hpx::threads::topology& retrieve_topology()
 ///////////////////////////////////////////////////////////////////////////////
 double mysecond()
 {
-    return hpx::chrono::high_resolution_clock::now() * 1e-9;
+    return static_cast<double>(hpx::chrono::high_resolution_clock::now()) *
+        1e-9;
 }
 
 int checktick()
@@ -120,7 +121,7 @@ int checktick()
     for (std::size_t i = 1; i < M; i++)
     {
         int Delta = (int) (1.0E6 * (timesfound[i] - timesfound[i - 1]));
-        minDelta = (std::min)(minDelta, (std::max)(Delta, 0));
+        minDelta = (std::min) (minDelta, (std::max) (Delta, 0));
     }
 
     return (minDelta);

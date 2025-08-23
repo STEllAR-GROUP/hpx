@@ -612,7 +612,7 @@ namespace hpx::parallel {
 
                 auto count1 = detail::distance(first1, last1);
                 auto count2 = detail::distance(first2, last2);
-                auto count = (std::min)(count1, count2);
+                auto count = (std::min) (count1, count2);
 
                 using zip_iterator = hpx::util::zip_iterator<Iter1, Iter2>;
 
@@ -670,11 +670,11 @@ namespace hpx::parallel {
             return {HPX_MOVE(p.in1), HPX_MOVE(p.in2)};
         }
 
+        template <typename InInSender>
         // clang-format off
-        template <typename InInSender,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_sender_v<InInSender>
-            )>
+            )
         // clang-format on
         decltype(auto) get_pair(InInSender&& in_in_sender) noexcept
         {
@@ -797,10 +797,10 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<mismatch_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Pred,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -808,7 +808,7 @@ namespace hpx {
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(mismatch_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
@@ -826,13 +826,13 @@ namespace hpx {
                         last2, HPX_MOVE(op), hpx::identity_v, hpx::identity_v));
         }
 
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(mismatch_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
@@ -850,10 +850,10 @@ namespace hpx {
                         hpx::identity_v, hpx::identity_v));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Pred,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -861,7 +861,7 @@ namespace hpx {
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(mismatch_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, Pred op)
@@ -877,13 +877,13 @@ namespace hpx {
                     HPX_MOVE(op));
         }
 
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(mismatch_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
@@ -899,17 +899,16 @@ namespace hpx {
                     hpx::parallel::detail::equal_to{});
         }
 
+        template <typename FwdIter1, typename FwdIter2, typename Pred>
         // clang-format off
-        template <typename FwdIter1, typename FwdIter2,
-            typename Pred,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend std::pair<FwdIter1, FwdIter2> tag_fallback_invoke(mismatch_t,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
@@ -927,12 +926,12 @@ namespace hpx {
                         HPX_MOVE(op), hpx::identity_v, hpx::identity_v));
         }
 
+        template <typename FwdIter1, typename FwdIter2>
         // clang-format off
-        template <typename FwdIter1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend std::pair<FwdIter1, FwdIter2> tag_fallback_invoke(mismatch_t,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
@@ -950,17 +949,16 @@ namespace hpx {
                         hpx::identity_v));
         }
 
+        template <typename FwdIter1, typename FwdIter2, typename Pred>
         // clang-format off
-        template <typename FwdIter1, typename FwdIter2,
-            typename Pred,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend std::pair<FwdIter1, FwdIter2> tag_fallback_invoke(mismatch_t,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, Pred op)
@@ -975,12 +973,12 @@ namespace hpx {
                 .call(hpx::execution::seq, first1, last1, first2, HPX_MOVE(op));
         }
 
+        template <typename FwdIter1, typename FwdIter2>
         // clang-format off
-        template <typename FwdIter1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend std::pair<FwdIter1, FwdIter2> tag_fallback_invoke(
             mismatch_t, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)

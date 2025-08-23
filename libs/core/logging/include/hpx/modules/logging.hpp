@@ -235,7 +235,7 @@ bootstrap_logging const& operator<<(
 {
     LBT_(info) << t;
     LPROGRESS_ << t;
-    return l;
+    return l;    // NOLINT(bugprone-return-const-ref-from-parameter)
 }
 
 inline constexpr bootstrap_logging lbt_;

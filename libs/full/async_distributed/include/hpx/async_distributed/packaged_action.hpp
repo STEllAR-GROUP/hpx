@@ -509,7 +509,7 @@ namespace hpx::lcos {
                     HPX_ASSERT(
                         !traits::action_was_object_migrated<action_type>::call(
                             id, addr.address_)
-                             .first);
+                            .first);
                     HPX_ASSERT(hpx::detail::pin_count_is_valid<component_type>(
                         addr.address_));
                 }
@@ -609,7 +609,7 @@ namespace hpx::lcos {
                     HPX_ASSERT(
                         !traits::action_was_object_migrated<action_type>::call(
                             id, addr.address_)
-                             .first);
+                            .first);
                     HPX_ASSERT(hpx::detail::pin_count_is_valid<component_type>(
                         addr.address_));
                 }

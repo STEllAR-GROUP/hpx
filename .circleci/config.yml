@@ -11,7 +11,7 @@ working_dir_default: &working_dir_default
 
 docker_default: &docker_default
     docker:
-      - image: stellargroup/build_env:14
+      - image: stellargroup/build_env:17
 
 defaults: &defaults
     <<: *working_dir_default
@@ -170,12 +170,12 @@ jobs:
           name: Check that the modules are well clang-formatted
           command: |
               cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
-              clang-format-11 --version
-              clang-format-11 -i **/*.{cpp,hpp}
+              clang-format-20 --version
+              clang-format-20 -i **/*.{cpp,hpp}
               cd /hpx/source/examples
-              clang-format-11 -i **/*.{cpp,hpp}
+              clang-format-20 -i **/*.{cpp,hpp}
               cd /hpx/source/tests
-              clang-format-11 -i **/*.{cpp,hpp}
+              clang-format-20 -i **/*.{cpp,hpp}
               git diff --exit-code > /tmp/modified_clang_format_files.txt
       - store_artifacts:
           path: /tmp/modified_clang_format_files.txt
@@ -234,7 +234,7 @@ jobs:
                 -DHPX_WITH_COMPILER_WARNINGS=On \
                 -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=On \
                 -DHPX_WITH_DEPRECATION_WARNINGS=On \
-                -DCMAKE_CXX_CLANG_TIDY=clang-tidy \
+                -DCMAKE_CXX_CLANG_TIDY=clang-tidy-20 \
                 -DHPX_WITH_THREAD_LOCAL_STORAGE=On \
                 -DHPX_WITH_STACKTRACES_STATIC_SYMBOLS=On \
                 -DHPX_WITH_STACKTRACES_DEMANGLE_SYMBOLS=Off \
@@ -335,7 +335,7 @@ jobs:
   # We need a full clone here to be able to compare to master.
   spellcheck:
     docker:
-      - image: stellargroup/build_env:14
+      - image: stellargroup/build_env:17
     resource_class: large  # Increased memory allocation
     steps:
       - checkout:
@@ -480,15 +480,53 @@ jobs:
           paths:
             - ./build
 
-  tests.examples:
+  tests.examples1:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Examples
+          name: Building Examples (1)
           command: |
-              ninja -j2 -k 0 examples
+              ninja -j2 -k 0 \
+                `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.examples1.targets`
+      - run:
+          name: Running Example Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest \
+                --timeout 180 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex \
+                  `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.examples1.targets | sed ':b;N;$!bb;s/\n/|/g'`
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.examples1
+      - store_artifacts:
+          path: tests.examples1
+      - persist_to_workspace:
+          root: /hpx
+          paths:
+            - ./build
+
+  tests.examples2:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Examples (2)
+          command: |
+              ninja -j2 -k 0 \
+                `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.examples2.targets`
       - run:
           name: Running Example Tests
           when: always
@@ -497,9 +535,15 @@ jobs:
               # NOTE: transpose_block_numa is disabled because
               # hwloc_get_area_membind_nodeset (which is used by the
               # numa_allocator) fails with EPERM.
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure \
-                  -R tests.examples \
-                  -E tests.examples.transpose.transpose_block_numa
+              ctest \
+                --timeout 180 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex \
+                  `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.examples2.targets | sed ':b;N;$!bb;s/\n/|/g'` \
+                --exclude-regex \
+                  tests.examples.transpose.transpose_block_numa
       - run:
           <<: *convert_xml
       - run:
@@ -507,9 +551,9 @@ jobs:
       - run:
           <<: *move_debug_log
       - store_test_results:
-          path: tests.examples
+          path: tests.examples2
       - store_artifacts:
-          path: tests.examples
+          path: tests.examples2
       - persist_to_workspace:
           root: /hpx
           paths:
@@ -581,15 +625,84 @@ jobs:
       - store_artifacts:
           path: tests.unit2.algorithms
 
-  tests.unit.container_algorithms:
+  tests.unit3.algorithms:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Unit Tests (Container Algorithms)
+          name: Building Unit Tests (Algorithms, 3)
           command: |
-              ninja -j2 -k 0 tests.unit.modules.algorithms.container_algorithms
+              ninja -j1 -k 0 \
+                `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit3.algorithms`
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest \
+                --timeout 180 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex \
+                  `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit3.algorithms | sed ':b;N;$!bb;s/\n/|/g'` \
+                --exclude-regex \
+                  tests.unit.modules.algorithms.algorithms.foreach_std_policies
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit3.algorithms
+      - store_artifacts:
+          path: tests.unit3.algorithms
+
+  tests.unit4.algorithms:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests (Algorithms, 4)
+          command: |
+              ninja -j1 -k 0 \
+                `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit4.algorithms`
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest \
+                --timeout 180 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex \
+                  `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit4.algorithms | sed ':b;N;$!bb;s/\n/|/g'`
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit4.algorithms
+      - store_artifacts:
+          path: tests.unit4.algorithms
+
+  tests.unit1.container_algorithms:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests (Container Algorithms, 1)
+          command: |
+              ninja -j2 -k 0 \
+                `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.container_algorithms`
       - run:
           name: Running Unit Tests
           when: always
@@ -600,7 +713,10 @@ jobs:
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
-                --tests-regex tests.unit.modules.algorithms.container_algorithms
+                --tests-regex \
+                  `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.container_algorithms | sed ':b;N;$!bb;s/\n/|/g'` \
+                --exclude-regex \
+                  tests.unit.modules.algorithms.container_algorithms.for_loop_range_generator
       - run:
           <<: *convert_xml
       - run:
@@ -608,19 +724,52 @@ jobs:
       - run:
           <<: *move_debug_log
       - store_test_results:
-          path: tests.unit.container_algorithms
+          path: tests.unit1.container_algorithms
       - store_artifacts:
-          path: tests.unit.container_algorithms
+          path: tests.unit1.container_algorithms
 
-  tests.unit.segmented_algorithms:
+  tests.unit2.container_algorithms:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Unit Tests (Segmented Algorithms)
+          name: Building Unit Tests (Container Algorithms, 2)
           command: |
-              ninja -j1 -k 0 tests.unit.modules.segmented_algorithms
+              ninja -j2 -k 0 \
+                `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.container_algorithms`
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest \
+                --timeout 120 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex \
+                  `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.container_algorithms | sed ':b;N;$!bb;s/\n/|/g'`
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit2.container_algorithms
+      - store_artifacts:
+          path: tests.unit2.container_algorithms
+
+  tests.unit1.segmented_algorithms:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests (Segmented Algorithms, 1)
+          command: |
+              ninja -j1 -k 0 `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.segmented_algorithms`
       - run:
           name: Running Unit Tests
           when: always
@@ -631,7 +780,8 @@ jobs:
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
-                --tests-regex tests.unit.modules.segmented_algorithms
+                --tests-regex \
+                  `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.segmented_algorithms | sed ':b;N;$!bb;s/\n/|/g'`
       - run:
           <<: *convert_xml
       - run:
@@ -639,9 +789,41 @@ jobs:
       - run:
           <<: *move_debug_log
       - store_test_results:
-          path: tests.unit.segmented_algorithms
+          path: tests.unit1.segmented_algorithms
       - store_artifacts:
-          path: tests.unit.segmented_algorithms
+          path: tests.unit1.segmented_algorithms
+
+  tests.unit2.segmented_algorithms:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests (Segmented Algorithms, 2)
+          command: |
+              ninja -j1 -k 0 `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.segmented_algorithms`
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest \
+                --timeout 270 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex \
+                  `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.segmented_algorithms | sed ':b;N;$!bb;s/\n/|/g'`
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit2.segmented_algorithms
+      - store_artifacts:
+          path: tests.unit2.segmented_algorithms
 
   tests.unit1:
     <<: *defaults
@@ -697,8 +879,7 @@ jobs:
                 --output-on-failure \
                 --tests-regex `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.targets | sed ':b;N;$!bb;s/\n/|/g'` \
                 --exclude-regex \
-              "tests.unit.modules.compute_local.numa_allocator|\
-              tests.unit.modules.resource_partitioner.scheduler_binding_check"
+                  "tests.unit.modules.compute_local.numa_allocator"
       - run:
           <<: *convert_xml
       - run:
@@ -710,15 +891,81 @@ jobs:
       - store_artifacts:
           path: tests.unit2
 
-  tests.regressions:
+  tests.unit3:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Regressions Tests
+          name: Building Unit Tests (3)
           command: |
-              ninja -j2 -k 0 tests.regressions
+              ninja -j2 -k 0 `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit3.targets`
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest \
+                --timeout 180 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit3.targets | sed ':b;N;$!bb;s/\n/|/g'`
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit3
+      - store_artifacts:
+          path: tests.unit3
+
+  tests.unit4:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests (4)
+          command: |
+              ninja -j2 -k 0 `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit4.targets`
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              # NOTE: the numa_allocator test is disabled because
+              # hwloc_get_area_membind_nodeset used by it fails with EPERM.
+              ctest \
+                --timeout 180 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit4.targets | sed ':b;N;$!bb;s/\n/|/g'` \
+                --exclude-regex \
+                    "tests.unit.modules.resource_partitioner.scheduler_binding_check"
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit4
+      - store_artifacts:
+          path: tests.unit4
+
+  tests.regressions1:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Regressions Tests (1)
+          command: |
+              ninja -j2 -k 0 `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.regressions1.targets`
       - run:
           name: Running Regressions Tests
           when: always
@@ -728,13 +975,9 @@ jobs:
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
-                -R tests.regressions \
+                --tests-regex `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.regressions1.targets | sed ':b;N;$!bb;s/\n/|/g'` \
                 --exclude-regex \
-              "tests.regressions.modules.threading_base.thread_stacksize_current|\
-              tests.regressions.modules.parcelset.distributed.tcp.nested_vectors_6623|\
-              tests.regressions.modules.parcelset.distributed.tcp.very_big_tchunk|\
-              tests.regressions.modules.parcelset.distributed.tcp.very_big_parcel|\
-              tests.regressions.modules.parcelset.distributed.tcp.very_big_parcel_int_max_plus_1"
+                    "tests.regressions.modules.threading_base.thread_stacksize_current"
       - run:
           <<: *convert_xml
       - run:
@@ -742,9 +985,45 @@ jobs:
       - run:
           <<: *move_debug_log
       - store_test_results:
-          path: tests.regressions
+          path: tests.regressions1
       - store_artifacts:
-          path: tests.regressions
+          path: tests.regressions1
+
+  tests.regressions2:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Regressions Tests (2)
+          command: |
+              ninja -j2 -k 0 `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.regressions2.targets`
+      - run:
+          name: Running Regressions Tests
+          when: always
+          command: |
+              ctest \
+                --timeout 180 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.regressions2.targets | sed ':b;N;$!bb;s/\n/|/g'` \
+                --exclude-regex \
+                    "tests.regressions.modules.command_line_handling_local|\
+                    tests.regressions.modules.parcelset.distributed.tcp.nested_vectors_6623|\
+                    tests.regressions.modules.parcelset.distributed.tcp.very_big_tchunk|\
+                    tests.regressions.modules.parcelset.distributed.tcp.very_big_parcel|\
+                    tests.regressions.modules.parcelset.distributed.tcp.very_big_parcel_int_max_plus_1"
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.regressions2
+      - store_artifacts:
+          path: tests.regressions2
 
   tests.headers1:
     <<: *defaults
@@ -756,7 +1035,7 @@ jobs:
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
                 -R tests.headers \
-                -E "tests.headers.modules.[a-n].*"
+                -E "tests.headers.modules.[a-p].*"
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -773,7 +1052,7 @@ jobs:
           name: Building Header Tests (part 2)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R "tests.headers.modules.[a-c].*"
+                -R "tests.headers.modules.[a-b].*"
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -790,7 +1069,7 @@ jobs:
           name: Building Header Tests (part 3)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R "tests.headers.modules.[d-g].*"
+                -R "tests.headers.modules.[c-g].*"
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -807,7 +1086,7 @@ jobs:
           name: Building Header Tests (part 4)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R "tests.headers.modules.[h-n].*"
+                -R "tests.headers.modules.[h-p].*"
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -975,21 +1254,37 @@ workflows:
           requires:
             - configure
           <<: *gh_pages_filter
-      - tests.examples:
+      - tests.examples1:
+          <<: *core_dependency
+      - tests.examples2:
           <<: *core_dependency
       - tests.unit1.algorithms:
           <<: *core_dependency
       - tests.unit2.algorithms:
           <<: *core_dependency
-      - tests.unit.container_algorithms:
+      - tests.unit3.algorithms:
           <<: *core_dependency
-      - tests.unit.segmented_algorithms:
+      - tests.unit4.algorithms:
+          <<: *core_dependency
+      - tests.unit1.container_algorithms:
+          <<: *core_dependency
+      - tests.unit2.container_algorithms:
+          <<: *core_dependency
+      - tests.unit1.segmented_algorithms:
+          <<: *core_dependency
+      - tests.unit2.segmented_algorithms:
           <<: *core_dependency
       - tests.unit1:
           <<: *core_dependency
       - tests.unit2:
           <<: *core_dependency
-      - tests.regressions:
+      - tests.unit3:
+          <<: *core_dependency
+      - tests.unit4:
+          <<: *core_dependency
+      - tests.regressions1:
+          <<: *core_dependency
+      - tests.regressions2:
           <<: *core_dependency
       - tests.performance:
           <<: *core_dependency
@@ -1005,8 +1300,11 @@ workflows:
           requires:
             - configure
             # Force docs to be built after examples so that workspace doesn't
-            # have conflicts
-            - tests.examples
+            # have conflicts.
+            #
+            # We make this depend on example2 only as this takes longer to run
+            # than example1. Making it depend on both causes workspace conflicts.
+            - tests.examples2
           <<: *gh_pages_filter
       - depreport:
           requires:
@@ -1016,15 +1314,21 @@ workflows:
           requires:
             - configure
             # Force docs to be built after examples so that workspace doesn't
-            # have conflicts
-            - tests.examples
+            # have conflicts.
+            #
+            # We make this depend on example2 only as this takes longer to run
+            # than example1. Making it depend on both causes workspace conflicts.
+            - tests.examples2
           <<: *additional_docs_filter
       - docs-latexpdf:
           requires:
             - configure
             # Force docs to be built after examples so that workspace doesn't
-            # have conflicts
-            - tests.examples
+            # have conflicts.
+            #
+            # We make this depend on example2 only as this takes longer to run
+            # than example1. Making it depend on both causes workspace conflicts.
+            - tests.examples2
           <<: *additional_docs_filter
       - docs_push:
           requires:
@@ -1036,14 +1340,21 @@ workflows:
       - install:
           requires:
             - core
-            - tests.examples
+            - tests.examples2
             - tests.unit1.algorithms
             - tests.unit2.algorithms
-            - tests.unit.container_algorithms
-            - tests.unit.segmented_algorithms
+            - tests.unit3.algorithms
+            - tests.unit4.algorithms
+            - tests.unit1.container_algorithms
+            - tests.unit2.container_algorithms
+            - tests.unit1.segmented_algorithms
+            - tests.unit2.segmented_algorithms
             - tests.unit1
             - tests.unit2
-            - tests.regressions
+            - tests.unit3
+            - tests.unit4
+            - tests.regressions1
+            - tests.regressions2
             - tests.performance
             - tests.headers1
             - tests.headers2

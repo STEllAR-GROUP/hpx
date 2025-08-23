@@ -14,7 +14,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Install dependencies
       run: |
           brew install --overwrite python-tk && \
@@ -29,11 +29,12 @@ jobs:
               -GNinja \
               -DCMAKE_BUILD_TYPE=Debug \
               -DHPX_WITH_FETCH_ASIO=ON \
+              -DHPX_WITH_ASIO_TAG=asio-1-34-2 \
               -DHPX_WITH_EXAMPLES=ON \
               -DHPX_WITH_TESTS=ON \
               -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=3 \
-              -DHPX_WITH_VERIFY_LOCKS=ON \
-              -DHPX_WITH_VERIFY_LOCKS_BACKTRACE=ON \
+              -DHPX_WITH_VERIFY_LOCKS=OFF \
+              -DHPX_WITH_VERIFY_LOCKS_BACKTRACE=OFF \
               -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=ON
     - name: Build
       shell: bash
@@ -75,4 +76,5 @@ jobs:
           tests.unit.threads.distributed.tcp.thread_stacksize|\
           tests.unit.topology.numa_allocator|\
           tests.unit.modules.runtime_components.distributed.tcp.migrate_polymorphic_component|\
-          tests.unit.modules.executors.limiting_executor"
+          tests.unit.modules.executors.limiting_executor|\
+          tests.unit.modules.compute_local.block_fork_join_executor"

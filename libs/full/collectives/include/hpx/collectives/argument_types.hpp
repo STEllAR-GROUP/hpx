@@ -22,12 +22,13 @@ namespace hpx::collectives {
         struct argument_type
         {
             explicit constexpr argument_type(
-                std::size_t argument = Default) noexcept
+                std::size_t const argument = Default) noexcept
               : argument_(argument)
             {
             }
 
-            constexpr argument_type& operator=(std::size_t argument) noexcept
+            constexpr argument_type& operator=(
+                std::size_t const argument) noexcept
             {
                 argument_ = argument;
                 return *this;
@@ -36,6 +37,11 @@ namespace hpx::collectives {
             constexpr operator std::size_t() const noexcept
             {
                 return argument_;
+            }
+
+            [[nodiscard]] constexpr bool is_default() const noexcept
+            {
+                return argument_ == Default;
             }
 
             std::size_t argument_;

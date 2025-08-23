@@ -1,5 +1,5 @@
 //  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -69,7 +69,7 @@ void print_results(std::uint64_t cores, double walltime)
     hpx::util::format_to(std::cout,
         "{:-21} {:-21} {:-21} {:-21} {:-21} {:-21} {:10.12}, {:10.12}\n",
         cores_str, seed_str, tasks_str, min_delay_str, max_delay_str,
-        total_delay_str, walltime, walltime / tasks)
+        total_delay_str, walltime, walltime / static_cast<double>(tasks))
         << std::flush;
 }
 

@@ -56,9 +56,11 @@ void do_stuff(std::size_t n, bool printout)
 {
     if (printout)
         std::cout << "[do stuff] " << n << "\n";
+
+    double convert = 2.0 * M_PI / static_cast<double>(n);
     for (std::size_t i(0); i < n; ++i)
     {
-        double f = std::sin(2 * M_PI * i / n);
+        double f = std::sin(convert * static_cast<double>(i));
         if (printout)
             std::cout << "sin(" << i << ") = " << f << ", ";
     }

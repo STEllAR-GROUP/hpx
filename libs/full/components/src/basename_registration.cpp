@@ -86,9 +86,14 @@ namespace hpx {
         {
             std::string name;
             if (i == num_ids - 1)
+            {
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 name = detail::name_from_basename(HPX_MOVE(basename), i);
+            }
             else
+            {
                 name = detail::name_from_basename(basename, i);
+            }
 
             results.push_back(
                 agas::on_symbol_namespace_event(HPX_MOVE(name), true));
@@ -124,9 +129,14 @@ namespace hpx {
         {
             std::string name;
             if (i == ids.size() - 1)
+            {
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 name = detail::name_from_basename(HPX_MOVE(basename), i);
+            }
             else
+            {
                 name = detail::name_from_basename(basename, i);
+            }
 
             results.emplace_back(
                 agas::on_symbol_namespace_event(HPX_MOVE(name), true));

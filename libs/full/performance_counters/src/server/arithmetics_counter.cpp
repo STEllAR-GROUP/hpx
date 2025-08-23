@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -119,15 +119,15 @@ namespace hpx::performance_counters::server {
         }
 
         if (base_values[0].scale_inverse_ &&
-            base_values[0].scaling_ != 1.0)    //-V550
+            static_cast<double>(base_values[0].scaling_) != 1.0)    //-V550
         {
-            base_values[0].value_ =
-                static_cast<std::int64_t>(value * base_values[0].scaling_);
+            base_values[0].value_ = static_cast<std::int64_t>(
+                value * static_cast<double>(base_values[0].scaling_));
         }
         else
         {
-            base_values[0].value_ =
-                static_cast<std::int64_t>(value / base_values[0].scaling_);
+            base_values[0].value_ = static_cast<std::int64_t>(
+                value / static_cast<double>(base_values[0].scaling_));
         }
 
         base_values[0].time_ =

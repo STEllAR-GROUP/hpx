@@ -117,7 +117,7 @@ namespace hpx::parallel::detail {
         std::size_t cores =
             hpx::execution::experimental::processing_units_count(
                 policy.parameters(), policy.executor(),
-                hpx::chrono::null_duration, (std::min)(len1, len2));
+                hpx::chrono::null_duration, (std::min) (len1, len2));
 
         std::size_t const step = (len1 + cores - 1) / cores;
 
@@ -140,7 +140,7 @@ namespace hpx::parallel::detail {
             // find start in sequence 1
             std::size_t start1 = (curr_chunk - chunks.get()) * step;
             std::size_t end1 =
-                (std::min)(start1 + step, static_cast<std::size_t>(len1));
+                (std::min) (start1 + step, static_cast<std::size_t>(len1));
 
             if (start1 >= end1)
             {
@@ -243,11 +243,11 @@ namespace hpx::parallel::detail {
                 chunk->start_index = curr_chunk->start_index + curr_chunk->len;
                 if (curr_chunk->first1 != static_cast<std::size_t>(-1))
                 {
-                    first1_pos = (std::max)(first1_pos, curr_chunk->first1);
+                    first1_pos = (std::max) (first1_pos, curr_chunk->first1);
                 }
                 if (curr_chunk->first2 != static_cast<std::size_t>(-1))
                 {
-                    first2_pos = (std::max)(first2_pos, curr_chunk->first2);
+                    first2_pos = (std::max) (first2_pos, curr_chunk->first2);
                 }
             }
 

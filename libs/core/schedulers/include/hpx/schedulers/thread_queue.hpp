@@ -420,12 +420,14 @@ namespace hpx::threads::policies {
             else
             {
                 // delete only this many threads
-                std::int64_t delete_count = (std::min)(
-                    static_cast<std::int64_t>(terminated_items_count_ / 10),
-                    static_cast<std::int64_t>(parameters_.max_delete_count_));
+                std::int64_t delete_count =
+                    (std::min) (static_cast<std::int64_t>(
+                                    terminated_items_count_ / 10),
+                        static_cast<std::int64_t>(
+                            parameters_.max_delete_count_));
 
                 // delete at least this many threads
-                delete_count = (std::max)(delete_count,
+                delete_count = (std::max) (delete_count,
                     static_cast<std::int64_t>(parameters_.min_delete_count_));
 
                 thread_data* todelete;
@@ -898,9 +900,10 @@ namespace hpx::threads::policies {
         std::size_t get_next_threads(Iterator it, std::int64_t max_items,
             bool allow_stealing = false, bool steal = false)
         {
-            std::int64_t const work_items_count = (std::min)(
-                work_items_count_.data_.load(std::memory_order_relaxed),
-                max_items);
+            std::int64_t const work_items_count =
+                (std::min) (work_items_count_.data_.load(
+                                std::memory_order_relaxed),
+                    max_items);
 
             if (work_items_count == 0)
             {
@@ -1103,9 +1106,18 @@ namespace hpx::threads::policies {
         inline bool wait_or_add_new(
             bool, std::size_t& added, bool steal = false) HPX_HOT
         {
-            if (0 == new_tasks_count_.data_.load(std::memory_order_relaxed))
+            // no need to try converting from other queue if that has no staged
+            // threads
+            auto const new_tasks_count =
+                new_tasks_count_.data_.load(std::memory_order_relaxed);
+            if (HPX_LIKELY(0 == new_tasks_count))
             {
                 return true;
+            }
+
+            if (new_tasks_count < parameters_.min_tasks_to_steal_staged_)
+            {
+                return false;
             }
 
             // No obvious work has to be done, so a lock won't hurt too much.

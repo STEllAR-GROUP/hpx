@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Minh-Khanh Do
-//  Copyright (c) 2020-2024 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -81,7 +81,7 @@ namespace hpx { namespace parallel {
                 {
                     exclusive_scan<typename vector_type::iterator>().sequential(
                         HPX_FORWARD(ExPolicy, policy), first + 1, last,
-                        result.begin() + 1, *first, HPX_FORWARD(Op, op));
+                        result.begin() + 1, *first, op);
                     result[0] = op(result.back(), *(last - 1));
                 }
                 return result;
@@ -144,7 +144,7 @@ namespace hpx { namespace parallel {
                 HPX_FORWARD(ExPolicy, policy), first, last, dest, init,
                 HPX_FORWARD(Op, op), merge_exclusive_scan(),
                 // new init value is first element from
-                // segmented_excluisve_scan_vector + last init value
+                // segmented_exclusive_scan_vector + last init value
                 [op](vector_type v, T val) { return op(v.front(), val); });
         }
 
@@ -197,20 +197,16 @@ namespace hpx { namespace parallel {
                 OutIter>::is_segmented_iterator;
 
             // check if OutIter is segmented in the same way as SegIter
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             if (is_segmented_the_same(first, last, dest, is_out_seg()))
             {
                 return segmented_exclusive_scan_seq(
                     HPX_FORWARD(ExPolicy, policy), first, last, dest, init,
                     HPX_FORWARD(Op, op), is_out_seg(), HPX_FORWARD(Conv, conv));
             }
-            else
-            {
-                return segmented_exclusive_scan_seq(
-                    HPX_FORWARD(ExPolicy, policy), first, last, dest, init,
-                    HPX_FORWARD(Op, op), std::false_type(),
-                    HPX_FORWARD(Conv, conv));
-            }
+
+            return segmented_exclusive_scan_seq(HPX_FORWARD(ExPolicy, policy),
+                first, last, dest, init, HPX_FORWARD(Op, op), std::false_type(),
+                HPX_FORWARD(Conv, conv));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -224,24 +220,20 @@ namespace hpx { namespace parallel {
             using is_out_seg = typename hpx::traits::segmented_iterator_traits<
                 OutIter>::is_segmented_iterator;
 
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             if (is_segmented_the_same(first, last, dest, is_out_seg()))
             {
                 return segmented_exclusive_scan_par(
                     HPX_FORWARD(ExPolicy, policy), first, last, dest, init,
                     HPX_FORWARD(Op, op), is_out_seg(), HPX_FORWARD(Conv, conv));
             }
-            else
-            {
-                return segmented_exclusive_scan_par(
-                    HPX_FORWARD(ExPolicy, policy), first, last, dest, init,
-                    HPX_FORWARD(Op, op), std::false_type(),
-                    HPX_FORWARD(Conv, conv));
-            }
+
+            return segmented_exclusive_scan_par(HPX_FORWARD(ExPolicy, policy),
+                first, last, dest, init, HPX_FORWARD(Op, op), std::false_type(),
+                HPX_FORWARD(Conv, conv));
         }
         /// \endcond
     }    // namespace detail
-}}       // namespace hpx::parallel
+}}    // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {

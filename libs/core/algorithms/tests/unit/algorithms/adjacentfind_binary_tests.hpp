@@ -47,7 +47,8 @@ void test_adjacent_find(ExPolicy policy, IteratorTag)
     iterator index = hpx::adjacent_find(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::greater<int>());
 
-    base_iterator test_index = std::begin(c) + random_pos;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(random_pos);
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -72,7 +73,8 @@ void test_adjacent_find_async(ExPolicy p, IteratorTag)
     f.wait();
 
     // create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + random_pos;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(random_pos);
     HPX_TEST(f.get() == iterator(test_index));
 }
 

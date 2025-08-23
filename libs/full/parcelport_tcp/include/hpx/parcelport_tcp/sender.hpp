@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
@@ -74,11 +74,13 @@ namespace hpx::parcelset::policies::tcp {
             // gracefully and portably shutdown the socket
             if (socket_.is_open())
             {
+                // NOLINTBEGIN(bugprone-unused-return-value)
                 std::error_code ec;
                 socket_.shutdown(asio::ip::tcp::socket::shutdown_both, ec);
 
                 // close the socket to give it back to the OS
                 socket_.close(ec);
+                // NOLINTEND(bugprone-unused-return-value)
             }
         }
 
@@ -167,8 +169,12 @@ namespace hpx::parcelset::policies::tcp {
                 for (serialization::serialization_chunk& c : buffer_.chunks_)
                 {
                     if (c.type_ ==
-                        serialization::chunk_type::chunk_type_pointer)
+                            serialization::chunk_type::chunk_type_pointer ||
+                        c.type_ ==
+                            serialization::chunk_type::chunk_type_const_pointer)
+                    {
                         buffers.emplace_back(c.data_.cpos_, c.size_);
+                    }
                 }
             }
             else

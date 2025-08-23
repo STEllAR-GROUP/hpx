@@ -21,7 +21,7 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 _gen(seed);
 
 struct throw_always
@@ -46,13 +46,14 @@ struct user_defined_type
 {
     user_defined_type() = default;
     user_defined_type(int rand_no)
-      : val(rand_no)
+      : val(static_cast<unsigned int>(rand_no))
     {
-        std::uniform_int_distribution<> dis(0, name_list.size() - 1);
+        std::uniform_int_distribution<> dis(
+            0, static_cast<int>(name_list.size() - 1));
         name = name_list[dis(_gen)];
     }
 
-    bool operator<(int rand_base) const
+    bool operator<(unsigned int rand_base) const
     {
         static std::string const base_name = "BASE";
 
@@ -71,7 +72,7 @@ struct user_defined_type
 
     static const std::vector<std::string> name_list;
 
-    int val;
+    unsigned int val;
     std::string name;
 };
 
@@ -80,9 +81,10 @@ const std::vector<std::string> user_defined_type::name_list{
 
 struct random_fill
 {
-    random_fill(int rand_base, int range)
+    random_fill(std::size_t rand_base, std::size_t half_range /* >= 0 */)
       : gen(_gen())
-      , dist(rand_base - range / 2, rand_base + range / 2)
+      , dist(static_cast<int>(rand_base - half_range),
+            static_cast<int>(rand_base + half_range))
     {
     }
 
@@ -97,7 +99,8 @@ struct random_fill
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag, typename DataType, typename Pred>
-void test_partition_copy(IteratorTag, DataType, Pred pred, int rand_base)
+void test_partition_copy(
+    IteratorTag, DataType, Pred pred, unsigned int rand_base)
 {
     using base_iterator = typename std::vector<DataType>::iterator;
     using iterator = test::test_iterator<base_iterator, IteratorTag>;
@@ -128,7 +131,7 @@ void test_partition_copy(IteratorTag, DataType, Pred pred, int rand_base)
 template <typename ExPolicy, typename IteratorTag, typename DataType,
     typename Pred>
 void test_partition_copy(
-    ExPolicy policy, IteratorTag, DataType, Pred pred, int rand_base)
+    ExPolicy policy, IteratorTag, DataType, Pred pred, unsigned int rand_base)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -162,7 +165,7 @@ void test_partition_copy(
 template <typename ExPolicy, typename IteratorTag, typename DataType,
     typename Pred>
 void test_partition_copy_async(
-    ExPolicy policy, IteratorTag, DataType, Pred pred, int rand_base)
+    ExPolicy policy, IteratorTag, DataType, Pred pred, unsigned int rand_base)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -344,21 +347,25 @@ void test_partition_copy()
 {
     using namespace hpx::execution;
 
-    int rand_base = _gen();
+    unsigned int rand_base = _gen();
 
     ////////// Test cases for 'int' type.
     test_partition_copy(
         IteratorTag(), int(),
-        [rand_base](const int n) -> bool { return n < rand_base; }, rand_base);
+        [rand_base](const unsigned int n) -> bool { return n < rand_base; },
+        rand_base);
     test_partition_copy(
         seq, IteratorTag(), int(),
-        [rand_base](const int n) -> bool { return n < rand_base; }, rand_base);
+        [rand_base](const unsigned int n) -> bool { return n < rand_base; },
+        rand_base);
     test_partition_copy(
         par, IteratorTag(), int(),
-        [rand_base](const int n) -> bool { return n <= rand_base; }, rand_base);
+        [rand_base](const unsigned int n) -> bool { return n <= rand_base; },
+        rand_base);
     test_partition_copy(
         par_unseq, IteratorTag(), int(),
-        [rand_base](const int n) -> bool { return n > rand_base; }, rand_base);
+        [rand_base](const unsigned int n) -> bool { return n > rand_base; },
+        rand_base);
 
     ////////// Test cases for user defined type.
     test_partition_copy(
@@ -385,10 +392,12 @@ void test_partition_copy()
     ////////// Asynchronous test cases for 'int' type.
     test_partition_copy_async(
         seq(task), IteratorTag(), int(),
-        [rand_base](const int n) -> bool { return n >= rand_base; }, rand_base);
+        [rand_base](const unsigned int n) -> bool { return n >= rand_base; },
+        rand_base);
     test_partition_copy_async(
         par(task), IteratorTag(), int(),
-        [rand_base](const int n) -> bool { return n < rand_base; }, rand_base);
+        [rand_base](const unsigned int n) -> bool { return n < rand_base; },
+        rand_base);
 
     ////////// Asynchronous test cases for user defined type.
     test_partition_copy_async(
@@ -405,7 +414,7 @@ void test_partition_copy()
     ////////// Corner test cases.
     test_partition_copy(
         par, IteratorTag(), int(),
-        [rand_base](const int) -> bool {
+        [rand_base](const unsigned int) -> bool {
             HPX_UNUSED(rand_base);
             return true;
         },

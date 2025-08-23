@@ -47,14 +47,4 @@ namespace hpx {
                 typename traits::promise_remote_result<Result>::type>
         class promise;
     }
-
-    namespace lcos {
-
-        template <typename Result,
-            typename RemoteResult =
-                typename traits::promise_remote_result<Result>::type>
-        using promise HPX_DEPRECATED_V(1, 8,
-            "hpx::lcos::promise is deprecated, use hpx::distributed::promise "
-            "instead") = hpx::distributed::promise<Result, RemoteResult>;
-    }
 }    // namespace hpx

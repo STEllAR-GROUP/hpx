@@ -153,7 +153,7 @@ namespace hpx::execution::experimental::detail {
         {
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
             static hpx::util::itt::event notify_event(
-                "set_value_loop_visitor_static::do_work_chunk(chunking)");
+                "set_value_loop_visitor::do_work_chunk(chunking)");
 
             hpx::util::itt::mark_event e(notify_event);
 #endif

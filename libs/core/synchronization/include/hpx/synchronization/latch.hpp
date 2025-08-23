@@ -225,12 +225,6 @@ namespace hpx {
 
 namespace hpx::lcos::local {
 
-    /// \cond NOINTERNAL
-    using cpp20_latch HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::cpp20_latch is deprecated, use hpx::latch instead") =
-        hpx::latch;
-    /// \endcond
-
     ///////////////////////////////////////////////////////////////////////////
     /// A latch maintains an internal counter_ that is initialized when the
     /// latch is created. Threads may block at a synchronization point waiting

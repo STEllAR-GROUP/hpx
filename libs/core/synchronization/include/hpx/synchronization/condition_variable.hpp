@@ -1252,14 +1252,3 @@ namespace hpx {
         hpx::util::cache_aligned_data_derived<data_type> data_;
     };
 }    // namespace hpx
-
-namespace hpx::lcos::local {
-
-    using condition_variable HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::condition_variable is deprecated, use "
-        "hpx::condition_variable instead") = hpx::condition_variable;
-
-    using condition_variable_any HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::condition_variable_any is deprecated, use "
-        "hpx::condition_variable_any instead") = hpx::condition_variable_any;
-}    // namespace hpx::lcos::local

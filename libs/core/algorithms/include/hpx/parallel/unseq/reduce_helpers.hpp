@@ -229,7 +229,7 @@ namespace hpx::parallel::util::detail {
                 // Vectorized loop
                 std::size_t const limit = block_size * (count / block_size);
                 for (std::size_t i = 2 * block_size; i != limit;
-                     i += block_size)
+                    i += block_size)
                 {
                     HPX_VECTORIZE
                     for (std::size_t j = 0; j != block_size; ++j)
@@ -407,8 +407,9 @@ namespace hpx::parallel::util::detail {
         reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce r,
             Convert conv)
         {
-            constexpr std::size_t block_size = (std::max)(
-                HPX_LANE_SIZE / (sizeof(T) * 8), static_cast<std::size_t>(1));
+            constexpr std::size_t block_size =
+                (std::max) (HPX_LANE_SIZE / (sizeof(T) * 8),
+                    static_cast<std::size_t>(1));
 
             // To small, just run sequential
             if (count <= 2 * block_size)
@@ -438,7 +439,7 @@ namespace hpx::parallel::util::detail {
                 // Vectorized loop
                 std::size_t const limit = block_size * (count / block_size);
                 for (std::size_t i = 2 * block_size; i != limit;
-                     i += block_size)
+                    i += block_size)
                 {
                     HPX_VECTORIZE
                     for (std::size_t j = 0; j != block_size; ++j)

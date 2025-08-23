@@ -29,6 +29,7 @@ ex::any_sender<int> fib3(int n)
 
 int hpx_main()
 {
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(fib3(15))), 610);
     return hpx::local::finalize();
 }

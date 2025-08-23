@@ -263,7 +263,7 @@ namespace hpx::parallel {
 
                 using policy_type = std::decay_t<decltype(policy)>;
 
-                std::size_t count = (std::min)(count1, count2);
+                std::size_t count = (std::min) (count1, count2);
                 hpx::parallel::util::cancellation_token<std::size_t> tok(count);
 
                 auto f1 = [tok, pred, proj1, proj2](zip_iterator it,
@@ -329,17 +329,17 @@ namespace hpx {
     inline constexpr struct lexicographical_compare_t final
       : hpx::detail::tag_parallel_algorithm<lexicographical_compare_t>
     {
-        // clang-format off
         template <typename InIter1, typename InIter2,
-            typename Pred = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter1> &&
                 hpx::traits::is_iterator_v<InIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<InIter1>::value_type,
                     typename std::iterator_traits<InIter2>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(hpx::lexicographical_compare_t,
             InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
@@ -355,10 +355,10 @@ namespace hpx {
                 HPX_MOVE(pred), hpx::identity_v, hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Pred = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -366,7 +366,7 @@ namespace hpx {
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             hpx::lexicographical_compare_t, ExPolicy&& policy, FwdIter1 first1,

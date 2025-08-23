@@ -68,11 +68,11 @@ namespace hpx::parallel::util {
             HPX_MOVE(f), [](util::in_in_result<I1, I2>&& p) { return p.in2; });
     }
 
+    template <typename InInResultSender>
     // clang-format off
-    template <typename InInResultSender,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::execution::experimental::is_sender_v<InInResultSender>
-        )>
+        )
     // clang-format on
     decltype(auto) get_in2_element(InInResultSender&& result_sender)
     {
@@ -163,11 +163,11 @@ namespace hpx::parallel::util {
         };
     }    // namespace functional
 
+    template <typename Sender>
     // clang-format off
-    template <typename Sender,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::execution::experimental::is_sender_v<Sender>
-        )>
+        )
     // clang-format on
     decltype(auto) get_second_element(Sender&& sender)
     {
@@ -273,11 +273,11 @@ namespace hpx::parallel::util {
             HPX_MOVE(f), [](in_in_out_result<I1, I2, O>&& p) { return p.out; });
     }
 
+    template <typename InInOutResultSender>
     // clang-format off
-    template <typename InInOutResultSender,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::execution::experimental::is_sender_v<InInOutResultSender>
-        )>
+        )
     // clang-format on
     decltype(auto) get_third_element(InInOutResultSender&& result_sender)
     {
@@ -421,11 +421,11 @@ namespace hpx::parallel::util {
             return result_type{hpx::get<0>(t), hpx::get<1>(t)};
         }
 
+        template <typename ZipIterSender>
         // clang-format off
-        template <typename ZipIterSender,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_sender_v<ZipIterSender>
-            )>
+            )
         // clang-format on
         decltype(auto) get_in_out_result(ZipIterSender&& zipiter_sender)
         {
@@ -506,11 +506,11 @@ namespace hpx::parallel::util {
             return result_type{hpx::get<0>(t), hpx::get<1>(t), hpx::get<2>(t)};
         }
 
+        template <typename ZipIterSender>
         // clang-format off
-        template <typename ZipIterSender,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_sender_v<ZipIterSender>
-            )>
+            )
         // clang-format on
         decltype(auto) get_in_in_out_result(ZipIterSender&& zipiter_sender)
         {
@@ -555,4 +555,4 @@ namespace hpx::ranges {
     using hpx::parallel::util::in_out_result;
     using hpx::parallel::util::min_max_result;
 }    // namespace hpx::ranges
-     // namespace hpx::ranges
+// namespace hpx::ranges

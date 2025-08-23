@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,6 +16,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -81,6 +82,8 @@ void _fibonacci(std::shared_ptr<_fibonacci_frame> const& frame_)
         goto L1;
     case 2:
         goto L2;
+    default:
+        std::terminate();
     }
 
     // if (n < 2) return hpx::make_ready_future(n);

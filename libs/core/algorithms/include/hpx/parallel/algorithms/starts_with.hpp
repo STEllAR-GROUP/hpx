@@ -266,17 +266,17 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<starts_with_t>
     {
     private:
-        // clang-format off
         template <typename InIter1, typename InIter2,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter1> &&
                 hpx::traits::is_iterator_v<InIter2> &&
                 hpx::is_invocable_v<Pred,
                     hpx::traits::iter_value_t<InIter1>,
                     hpx::traits::iter_value_t<InIter2>
                 >
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(hpx::starts_with_t, InIter1 first1,
             InIter1 last1, InIter2 first2, InIter2 last2, Pred pred = Pred())
@@ -292,10 +292,10 @@ namespace hpx {
                 HPX_MOVE(pred), hpx::identity_v, hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Pred = ranges::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = ranges::equal_to>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -303,7 +303,7 @@ namespace hpx {
                     hpx::traits::iter_value_t<FwdIter1>,
                     hpx::traits::iter_value_t<FwdIter2>
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::starts_with_t,
             ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,

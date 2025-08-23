@@ -12,6 +12,7 @@
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <random>
@@ -44,7 +45,8 @@ void test_partial_sort_range_sent(IteratorTag)
     for (std::uint64_t i = 1; i < SIZE; ++i)
     {
         B = A;
-        hpx::ranges::partial_sort(B.begin(), B.begin() + i,
+        hpx::ranges::partial_sort(B.begin(),
+            B.begin() + static_cast<std::ptrdiff_t>(i),
             sentinel<std::uint64_t>{SIZE}, compare_t());
 
         for (std::uint64_t j = 0; j < i; ++j)
@@ -72,7 +74,8 @@ void test_partial_sort_range_sent(ExPolicy policy, IteratorTag)
     for (std::uint64_t i = 1; i < SIZE; ++i)
     {
         B = A;
-        hpx::ranges::partial_sort(policy, B.begin(), B.begin() + i,
+        hpx::ranges::partial_sort(policy, B.begin(),
+            B.begin() + static_cast<std::ptrdiff_t>(i),
             sentinel<std::uint64_t>{SIZE}, compare_t());
 
         for (std::uint64_t j = 0; j < i; ++j)
@@ -100,7 +103,8 @@ void test_partial_sort_range_async_sent(ExPolicy p, IteratorTag)
     for (std::uint64_t i = 1; i < SIZE; ++i)
     {
         B = A;
-        auto result = hpx::ranges::partial_sort(p, B.begin(), B.begin() + i,
+        auto result = hpx::ranges::partial_sort(p, B.begin(),
+            B.begin() + static_cast<std::ptrdiff_t>(i),
             sentinel<std::uint64_t>{SIZE}, compare_t());
         result.wait();
 
@@ -129,7 +133,8 @@ void test_partial_sort_range(IteratorTag)
     for (std::uint64_t i = 1; i < SIZE; ++i)
     {
         B = A;
-        hpx::ranges::partial_sort(B, B.begin() + i, compare_t());
+        hpx::ranges::partial_sort(
+            B, B.begin() + static_cast<std::ptrdiff_t>(i), compare_t());
 
         for (std::uint64_t j = 0; j < i; ++j)
         {
@@ -156,7 +161,8 @@ void test_partial_sort_range(ExPolicy policy, IteratorTag)
     for (std::uint64_t i = 1; i < SIZE; ++i)
     {
         B = A;
-        hpx::ranges::partial_sort(policy, B, B.begin() + i, compare_t());
+        hpx::ranges::partial_sort(
+            policy, B, B.begin() + static_cast<std::ptrdiff_t>(i), compare_t());
 
         for (std::uint64_t j = 0; j < i; ++j)
         {
@@ -183,8 +189,8 @@ void test_partial_sort_range_async(ExPolicy p, IteratorTag)
     for (std::uint64_t i = 1; i < SIZE; ++i)
     {
         B = A;
-        auto result =
-            hpx::ranges::partial_sort(p, B, B.begin() + i, compare_t());
+        auto result = hpx::ranges::partial_sort(
+            p, B, B.begin() + static_cast<std::ptrdiff_t>(i), compare_t());
         result.wait();
 
         for (std::uint64_t j = 0; j < i; ++j)

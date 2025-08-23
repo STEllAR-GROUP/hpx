@@ -23,8 +23,10 @@
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
+#include <hpx/threading/thread.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/type_support/pack.hpp>
@@ -56,8 +58,10 @@ namespace hpx::parallel::execution::detail {
         HPX_FORCEINLINE static constexpr void bulk_invoke_helper(
             hpx::util::index_pack<Is...>, F&& f, T&& t, Ts&& ts)
         {
+            // NOLINTBEGIN(bugprone-use-after-move)
             HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t),
                 hpx::get<Is>(HPX_FORWARD(Ts, ts))...);
+            // NOLINTEND(bugprone-use-after-move)
         }
 
         // Perform the work in one element indexed by index. The index
@@ -66,18 +70,12 @@ namespace hpx::parallel::execution::detail {
         HPX_FORCEINLINE void do_work_chunk(
             F&& f, Ts&& ts, std::uint32_t const index) const
         {
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-            static hpx::util::itt::event notify_event(
-                "set_value_loop_visitor_static::do_work_chunk(chunking)");
-
-            hpx::util::itt::mark_event e(notify_event);
-#endif
             using index_pack_type =
                 hpx::detail::fused_index_pack_t<std::decay_t<Ts>>;
 
             auto const i_begin = index * chunk_size;
-            auto const i_end = (std::min)(
-                i_begin + chunk_size, static_cast<std::uint32_t>(size));
+            auto const i_end = (std::min) (i_begin + chunk_size,
+                static_cast<std::uint32_t>(size));
 
             auto it = std::next(hpx::util::begin(state->shape), i_begin);
             for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
@@ -93,12 +91,16 @@ namespace hpx::parallel::execution::detail {
             auto f = state->f;
             auto ts = state->ts;
 
-            auto& local_queue = state->queues[worker_thread].data_;
+            hpx::optional<std::uint32_t> index;
 
             // Handle local queue first
-            hpx::optional<std::uint32_t> index;
+            auto& local_queue = state->queues[worker_thread].data_;
             while ((index = local_queue.template pop<Which>()))
             {
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+                static hpx::util::itt::event notify_event("do_work_chunk");
+                hpx::util::itt::mark_event e(notify_event);
+#endif
                 do_work_chunk(f, ts, *index);
             }
 
@@ -108,18 +110,22 @@ namespace hpx::parallel::execution::detail {
                 constexpr auto opposite_end =
                     hpx::concurrency::detail::opposite_end_v<Which>;
 
-                // clang-format off
-                for (std::uint32_t offset = 1; offset != state->num_threads;
-                    ++offset)
-                // clang-format on
+                auto const num_threads = state->num_threads;
+                for (std::uint32_t offset = 1; offset != num_threads; ++offset)
                 {
-                    std::size_t neighbor_thread =
-                        (worker_thread + offset) % state->num_threads;
-                    auto& neighbor_queue = state->queues[neighbor_thread].data_;
+                    std::size_t neighbor_thread = worker_thread + offset;
+                    if (neighbor_thread >= num_threads)
+                        neighbor_thread -= num_threads;
 
+                    auto& neighbor_queue = state->queues[neighbor_thread].data_;
                     while (
                         (index = neighbor_queue.template pop<opposite_end>()))
                     {
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+                        static hpx::util::itt::event notify_event(
+                            "do_work_chunk (stealing)");
+                        hpx::util::itt::mark_event e(notify_event);
+#endif
                         do_work_chunk(f, ts, *index);
                     }
                 }
@@ -210,13 +216,12 @@ namespace hpx::parallel::execution::detail {
         using init_no_addref = base_type::init_no_addref;
 
         // Compute a chunk size given a number of worker threads and a total
-        // number of items n. Returns a power-of-2 chunk size that produces at
-        // most 8 and at least 4 chunks per worker thread.
+        // number of items n.
         constexpr std::uint32_t get_chunk_size(
             std::uint32_t const n) const noexcept
         {
             std::uint32_t chunk_size = 1;
-            while (chunk_size * num_threads * 8 < n)
+            while (chunk_size * num_threads * 64 < n)
             {
                 chunk_size *= 2;
             }
@@ -226,7 +231,11 @@ namespace hpx::parallel::execution::detail {
         HPX_FORCEINLINE constexpr std::uint32_t wrapped_pu_num(
             std::uint32_t const pu, bool const needs_wraparound) const noexcept
         {
-            return needs_wraparound ? pu % available_threads : pu;
+            if (!needs_wraparound || pu < available_threads)
+            {
+                return pu;
+            }
+            return pu - available_threads;
         }
 
         hpx::threads::mask_type full_mask() const noexcept
@@ -262,10 +271,8 @@ namespace hpx::parallel::execution::detail {
 
             auto mask = hpx::threads::mask_type();
             hpx::threads::resize(mask, num_cores);
-            // clang-format off
             for (std::uint32_t i = 0, j = 0; i != num_threads && j != num_cores;
                 ++j)
-            // clang-format on
             {
                 if (hpx::threads::test(orgmask, j))
                 {
@@ -274,6 +281,17 @@ namespace hpx::parallel::execution::detail {
                 }
             }
             return mask;
+        }
+
+        static std::uint32_t get_first_core(hpx::threads::mask_cref_type mask)
+        {
+            auto size = hpx::threads::mask_size(mask);
+            for (std::uint32_t i = 0; i != size; ++i)
+            {
+                if (hpx::threads::test(mask, i))
+                    return i;
+            }
+            return 0;
         }
 
         // Initialize a queue for a worker thread.
@@ -294,8 +312,9 @@ namespace hpx::parallel::execution::detail {
             auto& queue = queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
             auto const part_begin = worker_thread;
-            auto part_end = static_cast<std::uint32_t>((std::min)(
-                size + num_threads - 1, part_begin + num_steps * num_threads));
+            auto part_end =
+                static_cast<std::uint32_t>((std::min) (size + num_threads - 1,
+                    part_begin + num_steps * num_threads));
             auto const remainder = static_cast<std::uint32_t>(
                 (part_end - part_begin) % num_threads);
             if (remainder != 0)
@@ -347,7 +366,7 @@ namespace hpx::parallel::execution::detail {
             {
                 // apply hint if none was given
                 hint.mode = hpx::threads::thread_schedule_hint_mode::thread;
-                hint.hint = static_cast<std::uint16_t>(
+                hint.hint = static_cast<std::int16_t>(
                     wrapped_pu_num(worker_thread, needs_wraparound) +
                     first_thread);
 
@@ -371,8 +390,9 @@ namespace hpx::parallel::execution::detail {
           : base_type(init_no_addref{})
           , first_thread(static_cast<std::uint32_t>(first_thread_))
           , num_threads(static_cast<std::uint32_t>(num_threads_))
-          , available_threads((std::min)(
-                static_cast<std::uint32_t>(available_threads_), num_threads))
+          , available_threads(
+                (std::min) (static_cast<std::uint32_t>(available_threads_),
+                    num_threads))
           , policy(HPX_MOVE(l))
           , f(HPX_FORWARD(F_, f))
           , shape(shape)
@@ -387,6 +407,12 @@ namespace hpx::parallel::execution::detail {
         void execute(hpx::threads::thread_description const& desc,
             threads::thread_pool_base* pool)
         {
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            static hpx::util::itt::event notify_event(
+                "index_queue_spawning::execute");
+            hpx::util::itt::mark_event e(notify_event);
+#endif
+
             auto const size =
                 static_cast<std::uint32_t>(hpx::util::size(shape));
 
@@ -399,11 +425,11 @@ namespace hpx::parallel::execution::detail {
             std::uint32_t const num_pus = num_threads;
             if (num_chunks < static_cast<std::uint32_t>(num_threads))
             {
-                num_threads = num_chunks;    //-V101
+                num_threads = num_chunks;
                 tasks_remaining.data_ = num_chunks;
-                pu_mask = limit_mask(pu_mask, num_chunks);    //-V106
+                pu_mask = limit_mask(pu_mask, num_chunks);
 
-                available_threads = (std::min)(available_threads, num_threads);
+                available_threads = (std::min) (available_threads, num_threads);
             }
 
             HPX_ASSERT(hpx::threads::count(pu_mask) == available_threads);
@@ -417,10 +443,8 @@ namespace hpx::parallel::execution::detail {
             // Initialize the queues for all worker threads so that worker
             // threads can start stealing immediately when they start.
 
-            // clang-format off
             for (std::uint32_t worker_thread = 0; worker_thread != num_threads;
                 ++worker_thread)
-            // clang-format on
             {
                 if (hint.placement_mode() == placement::breadth_first ||
                     hint.placement_mode() == placement::breadth_first_reverse)
@@ -443,15 +467,20 @@ namespace hpx::parallel::execution::detail {
             bool const needs_wraparound = num_threads > available_threads;
 
             auto const& rp = hpx::resource::get_partitioner();
-            std::size_t main_pu_num = rp.get_pu_num(wrapped_pu_num(
-                local_worker_thread, needs_wraparound));    //-V106
+            std::size_t main_pu_num = get_first_core(pu_mask);
+            if (local_worker_thread != static_cast<std::uint32_t>(-1))
+            {
+                main_pu_num = rp.get_pu_num(
+                    wrapped_pu_num(local_worker_thread, needs_wraparound));
+            }
+
             if (!hpx::threads::test(pu_mask, main_pu_num) || num_threads == 1)
             {
                 main_thread_ok = true;
                 local_worker_thread = worker_thread++;
                 main_pu_num = rp.get_pu_num(
                     wrapped_pu_num(local_worker_thread, needs_wraparound) +
-                    first_thread);    //-V106
+                    first_thread);
             }
 
             bool const reverse_placement =
@@ -460,14 +489,11 @@ namespace hpx::parallel::execution::detail {
             bool const allow_stealing =
                 !hpx::threads::do_not_share_function(hint.sharing_mode());
 
-            // clang-format off
             for (std::uint32_t pu = 0;
                 worker_thread != num_threads && pu != num_pus; ++pu)
-            // clang-format on
             {
-                std::size_t const pu_num =
-                    rp.get_pu_num(wrapped_pu_num(pu, needs_wraparound) +
-                        first_thread);    //-V106
+                std::size_t const pu_num = rp.get_pu_num(
+                    wrapped_pu_num(pu, needs_wraparound) + first_thread);
 
                 // The queue for the local thread is handled later inline.
                 if (allow_stealing && !main_thread_ok &&
@@ -481,7 +507,7 @@ namespace hpx::parallel::execution::detail {
                     local_worker_thread = worker_thread++;
                     main_pu_num = rp.get_pu_num(
                         wrapped_pu_num(local_worker_thread, needs_wraparound) +
-                        first_thread);    //-V106
+                        first_thread);
                     continue;
                 }
 
@@ -556,8 +582,7 @@ namespace hpx::parallel::execution::detail {
         HPX_ASSERT(pool);
 
         // Don't spawn tasks if there is no work to be done
-        std::size_t const size = hpx::util::size(shape);
-        if (size == 0)
+        if (hpx::util::begin(shape) == hpx::util::end(shape))
         {
             return hpx::make_ready_future();
         }

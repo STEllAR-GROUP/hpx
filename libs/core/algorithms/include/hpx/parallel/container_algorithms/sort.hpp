@@ -290,41 +290,6 @@ namespace hpx { namespace ranges {
 #include <type_traits>
 #include <utility>
 
-namespace hpx::parallel {
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng,
-        typename Comp = detail::less,
-        typename Proj = hpx::identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_range_v<Rng> &&
-            traits::is_projected_range_v<Proj, Rng> &&
-            traits::is_indirect_callable<ExPolicy, Comp,
-                traits::projected_range<Proj, Rng>,
-                traits::projected_range<Proj, Rng>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::parallel::sort is deprecated, use hpx::sort instead")
-        util::detail::algorithm_result_t<ExPolicy,
-            hpx::traits::range_iterator_t<Rng>> sort(ExPolicy&& policy,
-            Rng&& rng, Comp&& comp = Comp(), Proj&& proj = Proj())
-    {
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return sort(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-            hpx::util::end(rng), HPX_FORWARD(Comp, comp),
-            HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}    // namespace hpx::parallel
-
 namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -333,11 +298,10 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<sort_t>
     {
     private:
-        // clang-format off
         template <typename RandomIt, typename Sent,
-            typename Comp = ranges::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = ranges::less, typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::traits::is_sentinel_for_v<Sent, RandomIt> &&
                 parallel::traits::is_projected_v<Proj, RandomIt> &&
@@ -346,7 +310,7 @@ namespace hpx::ranges {
                     parallel::traits::projected<Proj, RandomIt>,
                     parallel::traits::projected<Proj, RandomIt>
                 >
-            )>
+            )
         // clang-format on
         friend RandomIt tag_fallback_invoke(hpx::ranges::sort_t, RandomIt first,
             Sent last, Comp comp = Comp(), Proj proj = Proj())
@@ -359,11 +323,10 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename RandomIt, typename Sent,
-            typename Comp = ranges::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = ranges::less, typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::traits::is_sentinel_for_v<Sent, RandomIt> &&
@@ -372,7 +335,7 @@ namespace hpx::ranges {
                     parallel::traits::projected<Proj, RandomIt>,
                     parallel::traits::projected<Proj, RandomIt>
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, RandomIt>
         tag_fallback_invoke(hpx::ranges::sort_t, ExPolicy&& policy,
@@ -386,11 +349,10 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
+        template <typename Rng, typename Comp = ranges::less,
+            typename Proj = hpx::identity>
         // clang-format off
-        template <typename Rng,
-            typename Comp = ranges::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
                 parallel::traits::is_indirect_callable_v<
@@ -398,7 +360,7 @@ namespace hpx::ranges {
                     parallel::traits::projected_range<Proj, Rng>,
                     parallel::traits::projected_range<Proj, Rng>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::sort_t, Rng&& rng, Comp comp = Comp(),
@@ -416,11 +378,10 @@ namespace hpx::ranges {
                 HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
+        template <typename ExPolicy, typename Rng, typename Comp = ranges::less,
+            typename Proj = hpx::identity>
         // clang-format off
-        template <typename ExPolicy, typename Rng,
-            typename Comp = ranges::less,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -428,7 +389,7 @@ namespace hpx::ranges {
                     parallel::traits::projected_range<Proj, Rng>,
                     parallel::traits::projected_range<Proj, Rng>
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             hpx::traits::range_iterator_t<Rng>>

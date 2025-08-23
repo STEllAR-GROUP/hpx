@@ -386,7 +386,9 @@ namespace hpx::parcelset::policies::lci {
         {
             serialization::serialization_chunk& chunk =
                 buffer_.chunks_[send_chunks_idx];
-            if (chunk.type_ == serialization::chunk_type::chunk_type_pointer)
+            if (chunk.type_ == serialization::chunk_type::chunk_type_pointer ||
+                chunk.type_ ==
+                    serialization::chunk_type::chunk_type_const_pointer)
             {
                 state.store(
                     connection_state::locked, std::memory_order_relaxed);

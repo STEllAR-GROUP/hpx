@@ -130,8 +130,8 @@ namespace hpx::parallel::util::detail {
         HPX_HOST_DEVICE chunk_size_iterator(IterOrR it, std::size_t chunk_size,
             std::size_t count = 0, std::size_t current = 0) noexcept
           : data_(it, 0)
-          , chunk_size_(
-                (std::max)((std::min)(chunk_size, count), std::size_t(1)))
+          , chunk_size_((std::max) ((std::min) (chunk_size, count),
+                static_cast<std::size_t>(1)))
           , last_chunk_size_(get_last_chunk_size(count, chunk_size))
           , count_(count)
           , current_(get_current(current, chunk_size))
@@ -261,21 +261,27 @@ namespace hpx::parallel::util::detail {
                 -static_cast<std::ptrdiff_t>(offset + chunk()), chunk());
         }
 
-        template <typename Iter = IterOrR,
-            HPX_CONCEPT_REQUIRES_(hpx::traits::is_bidirectional_iterator_v<
+        template <typename Iter = IterOrR>
+        // clang-format off
+            requires (hpx::traits::is_bidirectional_iterator_v<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
-                std::is_integral_v<Iter>)>
+                std::is_integral_v<Iter>
+            )
+        // clang-format on
         HPX_HOST_DEVICE void decrement() noexcept
         {
             decrement(0);
         }
 
-        template <typename Iter = IterOrR,
-            HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<
+        template <typename Iter = IterOrR>
+        // clang-format off
+            requires (hpx::traits::is_random_access_iterator_v<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
-                std::is_integral_v<Iter>)>
+                std::is_integral_v<Iter>
+            )
+        // clang-format on
         HPX_HOST_DEVICE void advance(std::ptrdiff_t n) noexcept
         {
             // prepare next value
@@ -289,11 +295,14 @@ namespace hpx::parallel::util::detail {
             }
         }
 
-        template <typename Iter = IterOrR,
-            HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<
+        template <typename Iter = IterOrR>
+        // clang-format off
+            requires (hpx::traits::is_random_access_iterator_v<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
-                std::is_integral_v<Iter>)>
+                std::is_integral_v<Iter>
+            )
+        // clang-format on
         HPX_HOST_DEVICE constexpr std::ptrdiff_t distance_to(
             chunk_size_iterator const& rhs) const noexcept
         {
@@ -353,8 +362,8 @@ namespace hpx::parallel::util::detail {
             std::size_t chunk_size, std::size_t count = 0,
             std::size_t current = 0, std::size_t base_idx = 0)
           : data_(it, 0, base_idx)
-          , chunk_size_(
-                (std::max)((std::min)(chunk_size, count), std::size_t(1)))
+          , chunk_size_((std::max) ((std::min) (chunk_size, count),
+                static_cast<std::size_t>(1)))
           , last_chunk_size_(get_last_chunk_size(count, chunk_size))
           , count_(count)
           , current_(get_current(current, chunk_size))
@@ -498,21 +507,27 @@ namespace hpx::parallel::util::detail {
                 -static_cast<std::ptrdiff_t>(offset + chunk()), chunk());
         }
 
-        template <typename Iter = IterOrR,
-            HPX_CONCEPT_REQUIRES_(hpx::traits::is_bidirectional_iterator_v<
+        template <typename Iter = IterOrR>
+        // clang-format off
+            requires (hpx::traits::is_bidirectional_iterator_v<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
-                std::is_integral_v<Iter>)>
+                std::is_integral_v<Iter>
+            )
+        // clang-format on
         HPX_HOST_DEVICE void decrement() noexcept
         {
             decrement(0);
         }
 
-        template <typename Iter = IterOrR,
-            HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<
+        template <typename Iter = IterOrR>
+        // clang-format off
+            requires (hpx::traits::is_random_access_iterator_v<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
-                std::is_integral_v<Iter>)>
+                std::is_integral_v<Iter>
+            )
+        // clang-format on
         HPX_HOST_DEVICE void advance(std::ptrdiff_t n) noexcept
         {
             // prepare next value
@@ -526,11 +541,14 @@ namespace hpx::parallel::util::detail {
             }
         }
 
-        template <typename Iter = IterOrR,
-            HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<
+        template <typename Iter = IterOrR>
+        // clang-format off
+            requires (hpx::traits::is_random_access_iterator_v<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
-                std::is_integral_v<Iter>)>
+                std::is_integral_v<Iter>
+            )
+        // clang-format on
         HPX_HOST_DEVICE constexpr std::ptrdiff_t distance_to(
             chunk_size_idx_iterator const& rhs) const noexcept
         {

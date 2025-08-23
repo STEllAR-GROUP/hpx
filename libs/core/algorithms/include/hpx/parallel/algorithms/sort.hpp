@@ -306,7 +306,7 @@ namespace hpx::parallel {
                 cores, count, max_chunks, chunk_size);
 
             // we should not get smaller than our sort_limit_per_task
-            chunk_size = (std::max)(chunk_size, sort_limit_per_task);
+            chunk_size = (std::max) (chunk_size, sort_limit_per_task);
 
             std::ptrdiff_t const N = last - first;
             HPX_ASSERT(N >= 0);
@@ -378,39 +378,6 @@ namespace hpx::parallel {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename RandomIt,
-        typename Comp = detail::less, typename Proj = hpx::identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<RandomIt> &&
-            traits::is_projected_v<Proj, RandomIt> &&
-            traits::is_indirect_callable<ExPolicy, Comp,
-                traits::projected<Proj, RandomIt>,
-                traits::projected<Proj, RandomIt>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::parallel::sort is deprecated, use hpx::sort instead")
-        util::detail::algorithm_result_t<ExPolicy, RandomIt> sort(
-            ExPolicy&& policy, RandomIt first, RandomIt last,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
-    {
-        static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
-            "Requires a random access iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::sort<RandomIt>().call(HPX_FORWARD(ExPolicy, policy),
-            first, last, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
 }    // namespace hpx::parallel
 
 namespace hpx {
@@ -420,16 +387,16 @@ namespace hpx {
     inline constexpr struct sort_t final
       : hpx::detail::tag_parallel_algorithm<sort_t>
     {
-        // clang-format off
         template <typename RandomIt,
-            typename Comp = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::is_invocable_v<Comp,
                     hpx::traits::iter_value_t<RandomIt>,
                     hpx::traits::iter_value_t<RandomIt>
                 >
-            )>
+            )
         // clang-format on
         friend void tag_fallback_invoke(
             hpx::sort_t, RandomIt first, RandomIt last, Comp comp = Comp())
@@ -441,17 +408,17 @@ namespace hpx {
                 first, last, HPX_MOVE(comp), hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename RandomIt,
-            typename Comp = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::is_invocable_v<Comp,
                     hpx::traits::iter_value_t<RandomIt>,
                     hpx::traits::iter_value_t<RandomIt>
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::sort_t, ExPolicy&& policy, RandomIt first,

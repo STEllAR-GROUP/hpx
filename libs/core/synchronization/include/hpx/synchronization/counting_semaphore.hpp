@@ -364,6 +364,7 @@ namespace hpx {
             }
 
             explicit counting_semaphore(std::ptrdiff_t value) noexcept
+              // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new)
               : data_(new data_type(value), false)
             {
             }
@@ -462,29 +463,6 @@ namespace hpx {
         }
     };
 }    // namespace hpx
-
-/// \cond NOINTERN
-namespace hpx::lcos::local {
-
-    template <std::ptrdiff_t LeastMaxValue = PTRDIFF_MAX,
-        typename Mutex = hpx::spinlock>
-    using cpp20_counting_semaphore HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::cpp20_counting_semaphore is deprecated, use "
-        "hpx::counting_semaphore instead") =
-        hpx::detail::counting_semaphore<LeastMaxValue, Mutex>;
-
-    template <typename Mutex = hpx::spinlock, int N = 0>
-    using counting_semaphore_var HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::counting_semaphore_var is deprecated, use "
-        "hpx::counting_semaphore_var instead") =
-        hpx::counting_semaphore_var<Mutex, N>;
-
-    using counting_semaphore HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::counting_semaphore is deprecated, use "
-        "hpx::counting_semaphore_var<> instead") =
-        hpx::counting_semaphore_var<>;
-}    // namespace hpx::lcos::local
-     /// \endcond
 
 #endif
 

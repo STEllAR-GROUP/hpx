@@ -28,6 +28,7 @@ namespace boost { namespace inspect {
         register_signature(".ipp");
         register_signature("Jamfile");
         register_signature(".py");
+        register_signature(".ixx");
     }
 
     void tab_check::inspect(const string& library_name,

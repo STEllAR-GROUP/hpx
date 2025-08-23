@@ -41,7 +41,7 @@ namespace jacobi_smp {
         typedef std::vector<hpx::shared_future<void>> deps_vector;
 
         std::size_t n_block =
-            static_cast<std::size_t>(std::ceil(double(n) / block_size));
+            static_cast<std::size_t>(std::ceil(double(n) / double(block_size)));
 
         std::shared_ptr<deps_vector> deps_new(
             new deps_vector(n_block, hpx::make_ready_future()));
@@ -53,7 +53,7 @@ namespace jacobi_smp {
         {
             for (std::size_t y = 1, j = 0; y < n - 1; y += block_size, ++j)
             {
-                std::size_t y_end = (std::min)(y + block_size, n - 1);
+                std::size_t y_end = (std::min) (y + block_size, n - 1);
                 std::vector<hpx::shared_future<void>> trigger;
                 trigger.reserve(3);
                 trigger.push_back((*deps_old)[j]);

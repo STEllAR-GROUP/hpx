@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -137,6 +137,7 @@ namespace hpx::runtime_local::detail {
                 throw_auxinfo_ = *auxinfo_;
             }
         }
+        // NOLINTNEXTLINE(bugprone-empty-catch)
         catch (...)
         {    //-V565
             // do nothing

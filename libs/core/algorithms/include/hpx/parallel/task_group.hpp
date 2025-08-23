@@ -61,11 +61,12 @@ namespace hpx::experimental {
         /// \param f          The user defined function to invoke inside the task
         ///                   group.
         /// \param ts         Additional arguments to use to invoke \c f().
+
+        template <typename Executor, typename F, typename... Ts>
         // clang-format off
-        template <typename Executor, typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_executor_any_v<std::decay_t<Executor>>
-            )>
+            )
         // clang-format on
         void run(Executor&& exec, F&& f, Ts&&... ts)
         {
@@ -100,11 +101,12 @@ namespace hpx::experimental {
         /// \param f   The user defined function to invoke inside the task
         ///            group.
         /// \param ts  Additional arguments to use to invoke \c f().
+
+        template <typename F, typename... Ts>
         // clang-format off
-        template <typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !hpx::traits::is_executor_any_v<std::decay_t<F>>
-            )>
+            )
         // clang-format on
         void run(F&& f, Ts&&... ts)
         {

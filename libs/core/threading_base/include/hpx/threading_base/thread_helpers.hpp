@@ -656,6 +656,7 @@ namespace hpx::this_thread {
     // returns whether the remaining stack-space is at least as large as
     // requested
     HPX_CORE_EXPORT bool has_sufficient_stack_space(
-        std::size_t space_needed = 8 * HPX_THREADS_STACK_OVERHEAD) noexcept;
+        std::size_t space_needed = static_cast<std::size_t>(
+            8 * HPX_THREADS_STACK_OVERHEAD)) noexcept;
     /// \endcond
 }    // namespace hpx::this_thread

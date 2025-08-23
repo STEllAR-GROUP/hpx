@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -34,7 +34,8 @@ struct file_wrapper
 
         if (mode & std::ios_base::in)
         {
-            stream_.read(data_.data(), data_.size());
+            stream_.read(
+                data_.data(), static_cast<std::streamsize>(data_.size()));
         }
     }
 
@@ -42,7 +43,8 @@ struct file_wrapper
     {
         if (mode_ & std::ios_base::out)
         {
-            stream_.write(data_.data(), data_.size());
+            stream_.write(
+                data_.data(), static_cast<std::streamsize>(data_.size()));
         }
     }
 
