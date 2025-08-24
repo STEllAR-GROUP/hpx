@@ -133,14 +133,34 @@ namespace hpx::execution::experimental {
     // Continue on
     using stdexec::continue_on;
     using stdexec::continue_on_t;
+    // Backward compatibility alias for continues_on
+    inline constexpr stdexec::continue_on_t continues_on{};
+    using continues_on_t = stdexec::continue_on_t;
 
     // Transfer just
     using stdexec::transfer_just;
     using stdexec::transfer_just_t;
 
-    // Bulk (NOT FORWARDED)
-    //    using stdexec::bulk_t;
-    //    using stdexec::bulk;
+    // Bulk operations - stdexec provides these
+    using stdexec::bulk;
+    using stdexec::bulk_chunked;
+    using stdexec::bulk_chunked_t;
+    using stdexec::bulk_t;
+    using stdexec::bulk_unchunked;
+    using stdexec::bulk_unchunked_t;
+
+    // Execution policies for stdexec bulk operations
+    // Use stdexec's own execution policy types
+    using stdexec::is_execution_policy;
+    using stdexec::is_execution_policy_v;
+    using stdexec::par;
+    using stdexec::par_unseq;
+    using stdexec::parallel_policy;
+    using stdexec::parallel_unsequenced_policy;
+    using stdexec::seq;
+    using stdexec::sequenced_policy;
+    using stdexec::unseq;
+    using stdexec::unsequenced_policy;
 
     // Split
     using stdexec::split;
@@ -308,6 +328,11 @@ namespace hpx::execution::experimental {
 
         using stdexec::__connect_awaitable_t;
     }    // namespace stdexec_internal
+
+    // Additional stdexec concepts and utilities needed for domain customization
+    using stdexec::__completes_on;
+    using stdexec::__starts_on;
+    using stdexec::sender_expr_for;
 }    // namespace hpx::execution::experimental
 
 // Leaving this as a placeholder
