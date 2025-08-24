@@ -67,6 +67,33 @@ function(add_hpx_module libname modulename)
             FORCE
   )
 
+  if(${modulename}_GLOBAL_HEADER_MODULE_GEN)
+    # Mark the module as exposing C++ modules
+    set(cxx_modules ${HPX_ENABLED_CXX_MODULES})
+    list(APPEND cxx_modules ${modulename})
+    list(SORT cxx_modules)
+    list(REMOVE_DUPLICATES cxx_modules)
+
+    set(HPX_ENABLED_CXX_MODULES
+        ${cxx_modules}
+        CACHE INTERNAL "List of HPX modules that are exposed as a C++ module"
+              FORCE
+    )
+
+    set(cxx_modules ${HPX_${libname_upper}_ENABLED_CXX_MODULES})
+    list(APPEND cxx_modules ${modulename})
+    list(SORT cxx_modules)
+    list(REMOVE_DUPLICATES cxx_modules)
+
+    set(HPX_${libname_upper}_ENABLED_CXX_MODULES
+        ${cxx_modules}
+        CACHE
+          INTERNAL
+          "List of HPX modules that are exposed as a C++ module in the ${libname} library"
+          FORCE
+    )
+  endif()
+
   # Main directories of the module
   set(SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
   set(HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include")
