@@ -98,7 +98,6 @@ struct algorithm_map<hpx::fill_t> {
         return ::thrust::fill(policy.get(), HPX_FORWARD(Args, args)...);
     }
     
-    static constexpr char const* name() { return "thrust::fill"; }
 };
 
 template<>
@@ -116,7 +115,6 @@ struct algorithm_map<hpx::copy_t> {
         return ::thrust::copy(policy.get(), HPX_FORWARD(Args, args)...);
     }
     
-    static constexpr char const* name() { return "thrust::copy"; }
 };
 
 template<>
@@ -126,7 +124,6 @@ struct algorithm_map<hpx::transform_t> {
         return ::thrust::transform(policy.get(), HPX_FORWARD(Args, args)...);
     }
     
-    static constexpr char const* name() { return "thrust::transform"; }
 };
 
 template<>
@@ -136,7 +133,6 @@ struct algorithm_map<hpx::for_each_t> {
         return ::thrust::for_each(policy.get(), HPX_FORWARD(Args, args)...);
     }
     
-    static constexpr char const* name() { return "thrust::for_each"; }
 };
 
 template<>
@@ -146,7 +142,6 @@ struct algorithm_map<hpx::reduce_t> {
         return ::thrust::reduce(policy.get(), HPX_FORWARD(Args, args)...);
     }
     
-    static constexpr char const* name() { return "thrust::reduce"; }
 };
 
 template<>
@@ -156,7 +151,6 @@ struct algorithm_map<hpx::sort_t> {
         return ::thrust::sort(policy.get(), HPX_FORWARD(Args, args)...);
     }
     
-    static constexpr char const* name() { return "thrust::sort"; }
 };
 
 template<>
@@ -166,7 +160,6 @@ struct algorithm_map<hpx::find_t> {
         return ::thrust::find(policy.get(), HPX_FORWARD(Args, args)...);
     }
     
-    static constexpr char const* name() { return "thrust::find"; }
 };
 
 template<>
@@ -176,7 +169,6 @@ struct algorithm_map<hpx::count_t> {
         return ::thrust::count(policy.get(), HPX_FORWARD(Args, args)...);
     }
     
-    static constexpr char const* name() { return "thrust::count"; }
 };
 
 
@@ -187,7 +179,6 @@ struct algorithm_map<hpx::unique_t> {
         return ::thrust::unique(policy.get(), HPX_FORWARD(Args, args)...);
     }
     
-    static constexpr char const* name() { return "thrust::unique"; }
 };
 
 template<>
@@ -197,7 +188,6 @@ struct algorithm_map<hpx::reverse_t> {
         return ::thrust::reverse(policy.get(), HPX_FORWARD(Args, args)...);
     }
     
-    static constexpr char const* name() { return "thrust::reverse"; }
 };
 
 template<>
@@ -575,7 +565,6 @@ struct algorithm_map<hpx::inclusive_scan_t> {
         return ::thrust::inclusive_scan(policy.get(), HPX_FORWARD(Args, args)...);
     }
     
-    static constexpr char const* name() { return "thrust::inclusive_scan"; }
 };
 
 template<>
@@ -585,7 +574,6 @@ struct algorithm_map<hpx::exclusive_scan_t> {
         return ::thrust::exclusive_scan(policy.get(), HPX_FORWARD(Args, args)...);
     }
     
-    static constexpr char const* name() { return "thrust::exclusive_scan"; }
 };
 
 

@@ -11,6 +11,7 @@
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/rebind_executor.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/config/forward.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -256,10 +257,8 @@ namespace hpx::thrust {
             static_assert(hpx::traits::is_executor_any_v<executor_type>,
                 "hpx::traits::is_executor_any_v<Executor>");
 
-            using rebound_type =
-                typename hpx::execution::experimental::rebind_executor<
-                    thrust_policy, Executor_, executor_parameters_type>::type;
-            return rebound_type(std::forward<Executor_>(exec), parameters());
+            return hpx::execution::experimental::create_rebound_policy(
+                thrust_policy(), HPX_FORWARD(Executor_, exec), parameters());
         }
 
         template <typename... Parameters_,
@@ -269,24 +268,13 @@ namespace hpx::thrust {
             executor_type, ParametersType>::type
         with(Parameters_&&... params) const
         {
-            using rebound_type =
-                typename hpx::execution::experimental::rebind_executor<
-                    thrust_policy, executor_type, ParametersType>::type;
-            return rebound_type(executor(),
+            return hpx::execution::experimental::create_rebound_policy(
+                thrust_policy(), executor(),
                 hpx::execution::experimental::join_executor_parameters(
-                    std::forward<Parameters_>(params)...));
+                    HPX_FORWARD(Parameters_, params)...));
         }
 
-        thrust_policy label(char const* l) const
-        {
-            auto p = *this;
-            p.label_ = l;
-            return p;
-        }
-        char const* label() const
-        {
-            return label_;
-        }
+
 
         executor_type executor() const
         {
@@ -304,7 +292,6 @@ namespace hpx::thrust {
 
     private:
         executor_parameters_type params_{};
-        char const* label_ = "unnamed kernel";
     };
 
     template <typename Executor, typename Parameters>
@@ -338,11 +325,8 @@ namespace hpx::thrust {
             static_assert(hpx::traits::is_executor_any_v<executor_type>,
                 "hpx::traits::is_executor_any_v<Executor>");
 
-            using rebound_type =
-                typename hpx::execution::experimental::rebind_executor<
-                    thrust_policy_shim, Executor_,
-                    executor_parameters_type>::type;
-            return rebound_type(std::forward<Executor_>(exec), parameters());
+            return hpx::execution::experimental::create_rebound_policy(
+                thrust_policy_shim(), HPX_FORWARD(Executor_, exec), parameters());
         }
 
         template <typename... Parameters_,
@@ -352,23 +336,13 @@ namespace hpx::thrust {
             thrust_policy_shim, executor_type, ParametersType>::type
         with(Parameters_&&... params) const
         {
-            using rebound_type =
-                typename hpx::execution::experimental::rebind_executor<
-                    thrust_policy_shim, executor_type, ParametersType>::type;
-            return rebound_type(executor(),
+            return hpx::execution::experimental::create_rebound_policy(
+                thrust_policy_shim(), executor(),
                 hpx::execution::experimental::join_executor_parameters(
-                    std::forward<Parameters_>(params)...));
+                    HPX_FORWARD(Parameters_, params)...));
         }
 
-        thrust_policy_shim& label(char const* l)
-        {
-            label_ = l;
-            return *this;
-        }
-        char const* label() const
-        {
-            return label_;
-        }
+
 
         Executor& executor()
         {
@@ -409,7 +383,6 @@ namespace hpx::thrust {
     private:
         Executor exec_;
         Parameters params_;
-        char const* label_ = "unnamed kernel";
     };
 
     // Host-specific policy that inherits from thrust_policy
