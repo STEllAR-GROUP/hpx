@@ -1,13 +1,11 @@
-/// \file
-/// Universal algorithm dispatch for Thrust integration with HPX
+//  Copyright (c)      2025 Aditya Sapra
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
 
 #pragma once
-
-//
-// SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
-//
 
 #include <hpx/thrust/detail/algorithm_map.hpp>
 #include <hpx/thrust/policy.hpp>
