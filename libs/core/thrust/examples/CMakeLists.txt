@@ -7,6 +7,24 @@
 if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_target(examples.modules.thrust)
   add_hpx_pseudo_dependencies(examples.modules examples.modules.thrust)
+  if(HPX_WITH_CUDA)
+    set(thrust_examples device_fill host_fill device_copy device_transform async_fill_n reverse_reduce)
+
+    foreach(example ${thrust_examples})
+      set(source ${example}.cu)
+      source_group("Source Files" FILES ${source})
+
+      add_hpx_executable(
+        ${example} INTERNAL_FLAGS
+        SOURCES ${source}
+        EXCLUDE_FROM_ALL
+        HPX_PREFIX ${HPX_BUILD_PREFIX}
+        FOLDER "Examples/Modules/Core/Thrust"
+      )
+
+      add_hpx_pseudo_dependencies(examples.modules.thrust ${example})
+    endforeach()
+  endif()
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_pseudo_target(tests.examples.modules.thrust)
     add_hpx_pseudo_dependencies(

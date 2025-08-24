@@ -24,9 +24,7 @@ foreach(test ${tests})
     FOLDER "Tests/Unit/Modules/Core/Thrust"
   )
 
-  add_hpx_unit_test(
-    "modules.thrust" ${test} ${${test}_PARAMETERS} RUN_SERIAL
-  )
+  add_hpx_unit_test("modules.thrust" ${test} ${${test}_PARAMETERS})
 endforeach()
 # Copyright (c) 2020-2023 The STE||AR-Group
 #

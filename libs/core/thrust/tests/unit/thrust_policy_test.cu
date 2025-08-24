@@ -1,10 +1,18 @@
+//
+// SPDX-License-Identifier: BSL-1.0
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+//
+
 #include <hpx/config.hpp>
 #include <hpx/algorithm.hpp>
-#include <hpx/thrust/algorithms.hpp>
-#include <hpx/thrust/policy.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/testing.hpp>
+
+#include <hpx/thrust/algorithms.hpp>
+#include <hpx/thrust/policy.hpp>
 
 #include <chrono>
 #include <iostream>
@@ -40,12 +48,10 @@ int hpx_main(hpx::program_options::variables_map&)
     auto stop_cpu = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> duration_cpu =
         stop_cpu - start_cpu;
-    std::cout << "CPU execution time: " << duration_cpu.count() << " ms"
-              << std::endl;
+    HPX_TEST(duration_cpu.count() >= 0.0);
     bool success_cpu =
         (cpu_vec[0] == fill_value) && (cpu_vec[size - 1] == fill_value);
-    std::cout << "CPU verification: " << (success_cpu ? "Success" : "Failed")
-              << std::endl;
+    HPX_TEST(success_cpu);
 
     // Test 2: Thrust Host Policy
     std::cout << "\n--- Test 2: Thrust Host Policy ---" << std::endl;
@@ -60,8 +66,7 @@ int hpx_main(hpx::program_options::variables_map&)
     auto stop_host = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> duration_host =
         stop_host - start_host;
-    std::cout << "Host fill execution time: " << duration_host.count() << " ms"
-              << std::endl;
+    HPX_TEST(duration_host.count() >= 0.0);
 
     std::cout << "Testing hpx::copy with thrust_host_policy..." << std::endl;
     hpx::copy(
@@ -77,8 +82,7 @@ int hpx_main(hpx::program_options::variables_map&)
         (host_vec[size - 1] == fill_value) &&
         (host_result[0] == fill_value + 1) &&
         (host_result[size - 1] == fill_value + 1);
-    std::cout << "Host policy verification: "
-              << (success_host ? "Success" : "Failed") << std::endl;
+    HPX_TEST(success_host);
 
     // Test 3: Thrust Device Policy - Multiple Algorithms
     std::cout
@@ -99,8 +103,7 @@ int hpx_main(hpx::program_options::variables_map&)
     auto stop_device = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> duration_device =
         stop_device - start_device;
-    std::cout << "Device fill execution time: " << duration_device.count()
-              << " ms" << std::endl;
+    HPX_TEST(duration_device.count() >= 0.0);
 
     std::cout << " Testing hpx::copy with thrust_device_policy..." << std::endl;
     hpx::copy(device_policy, device_vec.begin(), device_vec.end(),
@@ -120,8 +123,7 @@ int hpx_main(hpx::program_options::variables_map&)
     bool success_device = (first_val == fill_value) &&
         (last_val == fill_value) && (first_result == fill_value * 2) &&
         (last_result == fill_value * 2);
-    std::cout << "Device policy verification: "
-              << (success_device ? "Success" : "Failed") << std::endl;
+    HPX_TEST(success_device);
 
     // Test 4: Test NEW algorithms that weren't available before
     std::cout << "\n--- Test 4: Testing Additional Algorithms ---" << std::endl;
@@ -132,10 +134,6 @@ int hpx_main(hpx::program_options::variables_map&)
         numbers.begin(), numbers.end(), 1);    // Fill with 1, 2, 3, ..., 10
     thrust::device_vector<int> d_numbers = numbers;
 
-    std::cout << "Original data: ";
-    for (int i = 0; i < 10; ++i)
-        std::cout << numbers[i] << " ";
-    std::cout << std::endl;
 
     std::cout << " Testing hpx::reverse with thrust_device_policy..."
               << std::endl;
@@ -143,16 +141,11 @@ int hpx_main(hpx::program_options::variables_map&)
 
     // Copy back to see result
     thrust::host_vector<int> reversed_result = d_numbers;
-    std::cout << "After reverse: ";
-    for (int i = 0; i < 10; ++i)
-        std::cout << reversed_result[i] << " ";
-    std::cout << std::endl;
 
     std::cout << " Testing hpx::reduce with thrust_device_policy..."
               << std::endl;
     int sum = hpx::reduce(device_policy, d_numbers.begin(), d_numbers.end(), 0);
-    std::cout << "Sum of reversed array: " << sum << " (expected: 55)"
-              << std::endl;
+    HPX_TEST_EQ(sum, 55);
 
     // Test 5: Global Instance Test
     std::cout << "\n--- Test 5: Global Instance Test ---" << std::endl;
@@ -165,8 +158,7 @@ int hpx_main(hpx::program_options::variables_map&)
         global_host_vec.end(), 99);
     bool global_host_success =
         (global_host_vec[0] == 99) && (global_host_vec[999] == 99);
-    std::cout << "thrust_host global instance: "
-              << (global_host_success ? "Success" : "Failed") << std::endl;
+    HPX_TEST(global_host_success);
 
     // Test global thrust_device instance
     thrust::device_vector<int> global_device_vec(1000, 0);
@@ -175,8 +167,7 @@ int hpx_main(hpx::program_options::variables_map&)
     int first_device = global_device_vec[0];
     int last_device = global_device_vec[999];
     bool global_device_success = (first_device == 88) && (last_device == 88);
-    std::cout << "thrust_device global instance: "
-              << (global_device_success ? "Success" : "Failed") << std::endl;
+    HPX_TEST(global_device_success);
 
     // Performance Comparison
     std::cout << "\n=== Performance Comparison ===" << std::endl;
@@ -206,8 +197,7 @@ int hpx_main(hpx::program_options::variables_map&)
     f_fill.get();
     bool task_explicit_ok =
         (dev_task_vec[0] == 7) && (dev_task_vec[size - 1] == 7);
-    std::cout << "Task explicit target verification: "
-              << (task_explicit_ok ? "Success" : "Failed") << std::endl;
+    HPX_TEST(task_explicit_ok);
     all_tests_passed = all_tests_passed && task_explicit_ok;
 
     // Test 7: Task policy default-target fallback (async: reverse)
@@ -222,8 +212,7 @@ int hpx_main(hpx::program_options::variables_map&)
     f_rev.get();
     thrust::host_vector<int> h_after = d_small;
     bool task_default_ok = (h_after.front() == 10) && (h_after.back() == 1);
-    std::cout << "Task default target verification: "
-              << (task_default_ok ? "Success" : "Failed") << std::endl;
+    HPX_TEST(task_default_ok);
     all_tests_passed = all_tests_passed && task_default_ok;
 
     // Test 8: Same-stream ordering (reuse bound target): fill 1 then fill 2
@@ -234,8 +223,7 @@ int hpx_main(hpx::program_options::variables_map&)
     auto f2 = hpx::fill(p_task, order_vec.begin(), order_vec.end(), 2);
     hpx::when_all(f1, f2).get();
     bool order_ok = (order_vec[0] == 2) && (order_vec[size - 1] == 2);
-    std::cout << "Same-stream ordering verification: "
-              << (order_ok ? "Success" : "Failed") << std::endl;
+    HPX_TEST(order_ok);
     all_tests_passed = all_tests_passed && order_ok;
 
     // Test 9: Async algorithms with return values (fill_n)
@@ -264,14 +252,7 @@ int hpx_main(hpx::program_options::variables_map&)
 
     bool fill_n_success =
         iter_correct && first_half_filled && second_half_untouched;
-    std::cout << "Async fill_n verification: "
-              << (fill_n_success ? "Success" : "Failed") << std::endl;
-    std::cout << "  - Iterator position: "
-              << (iter_correct ? "Correct" : "Wrong") << std::endl;
-    std::cout << "  - First half filled: " << (first_half_filled ? "Yes" : "No")
-              << std::endl;
-    std::cout << "  - Second half untouched: "
-              << (second_half_untouched ? "Yes" : "No") << std::endl;
+    HPX_TEST(fill_n_success);
 
     all_tests_passed = all_tests_passed && fill_n_success;
 
