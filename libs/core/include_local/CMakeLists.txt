@@ -10,6 +10,7 @@ set(include_local_headers
     hpx/chrono.hpp
     hpx/condition_variable.hpp
     hpx/datapar.hpp
+    hpx/detail/std_headers.hpp
     hpx/exception.hpp
     hpx/execution.hpp
     hpx/format.hpp

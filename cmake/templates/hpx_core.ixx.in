@@ -8,11 +8,9 @@
 
 module;
 
-// Include all system headers in global module fragment to prevent ODR violations
-#include <algorithm>
-#include <cstdint>
-#include <sstream>
-#include <string>
+// Include all standard library headers in global module fragment to prevent ODR
+// violations.
+#include <hpx/detail/std_headers.hpp>
 
 // Define module-specific macros before including config
 #define HPX_BUILD_MODULE
