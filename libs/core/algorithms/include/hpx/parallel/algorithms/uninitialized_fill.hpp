@@ -249,7 +249,7 @@ namespace hpx::parallel {
                 call(
                     HPX_FORWARD(ExPolicy, policy), first, count,
                     [value, policy](Iter it, std::size_t part_size) mutable
-                    -> partition_result_type {
+                        -> partition_result_type {
                         return std::make_pair(it,
                             sequential_uninitialized_fill_n(
                                 HPX_FORWARD(ExPolicy, policy), it, part_size,
@@ -362,9 +362,9 @@ namespace hpx {
             requires (
                 hpx::traits::is_forward_iterator_v<FwdIter>
             )
-            // clang-format on
-            friend void tag_fallback_invoke(hpx::uninitialized_fill_t,
-                FwdIter first, FwdIter last, T const& value)
+        // clang-format on
+        friend void tag_fallback_invoke(hpx::uninitialized_fill_t,
+            FwdIter first, FwdIter last, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
@@ -379,9 +379,9 @@ namespace hpx {
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter>
             )
-            // clang-format on
-            friend decltype(auto) tag_fallback_invoke(hpx::uninitialized_fill_t,
-                ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)
+        // clang-format on
+        friend decltype(auto) tag_fallback_invoke(hpx::uninitialized_fill_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
@@ -408,9 +408,9 @@ namespace hpx {
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
             )
-            // clang-format on
-            friend FwdIter tag_fallback_invoke(hpx::uninitialized_fill_n_t,
-                FwdIter first, Size count, T const& value)
+        // clang-format on
+        friend FwdIter tag_fallback_invoke(hpx::uninitialized_fill_n_t,
+            FwdIter first, Size count, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
@@ -434,10 +434,9 @@ namespace hpx {
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
             )
-            // clang-format on
-            friend decltype(auto) tag_fallback_invoke(
-                hpx::uninitialized_fill_n_t, ExPolicy&& policy, FwdIter first,
-                Size count, T const& value)
+        // clang-format on
+        friend decltype(auto) tag_fallback_invoke(hpx::uninitialized_fill_n_t,
+            ExPolicy&& policy, FwdIter first, Size count, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
