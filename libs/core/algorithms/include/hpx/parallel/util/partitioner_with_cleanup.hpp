@@ -12,9 +12,9 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_local/dataflow.hpp>
 #endif
-#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/execution/algorithms/just.hpp>
 #include <hpx/execution/algorithms/let_value.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/detail/select_partitioner.hpp>
@@ -148,11 +148,11 @@ namespace hpx::parallel::util {
                             auto&& all_parts) mutable {
                             using item_type =
                                 std::decay_t<decltype(*all_parts.begin())>;
-                            constexpr bool is_variant_with_exception =
-                                requires {
-                                    std::holds_alternative<std::exception_ptr>(
-                                        std::declval<item_type>());
-                                };
+                            constexpr bool is_variant_with_exception = requires
+                            {
+                                std::holds_alternative<std::exception_ptr>(
+                                    std::declval<item_type>());
+                            };
 
                             if constexpr (!is_variant_with_exception)
                             {

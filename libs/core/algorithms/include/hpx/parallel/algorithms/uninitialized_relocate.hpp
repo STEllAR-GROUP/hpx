@@ -383,6 +383,9 @@ namespace hpx {
 #include <hpx/algorithms/traits/pointer_category.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
+#include <hpx/execution/algorithms/just.hpp>
+#include <hpx/execution_base/any_sender.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -760,12 +763,26 @@ namespace hpx::experimental {
                     if (!((first < dest_last) && (dest_last < last)))
                     {
                         // use parallel version
-                        return parallel::util::get_second_element(
-                            hpx::parallel::detail::uninitialized_relocate_n<
-                                parallel::util::in_out_result<InIter,
-                                    FwdIter>>()
-                                .call(HPX_FORWARD(ExPolicy, policy), first,
-                                    count, dest));
+                        if constexpr (has_scheduler_executor)
+                        {
+                            namespace ex = hpx::execution::experimental;
+                            return ex::unique_any_sender<
+                                FwdIter>(parallel::util::get_second_element(
+                                hpx::parallel::detail::uninitialized_relocate_n<
+                                    parallel::util::in_out_result<InIter,
+                                        FwdIter>>()
+                                    .call(HPX_FORWARD(ExPolicy, policy), first,
+                                        count, dest)));
+                        }
+                        else
+                        {
+                            return parallel::util::get_second_element(
+                                hpx::parallel::detail::uninitialized_relocate_n<
+                                    parallel::util::in_out_result<InIter,
+                                        FwdIter>>()
+                                    .call(HPX_FORWARD(ExPolicy, policy), first,
+                                        count, dest));
+                        }
                     }
                     // if it is we continue to use the sequential version
                 }
@@ -773,11 +790,24 @@ namespace hpx::experimental {
                 // to use the sequential version
             }
 
-            return parallel::util::get_second_element(
-                hpx::parallel::detail::uninitialized_relocate_n<
-                    parallel::util::in_out_result<InIter, FwdIter>>()
-                    .call(hpx::execution::seq, first,
-                        static_cast<std::size_t>(count), dest));
+            if constexpr (has_scheduler_executor)
+            {
+                namespace ex = hpx::execution::experimental;
+                return ex::unique_any_sender<FwdIter>(
+                    ex::just(parallel::util::get_second_element(
+                        hpx::parallel::detail::uninitialized_relocate_n<
+                            parallel::util::in_out_result<InIter, FwdIter>>()
+                            .call(hpx::execution::seq, first,
+                                static_cast<std::size_t>(count), dest))));
+            }
+            else
+            {
+                return parallel::util::get_second_element(
+                    hpx::parallel::detail::uninitialized_relocate_n<
+                        parallel::util::in_out_result<InIter, FwdIter>>()
+                        .call(hpx::execution::seq, first,
+                            static_cast<std::size_t>(count), dest));
+            }
         }
     } uninitialized_relocate_n{};
 
@@ -880,12 +910,26 @@ namespace hpx::experimental {
                     if (!((first < dest_last) && (dest_last < last)))
                     {
                         // use parallel version
-                        return parallel::util::get_second_element(
-                            hpx::parallel::detail::uninitialized_relocate_n<
-                                parallel::util::in_out_result<InIter1,
-                                    FwdIter>>()
-                                .call(HPX_FORWARD(ExPolicy, policy), first,
-                                    count, dest));
+                        if constexpr (has_scheduler_executor)
+                        {
+                            namespace ex = hpx::execution::experimental;
+                            return ex::unique_any_sender<
+                                FwdIter>(parallel::util::get_second_element(
+                                hpx::parallel::detail::uninitialized_relocate_n<
+                                    parallel::util::in_out_result<InIter1,
+                                        FwdIter>>()
+                                    .call(HPX_FORWARD(ExPolicy, policy), first,
+                                        count, dest)));
+                        }
+                        else
+                        {
+                            return parallel::util::get_second_element(
+                                hpx::parallel::detail::uninitialized_relocate_n<
+                                    parallel::util::in_out_result<InIter1,
+                                        FwdIter>>()
+                                    .call(HPX_FORWARD(ExPolicy, policy), first,
+                                        count, dest));
+                        }
                     }
                     // if it is we continue to use the sequential version
                 }
@@ -894,10 +938,22 @@ namespace hpx::experimental {
             }
 
             // sequential execution policy
-            return parallel::util::get_second_element(
-                hpx::parallel::detail::uninitialized_relocate_n<
-                    parallel::util::in_out_result<InIter1, FwdIter>>()
-                    .call(hpx::execution::seq, first, count, dest));
+            if constexpr (has_scheduler_executor)
+            {
+                namespace ex = hpx::execution::experimental;
+                return ex::unique_any_sender<FwdIter>(
+                    ex::just(parallel::util::get_second_element(
+                        hpx::parallel::detail::uninitialized_relocate_n<
+                            parallel::util::in_out_result<InIter1, FwdIter>>()
+                            .call(hpx::execution::seq, first, count, dest))));
+            }
+            else
+            {
+                return parallel::util::get_second_element(
+                    hpx::parallel::detail::uninitialized_relocate_n<
+                        parallel::util::in_out_result<InIter1, FwdIter>>()
+                        .call(hpx::execution::seq, first, count, dest));
+            }
         }
     } uninitialized_relocate{};
 
@@ -996,12 +1052,28 @@ namespace hpx::experimental {
                     if (!((first < dest_first) && (dest_first < last)))
                     {
                         // use parallel version
-                        return parallel::util::get_second_element(
-                            hpx::parallel::detail::
-                                uninitialized_relocate_backward<parallel::util::
-                                        in_out_result<BiIter1, BiIter2>>()
-                                    .call(HPX_FORWARD(ExPolicy, policy), first,
-                                        last, dest_last));
+                        if constexpr (has_scheduler_executor)
+                        {
+                            namespace ex = hpx::execution::experimental;
+                            return ex::unique_any_sender<BiIter2>(
+                                parallel::util::get_second_element(
+                                    hpx::parallel::detail::
+                                        uninitialized_relocate_backward<
+                                            parallel::util::in_out_result<
+                                                BiIter1, BiIter2>>()
+                                            .call(HPX_FORWARD(ExPolicy, policy),
+                                                first, last, dest_last)));
+                        }
+                        else
+                        {
+                            return parallel::util::get_second_element(
+                                hpx::parallel::detail::
+                                    uninitialized_relocate_backward<
+                                        parallel::util::in_out_result<BiIter1,
+                                            BiIter2>>()
+                                        .call(HPX_FORWARD(ExPolicy, policy),
+                                            first, last, dest_last));
+                        }
                     }
                     // if it is we continue to use the sequential version
                 }
@@ -1010,10 +1082,23 @@ namespace hpx::experimental {
             }
 
             // sequential execution policy
-            return parallel::util::get_second_element(
-                hpx::parallel::detail::uninitialized_relocate_backward<
-                    parallel::util::in_out_result<BiIter1, BiIter2>>()
-                    .call(hpx::execution::seq, first, last, dest_last));
+            if constexpr (has_scheduler_executor)
+            {
+                namespace ex = hpx::execution::experimental;
+                return ex::unique_any_sender<BiIter2>(
+                    ex::just(parallel::util::get_second_element(
+                        hpx::parallel::detail::uninitialized_relocate_backward<
+                            parallel::util::in_out_result<BiIter1, BiIter2>>()
+                            .call(
+                                hpx::execution::seq, first, last, dest_last))));
+            }
+            else
+            {
+                return parallel::util::get_second_element(
+                    hpx::parallel::detail::uninitialized_relocate_backward<
+                        parallel::util::in_out_result<BiIter1, BiIter2>>()
+                        .call(hpx::execution::seq, first, last, dest_last));
+            }
         }
     } uninitialized_relocate_backward{};
 }    // namespace hpx::experimental

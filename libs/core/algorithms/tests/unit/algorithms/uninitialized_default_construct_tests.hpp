@@ -321,7 +321,8 @@ void test_uninitialized_default_construct_exception_sender(
 {
     using data_type = test::count_instances_v<default_constructable>;
     using base_iterator = data_type*;
-    using decorated_iterator = test::decorated_iterator<base_iterator, IteratorTag>;
+    using decorated_iterator =
+        test::decorated_iterator<base_iterator, IteratorTag>;
 
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
