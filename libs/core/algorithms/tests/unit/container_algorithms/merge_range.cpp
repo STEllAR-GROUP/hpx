@@ -28,7 +28,7 @@ std::mt19937 _gen(seed);
 struct user_defined_type
 {
     user_defined_type() = default;
-    user_defined_type(int rand_no)
+    /*implicit*/ user_defined_type(int rand_no)
       : val(rand_no)
       , name(name_list[_gen() % name_list.size()])
     {
@@ -38,20 +38,18 @@ struct user_defined_type
     {
         if (this->name < t.name)
             return true;
-        else if (this->name > t.name)
+        if (this->name > t.name)
             return false;
-        else
-            return this->val < t.val;
+        return this->val < t.val;
     }
 
     bool operator>(user_defined_type const& t) const
     {
         if (this->name > t.name)
             return true;
-        else if (this->name < t.name)
+        if (this->name < t.name)
             return false;
-        else
-            return this->val > t.val;
+        return this->val > t.val;
     }
 
     bool operator==(user_defined_type const& t) const
@@ -66,13 +64,13 @@ struct user_defined_type
         return t;
     }
 
-    static const std::vector<std::string> name_list;
+    static std::vector<std::string> const name_list;
 
     int val;
     std::string name;
 };
 
-const std::vector<std::string> user_defined_type::name_list{
+std::vector<std::string> const user_defined_type::name_list{
     "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"};
 
 struct random_fill
@@ -97,7 +95,7 @@ struct random_fill
 template <typename DataType>
 void test_merge(DataType)
 {
-    std::size_t const size1 = 300007, size2 = 123456;
+    constexpr std::size_t size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
         dest_sol(size1 + size2);
 
@@ -125,7 +123,7 @@ void test_merge(ExPolicy&& policy, DataType)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    std::size_t const size1 = 300007, size2 = 123456;
+    constexpr std::size_t size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
         dest_sol(size1 + size2);
 
@@ -153,7 +151,7 @@ void test_merge_async(ExPolicy&& policy, DataType)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    std::size_t const size1 = 300007, size2 = 123456;
+    constexpr std::size_t size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
         dest_sol(size1 + size2);
 
@@ -202,9 +200,9 @@ void test_merge()
 template <typename IteratorTag, typename DataType>
 void test_merge_etc(IteratorTag, DataType, unsigned int rand_base)
 {
-    typedef typename std::vector<DataType>::iterator base_iterator;
+    using base_iterator = typename std::vector<DataType>::iterator;
 
-    std::size_t const size1 = 300007, size2 = 123456;
+    constexpr std::size_t size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
         dest_sol(size1 + size2);
 
@@ -215,7 +213,7 @@ void test_merge_etc(IteratorTag, DataType, unsigned int rand_base)
 
     // Test projection.
     {
-        typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+        using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
         DataType val;
         hpx::ranges::merge(
@@ -249,9 +247,9 @@ void test_merge_etc(
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef typename std::vector<DataType>::iterator base_iterator;
+    using base_iterator = typename std::vector<DataType>::iterator;
 
-    std::size_t const size1 = 300007, size2 = 123456;
+    constexpr std::size_t size1 = 300007, size2 = 123456;
     std::vector<DataType> src1(size1), src2(size2), dest_res(size1 + size2),
         dest_sol(size1 + size2);
 
@@ -262,7 +260,7 @@ void test_merge_etc(
 
     // Test projection.
     {
-        typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+        using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
         DataType val;
         hpx::ranges::merge(
@@ -293,20 +291,24 @@ void test_merge_etc(
 template <typename IteratorTag, typename DataType>
 void test_merge_stable(IteratorTag, DataType, unsigned int rand_base)
 {
-    typedef typename std::pair<DataType, int> ElemType;
-    typedef typename std::vector<ElemType>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using ElemType = std::pair<DataType, int>;
+    using base_iterator = typename std::vector<ElemType>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
-    std::size_t const size1 = 300007, size2 = 123456;
+    constexpr std::size_t size1 = 300007, size2 = 123456;
     std::vector<ElemType> src1(size1), src2(size2), dest(size1 + size2);
 
     int no = 0;
     auto rf = random_fill(rand_base, 6);
+
+    // clang-format off
     std::generate(std::begin(src1), std::end(src1),
         [&no, &rf]() -> std::pair<int, int> { return {rf(), no++}; });
     rf = random_fill(rand_base, 8);
     std::generate(std::begin(src2), std::end(src2),
         [&no, &rf]() -> std::pair<int, int> { return {rf(), no++}; });
+    // clang-format on
+
     std::sort(std::begin(src1), std::end(src1));
     std::sort(std::begin(src2), std::end(src2));
 
@@ -349,20 +351,24 @@ void test_merge_stable(
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef typename std::pair<DataType, int> ElemType;
-    typedef typename std::vector<ElemType>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using ElemType = std::pair<DataType, int>;
+    using base_iterator = typename std::vector<ElemType>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
-    std::size_t const size1 = 300007, size2 = 123456;
+    constexpr std::size_t size1 = 300007, size2 = 123456;
     std::vector<ElemType> src1(size1), src2(size2), dest(size1 + size2);
 
     int no = 0;
     auto rf = random_fill(rand_base, 6);
+
+    // clang-format off
     std::generate(std::begin(src1), std::end(src1),
         [&no, &rf]() -> std::pair<int, int> { return {rf(), no++}; });
     rf = random_fill(rand_base, 8);
     std::generate(std::begin(src2), std::end(src2),
         [&no, &rf]() -> std::pair<int, int> { return {rf(), no++}; });
+    // clang-format on
+
     std::sort(std::begin(src1), std::end(src1));
     std::sort(std::begin(src2), std::end(src2));
 
@@ -456,7 +462,7 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()("seed,s", value<unsigned int>(),
         "the random number generator seed to use for this run");
 
-    // By default this test should run on all available cores
+    // By default, this test should run on all available cores
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX

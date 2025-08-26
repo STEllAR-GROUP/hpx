@@ -134,8 +134,8 @@ namespace hpx::experimental {
     ///                  invoke (last argument)
     /// \param ts        The list of reductions and the function to invoke (last
     ///                  argument)
-    template <typename ExPolicy, typename T, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
+    template <typename ExPolicy, typename T, typename... Ts>
+        requires(hpx::is_execution_policy_v<ExPolicy>)
     decltype(auto) run_on_all(ExPolicy&& policy, T&& t, Ts&&... ts)
     {
         return detail::run_on_all(HPX_FORWARD(ExPolicy, policy),
@@ -155,7 +155,7 @@ namespace hpx::experimental {
     /// \param ts        The list of reductions and the function to invoke (last
     ///                  argument)
     template <typename T, typename... Ts>
-        requires(std::is_invocable_v<T &&, Ts && ...>)
+        requires(!hpx::is_execution_policy_v<T>)
     decltype(auto) run_on_all(T&& t, Ts&&... ts)
     {
         return detail::run_on_all(hpx::execution::par,

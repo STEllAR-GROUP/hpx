@@ -41,6 +41,7 @@ set(execution_headers
     hpx/execution/executor_parameters.hpp
     hpx/execution/executors/adaptive_static_chunk_size.hpp
     hpx/execution/executors/auto_chunk_size.hpp
+    hpx/execution/executors/collect_chunking_parameters.hpp
     hpx/execution/executors/default_parameters.hpp
     hpx/execution/executors/dynamic_chunk_size.hpp
     hpx/execution/executors/execution.hpp
@@ -49,6 +50,7 @@ set(execution_headers
     hpx/execution/executors/execution_parameters_fwd.hpp
     hpx/execution/executors/fused_bulk_execute.hpp
     hpx/execution/executors/guided_chunk_size.hpp
+    hpx/execution/executors/max_num_chunks.hpp
     hpx/execution/executors/num_cores.hpp
     hpx/execution/executors/persistent_auto_chunk_size.hpp
     hpx/execution/executors/polymorphic_executor.hpp

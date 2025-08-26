@@ -44,7 +44,9 @@ set_target_properties(hpx_wrap PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(hpx_wrap PRIVATE hpx_full)
 target_link_libraries(hpx_wrap PRIVATE hpx_init)
 target_link_libraries(hpx_wrap PRIVATE hpx_private_flags)
-target_compile_definitions(hpx_wrap PRIVATE HPX_APPLICATION_EXPORTS)
+target_compile_definitions(
+  hpx_wrap PRIVATE HPX_APPLICATION_EXPORTS HPX_LIBRARY_EXPORTS
+)
 target_include_directories(
   hpx_wrap PUBLIC $<BUILD_INTERFACE:${hpx_wrap_HEADER_ROOT}>
                   $<INSTALL_INTERFACE:include>

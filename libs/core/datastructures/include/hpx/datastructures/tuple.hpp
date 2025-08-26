@@ -192,25 +192,22 @@ namespace hpx {
     using hpx::std_adl_barrier::get;
 }    // namespace hpx
 
-#if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE)
-// Adapt hpx::tuple to be usable with std::tuple
+// Adapt hpx::tuple to be usable with structured binding contexts
 namespace std {
 
     template <typename... Ts>
-    struct tuple_size<hpx::tuple<Ts...>>
-      : public hpx::tuple_size<hpx::tuple<Ts...>>
+    struct tuple_size<hpx::tuple<Ts...>> : hpx::tuple_size<hpx::tuple<Ts...>>
     {
     };
 
     template <std::size_t I, typename... Ts>
     struct tuple_element<I, hpx::tuple<Ts...>>
-      : public hpx::tuple_element<I, hpx::tuple<Ts...>>
+      : hpx::tuple_element<I, hpx::tuple<Ts...>>
     {
     };
 
     using hpx::std_adl_barrier::get;
 }    // namespace std
-#endif
 
 namespace hpx {
 

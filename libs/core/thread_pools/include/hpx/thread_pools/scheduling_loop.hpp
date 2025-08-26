@@ -523,11 +523,14 @@ namespace hpx::threads::detail {
                 }
             }
 
+#if defined(HPX_HAVE_MODULE_ASYNC_MPI) ||                                      \
+    defined(HPX_HAVE_MODULE_ASYNC_CUDA) || defined(HPX_HAVE_MODULE_ASYNC_SYCL)
             if (scheduler.custom_polling_function() ==
                 policies::detail::polling_status::busy)
             {
                 idle_loop_count = 0;
             }
+#endif
 
             // something went badly wrong, give up
             if (HPX_UNLIKELY(this_state.load(std::memory_order_relaxed) ==
