@@ -4,6 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+include(HPX_CollectStdHeaders)
 include(HPX_ExportTargets)
 include(HPX_PrintSummary)
 
@@ -192,12 +193,35 @@ function(add_hpx_module libname modulename)
       )
     else()
       set(template_file
-          "${PROJECT_SOURCE_DIR}/cmake/templates/global_module_header.hpp.in"
+          "${HPX_SOURCE_DIR}/cmake/templates/global_module_header.hpp.in"
       )
     endif()
 
     configure_file(${template_file} ${global_header} @ONLY)
     set(generated_headers ${global_header})
+
+    if(${modulename}_GLOBAL_HEADER_MODULE_GEN)
+      # collect all standard header files used by this module
+      set(found_includes)
+      hpx_collect_std_headers(
+        ${modulename}
+        SOURCES ${${modulename}_HEADERS}
+        SOURCE_ROOT ${HPX_SOURCE_DIR}/libs/${libname}
+        GENERATED_ROOT ${CMAKE_BINARY_DIR}/libs/${libname}
+        FOUND_HEADERS found_includes
+      )
+
+      set(standard_headers ${HPX_STANDARD_HEADERS})
+      list(APPEND standard_headers ${found_includes})
+      list(SORT standard_headers)
+      list(REMOVE_DUPLICATES standard_headers)
+
+      set(HPX_STANDARD_HEADERS
+          ${standard_headers}
+          CACHE STRING "List of standard headers #included by HPX modules"
+                FORCE
+      )
+    endif()
   endif()
 
   # some headers files have to be generated, remove the `.in` file extension

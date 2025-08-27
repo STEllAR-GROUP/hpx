@@ -302,6 +302,11 @@ set(HPX_LIBS
 
 foreach(lib ${HPX_LIBS})
 
+  if(HPX_WITH_CXX_MODULES)
+    # the standard header needs to be recreated from scratch
+    unset(HPX_STANDARD_HEADERS CACHE)
+  endif()
+
   # NOTE: hpx_full (i.e. the target representing libhpx.so) is still created in
   # src/CMakeLists.txt. When all of hpx_full has been modularized the target
   # creation can move here as well.
@@ -322,6 +327,11 @@ foreach(lib ${HPX_LIBS})
         set(cxx_module_headers
             "${cxx_module_headers}#include <hpx/modules/${cxx_module}.hpp>\n"
         )
+      endforeach()
+
+      set(standard_headers)
+      foreach(std_header ${HPX_STANDARD_HEADERS})
+        set(standard_headers "${standard_headers}#include ${std_header}\n")
       endforeach()
 
       set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib})

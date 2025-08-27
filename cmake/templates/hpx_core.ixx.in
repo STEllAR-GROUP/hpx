@@ -10,8 +10,7 @@ module;
 
 // Include all standard library headers in global module fragment to prevent ODR
 // violations.
-#include <hpx/detail/std_headers.hpp>
-
+@standard_headers@
 // Define module-specific macros before including config
 #define HPX_BUILD_MODULE
 #include <hpx/config.hpp>
