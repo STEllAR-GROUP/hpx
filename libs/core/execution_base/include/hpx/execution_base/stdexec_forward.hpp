@@ -157,12 +157,20 @@ namespace hpx::execution::experimental {
         using stdexec::par;
         using stdexec::par_unseq;
     }    // namespace stdexec_bulk_operations
+
+    // Make bulk operations available at top level for backward compatibility
     using stdexec::parallel_policy;
     using stdexec::parallel_unsequenced_policy;
     using stdexec::seq;
     using stdexec::sequenced_policy;
     using stdexec::unseq;
     using stdexec::unsequenced_policy;
+    using stdexec_bulk_operations::bulk;
+    using stdexec_bulk_operations::bulk_chunked;
+    using stdexec_bulk_operations::bulk_chunked_t;
+    using stdexec_bulk_operations::bulk_t;
+    using stdexec_bulk_operations::bulk_unchunked;
+    using stdexec_bulk_operations::bulk_unchunked_t;
 
     // Split
     using stdexec::split;
