@@ -253,6 +253,15 @@ function(add_hpx_executable name)
     set(_target_flags ${_target_flags} UNITY_BUILD)
   endif()
 
+  # if modules are not enabled for this executable, then we need to add a
+  # special preprocessor constant preventing the code from trying to use the
+  # module interface unit exposed from the HPX libraries
+  if(HPX_WITH_CXX_MODULES AND NOT CMAKE_CXX_SCAN_FOR_MODULES)
+    target_compile_definitions(
+      ${name} PRIVATE HPX_APPLICATION_DOESNT_USE_CXX_MODULES
+    )
+  endif()
+
   hpx_setup_target(
     ${name}
     TYPE EXECUTABLE

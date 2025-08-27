@@ -357,6 +357,7 @@ with section("parse"):
                                     'EXCLUDE_FROM_GLOBAL_HEADER': '+',
                                     'ADD_TO_GLOBAL_HEADER': '+',
                                     'GLOBAL_HEADER_GEN': 1,
+                                    'GLOBAL_HEADER_MODULE_GEN': 1,
                                     'HEADERS': '+',
                                     'OBJECTS': '+',
                                     'MODULE_DEPENDENCIES': '+',

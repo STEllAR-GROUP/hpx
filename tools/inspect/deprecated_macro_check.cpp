@@ -66,6 +66,7 @@ namespace boost { namespace inspect {
         register_signature(".hpp");
         register_signature(".hxx");
         register_signature(".ipp");
+        register_signature(".ixx");
     }
 
     void deprecated_macro_check::inspect(const string& library_name,

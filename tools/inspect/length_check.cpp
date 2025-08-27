@@ -40,6 +40,7 @@ namespace boost { namespace inspect {
         register_signature(".inc");
         register_signature(".ipp");
         register_signature(".txt");
+        register_signature(".ixx");
     }
 
     struct pattern

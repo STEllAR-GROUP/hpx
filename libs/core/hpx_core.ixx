@@ -1,0 +1,48 @@
+//  Copyright (c) 2025 Haokun Wu
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+module;
+
+// Include all system headers in global module fragment to prevent ODR violations
+#include <algorithm>
+#include <cstdint>
+#include <sstream>
+#include <string>
+
+// Define module-specific macros before including config
+#define HPX_BUILD_MODULE
+#include <hpx/config.hpp>
+
+export module HPX.Core;
+
+#if defined(HPX_MSVC)
+// disable warning C5244: '#include <filename>' in the purview of module
+// 'HPX.Core' appears erroneous.  Consider moving that directive before
+// the module declaration, or replace the textual inclusion with
+// 'import <filename>;'.
+#pragma warning(push)
+#pragma warning(disable : 5244)
+#endif
+
+#if defined(HPX_CLANG_VERSION)
+// disable clang warning: '#include <filename>' attaches the declarations
+// to the named module 'HPX.Core', which is not usually intended; consider
+// moving that directive before the module declaration
+// [-Winclude-angled-in-module-purview]
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Winclude-angled-in-module-purview"
+#endif
+
+// include all HPX module files here that have been converted to C++ modules
+#include <hpx/modules/version.hpp>
+
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic pop
+#endif
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif

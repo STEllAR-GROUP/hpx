@@ -57,6 +57,7 @@ namespace boost { namespace inspect {
         register_signature(".hxx");
         register_signature(".inc");
         register_signature(".ipp");
+        register_signature(".ixx");
     }
 
     //  inspect ( C++ source files )  ---------------------------------------//

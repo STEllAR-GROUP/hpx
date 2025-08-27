@@ -312,6 +312,30 @@ if(HPX_WITH_UNITY_BUILD)
   set(HPX_WITH_UNITY_BUILD_OPTION UNITY_BUILD)
 endif()
 
+# ##############################################################################
+# C++20 modules configuration
+# ##############################################################################
+hpx_option(
+  HPX_WITH_CXX_MODULES BOOL "Enable C++20 modules mode (default: OFF)." OFF
+  ADVANCED
+)
+
+if(HPX_WITH_CXX_MODULES)
+  if(NOT (CMAKE_VERSION VERSION_GREATER_EQUAL "3.29"))
+    hpx_fatal(
+      "Please use a version of CMake newer than V3.28 in order to enable C++ module support for HPX"
+    )
+  endif()
+
+  hpx_info(
+    "HPX will build and install C++20 module interface units for downstream users."
+  )
+  hpx_info("Note: HPX itself will still be built using traditional headers.")
+  hpx_add_config_define(HPX_HAVE_CXX_MODULES)
+else()
+  hpx_info("HPX will be built and used with traditional headers only.")
+endif()
+
 hpx_option(
   HPX_WITH_PRECOMPILED_HEADERS
   BOOL
