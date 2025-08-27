@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/errors/exception_list.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/let_value.hpp>
 #include <hpx/execution/algorithms/then.hpp>
@@ -36,23 +36,8 @@ namespace hpx::detail {
         auto operator()(T1&& t1, Ts&&... ts) -> decltype(Tag{}(
             HPX_MOVE(policy), HPX_FORWARD(T1, t1), HPX_FORWARD(Ts, ts)...))
         {
-            try
-            {
-                return Tag{}(HPX_MOVE(policy), HPX_FORWARD(T1, t1),
-                    HPX_FORWARD(Ts, ts)...);
-            }
-            catch (std::bad_alloc const&)
-            {
-                throw;
-            }
-            catch (hpx::exception_list const&)
-            {
-                throw;
-            }
-            catch (...)
-            {
-                throw hpx::exception_list(std::current_exception());
-            }
+            return Tag{}(
+                HPX_MOVE(policy), HPX_FORWARD(T1, t1), HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -154,11 +139,7 @@ namespace hpx::detail {
         }
 
         template <typename ExPolicy>
-        // clang-format off
-            requires (
-                hpx::is_execution_policy_v<ExPolicy>
-            )
-        // clang-format on
+            requires(hpx::is_execution_policy_v<ExPolicy>)
         friend auto tag_fallback_invoke(Tag, ExPolicy&& policy)
         {
             return hpx::execution::experimental::detail::partial_algorithm<Tag,
@@ -171,13 +152,8 @@ namespace hpx::detail {
         // matching execution policy. Forward call to algorithm by passing the
         // resulting re-wrapped execution policy.
         //
-
         template <typename Scheduler, typename... Ts>
-        // clang-format off
-            requires (
-                hpx::execution::experimental::is_scheduler_v<Scheduler>
-            )
-        // clang-format on
+            requires(hpx::execution::experimental::is_scheduler_v<Scheduler>)
         friend auto tag_fallback_invoke(
             Tag tag, Scheduler&& scheduler, Ts&&... ts)
         {
@@ -195,16 +171,14 @@ namespace hpx::detail {
         // execution policy to the underlying algorithm.
         //
 
-        template <typename Scheduler, typename... Ts>
-        friend auto tag_invoke(Tag tag, Scheduler&& scheduler, Ts&&... ts)
-            -> std::enable_if_t<
+        // clang-format off
+        template <typename Scheduler, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
                 hpx::execution::experimental::is_policy_aware_scheduler_v<
-                    std::decay_t<Scheduler>>,
-                decltype(tag(
-                    scheduler.get_policy().on(std::declval<hpx::execution::
-                            experimental::explicit_scheduler_executor<
-                                std::decay_t<Scheduler>>>()),
-                    HPX_FORWARD(Ts, ts)...))>
+                    std::decay_t<Scheduler>>
+            )>
+        // clang-format on
+        friend auto tag_invoke(Tag tag, Scheduler&& scheduler, Ts&&... ts)
         {
             using namespace hpx::execution::experimental;
             using scheduler_type = std::decay_t<Scheduler>;

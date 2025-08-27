@@ -9,7 +9,6 @@
 
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/member_pack.hpp>
-#include <hpx/errors/exception_list.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>
@@ -35,23 +34,8 @@ namespace hpx::execution::experimental::detail {
         template <typename... Us>
         constexpr HPX_FORCEINLINE auto invoke(Us&&... us) &&
         {
-            try
-            {
-                return Tag{}(
-                    HPX_FORWARD(Us, us)..., HPX_MOVE(ts).template get<Is>()...);
-            }
-            catch (std::bad_alloc const&)
-            {
-                throw;
-            }
-            catch (hpx::exception_list const&)
-            {
-                throw;
-            }
-            catch (...)
-            {
-                throw hpx::exception_list(std::current_exception());
-            }
+            return Tag{}(
+                HPX_FORWARD(Us, us)..., HPX_MOVE(ts).template get<Is>()...);
         }
 
         template <typename... Ts_>

@@ -141,20 +141,22 @@ namespace hpx::execution::experimental {
     using stdexec::transfer_just;
     using stdexec::transfer_just_t;
 
-    // Bulk operations - stdexec provides these
-    using stdexec::bulk;
-    using stdexec::bulk_chunked;
-    using stdexec::bulk_chunked_t;
-    using stdexec::bulk_t;
-    using stdexec::bulk_unchunked;
-    using stdexec::bulk_unchunked_t;
+    namespace stdexec_bulk_operations {
+        // Bulk operations - stdexec provides these
+        using stdexec::bulk;
+        using stdexec::bulk_chunked;
+        using stdexec::bulk_chunked_t;
+        using stdexec::bulk_t;
+        using stdexec::bulk_unchunked;
+        using stdexec::bulk_unchunked_t;
 
-    // Execution policies for stdexec bulk operations
-    // Use stdexec's own execution policy types
-    using stdexec::is_execution_policy;
-    using stdexec::is_execution_policy_v;
-    using stdexec::par;
-    using stdexec::par_unseq;
+        // Execution policies for stdexec bulk operations
+        // Use stdexec's own execution policy types
+        using stdexec::is_execution_policy;
+        using stdexec::is_execution_policy_v;
+        using stdexec::par;
+        using stdexec::par_unseq;
+    }    // namespace stdexec_bulk_operations
     using stdexec::parallel_policy;
     using stdexec::parallel_unsequenced_policy;
     using stdexec::seq;

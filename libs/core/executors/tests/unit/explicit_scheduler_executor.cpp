@@ -134,32 +134,28 @@ void test_bulk_sync_void(Executor&& exec)
     HPX_TEST(executed);
 }
 
-#if !defined(HPX_HAVE_STDEXEC)
 template <typename Executor>
 void test_bulk_async_void(Executor&& exec)
 {
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
 
-    auto result = hpx::this_thread::experimental::sync_wait(
+    executed = false;
+
+    hpx::this_thread::experimental::sync_wait(
         hpx::parallel::execution::bulk_async_execute(
             exec, hpx::bind(&bulk_test_void, _1, _2), 107, 42));
-
-    HPX_UNUSED(result);    // sync_wait already waits for completion
 
     HPX_TEST(executed);
 
     executed = false;
 
-    auto result2 = hpx::this_thread::experimental::sync_wait(
+    hpx::this_thread::experimental::sync_wait(
         hpx::parallel::execution::bulk_async_execute(
             exec, &bulk_test_void, 107, 42));
 
-    HPX_UNUSED(result2);    // sync_wait already waits for completion
-
     HPX_TEST(executed);
 }
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 void bulk_test_f_void(int seq, hpx::shared_future<void> f,
@@ -177,7 +173,6 @@ void bulk_test_f_void(int seq, hpx::shared_future<void> f,
     }
 }
 
-#if !defined(HPX_HAVE_STDEXEC)
 template <typename Executor>
 void test_bulk_then_void(Executor&& exec)
 {
@@ -203,7 +198,6 @@ void test_bulk_then_void(Executor&& exec)
 
     HPX_TEST(executed);
 }
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Executor>
@@ -215,15 +209,9 @@ void test_executor(Executor&& exec)
     test_async(exec);
     test_then(exec);
 
-#if !defined(HPX_HAVE_STDEXEC)
     test_bulk_sync_void(exec);
-#endif
-#if !defined(HPX_HAVE_STDEXEC)
     test_bulk_async_void(exec);
-#endif
-#if !defined(HPX_HAVE_STDEXEC)
     test_bulk_then_void(exec);
-#endif
 }
 
 void tests(hpx::threads::thread_placement_hint placement)

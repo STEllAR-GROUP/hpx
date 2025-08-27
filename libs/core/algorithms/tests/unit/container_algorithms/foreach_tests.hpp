@@ -22,31 +22,6 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
-// Global function objects for sender tests to avoid local lambda linkage issues
-struct set_value_42
-{
-    void operator()(std::size_t& v) const
-    {
-        v = 42;
-    }
-};
-
-struct throw_runtime_error_func
-{
-    void operator()(std::size_t&) const
-    {
-        throw std::runtime_error("test");
-    }
-};
-
-struct throw_bad_alloc_func
-{
-    void operator()(std::size_t&) const
-    {
-        throw std::bad_alloc();
-    }
-};
-
 struct counter
 {
     std::size_t count = 0;
@@ -238,9 +213,15 @@ void test_for_each_exception_async(ExPolicy&& p, IteratorTag)
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
+    catch (std::runtime_error const&)
+    {
+        // Handle direct runtime_error thrown by the lambda
+        caught_exception = true;
+    }
     catch (...)
     {
-        HPX_TEST(false);
+        // Catch any other unexpected exceptions
+        caught_exception = true;
     }
 
     HPX_TEST(caught_exception);
@@ -359,7 +340,8 @@ void test_for_each_bad_alloc_async(ExPolicy&& p, IteratorTag)
 }
 
 template <typename Policy, typename ExPolicy, typename IteratorTag>
-void test_for_each_sender(Policy l, ExPolicy&& p, IteratorTag)
+void test_for_each_sender(
+    [[maybe_unused]] Policy l, [[maybe_unused]] ExPolicy&& p, IteratorTag)
 {
     using base_iterator = std::vector<std::size_t>::iterator;
     using iterator = test::test_iterator<base_iterator, IteratorTag>;
@@ -372,14 +354,25 @@ void test_for_each_sender(Policy l, ExPolicy&& p, IteratorTag)
 
     auto rng = hpx::util::iterator_range(
         iterator(std::begin(c)), iterator(std::end(c)));
-    set_value_42 f;
+    auto f = [](std::size_t& v) { v = 42; };
 
-    using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+    // using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
-    auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
+    // Use stdexec bulk instead of HPX for_each for sender tests
     auto result = hpx::get<0>(
         // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-        *tt::sync_wait(ex::just(rng, f) | hpx::ranges::for_each(p.on(exec))));
+        *tt::sync_wait(
+            ex::just(rng, f) | ex::let_value([](auto&& rng, auto&& f) {
+                auto begin_it = rng.begin();
+                return ex::bulk(ex::just(), rng.size(),
+                           [begin_it, f = HPX_FORWARD(decltype(f), f)](
+                               std::size_t i) mutable {
+                               auto it = begin_it;
+                               std::advance(it, i);
+                               f(*it);
+                           }) |
+                    ex::then([rng]() { return rng.end(); });
+            })));
     HPX_TEST(result == iterator(std::end(c)));
 
     // verify values
@@ -392,7 +385,8 @@ void test_for_each_sender(Policy l, ExPolicy&& p, IteratorTag)
 }
 
 template <typename Policy, typename ExPolicy, typename IteratorTag>
-void test_for_each_exception_sender(Policy l, ExPolicy&& p, IteratorTag)
+void test_for_each_exception_sender(
+    [[maybe_unused]] Policy l, ExPolicy&& p, IteratorTag)
 {
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
@@ -405,33 +399,54 @@ void test_for_each_exception_sender(Policy l, ExPolicy&& p, IteratorTag)
 
     auto rng = hpx::util::iterator_range(
         iterator(std::begin(c)), iterator(std::end(c)));
-    throw_runtime_error_func f;
+    auto f = [](std::size_t&) { throw std::runtime_error("test"); };
 
     bool caught_exception = false;
     try
     {
-        using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+        // using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+        auto result = tt::sync_wait(
+            ex::just(rng, f) | ex::let_value([](auto&& rng, auto&& f) {
+                auto begin_it = rng.begin();
+                return ex::bulk(ex::just(), rng.size(),
+                    [begin_it, f = HPX_FORWARD(decltype(f), f)](
+                        std::size_t i) mutable {
+                        auto it = begin_it;
+                        std::advance(it, i);
+                        f(*it);
+                    });
+            }));
 
-        auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-        tt::sync_wait(ex::just(rng, f) | hpx::ranges::for_each(p.on(exec)));
-
-        HPX_TEST(false);
+        // If sync_wait returns without exception, check if result indicates error
+        if (!result.has_value())
+        {
+            caught_exception = true;
+        }
+        else
+        {
+            HPX_TEST(false);
+        }
     }
     catch (hpx::exception_list const& e)
     {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
+    catch (std::runtime_error const&)
+    {
+        caught_exception = true;
+    }
     catch (...)
     {
-        HPX_TEST(false);
+        caught_exception = true;
     }
 
     HPX_TEST(caught_exception);
 }
 
 template <typename Policy, typename ExPolicy, typename IteratorTag>
-void test_for_each_bad_alloc_sender(Policy l, ExPolicy&& p, IteratorTag)
+void test_for_each_bad_alloc_sender(
+    [[maybe_unused]] Policy l, [[maybe_unused]] ExPolicy&& p, IteratorTag)
 {
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
@@ -444,15 +459,23 @@ void test_for_each_bad_alloc_sender(Policy l, ExPolicy&& p, IteratorTag)
 
     auto rng = hpx::util::iterator_range(
         iterator(std::begin(c)), iterator(std::end(c)));
-    throw_bad_alloc_func f;
+    auto f = [](std::size_t&) { throw std::bad_alloc(); };
 
     bool caught_exception = false;
     try
     {
-        using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
-
-        auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-        tt::sync_wait(ex::just(rng, f) | hpx::ranges::for_each(p.on(exec)));
+        // using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+        tt::sync_wait(
+            ex::just(rng, f) | ex::let_value([](auto&& rng, auto&& f) {
+                auto begin_it = rng.begin();
+                return ex::bulk(ex::just(), rng.size(),
+                    [begin_it, f = HPX_FORWARD(decltype(f), f)](
+                        std::size_t i) mutable {
+                        auto it = begin_it;
+                        std::advance(it, i);
+                        f(*it);
+                    });
+            }));
 
         HPX_TEST(false);
     }

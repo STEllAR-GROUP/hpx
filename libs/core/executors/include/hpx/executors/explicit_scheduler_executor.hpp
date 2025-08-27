@@ -239,14 +239,14 @@ namespace hpx::execution::experimental {
 #if defined(HPX_HAVE_STDEXEC)
                 return just(HPX_MOVE(result_vector), shape, HPX_FORWARD(F, f),
                            HPX_FORWARD(Ts, ts)...) |
-                    transfer(exec.sched_) |
+                    continues_on(exec.sched_) |
                     bulk(shape_size, HPX_MOVE(f_wrapper)) |
                     then(HPX_MOVE(get_result));
 #else
                 // When stdexec is not available, use HPX's original bulk implementation
                 return just(HPX_MOVE(result_vector), shape, HPX_FORWARD(F, f),
                            HPX_FORWARD(Ts, ts)...) |
-                    transfer(exec.sched_) |
+                    continues_on(exec.sched_) |
                     bulk(shape_size, HPX_MOVE(f_wrapper)) |
                     then(HPX_MOVE(get_result));
 #endif

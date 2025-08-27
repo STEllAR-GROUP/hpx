@@ -91,63 +91,62 @@ namespace hpx::execution::experimental {
     template <typename Policy>
     struct thread_pool_domain : stdexec::default_domain
     {
-        // Only intercept stdexec bulk expressions using concept constraints
+        // Transform bulk sender without environment (completes_on pattern)
+        template <__bulk_chunked_or_unchunked Sender>
+        auto transform_sender(Sender&& sndr) const noexcept
+        {
+            static_assert(hpx::execution::experimental::__completes_on<Sender,
+                              thread_pool_policy_scheduler<Policy>>,
+                "No thread_pool_policy_scheduler instance can be found in the "
+                "sender's "
+                "attributes on which to schedule bulk work.");
+
+            auto sched = hpx::execution::experimental::get_completion_scheduler<
+                hpx::execution::experimental::set_value_t>(
+                hpx::execution::experimental::get_env(sndr));
+
+            // Extract bulk parameters using structured binding
+            auto [tag, data, child] = sndr;
+            auto [shape, f] = data;
+
+            // Create HPX thread_pool_bulk_sender with extracted parameters
+            return hpx::execution::experimental::detail::
+                thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
+                    std::decay_t<decltype(shape)>,
+                    std::decay_t<decltype(f)>>{
+                    sched,    // scheduler from environment
+                    std::forward<decltype(child)>(child),    // child sender
+                    std::forward<decltype(shape)>(shape),    // shape
+                    std::forward<decltype(f)>(f)             // function
+                };
+        }
+
+        // Transform bulk sender with environment (starts_on pattern)
         template <__bulk_chunked_or_unchunked Sender, typename Env>
         auto transform_sender(Sender&& sndr, const Env& env) const noexcept
         {
-            // Extract scheduler from sender environment, following stdexec pattern
-            if constexpr (hpx::execution::experimental::__completes_on<Sender,
-                              thread_pool_policy_scheduler<Policy>>)
-            {
-                auto sched =
-                    hpx::execution::experimental::get_completion_scheduler<
-                        hpx::execution::experimental::set_value_t>(
-                        hpx::execution::experimental::get_env(sndr));
+            static_assert(hpx::execution::experimental::__starts_on<Sender,
+                              thread_pool_policy_scheduler<Policy>, Env>,
+                "No thread_pool_policy_scheduler instance can be found in the "
+                "receiver's "
+                "environment on which to schedule bulk work.");
 
-                // Extract bulk parameters using structured binding
-                auto [tag, data, child] = sndr;
+            auto sched = hpx::execution::experimental::get_scheduler(env);
 
-                // Create HPX thread_pool_bulk_sender with extracted parameters
-                return hpx::execution::experimental::detail::
-                    thread_pool_bulk_sender<Policy,
-                        std::decay_t<decltype(child)>,
-                        std::decay_t<decltype(data.__shape_)>,
-                        std::decay_t<decltype(data.__fun_)>>{
-                        sched,    // scheduler from environment
-                        std::forward<decltype(child)>(child),    // child sender
-                        std::forward<decltype(data.__shape_)>(
-                            data.__shape_),    // shape
-                        std::forward<decltype(data.__fun_)>(
-                            data.__fun_)    // function
-                    };
-            }
-            else if constexpr (hpx::execution::experimental::__starts_on<Sender,
-                                   thread_pool_policy_scheduler<Policy>, Env>)
-            {
-                auto sched = hpx::execution::experimental::get_scheduler(env);
+            // Extract bulk parameters using structured binding
+            auto [tag, data, child] = sndr;
+            auto [shape, f] = data;
 
-                // Extract bulk parameters using structured binding
-                auto [tag, data, child] = sndr;
-
-                // Create HPX thread_pool_bulk_sender with extracted parameters
-                return hpx::execution::experimental::detail::
-                    thread_pool_bulk_sender<Policy,
-                        std::decay_t<decltype(child)>,
-                        std::decay_t<decltype(data.__shape_)>,
-                        std::decay_t<decltype(data.__fun_)>>{
-                        sched,    // scheduler from environment
-                        std::forward<decltype(child)>(child),    // child sender
-                        std::forward<decltype(data.__shape_)>(
-                            data.__shape_),    // shape
-                        std::forward<decltype(data.__fun_)>(
-                            data.__fun_)    // function
-                    };
-            }
-            else
-            {
-                // If no matching scheduler found, return original sender
-                return std::forward<Sender>(sndr);
-            }
+            // Create HPX thread_pool_bulk_sender with extracted parameters
+            return hpx::execution::experimental::detail::
+                thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
+                    std::decay_t<decltype(shape)>,
+                    std::decay_t<decltype(f)>>{
+                    sched,    // scheduler from environment
+                    std::forward<decltype(child)>(child),    // child sender
+                    std::forward<decltype(shape)>(shape),    // shape
+                    std::forward<decltype(f)>(f)             // function
+                };
         }
 
         // FALLBACK: Handle non-bulk senders by delegating to default domain
