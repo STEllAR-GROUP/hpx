@@ -148,26 +148,6 @@ namespace hpx::execution::experimental {
                     std::forward<decltype(f)>(f)             // function
                 };
         }
-
-        // FALLBACK: Handle non-bulk senders by delegating to default domain
-        template <stdexec::sender Sender, typename Env>
-            requires(!__bulk_chunked_or_unchunked<Sender>)
-        auto transform_sender(Sender&& sndr, const Env& env) const noexcept
-        {
-            // delegate non-bulk senders to default domain
-            return stdexec::default_domain::transform_sender(
-                std::forward<Sender>(sndr), env);
-        }
-
-        // FALLBACK: Handle non-bulk senders (early phase - no environment)
-        template <stdexec::sender Sender>
-            requires(!__bulk_chunked_or_unchunked<Sender>)
-        auto transform_sender(Sender&& sndr) const noexcept
-        {
-            // delegate non-bulk senders to default domain
-            return stdexec::default_domain::transform_sender(
-                std::forward<Sender>(sndr));
-        }
     };
 
 #endif
