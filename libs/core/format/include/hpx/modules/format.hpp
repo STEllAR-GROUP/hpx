@@ -9,6 +9,12 @@
 
 #include <hpx/config.hpp>
 
+#if !defined(HPX_HAVE_CXX_MODULES) ||                                          \
+    defined(HPX_APPLICATION_DOESNT_USE_CXX_MODULES) ||                         \
+    (defined(HPX_CORE_EXPORTS) || defined(HPX_FULL_EXPORTS) ||                 \
+        defined(HPX_LIBRARY_EXPORTS) || defined(HPX_COMPONENT_EXPORTS) ||      \
+        defined(HPX_BUILD_MODULE))
+
 #include <cctype>
 #include <cstddef>
 #include <cstdio>
@@ -272,18 +278,18 @@ namespace hpx::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CORE_EXPORT void format_to(std::ostream& os,
+        HPX_MODULE_EXTERN_CORE void format_to(std::ostream& os,
             std::string_view format_str, format_arg const* args,
             std::size_t count);
 
-        HPX_CORE_EXPORT std::string format(std::string_view format_str,
+        HPX_MODULE_EXTERN_CORE std::string format(std::string_view format_str,
             format_arg const* args, std::size_t count);
     }    // namespace detail
 
     // enable using format in variadic contexts
-    HPX_CORE_EXPORT std::string const& format();
+    HPX_MODULE_EXTERN_CORE std::string const& format();
 
-    template <typename... Args>
+    HPX_MODULE_EXPORT template <typename... Args>
     std::string format(std::string_view format_str, Args const&... args)
     {
         detail::format_arg const format_args[] = {
@@ -291,7 +297,7 @@ namespace hpx::util {
         return detail::format(format_str, format_args, sizeof...(Args));
     }
 
-    template <typename... Args>
+    HPX_MODULE_EXPORT template <typename... Args>
     std::ostream& format_to(
         std::ostream& os, std::string_view format_str, Args const&... args)
     {
@@ -331,10 +337,16 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    template <typename Range>
+    HPX_MODULE_EXPORT template <typename Range>
     detail::format_join<Range> format_join(
         Range const& range, std::string_view delimiter) noexcept
     {
         return {range, delimiter};
     }
 }    // namespace hpx::util
+
+#else
+
+import HPX.Core;
+
+#endif

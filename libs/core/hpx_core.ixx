@@ -38,6 +38,7 @@ export module HPX.Core;
 
 // include all HPX module files here that have been converted to C++ modules
 #include <hpx/modules/version.hpp>
+#include <hpx/modules/format.hpp>
 
 #if defined(HPX_CLANG_VERSION)
 #pragma clang diagnostic pop
