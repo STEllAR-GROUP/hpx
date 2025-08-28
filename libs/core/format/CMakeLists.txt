@@ -26,6 +26,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core format
   GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${format_sources}
   HEADERS ${format_headers}
   COMPAT_HEADERS ${format_compat_headers}
