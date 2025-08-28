@@ -301,27 +301,67 @@ set(HPX_LIBS
 )
 
 foreach(lib ${HPX_LIBS})
+
+  if(HPX_WITH_CXX_MODULES)
+    # the standard header needs to be recreated from scratch
+    unset(HPX_STANDARD_HEADERS CACHE)
+  endif()
+
   # NOTE: hpx_full (i.e. the target representing libhpx.so) is still created in
   # src/CMakeLists.txt. When all of hpx_full has been modularized the target
   # creation can move here as well.
-  if(NOT ${lib} STREQUAL "full")
+  if(${lib} STREQUAL "full")
+    add_subdirectory(${lib})
+  else()
     string(TOUPPER ${lib} uppercase_lib)
     add_library(hpx_${lib} ${hpx_library_link_mode} src/empty.cpp)
     target_compile_definitions(hpx_${lib} PRIVATE HPX_${uppercase_lib}_EXPORTS)
 
+    add_subdirectory(${lib})
+
     if(HPX_WITH_CXX_MODULES)
-      target_sources(
-        hpx_${lib}
-        PUBLIC FILE_SET hpx_${lib}_public_sources TYPE CXX_MODULES FILES
-               ${CMAKE_CURRENT_SOURCE_DIR}/${lib}/hpx_${lib}.ixx
+
+      # generate module interface unit
+      set(cxx_module_headers)
+      foreach(cxx_module ${HPX_${uppercase_lib}_ENABLED_CXX_MODULES})
+        set(cxx_module_headers
+            "${cxx_module_headers}#include <hpx/modules/${cxx_module}.hpp>\n"
+        )
+      endforeach()
+
+      set(standard_headers)
+      foreach(std_header ${HPX_STANDARD_HEADERS})
+        set(standard_headers "${standard_headers}#include ${std_header}\n")
+      endforeach()
+
+      set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib})
+      set(lib_module_file "${lib_module_basedir}/hpx_${lib}.ixx")
+      configure_file(
+        "${HPX_SOURCE_DIR}/cmake/templates/hpx_${lib}.ixx.in"
+        ${lib_module_file} @ONLY
       )
+
+      add_hpx_source_group(
+        NAME hpx_${lib}
+        ROOT ${lib_module_basedir}
+        CLASS "Generated Files"
+        TARGETS ${lib_module_file}
+      )
+
       # cmake-format: off
+      target_sources(
+        hpx_${lib} PUBLIC
+            FILE_SET hpx_${lib}_public_sources
+                TYPE CXX_MODULES
+                BASE_DIRS ${lib_module_basedir}
+                FILES ${lib_module_file}
+      )
       set(module_installation
           FILE_SET hpx_${lib}_public_sources
-                   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx/miu
+              DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx/miu
           CXX_MODULES_BMI
-                   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx/bmi
-                   COMPONENT runtime
+              DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx/bmi
+              COMPONENT runtime
       )
       # cmake-format: on
     endif()
@@ -351,8 +391,6 @@ foreach(lib ${HPX_LIBS})
 
     hpx_export_internal_targets(hpx_${lib})
   endif()
-
-  add_subdirectory(${lib})
 
   set(_hpx_${lib}_modules
       ${_hpx_${lib}_modules}
