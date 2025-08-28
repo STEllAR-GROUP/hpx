@@ -178,8 +178,7 @@ namespace hpx::detail {
                     std::decay_t<Scheduler>>
             )>
         // clang-format on
-        friend auto tag_fallback_invoke(
-            Tag tag, Scheduler&& scheduler, Ts&&... ts)
+        friend auto tag_invoke(Tag tag, Scheduler&& scheduler, Ts&&... ts)
         {
             using namespace hpx::execution::experimental;
             using scheduler_type = std::decay_t<Scheduler>;

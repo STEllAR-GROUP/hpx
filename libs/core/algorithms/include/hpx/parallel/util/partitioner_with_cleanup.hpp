@@ -148,34 +148,25 @@ namespace hpx::parallel::util {
                             auto&& all_parts) mutable {
                             using item_type =
                                 std::decay_t<decltype(*all_parts.begin())>;
-                            constexpr bool is_variant_with_exception =
-                                requires {
-                                    std::holds_alternative<std::exception_ptr>(
-                                        std::declval<item_type>());
-                                };
+                            static_assert(
+                                std::is_same_v<item_type,
+                                    std::variant<Result, std::exception_ptr>>,
+                                "Expected variant with std::exception_ptr "
+                                "alternative");
 
-                            if constexpr (!is_variant_with_exception)
-                            {
-                                return ex::just(f(all_parts));
-                            }
-
-                            auto first_exception =
-                                std::optional<std::exception_ptr>{};
+                            std::vector<std::exception_ptr> exceptions;
+                            exceptions.reserve(all_parts.size());
                             for (auto&& item : all_parts)
                             {
                                 if (std::holds_alternative<std::exception_ptr>(
                                         item))
                                 {
-                                    if (!first_exception)
-                                    {
-                                        first_exception =
-                                            std::get<std::exception_ptr>(item);
-                                    }
-                                    break;
+                                    auto e = std::get<std::exception_ptr>(item);
+                                    exceptions.emplace_back(e);
                                 }
                             }
 
-                            if (first_exception.has_value())
+                            if (!exceptions.empty())
                             {
                                 for (auto&& item : all_parts)
                                 {
@@ -193,21 +184,27 @@ namespace hpx::parallel::util {
                                     }
                                 }
 
-                                try
+                                for (auto const& e : exceptions)
                                 {
-                                    std::rethrow_exception(
-                                        first_exception.value());
+                                    try
+                                    {
+                                        std::rethrow_exception(e);
+                                    }
+                                    catch (std::bad_alloc const&)
+                                    {
+                                        throw;
+                                    }
+                                    catch (...)
+                                    {
+                                    }
                                 }
-                                catch (std::bad_alloc const&)
+
+                                hpx::exception_list ex_list;
+                                for (auto const& e : exceptions)
                                 {
-                                    std::rethrow_exception(
-                                        first_exception.value());
+                                    ex_list.add(e);
                                 }
-                                catch (...)
-                                {
-                                    throw hpx::exception_list{
-                                        first_exception.value()};
-                                }
+                                throw HPX_MOVE(ex_list);
                             }
 
                             using original_t =
@@ -217,11 +214,11 @@ namespace hpx::parallel::util {
 
                             for (auto&& item : all_parts)
                             {
-                                values.emplace_back(std::get<0>(
-                                    HPX_FORWARD(decltype(item), item)));
+                                values.emplace_back(
+                                    std::get<0>(HPX_MOVE(item)));
                             }
 
-                            return ex::just(f(values));
+                            return ex::just(HPX_MOVE(f(values)));
                         });
                 }
                 else
