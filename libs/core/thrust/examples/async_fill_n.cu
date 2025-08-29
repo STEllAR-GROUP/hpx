@@ -1,13 +1,13 @@
-#include <hpx/init.hpp>
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 
 #include <hpx/thrust/algorithms.hpp>
 #include <hpx/thrust/policy.hpp>
 
-#include <thrust/device_vector.h>
 #include <hpx/async_cuda/cuda_polling_helper.hpp>
 #include <hpx/modules/async_cuda.hpp>
+#include <thrust/device_vector.h>
 
 int hpx_main(int, char**)
 {
@@ -26,6 +26,3 @@ int main(int argc, char** argv)
     hpx::local::init_params init_args;
     return hpx::local::init(hpx_main, argc, argv, init_args);
 }
-
-
-

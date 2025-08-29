@@ -7,11 +7,11 @@
 #pragma once
 
 // Required HPX execution headers
+#include <hpx/config/forward.hpp>
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/rebind_executor.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/config/forward.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -274,8 +274,6 @@ namespace hpx::thrust {
                     HPX_FORWARD(Parameters_, params)...));
         }
 
-
-
         executor_type executor() const
         {
             return executor_type{};
@@ -326,7 +324,8 @@ namespace hpx::thrust {
                 "hpx::traits::is_executor_any_v<Executor>");
 
             return hpx::execution::experimental::create_rebound_policy(
-                thrust_policy_shim(), HPX_FORWARD(Executor_, exec), parameters());
+                thrust_policy_shim(), HPX_FORWARD(Executor_, exec),
+                parameters());
         }
 
         template <typename... Parameters_,
@@ -341,8 +340,6 @@ namespace hpx::thrust {
                 hpx::execution::experimental::join_executor_parameters(
                     HPX_FORWARD(Parameters_, params)...));
         }
-
-
 
         Executor& executor()
         {
@@ -429,26 +426,25 @@ namespace hpx::thrust {
 
     template <typename Executor, typename Parameters>
     struct is_thrust_execution_policy<
-        hpx::thrust::thrust_policy_shim<Executor, Parameters>>
+        hpx::thrust::thrust_policy_shim<Executor, Parameters>> : std::true_type
+    {
+    };
+
+    template <>
+    struct is_thrust_execution_policy<hpx::thrust::thrust_host_policy>
       : std::true_type
     {
     };
 
     template <>
-    struct is_thrust_execution_policy<
-        hpx::thrust::thrust_host_policy> : std::true_type
+    struct is_thrust_execution_policy<hpx::thrust::thrust_device_policy>
+      : std::true_type
     {
     };
 
     template <>
-    struct is_thrust_execution_policy<
-        hpx::thrust::thrust_device_policy> : std::true_type
-    {
-    };
-
-    template <>
-    struct is_thrust_execution_policy<
-        hpx::thrust::thrust_task_policy> : std::true_type
+    struct is_thrust_execution_policy<hpx::thrust::thrust_task_policy>
+      : std::true_type
     {
     };
 
@@ -509,8 +505,7 @@ namespace hpx::thrust {
 namespace hpx::detail {
     template <typename Executor, typename Parameters>
     struct is_rebound_execution_policy<
-        hpx::thrust::thrust_policy_shim<Executor, Parameters>>
-      : std::true_type
+        hpx::thrust::thrust_policy_shim<Executor, Parameters>> : std::true_type
     {
     };
 
@@ -522,21 +517,18 @@ namespace hpx::detail {
     };
 
     template <>
-    struct is_execution_policy<hpx::thrust::thrust_policy>
-      : std::true_type
+    struct is_execution_policy<hpx::thrust::thrust_policy> : std::true_type
     {
     };
 
     template <typename Executor, typename Parameters>
     struct is_execution_policy<
-        hpx::thrust::thrust_policy_shim<Executor, Parameters>>
-      : std::true_type
+        hpx::thrust::thrust_policy_shim<Executor, Parameters>> : std::true_type
     {
     };
 
     template <>
-    struct is_execution_policy<hpx::thrust::thrust_host_policy>
-      : std::true_type
+    struct is_execution_policy<hpx::thrust::thrust_host_policy> : std::true_type
     {
     };
 
@@ -547,8 +539,7 @@ namespace hpx::detail {
     };
 
     template <>
-    struct is_execution_policy<hpx::thrust::thrust_task_policy>
-      : std::true_type
+    struct is_execution_policy<hpx::thrust::thrust_task_policy> : std::true_type
     {
     };
 
@@ -567,26 +558,25 @@ namespace hpx::detail {
 
     template <typename Executor, typename Parameters>
     struct is_parallel_execution_policy<
-        hpx::thrust::thrust_policy_shim<Executor, Parameters>>
+        hpx::thrust::thrust_policy_shim<Executor, Parameters>> : std::true_type
+    {
+    };
+
+    template <>
+    struct is_parallel_execution_policy<hpx::thrust::thrust_host_policy>
       : std::true_type
     {
     };
 
     template <>
-    struct is_parallel_execution_policy<
-        hpx::thrust::thrust_host_policy> : std::true_type
+    struct is_parallel_execution_policy<hpx::thrust::thrust_device_policy>
+      : std::true_type
     {
     };
 
     template <>
-    struct is_parallel_execution_policy<
-        hpx::thrust::thrust_device_policy> : std::true_type
-    {
-    };
-
-    template <>
-    struct is_parallel_execution_policy<
-        hpx::thrust::thrust_task_policy> : std::true_type
+    struct is_parallel_execution_policy<hpx::thrust::thrust_task_policy>
+      : std::true_type
     {
     };
 
@@ -598,8 +588,8 @@ namespace hpx::detail {
     };
 
     template <>
-    struct is_async_execution_policy<
-        hpx::thrust::thrust_task_policy> : std::true_type
+    struct is_async_execution_policy<hpx::thrust::thrust_task_policy>
+      : std::true_type
     {
     };
 

@@ -7,14 +7,14 @@
 
 #pragma once
 
-#include <hpx/thrust/detail/algorithm_map.hpp>
-#include <hpx/thrust/policy.hpp>
+#include <hpx/config/forward.hpp>    // HPX_FORWARD
+#include <hpx/config/move.hpp>       // HPX_MOVE
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/fill.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/config/forward.hpp>   // HPX_FORWARD
-#include <hpx/config/move.hpp>      // HPX_MOVE
+#include <hpx/thrust/detail/algorithm_map.hpp>
+#include <hpx/thrust/policy.hpp>
 #include <cuda_runtime.h>
 
 #include <type_traits>
