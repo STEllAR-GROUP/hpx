@@ -149,6 +149,7 @@ set(_is_executable "$<STREQUAL:$<TARGET_PROPERTY:TYPE>,EXECUTABLE>")
 set(_is_library "$<IN_LIST:$<TARGET_PROPERTY:TYPE>,${_library_types}>")
 
 add_library(hpx INTERFACE)
+add_library(init INTERFACE)
 add_library(wrap_main INTERFACE)
 
 target_link_libraries(hpx INTERFACE hpx_full)
@@ -183,6 +184,7 @@ target_link_libraries(
 )
 
 target_link_libraries(wrap_main INTERFACE hpx_interface_wrap_main)
+target_link_libraries(init INTERFACE HPXInternal::hpx_init)
 target_link_libraries(hpx INTERFACE hpx_interface)
 
 # HPX::component is to be linked privately to all HPX components NOTE: The
@@ -209,7 +211,7 @@ target_compile_definitions(
     "$<${_is_library}:HPX_PLUGIN_NAME_DEFAULT=hpx_$<TARGET_PROPERTY:NAME>>"
 )
 
-set(hpx_targets hpx wrap_main plugin component)
+set(hpx_targets hpx wrap_main init plugin component)
 set(hpx_internal_targets hpx_full hpx_interface hpx_interface_wrap_main)
 
 # cmake-format: off
