@@ -1,7 +1,8 @@
+//  Copyright (c)    2025 Aditya Sapra
 //
-// SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt)
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
 #include <hpx/config.hpp>
@@ -133,7 +134,6 @@ int hpx_main(hpx::program_options::variables_map&)
     std::iota(
         numbers.begin(), numbers.end(), 1);    // Fill with 1, 2, 3, ..., 10
     thrust::device_vector<int> d_numbers = numbers;
-
 
     std::cout << " Testing hpx::reverse with thrust_device_policy..."
               << std::endl;
