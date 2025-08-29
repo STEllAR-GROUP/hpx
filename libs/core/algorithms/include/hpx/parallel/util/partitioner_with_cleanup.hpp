@@ -78,15 +78,20 @@ namespace hpx::parallel::util {
                                               auto&&... args) mutable noexcept {
                             using result_type = std::decay_t<decltype(f1(
                                 HPX_FORWARD(decltype(args), args)...))>;
+                            using nonvoid_result_type =
+                                std::conditional_t<std::is_void_v<result_type>,
+                                    std::monostate, result_type>;
                             using variant_type =
-                                std::variant<result_type, std::exception_ptr>;
+                                std::variant<nonvoid_result_type,
+                                    std::exception_ptr>;
 
                             try
                             {
                                 if constexpr (std::is_void_v<result_type>)
                                 {
                                     f1(HPX_FORWARD(decltype(args), args)...);
-                                    return variant_type{std::in_place_index<0>};
+                                    return variant_type{std::in_place_index<0>,
+                                        std::monostate{}};
                                 }
                                 else
                                 {
@@ -103,8 +108,11 @@ namespace hpx::parallel::util {
                         };
 
                         // Use variant type as the Result template parameter
+                        using nonvoid_result =
+                            std::conditional_t<std::is_void_v<Result>,
+                                std::monostate, Result>;
                         using variant_result_type =
-                            std::variant<Result, std::exception_ptr>;
+                            std::variant<nonvoid_result, std::exception_ptr>;
                         auto&& items = detail::partition<variant_result_type>(
                             HPX_FORWARD(ExPolicy_, policy), first, count,
                             wrapped_f1);
@@ -196,6 +204,8 @@ namespace hpx::parallel::util {
                                     }
                                     catch (...)
                                     {
+                                        // intentionally ignore non-bad_alloc, which will be aggregated below
+                                        HPX_UNUSED(exceptions);
                                     }
                                 }
 
