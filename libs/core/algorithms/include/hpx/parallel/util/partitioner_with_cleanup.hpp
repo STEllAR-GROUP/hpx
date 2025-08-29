@@ -204,7 +204,6 @@ namespace hpx::parallel::util {
                                     }
                                     catch (...)
                                     {
-                                        // intentionally ignore non-bad_alloc, which will be aggregated below
                                         HPX_UNUSED(exceptions);
                                     }
                                 }
