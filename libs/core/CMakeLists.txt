@@ -95,3 +95,8 @@ hpx_info("  Configuring libhpx_core modules:")
 foreach(module ${_hpx_core_modules})
   add_subdirectory(${module})
 endforeach()
+
+set(_hpx_core_modules
+    ${_hpx_core_modules}
+    PARENT_SCOPE
+)
