@@ -198,6 +198,17 @@ namespace test {
         return c;
     }
 
+    inline std::vector<std::size_t> random_repeat(std::size_t size)
+    {
+        std::vector<std::size_t> c(size);
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::uniform_int_distribution<std::size_t> uni(0, (size - 1) / 2);
+        for (auto& x : c)
+            x = uni(g);
+        return c;
+    }
+
     template <typename T>
     inline std::vector<T> random_iota(std::size_t size)
     {
