@@ -45,24 +45,27 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_CORE_EXPORTS)
-# define  HPX_CORE_EXPORT        HPX_SYMBOL_EXPORT
+# define  HPX_CORE_EXPORT       HPX_SYMBOL_EXPORT
 #else
-# define  HPX_CORE_EXPORT        HPX_SYMBOL_IMPORT
+# define  HPX_CORE_EXPORT       HPX_SYMBOL_IMPORT
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // C++20 module export definitions
 #if defined(HPX_BUILD_MODULE)
-# undef HPX_CORE_EXPORT
-# define HPX_CORE_EXPORT         /* empty */
-# define HPX_MODULE_EXPORT       export
-# define HPX_MODULE_EXTERN_CORE  export extern "C++"
-# define HPX_NODISCARD_CORE      HPX_MODULE_EXTERN_CORE [[nodiscard]]
+# if defined(HPX_HAVE_ELF_HIDDEN_VISIBILITY)
+#  undef HPX_CORE_EXPORT
+#  define HPX_CORE_EXPORT               /* empty */
+# endif
+# define HPX_CORE_MODULE_EXPORT_EXTERN  export extern "C++"
 #else
-# define HPX_MODULE_EXPORT       /* empty */
-# define HPX_MODULE_EXTERN_CORE  HPX_CORE_EXPORT
-# define HPX_NODISCARD_CORE      [[nodiscard]] HPX_CORE_EXPORT
+# define HPX_CORE_MODULE_EXPORT_EXTERN  extern "C++"
 #endif
+
+#define HPX_CORE_MODULE_EXPORT                                                 \
+    HPX_CORE_MODULE_EXPORT_EXTERN HPX_CORE_EXPORT
+#define HPX_CORE_MODULE_EXPORT_NODISCARD                                       \
+    HPX_CORE_MODULE_EXPORT_EXTERN [[nodiscard]] HPX_CORE_EXPORT
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_EXPORTS) || defined(HPX_FULL_EXPORTS)
@@ -80,7 +83,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// define the export/import helper macros to be used for component modules
+// define the export/import helper macros to be used for library modules
 #if defined(HPX_LIBRARY_EXPORTS)
 # define  HPX_LIBRARY_EXPORT     HPX_SYMBOL_EXPORT
 #else

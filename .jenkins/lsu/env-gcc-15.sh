@@ -10,6 +10,7 @@ module load gcc/15
 module load boost/1.88.0-${build_type,,}
 module load hwloc
 module load openmpi
+module load ninja       # this loads ninja v1.13.1 needed for modules
 
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="23"

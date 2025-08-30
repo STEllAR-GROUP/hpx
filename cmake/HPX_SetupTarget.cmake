@@ -34,6 +34,7 @@ function(hpx_setup_target target)
       VERSION
       HPX_PREFIX
       HEADER_ROOT
+      SCAN_FOR_MODULES
   )
   set(multi_value_args DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS
                        LINK_FLAGS INSTALL_FLAGS INSTALL_PDB
@@ -74,12 +75,12 @@ function(hpx_setup_target target)
   get_target_property(target_SOURCES ${target} SOURCES)
 
   if(target_COMPILE_FLAGS)
-    hpx_append_property(${target} COMPILE_FLAGS ${target_COMPILE_FLAGS})
+    hpx_append_property(${target} COMPILE_FLAGS "${target_COMPILE_FLAGS}")
     hpx_debug("setup_target.${target}" "COMPILE_FLAGS: ${target_COMPILE_FLAGS}")
   endif()
 
   if(target_LINK_FLAGS)
-    hpx_append_property(${target} LINK_FLAGS ${target_LINK_FLAGS})
+    hpx_append_property(${target} LINK_FLAGS "${target_LINK_FLAGS}")
     hpx_debug("setup_target.${target}" "LINK_FLAGS: ${target_LINK_FLAGS}")
   endif()
 
@@ -219,6 +220,14 @@ function(hpx_setup_target target)
   endif()
 
   set_target_properties(${target} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+  if(HPX_WITH_CXX_MODULES AND ${target}_SCAN_FOR_MODULES)
+    set_target_properties(${target} PROPERTIES CXX_SCAN_FOR_MODULES ON)
+  else()
+    target_compile_definitions(
+      ${target} PRIVATE HPX_BINARY_DOESNT_USE_CXX_MODULES
+    )
+  endif()
 
   get_target_property(target_EXCLUDE_FROM_ALL ${target} EXCLUDE_FROM_ALL)
 
