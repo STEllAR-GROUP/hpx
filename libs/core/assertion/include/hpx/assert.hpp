@@ -6,4 +6,5 @@
 
 #pragma once
 
+#include <hpx/assertion/macros.hpp>
 #include <hpx/modules/assertion.hpp>

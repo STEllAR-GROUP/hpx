@@ -16,5 +16,6 @@
     defined(HPX_BINARY_DOESNT_USE_CXX_MODULES)
 @module_headers@
 #else
+@module_macro_headers@
 import HPX.Core;
 #endif
