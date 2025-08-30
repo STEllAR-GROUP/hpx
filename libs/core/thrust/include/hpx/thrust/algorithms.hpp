@@ -25,7 +25,7 @@ namespace hpx::thrust {
         requires(
             is_thrust_execution_policy_v<std::decay_t<ThrustPolicy>> &&
             detail::is_algorithm_mapped<HPXTag, ThrustPolicy, Args...>>)
-    auto tag_invoke(HPXTag tag, ThrustPolicy&& policy, Args&&... args)
+    decltype(auto) tag_invoke(HPXTag tag, ThrustPolicy&& policy, Args&&... args)
     {
         if constexpr (hpx::is_async_execution_policy_v<
                           std::decay_t<ThrustPolicy>>)
