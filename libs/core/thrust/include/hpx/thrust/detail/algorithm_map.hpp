@@ -678,11 +678,11 @@ namespace hpx::thrust::detail {
         }
     };
 
-    // SFINAE HELPER - Check if algorithm is mapped at compile time
-    // This is used in the universal tag_invoke to enable/disable the overload
+    // boolean predicate indicating whether a mapping exists
     template <typename HPXTag, typename Policy, typename... Args>
-    using is_algorithm_mapped =
-        std::void_t<decltype(algorithm_map<HPXTag>::invoke(
-            std::declval<Policy>(), std::declval<Args>()...))>;
+    concept is_algorithm_mapped = requires {
+        algorithm_map<HPXTag>::invoke(
+            std::declval<Policy>(), std::declval<Args>()...);
+    };
 
 }    // namespace hpx::thrust::detail
