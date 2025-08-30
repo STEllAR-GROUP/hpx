@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include <hpx/config/forward.hpp>    // HPX_FORWARD
-#include <hpx/config/move.hpp>       // HPX_MOVE
+#include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/fill.hpp>
