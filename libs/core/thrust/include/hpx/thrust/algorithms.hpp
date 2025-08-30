@@ -16,19 +16,18 @@
 #include <hpx/thrust/policy.hpp>
 #include <cuda_runtime.h>
 
-#include <type_traits>
 
 namespace hpx::thrust {
 
     template <typename HPXTag, typename ThrustPolicy, typename... Args>
         requires(
             is_thrust_execution_policy_v<std::decay_t<ThrustPolicy>> &&
-            detail::is_algorithm_mapped<HPXTag, ThrustPolicy, Args...>>)
+            detail::is_algorithm_mapped<HPXTag, ThrustPolicy, Args...>)
     decltype(auto) tag_invoke(HPXTag tag, ThrustPolicy&& policy, Args&&... args)
     {
         if constexpr (hpx::is_async_execution_policy_v<
                           std::decay_t<ThrustPolicy>>)
-        {
+        {   
             if constexpr (std::is_void_v<decltype(detail::algorithm_map<
                               HPXTag>::invoke(std::declval<ThrustPolicy>(),
                               std::declval<Args>()...))>)
