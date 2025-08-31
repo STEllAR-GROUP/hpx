@@ -284,6 +284,13 @@ namespace boost { namespace inspect {
         //
         {"(\\HPX_ASSERT\\b)", "HPX_ASSERT", {"hpx/assert.hpp"}},
         {"(\\HPX_ASSERT_MSG\\b)", "HPX_ASSERT_MSG", {"hpx/assert.hpp"}},
+        {"(\\HPX_THROW_EXCEPTION\\b)", "HPX_THROW_EXCEPTION",
+            {"hpx/modules/errors.hpp"}},
+        {"(\\HPX_THROWS_IF\\b)", "HPX_THROWS_IF", {"hpx/modules/errors.hpp"}},
+        {"(\\HPX_THROW_BAD_ALLOC\\b)", "HPX_THROW_BAD_ALLOC",
+            {"hpx/modules/errors.hpp"}},
+        {"(\\HPX_THROWS_BAD_ALLOC_IF\\b)", "HPX_THROWS_BAD_ALLOC_IF",
+            {"hpx/modules/errors.hpp"}},
         {nullptr, nullptr, {nullptr}}};
 
     //  include_check constructor  -------------------------------------------//
@@ -357,6 +364,15 @@ namespace boost { namespace inspect {
         // if one of the includes is <hpx/hpx.hpp> assume all is well
         if (includes.find("hpx/hpx.hpp") != includes.end())
             return;
+
+        // if one of the includes starts with <hpx/include/...> assume all is
+        // well as well
+        constexpr char const* prefix = "hpx/include/";
+        if (auto it = includes.lower_bound(prefix);
+            it != includes.end() && it->find(prefix) == 0)
+        {
+            return;
+        }
 
         // for all given names, check whether corresponding include was found
         std::set<std::string> checked_includes;

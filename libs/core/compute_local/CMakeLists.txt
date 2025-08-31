@@ -53,6 +53,7 @@ add_hpx_module(
     hpx_datastructures
     hpx_execution
     hpx_executors
+    hpx_errors
     hpx_functional
     hpx_futures
     hpx_iterator_support

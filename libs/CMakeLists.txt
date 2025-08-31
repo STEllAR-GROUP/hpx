@@ -302,12 +302,17 @@ set(HPX_LIBS
     CACHE INTERNAL "List of HPX libraries" FORCE
 )
 
+if(HPX_WITH_CXX_MODULES)
+  # the standard header needs to be recreated from scratch
+  unset(HPX_STANDARD_HEADERS CACHE)
+  unset(HPX_ENABLED_CXX_MODULES CACHE)
+endif()
+
 foreach(lib ${HPX_LIBS})
 
+  string(TOUPPER ${lib} uppercase_lib)
   if(HPX_WITH_CXX_MODULES)
-    # the standard header needs to be recreated from scratch
-    unset(HPX_STANDARD_HEADERS CACHE)
-    unset(HPX_ENABLED_CXX_MODULES CACHE)
+    unset(HPX_${uppercase_lib}_ENABLED_CXX_MODULES CACHE)
   endif()
 
   # NOTE: hpx_full (i.e. the target representing libhpx.so) is still created in
@@ -316,9 +321,6 @@ foreach(lib ${HPX_LIBS})
   if(${lib} STREQUAL "full")
     add_subdirectory(${lib})
   else()
-    unset(${HPX_${uppercase_lib}_ENABLED_CXX_MODULES} CACHE)
-
-    string(TOUPPER ${lib} uppercase_lib)
     add_library(hpx_${lib} ${hpx_library_link_mode} src/empty.cpp)
     target_compile_definitions(hpx_${lib} PRIVATE HPX_${uppercase_lib}_EXPORTS)
 

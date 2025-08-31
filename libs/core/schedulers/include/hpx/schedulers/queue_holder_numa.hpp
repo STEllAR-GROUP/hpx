@@ -7,12 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/schedulers/queue_holder_thread.hpp>
 #include <hpx/schedulers/thread_queue_mc.hpp>
 #include <hpx/threading_base/print.hpp>
 #include <hpx/threading_base/thread_data.hpp>
-//
-#include <hpx/schedulers/queue_holder_thread.hpp>
-//
+
 #include <cstddef>
 #include <cstdint>
 #include <exception>

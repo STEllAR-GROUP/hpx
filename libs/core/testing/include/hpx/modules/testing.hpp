@@ -11,12 +11,12 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/testing/performance.hpp>
-#include <hpx/thread_support/spinlock.hpp>
 #include <hpx/util/ios_flags_saver.hpp>
 
 #include <cstddef>

@@ -13,9 +13,9 @@
 #include <chrono>
 #include <thread>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
 
-    void spinlock::yield_k(unsigned k) noexcept
+    void spinlock::yield_k(unsigned const k) noexcept
     {
         // Experiments on Windows and Fedora 32 show that a single pause,
         // followed by an immediate sleep, is best.
@@ -29,5 +29,4 @@ namespace hpx { namespace util { namespace detail {
             std::this_thread::sleep_for(std::chrono::microseconds(1));
         }
     }
-
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

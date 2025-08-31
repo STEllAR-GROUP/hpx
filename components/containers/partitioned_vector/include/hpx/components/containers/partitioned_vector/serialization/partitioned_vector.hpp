@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/serialization/serialize.hpp>
 
 #include <cstddef>
