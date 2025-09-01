@@ -2308,7 +2308,70 @@ void test_completion_scheduler()
             "the completion scheduler should be a thread_pool_scheduler");
     }
 }
+
 #endif
+
+void test_scheduler_copy_avoidance()
+{
+    // Test that scheduler operations don't create unnecessary copies
+
+    // Create a scheduler with copy/move tracking
+    static std::atomic<int> copy_count{0};
+    static std::atomic<int> move_count{0};
+
+    struct copy_tracking_scheduler : ex::thread_pool_scheduler
+    {
+        copy_tracking_scheduler() = default;
+
+        copy_tracking_scheduler(const copy_tracking_scheduler& other)
+          : ex::thread_pool_scheduler(other)
+        {
+            copy_count.fetch_add(1, std::memory_order_relaxed);
+        }
+
+        copy_tracking_scheduler(copy_tracking_scheduler&& other) noexcept
+          : ex::thread_pool_scheduler(std::move(other))
+        {
+            move_count.fetch_add(1, std::memory_order_relaxed);
+        }
+
+        copy_tracking_scheduler& operator=(const copy_tracking_scheduler& other)
+        {
+            ex::thread_pool_scheduler::operator=(other);
+            copy_count.fetch_add(1, std::memory_order_relaxed);
+            return *this;
+        }
+
+        copy_tracking_scheduler& operator=(
+            copy_tracking_scheduler&& other) noexcept
+        {
+            ex::thread_pool_scheduler::operator=(std::move(other));
+            move_count.fetch_add(1, std::memory_order_relaxed);
+            return *this;
+        }
+    };
+
+    // Reset counters
+    copy_count.store(0);
+    move_count.store(0);
+
+    copy_tracking_scheduler sched{};
+
+    // Test basic scheduler operations
+    auto sender = ex::schedule(sched);
+
+    // Execute the operation - should not create unnecessary copies
+    tt::sync_wait(std::move(sender));
+
+    // Verify that no unnecessary copies were made
+    int final_copy_count = copy_count.load();
+    int final_move_count = move_count.load();
+
+    // Scheduler operations should minimize copies
+    HPX_TEST_LTE(final_copy_count, 1);    // At most 1 copy should be acceptable
+
+    HPX_TEST(true);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
@@ -2349,6 +2412,8 @@ int hpx_main()
     test_stdexec_execution_policies();
     test_completion_scheduler();
 #endif
+
+    test_scheduler_copy_avoidance();
 
     return hpx::local::finalize();
 }

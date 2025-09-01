@@ -101,9 +101,10 @@ namespace hpx::execution::experimental {
                 "sender's "
                 "attributes on which to schedule bulk work.");
 
-            auto sched = hpx::execution::experimental::get_completion_scheduler<
-                hpx::execution::experimental::set_value_t>(
-                hpx::execution::experimental::get_env(sndr));
+            auto&& sched =
+                hpx::execution::experimental::get_completion_scheduler<
+                    hpx::execution::experimental::set_value_t>(
+                    hpx::execution::experimental::get_env(sndr));
 
             // Extract bulk parameters using structured binding
             auto [tag, data, child] = sndr;
@@ -115,9 +116,9 @@ namespace hpx::execution::experimental {
                     std::decay_t<decltype(shape)>,
                     std::decay_t<decltype(f)>>{
                     sched,    // scheduler from environment
-                    std::forward<decltype(child)>(child),    // child sender
-                    std::forward<decltype(shape)>(shape),    // shape
-                    std::forward<decltype(f)>(f)             // function
+                    HPX_FORWARD(decltype(child), child),    // child sender
+                    HPX_FORWARD(decltype(shape), shape),    // shape
+                    HPX_FORWARD(decltype(f), f)             // function
                 };
         }
 
@@ -131,7 +132,7 @@ namespace hpx::execution::experimental {
                 "receiver's "
                 "environment on which to schedule bulk work.");
 
-            auto sched = hpx::execution::experimental::get_scheduler(env);
+            auto&& sched = hpx::execution::experimental::get_scheduler(env);
 
             // Extract bulk parameters using structured binding
             auto [tag, data, child] = sndr;
@@ -143,9 +144,9 @@ namespace hpx::execution::experimental {
                     std::decay_t<decltype(shape)>,
                     std::decay_t<decltype(f)>>{
                     sched,    // scheduler from environment
-                    std::forward<decltype(child)>(child),    // child sender
-                    std::forward<decltype(shape)>(shape),    // shape
-                    std::forward<decltype(f)>(f)             // function
+                    HPX_FORWARD(decltype(child), child),    // child sender
+                    HPX_FORWARD(decltype(shape), shape),    // shape
+                    HPX_FORWARD(decltype(f), f)             // function
                 };
         }
     };
