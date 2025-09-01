@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,13 +12,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/asio/asio_util.hpp>
-#include <hpx/util/from_string.hpp>
-
-#include <cstdint>
-#include <string>
-
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/util/from_string.hpp>
 
 #include <asio/io_context.hpp>
 #include <asio/ip/address_v4.hpp>
@@ -26,7 +22,9 @@
 #include <asio/ip/host_name.hpp>
 #include <asio/ip/tcp.hpp>
 
+#include <cstdint>
 #include <exception>
+#include <string>
 #include <system_error>
 
 #if defined(HPX_WINDOWS) && !defined(HPX_HAVE_STATIC_LINKING)

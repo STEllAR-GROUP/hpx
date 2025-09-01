@@ -1,6 +1,6 @@
 //  Copyright (c) 2013-2019 Thomas Heller
 //  Copyright (c) 2008 Peter Dimov
-//  Copyright (c) 2018-2022 Hartmut Kaiser
+//  Copyright (c) 2018-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,10 +9,10 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/errors/throw_exception.hpp>
 #include <hpx/execution_base/agent_base.hpp>
 #include <hpx/execution_base/context_base.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/timing/steady_clock.hpp>
 

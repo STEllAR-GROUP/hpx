@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,6 +30,7 @@ set(preprocessor_sources)
 include(HPX_AddModule)
 add_hpx_module(
   core preprocessor NO_CONFIG_IN_GENERATED_HEADERS
+  GLOBAL_HEADER_GEN ON
   SOURCES ${preprocessor_sources}
   HEADERS ${preprocessor_headers}
   COMPAT_HEADERS ${preprocessor_compat_headers}

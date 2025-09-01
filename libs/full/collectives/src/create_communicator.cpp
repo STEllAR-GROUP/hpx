@@ -14,8 +14,8 @@
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
-#include <hpx/errors/throw_exception.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/runtime_components/component_factory.hpp>

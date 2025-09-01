@@ -362,6 +362,7 @@ with section("parse"):
                                     'GLOBAL_HEADER_GEN': 1,
                                     'GLOBAL_HEADER_MODULE_GEN': 1,
                                     'HEADERS': '+',
+                                    'MACRO_HEADERS': '+',
                                     'OBJECTS': '+',
                                     'MODULE_DEPENDENCIES': '+',
                                     'SOURCES': '+'},

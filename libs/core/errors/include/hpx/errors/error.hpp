@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //  Copyright (c) 2014      Anuj R. Sharma
 //
@@ -23,8 +23,7 @@ namespace hpx {
     ///
     /// This enumeration lists all possible error conditions which can be
     /// reported from any of the API functions.
-    enum class error : std::int16_t
-    {
+    HPX_CORE_MODULE_EXPORT_EXTERN enum class error : std::int16_t {
         success = 0,
         ///< The operation was successful
         no_success = 1,
@@ -151,47 +150,56 @@ namespace hpx {
         /// \endcond
     };
 
-    inline constexpr bool operator==(int lhs, error rhs) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN constexpr bool operator==(
+        int lhs, error rhs) noexcept
     {
         return lhs == static_cast<int>(rhs);
     }
 
-    inline constexpr bool operator==(error lhs, int rhs) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN constexpr bool operator==(
+        error lhs, int rhs) noexcept
     {
         return static_cast<int>(lhs) == rhs;
     }
 
-    inline constexpr bool operator!=(int lhs, error rhs) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN constexpr bool operator!=(
+        int lhs, error rhs) noexcept
     {
         return !(lhs == rhs);
     }
 
-    inline constexpr bool operator!=(error lhs, int rhs) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN constexpr bool operator!=(
+        error lhs, int rhs) noexcept
     {
         return !(lhs == rhs);
     }
 
-    inline constexpr bool operator<(int lhs, error rhs) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN constexpr bool operator<(
+        int lhs, error rhs) noexcept
     {
         return lhs < static_cast<int>(rhs);
     }
 
-    inline constexpr bool operator>=(int lhs, error rhs) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN constexpr bool operator>=(
+        int lhs, error rhs) noexcept
     {
         return !(lhs < rhs);
     }
 
-    inline constexpr int operator&(error lhs, error rhs) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN constexpr int operator&(
+        error lhs, error rhs) noexcept
     {
         return static_cast<int>(lhs) & static_cast<int>(rhs);
     }
 
-    inline constexpr int operator&(int lhs, error rhs) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN constexpr int operator&(
+        int lhs, error rhs) noexcept
     {
         return lhs & static_cast<int>(rhs);
     }
 
-    inline constexpr int operator|=(int& lhs, error rhs) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN constexpr int operator|=(
+        int& lhs, error rhs) noexcept
     {
         lhs = lhs | static_cast<int>(rhs);
         return lhs;
@@ -329,7 +337,7 @@ namespace hpx {
 #undef HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG
 
     // Return a textual representation of a given error code
-    HPX_CORE_EXPORT char const* get_error_name(error e) noexcept;
+    HPX_CORE_MODULE_EXPORT char const* get_error_name(error e) noexcept;
 
 }    // namespace hpx
 
@@ -337,13 +345,13 @@ namespace hpx {
 namespace std {
 
     // make sure our errors get recognized by the Boost.System library
-    template <>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <>
     struct is_error_code_enum<hpx::error>
     {
         static constexpr bool value = true;
     };
 
-    template <>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <>
     struct is_error_condition_enum<hpx::error>
     {
         static constexpr bool value = true;

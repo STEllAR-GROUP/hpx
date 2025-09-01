@@ -104,4 +104,14 @@
 # define HPX_ALWAYS_IMPORT       HPX_SYMBOL_IMPORT
 #endif
 #endif
+
+// Simplify the condition whether HPX modules should be imported or not
+#if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_BUILD_MODULE) ||             \
+    defined(HPX_CORE_EXPORTS) || defined(HPX_FULL_EXPORTS) ||                  \
+    defined(HPX_BINARY_DOESNT_USE_CXX_MODULES)
+#undef HPX_COMPILE_WITH_MODULES
+#else
+#define HPX_COMPILE_WITH_MODULES
+#endif
+
 // clang-format on

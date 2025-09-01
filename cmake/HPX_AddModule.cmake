@@ -15,6 +15,7 @@ function(add_hpx_module libname modulename)
   set(multi_value_args
       SOURCES
       HEADERS
+      MACRO_HEADERS
       COMPAT_HEADERS
       GENERATED_HEADERS
       OBJECTS
@@ -182,6 +183,12 @@ function(add_hpx_module libname modulename)
     if(NOT ${modulename}_NO_CONFIG_IN_GENERATED_HEADERS)
       set(module_headers "${module_headers}#endif\n")
     endif()
+    set(module_macro_headers)
+    foreach(header_file ${${modulename}_MACRO_HEADERS})
+      set(module_macro_headers
+          "${module_macro_headers}#include <${header_file}>\n"
+      )
+    endforeach()
 
     # Decide output path and template file
     set(global_header

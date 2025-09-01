@@ -9,8 +9,8 @@
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/errors/throw_exception.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>

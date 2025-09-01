@@ -84,7 +84,7 @@ namespace hpx::util {
         }
     }    // namespace detail
 
-    void set_thread_name(const char* thread_name) noexcept
+    void set_thread_name(char const* thread_name) noexcept
     {
         detail::set_thread_name(thread_name);
     }

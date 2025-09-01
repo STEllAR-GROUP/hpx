@@ -15,7 +15,6 @@
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/concurrency/detail/contiguous_index_queue.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/executors/default_parameters.hpp>
 #include <hpx/execution/executors/execution.hpp>
@@ -26,6 +25,7 @@
 #include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/hardware.hpp>
 #include <hpx/modules/itt_notify.hpp>
