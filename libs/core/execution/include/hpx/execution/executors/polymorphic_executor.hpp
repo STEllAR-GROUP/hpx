@@ -17,8 +17,7 @@
 #include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/thread_support.hpp>
-#include <hpx/type_support/aligned_storage.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <cstddef>

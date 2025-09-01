@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/config/endian.hpp>
 #include <hpx/serialization/config/defines.hpp>
-#include <hpx/type_support/extra_data.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <cstdint>

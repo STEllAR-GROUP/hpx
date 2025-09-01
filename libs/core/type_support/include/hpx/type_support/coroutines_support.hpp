@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config/defines.hpp>
+#include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 
@@ -16,30 +16,26 @@
 
 namespace hpx {
 
-    using std::coroutine_handle;
-    using std::noop_coroutine;
-    using std::suspend_always;
-    using std::suspend_never;
+    HPX_CORE_MODULE_EXPORT_EXTERN using std::coroutine_handle;
+    HPX_CORE_MODULE_EXPORT_EXTERN using std::coroutine_traits;
+    HPX_CORE_MODULE_EXPORT_EXTERN using std::noop_coroutine;
+    HPX_CORE_MODULE_EXPORT_EXTERN using std::suspend_always;
+    HPX_CORE_MODULE_EXPORT_EXTERN using std::suspend_never;
 }    // namespace hpx
-#define HPX_COROUTINE_NAMESPACE_STD std
 
 #elif __has_include(<experimental/coroutine>)
 #include <experimental/coroutine>
 
 namespace hpx {
 
-    using std::experimental::coroutine_handle;
-    using std::experimental::noop_coroutine;
-    using std::experimental::suspend_always;
-    using std::experimental::suspend_never;
+    HPX_CORE_MODULE_EXPORT_EXTERN using std::experimental::coroutine_handle;
+    HPX_CORE_MODULE_EXPORT_EXTERN using std::experimental::coroutine_traits;
+    HPX_CORE_MODULE_EXPORT_EXTERN using std::experimental::noop_coroutine;
+    HPX_CORE_MODULE_EXPORT_EXTERN using std::experimental::suspend_always;
+    HPX_CORE_MODULE_EXPORT_EXTERN using std::experimental::suspend_never;
 }    // namespace hpx
-#define HPX_COROUTINE_NAMESPACE_STD std::experimental
 
 #endif
-#endif
-
-#if !defined(HPX_COROUTINE_NAMESPACE_STD)
-#error "Platform does not support C++20 coroutines"
 #endif
 
 #endif    // HPX_HAVE_CXX20_COROUTINES

@@ -18,10 +18,10 @@
 #include <hpx/distribution_policies/container_distribution_policy.hpp>
 #include <hpx/distribution_policies/explicit_container_distribution_policy.hpp>
 #include <hpx/functional/reference_wrapper.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_components/distributed_metadata_base.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/copy_component.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #include <hpx/components/containers/partitioned_vector/export_definitions.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>

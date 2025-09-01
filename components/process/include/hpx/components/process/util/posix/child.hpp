@@ -18,14 +18,20 @@
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
-struct child
-{
-    pid_t pid;
+    struct child
+    {
+        pid_t pid;
 
-    child() : pid(0) {}
-    explicit child(pid_t p) : pid(p) {}
-};
+        child()
+          : pid(0)
+        {
+        }
+        explicit child(pid_t p)
+          : pid(p)
+        {
+        }
+    };
 
-}}}}
+}}}}    // namespace hpx::components::process::posix
 
 #endif

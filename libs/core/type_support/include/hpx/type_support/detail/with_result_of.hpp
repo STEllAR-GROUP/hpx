@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <utility>
 
 namespace hpx::util::detail {
@@ -19,7 +21,7 @@ namespace hpx::util::detail {
     // until it is required for conversion, and guaranteed copy elision in C++17
     // ensures that a copy constructor is not called when returning from the
     // conversion operator.
-    template <typename F>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F>
     class with_result_of_t
     {
         F&& f;

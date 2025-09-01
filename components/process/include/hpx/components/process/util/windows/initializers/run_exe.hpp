@@ -22,67 +22,68 @@
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
-namespace initializers {
+    namespace initializers {
 
-template <class String>
-class run_exe_ : public initializer_base
-{
-public:
-    run_exe_() {}
-    explicit run_exe_(const String &s) : s_(s) {}
+        template <class String>
+        class run_exe_ : public initializer_base
+        {
+        public:
+            run_exe_() {}
+            explicit run_exe_(const String& s)
+              : s_(s)
+            {
+            }
 
-    template <class WindowsExecutor>
-    void on_CreateProcess_setup(WindowsExecutor &e) const
-    {
-        e.exe = s_.c_str();
-    }
+            template <class WindowsExecutor>
+            void on_CreateProcess_setup(WindowsExecutor& e) const
+            {
+                e.exe = s_.c_str();
+            }
 
-private:
-    friend class hpx::serialization::access;
+        private:
+            friend class hpx::serialization::access;
 
-    template <typename Archive>
-    void serialize(Archive& ar, unsigned)
-    {
-        ar & s_;
-    }
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned)
+            {
+                ar & s_;
+            }
 
-    String s_;
-};
+            String s_;
+        };
 
 #if defined(_UNICODE) || defined(UNICODE)
-inline run_exe_<std::wstring> run_exe(const wchar_t *ws)
-{
-    return run_exe_<std::wstring>(ws);
-}
+        inline run_exe_<std::wstring> run_exe(const wchar_t* ws)
+        {
+            return run_exe_<std::wstring>(ws);
+        }
 
-inline run_exe_<std::wstring> run_exe(const std::wstring &ws)
-{
-    return run_exe_<std::wstring>(ws);
-}
+        inline run_exe_<std::wstring> run_exe(const std::wstring& ws)
+        {
+            return run_exe_<std::wstring>(ws);
+        }
 
-inline run_exe_<std::wstring> run_exe(const filesystem::path &p)
-{
-    return run_exe_<std::wstring>(p.wstring());
-}
+        inline run_exe_<std::wstring> run_exe(const filesystem::path& p)
+        {
+            return run_exe_<std::wstring>(p.wstring());
+        }
 #else
-inline run_exe_<std::string> run_exe(const char *s)
-{
-    return run_exe_<std::string>(s);
-}
+        inline run_exe_<std::string> run_exe(const char* s)
+        {
+            return run_exe_<std::string>(s);
+        }
 
-inline run_exe_<std::string> run_exe(const std::string &s)
-{
-    return run_exe_<std::string>(s);
-}
+        inline run_exe_<std::string> run_exe(const std::string& s)
+        {
+            return run_exe_<std::string>(s);
+        }
 
-inline run_exe_<std::string> run_exe(const filesystem::path &p)
-{
-    return run_exe_<std::string>(p.string());
-}
+        inline run_exe_<std::string> run_exe(const filesystem::path& p)
+        {
+            return run_exe_<std::string>(p.string());
+        }
 #endif
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::windows::initializers
 
 #endif

@@ -14,7 +14,7 @@
 #include <hpx/batch_environments/pjm_environment.hpp>
 #include <hpx/batch_environments/slurm_environment.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <asio/io_context.hpp>
 #include <asio/ip/host_name.hpp>

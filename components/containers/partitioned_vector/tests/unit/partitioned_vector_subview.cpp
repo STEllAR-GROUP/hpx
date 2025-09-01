@@ -27,11 +27,8 @@
 HPX_REGISTER_PARTITIONED_VECTOR(double)
 #endif
 
-void bulk_test(hpx::lcos::spmd_block block,
-    std::size_t N,
-    std::size_t tile,
-    std::size_t elt_size,
-    std::string vec_name)
+void bulk_test(hpx::lcos::spmd_block block, std::size_t N, std::size_t tile,
+    std::size_t elt_size, std::string vec_name)
 {
     using const_iterator = typename std::vector<double>::const_iterator;
     using vector_type = hpx::partitioned_vector<double>;
@@ -67,7 +64,7 @@ void bulk_test(hpx::lcos::spmd_block block,
                 // Check that dereferencing iterator and const_iterator does not
                 // retrieve the same type
                 HPX_TEST((!std::is_same<decltype(*left_it),
-                          decltype(*right_it)>::value));
+                    decltype(*right_it)>::value));
 
                 // It's a local write operation
                 *left_it = *right_it;
@@ -89,7 +86,7 @@ void bulk_test(hpx::lcos::spmd_block block,
 
                 for (std::size_t jj = j, jj_end = j + tile; jj < jj_end; jj++)
                     for (std::size_t ii = i, ii_end = i + tile; ii < ii_end;
-                         ii++)
+                        ii++)
                     {
                         // It's a Get operation
                         std::vector<double> value =

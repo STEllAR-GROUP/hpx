@@ -45,7 +45,7 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/signal_handler_debugging.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
 // include unistd.h conditionally to check for POSIX version. Not all OSs have

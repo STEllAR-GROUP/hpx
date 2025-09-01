@@ -24,7 +24,7 @@
 #include <hpx/concurrency/detail/freelist.hpp>
 #include <hpx/concurrency/detail/tagged_ptr.hpp>
 #include <hpx/concurrency/detail/tagged_ptr_pair.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <atomic>
 #include <cstddef>

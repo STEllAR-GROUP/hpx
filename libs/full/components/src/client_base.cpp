@@ -10,7 +10,7 @@
 #include <hpx/components/client_base.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/extra_data.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstdint>
 #include <string>

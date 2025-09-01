@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/type_support/is_trivially_relocatable.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <type_traits>
 
 #include <cassert>

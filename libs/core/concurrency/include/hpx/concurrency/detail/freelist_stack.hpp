@@ -17,7 +17,7 @@
 #include <hpx/allocator_support/aligned_allocator.hpp>
 #include <hpx/concurrency/detail/tagged_ptr.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/bit_cast.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <array>
 #include <atomic>

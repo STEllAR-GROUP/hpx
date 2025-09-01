@@ -14,10 +14,10 @@
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <exception>
 #if defined(HPX_HAVE_CXX17_STD_EXECUTION_POLICES)

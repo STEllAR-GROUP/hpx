@@ -11,8 +11,8 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/loop.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <algorithm>
 #include <cstddef>

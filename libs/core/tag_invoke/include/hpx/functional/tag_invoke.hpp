@@ -104,7 +104,7 @@ namespace hpx::functional {
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
-#include <hpx/type_support/meta.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <type_traits>
 #include <utility>

@@ -16,7 +16,7 @@
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <exception>
 #include <memory>

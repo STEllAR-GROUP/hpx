@@ -18,8 +18,7 @@
 
 #include <unistd.h>
 
-namespace hpx { namespace components { namespace process { namespace posix
-{
+namespace hpx { namespace components { namespace process { namespace posix {
     pipe create_pipe()
     {
         int fds[2];
@@ -31,13 +30,13 @@ namespace hpx { namespace components { namespace process { namespace posix
         return pipe(fds[0], fds[1]);
     }
 
-    pipe create_pipe(hpx::error_code &ec)
+    pipe create_pipe(hpx::error_code& ec)
     {
-        int fds[2] = { 0, 0 };
+        int fds[2] = {0, 0};
         if (::pipe(fds) == -1)
         {
-            HPX_THROWS_IF(ec, hpx::error::invalid_status,
-                "posix::create_pipe", "pipe(2) failed");
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "posix::create_pipe",
+                "pipe(2) failed");
         }
         else
         {
@@ -45,6 +44,6 @@ namespace hpx { namespace components { namespace process { namespace posix
         }
         return pipe(fds[0], fds[1]);
     }
-}}}}
+}}}}    // namespace hpx::components::process::posix
 
 #endif

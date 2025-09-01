@@ -11,8 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/unwrap_ref.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <functional>
 #include <type_traits>

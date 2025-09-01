@@ -13,12 +13,12 @@
 #include <hpx/components/client_base.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime_components/derived_component_factory.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
 #include <hpx/runtime_local/detail/serialize_exception.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <exception>

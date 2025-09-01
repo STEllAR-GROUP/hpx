@@ -15,15 +15,12 @@
 
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/initializers.hpp>
-namespace hpx { namespace components { namespace process
-{
+namespace hpx { namespace components { namespace process {
     using namespace windows::initializers;
-}}}
+}}}    // namespace hpx::components::process
 #else
 #include <hpx/components/process/util/posix/initializers.hpp>
-namespace hpx { namespace components { namespace process
-{
+namespace hpx { namespace components { namespace process {
     using namespace posix::initializers;
-}}}
+}}}    // namespace hpx::components::process
 #endif
-

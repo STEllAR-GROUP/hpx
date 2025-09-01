@@ -22,13 +22,13 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/needs_automatic_registration.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <cstdint>

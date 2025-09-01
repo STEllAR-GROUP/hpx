@@ -19,21 +19,19 @@
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
-namespace initializers {
+    namespace initializers {
 
-class close_stdout : public initializer_base
-{
-public:
-    template <class WindowsExecutor>
-    void on_CreateProcess_setup(WindowsExecutor &e) const
-    {
-        e.startup_info.hStdOutput = INVALID_HANDLE_VALUE;
-        e.startup_info.dwFlags |= STARTF_USESTDHANDLES;
-    }
-};
+        class close_stdout : public initializer_base
+        {
+        public:
+            template <class WindowsExecutor>
+            void on_CreateProcess_setup(WindowsExecutor& e) const
+            {
+                e.startup_info.hStdOutput = INVALID_HANDLE_VALUE;
+                e.startup_info.dwFlags |= STARTF_USESTDHANDLES;
+            }
+        };
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::windows::initializers
 
 #endif

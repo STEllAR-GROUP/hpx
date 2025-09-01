@@ -1401,8 +1401,8 @@ namespace hpx { namespace ranges {
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/find.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #include <type_traits>
 #include <utility>

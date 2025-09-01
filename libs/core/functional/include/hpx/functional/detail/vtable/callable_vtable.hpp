@@ -14,7 +14,7 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
-#include <hpx/type_support/void_guard.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <utility>
