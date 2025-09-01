@@ -37,7 +37,8 @@
 #include <vector>
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-#include <ittnotify.h>
+#include <hpx/modules/itt_notify.hpp>
+#include <hpx/itt_notify/detail/use_ittnotify_api.hpp>
 #include <map>
 #endif
 

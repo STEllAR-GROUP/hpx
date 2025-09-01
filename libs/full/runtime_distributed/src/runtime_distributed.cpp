@@ -22,9 +22,9 @@
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/itt_notify/thread_name.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/io_service.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/static_reinit.hpp>
 #include <hpx/modules/threadmanager.hpp>
