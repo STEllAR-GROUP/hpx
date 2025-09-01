@@ -17,31 +17,30 @@
 #include <asio/posix/stream_descriptor.hpp>
 #endif
 
-namespace hpx { namespace components { namespace process  { namespace util {
+namespace hpx { namespace components { namespace process { namespace util {
 
 #if defined(HPX_WINDOWS)
-typedef asio::windows::stream_handle pipe_end;
+    typedef asio::windows::stream_handle pipe_end;
 #else
-typedef asio::posix::stream_descriptor pipe_end;
+    typedef asio::posix::stream_descriptor pipe_end;
 #endif
 
-inline const char *zero_device()
-{
+    inline const char* zero_device()
+    {
 #if defined(HPX_WINDOWS)
-    return "NUL";
+        return "NUL";
 #else
-    return "/dev/zero";
+        return "/dev/zero";
 #endif
-}
+    }
 
-inline const char *null_device()
-{
+    inline const char* null_device()
+    {
 #if defined(HPX_WINDOWS)
-    return "NUL";
+        return "NUL";
 #else
-    return "/dev/null";
+        return "/dev/null";
 #endif
-}
+    }
 
-}}}}
-
+}}}}    // namespace hpx::components::process::util

@@ -10,7 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/equality.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 

@@ -18,19 +18,23 @@
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
-struct pipe
-{
-    HANDLE source;
-    HANDLE sink;
+    struct pipe
+    {
+        HANDLE source;
+        HANDLE sink;
 
-    pipe(HANDLE source, HANDLE sink) : source(source), sink(sink) {}
-};
+        pipe(HANDLE source, HANDLE sink)
+          : source(source)
+          , sink(sink)
+        {
+        }
+    };
 
-inline pipe make_pipe(HANDLE source, HANDLE sink)
-{
-    return pipe(source, sink);
-}
+    inline pipe make_pipe(HANDLE source, HANDLE sink)
+    {
+        return pipe(source, sink);
+    }
 
-}}}}
+}}}}    // namespace hpx::components::process::windows
 
 #endif

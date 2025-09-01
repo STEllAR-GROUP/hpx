@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2022 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,9 +6,11 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 namespace hpx::util {
 
-    struct empty_function
+    HPX_CORE_MODULE_EXPORT_EXTERN struct empty_function
     {
         template <typename... Ts>
         constexpr void operator()(Ts&&...) const noexcept

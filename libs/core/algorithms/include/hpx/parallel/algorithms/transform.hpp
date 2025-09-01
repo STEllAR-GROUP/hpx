@@ -282,6 +282,7 @@ namespace hpx {
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -290,7 +291,6 @@ namespace hpx {
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/transform_loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #include <hpx/functional/traits/get_function_address.hpp>

@@ -24,8 +24,8 @@
 #include <hpx/modules/compute.hpp>
 #include <hpx/modules/compute_local.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/thread.hpp>
-#include <hpx/type_support/unused.hpp>
 #include <hpx/version.hpp>
 
 #include <cstddef>

@@ -17,7 +17,8 @@
 
 namespace hpx {
 
-    template <typename Ref, typename V = void, typename Allocator = void>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Ref, typename V = void,
+        typename Allocator = void>
     using generator = std::generator<Ref, V, Allocator>;
 }
 
@@ -49,27 +50,29 @@ namespace hpx {
 
 namespace hpx {
 
-    template <typename Ref, typename V = void, typename Allocator = void>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Ref, typename V = void,
+        typename Allocator = void>
     struct generator;
 
     namespace detail {
 
-        struct alignas(HPX_STDCPP_DEFAULT_NEW_ALIGNMENT) aligned_block
+        HPX_CORE_MODULE_EXPORT_EXTERN struct alignas(
+            HPX_STDCPP_DEFAULT_NEW_ALIGNMENT) aligned_block
         {
             unsigned char pad[HPX_STDCPP_DEFAULT_NEW_ALIGNMENT];
         };
 
-        template <typename Allocator>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Allocator>
         using rebind = typename std::allocator_traits<
             Allocator>::template rebind_alloc<aligned_block>;
 
-        template <typename Allocator>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Allocator>
         concept has_real_pointers = std::is_void_v<Allocator> ||
             std::is_pointer_v<
                 typename std::allocator_traits<Allocator>::pointer>;
 
         // clang-format off
-        template <typename T, typename U>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename U>
         concept common_reference_with =
             std::same_as<std::common_reference_t<T, U>,
                 std::common_reference_t<U, T>> &&
@@ -78,7 +81,7 @@ namespace hpx {
         // clang-format on
 
         // statically specified allocator type
-        template <typename Alloc = void>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Alloc = void>
         class promise_allocator
         {
             using Allocator = rebind<Alloc>;
@@ -394,22 +397,22 @@ namespace hpx {
             }
         };
 
-        template <typename Ref, typename V>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Ref, typename V>
         using gen_value_t =
             std::conditional_t<std::is_void_v<V>, std::remove_cvref_t<Ref>, V>;
 
-        template <typename Ref, typename V>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Ref, typename V>
         using gen_reference_t =
             std::conditional_t<std::is_void_v<V>, Ref&&, Ref>;
 
-        template <typename Ref>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Ref>
         using gen_yield_t =
             std::conditional_t<std::is_reference_v<Ref>, Ref, Ref const&>;
 
-        template <typename Value, typename Ref>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Value, typename Ref>
         class gen_iter;
 
-        template <typename Yielded>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Yielded>
         class gen_promise_base
         {
         public:
@@ -594,11 +597,11 @@ namespace hpx {
             nest_info* info = nullptr;
         };
 
-        struct gen_secret_tag
+        HPX_CORE_MODULE_EXPORT_EXTERN struct gen_secret_tag
         {
         };
 
-        template <typename Value, typename Ref>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Value, typename Ref>
         class gen_iter
         {
         public:
@@ -681,7 +684,8 @@ namespace hpx {
         };
     }    // namespace detail
 
-    template <typename Ref, typename V, typename Allocator>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Ref, typename V,
+        typename Allocator>
     struct generator
     {
     private:

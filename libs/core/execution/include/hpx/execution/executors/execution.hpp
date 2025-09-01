@@ -32,9 +32,8 @@
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/type_support/detail/wrap_int.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <functional>

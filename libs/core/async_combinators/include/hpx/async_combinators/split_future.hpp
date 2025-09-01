@@ -75,8 +75,7 @@ namespace hpx {
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <array>
 #include <cstddef>

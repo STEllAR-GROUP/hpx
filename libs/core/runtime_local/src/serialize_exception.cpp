@@ -23,6 +23,8 @@
 #include <system_error>
 #include <typeinfo>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::runtime_local::detail {
 
@@ -426,3 +428,5 @@ namespace hpx::runtime_local::detail {
         }
     }
 }    // namespace hpx::runtime_local::detail
+
+#include <hpx/config/warnings_suffix.hpp>

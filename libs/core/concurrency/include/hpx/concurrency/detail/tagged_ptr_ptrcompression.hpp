@@ -10,7 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/bit_cast.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <cstdint>

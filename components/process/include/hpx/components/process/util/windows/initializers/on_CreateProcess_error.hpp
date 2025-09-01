@@ -46,7 +46,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
             template <typename Archive>
             void serialize(Archive& ar, unsigned const)
             {
-                ar& handler_;
+                ar & handler_;
             }
 
             Handler handler_;

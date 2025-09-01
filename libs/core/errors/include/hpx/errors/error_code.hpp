@@ -79,6 +79,9 @@ namespace hpx {
     }
     /// \endcond
 
+    HPX_CORE_MODULE_EXPORT_EXTERN [[nodiscard]] inline error_code
+    make_error_code(std::exception_ptr const& e);
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief A hpx::error_code represents an arbitrary error condition.
     ///
@@ -212,6 +215,11 @@ namespace hpx {
         ///         the passed string fails).
         error_code(error e, std::string const& msg, char const* func,
             char const* file, long line, throwmode mode = throwmode::plain);
+
+        error_code(error_code&&) = default;
+        error_code& operator=(error_code&&) = default;
+
+        ~error_code() = default;
 
         /// Return a reference to the error message stored in the hpx::error_code.
         ///

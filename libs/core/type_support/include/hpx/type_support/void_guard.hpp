@@ -16,7 +16,7 @@ namespace hpx::util {
     // Usage: return void_guard<Result>(), expr;
     // - Result != void -> return expr;
     // - Result == void -> return (void)expr;
-    template <typename Result>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Result>
     struct void_guard
     {
     };

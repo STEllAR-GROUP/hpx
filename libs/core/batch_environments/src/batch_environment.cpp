@@ -14,7 +14,7 @@
 #include <hpx/batch_environments/pjm_environment.hpp>
 #include <hpx/batch_environments/slurm_environment.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <asio/io_context.hpp>
 #include <asio/ip/host_name.hpp>
@@ -24,6 +24,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::util {
 
@@ -292,3 +294,5 @@ namespace hpx::util {
         return batch_name_;
     }
 }    // namespace hpx::util
+
+#include <hpx/config/warnings_suffix.hpp>

@@ -13,10 +13,8 @@
 #include <hpx/iterator_support/detail/minimum_category.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/type_support/default_sentinel.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <iterator>

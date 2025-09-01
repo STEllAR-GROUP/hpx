@@ -139,8 +139,7 @@ namespace hpx {
 #include <hpx/futures/traits/is_future_range.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/unwrap_ref.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <cstddef>

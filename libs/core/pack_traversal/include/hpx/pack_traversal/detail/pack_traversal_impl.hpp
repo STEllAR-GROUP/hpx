@@ -12,10 +12,9 @@
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/pack_traversal/detail/container_category.hpp>
 #include <hpx/pack_traversal/traits/pack_traversal_rebind_container.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/pack.hpp>
 #include <hpx/util/detail/reserve.hpp>
 
 #include <cstddef>

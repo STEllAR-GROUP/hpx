@@ -35,7 +35,6 @@
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <cstdint>

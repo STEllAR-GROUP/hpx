@@ -4,10 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/type_support/is_trivially_relocatable.hpp>
-#include <hpx/type_support/uninitialized_relocation_primitives.hpp>
+#include <hpx/modules/type_support.hpp>
+
+#include <hpx/init.hpp>
 
 #define N 50
 #define K 10
@@ -27,7 +27,7 @@ struct trivially_relocatable_struct
     {
         count++;
     }
-    trivially_relocatable_struct(trivially_relocatable_struct&& other)
+    trivially_relocatable_struct(trivially_relocatable_struct&& other) noexcept
       : data(other.data)
     {
         move_count++;

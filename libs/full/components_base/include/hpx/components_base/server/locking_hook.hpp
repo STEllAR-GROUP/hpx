@@ -14,9 +14,9 @@
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/thread_data.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <mutex>
 #include <type_traits>

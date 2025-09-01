@@ -114,5 +114,6 @@ add_hpx_module(
     hpx_synchronization
     hpx_threading
     hpx_topology
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

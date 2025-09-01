@@ -17,8 +17,7 @@
 
 #include <type_traits>
 
-namespace hpx { namespace components
-{
+namespace hpx { namespace components {
     /// Migrate the component with the given id from the specified target
     /// storage (resurrect the object)
     ///
@@ -43,19 +42,15 @@ namespace hpx { namespace components
 #if defined(DOXYGEN)
     future<hpx::id_type>
 #else
-    inline typename std::enable_if<
-        traits::is_component<Component>::value, future<hpx::id_type>
-    >::type
+    inline typename std::enable_if<traits::is_component<Component>::value,
+        future<hpx::id_type>>::type
 #endif
     migrate_from_storage(hpx::id_type const& to_resurrect,
         hpx::id_type const& target = hpx::invalid_id)
     {
         typedef server::trigger_migrate_from_storage_here_action<Component>
             action_type;
-        return async<action_type>(naming::get_locality_from_id(to_resurrect),
-            to_resurrect, target);
+        return async<action_type>(
+            naming::get_locality_from_id(to_resurrect), to_resurrect, target);
     }
-}}
-
-
-
+}}    // namespace hpx::components

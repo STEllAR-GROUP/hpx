@@ -137,7 +137,7 @@ namespace hpx { namespace performance_counters { namespace papi {
         hpx::error_code& ec)
     {
         for (auto gi = hpx::util::generator_iterator<T>(&gen); *gi != nullptr;
-             ++gi)
+            ++gi)
         {
             std::set<std::string>::const_iterator it;
             // iterate over known thread names

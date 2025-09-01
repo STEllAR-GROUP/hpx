@@ -11,8 +11,8 @@
 #include <hpx/agas_base/server/component_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstdint>
 #include <string>

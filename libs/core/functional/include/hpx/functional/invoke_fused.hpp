@@ -13,8 +13,7 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/void_guard.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>

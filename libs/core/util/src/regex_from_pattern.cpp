@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,8 @@
 #include <hpx/util/regex_from_pattern.hpp>
 
 #include <string>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::util {
 
@@ -126,3 +128,5 @@ namespace hpx::util {
         return result;
     }
 }    // namespace hpx::util
+
+#include <hpx/config/warnings_suffix.hpp>

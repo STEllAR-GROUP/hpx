@@ -16,10 +16,9 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/type_support/unused.hpp>
-#include <hpx/type_support/void_guard.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/executors/execution_policy.hpp>

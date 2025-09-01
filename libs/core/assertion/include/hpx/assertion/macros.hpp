@@ -15,11 +15,17 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/config/export_definitions.hpp>
+
 #include <hpx/assertion/current_function.hpp>
-#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
+
+#if !defined(HPX_COMPILE_WITH_MODULES)
+#include <hpx/config.hpp>
+#include <hpx/assertion/api.hpp>
+#include <hpx/assertion/evaluate_assert.hpp>
+#include <hpx/assertion/source_location.hpp>
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
 #include <assert.h>
@@ -29,6 +35,7 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+#endif
 
 #if defined(DOXYGEN)
 /// \def HPX_ASSERT(expr, msg)

@@ -16,9 +16,9 @@
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <atomic>
 #include <cstdint>

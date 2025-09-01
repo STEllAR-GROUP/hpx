@@ -6,7 +6,7 @@
 
 #include <hpx/execution_base/traits/coroutine_traits.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/type_support/coroutines_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <utility>
 

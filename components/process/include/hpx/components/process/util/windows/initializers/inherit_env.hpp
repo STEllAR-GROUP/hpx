@@ -18,15 +18,13 @@
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
-namespace initializers {
+    namespace initializers {
 
-class inherit_env : public initializer_base
-{
-public:
-};
+        class inherit_env : public initializer_base
+        {
+        public:
+        };
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::windows::initializers
 
 #endif

@@ -8,7 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/modules/thread_support.hpp>
+#include <hpx/thread_support/spinlock.hpp>
 
 #include <chrono>
 #include <thread>

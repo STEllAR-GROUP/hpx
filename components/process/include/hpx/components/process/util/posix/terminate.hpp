@@ -20,30 +20,30 @@
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
-template <class Process>
-void terminate(const Process &p)
-{
-    if (::kill(p.pid, SIGKILL) == -1)
+    template <class Process>
+    void terminate(const Process& p)
     {
-        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-            "process::terminate", "kill(2) failed");
+        if (::kill(p.pid, SIGKILL) == -1)
+        {
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "process::terminate", "kill(2) failed");
+        }
     }
-}
 
-template <class Process>
-void terminate(const Process &p, hpx::error_code &ec)
-{
-    if (::kill(p.pid, SIGKILL) == -1)
+    template <class Process>
+    void terminate(const Process& p, hpx::error_code& ec)
     {
-        HPX_THROWS_IF(ec, hpx::error::invalid_status,
-            "process::terminate", "kill(2) failed");
+        if (::kill(p.pid, SIGKILL) == -1)
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "process::terminate",
+                "kill(2) failed");
+        }
+        else
+        {
+            ec = hpx::make_success_code();
+        }
     }
-    else
-    {
-        ec = hpx::make_success_code();
-    }
-}
 
-}}}}
+}}}}    // namespace hpx::components::process::posix
 
 #endif
