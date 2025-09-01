@@ -10,6 +10,7 @@ module load gcc/15
 module load boost/1.88.0-${build_type,,}
 module load hwloc
 module load openmpi
+module load ninja       # this loads ninja v1.13.1 needed for modules
 
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="23"
@@ -28,6 +29,7 @@ configure_extra_options+=" -DCMAKE_C_FLAGS=-fPIC"
 configure_extra_options+=" -DHPX_WITH_DATAPAR_BACKEND=EVE"
 configure_extra_options+=" -DHPX_WITH_FETCH_EVE=ON"
 configure_extra_options+=" -DHPX_WITH_EVE_TAG=main"
+configure_extra_options+=" -DHPX_WITH_CXX_MODULES=ON"
 
 # The pwrapi library still needs to be set up properly on rostam
 # configure_extra_options+=" -DHPX_WITH_POWER_COUNTER=ON"

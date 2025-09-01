@@ -244,7 +244,8 @@ with section("parse"):
                                        'OUTPUT_SUFFIX': 1,
                                        'SOURCES': '+',
                                        'SOURCE_GLOB': 1,
-                                       'SOURCE_ROOT': 1},
+                                       'SOURCE_ROOT': 1,
+                                       'SCAN_FOR_MODULES': 1},
                            'pargs': { 'flags': ['EXCLUDE_FROM_ALL',
                                                  'INSTALL_HEADERS',
                                                  'INTERNAL_FLAGS',
@@ -281,6 +282,7 @@ with section("parse"):
                                         'HEADER_GLOB': 1,
                                         'HEADER_ROOT': 1,
                                         'HPX_PREFIX': 1,
+                                        'SCAN_FOR_MODULES': 1,
                                         'INI': 1,
                                         'INSTALL_SUFFIX': 1,
                                         'LANGUAGE': 1,
@@ -324,7 +326,8 @@ with section("parse"):
                                      'OUTPUT_SUFFIX': 1,
                                      'SOURCES': '+',
                                      'SOURCE_GLOB': 1,
-                                     'SOURCE_ROOT': 1},
+                                     'SOURCE_ROOT': 1,
+                                     'SCAN_FOR_MODULES': 1},
                          'pargs': { 'flags': ['EXCLUDE_FROM_ALL',
                                                'INSTALL_HEADERS',
                                                'INTERNAL_FLAGS',
@@ -549,6 +552,7 @@ with section("parse"):
                                       'NAME': 1,
                                       'SOVERSION': 1,
                                       'TYPE': 1,
+                                      'SCAN_FOR_MODULES': 1,
                                       'VERSION': 1},
                           'pargs': { 'flags': ['EXPORT',
                                                 'INSTALL',
@@ -568,7 +572,16 @@ with section("parse"):
     'write_config_defines_file': { 'kwargs': { 'FILENAME': 1,
                                                'NAMESPACE': 1,
                                                'TEMPLATE': 1},
-                                   'pargs': {'flags': [], 'nargs': '*'}}
+                                   'pargs': {'flags': [], 'nargs': '*'}},
+    'hpx_collect_std_headers': { 'kwargs': { 'SOURCES': '+',
+                                             'SOURCE_ROOT': 1,
+                                             'GENERATED_ROOT': 1,
+                                             'FOUND_HEADERS': 1},
+                          'pargs': { 'flags': [], 'nargs': '1+'}},
+    'hpx_extract_includes_from_file': { 'kwargs': { 'SOURCE': 1,
+                                                    'INCLUDE_DIRS': '+',
+                                                    'FOUND_HEADERS': 1},
+                          'pargs': { 'flags': [], 'nargs': '1+'}}
   }
 
   # Specify property tags.

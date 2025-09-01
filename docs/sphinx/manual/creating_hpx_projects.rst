@@ -263,6 +263,18 @@ executables if you are using the macros described below
 (:ref:`using_hpx_cmake_macros`). See :ref:`minimal` for more information on
 implicitly using ``main()`` as the entry point.
 
+If you want to use the facilities exposed by ``hpx::runtime_manager`` in binaries
+that were not linked as executables (e.g., in shared libraries), you will need
+make your cmake target explicitly depend on the ``HPX::init`` target:
+
+.. code-block:: cmake
+
+   add_library(hello_world_component SHARED hello_world_component.cpp)
+   target_link_libraries(hello_world_component PRIVATE HPX::init)
+
+Otherwise you may see compilation errors complaining about the header file
+``hpx/runtime_manager.hpp`` not being found.
+
 Creating a component requires setting two additional compile definitions:
 
 .. code-block:: cmake

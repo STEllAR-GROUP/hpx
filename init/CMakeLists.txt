@@ -53,6 +53,7 @@ target_link_libraries(hpx_init PRIVATE hpx_full)
 target_link_libraries(hpx_init PRIVATE hpx_private_flags)
 target_compile_definitions(
   hpx_init PRIVATE HPX_APPLICATION_EXPORTS HPX_LIBRARY_EXPORTS
+                   HPX_BINARY_DOESNT_USE_CXX_MODULES
 )
 target_include_directories(
   hpx_init PUBLIC $<BUILD_INTERFACE:${hpx_init_HEADER_ROOT}>

@@ -24,6 +24,7 @@ jobs:
       shell: bash
       run: |
           ln -s "$(which aclocal)" /opt/homebrew/bin/aclocal-1.16
+          ln -s "$(which automake)" /opt/homebrew/bin/automake-1.16
           cmake \
               -H. \
               -Bbuild \

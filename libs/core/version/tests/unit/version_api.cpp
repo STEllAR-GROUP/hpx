@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/version.hpp>
+#include <hpx/version.hpp>
 
 #include <cstdint>
 

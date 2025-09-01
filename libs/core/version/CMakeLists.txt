@@ -6,7 +6,7 @@
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(version_headers hpx/version.hpp hpx/version_api.hpp)
+set(version_headers hpx/version.hpp hpx/version/api.hpp)
 
 set(version_sources version.cpp)
 

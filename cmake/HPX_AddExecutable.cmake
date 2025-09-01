@@ -28,6 +28,7 @@ function(add_hpx_executable name)
       INSTALL_SUFFIX
       LANGUAGE
       HPX_PREFIX
+      SCAN_FOR_MODULES
   )
   set(multi_value_args
       SOURCES
@@ -256,20 +257,23 @@ function(add_hpx_executable name)
   # if modules are not enabled for this executable, then we need to add a
   # special preprocessor constant preventing the code from trying to use the
   # module interface unit exposed from the HPX libraries
-  if(HPX_WITH_CXX_MODULES AND NOT CMAKE_CXX_SCAN_FOR_MODULES)
-    target_compile_definitions(
-      ${name} PRIVATE HPX_APPLICATION_DOESNT_USE_CXX_MODULES
-    )
+  if(HPX_WITH_CXX_MODULES)
+    if(NOT (CMAKE_CXX_SCAN_FOR_MODULES OR ${name}_SCAN_FOR_MODULES))
+      set(${name}_SCAN_FOR_MODULES OFF)
+    else()
+      set(${name}_SCAN_FOR_MODULES ON)
+    endif()
   endif()
 
   hpx_setup_target(
     ${name}
     TYPE EXECUTABLE
-    FOLDER ${${name}_FOLDER}
-    COMPILE_FLAGS ${${name}_COMPILE_FLAGS}
-    LINK_FLAGS ${${name}_LINK_FLAGS}
-    DEPENDENCIES ${${name}_DEPENDENCIES}
-    COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
-    HPX_PREFIX ${${name}_HPX_PREFIX} ${_target_flags}
+    FOLDER "${${name}_FOLDER}"
+    COMPILE_FLAGS "${${name}_COMPILE_FLAGS}"
+    LINK_FLAGS "${${name}_LINK_FLAGS}"
+    DEPENDENCIES "${${name}_DEPENDENCIES}"
+    COMPONENT_DEPENDENCIES "${${name}_COMPONENT_DEPENDENCIES}"
+    HPX_PREFIX "${${name}_HPX_PREFIX}" ${_target_flags}
+    SCAN_FOR_MODULES ${${name}_SCAN_FOR_MODULES}
   )
 endfunction()
