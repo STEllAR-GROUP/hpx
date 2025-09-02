@@ -2368,7 +2368,9 @@ void test_scheduler_copy_avoidance()
     int final_move_count = move_count.load();
 
     // Scheduler operations should minimize copies
-    HPX_TEST_LTE(final_copy_count, 1);    // At most 1 copy should be acceptable
+    HPX_TEST_LTE(final_copy_count, 1);
+    
+    (void) final_move_count;
 
     HPX_TEST(true);
 }
