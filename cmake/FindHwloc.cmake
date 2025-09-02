@@ -80,6 +80,11 @@ if(NOT TARGET Hwloc::hwloc)
   add_library(Hwloc::hwloc INTERFACE IMPORTED)
   target_include_directories(Hwloc::hwloc SYSTEM INTERFACE ${Hwloc_INCLUDE_DIR})
   target_link_libraries(Hwloc::hwloc INTERFACE ${Hwloc_LIBRARIES})
+  if(APPLE)
+    target_link_libraries(
+      Hwloc::hwloc INTERFACE "-framework CoreFoundation" "-framework IOKit"
+    )
+  endif()
   mark_as_advanced(HWLOC_ROOT HWLOC_LIBRARY HWLOC_INCLUDE_DIR)
 
   mark_as_advanced(Hwloc_ROOT Hwloc_LIBRARY Hwloc_INCLUDE_DIR)
