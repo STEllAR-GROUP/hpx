@@ -2369,7 +2369,6 @@ void test_scheduler_copy_avoidance()
 
     // Scheduler operations should minimize copies
     HPX_TEST_LTE(final_copy_count, 1);
-    
     (void) final_move_count;
 
     HPX_TEST(true);
@@ -2377,7 +2376,7 @@ void test_scheduler_copy_avoidance()
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
-{
+{ß
     test_execute();
     test_sender_receiver_basic();
     test_sender_receiver_then();

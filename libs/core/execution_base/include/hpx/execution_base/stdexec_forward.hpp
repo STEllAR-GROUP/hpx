@@ -149,6 +149,14 @@ namespace hpx::execution::experimental {
     using stdexec::bulk_unchunked;
     using stdexec::bulk_unchunked_t;
 
+    // Execution policies
+    using stdexec::is_execution_policy;
+    using stdexec::is_execution_policy_v;
+    using stdexec::par;
+    using stdexec::par_unseq;
+    using stdexec::seq;
+    using stdexec::unseq;
+
     // Split
     using stdexec::split;
     using stdexec::split_t;
