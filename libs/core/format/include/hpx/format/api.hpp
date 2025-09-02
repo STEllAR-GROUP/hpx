@@ -272,18 +272,18 @@ namespace hpx::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CORE_EXPORT void format_to(std::ostream& os,
+        HPX_CORE_MODULE_EXPORT_FUNCTION void format_to(std::ostream& os,
             std::string_view format_str, format_arg const* args,
             std::size_t count);
 
-        HPX_CORE_EXPORT std::string format(std::string_view format_str,
+        HPX_CORE_MODULE_EXPORT_FUNCTION std::string format(std::string_view format_str,
             format_arg const* args, std::size_t count);
     }    // namespace detail
 
     // enable using format in variadic contexts
-    HPX_CORE_EXPORT std::string const& format();
+    HPX_CORE_MODULE_EXPORT_FUNCTION std::string const& format();
 
-    template <typename... Args>
+    HPX_CORE_MODULE_EXPORT_TEMPLATE template <typename... Args>
     std::string format(std::string_view format_str, Args const&... args)
     {
         detail::format_arg const format_args[] = {
@@ -291,7 +291,7 @@ namespace hpx::util {
         return detail::format(format_str, format_args, sizeof...(Args));
     }
 
-    template <typename... Args>
+    HPX_CORE_MODULE_EXPORT_TEMPLATE template <typename... Args>
     std::ostream& format_to(
         std::ostream& os, std::string_view format_str, Args const&... args)
     {
@@ -331,7 +331,7 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    template <typename Range>
+    HPX_CORE_MODULE_EXPORT_TEMPLATE template <typename Range>
     detail::format_join<Range> format_join(
         Range const& range, std::string_view delimiter) noexcept
     {

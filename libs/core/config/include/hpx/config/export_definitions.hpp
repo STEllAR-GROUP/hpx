@@ -58,14 +58,20 @@
 #  define HPX_CORE_EXPORT               /* empty */
 # endif
 # define HPX_CORE_MODULE_EXPORT_EXTERN  export extern "C++"
+# define HPX_CORE_MODULE_EXPORT_TEMPLATE export
+# define HPX_CORE_MODULE_EXPORT_CLASS  export extern "C++" class
 #else
 # define HPX_CORE_MODULE_EXPORT_EXTERN  extern "C++"
+# define HPX_CORE_MODULE_EXPORT_TEMPLATE  /* empty */
+#  define HPX_CORE_MODULE_EXPORT_CLASS  class HPX_ALWAYS_EXPORT
 #endif
 
 #define HPX_CORE_MODULE_EXPORT                                                 \
     HPX_CORE_MODULE_EXPORT_EXTERN HPX_CORE_EXPORT
 #define HPX_CORE_MODULE_EXPORT_NODISCARD                                       \
     HPX_CORE_MODULE_EXPORT_EXTERN [[nodiscard]] HPX_CORE_EXPORT
+#  define HPX_CORE_MODULE_EXPORT_FUNCTION                                      \
+    HPX_CORE_MODULE_EXPORT_EXTERN HPX_CORE_EXPORT
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_EXPORTS) || defined(HPX_FULL_EXPORTS)

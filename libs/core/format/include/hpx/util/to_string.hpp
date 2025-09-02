@@ -37,7 +37,7 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_TEMPLATE template <typename T>
     [[nodiscard]] std::string to_string(T const& v)
     {
         try
