@@ -2376,7 +2376,7 @@ void test_scheduler_copy_avoidance()
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
-{ß
+{
     test_execute();
     test_sender_receiver_basic();
     test_sender_receiver_then();
