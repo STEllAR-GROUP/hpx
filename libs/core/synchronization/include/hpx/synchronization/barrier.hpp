@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,9 +15,9 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <climits>

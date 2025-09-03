@@ -15,5 +15,10 @@
 @module_headers@
 #else
 @module_macro_headers@
+// suppress certain MSVC warnings related to dll-interface inconsistencies
+#include <hpx/config/warnings_prefix.hpp>
+
 import HPX.Core;
+
+#include <hpx/config/warnings_suffix.hpp>
 #endif

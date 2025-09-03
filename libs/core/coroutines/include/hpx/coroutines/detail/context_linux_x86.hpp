@@ -1,6 +1,6 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
 //  Copyright (c) 2007 Robert Perricone
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2013-2016 Thomas Heller
 //  Copyright (c) 2017 Christopher Taylor
@@ -20,14 +20,14 @@
 #include <hpx/coroutines/detail/posix_utility.hpp>
 #include <hpx/coroutines/detail/swap_context.hpp>
 #include <hpx/coroutines/signal_handler_debugging.hpp>
-#include <hpx/debugging/attach_debugger.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/version.hpp>
 
 #if defined(HPX_HAVE_STACKTRACES)
-#include <hpx/debugging/backtrace.hpp>
+#include <hpx/modules/debugging.hpp>
 #endif
 
 #include <atomic>

@@ -21,9 +21,9 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/string_util.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_local/interval_timer.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>

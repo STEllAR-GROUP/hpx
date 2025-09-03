@@ -25,7 +25,7 @@
 #include <hpx/threading_base/detail/reset_lco_description.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-#include <hpx/debugging/backtrace.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/threading_base/detail/reset_backtrace.hpp>
 #endif
 

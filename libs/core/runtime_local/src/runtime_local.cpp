@@ -11,15 +11,15 @@
 #include <hpx/command_line_handling_local/parse_command_line_local.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/signal_handler_debugging.hpp>
-#include <hpx/debugging/attach_debugger.hpp>
-#include <hpx/debugging/backtrace.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
@@ -33,7 +33,6 @@
 #include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/static_reinit/static_reinit.hpp>
-#include <hpx/thread_support/set_thread_name.hpp>
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>

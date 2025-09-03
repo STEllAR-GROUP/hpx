@@ -14,7 +14,7 @@
 #include <hpx/actions_base/actions_base_fwd.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
-#include <hpx/debugging/demangle_helper.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/serialization/traits/needs_automatic_registration.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>

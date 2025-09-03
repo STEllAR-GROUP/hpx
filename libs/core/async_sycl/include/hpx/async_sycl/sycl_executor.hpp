@@ -1,5 +1,5 @@
 //  Copyright (c) 2022 Gregor Daiﬂ
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,13 +12,12 @@
 #include <hpx/config.hpp>
 #include <hpx/async_base/async.hpp>
 #include <hpx/async_sycl/sycl_future.hpp>
-#include <hpx/errors/exception.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/include/post.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <cstddef>
 #include <exception>

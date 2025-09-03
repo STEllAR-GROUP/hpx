@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -19,7 +19,7 @@
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #if defined(HPX_HAVE_VERIFY_LOCKS)
-#include <hpx/debugging/backtrace.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #endif
 

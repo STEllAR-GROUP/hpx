@@ -489,4 +489,68 @@ namespace hpx::util::stack_trace {
 #endif
 }    // namespace hpx::util::stack_trace
 
+namespace hpx::util {
+
+    backtrace::backtrace(std::size_t frames_no)
+    {
+        if (frames_no == 0)
+            return;
+        frames_no += 2;    // we omit two frames from printing
+        frames_.resize(frames_no, nullptr);
+
+        std::size_t const size =
+            stack_trace::trace(&frames_.front(), frames_no);
+        if (size != 0)
+            frames_.resize(size);
+    }
+
+    void backtrace::trace_line(std::size_t frame_no, std::ostream& out) const
+    {
+        if (frame_no < frames_.size())
+            stack_trace::write_symbols(&frames_[frame_no], 1, out);
+    }
+
+    std::string backtrace::trace_line(std::size_t frame_no) const
+    {
+        if (frame_no < frames_.size())
+            return stack_trace::get_symbol(frames_[frame_no]);
+        return {};
+    }
+
+    std::string backtrace::trace() const
+    {
+        if (frames_.empty())
+            return {};
+        return stack_trace::get_symbols(&frames_.front(), frames_.size());
+    }
+
+    void backtrace::trace(std::ostream& out) const
+    {
+        if (frames_.empty())
+            return;
+        stack_trace::write_symbols(&frames_.front(), frames_.size(), out);
+    }
+
+    namespace detail {
+
+        std::ostream& trace_manip::write(std::ostream& out) const
+        {
+            if (tr_)
+                tr_->trace(out);
+            return out;
+        }
+
+        inline std::ostream& operator<<(
+            std::ostream& out, detail::trace_manip const& t)
+        {
+            return t.write(out);
+        }
+    }    // namespace detail
+
+    std::string trace(std::size_t frames_no)
+    {
+        return backtrace(frames_no).trace();
+    }
+}    // namespace hpx::util
+
 #endif

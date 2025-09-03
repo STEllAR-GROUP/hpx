@@ -13,6 +13,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/performance_counters/apex_sample_value.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
@@ -20,7 +21,6 @@
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/runtime_local/get_thread_name.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
@@ -37,8 +37,8 @@
 #include <vector>
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-#include <hpx/modules/itt_notify.hpp>
 #include <hpx/itt_notify/detail/use_ittnotify_api.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <map>
 #endif
 

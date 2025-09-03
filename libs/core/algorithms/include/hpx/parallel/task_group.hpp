@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2024 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,14 +13,13 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors/exception_list.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/futures/detail/future_data.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/synchronization/latch.hpp>

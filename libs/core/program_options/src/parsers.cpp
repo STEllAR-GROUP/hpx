@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
-#include <hpx/debugging/environ.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/program_options/detail/cmdline.hpp>
 #include <hpx/program_options/detail/config_file.hpp>
 #include <hpx/program_options/detail/convert.hpp>
