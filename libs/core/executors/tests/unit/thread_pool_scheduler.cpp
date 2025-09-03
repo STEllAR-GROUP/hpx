@@ -1927,11 +1927,11 @@ void test_keep_future_sender()
             [](int&& x, double const& y) { return x * 2 + (int(y) / 2); });
 #if defined(HPX_HAVE_STDEXEC)
         HPX_TEST_EQ(
-            hpx::get<0>(*(tt::sync_wait(
+            hpx::get<0>(
+                *(tt::sync_wait(
                 ex::when_all(
                     ex::keep_future(std::move(f)), ex::keep_future(sf)) |
-                ex::transfer(ex::thread_pool_scheduler{}) | ex::then(fun))),
-            85);
+                ex::transfer(ex::thread_pool_scheduler{}) | ex::then(fun)))), 85);
 #else
         HPX_TEST_EQ(hpx::get<0>(*(ex::when_all(ex::keep_future(std::move(f)),
                                       ex::keep_future(sf)) |
@@ -2139,7 +2139,7 @@ void test_stdexec_bulk_chunked_customization()
     std::atomic<int> total_processed{0};
     auto bulk_chunked_sender = stdexec::bulk_chunked(
         ex::schedule(scheduler) | stdexec::then([]() { return 1; }),
-        stdexec::par, 20, [&](int begin, int end, int value) {
+        stdexec::par, 20, [&](int begin, int end, int& value) {
             for (int i = begin; i < end; ++i)
             {
                 total_processed.fetch_add(value, std::memory_order_relaxed);

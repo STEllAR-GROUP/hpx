@@ -147,11 +147,12 @@ namespace hpx::execution::experimental::detail {
                 static_cast<std::size_t>(index) * task_f->chunk_size;
             auto const i_end =
                 (std::min) (i_begin + task_f->chunk_size, task_f->size);
-            auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
-            for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
+            // auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
+            // auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
+            for (std::uint32_t i = i_begin; i != i_end; (void) ++i)
             {
                 bulk_scheduler_invoke_helper(
-                    index_pack_type{}, op_state->f, *it, ts);
+                    index_pack_type{}, op_state->f, i, ts);
             }
         }
 
@@ -442,15 +443,16 @@ namespace hpx::execution::experimental::detail {
             }
         }
 
-        using range_value_type =
-            hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Shape>>;
+        // using range_value_type =
+        //     hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Shape>>;
 
         template <typename... Ts>
         void execute(Ts&&... ts)
         {
             // Don't spawn tasks if there is no work to be done
             auto const size =
-                static_cast<std::uint32_t>(hpx::util::size(op_state->shape));
+                static_cast<std::uint32_t>(op_state->shape);
+                // static_cast<std::uint32_t>(hpx::util::size(op_state->shape));
             if (size == 0)
             {
                 hpx::execution::experimental::set_value(
@@ -585,7 +587,7 @@ namespace hpx::execution::experimental::detail {
         // clang-format off
         template <typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_invocable_v<F, range_value_type,
+                hpx::is_invocable_v<F, Shape,
                     std::add_lvalue_reference_t<Ts>...>
             )>
         // clang-format on

@@ -33,6 +33,7 @@
 #include <exception>
 #include <string>
 #include <utility>
+#include <ranges>
 
 // Forward declaration
 namespace hpx::execution::experimental::detail {
@@ -107,16 +108,20 @@ namespace hpx::execution::experimental {
                     hpx::execution::experimental::get_env(sndr));
 
             // Extract bulk parameters using structured binding
-            auto [tag, data, child] = sndr;
-            auto [shape, f] = data;
+            auto&& [tag, data, child] = sndr;
+            auto&& [pol, shape, f] = data;
+
+            auto iota_shape = std::views::iota(decltype(shape){0}, shape);
 
             // Create HPX thread_pool_bulk_sender with extracted parameters
             return hpx::execution::experimental::detail::
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
+                    // std::decay_t<decltype(iota_shape)>,
                     std::decay_t<decltype(shape)>,
                     std::decay_t<decltype(f)>>{
-                    sched,    // scheduler from environment
+                    HPX_MOVE(sched),    // scheduler from environment
                     HPX_FORWARD(decltype(child), child),    // child sender
+                    // HPX_FORWARD(decltype(iota_shape), iota_shape),    // shape
                     HPX_FORWARD(decltype(shape), shape),    // shape
                     HPX_FORWARD(decltype(f), f)             // function
                 };
@@ -135,16 +140,20 @@ namespace hpx::execution::experimental {
             auto&& sched = hpx::execution::experimental::get_scheduler(env);
 
             // Extract bulk parameters using structured binding
-            auto [tag, data, child] = sndr;
-            auto [shape, f] = data;
+            auto&& [tag, data, child] = sndr;
+            auto&& [pol, shape, f] = data;
+
+            auto iota_shape = std::views::iota(decltype(shape){0}, shape);
 
             // Create HPX thread_pool_bulk_sender with extracted parameters
             return hpx::execution::experimental::detail::
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
+                    // std::decay_t<decltype(iota_shape)>,
                     std::decay_t<decltype(shape)>,
                     std::decay_t<decltype(f)>>{
-                    sched,    // scheduler from environment
+                    HPX_MOVE(sched),    // scheduler from environment
                     HPX_FORWARD(decltype(child), child),    // child sender
+                    // HPX_MOVE(iota_shape),    // shape
                     HPX_FORWARD(decltype(shape), shape),    // shape
                     HPX_FORWARD(decltype(f), f)             // function
                 };
