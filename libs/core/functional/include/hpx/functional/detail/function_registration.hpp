@@ -30,7 +30,7 @@ namespace hpx::util::detail {
         static char const* call()
 #ifdef HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION
         {
-            return debug::type_id<F>::typeid_.type_id();
+            return debug::type_id<F>();
         }
 #else
             = delete;

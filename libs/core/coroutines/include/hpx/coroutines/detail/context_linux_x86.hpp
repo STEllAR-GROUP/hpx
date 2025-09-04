@@ -22,7 +22,6 @@
 #include <hpx/coroutines/signal_handler_debugging.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/util/from_string.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/version.hpp>
 

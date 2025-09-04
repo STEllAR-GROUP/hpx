@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+//  Make HPX inspect tool happy: hpxinspect:noinclude:from_string
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -23,7 +25,8 @@ namespace hpx::util {
 
     namespace detail {
 
-        template <typename T, typename Enable = void>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T,
+            typename Enable = void>
         struct from_string
         {
             template <typename Char>
@@ -35,7 +38,7 @@ namespace hpx::util {
             }
         };
 
-        template <typename T, typename U>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename U>
         [[nodiscard]] T check_out_of_range(U const& value)
         {
             U const min = (std::numeric_limits<T>::min)();
@@ -52,7 +55,7 @@ namespace hpx::util {
             return static_cast<T>(value);
         }
 
-        template <typename Char>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Char>
         void check_only_whitespace(
             std::basic_string<Char> const& s, std::size_t pos)
         {
@@ -68,7 +71,7 @@ namespace hpx::util {
             }
         }
 
-        template <typename T>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
         struct from_string<T, std::enable_if_t<std::is_integral_v<T>>>
         {
             template <typename Char>
@@ -136,7 +139,7 @@ namespace hpx::util {
             }
         };
 
-        template <typename T>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
         struct from_string<T, std::enable_if_t<std::is_floating_point_v<T>>>
         {
             template <typename Char>
@@ -168,7 +171,7 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    HPX_CORE_MODULE_EXPORT_TEMPLATE template <typename T, typename Char>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Char>
     [[nodiscard]] T from_string(std::basic_string<Char> const& v)
     {
         try
@@ -183,7 +186,8 @@ namespace hpx::util {
         }
     }
 
-    HPX_CORE_MODULE_EXPORT_TEMPLATE template <typename T, typename U, typename Char>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename U,
+        typename Char>
     [[nodiscard]] T from_string(
         std::basic_string<Char> const& v, U&& default_value)
     {
@@ -199,7 +203,7 @@ namespace hpx::util {
         }
     }
 
-    HPX_CORE_MODULE_EXPORT_TEMPLATE template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     [[nodiscard]] T from_string(std::string const& v)
     {
         try
@@ -214,7 +218,7 @@ namespace hpx::util {
         }
     }
 
-    HPX_CORE_MODULE_EXPORT_TEMPLATE template <typename T, typename U>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename U>
     [[nodiscard]] T from_string(std::string const& v, U&& default_value)
     {
         try

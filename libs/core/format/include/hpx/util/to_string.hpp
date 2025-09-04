@@ -4,10 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+//  Make HPX inspect tool happy: hpxinspect:noinclude:to_string
+
 #pragma once
 
 #include <hpx/modules/format.hpp>
-#include <hpx/util/bad_lexical_cast.hpp>
 
 #include <string>
 #include <type_traits>
@@ -16,7 +17,8 @@ namespace hpx::util {
 
     namespace detail {
 
-        template <typename T, typename Enable = void>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T,
+            typename Enable = void>
         struct to_string
         {
             [[nodiscard]] static std::string call(T const& value)
@@ -37,7 +39,7 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    HPX_CORE_MODULE_EXPORT_TEMPLATE template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     [[nodiscard]] std::string to_string(T const& v)
     {
         try

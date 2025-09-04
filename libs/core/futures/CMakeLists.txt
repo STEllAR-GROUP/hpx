@@ -79,6 +79,7 @@ add_hpx_module(
     hpx_synchronization
     hpx_timing
     hpx_threading_base
+    hpx_thread_support
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

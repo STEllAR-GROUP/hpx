@@ -107,14 +107,14 @@ namespace hpx::actions::detail {
         /// HPX_REGISTER_ACTION_DECLARATION
         static_assert(traits::needs_automatic_registration_v<Action>,
             "HPX_REGISTER_ACTION_DECLARATION missing");
-        return util::debug::type_id<Action>::typeid_.type_id();
+        return util::debug::type_id<Action>();
     }
 #endif
 #else    // HPX_HAVE_NETWORKING
     template <typename Action>
     char const* get_action_name() noexcept
     {
-        return util::debug::type_id<Action>::typeid_.type_id();
+        return util::debug::type_id<Action>();
     }
 #endif
 

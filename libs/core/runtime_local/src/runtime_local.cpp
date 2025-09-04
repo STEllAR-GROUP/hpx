@@ -18,6 +18,7 @@
 #include <hpx/itt_notify/thread_name.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threadmanager.hpp>
@@ -38,7 +39,6 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/type_support/unused.hpp>
-#include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/version.hpp>
 

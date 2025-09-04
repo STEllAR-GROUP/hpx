@@ -62,6 +62,12 @@
 
 namespace hpx::util::stack_trace {
 
+    [[nodiscard]] std::size_t trace(void** addresses, std::size_t size);
+    void write_symbols(void* const* addresses, std::size_t size, std::ostream&);
+    [[nodiscard]] std::string get_symbol(void* address);
+    [[nodiscard]] std::string get_symbols(
+        void* const* address, std::size_t size);
+
 #if defined(HPX_HAVE_EXECINFO) && defined(HPX_HAVE_UNWIND)
     struct trace_data
     {

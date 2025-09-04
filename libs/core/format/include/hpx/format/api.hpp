@@ -1,5 +1,5 @@
 //  Copyright (c) 2017-2021 Agustin Berge
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -26,14 +26,14 @@ namespace hpx::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
         struct type_specifier
         {
             static char const* value() noexcept = delete;
         };
 
 #define DECL_TYPE_SPECIFIER(Type, Spec)                                        \
-    template <>                                                                \
+    HPX_CORE_MODULE_EXPORT_EXTERN template <>                                  \
     struct type_specifier<Type>                                                \
     {                                                                          \
         static constexpr char const* value() noexcept                          \
@@ -69,7 +69,8 @@ namespace hpx::util {
 #undef DECL_TYPE_SPECIFIER
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, bool IsFundamental = std::is_fundamental_v<T>>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T,
+            bool IsFundamental = std::is_fundamental_v<T>>
         struct formatter
         {
             static void call(
@@ -100,7 +101,7 @@ namespace hpx::util {
             }
         };
 
-        template <>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <>
         struct formatter<bool> : formatter<int>
         {
             static void call(
@@ -111,7 +112,7 @@ namespace hpx::util {
             }
         };
 
-        template <>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <>
         struct formatter<void const*, /*IsFundamental=*/false>
         {
             static void call(
@@ -121,13 +122,13 @@ namespace hpx::util {
             }
         };
 
-        template <typename T>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
         struct formatter<T const*, /*IsFundamental=*/false>
           : formatter<void const*>
         {
         };
 
-        template <>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <>
         struct formatter<char const*, /*IsFundamental=*/false>
         {
             static void call(
@@ -164,7 +165,7 @@ namespace hpx::util {
             }
         };
 
-        template <>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <>
         struct formatter<std::string, /*IsFundamental=*/false>
           : formatter<char const*>
         {
@@ -186,7 +187,7 @@ namespace hpx::util {
             }
         };
 
-        template <>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <>
         struct formatter<std::tm, /*IsFundamental=*/false>
         {
             static void call(
@@ -216,7 +217,7 @@ namespace hpx::util {
             }
         };
 
-        template <typename T>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
         void format_value(
             std::ostream& os, std::string_view spec, T const& value)
         {
@@ -226,7 +227,7 @@ namespace hpx::util {
             os << value;
         }
 
-        template <typename T>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
         struct formatter<T, /*IsFundamental=*/false>
         {
             static void call(
@@ -237,7 +238,7 @@ namespace hpx::util {
             }
         };
 
-        struct format_arg
+        HPX_CORE_MODULE_EXPORT_EXTERN struct format_arg
         {
             format_arg() = default;
 
@@ -272,18 +273,18 @@ namespace hpx::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CORE_MODULE_EXPORT_FUNCTION void format_to(std::ostream& os,
+        HPX_CORE_MODULE_EXPORT void format_to(std::ostream& os,
             std::string_view format_str, format_arg const* args,
             std::size_t count);
 
-        HPX_CORE_MODULE_EXPORT_FUNCTION std::string format(std::string_view format_str,
+        HPX_CORE_MODULE_EXPORT std::string format(std::string_view format_str,
             format_arg const* args, std::size_t count);
     }    // namespace detail
 
     // enable using format in variadic contexts
-    HPX_CORE_MODULE_EXPORT_FUNCTION std::string const& format();
+    HPX_CORE_MODULE_EXPORT std::string const& format();
 
-    HPX_CORE_MODULE_EXPORT_TEMPLATE template <typename... Args>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename... Args>
     std::string format(std::string_view format_str, Args const&... args)
     {
         detail::format_arg const format_args[] = {
@@ -291,7 +292,7 @@ namespace hpx::util {
         return detail::format(format_str, format_args, sizeof...(Args));
     }
 
-    HPX_CORE_MODULE_EXPORT_TEMPLATE template <typename... Args>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename... Args>
     std::ostream& format_to(
         std::ostream& os, std::string_view format_str, Args const&... args)
     {
@@ -304,7 +305,7 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename Range>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Range>
         struct format_join
         {
             Range const& rng;
@@ -331,7 +332,7 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    HPX_CORE_MODULE_EXPORT_TEMPLATE template <typename Range>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Range>
     detail::format_join<Range> format_join(
         Range const& range, std::string_view delimiter) noexcept
     {

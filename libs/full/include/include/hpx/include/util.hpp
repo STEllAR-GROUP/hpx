@@ -28,8 +28,6 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/unwrap.hpp>
-#include <hpx/util/from_string.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/to_string.hpp>
 
 #include <hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp>

@@ -10,7 +10,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/util/to_string.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <algorithm>
 
@@ -75,7 +75,7 @@ namespace boost { namespace inspect {
         register_signature(".ixx");
 
         for (deprecated_includes const* includes_it = &names[0];
-             includes_it->include_regex != nullptr; ++includes_it)
+            includes_it->include_regex != nullptr; ++includes_it)
         {
             std::string rx = std::string(R"(^\s*#\s*include\s*<()") +
                 includes_it->include_regex + ")>\\s*$" + "|" +

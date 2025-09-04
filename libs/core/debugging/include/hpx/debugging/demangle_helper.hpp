@@ -9,9 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#include <cstdlib>
 #include <string>
-#include <type_traits>
 #include <typeinfo>
 
 // --------------------------------------------------------------------
@@ -75,25 +73,12 @@ namespace hpx::util::debug {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util::debug {
 
-#if defined(__GNUG__)
     HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
-    struct type_id
+    char const* type_id()
     {
-        static cxxabi_demangle_helper<T> typeid_;
-    };
-
-    template <typename T>
-    cxxabi_demangle_helper<T> type_id<T>::typeid_ = cxxabi_demangle_helper<T>();
-#else
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
-    struct type_id
-    {
-        static demangle_helper<T> typeid_;
-    };
-
-    template <typename T>
-    demangle_helper<T> type_id<T>::typeid_ = demangle_helper<T>();
-#endif
+        static cxxabi_demangle_helper<T> id = cxxabi_demangle_helper<T>();
+        return id.type_id();
+    }
 
     // --------------------------------------------------------------------
     // print type information
@@ -103,7 +88,7 @@ namespace hpx::util::debug {
     HPX_CORE_MODULE_EXPORT_EXTERN template <typename T = void>
     std::string print_type(char const* = "")
     {
-        return std::string(type_id<T>::typeid_.type_id());
+        return std::string(type_id<T>());
     }
 
     HPX_CORE_MODULE_EXPORT_EXTERN template <>
@@ -116,7 +101,7 @@ namespace hpx::util::debug {
         requires(sizeof...(Args) != 0)
     std::string print_type(char const* delim = "")
     {
-        std::string const temp(type_id<T>::typeid_.type_id());
+        std::string const temp = type_id<T>();
         return temp + delim + print_type<Args...>(delim);
     }
 }    // namespace hpx::util::debug

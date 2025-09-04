@@ -46,17 +46,18 @@ add_hpx_module(
   HEADERS ${runtime_configuration_headers}
   COMPAT_HEADERS ${runtime_configuration_compat_headers}
   MODULE_DEPENDENCIES
-    hpx_program_options
     hpx_errors
+    hpx_coroutines
     hpx_filesystem
+    hpx_format
+    hpx_ini
     hpx_itt_notify
     hpx_logging
+    hpx_program_options
     hpx_plugin
-    hpx_ini
     hpx_prefix
-    hpx_coroutines
-    hpx_version
     hpx_string_util
     hpx_synchronization
+    hpx_version
   CMAKE_SUBDIRS examples tests
 )

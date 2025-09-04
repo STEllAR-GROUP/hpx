@@ -227,7 +227,7 @@ namespace hpx::serialization::detail {
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_2(Class, Override)              \
     HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_3(                                 \
-        Class, hpx::util::debug::type_id<Class>::typeid_.type_id(), Override)  \
+        Class, hpx::util::debug::type_id<Class>(), Override)                   \
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_1(Class)                        \
@@ -246,7 +246,7 @@ namespace hpx::serialization::detail {
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED_2(Class, Override)     \
     HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED_3(                        \
-        Class, hpx::util::debug::type_id<T>::typeid_.type_id(), Override)      \
+        Class, hpx::util::debug::type_id<T>(), Override)                       \
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED_1(Class)               \

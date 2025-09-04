@@ -57,7 +57,13 @@ add_hpx_module(
   HEADERS ${program_options_headers}
   COMPAT_HEADERS ${program_options_compat_headers}
   DEPENDENCIES ${__boost_program_options}
-  MODULE_DEPENDENCIES hpx_config hpx_datastructures hpx_format hpx_functional
-                      hpx_iterator_support hpx_string_util
+  MODULE_DEPENDENCIES
+    hpx_config
+    hpx_datastructures
+    hpx_debugging
+    hpx_format
+    hpx_functional
+    hpx_iterator_support
+    hpx_string_util
   CMAKE_SUBDIRS examples tests
 )

@@ -791,8 +791,7 @@ namespace hpx::util::itt {
         ~task() = default;
 
         template <typename T>
-        void add_metadata(
-            string_handle const& name, T const& val) const noexcept
+        void add_metadata(string_handle const&, T const&) const noexcept
         {
         }
     };

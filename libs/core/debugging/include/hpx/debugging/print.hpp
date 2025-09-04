@@ -66,22 +66,22 @@ namespace hpx::debug {
         HPX_CORE_MODULE_EXPORT_EXTERN template <typename Int>
         HPX_CORE_EXPORT void print_dec(std::ostream& os, Int const& v, int n);
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template HPX_CORE_EXPORT void print_dec(
+        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::int16_t const&, int);
-        HPX_CORE_MODULE_EXPORT_EXTERN template HPX_CORE_EXPORT void print_dec(
+        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::uint16_t const&, int);
-        HPX_CORE_MODULE_EXPORT_EXTERN template HPX_CORE_EXPORT void print_dec(
+        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::int32_t const&, int);
-        HPX_CORE_MODULE_EXPORT_EXTERN template HPX_CORE_EXPORT void print_dec(
+        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::uint32_t const&, int);
-        HPX_CORE_MODULE_EXPORT_EXTERN template HPX_CORE_EXPORT void print_dec(
+        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::int64_t const&, int);
-        HPX_CORE_MODULE_EXPORT_EXTERN template HPX_CORE_EXPORT void print_dec(
+        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::uint64_t const&, int);
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template HPX_CORE_EXPORT void print_dec(
+        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::atomic<int> const&, int);
-        HPX_CORE_MODULE_EXPORT_EXTERN template HPX_CORE_EXPORT void print_dec(
+        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::atomic<unsigned int> const&, int);
 
         HPX_CORE_MODULE_EXPORT_EXTERN template <int N, typename T>
@@ -326,7 +326,8 @@ namespace hpx::debug {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CORE_MODULE_EXPORT void register_print_info(void (*)(std::ostream&));
+        HPX_CORE_MODULE_EXPORT void register_print_info(
+            void (*)(std::ostream&));
         HPX_CORE_MODULE_EXPORT void generate_prefix(std::ostream& os);
 
         ///////////////////////////////////////////////////////////////////////
