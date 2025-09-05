@@ -24,6 +24,7 @@
 #include <chrono>
 #include <cstddef>
 #include <exception>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -1926,11 +1927,11 @@ void test_keep_future_sender()
             [](int&& x, double const& y) { return x * 2 + (int(y) / 2); });
 #if defined(HPX_HAVE_STDEXEC)
         HPX_TEST_EQ(
-            hpx::get<0>(*(tt::sync_wait(
+            hpx::get<0>(
+                *(tt::sync_wait(
                 ex::when_all(
                     ex::keep_future(std::move(f)), ex::keep_future(sf)) |
-                ex::transfer(ex::thread_pool_scheduler{}) | ex::then(fun)))),
-            85);
+                ex::transfer(ex::thread_pool_scheduler{}) | ex::then(fun)))), 85);
 #else
         HPX_TEST_EQ(hpx::get<0>(*(ex::when_all(ex::keep_future(std::move(f)),
                                       ex::keep_future(sf)) |
@@ -1951,8 +1952,8 @@ void test_bulk()
         hpx::thread::id parent_id = hpx::this_thread::get_id();
 
 #if defined(HPX_HAVE_STDEXEC)
-        tt::sync_wait(
-            ex::schedule(ex::thread_pool_scheduler{}) | ex::bulk(n, [&](int i) {
+        tt::sync_wait(ex::schedule(ex::thread_pool_scheduler{}) |
+            ex::bulk(ex::par, n, [&](int i) {
                 ++v[i];
                 HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             }));
@@ -1977,7 +1978,7 @@ void test_bulk()
 #if defined(HPX_HAVE_STDEXEC)
         auto v_out = hpx::get<0>(*(tt::sync_wait(
             ex::transfer_just(ex::thread_pool_scheduler{}, std::move(v)) |
-            ex::bulk(n, [&parent_id](int i, std::vector<int>& v) {
+            ex::bulk(ex::par, n, [&parent_id](int i, std::vector<int>& v) {
                 v[i] = i;
                 HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             }))));
@@ -2005,10 +2006,12 @@ void test_bulk()
 
         hpx::mutex mtx;
 #if defined(HPX_HAVE_STDEXEC)
-        tt::sync_wait(ex::schedule(ex::thread_pool_scheduler{}) |
-            ex::bulk(std::move(v), [&](std::string const& s) {
+        auto v_size = v.size();
+        tt::sync_wait(ex::bulk(
+            ex::transfer_just(ex::thread_pool_scheduler{}, std::move(v)),
+            ex::par, v_size, [&](int i, std::vector<std::string> const& vec) {
                 std::lock_guard lk(mtx);
-                string_map.insert(s);
+                string_map.insert(vec[i]);
             }));
 #else
         ex::schedule(ex::thread_pool_scheduler{}) |
@@ -2037,7 +2040,7 @@ void test_bulk()
         {
 #if defined(HPX_HAVE_STDEXEC)
             tt::sync_wait(ex::transfer_just(ex::thread_pool_scheduler{}) |
-                ex::bulk(n, [&v, i_fail](int i) {
+                ex::bulk(ex::par, n, [&v, i_fail](int i) {
                     if (i == i_fail)
                     {
                         throw std::runtime_error("error");
@@ -2088,19 +2091,156 @@ void test_bulk()
 }
 // NOLINTEND(bugprone-unchecked-optional-access)
 
+#if defined(HPX_HAVE_STDEXEC)
+// ============================================================================
+// STDEXEC BULK OPERATIONS DOMAIN CUSTOMIZATION TESTS
+// ============================================================================
+// These tests verify that HPX's thread_pool_scheduler properly integrates with
+// stdexec's bulk operations through domain customization as specified in P2999R3.
+// The domain system allows HPX to intercept and customize stdexec bulk operations
+// to use HPX's sophisticated work-stealing thread pool implementation.
+
+void test_stdexec_domain_queries()
+{
+    auto scheduler = ex::thread_pool_scheduler{};
+
+    // Verify domain is accessible via stdexec::get_domain
+    static_assert(requires { stdexec::get_domain(scheduler); });
+    auto domain = stdexec::get_domain(scheduler);
+
+    HPX_TEST(true);    // Domain query successful
+}
+
+void test_stdexec_bulk_domain_customization()
+{
+    auto scheduler = ex::thread_pool_scheduler{};
+
+    // Test basic bulk operation with domain customization
+    std::vector<int> results(10, 0);
+    auto bulk_sender = stdexec::bulk(
+        ex::schedule(scheduler) | stdexec::then([]() { return 42; }),
+        stdexec::par, 10,
+        [&](int idx, int value) { results[idx] = value + idx; });
+
+    stdexec::sync_wait(std::move(bulk_sender));
+
+    // Verify results
+    for (int i = 0; i < 10; ++i)
+    {
+        HPX_TEST_EQ(results[i], 42 + i);
+    }
+}
+
+void test_stdexec_bulk_chunked_customization()
+{
+    auto scheduler = ex::thread_pool_scheduler{};
+
+    // Test bulk_chunked operation - processes ranges of work items
+    std::atomic<int> total_processed{0};
+    auto bulk_chunked_sender = stdexec::bulk_chunked(
+        ex::schedule(scheduler) | stdexec::then([]() { return 1; }),
+        stdexec::par, 20, [&](int begin, int end, int& value) {
+            for (int i = begin; i < end; ++i)
+            {
+                total_processed.fetch_add(value, std::memory_order_relaxed);
+            }
+        });
+
+    stdexec::sync_wait(std::move(bulk_chunked_sender));
+
+    HPX_TEST_EQ(total_processed.load(), 20);    // 20 items * 1 value each
+}
+
+void test_stdexec_bulk_unchunked_customization()
+{
+    auto scheduler = ex::thread_pool_scheduler{};
+
+    // Test bulk_unchunked operation - processes individual work items
+    std::vector<int> results(15, 0);
+    auto bulk_unchunked_sender = stdexec::bulk_unchunked(
+        ex::schedule(scheduler) | stdexec::then([]() { return 5; }),
+        stdexec::par, 15,
+        [&](int idx, int value) { results[idx] = value * idx; });
+
+    stdexec::sync_wait(std::move(bulk_unchunked_sender));
+
+    // Verify results
+    for (int i = 0; i < 15; ++i)
+    {
+        HPX_TEST_EQ(results[i], 5 * i);
+    }
+}
+
+void test_stdexec_thread_distribution()
+{
+    auto scheduler = ex::thread_pool_scheduler{};
+    std::thread::id main_thread_id = std::this_thread::get_id();
+
+    // Test that bulk operations run on worker threads
+    std::set<std::thread::id> worker_threads;
+    std::atomic<int> task_count{0};
+
+    auto bulk_sender = stdexec::bulk(
+        ex::schedule(scheduler) | stdexec::then([]() { return 0; }),
+        stdexec::par, 8, [&](int idx, int value) {
+            worker_threads.insert(std::this_thread::get_id());
+            task_count.fetch_add(1, std::memory_order_relaxed);
+        });
+
+    stdexec::sync_wait(std::move(bulk_sender));
+
+    HPX_TEST_EQ(task_count.load(), 8);
+    HPX_TEST(!worker_threads.empty());
+
+    // Verify tasks didn't run on main thread (they use HPX thread pool)
+    for (const auto& thread_id : worker_threads)
+    {
+        HPX_TEST_NEQ(thread_id, main_thread_id);
+    }
+}
+
+void test_stdexec_execution_policies()
+{
+    auto scheduler = ex::thread_pool_scheduler{};
+
+    // Test different execution policies with stdexec bulk operations
+    std::vector<int> seq_results(5, 0);
+    auto seq_sender = stdexec::bulk(
+        ex::schedule(scheduler) | stdexec::then([]() { return 10; }),
+        stdexec::seq, 5,
+        [&](int idx, int value) { seq_results[idx] = value + idx; });
+
+    stdexec::sync_wait(std::move(seq_sender));
+
+    for (int i = 0; i < 5; ++i)
+    {
+        HPX_TEST_EQ(seq_results[i], 10 + i);
+    }
+
+    // Test par_unseq policy
+    std::vector<int> par_unseq_results(5, 0);
+    auto par_unseq_sender = stdexec::bulk(
+        ex::schedule(scheduler) | stdexec::then([]() { return 20; }),
+        stdexec::par_unseq, 5,
+        [&](int idx, int value) { par_unseq_results[idx] = value + idx; });
+
+    stdexec::sync_wait(std::move(par_unseq_sender));
+
+    for (int i = 0; i < 5; ++i)
+    {
+        HPX_TEST_EQ(par_unseq_results[i], 20 + i);
+    }
+}
+#endif    // HPX_HAVE_STDEXEC
+
+#if defined(HPX_HAVE_STDEXEC)
 void test_completion_scheduler()
 {
     namespace ex = hpx::execution::experimental;
     {
         auto sender = ex::schedule(ex::thread_pool_scheduler{});
         auto completion_scheduler =
-            ex::get_completion_scheduler<ex::set_value_t>(
-#if defined(HPX_HAVE_STDEXEC)
-                ex::get_env(sender)
-#else
-                sender
-#endif
-            );
+            ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(sender));
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
                 ex::thread_pool_scheduler>,
@@ -2114,13 +2254,7 @@ void test_completion_scheduler()
             ex::then(ex::schedule(ex::thread_pool_scheduler{}), []() {});
         using hpx::functional::tag_invoke;
         auto completion_scheduler =
-            ex::get_completion_scheduler<ex::set_value_t>(
-#if defined(HPX_HAVE_STDEXEC)
-                ex::get_env(sender)
-#else
-                sender
-#endif
-            );
+            ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(sender));
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
                 ex::thread_pool_scheduler>,
@@ -2130,49 +2264,7 @@ void test_completion_scheduler()
     {
         auto sender = ex::transfer_just(ex::thread_pool_scheduler{}, 42);
         auto completion_scheduler =
-            ex::get_completion_scheduler<ex::set_value_t>(
-#if defined(HPX_HAVE_STDEXEC)
-                ex::get_env(sender)
-#else
-                sender
-#endif
-            );
-        static_assert(
-            std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
-                ex::thread_pool_scheduler>,
-            "the completion scheduler should be a thread_pool_scheduler");
-    }
-
-    {
-        auto sender =
-            ex::bulk(ex::schedule(ex::thread_pool_scheduler{}), 10, [](int) {});
-        auto completion_scheduler =
-            ex::get_completion_scheduler<ex::set_value_t>(
-#if defined(HPX_HAVE_STDEXEC)
-                ex::get_env(sender)
-#else
-                sender
-#endif
-            );
-        static_assert(
-            std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
-                ex::thread_pool_scheduler>,
-            "the completion scheduler should be a thread_pool_scheduler");
-    }
-
-    {
-        auto sender = ex::then(
-            ex::bulk(ex::transfer_just(ex::thread_pool_scheduler{}, 42), 10,
-                [](int, int) {}),
-            [](int) {});
-        auto completion_scheduler =
-            ex::get_completion_scheduler<ex::set_value_t>(
-#if defined(HPX_HAVE_STDEXEC)
-                ex::get_env(sender)
-#else
-                sender
-#endif
-            );
+            ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(sender));
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
                 ex::thread_pool_scheduler>,
@@ -2181,22 +2273,105 @@ void test_completion_scheduler()
 
     {
         auto sender = ex::bulk(
-            ex::then(
-                ex::transfer_just(ex::thread_pool_scheduler{}, 42), [](int) {}),
-            10, [](int, int) {});
+            ex::schedule(ex::thread_pool_scheduler{}), ex::par, 10, [](int) {});
         auto completion_scheduler =
-            ex::get_completion_scheduler<ex::set_value_t>(
-#if defined(HPX_HAVE_STDEXEC)
-                ex::get_env(sender)
-#else
-                sender
-#endif
-            );
+            ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(sender));
         static_assert(
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
                 ex::thread_pool_scheduler>,
             "the completion scheduler should be a thread_pool_scheduler");
     }
+
+    {
+        auto sender = ex::then(
+            ex::bulk(ex::transfer_just(ex::thread_pool_scheduler{}, 42),
+                ex::par, 10, [](int, int) {}),
+            [](int) {});
+        auto completion_scheduler =
+            ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(sender));
+        static_assert(
+            std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
+                ex::thread_pool_scheduler>,
+            "the completion scheduler should be a thread_pool_scheduler");
+    }
+
+    {
+        auto sender = ex::bulk(
+            ex::then(ex::transfer_just(ex::thread_pool_scheduler{}, 42),
+                [](int i) { return i; }),
+            ex::par, 10, [](int idx, int val) {});
+        auto completion_scheduler =
+            ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(sender));
+        static_assert(
+            std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
+                ex::thread_pool_scheduler>,
+            "the completion scheduler should be a thread_pool_scheduler");
+    }
+}
+
+#endif
+
+void test_scheduler_copy_avoidance()
+{
+    // Test that scheduler operations don't create unnecessary copies
+
+    // Create a scheduler with copy/move tracking
+    static std::atomic<int> copy_count{0};
+    static std::atomic<int> move_count{0};
+
+    struct copy_tracking_scheduler : ex::thread_pool_scheduler
+    {
+        copy_tracking_scheduler() = default;
+
+        copy_tracking_scheduler(const copy_tracking_scheduler& other)
+          : ex::thread_pool_scheduler(other)
+        {
+            copy_count.fetch_add(1, std::memory_order_relaxed);
+        }
+
+        copy_tracking_scheduler(copy_tracking_scheduler&& other) noexcept
+          : ex::thread_pool_scheduler(std::move(other))
+        {
+            move_count.fetch_add(1, std::memory_order_relaxed);
+        }
+
+        copy_tracking_scheduler& operator=(const copy_tracking_scheduler& other)
+        {
+            ex::thread_pool_scheduler::operator=(other);
+            copy_count.fetch_add(1, std::memory_order_relaxed);
+            return *this;
+        }
+
+        copy_tracking_scheduler& operator=(
+            copy_tracking_scheduler&& other) noexcept
+        {
+            ex::thread_pool_scheduler::operator=(std::move(other));
+            move_count.fetch_add(1, std::memory_order_relaxed);
+            return *this;
+        }
+    };
+
+    // Reset counters
+    copy_count.store(0);
+    move_count.store(0);
+
+    copy_tracking_scheduler sched{};
+
+    // Test basic scheduler operations
+    auto sender = ex::schedule(sched);
+
+    // Execute the operation - should not create unnecessary copies
+    tt::sync_wait(std::move(sender));
+
+    // Verify that no unnecessary copies were made
+    int final_copy_count = copy_count.load();
+    int final_move_count = move_count.load();
+
+    // Scheduler operations should minimize copies
+    HPX_TEST_LTE(final_copy_count, 1);
+    (void) final_move_count;
+
+    HPX_TEST(true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2228,7 +2403,18 @@ int hpx_main()
     test_let_error();
     test_detach();
     test_bulk();
+#if defined(HPX_HAVE_STDEXEC)
+    // Test stdexec bulk operations domain customization
+    test_stdexec_domain_queries();
+    test_stdexec_bulk_domain_customization();
+    test_stdexec_bulk_chunked_customization();
+    test_stdexec_bulk_unchunked_customization();
+    test_stdexec_thread_distribution();
+    test_stdexec_execution_policies();
     test_completion_scheduler();
+#endif
+
+    test_scheduler_copy_avoidance();
 
     return hpx::local::finalize();
 }

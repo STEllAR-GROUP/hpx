@@ -24,6 +24,7 @@
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -270,7 +271,7 @@ namespace hpx::execution::experimental {
             scheduler_executor const& exec, F&& f, S const& shape, Ts&&... ts)
         {
             hpx::this_thread::experimental::sync_wait(
-                bulk(schedule(exec.sched_), shape,
+                bulk(schedule(exec.sched_), hpx::util::size(shape),
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
@@ -296,7 +297,7 @@ namespace hpx::execution::experimental {
                     when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
                 auto loop = bulk(transfer(HPX_MOVE(pre_req), exec.sched_),
-                    shape,
+                    hpx::util::size(shape),
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
                 return make_future(HPX_MOVE(loop));
@@ -308,10 +309,10 @@ namespace hpx::execution::experimental {
                     when_all(keep_future(HPX_FORWARD(Future, predecessor)),
                         just(std::vector<result_type>(hpx::util::size(shape))));
 
-                auto loop =
-                    bulk(transfer(HPX_MOVE(pre_req), exec.sched_), shape,
-                        detail::captured_args_then(
-                            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+                auto loop = bulk(transfer(HPX_MOVE(pre_req), exec.sched_),
+                    hpx::util::size(shape),
+                    detail::captured_args_then(
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
                 return make_future(then(
                     HPX_MOVE(loop), [](auto&&, std::vector<result_type>&& v) {

@@ -22,7 +22,6 @@
 #include <hpx/errors/exception.hpp>
 #include <hpx/errors/exception_list.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
@@ -148,12 +147,12 @@ namespace hpx::execution::experimental::detail {
                 static_cast<std::size_t>(index) * task_f->chunk_size;
             auto const i_end =
                 (std::min) (i_begin + task_f->chunk_size, task_f->size);
-
-            auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
-            for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
+            // auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
+            // auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
+            for (std::uint32_t i = i_begin; i != i_end; (void) ++i)
             {
                 bulk_scheduler_invoke_helper(
-                    index_pack_type{}, op_state->f, *it, ts);
+                    index_pack_type{}, op_state->f, i, ts);
             }
         }
 
@@ -444,15 +443,16 @@ namespace hpx::execution::experimental::detail {
             }
         }
 
-        using range_value_type =
-            hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Shape>>;
+        // using range_value_type =
+        //     hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Shape>>;
 
         template <typename... Ts>
         void execute(Ts&&... ts)
         {
             // Don't spawn tasks if there is no work to be done
             auto const size =
-                static_cast<std::uint32_t>(hpx::util::size(op_state->shape));
+                static_cast<std::uint32_t>(op_state->shape);
+                // static_cast<std::uint32_t>(hpx::util::size(op_state->shape));
             if (size == 0)
             {
                 hpx::execution::experimental::set_value(
@@ -587,7 +587,7 @@ namespace hpx::execution::experimental::detail {
         // clang-format off
         template <typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_invocable_v<F, range_value_type,
+                hpx::is_invocable_v<F, Shape,
                     std::add_lvalue_reference_t<Ts>...>
             )>
         // clang-format on
@@ -787,8 +787,9 @@ namespace hpx::execution::experimental::detail {
             hpx::util::cache_aligned_data<std::atomic<std::size_t>>
                 tasks_remaining;
 
-            using value_types = value_types_of_t<Sender, empty_env,
-                decayed_tuple, hpx::variant>;
+            using value_types = value_types_of_t<Sender,
+                hpx::execution::experimental::empty_env, decayed_tuple,
+                hpx::variant>;
             hpx::util::detail::prepend_t<value_types, hpx::monostate> ts;
             std::atomic<bool> bad_alloc_thrown{false};
             hpx::exception_list exceptions;
@@ -847,61 +848,8 @@ namespace hpx::execution::experimental::detail {
     };
 }    // namespace hpx::execution::experimental::detail
 
-namespace hpx::execution::experimental {
-
-    // clang-format off
-    template <typename Policy, typename Sender, typename Shape, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            !std::is_integral_v<Shape>
-        )>
-    // clang-format on
-    constexpr auto tag_invoke(bulk_t,
-        thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
-        Shape const& shape, F&& f)
-    {
-        if constexpr (std::is_same_v<Policy, launch::sync_policy>)
-        {
-            // fall back to non-bulk scheduling if sync execution was requested
-            return detail::bulk_sender<Sender, Shape, F>{
-                HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f)};
-        }
-        else
-        {
-            return detail::thread_pool_bulk_sender<Policy, Sender, Shape, F>{
-                HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender), shape,
-                HPX_FORWARD(F, f)};
-        }
-    }
-
-    // clang-format off
-    template <typename Policy, typename Sender, typename Count, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            std::is_integral_v<Count>
-        )>
-    // clang-format on
-    constexpr decltype(auto) tag_invoke(bulk_t,
-        thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
-        Count const& count, F&& f)
-    {
-        if constexpr (std::is_same_v<Policy, launch::sync_policy>)
-        {
-            // fall back to non-bulk scheduling if sync execution was requested
-#if defined(HPX_HAVE_STDEXEC)
-            return hpx::execution::experimental::bulk(
-                HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
-                HPX_FORWARD(F, f));
-#else
-            return detail::bulk_sender<Sender, hpx::util::counting_shape<Count>,
-                F>{HPX_FORWARD(Sender, sender),
-                hpx::util::counting_shape(count), HPX_FORWARD(F, f)};
-#endif
-        }
-        else
-        {
-            return detail::thread_pool_bulk_sender<Policy, Sender,
-                hpx::util::counting_shape<Count>, F>{HPX_MOVE(scheduler),
-                HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
-                HPX_FORWARD(F, f)};
-        }
-    }
-}    // namespace hpx::execution::experimental
+// Note: With stdexec integration, bulk operations are now customized
+// through the domain system in thread_pool_scheduler.hpp rather than
+// direct tag_invoke customizations. The thread_pool_domain<Policy>
+// intercepts stdexec::bulk_chunked_t operations and creates
+// thread_pool_bulk_sender instances for parallel execution.
