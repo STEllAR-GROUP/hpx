@@ -69,6 +69,7 @@ set(STANDARD_LIBRARY_HEADERS
     "<strstream>"
     "<syncstream>"
     "<system_error>"
+    "<sstream>"
     "<thread>"
     "<tuple>"
     "<type_traits>"

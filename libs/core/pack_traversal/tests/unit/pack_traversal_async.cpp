@@ -8,8 +8,8 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <array>

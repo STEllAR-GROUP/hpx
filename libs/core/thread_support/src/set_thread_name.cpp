@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,8 @@
 //      http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx
 
 #include <hpx/config.hpp>
-#include <hpx/thread_support/set_thread_name.hpp>
+#include <hpx/modules/thread_support.hpp>
+
 #include <cstddef>
 #include <string>
 

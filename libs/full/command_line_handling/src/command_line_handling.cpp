@@ -31,7 +31,6 @@
 #if defined(HPX_HAVE_MAX_CPU_COUNT)
 #include <hpx/preprocessor/stringize.hpp>
 #endif
-#include <hpx/util/from_string.hpp>
 #include <hpx/version.hpp>
 
 #include <algorithm>

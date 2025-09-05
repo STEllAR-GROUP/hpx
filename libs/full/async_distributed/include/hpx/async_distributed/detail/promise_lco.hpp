@@ -17,7 +17,7 @@
 #include <hpx/components_base/traits/component_type_database.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <exception>

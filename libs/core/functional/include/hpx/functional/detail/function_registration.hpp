@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/debugging/demangle_helper.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 
@@ -30,7 +30,7 @@ namespace hpx::util::detail {
         static char const* call()
 #ifdef HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION
         {
-            return debug::type_id<F>::typeid_.type_id();
+            return debug::type_id<F>();
         }
 #else
             = delete;

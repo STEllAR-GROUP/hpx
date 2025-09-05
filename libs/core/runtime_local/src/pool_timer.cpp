@@ -11,11 +11,11 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/runtime_local/pool_timer.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <asio/basic_waitable_timer.hpp>
 

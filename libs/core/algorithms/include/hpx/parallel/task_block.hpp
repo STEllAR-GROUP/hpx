@@ -13,7 +13,6 @@
 #include <hpx/config.hpp>
 #include <hpx/async_local/async.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>

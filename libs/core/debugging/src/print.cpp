@@ -35,6 +35,10 @@ HPX_CORE_EXPORT char** freebsd_environ = nullptr;
 #include <winsock2.h>
 #endif
 
+// Used to wrap function call parameters to prevent evaluation
+// when debugging is disabled
+#define HPX_DP_LAZY(Expr, printer) printer.eval([&] { return Expr; })
+
 // ------------------------------------------------------------
 /// \cond NODETAIL
 namespace hpx::debug {
@@ -45,24 +49,21 @@ namespace hpx::debug {
     namespace detail {
 
         template <typename Int>
-        HPX_CORE_EXPORT void print_dec(std::ostream& os, Int const& v, int N)
+        void print_dec(std::ostream& os, Int const& v, int N)
         {
             os << std::right << std::setfill('0') << std::setw(N)
                << std::noshowbase << std::dec << v;
         }
 
-        template HPX_CORE_EXPORT void print_dec(
-            std::ostream&, std::int16_t const&, int);
-        template HPX_CORE_EXPORT void print_dec(
-            std::ostream&, std::int32_t const&, int);
-        template HPX_CORE_EXPORT void print_dec(
-            std::ostream&, std::int64_t const&, int);
-        template HPX_CORE_EXPORT void print_dec(
-            std::ostream&, std::uint64_t const&, int);
+        template void print_dec(std::ostream&, std::int16_t const&, int);
+        template void print_dec(std::ostream&, std::uint16_t const&, int);
+        template void print_dec(std::ostream&, std::int32_t const&, int);
+        template void print_dec(std::ostream&, std::uint32_t const&, int);
+        template void print_dec(std::ostream&, std::int64_t const&, int);
+        template void print_dec(std::ostream&, std::uint64_t const&, int);
 
-        template HPX_CORE_EXPORT void print_dec(
-            std::ostream&, std::atomic<int> const&, int);
-        template HPX_CORE_EXPORT void print_dec(
+        template void print_dec(std::ostream&, std::atomic<int> const&, int);
+        template void print_dec(
             std::ostream&, std::atomic<unsigned int> const&, int);
     }    // namespace detail
 
@@ -213,6 +214,11 @@ namespace hpx::debug {
                 print_info(os);
             }
             os << detail::hostname_print_helper();
+        }
+
+        void display_to_cout(std::string const& str)
+        {
+            std::cout << str;
         }
     }    // namespace detail
 

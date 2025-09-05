@@ -57,6 +57,7 @@ add_hpx_module(
     hpx_pack_traversal
     hpx_errors
     hpx_memory
+    hpx_thread_support
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

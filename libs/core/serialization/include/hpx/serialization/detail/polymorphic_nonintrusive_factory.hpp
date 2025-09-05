@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/debugging/demangle_helper.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
@@ -49,7 +49,7 @@ namespace hpx::serialization::detail {
             // HPX_REGISTER_ACTION_DECLARATION
             static_assert(traits::needs_automatic_registration_v<T>,
                 "HPX_REGISTER_ACTION_DECLARATION missing");
-            return util::debug::type_id<T>::typeid_.type_id();
+            return util::debug::type_id<T>();
         }
     };
 #endif
@@ -247,8 +247,7 @@ namespace hpx::serialization::detail {
 /**/
 #define HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE(Parameters, Template)        \
     HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(Parameters, Template,       \
-        hpx::util::debug::type_id<HPX_PP_STRIP_PARENS(Template)>::typeid_      \
-            .type_id())                                                        \
+        hpx::util::debug::type_id<HPX_PP_STRIP_PARENS(Template)>())            \
     HPX_PP_STRIP_PARENS(Parameters)                                            \
     hpx::serialization::detail::register_class<HPX_PP_STRIP_PARENS(Template)>  \
         HPX_PP_STRIP_PARENS(Template)::hpx_register_class_instance;            \

@@ -19,6 +19,7 @@ add_hpx_module(
     hpx_assertion
     hpx_config
     hpx_errors
+    hpx_format
     hpx_serialization
     hpx_string_util
     hpx_thread_support

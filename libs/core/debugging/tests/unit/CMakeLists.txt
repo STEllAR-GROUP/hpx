@@ -16,11 +16,9 @@ foreach(test ${tests})
   # add example executable
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS
-    SOURCES ${sources} ${${test}_FLAGS} ${${test}_LIBS}
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     FOLDER ${folder_name}
-    NOLIBS
-    DEPENDENCIES hpx_core
   )
 
   add_hpx_unit_test("modules.debugging" ${test} ${${test}_PARAMETERS})
