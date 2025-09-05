@@ -162,19 +162,18 @@ namespace hpx::parallel::util {
                                 "Expected variant with std::exception_ptr "
                                 "alternative");
 
-                            std::vector<std::exception_ptr> exceptions;
-                            exceptions.reserve(all_parts.size());
+                            hpx::exception_list ex_list;
                             for (auto&& item : all_parts)
                             {
                                 if (std::holds_alternative<std::exception_ptr>(
                                         item))
                                 {
                                     auto e = std::get<std::exception_ptr>(item);
-                                    exceptions.emplace_back(e);
+                                    ex_list.add(e);
                                 }
                             }
 
-                            if (!exceptions.empty())
+                            if (ex_list.size() > 0)
                             {
                                 for (auto&& item : all_parts)
                                 {
@@ -192,11 +191,11 @@ namespace hpx::parallel::util {
                                     }
                                 }
 
-                                for (auto const& e : exceptions)
+                                for (auto ex : ex_list)
                                 {
                                     try
                                     {
-                                        std::rethrow_exception(e);
+                                        std::rethrow_exception(ex);
                                     }
                                     catch (std::bad_alloc const&)
                                     {
@@ -204,15 +203,10 @@ namespace hpx::parallel::util {
                                     }
                                     catch (...)
                                     {
-                                        HPX_UNUSED(exceptions);
+                                        HPX_UNUSED(ex_list);
                                     }
                                 }
 
-                                hpx::exception_list ex_list;
-                                for (auto const& e : exceptions)
-                                {
-                                    ex_list.add(e);
-                                }
                                 throw HPX_MOVE(ex_list);
                             }
 
