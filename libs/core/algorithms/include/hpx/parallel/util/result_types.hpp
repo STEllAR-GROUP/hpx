@@ -73,8 +73,8 @@ namespace hpx::parallel::util {
         requires (
             hpx::execution::experimental::is_sender_v<InInResultSender>
         )
-        // clang-format on
-        decltype(auto) get_in2_element(InInResultSender&& result_sender)
+    // clang-format on
+    decltype(auto) get_in2_element(InInResultSender&& result_sender)
     {
         return hpx::execution::experimental::then(
             HPX_FORWARD(InInResultSender, result_sender), [](auto&& result) {
@@ -134,8 +134,8 @@ namespace hpx::parallel::util {
     }
 
     template <typename Sender>
-    requires(hpx::execution::experimental::is_sender_v<Sender>) decltype(auto)
-        get_pair(Sender&& sender)
+        requires(hpx::execution::experimental::is_sender_v<Sender>)
+    decltype(auto) get_pair(Sender&& sender)
     {
         return hpx::execution::experimental::then(
             HPX_FORWARD(Sender, sender), [](auto&& in_out_result) {
@@ -179,8 +179,8 @@ namespace hpx::parallel::util {
         requires (
             hpx::execution::experimental::is_sender_v<Sender>
         )
-        // clang-format on
-        decltype(auto) get_second_element(Sender&& sender)
+    // clang-format on
+    decltype(auto) get_second_element(Sender&& sender)
     {
         return hpx::execution::experimental::then(
             HPX_FORWARD(Sender, sender), functional::get_second_element{});
@@ -289,8 +289,8 @@ namespace hpx::parallel::util {
         requires (
             hpx::execution::experimental::is_sender_v<InInOutResultSender>
         )
-        // clang-format on
-        decltype(auto) get_third_element(InInOutResultSender&& result_sender)
+    // clang-format on
+    decltype(auto) get_third_element(InInOutResultSender&& result_sender)
     {
         return hpx::execution::experimental::then(
             HPX_FORWARD(InInOutResultSender, result_sender), [](auto&& result) {
@@ -437,8 +437,8 @@ namespace hpx::parallel::util {
             requires (
                 hpx::execution::experimental::is_sender_v<ZipIterSender>
             )
-            // clang-format on
-            decltype(auto) get_in_out_result(ZipIterSender&& zipiter_sender)
+        // clang-format on
+        decltype(auto) get_in_out_result(ZipIterSender&& zipiter_sender)
         {
             return hpx::execution::experimental::then(
                 HPX_FORWARD(ZipIterSender, zipiter_sender), [](auto&& zipiter) {
@@ -522,8 +522,8 @@ namespace hpx::parallel::util {
             requires (
                 hpx::execution::experimental::is_sender_v<ZipIterSender>
             )
-            // clang-format on
-            decltype(auto) get_in_in_out_result(ZipIterSender&& zipiter_sender)
+        // clang-format on
+        decltype(auto) get_in_in_out_result(ZipIterSender&& zipiter_sender)
         {
             return hpx::execution::experimental::then(
                 HPX_FORWARD(ZipIterSender, zipiter_sender), [](auto&& zipiter) {
