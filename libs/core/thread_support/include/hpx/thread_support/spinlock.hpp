@@ -19,12 +19,12 @@
 namespace hpx::util::detail {
 
     /// Lockable spinlock class
-    struct spinlock
+    HPX_CORE_MODULE_EXPORT_EXTERN struct spinlock
     {
     private:
         std::atomic<bool> m;
 
-        HPX_CORE_EXPORT void yield_k(unsigned) noexcept;
+        HPX_CORE_EXPORT static void yield_k(unsigned) noexcept;
 
     public:
         constexpr spinlock() noexcept

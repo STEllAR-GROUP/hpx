@@ -7,6 +7,7 @@
 
 #include <hpx/config/endian.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/string_util.hpp>

@@ -17,8 +17,8 @@
 #include <hpx/timing/steady_clock.hpp>
 
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-#include <hpx/errors/throw_exception.hpp>
 #include <hpx/execution_base/detail/spinlock_deadlock_detection.hpp>
+#include <hpx/modules/errors.hpp>
 #endif
 
 #include <chrono>

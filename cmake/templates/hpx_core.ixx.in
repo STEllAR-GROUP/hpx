@@ -8,12 +8,33 @@
 
 module;
 
-// Include all standard library headers in global module fragment to prevent ODR
-// violations.
-@standard_headers@
 // Define module-specific macros before including config
 #define HPX_BUILD_MODULE
 #include <hpx/config.hpp>
+
+// Include all standard library headers in global module fragment to prevent ODR
+// violations.
+@standard_headers@
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+# if defined(__has_include)
+#  if __has_include(<coroutine>)
+#   include <coroutine>
+#  elif __has_include(<experimental/coroutine>)
+#   include <experimental/coroutine>
+#  endif
+# endif
+#endif
+
+#if defined(HPX_HAVE_CXX20_STD_BIT_CAST)
+# include <bit>
+#endif
+#if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
+# include <source_location>
+#endif
+
+#if defined(HPX_HAVE_CXX23_STD_GENERATOR)
+# include <generator>
+#endif
 
 export module HPX.Core;
 

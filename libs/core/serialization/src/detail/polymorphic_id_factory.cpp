@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>
 
 #include <cstddef>

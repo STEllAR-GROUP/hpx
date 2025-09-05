@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2024 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,8 +8,15 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/assertion/include
 set(assertion_headers
-    hpx/assert.hpp hpx/modules/assertion.hpp hpx/assertion/current_function.hpp
-    hpx/assertion/evaluate_assert.hpp hpx/assertion/source_location.hpp
+    hpx/assert.hpp hpx/assertion/api.hpp hpx/assertion/current_function.hpp
+    hpx/assertion/evaluate_assert.hpp hpx/assertion/macros.hpp
+    hpx/assertion/source_location.hpp
+)
+set(assertion_exclude_global_header
+    hpx/assert.hpp hpx/assertion/current_function.hpp hpx/assertion/macros.hpp
+)
+set(assertion_macro_headers hpx/assertion/current_function.hpp
+                            hpx/assertion/macros.hpp
 )
 
 # Default location is $HPX_ROOT/libs/assertion/include_compatibility
@@ -26,9 +33,12 @@ set(assertion_sources assertion.cpp source_location.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   core assertion
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
+  EXCLUDE_FROM_GLOBAL_HEADER ${assertion_exclude_global_header}
   SOURCES ${assertion_sources}
   HEADERS ${assertion_headers}
+  MACRO_HEADERS ${assertion_macro_headers}
   COMPAT_HEADERS ${assertion_compat_headers}
   MODULE_DEPENDENCIES hpx_config hpx_format hpx_preprocessor
   CMAKE_SUBDIRS examples tests

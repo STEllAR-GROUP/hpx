@@ -9,6 +9,7 @@
 #include <hpx/async_local/post.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/thread_pool_util/thread_pool_suspension_helpers.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>

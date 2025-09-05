@@ -12,6 +12,7 @@
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/runtime.hpp>

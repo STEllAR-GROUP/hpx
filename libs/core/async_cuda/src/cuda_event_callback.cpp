@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Gregor Dai√ü
+//  Copyright (c) 2023 Gregor Daiﬂ
 //  Copyright (c) 2021 ETH Zurich
 //  Copyright (c) 2020 John Biddiscombe
 //  Copyright (c) 2016 Hartmut Kaiser
@@ -17,6 +17,7 @@
 #include <hpx/async_cuda/detail/cuda_debug.hpp>
 #include <hpx/async_cuda/detail/cuda_event_callback.hpp>
 #include <hpx/concurrency/concurrentqueue.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>

@@ -18,7 +18,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/logging/message.hpp>
-#include <hpx/thread_support/spinlock.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <fstream>
 #include <memory>

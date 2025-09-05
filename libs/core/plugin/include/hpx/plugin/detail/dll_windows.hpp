@@ -25,6 +25,8 @@
     "This file shouldn't be included directly, use the file hpx/plugin/dll.hpp only."
 #endif
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util::plugin {
 
@@ -268,3 +270,5 @@ namespace hpx::util::plugin {
         HMODULE dll_handle = nullptr;
     };
 }    // namespace hpx::util::plugin
+
+#include <hpx/config/warnings_suffix.hpp>

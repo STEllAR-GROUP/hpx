@@ -9,10 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/errors/error.hpp>
-#include <hpx/errors/throw_exception.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>

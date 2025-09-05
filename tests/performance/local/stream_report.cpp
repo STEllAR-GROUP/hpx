@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,6 +22,7 @@
 #include <hpx/format.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/compute.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/thread.hpp>
 #include <hpx/type_support/unused.hpp>

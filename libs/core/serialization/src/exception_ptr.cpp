@@ -1,5 +1,5 @@
 //  Copyright (c)      2020 ETH Zurich
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/errors/detail/define_error_info.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/serialization/exception_ptr.hpp>
 #include <hpx/serialization/serialize.hpp>

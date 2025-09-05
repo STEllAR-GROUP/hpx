@@ -13,7 +13,7 @@
 
 namespace hpx::util {
 
-    class atomic_count
+    HPX_CORE_MODULE_EXPORT_EXTERN class atomic_count
     {
     public:
         explicit constexpr atomic_count(long value) noexcept

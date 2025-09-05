@@ -5,10 +5,9 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 function(hpx_append_property target property)
-  get_target_property(existing ${target} ${property})
-  if(existing)
-    set_property(TARGET ${target} PROPERTY ${property} "${existing} ${ARGN}")
-  else()
-    set_property(TARGET ${target} PROPERTY ${property} "${ARGN}")
-  endif()
+  set_property(
+    TARGET ${target}
+    PROPERTY ${property} "${ARGN}"
+    APPEND
+  )
 endfunction()
