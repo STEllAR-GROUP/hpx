@@ -116,13 +116,11 @@ namespace hpx::execution::experimental {
             // Create HPX thread_pool_bulk_sender with extracted parameters
             return hpx::execution::experimental::detail::
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
-                    // std::decay_t<decltype(iota_shape)>,
-                    std::decay_t<decltype(shape)>,
+                    std::decay_t<decltype(iota_shape)>,
                     std::decay_t<decltype(f)>>{
                     HPX_MOVE(sched),    // scheduler from environment
                     HPX_FORWARD(decltype(child), child),    // child sender
-                    // HPX_FORWARD(decltype(iota_shape), iota_shape),    // shape
-                    HPX_FORWARD(decltype(shape), shape),    // shape
+                    HPX_MOVE(iota_shape),    // shape
                     HPX_FORWARD(decltype(f), f)             // function
                 };
         }
@@ -148,13 +146,11 @@ namespace hpx::execution::experimental {
             // Create HPX thread_pool_bulk_sender with extracted parameters
             return hpx::execution::experimental::detail::
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
-                    // std::decay_t<decltype(iota_shape)>,
-                    std::decay_t<decltype(shape)>,
+                    std::decay_t<decltype(iota_shape)>,
                     std::decay_t<decltype(f)>>{
                     HPX_MOVE(sched),    // scheduler from environment
                     HPX_FORWARD(decltype(child), child),    // child sender
-                    // HPX_MOVE(iota_shape),    // shape
-                    HPX_FORWARD(decltype(shape), shape),    // shape
+                    HPX_MOVE(iota_shape),    // shape
                     HPX_FORWARD(decltype(f), f)             // function
                 };
         }
