@@ -1,5 +1,5 @@
 //  Copyright (c) 2019 Thomas Heller
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,6 @@
 #pragma once
 
 #include <hpx/config/export_definitions.hpp>
-#include <hpx/assertion/current_function.hpp>
 
 #include <cstdint>
 #include <iosfwd>
@@ -26,7 +25,7 @@ namespace hpx {
     /// This contains the location information where \a HPX_ASSERT has been
     /// called
 #if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
-    using std::source_location;
+    HPX_CORE_MODULE_EXPORT_EXTERN using std::source_location;
 #else
     /// The \a source_location class represents certain information about the
     /// source code, such as file names, line numbers, and function names.
@@ -46,7 +45,7 @@ namespace hpx {
     /// efficiently.
     /// It is unspecified whether the copy/move constructors and the copy/move
     /// assignment operators of \a source_location are trivial and/or constexpr.
-    struct source_location
+    HPX_CORE_MODULE_EXPORT_EXTERN struct source_location
     {
         char const* filename;
         std::uint_least32_t line_number;
@@ -79,17 +78,6 @@ namespace hpx {
     };
 #endif
 
-    HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_CORE_MODULE_EXPORT std::ostream& operator<<(
         std::ostream& os, source_location const& loc);
 }    // namespace hpx
-
-#if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
-#define HPX_CURRENT_SOURCE_LOCATION() std::source_location::current()
-#else
-#define HPX_CURRENT_SOURCE_LOCATION()                                          \
-    ::hpx::source_location                                                     \
-    {                                                                          \
-        __FILE__, static_cast<std::uint_least32_t>(__LINE__),                  \
-            HPX_ASSERT_CURRENT_FUNCTION                                        \
-    }
-#endif

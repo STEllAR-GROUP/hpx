@@ -11,7 +11,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/datastructures/detail/small_vector.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/futures/traits/future_access.hpp>
@@ -19,9 +18,9 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/type_support/aligned_storage.hpp>
 #include <hpx/type_support/assert_owns_lock.hpp>

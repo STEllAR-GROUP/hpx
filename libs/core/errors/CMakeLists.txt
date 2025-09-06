@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,15 +8,19 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/errors/include
 set(errors_headers
+    hpx/errors/detail/define_error_info.hpp
     hpx/errors/error.hpp
     hpx/errors/error_code.hpp
     hpx/errors/exception.hpp
     hpx/errors/exception_fwd.hpp
     hpx/errors/exception_info.hpp
     hpx/errors/exception_list.hpp
+    hpx/errors/macros.hpp
     hpx/errors/throw_exception.hpp
     hpx/errors/try_catch_exception_ptr.hpp
 )
+set(errors_exclude_global_header hpx/errors/exception_fwd.hpp)
+set(errors_macro_headers hpx/errors/macros.hpp)
 
 # Default location is $HPX_ROOT/libs/errors/include_compatibility
 # cmake-format: off
@@ -40,8 +44,11 @@ include(HPX_AddModule)
 add_hpx_module(
   core errors
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
+  EXCLUDE_FROM_GLOBAL_HEADER ${errors_exclude_global_header}
   SOURCES ${errors_sources}
   HEADERS ${errors_headers}
+  MACRO_HEADERS ${errors_macro_headers}
   COMPAT_HEADERS ${errors_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion

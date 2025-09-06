@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,12 +11,15 @@ foreach(test ${tests})
 
   source_group("Source Files" FILES ${sources})
 
-  add_executable(${test}_test EXCLUDE_FROM_ALL ${sources})
-  target_link_libraries(${test}_test PRIVATE hpx_core)
-  set_target_properties(
-    ${test}_test PROPERTIES FOLDER "Tests/Unit/Modules/Core/Format"
+  set(folder_name "Tests/Unit/Modules/Core/Format")
+
+  # add example executable
+  add_hpx_executable(
+    ${test}_test INTERNAL_FLAGS
+    SOURCES ${sources} ${${test}_FLAGS}
+    EXCLUDE_FROM_ALL
+    FOLDER ${folder_name}
   )
 
   add_hpx_unit_test("modules.format" ${test} ${${test}_PARAMETERS})
-
 endforeach()

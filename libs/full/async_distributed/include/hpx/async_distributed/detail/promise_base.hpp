@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2016-2017 Thomas Heller
 //  Copyright (c) 2011      Bryce Adelstein-Lelbach
 //
@@ -13,7 +13,6 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component_heap.hpp>
 #include <hpx/components_base/server/managed_component_base.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>

@@ -8,8 +8,8 @@
 
 #include <hpx/program_options/config.hpp>
 #include <hpx/datastructures/any.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/program_options/errors.hpp>
-#include <hpx/util/to_string.hpp>
 
 #include <functional>
 #include <limits>

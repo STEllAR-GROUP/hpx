@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2020 Nikunj Gupta
 //
@@ -7,8 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/errors/error.hpp>
-#include <hpx/errors/exception.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/detail/get_default_timer_service.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)

@@ -1,5 +1,5 @@
 // (C) Copyright 2007-9 Anthony Williams
-// Copyright (c) 2015-2023 Hartmut Kaiser
+// Copyright (c) 2015-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See
@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors/exception.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/threading.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>

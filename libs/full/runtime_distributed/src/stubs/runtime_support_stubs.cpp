@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,6 +14,7 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime_distributed/applier.hpp>

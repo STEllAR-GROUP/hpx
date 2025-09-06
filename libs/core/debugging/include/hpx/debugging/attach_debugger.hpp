@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2017      Denis Blank
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,5 +13,5 @@ namespace hpx::util {
 
     /// Tries to break an attached debugger, if not supported a loop is
     /// invoked which gives enough time to attach a debugger manually.
-    HPX_CORE_EXPORT void attach_debugger();
+    HPX_CORE_MODULE_EXPORT void attach_debugger();
 }    // namespace hpx::util

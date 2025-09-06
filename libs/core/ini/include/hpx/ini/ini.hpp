@@ -1,5 +1,5 @@
 //  Copyright (c) 2005-2007 Andre Merzky
-//  Copyright (c) 2005-2023 Hartmut Kaiser
+//  Copyright (c) 2005-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/util/to_string.hpp>
 
 #include <map>
 #include <mutex>

@@ -15,10 +15,10 @@
 #include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/components_base/traits/managed_component_policies.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/synchronization/barrier.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>

@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/batch_environments/pjm_environment.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/string_util/tokenizer.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <iterator>

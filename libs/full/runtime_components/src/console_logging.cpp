@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,6 +15,7 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
@@ -23,7 +24,6 @@
 #include <hpx/runtime_local/state.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/synchronization/mutex.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/type_support/static.hpp>
 
 #include <atomic>

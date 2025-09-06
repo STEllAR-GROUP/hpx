@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach & Katelyn Kufahl
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2015 Anton Bikineev
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,6 +21,7 @@
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/agas_base.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/parcelset/detail/parcel_await.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>

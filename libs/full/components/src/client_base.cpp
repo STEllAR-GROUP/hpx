@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/errors/error_code.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/type_support/extra_data.hpp>
 
 #include <cstdint>

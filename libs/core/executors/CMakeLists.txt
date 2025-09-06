@@ -99,6 +99,7 @@ add_hpx_module(
     hpx_concepts
     hpx_concurrency
     hpx_config
+    hpx_debugging
     hpx_errors
     hpx_execution
     hpx_format

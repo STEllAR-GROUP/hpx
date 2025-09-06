@@ -1,5 +1,5 @@
 //  Copyright (c) 2019 Thomas Heller
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,8 +16,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion/evaluate_assert.hpp>
-#include <hpx/assertion/source_location.hpp>
+#include <hpx/assertion/current_function.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 
@@ -28,18 +28,7 @@
 #include <exception>
 #include <string>
 #include <type_traits>
-
-namespace hpx::assertion {
-
-    /// The signature for an assertion handler
-    using assertion_handler = void (*)(hpx::source_location const& loc,
-        const char* expr, std::string const& msg);
-
-    /// Set the assertion handler to be used within a program. If the handler has been
-    /// set already once, the call to this function will be ignored.
-    /// \note This function is not thread safe
-    HPX_CORE_EXPORT void set_assertion_handler(assertion_handler handler);
-}    // namespace hpx::assertion
+#include <utility>
 
 #if defined(DOXYGEN)
 /// \def HPX_ASSERT(expr, msg)
@@ -51,7 +40,7 @@ namespace hpx::assertion {
 ///             the assert fails. This should be convertible to a std::string
 ///
 /// If \p expr evaluates to false, The source location and \p msg is being
-/// printed along with the expression and additional. Afterwards the program is
+/// printed along with the expression and additional. Afterward, the program is
 /// being aborted. The assertion handler can be customized by calling
 /// hpx::assertion::set_assertion_handler().
 ///
@@ -102,4 +91,15 @@ namespace hpx::assertion {
         "message it means that you have found a bug in HPX. Please report it " \
         "on the issue tracker: https://github.com/STEllAR-GROUP/hpx/issues."); \
     std::terminate()
+
+#if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
+#define HPX_CURRENT_SOURCE_LOCATION() std::source_location::current()
+#else
+#define HPX_CURRENT_SOURCE_LOCATION()                                          \
+    ::hpx::source_location                                                     \
+    {                                                                          \
+        __FILE__, static_cast<std::uint_least32_t>(__LINE__),                  \
+            HPX_ASSERT_CURRENT_FUNCTION                                        \
+    }
+#endif
 #endif

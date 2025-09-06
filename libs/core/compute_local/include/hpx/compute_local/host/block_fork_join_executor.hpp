@@ -13,7 +13,6 @@
 #include <hpx/compute_local/host/target.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
@@ -21,6 +20,7 @@
 #include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 
 #include <chrono>

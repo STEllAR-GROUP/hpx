@@ -106,6 +106,7 @@ add_hpx_module(
     hpx_synchronization
     hpx_threading
     hpx_threading_base
+    hpx_thread_support
     hpx_timed_execution
     hpx_timing
   CMAKE_SUBDIRS examples tests

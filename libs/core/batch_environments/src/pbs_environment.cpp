@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,7 +8,6 @@
 #include <hpx/batch_environments/pbs_environment.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <fstream>

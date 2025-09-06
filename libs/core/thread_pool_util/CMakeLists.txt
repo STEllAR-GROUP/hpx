@@ -20,6 +20,6 @@ add_hpx_module(
   GLOBAL_HEADER_GEN ON
   SOURCES ${thread_pool_util_sources}
   HEADERS ${thread_pool_util_headers}
-  MODULE_DEPENDENCIES hpx_async_local hpx_futures hpx_functional
+  MODULE_DEPENDENCIES hpx_async_local hpx_errors hpx_futures hpx_functional
   CMAKE_SUBDIRS examples tests
 )

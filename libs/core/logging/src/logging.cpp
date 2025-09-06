@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,8 +11,8 @@
 #include <hpx/logging/config/defines.hpp>
 
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <string>
 #include <utility>

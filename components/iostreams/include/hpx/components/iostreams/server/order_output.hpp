@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2017 Hartmut Kaiser
+//  Copyright (c) 2011-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <hpx/components/iostreams/server/buffer.hpp>
 

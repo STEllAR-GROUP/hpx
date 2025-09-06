@@ -13,7 +13,7 @@ namespace hpx::detail {
 
     std::string& thread_name()
     {
-        static thread_local std::string thread_name_;
+        thread_local std::string thread_name_;
         return thread_name_;
     }
 }    // namespace hpx::detail

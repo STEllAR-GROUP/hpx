@@ -59,15 +59,17 @@ add_hpx_module(
   SOURCES ${schedulers_sources}
   MODULE_DEPENDENCIES
     hpx_affinity
+    hpx_assertion
     hpx_concurrency
     hpx_config
-    hpx_assertion
+    hpx_debugging
     hpx_errors
     hpx_format
     hpx_functional
     hpx_logging
     hpx_synchronization
     hpx_threading_base
+    hpx_thread_support
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

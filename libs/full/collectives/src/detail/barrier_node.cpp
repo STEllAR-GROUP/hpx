@@ -12,11 +12,11 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <string>
