@@ -147,12 +147,11 @@ namespace hpx::execution::experimental::detail {
                 static_cast<std::size_t>(index) * task_f->chunk_size;
             auto const i_end =
                 (std::min) (i_begin + task_f->chunk_size, task_f->size);
-            // auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
-            // auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
+            auto it = std::ranges::next(hpx::util::begin(op_state->shape), i_begin);
             for (std::uint32_t i = i_begin; i != i_end; (void) ++i)
             {
                 bulk_scheduler_invoke_helper(
-                    index_pack_type{}, op_state->f, i, ts);
+                    index_pack_type{}, op_state->f, *it, ts);
             }
         }
 
@@ -585,11 +584,11 @@ namespace hpx::execution::experimental::detail {
         }
 
         // clang-format off
-        template <typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_invocable_v<F, Shape,
+        template <typename... Ts>
+        requires (
+                hpx::is_invocable_v<F, range_value_type,
                     std::add_lvalue_reference_t<Ts>...>
-            )>
+            )
         // clang-format on
         friend void tag_invoke(hpx::execution::experimental::set_value_t,
             bulk_receiver&& r, Ts&&... ts) noexcept
