@@ -6,8 +6,8 @@
 
 #include <hpx/config.hpp>
 
-// CLang V19.1.1 ICE's while compiling this file
-#if !defined(HPX_COMPUTE_DEVICE_CODE) &&                                       \
+// Apple Clang and Clang V19.1.1 ICE's while compiling this file
+#if !defined(HPX_COMPUTE_DEVICE_CODE) && !defined(HPX_APPLE_CLANG_VERSION) &&  \
     (!defined(HPX_CLANG_VERSION) || HPX_CLANG_VERSION != 190101)
 
 #include <hpx/hpx_main.hpp>
