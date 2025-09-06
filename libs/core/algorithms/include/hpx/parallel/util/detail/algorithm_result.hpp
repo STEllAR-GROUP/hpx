@@ -16,7 +16,7 @@
 #include <hpx/executors/execution_policy_fwd.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)
 // for is_sender

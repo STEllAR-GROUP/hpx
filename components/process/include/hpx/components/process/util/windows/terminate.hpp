@@ -20,30 +20,30 @@
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
-template <class Process>
-void terminate(const Process &p)
-{
-    if (!::TerminateProcess(p.process_handle(), EXIT_FAILURE))
+    template <class Process>
+    void terminate(const Process& p)
     {
-        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-            "process::terminate", "TerminateProcess() failed");
+        if (!::TerminateProcess(p.process_handle(), EXIT_FAILURE))
+        {
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "process::terminate", "TerminateProcess() failed");
+        }
     }
-}
 
-template <class Process>
-void terminate(const Process &p, hpx::error_code &ec)
-{
-    if (!::TerminateProcess(p.process_handle(), EXIT_FAILURE))
+    template <class Process>
+    void terminate(const Process& p, hpx::error_code& ec)
     {
-        HPX_THROWS_IF(ec, hpx::error::invalid_status,
-            "process::terminate", "TerminateProcess() failed");
+        if (!::TerminateProcess(p.process_handle(), EXIT_FAILURE))
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "process::terminate",
+                "TerminateProcess() failed");
+        }
+        else
+        {
+            ec = hpx::make_success_code();
+        }
     }
-    else
-    {
-        ec = hpx::make_success_code();
-    }
-}
 
-}}}}
+}}}}    // namespace hpx::components::process::windows
 
 #endif

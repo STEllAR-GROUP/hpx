@@ -10,9 +10,9 @@
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <type_traits>
 #include <utility>

@@ -17,8 +17,8 @@
 #include <hpx/async_cuda/get_targets.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 

@@ -19,15 +19,14 @@
 
 #include <string>
 
-namespace hpx { namespace components { namespace process { namespace windows
-{
+namespace hpx { namespace components { namespace process { namespace windows {
 #if defined(_UNICODE) || defined(UNICODE)
-    HPX_PROCESS_EXPORT std::wstring search_path(const std::wstring &filename,
-        std::wstring path = L"");
+    HPX_PROCESS_EXPORT std::wstring search_path(
+        const std::wstring& filename, std::wstring path = L"");
 #else
-    HPX_PROCESS_EXPORT std::string search_path(const std::string &filename,
-        std::string path = "");
+    HPX_PROCESS_EXPORT std::string search_path(
+        const std::string& filename, std::string path = "");
 #endif
-}}}}
+}}}}    // namespace hpx::components::process::windows
 
 #endif

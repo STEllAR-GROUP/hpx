@@ -10,7 +10,7 @@
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/identity.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <type_traits>
 #include <utility>

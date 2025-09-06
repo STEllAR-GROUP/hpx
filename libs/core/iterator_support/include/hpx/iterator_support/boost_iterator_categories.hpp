@@ -14,8 +14,7 @@
 #if !defined(                                                                  \
     HPX_ITERATOR_SUPPORT_HAVE_BOOST_ITERATOR_TRAVERSAL_TAG_COMPATIBILITY)
 
-#include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/lazy_conditional.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <iterator>
 #include <type_traits>

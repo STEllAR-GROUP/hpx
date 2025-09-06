@@ -8,8 +8,7 @@
 #pragma once
 
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/is_contiguous_iterator.hpp>
-#include <hpx/type_support/is_relocatable.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <type_traits>
 

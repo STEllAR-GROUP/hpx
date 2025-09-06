@@ -18,24 +18,22 @@
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
-namespace initializers {
+    namespace initializers {
 
-class inherit_env : public initializer_base
-{
-public:
-    template <class PosixExecutor>
-    void on_fork_setup(PosixExecutor &e) const
-    {
+        class inherit_env : public initializer_base
+        {
+        public:
+            template <class PosixExecutor>
+            void on_fork_setup(PosixExecutor& e) const
+            {
 #if defined(__FreeBSD__)
-        e.env = freebsd_environ;
+                e.env = freebsd_environ;
 #else
-        e.env = environ;
+                e.env = environ;
 #endif
-    }
-};
+            }
+        };
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::posix::initializers
 
 #endif

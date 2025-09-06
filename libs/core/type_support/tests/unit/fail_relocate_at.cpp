@@ -7,7 +7,7 @@
 // This test should fail to compile
 
 #include <hpx/init.hpp>
-#include <hpx/type_support/relocate_at.hpp>
+#include <hpx/modules/type_support.hpp>
 
 using hpx::experimental::relocate_at;
 

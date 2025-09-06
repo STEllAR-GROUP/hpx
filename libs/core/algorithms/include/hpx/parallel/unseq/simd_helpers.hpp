@@ -10,8 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/unseq/reduce_helpers.hpp>
-#include <hpx/type_support/construct_at.hpp>
 
 #include <algorithm>
 #include <cstddef>

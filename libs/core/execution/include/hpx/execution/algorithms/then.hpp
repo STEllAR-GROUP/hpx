@@ -21,8 +21,8 @@
 #include <hpx/functional/detail/tag_priority_invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <exception>
 #include <type_traits>

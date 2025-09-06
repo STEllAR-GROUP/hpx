@@ -28,7 +28,13 @@ add_hpx_module(
   GLOBAL_HEADER_GEN ON
   HEADERS ${timed_execution_headers}
   COMPAT_HEADERS ${timed_execution_compat_headers}
-  MODULE_DEPENDENCIES hpx_concepts hpx_execution hpx_executors hpx_threading
-                      hpx_timing hpx_topology
+  MODULE_DEPENDENCIES
+    hpx_concepts
+    hpx_execution
+    hpx_executors
+    hpx_threading
+    hpx_timing
+    hpx_topology
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

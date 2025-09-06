@@ -16,18 +16,17 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 
-namespace hpx { namespace components { namespace process { namespace posix
-{
+namespace hpx { namespace components { namespace process { namespace posix {
     filesystem::path shell_path()
     {
         return "/bin/sh";
     }
 
-    filesystem::path shell_path(hpx::error_code &ec)
+    filesystem::path shell_path(hpx::error_code& ec)
     {
         ec = hpx::make_success_code();
         return "/bin/sh";
     }
-}}}}
+}}}}    // namespace hpx::components::process::posix
 
 #endif

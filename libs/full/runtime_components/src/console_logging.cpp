@@ -17,6 +17,7 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threadmanager.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_components/server/console_logging.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/runtime_local/state.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/synchronization/mutex.hpp>
-#include <hpx/type_support/static.hpp>
 
 #include <atomic>
 #include <cstddef>

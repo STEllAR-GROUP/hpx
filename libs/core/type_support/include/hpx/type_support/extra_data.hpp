@@ -15,9 +15,9 @@
 
 namespace hpx::util {
 
-    using extra_data_id_type = void const*;
+    HPX_CORE_MODULE_EXPORT_EXTERN using extra_data_id_type = void const*;
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     struct extra_data_helper
     {
         // this is intentionally left unimplemented, will lead to linker errors
@@ -29,24 +29,24 @@ namespace hpx::util {
         static void reset(T* data) noexcept;
     };
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     [[nodiscard]] extra_data_id_type extra_data_id() noexcept
     {
         return extra_data_helper<T>::id();
     }
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     constexpr void reset_extra_data(T* data) noexcept(
         noexcept(extra_data_helper<T>::reset(data)))
     {
         extra_data_helper<T>::reset(data);
     }
 
-    struct extra_data_member_base;
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN struct extra_data_member_base;
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     struct extra_data_member;
 
-    struct extra_data_node
+    HPX_CORE_MODULE_EXPORT_EXTERN struct extra_data_node
     {
         constexpr extra_data_node() noexcept = default;
 
@@ -72,7 +72,7 @@ namespace hpx::util {
         extra_data_id_type id_ = nullptr;
     };
 
-    struct extra_data_member_base
+    HPX_CORE_MODULE_EXPORT_EXTERN struct extra_data_member_base
     {
         explicit extra_data_member_base(extra_data_node&& next) noexcept
           : next_(HPX_MOVE(next))
@@ -93,7 +93,7 @@ namespace hpx::util {
         extra_data_node next_;
     };
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     struct extra_data_member final : extra_data_member_base
     {
         explicit constexpr extra_data_member(extra_data_node&& next) noexcept
@@ -144,7 +144,7 @@ namespace hpx::util {
         return ptr_->next_.get<T>();
     }
 
-    struct extra_data
+    HPX_CORE_MODULE_EXPORT_EXTERN struct extra_data
     {
         constexpr extra_data() noexcept = default;
 

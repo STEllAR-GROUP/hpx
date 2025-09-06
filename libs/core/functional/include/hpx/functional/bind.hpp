@@ -20,8 +20,7 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/functional/traits/is_bind_expression.hpp>
 #include <hpx/functional/traits/is_placeholder.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>

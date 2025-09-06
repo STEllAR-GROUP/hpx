@@ -43,11 +43,11 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     struct decay_unwrap : detail::decay_unwrap_impl<std::decay_t<T>>
     {
     };
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     using decay_unwrap_t = typename decay_unwrap<T>::type;
 }    // namespace hpx::util

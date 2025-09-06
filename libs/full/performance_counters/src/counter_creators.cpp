@@ -14,6 +14,7 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/performance_counters/agas_namespace_action_code.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -22,7 +23,6 @@
 #include <hpx/performance_counters/server/locality_namespace_counters.hpp>
 #include <hpx/performance_counters/server/primary_namespace_counters.hpp>
 #include <hpx/performance_counters/server/symbol_namespace_counters.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstdint>
 #include <string>

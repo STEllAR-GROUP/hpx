@@ -9,8 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/variant.hpp>
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>

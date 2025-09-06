@@ -16,8 +16,8 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/timing/scoped_timer.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>
 

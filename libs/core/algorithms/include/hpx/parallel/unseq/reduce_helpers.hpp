@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/invoke.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <cstddef>

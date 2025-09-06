@@ -11,4 +11,3 @@
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_impl.hpp>
-

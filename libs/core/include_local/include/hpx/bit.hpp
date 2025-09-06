@@ -7,4 +7,4 @@
 #pragma once
 
 #include <hpx/config.hpp>    // for endian support
-#include <hpx/type_support/bit_cast.hpp>
+#include <hpx/modules/type_support.hpp>

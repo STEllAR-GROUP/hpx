@@ -6,14 +6,16 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 namespace hpx::util {
 
-    template <bool Enable, typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <bool Enable, typename T>
     struct lazy_enable_if
     {
     };
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     struct lazy_enable_if<true, T>
     {
         using type = typename T::type;

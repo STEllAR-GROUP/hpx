@@ -8,5 +8,3 @@
 
 #include <hpx/components/process/process.hpp>
 #include <hpx/components/process/util/initializers.hpp>
-
-

@@ -7,10 +7,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/detail/counting_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <cstddef>
 #include <cstdint>

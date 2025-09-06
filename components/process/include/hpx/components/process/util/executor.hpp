@@ -15,15 +15,12 @@
 
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/executor.hpp>
-namespace hpx { namespace components { namespace process { namespace util
-{
+namespace hpx { namespace components { namespace process { namespace util {
     using windows::executor;
-}}}}
+}}}}    // namespace hpx::components::process::util
 #else
 #include <hpx/components/process/util/posix/executor.hpp>
-namespace hpx { namespace components { namespace process { namespace util
-{
+namespace hpx { namespace components { namespace process { namespace util {
     using posix::executor;
-}}}}
+}}}}    // namespace hpx::components::process::util
 #endif
-

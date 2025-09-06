@@ -17,7 +17,7 @@
 
 #include <hpx/concepts/has_xxx.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/equality.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <iterator>

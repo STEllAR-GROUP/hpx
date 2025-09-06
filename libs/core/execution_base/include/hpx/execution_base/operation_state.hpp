@@ -28,7 +28,7 @@ namespace hpx::execution::experimental {
 #include <hpx/config/constexpr.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
-#include <hpx/type_support/meta.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <type_traits>
 #include <utility>

@@ -9,10 +9,10 @@
 
 #pragma once
 
+#include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <tuple>

@@ -17,9 +17,9 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstdint>
 #include <string>

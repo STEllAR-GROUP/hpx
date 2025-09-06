@@ -13,10 +13,10 @@
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/threading_base/execution_agent.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
-#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <cstdint>

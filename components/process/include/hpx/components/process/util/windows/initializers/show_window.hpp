@@ -19,26 +19,27 @@
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
-namespace initializers {
+    namespace initializers {
 
-class show_window : public initializer_base
-{
-public:
-    explicit show_window(WORD flags) : flags_(flags) {}
+        class show_window : public initializer_base
+        {
+        public:
+            explicit show_window(WORD flags)
+              : flags_(flags)
+            {
+            }
 
-    template <class WindowsExecutor>
-    void on_CreateProcess_setup(WindowsExecutor &e) const
-    {
-        e.startup_info.dwFlags |= STARTF_USESHOWWINDOW;
-        e.startup_info.wShowWindow |= flags_;
-    }
+            template <class WindowsExecutor>
+            void on_CreateProcess_setup(WindowsExecutor& e) const
+            {
+                e.startup_info.dwFlags |= STARTF_USESHOWWINDOW;
+                e.startup_info.wShowWindow |= flags_;
+            }
 
-private:
-    WORD flags_;
-};
+        private:
+            WORD flags_;
+        };
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::windows::initializers
 
 #endif

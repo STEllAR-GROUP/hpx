@@ -53,5 +53,6 @@ add_hpx_module(
     hpx_filesystem
     hpx_format
     hpx_functional
+    hpx_type_support
   CMAKE_SUBDIRS tests
 )

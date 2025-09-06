@@ -15,15 +15,12 @@
 
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/search_path.hpp>
-namespace hpx { namespace components { namespace process { namespace util
-{
+namespace hpx { namespace components { namespace process { namespace util {
     using windows::search_path;
-}}}}
+}}}}    // namespace hpx::components::process::util
 #else
 #include <hpx/components/process/util/posix/search_path.hpp>
-namespace hpx { namespace components { namespace process { namespace util
-{
+namespace hpx { namespace components { namespace process { namespace util {
     using posix::search_path;
-}}}}
+}}}}    // namespace hpx::components::process::util
 #endif
-
