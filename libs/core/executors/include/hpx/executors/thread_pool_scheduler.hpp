@@ -115,7 +115,7 @@ namespace hpx::execution::experimental {
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
                     std::decay_t<decltype(iota_shape)>,
                     std::decay_t<decltype(f)>, true>{
-                    // ✅ true for chunked
+                    // true for chunked
                     HPX_MOVE(sched),    // scheduler from environment
                     HPX_FORWARD(decltype(child), child),    // child sender
                     HPX_MOVE(iota_shape),                   // shape
@@ -154,7 +154,7 @@ namespace hpx::execution::experimental {
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
                     std::decay_t<decltype(iota_shape)>,
                     std::decay_t<decltype(f)>, false>{
-                    // ✅ false for unchunked
+                    // false for unchunked
                     HPX_MOVE(sched),    // scheduler from environment
                     HPX_FORWARD(decltype(child), child),    // child sender
                     HPX_MOVE(iota_shape),                   // shape
@@ -193,7 +193,7 @@ namespace hpx::execution::experimental {
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
                     std::decay_t<decltype(iota_shape)>,
                     std::decay_t<decltype(f)>, true>{
-                    // ✅ true for chunked (default)
+                    // true for chunked (default)
                     HPX_MOVE(sched),    // scheduler from environment
                     HPX_FORWARD(decltype(child), child),    // child sender
                     HPX_MOVE(iota_shape),                   // shape
@@ -229,7 +229,7 @@ namespace hpx::execution::experimental {
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
                     std::decay_t<decltype(iota_shape)>,
                     std::decay_t<decltype(f)>, true>{
-                    // ✅ true for chunked
+                    // true for chunked
                     HPX_MOVE(sched),    // scheduler from environment
                     HPX_FORWARD(decltype(child), child),    // child sender
                     HPX_MOVE(iota_shape),                   // shape
@@ -266,7 +266,7 @@ namespace hpx::execution::experimental {
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
                     std::decay_t<decltype(iota_shape)>,
                     std::decay_t<decltype(f)>, false>{
-                    // ✅ false for unchunked
+                    // false for unchunked
                     HPX_MOVE(sched),    // scheduler from environment
                     HPX_FORWARD(decltype(child), child),    // child sender
                     HPX_MOVE(iota_shape),                   // shape
@@ -303,7 +303,7 @@ namespace hpx::execution::experimental {
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
                     std::decay_t<decltype(iota_shape)>,
                     std::decay_t<decltype(f)>, true>{
-                    // ✅ true for chunked (default)
+                    // true for chunked (default)
                     HPX_MOVE(sched),    // scheduler from environment
                     HPX_FORWARD(decltype(child), child),    // child sender
                     HPX_MOVE(iota_shape),                   // shape
