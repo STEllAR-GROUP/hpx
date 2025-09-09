@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -24,9 +24,11 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -49,9 +51,7 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/string_util/case_conv.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/type_support/unused.hpp>
-#include <hpx/util/from_string.hpp>
 
 #ifdef HPX_HAVE_LIB_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>

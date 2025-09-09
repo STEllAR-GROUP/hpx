@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,7 +19,6 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/concurrency/stack.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>

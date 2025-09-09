@@ -8,10 +8,10 @@
 // tasks bound to that core incrementally.
 // Tasks should always report the right core number when they run.
 
-#include <hpx/debugging/print.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>

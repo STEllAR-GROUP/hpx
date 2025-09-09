@@ -9,13 +9,13 @@
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/util.hpp>
 #include <hpx/plugin/traits/plugin_config_data.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <hpx/parcel_coalescing/counter_registry.hpp>
 #include <hpx/parcel_coalescing/message_handler.hpp>

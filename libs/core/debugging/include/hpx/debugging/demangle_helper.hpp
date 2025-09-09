@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 John Biddiscombe
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,9 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#include <cstdlib>
 #include <string>
-#include <type_traits>
 #include <typeinfo>
 
 // --------------------------------------------------------------------
@@ -19,7 +17,7 @@
 // --------------------------------------------------------------------
 namespace hpx::util::debug {
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     struct demangle_helper
     {
         [[nodiscard]] static char const* type_id() noexcept
@@ -41,7 +39,7 @@ namespace hpx::util::debug {
 // --------------------------------------------------------------------
 namespace hpx::util::debug {
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     class cxxabi_demangle_helper
     {
     public:
@@ -66,7 +64,7 @@ namespace hpx::util::debug {
 
 namespace hpx::util::debug {
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     using cxxabi_demangle_helper = demangle_helper<T>;
 }    // namespace hpx::util::debug
 
@@ -75,52 +73,35 @@ namespace hpx::util::debug {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util::debug {
 
-    template <typename T>
-    struct type_id
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    char const* type_id()
     {
-        static demangle_helper<T> typeid_;
-    };
-
-    template <typename T>
-    demangle_helper<T> type_id<T>::typeid_ = demangle_helper<T>();
-
-#if defined(__GNUG__)
-    template <typename T>
-    struct cxx_type_id
-    {
-        static cxxabi_demangle_helper<T> typeid_;
-    };
-
-    template <typename T>
-    cxxabi_demangle_helper<T> cxx_type_id<T>::typeid_ =
-        cxxabi_demangle_helper<T>();
-#else
-    template <typename T>
-    using cxx_type_id = type_id<T>;
-#endif
+        static cxxabi_demangle_helper<T> id = cxxabi_demangle_helper<T>();
+        return id.type_id();
+    }
 
     // --------------------------------------------------------------------
     // print type information
     // usage : std::cout << print_type<args...>("separator")
     // separator is appended if the number of types > 1
     // --------------------------------------------------------------------
-    template <typename T = void>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T = void>
     std::string print_type(char const* = "")
     {
-        return std::string(cxx_type_id<T>::typeid_.type_id());
+        return std::string(type_id<T>());
     }
 
-    template <>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <>
     inline std::string print_type<>(char const*)
     {
         return "void";
     }
 
-    template <typename T, typename... Args>
-    std::enable_if_t<sizeof...(Args) != 0, std::string> print_type(
-        char const* delim = "")
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename... Args>
+        requires(sizeof...(Args) != 0)
+    std::string print_type(char const* delim = "")
     {
-        std::string const temp(cxx_type_id<T>::typeid_.type_id());
+        std::string const temp = type_id<T>();
         return temp + delim + print_type<Args...>(delim);
     }
 }    // namespace hpx::util::debug

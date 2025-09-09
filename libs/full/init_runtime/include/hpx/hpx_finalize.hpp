@@ -59,7 +59,7 @@ namespace hpx {
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           parameter \a ec. Otherwise, it throws an instance of
     ///           hpx::exception.
     ///
     /// This function will block and wait for all connected localities to exit
@@ -69,7 +69,7 @@ namespace hpx {
     /// Using this function is an alternative to \a hpx::disconnect, these
     /// functions do not need to be called both.
     HPX_EXPORT int finalize(double shutdown_timeout, double localwait = -1.0,
-        error_code& ec = throws);
+        hpx::error_code& ec = throws);
 
     /// \brief Main function to gracefully terminate the HPX runtime system.
     ///
@@ -91,7 +91,7 @@ namespace hpx {
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           parameter \a ec. Otherwise, it throws an instance of
     ///           hpx::exception.
     ///
     /// This function will block and wait for all connected localities to exit
@@ -100,7 +100,7 @@ namespace hpx {
     ///
     /// Using this function is an alternative to \a hpx::disconnect, these
     /// functions do not need to be called both.
-    inline int finalize(error_code& ec = throws)
+    inline int finalize(hpx::error_code& ec = throws)
     {
         return finalize(-1.0, -1.0, ec);
     }
@@ -157,7 +157,7 @@ namespace hpx {
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           parameter \a ec. Otherwise, it throws an instance of
     ///           hpx::exception.
     ///
     /// This function will block and wait for this locality to finish executing
@@ -165,7 +165,7 @@ namespace hpx {
     /// called by any locality being disconnected.
     ///
     HPX_EXPORT int disconnect(double shutdown_timeout, double localwait = -1.0,
-        error_code& ec = throws);
+        hpx::error_code& ec = throws);
 
     /// \brief Disconnect this locality from the application.
     ///
@@ -183,14 +183,14 @@ namespace hpx {
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           parameter \a ec. Otherwise, it throws an instance of
     ///           hpx::exception.
     ///
     /// This function will block and wait for this locality to finish executing
     /// before returning to the caller. It should be the last HPX-function
     /// called by any locality being disconnected.
     ///
-    inline int disconnect(error_code& ec = throws)
+    inline int disconnect(hpx::error_code& ec = throws)
     {
         return disconnect(-1.0, -1.0, ec);
     }
@@ -206,5 +206,5 @@ namespace hpx {
     /// called on every locality. This function should be used only if the
     /// runtime system was started using `hpx::start`.
     ///
-    HPX_EXPORT int stop(error_code& ec = throws);
+    HPX_EXPORT int stop(hpx::error_code& ec = throws);
 }    // namespace hpx

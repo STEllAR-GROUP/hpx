@@ -7,8 +7,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/config/compiler_fence.hpp>
-#include <hpx/thread_support/spinlock.hpp>
+#include <hpx/config.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <chrono>
 #include <thread>

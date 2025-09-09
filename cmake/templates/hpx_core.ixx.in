@@ -36,6 +36,10 @@ module;
 # include <generator>
 #endif
 
+#if defined(__GNUG__)
+# include <cxxabi.h>
+#endif
+
 export module HPX.Core;
 
 #if defined(HPX_MSVC)

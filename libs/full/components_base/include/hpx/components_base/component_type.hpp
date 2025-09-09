@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2017 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -13,6 +13,7 @@
 #include <hpx/components_base/components_base_fwd.hpp>
 #include <hpx/components_base/traits/component_type_database.hpp>
 #include <hpx/functional/move_only_function.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/gid_type.hpp>
 #include <hpx/naming_base/naming_base.hpp>
@@ -21,7 +22,6 @@
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
 
 #include <cstdint>
 #include <string>

@@ -18,7 +18,7 @@
 #include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/util/from_string.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <cctype>
 #include <cstdint>

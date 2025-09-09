@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/debugging/print.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/threading_base/print.hpp>

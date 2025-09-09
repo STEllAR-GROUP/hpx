@@ -107,6 +107,7 @@ add_hpx_module(
     hpx_threading
     hpx_threading_base
     hpx_threadmanager
+    hpx_thread_support
     hpx_timing
     hpx_topology
     hpx_type_support

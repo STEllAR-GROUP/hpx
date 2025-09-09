@@ -1,5 +1,5 @@
 //  Copyright (c) 2005-2007 Andre Merzky
-//  Copyright (c) 2005-2022 Hartmut Kaiser
+//  Copyright (c) 2005-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -28,11 +28,11 @@
 #include <hpx/assert.hpp>
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/serialization/map.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 
 #ifdef __APPLE__
 #include <crt_externs.h>

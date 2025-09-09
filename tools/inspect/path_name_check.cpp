@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/filesystem.hpp>
-#include <hpx/util/to_string.hpp>
+#include <hpx/modules/format.hpp>
 
 #include "function_hyper.hpp"
 #include "path_name_check.hpp"

@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2024 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,10 +8,10 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/string_util.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <hpx/components_base/component_startup_shutdown.hpp>
 #include <hpx/naming_base/id_type.hpp>

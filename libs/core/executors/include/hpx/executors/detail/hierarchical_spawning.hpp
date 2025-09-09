@@ -1,5 +1,5 @@
 //  Copyright (c) 2019-2020 ETH Zurich
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,7 +13,6 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/scheduling_properties.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
@@ -23,6 +22,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/synchronization/latch.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>

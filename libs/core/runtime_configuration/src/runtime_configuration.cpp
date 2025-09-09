@@ -9,7 +9,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
-#include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/preprocessor/expand.hpp>
@@ -20,9 +20,13 @@
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
-#include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/version.hpp>
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#include <hpx/itt_notify/detail/use_ittnotify_api.hpp>
+#include <hpx/modules/itt_notify.hpp>
+#endif
 
 #include <algorithm>
 #include <cstddef>

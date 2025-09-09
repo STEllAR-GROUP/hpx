@@ -33,7 +33,6 @@
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <cstdint>

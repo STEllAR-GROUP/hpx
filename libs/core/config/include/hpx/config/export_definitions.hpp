@@ -55,11 +55,13 @@
 #if defined(HPX_BUILD_MODULE)
 # if defined(HPX_HAVE_ELF_HIDDEN_VISIBILITY)
 #  undef HPX_CORE_EXPORT
-#  define HPX_CORE_EXPORT               /* empty */
+#  define HPX_CORE_EXPORT                /* empty */
 # endif
-# define HPX_CORE_MODULE_EXPORT_EXTERN  export extern "C++"
+# define HPX_CORE_MODULE_EXPORT_EXTERN   export extern "C++"
+# define HPX_CORE_MODULE_EXPORT_EXTERN_C export extern
 #else
-# define HPX_CORE_MODULE_EXPORT_EXTERN  extern "C++"
+# define HPX_CORE_MODULE_EXPORT_EXTERN   extern "C++"
+# define HPX_CORE_MODULE_EXPORT_EXTERN_C extern
 #endif
 
 #define HPX_CORE_MODULE_EXPORT                                                 \

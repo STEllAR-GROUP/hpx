@@ -9,7 +9,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/util/to_string.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <algorithm>
 
@@ -266,9 +266,9 @@ namespace boost { namespace inspect {
         {"(\\bhpx\\s*::\\s*intrusive_ptr\\b)", "hpx::intrusive_ptr",
             {"hpx/modules/memory.hpp"}},
         {"(\\bhpx\\s*::\\s*util\\s*::\\s*from_string\\b)",
-            "hpx::util::from_string", {"hpx/util/from_string.hpp"}},
+            "hpx::util::from_string", {"hpx/modules/format.hpp"}},
         {"(\\bhpx\\s*::\\s*util\\s*::\\s*to_string\\b)", "hpx::util::to_string",
-            {"hpx/util/to_string.hpp"}},
+            {"hpx/modules/format.hpp"}},
         // macros
         {"(\\bHPX_PP_CAT\\b)", "HPX_PP_CAT",
             {"hpx/modules/preprocessor.hpp", "hpx/preprocessor/cat.hpp"}},

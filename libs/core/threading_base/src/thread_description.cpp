@@ -10,7 +10,6 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_description.hpp>
-#include <hpx/util/to_string.hpp>
 
 #include <ostream>
 #include <string>
