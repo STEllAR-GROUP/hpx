@@ -286,6 +286,10 @@ namespace hpx::parallel {
         {
             // number of elements to sort
             std::size_t count = last - first;
+            if (count == 0)
+            {
+                return hpx::make_ready_future(last);
+            }
 
             // figure out the chunk size to use
             std::size_t const cores =
