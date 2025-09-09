@@ -191,7 +191,7 @@ namespace hpx::parallel::util {
                                     }
                                 }
 
-                                for (auto ex : ex_list)
+                                for (auto const& ex : ex_list)
                                 {
                                     try
                                     {
