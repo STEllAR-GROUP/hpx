@@ -149,7 +149,8 @@ namespace hpx::execution::experimental {
 
             auto iota_shape = std::views::iota(decltype(shape){0}, shape);
 
-            // Create HPX thread_pool_bulk_sender with extracted parameters (unchunked mode)
+            // Create HPX thread_pool_bulk_sender with extracted parameters
+            // (unchunked mode)
             return hpx::execution::experimental::detail::
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
                     std::decay_t<decltype(iota_shape)>,
@@ -162,7 +163,8 @@ namespace hpx::execution::experimental {
                 };
         }
 
-        // Handle bulk operations (generic bulk_t) without environment (completes_on pattern)
+        // Handle bulk operations (generic bulk_t) without environment
+        // (completes_on pattern)
         template <hpx::execution::experimental::sender_expr_for<
             hpx::execution::experimental::bulk_t>
                 Sender>
@@ -188,7 +190,8 @@ namespace hpx::execution::experimental {
 
             auto iota_shape = std::views::iota(decltype(shape){0}, shape);
 
-            // Create HPX thread_pool_bulk_sender with extracted parameters (chunked mode as default)
+            // Create HPX thread_pool_bulk_sender with extracted parameters
+            // (chunked mode as default)
             return hpx::execution::experimental::detail::
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
                     std::decay_t<decltype(iota_shape)>,
@@ -261,7 +264,8 @@ namespace hpx::execution::experimental {
 
             auto iota_shape = std::views::iota(decltype(shape){0}, shape);
 
-            // Create HPX thread_pool_bulk_sender with extracted parameters (unchunked mode)
+            // Create HPX thread_pool_bulk_sender with extracted parameters
+            // (unchunked mode)
             return hpx::execution::experimental::detail::
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
                     std::decay_t<decltype(iota_shape)>,
@@ -298,7 +302,8 @@ namespace hpx::execution::experimental {
 
             auto iota_shape = std::views::iota(decltype(shape){0}, shape);
 
-            // Create HPX thread_pool_bulk_sender with extracted parameters (chunked mode as default)
+            // Create HPX thread_pool_bulk_sender with extracted parameters
+            // (chunked mode as default)
             return hpx::execution::experimental::detail::
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
                     std::decay_t<decltype(iota_shape)>,

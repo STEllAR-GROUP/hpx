@@ -380,7 +380,7 @@ void test_transfer_basic()
     auto work2 = ex::then(work1, [=, &current_id]() {
         HPX_TEST_EQ(current_id, hpx::this_thread::get_id());
     });
-    auto transfer1 = ex::continues_on(work2, sched);
+    auto transfer1 = ex::transfer(work2, sched);
     auto work3 = ex::then(transfer1, [=, &current_id]() {
         hpx::thread::id new_id = hpx::this_thread::get_id();
         HPX_TEST_NEQ(current_id, new_id);
@@ -390,7 +390,7 @@ void test_transfer_basic()
     auto work4 = ex::then(work3, [=, &current_id]() {
         HPX_TEST_EQ(current_id, hpx::this_thread::get_id());
     });
-    auto transfer2 = ex::continues_on(work4, sched);
+    auto transfer2 = ex::transfer(work4, sched);
     auto work5 = ex::then(transfer2, [=, &current_id]() {
         hpx::thread::id new_id = hpx::this_thread::get_id();
         HPX_TEST_NEQ(current_id, new_id);
@@ -417,7 +417,7 @@ void test_transfer_arguments()
         HPX_TEST_EQ(current_id, hpx::this_thread::get_id());
         return x / 2.0;
     });
-    auto transfer1 = ex::continues_on(work2, sched);
+    auto transfer1 = ex::transfer(work2, sched);
     auto work3 = ex::then(transfer1, [=, &current_id](double x) {
         hpx::thread::id new_id = hpx::this_thread::get_id();
         HPX_TEST_NEQ(current_id, new_id);
@@ -429,7 +429,7 @@ void test_transfer_arguments()
         HPX_TEST_EQ(current_id, hpx::this_thread::get_id());
         return "result: " + std::to_string(x);
     });
-    auto transfer2 = ex::continues_on(work4, sched);
+    auto transfer2 = ex::transfer(work4, sched);
     auto work5 = ex::then(transfer2, [=, &current_id](std::string s) {
         hpx::thread::id new_id = hpx::this_thread::get_id();
         HPX_TEST_NEQ(current_id, new_id);
@@ -461,7 +461,7 @@ void test_just_void()
         hpx::thread::id parent_id = hpx::this_thread::get_id();
 
         auto begin = ex::just();
-        auto transfer1 = ex::continues_on(begin, ex::thread_pool_scheduler{});
+        auto transfer1 = ex::transfer(begin, ex::thread_pool_scheduler{});
         auto work1 = ex::then(transfer1, [parent_id]() {
             HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
         });
@@ -486,7 +486,7 @@ void test_just_one_arg()
         hpx::thread::id parent_id = hpx::this_thread::get_id();
 
         auto begin = ex::just(3);
-        auto transfer1 = ex::continues_on(begin, ex::thread_pool_scheduler{});
+        auto transfer1 = ex::transfer(begin, ex::thread_pool_scheduler{});
         auto work1 = ex::then(transfer1, [parent_id](int x) {
             HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             HPX_TEST_EQ(x, 3);
@@ -513,7 +513,7 @@ void test_just_two_args()
         hpx::thread::id parent_id = hpx::this_thread::get_id();
 
         auto begin = ex::just(3, std::string("hello"));
-        auto transfer1 = ex::continues_on(begin, ex::thread_pool_scheduler{});
+        auto transfer1 = ex::transfer(begin, ex::thread_pool_scheduler{});
         auto work1 = ex::then(transfer1, [parent_id](int x, std::string y) {
             HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             HPX_TEST_EQ(x, 3);
@@ -901,7 +901,7 @@ void test_future_sender()
     {
         HPX_TEST_EQ(
             ex::make_future(
-                ex::continues_on(ex::as_sender(hpx::async([]() { return 42; })),
+                ex::transfer(ex::as_sender(hpx::async([]() { return 42; })),
                     ex::thread_pool_scheduler{}))
                 .get(),
             42);
@@ -949,7 +949,7 @@ void test_ensure_started()
 
     {
         auto s = ex::transfer_just(sched, 42) | ex::ensure_started() |
-            ex::continues_on(sched);
+            ex::transfer(sched);
         HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(std::move(s))), 42);
     }
 
@@ -1081,11 +1081,11 @@ void test_ensure_started_when_all()
             std::unique_lock l{mtx};
             cond.wait(l, [&]() { return started; });
         }
-        auto succ1 = s | ex::continues_on(sched) | ex::then([&](int const& x) {
+        auto succ1 = s | ex::transfer(sched) | ex::then([&](int const& x) {
             ++successor_task_calls;
             return x + 1;
         });
-        auto succ2 = s | ex::continues_on(sched) | ex::then([&](int const& x) {
+        auto succ2 = s | ex::transfer(sched) | ex::then([&](int const& x) {
             ++successor_task_calls;
             return x + 2;
         });
@@ -1125,7 +1125,7 @@ void test_split()
 
     {
         auto s = ex::transfer_just(sched, 42) | ex::split() |
-            ex::continues_on(sched);
+            ex::transfer(sched);
         HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(std::move(s))), 42);
     }
 
@@ -1210,11 +1210,11 @@ void test_split_when_all()
             ++first_task_calls;
             return 3;
         }) | ex::split();
-        auto succ1 = s | ex::continues_on(sched) | ex::then([&](int const& x) {
+        auto succ1 = s | ex::transfer(sched) | ex::then([&](int const& x) {
             ++successor_task_calls;
             return x + 1;
         });
-        auto succ2 = s | ex::continues_on(sched) | ex::then([&](int const& x) {
+        auto succ2 = s | ex::transfer(sched) | ex::then([&](int const& x) {
             ++successor_task_calls;
             return x + 2;
         });
@@ -1855,7 +1855,7 @@ void test_keep_future_sender()
         auto f = hpx::async([&]() { return 42; });
 #if defined(HPX_HAVE_STDEXEC)
         auto r = hpx::get<0>(*(tt::sync_wait(ex::keep_future(std::move(f)) |
-            ex::continues_on(ex::thread_pool_scheduler{}))));
+            ex::transfer(ex::thread_pool_scheduler{}))));
 #else
         auto r = hpx::get<0>(*(ex::keep_future(std::move(f)) |
             ex::transfer(ex::thread_pool_scheduler{}) | tt::sync_wait()));
@@ -1868,7 +1868,7 @@ void test_keep_future_sender()
         auto sf = hpx::async([&]() { return 42; }).share();
 #if defined(HPX_HAVE_STDEXEC)
         auto r = hpx::get<0>(*(tt::sync_wait(ex::keep_future(std::move(sf)) |
-            ex::continues_on(ex::thread_pool_scheduler{}))));
+            ex::transfer(ex::thread_pool_scheduler{}))));
 #else
         auto r = hpx::get<0>(*(ex::keep_future(std::move(sf)) |
             ex::transfer(ex::thread_pool_scheduler{}) | tt::sync_wait()));
@@ -1889,7 +1889,7 @@ void test_keep_future_sender()
         // reference may outlive the value.
 #if defined(HPX_HAVE_STDEXEC)
         auto r = hpx::get<0>(*(tt::sync_wait(ex::keep_future(std::move(sf)) |
-            ex::continues_on(ex::thread_pool_scheduler{}))));
+            ex::transfer(ex::thread_pool_scheduler{}))));
 #else
         auto r = hpx::get<0>(*(ex::keep_future(std::move(sf)) |
             ex::transfer(ex::thread_pool_scheduler{}) | tt::sync_wait()));
@@ -1929,7 +1929,7 @@ void test_keep_future_sender()
         HPX_TEST_EQ(hpx::get<0>(*(tt::sync_wait(
                         ex::when_all(ex::keep_future(std::move(f)),
                             ex::keep_future(sf)) |
-                        ex::continues_on(ex::thread_pool_scheduler{}) |
+                        ex::transfer(ex::thread_pool_scheduler{}) |
                         ex::then(fun)))),
             85);
 #else
@@ -2192,7 +2192,8 @@ void test_stdexec_bulk_chunked_customization()
     auto bulk_chunked_sender = stdexec::bulk_chunked(
         ex::schedule(scheduler) | stdexec::then([]() { return 1; }),
         stdexec::par, 100, [&](int idx, int value) {
-            // With chunked execution: larger chunks (chunk_size=16), fewer context switches
+            // With chunked execution: larger chunks (chunk_size=16), fewer
+            // context switches
             function_calls.fetch_add(1, std::memory_order_relaxed);
             results[idx] = value + idx;
             total_processed.fetch_add(1, std::memory_order_relaxed);
@@ -2223,7 +2224,8 @@ void test_stdexec_bulk_unchunked_customization()
     auto bulk_unchunked_sender = stdexec::bulk_unchunked(
         ex::schedule(scheduler) | stdexec::then([]() { return 5; }),
         stdexec::par, 100, [&](int idx, int value) {
-            // With unchunked execution: smaller chunks (chunk_size=1), better work stealing
+            // With unchunked execution: smaller chunks (chunk_size=1), better
+            // work stealing
             function_calls.fetch_add(1, std::memory_order_relaxed);
             results[idx] = value * idx;
         });

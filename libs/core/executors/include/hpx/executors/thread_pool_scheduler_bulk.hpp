@@ -54,7 +54,8 @@ namespace hpx::execution::experimental::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // Compute a chunk size given a number of worker threads and a total number
-    // Chunked execution: larger chunks for better cache locality and fewer context switches
+    // Chunked execution: larger chunks for better cache locality and fewer
+    // context switches
     static constexpr std::uint32_t get_bulk_scheduler_chunk_size_chunked(
         std::uint32_t const num_threads, std::size_t const n) noexcept
     {
@@ -80,7 +81,7 @@ namespace hpx::execution::experimental::detail {
             chunk_size *= 2;
         }
         return static_cast<std::uint32_t>(
-            (std::max)(chunk_size, std::uint64_t(1)));
+            (std::max) (chunk_size, std::uint64_t(1)));
     }
 
     template <std::size_t... Is, typename F, typename T, typename Ts>
@@ -167,7 +168,7 @@ namespace hpx::execution::experimental::detail {
             auto const i_begin =
                 static_cast<std::size_t>(index) * task_f->chunk_size;
             auto const i_end =
-                (std::min)(i_begin + task_f->chunk_size, task_f->size);
+                (std::min) (i_begin + task_f->chunk_size, task_f->size);
 
             auto it =
                 std::ranges::next(hpx::util::begin(op_state->shape), i_begin);
@@ -419,8 +420,8 @@ namespace hpx::execution::experimental::detail {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
             auto const part_begin = worker_thread;
-            auto part_end = (std::min)(
-                size + num_threads - 1, part_begin + num_steps * num_threads);
+            auto part_end = (std::min) (size + num_threads - 1,
+                part_begin + num_steps * num_threads);
             auto const remainder = (part_end - part_begin) % num_threads;
             if (remainder != 0)
             {
@@ -579,7 +580,8 @@ namespace hpx::execution::experimental::detail {
                 !hpx::threads::do_not_share_function(hint.sharing_mode());
             bool allow_stealing = op_state->is_chunked_execution ?
                 base_allow_stealing :    // Chunked: normal work stealing
-                true;    // Unchunked: always enable aggressive work stealing for load balancing
+                true;    // Unchunked: always enable aggressive work stealing
+                         // for load balancing
 
             for (std::uint32_t pu = 0;
                 worker_thread != op_state->num_worker_threads && pu != num_pus;
