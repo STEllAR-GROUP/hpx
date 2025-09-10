@@ -1124,8 +1124,8 @@ void test_split()
     }
 
     {
-        auto s = ex::transfer_just(sched, 42) | ex::split() |
-            ex::transfer(sched);
+        auto s =
+            ex::transfer_just(sched, 42) | ex::split() | ex::transfer(sched);
         HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(std::move(s))), 42);
     }
 
@@ -1926,11 +1926,11 @@ void test_keep_future_sender()
         auto fun = hpx::unwrapping(
             [](int&& x, double const& y) { return x * 2 + (int(y) / 2); });
 #if defined(HPX_HAVE_STDEXEC)
-        HPX_TEST_EQ(hpx::get<0>(*(tt::sync_wait(
-                        ex::when_all(ex::keep_future(std::move(f)),
-                            ex::keep_future(sf)) |
-                        ex::transfer(ex::thread_pool_scheduler{}) |
-                        ex::then(fun)))),
+        HPX_TEST_EQ(
+            hpx::get<0>(*(tt::sync_wait(
+                ex::when_all(
+                    ex::keep_future(std::move(f)), ex::keep_future(sf)) |
+                ex::transfer(ex::thread_pool_scheduler{}) | ex::then(fun)))),
             85);
 #else
         HPX_TEST_EQ(hpx::get<0>(*(ex::when_all(ex::keep_future(std::move(f)),
