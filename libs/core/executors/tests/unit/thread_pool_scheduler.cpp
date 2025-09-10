@@ -52,6 +52,20 @@ struct custom_type_non_default_constructible_non_copyable
 namespace ex = hpx::execution::experimental;
 namespace tt = hpx::this_thread::experimental;
 
+// Template to detect thread_pool_bulk_sender specializations
+template <typename T>
+struct is_thread_pool_bulk_sender : std::false_type
+{
+};
+
+template <typename Policy, typename Sender, typename Shape, typename F,
+    bool IsChunked>
+struct is_thread_pool_bulk_sender<hpx::execution::experimental::detail::
+        thread_pool_bulk_sender<Policy, Sender, Shape, F, IsChunked>>
+  : std::true_type
+{
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 void test_execute()
 {
@@ -531,6 +545,56 @@ void test_transfer_just_void()
     auto work1 = ex::then(begin,
         [parent_id]() { HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id()); });
     tt::sync_wait(work1);
+}
+
+void test_bulk_starts_on()
+{
+    std::vector<int> const ns = {0, 1, 10, 43};
+
+    for (int n : ns)
+    {
+        std::vector<int> v(n, 0);
+        hpx::thread::id parent_id = hpx::this_thread::get_id();
+
+#if defined(HPX_HAVE_STDEXEC)
+        // Test starts_on pattern: bulk operation with scheduler in environment
+        // Use start_on to provide scheduler through environment
+        auto bulk_sender = ex::start_on(ex::thread_pool_scheduler{},
+            ex::just() | ex::bulk(ex::par, n, [&](int i) {
+                ++v[i];
+                HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
+            }));
+
+        tt::sync_wait(std::move(bulk_sender));
+#else
+        ex::start_on(ex::thread_pool_scheduler{},
+            ex::just() |
+                ex::bulk(n,
+                    [&](int i) {
+                        ++v[i];
+                        HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
+                    })) |
+            tt::sync_wait();
+#endif
+
+        // Verify results
+        int incremented_count = 0;
+        for (int i = 0; i < n; ++i)
+        {
+            if (v[i] == 1)
+            {
+                ++incremented_count;
+            }
+        }
+        if (n > 0)
+        {
+            HPX_TEST(incremented_count > 0);
+        }
+        else
+        {
+            HPX_TEST_EQ(incremented_count, 0);
+        }
+    }
 }
 
 void test_transfer_just_one_arg()
@@ -1952,11 +2016,20 @@ void test_bulk()
         hpx::thread::id parent_id = hpx::this_thread::get_id();
 
 #if defined(HPX_HAVE_STDEXEC)
-        tt::sync_wait(ex::schedule(ex::thread_pool_scheduler{}) |
+        auto bulk_sender = ex::schedule(ex::thread_pool_scheduler{}) |
             ex::bulk(ex::par, n, [&](int i) {
                 ++v[i];
                 HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
-            }));
+            });
+
+        // Static assertion to verify the sender type is thread_pool_bulk_sender
+        using sender_type = std::decay_t<decltype(bulk_sender)>;
+
+        static_assert(is_thread_pool_bulk_sender<sender_type>::value,
+            "Bulk sender should be transformed to thread_pool_bulk_sender by "
+            "domain customization");
+
+        tt::sync_wait(std::move(bulk_sender));
 #else
         ex::schedule(ex::thread_pool_scheduler{}) | ex::bulk(n, [&](int i) {
             ++v[i];
@@ -2477,6 +2550,11 @@ int hpx_main()
     test_just_one_arg();
     test_just_two_args();
     test_transfer_just_void();
+    test_transfer_basic();
+    test_transfer_arguments();
+    test_keep_future_sender();
+    test_bulk();
+    test_bulk_starts_on();
     test_transfer_just_one_arg();
     test_transfer_just_two_args();
     test_when_all();

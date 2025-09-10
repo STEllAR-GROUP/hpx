@@ -81,7 +81,7 @@ namespace hpx::execution::experimental::detail {
             chunk_size *= 2;
         }
         return static_cast<std::uint32_t>(
-            (std::max) (chunk_size, std::uint64_t(1)));
+            (std::max)(chunk_size, std::uint64_t(1)));
     }
 
     template <std::size_t... Is, typename F, typename T, typename Ts>
@@ -160,7 +160,7 @@ namespace hpx::execution::experimental::detail {
 #endif
             std::printf("[DEBUG] do_work_chunk: execution_mode=%s, index=%u, "
                         "worker_thread=%u\n",
-                op_state->is_chunked_execution ? "chunked" : "unchunked", index,
+                op_state->is_chunked ? "chunked" : "unchunked", index,
                 task_f->worker_thread);
 
             using index_pack_type = hpx::detail::fused_index_pack_t<Ts>;
@@ -168,7 +168,7 @@ namespace hpx::execution::experimental::detail {
             auto const i_begin =
                 static_cast<std::size_t>(index) * task_f->chunk_size;
             auto const i_end =
-                (std::min) (i_begin + task_f->chunk_size, task_f->size);
+                (std::min)(i_begin + task_f->chunk_size, task_f->size);
 
             auto it =
                 std::ranges::next(hpx::util::begin(op_state->shape), i_begin);
@@ -180,7 +180,7 @@ namespace hpx::execution::experimental::detail {
                 ++it;
             }
 
-            if (op_state->is_chunked_execution)
+            if (op_state->is_chunked)
             {
                 std::printf(
                     "[DEBUG] Chunked: processed chunk [%zu, %zu) "
@@ -302,8 +302,7 @@ namespace hpx::execution::experimental::detail {
         {
             std::printf(
                 "[DEBUG] Task function: execution_mode=%s, worker_thread=%u\n",
-                op_state->is_chunked_execution ? "chunked" : "unchunked",
-                worker_thread);
+                op_state->is_chunked ? "chunked" : "unchunked", worker_thread);
             auto visitor =
                 set_value_loop_visitor<OperationState>{op_state, this};
             hpx::visit(HPX_MOVE(visitor), op_state->ts);
@@ -420,8 +419,8 @@ namespace hpx::execution::experimental::detail {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
             auto const part_begin = worker_thread;
-            auto part_end = (std::min) (size + num_threads - 1,
-                part_begin + num_steps * num_threads);
+            auto part_end = (std::min)(
+                size + num_threads - 1, part_begin + num_steps * num_threads);
             auto const remainder = (part_end - part_begin) % num_threads;
             if (remainder != 0)
             {
@@ -504,7 +503,7 @@ namespace hpx::execution::experimental::detail {
             }
 
             // Calculate chunk size based on execution mode
-            std::uint32_t chunk_size = op_state->is_chunked_execution ?
+            std::uint32_t chunk_size = op_state->is_chunked ?
                 get_bulk_scheduler_chunk_size_chunked(
                     op_state->num_worker_threads, size) :
                 get_bulk_scheduler_chunk_size_unchunked(
@@ -578,7 +577,7 @@ namespace hpx::execution::experimental::detail {
             // Configure work stealing based on execution mode
             bool base_allow_stealing =
                 !hpx::threads::do_not_share_function(hint.sharing_mode());
-            bool allow_stealing = op_state->is_chunked_execution ?
+            bool allow_stealing = op_state->is_chunked ?
                 base_allow_stealing :    // Chunked: normal work stealing
                 true;    // Unchunked: always enable aggressive work stealing
                          // for load balancing
@@ -680,7 +679,6 @@ namespace hpx::execution::experimental::detail {
         HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
         HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
         hpx::threads::mask_type pu_mask;
-        bool is_chunked_execution;
 
     public:
         template <typename Sender_, typename Shape_, typename F_>
@@ -692,7 +690,6 @@ namespace hpx::execution::experimental::detail {
           , shape(HPX_FORWARD(Shape_, shape))
           , f(HPX_FORWARD(F_, f))
           , pu_mask(HPX_MOVE(pu_mask))
-          , is_chunked_execution(IsChunked)
         {
         }
 
@@ -708,7 +705,6 @@ namespace hpx::execution::experimental::detail {
                 hpx::execution::experimental::processing_units_count(
                     hpx::execution::experimental::null_parameters, scheduler,
                     hpx::chrono::null_duration, 0)))
-          , is_chunked_execution(IsChunked)
         {
         }
 
@@ -824,6 +820,8 @@ namespace hpx::execution::experimental::detail {
         template <typename Receiver>
         struct operation_state
         {
+            static constexpr bool is_chunked = IsChunked;
+
             using operation_state_type =
                 hpx::execution::experimental::connect_result_t<Sender,
                     bulk_receiver<operation_state, F, Shape>>;
@@ -841,7 +839,6 @@ namespace hpx::execution::experimental::detail {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
             hpx::util::cache_aligned_data<std::atomic<std::size_t>>
                 tasks_remaining;
-            bool is_chunked_execution;
 
             using value_types = value_types_of_t<Sender,
                 hpx::execution::experimental::empty_env, decayed_tuple,
@@ -854,7 +851,7 @@ namespace hpx::execution::experimental::detail {
                 typename F_, typename Receiver_>
             operation_state(Scheduler_&& scheduler, Sender_&& sender,
                 Shape_&& shape, F_&& f, hpx::threads::mask_type pumask,
-                Receiver_&& receiver, bool chunked_execution)
+                Receiver_&& receiver)
               : scheduler(HPX_FORWARD(Scheduler_, scheduler))
               , op_state(hpx::execution::experimental::connect(
                     HPX_FORWARD(Sender_, sender),
@@ -870,7 +867,6 @@ namespace hpx::execution::experimental::detail {
               , shape(HPX_FORWARD(Shape_, shape))
               , f(HPX_FORWARD(F_, f))
               , receiver(HPX_FORWARD(Receiver_, receiver))
-              , is_chunked_execution(chunked_execution)
             {
                 tasks_remaining.data_.store(
                     num_worker_threads, std::memory_order_relaxed);
@@ -891,7 +887,7 @@ namespace hpx::execution::experimental::detail {
             return operation_state<std::decay_t<Receiver>>{
                 HPX_MOVE(s.scheduler), HPX_MOVE(s.sender), HPX_MOVE(s.shape),
                 HPX_MOVE(s.f), HPX_MOVE(s.pu_mask),
-                HPX_FORWARD(Receiver, receiver), s.is_chunked_execution};
+                HPX_FORWARD(Receiver, receiver)};
         }
 
         template <typename Receiver>
@@ -900,7 +896,7 @@ namespace hpx::execution::experimental::detail {
         {
             return operation_state<std::decay_t<Receiver>>{s.scheduler,
                 s.sender, s.shape, s.f, s.pu_mask,
-                HPX_FORWARD(Receiver, receiver), s.is_chunked_execution};
+                HPX_FORWARD(Receiver, receiver)};
         }
     };
 }    // namespace hpx::execution::experimental::detail
