@@ -89,7 +89,8 @@ namespace hpx::execution::experimental {
     template <typename Policy>
     struct thread_pool_domain : stdexec::default_domain
     {
-        // Unified transform_sender for all bulk operations without environment (completes_on pattern)
+        // Unified transform_sender for all bulk operations without environment
+        // (completes_on pattern)
         template <any_bulk_sender Sender>
         auto transform_sender(Sender&& sndr) const noexcept
         {
@@ -167,7 +168,8 @@ namespace hpx::execution::experimental {
             }
         }
 
-        // Unified transform_sender for all bulk operations with environment (starts_on pattern)
+        // Unified transform_sender for all bulk operations with environment
+        // (starts_on pattern)
         template <any_bulk_sender Sender, typename Env>
         auto transform_sender(Sender&& sndr, const Env& env) const noexcept
         {
