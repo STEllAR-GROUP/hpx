@@ -6,10 +6,9 @@
 
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/type_support.hpp>
 
-#include <hpx/type_support/is_trivially_relocatable.hpp>
-#include <hpx/type_support/relocate_at.hpp>
+#include <hpx/modules/type_support.hpp>
 
 using hpx::experimental::is_trivially_relocatable_v;
 using hpx::experimental::relocate_at;

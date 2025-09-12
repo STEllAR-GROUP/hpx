@@ -57,12 +57,14 @@
 #  undef HPX_CORE_EXPORT
 #  define HPX_CORE_EXPORT                /* empty */
 # endif
-# define HPX_CORE_MODULE_EXPORT_EXTERN   export extern "C++"
-# define HPX_CORE_MODULE_EXPORT_EXTERN_C export extern
+# define HPX_CXX_EXPORT                  export
+# define HPX_CXX_EXTERN                  extern "C++"
 #else
-# define HPX_CORE_MODULE_EXPORT_EXTERN   extern "C++"
-# define HPX_CORE_MODULE_EXPORT_EXTERN_C extern
+# define HPX_CXX_EXPORT                  /* empty */
+# define HPX_CXX_EXTERN                  /* empty */
 #endif
+
+#define HPX_CORE_MODULE_EXPORT_EXTERN    HPX_CXX_EXPORT HPX_CXX_EXTERN
 
 #define HPX_CORE_MODULE_EXPORT                                                 \
     HPX_CORE_MODULE_EXPORT_EXTERN HPX_CORE_EXPORT
@@ -108,6 +110,17 @@
 #endif
 
 // Simplify the condition whether HPX modules should be imported or not
+#if defined(HPX_HAVE_BUILD_USING_CXX_MODULES)
+
+#if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_BUILD_MODULE) ||             \
+    defined(HPX_BINARY_DOESNT_USE_CXX_MODULES)
+#undef HPX_COMPILE_WITH_MODULES
+#else
+#define HPX_COMPILE_WITH_MODULES
+#endif
+
+#else
+
 #if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_BUILD_MODULE) ||             \
     defined(HPX_CORE_EXPORTS) || defined(HPX_FULL_EXPORTS) ||                  \
     defined(HPX_BINARY_DOESNT_USE_CXX_MODULES)
@@ -115,5 +128,7 @@
 #else
 #define HPX_COMPILE_WITH_MODULES
 #endif
+
+#endif  // HPX_HAVE_BUILD_USING_CXX_MODULES
 
 // clang-format on

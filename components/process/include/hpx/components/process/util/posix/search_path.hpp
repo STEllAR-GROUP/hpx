@@ -18,10 +18,9 @@
 
 #include <string>
 
-namespace hpx { namespace components { namespace process { namespace posix
-{
-    HPX_PROCESS_EXPORT std::string search_path(const std::string &filename,
-        std::string path = "");
-}}}}
+namespace hpx { namespace components { namespace process { namespace posix {
+    HPX_PROCESS_EXPORT std::string search_path(
+        const std::string& filename, std::string path = "");
+}}}}    // namespace hpx::components::process::posix
 
 #endif

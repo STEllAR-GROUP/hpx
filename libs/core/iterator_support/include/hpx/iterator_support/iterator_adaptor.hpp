@@ -14,8 +14,7 @@
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/lazy_conditional.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <iterator>
 #include <type_traits>

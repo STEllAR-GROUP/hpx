@@ -18,8 +18,7 @@
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>
-#include <hpx/type_support/unused.hpp>
-
+#include <hpx/modules/type_support.hpp>
 #include <exception>
 #include <utility>
 

@@ -12,8 +12,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
 namespace hpx::assertion::detail {
 
     constexpr void current_function_helper(){

@@ -26,7 +26,7 @@
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <exception>
 #include <iterator>

@@ -13,6 +13,8 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 /// \namespace hpx
 namespace hpx {
     /// \brief Main function to gracefully terminate the HPX runtime system.
@@ -208,3 +210,5 @@ namespace hpx {
     ///
     HPX_EXPORT int stop(hpx::error_code& ec = throws);
 }    // namespace hpx
+
+#include <hpx/config/warnings_suffix.hpp>

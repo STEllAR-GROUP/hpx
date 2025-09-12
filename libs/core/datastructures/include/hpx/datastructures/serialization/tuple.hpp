@@ -11,12 +11,12 @@
 
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <memory>

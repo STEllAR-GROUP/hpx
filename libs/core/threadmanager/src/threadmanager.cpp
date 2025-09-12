@@ -18,6 +18,7 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/threadmanager.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/thread_pool_util/thread_pool_suspension_helpers.hpp>
@@ -28,7 +29,6 @@
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_entry_as.hpp>
 
 #include <cstddef>

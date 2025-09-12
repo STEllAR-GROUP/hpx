@@ -171,8 +171,9 @@ function(hpx_extract_includes_from_file module)
       endif()
     endforeach()
 
-    if(NOT file_found)
-      hpx_warn("Included file does not exist: ${hpx_file}")
+    # we know that the file modules_enabled.hpp will be generated later
+    if(NOT file_found AND NOT hpx_file MATCHES "hpx/config/modules_enabled.hpp")
+      hpx_debug("Included file does not exist: ${hpx_file}")
     endif()
   endforeach()
 
@@ -207,14 +208,14 @@ function(hpx_collect_std_headers module)
   file(
     GLOB_RECURSE header_dirs
     LIST_DIRECTORIES true
-    "${${module}_SOURCE_ROOT}/**/include/"
+    "${${module}_SOURCE_ROOT}/**/"
   )
 
   if(${module}_GENERATED_ROOT)
     file(
       GLOB_RECURSE generated_header_dirs
       LIST_DIRECTORIES true
-      "${${module}_GENERATED_ROOT}/**/include/"
+      "${${module}_GENERATED_ROOT}/**/"
     )
     list(APPEND header_dirs ${generated_header_dirs})
   endif()
@@ -235,7 +236,7 @@ function(hpx_collect_std_headers module)
     set(found_recursive_includes)
     hpx_extract_includes_from_file(
       ${module}
-      SOURCE "include/${source_file}"
+      SOURCE ${source_file}
       INCLUDE_DIRS ${include_dirs}
       FOUND_HEADERS found_recursive_includes
     )

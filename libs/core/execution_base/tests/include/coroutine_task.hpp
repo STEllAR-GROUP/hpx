@@ -12,9 +12,8 @@
 #include <hpx/execution_base/coroutine_utils.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/stop_token.hpp>
-#include <hpx/type_support/coroutines_support.hpp>
-#include <hpx/type_support/meta.hpp>
 
 #include <any>
 #include <exception>

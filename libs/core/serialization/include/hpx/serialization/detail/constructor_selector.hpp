@@ -8,10 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/type_support/aligned_storage.hpp>
 
 #include <type_traits>
 

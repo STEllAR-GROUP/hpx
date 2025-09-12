@@ -43,6 +43,8 @@ asio::detail::winsock_init<>::manual manual_winsock_init;
 #endif
 #endif
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
 
@@ -484,3 +486,5 @@ namespace hpx::util {
         return true;
     }
 }    // namespace hpx::util
+
+#include <hpx/config/warnings_suffix.hpp>

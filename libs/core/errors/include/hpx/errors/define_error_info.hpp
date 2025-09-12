@@ -8,28 +8,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors/exception.hpp>
 #include <hpx/errors/exception_info.hpp>
+#include <hpx/errors/macros.hpp>
 
 #include <exception>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-
-#define HPX_DEFINE_ERROR_INFO(NAME, TYPE)                                      \
-    HPX_CORE_MODULE_EXPORT_EXTERN struct NAME : ::hpx::error_info<NAME, TYPE>  \
-    {                                                                          \
-        explicit NAME(TYPE const& value) noexcept(                             \
-            std::is_nothrow_copy_constructible_v<TYPE>)                        \
-          : error_info(value)                                                  \
-        {                                                                      \
-        }                                                                      \
-                                                                               \
-        explicit NAME(TYPE&& value) noexcept                                   \
-          : error_info(HPX_MOVE(value))                                        \
-        {                                                                      \
-        }                                                                      \
-    } /**/
+#include <typeinfo>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -51,7 +37,7 @@ namespace hpx::detail {
     // under the [line] tag.
     HPX_DEFINE_ERROR_INFO(throw_line, long);    //-V835
 
-    struct std_exception : std::exception
+    HPX_CORE_MODULE_EXPORT_EXTERN struct std_exception : std::exception
     {
     private:
         std::string what_;
@@ -68,7 +54,7 @@ namespace hpx::detail {
         }
     };
 
-    struct bad_alloc : std::bad_alloc
+    HPX_CORE_MODULE_EXPORT_EXTERN struct bad_alloc : std::bad_alloc
     {
     private:
         std::string what_;
@@ -85,7 +71,7 @@ namespace hpx::detail {
         }
     };
 
-    struct bad_exception : std::bad_exception
+    HPX_CORE_MODULE_EXPORT_EXTERN struct bad_exception : std::bad_exception
     {
     private:
         std::string what_;
@@ -102,7 +88,7 @@ namespace hpx::detail {
         }
     };
 
-    struct bad_cast : std::bad_cast
+    HPX_CORE_MODULE_EXPORT_EXTERN struct bad_cast : std::bad_cast
     {
     private:
         std::string what_;
@@ -119,7 +105,7 @@ namespace hpx::detail {
         }
     };
 
-    struct bad_typeid : std::bad_typeid
+    HPX_CORE_MODULE_EXPORT_EXTERN struct bad_typeid : std::bad_typeid
     {
     private:
         std::string what_;

@@ -17,22 +17,26 @@
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
-namespace initializers {
+    namespace initializers {
 
-struct initializer_base
-{
-    template <class WindowsExecutor>
-    void on_CreateProcess_setup(WindowsExecutor&) const {}
+        struct initializer_base
+        {
+            template <class WindowsExecutor>
+            void on_CreateProcess_setup(WindowsExecutor&) const
+            {
+            }
 
-    template <class WindowsExecutor>
-    void on_CreateProcess_error(WindowsExecutor&) const {}
+            template <class WindowsExecutor>
+            void on_CreateProcess_error(WindowsExecutor&) const
+            {
+            }
 
-    template <class WindowsExecutor>
-    void on_CreateProcess_success(WindowsExecutor&) const {}
-};
+            template <class WindowsExecutor>
+            void on_CreateProcess_success(WindowsExecutor&) const
+            {
+            }
+        };
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::windows::initializers
 
 #endif

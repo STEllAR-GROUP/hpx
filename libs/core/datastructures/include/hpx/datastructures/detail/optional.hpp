@@ -7,8 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/aligned_storage.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <exception>

@@ -21,7 +21,10 @@ namespace hpx::util {
         {
         }
 
-        HPX_NON_COPYABLE(atomic_count);
+        atomic_count(atomic_count const&) = delete;
+        atomic_count(atomic_count&&) = delete;
+        atomic_count& operator=(atomic_count const&) = delete;
+        atomic_count& operator=(atomic_count&&) = delete;
 
         ~atomic_count() = default;
 

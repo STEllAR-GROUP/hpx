@@ -6,7 +6,7 @@
 
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <exception>

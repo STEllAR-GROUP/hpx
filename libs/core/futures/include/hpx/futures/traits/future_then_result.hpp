@@ -11,8 +11,7 @@
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
-#include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/lazy_conditional.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <type_traits>
 #include <utility>

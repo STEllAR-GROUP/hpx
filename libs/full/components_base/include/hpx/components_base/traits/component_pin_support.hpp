@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/detail/wrap_int.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstdint>
 

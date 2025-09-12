@@ -66,22 +66,22 @@ namespace hpx::debug {
         HPX_CORE_MODULE_EXPORT_EXTERN template <typename Int>
         HPX_CORE_EXPORT void print_dec(std::ostream& os, Int const& v, int n);
 
-        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
+        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::int16_t const&, int);
-        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
+        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::uint16_t const&, int);
-        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
+        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::int32_t const&, int);
-        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
+        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::uint32_t const&, int);
-        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
+        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::int64_t const&, int);
-        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
+        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::uint64_t const&, int);
 
-        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
+        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::atomic<int> const&, int);
-        HPX_CORE_MODULE_EXPORT_EXTERN_C template HPX_CORE_EXPORT void print_dec(
+        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::atomic<unsigned int> const&, int);
 
         HPX_CORE_MODULE_EXPORT_EXTERN template <int N, typename T>
@@ -457,7 +457,7 @@ namespace hpx::debug {
     struct enable_print;
 
     // when false, debug statements should produce no code
-    HPX_CORE_MODULE_EXPORT_EXTERN template <>
+    template <>
     struct enable_print<false>
     {
         explicit constexpr enable_print(char const*) noexcept {}
@@ -551,7 +551,7 @@ namespace hpx::debug {
     }
 
     // when true, debug statements produce valid output
-    HPX_CORE_MODULE_EXPORT_EXTERN template <>
+    template <>
     struct enable_print<true>
     {
     private:

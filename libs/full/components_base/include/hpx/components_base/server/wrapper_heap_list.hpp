@@ -8,9 +8,9 @@
 
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/one_size_heap_list.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
-#include <hpx/type_support/aligned_storage.hpp>
 
 #include <cstddef>
 #include <mutex>

@@ -19,13 +19,10 @@
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/type_support/aligned_storage.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
-#include <hpx/type_support/construct_at.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <atomic>
 #include <chrono>

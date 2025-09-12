@@ -33,10 +33,10 @@
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/topology/cpu_mask.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <algorithm>
 #include <atomic>

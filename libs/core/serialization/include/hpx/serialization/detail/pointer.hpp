@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/access.hpp>
 #include <hpx/serialization/basic_archive.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>
@@ -18,9 +19,6 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
-#include <hpx/type_support/extra_data.hpp>
-#include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/lazy_conditional.hpp>
 
 #include <cstdint>
 #include <map>

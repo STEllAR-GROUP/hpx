@@ -11,7 +11,7 @@
 #include <hpx/components/containers/partitioned_vector/detail/view_element.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <array>
 #include <cstddef>

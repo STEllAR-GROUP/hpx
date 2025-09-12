@@ -41,5 +41,6 @@ add_hpx_module(
     hpx_threading_base
     hpx_synchronization
     hpx_thread_pools
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

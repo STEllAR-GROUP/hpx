@@ -18,20 +18,18 @@
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
-namespace initializers {
+    namespace initializers {
 
-class close_stdin : public initializer_base
-{
-public:
-    template <class PosixExecutor>
-    void on_exec_setup(PosixExecutor&) const
-    {
-        ::close(STDIN_FILENO);
-    }
-};
+        class close_stdin : public initializer_base
+        {
+        public:
+            template <class PosixExecutor>
+            void on_exec_setup(PosixExecutor&) const
+            {
+                ::close(STDIN_FILENO);
+            }
+        };
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::posix::initializers
 
 #endif

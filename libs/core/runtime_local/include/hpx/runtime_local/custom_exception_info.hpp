@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/errors/detail/define_error_info.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <cstddef>
 #include <cstdint>

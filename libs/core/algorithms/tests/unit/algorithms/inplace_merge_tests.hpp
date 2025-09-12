@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/merge.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>

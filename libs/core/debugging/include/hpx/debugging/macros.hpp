@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/config/compiler_specific.hpp>
 
 // The 'environ' should be declared in some cases. E.g. Linux man page says:
 // (This variable must be declared in the user program, but is declared in

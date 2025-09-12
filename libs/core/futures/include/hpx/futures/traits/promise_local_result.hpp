@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 namespace hpx::traits {
 

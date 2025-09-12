@@ -9,8 +9,8 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <array>
 #include <cstddef>

@@ -16,8 +16,7 @@
 
 #include <hpx/components/process/util/windows/create_pipe.hpp>
 
-namespace hpx { namespace components { namespace process { namespace windows
-{
+namespace hpx { namespace components { namespace process { namespace windows {
     pipe create_pipe()
     {
         HANDLE handles[2];
@@ -29,13 +28,13 @@ namespace hpx { namespace components { namespace process { namespace windows
         return make_pipe(handles[0], handles[1]);
     }
 
-    pipe create_pipe(hpx::error_code &ec)
+    pipe create_pipe(hpx::error_code& ec)
     {
-        HANDLE handles[2] = { nullptr, nullptr };
+        HANDLE handles[2] = {nullptr, nullptr};
         if (!::CreatePipe(&handles[0], &handles[1], nullptr, 0))
         {
-            HPX_THROWS_IF(ec, hpx::error::invalid_status,
-                "posix::create_pipe", "CreatePipe() failed");
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "posix::create_pipe",
+                "CreatePipe() failed");
         }
         else
         {
@@ -43,6 +42,6 @@ namespace hpx { namespace components { namespace process { namespace windows
         }
         return make_pipe(handles[0], handles[1]);
     }
-}}}}
+}}}}    // namespace hpx::components::process::windows
 
 #endif

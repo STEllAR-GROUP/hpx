@@ -12,8 +12,8 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/component_heap.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/address.hpp>
-#include <hpx/type_support/bit_cast.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::components::server {

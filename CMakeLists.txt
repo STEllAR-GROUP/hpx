@@ -315,11 +315,11 @@ endif()
 # ##############################################################################
 # C++20 modules configuration
 # ##############################################################################
+
 hpx_option(
-  HPX_WITH_CXX_MODULES BOOL "Enable C++20 modules mode (default: OFF)." OFF
+  HPX_WITH_CXX_MODULES BOOL "Enable exposing C++20 modules (default: OFF)." OFF
   ADVANCED
 )
-
 if(HPX_WITH_CXX_MODULES)
   if(NOT (CMAKE_VERSION VERSION_GREATER_EQUAL "3.29"))
     hpx_fatal(
@@ -330,8 +330,21 @@ if(HPX_WITH_CXX_MODULES)
   hpx_info(
     "HPX will build and install C++20 module interface units for downstream users."
   )
-  hpx_info("Note: HPX itself will still be built using traditional headers.")
   hpx_add_config_define(HPX_HAVE_CXX_MODULES)
+
+  hpx_option(
+    HPX_WITH_BUILD_USING_CXX_MODULES
+    BOOL
+    "Enable building HPX itself using C++20 modules (experimental, default: OFF)."
+    OFF
+    ADVANCED
+  )
+  if(HPX_WITH_BUILD_USING_CXX_MODULES)
+    hpx_info("Note: HPX itself will be built using C++ modules as well.")
+    hpx_add_config_define(HPX_HAVE_BUILD_USING_CXX_MODULES)
+  else()
+    hpx_info("Note: HPX itself will still be built using traditional headers.")
+  endif()
 else()
   hpx_info("HPX will be built and used with traditional headers only.")
 endif()

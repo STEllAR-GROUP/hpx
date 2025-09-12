@@ -25,9 +25,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/type_support/detail/with_result_of.hpp>
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <atomic>
 #include <cstddef>
