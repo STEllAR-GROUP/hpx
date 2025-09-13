@@ -24,7 +24,7 @@
 #include <hpx/components/client_base.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/components_base/server/locking_hook.hpp>
-#include <hpx/functional/invoke_result.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>

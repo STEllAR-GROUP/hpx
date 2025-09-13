@@ -14,8 +14,7 @@
 namespace hpx::util::cache::statistics {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT enum class method
-    {
+    HPX_CXX_EXPORT enum class method {
         get_entry = 0,
         insert_entry = 1,
         update_entry = 2,

@@ -106,7 +106,7 @@ namespace hpx::util::cache::entries {
 
         /// \brief    Forwarding operator<=> allowing to compare entries instead
         ///           of the values.
-        friend auto operator<=>(entry const& , entry const& ) = default;
+        friend auto operator<=>(entry const&, entry const&) = default;
 
         /// \brief Get a reference to the stored data value
         ///

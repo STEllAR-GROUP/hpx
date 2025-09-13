@@ -14,8 +14,8 @@
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy_fwd.hpp>
-#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)

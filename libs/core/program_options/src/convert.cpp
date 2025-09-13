@@ -40,9 +40,9 @@ namespace hpx::program_options::detail {
         FromChar const* from = s.data();
         FromChar const* from_end = s.data() + s.size();
 
-        // The interface of cvt is not really iterator-like, and it's
-        // not possible the tell the required output size without the conversion.
-        // All we can is convert data by pieces.
+        // The interface of cvt is not really iterator-like, and it's not
+        // possible to tell the required output size without the conversion. All
+        // we can is convert data by pieces.
         while (from != from_end)
         {
             // std::basic_string does not provide non-const pointers to the data,
@@ -50,10 +50,8 @@ namespace hpx::program_options::detail {
             ToChar buffer[32];
 
             ToChar* to_next = buffer;
-            // Need variable because std::bind doesn't work with rvalues.
-            ToChar* to_end = buffer + 32;
             std::codecvt_base::result const r =
-                fun(state, from, from_end, from, buffer, to_end, to_next);
+                fun(state, from, from_end, from, &buffer[0], &buffer[32], to_next);
 
             if (r == std::codecvt_base::error)
                 throw std::logic_error("character conversion failed");

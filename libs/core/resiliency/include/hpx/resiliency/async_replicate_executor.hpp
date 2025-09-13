@@ -16,10 +16,10 @@
 
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <cstddef>
 #include <exception>

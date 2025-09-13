@@ -133,7 +133,6 @@ namespace hpx {
 #include <hpx/allocator_support/thread_local_caching_allocator.hpp>
 #include <hpx/concurrency/stack.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/detail/future_transforms.hpp>
 #include <hpx/futures/future.hpp>
@@ -143,6 +142,7 @@ namespace hpx {
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/is_future_range.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
 
 #include <cstddef>

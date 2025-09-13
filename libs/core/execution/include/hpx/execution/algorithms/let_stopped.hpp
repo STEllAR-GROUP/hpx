@@ -24,10 +24,9 @@
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/detail/tag_priority_invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/invoke_result.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <exception>

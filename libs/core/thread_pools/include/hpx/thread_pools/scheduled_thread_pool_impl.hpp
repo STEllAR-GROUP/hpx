@@ -12,10 +12,10 @@
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/schedulers.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/thread_pools/scheduling_loop.hpp>
 #include <hpx/threading_base/create_thread.hpp>

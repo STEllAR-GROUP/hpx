@@ -10,8 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/counting_shape.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <type_traits>
 #include <utility>

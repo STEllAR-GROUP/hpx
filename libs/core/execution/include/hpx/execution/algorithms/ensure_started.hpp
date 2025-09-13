@@ -22,7 +22,7 @@
 #include <hpx/execution/algorithms/split.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/functional/detail/tag_priority_invoke.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <exception>
 #include <memory>

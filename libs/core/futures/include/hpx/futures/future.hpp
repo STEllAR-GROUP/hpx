@@ -19,9 +19,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/concurrency/stack.hpp>
-#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/experimental/scope_exit.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
@@ -32,6 +30,7 @@
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/detail/constructor_selector.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>

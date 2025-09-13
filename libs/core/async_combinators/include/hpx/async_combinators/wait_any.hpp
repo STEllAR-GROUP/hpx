@@ -124,9 +124,9 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/async_combinators/wait_some.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 
 #include <array>
