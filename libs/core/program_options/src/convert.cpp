@@ -50,8 +50,8 @@ namespace hpx::program_options::detail {
             ToChar buffer[32];
 
             ToChar* to_next = buffer;
-            std::codecvt_base::result const r =
-                fun(state, from, from_end, from, &buffer[0], &buffer[32], to_next);
+            std::codecvt_base::result const r = fun(
+                state, from, from_end, from, &buffer[0], &buffer[32], to_next);
 
             if (r == std::codecvt_base::error)
                 throw std::logic_error("character conversion failed");

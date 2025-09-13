@@ -29,7 +29,7 @@ namespace hpx::util {
 
 #if defined(HPX_HAVE_JEMALLOC_PREFIX)
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T = char>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T = char>
     struct internal_allocator
     {
         using value_type = T;
@@ -108,14 +108,14 @@ namespace hpx::util {
         }
     };
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     [[nodiscard]] constexpr bool operator==(
         internal_allocator<T> const&, internal_allocator<T> const&) noexcept
     {
         return true;
     }
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     [[nodiscard]] constexpr bool operator!=(
         internal_allocator<T> const&, internal_allocator<T> const&) noexcept
     {
@@ -123,7 +123,7 @@ namespace hpx::util {
     }
 #else
     // fall back to system allocator if no special internal allocator is needed
-    template <typename T = char>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T = char>
     using internal_allocator = std::allocator<T>;
 #endif
 }    // namespace hpx::util

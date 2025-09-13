@@ -90,6 +90,7 @@ add_hpx_module(
   GENERATED_HEADERS ${generated_include_local_headers}
   MODULE_DEPENDENCIES
     hpx_algorithms
+    hpx_assertion
     hpx_async_base
     hpx_async_combinators
     hpx_async_local
@@ -104,6 +105,7 @@ add_hpx_module(
     hpx_memory
     hpx_runtime_local
     hpx_synchronization
+    hpx_tag_invoke
     hpx_threading
     hpx_threading_base
     hpx_thread_support

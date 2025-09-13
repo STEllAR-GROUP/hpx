@@ -21,7 +21,6 @@
 // violations.
 #include <hpx/config/std_headers.hpp>
 #endif
-
 @module_macro_headers@
 // suppress certain MSVC warnings related to dll-interface inconsistencies
 #include <hpx/config/warnings_prefix.hpp>

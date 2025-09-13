@@ -40,6 +40,7 @@ add_hpx_module(
   HEADERS ${async_combinators_headers}
   COMPAT_HEADERS ${async_combinators_compat_headers}
   MODULE_DEPENDENCIES
+    hpx_allocator_support
     hpx_async_base
     hpx_concurrency
     hpx_config

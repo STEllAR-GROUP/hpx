@@ -47,6 +47,6 @@ add_hpx_module(
   HEADERS ${iterator_support_headers}
   COMPAT_HEADERS ${iterator_support_compat_headers}
   MODULE_DEPENDENCIES hpx_config hpx_datastructures hpx_functional
-                      hpx_serialization hpx_type_support
+                      hpx_serialization hpx_tag_invoke hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

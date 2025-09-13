@@ -32,6 +32,7 @@ add_hpx_module(
     hpx_concepts
     hpx_execution
     hpx_executors
+    hpx_tag_invoke
     hpx_threading
     hpx_timing
     hpx_topology

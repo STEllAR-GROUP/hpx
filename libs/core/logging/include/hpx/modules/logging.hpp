@@ -55,9 +55,9 @@ namespace hpx {
 
 #if defined(HPX_HAVE_LOGGING)
 
-#include <hpx/assertion/current_function.hpp>
 #include <hpx/logging/level.hpp>
 #include <hpx/logging/logging.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/format.hpp>
 
 #include <string>

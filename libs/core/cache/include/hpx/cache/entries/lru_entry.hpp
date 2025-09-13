@@ -89,12 +89,29 @@ namespace hpx::util::cache::entries {
 
         /// \brief Compare the 'age' of two entries. An entry is 'older' than
         ///        another entry if it has been accessed less recently (LRU).
-        friend auto
-        operator<=>(lru_entry const& lhs, lru_entry const& rhs) noexcept(
-            noexcept(std::declval<time_point const&>() <=>
-                std::declval<time_point const&>()))
+        friend auto operator<(lru_entry const& lhs, lru_entry const& rhs)
         {
-            return rhs.get_access_time() <=> lhs.get_access_time();
+            return rhs.get_access_time() < lhs.get_access_time();
+        }
+        friend auto operator>(lru_entry const& lhs, lru_entry const& rhs)
+        {
+            return rhs < lhs;
+        }
+        friend auto operator<=(lru_entry const& lhs, lru_entry const& rhs)
+        {
+            return !(rhs < lhs);
+        }
+        friend auto operator>=(lru_entry const& lhs, lru_entry const& rhs)
+        {
+            return !(lhs < rhs);
+        }
+        friend auto operator==(lru_entry const& lhs, lru_entry const& rhs)
+        {
+            return lhs.get_access_time() == rhs.get_access_time();
+        }
+        friend auto operator!=(lru_entry const& lhs, lru_entry const& rhs)
+        {
+            return !(lhs == rhs);
         }
 
     private:

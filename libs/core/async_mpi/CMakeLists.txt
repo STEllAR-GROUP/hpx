@@ -38,12 +38,13 @@ add_hpx_module(
   DEPENDENCIES Mpi::mpi
   MODULE_DEPENDENCIES
     hpx_concurrency
+    hpx_config
     hpx_errors
     hpx_execution_base
     hpx_memory
-    hpx_threading_base
     hpx_mpi_base
+    hpx_threading_base
     hpx_runtime_local
-    hpx_config
+    hpx_tag_invoke
   CMAKE_SUBDIRS examples tests
 )
