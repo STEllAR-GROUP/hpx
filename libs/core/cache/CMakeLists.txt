@@ -44,6 +44,8 @@ set(cache_sources)
 include(HPX_AddModule)
 add_hpx_module(
   core cache
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${cache_sources}
   HEADERS ${cache_headers}
   COMPAT_HEADERS ${cache_compat_headers}

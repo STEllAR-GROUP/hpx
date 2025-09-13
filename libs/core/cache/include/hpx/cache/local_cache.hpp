@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -58,7 +58,7 @@ namespace hpx::util::cache {
     ///                       the type \a statistics#no_statistics which does
     ///                       not collect any numbers, but provides empty stubs
     ///                       allowing the code to compile.
-    template <typename Key, typename Entry,
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Key, typename Entry,
         typename UpdatePolicy = std::less<Entry>,
         typename InsertPolicy = policies::always<Entry>,
         typename CacheStorage = std::map<Key, Entry>,
@@ -577,7 +577,7 @@ namespace hpx::util::cache {
         ///               function if the indexed value is found in the cache.
         /// \note         The difference to the other overload of the \a insert
         ///               function is that this overload replaces the whole
-        ///               cache entry, while the other overload retplaces the
+        ///               cache entry, while the other overload replaces the
         ///               cached value only, leaving the cache entry properties
         ///               untouched.
         ///

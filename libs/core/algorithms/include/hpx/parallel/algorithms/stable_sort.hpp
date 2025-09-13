@@ -219,6 +219,10 @@ namespace hpx::parallel {
                 auto last_iter = first;
                 std::size_t count =
                     detail::advance_and_get_distance(last_iter, last);
+                if (count == 0)
+                {
+                    return algorithm_result::get(HPX_MOVE(last_iter));
+                }
 
                 // figure out the chunk size to use
                 std::size_t cores =

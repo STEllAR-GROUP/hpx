@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,11 +32,11 @@ namespace hpx::util::cache::entries {
     ///                   default constructible, copy constructible and
     ///                   less_than_comparable.
     ///
-    template <typename Value>
-    class fifo_entry : public entry<Value, fifo_entry<Value>>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Value>
+    class fifo_entry : public entry<Value>
     {
     private:
-        using base_type = entry<Value, fifo_entry<Value>>;
+        using base_type = entry<Value>;
         using time_point = std::chrono::steady_clock::time_point;
 
     public:
@@ -80,13 +80,7 @@ namespace hpx::util::cache::entries {
 
         /// \brief Compare the 'age' of two entries. An entry is 'older' than
         ///        another entry if it has been created earlier (FIFO).
-        friend bool
-        operator<(fifo_entry const& lhs, fifo_entry const& rhs) noexcept(
-            noexcept(std::declval<time_point const&>() <
-                std::declval<time_point const&>()))
-        {
-            return lhs.get_creation_time() < rhs.get_creation_time();
-        }
+        friend auto operator<=>(fifo_entry const&, fifo_entry const&) = default;
 
     private:
         time_point insertion_time_;

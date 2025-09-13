@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,11 +15,11 @@
 namespace hpx::util::cache::statistics {
 
     ///////////////////////////////////////////////////////////////////////////
-    class local_statistics : public no_statistics
+    HPX_CORE_MODULE_EXPORT_EXTERN class local_statistics : public no_statistics
     {
     private:
         [[nodiscard]] static std::size_t get_and_reset(
-            std::size_t& value, bool reset) noexcept
+            std::size_t& value, bool const reset) noexcept
         {
             std::size_t const result = value;
             if (reset)
@@ -47,25 +47,25 @@ namespace hpx::util::cache::statistics {
             return evictions_;
         }
 
-        [[nodiscard]] std::size_t hits(bool reset) noexcept
+        [[nodiscard]] std::size_t hits(bool const reset) noexcept
         {
             return get_and_reset(hits_, reset);
         }
-        [[nodiscard]] std::size_t misses(bool reset) noexcept
+        [[nodiscard]] std::size_t misses(bool const reset) noexcept
         {
             return get_and_reset(misses_, reset);
         }
-        [[nodiscard]] std::size_t insertions(bool reset) noexcept
+        [[nodiscard]] std::size_t insertions(bool const reset) noexcept
         {
             return get_and_reset(insertions_, reset);
         }
-        [[nodiscard]] std::size_t evictions(bool reset) noexcept
+        [[nodiscard]] std::size_t evictions(bool const reset) noexcept
         {
             return get_and_reset(evictions_, reset);
         }
 
         /// \brief  The function \a got_hit will be called by a cache instance
-        ///         whenever a entry got touched.
+        ///         whenever an entry got touched.
         void got_hit() noexcept
         {
             ++hits_;
