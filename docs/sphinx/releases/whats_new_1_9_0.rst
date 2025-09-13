@@ -277,7 +277,7 @@ Closed pull requests
 * :hpx-pr:`5985` - Re-add deprecated tag_policy_tag et.al. types that were removed in V1.8.1
 * :hpx-pr:`5981` - docs: add docs for condition_variable.hpp
 * :hpx-pr:`5980` - More work on execution::read
-* :hpx-pr:`5979` - Remove support for clang-v8 and clang-v9, switch LSU clang-v13 to C++17
+* :hpx-pr:`5979` - Unsupported clang-v8 and clang-v9, switch LSU clang-v13 to C++17
 * :hpx-pr:`5977` - fix: Compilation errors for -std=c++17 builders
 * :hpx-pr:`5975` - docs: fix & improve parallel algorithms documentation 5
 * :hpx-pr:`5974` - [P2300] Adapt get completion signatures for awaitable senders
