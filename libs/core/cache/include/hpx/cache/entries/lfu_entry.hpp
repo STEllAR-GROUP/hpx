@@ -82,7 +82,30 @@ namespace hpx::util::cache::entries {
 
         /// \brief Compare the 'age' of two entries. An entry is 'older' than
         ///        another entry if it has been accessed less frequently (LFU).
-        friend auto operator<=>(lfu_entry const&, lfu_entry const&) = default;
+        friend auto operator<(lfu_entry const& lhs, lfu_entry const& rhs)
+        {
+            return lhs.get_access_count() < rhs.get_access_count();
+        }
+        friend auto operator>(lfu_entry const& lhs, lfu_entry const& rhs)
+        {
+            return rhs < lhs;
+        }
+        friend auto operator<=(lfu_entry const& lhs, lfu_entry const& rhs)
+        {
+            return !(rhs < lhs);
+        }
+        friend auto operator>=(lfu_entry const& lhs, lfu_entry const& rhs)
+        {
+            return !(lhs < rhs);
+        }
+        friend auto operator==(lfu_entry const& lhs, lfu_entry const& rhs)
+        {
+            return lhs.get_access_count() == rhs.get_access_count();
+        }
+        friend auto operator!=(lfu_entry const& lhs, lfu_entry const& rhs)
+        {
+            return !(lhs == rhs);
+        }
 
     private:
         unsigned long ref_count_ = 0;

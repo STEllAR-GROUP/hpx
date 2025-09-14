@@ -66,10 +66,35 @@ namespace hpx::util::cache::entries {
 
         /// \brief Compare the 'age' of two entries. An entry is 'older' than
         ///        another entry if it has a bigger size.
-        friend auto operator<=>(
+        friend auto operator<(
             size_entry const& lhs, size_entry const& rhs) noexcept
         {
-            return rhs.get_size() <=> lhs.get_size();
+            return rhs.get_size() < lhs.get_size();
+        }
+        friend auto operator>(
+            size_entry const& lhs, size_entry const& rhs) noexcept
+        {
+            return rhs < lhs;
+        }
+        friend auto operator<=(
+            size_entry const& lhs, size_entry const& rhs) noexcept
+        {
+            return !(rhs < lhs);
+        }
+        friend auto operator>=(
+            size_entry const& lhs, size_entry const& rhs) noexcept
+        {
+            return !(lhs < rhs);
+        }
+        friend auto operator==(
+            size_entry const& lhs, size_entry const& rhs) noexcept
+        {
+            return lhs.get_size() == rhs.get_size();
+        }
+        friend auto operator!=(
+            size_entry const& lhs, size_entry const& rhs) noexcept
+        {
+            return !(lhs == rhs);
         }
 
     private:

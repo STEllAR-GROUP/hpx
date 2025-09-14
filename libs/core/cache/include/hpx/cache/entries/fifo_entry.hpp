@@ -80,7 +80,30 @@ namespace hpx::util::cache::entries {
 
         /// \brief Compare the 'age' of two entries. An entry is 'older' than
         ///        another entry if it has been created earlier (FIFO).
-        friend auto operator<=>(fifo_entry const&, fifo_entry const&) = default;
+        friend auto operator<(fifo_entry const& lhs, fifo_entry const& rhs)
+        {
+            return lhs.get_creation_time() < rhs.get_creation_time();
+        }
+        friend auto operator>(fifo_entry const& lhs, fifo_entry const& rhs)
+        {
+            return rhs < lhs;
+        }
+        friend auto operator<=(fifo_entry const& lhs, fifo_entry const& rhs)
+        {
+            return !(rhs < lhs);
+        }
+        friend auto operator>=(fifo_entry const& lhs, fifo_entry const& rhs)
+        {
+            return !(lhs < rhs);
+        }
+        friend auto operator==(fifo_entry const& lhs, fifo_entry const& rhs)
+        {
+            return lhs.get_creation_time() == rhs.get_creation_time();
+        }
+        friend auto operator!=(fifo_entry const& lhs, fifo_entry const& rhs)
+        {
+            return !(lhs == rhs);
+        }
 
     private:
         time_point insertion_time_;
