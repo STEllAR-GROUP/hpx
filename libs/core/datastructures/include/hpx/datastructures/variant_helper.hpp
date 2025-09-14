@@ -12,7 +12,7 @@
 // we shouldn't implement hpx::get for variant if hpx::variant is an alias for
 // std::variant
 #if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_VARIANT)
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>    // for size_t
 #include <utility>

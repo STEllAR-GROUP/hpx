@@ -28,9 +28,7 @@
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/detail/with_result_of.hpp>
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <exception>
 #include <type_traits>

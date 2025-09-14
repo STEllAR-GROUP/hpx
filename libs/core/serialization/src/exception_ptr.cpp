@@ -7,7 +7,6 @@
 
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/errors/detail/define_error_info.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/serialization/exception_ptr.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -24,6 +23,8 @@
 #include <string>
 #include <system_error>
 #include <typeinfo>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::serialization {
@@ -356,3 +357,5 @@ namespace hpx::serialization {
     template HPX_CORE_EXPORT void load(
         hpx::serialization::input_archive&, std::exception_ptr&, unsigned int);
 }    // namespace hpx::serialization
+
+#include <hpx/config/warnings_suffix.hpp>

@@ -8,7 +8,9 @@
 
 #pragma once
 
-#include <hpx/modules/format.hpp>
+#include <hpx/config.hpp>
+#include <hpx/format/api.hpp>
+#include <hpx/util/bad_lexical_cast.hpp>
 
 #include <string>
 #include <type_traits>
@@ -27,7 +29,7 @@ namespace hpx::util {
             }
         };
 
-        template <typename T>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
         struct to_string<T,
             std::enable_if_t<std::is_integral_v<T> ||
                 std::is_floating_point_v<T>>>

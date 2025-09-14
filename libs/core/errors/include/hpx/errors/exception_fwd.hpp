@@ -29,7 +29,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Encode error category for new error_code.
-    HPX_CORE_MODULE_EXPORT_EXTERN enum class throwmode : std::uint8_t {
+    HPX_CXX_EXPORT enum class throwmode : std::uint8_t {
         plain = 0,
         rethrow = 1,
 
@@ -82,7 +82,7 @@ namespace hpx {
     // the compiler.
     extern HPX_DEVICE error_code throws;
 #else
-    HPX_CORE_MODULE_EXPORT error_code throws;
+    HPX_CORE_MODULE_EXPORT_EXTERN extern HPX_CORE_EXPORT error_code throws;
 #endif
 
     /// \cond NOINTERNAL

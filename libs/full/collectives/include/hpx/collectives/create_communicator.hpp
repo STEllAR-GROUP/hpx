@@ -110,7 +110,7 @@ namespace hpx { namespace collectives {
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/modules/async_base.hpp>
-#include <hpx/type_support/extra_data.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <tuple>
 #include <utility>

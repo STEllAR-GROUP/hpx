@@ -10,7 +10,7 @@
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <array>
 #include <cstddef>

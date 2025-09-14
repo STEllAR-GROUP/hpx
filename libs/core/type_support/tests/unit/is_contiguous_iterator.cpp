@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/is_contiguous_iterator.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <array>
 #include <cassert>

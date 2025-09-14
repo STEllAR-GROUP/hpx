@@ -55,7 +55,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
             std::array<std::wstring, 4> extensions = {
                 L"", L".exe", L".com", L".bat"};
             for (std::array<std::wstring, 4>::iterator it2 = extensions.begin();
-                 it2 != extensions.end(); ++it2)
+                it2 != extensions.end(); ++it2)
             {
                 filesystem::path p2 = p;
                 p2 += *it2;
@@ -98,7 +98,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
             std::array<std::string, 4> extensions =    //-V112
                 {{"", ".exe", ".com", ".bat"}};
             for (std::array<std::string, 4>::iterator it2 = extensions.begin();
-                 it2 != extensions.end(); ++it2)
+                it2 != extensions.end(); ++it2)
             {
                 filesystem::path p2 = p;
                 p2 += *it2;

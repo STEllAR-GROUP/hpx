@@ -17,8 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 namespace ex = hpx::execution::experimental;
 

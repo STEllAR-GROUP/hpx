@@ -16,6 +16,8 @@
 #include <string>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::util::batch_environments {
 
     pbs_environment::pbs_environment(
@@ -146,3 +148,5 @@ namespace hpx::util::batch_environments {
         num_localities_ = nodes.size();
     }
 }    // namespace hpx::util::batch_environments
+
+#include <hpx/config/warnings_suffix.hpp>

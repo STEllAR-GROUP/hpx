@@ -8,7 +8,7 @@
 
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/traits/is_future.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <type_traits>
 

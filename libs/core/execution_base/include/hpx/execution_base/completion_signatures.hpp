@@ -15,8 +15,7 @@
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/tag_invoke.hpp>
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -25,7 +24,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/traits/coroutine_traits.hpp>
-#include <hpx/type_support/coroutines_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <exception>
 #include <system_error>

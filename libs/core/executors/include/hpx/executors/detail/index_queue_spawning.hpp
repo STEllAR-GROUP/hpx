@@ -24,11 +24,11 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/threading/thread.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/topology/cpu_mask.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <algorithm>
 #include <atomic>

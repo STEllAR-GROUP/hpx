@@ -17,6 +17,7 @@
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/threadmanager.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/runtime_distributed.hpp>
@@ -25,7 +26,6 @@
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <cstdint>

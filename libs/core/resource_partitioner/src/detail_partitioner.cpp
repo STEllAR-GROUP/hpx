@@ -11,13 +11,13 @@
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/type_support/static.hpp>
 #include <hpx/util/get_entry_as.hpp>
 
 #include <atomic>

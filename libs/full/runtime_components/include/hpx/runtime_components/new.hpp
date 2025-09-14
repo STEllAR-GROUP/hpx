@@ -19,9 +19,9 @@
 #include <hpx/components_base/server/create_component.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_components/create_component_helpers.hpp>
-#include <hpx/type_support/lazy_enable_if.hpp>
 
 #include <algorithm>
 #include <cstddef>

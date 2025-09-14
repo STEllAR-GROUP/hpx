@@ -10,7 +10,7 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>

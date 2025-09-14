@@ -15,9 +15,9 @@
 
 namespace hpx::util {
 
-    using extra_data_id_type = void const*;
+    HPX_CORE_MODULE_EXPORT_EXTERN using extra_data_id_type = void const*;
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     struct extra_data_helper
     {
         // this is intentionally left unimplemented, will lead to linker errors
@@ -29,29 +29,40 @@ namespace hpx::util {
         static void reset(T* data) noexcept;
     };
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     [[nodiscard]] extra_data_id_type extra_data_id() noexcept
     {
         return extra_data_helper<T>::id();
     }
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     constexpr void reset_extra_data(T* data) noexcept(
         noexcept(extra_data_helper<T>::reset(data)))
     {
         extra_data_helper<T>::reset(data);
     }
 
-    struct extra_data_member_base;
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN struct extra_data_node;
+    HPX_CORE_MODULE_EXPORT_EXTERN struct extra_data_member_base;
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     struct extra_data_member;
 
-    struct extra_data_node
+    namespace detail {
+
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+        constexpr T* extra_data_node_get(extra_data_node const* this_) noexcept;
+    }
+
+    HPX_CORE_MODULE_EXPORT_EXTERN struct extra_data_node
     {
         constexpr extra_data_node() noexcept = default;
 
         template <typename T>
-        extra_data_node(T* t, extra_data_node&& next);
+        extra_data_node(T*, extra_data_node&& next)
+          : ptr_(std::make_unique<extra_data_member<T>>(HPX_MOVE(next)))
+          , id_(extra_data_id<T>())
+        {
+        }
 
         extra_data_node(extra_data_node const&) = delete;
         extra_data_node(extra_data_node&&) noexcept = default;
@@ -61,7 +72,10 @@ namespace hpx::util {
         ~extra_data_node() = default;
 
         template <typename T>
-        [[nodiscard]] constexpr T* get() const noexcept;
+        [[nodiscard]] constexpr T* get() const noexcept
+        {
+            return detail::extra_data_node_get<T>(this);
+        }
 
         [[nodiscard]] explicit constexpr operator bool() const noexcept
         {
@@ -72,7 +86,7 @@ namespace hpx::util {
         extra_data_id_type id_ = nullptr;
     };
 
-    struct extra_data_member_base
+    HPX_CORE_MODULE_EXPORT_EXTERN struct extra_data_member_base
     {
         explicit extra_data_member_base(extra_data_node&& next) noexcept
           : next_(HPX_MOVE(next))
@@ -93,7 +107,7 @@ namespace hpx::util {
         extra_data_node next_;
     };
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     struct extra_data_member final : extra_data_member_base
     {
         explicit constexpr extra_data_member(extra_data_node&& next) noexcept
@@ -121,30 +135,27 @@ namespace hpx::util {
         T t_;
     };
 
-    template <typename T>
-    extra_data_node::extra_data_node(T*, extra_data_node&& next)
-      : ptr_(std::make_unique<extra_data_member<T>>(HPX_MOVE(next)))
-      , id_(extra_data_id<T>())
-    {
-    }
+    namespace detail {
 
-    template <typename T>
-    constexpr T* extra_data_node::get() const noexcept
-    {
-        if (!*this)
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+        constexpr T* extra_data_node_get(extra_data_node const* this_) noexcept
         {
-            return nullptr;
+            if (!*this_)
+            {
+                return nullptr;
+            }
+
+            if (this_->id_ == extra_data_id<T>())
+            {
+                return static_cast<extra_data_member<T>*>(this_->ptr_.get())
+                    ->value();
+            }
+
+            return this_->ptr_->next_.get<T>();
         }
+    }    // namespace detail
 
-        if (id_ == extra_data_id<T>())
-        {
-            return static_cast<extra_data_member<T>*>(ptr_.get())->value();
-        }
-
-        return ptr_->next_.get<T>();
-    }
-
-    struct extra_data
+    HPX_CORE_MODULE_EXPORT_EXTERN struct extra_data
     {
         constexpr extra_data() noexcept = default;
 

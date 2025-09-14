@@ -21,7 +21,7 @@
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <exception>

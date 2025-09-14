@@ -18,6 +18,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
 
@@ -98,5 +100,7 @@ namespace hpx::util::logging {
             m_writer(msg);
     }
 }    // namespace hpx::util::logging
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif    // HPX_HAVE_LOGGING

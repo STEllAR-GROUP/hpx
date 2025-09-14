@@ -16,28 +16,36 @@
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
-namespace initializers {
+    namespace initializers {
 
-struct initializer_base
-{
-    template <class PosixExecutor>
-    void on_fork_setup(PosixExecutor&) const {}
+        struct initializer_base
+        {
+            template <class PosixExecutor>
+            void on_fork_setup(PosixExecutor&) const
+            {
+            }
 
-    template <class PosixExecutor>
-    void on_fork_error(PosixExecutor&) const {}
+            template <class PosixExecutor>
+            void on_fork_error(PosixExecutor&) const
+            {
+            }
 
-    template <class PosixExecutor>
-    void on_fork_success(PosixExecutor&) const {}
+            template <class PosixExecutor>
+            void on_fork_success(PosixExecutor&) const
+            {
+            }
 
-    template <class PosixExecutor>
-    void on_exec_setup(PosixExecutor&) const {}
+            template <class PosixExecutor>
+            void on_exec_setup(PosixExecutor&) const
+            {
+            }
 
-    template <class PosixExecutor>
-    void on_exec_error(PosixExecutor&) const {}
-};
+            template <class PosixExecutor>
+            void on_exec_error(PosixExecutor&) const
+            {
+            }
+        };
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::posix::initializers
 
 #endif

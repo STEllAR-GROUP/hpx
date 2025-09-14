@@ -33,7 +33,7 @@ namespace hpx::util {
         };
 
 #define DECL_TYPE_SPECIFIER(Type, Spec)                                        \
-    HPX_CORE_MODULE_EXPORT_EXTERN template <>                                  \
+    template <>                                                                \
     struct type_specifier<Type>                                                \
     {                                                                          \
         static constexpr char const* value() noexcept                          \
@@ -101,7 +101,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <>
+        template <>
         struct formatter<bool> : formatter<int>
         {
             static void call(
@@ -112,7 +112,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <>
+        template <>
         struct formatter<void const*, /*IsFundamental=*/false>
         {
             static void call(
@@ -128,7 +128,7 @@ namespace hpx::util {
         {
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <>
+        template <>
         struct formatter<char const*, /*IsFundamental=*/false>
         {
             static void call(
@@ -165,7 +165,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <>
+        template <>
         struct formatter<std::string, /*IsFundamental=*/false>
           : formatter<char const*>
         {
@@ -187,7 +187,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <>
+        template <>
         struct formatter<std::tm, /*IsFundamental=*/false>
         {
             static void call(

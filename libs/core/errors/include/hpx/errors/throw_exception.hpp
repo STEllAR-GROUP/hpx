@@ -12,13 +12,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion/current_function.hpp>
 #include <hpx/errors/error.hpp>
 #include <hpx/errors/exception_fwd.hpp>
+#include <hpx/modules/assertion.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <exception>
 #include <string>

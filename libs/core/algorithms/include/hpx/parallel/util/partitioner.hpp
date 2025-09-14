@@ -19,14 +19,12 @@
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/partitioner_iteration.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/detail/select_partitioner.hpp>
-#include <hpx/type_support/empty_function.hpp>
-#include <hpx/type_support/unused.hpp>
-#include <hpx/type_support/void_guard.hpp>
 
 #include <cstddef>
 #include <exception>

@@ -17,7 +17,7 @@
 #include <hpx/coroutines/detail/coroutine_self.hpp>
 #include <hpx/coroutines/detail/tss.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <map>

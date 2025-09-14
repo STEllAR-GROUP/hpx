@@ -91,7 +91,7 @@ namespace hpx::util::debug {
         return std::string(type_id<T>());
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <>
+    template <>
     inline std::string print_type<>(char const*)
     {
         return "void";

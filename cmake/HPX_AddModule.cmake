@@ -1,4 +1,5 @@
 # Copyright (c) 2019-2023 ETH Zurich
+# Copyright (c) 2019-2025 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,6 +7,8 @@
 
 include(HPX_CollectStdHeaders)
 include(HPX_ExportTargets)
+include(HPX_Message)
+include(HPX_Option)
 include(HPX_PrintSummary)
 
 function(add_hpx_module libname modulename)
@@ -35,9 +38,6 @@ function(add_hpx_module libname modulename)
         "Arguments were not used by the module: ${${modulename}_UNPARSED_ARGUMENTS}"
     )
   endif()
-
-  include(HPX_Message)
-  include(HPX_Option)
 
   # Global headers should be always generated except if explicitly disabled
   if("${${modulename}_GLOBAL_HEADER_GEN}" STREQUAL "")
@@ -161,6 +161,7 @@ function(add_hpx_module libname modulename)
       )
       hpx_error(${error_message})
     endif()
+
     # Add a global include file that include all module headers
     set(global_header
         "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/modules/${modulename}.hpp"
@@ -183,18 +184,18 @@ function(add_hpx_module libname modulename)
     if(NOT ${modulename}_NO_CONFIG_IN_GENERATED_HEADERS)
       set(module_headers "${module_headers}#endif\n")
     endif()
-    set(module_macro_headers)
-    foreach(header_file ${${modulename}_MACRO_HEADERS})
-      set(module_macro_headers
-          "${module_macro_headers}#include <${header_file}>\n"
-      )
-    endforeach()
 
     # Decide output path and template file
+    set(module_macro_headers)
     set(global_header
         "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/modules/${modulename}.hpp"
     )
     if(${modulename}_GLOBAL_HEADER_MODULE_GEN)
+      foreach(header_file ${${modulename}_MACRO_HEADERS})
+        set(module_macro_headers
+            "${module_macro_headers}#include <${header_file}>\n"
+        )
+      endforeach()
       set(template_file
           "${HPX_SOURCE_DIR}/cmake/templates/global_module_header_modules.hpp.in"
       )
@@ -212,9 +213,9 @@ function(add_hpx_module libname modulename)
       set(found_includes)
       hpx_collect_std_headers(
         ${modulename}
-        SOURCES ${${modulename}_HEADERS}
-        SOURCE_ROOT ${HPX_SOURCE_DIR}/libs/${libname}
-        GENERATED_ROOT ${CMAKE_BINARY_DIR}/libs/${libname}
+        SOURCES ${global_header}
+        SOURCE_ROOT ${HPX_SOURCE_DIR}/libs/${libname}/${modulename}
+        GENERATED_ROOT ${CMAKE_BINARY_DIR}/libs/${libname}/${modulename}
         FOUND_HEADERS found_includes
       )
 
@@ -228,6 +229,22 @@ function(add_hpx_module libname modulename)
           CACHE STRING "List of standard headers #included by HPX modules"
                 FORCE
       )
+
+      if(HPX_WITH_BUILD_USING_CXX_MODULES)
+        # generate module specific MIU: variables: cxx_module_part,
+        # cxx_module_headers
+        set(cxx_sub_module ".${modulename}")
+        set(cxx_module_headers
+            "${cxx_module_headers}#include <hpx/modules/${modulename}.hpp>\n"
+        )
+
+        set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib}/${modulename})
+        set(lib_module_file "${lib_module_basedir}/hpx_${modulename}.ixx")
+        configure_file(
+          "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in" ${lib_module_file}
+          @ONLY
+        )
+      endif()
     endif()
   endif()
 
@@ -303,6 +320,16 @@ function(add_hpx_module libname modulename)
     )
     set(generated_headers ${generated_headers} ${cache_line_size_file})
 
+    # Generate an empty placeholder file for hpx/config/std_headers.hpp This
+    # will be overwritten in libs/CMakeLists.txt with some real content.
+    if(HPX_WITH_CXX_MODULES)
+      set(std_header_file
+          "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/config/std_headers.hpp"
+      )
+      file(WRITE ${std_header_file} "")
+      set(generated_headers ${generated_headers} ${std_header_file})
+    endif()
+
   endif()
 
   # collect zombie generated headers
@@ -354,6 +381,35 @@ function(add_hpx_module libname modulename)
     ${generated_headers}
     ${compat_headers}
   )
+
+  set(module_installation)
+  if(${modulename}_GLOBAL_HEADER_MODULE_GEN
+     AND HPX_WITH_BUILD_USING_CXX_MODULES
+  )
+    add_hpx_source_group(
+      NAME hpx_${modulename}
+      ROOT ${lib_module_basedir}
+      CLASS "Generated Files"
+      TARGETS ${lib_module_file}
+    )
+
+    # cmake-format: off
+    target_sources(
+      hpx_${modulename} PUBLIC
+          FILE_SET hpx_${modulename}_public_sources
+              TYPE CXX_MODULES
+              BASE_DIRS ${lib_module_basedir}
+              FILES ${lib_module_file}
+    )
+    set(module_installation
+        FILE_SET hpx_${modulename}_public_sources
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx/miu
+        CXX_MODULES_BMI
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx/bmi
+            COMPONENT ${modulename}
+    )
+    # cmake-format: on
+  endif()
 
   if(HPX_WITH_CHECK_MODULE_DEPENDENCIES)
     # verify that all dependencies are from the same module category
@@ -487,7 +543,9 @@ function(add_hpx_module libname modulename)
     EXPORT HPXInternalTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${modulename}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${modulename}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${modulename}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT ${modulename}
+            ${module_installation}
   )
   hpx_export_internal_targets(hpx_${modulename})
 

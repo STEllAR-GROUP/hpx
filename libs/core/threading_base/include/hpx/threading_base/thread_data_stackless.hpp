@@ -14,9 +14,9 @@
 #include <hpx/coroutines/stackless_coroutine.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
-#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <memory>

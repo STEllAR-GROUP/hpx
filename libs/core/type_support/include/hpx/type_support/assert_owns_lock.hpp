@@ -1,5 +1,5 @@
 //  Copyright (c) 2013 Agustin Berge
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,26 +11,26 @@
 #include <hpx/assert.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 
-#include <type_traits>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util::detail {
 
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF(owns_lock)
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CORE_MODULE_EXPORT_EXTERN, owns_lock)
 
-    template <typename Lock>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Lock>
     constexpr void assert_owns_lock(Lock const&, int) noexcept
+        requires(!has_owns_lock_v<Lock>)
     {
     }
 
-    template <typename Lock>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Lock>
     constexpr void assert_doesnt_own_lock(Lock const&, int) noexcept
+        requires(!has_owns_lock_v<Lock>)
     {
     }
 
-    template <typename Lock>
-    std::enable_if_t<has_owns_lock_v<Lock>> assert_owns_lock(
-        [[maybe_unused]] Lock& l, long) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Lock>
+    void assert_owns_lock([[maybe_unused]] Lock& l, long) noexcept
+        requires(has_owns_lock_v<Lock>)
     {
 #if defined(HPX_MSVC)
 #pragma warning(push)
@@ -44,9 +44,9 @@ namespace hpx::util::detail {
 #endif
     }
 
-    template <typename Lock>
-    std::enable_if_t<has_owns_lock_v<Lock>> assert_doesnt_own_lock(
-        [[maybe_unused]] Lock& l, long) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Lock>
+    void assert_doesnt_own_lock([[maybe_unused]] Lock& l, long) noexcept
+        requires(has_owns_lock_v<Lock>)
     {
 #if defined(HPX_MSVC)
 #pragma warning(push)
@@ -60,8 +60,3 @@ namespace hpx::util::detail {
 #endif
     }
 }    // namespace hpx::util::detail
-
-#define HPX_ASSERT_OWNS_LOCK(l) ::hpx::util::detail::assert_owns_lock(l, 0L)
-
-#define HPX_ASSERT_DOESNT_OWN_LOCK(l)                                          \
-    ::hpx::util::detail::assert_doesnt_own_lock(l, 0L)

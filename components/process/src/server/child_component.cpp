@@ -15,16 +15,14 @@
 #include <functional>
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION(
-    hpx::components::process::server::child::terminate_action,
+HPX_REGISTER_ACTION(hpx::components::process::server::child::terminate_action,
     hpx_components_process_server_child_terminate_action)
 
 HPX_REGISTER_ACTION(
     hpx::components::process::server::child::wait_for_exit_action,
     hpx_components_process_server_child_wait_for_exit)
 
-namespace hpx { namespace components { namespace process { namespace server
-{
+namespace hpx { namespace components { namespace process { namespace server {
     void child::terminate()
     {
         process::util::terminate(child_);
@@ -36,5 +34,4 @@ namespace hpx { namespace components { namespace process { namespace server
             &process::util::wait_for_exit<process::util::child>;
         return hpx::run_as_os_thread(f, std::ref(child_)).get();
     }
-}}}}
-
+}}}}    // namespace hpx::components::process::server

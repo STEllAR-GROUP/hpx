@@ -4,7 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/assert.hpp>
+#include <hpx/config.hpp>
+#include <hpx/assertion/api.hpp>
+#include <hpx/assertion/evaluate_assert.hpp>
+#include <hpx/assertion/source_location.hpp>
 
 #include <iostream>
 #include <string>
@@ -30,8 +33,8 @@ namespace hpx::assertion {
 
     namespace detail {
 
-        void handle_assert(hpx::source_location const& loc, char const* expr,
-            std::string const& msg) noexcept
+        HPX_CORE_EXPORT void handle_assert(hpx::source_location const& loc,
+            char const* expr, std::string const& msg) noexcept
         {
             if (get_handler() == nullptr)
             {

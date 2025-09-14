@@ -23,7 +23,7 @@ namespace hpx {
     ///
     /// This enumeration lists all possible error conditions which can be
     /// reported from any of the API functions.
-    HPX_CORE_MODULE_EXPORT_EXTERN enum class error : std::int16_t {
+    HPX_CXX_EXPORT enum class error : std::int16_t {
         success = 0,
         ///< The operation was successful
         no_success = 1,
@@ -345,13 +345,13 @@ namespace hpx {
 namespace std {
 
     // make sure our errors get recognized by the Boost.System library
-    HPX_CORE_MODULE_EXPORT_EXTERN template <>
+    template <>
     struct is_error_code_enum<hpx::error>
     {
         static constexpr bool value = true;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <>
+    template <>
     struct is_error_condition_enum<hpx::error>
     {
         static constexpr bool value = true;

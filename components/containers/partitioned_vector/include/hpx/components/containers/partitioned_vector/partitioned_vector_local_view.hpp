@@ -16,8 +16,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// \cond NOINTERNAL
 
-namespace hpx
-{
+namespace hpx {
     template <typename T, std::size_t N, typename Data>
     struct partitioned_vector_local_view
       : public hpx::partitioned_vector_view<T, N, Data>
@@ -29,8 +28,9 @@ namespace hpx
 
     public:
         using value_type = T;
-        using iterator = typename hpx::partitioned_vector_local_view_iterator<
-            Data, base_iterator>;
+        using iterator =
+            typename hpx::partitioned_vector_local_view_iterator<Data,
+                base_iterator>;
         using const_iterator =
             typename hpx::const_partitioned_vector_local_view_iterator<Data,
                 const_base_iterator>;
@@ -84,5 +84,4 @@ namespace hpx
     {
         return partitioned_vector_local_view<T, N, Data>(base);
     }
-}
-
+}    // namespace hpx

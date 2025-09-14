@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/detail/invocation_count_registry.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/static.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <regex>
 #include <string>

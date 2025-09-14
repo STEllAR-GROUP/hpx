@@ -49,7 +49,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        class exception_info_node_base
+        HPX_CORE_MODULE_EXPORT_EXTERN class exception_info_node_base
         {
         public:
             virtual ~exception_info_node_base() = default;
@@ -69,7 +69,7 @@ namespace hpx {
             std::shared_ptr<exception_info_node_base> next;
         };
 
-        template <typename... Ts>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename... Ts>
         class exception_info_node
           : public exception_info_node_base
           , Ts...

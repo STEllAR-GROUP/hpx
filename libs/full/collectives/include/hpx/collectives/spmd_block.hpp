@@ -21,9 +21,9 @@
 #include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <array>
 #include <atomic>

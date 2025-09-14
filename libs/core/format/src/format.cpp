@@ -6,7 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/modules/format.hpp>
+#include <hpx/format/api.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -123,7 +123,7 @@ namespace hpx::util::detail {
         }
     }
 
-    std::string format(
+    HPX_CORE_EXPORT std::string format(
         std::string_view format_str, format_arg const* args, std::size_t count)
     {
         std::ostringstream os;

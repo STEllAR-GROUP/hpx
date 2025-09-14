@@ -25,10 +25,8 @@
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/stop_token.hpp>
-#include <hpx/type_support/detail/with_result_of.hpp>
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <atomic>
 #include <cstddef>

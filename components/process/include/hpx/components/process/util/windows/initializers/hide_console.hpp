@@ -19,21 +19,19 @@
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
-namespace initializers {
+    namespace initializers {
 
-class hide_console : public initializer_base
-{
-public:
-    template <class WindowsExecutor>
-    void on_CreateProcess_setup(WindowsExecutor &e) const
-    {
-        e.startup_info.dwFlags |= STARTF_USESHOWWINDOW;
-        e.startup_info.wShowWindow |= SW_HIDE;
-    }
-};
+        class hide_console : public initializer_base
+        {
+        public:
+            template <class WindowsExecutor>
+            void on_CreateProcess_setup(WindowsExecutor& e) const
+            {
+                e.startup_info.dwFlags |= STARTF_USESHOWWINDOW;
+                e.startup_info.wShowWindow |= SW_HIDE;
+            }
+        };
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::windows::initializers
 
 #endif

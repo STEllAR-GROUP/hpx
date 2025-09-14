@@ -8,7 +8,7 @@
 //      http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx
 
 #include <hpx/config.hpp>
-#include <hpx/modules/thread_support.hpp>
+#include <hpx/thread_support/set_thread_name.hpp>
 
 #include <cstddef>
 #include <string>

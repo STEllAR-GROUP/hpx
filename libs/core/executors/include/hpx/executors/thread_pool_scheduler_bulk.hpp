@@ -39,7 +39,6 @@
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/topology/cpu_mask.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <algorithm>
 #include <atomic>

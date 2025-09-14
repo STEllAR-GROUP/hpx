@@ -7,7 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/errors/detail/define_error_info.hpp>
+#include <hpx/errors/define_error_info.hpp>
 #include <hpx/errors/error.hpp>
 #include <hpx/errors/error_code.hpp>
 #include <hpx/errors/exception.hpp>
@@ -28,6 +28,7 @@
 #include <stdexcept>
 #include <string>
 #include <system_error>
+#include <typeinfo>
 #include <utility>
 
 namespace hpx {

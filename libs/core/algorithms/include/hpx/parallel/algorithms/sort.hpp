@@ -159,6 +159,7 @@ namespace hpx {
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
@@ -167,8 +168,6 @@ namespace hpx {
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/void_guard.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -286,6 +285,10 @@ namespace hpx::parallel {
         {
             // number of elements to sort
             std::size_t count = last - first;
+            if (count == 0)
+            {
+                return hpx::make_ready_future(last);
+            }
 
             // figure out the chunk size to use
             std::size_t const cores =
@@ -308,10 +311,7 @@ namespace hpx::parallel {
             // we should not get smaller than our sort_limit_per_task
             chunk_size = (std::max) (chunk_size, sort_limit_per_task);
 
-            std::ptrdiff_t const N = last - first;
-            HPX_ASSERT(N >= 0);
-
-            if (static_cast<std::size_t>(N) < chunk_size)
+            if (count < chunk_size)
             {
                 std::sort(first, last, comp);
                 return hpx::make_ready_future(last);

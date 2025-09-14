@@ -12,9 +12,7 @@ set(assertion_headers
     hpx/assertion/evaluate_assert.hpp hpx/assertion/macros.hpp
     hpx/assertion/source_location.hpp
 )
-set(assertion_exclude_global_header
-    hpx/assert.hpp hpx/assertion/current_function.hpp hpx/assertion/macros.hpp
-)
+set(assertion_exclude_global_header hpx/assert.hpp)
 set(assertion_macro_headers hpx/assertion/current_function.hpp
                             hpx/assertion/macros.hpp
 )

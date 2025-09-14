@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/preprocessor/cat.hpp>
-#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <limits>

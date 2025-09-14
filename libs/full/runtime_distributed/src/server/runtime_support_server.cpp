@@ -31,6 +31,7 @@
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/plugin_factories/binary_filter_factory_base.hpp>
 #include <hpx/plugin_factories/message_handler_factory_base.hpp>
@@ -51,7 +52,6 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/string_util/case_conv.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #ifdef HPX_HAVE_LIB_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
