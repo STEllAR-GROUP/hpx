@@ -568,8 +568,8 @@ void test_bulk_starts_on()
         tt::sync_wait(std::move(bulk_sender));
 #else
         // For non-stdexec builds, use schedule + bulk pattern
-        auto bulk_sender = ex::schedule(ex::thread_pool_scheduler{}) |
-            ex::bulk(n, [&](int i) {
+        auto bulk_sender =
+            ex::schedule(ex::thread_pool_scheduler{}) | ex::bulk(n, [&](int i) {
                 ++v[i];
                 HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             });
