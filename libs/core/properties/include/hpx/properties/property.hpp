@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2023-2024 Hartmut Kaiser
+//  Copyright (c) 2023-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +15,7 @@
 
 namespace hpx::experimental {
 
-    inline constexpr struct prefer_t
+    HPX_CORE_MODULE_EXPORT_EXTERN inline constexpr struct prefer_t
       : hpx::functional::detail::tag_fallback<prefer_t>
     {
         // clang-format off
