@@ -268,11 +268,10 @@ namespace hpx::functional::detail {
         struct tag_fallback
         {
             // is tag-invocable
-            template <typename... Args,
-                typename =
-                    std::enable_if_t<is_tag_invocable_v<Tag, Args&&...> &&
-                        meta::value<meta::invoke<Enable, enable_tag_invoke_t,
-                            Args&&...>>>>
+            template <typename... Args>
+                requires(is_tag_invocable_v<Tag, Args && ...> &&
+                    meta::value<
+                        meta::invoke<Enable, enable_tag_invoke_t, Args && ...>>)
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
                 noexcept(is_nothrow_tag_invocable_v<Tag, Args&&...>)
@@ -283,11 +282,10 @@ namespace hpx::functional::detail {
             }
 
             // is not tag-invocable
-            template <typename... Args,
-                typename =
-                    std::enable_if_t<!is_tag_invocable_v<Tag, Args&&...> &&
-                        meta::value<meta::invoke<Enable,
-                            enable_tag_fallback_invoke_t, Args&&...>>>>
+            template <typename... Args>
+                requires(!is_tag_invocable_v<Tag, Args && ...> &&
+                    meta::value<meta::invoke<Enable,
+                        enable_tag_fallback_invoke_t, Args && ...>>)
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
                 noexcept(is_nothrow_tag_fallback_invocable_v<Tag, Args&&...>)
@@ -307,11 +305,10 @@ namespace hpx::functional::detail {
         struct tag_fallback_noexcept
         {
             // is nothrow tag-invocable
-            template <typename... Args,
-                typename = std::enable_if_t<
-                    is_nothrow_tag_invocable_v<Tag, Args&&...> &&
+            template <typename... Args>
+                requires(is_nothrow_tag_invocable_v<Tag, Args && ...> &&
                     meta::value<
-                        meta::invoke<Enable, enable_tag_invoke_t, Args&&...>>>>
+                        meta::invoke<Enable, enable_tag_invoke_t, Args && ...>>)
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
                 -> tag_invoke_result_t<Tag, Args&&...>
@@ -321,11 +318,10 @@ namespace hpx::functional::detail {
             }
 
             // is not nothrow tag-invocable
-            template <typename... Args,
-                typename = std::enable_if_t<
-                    !is_nothrow_tag_invocable_v<Tag, Args&&...> &&
+            template <typename... Args>
+                requires(!is_nothrow_tag_invocable_v<Tag, Args && ...> &&
                     meta::value<meta::invoke<Enable,
-                        enable_tag_fallback_invoke_t, Args&&...>>>>
+                        enable_tag_fallback_invoke_t, Args && ...>>)
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
             {

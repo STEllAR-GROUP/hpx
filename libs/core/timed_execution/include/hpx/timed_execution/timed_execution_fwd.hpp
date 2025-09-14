@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
@@ -72,11 +71,11 @@ namespace hpx::parallel::execution {
       : hpx::functional::detail::tag_fallback<post_at_t>
     {
     private:
+        template <typename Executor, typename F, typename... Ts>
         // clang-format off
-        template <typename Executor, typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_executor_any_v<Executor>
-            )>
+            )
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(post_at_t,
             Executor&& exec, hpx::chrono::steady_time_point const& abs_time,
@@ -112,11 +111,11 @@ namespace hpx::parallel::execution {
       : hpx::functional::detail::tag_fallback<post_after_t>
     {
     private:
+        template <typename Executor, typename F, typename... Ts>
         // clang-format off
-        template <typename Executor, typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_executor_any_v<Executor>
-            )>
+            )
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(post_after_t,
             Executor&& exec, hpx::chrono::steady_duration const& rel_time,
@@ -158,11 +157,11 @@ namespace hpx::parallel::execution {
       : hpx::functional::detail::tag_fallback<async_execute_at_t>
     {
     private:
+        template <typename Executor, typename F, typename... Ts>
         // clang-format off
-        template <typename Executor, typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_executor_any_v<Executor>
-            )>
+            )
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             async_execute_at_t, Executor&& exec,
@@ -199,11 +198,11 @@ namespace hpx::parallel::execution {
       : hpx::functional::detail::tag_fallback<async_execute_after_t>
     {
     private:
+        template <typename Executor, typename F, typename... Ts>
         // clang-format off
-        template <typename Executor, typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_executor_any_v<Executor>
-            )>
+            )
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             async_execute_after_t, Executor&& exec,
@@ -240,11 +239,11 @@ namespace hpx::parallel::execution {
       : hpx::functional::detail::tag_fallback<sync_execute_at_t>
     {
     private:
+        template <typename Executor, typename F, typename... Ts>
         // clang-format off
-        template <typename Executor, typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_executor_any_v<Executor>
-            )>
+            )
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             sync_execute_at_t, Executor&& exec,
@@ -281,11 +280,11 @@ namespace hpx::parallel::execution {
       : hpx::functional::detail::tag_fallback<sync_execute_after_t>
     {
     private:
+        template <typename Executor, typename F, typename... Ts>
         // clang-format off
-        template <typename Executor, typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_executor_any_v<Executor>
-            )>
+            )
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             sync_execute_after_t, Executor&& exec,

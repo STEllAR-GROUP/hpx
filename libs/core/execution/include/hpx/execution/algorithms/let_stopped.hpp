@@ -13,7 +13,6 @@
 #else
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -115,13 +114,14 @@ namespace hpx::execution::experimental {
                 let_stopped_sender const&,
                 Env) noexcept -> generate_completion_signatures<Env>;
 
-            template <typename CPO, typename Scheduler_ = Scheduler,
-                HPX_CONCEPT_REQUIRES_(
+            template <typename CPO, typename Scheduler_ = Scheduler>
+            // clang-format off
+                requires (
                    !hpx::execution::experimental::is_scheduler_v<Scheduler_> &&
                     hpx::execution::experimental::detail::is_receiver_cpo_v<CPO> &&
                     hpx::execution::experimental::detail::has_completion_scheduler_v<
                         CPO, predecessor_sender_t>
-                )>
+                )
             // clang-format on
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>
@@ -131,12 +131,12 @@ namespace hpx::execution::experimental {
                 return tag(sender.predecessor_sender);
             }
 
+            template <typename CPO, typename Scheduler_ = Scheduler>
             // clang-format off
-            template <typename CPO, typename Scheduler_ = Scheduler,
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     hpx::execution::experimental::is_scheduler_v<Scheduler_> &&
                     hpx::execution::experimental::detail::is_receiver_cpo_v<CPO>
-                )>
+                )
             // clang-format on
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
@@ -294,15 +294,15 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_priority<let_stopped_t>
     {
     private:
+        template <typename PredecessorSender, typename F>
         // clang-format off
-        template <typename PredecessorSender, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 is_sender_v<PredecessorSender> &&
                 experimental::detail::is_completion_scheduler_tag_invocable_v<
                     hpx::execution::experimental::set_value_t,
                     PredecessorSender, let_stopped_t, F
                 >
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
             let_stopped_t, PredecessorSender&& predecessor_sender, F&& f)
@@ -318,11 +318,11 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f));
         }
 
+        template <typename PredecessorSender, typename F>
         // clang-format off
-        template <typename PredecessorSender, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_sender_v<PredecessorSender>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_invoke(let_stopped_t,
             hpx::execution::experimental::run_loop_scheduler const& sched,
@@ -334,11 +334,11 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f), sched};
         }
 
+        template <typename PredecessorSender, typename F>
         // clang-format off
-        template <typename PredecessorSender, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 is_sender_v<PredecessorSender>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             let_stopped_t, PredecessorSender&& predecessor_sender, F&& f)
@@ -348,11 +348,11 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f), detail::no_scheduler{}};
         }
 
+        template <typename F, typename Scheduler>
         // clang-format off
-        template <typename F, typename Scheduler,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::execution::experimental::is_scheduler_v<Scheduler>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             let_stopped_t, Scheduler&& scheduler, F&& f)

@@ -13,7 +13,6 @@
 #else
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/queries/get_scheduler.hpp>
 #include <hpx/execution/queries/get_stop_token.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
@@ -222,12 +221,12 @@ namespace hpx::execution::experimental {
                         &s.loop.head, s.loop, HPX_FORWARD(Receiver, receiver));
                 }
 
+                template <typename CPO>
                 // clang-format off
-                template <typename CPO,
-                    HPX_CONCEPT_REQUIRES_(
+                    requires (
                         meta::value<meta::one_of<
                             std::decay_t<CPO>, set_value_t, set_stopped_t>>
-                    )>
+                    )
                 // clang-format on
                 friend run_loop_scheduler tag_invoke(
                     hpx::execution::experimental::get_completion_scheduler_t<

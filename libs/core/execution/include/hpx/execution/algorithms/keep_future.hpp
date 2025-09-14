@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
@@ -23,6 +22,7 @@
 #include <utility>
 
 namespace hpx::execution::experimental {
+    namespace hpxexp = hpx::execution::experimental;
 
     namespace detail {
 
@@ -51,13 +51,12 @@ namespace hpx::execution::experimental {
                         // to move receiver and future into the on_completed
                         // callback.
                         state->set_on_completed([&os]() mutable {
-                            hpx::execution::experimental::set_value(
+                            hpxexp::set_value(
                                 HPX_MOVE(os.receiver), HPX_MOVE(os.future));
                         });
                     },
                     [&](std::exception_ptr ep) {
-                        hpx::execution::experimental::set_error(
-                            HPX_MOVE(os.receiver), HPX_MOVE(ep));
+                        hpxexp::set_error(HPX_MOVE(os.receiver), HPX_MOVE(ep));
                     });
             }
         };
@@ -68,11 +67,9 @@ namespace hpx::execution::experimental {
             std::decay_t<Future> future;
 #if defined(HPX_HAVE_STDEXEC)
             using completion_signatures =
-                hpx::execution::experimental::completion_signatures<
-                    hpx::execution::experimental::set_value_t(
-                        std::decay_t<Future>),
-                    hpx::execution::experimental::set_error_t(
-                        std::exception_ptr)>;
+                hpxexp::completion_signatures<hpxexp::set_value_t(
+                                                  std::decay_t<Future>),
+                    hpxexp::set_error_t(std::exception_ptr)>;
 #else
             struct completion_signatures
             {
@@ -161,11 +158,11 @@ namespace hpx::execution::experimental {
 
     inline constexpr struct keep_future_t final
     {
+        template <typename Future>
         // clang-format off
-        template <typename Future,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_future_v<std::decay_t<Future>>
-            )>
+            )
         // clang-format on
         constexpr HPX_FORCEINLINE auto operator()(Future&& future) const
         {

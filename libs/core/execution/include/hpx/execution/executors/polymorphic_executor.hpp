@@ -844,11 +844,11 @@ namespace hpx::parallel::execution {
         }
 
         // BulkOneWayExecutor interface
+        template <typename F, typename Shape>
         // clang-format off
-        template <typename F, typename Shape,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !std::is_integral_v<Shape>
-            )>
+            )
         // clang-format on
         HPX_FORCEINLINE friend std::vector<R> tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
@@ -866,11 +866,11 @@ namespace hpx::parallel::execution {
         }
 
         // BulkTwoWayExecutor interface
+        template <typename F, typename Shape>
         // clang-format off
-        template <typename F, typename Shape,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !std::is_integral_v<Shape>
-            )>
+            )
         // clang-format on
         HPX_FORCEINLINE friend std::vector<hpx::future<R>> tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
@@ -887,11 +887,11 @@ namespace hpx::parallel::execution {
                 HPX_FORWARD(Ts, ts)...);
         }
 
+        template <typename F, typename Shape>
         // clang-format off
-        template <typename F, typename Shape,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !std::is_integral_v<Shape>
-            )>
+            )
         // clang-format on
         HPX_FORCEINLINE friend hpx::future<std::vector<R>> tag_invoke(
             hpx::parallel::execution::bulk_then_execute_t,

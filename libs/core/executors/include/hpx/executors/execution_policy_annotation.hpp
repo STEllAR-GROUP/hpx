@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/rebind_executor.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
@@ -26,15 +25,15 @@ namespace hpx::execution::experimental {
 
     // with_annotation property implementation for execution policies
     // that simply forwards to the embedded executor
+    template <typename ExPolicy>
     // clang-format off
-    template <typename ExPolicy,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::is_invocable_v<
                 hpx::execution::experimental::with_annotation_t,
                 typename std::decay_t<ExPolicy>::executor_type,
                 const char*>
-        )>
+        )
     // clang-format on
     constexpr decltype(auto) tag_invoke(
         hpx::execution::experimental::with_annotation_t, ExPolicy&& policy,
@@ -47,15 +46,15 @@ namespace hpx::execution::experimental {
             policy, HPX_MOVE(exec), policy.parameters());
     }
 
+    template <typename ExPolicy>
     // clang-format off
-    template <typename ExPolicy,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::is_invocable_v<
                 hpx::execution::experimental::with_annotation_t,
                 typename std::decay_t<ExPolicy>::executor_type,
                 std::string>
-        )>
+        )
     // clang-format on
     decltype(auto) tag_invoke(hpx::execution::experimental::with_annotation_t,
         ExPolicy&& policy, std::string annotation)
@@ -69,14 +68,14 @@ namespace hpx::execution::experimental {
 
     // get_annotation property implementation for execution policies
     // that simply forwards to the embedded executor
+    template <typename ExPolicy>
     // clang-format off
-    template <typename ExPolicy,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::is_invocable_v<
                 hpx::execution::experimental::get_annotation_t,
                 typename std::decay_t<ExPolicy>::executor_type>
-        )>
+        )
     // clang-format on
     constexpr decltype(auto) tag_invoke(
         hpx::execution::experimental::get_annotation_t, ExPolicy&& policy)

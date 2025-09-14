@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution_base/get_env.hpp>
@@ -35,6 +34,8 @@
 #endif
 
 namespace hpx::execution::experimental {
+
+    namespace hpxexp = hpx::execution::experimental;
 
     // empty_variant will be returned by execution::value_types_of_t and
     // execution::error_types_of_t if no signatures are provided.
@@ -475,9 +476,7 @@ namespace hpx::execution::experimental {
     // operations.
 #if defined(HPX_HAVE_STDEXEC)
     template <typename Sender, typename... Env>
-    struct is_sender_in
-      : std::bool_constant<
-            hpx::execution::experimental::sender_in<Sender, Env...>>
+    struct is_sender_in : std::bool_constant<hpxexp::sender_in<Sender, Env...>>
     {
     };
 
@@ -485,8 +484,7 @@ namespace hpx::execution::experimental {
     inline constexpr bool is_sender_in_v = is_sender_in<Sender, Env...>::value;
 
     template <typename Sender>
-    struct is_sender
-      : std::bool_constant<hpx::execution::experimental::sender<Sender>>
+    struct is_sender : std::bool_constant<hpxexp::sender<Sender>>
     {
     };
 
@@ -496,8 +494,7 @@ namespace hpx::execution::experimental {
     // \see is_sender
     template <typename Sender, typename Receiver>
     struct is_sender_to
-      : std::bool_constant<
-            hpx::execution::experimental::sender_to<Sender, Receiver>>
+      : std::bool_constant<hpxexp::sender_to<Sender, Receiver>>
     {
     };
 
@@ -508,15 +505,14 @@ namespace hpx::execution::experimental {
     // The sender_of concept defines the requirements for a sender type that on
     // successful completion sends the specified set of value types.
     template <typename Sender, typename Signal,
-        typename Env = hpx::execution::experimental::empty_env>
+        typename Env = hpxexp::empty_env>
     struct is_sender_of
-      : std::bool_constant<
-            hpx::execution::experimental::sender_of<Sender, Signal, Env>>
+      : std::bool_constant<hpxexp::sender_of<Sender, Signal, Env>>
     {
     };
 
     template <typename Sender, typename Signal,
-        typename Env = hpx::execution::experimental::empty_env>
+        typename Env = hpxexp::empty_env>
     inline constexpr bool is_sender_of_v =
         is_sender_of<Sender, Signal, Env>::value;
 
@@ -532,11 +528,9 @@ namespace hpx::execution::experimental {
     // single-sender-value-type<S, E> is an alias for type void.
     // 3. Otherwise, single-sender-value-type<S, E> is ill-formed.
     //
-    template <typename Sender,
-        typename Env = hpx::execution::experimental::empty_env>
+    template <typename Sender, typename Env = hpxexp::empty_env>
     using single_sender_value_t =
-        hpx::execution::experimental::stdexec_internal::__single_sender_value_t<
-            Sender, Env>;
+        hpxexp::stdexec_internal::__single_sender_value_t<Sender, Env>;
 
     template <typename A, typename B>
     inline constexpr bool is_derived_from_v = std::derived_from<A, B>;
@@ -547,23 +541,22 @@ namespace hpx::execution::experimental {
     //    hpx::execution::experimental::with_awaitable_senders<Promise>;
 
     template <typename ReceiverID>
-    using operation = hpx::execution::experimental::stdexec_internal::
-        __connect_awaitable_::__operation<ReceiverID>;
+    using operation =
+        hpxexp::stdexec_internal::__connect_awaitable_::__operation<ReceiverID>;
 
     template <typename ReceiverID>
-    using promise = hpx::execution::experimental::stdexec_internal::
-        __connect_awaitable_::__promise<ReceiverID>;
+    using promise =
+        hpxexp::stdexec_internal::__connect_awaitable_::__promise<ReceiverID>;
 
     template <typename Rec>
-    using promise_t = hpx::execution::experimental::stdexec_internal::
-        __connect_awaitable_::__promise_t<Rec>;
+    using promise_t =
+        hpxexp::stdexec_internal::__connect_awaitable_::__promise_t<Rec>;
 
     template <typename Rec>
-    using operation_t = hpx::execution::experimental::stdexec_internal::
-        __connect_awaitable_::__operation_t<Rec>;
+    using operation_t =
+        hpxexp::stdexec_internal::__connect_awaitable_::__operation_t<Rec>;
 
-    using connect_awaitable_t =
-        hpx::execution::experimental::stdexec_internal::__connect_awaitable_t;
+    using connect_awaitable_t = hpxexp::stdexec_internal::__connect_awaitable_t;
     inline constexpr connect_awaitable_t connect_awaitable{};
 #else
     template <typename Sender, typename Env = no_env>
@@ -1014,9 +1007,11 @@ namespace hpx::execution::experimental {
         template <typename Value>
         struct receiver_base
         {
-            template <typename... Us,
-                HPX_CONCEPT_REQUIRES_(
-                    std::is_constructible_v<value_or_void_t<Value>, Us...>)>
+            template <typename... Us>
+            // clang-format off
+                requires (
+                    std::is_constructible_v<value_or_void_t<Value>, Us...>)
+            // clang-format on
             friend void tag_invoke(
                 set_value_t, receiver_base&& self, Us&&... us) noexcept
             try
@@ -1605,7 +1600,7 @@ namespace hpx::execution::experimental {
     template <typename Sender, typename Receiver>
     struct has_nothrow_connect
       : std::integral_constant<bool,
-            noexcept(hpx::execution::experimental::connect(
+            noexcept(hpxexp::connect(
                 std::declval<Sender>(), std::declval<Receiver>()))>
     {
     };

@@ -13,7 +13,6 @@
 #endif
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/concurrency/detail/non_contiguous_index_queue.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
@@ -196,11 +195,11 @@ namespace hpx::execution::experimental::detail {
         // first tries to handle all chunks in the queue owned by worker_thread.
         // It then tries to steal chunks from neighboring threads.
         //
+        template <typename Ts>
         // clang-format off
-        template <typename Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !std::is_same_v<std::decay_t<Ts>, hpx::monostate>
-            )>
+            )
         // clang-format on
         void operator()(Ts& ts) const
         {
@@ -230,11 +229,11 @@ namespace hpx::execution::experimental::detail {
         // called once all worker threads have processed their chunks and the
         // connected receiver should be signaled.
         //
+        template <typename Ts>
         // clang-format off
-        template <typename Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !std::is_same_v<std::decay_t<Ts>, hpx::monostate>
-            )>
+            )
         // clang-format on
         void operator()(Ts&& ts) const
         {
@@ -582,12 +581,12 @@ namespace hpx::execution::experimental::detail {
             }
         }
 
+        template <typename... Ts>
         // clang-format off
-        template <typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_invocable_v<F, range_value_type,
                     std::add_lvalue_reference_t<Ts>...>
-            )>
+            )
         // clang-format on
         friend void tag_invoke(hpx::execution::experimental::set_value_t,
             bulk_receiver&& r, Ts&&... ts) noexcept
@@ -679,15 +678,15 @@ namespace hpx::execution::experimental::detail {
             std::decay_t<Sender> const& pred_snd;
             thread_pool_policy_scheduler<Policy> const& sch;
 
+            template <typename CPO>
             // clang-format off
-            template <typename CPO,
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     meta::value<meta::one_of<CPO,
                         hpx::execution::experimental::set_error_t,
                         hpx::execution::experimental::set_stopped_t>> &&
                     hpx::execution::experimental::detail::has_completion_scheduler_v<
                         CPO, std::decay_t<Sender>>
-                )>
+                )
             // clang-format on
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>
@@ -738,14 +737,15 @@ namespace hpx::execution::experimental::detail {
             thread_pool_bulk_sender const&,
             Env) -> generate_completion_signatures<Env>;
 
-        template <typename CPO,
-            HPX_CONCEPT_REQUIRES_(
+        template <typename CPO>
+        // clang-format off
+            requires (
                 meta::value<meta::one_of<CPO,
                     hpx::execution::experimental::set_error_t,
                     hpx::execution::experimental::set_stopped_t>> &&
                 hpx::execution::experimental::detail::has_completion_scheduler_v<
                     CPO, std::decay_t<Sender>>
-            )>
+            )
         // clang-format on
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::get_completion_scheduler_t<CPO> tag,
@@ -847,11 +847,11 @@ namespace hpx::execution::experimental::detail {
 
 namespace hpx::execution::experimental {
 
+    template <typename Policy, typename Sender, typename Shape, typename F>
     // clang-format off
-    template <typename Policy, typename Sender, typename Shape, typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             !std::is_integral_v<Shape>
-        )>
+        )
     // clang-format on
     constexpr auto tag_invoke(bulk_t,
         thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
@@ -871,11 +871,11 @@ namespace hpx::execution::experimental {
         }
     }
 
+    template <typename Policy, typename Sender, typename Count, typename F>
     // clang-format off
-    template <typename Policy, typename Sender, typename Count, typename F,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             std::is_integral_v<Count>
-        )>
+        )
     // clang-format on
     constexpr decltype(auto) tag_invoke(bulk_t,
         thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,

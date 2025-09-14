@@ -12,7 +12,6 @@
 #include <hpx/execution_base/stdexec_forward.hpp>
 #else
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
@@ -84,11 +83,11 @@ namespace hpx::execution::experimental {
                     });
             }
 
+            template <typename... Ts>
             // clang-format off
-            template <typename... Ts,
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     hpx::is_invocable_v<F, Ts...>
-                )>
+                )
             // clang-format on
             friend void tag_invoke(
                 set_value_t, then_receiver&& r, Ts&&... ts) noexcept
@@ -154,13 +153,13 @@ namespace hpx::execution::experimental {
             friend auto tag_invoke(get_completion_signatures_t,
                 then_sender const&, Env) -> generate_completion_signatures<Env>;
 
+            template <typename CPO>
             // clang-format off
-            template <typename CPO,
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     meta::value<meta::one_of<
                         std::decay_t<CPO>, set_value_t, set_stopped_t>> &&
                     detail::has_completion_scheduler_v<CPO, Sender>
-                )>
+                )
             // clang-format on
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>
@@ -205,15 +204,15 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_priority<then_t>
     {
     private:
+        template <typename Sender, typename F>
         // clang-format off
-        template <typename Sender, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 is_sender_v<Sender> &&
                 experimental::detail::is_completion_scheduler_tag_invocable_v<
                     hpx::execution::experimental::set_value_t,
                     Sender, then_t, F
                 >
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
             then_t, Sender&& sender, F&& f)
@@ -226,11 +225,11 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(Sender, sender), HPX_FORWARD(F, f));
         }
 
+        template <typename Sender, typename F>
         // clang-format off
-        template <typename Sender, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 is_sender_v<Sender>
-            )>
+            )
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             then_t, Sender&& sender, F&& f)
