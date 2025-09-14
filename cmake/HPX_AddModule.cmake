@@ -171,6 +171,9 @@ function(add_hpx_module libname modulename)
       set(module_headers
           "${module_headers}#if defined(HPX_HAVE_MODULE_${modulename_upper})\n"
       )
+      set(module_headers
+          "${module_headers}#include <hpx/${modulename}/config/defines.hpp>\n"
+      )
     endif()
     foreach(header_file ${${modulename}_HEADERS})
       # Exclude the files specified

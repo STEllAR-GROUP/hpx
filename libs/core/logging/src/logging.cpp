@@ -9,10 +9,9 @@
 
 #if defined(HPX_HAVE_LOGGING)
 #include <hpx/logging/config/defines.hpp>
-
+#include <hpx/logging/api.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/modules/logging.hpp>
 
 #include <string>
 #include <utility>

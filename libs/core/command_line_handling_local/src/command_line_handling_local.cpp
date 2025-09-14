@@ -5,8 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/logging/config/defines.hpp>
-
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling_local/command_line_handling_local.hpp>
 #include <hpx/command_line_handling_local/parse_command_line_local.hpp>
@@ -14,6 +12,7 @@
 #include <hpx/modules/asio.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/string_util.hpp>
