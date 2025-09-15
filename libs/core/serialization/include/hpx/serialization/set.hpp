@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Andreas Schaefer
+//  Copyright (c) 2023-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,6 +7,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstddef>
@@ -15,7 +17,8 @@
 
 namespace hpx::serialization {
 
-    template <typename T, typename Compare, typename Allocator>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Compare,
+        typename Allocator>
     void serialize(
         input_archive& ar, std::set<T, Compare, Allocator>& set, unsigned)
     {
@@ -31,7 +34,8 @@ namespace hpx::serialization {
         }
     }
 
-    template <typename T, typename Compare, typename Allocator>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Compare,
+        typename Allocator>
     void serialize(output_archive& ar,
         std::set<T, Compare, Allocator> const& set, unsigned)
     {

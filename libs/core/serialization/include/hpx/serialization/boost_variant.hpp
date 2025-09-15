@@ -2,6 +2,7 @@
 //  troy d. straszheim <troy@resophonic.com>
 //  http://www.resophonic.com
 //  Copyright (c) 2015 Anton Bikineev
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -26,7 +27,8 @@ namespace hpx::serialization {
     namespace detail {
 
         ////////////////////////////////////////////////////////////////////////
-        struct boost_variant_save_visitor : boost::static_visitor<>
+        HPX_CORE_MODULE_EXPORT_EXTERN struct boost_variant_save_visitor
+          : boost::static_visitor<>
         {
             explicit constexpr boost_variant_save_visitor(
                 output_archive& ar) noexcept
@@ -45,10 +47,10 @@ namespace hpx::serialization {
         };
 
         ////////////////////////////////////////////////////////////////////////
-        template <typename... Ts>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename... Ts>
         struct boost_variant_impl;
 
-        template <typename T, typename... Ts>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename... Ts>
         struct boost_variant_impl<T, Ts...>
         {
             template <typename V>
@@ -75,7 +77,7 @@ namespace hpx::serialization {
         };
     }    // namespace detail
 
-    template <typename... T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename... T>
     void save(output_archive& ar, boost::variant<T...> const& v, unsigned)
     {
         int const which = v.which();
@@ -84,7 +86,7 @@ namespace hpx::serialization {
         v.apply_visitor(visitor);
     }
 
-    template <typename... T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename... T>
     void load(input_archive& ar, boost::variant<T...>& v, unsigned)
     {
         int which;
@@ -101,7 +103,8 @@ namespace hpx::serialization {
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        (template <typename... T>), (boost::variant<T...>) )
+        (HPX_CORE_MODULE_EXPORT_EXTERN template <typename... T>),
+        (boost::variant<T...>) )
 }    // namespace hpx::serialization
 
 #endif    // HPX_SERIALIZATION_HAVE_BOOST_TYPES

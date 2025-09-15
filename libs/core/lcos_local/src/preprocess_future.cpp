@@ -6,8 +6,8 @@
 
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos_local/detail/preprocess_future.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/serialization/output_archive.hpp>
 
 #include <cstdint>
 

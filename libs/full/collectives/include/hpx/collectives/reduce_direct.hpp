@@ -85,9 +85,9 @@ namespace hpx { namespace lcos {
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/serialization/vector.hpp>
 #include <hpx/util/calculate_fanout.hpp>
 
 #include <cstddef>

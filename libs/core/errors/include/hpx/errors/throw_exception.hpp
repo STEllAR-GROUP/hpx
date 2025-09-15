@@ -32,7 +32,7 @@ namespace hpx::detail {
         std::string const& func, std::string const& file, long line);
 
     HPX_CORE_MODULE_EXPORT_EXTERN [[noreturn]] HPX_CORE_EXPORT void
-    throw_exception(error errcode, std::string const& msg,
+    throw_exception(hpx::error errcode, std::string const& msg,
         std::string const& func, std::string const& file, long line);
 
     HPX_CORE_MODULE_EXPORT_EXTERN [[noreturn]] HPX_CORE_EXPORT void
@@ -48,7 +48,7 @@ namespace hpx::detail {
         std::string const& auxinfo = "");
 
     HPX_CORE_MODULE_EXPORT_NODISCARD std::exception_ptr get_exception(
-        error errcode, std::string const& msg, throwmode mode,
+        hpx::error errcode, std::string const& msg, throwmode mode,
         std::string const& func = "<unknown>",
         std::string const& file = "<unknown>", long line = -1,
         std::string const& auxinfo = "");
@@ -59,8 +59,8 @@ namespace hpx::detail {
         std::string const& file = "<unknown>", long line = -1,
         std::string const& auxinfo = "");
 
-    HPX_CORE_MODULE_EXPORT void throws_if(hpx::error_code& ec, error errcode,
-        std::string const& msg, std::string const& func,
+    HPX_CORE_MODULE_EXPORT void throws_if(hpx::error_code& ec,
+        hpx::error errcode, std::string const& msg, std::string const& func,
         std::string const& file, long line);
 
     HPX_CORE_MODULE_EXPORT void throws_bad_alloc_if(

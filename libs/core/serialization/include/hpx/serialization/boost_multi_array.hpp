@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Anton Bikineev
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,7 +20,8 @@
 
 namespace hpx::serialization {
 
-    template <typename T, std::size_t N, typename Allocator>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, std::size_t N,
+        typename Allocator>
     void load(input_archive& ar, boost::multi_array<T, N, Allocator>& marray,
         unsigned)
     {
@@ -34,9 +36,10 @@ namespace hpx::serialization {
         // clang-format on
     }
 
-    template <typename T, std::size_t N, typename Allocator>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, std::size_t N,
+        typename Allocator>
     void save(output_archive& ar,
-        const boost::multi_array<T, N, Allocator>& marray, unsigned)
+        boost::multi_array<T, N, Allocator> const& marray, unsigned)
     {
         // clang-format off
         ar & make_array(marray.shape(), marray.num_dimensions());
@@ -45,7 +48,8 @@ namespace hpx::serialization {
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        (template <typename T, std::size_t N, typename Allocator>),
+        (HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, std::size_t N,
+            typename Allocator>),
         (boost::multi_array<T, N, Allocator>) )
 }    // namespace hpx::serialization
 

@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/modules/serialization.hpp>
 
 namespace hpx::serialization {
 

@@ -7,8 +7,7 @@
 #pragma once
 
 #include <hpx/datastructures/optional.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <utility>
 

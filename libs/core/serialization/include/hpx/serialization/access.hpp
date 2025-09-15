@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2014-2015 Anton Bikineev
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -26,14 +26,14 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        template <typename T>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
         HPX_FORCEINLINE void serialize_force_adl(
             output_archive& ar, T const& t, unsigned)
         {
             serialize(ar, const_cast<T&>(t), 0);
         }
 
-        template <class T>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <class T>
         HPX_FORCEINLINE void serialize_force_adl(
             input_archive& ar, T& t, unsigned)
         {
@@ -42,7 +42,7 @@ namespace hpx::serialization {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    class access
+    HPX_CORE_MODULE_EXPORT_EXTERN class access
     {
     public:
         template <typename T>
@@ -158,7 +158,7 @@ namespace hpx::traits {
 
     // the case when hpx::serialization::access::has_serialize_v<T> is true has
     // to be handled separately to avoid circular dependencies
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     struct is_not_bitwise_serializable<T,
         std::enable_if_t<!std::is_abstract_v<T> &&
             !hpx::traits::has_serialize_adl_v<T> &&

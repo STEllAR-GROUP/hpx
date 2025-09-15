@@ -16,13 +16,11 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/runtime_components/create_component_helpers.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/serialization/string.hpp>
-#include <hpx/serialization/vector.hpp>
 
 #include <algorithm>
 #include <cstddef>

@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/config/endian.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/serialization/array.hpp>
 #include <hpx/serialization/detail/serialize_collection.hpp>
@@ -24,7 +23,7 @@
 
 namespace hpx::serialization {
 
-    template <typename Allocator>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Allocator>
     void serialize(input_archive& ar, std::vector<bool, Allocator>& v, unsigned)
     {
         std::uint64_t size = 0;
@@ -46,7 +45,7 @@ namespace hpx::serialization {
         }
     }
 
-    template <typename T, typename Allocator>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Allocator>
     void serialize(input_archive& ar, std::vector<T, Allocator>& v, unsigned)
     {
         v.clear();
@@ -93,7 +92,7 @@ namespace hpx::serialization {
         }
     }
 
-    template <typename Allocator>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Allocator>
     void serialize(
         output_archive& ar, std::vector<bool, Allocator> const& v, unsigned)
     {
@@ -112,7 +111,7 @@ namespace hpx::serialization {
         }
     }
 
-    template <typename T, typename Allocator>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Allocator>
     void serialize(
         output_archive& ar, std::vector<T, Allocator> const& v, unsigned)
     {

@@ -8,10 +8,11 @@
 // that function arguments and other parameters used in the print statements
 // are completely elided
 
-#include <hpx/init_runtime_local/init_runtime_local.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
+
+#include <hpx/init_runtime_local/init_runtime_local.hpp>
 #include <hpx/threading_base/print.hpp>
 
 #include <hpx/hpx_main.hpp>

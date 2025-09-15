@@ -43,6 +43,6 @@ target_link_libraries(
 add_hpx_pseudo_dependencies(
   components.parcel_plugins.binary_filter.bzip2 compression_bzip2
 )
-add_hpx_pseudo_dependencies(core components.parcel_plugins.binary_filter.bzip2)
+add_hpx_pseudo_dependencies(components.parcel_plugins.binary_filter.bzip2)
 
 add_subdirectory(tests)

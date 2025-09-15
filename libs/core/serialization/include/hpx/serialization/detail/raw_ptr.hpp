@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,7 @@
 
 namespace hpx::serialization::detail {
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     struct raw_ptr_type
     {
         using element_type = T;
@@ -41,7 +41,7 @@ namespace hpx::serialization::detail {
         T* t;
     };
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     struct raw_ptr_proxy
     {
         explicit constexpr raw_ptr_proxy(T*& t) noexcept
@@ -69,13 +69,13 @@ namespace hpx::serialization::detail {
         T*& t;
     };
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     HPX_FORCEINLINE constexpr raw_ptr_proxy<T> raw_ptr(T*& t) noexcept
     {
         return raw_ptr_proxy<T>(t);
     }
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     HPX_FORCEINLINE constexpr raw_ptr_proxy<T> raw_ptr(
         T* const& t) noexcept    //-V835
     {
@@ -83,7 +83,7 @@ namespace hpx::serialization::detail {
     }
 
     // allow raw_ptr_type to be serialized as prvalue
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     HPX_FORCEINLINE output_archive& operator<<(
         output_archive& ar, raw_ptr_proxy<T> t)
     {
@@ -91,7 +91,7 @@ namespace hpx::serialization::detail {
         return ar;
     }
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     HPX_FORCEINLINE input_archive& operator>>(
         input_archive& ar, raw_ptr_proxy<T> t)
     {
@@ -99,7 +99,7 @@ namespace hpx::serialization::detail {
         return ar;
     }
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     HPX_FORCEINLINE output_archive& operator&(    //-V524
         output_archive& ar, raw_ptr_proxy<T> t)
     {
@@ -107,7 +107,7 @@ namespace hpx::serialization::detail {
         return ar;
     }
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     HPX_FORCEINLINE input_archive& operator&(    //-V524
         input_archive& ar, raw_ptr_proxy<T> t)
     {

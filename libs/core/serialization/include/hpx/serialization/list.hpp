@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/serialization/detail/serialize_collection.hpp>
 #include <hpx/serialization/serialize.hpp>
 
@@ -15,7 +16,7 @@
 
 namespace hpx::serialization {
 
-    template <typename T, typename Allocator>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Allocator>
     void serialize(input_archive& ar, std::list<T, Allocator>& ls, unsigned)
     {
         // normal load ...
@@ -27,7 +28,7 @@ namespace hpx::serialization {
         detail::load_collection(ar, ls, size);
     }
 
-    template <typename T, typename Allocator>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Allocator>
     void serialize(output_archive& ar,
         std::list<T, Allocator> const& ls,    //-V826
         unsigned)

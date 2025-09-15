@@ -1,5 +1,5 @@
 //  Copyright (c) 2019 Jan Melech
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,6 @@
 
 namespace hpx::serialization {
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& ar, T& t, const unsigned int);
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive, typename T>
+    void serialize_struct(Archive& ar, T& t, unsigned int const);
 }    // namespace hpx::serialization

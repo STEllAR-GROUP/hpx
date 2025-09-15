@@ -103,6 +103,7 @@ add_hpx_module(
     hpx_program_options
     hpx_resource_partitioner
     hpx_runtime_configuration
+    hpx_serialization
     hpx_static_reinit
     hpx_tag_invoke
     hpx_threading

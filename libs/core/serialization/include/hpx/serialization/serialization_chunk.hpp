@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,21 +21,20 @@
 namespace hpx::serialization {
 
     ////////////////////////////////////////////////////////////////////////////
-    union chunk_data
+    HPX_CORE_MODULE_EXPORT_EXTERN union chunk_data
     {
         std::size_t index_;    // position inside the data buffer //-V117
         void const* cpos_;     // const pointer to external data buffer //-V117
         void* pos_;            // pointer to external data buffer //-V117
     };
 
-    enum class chunk_type : std::uint8_t
-    {
+    HPX_CXX_EXPORT enum class chunk_type : std::uint8_t {
         chunk_type_index = 0,
         chunk_type_const_pointer = 1,
         chunk_type_pointer = 2
     };
 
-    struct serialization_chunk
+    HPX_CORE_MODULE_EXPORT_EXTERN struct serialization_chunk
     {
         chunk_data data_;       // index or pointer
         std::size_t size_;      // size of serialization_chunk starting pos_
@@ -62,8 +61,8 @@ namespace hpx::serialization {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    [[nodiscard]] constexpr serialization_chunk create_index_chunk(
-        std::size_t index, std::size_t size) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN [[nodiscard]] constexpr serialization_chunk
+    create_index_chunk(std::size_t index, std::size_t size) noexcept
     {
         serialization_chunk retval = {
             {0}, size, 0, chunk_type::chunk_type_index};
@@ -71,7 +70,8 @@ namespace hpx::serialization {
         return retval;
     }
 
-    [[nodiscard]] constexpr serialization_chunk create_pointer_chunk(
+    HPX_CORE_MODULE_EXPORT_EXTERN [[nodiscard]] constexpr serialization_chunk
+    create_pointer_chunk(
         void const* pos, std::size_t size, std::uint64_t rkey = 0) noexcept
     {
         serialization_chunk retval = {

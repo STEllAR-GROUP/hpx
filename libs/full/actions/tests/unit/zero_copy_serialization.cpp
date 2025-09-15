@@ -13,13 +13,10 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/post.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/parcelset/parcel.hpp>
-#include <hpx/serialization/array.hpp>
-#include <hpx/serialization/detail/preprocess_container.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/serialize_buffer.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 
 #include <cstddef>

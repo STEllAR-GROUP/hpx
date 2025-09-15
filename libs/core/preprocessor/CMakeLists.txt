@@ -24,14 +24,10 @@ set(preprocessor_compat_headers
 )
 # cmake-format: on
 
-# Default location is $HPX_ROOT/libs/preprocessor/src
-set(preprocessor_sources)
-
 include(HPX_AddModule)
 add_hpx_module(
   core preprocessor NO_CONFIG_IN_GENERATED_HEADERS
   GLOBAL_HEADER_GEN ON
-  SOURCES ${preprocessor_sources}
   HEADERS ${preprocessor_headers}
   COMPAT_HEADERS ${preprocessor_compat_headers}
   CMAKE_SUBDIRS tests

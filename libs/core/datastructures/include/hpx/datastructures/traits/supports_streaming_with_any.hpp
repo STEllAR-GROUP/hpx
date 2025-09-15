@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/serialization/serialize_buffer_fwd.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <type_traits>
 

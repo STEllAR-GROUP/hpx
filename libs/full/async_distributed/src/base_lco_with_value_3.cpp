@@ -13,7 +13,7 @@
 #include <hpx/async_distributed/post.hpp>
 #include <hpx/datastructures/serialization/tuple.hpp>
 #include <hpx/ini/ini.hpp>
-#include <hpx/serialization/vector.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstdint>
 #include <string>

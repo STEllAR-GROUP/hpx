@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Hartmut Kaiser
+//  Copyright (c) 2023-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,7 @@
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     class has_serialize_adl
     {
         template <typename T1>
@@ -35,11 +35,11 @@ namespace hpx::traits {
         static constexpr bool value = decltype(test<T>(0))::value;
     };
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     inline constexpr bool has_serialize_adl_v = has_serialize_adl<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     class has_struct_serialization
     {
         template <typename T1>
@@ -56,7 +56,7 @@ namespace hpx::traits {
         static constexpr bool value = decltype(test<T>(0))::value;
     };
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     inline constexpr bool has_struct_serialization_v =
         has_struct_serialization<T>::value;
 

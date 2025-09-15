@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Anton Bikineev
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,25 +23,26 @@ namespace hpx::serialization::detail {
     ////////////////////////////////////////////////////////////////////////////
     // not every random access sequence is reservable, so we need an explicit
     // trait to determine this
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF(reserve)
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CORE_MODULE_EXPORT_EXTERN, reserve)
 
-    template <typename Container>
-    HPX_FORCEINLINE void reserve_if_container(Container& v,
-        std::size_t n) noexcept(!has_reserve_v<std::decay_t<Container>>)
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Container>
+    HPX_FORCEINLINE void reserve_if_container(
+        Container& v, std::size_t n) noexcept(!has_reserve_v<Container>)
     {
-        if constexpr (has_reserve_v<std::decay_t<Container>>)
+        if constexpr (has_reserve_v<Container>)
         {
             v.reserve(n);
         }
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    template <typename Archive, typename Collection>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive,
+        typename Collection>
     void save_collection(Archive& ar, const Collection& collection)
     {
         using value_type = typename Collection::value_type;
 
-        for (const auto& i : collection)
+        for (auto const& i : collection)
         {
             if constexpr (!std::is_default_constructible_v<value_type>)
             {
@@ -53,7 +55,8 @@ namespace hpx::serialization::detail {
         }
     }
 
-    template <typename Archive, typename Collection>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive,
+        typename Collection>
     void load_collection(Archive& ar, Collection& collection,
         typename Collection::size_type size)
     {

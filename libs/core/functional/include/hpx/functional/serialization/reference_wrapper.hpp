@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/reference_wrapper.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/modules/serialization.hpp>
 
 namespace hpx::serialization {
 

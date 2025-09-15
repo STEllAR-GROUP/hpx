@@ -20,9 +20,9 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/thread_description.hpp>

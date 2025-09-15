@@ -212,8 +212,6 @@ foreach(component ${component_dirs})
   add_subdirectory(${component})
   add_hpx_pseudo_dependencies(components components.${component})
 endforeach()
-
-add_hpx_pseudo_dependencies(core components)
 '''
 
 f = open(os.path.join(cwd, 'CMakeLists.txt'), 'w')

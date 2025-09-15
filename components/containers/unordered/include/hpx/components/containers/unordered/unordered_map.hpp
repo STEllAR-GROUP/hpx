@@ -17,13 +17,11 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/distribution_policies/container_distribution_policy.hpp>
 #include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_components/distributed_metadata_base.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/copy_component.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/unordered_map.hpp>
-#include <hpx/serialization/vector.hpp>
 
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
 #include <hpx/components/containers/unordered/unordered_map_segmented_iterator.hpp>
