@@ -9,8 +9,7 @@
 #include <hpx/config/attributes.hpp>
 #include <hpx/config/defines.hpp>
 #include <hpx/config/version.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Deprecate a given functionality starting HPX V1.9

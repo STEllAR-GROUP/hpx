@@ -15,8 +15,8 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/modules/cache.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/statistics/histogram.hpp>
 
 #include <hpx/modules/program_options.hpp>

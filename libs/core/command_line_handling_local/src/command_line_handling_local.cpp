@@ -20,7 +20,7 @@
 #include <hpx/modules/util.hpp>
 #include <hpx/version.hpp>
 #if defined(HPX_HAVE_MAX_CPU_COUNT)
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #endif
 
 #include <algorithm>

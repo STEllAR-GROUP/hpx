@@ -14,7 +14,6 @@
 #else
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -31,6 +30,7 @@
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/move_only_function.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/tag_invoke.hpp>

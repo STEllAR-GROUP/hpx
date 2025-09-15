@@ -163,6 +163,7 @@ add_hpx_module(
     hpx_allocator_support
     hpx_async_base
     hpx_async_combinators
+    hpx_concepts
     hpx_concurrency
     hpx_config
     hpx_threading
@@ -170,6 +171,7 @@ add_hpx_module(
     hpx_errors
     hpx_lock_registration
     hpx_memory
+    hpx_preprocessor
     hpx_synchronization
     hpx_tag_invoke
     hpx_thread_support

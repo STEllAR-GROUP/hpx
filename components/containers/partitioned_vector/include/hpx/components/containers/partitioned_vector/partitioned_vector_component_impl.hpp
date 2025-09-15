@@ -11,9 +11,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components/get_ptr.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>

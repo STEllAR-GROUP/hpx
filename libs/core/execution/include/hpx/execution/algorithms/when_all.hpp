@@ -44,7 +44,6 @@ namespace hpx::execution::experimental {
 }    // namespace hpx::execution::experimental
 #else
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
@@ -56,6 +55,7 @@ namespace hpx::execution::experimental {
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/invoke_fused.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/stop_token.hpp>

@@ -48,6 +48,7 @@ add_hpx_module(
     hpx_futures
     hpx_memory
     hpx_pack_traversal
+    hpx_preprocessor
     hpx_tag_invoke
     hpx_thread_support
     hpx_type_support

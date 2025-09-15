@@ -11,7 +11,6 @@
 #include <hpx/config.hpp>
 #include <hpx/compute_local/host/numa_domains.hpp>
 #include <hpx/compute_local/host/target.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/this_thread.hpp>

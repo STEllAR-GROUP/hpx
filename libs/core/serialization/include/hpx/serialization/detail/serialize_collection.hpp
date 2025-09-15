@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/serialization/detail/constructor_selector.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>

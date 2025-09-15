@@ -13,7 +13,6 @@
 #include <hpx/execution_base/stdexec_forward.hpp>
 #else
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/inject_scheduler.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/run_loop.hpp>
@@ -21,6 +20,7 @@
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 
 #include <exception>

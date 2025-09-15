@@ -10,14 +10,13 @@
 #include <hpx/config.hpp>
 #include <hpx/async_base/scheduling_properties.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
-#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
