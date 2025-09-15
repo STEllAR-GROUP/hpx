@@ -82,9 +82,10 @@ namespace hpx::execution::experimental {
         hpx::execution::experimental::sender_expr_for<Sender,
             hpx::execution::experimental::bulk_chunked_t> ||
         hpx::execution::experimental::sender_expr_for<Sender,
-            hpx::execution::experimental::bulk_unchunked_t> ||
-        hpx::execution::experimental::sender_expr_for<Sender,
-            hpx::execution::experimental::bulk_t>;
+            hpx::execution::experimental::bulk_unchunked_t>;
+    // ||
+    //     hpx::execution::experimental::sender_expr_for<Sender,
+    //         hpx::execution::experimental::bulk_t>;
 
     // Domain customization for stdexec bulk operations
     //
@@ -154,29 +155,29 @@ namespace hpx::execution::experimental {
                         HPX_FORWARD(decltype(f), f)             // function
                     };
             }
-            else if constexpr (hpx::execution::experimental::sender_expr_for<
-                                   Sender,
-                                   hpx::execution::experimental::bulk_t>)
-            {
-                std::printf(
-                    "[DEBUG] Domain transform: bulk (completes_on) - "
-                    "direct transform to avoid stdexec template complexity\n");
+            // else if constexpr (hpx::execution::experimental::sender_expr_for<
+            //                        Sender,
+            //                        hpx::execution::experimental::bulk_t>)
+            // {
+            //     std::printf(
+            //         "[DEBUG] Domain transform: bulk (completes_on) - "
+            //         "direct transform to avoid stdexec template complexity\n");
 
-                // Direct transform to bypass stdexec's default bulk() → bulk_chunked()
-                // transformation which creates complex nested templates that fail to
-                // compile with local lambdas. Use unchunked mode for regular bulk_t
-                // to match expected f(index, ...) signature.
-                return hpx::execution::experimental::detail::
-                    thread_pool_bulk_sender<Policy,
-                        std::decay_t<decltype(child)>,
-                        std::decay_t<decltype(iota_shape)>,
-                        std::decay_t<decltype(f)>, false>{
-                        HPX_MOVE(sched),    // scheduler from environment
-                        HPX_FORWARD(decltype(child), child),    // child sender
-                        HPX_MOVE(iota_shape),                   // shape
-                        HPX_FORWARD(decltype(f), f)             // function
-                    };
-            }
+            //     // Direct transform to bypass stdexec's default bulk() → bulk_chunked()
+            //     // transformation which creates complex nested templates that fail to
+            //     // compile with local lambdas. Use unchunked mode for regular bulk_t
+            //     // to match expected f(index, ...) signature.
+            //     return hpx::execution::experimental::detail::
+            //         thread_pool_bulk_sender<Policy,
+            //             std::decay_t<decltype(child)>,
+            //             std::decay_t<decltype(iota_shape)>,
+            //             std::decay_t<decltype(f)>, false>{
+            //             HPX_MOVE(sched),    // scheduler from environment
+            //             HPX_FORWARD(decltype(child), child),    // child sender
+            //             HPX_MOVE(iota_shape),                   // shape
+            //             HPX_FORWARD(decltype(f), f)             // function
+            //         };
+            // }
         }
 
         // Unified transform_sender for all bulk operations with environment
@@ -233,29 +234,29 @@ namespace hpx::execution::experimental {
                         HPX_FORWARD(decltype(f), f)             // function
                     };
             }
-            else if constexpr (hpx::execution::experimental::sender_expr_for<
-                                   Sender,
-                                   hpx::execution::experimental::bulk_t>)
-            {
-                std::printf(
-                    "[DEBUG] Domain transform: bulk (starts_on) - "
-                    "direct transform to avoid stdexec template complexity\n");
+            // else if constexpr (hpx::execution::experimental::sender_expr_for<
+            //                        Sender,
+            //                        hpx::execution::experimental::bulk_t>)
+            // {
+            //     std::printf(
+            //         "[DEBUG] Domain transform: bulk (starts_on) - "
+            //         "direct transform to avoid stdexec template complexity\n");
 
-                // Direct transform to bypass stdexec's default bulk() → bulk_chunked()
-                // transformation which creates complex nested templates that fail to
-                // compile with local lambdas. Use unchunked mode for regular bulk_t
-                // to match expected f(index, ...) signature.
-                return hpx::execution::experimental::detail::
-                    thread_pool_bulk_sender<Policy,
-                        std::decay_t<decltype(child)>,
-                        std::decay_t<decltype(iota_shape)>,
-                        std::decay_t<decltype(f)>, false>{
-                        HPX_MOVE(sched),    // scheduler from environment
-                        HPX_FORWARD(decltype(child), child),    // child sender
-                        HPX_MOVE(iota_shape),                   // shape
-                        HPX_FORWARD(decltype(f), f)             // function
-                    };
-            }
+            //     // Direct transform to bypass stdexec's default bulk() → bulk_chunked()
+            //     // transformation which creates complex nested templates that fail to
+            //     // compile with local lambdas. Use unchunked mode for regular bulk_t
+            //     // to match expected f(index, ...) signature.
+            //     return hpx::execution::experimental::detail::
+            //         thread_pool_bulk_sender<Policy,
+            //             std::decay_t<decltype(child)>,
+            //             std::decay_t<decltype(iota_shape)>,
+            //             std::decay_t<decltype(f)>, false>{
+            //             HPX_MOVE(sched),    // scheduler from environment
+            //             HPX_FORWARD(decltype(child), child),    // child sender
+            //             HPX_MOVE(iota_shape),                   // shape
+            //             HPX_FORWARD(decltype(f), f)             // function
+            //         };
+            // }
         }
     };
 
