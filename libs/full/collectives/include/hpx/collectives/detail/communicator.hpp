@@ -19,9 +19,8 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <mutex>

@@ -15,11 +15,11 @@
 #include <hpx/execution/algorithms/just.hpp>
 #include <hpx/execution/algorithms/let_value.hpp>
 #include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/detail/select_partitioner.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>

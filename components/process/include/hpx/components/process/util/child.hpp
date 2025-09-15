@@ -15,15 +15,12 @@
 
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/child.hpp>
-namespace hpx { namespace components { namespace process { namespace util
-{
+namespace hpx { namespace components { namespace process { namespace util {
     using windows::child;
-}}}}
+}}}}    // namespace hpx::components::process::util
 #else
 #include <hpx/components/process/util/posix/child.hpp>
-namespace hpx { namespace components { namespace process { namespace util
-{
+namespace hpx { namespace components { namespace process { namespace util {
     using posix::child;
-}}}}
+}}}}    // namespace hpx::components::process::util
 #endif
-

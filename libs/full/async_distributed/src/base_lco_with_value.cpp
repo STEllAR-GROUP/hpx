@@ -11,9 +11,9 @@
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/async_distributed/post.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <vector>
 

@@ -63,7 +63,7 @@ namespace hpx::util {
 
 #else
 
-#include <hpx/type_support/static.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <pthread.h>
 
 namespace hpx::util {

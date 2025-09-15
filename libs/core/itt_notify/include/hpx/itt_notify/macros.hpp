@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/config/export_definitions.hpp>
 
 #if !defined(HPX_COMPILE_WITH_MODULES)
 #include <hpx/itt_notify/api.hpp>

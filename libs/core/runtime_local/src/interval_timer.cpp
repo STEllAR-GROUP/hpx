@@ -10,10 +10,10 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_local/interval_timer.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <chrono>
 #include <cstddef>

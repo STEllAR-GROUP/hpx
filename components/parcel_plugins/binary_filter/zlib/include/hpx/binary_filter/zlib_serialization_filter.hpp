@@ -69,11 +69,12 @@ namespace hpx::plugins::compression {
 
         void load(void* dst, std::size_t dst_count) override;
         void save(void const* src, std::size_t src_count) override;
-        bool flush(void* dst, std::size_t dst_count, std::size_t& written) override;
+        bool flush(
+            void* dst, std::size_t dst_count, std::size_t& written) override;
 
         void set_max_length(std::size_t size) override;
-        std::size_t init_data(
-            void const* buffer, std::size_t size, std::size_t buffer_size) override;
+        std::size_t init_data(void const* buffer, std::size_t size,
+            std::size_t buffer_size) override;
 
     protected:
         std::size_t load_impl(void* dst, std::size_t dst_count, void const* src,

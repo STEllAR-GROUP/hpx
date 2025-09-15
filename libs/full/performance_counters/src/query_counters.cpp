@@ -14,6 +14,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/performance_counters/apex_sample_value.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <cstdint>

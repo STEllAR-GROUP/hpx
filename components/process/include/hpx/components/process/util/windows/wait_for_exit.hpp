@@ -18,46 +18,46 @@
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
-template <class Process>
-inline int wait_for_exit(const Process &p)
-{
-    if (::WaitForSingleObject(p.process_handle(), INFINITE) == WAIT_FAILED)
+    template <class Process>
+    inline int wait_for_exit(const Process& p)
     {
-        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-            "process::wait_for_exit", "WaitForSingleObject() failed");
+        if (::WaitForSingleObject(p.process_handle(), INFINITE) == WAIT_FAILED)
+        {
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "process::wait_for_exit", "WaitForSingleObject() failed");
+        }
+
+        DWORD exit_code;
+        if (!::GetExitCodeProcess(p.process_handle(), &exit_code))
+        {
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "process::wait_for_exit", "GetExitCodeProcess() failed");
+        }
+        return static_cast<int>(exit_code);
     }
 
-    DWORD exit_code;
-    if (!::GetExitCodeProcess(p.process_handle(), &exit_code))
+    template <class Process>
+    inline int wait_for_exit(const Process& p, hpx::error_code& ec)
     {
-        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-            "process::wait_for_exit", "GetExitCodeProcess() failed");
-    }
-    return static_cast<int>(exit_code);
-}
+        DWORD exit_code = 1;
 
-template <class Process>
-inline int wait_for_exit(const Process &p, hpx::error_code &ec)
-{
-    DWORD exit_code = 1;
+        if (::WaitForSingleObject(p.process_handle(), INFINITE) == WAIT_FAILED)
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "process::wait_for_exit", "WaitForSingleObject() failed");
+        }
+        else if (!::GetExitCodeProcess(p.process_handle(), &exit_code))
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "process::wait_for_exit", "GetExitCodeProcess() failed");
+        }
+        else
+        {
+            ec = hpx::make_success_code();
+        }
+        return static_cast<int>(exit_code);
+    }
 
-    if (::WaitForSingleObject(p.process_handle(), INFINITE) == WAIT_FAILED)
-    {
-        HPX_THROWS_IF(ec, hpx::error::invalid_status,
-            "process::wait_for_exit", "WaitForSingleObject() failed");
-    }
-    else if (!::GetExitCodeProcess(p.process_handle(), &exit_code))
-    {
-        HPX_THROWS_IF(ec, hpx::error::invalid_status,
-            "process::wait_for_exit", "GetExitCodeProcess() failed");
-    }
-    else
-    {
-        ec = hpx::make_success_code();
-    }
-    return static_cast<int>(exit_code);
-}
-
-}}}}
+}}}}    // namespace hpx::components::process::windows
 
 #endif

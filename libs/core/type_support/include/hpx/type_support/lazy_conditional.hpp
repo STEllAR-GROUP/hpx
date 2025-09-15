@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,15 +6,19 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <type_traits>
 
 namespace hpx::util {
 
-    template <bool Enable, typename C1, typename C2>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <bool Enable, typename C1,
+        typename C2>
     struct lazy_conditional : std::conditional_t<Enable, C1, C2>
     {
     };
 
-    template <bool Enable, typename C1, typename C2>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <bool Enable, typename C1,
+        typename C2>
     using lazy_conditional_t = typename lazy_conditional<Enable, C1, C2>::type;
 }    // namespace hpx::util

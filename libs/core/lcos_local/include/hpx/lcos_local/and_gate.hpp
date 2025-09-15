@@ -17,9 +17,9 @@
 #include <hpx/futures/promise.hpp>
 #include <hpx/lcos_local/conditional_cv.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <cstddef>
 #include <mutex>

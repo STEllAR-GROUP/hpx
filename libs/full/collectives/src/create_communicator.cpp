@@ -18,11 +18,11 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/lock_registration.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
 #include <hpx/synchronization/mutex.hpp>
-#include <hpx/type_support/extra_data.hpp>
 
 #include <cstddef>
 #include <cstdint>

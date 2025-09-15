@@ -50,13 +50,13 @@ namespace hpx::components::process::posix::initializers {
         template <typename Archive>
         void save(Archive& ar, unsigned const) const
         {
-            ar& s_;
+            ar & s_;
         }
 
         template <typename Archive>
         void load(Archive& ar, const unsigned int)
         {
-            ar& s_;
+            ar & s_;
 
             cmd_line_[0] = const_cast<char*>(s_.c_str());
             cmd_line_[1] = nullptr;

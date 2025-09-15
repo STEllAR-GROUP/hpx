@@ -18,8 +18,8 @@
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/parallel_executor.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/for_loop_reduction.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <memory>

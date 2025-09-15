@@ -226,8 +226,8 @@ namespace hpx { namespace collectives {
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <type_traits>

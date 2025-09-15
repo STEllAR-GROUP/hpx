@@ -13,13 +13,11 @@
 #include <sstream>
 #include <string>
 
-namespace hpx
-{
+namespace hpx {
     HPX_IOSTREAMS_EXPORT extern iostreams::ostream<> cout;
     HPX_IOSTREAMS_EXPORT extern iostreams::ostream<> cerr;
 
     // special stream which writes to a predefine stringstream on the console
     HPX_IOSTREAMS_EXPORT extern iostreams::ostream<> consolestream;
     HPX_IOSTREAMS_EXPORT std::stringstream const& get_consolestream();
-}
-
+}    // namespace hpx

@@ -11,11 +11,11 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/plugin.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>
 #include <hpx/string_util/tokenizer.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #if defined(HPX_WINDOWS)
 #include <windows.h>

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <array>
 #include <iterator>
 #include <string>
@@ -15,26 +17,28 @@
 #include <vector>
 
 namespace hpx::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     // Iterators are contiguous if they are pointers (without concepts we have
     // no generic way of determining whether an iterator is contiguous)
 
     namespace detail {
 
-        template <typename Iter>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Iter>
         using iter_value_type_t =
             typename std::iterator_traits<Iter>::value_type;
 
-        template <typename T>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
         inline constexpr bool has_valid_array_v =
             std::is_copy_assignable_v<T> && !std::is_function_v<T>;
 
-        template <typename Iter, typename Enable = void>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Iter,
+            typename Enable = void>
         struct is_std_array_iterator : std::false_type
         {
         };
 
-        template <typename Iter>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Iter>
         struct is_std_array_iterator<Iter,
             std::enable_if_t<has_valid_array_v<iter_value_type_t<Iter>>>>
           : std::bool_constant<(
@@ -48,17 +52,18 @@ namespace hpx::traits {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
         inline constexpr bool has_valid_vector_v =
             std::is_copy_assignable_v<T> && !std::is_function_v<T> &&
             !std::is_same_v<T, bool>;
 
-        template <typename T, typename Enable = void>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T,
+            typename Enable = void>
         struct is_std_vector_iterator : std::false_type
         {
         };
 
-        template <typename Iter>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Iter>
         struct is_std_vector_iterator<Iter,
             std::enable_if_t<has_valid_vector_v<iter_value_type_t<Iter>>>>
           : std::bool_constant<
@@ -72,7 +77,7 @@ namespace hpx::traits {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Char>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Char>
         struct is_valid_char_type : std::false_type
         {
         };
@@ -109,7 +114,7 @@ namespace hpx::traits {
         // This implementation of has_value_type seems to work fine even for
         // VS2013 which has an implementation of std::iterator_traits that is
         // SFINAE-unfriendly.
-        template <typename T>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
         struct has_value_type_helper
         {
 #if defined(HPX_MSVC) && defined(__CUDACC__)
@@ -130,12 +135,13 @@ namespace hpx::traits {
                 sizeof(test(std::declval<T>())) == sizeof(void*);
         };
 
-        template <typename Iter, typename Enable = void>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Iter,
+            typename Enable = void>
         struct is_std_basic_string_iterator : std::false_type
         {
         };
 
-        template <typename Iter>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Iter>
         struct is_std_basic_string_iterator<Iter,
             std::enable_if_t<has_value_type_helper<Iter>::value &&
                 is_valid_char_type<iter_value_type_t<Iter>>::value>>
@@ -149,7 +155,8 @@ namespace hpx::traits {
         {
         };
 
-        template <typename Iter, typename Enable = void>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Iter,
+            typename Enable = void>
         struct is_known_contiguous_iterator
           : std::bool_constant<is_std_array_iterator<Iter>::value ||
                 is_std_vector_iterator<Iter>::value ||
@@ -157,23 +164,23 @@ namespace hpx::traits {
         {
         };
 
-        template <typename Iter>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Iter>
         struct is_known_contiguous_iterator<Iter,
             std::enable_if_t<std::is_pointer_v<Iter>>> : std::true_type
         {
         };
     }    // namespace detail
 
-    template <typename Iter>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Iter>
     struct is_contiguous_iterator : detail::is_known_contiguous_iterator<Iter>
     {
     };
 
-    template <typename Iter>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Iter>
     using is_contiguous_iterator_t =
         typename is_contiguous_iterator<Iter>::type;
 
-    template <typename Iter>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Iter>
     inline constexpr bool is_contiguous_iterator_v =
         is_contiguous_iterator<Iter>::value;
 }    // namespace hpx::traits

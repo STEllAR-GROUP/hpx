@@ -16,12 +16,11 @@
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters_fwd.hpp>

@@ -123,7 +123,7 @@ namespace hpx {
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>

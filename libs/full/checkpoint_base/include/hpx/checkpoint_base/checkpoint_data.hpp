@@ -9,9 +9,9 @@
 
 #pragma once
 
+#include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/type_support/extra_data.hpp>
 
 #include <cstddef>
 

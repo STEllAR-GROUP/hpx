@@ -15,9 +15,8 @@
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/pack_traversal/detail/container_category.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <atomic>
 #include <cstddef>

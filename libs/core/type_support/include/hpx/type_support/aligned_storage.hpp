@@ -15,7 +15,8 @@
 // C++23 deprecated std::aligned_storage_t
 namespace hpx {
 
-    template <std::size_t Size, std::size_t Align = alignof(std::max_align_t)>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <std::size_t Size,
+        std::size_t Align = alignof(std::max_align_t)>
     struct alignas(Align) aligned_storage_t
     {
         std::byte data[Size];
@@ -28,7 +29,8 @@ namespace hpx {
 
 namespace hpx {
 
-    template <std::size_t Size, std::size_t Align = alignof(std::max_align_t)>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <std::size_t Size,
+        std::size_t Align = alignof(std::max_align_t)>
     using aligned_storage_t = std::aligned_storage_t<Size, Align>;
 }    // namespace hpx
 

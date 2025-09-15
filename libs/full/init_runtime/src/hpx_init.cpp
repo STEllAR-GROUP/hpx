@@ -33,6 +33,7 @@
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/program_options/parsers.hpp>
@@ -53,8 +54,6 @@
 #include <hpx/string_util/split.hpp>
 #include <hpx/threading/thread.hpp>
 #include <hpx/threading_base/detail/get_default_timer_service.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #ifdef HPX_HAVE_MODULE_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>

@@ -156,8 +156,7 @@ namespace hpx {
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/unwrap_ref.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <array>

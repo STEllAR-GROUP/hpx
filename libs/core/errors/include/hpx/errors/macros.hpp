@@ -12,7 +12,8 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
+#include <hpx/config/defines.hpp>
+#include <hpx/config/export_definitions.hpp>
 #include <hpx/modules/preprocessor.hpp>
 
 #if !defined(HPX_COMPILE_WITH_MODULES)
@@ -163,3 +164,20 @@
 ///
 #define HPX_THROWS_BAD_ALLOC_IF(ec, f)                                         \
     hpx::detail::throws_bad_alloc_if(ec, f, __FILE__, __LINE__) /**/
+
+////////////////////////////////////////////////////////////////////////////////
+// From hpx/errors/define_error_info.hpp
+#define HPX_DEFINE_ERROR_INFO(NAME, TYPE)                                      \
+    HPX_CORE_MODULE_EXPORT_EXTERN struct NAME : ::hpx::error_info<NAME, TYPE>  \
+    {                                                                          \
+        explicit NAME(TYPE const& value) noexcept(                             \
+            std::is_nothrow_copy_constructible_v<TYPE>)                        \
+          : error_info(value)                                                  \
+        {                                                                      \
+        }                                                                      \
+                                                                               \
+        explicit NAME(TYPE&& value) noexcept                                   \
+          : error_info(HPX_MOVE(value))                                        \
+        {                                                                      \
+        }                                                                      \
+    } /**/

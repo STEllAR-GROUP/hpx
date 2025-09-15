@@ -6,7 +6,7 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/checkpoint_base/checkpoint_data.hpp>
-#include <hpx/type_support/extra_data.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstdint>
 

@@ -8,7 +8,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/errors/include
 set(errors_headers
-    hpx/errors/detail/define_error_info.hpp
+    hpx/errors/define_error_info.hpp
     hpx/errors/error.hpp
     hpx/errors/error_code.hpp
     hpx/errors/exception.hpp

@@ -24,9 +24,10 @@ unsigned int seed = std::random_device{}();
 struct random_fill
 {
     random_fill()
-      : gen(seed),
-        dist(0, RAND_MAX)
-    {}
+      : gen(seed)
+      , dist(0, RAND_MAX)
+    {
+    }
 
     int operator()()
     {
@@ -38,7 +39,8 @@ struct random_fill
 
     template <typename Archive>
     void serialize(Archive&, unsigned)
-    {}
+    {
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////

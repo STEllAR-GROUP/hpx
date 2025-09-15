@@ -10,8 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/remove.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>

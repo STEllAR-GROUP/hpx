@@ -15,17 +15,14 @@
 
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/pipe.hpp>
-namespace hpx { namespace components { namespace process { namespace util
-{
-    using windows::pipe;
+namespace hpx { namespace components { namespace process { namespace util {
     using windows::make_pipe;
-}}}}
+    using windows::pipe;
+}}}}    // namespace hpx::components::process::util
 #else
 #include <hpx/components/process/util/posix/pipe.hpp>
-namespace hpx { namespace components { namespace process { namespace util
-{
-    using posix::pipe;
+namespace hpx { namespace components { namespace process { namespace util {
     using posix::make_pipe;
-}}}}
+    using posix::pipe;
+}}}}    // namespace hpx::components::process::util
 #endif
-

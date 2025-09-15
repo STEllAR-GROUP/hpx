@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/async_distributed/continuation_fwd.hpp>
 #include <hpx/functional/detail/invoke.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <exception>
 #include <utility>

@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/boost_iterator_categories.hpp>
-#include <hpx/type_support/equality.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <iterator>
 #include <type_traits>

@@ -6,4 +6,4 @@
 
 #pragma once
 
-#include <hpx/type_support/generator.hpp>
+#include <hpx/modules/type_support.hpp>

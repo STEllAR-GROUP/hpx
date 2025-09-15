@@ -39,8 +39,7 @@ namespace hpx::execution::experimental {
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
-#include <hpx/type_support/equality.hpp>
-#include <hpx/type_support/meta.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <exception>

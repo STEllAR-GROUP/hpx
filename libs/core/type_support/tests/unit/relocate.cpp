@@ -12,12 +12,10 @@
     so it is not tested separately.
 */
 
-#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/type_support.hpp>
 
-#include <hpx/type_support/is_trivially_relocatable.hpp>
-#include <hpx/type_support/relocate_at.hpp>
+#include <hpx/init.hpp>
 
 using hpx::experimental::is_trivially_relocatable_v;
 using hpx::experimental::relocate;
@@ -32,7 +30,8 @@ struct non_trivially_relocatable_struct
     {
         count++;
     }
-    non_trivially_relocatable_struct(non_trivially_relocatable_struct&& other)
+    non_trivially_relocatable_struct(
+        non_trivially_relocatable_struct&& other) noexcept
       : data(other.data)
     {
         count++;

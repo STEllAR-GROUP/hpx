@@ -32,7 +32,10 @@ namespace hpx::util::detail {
         {
         }
 
-        HPX_NON_COPYABLE(spinlock);
+        spinlock(spinlock const&) = delete;
+        spinlock(spinlock&&) = delete;
+        spinlock& operator=(spinlock const&) = delete;
+        spinlock& operator=(spinlock&&) = delete;
 
         ~spinlock() = default;
 

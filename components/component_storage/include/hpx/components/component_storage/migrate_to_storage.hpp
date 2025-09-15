@@ -19,8 +19,7 @@
 
 #include <type_traits>
 
-namespace hpx { namespace components
-{
+namespace hpx { namespace components {
     /// Migrate the component with the given id to the specified target storage
     ///
     /// The function \a migrate_to_storage<Component> will migrate the component
@@ -42,12 +41,11 @@ namespace hpx { namespace components
 #if defined(DOXYGEN)
     future<hpx::id_type>
 #else
-    inline typename std::enable_if<
-        traits::is_component<Component>::value, future<hpx::id_type>
-    >::type
+    inline typename std::enable_if<traits::is_component<Component>::value,
+        future<hpx::id_type>>::type
 #endif
-    migrate_to_storage(hpx::id_type const& to_migrate,
-        hpx::id_type const& target_storage)
+    migrate_to_storage(
+        hpx::id_type const& to_migrate, hpx::id_type const& target_storage)
     {
         typedef server::trigger_migrate_to_storage_here_action<Component>
             action_type;
@@ -71,8 +69,8 @@ namespace hpx { namespace components
     ///          component instance. This should be the same as \a migrate_to.
     ///
     template <typename Derived, typename Stub, typename Data>
-    inline Derived
-    migrate_to_storage(client_base<Derived, Stub, Data> const& to_migrate,
+    inline Derived migrate_to_storage(
+        client_base<Derived, Stub, Data> const& to_migrate,
         hpx::components::component_storage const& target_storage)
     {
         using component_type =
@@ -80,7 +78,4 @@ namespace hpx { namespace components
         return Derived(migrate_to_storage<component_type>(
             to_migrate.get_id(), target_storage.get_id()));
     }
-}}
-
-
-
+}}    // namespace hpx::components

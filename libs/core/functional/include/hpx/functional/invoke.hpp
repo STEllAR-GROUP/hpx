@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/type_support/void_guard.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <utility>
 

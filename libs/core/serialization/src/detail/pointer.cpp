@@ -7,10 +7,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/detail/pointer.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
-#include <hpx/type_support/extra_data.hpp>
 
 #include <cstdint>
 #include <map>

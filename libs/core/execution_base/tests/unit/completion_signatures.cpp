@@ -8,7 +8,7 @@
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/type_support/coroutines_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <exception>
 #include <utility>

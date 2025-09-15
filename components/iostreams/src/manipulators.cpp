@@ -7,8 +7,7 @@
 
 #include <hpx/components/iostreams/manipulators.hpp>
 
-namespace hpx
-{
+namespace hpx {
     // hpx::flush
     iostreams::flush_type flush = iostreams::flush_type();
     // hpx::endl
@@ -17,4 +16,4 @@ namespace hpx
     iostreams::async_flush_type async_flush = iostreams::async_flush_type();
     // hpx::async_endl
     iostreams::async_endl_type async_endl = iostreams::async_endl_type();
-}
+}    // namespace hpx

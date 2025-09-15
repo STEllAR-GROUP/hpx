@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/detail/allow_zero_copy_receive.hpp>
-#include <hpx/type_support/extra_data.hpp>
 
 #include <cstdint>
 

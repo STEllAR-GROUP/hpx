@@ -14,33 +14,9 @@ module;
 
 // Include all standard library headers in global module fragment to prevent ODR
 // violations.
-@standard_headers@
-#if defined(HPX_HAVE_CXX20_COROUTINES)
-# if defined(__has_include)
-#  if __has_include(<coroutine>)
-#   include <coroutine>
-#  elif __has_include(<experimental/coroutine>)
-#   include <experimental/coroutine>
-#  endif
-# endif
-#endif
+#include <hpx/config/std_headers.hpp>
 
-#if defined(HPX_HAVE_CXX20_STD_BIT_CAST)
-# include <bit>
-#endif
-#if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
-# include <source_location>
-#endif
-
-#if defined(HPX_HAVE_CXX23_STD_GENERATOR)
-# include <generator>
-#endif
-
-#if defined(__GNUG__)
-# include <cxxabi.h>
-#endif
-
-export module HPX.Core;
+export module HPX.Core@cxx_sub_module@;
 
 #if defined(HPX_MSVC)
 // disable warning C5244: '#include <filename>' in the purview of module
@@ -60,7 +36,7 @@ export module HPX.Core;
 #pragma clang diagnostic ignored "-Winclude-angled-in-module-purview"
 #endif
 
-// include all HPX module files here that have been converted to C++ modules
+// include HPX module files here that have been converted to C++ modules
 @cxx_module_headers@
 #if defined(HPX_CLANG_VERSION)
 #pragma clang diagnostic pop

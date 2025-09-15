@@ -12,7 +12,7 @@
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <cstring>
