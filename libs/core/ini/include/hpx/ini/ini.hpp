@@ -12,7 +12,7 @@
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <map>
 #include <mutex>

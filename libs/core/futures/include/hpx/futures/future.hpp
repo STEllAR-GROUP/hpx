@@ -28,13 +28,9 @@
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/serialization/detail/constructor_selector.hpp>
-#include <hpx/serialization/detail/non_default_constructible.hpp>
-#include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
-#include <hpx/serialization/exception_ptr.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <exception>

@@ -4,10 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/serialization/base_object.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
 
 #include <memory>
 #include <vector>

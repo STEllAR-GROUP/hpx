@@ -13,11 +13,10 @@
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/serialization/base_object.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <hpx/execution/executors/execution.hpp>

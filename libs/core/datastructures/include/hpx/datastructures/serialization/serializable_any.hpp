@@ -23,10 +23,8 @@
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/serialization/base_object.hpp>
-#include <hpx/serialization/detail/raw_ptr.hpp>
-#include <hpx/serialization/serialize.hpp>
 
 #include <algorithm>
 #include <cstddef>

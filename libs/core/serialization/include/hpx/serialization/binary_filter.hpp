@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2022 Hartmut Kaiser
+// Copyright (c) 2007-2025 Hartmut Kaiser
 // Copyright (c) 2015 Anton Bikineev
 //
 // SPDX-License-Identifier: BSL-1.0
@@ -17,7 +17,7 @@ namespace hpx::serialization {
 
     ///////////////////////////////////////////////////////////////////////////
     // Base class for all serialization filters.
-    struct binary_filter
+    HPX_CORE_MODULE_EXPORT_EXTERN struct binary_filter
     {
         virtual ~binary_filter() = default;
 

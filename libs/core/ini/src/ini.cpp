@@ -28,9 +28,8 @@
 #include <hpx/assert.hpp>
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/thread_support.hpp>
-#include <hpx/serialization/map.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>
 

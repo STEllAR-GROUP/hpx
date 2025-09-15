@@ -23,7 +23,7 @@
 # endif
 #endif
 
-#if defined(HPX_HAVE_CXX20_STD_BIT_CAST)
+#if defined(HPX_HAVE_CXX20_STD_BIT_CAST) || defined(HPX_HAVE_CXX20_STD_ENDIAN)
 # include <bit>
 #endif
 #if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)

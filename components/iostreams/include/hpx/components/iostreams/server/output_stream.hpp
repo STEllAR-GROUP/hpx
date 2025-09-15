@@ -12,7 +12,7 @@
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/server/component_base.hpp>
-#include <hpx/serialization/vector.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <hpx/components/iostreams/export_definitions.hpp>
 #include <hpx/components/iostreams/server/buffer.hpp>

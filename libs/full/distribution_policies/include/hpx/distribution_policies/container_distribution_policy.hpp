@@ -12,9 +12,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/distribution_policies/default_distribution_policy.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
-#include <hpx/serialization/vector.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <algorithm>
 #include <cstddef>

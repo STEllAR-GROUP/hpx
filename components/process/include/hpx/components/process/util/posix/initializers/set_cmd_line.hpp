@@ -14,9 +14,8 @@
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/string_util.hpp>
-#include <hpx/serialization/string.hpp>
-#include <hpx/serialization/vector.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>

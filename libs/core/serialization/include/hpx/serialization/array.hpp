@@ -1,7 +1,7 @@
 //  (C) Copyright 2005 Matthias Troyer and Dave Abrahams
 //  Copyright (c) 2015 Anton Bikineev
 //  Copyright (c) 2015 Andreas Schaefer
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/config/endian.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/serialization/detail/allow_zero_copy_receive.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -24,7 +23,7 @@
 
 namespace hpx::serialization {
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     class array
     {
     public:
@@ -107,7 +106,7 @@ namespace hpx::serialization {
     };
 
     // make_array function
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     HPX_FORCEINLINE constexpr array<T> make_array(
         T* begin, std::size_t size) noexcept
     {
@@ -115,7 +114,8 @@ namespace hpx::serialization {
     }
 
     // implement serialization for std::array
-    template <typename Archive, typename T, std::size_t N>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive, typename T,
+        std::size_t N>
     void serialize(
         Archive& ar, std::array<T, N>& a, unsigned int const /* version */)
     {
@@ -125,22 +125,22 @@ namespace hpx::serialization {
     }
 
     // allow our array to be serialized as prvalue compiler should support good
-    // ADL implementation but it is rather for all hpx serialization library
-    template <typename T>
+    // ADL implementation, but it is rather for all hpx serialization library
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     HPX_FORCEINLINE output_archive& operator<<(output_archive& ar, array<T> t)
     {
         ar.save(t);
         return ar;
     }
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     HPX_FORCEINLINE input_archive& operator>>(input_archive& ar, array<T> t)
     {
         ar.load(t);
         return ar;
     }
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     HPX_FORCEINLINE output_archive& operator&(    //-V524
         output_archive& ar, array<T> t)
     {
@@ -148,7 +148,7 @@ namespace hpx::serialization {
         return ar;
     }
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     HPX_FORCEINLINE input_archive& operator&(    //-V524
         input_archive& ar, array<T> t)
     {
@@ -157,7 +157,7 @@ namespace hpx::serialization {
     }
 
     // serialize plain arrays:
-    template <typename T, std::size_t N>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, std::size_t N>
     HPX_FORCEINLINE output_archive& operator<<(output_archive& ar, T (&t)[N])
     {
         array<T> array = make_array(t, N);
@@ -165,7 +165,7 @@ namespace hpx::serialization {
         return ar;
     }
 
-    template <typename T, std::size_t N>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, std::size_t N>
     HPX_FORCEINLINE input_archive& operator>>(input_archive& ar, T (&t)[N])
     {
         array<T> array = make_array(t, N);
@@ -173,7 +173,7 @@ namespace hpx::serialization {
         return ar;
     }
 
-    template <typename T, std::size_t N>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, std::size_t N>
     HPX_FORCEINLINE output_archive& operator&(    //-V524
         output_archive& ar, T (&t)[N])
     {
@@ -182,7 +182,7 @@ namespace hpx::serialization {
         return ar;
     }
 
-    template <typename T, std::size_t N>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, std::size_t N>
     HPX_FORCEINLINE input_archive& operator&(    //-V524
         input_archive& ar, T (&t)[N])
     {

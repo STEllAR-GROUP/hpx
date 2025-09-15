@@ -7,9 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/agas_base/gva.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/util/ios_flags_saver.hpp>
 
 #include <cstddef>

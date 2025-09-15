@@ -21,11 +21,13 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/preprocessor.hpp>
 
-#if !defined(HPX_COMPILE_WITH_MODULES)
+#if !defined(HPX_COMPILE_WITH_MODULES) ||                                      \
+    (defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_ASSERTION_WITH_MODULES))
 #include <hpx/config.hpp>
 #include <hpx/assertion/api.hpp>
 #include <hpx/assertion/evaluate_assert.hpp>
 #include <hpx/assertion/source_location.hpp>
+#endif
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
 #include <assert.h>
@@ -35,7 +37,6 @@
 #include <string>
 #include <type_traits>
 #include <utility>
-#endif
 
 #if defined(DOXYGEN)
 /// \def HPX_ASSERT(expr, msg)

@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/datastructures/detail/dynamic_bitset.hpp>
-#include <hpx/serialization.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
 #include <cstdint>

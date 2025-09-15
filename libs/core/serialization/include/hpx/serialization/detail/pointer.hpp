@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,6 +16,7 @@
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
+#include <hpx/serialization/macros.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
@@ -29,14 +30,17 @@
 
 namespace hpx::serialization::detail {
 
-    struct ptr_helper;
+    HPX_CORE_MODULE_EXPORT_EXTERN struct ptr_helper;
 
     // we need top use shared_ptr as util::any requires for the held type
     // to be copy-constructible
-    using ptr_helper_ptr = std::unique_ptr<ptr_helper>;
+    HPX_CORE_MODULE_EXPORT_EXTERN using ptr_helper_ptr =
+        std::unique_ptr<ptr_helper>;
 
-    using input_pointer_tracker = std::map<std::uint64_t, ptr_helper_ptr>;
-    using output_pointer_tracker = std::map<void const*, std::uint64_t>;
+    HPX_CORE_MODULE_EXPORT_EXTERN using input_pointer_tracker =
+        std::map<std::uint64_t, ptr_helper_ptr>;
+    HPX_CORE_MODULE_EXPORT_EXTERN using output_pointer_tracker =
+        std::map<void const*, std::uint64_t>;
 }    // namespace hpx::serialization::detail
 
 namespace hpx::util {
@@ -65,19 +69,20 @@ namespace hpx::util {
 namespace hpx::serialization {
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT void register_pointer(
+    HPX_CORE_MODULE_EXPORT_EXTERN HPX_CORE_EXPORT void register_pointer(
         input_archive& ar, std::uint64_t pos, detail::ptr_helper_ptr helper);
 
+    HPX_CORE_MODULE_EXPORT_EXTERN
     [[nodiscard]] HPX_CORE_EXPORT detail::ptr_helper& tracked_pointer(
         input_archive& ar, std::uint64_t pos);
 
-    [[nodiscard]] HPX_CORE_EXPORT std::uint64_t track_pointer(
-        output_archive& ar, void const* pos);
+    HPX_CORE_MODULE_EXPORT_EXTERN [[nodiscard]] HPX_CORE_EXPORT std::uint64_t
+    track_pointer(output_archive& ar, void const* pos);
 
     ////////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename Pointer>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Pointer>
         struct erase_ptr_helper : ptr_helper
         {
             using referred_type = typename Pointer::element_type;
@@ -91,7 +96,7 @@ namespace hpx::serialization {
             Pointer t_;
         };
 
-        template <typename Pointer>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Pointer>
         class pointer_input_dispatcher
         {
             using referred_type = typename Pointer::element_type;
@@ -168,7 +173,7 @@ namespace hpx::serialization {
                         nonintrusive_polymorphic, usual>>>;
         };
 
-        template <typename Pointer>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Pointer>
         class pointer_output_dispatcher
         {
             using referred_type = typename Pointer::element_type;
@@ -230,7 +235,7 @@ namespace hpx::serialization {
         };
 
         // forwarded serialize pointer functions
-        template <typename Pointer>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Pointer>
         HPX_FORCEINLINE void serialize_pointer_tracked(
             output_archive& ar, Pointer const& ptr)
         {
@@ -250,7 +255,7 @@ namespace hpx::serialization {
             }
         }
 
-        template <typename Pointer>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Pointer>
         HPX_FORCEINLINE void serialize_pointer_tracked(
             input_archive& ar, Pointer& ptr)
         {
@@ -282,7 +287,7 @@ namespace hpx::serialization {
             }
         }
 
-        template <typename Pointer>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Pointer>
         HPX_FORCEINLINE void serialize_pointer_untracked(
             output_archive& ar, Pointer const& ptr)
         {
@@ -294,7 +299,7 @@ namespace hpx::serialization {
             }
         }
 
-        template <typename Pointer>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Pointer>
         HPX_FORCEINLINE void serialize_pointer_untracked(
             input_archive& ar, Pointer& ptr)
         {

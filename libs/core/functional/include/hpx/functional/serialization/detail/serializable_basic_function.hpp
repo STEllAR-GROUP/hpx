@@ -14,7 +14,7 @@
 #include <hpx/functional/detail/vtable/vtable.hpp>
 #include <hpx/functional/serialization/detail/vtable/serializable_function_vtable.hpp>
 #include <hpx/functional/serialization/detail/vtable/serializable_vtable.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <string>
 #include <type_traits>

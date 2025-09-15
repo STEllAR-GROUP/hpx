@@ -11,9 +11,7 @@
 #include "defs.hpp"
 
 #include <hpx/assert.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
-#include <hpx/serialization/vector.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cassert>
 #include <cstddef>

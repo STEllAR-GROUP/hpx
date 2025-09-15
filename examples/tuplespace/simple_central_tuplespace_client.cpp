@@ -20,9 +20,9 @@
 #include "central_tuplespace/simple_central_tuplespace.hpp"
 #include "small_big_object.hpp"
 
-typedef examples::server::simple_central_tuplespace central_tuplespace_type;
-typedef central_tuplespace_type::tuple_type tuple_type;
-typedef central_tuplespace_type::elem_type elem_type;
+using central_tuplespace_type = examples::server::simple_central_tuplespace;
+using tuple_type = central_tuplespace_type::tuple_type;
+using elem_type = central_tuplespace_type::elem_type;
 
 void print_tuple(tuple_type const& tuple)
 {
@@ -32,7 +32,7 @@ void print_tuple(tuple_type const& tuple)
         return;
     }
 
-    tuple_type::const_iterator it = tuple.begin();
+    auto it = tuple.begin();
     hpx::cout << "(" << *it;
     for (++it; it != tuple.end(); ++it)
     {
@@ -42,7 +42,7 @@ void print_tuple(tuple_type const& tuple)
 }
 
 void simple_central_tuplespace_test(
-    std::string const& tuplespace_symbol_name, tuple_type const tuple)
+    std::string const& tuplespace_symbol_name, tuple_type const& tuple)
 {
     examples::simple_central_tuplespace central_tuplespace;
 
@@ -53,7 +53,7 @@ void simple_central_tuplespace_test(
         return;
     }
 
-    int ret = central_tuplespace.write(hpx::launch::sync, tuple);
+    int const ret = central_tuplespace.write(hpx::launch::sync, tuple);
     hpx::cout << "locality " << hpx::get_locality_id() << ": "
               << "write_sync ";
     print_tuple(tuple);
@@ -104,7 +104,7 @@ int hpx_main()
 {
     {
         // Find the localities connected to this application.
-        std::vector<hpx::id_type> localities = hpx::find_all_localities();
+        std::vector<hpx::id_type> const localities = hpx::find_all_localities();
 
         std::string const tuplespace_symbol_name = "/tuplespace";
         examples::simple_central_tuplespace central_tuplespace;
@@ -148,7 +148,7 @@ int hpx_main()
             // Asynchronously start a new task. The task is encapsulated in a
             // future, which we can query to determine if the task has
             // completed.
-            typedef simple_central_tuplespace_test_action action_type;
+            using action_type = simple_central_tuplespace_test_action;
             futures.push_back(
                 hpx::async<action_type>(node, tuplespace_symbol_name, tuple1));
             futures.push_back(

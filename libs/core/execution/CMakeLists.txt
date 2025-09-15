@@ -172,6 +172,7 @@ add_hpx_module(
     hpx_lock_registration
     hpx_memory
     hpx_preprocessor
+    hpx_serialization
     hpx_synchronization
     hpx_tag_invoke
     hpx_thread_support

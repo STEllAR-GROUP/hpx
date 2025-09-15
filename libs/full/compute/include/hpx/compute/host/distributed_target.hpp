@@ -14,8 +14,8 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/compute/host/get_targets.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <cstddef>

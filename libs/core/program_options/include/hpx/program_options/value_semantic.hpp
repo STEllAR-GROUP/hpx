@@ -332,14 +332,11 @@ namespace hpx::program_options {
             {
                 return (std::numeric_limits<unsigned>::max)();
             }
-            else if (m_zero_tokens)
+            if (m_zero_tokens)
             {
                 return 0;
             }
-            else
-            {
-                return 1;
-            }
+            return 1;
         }
 
         bool is_required() const noexcept override

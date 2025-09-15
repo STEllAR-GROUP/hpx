@@ -9,7 +9,8 @@
 module;
 
 // Define module-specific macros before including config
-#define HPX_BUILD_MODULE
+#define HPX_COMPILE_BMI
+#define HPX_COMPILE_@modulename_upper@_WITH_MODULES
 #include <hpx/config.hpp>
 
 // Include all standard library headers in global module fragment to prevent ODR

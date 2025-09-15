@@ -9,11 +9,8 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/datastructures/serialization/tuple.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
 #include <cstdint>
 

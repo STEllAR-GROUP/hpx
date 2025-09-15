@@ -13,7 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
 #include <type_traits>
