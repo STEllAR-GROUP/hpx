@@ -85,11 +85,29 @@ namespace hpx::execution::experimental::detail {
             (std::max)(chunk_size, std::uint64_t(1)));
     }
 
+    // For bulk_unchunked: f(index, ...)
     template <std::size_t... Is, typename F, typename T, typename Ts>
     constexpr void bulk_scheduler_invoke_helper(
         hpx::util::index_pack<Is...>, F&& f, T&& t, Ts& ts)
     {
         HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t), hpx::get<Is>(ts)...);
+    }
+
+    // For bulk_chunked: f(start, end, ...)
+    template <std::size_t... Is, typename F, typename Start, typename End, typename Ts>
+    constexpr void bulk_scheduler_invoke_helper_chunked(
+        hpx::util::index_pack<Is...>, F&& f, Start&& start, End&& end, Ts& ts)
+    {
+        if constexpr (sizeof...(Is) == 0)
+        {
+            // No additional arguments from sender values
+            HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Start, start), HPX_FORWARD(End, end));
+        }
+        else
+        {
+            // Additional arguments from sender values
+            HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Start, start), HPX_FORWARD(End, end), hpx::get<Is>(ts)...);
+        }
     }
 
     inline hpx::threads::mask_type full_mask(
@@ -173,12 +191,21 @@ namespace hpx::execution::experimental::detail {
 
             auto it =
                 std::ranges::next(hpx::util::begin(op_state->shape), i_begin);
-            for (std::uint32_t i = i_begin; i != i_end; (void) ++i)
+            if constexpr (OperationState::is_chunked)
             {
-                // Same signature for both modes: f(index, values...)
-                bulk_scheduler_invoke_helper(
-                    index_pack_type{}, op_state->f, *it, ts);
-                ++it;
+                // bulk_chunked: f(start, end, values...)
+                bulk_scheduler_invoke_helper_chunked(
+                    index_pack_type{}, op_state->f, i_begin, i_end, ts);
+            }
+            else
+            {
+                // bulk_unchunked: f(index, values...) for each element
+                for (std::uint32_t i = i_begin; i != i_end; (void) ++i)
+                {
+                    bulk_scheduler_invoke_helper(
+                        index_pack_type{}, op_state->f, *it, ts);
+                    ++it;
+                }
             }
 
             if (op_state->is_chunked)
@@ -637,10 +664,6 @@ namespace hpx::execution::experimental::detail {
 
         // clang-format off
         template <typename... Ts>
-        requires (
-                hpx::is_invocable_v<F, range_value_type,
-                    std::add_lvalue_reference_t<Ts>...>
-            )
         // clang-format on
         friend void tag_invoke(hpx::execution::experimental::set_value_t,
             bulk_receiver&& r, Ts&&... ts) noexcept

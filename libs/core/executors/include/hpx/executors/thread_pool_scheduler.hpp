@@ -75,7 +75,8 @@ namespace hpx::execution::experimental {
 
     // Forward declarations for domain system
 
-    // Concept to match any bulk sender type
+    // Concept to match bulk sender types
+    // Note: We keep bulk_t handling as pragmatic workaround for stdexec template issues
     template <typename Sender>
     concept any_bulk_sender =
         hpx::execution::experimental::sender_expr_for<Sender,
@@ -87,11 +88,10 @@ namespace hpx::execution::experimental {
 
     // Domain customization for stdexec bulk operations
     //
-    // NOTE: This implementation keeps explicit bulk_t handling as a pragmatic
-    // workaround for stdexec template instantiation issues. While P3481R5 design
-    // expects bulk() → bulk_chunked() through default implementation, stdexec's
-    // complex template machinery fails with local lambdas in test code.
-    // This direct transform provides the same semantics while avoiding compilation errors.
+    // NOTE: While P3481R5 design expects bulk() → bulk_chunked() through default
+    // implementation, we keep explicit bulk_t handling as a pragmatic workaround
+    // for stdexec template instantiation issues with local lambdas in test code.
+    // This provides the same semantics while avoiding compilation errors.
     template <typename Policy>
     struct thread_pool_domain : stdexec::default_domain
     {
@@ -164,13 +164,13 @@ namespace hpx::execution::experimental {
 
                 // Direct transform to bypass stdexec's default bulk() → bulk_chunked()
                 // transformation which creates complex nested templates that fail to
-                // compile with local lambdas. This provides the same semantic behavior
-                // (chunked execution) while avoiding template instantiation issues.
+                // compile with local lambdas. Use unchunked mode for regular bulk_t
+                // to match expected f(index, ...) signature.
                 return hpx::execution::experimental::detail::
                     thread_pool_bulk_sender<Policy,
                         std::decay_t<decltype(child)>,
                         std::decay_t<decltype(iota_shape)>,
-                        std::decay_t<decltype(f)>, true>{
+                        std::decay_t<decltype(f)>, false>{
                         HPX_MOVE(sched),    // scheduler from environment
                         HPX_FORWARD(decltype(child), child),    // child sender
                         HPX_MOVE(iota_shape),                   // shape
@@ -243,13 +243,13 @@ namespace hpx::execution::experimental {
 
                 // Direct transform to bypass stdexec's default bulk() → bulk_chunked()
                 // transformation which creates complex nested templates that fail to
-                // compile with local lambdas. This provides the same semantic behavior
-                // (chunked execution) while avoiding template instantiation issues.
+                // compile with local lambdas. Use unchunked mode for regular bulk_t
+                // to match expected f(index, ...) signature.
                 return hpx::execution::experimental::detail::
                     thread_pool_bulk_sender<Policy,
                         std::decay_t<decltype(child)>,
                         std::decay_t<decltype(iota_shape)>,
-                        std::decay_t<decltype(f)>, true>{
+                        std::decay_t<decltype(f)>, false>{
                         HPX_MOVE(sched),    // scheduler from environment
                         HPX_FORWARD(decltype(child), child),    // child sender
                         HPX_MOVE(iota_shape),                   // shape

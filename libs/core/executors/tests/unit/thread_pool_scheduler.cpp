@@ -2221,13 +2221,8 @@ void test_stdexec_bulk_domain_customization()
     auto bulk_sender = stdexec::bulk(
         ex::schedule(scheduler) | stdexec::then([]() { return 42; }),
         stdexec::par, 10, [&](int idx, int value) {
-            // In chunked mode, this is called once per chunk with the begin index
-            // We need to process the entire chunk starting from idx
+            // In unchunked mode, this is called once per index
             chunk_calls.fetch_add(1);
-
-            // For chunked execution, we process from the begin index
-            // In a real chunked implementation, we'd get begin and end parameters
-            // For compatibility, we just set the single index we receive
             results[idx] = value + idx;
         });
 
@@ -2265,15 +2260,21 @@ void test_stdexec_bulk_chunked_customization()
 
     auto bulk_chunked_sender = stdexec::bulk_chunked(
         ex::schedule(scheduler) | stdexec::then([]() { return 1; }),
-        stdexec::par, 100, [&](int idx, int value) {
-            // With chunked execution: larger chunks (chunk_size=16), fewer
-            // context switches
-            function_calls.fetch_add(1, std::memory_order_relaxed);
-            results[idx] = value + idx;
-            total_processed.fetch_add(1, std::memory_order_relaxed);
-
-            std::printf("[CHUNKED TEST] Processing index %d on thread %zu\n",
-                idx, hpx::get_worker_thread_num());
+        stdexec::par, 100, [&](int start, int end, int value) {
+            // With chunked execution: process range [start, end)
+            std::printf("[CHUNKED DEBUG] Lambda called with start=%d, end=%d, value=%d, chunk_size=%d on thread %zu\n",
+                start, end, value, (end - start), hpx::get_worker_thread_num());
+            
+            for (int idx = start; idx < end; ++idx) {
+                function_calls.fetch_add(1, std::memory_order_relaxed);
+                results[idx] = value + idx;
+                total_processed.fetch_add(1, std::memory_order_relaxed);
+                std::printf("[CHUNKED TEST] Processing index %d (result=%d) on thread %zu\n",
+                    idx, value + idx, hpx::get_worker_thread_num());
+            }
+            
+            std::printf("[CHUNKED DEBUG] Finished processing chunk [%d, %d) - processed %d elements\n",
+                start, end, (end - start));
         });
 
     stdexec::sync_wait(std::move(bulk_chunked_sender));
