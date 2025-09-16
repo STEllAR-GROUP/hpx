@@ -86,7 +86,7 @@ namespace hpx::execution::experimental {
 
     // Domain customization for stdexec bulk operations
     //
-    // NOTE: While P3481R5 design expects bulk() → bulk_chunked() through default
+    // NOTE: While P3481R5 design expects bulk() -> bulk_chunked() through default
     // implementation, we keep explicit bulk_t handling as a pragmatic workaround
     // for stdexec template instantiation issues with local lambdas in test code.
     // This provides the same semantics while avoiding compilation errors.
