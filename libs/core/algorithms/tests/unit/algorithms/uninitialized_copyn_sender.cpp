@@ -42,10 +42,11 @@ void test_uninitialized_copy_n_sender(
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
+    // When the size is -1, the algorithm should not do anything.
     tt::sync_wait(ex::just(iterator(std::begin(c)), -1, std::begin(d)) |
         hpx::uninitialized_copy_n(ex_policy.on(exec)));
-    HPX_TEST(std::all_of(std::begin(d), std::end(d),
-        [](std::size_t i) { return i == std::size_t{}; }));
+    HPX_TEST(std::all_of(
+        std::begin(d), std::end(d), [](std::size_t i) { return i == 0; }));
 
     tt::sync_wait(ex::just(iterator(std::begin(c)), c.size(), std::begin(d)) |
         hpx::uninitialized_copy_n(ex_policy.on(exec)));

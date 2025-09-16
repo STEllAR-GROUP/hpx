@@ -183,7 +183,9 @@ namespace hpx::parallel::util {
                                         using result_t =
                                             std::variant_alternative_t<0,
                                                 item_type>;
-                                        if constexpr (!std::is_void_v<result_t>)
+                                        if constexpr (!std::is_same_v<
+                                                          std::monostate,
+                                                          result_t>)
                                         {
                                             cleanup(
                                                 HPX_MOVE(std::get<0>(item)));

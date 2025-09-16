@@ -181,8 +181,6 @@ void test_uninitialized_copy_exception_sender(
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    std::cout << "[TEST] Throwing exception in sender with "
-              << throw_after.load() << "\n";
     bool caught_exception = false;
     try
     {
@@ -200,13 +198,11 @@ void test_uninitialized_copy_exception_sender(
     }
     catch (hpx::exception_list const& e)
     {
-        std::cout << "[TEST] Caught exception in sender\n";
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(ex_policy, e);
     }
     catch (...)
     {
-        std::cout << "[TEST] Caught unknown exception\n";
         HPX_TEST(false);
     }
 
