@@ -2249,8 +2249,6 @@ void test_stdexec_bulk_domain_customization()
 
 void test_stdexec_bulk_chunked_customization()
 {
-    std::printf("\n=== STARTING test_stdexec_bulk_chunked_customization ===\n");
-
     auto scheduler = ex::thread_pool_scheduler{};
 
     // Test bulk_chunked operation - should use larger chunks for better performance
@@ -2262,26 +2260,16 @@ void test_stdexec_bulk_chunked_customization()
         ex::schedule(scheduler) | stdexec::then([]() { return 1; }),
         stdexec::par, 100, [&](int start, int end, int value) {
             // With chunked execution: process range [start, end)
-            std::printf("[CHUNKED DEBUG] Lambda called with start=%d, end=%d, value=%d, chunk_size=%d on thread %zu\n",
-                start, end, value, (end - start), hpx::get_worker_thread_num());
-            
-            for (int idx = start; idx < end; ++idx) {
+
+            for (int idx = start; idx < end; ++idx)
+            {
                 function_calls.fetch_add(1, std::memory_order_relaxed);
                 results[idx] = value + idx;
                 total_processed.fetch_add(1, std::memory_order_relaxed);
-                std::printf("[CHUNKED TEST] Processing index %d (result=%d) on thread %zu\n",
-                    idx, value + idx, hpx::get_worker_thread_num());
             }
-            
-            std::printf("[CHUNKED DEBUG] Finished processing chunk [%d, %d) - processed %d elements\n",
-                start, end, (end - start));
         });
 
     stdexec::sync_wait(std::move(bulk_chunked_sender));
-
-    std::printf("=== FINISHED test_stdexec_bulk_chunked_customization ===\n");
-    std::printf("Total processed: %d, Function calls: %d\n",
-        total_processed.load(), function_calls.load());
 
     // Verify all elements were processed
     HPX_TEST_EQ(total_processed.load(), 100);
@@ -2296,9 +2284,6 @@ void test_stdexec_bulk_chunked_customization()
 
 void test_stdexec_bulk_unchunked_customization()
 {
-    std::printf(
-        "\n=== STARTING test_stdexec_bulk_unchunked_customization ===\n");
-
     auto scheduler = ex::thread_pool_scheduler{};
 
     // Test bulk_unchunked operation - should use smaller chunks for better load balancing
@@ -2313,15 +2298,9 @@ void test_stdexec_bulk_unchunked_customization()
             // work stealing
             function_calls.fetch_add(1, std::memory_order_relaxed);
             results[idx] = value * idx;
-
-            std::printf("[UNCHUNKED TEST] Processing index %d on thread %zu\n",
-                idx, hpx::get_worker_thread_num());
         });
 
     stdexec::sync_wait(std::move(bulk_unchunked_sender));
-
-    std::printf("=== FINISHED test_stdexec_bulk_unchunked_customization ===\n");
-    std::printf("Function calls: %d\n", function_calls.load());
 
     // Verify all elements were processed
     HPX_TEST_EQ(function_calls.load(), 100);    // Called once per element

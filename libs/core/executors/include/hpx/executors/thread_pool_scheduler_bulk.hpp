@@ -94,19 +94,22 @@ namespace hpx::execution::experimental::detail {
     }
 
     // For bulk_chunked: f(start, end, ...)
-    template <std::size_t... Is, typename F, typename Start, typename End, typename Ts>
+    template <std::size_t... Is, typename F, typename Start, typename End,
+        typename Ts>
     constexpr void bulk_scheduler_invoke_helper_chunked(
         hpx::util::index_pack<Is...>, F&& f, Start&& start, End&& end, Ts& ts)
     {
         if constexpr (sizeof...(Is) == 0)
         {
             // No additional arguments from sender values
-            HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Start, start), HPX_FORWARD(End, end));
+            HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Start, start),
+                HPX_FORWARD(End, end));
         }
         else
         {
             // Additional arguments from sender values
-            HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Start, start), HPX_FORWARD(End, end), hpx::get<Is>(ts)...);
+            HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Start, start),
+                HPX_FORWARD(End, end), hpx::get<Is>(ts)...);
         }
     }
 
@@ -177,10 +180,6 @@ namespace hpx::execution::experimental::detail {
 
             hpx::util::itt::mark_event e(notify_event);
 #endif
-            std::printf("[DEBUG] do_work_chunk: execution_mode=%s, index=%u, "
-                        "worker_thread=%u\n",
-                op_state->is_chunked ? "chunked" : "unchunked", index,
-                task_f->worker_thread);
 
             using index_pack_type = hpx::detail::fused_index_pack_t<Ts>;
 
@@ -206,21 +205,6 @@ namespace hpx::execution::experimental::detail {
                         index_pack_type{}, op_state->f, *it, ts);
                     ++it;
                 }
-            }
-
-            if (op_state->is_chunked)
-            {
-                std::printf(
-                    "[DEBUG] Chunked: processed chunk [%zu, %zu) "
-                    "(chunk_size=%u) with optimized work distribution\n",
-                    i_begin, i_end, task_f->chunk_size);
-            }
-            else
-            {
-                std::printf(
-                    "[DEBUG] Unchunked: processed elements [%zu, %zu) "
-                    "(chunk_size=%u) with fine-grained load balancing\n",
-                    i_begin, i_end, task_f->chunk_size);
             }
         }
 
@@ -328,9 +312,6 @@ namespace hpx::execution::experimental::detail {
         // Visit the values sent by the predecessor sender.
         void do_work() const
         {
-            std::printf(
-                "[DEBUG] Task function: execution_mode=%s, worker_thread=%u\n",
-                op_state->is_chunked ? "chunked" : "unchunked", worker_thread);
             auto visitor =
                 set_value_loop_visitor<OperationState>{op_state, this};
             hpx::visit(HPX_MOVE(visitor), op_state->ts);
