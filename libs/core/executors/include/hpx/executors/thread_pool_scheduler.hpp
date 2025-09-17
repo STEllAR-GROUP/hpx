@@ -78,10 +78,10 @@ namespace hpx::execution::experimental {
     // Concept to match bulk sender types
     // Note: We keep bulk_t handling as pragmatic workaround for stdexec template issues
     template <typename Sender>
-    concept any_bulk_sender =
-        hpx::execution::experimental::sender_expr_for<Sender,
+    concept bulk_chunked_or_unchunked_sender =
+        hpx::execution::experimental::stdexec_internal::sender_expr_for<Sender,
             hpx::execution::experimental::bulk_chunked_t> ||
-        hpx::execution::experimental::sender_expr_for<Sender,
+        hpx::execution::experimental::stdexec_internal::sender_expr_for<Sender,
             hpx::execution::experimental::bulk_unchunked_t>;
 
     // Domain customization for stdexec bulk operations
@@ -95,10 +95,10 @@ namespace hpx::execution::experimental {
     {
         // Unified transform_sender for all bulk operations without environment
         // (completes_on pattern)
-        template <any_bulk_sender Sender>
+        template <bulk_chunked_or_unchunked_sender Sender>
         auto transform_sender(Sender&& sndr) const noexcept
         {
-            static_assert(hpx::execution::experimental::__completes_on<Sender,
+            static_assert(hpx::execution::experimental::stdexec_internal::__completes_on<Sender,
                               thread_pool_policy_scheduler<Policy>>,
                 "No thread_pool_policy_scheduler instance can be found in the "
                 "sender's "
@@ -115,7 +115,7 @@ namespace hpx::execution::experimental {
 
             auto iota_shape = std::views::iota(decltype(shape){0}, shape);
 
-            if constexpr (hpx::execution::experimental::sender_expr_for<Sender,
+            if constexpr (hpx::execution::experimental::stdexec_internal::sender_expr_for<Sender,
                               hpx::execution::experimental::bulk_unchunked_t>)
             {
                 // This should be launching one hpx thread for each index
@@ -131,7 +131,7 @@ namespace hpx::execution::experimental {
                     };
             }
             else if constexpr (
-                hpx::execution::experimental::sender_expr_for<Sender,
+                hpx::execution::experimental::stdexec_internal::sender_expr_for<Sender,
                     hpx::execution::experimental::bulk_chunked_t>)
             {
                 // This should be launching one hpx thread for each chunk
@@ -150,10 +150,10 @@ namespace hpx::execution::experimental {
 
         // Unified transform_sender for all bulk operations with environment
         // (starts_on pattern)
-        template <any_bulk_sender Sender, typename Env>
+        template <bulk_chunked_or_unchunked_sender Sender, typename Env>
         auto transform_sender(Sender&& sndr, const Env& env) const noexcept
         {
-            static_assert(hpx::execution::experimental::__starts_on<Sender,
+            static_assert(hpx::execution::experimental::stdexec_internal::__starts_on<Sender,
                               thread_pool_policy_scheduler<Policy>, Env>,
                 "No thread_pool_policy_scheduler instance can be found in the "
                 "receiver's "
@@ -167,7 +167,7 @@ namespace hpx::execution::experimental {
 
             auto iota_shape = std::views::iota(decltype(shape){0}, shape);
 
-            if constexpr (hpx::execution::experimental::sender_expr_for<Sender,
+            if constexpr (hpx::execution::experimental::stdexec_internal::sender_expr_for<Sender,
                               hpx::execution::experimental::bulk_unchunked_t>)
             {
                 return hpx::execution::experimental::detail::
@@ -182,7 +182,7 @@ namespace hpx::execution::experimental {
                     };
             }
             else if constexpr (
-                hpx::execution::experimental::sender_expr_for<Sender,
+                hpx::execution::experimental::stdexec_internal::sender_expr_for<Sender,
                     hpx::execution::experimental::bulk_chunked_t>)
             {
                 return hpx::execution::experimental::detail::
@@ -451,7 +451,6 @@ namespace hpx::execution::experimental {
             {
                 return {s.scheduler, HPX_FORWARD(Receiver, receiver)};
             }
-#if defined(HPX_HAVE_STDEXEC)
             struct env
             {
                 std::decay_t<Scheduler> const& sched;
@@ -470,12 +469,14 @@ namespace hpx::execution::experimental {
                     return e.sched;
                 }
 
+#if defined(HPX_HAVE_STDEXEC)
                 // Add domain query to sender environment
                 friend constexpr auto tag_invoke(
                     stdexec::get_domain_t, env const& e) noexcept
                 {
                     return stdexec::get_domain(e.sched);
                 }
+#endif
             };
 
             friend constexpr auto tag_invoke(
@@ -498,35 +499,6 @@ namespace hpx::execution::experimental {
             {
                 return s.scheduler;
             }
-#else
-            struct env_no_stdexec
-            {
-                thread_pool_policy_scheduler<Policy> sched;
-
-                friend constexpr auto tag_invoke(
-                    hpx::execution::experimental::get_completion_scheduler_t<
-                        hpx::execution::experimental::set_value_t>,
-                    env_no_stdexec const& e) noexcept
-                {
-                    return e.sched;
-                }
-
-                friend constexpr auto tag_invoke(
-                    hpx::execution::experimental::get_completion_scheduler_t<
-                        hpx::execution::experimental::set_stopped_t>,
-                    env_no_stdexec const& e) noexcept
-                {
-                    return e.sched;
-                }
-            };
-
-            friend constexpr auto tag_invoke(
-                hpx::execution::experimental::get_env_t,
-                sender const& s) noexcept
-            {
-                return env_no_stdexec{s.scheduler};
-            };
-#endif
         };
 
 #if defined(HPX_HAVE_STDEXEC)

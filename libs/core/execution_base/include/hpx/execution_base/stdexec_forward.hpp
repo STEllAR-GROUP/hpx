@@ -133,9 +133,6 @@ namespace hpx::execution::experimental {
     // Continue on
     using stdexec::continue_on;
     using stdexec::continue_on_t;
-    // Backward compatibility alias for continues_on
-    inline constexpr stdexec::continue_on_t continues_on{};
-    using continues_on_t = stdexec::continue_on_t;
 
     // Transfer just
     using stdexec::transfer_just;
@@ -322,12 +319,12 @@ namespace hpx::execution::experimental {
         }
 
         using stdexec::__connect_awaitable_t;
-    }    // namespace stdexec_internal
 
-    // Additional stdexec concepts and utilities needed for domain customization
-    using stdexec::__completes_on;
-    using stdexec::__starts_on;
-    using stdexec::sender_expr_for;
+        // Additional stdexec concepts and utilities needed for domain customization
+        using stdexec::__completes_on;
+        using stdexec::__starts_on;
+        using stdexec::sender_expr_for;
+    }    // namespace stdexec_internal
 }    // namespace hpx::execution::experimental
 
 // Leaving this as a placeholder

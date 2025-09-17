@@ -542,53 +542,6 @@ namespace hpx::ranges {
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), HPX_MOVE(f), HPX_MOVE(proj));
         }
-
-#if defined(HPX_HAVE_STDEXEC)
-        // Sender algorithm support for stdexec integration
-        template <typename Sender, typename ExPolicy, typename F,
-            typename Proj = hpx::identity>
-        // clang-format off
-            requires (
-                hpx::execution::experimental::sender<Sender> &&
-                std::invocable<F,
-                    typename hpx::execution::experimental::value_types_of_t<
-                        Sender, hpx::execution::experimental::empty_env>::
-                        template apply<std::tuple>>
-            )
-        // clang-format on
-        friend auto tag_fallback_invoke(hpx::ranges::for_each_t,
-            Sender&& sender, ExPolicy&& policy, F&& f, Proj&& proj = Proj{})
-        {
-            return HPX_FORWARD(Sender, sender) |
-                hpx::execution::experimental::let_value(
-                    [policy = HPX_FORWARD(ExPolicy, policy),
-                        f = HPX_FORWARD(F, f),
-                        proj = HPX_FORWARD(Proj, proj)](auto&& rng) mutable {
-                        return hpx::execution::experimental::just(hpx::for_each(
-                            policy, HPX_FORWARD(decltype(rng), rng),
-                            HPX_MOVE(f), HPX_MOVE(proj)));
-                    });
-        }
-
-        // Partial algorithm support for stdexec senders
-        template <typename ExPolicy>
-        friend auto tag_fallback_invoke(
-            hpx::ranges::for_each_t, ExPolicy&& policy)
-        {
-            return [policy = HPX_FORWARD(ExPolicy, policy)](
-                       auto&& sender) mutable {
-                return HPX_FORWARD(decltype(sender), sender) |
-                    hpx::execution::experimental::let_value(
-                        [policy = HPX_MOVE(policy)](
-                            auto&& rng, auto&& f) mutable {
-                            return hpx::execution::experimental::just(
-                                hpx::for_each(policy,
-                                    HPX_FORWARD(decltype(rng), rng),
-                                    HPX_FORWARD(decltype(f), f)));
-                        });
-            };
-        }
-#endif
     } for_each{};
 
     ///////////////////////////////////////////////////////////////////////////

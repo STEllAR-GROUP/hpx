@@ -508,7 +508,7 @@ namespace hpx::execution::experimental {
     // The sender_of concept defines the requirements for a sender type that on
     // successful completion sends the specified set of value types.
     template <typename Sender, typename Signal,
-        typename Env = hpx::execution::experimental::env<>>
+        typename Env = hpx::execution::experimental::empty_env>
     struct is_sender_of
       : std::bool_constant<
             hpx::execution::experimental::sender_of<Sender, Signal, Env>>
@@ -516,7 +516,7 @@ namespace hpx::execution::experimental {
     };
 
     template <typename Sender, typename Signal,
-        typename Env = hpx::execution::experimental::env<>>
+        typename Env = hpx::execution::experimental::empty_env>
     inline constexpr bool is_sender_of_v =
         is_sender_of<Sender, Signal, Env>::value;
 
@@ -533,7 +533,7 @@ namespace hpx::execution::experimental {
     // 3. Otherwise, single-sender-value-type<S, E> is ill-formed.
     //
     template <typename Sender,
-        typename Env = hpx::execution::experimental::env<>>
+        typename Env = hpx::execution::experimental::empty_env>
     using single_sender_value_t =
         hpx::execution::experimental::stdexec_internal::__single_sender_value_t<
             Sender, Env>;
@@ -1008,9 +1008,8 @@ namespace hpx::execution::experimental {
             value_or_void_t<Value>, std::exception_ptr>;
 
         template <typename Promise>
-        using coroutine_env_t =
-            hpx::util::detected_or<hpx::execution::experimental::empty_env,
-                hpx::functional::tag_invoke_result_t, get_env_t, Promise>;
+        using coroutine_env_t = hpx::util::detected_or<exec_envs::empty_env,
+            hpx::functional::tag_invoke_result_t, get_env_t, Promise>;
 
         template <typename Value>
         struct receiver_base
