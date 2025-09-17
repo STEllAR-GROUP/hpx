@@ -82,7 +82,7 @@ namespace hpx::execution::experimental::detail {
             chunk_size *= 2;
         }
         return static_cast<std::uint32_t>(
-            (std::max)(chunk_size, std::uint64_t(1)));
+            (std::max) (chunk_size, std::uint64_t(1)));
     }
 
     // For bulk_unchunked: f(index, ...)
@@ -176,7 +176,7 @@ namespace hpx::execution::experimental::detail {
             auto const i_begin =
                 static_cast<std::size_t>(index) * task_f->chunk_size;
             auto const i_end =
-                (std::min)(i_begin + task_f->chunk_size, task_f->size);
+                (std::min) (i_begin + task_f->chunk_size, task_f->size);
 
             if constexpr (OperationState::is_chunked)
             {
@@ -187,8 +187,8 @@ namespace hpx::execution::experimental::detail {
             else
             {
                 // bulk_unchunked: f(index, values...) for each element
-                auto it = std::ranges::next(
-                    hpx::util::begin(op_state->shape), i_begin);
+                auto it =
+                    std::ranges::next(hpx::util::begin(op_state->shape), i_begin);
                 for (std::uint32_t i = i_begin; i != i_end; (void) ++i)
                 {
                     bulk_scheduler_invoke_helper(
@@ -418,8 +418,8 @@ namespace hpx::execution::experimental::detail {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
             auto const part_begin = worker_thread;
-            auto part_end = (std::min)(
-                size + num_threads - 1, part_begin + num_steps * num_threads);
+            auto part_end = (std::min) (size + num_threads - 1,
+                part_begin + num_steps * num_threads);
             auto const remainder = (part_end - part_begin) % num_threads;
             if (remainder != 0)
             {
@@ -633,11 +633,7 @@ namespace hpx::execution::experimental::detail {
         }
 
         // clang-format off
-        template <typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_invocable_v<F, range_value_type,
-                    std::add_lvalue_reference_t<Ts>...>
-            )>
+        template <typename... Ts>
         // clang-format on
         friend void tag_invoke(hpx::execution::experimental::set_value_t,
             bulk_receiver&& r, Ts&&... ts) noexcept
