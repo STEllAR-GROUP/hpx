@@ -98,8 +98,9 @@ namespace hpx::execution::experimental {
         template <bulk_chunked_or_unchunked_sender Sender>
         auto transform_sender(Sender&& sndr) const noexcept
         {
-            static_assert(hpx::execution::experimental::stdexec_internal::__completes_on<Sender,
-                              thread_pool_policy_scheduler<Policy>>,
+            static_assert(
+                hpx::execution::experimental::stdexec_internal::__completes_on<
+                    Sender, thread_pool_policy_scheduler<Policy>>,
                 "No thread_pool_policy_scheduler instance can be found in the "
                 "sender's "
                 "attributes on which to schedule bulk work.");
@@ -115,8 +116,9 @@ namespace hpx::execution::experimental {
 
             auto iota_shape = std::views::iota(decltype(shape){0}, shape);
 
-            if constexpr (hpx::execution::experimental::stdexec_internal::sender_expr_for<Sender,
-                              hpx::execution::experimental::bulk_unchunked_t>)
+            if constexpr (
+                hpx::execution::experimental::stdexec_internal::sender_expr_for<
+                    Sender, hpx::execution::experimental::bulk_unchunked_t>)
             {
                 // This should be launching one hpx thread for each index
                 return hpx::execution::experimental::detail::
@@ -131,8 +133,8 @@ namespace hpx::execution::experimental {
                     };
             }
             else if constexpr (
-                hpx::execution::experimental::stdexec_internal::sender_expr_for<Sender,
-                    hpx::execution::experimental::bulk_chunked_t>)
+                hpx::execution::experimental::stdexec_internal::sender_expr_for<
+                    Sender, hpx::execution::experimental::bulk_chunked_t>)
             {
                 // This should be launching one hpx thread for each chunk
                 return hpx::execution::experimental::detail::
@@ -153,8 +155,9 @@ namespace hpx::execution::experimental {
         template <bulk_chunked_or_unchunked_sender Sender, typename Env>
         auto transform_sender(Sender&& sndr, const Env& env) const noexcept
         {
-            static_assert(hpx::execution::experimental::stdexec_internal::__starts_on<Sender,
-                              thread_pool_policy_scheduler<Policy>, Env>,
+            static_assert(
+                hpx::execution::experimental::stdexec_internal::__starts_on<
+                    Sender, thread_pool_policy_scheduler<Policy>, Env>,
                 "No thread_pool_policy_scheduler instance can be found in the "
                 "receiver's "
                 "environment on which to schedule bulk work.");
@@ -167,8 +170,9 @@ namespace hpx::execution::experimental {
 
             auto iota_shape = std::views::iota(decltype(shape){0}, shape);
 
-            if constexpr (hpx::execution::experimental::stdexec_internal::sender_expr_for<Sender,
-                              hpx::execution::experimental::bulk_unchunked_t>)
+            if constexpr (
+                hpx::execution::experimental::stdexec_internal::sender_expr_for<
+                    Sender, hpx::execution::experimental::bulk_unchunked_t>)
             {
                 return hpx::execution::experimental::detail::
                     thread_pool_bulk_sender<Policy,
@@ -182,8 +186,8 @@ namespace hpx::execution::experimental {
                     };
             }
             else if constexpr (
-                hpx::execution::experimental::stdexec_internal::sender_expr_for<Sender,
-                    hpx::execution::experimental::bulk_chunked_t>)
+                hpx::execution::experimental::stdexec_internal::sender_expr_for<
+                    Sender, hpx::execution::experimental::bulk_chunked_t>)
             {
                 return hpx::execution::experimental::detail::
                     thread_pool_bulk_sender<Policy,

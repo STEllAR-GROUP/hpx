@@ -187,8 +187,8 @@ namespace hpx::execution::experimental::detail {
             else
             {
                 // bulk_unchunked: f(index, values...) for each element
-                auto it =
-                    std::ranges::next(hpx::util::begin(op_state->shape), i_begin);
+                auto it = std::ranges::next(
+                    hpx::util::begin(op_state->shape), i_begin);
                 for (std::uint32_t i = i_begin; i != i_end; (void) ++i)
                 {
                     bulk_scheduler_invoke_helper(
