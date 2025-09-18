@@ -160,8 +160,10 @@ add_hpx_module(
   COMPAT_HEADERS ${execution_compat_headers}
   DEPENDENCIES ${execution_optional_dependencies}
   MODULE_DEPENDENCIES
+    hpx_allocator_support
     hpx_async_base
     hpx_async_combinators
+    hpx_concepts
     hpx_concurrency
     hpx_config
     hpx_threading
@@ -169,7 +171,9 @@ add_hpx_module(
     hpx_errors
     hpx_lock_registration
     hpx_memory
+    hpx_preprocessor
     hpx_synchronization
+    hpx_tag_invoke
     hpx_thread_support
     hpx_timing
     hpx_topology

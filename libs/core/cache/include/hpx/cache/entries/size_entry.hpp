@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,26 +13,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util::cache::entries {
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Value, typename Derived = void>
-    class size_entry;
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
-
-        template <typename Value, typename Derived>
-        struct size_derived
-        {
-            using type = Derived;
-        };
-
-        template <typename Value>
-        struct size_derived<Value, void>
-        {
-            using type = size_entry<Value>;
-        };
-    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     /// \class size_entry size_entry.hpp hpx/cache/entries/size_entry.hpp
@@ -50,17 +30,12 @@ namespace hpx::util::cache::entries {
     /// \tparam Value     The data type to be stored in a cache. It has to be
     ///                   default constructible, copy constructible and
     ///                   less_than_comparable.
-    /// \tparam Derived   The (optional) type for which this type is used as a
-    ///                   base class.
     ///
-    template <typename Value, typename Derived>
-    class size_entry
-      : public entry<Value, typename detail::size_derived<Value, Derived>::type>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Value>
+    class size_entry : public entry<Value>
     {
     private:
-        using derived_type =
-            typename detail::size_derived<Value, Derived>::type;
-        using base_type = entry<Value, derived_type>;
+        using base_type = entry<Value>;
 
     public:
         /// \brief Any cache entry has to be default constructible
@@ -91,10 +66,35 @@ namespace hpx::util::cache::entries {
 
         /// \brief Compare the 'age' of two entries. An entry is 'older' than
         ///        another entry if it has a bigger size.
-        friend constexpr bool operator<(
+        friend auto operator<(
             size_entry const& lhs, size_entry const& rhs) noexcept
         {
-            return lhs.get_size() > rhs.get_size();
+            return rhs.get_size() < lhs.get_size();
+        }
+        friend auto operator>(
+            size_entry const& lhs, size_entry const& rhs) noexcept
+        {
+            return rhs < lhs;
+        }
+        friend auto operator<=(
+            size_entry const& lhs, size_entry const& rhs) noexcept
+        {
+            return !(rhs < lhs);
+        }
+        friend auto operator>=(
+            size_entry const& lhs, size_entry const& rhs) noexcept
+        {
+            return !(lhs < rhs);
+        }
+        friend auto operator==(
+            size_entry const& lhs, size_entry const& rhs) noexcept
+        {
+            return lhs.get_size() == rhs.get_size();
+        }
+        friend auto operator!=(
+            size_entry const& lhs, size_entry const& rhs) noexcept
+        {
+            return !(lhs == rhs);
         }
 
     private:

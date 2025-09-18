@@ -48,6 +48,7 @@ add_hpx_module(
   HEADERS ${lcos_local_headers}
   COMPAT_HEADERS ${lcos_local_compat_headers}
   MODULE_DEPENDENCIES
+    hpx_allocator_support
     hpx_concurrency
     hpx_config
     hpx_execution

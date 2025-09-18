@@ -40,8 +40,7 @@
 #error HPX cannot be compiled with a Boost version earlier than 1.71.0
 #endif
 
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <cstddef>
 

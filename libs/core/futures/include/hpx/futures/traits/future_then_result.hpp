@@ -8,9 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <type_traits>

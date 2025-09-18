@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <type_traits>
 #include <utility>

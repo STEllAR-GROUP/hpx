@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <cstddef>
 #include <type_traits>

@@ -12,16 +12,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/allocator_deleter.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/allocator_support/thread_local_caching_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/concurrency/stack.hpp>
-#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/experimental/scope_exit.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
@@ -30,8 +24,11 @@
 #include <hpx/futures/traits/future_then_result.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/detail/constructor_selector.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>

@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_distributed/bind_action.hpp>
-#include <hpx/preprocessor/cat.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <cstddef>
 #include <mutex>

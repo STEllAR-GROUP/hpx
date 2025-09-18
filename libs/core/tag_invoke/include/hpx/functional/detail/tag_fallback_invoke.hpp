@@ -121,9 +121,9 @@ namespace hpx::functional::detail {
     namespace tag_fallback_invoke_t_ns {
 
         // poison pill
-        void tag_fallback_invoke();
+        HPX_CORE_MODULE_EXPORT_EXTERN void tag_fallback_invoke();
 
-        struct tag_fallback_invoke_t
+        HPX_CORE_MODULE_EXPORT_EXTERN struct tag_fallback_invoke_t
         {
             template <typename Tag, typename... Ts>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
@@ -152,8 +152,8 @@ namespace hpx::functional::detail {
 
     namespace tag_fallback_invoke_ns {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        inline constexpr tag_fallback_invoke_t_ns::tag_fallback_invoke_t
-            tag_fallback_invoke = {};
+        HPX_CORE_MODULE_EXPORT_EXTERN inline constexpr tag_fallback_invoke_t_ns::
+            tag_fallback_invoke_t tag_fallback_invoke = {};
 #else
         HPX_DEVICE static tag_fallback_invoke_t_ns::tag_fallback_invoke_t const
             tag_fallback_invoke = {};
@@ -161,24 +161,24 @@ namespace hpx::functional::detail {
     }    // namespace tag_fallback_invoke_ns
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Tag, typename... Args>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Tag, typename... Args>
     using is_tag_fallback_invocable =
         hpx::is_invocable<decltype(tag_fallback_invoke_ns::tag_fallback_invoke),
             Tag, Args...>;
 
-    template <typename Tag, typename... Args>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Tag, typename... Args>
     inline constexpr bool is_tag_fallback_invocable_v =
         is_tag_fallback_invocable<Tag, Args...>::value;
 
-    template <typename Sig, bool Invocable>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Sig, bool Invocable>
     struct is_nothrow_tag_fallback_invocable_impl;
 
-    template <typename Sig>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Sig>
     struct is_nothrow_tag_fallback_invocable_impl<Sig, false> : std::false_type
     {
     };
 
-    template <typename Tag, typename... Args>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Tag, typename... Args>
     struct is_nothrow_tag_fallback_invocable_impl<
         decltype(tag_fallback_invoke_ns::tag_fallback_invoke)(Tag, Args...),
         true>
@@ -194,7 +194,7 @@ namespace hpx::functional::detail {
     // noexcept(true) to not falsely exclude correct overloads. However, this
     // may lead to noexcept(false) overloads falsely being candidates.
 #if !defined(HPX_CUDA_VERSION) || (HPX_CUDA_VERSION >= 1102)
-    template <typename Tag, typename... Args>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Tag, typename... Args>
     struct is_nothrow_tag_fallback_invocable
       : is_nothrow_tag_fallback_invocable_impl<
             decltype(tag_fallback_invoke_ns::tag_fallback_invoke)(Tag, Args...),
@@ -208,30 +208,30 @@ namespace hpx::functional::detail {
     };
 #endif
 
-    template <typename Tag, typename... Args>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Tag, typename... Args>
     inline constexpr bool is_nothrow_tag_fallback_invocable_v =
         is_nothrow_tag_fallback_invocable<Tag, Args...>::value;
 
-    template <typename Tag, typename... Args>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Tag, typename... Args>
     using tag_fallback_invoke_result = hpx::util::invoke_result<
         decltype(tag_fallback_invoke_ns::tag_fallback_invoke), Tag, Args...>;
 
-    template <typename Tag, typename... Args>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Tag, typename... Args>
     using tag_fallback_invoke_result_t =
         typename tag_fallback_invoke_result<Tag, Args...>::type;
 
     ///////////////////////////////////////////////////////////////////////////////
     namespace tag_base_ns {
 
-        template <typename Tag, typename... Args>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Tag, typename... Args>
         struct not_tag_fallback_noexcept_invocable;
 
         // poison pills
-        void tag_invoke();
-        void tag_fallback_invoke();
+        HPX_CORE_MODULE_EXPORT_EXTERN void tag_invoke();
+        HPX_CORE_MODULE_EXPORT_EXTERN void tag_fallback_invoke();
 
         // use this tag type to enable the tag_fallback_invoke function overloads
-        struct enable_tag_fallback_invoke_t;
+        HPX_CORE_MODULE_EXPORT_EXTERN struct enable_tag_fallback_invoke_t;
 
         ///////////////////////////////////////////////////////////////////////////
         /// Helper base class implementing the tag_invoke logic for CPOs that
@@ -263,7 +263,7 @@ namespace hpx::functional::detail {
         /// match. This is because tag_fallback will dispatch to
         /// tag_fallback_invoke only if there are no matching tag_invoke
         /// overloads.
-        template <typename Tag, typename Enable>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Tag, typename Enable>
         // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         struct tag_fallback
         {
@@ -302,7 +302,7 @@ namespace hpx::functional::detail {
         // helper base class implementing the tag_invoke logic for CPOs that
         // fall back to directly invoke its fallback. Either invocation has to
         // be noexcept.
-        template <typename Tag, typename Enable>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Tag, typename Enable>
         // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         struct tag_fallback_noexcept
         {
@@ -346,22 +346,23 @@ namespace hpx::functional::detail {
 
     inline namespace tag_invoke_base_ns {
 
-        template <typename Tag,
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Tag,
             typename Enable = meta::constant<meta::bool_<true>>>
         using tag_fallback = tag_base_ns::tag_fallback<Tag, Enable>;
 
-        template <typename Tag,
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Tag,
             typename Enable = meta::constant<meta::bool_<true>>>
         using tag_fallback_noexcept =
             tag_base_ns::tag_fallback_noexcept<Tag, Enable>;
 
-        using enable_tag_fallback_invoke_t =
+        HPX_CORE_MODULE_EXPORT_EXTERN using enable_tag_fallback_invoke_t =
             tag_base_ns::enable_tag_fallback_invoke_t;
     }    // namespace tag_invoke_base_ns
 
     inline namespace tag_fallback_invoke_f_ns {
 
-        using tag_fallback_invoke_ns::tag_fallback_invoke;
+        HPX_CORE_MODULE_EXPORT_EXTERN using tag_fallback_invoke_ns::
+            tag_fallback_invoke;
     }    // namespace tag_fallback_invoke_f_ns
 }    // namespace hpx::functional::detail
 

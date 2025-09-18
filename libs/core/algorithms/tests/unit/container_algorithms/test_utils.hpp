@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/runtime.hpp>
 

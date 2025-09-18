@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/let_value.hpp>
 #include <hpx/execution/algorithms/then.hpp>
@@ -17,6 +16,7 @@
 #include <hpx/executors/execute_on.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/explicit_scheduler_executor.hpp>
+#include <hpx/modules/concepts.hpp>
 
 #include <type_traits>
 #include <utility>

@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/datastructures/optional.hpp>
@@ -16,6 +15,7 @@
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/move_only_function.hpp>
+#include <hpx/modules/allocator_support.hpp>
 #include <hpx/synchronization/mutex.hpp>
 
 #include <exception>

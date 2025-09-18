@@ -19,7 +19,7 @@ namespace hpx::traits {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename T>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
         struct has_allocate
         {
         private:
@@ -33,7 +33,7 @@ namespace hpx::traits {
             static constexpr bool value = decltype(test<T>(nullptr))::value;
         };
 
-        template <typename T>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
         struct has_value_type
         {
         private:
@@ -47,7 +47,8 @@ namespace hpx::traits {
             static constexpr bool value = decltype(test<T>(nullptr))::value;
         };
 
-        template <typename T, bool HasAllocate = has_allocate<T>::value>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T,
+            bool HasAllocate = has_allocate<T>::value>
         struct has_deallocate
         {
         private:
@@ -65,7 +66,7 @@ namespace hpx::traits {
                 std::declval<T>(), std::declval<pointer>()))::value;
         };
 
-        template <typename T>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
         struct has_deallocate<T, false>
         {
             static constexpr bool value = false;
@@ -73,7 +74,7 @@ namespace hpx::traits {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     struct is_allocator
       : std::integral_constant<bool,
             detail::has_value_type<T>::value &&
@@ -82,6 +83,6 @@ namespace hpx::traits {
     {
     };
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     inline constexpr bool is_allocator_v = is_allocator<T>::value;
 }    // namespace hpx::traits

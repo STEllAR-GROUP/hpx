@@ -9,8 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/allocator_support/thread_local_caching_allocator.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concurrency/stack.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
@@ -28,6 +26,7 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/one_shot.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/serialization/serialize.hpp>
