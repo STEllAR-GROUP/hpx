@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 Thomas Heller
-//  Copyright (c) 2023 Hartmut Kaiser
+//  Copyright (c) 2023-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/preprocessor/cat.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -25,14 +25,15 @@
 
 namespace hpx::util::detail {
 
-    [[nodiscard]] inline void* __aligned_alloc(
+    HPX_CORE_MODULE_EXPORT_EXTERN [[nodiscard]] inline void* __aligned_alloc(
         std::size_t alignment, std::size_t size) noexcept
     {
         return HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, aligned_alloc)(
             alignment, size);
     }
 
-    inline void __aligned_free(void* p, std::size_t) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN inline void __aligned_free(
+        void* p, std::size_t) noexcept
     {
         return HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, free)(p);
     }
@@ -44,13 +45,14 @@ namespace hpx::util::detail {
 
 namespace hpx::util::detail {
 
-    [[nodiscard]] inline void* __aligned_alloc(
+    HPX_CORE_MODULE_EXPORT_EXTERN [[nodiscard]] inline void* __aligned_alloc(
         std::size_t alignment, std::size_t size) noexcept
     {
         return std::aligned_alloc(alignment, size);
     }
 
-    inline void __aligned_free(void* p, std::size_t) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN inline void __aligned_free(
+        void* p, std::size_t) noexcept
     {
         std::free(p);
     }
@@ -62,13 +64,14 @@ namespace hpx::util::detail {
 
 namespace hpx::util::detail {
 
-    [[nodiscard]] inline void* __aligned_alloc(
+    HPX_CORE_MODULE_EXPORT_EXTERN [[nodiscard]] inline void* __aligned_alloc(
         std::size_t alignment, std::size_t size) noexcept
     {
         return aligned_alloc(alignment, size);
     }
 
-    inline void __aligned_free(void* p, std::size_t) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN inline void __aligned_free(
+        void* p, std::size_t) noexcept
     {
         free(p);
     }
@@ -81,7 +84,7 @@ namespace hpx::util::detail {
 namespace hpx::util::detail {
 
     // provide our own (simple) implementation of aligned_alloc
-    [[nodiscard]] inline void* __aligned_alloc(
+    HPX_CORE_MODULE_EXPORT_EXTERN [[nodiscard]] inline void* __aligned_alloc(
         std::size_t alignment, std::size_t size) noexcept
     {
         if (alignment < alignof(void*))
@@ -105,7 +108,8 @@ namespace hpx::util::detail {
         return aligned_mem;
     }
 
-    inline void __aligned_free(void* p, std::size_t) noexcept
+    HPX_CORE_MODULE_EXPORT_EXTERN inline void __aligned_free(
+        void* p, std::size_t) noexcept
     {
         if (nullptr != p)
         {
@@ -118,7 +122,7 @@ namespace hpx::util::detail {
 
 namespace hpx::util::detail {
 
-    template <typename Allocator>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Allocator>
     [[nodiscard]] void* __aligned_alloc(Allocator const& alloc,
         std::size_t alignment, std::size_t size) noexcept
     {
@@ -146,14 +150,14 @@ namespace hpx::util::detail {
         return aligned_mem;
     }
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     [[nodiscard]] void* __aligned_alloc(std::allocator<T> const&,
         std::size_t alignment, std::size_t size) noexcept
     {
         return __aligned_alloc(alignment, size);
     }
 
-    template <typename Allocator>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Allocator>
     void __aligned_free(
         Allocator const& alloc, void* p, std::size_t size) noexcept
     {
@@ -167,7 +171,7 @@ namespace hpx::util::detail {
         }
     }
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     inline void __aligned_free(
         std::allocator<T> const&, void* p, std::size_t size) noexcept
     {
@@ -180,7 +184,8 @@ namespace hpx::util::detail {
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T = int, typename Allocator = std::allocator<T>>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T = int,
+        typename Allocator = std::allocator<T>>
     struct aligned_allocator
     {
     private:
@@ -269,14 +274,14 @@ namespace hpx::util {
         }
     };
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     [[nodiscard]] constexpr bool operator==(
         aligned_allocator<T> const&, aligned_allocator<T> const&) noexcept
     {
         return true;
     }
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     [[nodiscard]] constexpr bool operator!=(
         aligned_allocator<T> const&, aligned_allocator<T> const&) noexcept
     {

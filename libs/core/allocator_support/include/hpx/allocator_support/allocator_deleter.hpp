@@ -15,7 +15,7 @@
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Allocator>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Allocator>
     struct allocator_deleter
     {
         template <typename SharedState>

@@ -14,11 +14,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/cache/entries/lfu_entry.hpp>
-#include <hpx/cache/local_cache.hpp>
-#include <hpx/cache/statistics/local_full_statistics.hpp>
+#include <hpx/modules/cache.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/statistics/histogram.hpp>
 
 #include <hpx/modules/program_options.hpp>

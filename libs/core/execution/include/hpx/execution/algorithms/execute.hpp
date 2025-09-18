@@ -16,7 +16,7 @@
 #include <hpx/execution/algorithms/start_detached.hpp>
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <utility>
 

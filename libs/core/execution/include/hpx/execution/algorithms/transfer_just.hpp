@@ -14,7 +14,7 @@
 
 #include <hpx/execution/algorithms/just.hpp>
 #include <hpx/execution/algorithms/transfer.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <utility>
 

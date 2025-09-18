@@ -68,6 +68,7 @@ add_hpx_module(
   COMPAT_HEADERS ${synchronization_compat_headers}
   MODULE_DEPENDENCIES
     hpx_config
+    hpx_allocator_support
     hpx_assertion
     hpx_execution_base
     hpx_concurrency
@@ -80,6 +81,7 @@ add_hpx_module(
     hpx_lock_registration
     hpx_logging
     hpx_memory
+    hpx_tag_invoke
     hpx_threading_base
     hpx_thread_support
     hpx_timing

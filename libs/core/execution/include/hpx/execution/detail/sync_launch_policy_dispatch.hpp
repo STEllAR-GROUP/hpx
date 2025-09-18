@@ -8,11 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/futures/traits/is_future.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <functional>
 #include <type_traits>

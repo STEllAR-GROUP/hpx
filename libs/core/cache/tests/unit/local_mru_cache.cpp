@@ -1,12 +1,10 @@
-//  Copyright (c) 2008-2022 Hartmut Kaiser
+//  Copyright (c) 2008-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/cache/entries/lru_entry.hpp>
-#include <hpx/cache/local_cache.hpp>
-#include <hpx/cache/statistics/local_statistics.hpp>
+#include <hpx/modules/cache.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <functional>
@@ -43,7 +41,7 @@ void test_mru_insert()
     HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.capacity());
 
     // insert all items into the cache
-    for (data* d = &cache_entries[0]; d->key != nullptr; ++d)
+    for (data const* d = &cache_entries[0]; d->key != nullptr; ++d)
     {
         HPX_TEST(c.insert(d->key, d->value));
         HPX_TEST_LTE(c.size(), static_cast<cache_type::size_type>(3));
@@ -110,7 +108,7 @@ void test_mru_clear()
     HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.capacity());
 
     // insert all items into the cache
-    for (data* d = &cache_entries[0]; d->key != nullptr; ++d)
+    for (data const* d = &cache_entries[0]; d->key != nullptr; ++d)
     {
         HPX_TEST(c.insert(d->key, d->value));
         HPX_TEST_LTE(c.size(), static_cast<cache_type::size_type>(3));
@@ -125,7 +123,7 @@ void test_mru_clear()
 ///////////////////////////////////////////////////////////////////////////////
 struct erase_func
 {
-    erase_func(std::string const& key)
+    explicit erase_func(std::string const& key)
       : key_(key)
     {
     }
@@ -150,7 +148,7 @@ void test_mru_erase_one()
     HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.capacity());
 
     // insert all items into the cache
-    for (data* d = &cache_entries[0]; d->key != nullptr; ++d)
+    for (data const* d = &cache_entries[0]; d->key != nullptr; ++d)
     {
         HPX_TEST(c.insert(d->key, d->value));
         HPX_TEST_LTE(c.size(), static_cast<cache_type::size_type>(3));

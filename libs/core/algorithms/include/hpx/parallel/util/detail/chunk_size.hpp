@@ -16,8 +16,8 @@
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/modules/properties.hpp>
 #include <hpx/parallel/util/detail/chunk_size_iterator.hpp>
-#include <hpx/properties/property.hpp>
 
 #include <algorithm>
 #include <cstddef>

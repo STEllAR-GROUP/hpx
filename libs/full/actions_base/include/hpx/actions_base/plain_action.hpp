@@ -15,10 +15,8 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/component_type_database.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/naming_base/address.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
 
 #include <cstdlib>
 #include <stdexcept>

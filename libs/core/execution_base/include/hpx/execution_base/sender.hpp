@@ -36,9 +36,7 @@ namespace hpx::execution::experimental {
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
-#include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <cstddef>

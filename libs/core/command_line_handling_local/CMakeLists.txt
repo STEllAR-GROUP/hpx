@@ -74,6 +74,8 @@ add_hpx_module(
     hpx_errors
     hpx_filesystem
     hpx_format
+    hpx_logging
+    hpx_preprocessor
     hpx_string_util
     hpx_topology
     hpx_util

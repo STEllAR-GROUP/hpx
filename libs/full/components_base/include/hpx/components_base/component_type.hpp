@@ -13,15 +13,11 @@
 #include <hpx/components_base/components_base_fwd.hpp>
 #include <hpx/components_base/traits/component_type_database.hpp>
 #include <hpx/functional/move_only_function.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/gid_type.hpp>
 #include <hpx/naming_base/naming_base.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/preprocessor/stringize.hpp>
-#include <hpx/preprocessor/strip_parens.hpp>
 
 #include <cstdint>
 #include <string>

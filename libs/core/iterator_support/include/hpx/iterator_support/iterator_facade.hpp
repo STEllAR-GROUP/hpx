@@ -15,8 +15,8 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/concepts/has_xxx.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <cstddef>

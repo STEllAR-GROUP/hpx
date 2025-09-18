@@ -52,8 +52,7 @@ namespace hpx::execution::experimental {
 #else
 
 #include <hpx/config/constexpr.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <exception>

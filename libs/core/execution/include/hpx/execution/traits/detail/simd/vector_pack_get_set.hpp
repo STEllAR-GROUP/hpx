@@ -11,9 +11,9 @@
 #if defined(HPX_HAVE_DATAPAR_EXPERIMENTAL_SIMD)
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/traits/detail/simd/vector_pack_simd.hpp>
 #include <hpx/execution/traits/vector_pack_alignment_size.hpp>
+#include <hpx/modules/concepts.hpp>
 
 #include <cstddef>
 

@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/resiliency/config.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/modules/async_local.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <utility>
 

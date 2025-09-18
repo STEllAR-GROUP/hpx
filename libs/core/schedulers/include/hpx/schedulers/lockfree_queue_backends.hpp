@@ -17,7 +17,7 @@
 #include <hpx/concurrency/queue.hpp>
 #endif
 
-#include <hpx/allocator_support/aligned_allocator.hpp>
+#include <hpx/modules/allocator_support.hpp>
 
 // Does not rely on CXX11_STD_ATOMIC_128BIT
 #include <hpx/concurrency/concurrentqueue.hpp>
