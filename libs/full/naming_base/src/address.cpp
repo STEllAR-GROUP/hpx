@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/naming_base/address.hpp>
-#include <hpx/serialization/serialize.hpp>
 
 #include <cstddef>
 

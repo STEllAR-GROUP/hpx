@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstdint>
 #include <iostream>

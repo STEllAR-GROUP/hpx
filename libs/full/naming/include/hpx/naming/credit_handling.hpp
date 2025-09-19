@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/naming_base.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -14,8 +14,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/checkpoint.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
 
 #include <iostream>
 #include <memory>

@@ -8,9 +8,9 @@
 
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/serialization/access.hpp>
 
 #include <type_traits>
 #include <utility>

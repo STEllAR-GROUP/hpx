@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/serialization/serialize.hpp>
 
 #include <cstddef>    // for size_t
 #include <type_traits>

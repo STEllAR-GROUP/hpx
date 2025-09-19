@@ -39,6 +39,7 @@ set(program_options_sources
     cmdline.cpp
     config_file.cpp
     convert.cpp
+    errors.cpp
     options_description.cpp
     parsers.cpp
     positional_options.cpp

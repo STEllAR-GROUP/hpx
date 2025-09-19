@@ -11,7 +11,7 @@
 #include <hpx/agas_base/locality_namespace.hpp>
 #include <hpx/agas_base/server/locality_namespace.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
-#include <hpx/serialization/vector.hpp>
+#include <hpx/modules/serialization.hpp>
 
 using hpx::agas::server::locality_namespace;
 

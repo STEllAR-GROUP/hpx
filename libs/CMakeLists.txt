@@ -350,6 +350,7 @@ foreach(lib ${HPX_LIBS})
 
       set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib})
       set(lib_module_file "${lib_module_basedir}/hpx_${lib}.ixx")
+      set(modulename_upper "${uppercase_lib}")
       configure_file(
         "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in" ${lib_module_file} @ONLY
       )

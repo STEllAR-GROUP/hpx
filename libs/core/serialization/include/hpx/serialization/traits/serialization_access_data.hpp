@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,7 +18,7 @@
 namespace hpx::traits {
 
     ////////////////////////////////////////////////////////////////////////////
-    template <typename Container>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Container>
     struct default_serialization_access_data
     {
         using preprocessing_only = std::false_type;
@@ -61,7 +61,7 @@ namespace hpx::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Container>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Container>
     struct serialization_access_data
       : default_serialization_access_data<Container>
     {
@@ -157,7 +157,7 @@ namespace hpx::traits {
         }
     };
 
-    template <typename Container>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Container>
     struct serialization_access_data<Container const>
       : serialization_access_data<Container>
     {

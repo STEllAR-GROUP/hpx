@@ -11,10 +11,8 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
-
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/vector.hpp>
 
 #include <cstddef>
 #include <iostream>

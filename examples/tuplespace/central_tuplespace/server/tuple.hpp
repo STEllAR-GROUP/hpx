@@ -7,8 +7,7 @@
 #pragma once
 
 #include <hpx/datastructures/serialization/serializable_any.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/vector.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <type_traits>
 #include <vector>

@@ -46,6 +46,8 @@ target_link_libraries(
 add_hpx_pseudo_dependencies(
   components.parcel_plugins.binary_filter.snappy compression_snappy
 )
-add_hpx_pseudo_dependencies(core components.parcel_plugins.binary_filter.snappy)
+add_hpx_pseudo_dependencies(
+  components components.parcel_plugins.binary_filter.snappy
+)
 
 add_subdirectory(tests)

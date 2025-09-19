@@ -27,13 +27,12 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/naming/split_gid.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/vector.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/insert_checked.hpp>

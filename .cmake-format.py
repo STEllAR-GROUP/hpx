@@ -361,6 +361,7 @@ with section("parse"):
                                     'ADD_TO_GLOBAL_HEADER': '+',
                                     'GLOBAL_HEADER_GEN': 1,
                                     'GLOBAL_HEADER_MODULE_GEN': 1,
+                                    'MODULE_SOURCE': 1,
                                     'HEADERS': '+',
                                     'MACRO_HEADERS': '+',
                                     'OBJECTS': '+',

@@ -15,7 +15,6 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/serialization/detail/preprocess_container.hpp>
 
 #include <algorithm>
 #include <cstddef>

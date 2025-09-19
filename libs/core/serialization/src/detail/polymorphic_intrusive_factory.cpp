@@ -18,8 +18,8 @@ namespace hpx::serialization::detail {
 
     polymorphic_intrusive_factory& polymorphic_intrusive_factory::instance()
     {
-        hpx::util::static_<polymorphic_intrusive_factory> factory;
-        return factory.get();
+        static polymorphic_intrusive_factory factory;
+        return factory;
     }
 
     void polymorphic_intrusive_factory::register_class(
@@ -32,8 +32,7 @@ namespace hpx::serialization::detail {
                 "Cannot register a factory with an empty name");
         }
 
-        auto const it = map_.find(name);
-        if (it == map_.end())
+        if (auto const it = map_.find(name); it == map_.end())
         {
             map_.emplace(name, fun);
         }

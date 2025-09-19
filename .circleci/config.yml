@@ -62,7 +62,7 @@ docs_push_filter: &docs_push_filter
 
 core_dependency: &core_dependency
     requires:
-      - core
+      - components
     <<: *gh_pages_filter
 
 additional_docs_filter: &additional_docs_filter
@@ -475,6 +475,20 @@ jobs:
           name: Building Core
           command: |
               ninja -j2 -k 0 core
+      - persist_to_workspace:
+          root: /hpx
+          paths:
+            - ./build
+
+  components:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Components
+          command: |
+              ninja -j2 -k 0 components
       - persist_to_workspace:
           root: /hpx
           paths:
@@ -936,8 +950,6 @@ jobs:
           when: always
           command: |
               ulimit -c unlimited
-              # NOTE: the numa_allocator test is disabled because
-              # hwloc_get_area_membind_nodeset used by it fails with EPERM.
               ctest \
                 --timeout 180 \
                 -T test \
@@ -956,6 +968,37 @@ jobs:
           path: tests.unit4
       - store_artifacts:
           path: tests.unit4
+
+  tests.unit5:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests (5)
+          command: |
+              ninja -j2 -k 0 `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit5.targets`
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest \
+                --timeout 180 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit5.targets | sed ':b;N;$!bb;s/\n/|/g'`
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit5
+      - store_artifacts:
+          path: tests.unit5
 
   tests.regressions1:
     <<: *defaults
@@ -1025,74 +1068,141 @@ jobs:
       - store_artifacts:
           path: tests.regressions2
 
-  tests.headers1:
+  tests.headers1_1:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Header Tests (part 1)
+          name: Building Header Tests (part 1/1)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R tests.headers \
-                -E "tests.headers.modules.[a-p].*"
+                -R "tests.headers.modules.[q-s].*"
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: tests.headers1
+          path: tests.headers1_1
       - store_artifacts:
-          path: tests.headers1
+          path: tests.headers1_1
 
-  tests.headers2:
+  tests.headers1_2:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Header Tests (part 2)
+          name: Building Header Tests (part 1/2)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R "tests.headers.modules.[a-b].*"
+                -R "tests.headers.modules.[t-z].*"
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: tests.headers2
+          path: tests.headers1_2
       - store_artifacts:
-          path: tests.headers2
+          path: tests.headers1_2
 
-  tests.headers3:
+  tests.headers2_1:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Header Tests (part 3)
+          name: Building Header Tests (part 2/1)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R "tests.headers.modules.[c-g].*"
+                -R "tests.headers.modules.a[a-l].*"
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: tests.headers3
+          path: tests.headers2_1
       - store_artifacts:
-          path: tests.headers3
+          path: tests.headers2_1
 
-  tests.headers4:
+  tests.headers2_2:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Header Tests (part 4)
+          name: Building Header Tests (part 2/2)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R "tests.headers.modules.[h-p].*"
+                -R "tests.headers.modules.(a[m-z])|b.*"
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: tests.headers4
+          path: tests.headers2_2
       - store_artifacts:
-          path: tests.headers4
+          path: tests.headers2_2
+
+  tests.headers3_1:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Header Tests (part 3/1)
+          command: |
+              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
+                -R "tests.headers.modules.[c-d].*"
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.headers3_1
+      - store_artifacts:
+          path: tests.headers3_1
+
+  tests.headers3_2:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Header Tests (part 3/2)
+          command: |
+              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
+                -R "tests.headers.modules.[e-g].*"
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.headers3_2
+      - store_artifacts:
+          path: tests.headers3_2
+
+  tests.headers4_1:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Header Tests (part 4/1)
+          command: |
+              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
+                -R "tests.headers.modules.[h-l].*"
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.headers4_1
+      - store_artifacts:
+          path: tests.headers4_2
+
+  tests.headers4_2:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Header Tests (part 4/2)
+          command: |
+              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
+                -R "tests.headers.modules.[m-p].*"
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.headers4_2
+      - store_artifacts:
+          path: tests.headers4_2
 
   tests.performance:
     <<: *defaults
@@ -1254,6 +1364,10 @@ workflows:
           requires:
             - configure
           <<: *gh_pages_filter
+      - components:
+          requires:
+            - core
+          <<: *gh_pages_filter
       - tests.examples1:
           <<: *core_dependency
       - tests.examples2:
@@ -1282,19 +1396,29 @@ workflows:
           <<: *core_dependency
       - tests.unit4:
           <<: *core_dependency
+      - tests.unit5:
+          <<: *core_dependency
       - tests.regressions1:
           <<: *core_dependency
       - tests.regressions2:
           <<: *core_dependency
       - tests.performance:
           <<: *core_dependency
-      - tests.headers1:
+      - tests.headers1_1:
           <<: *core_dependency
-      - tests.headers2:
+      - tests.headers1_2:
           <<: *core_dependency
-      - tests.headers3:
+      - tests.headers2_1:
           <<: *core_dependency
-      - tests.headers4:
+      - tests.headers2_2:
+          <<: *core_dependency
+      - tests.headers3_1:
+          <<: *core_dependency
+      - tests.headers3_2:
+          <<: *core_dependency
+      - tests.headers4_1:
+          <<: *core_dependency
+      - tests.headers4_2:
           <<: *core_dependency
       - docs-html:
           requires:
@@ -1353,13 +1477,18 @@ workflows:
             - tests.unit2
             - tests.unit3
             - tests.unit4
+            - tests.unit5
             - tests.regressions1
             - tests.regressions2
             - tests.performance
-            - tests.headers1
-            - tests.headers2
-            - tests.headers3
-            - tests.headers4
+            - tests.headers1_1
+            - tests.headers1_2
+            - tests.headers2_1
+            - tests.headers2_2
+            - tests.headers3_1
+            - tests.headers3_2
+            - tests.headers4_1
+            - tests.headers4_2
             # prevent docs from being rebuilt
             - docs-html
             - docs-singlehtml

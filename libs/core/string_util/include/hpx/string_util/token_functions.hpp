@@ -117,17 +117,14 @@ namespace hpx::string_util {
                 tok += '\n';
                 return;
             }
-            else if (is_quote(*next) || is_c(*next) || is_escape(*next))
+            if (is_quote(*next) || is_c(*next) || is_escape(*next))
             {
                 tok += *next;
                 return;
             }
-            else
-            {
-                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                    "escaped_list_separator::do_escape",
-                    "unknown escape sequence");
-            }
+
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "escaped_list_separator::do_escape", "unknown escape sequence");
         }
 
     public:

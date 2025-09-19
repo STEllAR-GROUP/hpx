@@ -14,7 +14,7 @@
 #include <hpx/async_base/scheduling_properties.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstdint>
 #include <type_traits>

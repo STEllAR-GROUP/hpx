@@ -8,13 +8,7 @@
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 
-#include <hpx/serialization/boost_variant.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/string.hpp>
-#include <hpx/serialization/variant.hpp>
-
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <string>

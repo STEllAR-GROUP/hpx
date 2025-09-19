@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,8 +14,7 @@
 
 namespace hpx::util {
 
-    enum class exception_type
-    {
+    HPX_CXX_EXPORT enum class exception_type {
         // unknown exception
         unknown_exception = 0,
 
@@ -51,25 +50,25 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        using save_custom_exception_handler_type =
+        HPX_CORE_MODULE_EXPORT_EXTERN using save_custom_exception_handler_type =
             std::function<void(hpx::serialization::output_archive&,
                 std::exception_ptr const&, unsigned int)>;
-        using load_custom_exception_handler_type =
+        HPX_CORE_MODULE_EXPORT_EXTERN using load_custom_exception_handler_type =
             std::function<void(hpx::serialization::input_archive&,
                 std::exception_ptr&, unsigned int)>;
 
-        HPX_CORE_EXPORT void set_save_custom_exception_handler(
-            save_custom_exception_handler_type f);
-        HPX_CORE_EXPORT void set_load_custom_exception_handler(
-            load_custom_exception_handler_type f);
+        HPX_CORE_MODULE_EXPORT_EXTERN HPX_CORE_EXPORT void
+        set_save_custom_exception_handler(save_custom_exception_handler_type f);
+        HPX_CORE_MODULE_EXPORT_EXTERN HPX_CORE_EXPORT void
+        set_load_custom_exception_handler(load_custom_exception_handler_type f);
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Archive>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive>
     void save(Archive& ar, std::exception_ptr const& e, unsigned int);
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Archive>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive>
     void load(Archive& ar, std::exception_ptr& e, unsigned int);
 
     HPX_SERIALIZATION_SPLIT_FREE(std::exception_ptr)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,7 +15,7 @@
 
 namespace hpx::serialization {
 
-    struct erased_output_container
+    HPX_CORE_MODULE_EXPORT_EXTERN struct erased_output_container
     {
         virtual ~erased_output_container() = default;
 
@@ -32,7 +32,7 @@ namespace hpx::serialization {
         virtual void flush() = 0;
     };
 
-    struct erased_input_container
+    HPX_CORE_MODULE_EXPORT_EXTERN struct erased_input_container
     {
         virtual ~erased_input_container() = default;
 

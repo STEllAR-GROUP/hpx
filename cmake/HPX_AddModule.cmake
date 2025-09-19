@@ -14,7 +14,7 @@ include(HPX_PrintSummary)
 function(add_hpx_module libname modulename)
   # Retrieve arguments
   set(options CUDA CONFIG_FILES NO_CONFIG_IN_GENERATED_HEADERS)
-  set(one_value_args GLOBAL_HEADER_GEN GLOBAL_HEADER_MODULE_GEN)
+  set(one_value_args GLOBAL_HEADER_GEN GLOBAL_HEADER_MODULE_GEN MODULE_SOURCE)
   set(multi_value_args
       SOURCES
       HEADERS
@@ -69,7 +69,7 @@ function(add_hpx_module libname modulename)
             FORCE
   )
 
-  if(${modulename}_GLOBAL_HEADER_MODULE_GEN)
+  if(${modulename}_GLOBAL_HEADER_MODULE_GEN OR ${modulename}_MODULE_SOURCE)
     # Mark the module as exposing C++ modules
     set(cxx_modules ${HPX_ENABLED_CXX_MODULES})
     list(APPEND cxx_modules ${modulename})
@@ -194,6 +194,7 @@ function(add_hpx_module libname modulename)
         "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/modules/${modulename}.hpp"
     )
     if(${modulename}_GLOBAL_HEADER_MODULE_GEN)
+      # generate list of macro headers to #include
       list(LENGTH ${modulename}_MACRO_HEADERS macro_headers)
       if(macro_headers GREATER 0)
         set(module_macro_headers "\n")
@@ -203,16 +204,36 @@ function(add_hpx_module libname modulename)
             "${module_macro_headers}#include <${header_file}>\n"
         )
       endforeach()
-      set(template_file
-          "${HPX_SOURCE_DIR}/cmake/templates/global_module_header_modules.hpp.in"
-      )
+
+      if(HPX_WITH_BUILD_USING_CXX_MODULES)
+        # generate a list of imported dependent modules
+        set(template_file "global_module_header_modules_separate.hpp.in")
+        set(module_imports)
+        foreach(dep ${${modulename}_MODULE_DEPENDENCIES})
+          string(FIND ${dep} "hpx_" find_index)
+          if(${find_index} EQUAL 0)
+            string(SUBSTRING ${dep} 4 -1 dep) # cut off leading "hpx_"
+            set(module_imports
+                "${module_imports}#include <hpx/modules/${dep}.hpp>\n"
+            )
+          endif()
+        endforeach()
+        list(LENGTH ${modulename}_MODULE_DEPENDENCIES dep_count)
+        if(dep_count GREATER 0)
+          set(module_imports "${module_imports}\n")
+        endif()
+        set(module_imports "${module_imports}import HPX.Core.${modulename};")
+      else()
+        set(template_file "global_module_header_modules.hpp.in")
+      endif()
     else()
-      set(template_file
-          "${HPX_SOURCE_DIR}/cmake/templates/global_module_header.hpp.in"
-      )
+      set(template_file "global_module_header.hpp.in")
     endif()
 
-    configure_file(${template_file} ${global_header} @ONLY)
+    configure_file(
+      "${HPX_SOURCE_DIR}/cmake/templates/${template_file}" ${global_header}
+      @ONLY
+    )
     set(generated_headers ${global_header})
 
     if(${modulename}_GLOBAL_HEADER_MODULE_GEN)
@@ -390,13 +411,21 @@ function(add_hpx_module libname modulename)
   )
 
   set(module_installation)
-  if(${modulename}_GLOBAL_HEADER_MODULE_GEN
+  if((${modulename}_GLOBAL_HEADER_MODULE_GEN OR ${modulename}_MODULE_SOURCE)
      AND HPX_WITH_BUILD_USING_CXX_MODULES
   )
+    if(${modulename}_MODULE_SOURCE)
+      set(lib_module_basedir ${SOURCE_ROOT})
+      set(lib_module_file ${SOURCE_ROOT}/${${modulename}_MODULE_SOURCE})
+      set(lib_module_class "Source Files")
+    else()
+      set(lib_module_class "Generated Files")
+    endif()
+
     add_hpx_source_group(
       NAME hpx_${modulename}
       ROOT ${lib_module_basedir}
-      CLASS "Generated Files"
+      CLASS ${lib_module_class}
       TARGETS ${lib_module_file}
     )
 
@@ -405,8 +434,8 @@ function(add_hpx_module libname modulename)
       hpx_${modulename} PUBLIC
           FILE_SET hpx_${modulename}_public_sources
               TYPE CXX_MODULES
-              BASE_DIRS ${lib_module_basedir}
-              FILES ${lib_module_file}
+                  BASE_DIRS ${lib_module_basedir}
+                  FILES ${lib_module_file}
     )
     set(module_installation
         FILE_SET hpx_${modulename}_public_sources
