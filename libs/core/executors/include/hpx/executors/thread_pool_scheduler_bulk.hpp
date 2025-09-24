@@ -634,17 +634,9 @@ namespace hpx::execution::experimental::detail {
 
         // clang-format off
         template <typename... Ts>
-        requires(
-            (!OperationState::is_chunked &&
-                     hpx::is_invocable_v<F, range_value_type,
-                         std::add_lvalue_reference_t<Ts>...>) ||
-            (OperationState::is_chunked &&
-                hpx::is_invocable_v<F, range_value_type, range_value_type,
-                    std::add_lvalue_reference_t<Ts>...>)
-        )
+        // clang-format on
         friend void tag_invoke(hpx::execution::experimental::set_value_t,
             bulk_receiver&& r, Ts&&... ts) noexcept
-        // clang-format on
         {
             hpx::detail::try_catch_exception_ptr(
                 [&]() { r.execute(HPX_FORWARD(Ts, ts)...); },
