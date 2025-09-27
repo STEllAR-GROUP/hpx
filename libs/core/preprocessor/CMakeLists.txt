@@ -10,6 +10,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(preprocessor_headers
     hpx/preprocessor/cat.hpp
     hpx/preprocessor/config.hpp
+    hpx/preprocessor/empty.hpp
     hpx/preprocessor/expand.hpp
     hpx/preprocessor/identity.hpp
     hpx/preprocessor/nargs.hpp

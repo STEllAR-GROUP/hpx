@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/serialization/macros.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <exception>
@@ -50,26 +51,26 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN using save_custom_exception_handler_type =
+        HPX_CXX_EXPORT using save_custom_exception_handler_type =
             std::function<void(hpx::serialization::output_archive&,
                 std::exception_ptr const&, unsigned int)>;
-        HPX_CORE_MODULE_EXPORT_EXTERN using load_custom_exception_handler_type =
+        HPX_CXX_EXPORT using load_custom_exception_handler_type =
             std::function<void(hpx::serialization::input_archive&,
                 std::exception_ptr&, unsigned int)>;
 
-        HPX_CORE_MODULE_EXPORT_EXTERN HPX_CORE_EXPORT void
+        HPX_CXX_EXPORT HPX_CXX_EXTERN HPX_CORE_EXPORT void
         set_save_custom_exception_handler(save_custom_exception_handler_type f);
-        HPX_CORE_MODULE_EXPORT_EXTERN HPX_CORE_EXPORT void
+        HPX_CXX_EXPORT HPX_CXX_EXTERN HPX_CORE_EXPORT void
         set_load_custom_exception_handler(load_custom_exception_handler_type f);
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive>
+    HPX_CXX_EXPORT template <typename Archive>
     void save(Archive& ar, std::exception_ptr const& e, unsigned int);
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive>
+    HPX_CXX_EXPORT template <typename Archive>
     void load(Archive& ar, std::exception_ptr& e, unsigned int);
 
-    HPX_SERIALIZATION_SPLIT_FREE(std::exception_ptr)
+    HPX_SERIALIZATION_SPLIT_FREE(HPX_CXX_EXPORT, std::exception_ptr)
 }    // namespace hpx::serialization

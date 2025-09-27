@@ -169,7 +169,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // From hpx/errors/define_error_info.hpp
 #define HPX_DEFINE_ERROR_INFO(NAME, TYPE)                                      \
-    HPX_CORE_MODULE_EXPORT_EXTERN struct NAME : ::hpx::error_info<NAME, TYPE>  \
+    HPX_CXX_EXPORT struct NAME : ::hpx::error_info<NAME, TYPE>                 \
     {                                                                          \
         explicit NAME(TYPE const& value) noexcept(                             \
             std::is_nothrow_copy_constructible_v<TYPE>)                        \

@@ -27,7 +27,7 @@ namespace hpx::serialization {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CORE_MODULE_EXPORT_EXTERN struct basic_chunker
+        HPX_CXX_EXPORT struct basic_chunker
         {
             explicit constexpr basic_chunker(
                 std::vector<serialization_chunk>*) noexcept
@@ -65,7 +65,7 @@ namespace hpx::serialization {
             static constexpr void reset() noexcept {}
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN struct vector_chunker
+        HPX_CXX_EXPORT struct vector_chunker
         {
             explicit constexpr vector_chunker(
                 std::vector<serialization_chunk>* chunks) noexcept
@@ -112,7 +112,7 @@ namespace hpx::serialization {
             std::vector<serialization_chunk>* chunks_;
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN struct counting_chunker
+        HPX_CXX_EXPORT struct counting_chunker
         {
             explicit constexpr counting_chunker(
                 std::vector<serialization_chunk>*) noexcept
@@ -165,8 +165,7 @@ namespace hpx::serialization {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Container,
-        typename Chunker>
+    HPX_CXX_EXPORT template <typename Container, typename Chunker>
     struct output_container : erased_output_container
     {
         using access_traits = traits::serialization_access_data<Container>;
@@ -295,8 +294,7 @@ namespace hpx::serialization {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Container,
-        typename Chunker>
+    HPX_CXX_EXPORT template <typename Container, typename Chunker>
     struct filtered_output_container : output_container<Container, Chunker>
     {
         using access_traits = traits::serialization_access_data<Container>;

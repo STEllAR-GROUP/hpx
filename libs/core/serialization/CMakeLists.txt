@@ -252,8 +252,11 @@ add_hpx_module(
     hpx_preprocessor
     hpx_type_support
   DEPENDENCIES ${serialization_optional_dependencies}
-  ADD_TO_GLOBAL_HEADER hpx/serialization/detail/allow_zero_copy_receive.hpp
-                       hpx/serialization/detail/preprocess_container.hpp
-  EXCLUDE_FROM_GLOBAL_HEADER ${boost_serialization_headers}
+  ADD_TO_GLOBAL_HEADER
+    hpx/serialization/detail/allow_zero_copy_receive.hpp
+    hpx/serialization/detail/polymorphic_id_factory.hpp
+    hpx/serialization/detail/polymorphic_intrusive_factory.hpp
+    hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp
+    hpx/serialization/detail/preprocess_container.hpp
   CMAKE_SUBDIRS examples tests
 )

@@ -17,11 +17,11 @@
 
 namespace hpx::util {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN class backtrace
+    HPX_CXX_EXPORT class backtrace
     {
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN std::string trace(
+    HPX_CXX_EXPORT std::string trace(
         std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)
     {
         return {};

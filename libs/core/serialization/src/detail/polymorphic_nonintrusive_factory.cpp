@@ -54,20 +54,10 @@ namespace hpx::serialization::detail {
     }
 
     void* polymorphic_nonintrusive_factory::load_create(
-        input_archive& ar, std::string const& name) const
+        input_archive& ar, std::string const&) const
     {
         std::string class_name;
         ar >> class_name;
-
-        if (std::string const expected_class_name = typeinfo_map_.at(name);
-            class_name != expected_class_name)
-        {
-            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
-                "polymorphic_nonintrusive_factory::register_class",
-                "Unexpected (non-matching) type received (received: {}, "
-                "expected: {})",
-                class_name, expected_class_name);
-        }
 
         function_bunch_type const& bunch = map_.at(class_name);
         return bunch.create_function(ar);

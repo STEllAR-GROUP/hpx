@@ -20,14 +20,14 @@
 
 namespace hpx::traits {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     struct is_bitwise_serializable<std::tuple<Ts...>>
       : ::hpx::util::all_of<
             hpx::traits::is_bitwise_serializable<std::remove_const_t<Ts>>...>
     {
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     struct is_not_bitwise_serializable<std::tuple<Ts...>>
       : std::integral_constant<bool,
             !is_bitwise_serializable_v<std::tuple<Ts...>>>
@@ -39,12 +39,11 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive, typename Is,
-            typename... Ts>
+        HPX_CXX_EXPORT template <typename Archive, typename Is, typename... Ts>
         struct std_serialize_with_index_pack;
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive,
-            std::size_t... Is, typename... Ts>
+        HPX_CXX_EXPORT template <typename Archive, std::size_t... Is,
+            typename... Ts>
         struct std_serialize_with_index_pack<Archive,
             hpx::util::index_pack<Is...>, Ts...>
         {
@@ -62,7 +61,7 @@ namespace hpx::serialization {
         };
     }    // namespace detail
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive, typename... Ts>
+    HPX_CXX_EXPORT template <typename Archive, typename... Ts>
     void serialize(Archive& ar, std::tuple<Ts...>& t, unsigned int version)
     {
         using Is = hpx::util::make_index_pack_t<sizeof...(Ts)>;
@@ -70,7 +69,7 @@ namespace hpx::serialization {
             ar, t, version);
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive>
+    HPX_CXX_EXPORT template <typename Archive>
     constexpr void serialize(Archive&, std::tuple<>&, unsigned int) noexcept
     {
     }

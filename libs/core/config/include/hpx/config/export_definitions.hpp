@@ -59,17 +59,17 @@
 # endif
 # define HPX_CXX_EXPORT                  export
 # define HPX_CXX_EXTERN                  extern "C++"
+# define HPX_EXTERN                      /* empty */
 #else
 # define HPX_CXX_EXPORT                  /* empty */
 # define HPX_CXX_EXTERN                  /* empty */
+# define HPX_EXTERN                      extern
 #endif
 
-#define HPX_CORE_MODULE_EXPORT_EXTERN    HPX_CXX_EXPORT HPX_CXX_EXTERN
-
 #define HPX_CORE_MODULE_EXPORT                                                 \
-    HPX_CORE_MODULE_EXPORT_EXTERN HPX_CORE_EXPORT
+    HPX_CXX_EXPORT HPX_CXX_EXTERN HPX_CORE_EXPORT
 #define HPX_CORE_MODULE_EXPORT_NODISCARD                                       \
-    HPX_CORE_MODULE_EXPORT_EXTERN [[nodiscard]] HPX_CORE_EXPORT
+    HPX_CXX_EXPORT HPX_CXX_EXTERN [[nodiscard]] HPX_CORE_EXPORT
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_EXPORTS) || defined(HPX_FULL_EXPORTS)

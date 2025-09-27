@@ -15,7 +15,7 @@
 namespace hpx::assertion {
 
     /// The signature for an assertion handler
-    HPX_CORE_MODULE_EXPORT_EXTERN using assertion_handler =
+    HPX_CXX_EXPORT using assertion_handler =
         void (*)(hpx::source_location const& loc, char const* expr,
             std::string const& msg);
 

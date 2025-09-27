@@ -15,21 +15,21 @@
 
 namespace hpx::serialization {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_FORCEINLINE output_archive& operator<<(output_archive& ar, T const& t)
     {
         ar.save(t);
         return ar;
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_FORCEINLINE input_archive& operator>>(input_archive& ar, T& t)
     {
         ar.load(t);
         return ar;
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_FORCEINLINE output_archive& operator&(    //-V524
         output_archive& ar, T const& t)
     {
@@ -37,7 +37,7 @@ namespace hpx::serialization {
         return ar;
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_FORCEINLINE input_archive& operator&(input_archive& ar, T& t)    //-V524
     {
         ar.load(t);
@@ -46,13 +46,13 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         void serialize_one(output_archive& ar, T const& t)
         {
             ar.save(t);
         }
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         void serialize_one(input_archive& ar, T& t)
         {
             ar.load(t);

@@ -25,7 +25,7 @@ namespace hpx {
     /// This contains the location information where \a HPX_ASSERT has been
     /// called
 #if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
-    HPX_CORE_MODULE_EXPORT_EXTERN using std::source_location;
+    HPX_CXX_EXPORT using std::source_location;
 #else
     /// The \a source_location class represents certain information about the
     /// source code, such as file names, line numbers, and function names.
@@ -45,7 +45,7 @@ namespace hpx {
     /// efficiently.
     /// It is unspecified whether the copy/move constructors and the copy/move
     /// assignment operators of \a source_location are trivial and/or constexpr.
-    HPX_CORE_MODULE_EXPORT_EXTERN struct source_location
+    HPX_CXX_EXPORT struct source_location
     {
         char const* filename;
         std::uint_least32_t line_number;

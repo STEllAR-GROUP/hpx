@@ -17,7 +17,7 @@
 
 namespace hpx::serialization {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     void serialize(input_archive& ar, std::valarray<T>& arr, int /* version */)
     {
         std::uint64_t sz = 0;
@@ -31,7 +31,7 @@ namespace hpx::serialization {
             ar >> arr[i];
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     void serialize(
         output_archive& ar, std::valarray<T> const& arr, int /* version */)
     {

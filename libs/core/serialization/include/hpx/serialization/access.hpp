@@ -26,14 +26,14 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         HPX_FORCEINLINE void serialize_force_adl(
             output_archive& ar, T const& t, unsigned)
         {
             serialize(ar, const_cast<T&>(t), 0);
         }
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <class T>
+        HPX_CXX_EXPORT template <class T>
         HPX_FORCEINLINE void serialize_force_adl(
             input_archive& ar, T& t, unsigned)
         {
@@ -42,7 +42,7 @@ namespace hpx::serialization {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN class access
+    HPX_CXX_EXPORT class access
     {
     public:
         template <typename T>
@@ -158,7 +158,7 @@ namespace hpx::traits {
 
     // the case when hpx::serialization::access::has_serialize_v<T> is true has
     // to be handled separately to avoid circular dependencies
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct is_not_bitwise_serializable<T,
         std::enable_if_t<!std::is_abstract_v<T> &&
             !hpx::traits::has_serialize_adl_v<T> &&

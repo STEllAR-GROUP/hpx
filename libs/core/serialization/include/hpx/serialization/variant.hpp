@@ -13,6 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/serialization/macros.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstddef>
@@ -25,7 +26,7 @@ namespace hpx::serialization {
     namespace detail {
 
         ////////////////////////////////////////////////////////////////////////
-        HPX_CORE_MODULE_EXPORT_EXTERN struct std_variant_save_visitor
+        HPX_CXX_EXPORT struct std_variant_save_visitor
         {
             explicit constexpr std_variant_save_visitor(
                 output_archive& ar) noexcept
@@ -44,10 +45,10 @@ namespace hpx::serialization {
         };
 
         ////////////////////////////////////////////////////////////////////////
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename... Ts>
+        HPX_CXX_EXPORT template <typename... Ts>
         struct std_variant_impl;
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename... Ts>
+        HPX_CXX_EXPORT template <typename T, typename... Ts>
         struct std_variant_impl<T, Ts...>
         {
             template <typename V>
@@ -74,7 +75,7 @@ namespace hpx::serialization {
         };
     }    // namespace detail
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     void save(output_archive& ar, std::variant<Ts...> const& v, unsigned)
     {
         auto const which = static_cast<std::uint64_t>(v.index());
@@ -83,7 +84,7 @@ namespace hpx::serialization {
         std::visit(visitor, v);
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     void load(input_archive& ar, std::variant<Ts...>& v, unsigned)
     {
         std::uint64_t which;
@@ -101,6 +102,5 @@ namespace hpx::serialization {
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        (HPX_CORE_MODULE_EXPORT_EXTERN template <typename... Ts>),
-        (std::variant<Ts...>) )
+        HPX_CXX_EXPORT, (template <typename... Ts>), (std::variant<Ts...>) )
 }    // namespace hpx::serialization

@@ -15,12 +15,12 @@ namespace hpx::traits {
 
     // This trait is used to decide whether a class (or specialization) is
     // required to automatically register to the action factory
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct needs_automatic_registration : std::true_type
     {
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool needs_automatic_registration_v =
         needs_automatic_registration<T>::value;
 }    // namespace hpx::traits

@@ -15,7 +15,7 @@
 
 namespace hpx::experimental {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN inline constexpr struct prefer_t
+    HPX_CXX_EXPORT inline constexpr struct prefer_t
       : hpx::functional::detail::tag_fallback<prefer_t>
     {
         // clang-format off

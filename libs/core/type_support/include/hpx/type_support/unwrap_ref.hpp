@@ -12,28 +12,28 @@
 
 namespace hpx::util {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct unwrap_reference
     {
         using type = T;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct unwrap_reference<::std::reference_wrapper<T>>
     {
         using type = T;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct unwrap_reference<::std::reference_wrapper<T> const>
     {
         using type = T;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using unwrap_reference_t = typename unwrap_reference<T>::type;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr unwrap_reference_t<T>& unwrap_ref(
         T& t) noexcept
     {

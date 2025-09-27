@@ -22,23 +22,23 @@ namespace hpx::traits {
 #if defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
     // By default, any abstract type or type that exposes serialization will be
     // treated as non-bitwise copyable.
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_not_bitwise_serializable
       : std::integral_constant<bool,
             std::is_abstract_v<T> || hpx::traits::has_serialize_adl_v<T>>
     {
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_not_bitwise_serializable_v =
         is_not_bitwise_serializable<T>::value;
 #else
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_not_bitwise_serializable : std::true_type
     {
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_not_bitwise_serializable_v = true;
 #endif
 

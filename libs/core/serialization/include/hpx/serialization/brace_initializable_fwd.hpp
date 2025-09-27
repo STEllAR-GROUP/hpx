@@ -11,6 +11,6 @@
 
 namespace hpx::serialization {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive, typename T>
+    HPX_CXX_EXPORT template <typename Archive, typename T>
     void serialize_struct(Archive& ar, T& t, unsigned int const);
 }    // namespace hpx::serialization

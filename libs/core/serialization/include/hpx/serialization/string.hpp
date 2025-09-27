@@ -16,7 +16,7 @@
 namespace hpx::serialization {
 
     // load string
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Char, typename CharTraits,
+    HPX_CXX_EXPORT template <typename Char, typename CharTraits,
         typename Allocator>
     void serialize(input_archive& ar,
         std::basic_string<Char, CharTraits, Allocator>& s, unsigned)
@@ -32,7 +32,7 @@ namespace hpx::serialization {
     }
 
     // save string
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Char, typename CharTraits,
+    HPX_CXX_EXPORT template <typename Char, typename CharTraits,
         typename Allocator>
     void serialize(output_archive& ar,
         std::basic_string<Char, CharTraits, Allocator> const& s, unsigned)

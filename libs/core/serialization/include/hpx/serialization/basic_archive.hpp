@@ -22,7 +22,7 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN struct ptr_helper
+        HPX_CXX_EXPORT struct ptr_helper
         {
             virtual ~ptr_helper() = default;
         };
@@ -41,32 +41,32 @@ namespace hpx::serialization {
         all_archive_flags = 0x001fe000    // all of the above
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN constexpr archive_flags operator|(
+    HPX_CXX_EXPORT constexpr archive_flags operator|(
         archive_flags lhs, archive_flags rhs) noexcept
     {
         return static_cast<archive_flags>(
             static_cast<std::uint32_t>(lhs) | static_cast<std::uint32_t>(rhs));
     }
-    HPX_CORE_MODULE_EXPORT_EXTERN constexpr std::uint32_t operator|(
+    HPX_CXX_EXPORT constexpr std::uint32_t operator|(
         std::uint32_t const lhs, archive_flags rhs) noexcept
     {
         return lhs | static_cast<std::uint32_t>(rhs);
     }
-    HPX_CORE_MODULE_EXPORT_EXTERN constexpr std::uint32_t operator&(
+    HPX_CXX_EXPORT constexpr std::uint32_t operator&(
         std::uint32_t const lhs, archive_flags rhs) noexcept
     {
         return lhs & static_cast<std::uint32_t>(rhs);
     }
 
 #if defined(HPX_SERIALIZATION_HAVE_SUPPORTS_ENDIANESS)
-    HPX_CORE_MODULE_EXPORT_EXTERN HPX_FORCEINLINE void reverse_bytes(
+    HPX_CXX_EXPORT HPX_FORCEINLINE void reverse_bytes(
         std::size_t size, char* address)
     {
         std::reverse(address, address + size);
     }
 #endif
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive>
+    HPX_CXX_EXPORT template <typename Archive>
     struct basic_archive
     {
         static constexpr std::uint64_t npos = static_cast<std::uint64_t>(-1);
@@ -202,19 +202,19 @@ namespace hpx::serialization {
         util::extra_data extra_data_;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive>
+    HPX_CXX_EXPORT template <typename Archive>
     void save_binary(Archive& ar, void const* address, std::size_t count)
     {
         ar.save_binary(address, count);
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive>
+    HPX_CXX_EXPORT template <typename Archive>
     void load_binary(Archive& ar, void* address, std::size_t count)
     {
         ar.load_binary(address, count);
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Archive>
+    HPX_CXX_EXPORT template <typename Archive>
     std::size_t current_pos(Archive const& ar) noexcept
     {
         return ar.current_pos();

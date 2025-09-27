@@ -68,7 +68,7 @@ struct D : B
       , d(89)
     {
     }
-    void f() {}
+    void f() override {}
 
     int d;
 };
@@ -92,6 +92,8 @@ struct C
       : c(c)
     {
     }
+
+    virtual ~C() = default;
 
     T c;
 };
@@ -130,7 +132,7 @@ public:
     C<T> c;
 };
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <class Archive, class T>
     void serialize(Archive& archive, E<T>& s, unsigned)
@@ -138,7 +140,7 @@ namespace hpx { namespace serialization {
         archive& hpx::serialization::base_object<A>(s);
         archive & s.c;
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization
 
 template <typename T>
 E<T>* e_factory(hpx::serialization::input_archive& ar, E<T>* /*unused*/)

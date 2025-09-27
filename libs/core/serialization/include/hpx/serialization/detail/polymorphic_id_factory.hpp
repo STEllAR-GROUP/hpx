@@ -29,7 +29,7 @@
 
 namespace hpx::serialization::detail {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN class id_registry
+    HPX_CXX_EXPORT class id_registry
     {
     public:
         id_registry(id_registry const&) = delete;
@@ -85,7 +85,7 @@ namespace hpx::serialization::detail {
         cache_t cache;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN class polymorphic_id_factory
+    HPX_CXX_EXPORT class polymorphic_id_factory
     {
     public:
         polymorphic_id_factory(polymorphic_id_factory const&) = delete;
@@ -126,7 +126,7 @@ namespace hpx::serialization::detail {
         friend struct hpx::util::static_<polymorphic_id_factory>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct register_class_name<T,
         std::enable_if_t<traits::is_serialized_with_id_v<T>>>
     {
@@ -148,10 +148,10 @@ namespace hpx::serialization::detail {
         }
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <std::uint32_t desc>
+    HPX_CXX_EXPORT template <std::uint32_t desc>
     [[nodiscard]] std::string get_constant_entry_name();
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <std::uint32_t Id>
+    HPX_CXX_EXPORT template <std::uint32_t Id>
     struct add_constant_entry
     {
         add_constant_entry()

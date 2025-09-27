@@ -26,7 +26,7 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Allocator>
+        HPX_CXX_EXPORT template <typename Allocator>
         struct array_allocator
         {
             auto* operator()(Allocator alloc, std::size_t size) const
@@ -37,7 +37,7 @@ namespace hpx::serialization {
             }
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct array_allocator<std::allocator<T>>
         {
             T* operator()(std::allocator<T>, std::size_t size) const
@@ -46,7 +46,7 @@ namespace hpx::serialization {
             }
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Deallocator>
+        HPX_CXX_EXPORT template <typename Deallocator>
         struct array_deleter
         {
             template <typename T>
@@ -58,7 +58,7 @@ namespace hpx::serialization {
             }
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct array_deleter<std::allocator<T>>
         {
             void operator()(
@@ -70,7 +70,7 @@ namespace hpx::serialization {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Allocator>
     class serialize_buffer
     {
     private:

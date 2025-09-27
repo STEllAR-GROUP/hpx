@@ -17,7 +17,7 @@
 namespace hpx::traits {
 
 #if !defined(HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION)
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_bitwise_serializable
       : std::integral_constant<bool,
             (std::is_trivially_copy_assignable_v<T> ||
@@ -27,7 +27,7 @@ namespace hpx::traits {
     {
     };
 #else
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_bitwise_serializable
       : std::integral_constant<bool,
             std::is_trivially_copy_assignable_v<T> ||
@@ -37,7 +37,7 @@ namespace hpx::traits {
     };
 #endif
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_bitwise_serializable_v =
         is_bitwise_serializable<T>::value;
 

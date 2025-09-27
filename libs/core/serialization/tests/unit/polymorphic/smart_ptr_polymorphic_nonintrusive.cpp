@@ -11,8 +11,6 @@
 #include <hpx/modules/testing.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <hpx/serialization/boost_intrusive_ptr.hpp>
-
 #include <boost/intrusive_ptr.hpp>
 #endif
 
@@ -32,7 +30,7 @@ struct A
     }
     virtual ~A() {}
 
-    virtual const char* foo() = 0;
+    virtual char const* foo() = 0;
 };
 
 HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(A)
@@ -52,7 +50,7 @@ struct B : A
     {
     }
 
-    const char* foo() override
+    char const* foo() override
     {
         return "B::foo";
     }
@@ -65,7 +63,7 @@ void load(Archive& ar, B& b, unsigned)
     ar & b.b;
 }
 template <class Archive>
-void save(Archive& ar, const B& b, unsigned)
+void save(Archive& ar, B const& b, unsigned)
 {
     ar& hpx::serialization::base_object<A>(b);
     ar & b.b;
@@ -82,7 +80,7 @@ struct C : public B
     {
     }
 
-    const char* foo() override
+    char const* foo() override
     {
         return "C::foo";
     }
@@ -144,7 +142,7 @@ struct D
     }
     virtual ~D() {}
 
-    virtual const char* foo() = 0;
+    virtual char const* foo() = 0;
 };
 HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(D)
 
@@ -154,7 +152,7 @@ void load(Archive& ar, D& d, unsigned)
     ar & d.a;
 }
 template <class Archive>
-void save(Archive& ar, const D& d, unsigned)
+void save(Archive& ar, D const& d, unsigned)
 {
     ar & d.a;
 }
@@ -182,7 +180,7 @@ struct E : D
     {
     }
 
-    const char* foo() override
+    char const* foo() override
     {
         return "E::foo";
     }
@@ -195,7 +193,7 @@ void load(Archive& ar, E& e, unsigned)
     ar & e.b;
 }
 template <class Archive>
-void save(Archive& ar, const E& e, unsigned)
+void save(Archive& ar, E const& e, unsigned)
 {
     ar& hpx::serialization::base_object<D>(e);
     ar & e.b;
@@ -212,7 +210,7 @@ struct F : public E
     {
     }
 
-    virtual const char* foo()
+    char const* foo() override
     {
         return "F::foo";
     }

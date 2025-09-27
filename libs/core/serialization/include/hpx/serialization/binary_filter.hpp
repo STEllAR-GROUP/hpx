@@ -17,7 +17,7 @@ namespace hpx::serialization {
 
     ///////////////////////////////////////////////////////////////////////////
     // Base class for all serialization filters.
-    HPX_CORE_MODULE_EXPORT_EXTERN struct binary_filter
+    HPX_CXX_EXPORT struct binary_filter
     {
         virtual ~binary_filter() = default;
 

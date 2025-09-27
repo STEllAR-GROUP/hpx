@@ -23,7 +23,7 @@
 
 namespace hpx::serialization {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Allocator>
+    HPX_CXX_EXPORT template <typename Allocator>
     void serialize(input_archive& ar, std::vector<bool, Allocator>& v, unsigned)
     {
         std::uint64_t size = 0;
@@ -45,7 +45,7 @@ namespace hpx::serialization {
         }
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Allocator>
     void serialize(input_archive& ar, std::vector<T, Allocator>& v, unsigned)
     {
         v.clear();
@@ -92,7 +92,7 @@ namespace hpx::serialization {
         }
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Allocator>
+    HPX_CXX_EXPORT template <typename Allocator>
     void serialize(
         output_archive& ar, std::vector<bool, Allocator> const& v, unsigned)
     {
@@ -111,7 +111,7 @@ namespace hpx::serialization {
         }
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Allocator>
     void serialize(
         output_archive& ar, std::vector<T, Allocator> const& v, unsigned)
     {

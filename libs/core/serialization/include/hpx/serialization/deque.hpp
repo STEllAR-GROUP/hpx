@@ -15,7 +15,7 @@
 
 namespace hpx::serialization {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Allocator>
     void serialize(
         input_archive& ar, std::deque<T, Allocator>& d, unsigned)    //-V826
     {
@@ -28,7 +28,7 @@ namespace hpx::serialization {
         detail::load_collection(ar, d, size);
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Allocator>
     void serialize(output_archive& ar,
         std::deque<T, Allocator> const& d,    //-V826
         unsigned)

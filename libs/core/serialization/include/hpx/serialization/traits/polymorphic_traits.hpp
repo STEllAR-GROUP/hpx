@@ -18,35 +18,34 @@ namespace hpx::traits {
 
     namespace detail {
 
-        HPX_HAS_XXX_TRAIT_DEF(HPX_CORE_MODULE_EXPORT_EXTERN, serialized_with_id)
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(
-            HPX_CORE_MODULE_EXPORT_EXTERN, hpx_serialization_get_name)
+        HPX_HAS_XXX_TRAIT_DEF(HPX_CXX_EXPORT, serialized_with_id)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CXX_EXPORT, hpx_serialization_get_name)
     }    // namespace detail
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct is_intrusive_polymorphic : detail::has_hpx_serialization_get_name<T>
     {
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_intrusive_polymorphic_v =
         is_intrusive_polymorphic<T>::value;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct is_nonintrusive_polymorphic : std::false_type
     {
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_nonintrusive_polymorphic_v =
         is_nonintrusive_polymorphic<T>::value;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct is_serialized_with_id : detail::has_serialized_with_id<T>
     {
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_serialized_with_id_v =
         is_serialized_with_id<T>::value;
 }    // namespace hpx::traits

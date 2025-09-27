@@ -17,8 +17,7 @@
 
 namespace hpx::serialization {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Compare,
-        typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Compare, typename Allocator>
     void serialize(
         input_archive& ar, std::set<T, Compare, Allocator>& set, unsigned)
     {
@@ -34,8 +33,7 @@ namespace hpx::serialization {
         }
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Compare,
-        typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Compare, typename Allocator>
     void serialize(output_archive& ar,
         std::set<T, Compare, Allocator> const& set, unsigned)
     {

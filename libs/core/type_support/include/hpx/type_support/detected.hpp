@@ -14,7 +14,7 @@ namespace hpx::util {
 
     // hpx::util::nonesuch is a class type used by hpx::util::detected_t to
     // indicate detection failure.
-    HPX_CORE_MODULE_EXPORT_EXTERN struct nonesuch
+    HPX_CXX_EXPORT struct nonesuch
     {
         nonesuch() = delete;
         ~nonesuch() = delete;
@@ -27,16 +27,15 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Default,
-            typename AlwaysVoid, template <typename...> class Op,
-            typename... Args>
+        HPX_CXX_EXPORT template <typename Default, typename AlwaysVoid,
+            template <typename...> class Op, typename... Args>
         struct detector
         {
             using value_t = std::false_type;
             using type = Default;
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Default,
+        HPX_CXX_EXPORT template <typename Default,
             template <typename...> class Op, typename... Args>
         struct detector<Default, std::void_t<Op<Args...>>, Op, Args...>
         {
@@ -48,20 +47,17 @@ namespace hpx::util {
     // The alias template is_detected is an alias for std::true_type if the
     // template-id Op<Args...> is valid; otherwise it is an alias for
     // std::false_type.
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <typename...> class Op,
-        typename... Args>
+    HPX_CXX_EXPORT template <template <typename...> class Op, typename... Args>
     using is_detected =
         typename detail::detector<nonesuch, void, Op, Args...>::value_t;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <typename...> class Op,
-        typename... Args>
+    HPX_CXX_EXPORT template <template <typename...> class Op, typename... Args>
     inline constexpr bool is_detected_v = is_detected<Op, Args...>::value;
 
     // The alias template detected_t is an alias for Op<Args...> if that
     // template-id is valid; otherwise it is an alias for the class
     // hpx::util::nonesuch.
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <typename...> class Op,
-        typename... Args>
+    HPX_CXX_EXPORT template <template <typename...> class Op, typename... Args>
     using detected_t =
         typename detail::detector<nonesuch, void, Op, Args...>::type;
 
@@ -73,24 +69,24 @@ namespace hpx::util {
     //   std::true_type, and type is an alias for Op<Args...>;
     // - Otherwise, value_t is an alias for std::false_type and type is an alias
     //   for Default.
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Default,
-        template <typename...> class Op, typename... Args>
+    HPX_CXX_EXPORT template <typename Default, template <typename...> class Op,
+        typename... Args>
     using detected_or = detail::detector<Default, void, Op, Args...>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Default,
-        template <typename...> class Op, typename... Args>
+    HPX_CXX_EXPORT template <typename Default, template <typename...> class Op,
+        typename... Args>
     using detected_or_t = typename detected_or<Default, Op, Args...>::type;
 
     // The alias template is_detected_exact checks whether
     // detected_t<Op, Args...> is Expected.
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Expected,
-        template <typename...> class Op, typename... Args>
+    HPX_CXX_EXPORT template <typename Expected, template <typename...> class Op,
+        typename... Args>
     using is_detected_exact = std::is_same<Expected, detected_t<Op, Args...>>;
 
     // The alias template is_detected_convertible checks whether
     // detected_t<Op, Args...> is convertible to To.
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename To,
-        template <typename...> class Op, typename... Args>
+    HPX_CXX_EXPORT template <typename To, template <typename...> class Op,
+        typename... Args>
     using is_detected_convertible =
         std::is_convertible<detected_t<Op, Args...>, To>;
 }    // namespace hpx::util

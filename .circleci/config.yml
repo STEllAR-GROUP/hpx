@@ -1111,7 +1111,7 @@ jobs:
           name: Building Header Tests (part 2/1)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R "tests.headers.modules.a[a-l].*"
+                -R "tests.headers.modules.a[a-h].*"
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -1128,13 +1128,30 @@ jobs:
           name: Building Header Tests (part 2/2)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R "tests.headers.modules.(a[m-z])|b.*"
+                -R "tests.headers.modules.al.*"
       - run:
           <<: *convert_xml
       - store_test_results:
           path: tests.headers2_2
       - store_artifacts:
           path: tests.headers2_2
+
+  tests.headers2_3:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Header Tests (part 2/3)
+          command: |
+              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
+                -R "tests.headers.modules.((a[m-z])|b).*"
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.headers2_3
+      - store_artifacts:
+          path: tests.headers2_3
 
   tests.headers3_1:
     <<: *defaults
@@ -1412,6 +1429,8 @@ workflows:
           <<: *core_dependency
       - tests.headers2_2:
           <<: *core_dependency
+      - tests.headers2_3:
+          <<: *core_dependency
       - tests.headers3_1:
           <<: *core_dependency
       - tests.headers3_2:
@@ -1485,6 +1504,7 @@ workflows:
             - tests.headers1_2
             - tests.headers2_1
             - tests.headers2_2
+            - tests.headers2_3
             - tests.headers3_1
             - tests.headers3_2
             - tests.headers4_1

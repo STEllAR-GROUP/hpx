@@ -18,7 +18,7 @@
 namespace hpx::traits {
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Container>
+    HPX_CXX_EXPORT template <typename Container>
     struct default_serialization_access_data
     {
         using preprocessing_only = std::false_type;
@@ -61,7 +61,7 @@ namespace hpx::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Container>
+    HPX_CXX_EXPORT template <typename Container>
     struct serialization_access_data
       : default_serialization_access_data<Container>
     {
@@ -157,7 +157,7 @@ namespace hpx::traits {
         }
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Container>
+    HPX_CXX_EXPORT template <typename Container>
     struct serialization_access_data<Container const>
       : serialization_access_data<Container>
     {

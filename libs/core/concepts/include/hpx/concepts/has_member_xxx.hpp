@@ -81,4 +81,4 @@
     /**/
 
 #define HPX_HAS_MEMBER_XXX_TRAIT_DEF_1(Member)                                 \
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF_2(/**/, Member) /**/
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF_2(HPX_PP_EMPTY(), Member) /**/

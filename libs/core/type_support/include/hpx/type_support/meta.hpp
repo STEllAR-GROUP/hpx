@@ -18,13 +18,13 @@ namespace hpx::meta {
 
     ///////////////////////////////////////////////////////////////////////////
     // make an alias template that extracts the embedded ::type of T
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using type = typename T::type;
 
     // hide a template type parameter from ADL
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct hidden
         {
             using type = struct _
@@ -34,53 +34,52 @@ namespace hpx::meta {
         };
     }    // namespace detail
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using hidden = meta::type<detail::hidden<T>>;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using identity = T;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr auto value = T::value;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename U>
+    HPX_CXX_EXPORT template <typename T, typename U>
     inline constexpr bool value<std::is_same<T, U>> = false;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool value<std::is_same<T, T>> = true;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <class...> typename F>
+    HPX_CXX_EXPORT template <template <class...> typename F>
     struct func
     {
         template <typename... Ts>
         using apply = F<Ts...>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <class> typename F>
+    HPX_CXX_EXPORT template <template <class> typename F>
     struct func1
     {
         template <typename T1>
         using apply = F<T1>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <class, class> typename F>
+    HPX_CXX_EXPORT template <template <class, class> typename F>
     struct func2
     {
         template <typename T1, typename T2>
         using apply = F<T1, T2>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <
-        template <class, class, class> typename F>
+    HPX_CXX_EXPORT template <template <class, class, class> typename F>
     struct func3
     {
         template <typename T1, typename T2, typename T3>
         using apply = F<T1, T2, T3>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename R>
+    HPX_CXX_EXPORT template <typename R>
     struct compose_func
     {
         template <typename... Ts>
@@ -88,150 +87,135 @@ namespace hpx::meta {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     using invoke = typename F::template apply<Ts...>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename T1>
+    HPX_CXX_EXPORT template <typename F, typename T1>
     using invoke1 = typename F::template apply<T1>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename T1,
-        typename T2>
+    HPX_CXX_EXPORT template <typename F, typename T1, typename T2>
     using invoke2 = typename F::template apply<T1, T2>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename T1,
-        typename T2, typename T3>
+    HPX_CXX_EXPORT template <typename F, typename T1, typename T2, typename T3>
     using invoke3 = typename F::template apply<T1, T2, T3>;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <class...> typename T,
-        typename... Ts>
+    HPX_CXX_EXPORT template <template <class...> typename T, typename... Ts>
     using is_valid = util::is_detected<T, Ts...>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <class> typename T,
-        typename T1>
+    HPX_CXX_EXPORT template <template <class> typename T, typename T1>
     using is_valid1 = util::is_detected<T, T1>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <class, class> typename T,
-        typename T1, typename T2>
+    HPX_CXX_EXPORT template <template <class, class> typename T, typename T1,
+        typename T2>
     using is_valid2 = util::is_detected<T, T1, T2>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <
-        template <class, class, class> typename T, typename T1, typename T2,
-        typename T3>
+    HPX_CXX_EXPORT template <template <class, class, class> typename T,
+        typename T1, typename T2, typename T3>
     using is_valid3 = util::is_detected<T, T1, T2, T3>;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     using is_invocable = is_valid<F::template apply, Ts...>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename T1>
+    HPX_CXX_EXPORT template <typename F, typename T1>
     using is_invocable1 = is_valid1<F::template apply, T1>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename T1,
-        typename T2>
+    HPX_CXX_EXPORT template <typename F, typename T1, typename T2>
     using is_invocable2 = is_valid2<F::template apply, T1, T2>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename T1,
-        typename T2, typename T3>
+    HPX_CXX_EXPORT template <typename F, typename T1, typename T2, typename T3>
     using is_invocable3 = is_valid3<F::template apply, T1, T2, T3>;
 
     ///////////////////////////////////////////////////////////////////////////
     // intentionally left unimplemented
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     struct pack;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <class...> typename F,
-        typename... Front>
+    HPX_CXX_EXPORT template <template <class...> typename F, typename... Front>
     struct bind_front_func
     {
         template <typename... Ts>
         using apply = F<Front..., Ts...>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <class...> typename F,
-        typename... Front>
+    HPX_CXX_EXPORT template <template <class...> typename F, typename... Front>
     struct bind_front1_func
     {
         template <typename A>
         using apply = F<Front..., A>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <class...> typename F,
-        typename... Front>
+    HPX_CXX_EXPORT template <template <class...> typename F, typename... Front>
     struct bind_front2_func
     {
         template <typename A, typename B>
         using apply = F<Front..., A, B>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <class...> typename F,
-        typename... Front>
+    HPX_CXX_EXPORT template <template <class...> typename F, typename... Front>
     struct bind_front3_func
     {
         template <typename A, typename B, typename C>
         using apply = F<Front..., A, B, C>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Front>
+    HPX_CXX_EXPORT template <typename F, typename... Front>
     using bind_front = bind_front_func<F::template apply, Front...>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Back>
+    HPX_CXX_EXPORT template <typename F, typename... Back>
     using bind_front1 = bind_front1_func<F::template apply, Back...>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Back>
+    HPX_CXX_EXPORT template <typename F, typename... Back>
     using bind_front2 = bind_front2_func<F::template apply, Back...>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Back>
+    HPX_CXX_EXPORT template <typename F, typename... Back>
     using bind_front3 = bind_front3_func<F::template apply, Back...>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <class...> typename F,
-        typename... Back>
+    HPX_CXX_EXPORT template <template <class...> typename F, typename... Back>
     struct bind_back_func
     {
         template <typename... Ts>
         using apply = F<Ts..., Back...>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <class...> typename F,
-        typename... Back>
+    HPX_CXX_EXPORT template <template <class...> typename F, typename... Back>
     struct bind_back1_func
     {
         template <typename A>
         using apply = F<A, Back...>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <class...> typename F,
-        typename... Back>
+    HPX_CXX_EXPORT template <template <class...> typename F, typename... Back>
     struct bind_back2_func
     {
         template <typename A, typename B>
         using apply = F<A, B, Back...>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <class...> typename F,
-        typename... Back>
+    HPX_CXX_EXPORT template <template <class...> typename F, typename... Back>
     struct bind_back3_func
     {
         template <typename A, typename B, typename C>
         using apply = F<A, B, C, Back...>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Back>
+    HPX_CXX_EXPORT template <typename F, typename... Back>
     using bind_back = bind_back_func<F::template apply, Back...>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Back>
+    HPX_CXX_EXPORT template <typename F, typename... Back>
     using bind_back1 = bind_back1_func<F::template apply, Back...>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Back>
+    HPX_CXX_EXPORT template <typename F, typename... Back>
     using bind_back2 = bind_back2_func<F::template apply, Back...>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Back>
+    HPX_CXX_EXPORT template <typename F, typename... Back>
     using bind_back3 = bind_back3_func<F::template apply, Back...>;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <bool>
+        HPX_CXX_EXPORT template <bool>
         struct if_
         {
             template <typename TrueCase, typename>
@@ -246,42 +230,41 @@ namespace hpx::meta {
         };
     }    // namespace detail
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Cond, typename TrueCase,
+    HPX_CXX_EXPORT template <typename Cond, typename TrueCase,
         typename FalseCase>
     using if_ = invoke2<detail::if_<value<Cond>>, TrueCase, FalseCase>;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename... Ts>
+        HPX_CXX_EXPORT template <typename... Ts>
         struct compose_args_helper_not_valid;
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename Pack,
+        HPX_CXX_EXPORT template <typename F, typename Pack,
             typename Enable = void>
         struct compose_args_helper
         {
             using type = compose_args_helper_not_valid<F, Pack>;
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename F,
-            template <class...> typename A, typename... As>
+        HPX_CXX_EXPORT template <typename F, template <class...> typename A,
+            typename... As>
         struct compose_args_helper<F, pack<A<As...>>,
             std::enable_if_t<value<is_invocable<F, As...>>>>
         {
             using type = invoke<F, As...>;
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename F,
-            template <class...> typename A, typename... As,
-            template <typename...> typename B, typename... Bs, typename... Rest>
+        HPX_CXX_EXPORT template <typename F, template <class...> typename A,
+            typename... As, template <typename...> typename B, typename... Bs,
+            typename... Rest>
         struct compose_args_helper<F, pack<A<As...>, B<Bs...>, Rest...>>
           : compose_args_helper<F, pack<pack<As..., Bs...>, Rest...>>
         {
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename F,
-            template <class...> typename A, typename... As,
-            template <class...> typename B, typename... Bs,
+        HPX_CXX_EXPORT template <typename F, template <class...> typename A,
+            typename... As, template <class...> typename B, typename... Bs,
             template <class...> typename C, typename... Cs, typename... Rest>
         struct compose_args_helper<F,
             pack<A<As...>, B<Bs...>, C<Cs...>, Rest...>>
@@ -289,9 +272,8 @@ namespace hpx::meta {
         {
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename F,
-            template <class...> typename A, typename... As,
-            template <class...> typename B, typename... Bs,
+        HPX_CXX_EXPORT template <typename F, template <class...> typename A,
+            typename... As, template <class...> typename B, typename... Bs,
             template <class...> typename C, typename... Cs,
             template <class...> typename D, typename... Ds, typename... Rest>
         struct compose_args_helper<F,
@@ -301,14 +283,14 @@ namespace hpx::meta {
         {
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename F>
+        HPX_CXX_EXPORT template <typename F>
         struct compose_args_helper<F, pack<>>
           : compose_args_helper<F, pack<pack<>>>
         {
         };
     }    // namespace detail
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F = func<pack>>
+    HPX_CXX_EXPORT template <typename F = func<pack>>
     struct compose_args
     {
         template <typename... Ts>
@@ -317,14 +299,13 @@ namespace hpx::meta {
 
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <template <class...> typename F,
-            typename Pack, typename Enable = void>
+        HPX_CXX_EXPORT template <template <class...> typename F, typename Pack,
+            typename Enable = void>
         struct defer_helper
         {
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <template <class...> typename F,
-            typename... Ts>
+        HPX_CXX_EXPORT template <template <class...> typename F, typename... Ts>
         struct defer_helper<F, pack<Ts...>,
             std::enable_if_t<value<is_valid<F, Ts...>>>>
         {
@@ -332,7 +313,7 @@ namespace hpx::meta {
         };
     }    // namespace detail
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <class...> typename F>
+    HPX_CXX_EXPORT template <template <class...> typename F>
     struct defer
     {
         template <typename... Ts>
@@ -340,75 +321,73 @@ namespace hpx::meta {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <bool Value>
+    HPX_CXX_EXPORT template <bool Value>
     using bool_ = std::bool_constant<Value>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Bool>
+    HPX_CXX_EXPORT template <typename Bool>
     using not_ = bool_<!value<Bool>>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T0, typename T1>
+    HPX_CXX_EXPORT template <typename T0, typename T1>
     using or_ = bool_<(value<T0> || value<T1>)>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T0, typename T1>
+    HPX_CXX_EXPORT template <typename T0, typename T1>
     using and_ = bool_<(value<T0> && value<T1>)>;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct constant
     {
         template <typename...>
         using apply = T;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN struct count
+    HPX_CXX_EXPORT struct count
     {
         template <typename... Ts>
         using apply = std::integral_constant<std::size_t, sizeof...(Ts)>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     struct curry
     {
         template <typename... Ts>
         using apply = invoke<F, Ts...>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F = func<pack>>
+    HPX_CXX_EXPORT template <typename F = func<pack>>
     using uncurry = compose_args<F>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... List>
+    HPX_CXX_EXPORT template <typename F, typename... List>
     using apply = invoke<uncurry<F>, List...>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F,
-        typename Continuation = func<pack>>
+    HPX_CXX_EXPORT template <typename F, typename Continuation = func<pack>>
     struct transform
     {
         template <typename... Ts>
         using apply = invoke<Continuation, invoke1<F, Ts>...>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Pred = func<std::is_same>>
+    HPX_CXX_EXPORT template <typename Pred = func<std::is_same>>
     struct not_pred
     {
         template <typename T1, typename T2>
         using apply = not_<invoke<Pred, T1, T2>>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T,
-        typename Cmp = func<std::is_same>>
+    HPX_CXX_EXPORT template <typename T, typename Cmp = func<std::is_same>>
     struct contains
     {
         template <typename... Ts>
         using apply = invoke<func<util::any_of>, invoke2<Cmp, T, Ts>...>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename... Ts>
+    HPX_CXX_EXPORT template <typename T, typename... Ts>
     using one_of = invoke<contains<T>, Ts...>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename... Ts>
+    HPX_CXX_EXPORT template <typename T, typename... Ts>
     using none_of = invoke<contains<T, not_pred<func<std::is_same>>>, Ts...>;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Continuation = func<pack>>
+    HPX_CXX_EXPORT template <typename Continuation = func<pack>>
     struct push_back
     {
         template <typename List, typename... Item>
@@ -416,7 +395,7 @@ namespace hpx::meta {
     };
 
     // clang-format off
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Continuation = func<pack>>
+    HPX_CXX_EXPORT template <typename Continuation = func<pack>>
     struct push_back_unique
     {
         template <typename List, typename Item>
@@ -430,35 +409,35 @@ namespace hpx::meta {
 
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename Pack,
+        HPX_CXX_EXPORT template <typename F, typename Pack,
             typename Enable = void>
         struct right_fold_helper
         {
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename State,
-            typename Head, typename... Tail>
+        HPX_CXX_EXPORT template <typename F, typename State, typename Head,
+            typename... Tail>
         struct right_fold_helper<F, pack<State, Head, Tail...>,
             std::enable_if_t<value<is_invocable2<F, State, Head>>>>
           : right_fold_helper<F, pack<invoke2<F, State, Head>, Tail...>>
         {
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename State>
+        HPX_CXX_EXPORT template <typename F, typename State>
         struct right_fold_helper<F, pack<State>>
         {
             using type = State;
         };
     }    // namespace detail
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Init, typename F>
+    HPX_CXX_EXPORT template <typename Init, typename F>
     struct right_fold
     {
         template <typename... Ts>
         using apply = type<detail::right_fold_helper<F, pack<Init, Ts...>>>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Continuation = func<pack>>
+    HPX_CXX_EXPORT template <typename Continuation = func<pack>>
     struct unique
     {
         template <typename... Ts>
@@ -466,7 +445,7 @@ namespace hpx::meta {
             invoke<right_fold<pack<>, push_back_unique<>>, Ts...>>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Old, typename New,
+    HPX_CXX_EXPORT template <typename Old, typename New,
         typename Continuation = func<pack>>
     struct replace
     {
@@ -475,8 +454,7 @@ namespace hpx::meta {
             invoke<Continuation, if_<std::is_same<Ts, Old>, New, Ts>...>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Old,
-        typename Continuation = func<pack>>
+    HPX_CXX_EXPORT template <typename Old, typename Continuation = func<pack>>
     struct remove
     {
         template <typename... Ts>
@@ -484,25 +462,25 @@ namespace hpx::meta {
             if_<std::is_same<Ts, Old>, pack<>, pack<Ts>>...>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename A, typename... As>
+    HPX_CXX_EXPORT template <typename A, typename... As>
     struct front
     {
         using type = A;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <template <typename...> typename Fn>
+    HPX_CXX_EXPORT template <template <typename...> typename Fn>
     struct compose_template_func
     {
         template <typename... Args>
         using apply = Fn<Args...>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename... As>
+    HPX_CXX_EXPORT template <typename... As>
     using single_t = std::enable_if_t < sizeof...(As) == 1,
           meta::type < front < As... >>>
         ;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Ty>
+    HPX_CXX_EXPORT template <typename Ty>
     struct single_or
     {
         template <typename... As>
@@ -510,18 +488,18 @@ namespace hpx::meta {
             std::enable_if_t<sizeof...(As) <= 1, meta::type<front<As..., Ty>>>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename = void>
+    HPX_CXX_EXPORT template <typename T, typename = void>
     inline constexpr bool has_id_v = false;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool has_id_v<T, std::void_t<typename T::id>> = true;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct has_id : std::integral_constant<bool, has_id_v<T>>
     {
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <bool val = true>
+    HPX_CXX_EXPORT template <bool val = true>
     struct get_id_func
     {
         template <typename T>
@@ -535,17 +513,17 @@ namespace hpx::meta {
         using apply = type_identity<T>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using get_id_t = hpx::type_identity_t<
         hpx::meta::invoke<get_id_func<value<has_id<T>>>, T>>;
 
     // clang-format off
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename... As>
+    HPX_CXX_EXPORT template <typename T, typename... As>
     inline constexpr bool is_constructible_from_v =
         std::is_destructible_v<T> && std::is_constructible_v<T, As...>;
     // Clang format bug: thinks   ^^this is a double reference
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename... As>
+    HPX_CXX_EXPORT template <typename T, typename... As>
     inline constexpr bool is_nothrow_constructible_from_v =
         is_constructible_from_v<T, As...> &&
     // Clang format bug: thinks       this^^ is a double reference

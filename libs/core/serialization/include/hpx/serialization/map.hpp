@@ -22,7 +22,7 @@
 
 namespace hpx::traits {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Key, typename Value>
+    HPX_CXX_EXPORT template <typename Key, typename Value>
     struct is_bitwise_serializable<std::pair<Key, Value>>
       : std::integral_constant<bool,
             is_bitwise_serializable_v<std::remove_const_t<Key>> &&
@@ -30,7 +30,7 @@ namespace hpx::traits {
     {
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Key, typename Value>
+    HPX_CXX_EXPORT template <typename Key, typename Value>
     struct is_not_bitwise_serializable<std::pair<Key, Value>>
       : std::integral_constant<bool,
             !is_bitwise_serializable_v<std::pair<Key, Value>>>
@@ -40,7 +40,7 @@ namespace hpx::traits {
 
 namespace hpx::serialization {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Key, typename Value>
+    HPX_CXX_EXPORT template <typename Key, typename Value>
     void serialize(input_archive& ar, std::pair<Key, Value>& t, unsigned)
     {
         using pair_type = std::pair<Key, Value>;
@@ -76,7 +76,7 @@ namespace hpx::serialization {
         }
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Key, typename Value>
+    HPX_CXX_EXPORT template <typename Key, typename Value>
     void serialize(output_archive& ar, std::pair<Key, Value> const& t, unsigned)
     {
         using pair_type = std::pair<Key, Value>;
@@ -105,8 +105,8 @@ namespace hpx::serialization {
         }
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Key, typename Value,
-        typename Comp, typename Alloc>
+    HPX_CXX_EXPORT template <typename Key, typename Value, typename Comp,
+        typename Alloc>
     void serialize(
         input_archive& ar, std::map<Key, Value, Comp, Alloc>& t, unsigned)
     {
@@ -125,8 +125,8 @@ namespace hpx::serialization {
         }
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Key, typename Value,
-        typename Comp, typename Alloc>
+    HPX_CXX_EXPORT template <typename Key, typename Value, typename Comp,
+        typename Alloc>
     void serialize(output_archive& ar,
         std::map<Key, Value, Comp, Alloc> const& t, unsigned)
     {

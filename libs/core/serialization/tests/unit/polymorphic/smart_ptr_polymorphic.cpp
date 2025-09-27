@@ -11,8 +11,6 @@
 #include <hpx/modules/testing.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <hpx/serialization/boost_intrusive_ptr.hpp>
-
 #include <boost/intrusive_ptr.hpp>
 #endif
 

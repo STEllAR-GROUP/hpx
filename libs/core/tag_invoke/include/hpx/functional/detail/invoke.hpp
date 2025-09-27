@@ -17,7 +17,7 @@ namespace hpx::util::detail {
     ///////////////////////////////////////////////////////////////////////////
     // when `pm` is a pointer to member of a class `C` and
     // `is_base_of_v<C, remove_reference_t<T>>` is `true`;
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename C, typename T,
+    HPX_CXX_EXPORT template <typename C, typename T,
         typename =
             std::enable_if_t<std::is_base_of_v<C, std::remove_reference_t<T>>>>
     constexpr T&& mem_ptr_target(T&& v) noexcept
@@ -27,7 +27,7 @@ namespace hpx::util::detail {
 
     // when `pm` is a pointer to member of a class `C` and
     // `remove_cvref_t<T>` is a specialization of `reference_wrapper`;
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename C, typename T>
+    HPX_CXX_EXPORT template <typename C, typename T>
     constexpr T& mem_ptr_target(std::reference_wrapper<T> v) noexcept
     {
         return v.get();
@@ -37,7 +37,7 @@ namespace hpx::util::detail {
     // satisfy the previous two items;
     //
     // Note: NVCC requires to use std::forward below
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename C, typename T>
+    HPX_CXX_EXPORT template <typename C, typename T>
     constexpr auto mem_ptr_target(T&& v) noexcept(noexcept(*std::forward<T>(v)))
         -> decltype(*std::forward<T>(v))
     {
@@ -45,7 +45,7 @@ namespace hpx::util::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename C>
+    HPX_CXX_EXPORT template <typename T, typename C>
     struct invoke_mem_obj
     {
         T C::* pm;
@@ -76,7 +76,7 @@ namespace hpx::util::detail {
         }
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename C>
+    HPX_CXX_EXPORT template <typename T, typename C>
     struct invoke_mem_fun
     {
         T C::* pm;
@@ -120,20 +120,20 @@ namespace hpx::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F,
+    HPX_CXX_EXPORT template <typename F,
         typename FD = std::remove_cv_t<std::remove_reference_t<F>>>
     struct dispatch_invoke
     {
         using type = F&&;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename T, typename C>
+    HPX_CXX_EXPORT template <typename F, typename T, typename C>
     struct dispatch_invoke<F, T C::*>
     {
         using type = std::conditional_t<std::is_function_v<T>,
             invoke_mem_fun<T, C>, invoke_mem_obj<T, C>>;
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     using invoke = typename dispatch_invoke<F>::type;
 }    // namespace hpx::util::detail

@@ -48,5 +48,5 @@
     /**/
 
 #define HPX_HAS_XXX_TRAIT_DEF_1(Name)                                          \
-    HPX_HAS_XXX_TRAIT_DEF_2(/**/, Name)                                        \
+    HPX_HAS_XXX_TRAIT_DEF_2(HPX_PP_EMPTY(), Name)                              \
     /**/

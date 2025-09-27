@@ -28,27 +28,47 @@
     }                                                                          \
     /**/
 
-#define HPX_SERIALIZATION_SPLIT_FREE(T)                                        \
-    HPX_CORE_MODULE_EXPORT_EXTERN HPX_FORCEINLINE void serialize(              \
+#define HPX_SERIALIZATION_SPLIT_FREE(...)                                      \
+    HPX_SERIALIZATION_SPLIT_FREE_(__VA_ARGS__)                                 \
+    /**/
+#define HPX_SERIALIZATION_SPLIT_FREE_(...)                                     \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_SERIALIZATION_SPLIT_FREE_,                    \
+        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
+    /**/
+#define HPX_SERIALIZATION_SPLIT_FREE_1(T)                                      \
+    HPX_SERIALIZATION_SPLIT_FREE_2(HPX_PP_EMPTY(), T)                          \
+    /**/
+#define HPX_SERIALIZATION_SPLIT_FREE_2(PREFIX, T)                              \
+    PREFIX HPX_FORCEINLINE void serialize(                                     \
         hpx::serialization::input_archive& ar, T& t, unsigned)                 \
     {                                                                          \
         load(ar, t, 0);                                                        \
     }                                                                          \
-    HPX_CORE_MODULE_EXPORT_EXTERN HPX_FORCEINLINE void serialize(              \
+    PREFIX HPX_FORCEINLINE void serialize(                                     \
         hpx::serialization::output_archive& ar, T& t, unsigned)                \
     {                                                                          \
         save(ar, const_cast<std::add_const_t<T>&>(t), 0);                      \
     }                                                                          \
     /**/
 
-#define HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(TEMPLATE, ARGS)                  \
-    HPX_PP_STRIP_PARENS(TEMPLATE)                                              \
+#define HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(...)                             \
+    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE_(__VA_ARGS__)                        \
+    /**/
+#define HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE_(...)                            \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE_,           \
+        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
+    /**/
+#define HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE_2(TEMPLATE, ARGS)                \
+    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE_3(HPX_PP_EMPTY(), TEMPLATE, ARGS)    \
+    /**/
+#define HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE_3(PREFIX, TEMPLATE, ARGS)        \
+    PREFIX HPX_PP_STRIP_PARENS(TEMPLATE)                                       \
     HPX_FORCEINLINE void serialize(hpx::serialization::input_archive& ar,      \
         HPX_PP_STRIP_PARENS(ARGS) & t, unsigned)                               \
     {                                                                          \
         load(ar, t, 0);                                                        \
     }                                                                          \
-    HPX_PP_STRIP_PARENS(TEMPLATE)                                              \
+    PREFIX HPX_PP_STRIP_PARENS(TEMPLATE)                                       \
     HPX_FORCEINLINE void serialize(hpx::serialization::output_archive& ar,     \
         HPX_PP_STRIP_PARENS(ARGS) & t, unsigned)                               \
     {                                                                          \
@@ -134,7 +154,8 @@
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED_2(Class, Name)        \
-    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED_3(Class, Name, /**/)      \
+    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED_3(                        \
+        Class, Name, HPX_PP_EMPTY())                                           \
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(...)                           \
@@ -153,18 +174,18 @@
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_2(Class, Name)                 \
-    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_3(Class, Name, /**/)               \
+    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_3(Class, Name, HPX_PP_EMPTY())     \
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(Class)                          \
     virtual std::string hpx_serialization_get_name() const = 0;                \
-    HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS(Class, /**/)                       \
+    HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS(Class, HPX_PP_EMPTY())             \
     HPX_SERIALIZATION_SPLIT_MEMBER()                                           \
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT_SPLITTED(Class)                 \
     virtual std::string hpx_serialization_get_name() const = 0;                \
-    HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_SPLITTED(/**/)                     \
+    HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_SPLITTED(HPX_PP_EMPTY())           \
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC(...)                                     \
@@ -182,7 +203,7 @@
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_1(Class)                                 \
-    HPX_SERIALIZATION_POLYMORPHIC_2(Class, /**/)                               \
+    HPX_SERIALIZATION_POLYMORPHIC_2(Class, HPX_PP_EMPTY())                     \
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(...)                            \
@@ -200,7 +221,7 @@
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_SPLITTED_1(Class)                        \
-    HPX_SERIALIZATION_POLYMORPHIC_SPLITTED_2(Class, /**/)                      \
+    HPX_SERIALIZATION_POLYMORPHIC_SPLITTED_2(Class, HPX_PP_EMPTY())            \
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(...)                            \
@@ -218,7 +239,7 @@
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_1(Class)                        \
-    HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_2(Class, /**/)                      \
+    HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_2(Class, HPX_PP_EMPTY())            \
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED(...)                   \
@@ -236,7 +257,7 @@
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED_1(Class)               \
-    HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED_2(Class, /**/)             \
+    HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED_2(Class, HPX_PP_EMPTY())   \
     /**/
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -253,7 +274,7 @@
         };                                                                     \
     }                                                                          \
     HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(Class)                                 \
-/**/
+    /**/
 #define HPX_SERIALIZATION_REGISTER_CLASS_NAME(Class, Name)                     \
     namespace hpx::serialization::detail {                                     \
         template <>                                                            \
@@ -261,19 +282,30 @@
         {                                                                      \
             char const* operator()() const                                     \
             {                                                                  \
-                [[maybe_unused]] auto& _ =                                     \
-                    hpx::serialization::detail::register_class<                \
-                        /**/ Class>::instance(); /* force instantiation */     \
                 return Name;                                                   \
             }                                                                  \
         };                                                                     \
+        inline hpx::serialization::detail::register_class</**/ Class>          \
+            HPX_PP_CAT(hpx_register_class_instance_, __LINE__){};              \
     }                                                                          \
-/**/
-#define HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(                        \
+    /**/
+
+#define HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(...)                    \
+    HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE_(__VA_ARGS__)               \
+    /**/
+#define HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE_(...)                   \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE_,  \
+        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
+    /**/
+#define HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE_3(                      \
     Parameters, Template, Name)                                                \
+    HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE_4(                          \
+        HPX_PP_EMPTY(), Parameters, Template, Name)                            \
+    /**/
+#define HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE_4(                      \
+    Prefix, Parameters, Template, Name)                                        \
     namespace hpx::serialization::detail {                                     \
-        HPX_PP_STRIP_PARENS(Parameters)                                        \
-        struct HPX_ALWAYS_EXPORT                                               \
+        Prefix HPX_PP_STRIP_PARENS(Parameters) struct HPX_ALWAYS_EXPORT        \
             get_serialization_name<HPX_PP_STRIP_PARENS(Template)>              \
         {                                                                      \
             constexpr char const* operator()() const noexcept                  \
@@ -282,18 +314,43 @@
             }                                                                  \
         };                                                                     \
     }                                                                          \
-/**/
-#define HPX_SERIALIZATION_REGISTER_CLASS(Class)                                \
+    /**/
+
+#define HPX_SERIALIZATION_REGISTER_CLASS(...)                                  \
+    HPX_SERIALIZATION_REGISTER_CLASS_(__VA_ARGS__)                             \
+    /**/
+#define HPX_SERIALIZATION_REGISTER_CLASS_(...)                                 \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_SERIALIZATION_REGISTER_CLASS_,                \
+        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
+    /**/
+#define HPX_SERIALIZATION_REGISTER_CLASS_1(Class)                              \
+    HPX_SERIALIZATION_REGISTER_CLASS_2(HPX_PP_EMPTY(), Class)                  \
+    /**/
+#define HPX_SERIALIZATION_REGISTER_CLASS_2(Prefix, Class)                      \
     HPX_SERIALIZATION_REGISTER_CLASS_NAME(Class, HPX_PP_STRINGIZE(Class))      \
-/**/
-#define HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE(Parameters, Template)        \
-    HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(Parameters, Template,       \
-        hpx::util::debug::type_id<HPX_PP_STRIP_PARENS(Template)>())            \
-    HPX_CORE_MODULE_EXPORT_EXTERN HPX_PP_STRIP_PARENS(Parameters)              \
-        hpx::serialization::detail::register_class<HPX_PP_STRIP_PARENS(        \
-            Template)>                                                         \
-            HPX_PP_STRIP_PARENS(Template)::hpx_register_class_instance;        \
-/**/
+    /**/
+
+#define HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE(...)                         \
+    HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE_(__VA_ARGS__)                    \
+    /**/
+#define HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE_(...)                        \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE_,       \
+        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
+    /**/
+#define HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE_2(Parameters, Template)      \
+    HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE_3(                               \
+        HPX_PP_EMPTY(), Parameters, Template)                                  \
+    /**/
+#define HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE_3(                           \
+    Prefix, Parameters, Template)                                              \
+    HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(Prefix, Parameters,         \
+        Template,                                                              \
+        (hpx::util::debug::type_id<HPX_PP_STRIP_PARENS(Template)>()))          \
+    HPX_PP_STRIP_PARENS(Parameters)                                            \
+    hpx::serialization::detail::register_class<HPX_PP_STRIP_PARENS(Template)>  \
+        HPX_PP_STRIP_PARENS(Template)::hpx_register_class_instance{};          \
+    /**/
+
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SEMIINTRUSIVE(Template)         \
     static hpx::serialization::detail::register_class<Template>                \
         hpx_register_class_instance;                                           \
@@ -304,7 +361,7 @@
     {                                                                          \
         return hpx_register_class_instance;                                    \
     }                                                                          \
-/**/
+    /**/
 #define HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR(Class, Func)                 \
     namespace hpx::serialization::detail {                                     \
         template <>                                                            \
@@ -317,7 +374,7 @@
             }                                                                  \
         };                                                                     \
     }                                                                          \
-/**/
+    /**/
 #define HPX_SERIALIZATION_WITH_CUSTOM_CONSTRUCTOR_TEMPLATE(                    \
     Parameters, Template, Func)                                                \
     namespace hpx::serialization::detail {                                     \
@@ -332,7 +389,7 @@
             }                                                                  \
         };                                                                     \
     }                                                                          \
-/**/
+    /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 // from file: hpx/serialization/traits/is_bitwise_serializable.hpp

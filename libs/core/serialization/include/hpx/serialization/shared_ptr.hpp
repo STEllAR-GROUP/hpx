@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/serialization/detail/pointer.hpp>
+#include <hpx/serialization/macros.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 
@@ -18,19 +19,18 @@
 
 namespace hpx::serialization {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     void load(input_archive& ar, std::shared_ptr<T>& ptr, unsigned)
     {
         detail::serialize_pointer_tracked(ar, ptr);
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     void save(output_archive& ar, std::shared_ptr<T> const& ptr, unsigned)
     {
         detail::serialize_pointer_tracked(ar, ptr);
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        (HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>),
-        (std::shared_ptr<T>) )
+        HPX_CXX_EXPORT, (template <typename T>), (std::shared_ptr<T>) )
 }    // namespace hpx::serialization

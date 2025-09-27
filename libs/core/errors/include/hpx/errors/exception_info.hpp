@@ -24,7 +24,7 @@
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Tag, typename Type>
+    HPX_CXX_EXPORT template <typename Tag, typename Type>
     struct error_info
     {
         using tag = Tag;
@@ -49,7 +49,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN class exception_info_node_base
+        HPX_CXX_EXPORT class exception_info_node_base
         {
         public:
             virtual ~exception_info_node_base() = default;
@@ -69,7 +69,7 @@ namespace hpx {
             std::shared_ptr<exception_info_node_base> next;
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename... Ts>
+        HPX_CXX_EXPORT template <typename... Ts>
         class exception_info_node
           : public exception_info_node_base
           , Ts...
@@ -103,7 +103,7 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN class exception_info
+    HPX_CXX_EXPORT class exception_info
     {
         using node_ptr = std::shared_ptr<detail::exception_info_node_base>;
 
@@ -146,8 +146,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN struct exception_with_info_base
-          : exception_info
+        HPX_CXX_EXPORT struct exception_with_info_base : exception_info
         {
             exception_with_info_base(
                 std::type_info const& type, exception_info xi) noexcept
@@ -159,7 +158,7 @@ namespace hpx {
             std::type_info const& type;
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename E>
+        HPX_CXX_EXPORT template <typename E>
         struct exception_with_info
           : E
           , exception_with_info_base
@@ -178,7 +177,7 @@ namespace hpx {
         };
     }    // namespace detail
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename E>
+    HPX_CXX_EXPORT template <typename E>
     [[noreturn]] void throw_with_info(
         E&& e, exception_info&& xi = exception_info())
     {
@@ -191,27 +190,27 @@ namespace hpx {
         throw detail::exception_with_info<ED>(HPX_FORWARD(E, e), HPX_MOVE(xi));
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename E>
+    HPX_CXX_EXPORT template <typename E>
     [[noreturn]] void throw_with_info(E&& e, exception_info const& xi)
     {
         throw_with_info(HPX_FORWARD(E, e), exception_info(xi));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename E>
+    HPX_CXX_EXPORT template <typename E>
     [[nodiscard]] exception_info* get_exception_info(E& e) noexcept
     {
         return dynamic_cast<exception_info*>(std::addressof(e));
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename E>
+    HPX_CXX_EXPORT template <typename E>
     [[nodiscard]] exception_info const* get_exception_info(E const& e) noexcept
     {
         return dynamic_cast<exception_info const*>(std::addressof(e));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename E, typename F>
+    HPX_CXX_EXPORT template <typename E, typename F>
     auto invoke_with_exception_info(E const& e, F&& f) noexcept(
         noexcept(HPX_FORWARD(F, f)(std::declval<exception_info const*>())))
         -> decltype(HPX_FORWARD(F, f)(std::declval<exception_info const*>()))
@@ -221,7 +220,7 @@ namespace hpx {
     }
 
     // clang-format off
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     auto invoke_with_exception_info(
         std::exception_ptr const& p, F&& f) noexcept(
         noexcept(HPX_FORWARD(F, f)(std::declval<exception_info const*>())))
@@ -245,7 +244,7 @@ namespace hpx {
         return HPX_FORWARD(F, f)(nullptr);
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     auto invoke_with_exception_info(hpx::error_code const& ec, F&& f)
         -> decltype(HPX_FORWARD(F, f)(std::declval<exception_info const*>()))
     {
