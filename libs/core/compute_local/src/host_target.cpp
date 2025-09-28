@@ -7,7 +7,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/compute_local/host/target.hpp>
-#include <hpx/datastructures/serialization/dynamic_bitset.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime_local/get_os_thread_count.hpp>

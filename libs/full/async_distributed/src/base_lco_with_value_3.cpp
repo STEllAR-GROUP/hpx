@@ -11,8 +11,8 @@
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/async_distributed/post.hpp>
-#include <hpx/datastructures/serialization/tuple.hpp>
 #include <hpx/ini/ini.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/serialization.hpp>
 
 #include <cstdint>

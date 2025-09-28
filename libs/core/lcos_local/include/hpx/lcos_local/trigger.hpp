@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/detail/intrusive_list.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos_local/conditional_trigger.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/thread_support.hpp>

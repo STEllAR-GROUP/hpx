@@ -98,7 +98,7 @@ namespace hpx { namespace experimental {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 

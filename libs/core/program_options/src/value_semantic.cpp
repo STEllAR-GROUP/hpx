@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
-#include <hpx/datastructures/any.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/program_options/detail/cmdline.hpp>
 #include <hpx/program_options/detail/convert.hpp>
 #include <hpx/program_options/value_semantic.hpp>

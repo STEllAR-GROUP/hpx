@@ -13,7 +13,7 @@
 #include <hpx/actions_base/traits/action_does_termination_detection.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/runtime_components/console_logging.hpp>

@@ -6,9 +6,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/thread.hpp>
 

@@ -15,10 +15,10 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/hashing.hpp>
 
 #include <cctype>
 #include <cstdint>

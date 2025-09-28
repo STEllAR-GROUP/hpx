@@ -6,7 +6,7 @@
 
 #include <hpx/program_options/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/any.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/value_semantic.hpp>

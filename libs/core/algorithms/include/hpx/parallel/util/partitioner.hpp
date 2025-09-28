@@ -13,12 +13,12 @@
 #include <hpx/async_local/dataflow.hpp>
 #endif
 #include <hpx/algorithms/traits/is_pair.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>

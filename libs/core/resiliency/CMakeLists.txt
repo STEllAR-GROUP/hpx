@@ -30,7 +30,13 @@ add_hpx_module(
   GLOBAL_HEADER_GEN ON
   SOURCES ${resiliency_sources}
   HEADERS ${resiliency_headers}
-  MODULE_DEPENDENCIES hpx_async_local hpx_concepts hpx_execution hpx_futures
-                      hpx_tag_invoke hpx_type_support
+  MODULE_DEPENDENCIES
+    hpx_async_local
+    hpx_concepts
+    hpx_datastructures
+    hpx_execution
+    hpx_futures
+    hpx_tag_invoke
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

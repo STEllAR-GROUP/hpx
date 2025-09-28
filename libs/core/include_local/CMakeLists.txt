@@ -95,6 +95,7 @@ add_hpx_module(
     hpx_async_combinators
     hpx_async_local
     hpx_compute_local
+    hpx_datastructures
     hpx_errors
     hpx_execution
     hpx_execution_base

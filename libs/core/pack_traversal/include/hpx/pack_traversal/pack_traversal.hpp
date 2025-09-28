@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/pack_traversal/detail/pack_traversal_impl.hpp>
 
 #include <type_traits>
