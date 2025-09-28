@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/just.hpp>
 #include <hpx/execution/algorithms/sync_wait.hpp>
 #include <hpx/execution/algorithms/then.hpp>
@@ -15,6 +14,7 @@
 #include <hpx/executors/execution_policy_fwd.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 

@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/variant.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/datastructures.hpp>
 
 namespace hpx {
 

@@ -6,7 +6,6 @@
 
 #include <hpx/init.hpp>
 
-#include <hpx/datastructures/serialization/tuple.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>

@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
+#include <hpx/modules/datastructures.hpp>
 
 #include <cstddef>    // for std::size_t
 #include <fstream>

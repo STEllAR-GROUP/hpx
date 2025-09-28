@@ -8,11 +8,11 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
 #include <hpx/future.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/mutex.hpp>
 
 #include <cstddef>

@@ -99,8 +99,7 @@
 // components
 #if defined(HPX_CORE_EXPORTS) || \
     defined(HPX_FULL_EXPORTS) || defined(HPX_EXPORTS) || \
-    defined(HPX_COMPONENT_EXPORTS) || defined(HPX_APPLICATION_EXPORTS) || \
-    defined(HPX_LIBRARY_EXPORTS)
+    defined(HPX_COMPONENT_EXPORTS) || defined(HPX_APPLICATION_EXPORTS)
 # define HPX_ALWAYS_EXPORT       HPX_SYMBOL_EXPORT
 # define HPX_ALWAYS_IMPORT       HPX_SYMBOL_IMPORT
 #else

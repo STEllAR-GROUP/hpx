@@ -1,4 +1,4 @@
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0 Distributed under the Boost Software
 //  License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -43,7 +43,7 @@
 namespace hpx::detail {
     namespace dynamic_bitset_impl {
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         constexpr T log2(T val) noexcept
         {
             int ret = -1;
@@ -57,19 +57,19 @@ namespace hpx::detail {
 
         // clear all bits except the rightmost one, then calculate the logarithm
         // base 2
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         constexpr T lowest_bit(T x) noexcept
         {
             HPX_ASSERT(x >= 1);    // PRE
             return log2<T>(x - (x & (x - 1)));
         }
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         inline constexpr T max_limit = static_cast<T>(-1);
 
         // Gives (read-)access to the object representation of an object of type
         // T (3.9p4). CANNOT be used on a base sub-object
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         constexpr unsigned char const* object_representation(T* p) noexcept
         {
             return reinterpret_cast<unsigned char const*>(p);
@@ -84,7 +84,7 @@ namespace hpx::detail {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshift-count-overflow"
 #endif
-        template <int Amount, int Width, typename T>
+        HPX_CXX_EXPORT template <int Amount, int Width, typename T>
         constexpr T left_shift(T const& v) noexcept
         {
             return Amount >= Width ? 0 : v >> Amount;
@@ -97,37 +97,33 @@ namespace hpx::detail {
 #endif
 
         // count function implementation
-        using byte_type = unsigned char;
+        HPX_CXX_EXPORT using byte_type = unsigned char;
 
-        enum class mode
-        {
-            access_by_bytes,
-            access_by_blocks
-        };
+        HPX_CXX_EXPORT enum class mode { access_by_bytes, access_by_blocks };
 
-        template <mode value>
+        HPX_CXX_EXPORT template <mode value>
         struct value_to_type
         {
         };
 
-        inline constexpr unsigned int const table_width = 8;
+        HPX_CXX_EXPORT inline constexpr unsigned int const table_width = 8;
 
         // Some platforms have fast popcount operation, that allow us to implement
         // counting bits much more efficiently
-        constexpr inline byte_type count_table[] = {0, 1, 1, 2, 1, 2, 2, 3, 1,
-            2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
-            1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4,
-            5, 3, 4, 4, 5, 4, 5, 5, 6, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4,
+        HPX_CXX_EXPORT constexpr inline byte_type count_table[] = {0, 1, 1, 2,
+            1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3,
+            4, 3, 4, 4, 5, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3,
+            3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 1, 2, 2, 3, 2, 3, 3, 4, 2,
+            3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+            2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5,
+            6, 4, 5, 5, 6, 5, 6, 6, 7, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4,
             4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 2, 3, 3, 4, 3,
             4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6,
-            5, 6, 6, 7, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3,
-            4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4,
-            4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 2,
-            3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6,
-            4, 5, 5, 6, 5, 6, 6, 7, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6,
-            7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8};
+            5, 6, 6, 7, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4,
+            5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5,
+            5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8};
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         constexpr std::size_t popcount(T value) noexcept
         {
             std::size_t num = 0u;
@@ -209,7 +205,7 @@ namespace hpx::detail {
 #endif
 
         // overload for access by blocks
-        template <typename Iterator, typename ValueType>
+        HPX_CXX_EXPORT template <typename Iterator, typename ValueType>
         std::size_t do_count(Iterator first, std::size_t length, ValueType,
             value_to_type<mode::access_by_blocks>) noexcept
         {
@@ -230,7 +226,7 @@ namespace hpx::detail {
         }
 
         // overload for access by bytes
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         std::size_t do_count(Iterator first, std::size_t length,
             int /* dummy */, value_to_type<mode::access_by_bytes>) noexcept
         {
@@ -247,7 +243,7 @@ namespace hpx::detail {
     }    // namespace dynamic_bitset_impl
 
     ////////////////////////////////////////////////////////////////////////////
-    template <typename Block = std::uint64_t,
+    HPX_CXX_EXPORT template <typename Block = std::uint64_t,
         typename Allocator = std::allocator<Block>>
     class dynamic_bitset
     {
@@ -831,69 +827,71 @@ namespace hpx::detail {
     // Global Functions
     //
     // comparison
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     bool operator!=(dynamic_bitset<Block, Allocator> const& a,
         dynamic_bitset<Block, Allocator> const& b) noexcept;
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     bool operator<=(dynamic_bitset<Block, Allocator> const& a,
         dynamic_bitset<Block, Allocator> const& b) noexcept;
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     bool operator>(dynamic_bitset<Block, Allocator> const& a,
         dynamic_bitset<Block, Allocator> const& b) noexcept;
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     bool operator>=(dynamic_bitset<Block, Allocator> const& a,
         dynamic_bitset<Block, Allocator> const& b) noexcept;
 
     // stream operators
-    template <typename CharT, typename Traits, typename Block,
+    HPX_CXX_EXPORT template <typename CharT, typename Traits, typename Block,
         typename Allocator>
     std::basic_ostream<CharT, Traits>& operator<<(
         std::basic_ostream<CharT, Traits>& os,
         dynamic_bitset<Block, Allocator> const& b);
 
-    template <typename CharT, typename Traits, typename Block,
+    HPX_CXX_EXPORT template <typename CharT, typename Traits, typename Block,
         typename Allocator>
     std::basic_istream<CharT, Traits>& operator>>(
         std::basic_istream<CharT, Traits>& is,
         dynamic_bitset<Block, Allocator>& b);
 
     // bitset operations
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     [[nodiscard]] dynamic_bitset<Block, Allocator> operator&(
         dynamic_bitset<Block, Allocator> const& x,
         dynamic_bitset<Block, Allocator> const& y);
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     [[nodiscard]] dynamic_bitset<Block, Allocator> operator|(
         dynamic_bitset<Block, Allocator> const& x,
         dynamic_bitset<Block, Allocator> const& y);
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     [[nodiscard]] dynamic_bitset<Block, Allocator> operator^(
         dynamic_bitset<Block, Allocator> const& x,
         dynamic_bitset<Block, Allocator> const& y);
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     [[nodiscard]] dynamic_bitset<Block, Allocator> operator-(
         dynamic_bitset<Block, Allocator> const& x,
         dynamic_bitset<Block, Allocator> const& y);
 
     // namespace scope swap
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     void swap(dynamic_bitset<Block, Allocator>& left,
         dynamic_bitset<Block, Allocator>& right) noexcept;
 
-    template <typename Block, typename Allocator, typename String>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator,
+        typename String>
     void to_string(dynamic_bitset<Block, Allocator> const& b, String& s);
 
-    template <typename Block, typename Allocator, typename BlockOutputIterator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator,
+        typename BlockOutputIterator>
     void to_block_range(
         dynamic_bitset<Block, Allocator> const& b, BlockOutputIterator result);
 
-    template <typename BlockIterator, typename B, typename A>
+    HPX_CXX_EXPORT template <typename BlockIterator, typename B, typename A>
     inline void from_block_range(
         BlockIterator first, BlockIterator last, dynamic_bitset<B, A>& result)
     {
@@ -1458,7 +1456,7 @@ namespace hpx::detail {
     }
 
     // conversions
-    template <typename B, typename A, typename String>
+    HPX_CXX_EXPORT template <typename B, typename A, typename String>
     void to_string_helper(
         dynamic_bitset<B, A> const& b, String& s, bool dump_all)
     {
@@ -1491,7 +1489,8 @@ namespace hpx::detail {
     // be done here. Thanks to James Kanze for making me (Gennaro) realize this
     // important separation of concerns issue, as well as many things about
     // i18n.
-    template <typename Block, typename Allocator, typename String>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator,
+        typename String>
     void to_string(dynamic_bitset<Block, Allocator> const& b, String& s)
     {
         to_string_helper(b, s, false);
@@ -1499,13 +1498,14 @@ namespace hpx::detail {
 
     // Differently from to_string this function dumps out every bit of the
     // internal representation (may be useful for debugging purposes)
-    template <typename B, typename A, typename String>
+    HPX_CXX_EXPORT template <typename B, typename A, typename String>
     void dump_to_string(dynamic_bitset<B, A> const& b, String& s)
     {
         to_string_helper(b, s, true /* =dump_all*/);
     }
 
-    template <typename Block, typename Allocator, typename BlockOutputIterator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator,
+        typename BlockOutputIterator>
     void to_block_range(
         dynamic_bitset<Block, Allocator> const& b, BlockOutputIterator result)
     {
@@ -1700,21 +1700,21 @@ namespace hpx::detail {
     //-----------------------------------------------------------------------------
     // comparison
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     bool operator==(dynamic_bitset<Block, Allocator> const& a,
         dynamic_bitset<Block, Allocator> const& b) noexcept
     {
         return (a.nubits_ == b.nubits_) && (a.bits_ == b.bits_);
     }
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     bool operator!=(dynamic_bitset<Block, Allocator> const& a,
         dynamic_bitset<Block, Allocator> const& b) noexcept
     {
         return !(a == b);
     }
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     bool operator<(dynamic_bitset<Block, Allocator> const& a,
         dynamic_bitset<Block, Allocator> const& b) noexcept
     {
@@ -1761,7 +1761,7 @@ namespace hpx::detail {
         return a.size() < b.size();
     }
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     bool oplessthan(dynamic_bitset<Block, Allocator> const& a,
         dynamic_bitset<Block, Allocator> const& b) noexcept
     {
@@ -1802,21 +1802,21 @@ namespace hpx::detail {
         return (a.num_blocks() < b.num_blocks());
     }
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     bool operator<=(dynamic_bitset<Block, Allocator> const& a,
         dynamic_bitset<Block, Allocator> const& b) noexcept
     {
         return !(a > b);
     }
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     bool operator>(dynamic_bitset<Block, Allocator> const& a,
         dynamic_bitset<Block, Allocator> const& b) noexcept
     {
         return b < a;
     }
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     bool operator>=(dynamic_bitset<Block, Allocator> const& a,
         dynamic_bitset<Block, Allocator> const& b) noexcept
     {
@@ -1824,7 +1824,7 @@ namespace hpx::detail {
     }
 
     // hash operations
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     std::size_t hash_value(dynamic_bitset<Block, Allocator> const& a)
     {
         std::size_t res = hash_value(a.nubits_);
@@ -1832,7 +1832,8 @@ namespace hpx::detail {
     }
 
     // stream operations
-    template <typename Ch, typename Tr, typename Block, typename Alloc>
+    HPX_CXX_EXPORT template <typename Ch, typename Tr, typename Block,
+        typename Alloc>
     std::basic_ostream<Ch, Tr>& operator<<(
         std::basic_ostream<Ch, Tr>& os, dynamic_bitset<Block, Alloc> const& b)
     {
@@ -1929,7 +1930,8 @@ namespace hpx::detail {
         return os;
     }
 
-    template <typename Ch, typename Tr, typename Block, typename Alloc>
+    HPX_CXX_EXPORT template <typename Ch, typename Tr, typename Block,
+        typename Alloc>
     std::basic_istream<Ch, Tr>& operator>>(
         std::basic_istream<Ch, Tr>& is, dynamic_bitset<Block, Alloc>& b)
     {
@@ -2014,7 +2016,7 @@ namespace hpx::detail {
     }
 
     // bitset operations
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     dynamic_bitset<Block, Allocator> operator&(
         dynamic_bitset<Block, Allocator> const& x,
         dynamic_bitset<Block, Allocator> const& y)
@@ -2023,7 +2025,7 @@ namespace hpx::detail {
         return b &= y;
     }
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     dynamic_bitset<Block, Allocator> operator|(
         dynamic_bitset<Block, Allocator> const& x,
         dynamic_bitset<Block, Allocator> const& y)
@@ -2032,7 +2034,7 @@ namespace hpx::detail {
         return b |= y;
     }
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     dynamic_bitset<Block, Allocator> operator^(
         dynamic_bitset<Block, Allocator> const& x,
         dynamic_bitset<Block, Allocator> const& y)
@@ -2041,7 +2043,7 @@ namespace hpx::detail {
         return b ^= y;
     }
 
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     dynamic_bitset<Block, Allocator> operator-(
         dynamic_bitset<Block, Allocator> const& x,
         dynamic_bitset<Block, Allocator> const& y)
@@ -2051,7 +2053,7 @@ namespace hpx::detail {
     }
 
     // namespace scope swap
-    template <typename Block, typename Allocator>
+    HPX_CXX_EXPORT template <typename Block, typename Allocator>
     void swap(dynamic_bitset<Block, Allocator>& left,
         dynamic_bitset<Block, Allocator>& right) noexcept
     {
@@ -2201,18 +2203,15 @@ namespace hpx::detail {
 // std::hash support
 #include <functional>
 
-namespace std {
+HPX_CXX_EXPORT template <typename Block, typename Allocator>
+struct std::hash<::hpx::detail::dynamic_bitset<Block, Allocator>>
+{
+    using argument_type = hpx::detail::dynamic_bitset<Block, Allocator>;
+    using result_type = std::size_t;
 
-    template <typename Block, typename Allocator>
-    struct hash<::hpx::detail::dynamic_bitset<Block, Allocator>>
+    result_type operator()(argument_type const& a) const noexcept
     {
-        using argument_type = hpx::detail::dynamic_bitset<Block, Allocator>;
-        using result_type = std::size_t;
-
-        result_type operator()(argument_type const& a) const noexcept
-        {
-            std::hash<argument_type> const hasher;
-            return hasher(a);
-        }
-    };
-}    // namespace std
+        std::hash<argument_type> const hasher;
+        return hasher(a);
+    }
+};

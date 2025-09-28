@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/plugin/config.hpp>
-#include <hpx/datastructures/any.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <map>

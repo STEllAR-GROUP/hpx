@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,11 +14,11 @@
 
 namespace hpx {
 
-    using std::get;
-    using std::holds_alternative;
-    using std::monostate;
-    using std::variant;
-    using std::visit;
+    HPX_CXX_EXPORT using std::get;
+    HPX_CXX_EXPORT using std::holds_alternative;
+    HPX_CXX_EXPORT using std::monostate;
+    HPX_CXX_EXPORT using std::variant;
+    HPX_CXX_EXPORT using std::visit;
 }    // namespace hpx
 
 #else
@@ -27,11 +27,11 @@ namespace hpx {
 
 namespace hpx {
 
-    using hpx::variant_ns::get;
-    using hpx::variant_ns::holds_alternative;
-    using hpx::variant_ns::monostate;
-    using hpx::variant_ns::variant;
-    using hpx::variant_ns::visit;
+    HPX_CXX_EXPORT using hpx::variant_ns::get;
+    HPX_CXX_EXPORT using hpx::variant_ns::holds_alternative;
+    HPX_CXX_EXPORT using hpx::variant_ns::monostate;
+    HPX_CXX_EXPORT using hpx::variant_ns::variant;
+    HPX_CXX_EXPORT using hpx::variant_ns::visit;
 }    // namespace hpx
 
 #endif

@@ -10,7 +10,7 @@
 #pragma once
 
 #include <hpx/plugin/config.hpp>
-#include <hpx/datastructures/any.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/plugin/abstract_factory.hpp>
 #include <hpx/plugin/concrete_factory.hpp>

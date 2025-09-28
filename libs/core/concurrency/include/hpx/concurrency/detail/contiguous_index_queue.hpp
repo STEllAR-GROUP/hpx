@@ -9,7 +9,7 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/datastructures/optional.hpp>
+#include <hpx/modules/datastructures.hpp>
 
 #include <atomic>
 #include <cstdint>

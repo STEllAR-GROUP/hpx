@@ -19,7 +19,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/datastructures/serialization/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>

@@ -20,7 +20,7 @@
 //
 // and the second invocation should issue an error message.
 
-#include <hpx/datastructures/any.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/program_options.hpp>
 
