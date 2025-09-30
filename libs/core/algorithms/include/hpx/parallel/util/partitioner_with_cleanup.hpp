@@ -12,6 +12,9 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_local/dataflow.hpp>
 #endif
+#include <hpx/execution/algorithms/just.hpp>
+#include <hpx/execution/algorithms/let_value.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
@@ -22,8 +25,12 @@
 #include <cstddef>
 #include <exception>
 #include <memory>
+#include <optional>
+#include <tuple>
 #include <type_traits>
 #include <utility>
+#include <variant>
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util {
@@ -47,8 +54,8 @@ namespace hpx::parallel::util {
 
             template <typename ExPolicy_, typename FwdIter, typename F1,
                 typename F2, typename Cleanup>
-            static R call(ExPolicy_&& policy, FwdIter first, std::size_t count,
-                F1&& f1, F2&& f2, Cleanup&& cleanup)
+            static decltype(auto) call(ExPolicy_&& policy, FwdIter first,
+                std::size_t count, F1&& f1, F2&& f2, Cleanup&& cleanup)
             {
                 // inform parameter traits
                 using scoped_executor_parameters =
@@ -60,14 +67,72 @@ namespace hpx::parallel::util {
 
                 try
                 {
-                    auto&& items = detail::partition<Result>(
-                        HPX_FORWARD(ExPolicy_, policy), first, count,
-                        HPX_FORWARD(F1, f1));
+                    const bool has_scheduler_executor =
+                        hpx::execution_policy_has_scheduler_executor_v<
+                            ExPolicy_>;
 
-                    scoped_params.mark_end_of_scheduling();
+                    if constexpr (has_scheduler_executor)
+                    {
+                        // Wrap f1 in a variant type to handle exceptions
+                        auto wrapped_f1 = [f1 = HPX_FORWARD(F1, f1)](
+                                              auto&&... args) mutable noexcept {
+                            using result_type = std::decay_t<decltype(f1(
+                                HPX_FORWARD(decltype(args), args)...))>;
+                            using nonvoid_result_type =
+                                std::conditional_t<std::is_void_v<result_type>,
+                                    std::monostate, result_type>;
+                            using variant_type =
+                                std::variant<nonvoid_result_type,
+                                    std::exception_ptr>;
 
-                    return reduce(HPX_MOVE(items), HPX_FORWARD(F2, f2),
-                        HPX_FORWARD(Cleanup, cleanup));
+                            try
+                            {
+                                if constexpr (std::is_void_v<result_type>)
+                                {
+                                    f1(HPX_FORWARD(decltype(args), args)...);
+                                    return variant_type{std::in_place_index<0>,
+                                        std::monostate{}};
+                                }
+                                else
+                                {
+                                    return variant_type{std::in_place_index<0>,
+                                        f1(HPX_FORWARD(
+                                            decltype(args), args)...)};
+                                }
+                            }
+                            catch (...)
+                            {
+                                return variant_type{std::in_place_index<1>,
+                                    std::current_exception()};
+                            }
+                        };
+
+                        // Use variant type as the Result template parameter
+                        using nonvoid_result =
+                            std::conditional_t<std::is_void_v<Result>,
+                                std::monostate, Result>;
+                        using variant_result_type =
+                            std::variant<nonvoid_result, std::exception_ptr>;
+                        auto&& items = detail::partition<variant_result_type>(
+                            HPX_FORWARD(ExPolicy_, policy), first, count,
+                            wrapped_f1);
+
+                        scoped_params.mark_end_of_scheduling();
+
+                        return reduce(HPX_MOVE(items), HPX_FORWARD(F2, f2),
+                            HPX_FORWARD(Cleanup, cleanup));
+                    }
+                    else
+                    {
+                        auto&& items = detail::partition<Result>(
+                            HPX_FORWARD(ExPolicy_, policy), first, count,
+                            HPX_FORWARD(F1, f1));
+
+                        scoped_params.mark_end_of_scheduling();
+
+                        return reduce(HPX_MOVE(items), HPX_FORWARD(F2, f2),
+                            HPX_FORWARD(Cleanup, cleanup));
+                    }
                 }
                 catch (...)
                 {
@@ -79,17 +144,100 @@ namespace hpx::parallel::util {
 
         private:
             template <typename Items, typename F, typename Cleanup>
-            static R reduce(Items&& workitems, F&& f, Cleanup&& cleanup)
+            static decltype(auto) reduce(
+                Items&& workitems, F&& f, Cleanup&& cleanup)
             {
-                // wait for all tasks to finish
-                if (hpx::wait_all_nothrow(workitems))
+                namespace ex = hpx::execution::experimental;
+                if constexpr (ex::is_sender_v<std::decay_t<Items>>)
                 {
-                    // always rethrow if 'errors' is not empty or workitems has
-                    // exceptional future
-                    handle_local_exceptions::call_with_cleanup(
-                        workitems, HPX_FORWARD(Cleanup, cleanup));
+                    return ex::let_value(workitems,
+                        [f = HPX_FORWARD(F, f),
+                            cleanup = HPX_FORWARD(Cleanup, cleanup)](
+                            auto&& all_parts) mutable {
+                            using item_type =
+                                std::decay_t<decltype(*all_parts.begin())>;
+                            static_assert(
+                                std::is_same_v<item_type,
+                                    std::variant<Result, std::exception_ptr>>,
+                                "Expected variant with std::exception_ptr "
+                                "alternative");
+
+                            hpx::exception_list ex_list;
+                            for (auto&& item : all_parts)
+                            {
+                                if (std::holds_alternative<std::exception_ptr>(
+                                        item))
+                                {
+                                    auto e = std::get<std::exception_ptr>(item);
+                                    ex_list.add(e);
+                                }
+                            }
+
+                            if (ex_list.size() > 0)
+                            {
+                                for (auto&& item : all_parts)
+                                {
+                                    if (!std::holds_alternative<
+                                            std::exception_ptr>(item))
+                                    {
+                                        using result_t =
+                                            std::variant_alternative_t<0,
+                                                item_type>;
+                                        if constexpr (!std::is_same_v<
+                                                          std::monostate,
+                                                          result_t>)
+                                        {
+                                            cleanup(
+                                                HPX_MOVE(std::get<0>(item)));
+                                        }
+                                    }
+                                }
+
+                                for (auto const& ex : ex_list)
+                                {
+                                    try
+                                    {
+                                        std::rethrow_exception(ex);
+                                    }
+                                    catch (std::bad_alloc const&)
+                                    {
+                                        throw;
+                                    }
+                                    catch (...)
+                                    {
+                                        HPX_UNUSED(ex_list);
+                                    }
+                                }
+
+                                throw HPX_MOVE(ex_list);
+                            }
+
+                            using original_t =
+                                std::variant_alternative_t<0, item_type>;
+                            auto values = std::vector<original_t>{};
+                            values.reserve(all_parts.size());
+
+                            for (auto&& item : all_parts)
+                            {
+                                values.emplace_back(
+                                    std::get<0>(HPX_MOVE(item)));
+                            }
+
+                            return ex::just(HPX_MOVE(f(values)));
+                        });
                 }
-                return f(HPX_FORWARD(Items, workitems));
+                else
+                {
+                    // wait for all tasks to finish
+                    if (hpx::wait_all_nothrow(workitems))
+                    {
+                        // always rethrow if 'errors' is not empty or workitems has
+                        // exceptional future
+                        handle_local_exceptions::call_with_cleanup(
+                            workitems, HPX_FORWARD(Cleanup, cleanup));
+                    }
+                    return f(HPX_FORWARD(Items, workitems));
+                }
             }
 
             template <typename Items1, typename Items2, typename F,
@@ -103,9 +251,17 @@ namespace hpx::parallel::util {
                         HPX_FORWARD(Cleanup, cleanup));
                 }
 
-                items.first.insert(items.first.end(),
-                    std::make_move_iterator(items.second.begin()),
-                    std::make_move_iterator(items.second.end()));
+                if constexpr (hpx::traits::is_future_v<Items2>)
+                {
+                    items.first.emplace_back(HPX_MOVE(items.second));
+                }
+                else
+                {
+                    items.first.insert(items.first.end(),
+                        std::make_move_iterator(items.second.begin()),
+                        std::make_move_iterator(items.second.end()));
+                }
+
                 return reduce(HPX_MOVE(items.first), HPX_FORWARD(F, f),
                     HPX_FORWARD(Cleanup, cleanup));
             }
@@ -167,9 +323,17 @@ namespace hpx::parallel::util {
                         HPX_FORWARD(Cleanup, cleanup));
                 }
 
-                items.first.insert(items.first.end(),
-                    std::make_move_iterator(items.second.begin()),
-                    std::make_move_iterator(items.second.end()));
+                if constexpr (hpx::traits::is_future_v<Items2>)
+                {
+                    items.first.emplace_back(HPX_MOVE(items.second));
+                }
+                else
+                {
+                    items.first.insert(items.first.end(),
+                        std::make_move_iterator(items.second.begin()),
+                        std::make_move_iterator(items.second.end()));
+                }
+
                 return reduce(HPX_MOVE(scoped_params), HPX_MOVE(items.first),
                     HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
             }
