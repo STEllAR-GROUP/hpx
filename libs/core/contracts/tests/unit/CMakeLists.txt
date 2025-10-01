@@ -25,6 +25,7 @@ if(HPX_WITH_TESTS)
             # C++26 Native Contract Tests
             # Condition: HPX_WITH_CONTRACTS=ON && __cplusplus >= 202602L
             # These tests use advanced C++26 contract features
+            # Note: Global contract flags are set in root CMakeLists.txt
             # -------------------------------
             
             # Define contract types for native C++26 tests
@@ -43,8 +44,8 @@ if(HPX_WITH_TESTS)
                     EXCLUDE_FROM_ALL
                     FOLDER "Tests/Unit/Modules/Core/Contracts/"
                 )
+                # Add only contract-specific evaluation semantic
                 target_compile_options(${TARGET_NAME}_test PRIVATE
-                    -std=c++26 -fcontracts -stdlib=libc++
                     -fcontract-evaluation-semantic=observe
                 )
                 
@@ -67,8 +68,8 @@ if(HPX_WITH_TESTS)
                     EXCLUDE_FROM_ALL
                     FOLDER "Tests/Unit/Modules/Core/Contracts/"
                 )
+                # Add only contract-specific evaluation semantic
                 target_compile_options(${TARGET_NAME}_test PRIVATE
-                    -std=c++26 -fcontracts -stdlib=libc++
                     -fcontract-evaluation-semantic=enforce
                 )
                 
@@ -92,8 +93,8 @@ if(HPX_WITH_TESTS)
                     EXCLUDE_FROM_ALL
                     FOLDER "Tests/Unit/Modules/Core/Contracts/"
                 )
+                # Add only contract-specific evaluation semantic
                 target_compile_options(${TARGET_NAME}_test PRIVATE
-                    -std=c++26 -fcontracts -stdlib=libc++
                     -fcontract-evaluation-semantic=quick_enforce
                 )
                 
@@ -117,8 +118,8 @@ if(HPX_WITH_TESTS)
                     EXCLUDE_FROM_ALL
                     FOLDER "Tests/Unit/Modules/Core/Contracts/"
                 )
+                # Add only contract-specific evaluation semantic
                 target_compile_options(${TARGET_NAME}_test PRIVATE
-                    -std=c++26 -fcontracts -stdlib=libc++
                     -fcontract-evaluation-semantic=ignore
                 )
                 
@@ -133,6 +134,7 @@ if(HPX_WITH_TESTS)
             # Fallback Mode Tests
             # Condition: HPX_WITH_CONTRACTS=ON && __cplusplus < 202602L
             # Tests the fallback mechanism from HPX_CONTRACT_ASSERT to HPX_ASSERT
+            # Note: Global C++23 flags are set in root CMakeLists.txt
             # -------------------------------
             
             add_hpx_executable(
@@ -143,9 +145,7 @@ if(HPX_WITH_TESTS)
                 EXCLUDE_FROM_ALL
                 FOLDER "Tests/Unit/Modules/Core/Contracts/"
             )
-            target_compile_options(fallback_contracts_test PRIVATE
-                -std=c++23  # Deliberately use C++23 to test fallback
-            )
+            # No additional compile options needed - using global settings
             
             add_hpx_unit_test("modules.contracts" fallback_contracts)
             set_tests_properties(tests.unit.modules.contracts.fallback_contracts PROPERTIES
@@ -159,6 +159,7 @@ if(HPX_WITH_TESTS)
         # Contracts Disabled Tests  
         # Condition: HPX_WITH_CONTRACTS=OFF
         # Tests that contract macros are no-ops when contracts are disabled
+        # Note: Standard C++ flags are used (no special contract flags)
         # -------------------------------
         
         add_hpx_executable(
@@ -169,9 +170,7 @@ if(HPX_WITH_TESTS)
             EXCLUDE_FROM_ALL
             FOLDER "Tests/Unit/Modules/Core/Contracts/"
         )
-        target_compile_options(disabled_contracts_test PRIVATE
-            -std=c++23  # Any standard works when contracts are disabled
-        )
+        # No additional compile options needed - using global settings
         
         add_hpx_unit_test("modules.contracts" disabled_contracts)
         set_tests_properties(tests.unit.modules.contracts.disabled_contracts PROPERTIES

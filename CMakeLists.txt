@@ -1456,12 +1456,10 @@ hpx_option(
 
 if(HPX_WITH_CONTRACTS)
   hpx_add_config_define(HPX_HAVE_CONTRACTS)
-   # Default compiler flags for contracts
-  set(HPX_CONTRACT_FLAGS "-std=c++23 -fcontracts -stdlib=libc++") 
-
-
-  # Apply these flags globally to all HPX targets that need contracts
-  add_compile_options(${HPX_CONTRACT_FLAGS})
+  
+  # Using Eric's clang with contracts support (C++23 + -fcontracts)
+  message(STATUS "HPX: Enabling C++23 contracts support with Eric's clang")
+  add_compile_options(-std=c++23 -fcontracts -stdlib=libc++)
 endif()
 
 hpx_option(
