@@ -1,3 +1,11 @@
+# Copyright (c) 2025 Alexandros Papadakis
+# Copyright (c) 2025Panagiotis Syskakis
+# HPX Contracts Module Unit Tests
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 if(HPX_WITH_TESTS)
     if (HPX_WITH_CONTRACTS)
 
@@ -27,15 +35,21 @@ if(HPX_WITH_TESTS)
                 set(TARGET_NAME "contract_violation_${CONTRACT_TYPE}_observe")
                 set(SOURCE_FILE "contract_violation_${CONTRACT_TYPE}.cpp")
                 
-                add_executable(${TARGET_NAME} ${SOURCE_FILE})
-                target_compile_options(${TARGET_NAME} PRIVATE
+                add_hpx_executable(
+                    ${TARGET_NAME}_test INTERNAL_FLAGS
+                    SOURCES ${SOURCE_FILE}
+                    NOLIBS
+                    DEPENDENCIES hpx_core
+                    EXCLUDE_FROM_ALL
+                    FOLDER "Tests/Unit/Modules/Core/Contracts/"
+                )
+                target_compile_options(${TARGET_NAME}_test PRIVATE
                     -std=c++26 -fcontracts -stdlib=libc++
                     -fcontract-evaluation-semantic=observe
                 )
-                target_link_libraries(${TARGET_NAME} PRIVATE hpx_core)
                 
-                add_hpx_unit_test("contracts" ${TARGET_NAME})
-                set_tests_properties(${TARGET_NAME} PROPERTIES
+                add_hpx_unit_test("modules.contracts" ${TARGET_NAME})
+                set_tests_properties(tests.unit.modules.contracts.${TARGET_NAME} PROPERTIES
                     LABELS contracts
                 )
             endforeach()
@@ -45,15 +59,21 @@ if(HPX_WITH_TESTS)
                 set(TARGET_NAME "contract_violation_${CONTRACT_TYPE}_enforce")
                 set(SOURCE_FILE "contract_violation_${CONTRACT_TYPE}.cpp")
                 
-                add_executable(${TARGET_NAME} ${SOURCE_FILE})
-                target_compile_options(${TARGET_NAME} PRIVATE
+                add_hpx_executable(
+                    ${TARGET_NAME}_test INTERNAL_FLAGS
+                    SOURCES ${SOURCE_FILE}
+                    NOLIBS
+                    DEPENDENCIES hpx_core
+                    EXCLUDE_FROM_ALL
+                    FOLDER "Tests/Unit/Modules/Core/Contracts/"
+                )
+                target_compile_options(${TARGET_NAME}_test PRIVATE
                     -std=c++26 -fcontracts -stdlib=libc++
                     -fcontract-evaluation-semantic=enforce
                 )
-                target_link_libraries(${TARGET_NAME} PRIVATE hpx_core)
                 
-                add_hpx_unit_test("contracts" ${TARGET_NAME})
-                set_tests_properties(${TARGET_NAME} PROPERTIES
+                add_hpx_unit_test("modules.contracts" ${TARGET_NAME})
+                set_tests_properties(tests.unit.modules.contracts.${TARGET_NAME} PROPERTIES
                     WILL_FAIL TRUE
                     LABELS contracts
                 )
@@ -64,15 +84,21 @@ if(HPX_WITH_TESTS)
                 set(TARGET_NAME "contract_violation_${CONTRACT_TYPE}_quick_enforce")
                 set(SOURCE_FILE "contract_violation_${CONTRACT_TYPE}.cpp")
                 
-                add_executable(${TARGET_NAME} ${SOURCE_FILE})
-                target_compile_options(${TARGET_NAME} PRIVATE
+                add_hpx_executable(
+                    ${TARGET_NAME}_test INTERNAL_FLAGS
+                    SOURCES ${SOURCE_FILE}
+                    NOLIBS
+                    DEPENDENCIES hpx_core
+                    EXCLUDE_FROM_ALL
+                    FOLDER "Tests/Unit/Modules/Core/Contracts/"
+                )
+                target_compile_options(${TARGET_NAME}_test PRIVATE
                     -std=c++26 -fcontracts -stdlib=libc++
                     -fcontract-evaluation-semantic=quick_enforce
                 )
-                target_link_libraries(${TARGET_NAME} PRIVATE hpx_core)
                 
-                add_hpx_unit_test("contracts" ${TARGET_NAME})
-                set_tests_properties(${TARGET_NAME} PROPERTIES
+                add_hpx_unit_test("modules.contracts" ${TARGET_NAME})
+                set_tests_properties(tests.unit.modules.contracts.${TARGET_NAME} PROPERTIES
                     WILL_FAIL TRUE
                     LABELS contracts
                 )
@@ -83,15 +109,21 @@ if(HPX_WITH_TESTS)
                 set(TARGET_NAME "contract_violation_${CONTRACT_TYPE}_ignore")
                 set(SOURCE_FILE "contract_violation_${CONTRACT_TYPE}.cpp")
                 
-                add_executable(${TARGET_NAME} ${SOURCE_FILE})
-                target_compile_options(${TARGET_NAME} PRIVATE
+                add_hpx_executable(
+                    ${TARGET_NAME}_test INTERNAL_FLAGS
+                    SOURCES ${SOURCE_FILE}
+                    NOLIBS
+                    DEPENDENCIES hpx_core
+                    EXCLUDE_FROM_ALL
+                    FOLDER "Tests/Unit/Modules/Core/Contracts/"
+                )
+                target_compile_options(${TARGET_NAME}_test PRIVATE
                     -std=c++26 -fcontracts -stdlib=libc++
                     -fcontract-evaluation-semantic=ignore
                 )
-                target_link_libraries(${TARGET_NAME} PRIVATE hpx_core)
                 
-                add_hpx_unit_test("contracts" ${TARGET_NAME})
-                set_tests_properties(${TARGET_NAME} PROPERTIES
+                add_hpx_unit_test("modules.contracts" ${TARGET_NAME})
+                set_tests_properties(tests.unit.modules.contracts.${TARGET_NAME} PROPERTIES
                     LABELS contracts
                 )
             endforeach()
@@ -103,14 +135,20 @@ if(HPX_WITH_TESTS)
             # Tests the fallback mechanism from HPX_CONTRACT_ASSERT to HPX_ASSERT
             # -------------------------------
             
-            add_executable(fallback_contracts fallback_contracts.cpp)
-            target_compile_options(fallback_contracts PRIVATE
+            add_hpx_executable(
+                fallback_contracts_test INTERNAL_FLAGS
+                SOURCES fallback_contracts.cpp
+                NOLIBS
+                DEPENDENCIES hpx_core
+                EXCLUDE_FROM_ALL
+                FOLDER "Tests/Unit/Modules/Core/Contracts/"
+            )
+            target_compile_options(fallback_contracts_test PRIVATE
                 -std=c++23  # Deliberately use C++23 to test fallback
             )
-            target_link_libraries(fallback_contracts PRIVATE hpx_core)
             
-            add_hpx_unit_test("contracts" fallback_contracts)
-            set_tests_properties(fallback_contracts PROPERTIES
+            add_hpx_unit_test("modules.contracts" fallback_contracts)
+            set_tests_properties(tests.unit.modules.contracts.fallback_contracts PROPERTIES
                 LABELS contracts
             )
             
@@ -123,14 +161,20 @@ if(HPX_WITH_TESTS)
         # Tests that contract macros are no-ops when contracts are disabled
         # -------------------------------
         
-        add_executable(disabled_contracts fallback_contracts.cpp)
-        target_compile_options(disabled_contracts PRIVATE
+        add_hpx_executable(
+            disabled_contracts_test INTERNAL_FLAGS
+            SOURCES fallback_contracts.cpp
+            NOLIBS
+            DEPENDENCIES hpx_core
+            EXCLUDE_FROM_ALL
+            FOLDER "Tests/Unit/Modules/Core/Contracts/"
+        )
+        target_compile_options(disabled_contracts_test PRIVATE
             -std=c++23  # Any standard works when contracts are disabled
         )
-        target_link_libraries(disabled_contracts PRIVATE hpx_core)
         
-        add_hpx_unit_test("contracts" disabled_contracts)
-        set_tests_properties(disabled_contracts PROPERTIES
+        add_hpx_unit_test("modules.contracts" disabled_contracts)
+        set_tests_properties(tests.unit.modules.contracts.disabled_contracts PROPERTIES
             LABELS contracts
         )
         

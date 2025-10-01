@@ -1,85 +1,85 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
-//
-//  SPDX-License-Identifier: BSL-1.0
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying
-//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-///////////////////////////////////////////////////////////////////////////////
-// The purpose of this example is to initialize the HPX runtime explicitly and
-// execute a HPX-thread printing "Hello World!" once. That's all.
-
-//[hello_world_2_getting_started
-
 #include <hpx/config.hpp>
-#include <hpx/hpx_init.hpp>
 #include <hpx/iostream.hpp>
-#include <hpx/parallel/algorithms/for_each.hpp>
+#include <contracts> 
+
 
 #ifdef HPX_HAVE_CONTRACTS
-
-// Currently testing with C++23 draft (value 202302L).
-// When C++26 is officially published, this macro value will likely
-// update to 202602L or similar. Review this check at that time.
-  #if __cplusplus < 202302L
-    #pragma message("Warning: Contracts require C++23 or later. Contracts disabled.")
-    #define HPX_PRECONDITION(expr)
-  #else
-    #define HPX_PRECONDITION(expr) pre((expr))
-  #endif
-#else
-  #define HPX_PRECONDITION(expr)
+    #define HPX_PRE(x) pre((x)) 
+    #define HPX_CONTRACT_ASSERT(x) contract_assert((x))  
+    #define HPX_POST(x) post((x))
 #endif
 
 
-
-int hpx_main(int, char*[])
-HPX_PRECONDITION(false)
+void handle_contract_violation(const std::contracts::contract_violation& violation)
 {
-    // Say hello to the world!
-    hpx::cout << "Hello World! time for contracts using def!!!1!!\n" << std::flush;
-    return hpx::finalize();
-}
-
-int main(int argc, char* argv[])
-{
-    return hpx::init(argc, argv);
-}
-
-
-// void for_each_bridge(auto &data)
-// pre(data.end()>data.begin())
-// {
-
-//     hpx::for_each(hpx::execution::seq, data.end(), data.begin(),
-//         [](int& value) { value *= 2; });
-// }
-
-// int hpx_main(int, char*[])
-// {
-//     // Say hello to the world!
-//     hpx::cout << "Hello World!\n" << std::flush;
-
-//     std::vector<int> data = {1, 2, 3, 4, 5};
-//     hpx::cout << (data.end()>data.begin()) << std::flush;
-     
-//     for_each_bridge(data);
+    if (violation.semantic() == std::contracts::evaluation_semantic::observe)
+    {
+        std::cerr << "Successfully overridden violation handler for observe mode\n";
+        std::cerr << violation.location().function_name() << ":"
+                  << violation.location().line()
+                  << ": observing violation: "
+                  << violation.comment()
+                  << "\n";
+        return; // don’t abort, just report
+    }
     
+    // fallback to default for enforce/quick_enforce
+    invoke_default_contract_violation_handler(violation);
+}
+
+int f(const int x) 
+HPX_PRE(false)
+HPX_POST(true)
+{
+    HPX_CONTRACT_ASSERT(false);
+    
+    return x;
+}
 
 
-//     hpx::cout << "Modified data: ";
-//     for (const auto& value : data)
-//     {
-//         hpx::cout << value << " ";
-//     }
-//     hpx::cout << "\n" << std::flush;
+int main() {
+  auto a = f(0);
+  std::cout << "Should be shown only in observe mode" << std::endl;
+}
 
 
 
-//     return hpx::finalize();
-// }
+// if(HPX_WITH_CONTRACTS)
 
-// int main(int argc, char* argv[])
-// {
-//     return hpx::init(argc, argv);
-// }
-//]
+//   add_executable(contract_violation_test_observe contract_violation_test.cpp)
+//   target_compile_options(contract_violation_test_observe PRIVATE
+//       -std=c++23 -fcontracts -stdlib=libc++
+//       -fcontract-evaluation-semantic=observe
+//   )
+//   add_test(NAME contract_violation_test_observe
+//       COMMAND $<TARGET_FILE:contract_violation_test_observe>)
+//   set_tests_properties(contract_violation_test_observe PROPERTIES
+//       PASS_REGULAR_EXPRESSION "Successfully overridden violation handler for observe mode")
+
+//   add_executable(contract_violation_test_enforce contract_violation_test.cpp)
+//   target_compile_options(contract_violation_test_enforce PRIVATE
+//       -std=c++23 -fcontracts -stdlib=libc++
+//       -fcontract-evaluation-semantic=enforce
+//   )
+//   add_test(NAME contract_violation_test_enforce
+//       COMMAND $<TARGET_FILE:contract_violation_test_enforce>)
+//   set_tests_properties(contract_violation_test_enforce PROPERTIES WILL_FAIL TRUE)
+
+//   add_executable(contract_violation_test_quick_enforce contract_violation_test.cpp)
+//   target_compile_options(contract_violation_test_quick_enforce PRIVATE
+//       -std=c++23 -fcontracts -stdlib=libc++
+//       -fcontract-evaluation-semantic=quick_enforce
+//   )
+//   add_test(NAME contract_violation_test_quick_enforce
+//       COMMAND $<TARGET_FILE:contract_violation_test_quick_enforce>)
+//   set_tests_properties(contract_violation_test_quick_enforce PROPERTIES WILL_FAIL TRUE)
+
+//   add_executable(contract_violation_test_ignore contract_violation_test.cpp)
+//   target_compile_options(contract_violation_test_ignore PRIVATE
+//       -std=c++23 -fcontracts -stdlib=libc++
+//       -fcontract-evaluation-semantic=ignore
+//   )
+//   add_test(NAME contract_violation_test_ignore
+//       COMMAND $<TARGET_FILE:contract_violation_test_ignore>)
+
+// endif()

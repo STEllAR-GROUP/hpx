@@ -1456,6 +1456,12 @@ hpx_option(
 
 if(HPX_WITH_CONTRACTS)
   hpx_add_config_define(HPX_HAVE_CONTRACTS)
+   # Default compiler flags for contracts
+  set(HPX_CONTRACT_FLAGS "-std=c++23 -fcontracts -stdlib=libc++") 
+
+
+  # Apply these flags globally to all HPX targets that need contracts
+  add_compile_options(${HPX_CONTRACT_FLAGS})
 endif()
 
 hpx_option(
@@ -1466,6 +1472,13 @@ hpx_option(
 if(HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS)
   hpx_add_config_define(HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS)
 endif()
+
+
+
+
+
+
+
 
 hpx_option(
   HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support." OFF
