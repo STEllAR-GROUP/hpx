@@ -1456,10 +1456,6 @@ hpx_option(
 
 if(HPX_WITH_CONTRACTS)
   hpx_add_config_define(HPX_HAVE_CONTRACTS)
-  
-  # Using Eric's clang with contracts support (C++23 + -fcontracts)
-  message(STATUS "HPX: Enabling C++23 contracts support with Eric's clang")
-  add_compile_options(-std=c++23 -fcontracts -stdlib=libc++)
 endif()
 
 hpx_option(
