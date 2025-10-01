@@ -7,6 +7,26 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_WITH_TESTS)
+    # -------------------------------
+    # Universal Contract Succeed Test
+    # Runs in ALL modes: C++26 native, fallback, and disabled
+    # Tests that contract macros work correctly with true conditions
+    # -------------------------------
+    
+    add_hpx_executable(
+        contract_succeed_test INTERNAL_FLAGS
+        SOURCES contract_succeed.cpp
+        NOLIBS
+        DEPENDENCIES hpx_core
+        EXCLUDE_FROM_ALL
+        FOLDER "Tests/Unit/Modules/Core/Contracts/"
+    )
+    
+    add_hpx_unit_test("modules.contracts" contract_succeed)
+    set_tests_properties(tests.unit.modules.contracts.contract_succeed PROPERTIES
+        LABELS contracts
+    )
+
     if (HPX_WITH_CONTRACTS)
 
         # Check if we have C++26 support for native contracts
@@ -137,6 +157,31 @@ if(HPX_WITH_TESTS)
             # Note: Global C++23 flags are set in root CMakeLists.txt
             # -------------------------------
             
+            # Simple contract tests following assertion module pattern
+            set(contract_tests contract_fail)
+
+            foreach(test ${contract_tests})
+                set(sources ${test}.cpp)
+
+                add_hpx_executable(
+                    ${test}_test INTERNAL_FLAGS
+                    SOURCES ${sources}
+                    NOLIBS
+                    DEPENDENCIES hpx_core
+                    EXCLUDE_FROM_ALL
+                    FOLDER "Tests/Unit/Modules/Core/Contracts/"
+                )
+                
+                add_hpx_unit_test("modules.contracts" ${test})
+            endforeach()
+
+            # Set contract_fail to expect failure in Debug mode (when assertions are active)
+            set_tests_properties(
+                tests.unit.modules.contracts.contract_fail PROPERTIES WILL_FAIL
+                                                            $<$<CONFIG:Debug>:true>
+            )
+            
+            # Original fallback test (for compatibility)
             add_hpx_executable(
                 fallback_contracts_test INTERNAL_FLAGS
                 SOURCES fallback_contracts.cpp
@@ -150,6 +195,7 @@ if(HPX_WITH_TESTS)
             add_hpx_unit_test("modules.contracts" fallback_contracts)
             set_tests_properties(tests.unit.modules.contracts.fallback_contracts PROPERTIES
                 LABELS contracts
+                WILL_FAIL $<$<CONFIG:Debug>:true>
             )
             
         endif()
