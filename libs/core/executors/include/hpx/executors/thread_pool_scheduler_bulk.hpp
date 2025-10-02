@@ -22,6 +22,7 @@
 #include <hpx/errors/exception.hpp>
 #include <hpx/errors/exception_list.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
@@ -162,7 +163,7 @@ namespace hpx::execution::experimental::detail {
             auto const i_begin =
                 static_cast<std::size_t>(index) * task_f->chunk_size;
             auto const i_end =
-                (std::min)(i_begin + task_f->chunk_size, task_f->size);
+                (std::min) (i_begin + task_f->chunk_size, task_f->size);
 
             if constexpr (OperationState::is_chunked)
             {
@@ -173,7 +174,8 @@ namespace hpx::execution::experimental::detail {
             else
             {
                 // bulk_unchunked: f(index, values...) for each element
-                // In unchunked case, chunk_size is 1, so each chunk will only have one element.
+                // In unchunked case, chunk_size is 1
+                // so each chunk will only have one element.
                 // The regular bulk invocation will go through the is_chunked case.
                 auto it = std::ranges::next(
                     hpx::util::begin(op_state->shape), i_begin);
@@ -402,8 +404,8 @@ namespace hpx::execution::experimental::detail {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
             auto const part_begin = worker_thread;
-            auto part_end = (std::min)(
-                size + num_threads - 1, part_begin + num_steps * num_threads);
+            auto part_end = (std::min) (size + num_threads - 1,
+                part_begin + num_steps * num_threads);
             auto const remainder = (part_end - part_begin) % num_threads;
             if (remainder != 0)
             {
