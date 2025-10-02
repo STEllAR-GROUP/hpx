@@ -55,34 +55,20 @@ namespace hpx::execution::experimental::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // Compute a chunk size given a number of worker threads and a total number
-    // Chunked execution: larger chunks for better cache locality and fewer
-    // context switches
-    static constexpr std::uint32_t get_bulk_scheduler_chunk_size_chunked(
+    // of items. Returns a power-of-2 chunk size that results in at least 8
+    // chunks per worker thread and at least 4 chunks per worker thread.
+    // If items < num_threads, returns a power-of-2 chunk
+    // size that results in at most 8 and
+    // at least 4 chunks per worker thread.
+    static constexpr std::uint32_t get_bulk_scheduler_chunk_size(
         std::uint32_t const num_threads, std::size_t const n) noexcept
     {
-        std::uint64_t chunk_size =
-            16;    // Start with larger chunk size for chunked mode
-        while (chunk_size * num_threads * 4 <
-            n)    // Fewer chunks per thread (4 instead of 8)
+        std::uint64_t chunk_size = 1;
+        while (chunk_size * num_threads * 8 < n)
         {
             chunk_size *= 2;
         }
         return static_cast<std::uint32_t>(chunk_size);
-    }
-
-    // Unchunked execution: smaller chunks for better load balancing and work stealing
-    static constexpr std::uint32_t get_bulk_scheduler_chunk_size_unchunked(
-        std::uint32_t const num_threads, std::size_t const n) noexcept
-    {
-        std::uint64_t chunk_size =
-            1;    // Start with minimum chunk size for fine-grained work
-        while (chunk_size * num_threads * 16 <
-            n)    // More chunks per thread (16 instead of 8)
-        {
-            chunk_size *= 2;
-        }
-        return static_cast<std::uint32_t>(
-            (std::max) (chunk_size, std::uint64_t(1)));
     }
 
     // For bulk_unchunked: f(index, ...)
@@ -176,7 +162,7 @@ namespace hpx::execution::experimental::detail {
             auto const i_begin =
                 static_cast<std::size_t>(index) * task_f->chunk_size;
             auto const i_end =
-                (std::min) (i_begin + task_f->chunk_size, task_f->size);
+                (std::min)(i_begin + task_f->chunk_size, task_f->size);
 
             if constexpr (OperationState::is_chunked)
             {
@@ -187,14 +173,12 @@ namespace hpx::execution::experimental::detail {
             else
             {
                 // bulk_unchunked: f(index, values...) for each element
+                // In unchunked case, chunk_size is 1, so each chunk will only have one element.
+                // The regular bulk invocation will go through the is_chunked case.
                 auto it = std::ranges::next(
                     hpx::util::begin(op_state->shape), i_begin);
-                for (std::uint32_t i = i_begin; i != i_end; (void) ++i)
-                {
-                    bulk_scheduler_invoke_helper(
-                        index_pack_type{}, op_state->f, *it, ts);
-                    ++it;
-                }
+                bulk_scheduler_invoke_helper(
+                    index_pack_type{}, op_state->f, *it, ts);
             }
         }
 
@@ -418,8 +402,8 @@ namespace hpx::execution::experimental::detail {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
             auto const part_begin = worker_thread;
-            auto part_end = (std::min) (size + num_threads - 1,
-                part_begin + num_steps * num_threads);
+            auto part_end = (std::min)(
+                size + num_threads - 1, part_begin + num_steps * num_threads);
             auto const remainder = (part_end - part_begin) % num_threads;
             if (remainder != 0)
             {
@@ -502,11 +486,12 @@ namespace hpx::execution::experimental::detail {
 
             // Calculate chunk size based on execution mode
             std::uint32_t chunk_size = op_state->is_chunked ?
-                get_bulk_scheduler_chunk_size_chunked(
+                get_bulk_scheduler_chunk_size(
                     op_state->num_worker_threads, size) :
-                get_bulk_scheduler_chunk_size_unchunked(
-                    op_state->num_worker_threads, size);
-            std::uint32_t num_chunks = (size + chunk_size - 1) / chunk_size;
+                1;
+            std::uint32_t num_chunks = op_state->is_chunked ?
+                (size + chunk_size - 1) / chunk_size :
+                size;
 
             // launch only as many tasks as we have chunks
             std::size_t const num_pus = op_state->num_worker_threads;
