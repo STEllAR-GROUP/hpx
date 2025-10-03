@@ -7,216 +7,86 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_WITH_TESTS)
-    # -------------------------------
-    # Universal Contract Succeed Test
-    # Runs in ALL modes: C++26 native, fallback, and disabled
-    # Tests that contract macros work correctly with true conditions
-    # -------------------------------
-    
-    add_hpx_executable(
-        contract_succeed_test INTERNAL_FLAGS
-        SOURCES contract_succeed.cpp
-        NOLIBS
-        DEPENDENCIES hpx_core
-        EXCLUDE_FROM_ALL
-        FOLDER "Tests/Unit/Modules/Core/Contracts/"
-    )
-    
-    add_hpx_unit_test("modules.contracts" contract_succeed)
-    set_tests_properties(tests.unit.modules.contracts.contract_succeed PROPERTIES
-        LABELS contracts
-    )
-
     if (HPX_WITH_CONTRACTS)
-
-        # Check if we have C++26 support for native contracts
-        include(CheckCXXSourceCompiles)
-        set(CMAKE_REQUIRED_FLAGS "-std=c++26")
-        check_cxx_source_compiles("
-            #if __cplusplus >= 202602L
-            int main() { return 0; }
-            #else
-            #error \"C++26 not available\"
-            #endif
-        " HAS_CXX26)
-
-        if(HAS_CXX26)
-            # -------------------------------
-            # C++26 Native Contract Tests
-            # Condition: HPX_WITH_CONTRACTS=ON && __cplusplus >= 202602L
-            # These tests use advanced C++26 contract features
-            # Note: Global contract flags are set in root CMakeLists.txt
-            # -------------------------------
-            
-            # Define contract types for native C++26 tests
-            set(CONTRACT_TYPES "pre" "post" "cassert")
-
-            # OBSERVE mode: Reports violations but does not abort
-            foreach(CONTRACT_TYPE IN LISTS CONTRACT_TYPES)
-                set(TARGET_NAME "contract_violation_${CONTRACT_TYPE}_observe")
-                set(SOURCE_FILE "contract_violation_${CONTRACT_TYPE}.cpp")
-                
-                add_hpx_executable(
-                    ${TARGET_NAME}_test INTERNAL_FLAGS
-                    SOURCES ${SOURCE_FILE}
-                    NOLIBS
-                    DEPENDENCIES hpx_core
-                    EXCLUDE_FROM_ALL
-                    FOLDER "Tests/Unit/Modules/Core/Contracts/"
-                )
-                # Add only contract-specific evaluation semantic
-                target_compile_options(${TARGET_NAME}_test PRIVATE
-                    -fcontract-evaluation-semantic=observe
-                )
-                
-                add_hpx_unit_test("modules.contracts" ${TARGET_NAME})
-                set_tests_properties(tests.unit.modules.contracts.${TARGET_NAME} PROPERTIES
-                    LABELS contracts
-                )
-            endforeach()
-
-            # ENFORCE mode: Aborts on contract violation
-            foreach(CONTRACT_TYPE IN LISTS CONTRACT_TYPES)
-                set(TARGET_NAME "contract_violation_${CONTRACT_TYPE}_enforce")
-                set(SOURCE_FILE "contract_violation_${CONTRACT_TYPE}.cpp")
-                
-                add_hpx_executable(
-                    ${TARGET_NAME}_test INTERNAL_FLAGS
-                    SOURCES ${SOURCE_FILE}
-                    NOLIBS
-                    DEPENDENCIES hpx_core
-                    EXCLUDE_FROM_ALL
-                    FOLDER "Tests/Unit/Modules/Core/Contracts/"
-                )
-                # Add only contract-specific evaluation semantic
-                target_compile_options(${TARGET_NAME}_test PRIVATE
-                    -fcontract-evaluation-semantic=enforce
-                )
-                
-                add_hpx_unit_test("modules.contracts" ${TARGET_NAME})
-                set_tests_properties(tests.unit.modules.contracts.${TARGET_NAME} PROPERTIES
-                    WILL_FAIL TRUE
-                    LABELS contracts
-                )
-            endforeach()
-
-            # QUICK_ENFORCE mode: Aborts immediately on violation
-            foreach(CONTRACT_TYPE IN LISTS CONTRACT_TYPES)
-                set(TARGET_NAME "contract_violation_${CONTRACT_TYPE}_quick_enforce")
-                set(SOURCE_FILE "contract_violation_${CONTRACT_TYPE}.cpp")
-                
-                add_hpx_executable(
-                    ${TARGET_NAME}_test INTERNAL_FLAGS
-                    SOURCES ${SOURCE_FILE}
-                    NOLIBS
-                    DEPENDENCIES hpx_core
-                    EXCLUDE_FROM_ALL
-                    FOLDER "Tests/Unit/Modules/Core/Contracts/"
-                )
-                # Add only contract-specific evaluation semantic
-                target_compile_options(${TARGET_NAME}_test PRIVATE
-                    -fcontract-evaluation-semantic=quick_enforce
-                )
-                
-                add_hpx_unit_test("modules.contracts" ${TARGET_NAME})
-                set_tests_properties(tests.unit.modules.contracts.${TARGET_NAME} PROPERTIES
-                    WILL_FAIL TRUE
-                    LABELS contracts
-                )
-            endforeach()
-
-            # IGNORE mode: Contracts are completely ignored
-            foreach(CONTRACT_TYPE IN LISTS CONTRACT_TYPES)
-                set(TARGET_NAME "contract_violation_${CONTRACT_TYPE}_ignore")
-                set(SOURCE_FILE "contract_violation_${CONTRACT_TYPE}.cpp")
-                
-                add_hpx_executable(
-                    ${TARGET_NAME}_test INTERNAL_FLAGS
-                    SOURCES ${SOURCE_FILE}
-                    NOLIBS
-                    DEPENDENCIES hpx_core
-                    EXCLUDE_FROM_ALL
-                    FOLDER "Tests/Unit/Modules/Core/Contracts/"
-                )
-                # Add only contract-specific evaluation semantic
-                target_compile_options(${TARGET_NAME}_test PRIVATE
-                    -fcontract-evaluation-semantic=ignore
-                )
-                
-                add_hpx_unit_test("modules.contracts" ${TARGET_NAME})
-                set_tests_properties(tests.unit.modules.contracts.${TARGET_NAME} PROPERTIES
-                    LABELS contracts
-                )
-            endforeach()
-
-        else()
-            # -------------------------------
-            # Fallback Mode Tests
-            # Condition: HPX_WITH_CONTRACTS=ON && __cplusplus < 202602L
-            # Tests the fallback mechanism from HPX_CONTRACT_ASSERT to HPX_ASSERT
-            # Note: Global C++23 flags are set in root CMakeLists.txt
-            # -------------------------------
-            
-            # Simple contract tests following assertion module pattern
-            set(contract_tests contract_fail)
-
-            foreach(test ${contract_tests})
-                set(sources ${test}.cpp)
-
-                add_hpx_executable(
-                    ${test}_test INTERNAL_FLAGS
-                    SOURCES ${sources}
-                    NOLIBS
-                    DEPENDENCIES hpx_core
-                    EXCLUDE_FROM_ALL
-                    FOLDER "Tests/Unit/Modules/Core/Contracts/"
-                )
-                
-                add_hpx_unit_test("modules.contracts" ${test})
-            endforeach()
-
-            # Set contract_fail to expect failure in Debug mode (when assertions are active)
-            set_tests_properties(
-                tests.unit.modules.contracts.contract_fail PROPERTIES WILL_FAIL
-                                                            $<$<CONFIG:Debug>:true>
-            )
-            
-            # Original fallback test (for compatibility)
+        # -------------------------------
+        # Contract Tests when HPX_WITH_CONTRACTS=ON
+        # This includes both native (__cpp_contracts) and fallback modes
+        # We need runtime detection to run appropriate tests
+        # -------------------------------
+        
+        # Declaration contracts tests (C++26 declaration syntax)
+        # These should work when __cpp_contracts is available
+        set(declaration_tests 
+            declaration_contracts_succeed
+            declaration_contracts_fail_pre 
+            declaration_contracts_fail_post 
+            declaration_contracts_fail_contract_assert
+        )
+        foreach(test ${declaration_tests})
             add_hpx_executable(
-                fallback_contracts_test INTERNAL_FLAGS
-                SOURCES fallback_contracts.cpp
+                ${test}_test INTERNAL_FLAGS
+                SOURCES ${test}.cpp
                 NOLIBS
                 DEPENDENCIES hpx_core
                 EXCLUDE_FROM_ALL
                 FOLDER "Tests/Unit/Modules/Core/Contracts/"
             )
-            # No additional compile options needed - using global settings
-            
-            add_hpx_unit_test("modules.contracts" fallback_contracts)
-            set_tests_properties(tests.unit.modules.contracts.fallback_contracts PROPERTIES
-                LABELS contracts
-                WILL_FAIL $<$<CONFIG:Debug>:true>
+            add_hpx_unit_test("modules.contracts" ${test})
+        endforeach()
+        
+        # Set failure expectations for declaration contract failure tests
+        set_tests_properties(
+            tests.unit.modules.contracts.declaration_contracts_fail_pre PROPERTIES WILL_FAIL
+                                                        
+        )
+        set_tests_properties(
+            tests.unit.modules.contracts.declaration_contracts_fail_post PROPERTIES WILL_FAIL
+                                                        
+        )
+        set_tests_properties(
+            tests.unit.modules.contracts.declaration_contracts_fail_contract_assert PROPERTIES WILL_FAIL
+                                                        
+        )
+        
+        # Fallback contracts tests (simple syntax for fallback mode)
+        # These work when __cpp_contracts is NOT available
+        set(fallback_tests 
+            fallback_contracts_succeed
+            fallback_contracts_fail
+        )
+        foreach(test ${fallback_tests})
+            add_hpx_executable(
+                ${test}_test INTERNAL_FLAGS
+                SOURCES ${test}.cpp
+                NOLIBS
+                DEPENDENCIES hpx_core
+                EXCLUDE_FROM_ALL
+                FOLDER "Tests/Unit/Modules/Core/Contracts/"
             )
-            
-        endif()
+            add_hpx_unit_test("modules.contracts" ${test})
+        endforeach()
+        
+        # Set failure expectation for fallback failure test
+        set_tests_properties(
+            tests.unit.modules.contracts.fallback_contracts_fail PROPERTIES WILL_FAIL
+                                                        $<$<CONFIG:Debug>:true>
+        )
 
     else()
         # -------------------------------
         # Contracts Disabled Tests  
         # Condition: HPX_WITH_CONTRACTS=OFF
         # Tests that contract macros are no-ops when contracts are disabled
-        # Note: Standard C++ flags are used (no special contract flags)
         # -------------------------------
         
         add_hpx_executable(
             disabled_contracts_test INTERNAL_FLAGS
-            SOURCES fallback_contracts.cpp
+            SOURCES disabled_contracts.cpp
             NOLIBS
             DEPENDENCIES hpx_core
             EXCLUDE_FROM_ALL
             FOLDER "Tests/Unit/Modules/Core/Contracts/"
         )
-        # No additional compile options needed - using global settings
         
         add_hpx_unit_test("modules.contracts" disabled_contracts)
         set_tests_properties(tests.unit.modules.contracts.disabled_contracts PROPERTIES

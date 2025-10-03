@@ -21,11 +21,22 @@
 ///
 /// ## Configuration Matrix:
 /// 
-/// | HPX_HAVE_CONTRACTS | C++ Version | Behavior |
-/// |--------------------|-------------|----------|
-/// | ON                 | C++26+      | Native contracts |
-/// | ON                 | < C++26     | HPX_ASSERT fallback |
-/// | OFF                | Any         | No-op (except HPX_CONTRACT_ASSERT) |
+/// | HPX_HAVE_CONTRACTS | __cpp_contracts | Behavior |
+/// |--------------------|-----------------|----------|
+/// | ON                 | Available       | Native C++26 contracts |
+/// | ON                 | Not Available   | HPX_ASSERT fallback |
+/// | OFF                | Any             | HPX_CONTRACT_ASSERT → HPX_ASSERT, PRE/POST → no-op |
+///
+/// ## Design Philosophy:
+///
+/// **HPX_CONTRACT_ASSERT** = Enhanced assertion that's always useful when assertions work
+/// - Available even when HPX_WITH_CONTRACTS=OFF because it's fundamentally a better assertion
+/// - Maps to HPX_ASSERT, so works whenever assertions are active (Debug builds)
+///
+/// **HPX_PRE/HPX_POST** = True contract syntax that requires language support
+/// - Disabled when HPX_WITH_CONTRACTS=OFF because they won't work the same in C++26
+/// - In C++26: attached to function declarations, not usable in function bodies
+/// - In fallback: work in function bodies but this is temporary compatibility
 ///
 /// ## Important Migration Notes:
 ///
@@ -47,48 +58,63 @@
 ///
 /// ### Preconditions:
 /// \code
-/// // C++26 mode: Use in function declaration
+/// // C++26 native contracts: Use in function declaration
 /// int divide(int a, int b) HPX_PRE(b != 0)
 /// {
 ///     return a / b;
 /// }
 ///
-/// // Fallback mode: Use in function body
+/// // Fallback mode: Use in function body (temporary compatibility)
 /// int divide(int a, int b)
 /// {
-///     HPX_PRE(b != 0);
+///     HPX_PRE(b != 0);  // Maps to HPX_ASSERT(b != 0)
+///     return a / b;
+/// }
+///
+/// // Contracts disabled: PRE/POST are no-ops to prepare for C++26 migration
+/// int divide(int a, int b)
+/// {
+///     HPX_PRE(b != 0);  // No-op - use HPX_CONTRACT_ASSERT instead
 ///     return a / b;
 /// }
 /// \endcode
 ///
 /// ### Postconditions:
 /// \code
-/// // C++26 mode: Can access return value as 'r'
+/// // C++26 native: Can access return value as 'r'
 /// int factorial(int n) HPX_PRE(n >= 0) HPX_POST(r; r > 0)
 /// {
 ///     return n <= 1 ? 1 : n * factorial(n - 1);
 /// }
 ///
-/// // Current fallback mode: Cannot access return value
+/// // Fallback mode: Cannot access return value (temporary)
 /// int factorial(int n)
 /// {
 ///     HPX_PRE(n >= 0);
 ///     int result = n <= 1 ? 1 : n * factorial(n - 1);
-///     // HPX_POST(result > 0);  // Must use local variable, not 'r'
+///     HPX_POST(result > 0);  // Maps to HPX_ASSERT, use local variable
 ///     return result;
 /// }
 /// \endcode
 ///
-/// **Note:** Current implementation has postconditions in function body without
-/// return value access. Full C++26 migration will enable proper postcondition
-/// syntax with return value checking.
-///
-/// ### Contract Assertions:
+/// ### Contract Assertions (Always Available):
 /// \code
 /// void process_array(std::vector<int>& arr, size_t index)
 /// {
+///     // HPX_CONTRACT_ASSERT works in all modes:
+///     // - Native C++26: maps to contract_assert
+///     // - Fallback: maps to HPX_ASSERT  
+///     // - Contracts disabled: still maps to HPX_ASSERT (enhanced assertion)
 ///     HPX_CONTRACT_ASSERT(index < arr.size());
 ///     arr[index] *= 2;
+/// }
+///
+/// // Recommended pattern when contracts are disabled:
+/// void safe_function(int* ptr)
+/// {
+///     HPX_CONTRACT_ASSERT(ptr != nullptr);  // Always works
+///     // HPX_PRE(ptr != nullptr);           // No-op when contracts disabled
+///     *ptr = 42;
 /// }
 /// \endcode
 ///
@@ -99,7 +125,12 @@
 /// cmake -DHPX_WITH_CONTRACTS=ON -DCMAKE_CXX_STANDARD=26
 /// \endcode
 ///
-/// Optional: Unify assertion systems:
+/// Contract assertions work even when contracts are disabled:
+/// \code  
+/// cmake -DHPX_WITH_CONTRACTS=OFF  # HPX_CONTRACT_ASSERT still maps to HPX_ASSERT
+/// \endcode
+///
+/// Optional: Unify assertion systems (when contracts enabled):
 /// \code  
 /// cmake -DHPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS=ON
 /// \endcode
@@ -107,15 +138,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-// Include HPX_ASSERT only when we need it for fallback mode
-// This avoids unnecessary dependencies when using native C++26 contracts
-#if !defined(HPX_HAVE_CONTRACTS) || __cplusplus < 202602L
 #include <hpx/assert.hpp>
-#endif
+
 
 #ifdef HPX_HAVE_CONTRACTS
-    #if __cplusplus >= 202602L
+    #if __cpp_contracts
         #define HPX_PRE(x) pre((x))
         #define HPX_CONTRACT_ASSERT(x) contract_assert((x))
         #define HPX_POST(x) post((x))
@@ -127,7 +154,9 @@
 
 
     #else
-        #pragma message("Warning: Contracts require C++26 or later. Falling back to HPX_ASSERT.")        
+        #pragma message("Warning: Contracts require C++26 or later. Falling back to HPX_ASSERT. 
+            Until C++26 is available, HPX_PRE and HPX_POST are inside function bodies. 
+            After migrating to C++26 they will be moved to function declarations thus HPX_PRE AND HPX_POST will not parse if contracts are not supported. ")        
         #define HPX_PRE(x) HPX_ASSERT((x))
         #define HPX_CONTRACT_ASSERT(x) HPX_ASSERT((x))  
         #define HPX_POST(x) HPX_ASSERT((x)) 
@@ -135,11 +164,7 @@
 
 #else
     #define HPX_PRE(x)
-    #if defined(HPX_ASSERT) 
-        #define HPX_CONTRACT_ASSERT(x) HPX_ASSERT((x))
-    #else 
-        #define HPX_CONTRACT_ASSERT(x)
-    #endif
+    #define HPX_CONTRACT_ASSERT(x) HPX_ASSERT((x))
     #define HPX_POST(x)
 #endif
 

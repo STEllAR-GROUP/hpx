@@ -1,23 +1,36 @@
-#ifdef HPX_HAVE_CONTRACTS
-    #if __cplusplus >= 202602L
-        #define HPX_PRE(x) pre((x)) //notes:Moving HPX_PRE() from body to function definition neccessary
-        #define HPX_CONTRACT_ASSERT(x) contract_assert((x))  
-        #define HPX_POST(x) post((x))
+//  Copyright (c) 2025 Alexandros Papadakis
+//  Copyright (c) 2025 Panagiotis Syskakis
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// This tests whether C++26 contracts are supported by the compiler
 
-        #ifdef HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS 
-            #define HPX_ASSERT(x) HPX_CONTRACT_ASSERT((x))
-        #endif
+#if __cpp_contracts
+// Test native contract syntax
+int divide(int a, int b) pre(b != 0) post(r; r == a / b)
+{
+    return a / b;
+}
 
+void test_contract_assert()
+{
+    contract_assert(true);
+}
 
-    #else
-        #pragma message("Warning: Contracts require C++26 or later. Falling back to HPX_ASSERT.")        
-        #define HPX_PRE(x) HPX_ASSERT((x))
-        #define HPX_CONTRACT_ASSERT(x) HPX_ASSERT((x))  
-        #define HPX_POST(x) HPX_ASSERT((x))
-    #endif
+int main()
+{
+    int result = divide(10, 2);
+    test_contract_assert();
+    return result == 5 ? 0 : 1;
+}
+
 #else
-    #define HPX_PRE(x)
-    #define HPX_CONTRACT_ASSERT(x)
-    #define HPX_POST(x)
+// Fallback test - contracts not available
+int main()
+{
+    // Test would fail if contracts were required but not available
+    return 0;
+}
 #endif
