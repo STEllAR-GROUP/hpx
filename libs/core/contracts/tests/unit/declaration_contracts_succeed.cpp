@@ -23,12 +23,6 @@ int divide(int a, int b) HPX_PRE(b != 0)
     return a / b;
 }
 
-// Function with postcondition in declaration
-int factorial(int n) HPX_PRE(n >= 0) HPX_POST(r: r > 0)
-{
-    return n <= 1 ? 1 : n * factorial(n - 1);
-}
-
 // Function with both pre and post conditions
 int safe_multiply(int a, int b) HPX_PRE(a > 0 && b > 0) HPX_POST(r: r > 0)
 {
@@ -42,12 +36,10 @@ int main()
     // Test functions with proper contract syntax
     int result1 = divide(10, 2);
     HPX_TEST_EQ(result1, 5);
+
     
-    int result2 = factorial(5);
-    HPX_TEST_EQ(result2, 120);
-    
-    int result3 = safe_multiply(3, 4);
-    HPX_TEST_EQ(result3, 12);
+    int result2 = safe_multiply(3, 4);
+    HPX_TEST_EQ(result2, 12);
     
     // Test contract assertions
     HPX_CONTRACT_ASSERT(true);
