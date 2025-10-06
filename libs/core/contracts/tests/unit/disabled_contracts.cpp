@@ -12,7 +12,8 @@
 // Verifies that PRE/POST are disabled but CONTRACT_ASSERT still works
 
 int main() 
-HPX_PRE(false) HPX_POST(false) // Should be no-op, not trigger assertion
+HPX_PRE(false) 
+HPX_POST(false) // Should be no-op, not trigger assertion
 {
     // This should still work (maps to HPX_ASSERT)
     HPX_CONTRACT_ASSERT(true);

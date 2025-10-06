@@ -24,13 +24,13 @@ int divide(int a, int b) HPX_PRE(b != 0)
 }
 
 // Function with postcondition in declaration
-int factorial(int n) HPX_PRE(n >= 0) HPX_POST(r; r > 0)
+int factorial(int n) HPX_PRE(n >= 0) HPX_POST(r: r > 0)
 {
     return n <= 1 ? 1 : n * factorial(n - 1);
 }
 
 // Function with both pre and post conditions
-int safe_multiply(int a, int b) HPX_PRE(a > 0 && b > 0) HPX_POST(r; r > 0)
+int safe_multiply(int a, int b) HPX_PRE(a > 0 && b > 0) HPX_POST(r: r > 0)
 {
     return a * b;
 }

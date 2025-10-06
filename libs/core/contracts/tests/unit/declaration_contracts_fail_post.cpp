@@ -13,7 +13,7 @@
 #include <hpx/contracts.hpp>
 
 // Function with postcondition that requires positive result
-int get_positive_number(int x) HPX_POST(r; r > 0)
+int get_positive_number(int x) HPX_POST(r: r > 0)
 {
     return -10;  // This violates the postcondition r > 0
 }
