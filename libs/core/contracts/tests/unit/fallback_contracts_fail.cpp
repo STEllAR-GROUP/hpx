@@ -15,14 +15,16 @@
 #include <iostream>
 int main()
 {
-    HPX_PRE(true);
-    HPX_CONTRACT_ASSERT(true);
-    HPX_POST(true);
+    HPX_PRE(true); //Will be moved to declaration when C++26 is live
+    HPX_POST(true); //Will be moved to declaration when C++26 is live
     
+    HPX_CONTRACT_ASSERT(true);
+
     // Add a failing assertion to test WILL_FAIL behavior
     HPX_CONTRACT_ASSERT(false);  // This should abort in Debug mode
-
     HPX_TEST(true);
+    
+    
 
     return hpx::util::report_errors();
 }

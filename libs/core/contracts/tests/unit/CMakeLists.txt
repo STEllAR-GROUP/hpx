@@ -1,5 +1,5 @@
 # Copyright (c) 2025 Alexandros Papadakis
-# Copyright (c) 2025Panagiotis Syskakis
+# Copyright (c) 2025 Panagiotis Syskakis
 # HPX Contracts Module Unit Tests
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -10,67 +10,84 @@ if(HPX_WITH_TESTS)
     if (HPX_WITH_CONTRACTS)
         # -------------------------------
         # Contract Tests when HPX_WITH_CONTRACTS=ON
-        # This includes both native (__cpp_contracts) and fallback modes
-        # We need runtime detection to run appropriate tests
+        # Automatically detect contract mode and build appropriate tests
         # -------------------------------
         
-        # Declaration contracts tests (C++26 declaration syntax)
-        # These should work when __cpp_contracts is available
-        set(declaration_tests 
-            declaration_contracts_succeed
-            declaration_contracts_fail_pre 
-            declaration_contracts_fail_post 
-            declaration_contracts_fail_contract_assert
+        # Detect if __cpp_contracts is available at configure time
+        add_hpx_config_test(
+            HPX_HAVE_NATIVE_CONTRACTS
+            SOURCE "
+                #ifndef __cpp_contracts
+                #error No native contracts support
+                #endif
+                int main() { return 0; }
+            "
         )
-        foreach(test ${declaration_tests})
-            add_hpx_executable(
-                ${test}_test INTERNAL_FLAGS
-                SOURCES ${test}.cpp
-                NOLIBS
-                DEPENDENCIES hpx_core
-                EXCLUDE_FROM_ALL
-                FOLDER "Tests/Unit/Modules/Core/Contracts/"
+        
+        if(HPX_HAVE_NATIVE_CONTRACTS)
+            message(STATUS "HPX Contracts: Native C++26 contracts detected - building declaration tests")
+            
+            # Declaration contracts tests (C++26 declaration syntax)
+            # These run when __cpp_contracts is available
+            set(contract_tests 
+                declaration_contracts_succeed
+                declaration_contracts_fail_pre 
+                declaration_contracts_fail_post 
+                declaration_contracts_fail_contract_assert
             )
-            add_hpx_unit_test("modules.contracts" ${test})
-        endforeach()
-        
-        # Set failure expectations for declaration contract failure tests
-        set_tests_properties(
-            tests.unit.modules.contracts.declaration_contracts_fail_pre PROPERTIES WILL_FAIL
-                                                        
-        )
-        set_tests_properties(
-            tests.unit.modules.contracts.declaration_contracts_fail_post PROPERTIES WILL_FAIL
-                                                        
-        )
-        set_tests_properties(
-            tests.unit.modules.contracts.declaration_contracts_fail_contract_assert PROPERTIES WILL_FAIL
-                                                        
-        )
-        
-        # Fallback contracts tests (simple syntax for fallback mode)
-        # These work when __cpp_contracts is NOT available
-        set(fallback_tests 
-            fallback_contracts_succeed
-            fallback_contracts_fail
-        )
-        foreach(test ${fallback_tests})
-            add_hpx_executable(
-                ${test}_test INTERNAL_FLAGS
-                SOURCES ${test}.cpp
-                NOLIBS
-                DEPENDENCIES hpx_core
-                EXCLUDE_FROM_ALL
-                FOLDER "Tests/Unit/Modules/Core/Contracts/"
+            foreach(test ${contract_tests})
+                add_hpx_executable(
+                    ${test}_test INTERNAL_FLAGS
+                    SOURCES ${test}.cpp
+                    NOLIBS
+                    DEPENDENCIES hpx_core
+                    EXCLUDE_FROM_ALL
+                    FOLDER "Tests/Unit/Modules/Core/Contracts/"
+                )
+                add_hpx_unit_test("modules.contracts" ${test})
+            endforeach()
+            
+            # Set failure expectations for declaration contract failure tests
+            # Native contracts should fail when violated
+            set_tests_properties(
+                tests.unit.modules.contracts.declaration_contracts_fail_pre PROPERTIES WILL_FAIL true
             )
-            add_hpx_unit_test("modules.contracts" ${test})
-        endforeach()
-        
-        # Set failure expectation for fallback failure test
-        set_tests_properties(
-            tests.unit.modules.contracts.fallback_contracts_fail PROPERTIES WILL_FAIL
-                                                        $<$<CONFIG:Debug>:true>
-        )
+            set_tests_properties(
+                tests.unit.modules.contracts.declaration_contracts_fail_post PROPERTIES WILL_FAIL true
+            )
+            set_tests_properties(
+                tests.unit.modules.contracts.declaration_contracts_fail_contract_assert PROPERTIES WILL_FAIL
+                                                            $<$<CONFIG:Debug>:true>
+            )
+            
+        else()
+            message(STATUS "HPX Contracts: Fallback mode detected - building fallback tests")
+            
+            # Fallback contracts tests (simple syntax for fallback mode)
+            # These run when __cpp_contracts is NOT available
+            set(contract_tests 
+                fallback_contracts_succeed
+                fallback_contracts_fail
+            )
+            foreach(test ${contract_tests})
+                add_hpx_executable(
+                    ${test}_test INTERNAL_FLAGS
+                    SOURCES ${test}.cpp
+                    NOLIBS
+                    DEPENDENCIES hpx_core
+                    EXCLUDE_FROM_ALL
+                    FOLDER "Tests/Unit/Modules/Core/Contracts/"
+                )
+                add_hpx_unit_test("modules.contracts" ${test})
+            endforeach()
+            
+            # Set failure expectation for fallback failure test
+            # Fallback only fails in Debug mode (HPX_ASSERT behavior)
+            set_tests_properties(
+                tests.unit.modules.contracts.fallback_contracts_fail PROPERTIES WILL_FAIL
+                                                            $<$<CONFIG:Debug>:true>
+            )
+        endif()
 
     else()
         # -------------------------------
@@ -78,6 +95,8 @@ if(HPX_WITH_TESTS)
         # Condition: HPX_WITH_CONTRACTS=OFF
         # Tests that contract macros are no-ops when contracts are disabled
         # -------------------------------
+        
+        message(STATUS "HPX Contracts: Disabled mode - building disabled tests")
         
         add_hpx_executable(
             disabled_contracts_test INTERNAL_FLAGS
@@ -89,9 +108,6 @@ if(HPX_WITH_TESTS)
         )
         
         add_hpx_unit_test("modules.contracts" disabled_contracts)
-        set_tests_properties(tests.unit.modules.contracts.disabled_contracts PROPERTIES
-            LABELS contracts
-        )
         
     endif()
 endif()
