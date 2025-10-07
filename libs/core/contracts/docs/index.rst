@@ -1,7 +1,6 @@
 ..
     Copyright (c) 2025 The STE||AR-Group
     Copyright (c) 2025 Alexandros Papadakis
-    Copyright (c) 2025 Panagiotis Syskakis
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -56,12 +55,24 @@ assertions in C++26 mode::
 
     void example_function(int value)
     {
-        HPX_ASSERT(value > 0);  // Becomes contract_assert() in C++26 mode
+        HPX_ASSERT(value > 0);  // Becomes contract_assert(value > 0) in C++26 mode
         // ... rest of function
     }
 
 This provides enhanced contract semantics throughout your existing codebase 
-without requiring changes to assertion code.
+without requiring changes to assertion code. The transformation occurs in the
+contracts module (``contracts.hpp``) where the ``HPX_ASSERT`` macro is 
+overridden to use ``HPX_CONTRACT_ASSERT`` when ``HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS=ON``:
+
+* ``HPX_WITH_CONTRACTS=ON`` - Contracts module is enabled
+* ``HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS=ON`` - Assertion enhancement is enabled  
+* ``HPX_HAVE_NATIVE_CONTRACTS=ON`` - C++26 native contracts are available (from config test)
+
+The implementation works by redefining ``HPX_ASSERT`` in ``contracts.hpp`` to 
+use ``HPX_CONTRACT_ASSERT``, which automatically adapts to the current contract 
+mode (native C++26 contracts or assertion fallback). This ensures all existing 
+``HPX_ASSERT`` calls throughout the HPX codebase automatically gain contract 
+semantics when available.
 
 Usage Examples
 ==============

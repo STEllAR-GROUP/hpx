@@ -1,6 +1,5 @@
 //  Copyright (c) 2025 The STE||AR-Group
 //  Copyright (c) 2025 Alexandros Papadakis
-//  Copyright (c) 2025 Panagiotis Syskakis
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,19 +27,14 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 
-// Contract implementation: automatically selects native C++26 contracts
+// Contract implementation: automatically selects native C++26 contracts 
 // or falls back to HPX_ASSERT based on compiler capabilities
 #ifdef HPX_HAVE_CONTRACTS
-    #if __cpp_contracts
+    #if HPX_HAVE_NATIVE_CONTRACTS
         // Native C++26 contracts mode
         #define HPX_PRE(x) pre(x)
         #define HPX_CONTRACT_ASSERT(x) contract_assert(x)
         #define HPX_POST(x) post(x)
-
-        #ifdef HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS 
-            #define HPX_ASSERT(x) HPX_CONTRACT_ASSERT((x))
-        #endif
-
     #else
         // Fallback mode: contracts map to assertions until C++26 migration
         #pragma message("HPX Contracts: Using assertion fallback mode. " \
@@ -49,7 +43,6 @@
         #define HPX_CONTRACT_ASSERT(x) HPX_ASSERT((x))  
         #define HPX_POST(x) HPX_ASSERT((x)) 
     #endif
-
 #else
     // Contracts disabled: PRE/POST are no-ops, CONTRACT_ASSERT remains available
     #define HPX_PRE(x)
@@ -57,4 +50,8 @@
     #define HPX_POST(x)
 #endif
 
-
+#ifdef HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS 
+    // Override HPX_ASSERT to use contract assertions 
+    #define HPX_ASSERT(x) HPX_CONTRACT_ASSERT(x)
+#endif
+    

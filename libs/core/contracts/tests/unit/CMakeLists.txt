@@ -1,5 +1,4 @@
 # Copyright (c) 2025 Alexandros Papadakis
-# Copyright (c) 2025 Panagiotis Syskakis
 # HPX Contracts Module Unit Tests
 #
 # SPDX-License-Identifier: BSL-1.0

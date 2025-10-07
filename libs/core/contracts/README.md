@@ -1,7 +1,6 @@
 <!--
     Copyright (c) 2025 The STE||AR-Group
     Copyright (c) 2025 Alexandros Papadakis
-    Copyright (c) 2025 Panagiotis Syskakis
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -45,7 +44,16 @@ cmake -DHPX_WITH_CONTRACTS=OFF #default
 ## Advanced Features
 
 ### Contract-Enhanced Assertions
-When `HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS=ON`, regular `HPX_ASSERT` calls are automatically upgraded to use contract assertions in C++26 mode, providing enhanced contract semantics throughout your codebase.
+When `HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS=ON`, regular `HPX_ASSERT` calls are automatically upgraded to use contract assertions:
+
+```cpp
+void process_data(std::vector<int>& data, size_t index) {
+    HPX_ASSERT(index < data.size());  // Becomes HPX_CONTRACT_ASSERT() -> adapts to current mode
+    data[index] *= 2;
+}
+```
+
+The implementation works by overriding the `HPX_ASSERT` macro in `contracts.hpp` to use `HPX_CONTRACT_ASSERT`, which automatically adapts to the current contract mode (native C++26 contracts when available, or assertion fallback otherwise).
 
 ## API Reference
 
