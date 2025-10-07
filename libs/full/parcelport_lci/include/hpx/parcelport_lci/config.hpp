@@ -19,19 +19,13 @@ namespace hpx::parcelset::policies::lci {
         static bool is_initialized;
         // whether to bypass the parcel queue and connection cache.
         static bool enable_send_immediate;
-        // whether to enable the backlog queue and eager message aggregation
-        static bool enable_lci_backlog_queue;
         // which protocol to use
         enum class protocol_t
         {
-            putva,
             sendrecv,
             putsendrecv,
         };
         static protocol_t protocol;
-        // Whether sending header requires completion
-        static bool enable_sendmc;
-        // which completion mechanism to use for header messages
         enum class comp_type_t
         {
             queue,
@@ -39,6 +33,7 @@ namespace hpx::parcelset::policies::lci {
             sync_single,
             sync_single_nolock,
         };
+        // which completion mechanism to use for header messages
         static comp_type_t completion_type_header;
         // which completion mechanism to use for followup messages
         static comp_type_t completion_type_followup;
@@ -57,8 +52,6 @@ namespace hpx::parcelset::policies::lci {
         // How many pre-posted receives for new messages
         // (can only be applied to `sendrecv` protocol).
         static int prepost_recv_num;
-        // Whether to register the buffer in HPX (or rely on LCI to register it)
-        static bool reg_mem;
         // How many devices to use
         static int ndevices;
         // How many completion managers to use
