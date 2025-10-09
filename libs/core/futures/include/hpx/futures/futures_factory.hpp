@@ -9,8 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 
-#include <hpx/allocator_support/allocator_deleter.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concurrency/stack.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
@@ -19,6 +17,7 @@
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
+#include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>

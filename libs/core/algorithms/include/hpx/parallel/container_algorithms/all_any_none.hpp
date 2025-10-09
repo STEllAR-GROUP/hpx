@@ -708,10 +708,10 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/all_any_none.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>

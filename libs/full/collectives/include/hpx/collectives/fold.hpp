@@ -168,11 +168,9 @@ namespace hpx { namespace lcos {
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
 #include <hpx/serialization/vector.hpp>
 
 #include <cstddef>

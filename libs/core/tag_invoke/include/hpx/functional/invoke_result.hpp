@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/invoke.hpp>
+#include <hpx/functional/macros.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -17,12 +18,13 @@ namespace hpx::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename Enable = void>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T,
+            typename Enable = void>
         struct invoke_result_impl
         {
         };
 
-        template <typename F, typename... Ts>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Ts>
         struct invoke_result_impl<F(Ts...),
             std::void_t<decltype(HPX_INVOKE(
                 std::declval<F>(), std::declval<Ts>()...))>>
@@ -30,15 +32,14 @@ namespace hpx::util {
             using type =
                 decltype(HPX_INVOKE(std::declval<F>(), std::declval<Ts>()...));
         };
-
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename... Ts>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Ts>
     struct invoke_result : detail::invoke_result_impl<F && (Ts && ...)>
     {
     };
 
-    template <typename F, typename... Ts>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Ts>
     using invoke_result_t = typename invoke_result<F, Ts...>::type;
 }    // namespace hpx::util

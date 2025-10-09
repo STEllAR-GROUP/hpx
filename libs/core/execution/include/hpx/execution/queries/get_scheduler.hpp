@@ -14,8 +14,7 @@
 
 #include <hpx/execution/queries/read.hpp>
 #include <hpx/execution_base/get_env.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 namespace hpx::execution::experimental {
 

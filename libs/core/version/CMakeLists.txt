@@ -38,8 +38,8 @@ add_hpx_module(
   HEADERS ${version_headers}
   EXCLUDE_FROM_GLOBAL_HEADER hpx/version.hpp
   MODULE_DEPENDENCIES hpx_config hpx_config_registry hpx_format hpx_prefix
+                      hpx_preprocessor
   DEPENDENCIES Hwloc::hwloc ${additional_dependencies}
-  MODULE_DEPENDENCIES hpx_config hpx_format hpx_prefix
   CMAKE_SUBDIRS tests
 )
 

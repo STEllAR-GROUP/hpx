@@ -120,9 +120,9 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/async_combinators/detail/throw_if_exceptional.hpp>
 #include <hpx/async_combinators/when_each.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <cstddef>

@@ -20,13 +20,11 @@
 // - don't change the macro name!
 #pragma once
 
-#include <hpx/preprocessor/cat.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <string>
 
-namespace hpx::util::logging::destination {
-
-    /**
+/**
 @page macros Macros - how, what for?
 
 - @ref macros_if_else_strategy
@@ -124,16 +122,16 @@ typedef logger_format_write logger_type;
 HPX_DEFINE_LOG(g_l, logger_type)
 @endcode
 
-
 */
 
-    ////////////////////////////////////////////////////////////////////////////
-    // Defining Macros
+////////////////////////////////////////////////////////////////////////////////
+// Defining Macros
 
 #define HPX_DECLARE_LOG(NAME)                                                  \
     ::hpx::util::logging::logger* HPX_PP_CAT(NAME, _logger)();                 \
     namespace {                                                                \
-        void const* const ensure_creation_##NAME = NAME##_logger();            \
+        [[maybe_unused]] inline void const* const ensure_creation_##NAME =     \
+            NAME##_logger();                                                   \
     }
 
 #define HPX_DEFINE_LOG(NAME, LEVEL)                                            \
@@ -144,9 +142,9 @@ HPX_DEFINE_LOG(g_l, logger_type)
         return &l;                                                             \
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    // Messages that were logged before initializing the log
-    // - cache the message (and I'll write it even if the filter is turned off)
+////////////////////////////////////////////////////////////////////////////////
+// Messages that were logged before initializing the log
+// - cache the message (and I'll write it even if the filter is turned off)
 
 #define HPX_LOG_USE_LOG(NAME, LEVEL)                                           \
     if (!(HPX_PP_CAT(NAME, _logger)()->is_enabled(LEVEL)))                     \
@@ -156,4 +154,3 @@ HPX_DEFINE_LOG(g_l, logger_type)
 
 #define HPX_LOG_FORMAT(NAME, LEVEL, FORMAT, ...)                               \
     HPX_LOG_USE_LOG(NAME, LEVEL).format(FORMAT, __VA_ARGS__)
-}    // namespace hpx::util::logging::destination

@@ -11,7 +11,6 @@
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/async_distributed/detail/post_callback.hpp>
@@ -21,6 +20,7 @@
 #include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/components_base/traits/component_type_is_compatible.hpp>
 #include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 

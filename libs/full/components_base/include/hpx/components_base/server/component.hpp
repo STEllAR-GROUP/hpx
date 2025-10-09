@@ -9,11 +9,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/components_base_fwd.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/components_base/traits/component_heap_type.hpp>
+#include <hpx/modules/allocator_support.hpp>
 
 #include <cstddef>
 #include <type_traits>

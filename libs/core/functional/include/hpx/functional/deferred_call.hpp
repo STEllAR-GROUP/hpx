@@ -9,10 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/member_pack.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <cstddef>

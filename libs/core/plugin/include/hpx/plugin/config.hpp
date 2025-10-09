@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/plugin/config/defines.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Older implementations of std::shared_ptr do not support binding function

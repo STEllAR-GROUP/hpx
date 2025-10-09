@@ -12,8 +12,8 @@
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/rebind_executor.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <cstddef>
 #include <string>

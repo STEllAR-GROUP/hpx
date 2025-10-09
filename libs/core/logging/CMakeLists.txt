@@ -1,4 +1,5 @@
-# Copyright (c) 2019-2023 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,7 +26,7 @@ endif()
 
 # Default location is $HPX_ROOT/libs/logging/include
 set(logging_headers
-    hpx/modules/logging.hpp
+    hpx/logging/api.hpp
     hpx/logging/detail/macros.hpp
     hpx/logging/detail/logger.hpp
     hpx/logging/format/destinations.hpp
@@ -33,9 +34,11 @@ set(logging_headers
     hpx/logging/format/named_write.hpp
     hpx/logging/level.hpp
     hpx/logging/logging.hpp
+    hpx/logging/macros.hpp
     hpx/logging/manipulator.hpp
     hpx/logging/message.hpp
 )
+set(logging_macro_headers hpx/logging/detail/macros.hpp hpx/logging/macros.hpp)
 
 # Default location is $HPX_ROOT/libs/logging/include_compatibility
 # cmake-format: off
@@ -71,9 +74,11 @@ set(logging_sources
 include(HPX_AddModule)
 add_hpx_module(
   core logging
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${logging_sources}
   HEADERS ${logging_headers}
+  MACRO_HEADERS ${logging_macro_headers}
   COMPAT_HEADERS ${logging_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion

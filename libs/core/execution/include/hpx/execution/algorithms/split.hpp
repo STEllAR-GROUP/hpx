@@ -13,11 +13,7 @@
 #include <hpx/execution_base/stdexec_forward.hpp>
 #else
 
-#include <hpx/allocator_support/allocator_deleter.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/allocator_support/traits/is_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -31,11 +27,13 @@
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/detail/tag_priority_invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/move_only_function.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/spinlock.hpp>

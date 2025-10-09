@@ -241,6 +241,7 @@ add_hpx_module(
   COMPAT_HEADERS ${serialization_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
+    hpx_concepts
     hpx_config
     hpx_debugging
     hpx_errors

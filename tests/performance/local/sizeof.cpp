@@ -11,7 +11,7 @@
 #include <hpx/include/util.hpp>
 #include <hpx/iostream.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 using hpx::program_options::options_description;
 using hpx::program_options::value;

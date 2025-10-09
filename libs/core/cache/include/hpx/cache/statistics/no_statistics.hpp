@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,8 +14,7 @@
 namespace hpx::util::cache::statistics {
 
     ///////////////////////////////////////////////////////////////////////////
-    enum class method
-    {
+    HPX_CXX_EXPORT enum class method {
         get_entry = 0,
         insert_entry = 1,
         update_entry = 2,
@@ -23,11 +22,11 @@ namespace hpx::util::cache::statistics {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    class no_statistics
+    HPX_CORE_MODULE_EXPORT_EXTERN class no_statistics
     {
     public:
         /// \brief  The function \a got_hit will be called by a cache instance
-        ///         whenever a entry got touched.
+        ///         whenever an entry got touched.
         static constexpr void got_hit() noexcept {}
 
         /// \brief  The function \a got_miss will be called by a cache instance
@@ -51,6 +50,12 @@ namespace hpx::util::cache::statistics {
         struct update_on_exit
         {
             constexpr update_on_exit(no_statistics const&, method) noexcept {}
+            ~update_on_exit() = default;
+
+            update_on_exit(update_on_exit const&) = delete;
+            update_on_exit(update_on_exit&&) = delete;
+            update_on_exit& operator=(update_on_exit const&) = delete;
+            update_on_exit& operator=(update_on_exit&&) = delete;
         };
 
         /// The function \a get_get_entry_count returns the number of

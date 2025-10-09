@@ -112,6 +112,7 @@ add_hpx_module(
     hpx_properties
     hpx_resource_partitioner
     hpx_synchronization
+    hpx_tag_invoke
     hpx_threading
     hpx_topology
     hpx_type_support

@@ -20,8 +20,8 @@
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/serialize.hpp>
 

@@ -11,8 +11,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/datastructures/optional.hpp>
-#include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>

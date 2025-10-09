@@ -14,8 +14,8 @@
 #include <memory>
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/aligned_allocator.hpp>
 #include <hpx/concurrency/detail/tagged_ptr.hpp>
+#include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/type_support.hpp>
 

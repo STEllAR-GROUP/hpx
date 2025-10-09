@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Gregor Dai√ü
+//  Copyright (c) 2022 Gregor Daiﬂ
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,9 +7,9 @@
 // hpxinspect:noascii
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_sycl/sycl_future.hpp>
+#include <hpx/modules/allocator_support.hpp>
 
 #include <exception>
 #include <iostream>

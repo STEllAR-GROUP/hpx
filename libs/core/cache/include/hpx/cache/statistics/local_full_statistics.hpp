@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,11 +20,12 @@
 namespace hpx::util::cache::statistics {
 
     ///////////////////////////////////////////////////////////////////////////
-    class local_full_statistics : public local_statistics
+    HPX_CORE_MODULE_EXPORT_EXTERN class local_full_statistics
+      : public local_statistics
     {
     private:
         [[nodiscard]] static std::int64_t get_and_reset_value(
-            std::int64_t& value, bool reset) noexcept
+            std::int64_t& value, bool const reset) noexcept
         {
             std::int64_t const result = value;
             if (reset)
@@ -46,13 +47,12 @@ namespace hpx::util::cache::statistics {
         {
         private:
             [[nodiscard]] static constexpr api_counter_data&
-            get_api_counter_data(local_full_statistics& stat, method m) noexcept
+            get_api_counter_data(
+                local_full_statistics& stat, method const m) noexcept
             {
                 switch (m)
                 {
                 case method::get_entry:
-                    [[fallthrough]];
-                default:
                     break;
 
                 case method::insert_entry:
@@ -80,11 +80,16 @@ namespace hpx::util::cache::statistics {
             }
 
         public:
-            update_on_exit(local_full_statistics& stat, method m) noexcept
+            update_on_exit(local_full_statistics& stat, method const m) noexcept
               : started_at_(now())
               , data_(get_api_counter_data(stat, m))
             {
             }
+
+            update_on_exit(update_on_exit const&) = delete;
+            update_on_exit(update_on_exit&&) = delete;
+            update_on_exit& operator=(update_on_exit const&) = delete;
+            update_on_exit& operator=(update_on_exit&&) = delete;
 
             ~update_on_exit()
             {
@@ -98,56 +103,63 @@ namespace hpx::util::cache::statistics {
 
         /// The function \a get_get_entry_count returns the number of
         /// invocations of the get_entry() API function of the cache.
-        [[nodiscard]] std::int64_t get_get_entry_count(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_get_entry_count(
+            bool const reset) noexcept
         {
             return get_and_reset_value(get_entry_.count_, reset);
         }
 
         /// The function \a get_insert_entry_count returns the number of
         /// invocations of the insert_entry() API function of the cache.
-        [[nodiscard]] std::int64_t get_insert_entry_count(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_insert_entry_count(
+            bool const reset) noexcept
         {
             return get_and_reset_value(insert_entry_.count_, reset);
         }
 
         /// The function \a get_update_entry_count returns the number of
         /// invocations of the update_entry() API function of the cache.
-        [[nodiscard]] std::int64_t get_update_entry_count(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_update_entry_count(
+            bool const reset) noexcept
         {
             return get_and_reset_value(update_entry_.count_, reset);
         }
 
         /// The function \a get_erase_entry_count returns the number of
         /// invocations of the erase() API function of the cache.
-        [[nodiscard]] std::int64_t get_erase_entry_count(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_erase_entry_count(
+            bool const reset) noexcept
         {
             return get_and_reset_value(erase_entry_.count_, reset);
         }
 
         /// The function \a get_get_entry_time returns the overall time spent
         /// executing of the get_entry() API function of the cache.
-        [[nodiscard]] std::int64_t get_get_entry_time(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_get_entry_time(bool const reset) noexcept
         {
             return get_and_reset_value(get_entry_.time_, reset);
         }
 
         /// The function \a get_insert_entry_time returns the overall time
         /// spent executing of the insert_entry() API function of the cache.
-        [[nodiscard]] std::int64_t get_insert_entry_time(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_insert_entry_time(
+            bool const reset) noexcept
         {
             return get_and_reset_value(insert_entry_.time_, reset);
         }
 
         /// The function \a get_update_entry_time returns the overall time
         /// spent executing of the update_entry() API function of the cache.
-        [[nodiscard]] std::int64_t get_update_entry_time(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_update_entry_time(
+            bool const reset) noexcept
         {
             return get_and_reset_value(update_entry_.time_, reset);
         }
 
         /// The function \a get_erase_entry_time returns the overall time spent
         /// executing of the erase() API function of the cache.
-        [[nodiscard]] std::int64_t get_erase_entry_time(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_erase_entry_time(
+            bool const reset) noexcept
         {
             return get_and_reset_value(erase_entry_.time_, reset);
         }

@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/modules/concepts.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util::detail {

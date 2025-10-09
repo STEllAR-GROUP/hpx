@@ -12,8 +12,8 @@
 #include <hpx/config/version.hpp>
 #include <hpx/modules/config_registry.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/prefix/find_prefix.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/version.hpp>
 
 #include <boost/config.hpp>

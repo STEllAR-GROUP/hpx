@@ -8,11 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/traits/is_tuple_like.hpp>
-#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/pack_traversal/pack_traversal.hpp>
 
 #include <cstddef>

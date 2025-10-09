@@ -93,6 +93,7 @@ add_hpx_module(
     hpx_debugging
     hpx_errors
     hpx_itt_notify
+    hpx_preprocessor
     hpx_serialization
     hpx_tag_invoke
     hpx_type_support

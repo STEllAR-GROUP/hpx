@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <hpx/preprocessor/cat.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <type_traits>
 

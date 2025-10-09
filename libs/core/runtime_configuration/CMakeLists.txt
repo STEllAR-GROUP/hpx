@@ -53,6 +53,7 @@ add_hpx_module(
     hpx_ini
     hpx_itt_notify
     hpx_logging
+    hpx_preprocessor
     hpx_program_options
     hpx_plugin
     hpx_prefix

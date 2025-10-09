@@ -11,7 +11,7 @@
 #include <hpx/execution_base/agent_base.hpp>
 #include <hpx/execution_base/agent_ref.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/timing/steady_clock.hpp>

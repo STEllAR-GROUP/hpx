@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/execution/queries/get_stop_token.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/coroutine_utils.hpp>
 #include <hpx/execution_base/get_env.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/stop_token.hpp>
 

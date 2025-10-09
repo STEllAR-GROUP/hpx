@@ -10,8 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <utility>
 

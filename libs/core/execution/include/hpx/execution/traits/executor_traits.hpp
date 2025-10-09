@@ -8,11 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
-#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <cstddef>

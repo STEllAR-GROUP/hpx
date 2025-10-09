@@ -59,6 +59,7 @@ add_hpx_module(
   SOURCES ${schedulers_sources}
   MODULE_DEPENDENCIES
     hpx_affinity
+    hpx_allocator_support
     hpx_assertion
     hpx_concurrency
     hpx_config

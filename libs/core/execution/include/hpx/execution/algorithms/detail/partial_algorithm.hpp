@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/member_pack.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <cstddef>

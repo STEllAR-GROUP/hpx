@@ -186,7 +186,6 @@ namespace hpx {
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/futures/traits/acquire_future.hpp>
@@ -196,6 +195,7 @@ namespace hpx {
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/is_future_range.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/util/detail/reserve.hpp>
 

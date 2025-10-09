@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_VC)
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/traits/vector_pack_alignment_size.hpp>
+#include <hpx/modules/concepts.hpp>
 
 #include <cstddef>
 

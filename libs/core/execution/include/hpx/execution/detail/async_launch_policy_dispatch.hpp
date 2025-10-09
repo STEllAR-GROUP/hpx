@@ -11,11 +11,11 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/futures/traits/is_future.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/scoped_annotation.hpp>

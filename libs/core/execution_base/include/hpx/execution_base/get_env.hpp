@@ -7,8 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)

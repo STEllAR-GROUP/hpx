@@ -32,10 +32,8 @@
 #include <hpx/modules/collectives.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
 
 #include <cstddef>

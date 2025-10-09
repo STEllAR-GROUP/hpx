@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_distributed/continuation_fwd.hpp>
-#include <hpx/functional/detail/invoke.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <exception>

@@ -11,10 +11,9 @@
 
 #include <hpx/plugin/config.hpp>
 #include <hpx/datastructures/any.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/plugin/abstract_factory.hpp>
 #include <hpx/plugin/concrete_factory.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 
 #include <algorithm>
 #include <cctype>

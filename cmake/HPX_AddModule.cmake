@@ -171,6 +171,9 @@ function(add_hpx_module libname modulename)
       set(module_headers
           "${module_headers}#if defined(HPX_HAVE_MODULE_${modulename_upper})\n"
       )
+      set(module_headers
+          "${module_headers}#include <hpx/${modulename}/config/defines.hpp>\n"
+      )
     endif()
     foreach(header_file ${${modulename}_HEADERS})
       # Exclude the files specified
@@ -191,6 +194,10 @@ function(add_hpx_module libname modulename)
         "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/modules/${modulename}.hpp"
     )
     if(${modulename}_GLOBAL_HEADER_MODULE_GEN)
+      list(LENGTH ${modulename}_MACRO_HEADERS macro_headers)
+      if(macro_headers GREATER 0)
+        set(module_macro_headers "\n")
+      endif()
       foreach(header_file ${${modulename}_MACRO_HEADERS})
         set(module_macro_headers
             "${module_macro_headers}#include <${header_file}>\n"

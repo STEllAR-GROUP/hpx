@@ -10,8 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/debugging.hpp>
-#include <hpx/preprocessor/stringize.hpp>
-#include <hpx/preprocessor/strip_parens.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <type_traits>
 
