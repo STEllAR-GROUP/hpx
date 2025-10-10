@@ -147,6 +147,7 @@ namespace hpx::parcelset {
             std::vector<completion_manager_t> completion_managers;
 
             bool do_progress_local();
+            std::size_t get_tls_device_idx();
             device_t& get_tls_device();
 
         private:
@@ -262,6 +263,7 @@ namespace hpx::traits {
                 "comp_type_header = queue\n"
                 "comp_type_followup = queue\n"
                 "progress_type = worker\n"
+                "progress_strategy = local\n"
                 "prepost_recv_num = 1\n"
                 "ndevices = 2\n"
                 "ncomps = 1\n"

@@ -47,6 +47,14 @@ namespace hpx::parcelset::policies::lci {
             poll,              // progress when polling completion
         };
         static progress_type_t progress_type;
+        // which device to make progress when a worker thread calls progress
+        enum class progress_strategy_t
+        {
+            local,     // HPX resource partitioner
+            global,    // Normal progress pthread
+            random,    // HPX worker thread
+        };
+        static progress_strategy_t progress_strategy;
         // How many progress threads to create
         static int progress_thread_num;
         // How many pre-posted receives for new messages

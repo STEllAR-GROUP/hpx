@@ -436,12 +436,38 @@ namespace hpx::parcelset::policies::lci {
     bool parcelport::do_progress_local()
     {
         bool ret = false;
-        auto device = get_tls_device();
-        ret = util::lci_environment::do_progress(device.device) || ret;
+        switch (config_t::progress_strategy)
+        {
+        case config_t::progress_strategy_t::local:
+        {
+            auto device = get_tls_device();
+            ret = util::lci_environment::do_progress(device.device) || ret;
+            break;
+        }
+        case config_t::progress_strategy_t::global:
+        {
+            std::size_t start_idx = get_tls_device_idx();
+            for (std::size_t i = 0; i < devices.size(); ++i)
+            {
+                auto& device = devices[(start_idx + i) % devices.size()];
+                ret = util::lci_environment::do_progress(device.device) || ret;
+            }
+            break;
+        }
+        case config_t::progress_strategy_t::random:
+        {
+            static thread_local unsigned int tls_rand_seed = rand();
+            auto device = devices[rand_r(&tls_rand_seed) % devices.size()];
+            ret = util::lci_environment::do_progress(device.device) || ret;
+            break;
+        }
+        default:
+            throw std::runtime_error("Unknown progress strategy");
+        }
         return ret;
     }
 
-    parcelport::device_t& parcelport::get_tls_device()
+    std::size_t parcelport::get_tls_device_idx()
     {
         static thread_local std::size_t tls_device_idx = -1;
 
@@ -449,7 +475,7 @@ namespace hpx::parcelset::policies::lci {
                 hpx::threads::get_self_id() == hpx::threads::invalid_thread_id))
         {
             static thread_local unsigned int tls_rand_seed = rand();
-            return devices[rand_r(&tls_rand_seed) % devices.size()];
+            return rand_r(&tls_rand_seed) % devices.size();
         }
         if (tls_device_idx == std::size_t(-1))
         {
@@ -472,7 +498,12 @@ namespace hpx::parcelset::policies::lci {
                 util::lci_environment::rank(), num_thread, total_thread_num,
                 tls_device_idx);
         }
-        return devices[tls_device_idx];
+        return tls_device_idx;
+    }
+
+    parcelport::device_t& parcelport::get_tls_device()
+    {
+        return devices[get_tls_device_idx()];
     }
 }    // namespace hpx::parcelset::policies::lci
 

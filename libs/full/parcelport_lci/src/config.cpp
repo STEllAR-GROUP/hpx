@@ -23,6 +23,7 @@ namespace hpx::parcelset::policies::lci {
     config_t::comp_type_t config_t::completion_type_header;
     config_t::comp_type_t config_t::completion_type_followup;
     config_t::progress_type_t config_t::progress_type;
+    config_t::progress_strategy_t config_t::progress_strategy;
     int config_t::progress_thread_num;
     int config_t::prepost_recv_num;
     int config_t::ndevices;
@@ -132,6 +133,26 @@ namespace hpx::parcelset::policies::lci {
         {
             throw std::runtime_error(
                 "Unknown progress type " + progress_type_str);
+        }
+        // set the progress strategy
+        std::string progress_strategy_str = util::get_entry_as<std::string>(
+            rtcfg, "hpx.parcel.lci.progress_strategy", "");
+        if (progress_strategy_str == "local")
+        {
+            progress_strategy = progress_strategy_t::local;
+        }
+        else if (progress_strategy_str == "global")
+        {
+            progress_strategy = progress_strategy_t::global;
+        }
+        else if (progress_strategy_str == "random")
+        {
+            progress_strategy = progress_strategy_t::random;
+        }
+        else
+        {
+            throw std::runtime_error(
+                "Unknown progress strategy " + progress_strategy_str);
         }
         progress_thread_num = util::get_entry_as(
             rtcfg, "hpx.parcel.lci.prg_thread_num", -1 /* Does not matter*/);
