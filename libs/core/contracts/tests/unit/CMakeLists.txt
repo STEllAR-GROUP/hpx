@@ -12,16 +12,36 @@ if(HPX_WITH_TESTS)
         # Automatically detect contract mode and build appropriate tests
         # -------------------------------
         
-        # Detect if __cpp_contracts is available at configure time
+        # Detect if native C++26 contracts are supported
+        # Check both __cpp_contracts feature macro (standard) and actual syntax support (experimental)
         add_hpx_config_test(
             HPX_HAVE_NATIVE_CONTRACTS
             SOURCE "
-                #ifndef __cpp_contracts
-                #error No native contracts support
-                #endif
+                #ifdef __cpp_contracts
+                // Standard C++26 contracts support detected
                 int main() { return 0; }
+                #else
+                #error No __cpp_contracts feature macro
+                #endif
+            "
+            OR 
+            SOURCE "
+                // Test actual contract syntax support (for experimental implementations)
+                int main() pre(true) {
+                    contract_assert(true);
+                    return 0;
+                }
             "
         )
+        
+        # Validate HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS configuration
+        if(HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS AND NOT HPX_HAVE_NATIVE_CONTRACTS)
+            message(WARNING "HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS is enabled but native C++26 contracts "
+                           "are not supported by this compiler. This means HPX_ASSERT will be mapped to "
+                           "HPX_CONTRACT_ASSERT, which in turn maps back to HPX_ASSERT, providing no "
+                           "enhancement. To get true contract assertion benefits, use a compiler with "
+                           "native contract support.")
+        endif()
         
         if(HPX_HAVE_NATIVE_CONTRACTS)
             message(STATUS "HPX Contracts: Native C++26 contracts detected - building declaration tests")
@@ -60,6 +80,11 @@ if(HPX_WITH_TESTS)
             )
             
         else()
+            message(WARNING "HPX Contracts: Native C++26 contracts are not supported by this compiler. "
+                           "Using fallback mode where HPX_PRE/HPX_POST become no-ops and "
+                           "HPX_CONTRACT_ASSERT maps to HPX_ASSERT. "
+                           "For full contract support, use a C++26-compliant compiler or "
+                           "experimental builds with contract support.")
             message(STATUS "HPX Contracts: Fallback mode detected - building fallback tests")
             
             # Fallback contracts tests (simple syntax for fallback mode)

@@ -10,12 +10,12 @@
 /// \headerfile hpx/contracts.hpp
 ///
 /// This header provides C++ contracts support for HPX with intelligent fallback
-/// to assertions when contracts are not available.
+/// behavior when contracts are not available.
 ///
 /// ## API Reference:
-/// - **HPX_PRE(condition)**: Precondition contracts
-/// - **HPX_POST(condition)**: Postcondition contracts  
-/// - **HPX_CONTRACT_ASSERT(condition)**: Contract assertions (always available)
+/// - **HPX_PRE(condition)**: Precondition contracts (no-op in fallback mode)
+/// - **HPX_POST(condition)**: Postcondition contracts (no-op in fallback mode)
+/// - **HPX_CONTRACT_ASSERT(condition)**: Contract assertions (always available, maps to HPX_ASSERT)
 ///
 /// ## Configuration:
 /// Enable with: `cmake -DHPX_WITH_CONTRACTS=ON -DCMAKE_CXX_STANDARD=26`
@@ -28,7 +28,7 @@
 #include <hpx/assert.hpp>
 
 // Contract implementation: automatically selects native C++26 contracts 
-// or falls back to HPX_ASSERT based on compiler capabilities
+// or provides appropriate fallback behavior based on compiler capabilities
 #ifdef HPX_HAVE_CONTRACTS
     #if HPX_HAVE_NATIVE_CONTRACTS
         // Native C++26 contracts mode
@@ -36,12 +36,13 @@
         #define HPX_CONTRACT_ASSERT(x) contract_assert(x)
         #define HPX_POST(x) post(x)
     #else
-        // Fallback mode: contracts map to assertions until C++26 migration
+        // Fallback mode: PRE/POST become no-ops for forward compatibility,
+        // CONTRACT_ASSERT maps to HPX_ASSERT for runtime validation
         #pragma message("HPX Contracts: Using assertion fallback mode. " \
-                       "Contracts will map to HPX_ASSERT until C++26 native support is available.")
-        #define HPX_PRE(x) HPX_ASSERT((x))
+                       "HPX_PRE/HPX_POST are no-ops, HPX_CONTRACT_ASSERT maps to HPX_ASSERT.")
+        #define HPX_PRE(x) 
         #define HPX_CONTRACT_ASSERT(x) HPX_ASSERT((x))  
-        #define HPX_POST(x) HPX_ASSERT((x)) 
+        #define HPX_POST(x)  
     #endif
 #else
     // Contracts disabled: PRE/POST are no-ops, CONTRACT_ASSERT remains available

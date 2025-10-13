@@ -23,8 +23,9 @@ automatically adapt their behavior based on compiler capabilities:
 
 * When C++26 native contracts are available (``__cpp_contracts`` defined), 
   they map to standard contract syntax
-* When contracts are not available but ``HPX_WITH_CONTRACTS=ON``, they fall 
-  back to :c:macro:`HPX_ASSERT` for compatibility
+* When contracts are not available but ``HPX_WITH_CONTRACTS=ON``, preconditions 
+  and postconditions become no-ops while contract assertions fall back to 
+  :c:macro:`HPX_ASSERT` for compatibility
 * When ``HPX_WITH_CONTRACTS=OFF``, preconditions and postconditions become 
   no-ops while contract assertions remain available as enhanced assertions
 
@@ -58,6 +59,12 @@ assertions in C++26 mode::
         HPX_ASSERT(value > 0);  // Becomes contract_assert(value > 0) in C++26 mode
         // ... rest of function
     }
+
+.. warning::
+   Enhanced assertions only provide benefits when native C++26 contracts are 
+   supported by the compiler. Without native contract support, 
+   ``HPX_ASSERT`` → ``HPX_CONTRACT_ASSERT`` → ``HPX_ASSERT`` (no enhancement).
+   CMake will issue a warning if you enable this option without native contract support.
 
 This provides enhanced contract semantics throughout your existing codebase 
 without requiring changes to assertion code. The transformation occurs in the
@@ -105,10 +112,11 @@ Design Philosophy
     as an enhanced assertion. Maps to :c:macro:`HPX_ASSERT` in all configurations.
 
 **HPX_PRE/HPX_POST**: True contract syntax
-    Represent language-level contract semantics. Disabled when 
-    ``HPX_WITH_CONTRACTS=OFF`` 
-    To prepare for C++26 migration where they 
-    will be attached to function declarations rather than used in function bodies.
+    Represent language-level contract semantics. When contracts are enabled but 
+    native C++26 contracts are not available, these become no-ops to maintain 
+    forward compatibility. When ``HPX_WITH_CONTRACTS=OFF``, they are also no-ops.
+    This prepares for C++26 migration where they will be attached to function 
+    declarations rather than used in function bodies.
 
 Migration Strategy
 ==================
@@ -119,7 +127,7 @@ Current (transition mode)::
 
     int func(int x)
     {
-        HPX_PRE(x > 0);    // Works in fallback mode
+        HPX_PRE(x > 0);    // No-op in fallback mode, active in native mode
         return x;
     }
 
@@ -129,6 +137,10 @@ Target (C++26 native)::
     {
         return x;
     }
+
+Note: In fallback mode, ``HPX_PRE`` and ``HPX_POST`` become no-ops to maintain 
+forward compatibility and avoid performance overhead. Use ``HPX_CONTRACT_ASSERT`` 
+when you need runtime validation in all modes.
 
 Testing
 =======

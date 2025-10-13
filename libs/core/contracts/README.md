@@ -53,6 +53,8 @@ void process_data(std::vector<int>& data, size_t index) {
 }
 ```
 
+**Important**: Enhanced assertions only provide benefits when native C++26 contracts are supported by the compiler. Without native contract support, `HPX_ASSERT` → `HPX_CONTRACT_ASSERT` → `HPX_ASSERT` (no enhancement). CMake will warn you if you enable this option without native contract support.
+
 The implementation works by overriding the `HPX_ASSERT` macro in `contracts.hpp` to use `HPX_CONTRACT_ASSERT`, which automatically adapts to the current contract mode (native C++26 contracts when available, or assertion fallback otherwise).
 
 ## API Reference
@@ -68,7 +70,7 @@ See [Module Documentation](docs/index.rst) for comprehensive usage guide, API re
 ## Features
 
 - ✅ Automatic C++26 native contract detection
-- ✅ Graceful fallback to HPX_ASSERT 
+- ✅ Graceful fallback: HPX_PRE/HPX_POST become no-ops, HPX_CONTRACT_ASSERT maps to HPX_ASSERT
 - ✅ Zero overhead when disabled
 - ✅ Forward-compatible API
 - ✅ Comprehensive test suite with automatic mode detection
