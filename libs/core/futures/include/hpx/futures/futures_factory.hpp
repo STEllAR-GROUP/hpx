@@ -127,8 +127,7 @@ namespace hpx::lcos::local {
                 {
                     threads::thread_init_data data(
                         threads::make_thread_function_nullary(
-                            util::deferred_call(
-                                &base_type::run_impl, HPX_MOVE(this_))),
+                            &base_type::run_impl, HPX_MOVE(this_)),
                         threads::thread_description(f_, annotation),
                         policy.priority(),
                         threads::thread_schedule_hint(
@@ -158,8 +157,7 @@ namespace hpx::lcos::local {
                     // create the thread without running it
                     threads::thread_init_data data(
                         threads::make_thread_function_nullary(
-                            util::deferred_call(
-                                &base_type::run_impl, std::move(this_))),
+                            &base_type::run_impl, std::move(this_)),
                         threads::thread_description(f_, annotation),
                         policy.priority(), policy.hint(), policy.stacksize(),
                         threads::thread_schedule_state::suspended, true);
@@ -177,8 +175,8 @@ namespace hpx::lcos::local {
                 }
 
                 threads::thread_init_data data(
-                    threads::make_thread_function_nullary(util::deferred_call(
-                        &base_type::run_impl, HPX_MOVE(this_))),
+                    threads::make_thread_function_nullary(
+                        &base_type::run_impl, HPX_MOVE(this_)),
                     threads::thread_description(f_, annotation),
                     policy.priority(), policy.hint(), policy.stacksize(),
                     threads::thread_schedule_state::pending);

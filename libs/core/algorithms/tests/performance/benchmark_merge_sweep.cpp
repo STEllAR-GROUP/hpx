@@ -37,6 +37,10 @@ template <typename InIter1, typename InIter2, typename OutIter>
 double run_merge_benchmark_std(int const test_count, InIter1 first1,
     InIter1 last1, InIter2 first2, InIter2 last2, OutIter dest)
 {
+    // warmup
+    std::merge(first1, last1, first2, last2, dest);
+
+    // actual measurement
     std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)
@@ -56,6 +60,10 @@ double run_merge_benchmark_hpx(int const test_count, ExPolicy policy,
     FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
     FwdIter3 dest)
 {
+    // warmup
+    hpx::merge(policy, first1, last1, first2, last2, dest);
+
+    // actual measurement
     std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)

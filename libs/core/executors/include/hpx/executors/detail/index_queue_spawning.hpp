@@ -41,6 +41,62 @@
 
 namespace hpx::parallel::execution::detail {
 
+    template <std::size_t... Is, typename F, typename T, typename Args>
+    HPX_FORCEINLINE constexpr void bulk_invoke_helper(
+        hpx::util::index_pack<Is...>, F&& f, T&& t, Args&& args)
+    {
+        // NOLINTBEGIN(bugprone-use-after-move)
+        HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t),
+            hpx::get<Is>(HPX_FORWARD(Args, args))...);
+        // NOLINTEND(bugprone-use-after-move)
+    }
+
+    template <std::size_t... Is, typename F, typename... Ts, typename Args>
+    HPX_FORCEINLINE constexpr void bulk_invoke_helper(
+        hpx::util::index_pack<Is...>, F&& f, hpx::tuple<Ts...>& t, Args&& args)
+    {
+        using embedded_index_pack_type =
+            hpx::util::make_index_pack<sizeof...(Ts)>;
+
+        // NOLINTBEGIN(bugprone-use-after-move)
+        if constexpr (std::is_invocable_v<F, embedded_index_pack_type,
+                          hpx::tuple<Ts...>,
+                          decltype(hpx::get<Is>(HPX_FORWARD(Args, args)))...>)
+        {
+            HPX_INVOKE(HPX_FORWARD(F, f), embedded_index_pack_type{}, t,
+                hpx::get<Is>(HPX_FORWARD(Args, args))...);
+        }
+        else
+        {
+            HPX_INVOKE(
+                HPX_FORWARD(F, f), t, hpx::get<Is>(HPX_FORWARD(Args, args))...);
+        }
+        // NOLINTEND(bugprone-use-after-move)
+    }
+
+    template <std::size_t... Is, typename F, typename... Ts, typename Args>
+    HPX_FORCEINLINE constexpr void bulk_invoke_helper(
+        hpx::util::index_pack<Is...>, F&& f, hpx::tuple<Ts...>&& t, Args&& args)
+    {
+        using embedded_index_pack_type =
+            hpx::util::make_index_pack<sizeof...(Ts)>;
+
+        // NOLINTBEGIN(bugprone-use-after-move)
+        if constexpr (std::is_invocable_v<F, embedded_index_pack_type,
+                          hpx::tuple<Ts...>&&,
+                          decltype(hpx::get<Is>(HPX_FORWARD(Args, args)))...>)
+        {
+            HPX_INVOKE(HPX_FORWARD(F, f), embedded_index_pack_type{},
+                HPX_MOVE(t), hpx::get<Is>(HPX_FORWARD(Args, args))...);
+        }
+        else
+        {
+            HPX_INVOKE(HPX_FORWARD(F, f), HPX_MOVE(t),
+                hpx::get<Is>(HPX_FORWARD(Args, args))...);
+        }
+        // NOLINTEND(bugprone-use-after-move)
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // This struct encapsulates the work done by one worker thread.
     template <typename SharedState>
@@ -53,42 +109,17 @@ namespace hpx::parallel::execution::detail {
         bool const reverse_placement;
         bool const allow_stealing;
 
-        template <std::size_t... Is, typename F, typename T, typename Ts>
-        HPX_FORCEINLINE static constexpr void bulk_invoke_helper(
-            hpx::util::index_pack<Is...>, F&& f, T&& t, Ts&& ts)
-        {
-            // NOLINTBEGIN(bugprone-use-after-move)
-            HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t),
-                hpx::get<Is>(HPX_FORWARD(Ts, ts))...);
-            // NOLINTEND(bugprone-use-after-move)
-        }
-
         // Perform the work in one element indexed by index. The index
         // represents a range of indices (iterators) in the given shape.
-        template <typename F, typename Ts>
-        HPX_FORCEINLINE void do_work_chunk(
-            F&& f, Ts&& ts, std::uint32_t const index) const
-        {
-            using index_pack_type =
-                hpx::detail::fused_index_pack_t<std::decay_t<Ts>>;
-
-            auto const i_begin = index * chunk_size;
-            auto const i_end = (std::min) (i_begin + chunk_size,
-                static_cast<std::uint32_t>(size));
-
-            auto it = std::next(hpx::util::begin(state->shape), i_begin);
-            for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
-            {
-                bulk_invoke_helper(index_pack_type{}, f, *it, ts);
-            }
-        }
-
         template <hpx::concurrency::detail::queue_end Which>
         void do_work() const
         {
             // explicitly copy function (object) and arguments
             auto f = state->f;
             auto ts = state->ts;
+
+            using index_pack_type =
+                hpx::detail::fused_index_pack_t<decltype(ts)>;
 
             hpx::optional<std::uint32_t> index;
 
@@ -100,7 +131,15 @@ namespace hpx::parallel::execution::detail {
                 static hpx::util::itt::event notify_event("do_work_chunk");
                 hpx::util::itt::mark_event e(notify_event);
 #endif
-                do_work_chunk(f, ts, *index);
+                auto const i_begin = *index * chunk_size;
+                auto const i_end = (std::min) (i_begin + chunk_size,
+                    static_cast<std::uint32_t>(size));
+
+                auto it = std::next(hpx::util::begin(state->shape), i_begin);
+                for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
+                {
+                    bulk_invoke_helper(index_pack_type{}, f, *it, ts);
+                }
             }
 
             if (allow_stealing)
@@ -125,7 +164,17 @@ namespace hpx::parallel::execution::detail {
                             "do_work_chunk (stealing)");
                         hpx::util::itt::mark_event e(notify_event);
 #endif
-                        do_work_chunk(f, ts, *index);
+                        auto const i_begin = *index * chunk_size;
+                        auto const i_end = (std::min) (i_begin + chunk_size,
+                            static_cast<std::uint32_t>(size));
+
+                        auto it =
+                            std::next(hpx::util::begin(state->shape), i_begin);
+                        for (std::uint32_t i = i_begin; i != i_end;
+                            (void) ++it, ++i)
+                        {
+                            bulk_invoke_helper(index_pack_type{}, f, *it, ts);
+                        }
                     }
                 }
             }
@@ -145,7 +194,7 @@ namespace hpx::parallel::execution::detail {
         // thread to finish, it will only decrement the counter. If it is the
         // last thread it will call set_exception if there is an exception.
         // Otherwise, it will call set_value on the shared state.
-        void finish() const
+        void finish() const noexcept
         {
             if (--(state->tasks_remaining.data_) == 0)
             {
@@ -176,7 +225,7 @@ namespace hpx::parallel::execution::detail {
         // Entry point for the worker thread. It will attempt to do its local
         // work, catch any exceptions, and then call set_value or set_exception
         // on the shared state.
-        void operator()() const
+        void operator()() const noexcept
         {
             try
             {
@@ -284,7 +333,7 @@ namespace hpx::parallel::execution::detail {
 
         static std::uint32_t get_first_core(hpx::threads::mask_cref_type mask)
         {
-            auto size = hpx::threads::mask_size(mask);
+            auto const size = hpx::threads::mask_size(mask);
             for (std::uint32_t i = 0; i != size; ++i)
             {
                 if (hpx::threads::test(mask, i))
@@ -340,9 +389,17 @@ namespace hpx::parallel::execution::detail {
                 return;
             }
 
-            // run task on small stack
-            auto post_policy = hpx::execution::experimental::with_stacksize(
-                policy, threads::thread_stacksize::small_);
+            auto post_policy = policy;
+
+            // run task on small stack (except if stackless threads should be
+            // used)
+            auto current_stacksize =
+                hpx::execution::experimental::get_stacksize(policy);
+            if (current_stacksize != threads::thread_stacksize::nostack)
+            {
+                post_policy = hpx::execution::experimental::with_stacksize(
+                    policy, threads::thread_stacksize::small_);
+            }
 
             if (dont_bind_to_core)
             {
@@ -353,8 +410,9 @@ namespace hpx::parallel::execution::detail {
                     hpx::execution::experimental::get_priority(post_policy);
                 if (priority == hpx::threads::thread_priority::bound)
                 {
-                    post_policy = hpx::execution::experimental::with_priority(
-                        post_policy, hpx::threads::thread_priority::normal);
+                    post_policy =
+                        hpx::execution::experimental::with_priority(post_policy,
+                            hpx::threads::thread_priority::initially_bound);
                 }
             }
 
@@ -552,9 +610,9 @@ namespace hpx::parallel::execution::detail {
         std::uint32_t num_threads;
         std::uint32_t available_threads;
         Launch policy;
-        std::decay_t<F> f;
+        HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
         Shape shape;
-        hpx::tuple<std::decay_t<Ts>...> ts;
+        HPX_NO_UNIQUE_ADDRESS hpx::tuple<std::decay_t<Ts>...> ts;
 
         hpx::threads::mask_type pu_mask;
         std::vector<hpx::util::cache_aligned_data<

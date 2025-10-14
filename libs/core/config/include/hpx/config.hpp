@@ -383,7 +383,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Maximum number of terminated threads to keep before cleaning them up.
 #if !defined(HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS)
-#  define HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS 100
+#  define HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS 1000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

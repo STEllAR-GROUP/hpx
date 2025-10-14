@@ -1312,8 +1312,8 @@ namespace hpx::agas {
                 threads::thread_priority) = &addressing_service::route;
 
             threads::thread_init_data data(
-                threads::make_thread_function_nullary(util::deferred_call(
-                    route_ptr, this, HPX_MOVE(p), HPX_MOVE(f), local_priority)),
+                threads::make_thread_function_nullary(
+                    route_ptr, this, HPX_MOVE(p), HPX_MOVE(f), local_priority),
                 "addressing_service::route", threads::thread_priority::normal,
                 threads::thread_schedule_hint(),
                 threads::thread_stacksize::default_,

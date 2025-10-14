@@ -226,7 +226,9 @@ namespace hpx::threads {
         // from what the previous use required. However, the physical stack size
         // must be the same as before.
         stacksize_enum_ = init_data.stacksize;
-        HPX_ASSERT(stacksize_ == get_stack_size());
+
+        HPX_ASSERT(stacksize_enum_ == thread_stacksize::nostack ||
+            stacksize_ == get_stack_size());
         HPX_ASSERT(stacksize_ != 0);
 
         current_state_.store(thread_state(
