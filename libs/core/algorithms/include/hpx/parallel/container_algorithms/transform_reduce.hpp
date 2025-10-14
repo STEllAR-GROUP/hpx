@@ -884,15 +884,14 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/transform_reduce.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -912,10 +911,10 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<transform_reduce_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent, typename T,
-            typename Reduce, typename Convert,
-            HPX_CONCEPT_REQUIRES_(
+            typename Reduce, typename Convert>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::is_invocable_v<Convert,
@@ -929,7 +928,7 @@ namespace hpx::ranges {
                        typename std::iterator_traits<Iter>::value_type
                    >::type
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Iter first,
@@ -943,10 +942,10 @@ namespace hpx::ranges {
                 HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
-        // clang-format off
         template <typename Iter, typename Sent, typename T, typename Reduce,
-            typename Convert,
-            HPX_CONCEPT_REQUIRES_(
+            typename Convert>
+        // clang-format off
+            requires (
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::is_invocable_v<Convert,
                    typename std::iterator_traits<Iter>::value_type
@@ -959,7 +958,7 @@ namespace hpx::ranges {
                        typename std::iterator_traits<Iter>::value_type
                    >::type
                 >
-            )>
+            )
         // clang-format on
         friend T tag_fallback_invoke(transform_reduce_t, Iter first, Sent last,
             T init, Reduce red_op, Convert conv_op)
@@ -972,14 +971,14 @@ namespace hpx::ranges {
                 HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent,
-            typename Iter2, typename T,
-            HPX_CONCEPT_REQUIRES_(
+            typename Iter2, typename T>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2>
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Iter first,
@@ -996,12 +995,12 @@ namespace hpx::ranges {
                 hpx::parallel::detail::multiplies());
         }
 
+        template <typename Iter, typename Sent, typename Iter2, typename T>
         // clang-format off
-        template <typename Iter, typename Sent, typename Iter2, typename T,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2>
-            )>
+            )
         // clang-format on
         friend T tag_fallback_invoke(
             transform_reduce_t, Iter first, Sent last, Iter2 first2, T init)
@@ -1017,10 +1016,10 @@ namespace hpx::ranges {
                 hpx::parallel::detail::multiplies());
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent,
-            typename Iter2, typename T, typename Reduce, typename Convert,
-            HPX_CONCEPT_REQUIRES_(
+            typename Iter2, typename T, typename Reduce, typename Convert>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2> &&
@@ -1038,7 +1037,7 @@ namespace hpx::ranges {
                         typename std::iterator_traits<Iter2>::value_type
                     >::type
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Iter first,
@@ -1054,10 +1053,10 @@ namespace hpx::ranges {
                 HPX_MOVE(init), HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
-        // clang-format off
         template <typename Iter, typename Sent, typename Iter2, typename T,
-            typename Reduce, typename Convert,
-            HPX_CONCEPT_REQUIRES_(
+            typename Reduce, typename Convert>
+        // clang-format off
+            requires (
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,
@@ -1074,7 +1073,7 @@ namespace hpx::ranges {
                         typename std::iterator_traits<Iter2>::value_type
                     >::type
                 >
-            )>
+            )
         // clang-format on
         friend T tag_fallback_invoke(transform_reduce_t, Iter first, Sent last,
             Iter2 first2, T init, Reduce red_op, Convert conv_op)
@@ -1090,10 +1089,11 @@ namespace hpx::ranges {
         }
 
         // range based versions
-        // clang-format off
+
         template <typename ExPolicy, typename Rng, typename T, typename Reduce,
-            typename Convert,
-            HPX_CONCEPT_REQUIRES_(
+            typename Convert>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<Convert,
@@ -1107,7 +1107,7 @@ namespace hpx::ranges {
                         typename hpx::traits::range_traits<Rng>::value_type
                     >::type
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Rng&& rng,
@@ -1124,9 +1124,9 @@ namespace hpx::ranges {
                 HPX_MOVE(conv_op));
         }
 
+        template <typename Rng, typename T, typename Reduce, typename Convert>
         // clang-format off
-        template <typename Rng, typename T, typename Reduce, typename Convert,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_traits<Rng>::value_type
@@ -1139,7 +1139,7 @@ namespace hpx::ranges {
                         typename hpx::traits::range_traits<Rng>::value_type
                     >::type
                 >
-            )>
+            )
         // clang-format on
         friend T tag_fallback_invoke(transform_reduce_t, Rng&& rng, T init,
             Reduce red_op, Convert conv_op)
@@ -1154,13 +1154,13 @@ namespace hpx::ranges {
                 HPX_MOVE(init), HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
+        template <typename ExPolicy, typename Rng, typename Iter2, typename T>
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename Iter2, typename T,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2>
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Rng&& rng,
@@ -1180,12 +1180,12 @@ namespace hpx::ranges {
                 hpx::parallel::detail::multiplies());
         }
 
+        template <typename Rng, typename Iter2, typename T>
         // clang-format off
-        template <typename Rng, typename Iter2, typename T,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2>
-            )>
+            )
         // clang-format on
         friend T tag_fallback_invoke(
             transform_reduce_t, Rng&& rng, Iter2 first2, T init)
@@ -1203,10 +1203,10 @@ namespace hpx::ranges {
                 hpx::parallel::detail::multiplies());
         }
 
+        template <typename ExPolicy, typename Rng, typename Iter2, typename T,
+            typename Reduce, typename Convert>
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename Iter2,
-            typename T, typename Reduce, typename Convert,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2> &&
@@ -1224,7 +1224,7 @@ namespace hpx::ranges {
                         typename std::iterator_traits<Iter2>::value_type
                     >::type
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Rng&& rng,
@@ -1243,10 +1243,10 @@ namespace hpx::ranges {
                 HPX_MOVE(conv_op));
         }
 
-        // clang-format off
         template <typename Rng, typename Iter2, typename T, typename Reduce,
-            typename Convert,
-            HPX_CONCEPT_REQUIRES_(
+            typename Convert>
+        // clang-format off
+            requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,
@@ -1263,7 +1263,7 @@ namespace hpx::ranges {
                         typename std::iterator_traits<Iter2>::value_type
                     >::type
                 >
-            )>
+            )
         // clang-format on
         friend T tag_fallback_invoke(transform_reduce_t, Rng&& rng,
             Iter2 first2, T init, Reduce red_op, Convert conv_op)

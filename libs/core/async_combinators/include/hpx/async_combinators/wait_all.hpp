@@ -147,7 +147,6 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/async_combinators/detail/throw_if_exceptional.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/futures/traits/detail/future_traits.hpp>
@@ -156,8 +155,8 @@ namespace hpx {
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/unwrap_ref.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <array>
@@ -733,26 +732,5 @@ namespace hpx {
 }    // namespace hpx
 
 #undef HPX_WAIT_ALL_FORCEINLINE
-
-namespace hpx::lcos {
-
-    template <typename... Ts>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_all is deprecated. Use hpx::wait_all instead.")
-    void wait_all(Ts&&... ts)
-    {
-        hpx::wait_all(HPX_FORWARD(Ts, ts)...);
-    }
-
-    template <typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::wait_all_n is deprecated. Use hpx::wait_all_n instead.")
-    void wait_all_n(Iterator begin, std::size_t count)
-    {
-        hpx::wait_all_n(begin, count);
-    }
-}    // namespace hpx::lcos
 
 #endif    // DOXYGEN

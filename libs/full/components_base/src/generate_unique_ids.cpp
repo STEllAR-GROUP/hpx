@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,7 +8,7 @@
 #include <hpx/config.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/generate_unique_ids.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -27,7 +27,7 @@ namespace hpx::util {
             lower_ = naming::invalid_gid;
 
             naming::gid_type lower;
-            std::size_t const count_ = (std::max)(range_delta, count);
+            std::size_t const count_ = (std::max) (range_delta, count);
 
             {
                 hpx::unlock_guard ul(l);

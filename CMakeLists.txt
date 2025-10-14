@@ -61,11 +61,11 @@ string(TIMESTAMP HPX_COPYRIGHT_YEAR "%Y")
 # ##############################################################################
 # Build all of HPX
 # ##############################################################################
-set(HPX_VERSION_MAJOR 1)
-set(HPX_VERSION_MINOR 11)
+set(HPX_VERSION_MAJOR 2)
+set(HPX_VERSION_MINOR 0)
 set(HPX_VERSION_SUBMINOR 0)
-set(HPX_VERSION_DATE 20240529)
-set(HPX_VERSION_TAG "-trunk")
+set(HPX_VERSION_DATE 20250630)
+set(HPX_VERSION_TAG "")
 
 set(HPX_VERSION
     "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}"
@@ -310,6 +310,43 @@ hpx_option(
 )
 if(HPX_WITH_UNITY_BUILD)
   set(HPX_WITH_UNITY_BUILD_OPTION UNITY_BUILD)
+endif()
+
+# ##############################################################################
+# C++20 modules configuration
+# ##############################################################################
+
+hpx_option(
+  HPX_WITH_CXX_MODULES BOOL "Enable exposing C++20 modules (default: OFF)." OFF
+  ADVANCED
+)
+if(HPX_WITH_CXX_MODULES)
+  if(NOT (CMAKE_VERSION VERSION_GREATER_EQUAL "3.29"))
+    hpx_fatal(
+      "Please use a version of CMake newer than V3.28 in order to enable C++ module support for HPX"
+    )
+  endif()
+
+  hpx_info(
+    "HPX will build and install C++20 module interface units for downstream users."
+  )
+  hpx_add_config_define(HPX_HAVE_CXX_MODULES)
+
+  hpx_option(
+    HPX_WITH_BUILD_USING_CXX_MODULES
+    BOOL
+    "Enable building HPX itself using C++20 modules (experimental, default: OFF)."
+    OFF
+    ADVANCED
+  )
+  if(HPX_WITH_BUILD_USING_CXX_MODULES)
+    hpx_info("Note: HPX itself will be built using C++ modules as well.")
+    hpx_add_config_define(HPX_HAVE_BUILD_USING_CXX_MODULES)
+  else()
+    hpx_info("Note: HPX itself will still be built using traditional headers.")
+  endif()
+else()
+  hpx_info("HPX will be built and used with traditional headers only.")
 endif()
 
 hpx_option(
@@ -1003,12 +1040,16 @@ hpx_option(
 if(HPX_WITH_APEX)
   hpx_add_config_define(HPX_HAVE_APEX) # tell HPX that we use APEX
   hpx_option(
-    HPX_WITH_APEX_NO_UPDATE BOOL
-    "Do not update code from remote APEX repository." OFF CATEGORY "Profiling"
+    HPX_WITH_APEX_REPOSITORY STRING "APEX repository"
+    "https://github.com/STEllAR-GROUP/apex.git" CATEGORY "Profiling"
   )
   hpx_option(
-    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.6.5"
+    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "hpx_v1.11.0"
     CATEGORY "Profiling"
+  )
+  hpx_option(
+    HPX_WITH_APEX_NO_UPDATE BOOL
+    "Do not update code from remote APEX repository." OFF CATEGORY "Profiling"
   )
 endif()
 
@@ -2007,12 +2048,6 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # Spirit headers: The file contains a character starting at offset ... that
     # is illegal in the current source character set
     hpx_add_compile_flag(-wd4828)
-
-    if(HPX_WITH_CXX_STANDARD LESS 20)
-      # support for attribute 'msvc::no_unique_address' in C++17 and earlier is
-      # a vendor extension
-      hpx_add_compile_flag(-wd4848)
-    endif()
 
     if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
       # unary minus operator applied to unsigned type, result still unsigned

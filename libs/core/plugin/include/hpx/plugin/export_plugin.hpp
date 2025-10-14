@@ -11,10 +11,9 @@
 
 #include <hpx/plugin/config.hpp>
 #include <hpx/datastructures/any.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/plugin/abstract_factory.hpp>
 #include <hpx/plugin/concrete_factory.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 
 #include <algorithm>
 #include <cctype>
@@ -128,7 +127,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_PLUGIN_EXPORT_LIST_(prefix, name, classname)                       \
     extern "C" HPX_PLUGIN_EXPORT_API std::map<std::string, hpx::any_nonser>*   \
-        HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME_(prefix, name, classname)()        \
+        HPX_PLUGIN_API                                                         \
+        HPX_PLUGIN_LIST_NAME_(prefix, name, classname)()                       \
     {                                                                          \
         static std::map<std::string, hpx::any_nonser> r;                       \
         return &r;                                                             \

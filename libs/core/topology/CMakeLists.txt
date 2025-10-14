@@ -62,6 +62,7 @@ add_hpx_module(
     hpx_errors
     hpx_format
     hpx_logging
+    hpx_tag_invoke
     hpx_type_support
     hpx_util
   DEPENDENCIES Hwloc::hwloc

@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/itt_notify.hpp>
-#include <hpx/thread_support/spinlock.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <utility>
 

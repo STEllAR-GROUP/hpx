@@ -68,7 +68,8 @@ namespace boost { namespace inspect {
         // Search backwards for a CR or LR
         std::size_t start_pos = contents.find_last_of(kCRLF, pos);
         std::string::const_iterator line_start = contents.begin() +
-            (start_pos == std::string::npos ? 0 : start_pos + 1);
+            static_cast<std::ptrdiff_t>(
+                start_pos == std::string::npos ? 0 : start_pos + 1);
 
         // Search forwards for a CR or LF
         std::size_t end_pos = contents.find_first_of(kCRLF, pos + 1);
@@ -76,7 +77,8 @@ namespace boost { namespace inspect {
         if (end_pos == std::string::npos)
             line_end = contents.end();
         else
-            line_end = contents.begin() + end_pos - 1;
+            line_end =
+                contents.begin() + static_cast<std::ptrdiff_t>(end_pos - 1);
 
         return std::string(line_start, line_end);
     }
@@ -92,6 +94,7 @@ namespace boost { namespace inspect {
         register_signature(".hpp");
         register_signature(".hxx");
         register_signature(".ipp");
+        register_signature(".ixx");
     }
 
     void ascii_check::inspect(const string& library_name,

@@ -310,7 +310,9 @@ namespace hpx::parcelset::policies::mpi {
             while (chunks_idx_ < buffer_.chunks_.size())
             {
                 auto const& c = buffer_.chunks_[chunks_idx_];
-                if (c.type_ == serialization::chunk_type::chunk_type_pointer)
+                if (c.type_ == serialization::chunk_type::chunk_type_pointer ||
+                    c.type_ ==
+                        serialization::chunk_type::chunk_type_const_pointer)
                 {
                     if (!request_done())
                     {

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,20 +8,20 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/schedulers/queue_helpers.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_data_stackful.hpp>
 #include <hpx/threading_base/thread_data_stackless.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
 
 #if defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
 #include <hpx/schedulers/deadlock_detection.hpp>
@@ -420,12 +420,14 @@ namespace hpx::threads::policies {
             else
             {
                 // delete only this many threads
-                std::int64_t delete_count = (std::min)(
-                    static_cast<std::int64_t>(terminated_items_count_ / 10),
-                    static_cast<std::int64_t>(parameters_.max_delete_count_));
+                std::int64_t delete_count =
+                    (std::min) (static_cast<std::int64_t>(
+                                    terminated_items_count_ / 10),
+                        static_cast<std::int64_t>(
+                            parameters_.max_delete_count_));
 
                 // delete at least this many threads
-                delete_count = (std::max)(delete_count,
+                delete_count = (std::max) (delete_count,
                     static_cast<std::int64_t>(parameters_.min_delete_count_));
 
                 thread_data* todelete;
@@ -898,9 +900,10 @@ namespace hpx::threads::policies {
         std::size_t get_next_threads(Iterator it, std::int64_t max_items,
             bool allow_stealing = false, bool steal = false)
         {
-            std::int64_t const work_items_count = (std::min)(
-                work_items_count_.data_.load(std::memory_order_relaxed),
-                max_items);
+            std::int64_t const work_items_count =
+                (std::min) (work_items_count_.data_.load(
+                                std::memory_order_relaxed),
+                    max_items);
 
             if (work_items_count == 0)
             {
@@ -1103,9 +1106,18 @@ namespace hpx::threads::policies {
         inline bool wait_or_add_new(
             bool, std::size_t& added, bool steal = false) HPX_HOT
         {
-            if (0 == new_tasks_count_.data_.load(std::memory_order_relaxed))
+            // no need to try converting from other queue if that has no staged
+            // threads
+            auto const new_tasks_count =
+                new_tasks_count_.data_.load(std::memory_order_relaxed);
+            if (HPX_LIKELY(0 == new_tasks_count))
             {
                 return true;
+            }
+
+            if (new_tasks_count < parameters_.min_tasks_to_steal_staged_)
+            {
+                return false;
             }
 
             // No obvious work has to be done, so a lock won't hurt too much.

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -33,7 +34,7 @@ namespace hpx::execution::experimental {
     {
         /// Construct a \a static_chunk_size executor parameters object
         ///
-        /// \note By default the number of loop iterations is determined from
+        /// \note By default, the number of loop iterations is determined from
         ///       the number of available cores and the overall number of loop
         ///       iterations to schedule.
         ///
@@ -45,7 +46,8 @@ namespace hpx::execution::experimental {
         ///                     number of loop iterations to run on a single
         ///                     thread.
         ///
-        constexpr explicit static_chunk_size(std::size_t chunk_size) noexcept
+        constexpr explicit static_chunk_size(
+            std::size_t const chunk_size) noexcept
           : chunk_size_(chunk_size)
         {
         }
@@ -55,8 +57,8 @@ namespace hpx::execution::experimental {
         friend std::size_t tag_override_invoke(
             hpx::execution::experimental::get_chunk_size_t,
             static_chunk_size& this_, Executor& exec,
-            hpx::chrono::steady_duration const&, std::size_t cores,
-            std::size_t num_tasks)
+            hpx::chrono::steady_duration const&, std::size_t const cores,
+            std::size_t const num_iterations)
         {
             // Make sure the internal round-robin counter of the executor is
             // reset
@@ -71,16 +73,26 @@ namespace hpx::execution::experimental {
 
             if (cores == 1)
             {
-                return num_tasks;
+                return num_iterations;
             }
 
-            // Return a chunk size that is a power of two; and that leads to at
-            // least 2 chunks per core, and at most 4 chunks per core.
-            std::size_t chunk_size = 1;
-            while (chunk_size * cores * 4 < num_tasks)    //-V112
-            {
-                chunk_size *= 2;
-            }
+            // Return a chunk size that ensures that each core ends up with the
+            // same number of chunks the sizes of which are equal (except for
+            // the last chunk, which may be smaller by not more than the number
+            // of chunks in terms of elements).
+            std::size_t const cores_times_4 = 4 * cores;    // -V112
+            std::size_t chunk_size =
+                (num_iterations + cores_times_4 - 1) / cores_times_4;
+
+            // we should not consider more chunks than we have elements
+            auto const max_chunks = (std::min) (cores_times_4, num_iterations);
+
+            // we should not make chunks smaller than what's determined by
+            // the max chunk size
+            chunk_size = (std::max) (chunk_size,
+                (num_iterations + max_chunks - 1) / max_chunks);
+
+            HPX_ASSERT(chunk_size * cores_times_4 >= num_iterations);
 
             return chunk_size;
         }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
@@ -21,6 +20,7 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/io_service/io_service_pool_fwd.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
@@ -123,7 +123,7 @@ namespace hpx::parallel::execution::detail {
             for (auto const& elem : shape)
             {
                 results.push_back(hpx::parallel::execution::async_execute(
-                    exec, HPX_FORWARD(F, f), elem, ts...));
+                    exec, f, elem, ts...));
             }
 
             return results;
@@ -155,7 +155,8 @@ namespace hpx::parallel::execution::detail {
                     HPX_FORWARD(Future, predecessor), exec_current,
                     [func = HPX_MOVE(func)](
                         auto&& predecessor) mutable -> vector_result_type {
-                        return hpx::unwrap(func(HPX_MOVE(predecessor)));
+                        return hpx::unwrap(func(
+                            HPX_FORWARD(decltype(predecessor), predecessor)));
                     });
 
             return hpx::traits::future_access<result_future_type>::create(

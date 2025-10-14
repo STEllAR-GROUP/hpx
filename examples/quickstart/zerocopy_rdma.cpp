@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <hpx/serialization.hpp>
 
@@ -18,7 +18,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-#define ZEROCOPY_DATASIZE 1024 * 1024
+constexpr std::size_t ZEROCOPY_DATASIZE = 1'048'576;
 
 ///////////////////////////////////////////////////////////////////////////////
 // A custom allocator which takes a pointer in its constructor and then returns

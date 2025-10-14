@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,10 +14,10 @@
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <exception>
 #if defined(HPX_HAVE_CXX17_STD_EXECUTION_POLICES)
@@ -93,6 +93,7 @@ namespace hpx::parallel::detail {
         using result_type = Result;
         using local_result_type = local_algorithm_result_t<result_type>;
 
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         explicit constexpr algorithm(char const* const name) noexcept
           : name_(name)
         {

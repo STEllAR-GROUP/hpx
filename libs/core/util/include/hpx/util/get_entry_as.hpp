@@ -7,7 +7,7 @@
 =============================================================================*/
 #pragma once
 
-#include <hpx/util/from_string.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <string>
 #include <type_traits>

@@ -43,8 +43,14 @@
 #include <stdexcept>
 #include <string>
 #include <system_error>
+#include <typeinfo>
 #include <utility>
 #include <vector>
+
+#if defined(HPX_WINDOWS)
+#include <excpt.h>
+#undef exception_info
+#endif
 
 namespace hpx {
 

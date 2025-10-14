@@ -9,10 +9,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_difference.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
@@ -61,12 +61,12 @@ namespace hpx::parallel::detail {
         }
     };
 
+    template <typename ExPolicy, typename InIter, typename OutIter, typename Op>
     // clang-format off
-    template <typename ExPolicy, typename InIter, typename OutIter, typename Op,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::is_vectorpack_execution_policy_v<ExPolicy> &&
             hpx::parallel::util::detail::iterator_datapar_compatible_v<InIter>
-        )>
+        )
     // clang-format on
     constexpr OutIter tag_invoke(sequential_adjacent_difference_t<ExPolicy>,
         InIter first, InIter last, OutIter dest, Op&& op)

@@ -379,7 +379,7 @@ namespace hpx::local::detail {
                     .style(unix_style)
                     .extra_parser(option_parser(rtcfg, as_bool(mode))),
                 notmode)
-                                          .run());
+                    .run());
 
             // collect unregistered options, if needed
             if (unregistered_options)
@@ -408,7 +408,7 @@ namespace hpx::local::detail {
                     .style(unix_style)
                     .extra_parser(option_parser(rtcfg, as_bool(mode))),
                 notmode)
-                                          .run());
+                    .run());
 
             // collect unregistered options, if needed
             if (unregistered_options)

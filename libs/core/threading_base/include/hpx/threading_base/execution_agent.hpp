@@ -24,7 +24,8 @@
 
 namespace hpx::threads {
 
-    struct HPX_CORE_EXPORT execution_context : hpx::execution_base::context_base
+    struct HPX_CORE_EXPORT execution_context final
+      : hpx::execution_base::context_base
     {
         hpx::execution_base::resource_base const& resource()
             const noexcept override

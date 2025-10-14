@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,35 +14,19 @@
 namespace hpx::util::cache::statistics {
 
     ///////////////////////////////////////////////////////////////////////////
-    enum class method
-    {
+    HPX_CXX_EXPORT enum class method {
         get_entry = 0,
         insert_entry = 1,
         update_entry = 2,
         erase_entry = 3
     };
 
-#define HPX_CACHE_METHOD_UNSCOPED_ENUM_DEPRECATION_MSG                         \
-    "The unscoped scheduler_mode names are deprecated. Please use "            \
-    "scheduler_mode::state instead."
-
-    HPX_DEPRECATED_V(1, 8, HPX_CACHE_METHOD_UNSCOPED_ENUM_DEPRECATION_MSG)
-    inline constexpr method method_get_entry = method::get_entry;
-    HPX_DEPRECATED_V(1, 8, HPX_CACHE_METHOD_UNSCOPED_ENUM_DEPRECATION_MSG)
-    inline constexpr method method_insert_entry = method::insert_entry;
-    HPX_DEPRECATED_V(1, 8, HPX_CACHE_METHOD_UNSCOPED_ENUM_DEPRECATION_MSG)
-    inline constexpr method method_update_entry = method::update_entry;
-    HPX_DEPRECATED_V(1, 8, HPX_CACHE_METHOD_UNSCOPED_ENUM_DEPRECATION_MSG)
-    inline constexpr method method_erase_entry = method::erase_entry;
-
-#undef HPX_CACHE_METHOD_UNSCOPED_ENUM_DEPRECATION_MSG
-
     ///////////////////////////////////////////////////////////////////////////
-    class no_statistics
+    HPX_CORE_MODULE_EXPORT_EXTERN class no_statistics
     {
     public:
         /// \brief  The function \a got_hit will be called by a cache instance
-        ///         whenever a entry got touched.
+        ///         whenever an entry got touched.
         static constexpr void got_hit() noexcept {}
 
         /// \brief  The function \a got_miss will be called by a cache instance
@@ -66,6 +50,12 @@ namespace hpx::util::cache::statistics {
         struct update_on_exit
         {
             constexpr update_on_exit(no_statistics const&, method) noexcept {}
+            ~update_on_exit() = default;
+
+            update_on_exit(update_on_exit const&) = delete;
+            update_on_exit(update_on_exit&&) = delete;
+            update_on_exit& operator=(update_on_exit const&) = delete;
+            update_on_exit& operator=(update_on_exit&&) = delete;
         };
 
         /// The function \a get_get_entry_count returns the number of

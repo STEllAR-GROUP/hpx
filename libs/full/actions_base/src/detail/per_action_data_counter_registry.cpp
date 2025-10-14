@@ -12,7 +12,7 @@
 #include <hpx/actions_base/detail/per_action_data_counter_registry.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/static.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstdint>
 #include <string>

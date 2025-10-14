@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2023 Hartmut Kaiser
+# Copyright (c) 2007-2025 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2018 Nikunj Gupta
 # Copyright (c) 2020 The STE||AR-Group
@@ -149,6 +149,7 @@ set(_is_executable "$<STREQUAL:$<TARGET_PROPERTY:TYPE>,EXECUTABLE>")
 set(_is_library "$<IN_LIST:$<TARGET_PROPERTY:TYPE>,${_library_types}>")
 
 add_library(hpx INTERFACE)
+add_library(init INTERFACE)
 add_library(wrap_main INTERFACE)
 
 target_link_libraries(hpx INTERFACE hpx_full)
@@ -183,6 +184,7 @@ target_link_libraries(
 )
 
 target_link_libraries(wrap_main INTERFACE hpx_interface_wrap_main)
+target_link_libraries(init INTERFACE HPXInternal::hpx_init)
 target_link_libraries(hpx INTERFACE hpx_interface)
 
 # HPX::component is to be linked privately to all HPX components NOTE: The
@@ -209,7 +211,7 @@ target_compile_definitions(
     "$<${_is_library}:HPX_PLUGIN_NAME_DEFAULT=hpx_$<TARGET_PROPERTY:NAME>>"
 )
 
-set(hpx_targets hpx wrap_main plugin component)
+set(hpx_targets hpx wrap_main init plugin component)
 set(hpx_internal_targets hpx_full hpx_interface hpx_interface_wrap_main)
 
 # cmake-format: off
@@ -300,14 +302,94 @@ set(HPX_LIBS
     CACHE INTERNAL "List of HPX libraries" FORCE
 )
 
+if(HPX_WITH_CXX_MODULES)
+  # the standard header needs to be recreated from scratch
+  unset(HPX_STANDARD_HEADERS CACHE)
+  unset(HPX_ENABLED_CXX_MODULES CACHE)
+endif()
+
 foreach(lib ${HPX_LIBS})
+
+  string(TOUPPER ${lib} uppercase_lib)
+  if(HPX_WITH_CXX_MODULES)
+    unset(HPX_${uppercase_lib}_ENABLED_CXX_MODULES CACHE)
+  endif()
+
   # NOTE: hpx_full (i.e. the target representing libhpx.so) is still created in
   # src/CMakeLists.txt. When all of hpx_full has been modularized the target
   # creation can move here as well.
-  if(NOT ${lib} STREQUAL "full")
-    string(TOUPPER ${lib} uppercase_lib)
+  if(${lib} STREQUAL "full")
+    add_subdirectory(${lib})
+  else()
     add_library(hpx_${lib} ${hpx_library_link_mode} src/empty.cpp)
     target_compile_definitions(hpx_${lib} PRIVATE HPX_${uppercase_lib}_EXPORTS)
+
+    add_subdirectory(${lib})
+
+    if(HPX_WITH_CXX_MODULES)
+      # generate module interface unit
+      set(cxx_module_headers)
+      foreach(cxx_module ${HPX_${uppercase_lib}_ENABLED_CXX_MODULES})
+        if(HPX_WITH_BUILD_USING_CXX_MODULES)
+          set(cxx_module_headers
+              "${cxx_module_headers}export import HPX.Core.${cxx_module};\n"
+          )
+        else()
+          set(cxx_module_headers
+              "${cxx_module_headers}#include <hpx/modules/${cxx_module}.hpp>\n"
+          )
+        endif()
+      endforeach()
+
+      set(cxx_standard_headers)
+      foreach(std_header ${HPX_STANDARD_HEADERS})
+        set(cxx_standard_headers
+            "${cxx_standard_headers}#include ${std_header}\n"
+        )
+      endforeach()
+
+      set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib})
+      set(lib_module_file "${lib_module_basedir}/hpx_${lib}.ixx")
+      configure_file(
+        "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in" ${lib_module_file} @ONLY
+      )
+
+      set(std_header_file
+          "${lib_module_basedir}/config/include/hpx/config/std_headers.hpp"
+      )
+      configure_file(
+        "${HPX_SOURCE_DIR}/cmake/templates/std_headers.hpp.in"
+        ${std_header_file} @ONLY
+      )
+      add_hpx_source_group(
+        NAME hpx_${lib}
+        ROOT ${lib_module_basedir}
+        CLASS "Generated Files"
+        TARGETS ${lib_module_file}
+      )
+
+      # cmake-format: off
+      target_sources(
+        hpx_${lib} PUBLIC
+            FILE_SET hpx_${lib}_public_sources
+                TYPE CXX_MODULES
+                BASE_DIRS ${lib_module_basedir}
+                FILES ${lib_module_file}
+      )
+      set(module_installation
+          FILE_SET hpx_${lib}_public_sources
+              DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx/miu
+          CXX_MODULES_BMI
+              DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx/bmi
+              COMPONENT runtime
+      )
+      # cmake-format: on
+
+      if(HPX_WITH_BUILD_USING_CXX_MODULES AND MSVC)
+        # suppress linker MSVC warning LNK4286: defined symbol imported
+        target_link_options(hpx_${lib} PRIVATE "/ignore:4286")
+      endif()
+    endif()
 
     set_target_properties(hpx_${lib} PROPERTIES FOLDER "Core")
 
@@ -316,7 +398,9 @@ foreach(lib ${HPX_LIBS})
       EXPORT HPXInternalTargets
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+              COMPONENT runtime
+              ${module_installation}
     )
 
     # install PDB if needed
@@ -332,8 +416,6 @@ foreach(lib ${HPX_LIBS})
 
     hpx_export_internal_targets(hpx_${lib})
   endif()
-
-  add_subdirectory(${lib})
 
   set(_hpx_${lib}_modules
       ${_hpx_${lib}_modules}

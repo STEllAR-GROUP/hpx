@@ -97,7 +97,7 @@ namespace hpx::parcelset::policies::tcp {
         util::endpoint_iterator_type const end = util::accept_end();
         for (util::endpoint_iterator_type it =
                  util::accept_begin(here_.get<locality>(), io_service);
-             it != end; ++it, ++tried)
+            it != end; ++it, ++tried)
         {
             try
             {
@@ -147,6 +147,7 @@ namespace hpx::parcelset::policies::tcp {
         if (acceptor_ != nullptr)
         {
             std::error_code ec;
+            // NOLINTNEXTLINE(bugprone-unused-return-value)
             acceptor_->close(ec);
             delete acceptor_;
             acceptor_ = nullptr;
@@ -176,10 +177,11 @@ namespace hpx::parcelset::policies::tcp {
                 util::endpoint_iterator_type end = util::connect_end();
                 for (util::endpoint_iterator_type it =
                          util::connect_begin(l.get<locality>(), io_service);
-                     it != end; ++it)
+                    it != end; ++it)
                 {
                     asio::ip::tcp::socket& s = sender_connection->socket();
                     s.close();
+                    // NOLINTNEXTLINE(bugprone-unused-return-value)
                     s.connect(*it, error);
                     if (!error)
                         break;

@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Minh-Khanh Do
-//  Copyright (c) 2020-2024 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,10 +16,9 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/type_support/unused.hpp>
-#include <hpx/type_support/void_guard.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -249,7 +248,7 @@ namespace hpx::parallel {
 
                 // handle all partitions
                 for (++sit_in, ++sit_out; sit_in != send_in;
-                     ++sit_in, ++sit_out)
+                    ++sit_in, ++sit_out)
                 {
                     beg_in = traits_in::begin(sit_in);
                     end_in = traits_in::end(sit_in);
@@ -372,7 +371,7 @@ namespace hpx::parallel {
 
                 // handle all partitions
                 for (++sit_in, ++sit_out; sit_in != send_in;
-                     ++sit_in, ++sit_out)
+                    ++sit_in, ++sit_out)
                 {
                     beg = traits_in::begin(sit_in);
                     end = traits_in::end(sit_in);
@@ -410,8 +409,8 @@ namespace hpx::parallel {
                 // segment
                 dispatch(traits_out::get_id(out_iters[i]),
                     segmented_scan_void<Algo>(), policy, std::true_type(),
-                    get<0>(in_iters[i]), get<1>(in_iters[i]), out,
-                    HPX_FORWARD(Conv, conv), last_value, HPX_FORWARD(Op, op));
+                    get<0>(in_iters[i]), get<1>(in_iters[i]), out, conv,
+                    last_value, op);
 
                 // 3. Step: compute new init values for the next segment
                 last_value = op(results[i], last_value);
@@ -590,7 +589,7 @@ namespace hpx::parallel {
 
                 // handle all partitions
                 for (++sit_in, ++sit_out; sit_in != send_in;
-                     ++sit_in, ++sit_out)
+                    ++sit_in, ++sit_out)
                 {
                     beg = traits_in::begin(sit_in);
                     end = traits_in::end(sit_in);

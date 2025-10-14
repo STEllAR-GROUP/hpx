@@ -9,7 +9,7 @@
 
 #include <hpx/plugin/config.hpp>
 #include <hpx/datastructures/any.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <map>
 #include <memory>
@@ -21,7 +21,7 @@ namespace hpx::util::plugin {
     ///////////////////////////////////////////////////////////////////////////
     using exported_plugins_type = std::map<std::string, hpx::any_nonser>;
     typedef exported_plugins_type*(HPX_PLUGIN_API* get_plugins_list_type)();
-    typedef exported_plugins_type*(HPX_PLUGIN_API get_plugins_list_np)();
+    typedef exported_plugins_type*(HPX_PLUGIN_API get_plugins_list_np) ();
     using dll_handle = shared_ptr<get_plugins_list_np>;
 
     ///////////////////////////////////////////////////////////////////////////

@@ -18,6 +18,8 @@
 #include <string>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::threads {
 
     HPX_CORE_EXPORT void parse_affinity_options(std::string const& spec,
@@ -35,3 +37,5 @@ namespace hpx::threads {
             spec, affinities, 1, 1, affinities.size(), num_pus, false, ec);
     }
 }    // namespace hpx::threads
+
+#include <hpx/config/warnings_suffix.hpp>

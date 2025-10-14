@@ -22,68 +22,71 @@
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
-namespace initializers {
+    namespace initializers {
 
-template <class String>
-class start_in_dir_ : public initializer_base
-{
-public:
-    start_in_dir_() {}
+        template <class String>
+        class start_in_dir_ : public initializer_base
+        {
+        public:
+            start_in_dir_() {}
 
-    explicit start_in_dir_(const String &s) : s_(s) {}
+            explicit start_in_dir_(const String& s)
+              : s_(s)
+            {
+            }
 
-    template <class WindowsExecutor>
-    void on_CreateProcess_setup(WindowsExecutor &e) const
-    {
-        e.work_dir = s_.c_str();
-    }
+            template <class WindowsExecutor>
+            void on_CreateProcess_setup(WindowsExecutor& e) const
+            {
+                e.work_dir = s_.c_str();
+            }
 
-private:
-    friend class hpx::serialization::access;
+        private:
+            friend class hpx::serialization::access;
 
-    template <typename Archive>
-    void serialize(Archive& ar, unsigned const)
-    {
-        ar & s_;
-    }
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned const)
+            {
+                ar & s_;
+            }
 
-    String s_;
-};
+            String s_;
+        };
 
 #if defined(_UNICODE) || defined(UNICODE)
-inline start_in_dir_<std::wstring> start_in_dir(const wchar_t *ws)
-{
-    return start_in_dir_<std::wstring>(ws);
-}
+        inline start_in_dir_<std::wstring> start_in_dir(const wchar_t* ws)
+        {
+            return start_in_dir_<std::wstring>(ws);
+        }
 
-inline start_in_dir_<std::wstring> start_in_dir(const std::wstring &ws)
-{
-    return start_in_dir_<std::wstring>(ws);
-}
+        inline start_in_dir_<std::wstring> start_in_dir(const std::wstring& ws)
+        {
+            return start_in_dir_<std::wstring>(ws);
+        }
 
-inline start_in_dir_<std::wstring> start_in_dir(const filesystem::path &p)
-{
-    return start_in_dir_<std::wstring>(p.wstring());
-}
+        inline start_in_dir_<std::wstring> start_in_dir(
+            const filesystem::path& p)
+        {
+            return start_in_dir_<std::wstring>(p.wstring());
+        }
 #else
-inline start_in_dir_<std::string> start_in_dir(const char *s)
-{
-    return start_in_dir_<std::string>(s);
-}
+        inline start_in_dir_<std::string> start_in_dir(const char* s)
+        {
+            return start_in_dir_<std::string>(s);
+        }
 
-inline start_in_dir_<std::string> start_in_dir(const std::string &s)
-{
-    return start_in_dir_<std::string>(s);
-}
+        inline start_in_dir_<std::string> start_in_dir(const std::string& s)
+        {
+            return start_in_dir_<std::string>(s);
+        }
 
-inline start_in_dir_<std::string> start_in_dir(const filesystem::path &p)
-{
-    return start_in_dir_<std::string>(p.string());
-}
+        inline start_in_dir_<std::string> start_in_dir(
+            const filesystem::path& p)
+        {
+            return start_in_dir_<std::string>(p.string());
+        }
 #endif
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::windows::initializers
 
 #endif

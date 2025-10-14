@@ -7,13 +7,12 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/debugging/demangle_helper.hpp>
-#include <hpx/debugging/print.hpp>
 #include <hpx/executors/dataflow.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/futures/traits/is_future_tuple.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 
 #include <cstddef>
@@ -79,7 +78,7 @@ namespace hpx::execution::experimental {
         template <typename T>
         T const& peek_future_result(T const& t)
         {
-            return t;
+            return t;    // NOLINT(bugprone-return-const-ref-from-parameter)
         }
 
         template <typename T,
@@ -152,7 +151,7 @@ namespace hpx::execution::experimental {
                             executor_.stacksize_,
                             hpx::threads::thread_schedule_hint(
                                 hpx::threads::thread_schedule_hint_mode::numa,
-                                domain)));
+                                static_cast<std::int16_t>(domain))));
                 }
                 else
                 {
@@ -161,7 +160,7 @@ namespace hpx::execution::experimental {
                             executor_.stacksize_,
                             hpx::threads::thread_schedule_hint(
                                 hpx::threads::thread_schedule_hint_mode::numa,
-                                domain)));
+                                static_cast<std::int16_t>(domain))));
                 }
 
                 return p.get_future();
@@ -197,10 +196,8 @@ namespace hpx::execution::experimental {
                 int domain = -1;
 #else
                 // get the argument for the numa hint function from the predecessor future
-                int domain =
-                    numa_function_(detail::future_extract_value()(
-                                       HPX_FORWARD(Future, predecessor)),
-                        ts...);
+                int domain = numa_function_(
+                    detail::future_extract_value()(predecessor), ts...);
 #endif
 
                 gpx_deb.debug(debug::str<>("then_schedule"), "domain ", domain);
@@ -224,7 +221,7 @@ namespace hpx::execution::experimental {
                             executor_.stacksize_,
                             hpx::threads::thread_schedule_hint(
                                 hpx::threads::thread_schedule_hint_mode::numa,
-                                domain)));
+                                static_cast<std::int16_t>(domain))));
                 }
                 else
                 {
@@ -233,7 +230,7 @@ namespace hpx::execution::experimental {
                             executor_.stacksize_,
                             hpx::threads::thread_schedule_hint(
                                 hpx::threads::thread_schedule_hint_mode::numa,
-                                domain)));
+                                static_cast<std::int16_t>(domain))));
                 }
 
                 return p.get_future();
@@ -508,7 +505,7 @@ namespace hpx::execution::experimental {
                         hpx::threads::thread_priority::high, exec.stacksize_,
                         hpx::threads::thread_schedule_hint(
                             hpx::threads::thread_schedule_hint_mode::numa,
-                            domain)));
+                            static_cast<std::int16_t>(domain))));
             }
             else
             {
@@ -516,7 +513,7 @@ namespace hpx::execution::experimental {
                     hpx::launch::async_policy(exec.priority_, exec.stacksize_,
                         hpx::threads::thread_schedule_hint(
                             hpx::threads::thread_schedule_hint_mode::numa,
-                            domain)));
+                            static_cast<std::int16_t>(domain))));
             }
             return p.get_future();
         }

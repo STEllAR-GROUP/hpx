@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,15 +13,11 @@
 #endif
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/concurrency/detail/non_contiguous_index_queue.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
-#include <hpx/errors/exception.hpp>
-#include <hpx/errors/exception_list.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
@@ -30,15 +26,16 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/iterator_support/counting_iterator.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/topology/cpu_mask.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -138,7 +135,7 @@ namespace hpx::execution::experimental::detail {
         {
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
             static hpx::util::itt::event notify_event(
-                "set_value_loop_visitor_static::do_work_chunk(chunking)");
+                "set_value_loop_visitor::do_work_chunk(chunking)");
 
             hpx::util::itt::mark_event e(notify_event);
 #endif
@@ -147,7 +144,7 @@ namespace hpx::execution::experimental::detail {
             auto const i_begin =
                 static_cast<std::size_t>(index) * task_f->chunk_size;
             auto const i_end =
-                (std::min)(i_begin + task_f->chunk_size, task_f->size);
+                (std::min) (i_begin + task_f->chunk_size, task_f->size);
 
             auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
             for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
@@ -177,7 +174,7 @@ namespace hpx::execution::experimental::detail {
                     hpx::concurrency::detail::opposite_end_v<Which>;
 
                 for (std::uint32_t offset = 1;
-                     offset != op_state->num_worker_threads; ++offset)
+                    offset != op_state->num_worker_threads; ++offset)
                 {
                     std::size_t neighbor_thread =
                         (worker_thread + offset) % op_state->num_worker_threads;
@@ -377,8 +374,8 @@ namespace hpx::execution::experimental::detail {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
             auto const part_begin = worker_thread;
-            auto part_end = (std::min)(
-                size + num_threads - 1, part_begin + num_steps * num_threads);
+            auto part_end = (std::min) (size + num_threads - 1,
+                part_begin + num_steps * num_threads);
             auto const remainder = (part_end - part_begin) % num_threads;
             if (remainder != 0)
             {
@@ -492,7 +489,7 @@ namespace hpx::execution::experimental::detail {
             // Initialize the queues for all worker threads so that worker
             // threads can start stealing immediately when they start.
             for (std::uint32_t worker_thread = 0;
-                 worker_thread != op_state->num_worker_threads; ++worker_thread)
+                worker_thread != op_state->num_worker_threads; ++worker_thread)
             {
                 if (hint.placement_mode() == placement::breadth_first ||
                     hint.placement_mode() == placement::breadth_first_reverse)
@@ -533,8 +530,8 @@ namespace hpx::execution::experimental::detail {
                 !hpx::threads::do_not_share_function(hint.sharing_mode());
 
             for (std::uint32_t pu = 0;
-                 worker_thread != op_state->num_worker_threads && pu != num_pus;
-                 ++pu)
+                worker_thread != op_state->num_worker_threads && pu != num_pus;
+                ++pu)
             {
                 std::size_t pu_num = rp.get_pu_num(pu + op_state->first_thread);
 

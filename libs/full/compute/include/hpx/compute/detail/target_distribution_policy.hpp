@@ -102,7 +102,7 @@ namespace hpx::compute::detail {
                 (num_partitions_ == static_cast<std::size_t>(-1)) ?
                 targets_.size() :
                 num_partitions_;
-            return (std::max)(num_parts, static_cast<std::size_t>(1));
+            return (std::max) (num_parts, static_cast<std::size_t>(1));
         }
 
     protected:
@@ -126,7 +126,7 @@ namespace hpx::compute::detail {
             // this distribution policy places an equal number of items onto
             // each target
             std::size_t const sites =
-                (std::max)(static_cast<std::size_t>(1), targets_.size());
+                (std::max) (static_cast<std::size_t>(1), targets_.size());
 
             // the overall number of items to create is smaller than the number
             // of sites

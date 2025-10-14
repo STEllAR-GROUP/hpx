@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/thread_support/set_thread_name.hpp>
+
 #include <cstddef>
 #include <string>
 
@@ -84,7 +85,7 @@ namespace hpx::util {
         }
     }    // namespace detail
 
-    void set_thread_name(const char* thread_name) noexcept
+    void set_thread_name(char const* thread_name) noexcept
     {
         detail::set_thread_name(thread_name);
     }

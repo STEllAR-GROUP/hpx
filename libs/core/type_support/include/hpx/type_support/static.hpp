@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/type_support/aligned_storage.hpp>
 
 #include <memory>
 #include <type_traits>
@@ -33,7 +34,7 @@ namespace hpx::util {
     // C++11 requires thread-safe initialization of function-scope statics.
     // For conforming compilers, we utilize this feature.
     //
-    template <typename T, typename Tag = T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Tag = T>
     struct HPX_EXPORT_STATIC_ static_
     {
     public:
@@ -92,7 +93,7 @@ namespace hpx::util {
     //      T::T() MUST not throw!
     //          this is a requirement of boost::call_once.
     //
-    template <typename T, typename Tag = T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Tag = T>
     struct HPX_EXPORT_STATIC_ static_
     {
     public:
@@ -158,17 +159,17 @@ namespace hpx::util {
             return reinterpret_cast<pointer>(data_);
         }
 
-        using storage_type = std::aligned_storage_t<sizeof(value_type),
+        using storage_type = hpx::aligned_storage_t<sizeof(value_type),
             std::alignment_of_v<value_type>>;
 
         static storage_type data_;
         static std::once_flag constructed_;
     };
 
-    template <typename T, typename Tag>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Tag>
     typename static_<T, Tag>::storage_type static_<T, Tag>::data_;
 
-    template <typename T, typename Tag>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename Tag>
     std::once_flag static_<T, Tag>::constructed_;
 #endif
 }    // namespace hpx::util

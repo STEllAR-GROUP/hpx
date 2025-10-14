@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -65,7 +65,6 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
@@ -76,8 +75,7 @@ namespace hpx {
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <array>
 #include <cstddef>
@@ -440,22 +438,4 @@ namespace hpx {
     }
 }    // namespace hpx
 
-namespace hpx::lcos {
-
-    template <typename F>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::split_future is deprecated. Use hpx::split_future instead.")
-    decltype(auto) split_future(F&& future)
-    {
-        return hpx::split_future(HPX_FORWARD(F, future));
-    }
-
-    template <typename F>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::split_future is deprecated. Use hpx::split_future instead.")
-    decltype(auto) split_future(F&& future, std::size_t size)
-    {
-        return hpx::split_future(HPX_FORWARD(F, future), size);
-    }
-}    // namespace hpx::lcos
 #endif

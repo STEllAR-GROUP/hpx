@@ -281,13 +281,19 @@ namespace test {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename InputIter1, typename InputIter2>
+    template <typename InputIter1, typename InputIter2,
+        typename Comp = std::equal_to<>>
     bool equal(InputIter1 first1, InputIter1 last1, InputIter2 first2,
-        InputIter2 last2)
+        InputIter2 last2, Comp comp = Comp{})
     {
         if (std::distance(first1, last1) != std::distance(first2, last2))
             return false;
 
-        return std::equal(first1, last1, first2);
+        return std::equal(
+            first1, last1, first2, [&](auto const& a, auto const& b) mutable {
+                if (comp(a, b))
+                    return true;
+                return false;
+            });
     }
 }    // namespace test

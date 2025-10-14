@@ -13,10 +13,9 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: jwlawson/actions-setup-cmake@v2.0
-      with:
-        cmake-version: '3.22.x'
+
     - name: Install dependencies
       run: |
         choco install ninja -y
@@ -45,7 +44,7 @@ jobs:
               -DCMAKE_CXX_COMPILER=g++ \
               -DBOOST_ROOT="C:\Boost" \
               -DHWLOC_ROOT="C:\projects\hwloc-win64-build-2.8.0" \
-              -DHPX_WITH_CXX_STANDARD=20 \
+              -DHPX_WITH_CXX_STANDARD=23 \
               -DHPX_WITH_STATIC_LINKING=ON \
               -DHPX_WITH_MALLOC=system \
               -DHPX_WITH_FETCH_ASIO=ON \

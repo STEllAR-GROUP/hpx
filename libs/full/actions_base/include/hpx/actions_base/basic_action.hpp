@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -39,13 +39,11 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
 #include <hpx/runtime_local/report_error.hpp>
-#include <hpx/type_support/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
     !defined(HPX_HAVE_APEX)
@@ -113,6 +111,7 @@ namespace hpx::actions {
                     hpx::invoke_fused(action_invoke<Action>{lva_, comptype_},
                         HPX_MOVE(args_));
                 }
+                // NOLINTNEXTLINE(bugprone-empty-catch)
                 catch (hpx::thread_interrupted const&)
                 {    //-V565
                      /* swallow this exception */
@@ -483,6 +482,7 @@ namespace hpx::actions {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename TF, TF F, typename Derived = void>
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     struct direct_action
       : action<TF, F,
             detail::action_type_t<direct_action<TF, F, Derived>, Derived>>

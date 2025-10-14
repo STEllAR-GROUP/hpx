@@ -577,6 +577,7 @@ namespace hpx::threads::policies {
                 {
                 case thread_priority::default_:
                 case thread_priority::low:
+                case thread_priority::initially_bound:
                 case thread_priority::bound:
                 case thread_priority::normal:
                 case thread_priority::boost:
@@ -602,6 +603,7 @@ namespace hpx::threads::policies {
             {
             case thread_priority::default_:
             case thread_priority::low:
+            case thread_priority::initially_bound:
             case thread_priority::bound:
             case thread_priority::normal:
             case thread_priority::boost:
@@ -834,7 +836,7 @@ namespace hpx::threads::policies {
                 bool suspended_only = true;
 
                 for (std::size_t i = 0; suspended_only && i != queues_.size();
-                     ++i)
+                    ++i)
                 {
                     suspended_only = queues_[i]->dump_suspended_threads(
                         i, idle_loop_count, running);

@@ -9,14 +9,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/detail/minimum_category.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/type_support/default_sentinel.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -226,7 +224,8 @@ namespace hpx::util {
                 typename zip_iterator_reference<IteratorTuple>::type>;
 
         public:
-            HPX_HOST_DEVICE constexpr zip_iterator_base() noexcept {}
+            // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
+            HPX_HOST_DEVICE zip_iterator_base() = default;
 
             HPX_HOST_DEVICE explicit constexpr zip_iterator_base(
                 IteratorTuple const& iterators)
@@ -238,6 +237,19 @@ namespace hpx::util {
               : iterators_(HPX_MOVE(iterators))
             {
             }
+
+            HPX_HOST_DEVICE zip_iterator_base(
+                zip_iterator_base const&) = default;
+            HPX_HOST_DEVICE zip_iterator_base(
+                zip_iterator_base&&) noexcept = default;
+            // NOLINTEND(bugprone-crtp-constructor-accessibility)
+
+            HPX_HOST_DEVICE zip_iterator_base& operator=(
+                zip_iterator_base const&) = default;
+            HPX_HOST_DEVICE zip_iterator_base& operator=(
+                zip_iterator_base&&) noexcept = default;
+
+            HPX_HOST_DEVICE ~zip_iterator_base() = default;
 
             HPX_HOST_DEVICE
             constexpr zip_iterator_base& operator=(
@@ -361,10 +373,7 @@ namespace hpx::util {
             detail::zip_iterator_base<hpx::tuple<Ts...>, zip_iterator<Ts...>>;
 
     public:
-        HPX_HOST_DEVICE constexpr zip_iterator() noexcept
-          : base_type()
-        {
-        }
+        HPX_HOST_DEVICE zip_iterator() = default;
 
         HPX_HOST_DEVICE explicit constexpr zip_iterator(
             Ts const&... vs) noexcept
@@ -387,6 +396,8 @@ namespace hpx::util {
             zip_iterator const& other) = default;
         HPX_HOST_DEVICE zip_iterator& operator=(
             zip_iterator&& other) noexcept = default;
+
+        HPX_HOST_DEVICE ~zip_iterator() = default;
 
         template <typename... Ts_>
         HPX_HOST_DEVICE std::enable_if_t<
@@ -442,10 +453,7 @@ namespace hpx::util {
             zip_iterator<hpx::tuple<Ts...>>>;
 
     public:
-        HPX_HOST_DEVICE constexpr zip_iterator() noexcept
-          : base_type()
-        {
-        }
+        HPX_HOST_DEVICE zip_iterator() = default;
 
         HPX_HOST_DEVICE explicit constexpr zip_iterator(
             Ts const&... vs) noexcept
@@ -468,6 +476,8 @@ namespace hpx::util {
             zip_iterator const& other) = default;
         HPX_HOST_DEVICE zip_iterator& operator=(
             zip_iterator&& other) noexcept = default;
+
+        HPX_HOST_DEVICE ~zip_iterator() = default;
 
         template <typename... Ts_>
         HPX_HOST_DEVICE std::enable_if_t<

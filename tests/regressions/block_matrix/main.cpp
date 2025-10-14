@@ -22,7 +22,7 @@ void output_hpx_info()
 {
     std::cout << "HPX information:" << std::endl;
 
-    int nlocs = hpx::get_num_localities().get();
+    int nlocs = static_cast<int>(hpx::get_num_localities().get());
     std::cout << "There are " << nlocs << " localities" << std::endl;
     hpx::id_type here = hpx::find_here();
     std::cout << "   here=" << here << std::endl;
@@ -31,7 +31,7 @@ void output_hpx_info()
     std::vector<hpx::id_type> locs = hpx::find_all_localities();
     std::cout << "   locs=" << mkstr(locs) << std::endl;
 
-    int nthreads = hpx::get_num_worker_threads();
+    int nthreads = static_cast<int>(hpx::get_num_worker_threads());
     std::cout << "There are " << nthreads << " threads overall" << std::endl;
     hpx::threads::thread_id_type self = hpx::threads::get_self_id();
     std::string name = hpx::get_thread_name();
@@ -73,7 +73,7 @@ int hpx_main(hpx::program_options::variables_map&)
     // Async action calls on remote localities
     test_dense_action act_test_dense;
     test_blocked_action act_test_blocked;
-    int nlocs = hpx::get_num_localities().get();
+    int nlocs = static_cast<int>(hpx::get_num_localities().get());
     std::vector<hpx::id_type> locs = hpx::find_all_localities();
     hpx::id_type loc1 = locs[1 % nlocs];
     hpx::id_type loc2 = locs[2 % nlocs];

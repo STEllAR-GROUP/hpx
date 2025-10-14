@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
-#include <hpx/type_support/static.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstdint>
 #include <string>

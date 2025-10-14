@@ -372,7 +372,7 @@ namespace hpx {
             for (hpx::id_type const& id : r.second)
             {
                 std::size_t size =
-                    (std::min)(part_sizes[l], size_ - allocated_size);
+                    (std::min) (part_sizes[l], size_ - allocated_size);
                 partitions_[l] =
                     partition_data(id, allocated_size, size, locality);
 

@@ -11,7 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/preprocessor/cat.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/runtime_local/component_startup_shutdown_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

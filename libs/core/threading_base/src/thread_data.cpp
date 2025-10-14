@@ -12,7 +12,7 @@
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #if defined(HPX_HAVE_APEX)

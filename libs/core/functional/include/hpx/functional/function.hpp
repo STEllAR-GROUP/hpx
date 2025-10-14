@@ -17,7 +17,7 @@
 #include <hpx/functional/detail/function_registration.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -93,19 +93,6 @@ namespace hpx {
         using function = hpx::function<Sig, true>;
     }    // namespace distributed
 }    // namespace hpx
-
-namespace hpx::util {
-
-    template <typename Sig, bool Serializable = true>
-    using function HPX_DEPRECATED_V(1, 8,
-        "hpx::util::function is deprecated. Please use hpx::function "
-        "instead.") = hpx::function<Sig, Serializable>;
-
-    template <typename Sig>
-    using function_nonser HPX_DEPRECATED_V(1, 8,
-        "hpx::util::function_nonser is deprecated. Please use hpx::function "
-        "instead.") = hpx::function<Sig>;
-}    // namespace hpx::util
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////

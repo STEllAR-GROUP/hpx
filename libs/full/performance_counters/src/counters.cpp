@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,6 +15,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/packaged_continuation.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/performance_counters/base_performance_counter.hpp>
@@ -32,7 +33,6 @@
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -1,5 +1,5 @@
 // Copyright (c) 2018 Adrian Serio
-// Copyright (c) 2018-2023 Hartmut Kaiser
+// Copyright (c) 2018-2025 Hartmut Kaiser
 //
 // SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -173,7 +173,7 @@ namespace hpx { namespace util {
         ost.write(reinterpret_cast<char const*>(&size), sizeof(std::int64_t));
 
         // Write the file to the stream
-        ost.write(ckp.data(), ckp.size());
+        ost.write(ckp.data(), static_cast<std::streamsize>(ckp.size()));
         return ost;
     }
 

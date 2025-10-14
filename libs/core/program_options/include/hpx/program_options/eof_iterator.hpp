@@ -50,6 +50,7 @@ namespace hpx { namespace program_options {
             std::forward_iterator_tag>
     {
     public:
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         eof_iterator() = default;
 
     protected:    // interface for derived

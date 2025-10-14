@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -24,11 +24,14 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/plugin_factories/binary_filter_factory_base.hpp>
 #include <hpx/plugin_factories/message_handler_factory_base.hpp>
@@ -49,9 +52,6 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/string_util/case_conv.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/type_support/unused.hpp>
-#include <hpx/util/from_string.hpp>
 
 #ifdef HPX_HAVE_LIB_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
@@ -289,7 +289,7 @@ namespace hpx { namespace components { namespace server {
         bool dijkstra_token)
     {
         applier::applier& appl = hpx::applier::get_applier();
-        naming::resolver_client& agas_client = naming::get_agas_client();
+        agas::addressing_service& agas_client = naming::get_agas_client();
 
         agas_client.start_shutdown();
 
@@ -428,7 +428,7 @@ namespace hpx { namespace components { namespace server {
             "runtime_support::shutdown_all: initializing application shutdown");
 
         applier::applier& appl = hpx::applier::get_applier();
-        naming::resolver_client& agas_client = naming::get_agas_client();
+        agas::addressing_service& agas_client = naming::get_agas_client();
 
         agas_client.start_shutdown();
 
@@ -615,7 +615,7 @@ namespace hpx { namespace components { namespace server {
 
             applier::applier& appl = hpx::applier::get_applier();
             threads::threadmanager& tm = appl.get_thread_manager();
-            naming::resolver_client& agas_client = naming::get_agas_client();
+            agas::addressing_service& agas_client = naming::get_agas_client();
 
             error_code ec(throwmode::lightweight);
 
@@ -781,7 +781,7 @@ namespace hpx { namespace components { namespace server {
         options.add(get_runtime().get_app_options());
 
         // then dynamic ones
-        naming::resolver_client& client = naming::get_agas_client();
+        agas::addressing_service& client = naming::get_agas_client();
         int result = load_components(
             ini, client.get_local_locality(), client, options, startup_handled);
         if (result != 0)
@@ -1125,7 +1125,7 @@ namespace hpx { namespace components { namespace server {
     bool runtime_support::load_component_static(util::section& ini,
         std::string const& instance, std::string const& component,
         filesystem::path const& lib, naming::gid_type const& /* prefix */,
-        naming::resolver_client& /* agas_client */, bool /* isdefault */,
+        agas::addressing_service& /* agas_client */, bool /* isdefault */,
         bool /* isenabled */,
         hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
@@ -1190,7 +1190,7 @@ namespace hpx { namespace components { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
     int runtime_support::load_components(util::section& ini,
-        naming::gid_type const& prefix, naming::resolver_client& agas_client,
+        naming::gid_type const& prefix, agas::addressing_service& agas_client,
         hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
@@ -1473,7 +1473,7 @@ namespace hpx { namespace components { namespace server {
     bool runtime_support::load_component_dynamic(util::section& ini,
         std::string const& instance, std::string const& component,
         filesystem::path lib, naming::gid_type const& prefix,
-        naming::resolver_client& agas_client, bool isdefault, bool isenabled,
+        agas::addressing_service& agas_client, bool isdefault, bool isenabled,
         hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
@@ -1623,7 +1623,7 @@ namespace hpx { namespace components { namespace server {
         util::section& ini, std::string const& instance,
         std::string const& /* component */, filesystem::path const& lib,
         naming::gid_type const& /* prefix */,
-        naming::resolver_client& /* agas_client */, bool /* isdefault */,
+        agas::addressing_service& /* agas_client */, bool /* isdefault */,
         bool /* isenabled */,
         hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)

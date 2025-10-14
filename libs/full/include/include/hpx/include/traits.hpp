@@ -11,9 +11,6 @@
 #include <hpx/algorithms/traits/pointer_category.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/concepts/has_member_xxx.hpp>
-#include <hpx/concepts/has_xxx.hpp>
 #include <hpx/datastructures/traits/is_tuple_like.hpp>
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
@@ -22,7 +19,6 @@
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/functional/traits/is_bind_expression.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/functional/traits/is_placeholder.hpp>
 #include <hpx/futures/traits/acquire_future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
@@ -36,6 +32,9 @@
 #include <hpx/futures/traits/promise_remote_result.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/traits/brace_initializable_traits.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
@@ -43,7 +42,6 @@
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
 #include <hpx/serialization/traits/serialization_access_data.hpp>
 #include <hpx/timed_execution/traits/is_timed_executor.hpp>
-#include <hpx/type_support/detail/wrap_int.hpp>
 
 #include <hpx/actions_base/traits/action_continuation.hpp>
 #include <hpx/actions_base/traits/action_decorate_continuation.hpp>

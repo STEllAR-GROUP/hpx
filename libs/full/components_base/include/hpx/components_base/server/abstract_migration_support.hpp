@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2023 Hartmut Kaiser
+//  Copyright (c) 2019-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,6 +25,7 @@ namespace hpx::components {
     /// This hook has to be inserted into the derivation chain of any
     /// abstract_component_base for it to support migration.
     template <typename BaseComponent, typename Mutex = hpx::spinlock>
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     struct abstract_base_migration_support : BaseComponent
     {
     private:
@@ -133,11 +134,11 @@ namespace hpx::components {
         }
 
         abstract_migration_support(abstract_migration_support const&) = delete;
-        abstract_migration_support(abstract_migration_support&&) = delete;
+        abstract_migration_support(abstract_migration_support&&) = default;
         abstract_migration_support& operator=(
             abstract_migration_support const&) = delete;
         abstract_migration_support& operator=(
-            abstract_migration_support&&) = delete;
+            abstract_migration_support&&) = default;
 
         ~abstract_migration_support() = default;
 

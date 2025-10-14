@@ -94,13 +94,13 @@ int verify_(
     {
         IA temp = *(A.begin());
         for (typename std::vector<IA>::const_iterator it = A.begin();
-             it != A.end(); ++it)
+            it != A.end(); ++it)
         {
             if (comp((*it), temp))
             {
                 if (print)
-                    hpx::util::format_to(
-                        std::cout, "fail {:8.6}", elapsed / 1e9)
+                    hpx::util::format_to(std::cout, "fail {:8.6}",
+                        static_cast<double>(elapsed) / 1e9)
                         << A.size() << std::endl;
                 return 0;
             }
@@ -108,7 +108,8 @@ int verify_(
         }
     }
     if (print)
-        hpx::util::format_to(std::cout, "OK {:8.6}", elapsed / 1e9)
+        hpx::util::format_to(
+            std::cout, "OK {:8.6}", static_cast<double>(elapsed) / 1e9)
             << A.size() << std::endl;
     return 1;
 }
@@ -232,7 +233,7 @@ void test_stable_sort_exception(ExPolicy&& policy, T)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::stable_sort(std::forward<ExPolicy>(policy),
+            hpx::stable_sort(policy,
                 decorated_iterator(
                     c.begin(), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(c.end()));
@@ -265,7 +266,7 @@ void test_stable_sort_exception(ExPolicy&& policy, T)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::stable_sort(std::forward<ExPolicy>(policy),
+            hpx::stable_sort(policy,
                 decorated_iterator(c.begin(), []() { throw std::bad_alloc(); }),
                 decorated_iterator(c.end()));
 
@@ -311,7 +312,7 @@ void test_stable_sort_exception(ExPolicy&& policy, T, Compare comp)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::stable_sort(std::forward<ExPolicy>(policy),
+            hpx::stable_sort(policy,
                 decorated_iterator(
                     c.begin(), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(c.end()), comp);
@@ -344,7 +345,7 @@ void test_stable_sort_exception(ExPolicy&& policy, T, Compare comp)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::stable_sort(std::forward<ExPolicy>(policy),
+            hpx::stable_sort(policy,
                 decorated_iterator(c.begin(), []() { throw std::bad_alloc(); }),
                 decorated_iterator(c.end()), comp);
 
@@ -391,11 +392,10 @@ void test_stable_sort_exception_async(ExPolicy&& policy, T)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::future<void> f =
-                hpx::stable_sort(std::forward<ExPolicy>(policy),
-                    decorated_iterator(
-                        c.begin(), []() { throw std::runtime_error("test"); }),
-                    decorated_iterator(c.end()));
+            hpx::future<void> f = hpx::stable_sort(policy,
+                decorated_iterator(
+                    c.begin(), []() { throw std::runtime_error("test"); }),
+                decorated_iterator(c.end()));
 
             returned_from_algorithm = true;
             f.get();
@@ -430,8 +430,7 @@ void test_stable_sort_exception_async(ExPolicy&& policy, T)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::future<void> f = hpx::stable_sort(
-                std::forward<ExPolicy>(policy),
+            hpx::future<void> f = hpx::stable_sort(policy,
                 decorated_iterator(c.begin(), []() { throw std::bad_alloc(); }),
                 decorated_iterator(c.end()));
 
@@ -482,11 +481,10 @@ void test_stable_sort_exception_async(ExPolicy&& policy, T, Compare comp)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::future<void> f =
-                hpx::stable_sort(std::forward<ExPolicy>(policy),
-                    decorated_iterator(
-                        c.begin(), []() { throw std::runtime_error("test"); }),
-                    decorated_iterator(c.end()), comp);
+            hpx::future<void> f = hpx::stable_sort(policy,
+                decorated_iterator(
+                    c.begin(), []() { throw std::runtime_error("test"); }),
+                decorated_iterator(c.end()), comp);
 
             returned_from_algorithm = true;
             f.get();
@@ -521,8 +519,7 @@ void test_stable_sort_exception_async(ExPolicy&& policy, T, Compare comp)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::future<void> f = hpx::stable_sort(
-                std::forward<ExPolicy>(policy),
+            hpx::future<void> f = hpx::stable_sort(policy,
                 decorated_iterator(c.begin(), []() { throw std::bad_alloc(); }),
                 decorated_iterator(c.end()), comp);
 

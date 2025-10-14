@@ -1,7 +1,7 @@
 //  Copyright (c) 2018-2020 Mikael Simberg
 //  Copyright (c) 2018-2019 John Biddiscombe
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -55,7 +55,7 @@ void print_stats(char const* title, char const* wait, char const* exec,
     std::int64_t count, double duration, bool csv)
 {
     std::ostringstream temp;
-    double const us = 1e6 * duration / count;
+    double const us = 1e6 * duration / static_cast<double>(count);
     if (csv)
     {
         hpx::util::format_to(temp,
@@ -104,7 +104,9 @@ double null_function() noexcept
         {
             for (std::uint64_t j = 0; j < array_size; ++j)
             {
-                dummy[j] = 1.0 / (2.0 * i * j + 1.0);
+                dummy[j] = 1.0 /
+                    (2.0 * static_cast<double>(i) * static_cast<double>(j) +
+                        1.0);
             }
         }
         global_scratch = dummy[0];
@@ -139,7 +141,8 @@ void measure_action_futures_wait_each(std::uint64_t count, bool csv)
 
     // stop the clock
     double const duration = walltime.elapsed();
-    print_stats("action", "WaitEach", "no-executor", count, duration, csv);
+    print_stats("action", "WaitEach", "no-executor",
+        static_cast<std::int64_t>(count), duration, csv);
 }
 
 // Time async action execution using wait each on futures vector
@@ -157,7 +160,8 @@ void measure_action_futures_wait_all(std::uint64_t count, bool csv)
 
     // stop the clock
     double const duration = walltime.elapsed();
-    print_stats("action", "WaitAll", "no-executor", count, duration, csv);
+    print_stats("action", "WaitAll", "no-executor",
+        static_cast<std::int64_t>(count), duration, csv);
 }
 #endif
 
@@ -177,7 +181,8 @@ void measure_function_futures_wait_each(
 
     // stop the clock
     double const duration = walltime.elapsed();
-    print_stats("async", "WaitEach", exec_name(exec), count, duration, csv);
+    print_stats("async", "WaitEach", exec_name(exec),
+        static_cast<std::int64_t>(count), duration, csv);
 }
 
 template <typename Executor>
@@ -194,7 +199,8 @@ void measure_function_futures_wait_all(
     hpx::wait_all(futures);
 
     double const duration = walltime.elapsed();
-    print_stats("async", "WaitAll", exec_name(exec), count, duration, csv);
+    print_stats("async", "WaitAll", exec_name(exec),
+        static_cast<std::int64_t>(count), duration, csv);
 }
 
 template <typename Executor>
@@ -249,8 +255,8 @@ void measure_function_futures_limiting_executor(
 
     // stop the clock
     double const duration = walltime.elapsed();
-    print_stats(
-        "apply", "limiting-Exec", exec_name(exec), count, duration, csv);
+    print_stats("apply", "limiting-Exec", exec_name(exec),
+        static_cast<std::int64_t>(count), duration, csv);
 }
 
 template <typename Executor>
@@ -265,11 +271,11 @@ void measure_function_futures_sliding_semaphore(
     {
         hpx::async(exec, [i, sem]() {
             null_function();
-            sem->signal(i);
+            sem->signal(static_cast<std::int64_t>(i));
         });
-        sem->wait(i);
+        sem->wait(static_cast<std::int64_t>(i));
     }
-    sem->wait(count + sem_count - 1);
+    sem->wait(static_cast<std::int64_t>(count + sem_count - 1));
 
     // stop the clock
     double const duration = walltime.elapsed();
@@ -314,7 +320,7 @@ void measure_function_futures_for_loop(std::uint64_t count, bool csv,
 
 void measure_function_futures_register_work(std::uint64_t count, bool csv)
 {
-    hpx::latch l(count);
+    hpx::latch l(static_cast<std::int64_t>(count));
 
     // start the clock
     high_resolution_timer const walltime;
@@ -332,12 +338,13 @@ void measure_function_futures_register_work(std::uint64_t count, bool csv)
 
     // stop the clock
     double const duration = walltime.elapsed();
-    print_stats("register_work", "latch", "none", count, duration, csv);
+    print_stats("register_work", "latch", "none",
+        static_cast<std::int64_t>(count), duration, csv);
 }
 
 void measure_function_futures_create_thread(std::uint64_t count, bool csv)
 {
-    hpx::latch l(count);
+    hpx::latch l(static_cast<std::int64_t>(count));
 
     auto const sched = hpx::threads::get_self_id_data()->get_scheduler_base();
     auto func = [&l]() {
@@ -366,13 +373,14 @@ void measure_function_futures_create_thread(std::uint64_t count, bool csv)
 
     // stop the clock
     double const duration = walltime.elapsed();
-    print_stats("create_thread", "latch", "none", count, duration, csv);
+    print_stats("create_thread", "latch", "none",
+        static_cast<std::int64_t>(count), duration, csv);
 }
 
 void measure_function_futures_create_thread_hierarchical_placement(
     std::uint64_t count, bool csv)
 {
-    hpx::latch l(count);
+    hpx::latch l(static_cast<std::int64_t>(count));
 
     auto sched = hpx::threads::get_self_id_data()->get_scheduler_base();
 
@@ -435,14 +443,14 @@ void measure_function_futures_create_thread_hierarchical_placement(
 
     // stop the clock
     double const duration = walltime.elapsed();
-    print_stats(
-        "create_thread_hierarchical", "latch", "none", count, duration, csv);
+    print_stats("create_thread_hierarchical", "latch", "none",
+        static_cast<std::int64_t>(count), duration, csv);
 }
 
 void measure_function_futures_apply_hierarchical_placement(
     std::uint64_t count, bool csv)
 {
-    hpx::latch l(count);
+    hpx::latch l(static_cast<std::int64_t>(count));
 
     auto const func = [&l]() {
         null_function();
@@ -474,8 +482,8 @@ void measure_function_futures_apply_hierarchical_placement(
 
     // stop the clock
     double const duration = walltime.elapsed();
-    print_stats("apply_hierarchical", "latch", "parallel_executor", count,
-        duration, csv);
+    print_stats("apply_hierarchical", "latch", "parallel_executor",
+        static_cast<std::int64_t>(count), duration, csv);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

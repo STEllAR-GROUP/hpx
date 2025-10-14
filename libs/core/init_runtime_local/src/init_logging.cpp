@@ -8,9 +8,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
-#include <hpx/logging/config/defines.hpp>
-
 #include <hpx/init_runtime_local/detail/init_logging.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/runtime_local/get_worker_thread_num.hpp>

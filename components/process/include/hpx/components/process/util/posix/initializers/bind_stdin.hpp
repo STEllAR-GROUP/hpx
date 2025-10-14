@@ -19,26 +19,27 @@
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
-namespace initializers {
+    namespace initializers {
 
-class bind_stdin : public initializer_base
-{
-public:
-    explicit bind_stdin(const boost::iostreams::file_descriptor_source &source)
-        : source_(source) {}
+        class bind_stdin : public initializer_base
+        {
+        public:
+            explicit bind_stdin(
+                const boost::iostreams::file_descriptor_source& source)
+              : source_(source)
+            {
+            }
 
-    template <class PosixExecutor>
-    void on_exec_setup(PosixExecutor&) const
-    {
-        ::dup2(source_.handle(), STDIN_FILENO);
-    }
+            template <class PosixExecutor>
+            void on_exec_setup(PosixExecutor&) const
+            {
+                ::dup2(source_.handle(), STDIN_FILENO);
+            }
 
-private:
-    boost::iostreams::file_descriptor_source source_;
-};
+        private:
+            boost::iostreams::file_descriptor_source source_;
+        };
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::posix::initializers
 
 #endif

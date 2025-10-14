@@ -150,18 +150,18 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -294,12 +294,12 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<destroy_t>
     {
     private:
+        template <typename ExPolicy, typename FwdIter>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             destroy_t, ExPolicy&& policy, FwdIter first, FwdIter last)
@@ -312,11 +312,11 @@ namespace hpx {
                     HPX_FORWARD(ExPolicy, policy), first, last));
         }
 
+        template <typename FwdIter>
         // clang-format off
-        template <typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend void tag_fallback_invoke(destroy_t, FwdIter first, FwdIter last)
         {
@@ -334,12 +334,12 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<destroy_n_t>
     {
     private:
+        template <typename ExPolicy, typename FwdIter, typename Size>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename Size,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             destroy_n_t, ExPolicy&& policy, FwdIter first, Size count)
@@ -368,11 +368,11 @@ namespace hpx {
                 static_cast<std::size_t>(count));
         }
 
+        template <typename FwdIter, typename Size>
         // clang-format off
-        template <typename FwdIter, typename Size,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             destroy_n_t, FwdIter first, Size count)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2024 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -94,7 +94,7 @@ namespace hpx::resiliency::experimental {
             std::vector<future_type> results;
             results.resize(size);
 
-            hpx::latch l(size + 1);
+            hpx::latch l(static_cast<std::ptrdiff_t>(size + 1));
 
             exec.spawn_hierarchical(results, l, 0, size, num_tasks, f,
                 hpx::util::begin(shape), ts...);
@@ -121,7 +121,7 @@ namespace hpx::resiliency::experimental {
                         *this, func, *it, ts...);
             }
 
-            l.count_down(size);
+            l.count_down(static_cast<std::ptrdiff_t>(size));
         }
 
         template <typename Result, typename F, typename Iter, typename... Ts>
@@ -133,7 +133,7 @@ namespace hpx::resiliency::experimental {
             {
                 // spawn hierarchical tasks
                 std::size_t chunk_size = (size + num_spread) / num_spread - 1;
-                chunk_size = (std::max)(chunk_size, num_tasks);
+                chunk_size = (std::max) (chunk_size, num_tasks);
 
                 while (size > chunk_size)
                 {

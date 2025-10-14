@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -80,7 +80,7 @@ double wait_tasks(std::size_t num_samples, std::size_t num_tasks,
         result += t.elapsed();
     }
 
-    return result / num_samples;
+    return result / static_cast<double>(num_samples);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -127,18 +127,20 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     hpx::util::format_to(std::cout, "{:10},{:10},{:10},{:10},{:10.12}\n",
         tasks_str, std::string("1"), delay_str, elapsed_seq,
-        elapsed_seq / num_tasks)
+        elapsed_seq / static_cast<double>(num_tasks))
         << std::endl;
-    hpx::util::print_cdash_timing("WaitAll", elapsed_seq / num_tasks);
+    hpx::util::print_cdash_timing(
+        "WaitAll", elapsed_seq / static_cast<double>(num_tasks));
 
     if (num_chunks != 1)
     {
         hpx::util::format_to(std::cout,
             "{:10},{:10},{:10},{:10},{:10.12},{:10.12}\n", tasks_str,
-            chunks_str, delay_str, elapsed_chunks, elapsed_chunks / num_tasks)
+            chunks_str, delay_str, elapsed_chunks,
+            elapsed_chunks / static_cast<double>(num_tasks))
             << std::endl;
         hpx::util::print_cdash_timing(
-            "WaitAllChunks", elapsed_chunks / num_tasks);
+            "WaitAllChunks", elapsed_chunks / static_cast<double>(num_tasks));
     }
     return hpx::local::finalize();
 }

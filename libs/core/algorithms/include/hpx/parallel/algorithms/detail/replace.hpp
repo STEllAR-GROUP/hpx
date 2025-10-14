@@ -8,13 +8,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <type_traits>
@@ -36,7 +36,7 @@ namespace hpx::parallel::detail {
             if constexpr (hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 return util::loop(HPX_FORWARD(ExPolicy, policy), first, last,
-                    [old_value, new_value, &proj](auto& v) {
+                    [old_value, new_value, &proj](auto&& v) {
                         if (HPX_INVOKE(proj, *v) == old_value)
                         {
                             *v = new_value;
@@ -89,7 +89,7 @@ namespace hpx::parallel::detail {
             if constexpr (hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 return util::loop(HPX_FORWARD(ExPolicy, policy), first, last,
-                    [&f, new_value, &proj](auto& v) {
+                    [&f, new_value, &proj](auto&& v) {
                         if (HPX_INVOKE(f, HPX_INVOKE(proj, *v)))
                         {
                             *v = new_value;

@@ -54,8 +54,8 @@ namespace hpx {
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/type_support/lazy_enable_if.hpp>
 
 #include <type_traits>
 #include <utility>

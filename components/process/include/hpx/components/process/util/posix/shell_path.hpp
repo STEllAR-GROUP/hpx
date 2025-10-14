@@ -18,10 +18,9 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 
-namespace hpx { namespace components { namespace process { namespace posix
-{
+namespace hpx { namespace components { namespace process { namespace posix {
     HPX_PROCESS_EXPORT filesystem::path shell_path();
-    HPX_PROCESS_EXPORT filesystem::path shell_path(hpx::error_code &ec);
-}}}}
+    HPX_PROCESS_EXPORT filesystem::path shell_path(hpx::error_code& ec);
+}}}}    // namespace hpx::components::process::posix
 
 #endif

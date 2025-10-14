@@ -1,14 +1,19 @@
-# Copyright (c) 2019-2021 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(debugging_headers
-    hpx/debugging/attach_debugger.hpp hpx/debugging/backtrace.hpp
-    hpx/debugging/backtrace/backtrace.hpp hpx/debugging/demangle_helper.hpp
-    hpx/debugging/environ.hpp hpx/debugging/print.hpp
+    hpx/debugging/attach_debugger.hpp
+    hpx/debugging/backtrace.hpp
+    hpx/debugging/backtrace/backtrace.hpp
+    hpx/debugging/demangle_helper.hpp
+    hpx/debugging/environ.hpp
+    hpx/debugging/macros.hpp
+    hpx/debugging/print.hpp
 )
+set(debugging_macro_headers hpx/debugging/macros.hpp)
 
 # cmake-format: off
 set(debugging_compat_headers
@@ -25,8 +30,10 @@ include(HPX_AddModule)
 add_hpx_module(
   core debugging
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${debugging_sources}
   HEADERS ${debugging_headers}
+  MACRO_HEADERS ${debugging_macro_headers}
   COMPAT_HEADERS ${debugging_compat_headers}
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/debugging/backtrace/backtrace.hpp"
   DEPENDENCIES Asio::asio

@@ -16,6 +16,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <cstdint>
 #include <vector>
 
 // ----------------------------------------------------------------------------
@@ -43,7 +44,7 @@ int main()
 
     std::atomic<std::size_t> signal_count(0);
 
-    hpx::sliding_semaphore sem(window_size, 0);
+    hpx::sliding_semaphore sem(static_cast<std::int64_t>(window_size), 0);
     message_double_action msg;
 
     for (std::size_t i = 0; i < (loop * window_size) + skip; ++i)
@@ -55,17 +56,17 @@ int main()
                 // so that N are always in flight
                 [&, parcel_count](hpx::future<double>&&) -> void {
                     ++signal_count;
-                    sem.signal(parcel_count);
+                    sem.signal(static_cast<std::int64_t>(parcel_count));
                 });
 
         //
         ++parcel_count;
 
         //
-        sem.wait(parcel_count);
+        sem.wait(static_cast<std::int64_t>(parcel_count));
     }
 
-    sem.wait(parcel_count + window_size - 1);
+    sem.wait(static_cast<std::int64_t>(parcel_count + window_size - 1));
 
     HPX_TEST_EQ(signal_count, (loop * window_size) + skip);
 

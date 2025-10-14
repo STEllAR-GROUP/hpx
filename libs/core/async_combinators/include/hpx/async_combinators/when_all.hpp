@@ -129,11 +129,8 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/allocator_support/thread_local_caching_allocator.hpp>
 #include <hpx/concurrency/stack.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/detail/future_transforms.hpp>
 #include <hpx/futures/future.hpp>
@@ -143,6 +140,8 @@ namespace hpx {
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/is_future_range.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
 
 #include <cstddef>
@@ -295,26 +294,5 @@ namespace hpx {
         }
     } when_all_n{};
 }    // namespace hpx
-
-namespace hpx::lcos {
-
-    template <typename... Args>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::when_all is deprecated. Use hpx::when_all instead.")
-    auto when_all(Args&&... args)
-    {
-        return hpx::when_all(HPX_FORWARD(Args, args)...);
-    }
-
-    template <typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::when_all_n is deprecated. Use hpx::when_all_n instead.")
-    auto when_all_n(Iterator begin, std::size_t count)
-    {
-        return hpx::when_all(begin, count);
-    }
-}    // namespace hpx::lcos
 
 #endif    // DOXYGEN

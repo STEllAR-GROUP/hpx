@@ -15,7 +15,7 @@
 #include <hpx/components/client.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
-#include <hpx/errors/exception.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/runtime_components/new.hpp>
@@ -66,11 +66,11 @@ namespace hpx::collectives {
     hpx::future<channel_communicator> create_channel_communicator(
         char const* basename, num_sites_arg num_sites, this_site_arg this_site)
     {
-        if (num_sites == static_cast<std::size_t>(-1))
+        if (num_sites.is_default())
         {
             num_sites = agas::get_num_localities(hpx::launch::sync);
         }
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
         }
@@ -107,11 +107,11 @@ namespace hpx::collectives {
         hpx::launch::sync_policy policy, char const* basename,
         num_sites_arg num_sites, this_site_arg this_site)
     {
-        if (num_sites == static_cast<std::size_t>(-1))
+        if (num_sites.is_default())
         {
             num_sites = agas::get_num_localities(hpx::launch::sync);
         }
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
         }

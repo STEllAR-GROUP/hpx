@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -27,10 +27,10 @@ namespace hpx::naming {
     ///////////////////////////////////////////////////////////////////////////
     bool operator<(gid_type const& lhs, gid_type const& rhs) noexcept
     {
-        std::int64_t lhs_msb =
-            detail::strip_internal_bits_from_gid(lhs.id_msb_);
-        std::int64_t rhs_msb =
-            detail::strip_internal_bits_from_gid(rhs.id_msb_);
+        auto const lhs_msb = static_cast<std::int64_t>(
+            detail::strip_internal_bits_from_gid(lhs.id_msb_));
+        auto const rhs_msb = static_cast<std::int64_t>(
+            detail::strip_internal_bits_from_gid(rhs.id_msb_));
 
         if (lhs_msb < rhs_msb)
         {
@@ -45,10 +45,10 @@ namespace hpx::naming {
 
     bool operator<=(gid_type const& lhs, gid_type const& rhs) noexcept
     {
-        std::int64_t lhs_msb =
-            detail::strip_internal_bits_from_gid(lhs.id_msb_);
-        std::int64_t rhs_msb =
-            detail::strip_internal_bits_from_gid(rhs.id_msb_);
+        auto const lhs_msb = static_cast<std::int64_t>(
+            detail::strip_internal_bits_from_gid(lhs.id_msb_));
+        auto const rhs_msb = static_cast<std::int64_t>(
+            detail::strip_internal_bits_from_gid(rhs.id_msb_));
 
         if (lhs_msb < rhs_msb)
         {
@@ -64,15 +64,15 @@ namespace hpx::naming {
     ///////////////////////////////////////////////////////////////////////////
     gid_type operator+(gid_type const& lhs, gid_type const& rhs) noexcept
     {
-        std::uint64_t lsb = lhs.id_lsb_ + rhs.id_lsb_;
+        std::uint64_t const lsb = lhs.id_lsb_ + rhs.id_lsb_;
         std::uint64_t msb = lhs.id_msb_ + rhs.id_msb_;
 
 #if defined(HPX_DEBUG)
         // make sure we're using the operator+ in proper contexts only
-        std::uint64_t lhs_internal_bits =
+        std::uint64_t const lhs_internal_bits =
             detail::get_internal_bits(lhs.id_msb_);
 
-        std::uint64_t msb_test =
+        std::uint64_t const msb_test =
             detail::strip_internal_bits_and_component_type_from_gid(
                 lhs.id_msb_) +
             detail::strip_internal_bits_and_locality_from_gid(rhs.id_msb_);
@@ -88,7 +88,7 @@ namespace hpx::naming {
 
     gid_type operator-(gid_type const& lhs, gid_type const& rhs) noexcept
     {
-        std::uint64_t lsb = lhs.id_lsb_ - rhs.id_lsb_;
+        std::uint64_t const lsb = lhs.id_lsb_ - rhs.id_lsb_;
         std::uint64_t msb = lhs.id_msb_ - rhs.id_msb_;
 
         if (lsb > lhs.id_lsb_)

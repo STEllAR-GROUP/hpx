@@ -19,6 +19,10 @@
 #endif
 #include <asio/executor_work_guard.hpp>
 #include <asio/io_context.hpp>
+#include <asio/version.hpp>
+#if ASIO_VERSION >= 103400
+#include <asio/post.hpp>
+#endif
 
 // The boost asio support includes termios.h. The termios.h file on ppc64le
 // defines these macros, which are also used by blaze, blaze_tensor as Template

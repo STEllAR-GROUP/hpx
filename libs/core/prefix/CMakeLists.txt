@@ -29,6 +29,7 @@ add_hpx_module(
     hpx_errors
     hpx_filesystem
     hpx_plugin
+    hpx_preprocessor
     hpx_string_util
     hpx_type_support
   CMAKE_SUBDIRS tests

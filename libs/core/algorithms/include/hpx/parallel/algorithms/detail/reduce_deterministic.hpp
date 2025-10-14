@@ -7,11 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/rfa.hpp>
 #include <hpx/parallel/util/loop.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <cstring>
@@ -91,7 +91,7 @@ namespace hpx::parallel::detail {
             T max_val = static_cast<T>(0.0);
             std::size_t partition_size_lim = 0;
             for (auto e = first; partition_size_lim < partition_size;
-                 ++partition_size_lim, ++e)
+                ++partition_size_lim, ++e)
             {
                 T temp_max_val = std::abs(static_cast<T>(*e));
                 if (max_val < temp_max_val)
@@ -123,7 +123,7 @@ namespace hpx::parallel::detail {
             rfa += init;
             std::size_t partition_size_lim = 0;
             for (auto e = first; partition_size_lim < partition_size;
-                 ++partition_size_lim, ++e)
+                ++partition_size_lim, ++e)
             {
                 rfa += (*e);
             }

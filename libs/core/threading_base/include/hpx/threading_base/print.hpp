@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/debugging/print.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 
 #include <iosfwd>

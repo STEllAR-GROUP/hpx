@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,7 +6,7 @@
 
 #include <hpx/async_distributed/detail/promise_lco.hpp>
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 namespace hpx::traits::detail {
 

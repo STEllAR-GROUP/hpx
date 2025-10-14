@@ -12,9 +12,9 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -224,12 +224,6 @@ namespace hpx {
 }    // namespace hpx
 
 namespace hpx::lcos::local {
-
-    /// \cond NOINTERNAL
-    using cpp20_latch HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::cpp20_latch is deprecated, use hpx::latch instead") =
-        hpx::latch;
-    /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
     /// A latch maintains an internal counter_ that is initialized when the

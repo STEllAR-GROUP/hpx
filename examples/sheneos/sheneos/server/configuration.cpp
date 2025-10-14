@@ -18,13 +18,13 @@ namespace hpx { namespace serialization {
     void serialize(
         input_archive& ar, sheneos::config_data& cfg, unsigned int const)
     {
-        ar& cfg.datafile_name_& cfg.symbolic_name_& cfg.num_instances_;
+        ar & cfg.datafile_name_ & cfg.symbolic_name_ & cfg.num_instances_;
     }
 
     void serialize(
         output_archive& ar, sheneos::config_data& cfg, unsigned int const)
     {
-        ar& cfg.datafile_name_& cfg.symbolic_name_& cfg.num_instances_;
+        ar & cfg.datafile_name_ & cfg.symbolic_name_ & cfg.num_instances_;
     }
 }}    // namespace hpx::serialization
 

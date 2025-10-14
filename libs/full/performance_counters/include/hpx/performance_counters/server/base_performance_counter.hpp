@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,9 +12,9 @@
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter_base.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

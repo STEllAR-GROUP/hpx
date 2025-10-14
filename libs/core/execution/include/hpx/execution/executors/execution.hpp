@@ -24,17 +24,14 @@
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/type_support/detail/wrap_int.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <functional>
@@ -79,10 +76,9 @@ namespace hpx::parallel::execution {
         }
 
         template <typename OneWayExecutor, typename F, typename... Ts,
-            typename Enable =
-                std::enable_if_t<!hpx::functional::is_tag_invocable_v<
-                    hpx::parallel::execution::sync_execute_t, OneWayExecutor&&,
-                    F&&, Ts&&...>>>
+            typename Enable = std::enable_if_t<!hpx::functional::
+                    is_tag_invocable_v<hpx::parallel::execution::sync_execute_t,
+                        OneWayExecutor&&, F&&, Ts&&...>>>
         HPX_DEPRECATED_V(1, 9,
             "Exposing sync_execute() from an executor is deprecated, please "
             "expose this functionality through a corresponding overload of "
@@ -232,10 +228,9 @@ namespace hpx::parallel::execution {
             }
 
             template <typename OneWayExecutor, typename F, typename... Ts,
-                typename Enable =
-                    std::enable_if_t<!hpx::functional::is_tag_invocable_v<
-                        hpx::parallel::execution::post_t, OneWayExecutor&&, F&&,
-                        Ts&&...>>>
+                typename Enable = std::enable_if_t<!hpx::functional::
+                        is_tag_invocable_v<hpx::parallel::execution::post_t,
+                            OneWayExecutor&&, F&&, Ts&&...>>>
             HPX_DEPRECATED_V(1, 9,
                 "Exposing post() from an executor is deprecated, please "
                 "expose this functionality through a corresponding overload of "
@@ -552,10 +547,9 @@ namespace hpx::parallel::execution {
             }
 
             template <typename TwoWayExecutor, typename F, typename... Ts,
-                typename Enable =
-                    std::enable_if_t<!hpx::functional::is_tag_invocable_v<
-                        hpx::parallel::execution::post_t, TwoWayExecutor&&, F&&,
-                        Ts&&...>>>
+                typename Enable = std::enable_if_t<!hpx::functional::
+                        is_tag_invocable_v<hpx::parallel::execution::post_t,
+                            TwoWayExecutor&&, F&&, Ts&&...>>>
             HPX_DEPRECATED_V(1, 9,
                 "Exposing post() from an executor is deprecated, please "
                 "expose this functionality through a corresponding overload of "
@@ -619,10 +613,9 @@ namespace hpx::parallel::execution {
 
         template <typename NonBlockingOneWayExecutor, typename F,
             typename... Ts,
-            typename Enable =
-                std::enable_if_t<!hpx::functional::is_tag_invocable_v<
-                    hpx::parallel::execution::post_t,
-                    NonBlockingOneWayExecutor&&, F&&, Ts&&...>>>
+            typename Enable = std::enable_if_t<!hpx::functional::
+                    is_tag_invocable_v<hpx::parallel::execution::post_t,
+                        NonBlockingOneWayExecutor&&, F&&, Ts&&...>>>
         HPX_DEPRECATED_V(1, 9,
             "Exposing post() from an executor is deprecated, please "
             "expose this functionality through a corresponding overload of "
@@ -1353,7 +1346,7 @@ namespace hpx::parallel::execution {
                         HPX_FORWARD(BulkExecutor, exec),
                         [func = HPX_MOVE(func)](
                             future_type&& predecessor) mutable
-                        -> vector_result_type {
+                            -> vector_result_type {
                             // use unwrap directly (instead of lazily) to avoid
                             // having to pull in dataflow
                             return hpx::unwrap(func(HPX_MOVE(predecessor)));

@@ -15,7 +15,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <exception>

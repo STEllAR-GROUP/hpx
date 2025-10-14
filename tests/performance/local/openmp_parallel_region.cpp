@@ -11,7 +11,7 @@
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <omp.h>
 

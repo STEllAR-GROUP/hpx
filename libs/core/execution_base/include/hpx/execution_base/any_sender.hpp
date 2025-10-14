@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,11 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/errors/error.hpp>
-#include <hpx/errors/throw_exception.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <cstring>
@@ -78,7 +77,7 @@ namespace hpx::detail {
         //   don't fit in the embedded storage.
         union storage
         {
-            std::aligned_storage_t<embedded_storage_size, alignment_size>
+            hpx::aligned_storage_t<embedded_storage_size, alignment_size>
                 embedded_storage;
             base_type* heap_storage = nullptr;
 

@@ -167,9 +167,9 @@ struct bitset_test
     template <typename Ch, typename Tr, typename Al>
     static void from_string(std::basic_string<Ch, Tr, Al> const& str,
         std::size_t pos, std::size_t max_char,
-        std::size_t num_bits = (std::size_t)(-1))
+        std::size_t num_bits = (std::size_t) (-1))
     {
-        std::size_t rlen = (std::min)(max_char, str.size() - pos);
+        std::size_t rlen = (std::min) (max_char, str.size() - pos);
 
         // The resulting size N of the bitset is num_bits, if
         // that is different from the default arg, rlen otherwise.
@@ -178,13 +178,13 @@ struct bitset_test
         // Subsequent decreasing character positions correspond to
         // increasing bit positions.
 
-        bool const size_upon_string = num_bits == (std::size_t)(-1);
+        bool const size_upon_string = num_bits == (std::size_t) (-1);
         Bitset b = size_upon_string ? Bitset(str, pos, max_char) :
                                       Bitset(str, pos, max_char, num_bits);
 
         std::size_t const actual_size = size_upon_string ? rlen : num_bits;
         HPX_TEST(b.size() == actual_size);
-        std::size_t m = (std::min)(num_bits, rlen);
+        std::size_t m = (std::min) (num_bits, rlen);
         std::size_t j;
         for (j = 0; j < m; ++j)
             HPX_TEST(bool(bool(b[j])) == (str[pos + m - 1 - j] == '1'));
@@ -428,7 +428,7 @@ struct bitset_test
         Bitset b(lhs), c(lhs);
         b.append(blocks.begin(), blocks.end());
         for (typename std::vector<Block>::const_iterator i = blocks.begin();
-             i != blocks.end(); ++i)
+            i != blocks.end(); ++i)
             c.append(*i);
         HPX_TEST(b == c);
     }
@@ -1082,7 +1082,7 @@ struct bitset_test
         {
             // Compare from most significant to least.
 
-            size_type leqsize((std::min)(asize, bsize));
+            size_type leqsize((std::min) (asize, bsize));
             size_type i;
             for (i = 0; i < leqsize; ++i, --asize, --bsize)
             {

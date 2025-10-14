@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2018-2024 Hartmut Kaiser
+//  Copyright (c) 2018-2025 Hartmut Kaiser
 //  Copyright (c) 2018-2019 Adrian Serio
 //  Copyright (c) 2019 Nikunj Gupta
 //
@@ -14,12 +14,12 @@
 #include <hpx/resiliency/async_replicate.hpp>
 #include <hpx/resiliency/resiliency_cpos.hpp>
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/modules/async_local.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -92,17 +92,19 @@ namespace hpx::resiliency::experimental {
                         }
                         else
                         {
-                            for (auto&& f : HPX_MOVE(results))
+                            for (auto&& fut :
+                                HPX_FORWARD(decltype(results), results))
                             {
-                                if (f.has_exception())
+                                if (fut.has_exception())
                                 {
                                     // rethrow abort_replicate_exception, if
                                     // caught
-                                    ex = detail::rethrow_on_abort_replicate(f);
+                                    ex =
+                                        detail::rethrow_on_abort_replicate(fut);
                                 }
                                 else
                                 {
-                                    auto&& result = f.get();
+                                    auto&& result = fut.get();
                                     if (HPX_INVOKE(pred, result))
                                     {
                                         valid_results.emplace_back(
@@ -184,7 +186,8 @@ namespace hpx::resiliency::experimental {
                         }
                         else
                         {
-                            for (auto&& f : HPX_MOVE(results))
+                            for (auto&& f :
+                                HPX_FORWARD(decltype(results), results))
                             {
                                 if (f.has_exception())
                                 {

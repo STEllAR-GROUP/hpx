@@ -43,9 +43,11 @@ add_hpx_module(
     hpx_format
     hpx_lock_registration
     hpx_logging
+    hpx_preprocessor
     hpx_schedulers
     hpx_testing
     hpx_threading_base
     hpx_timing
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

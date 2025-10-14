@@ -1,5 +1,5 @@
 //  Copyright (c) 2015-2017 Francisco Jose Tapia
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -164,7 +164,10 @@ namespace hpx::parallel::detail {
         std::size_t nelem = static_cast<std::size_t>(last - first);
 
         // Adjust when there are many threads and only a few elements
-        while (nelem > chunk_size && nthreads * nthreads > nelem >> 3)
+        while (nelem > chunk_size &&
+            static_cast<std::size_t>(nthreads) *
+                    static_cast<std::size_t>(nthreads) >
+                nelem >> 3)
         {
             nthreads /= 2;
         }
@@ -264,7 +267,7 @@ namespace hpx::parallel::detail {
         value_type* buf_first = global_buf.begin();
 
         for (std::uint32_t i = 0; i < nthreads - 1;
-             ++i, it_first += chunk_size, buf_first += chunk_size)
+            ++i, it_first += chunk_size, buf_first += chunk_size)
         {
             vmem_thread.emplace_back(it_first, it_first + chunk_size);
             vbuf_thread.emplace_back(buf_first, buf_first + chunk_size);
@@ -294,7 +297,7 @@ namespace hpx::parallel::detail {
         {
             std::size_t const distance = vmem_thread[i].size() / nintervals;
             for (std::size_t j = 1, pos = distance; j < nintervals;
-                 ++j, pos += distance)
+                ++j, pos += distance)
             {
                 vsample.push_back(vmem_thread[i].begin() + pos);
             }
@@ -308,7 +311,7 @@ namespace hpx::parallel::detail {
         vmilestone.reserve(nintervals);
 
         for (std::uint32_t pos = nthreads >> 1; pos < vsample.size();
-             pos += nthreads)
+            pos += nthreads)
         {
             vmilestone.push_back(vsample[pos]);
         }

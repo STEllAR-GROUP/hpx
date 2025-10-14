@@ -16,19 +16,23 @@
 #if !defined(HPX_WINDOWS)
 namespace hpx { namespace components { namespace process { namespace posix {
 
-struct pipe
-{
-    int source;
-    int sink;
+    struct pipe
+    {
+        int source;
+        int sink;
 
-    pipe(int source, int sink) : source(source), sink(sink) {}
-};
+        pipe(int source, int sink)
+          : source(source)
+          , sink(sink)
+        {
+        }
+    };
 
-inline pipe make_pipe(int source, int sink)
-{
-    return pipe(source, sink);
-}
+    inline pipe make_pipe(int source, int sink)
+    {
+        return pipe(source, sink);
+    }
 
-}}}}
+}}}}    // namespace hpx::components::process::posix
 
 #endif

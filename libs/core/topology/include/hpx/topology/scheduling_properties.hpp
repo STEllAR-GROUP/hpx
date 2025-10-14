@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/scheduling_properties.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <type_traits>

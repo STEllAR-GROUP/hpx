@@ -381,10 +381,14 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/pointer_category.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
+#include <hpx/execution/algorithms/just.hpp>
+#include <hpx/execution_base/any_sender.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/unseq/loop.hpp>
@@ -395,8 +399,6 @@ namespace hpx {
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/type_support/is_contiguous_iterator.hpp>
-#include <hpx/type_support/uninitialized_relocation_primitives.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -415,24 +417,27 @@ namespace hpx::parallel {
 
         ///////////////////////////////////////////////////////////////////////
 
-        // clang-format off
         template <typename ExPolicy, typename InIter, typename FwdIter,
-        typename Size, HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_input_iterator_v<InIter> &&
+            typename Size>
+        // clang-format off
+            requires(hpx::traits::is_input_iterator_v<InIter> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
-                std::is_integral_v<Size>
-            )>
+                std::is_integral_v<Size>)
         // clang-format on
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<InIter, FwdIter>>::type
-        parallel_uninitialized_relocate_n(
+        decltype(auto) parallel_uninitialized_relocate_n(
             ExPolicy&& policy, InIter first, Size count, FwdIter dest)
         {
-            if (count == 0)
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+            if constexpr (!has_scheduler_executor)
             {
-                return util::detail::algorithm_result<ExPolicy,
-                    util::in_out_result<InIter, FwdIter>>::
-                    get(util::in_out_result<InIter, FwdIter>{first, dest});
+                if (count == 0)
+                {
+                    return util::detail::algorithm_result<ExPolicy,
+                        util::in_out_result<InIter, FwdIter>>::
+                        get(util::in_out_result<InIter, FwdIter>{first, dest});
+                }
             }
 
             using zip_iter = ::hpx::util::zip_iterator<InIter, FwdIter>;
@@ -443,7 +448,7 @@ namespace hpx::parallel {
                 call(
                     HPX_FORWARD(ExPolicy, policy), zip_iter(first, dest), count,
                     [](zip_iter t, std::size_t part_size) mutable
-                    -> partition_result_type {
+                        -> partition_result_type {
                         using hpx::get;
 
                         auto iters = t.get_iterator_tuple();
@@ -461,7 +466,7 @@ namespace hpx::parallel {
                     },
                     // finalize, called once if no error occurred
                     [first, dest, count](auto&& data) mutable
-                    -> util::in_out_result<InIter, FwdIter> {
+                        -> util::in_out_result<InIter, FwdIter> {
                         // make sure iterators embedded in function object that is
                         // attached to futures are invalidated
                         util::detail::clear_container(data);
@@ -493,13 +498,14 @@ namespace hpx::parallel {
             }
 
             // non vectorized overload
+
+            template <typename ExPolicy, typename InIter, typename FwdIter>
             // clang-format off
-            template <typename ExPolicy, typename InIter, typename FwdIter,
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     hpx::is_sequenced_execution_policy_v<ExPolicy> &&
                     hpx::traits::is_input_iterator_v<InIter> &&
                     hpx::traits::is_forward_iterator_v<FwdIter>
-                )>
+                )
             // clang-format on
             static util::in_out_result<InIter, FwdIter> sequential(ExPolicy&&,
                 InIter first, std::size_t count, FwdIter dest) noexcept(hpx::
@@ -514,19 +520,17 @@ namespace hpx::parallel {
                     first_advanced, dest_advanced};
             }
 
+            template <typename ExPolicy, typename InIter, typename FwdIter>
             // clang-format off
-            template <typename ExPolicy, typename InIter, typename FwdIter,
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     hpx::is_execution_policy_v<ExPolicy> &&
                     hpx::traits::is_input_iterator_v<InIter> &&
                     hpx::traits::is_forward_iterator_v<FwdIter>
-                )>
+                )
             // clang-format on
-            static util::detail::algorithm_result_t<ExPolicy,
-                util::in_out_result<InIter, FwdIter>>
-            parallel(ExPolicy&& policy, InIter first, std::size_t count,
-                FwdIter dest) noexcept(hpx::experimental::util::detail::
-                    relocation_traits<InIter,
+            static decltype(auto) parallel(ExPolicy&& policy, InIter first,
+                std::size_t count, FwdIter dest) noexcept(hpx::experimental::
+                    util::detail::relocation_traits<InIter,
                         FwdIter>::is_noexcept_relocatable_v)
             {
                 return parallel_uninitialized_relocate_n(
@@ -550,15 +554,15 @@ namespace hpx::parallel {
 
             // non vectorized overload
             template <typename ExPolicy, typename InIter1, typename InIter2,
-                typename FwdIter,
-                // clang-format off
-                HPX_CONCEPT_REQUIRES_(
+                typename FwdIter>
+            // clang-format off
+                requires (
                     hpx::is_sequenced_execution_policy_v<ExPolicy>&&
                     hpx::traits::is_input_iterator_v<InIter1>&&
                     hpx::traits::is_input_iterator_v<InIter2>&&
                     hpx::traits::is_forward_iterator_v<FwdIter>
-                )>
-            //  clang-format on
+                )
+                //  clang-format on
             static util::in_out_result<InIter1, FwdIter> sequential(
                 ExPolicy&&, InIter1 first, InIter2 last,
                 FwdIter dest) noexcept(hpx::experimental::util::detail::relocation_traits<
@@ -573,20 +577,18 @@ namespace hpx::parallel {
             }
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
-                typename FwdIter,
+                typename FwdIter>
             // clang-format off
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     hpx::is_execution_policy_v<ExPolicy>&&
                     hpx::traits::is_input_iterator_v<InIter1>&&
                     hpx::traits::is_input_iterator_v<InIter2>&&
                     hpx::traits::is_forward_iterator_v<FwdIter>
-                )>
+                )
             // clang-format on
-            static util::detail::algorithm_result_t<ExPolicy,
-                util::in_out_result<InIter1, FwdIter>>
-            parallel(ExPolicy&& policy, InIter1 first, InIter2 last,
-                FwdIter dest) noexcept(hpx::experimental::util::detail::
-                    relocation_traits<InIter1,
+            static decltype(auto) parallel(ExPolicy&& policy, InIter1 first,
+                InIter2 last, FwdIter dest) noexcept(hpx::experimental::util::
+                    detail::relocation_traits<InIter1,
                         FwdIter>::is_noexcept_relocatable_v)
             {
                 auto count = std::distance(first, last);
@@ -612,13 +614,13 @@ namespace hpx::parallel {
             }
 
             // non vectorized overload
-            template <typename ExPolicy, typename BiIter1, typename BiIter2,
-                // clang-format off
-                HPX_CONCEPT_REQUIRES_(
+            template <typename ExPolicy, typename BiIter1, typename BiIter2>
+            // clang-format off
+                requires (
                     hpx::is_sequenced_execution_policy_v<ExPolicy> &&
                     hpx::traits::is_bidirectional_iterator_v<BiIter1> &&
                     hpx::traits::is_bidirectional_iterator_v<BiIter2>
-                )>
+                )
             //  clang-format on
             static util::in_out_result<BiIter1, BiIter2> sequential(
                 ExPolicy&&, BiIter1 first, BiIter1 last,
@@ -633,19 +635,17 @@ namespace hpx::parallel {
                             dest_last_advanced};
             }
 
-            template <typename ExPolicy, typename BiIter1, typename BiIter2,
+            template <typename ExPolicy, typename BiIter1, typename BiIter2>
             // clang-format off
-                HPX_CONCEPT_REQUIRES_(
+                requires (
                     hpx::is_execution_policy_v<ExPolicy>&&
                     hpx::traits::is_bidirectional_iterator_v<BiIter1>&&
                     hpx::traits::is_bidirectional_iterator_v<BiIter2>
-                )>
+                )
             // clang-format on
-            static util::detail::algorithm_result_t<ExPolicy,
-                util::in_out_result<BiIter1, BiIter2>>
-            parallel(ExPolicy&& policy, BiIter1 first, BiIter1 last,
-                BiIter2 dest_last) noexcept(hpx::experimental::util::detail::
-                    relocation_traits<BiIter1,
+            static decltype(auto) parallel(ExPolicy&& policy, BiIter1 first,
+                BiIter1 last, BiIter2 dest_last) noexcept(hpx::experimental::
+                    util::detail::relocation_traits<BiIter1,
                         BiIter2>::is_noexcept_relocatable_v)
             {
                 auto count = std::distance(first, last);
@@ -668,14 +668,13 @@ namespace hpx::experimental {
     inline constexpr struct uninitialized_relocate_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_n_t>
     {
+        template <typename InIter, typename Size, typename FwdIter>
         // clang-format off
-        template <typename InIter, typename Size,
-            typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(uninitialized_relocate_n_t,
             InIter first, Size count,
@@ -706,20 +705,18 @@ namespace hpx::experimental {
                         static_cast<std::size_t>(count), dest));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename InIter, typename Size,
-            typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+            typename FwdIter>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
-            )>
+            )
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
-        tag_fallback_invoke(uninitialized_relocate_n_t, ExPolicy&& policy,
-            InIter first, Size count,
+        friend decltype(auto) tag_fallback_invoke(uninitialized_relocate_n_t,
+            ExPolicy&& policy, InIter first, Size count,
             FwdIter dest) noexcept(util::detail::relocation_traits<InIter,
             FwdIter>::is_noexcept_relocatable_v)
         {
@@ -734,11 +731,21 @@ namespace hpx::experimental {
                 "Relocating from this source type to this destination type is "
                 "ill-formed");
 
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::detail::is_negative(count))
             {
-                return parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(HPX_MOVE(dest));
+                if constexpr (has_scheduler_executor)
+                {
+                    count = static_cast<std::size_t>(0);
+                }
+                else
+                {
+                    return parallel::util::detail::algorithm_result<ExPolicy,
+                        FwdIter>::get(HPX_MOVE(dest));
+                }
             }
 
             // If running in non-sequenced execution policy, we must check
@@ -755,12 +762,26 @@ namespace hpx::experimental {
                     if (!((first < dest_last) && (dest_last < last)))
                     {
                         // use parallel version
-                        return parallel::util::get_second_element(
-                            hpx::parallel::detail::uninitialized_relocate_n<
-                                parallel::util::in_out_result<InIter,
-                                    FwdIter>>()
-                                .call(HPX_FORWARD(ExPolicy, policy), first,
-                                    count, dest));
+                        if constexpr (has_scheduler_executor)
+                        {
+                            namespace ex = hpx::execution::experimental;
+                            return ex::unique_any_sender<
+                                FwdIter>(parallel::util::get_second_element(
+                                hpx::parallel::detail::uninitialized_relocate_n<
+                                    parallel::util::in_out_result<InIter,
+                                        FwdIter>>()
+                                    .call(HPX_FORWARD(ExPolicy, policy), first,
+                                        count, dest)));
+                        }
+                        else
+                        {
+                            return parallel::util::get_second_element(
+                                hpx::parallel::detail::uninitialized_relocate_n<
+                                    parallel::util::in_out_result<InIter,
+                                        FwdIter>>()
+                                    .call(HPX_FORWARD(ExPolicy, policy), first,
+                                        count, dest));
+                        }
                     }
                     // if it is we continue to use the sequential version
                 }
@@ -768,11 +789,24 @@ namespace hpx::experimental {
                 // to use the sequential version
             }
 
-            return parallel::util::get_second_element(
-                hpx::parallel::detail::uninitialized_relocate_n<
-                    parallel::util::in_out_result<InIter, FwdIter>>()
-                    .call(hpx::execution::seq, first,
-                        static_cast<std::size_t>(count), dest));
+            if constexpr (has_scheduler_executor)
+            {
+                namespace ex = hpx::execution::experimental;
+                return ex::unique_any_sender<FwdIter>(
+                    ex::just(parallel::util::get_second_element(
+                        hpx::parallel::detail::uninitialized_relocate_n<
+                            parallel::util::in_out_result<InIter, FwdIter>>()
+                            .call(hpx::execution::seq, first,
+                                static_cast<std::size_t>(count), dest))));
+            }
+            else
+            {
+                return parallel::util::get_second_element(
+                    hpx::parallel::detail::uninitialized_relocate_n<
+                        parallel::util::in_out_result<InIter, FwdIter>>()
+                        .call(hpx::execution::seq, first,
+                            static_cast<std::size_t>(count), dest));
+            }
         }
     } uninitialized_relocate_n{};
 
@@ -781,13 +815,13 @@ namespace hpx::experimental {
     inline constexpr struct uninitialized_relocate_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_t>
     {
+        template <typename InIter1, typename InIter2, typename FwdIter>
         // clang-format off
-        template <typename InIter1, typename InIter2, typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter1> &&
                 hpx::traits::is_iterator_v<InIter2> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(uninitialized_relocate_t,
             InIter1 first, InIter2 last,
@@ -817,19 +851,18 @@ namespace hpx::experimental {
                     .call(hpx::execution::seq, first, last, dest));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename InIter1, typename InIter2,
-            typename FwdIter, HPX_CONCEPT_REQUIRES_(
+            typename FwdIter>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<InIter1> &&
                 hpx::traits::is_iterator_v<InIter2> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
-        tag_fallback_invoke(uninitialized_relocate_t, ExPolicy&& policy,
-            InIter1 first, InIter2 last,
+        friend decltype(auto) tag_fallback_invoke(uninitialized_relocate_t,
+            ExPolicy&& policy, InIter1 first, InIter2 last,
             FwdIter dest) noexcept(util::detail::relocation_traits<InIter1,
             FwdIter>::is_noexcept_relocatable_v)
         {
@@ -846,12 +879,21 @@ namespace hpx::experimental {
                 "ill-formed");
 
             auto count = std::distance(first, last);
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::detail::is_negative(count))
             {
-                return parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(HPX_MOVE(dest));
+                if constexpr (has_scheduler_executor)
+                {
+                    count = static_cast<std::size_t>(0);
+                }
+                else
+                {
+                    return parallel::util::detail::algorithm_result<ExPolicy,
+                        FwdIter>::get(HPX_MOVE(dest));
+                }
             }
 
             // If running in non-sequenced execution policy, we must check
@@ -867,12 +909,26 @@ namespace hpx::experimental {
                     if (!((first < dest_last) && (dest_last < last)))
                     {
                         // use parallel version
-                        return parallel::util::get_second_element(
-                            hpx::parallel::detail::uninitialized_relocate_n<
-                                parallel::util::in_out_result<InIter1,
-                                    FwdIter>>()
-                                .call(HPX_FORWARD(ExPolicy, policy), first,
-                                    count, dest));
+                        if constexpr (has_scheduler_executor)
+                        {
+                            namespace ex = hpx::execution::experimental;
+                            return ex::unique_any_sender<
+                                FwdIter>(parallel::util::get_second_element(
+                                hpx::parallel::detail::uninitialized_relocate_n<
+                                    parallel::util::in_out_result<InIter1,
+                                        FwdIter>>()
+                                    .call(HPX_FORWARD(ExPolicy, policy), first,
+                                        count, dest)));
+                        }
+                        else
+                        {
+                            return parallel::util::get_second_element(
+                                hpx::parallel::detail::uninitialized_relocate_n<
+                                    parallel::util::in_out_result<InIter1,
+                                        FwdIter>>()
+                                    .call(HPX_FORWARD(ExPolicy, policy), first,
+                                        count, dest));
+                        }
                     }
                     // if it is we continue to use the sequential version
                 }
@@ -881,10 +937,22 @@ namespace hpx::experimental {
             }
 
             // sequential execution policy
-            return parallel::util::get_second_element(
-                hpx::parallel::detail::uninitialized_relocate_n<
-                    parallel::util::in_out_result<InIter1, FwdIter>>()
-                    .call(hpx::execution::seq, first, count, dest));
+            if constexpr (has_scheduler_executor)
+            {
+                namespace ex = hpx::execution::experimental;
+                return ex::unique_any_sender<FwdIter>(
+                    ex::just(parallel::util::get_second_element(
+                        hpx::parallel::detail::uninitialized_relocate_n<
+                            parallel::util::in_out_result<InIter1, FwdIter>>()
+                            .call(hpx::execution::seq, first, count, dest))));
+            }
+            else
+            {
+                return parallel::util::get_second_element(
+                    hpx::parallel::detail::uninitialized_relocate_n<
+                        parallel::util::in_out_result<InIter1, FwdIter>>()
+                        .call(hpx::execution::seq, first, count, dest));
+            }
         }
     } uninitialized_relocate{};
 
@@ -893,12 +961,12 @@ namespace hpx::experimental {
     inline constexpr struct uninitialized_relocate_backward_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_backward_t>
     {
+        template <typename BiIter1, typename BiIter2>
         // clang-format off
-        template <typename BiIter1, typename BiIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<BiIter1> &&
                 hpx::traits::is_iterator_v<BiIter2>
-            )>
+            )
         // clang-format on
         friend BiIter2 tag_fallback_invoke(uninitialized_relocate_backward_t,
             BiIter1 first, BiIter1 last,
@@ -927,18 +995,17 @@ namespace hpx::experimental {
                     .call(hpx::execution::seq, first, last, dest_last));
         }
 
+        template <typename ExPolicy, typename BiIter1, typename BiIter2>
         // clang-format off
-        template <typename ExPolicy, typename BiIter1, typename BiIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<BiIter1> &&
                 hpx::traits::is_iterator_v<BiIter2>
-            )>
+            )
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            BiIter2>::type
-        tag_fallback_invoke(uninitialized_relocate_backward_t,
-            ExPolicy&& policy, BiIter1 first, BiIter1 last,
+        friend decltype(auto) tag_fallback_invoke(
+            uninitialized_relocate_backward_t, ExPolicy&& policy, BiIter1 first,
+            BiIter1 last,
             BiIter2 dest_last) noexcept(util::detail::relocation_traits<BiIter1,
             BiIter2>::is_noexcept_relocatable_v)
         {
@@ -954,12 +1021,21 @@ namespace hpx::experimental {
                 "ill-formed");
 
             auto count = std::distance(first, last);
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::detail::is_negative(count))
             {
-                return parallel::util::detail::algorithm_result<ExPolicy,
-                    BiIter2>::get(HPX_MOVE(dest_last));
+                if constexpr (has_scheduler_executor)
+                {
+                    count = static_cast<std::size_t>(0);
+                }
+                else
+                {
+                    return parallel::util::detail::algorithm_result<ExPolicy,
+                        BiIter2>::get(HPX_MOVE(dest_last));
+                }
             }
 
             // If running in non-sequence execution policy, we must check
@@ -975,12 +1051,28 @@ namespace hpx::experimental {
                     if (!((first < dest_first) && (dest_first < last)))
                     {
                         // use parallel version
-                        return parallel::util::get_second_element(
-                            hpx::parallel::detail::
-                                uninitialized_relocate_backward<parallel::util::
-                                        in_out_result<BiIter1, BiIter2>>()
-                                    .call(HPX_FORWARD(ExPolicy, policy), first,
-                                        last, dest_last));
+                        if constexpr (has_scheduler_executor)
+                        {
+                            namespace ex = hpx::execution::experimental;
+                            return ex::unique_any_sender<BiIter2>(
+                                parallel::util::get_second_element(
+                                    hpx::parallel::detail::
+                                        uninitialized_relocate_backward<
+                                            parallel::util::in_out_result<
+                                                BiIter1, BiIter2>>()
+                                            .call(HPX_FORWARD(ExPolicy, policy),
+                                                first, last, dest_last)));
+                        }
+                        else
+                        {
+                            return parallel::util::get_second_element(
+                                hpx::parallel::detail::
+                                    uninitialized_relocate_backward<
+                                        parallel::util::in_out_result<BiIter1,
+                                            BiIter2>>()
+                                        .call(HPX_FORWARD(ExPolicy, policy),
+                                            first, last, dest_last));
+                        }
                     }
                     // if it is we continue to use the sequential version
                 }
@@ -989,10 +1081,23 @@ namespace hpx::experimental {
             }
 
             // sequential execution policy
-            return parallel::util::get_second_element(
-                hpx::parallel::detail::uninitialized_relocate_backward<
-                    parallel::util::in_out_result<BiIter1, BiIter2>>()
-                    .call(hpx::execution::seq, first, last, dest_last));
+            if constexpr (has_scheduler_executor)
+            {
+                namespace ex = hpx::execution::experimental;
+                return ex::unique_any_sender<BiIter2>(
+                    ex::just(parallel::util::get_second_element(
+                        hpx::parallel::detail::uninitialized_relocate_backward<
+                            parallel::util::in_out_result<BiIter1, BiIter2>>()
+                            .call(
+                                hpx::execution::seq, first, last, dest_last))));
+            }
+            else
+            {
+                return parallel::util::get_second_element(
+                    hpx::parallel::detail::uninitialized_relocate_backward<
+                        parallel::util::in_out_result<BiIter1, BiIter2>>()
+                        .call(hpx::execution::seq, first, last, dest_last));
+            }
         }
     } uninitialized_relocate_backward{};
 }    // namespace hpx::experimental

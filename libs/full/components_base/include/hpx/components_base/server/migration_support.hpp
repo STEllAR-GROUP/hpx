@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,10 +15,10 @@
 #include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
 
 #include <cstdint>
 #include <mutex>

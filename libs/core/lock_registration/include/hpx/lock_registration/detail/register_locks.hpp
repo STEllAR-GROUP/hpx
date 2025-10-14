@@ -8,9 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <map>

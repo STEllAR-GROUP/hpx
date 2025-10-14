@@ -10,7 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/equality.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 
@@ -371,7 +371,7 @@ namespace hpx::parallel::detail {
         constexpr T operator()(T const& t1, T const& t2) const
             noexcept(noexcept(std::declval<T>() > std::declval<T>()))
         {
-            return (std::max)(t1, t2);
+            return (std::max) (t1, t2);
         }
     };
 

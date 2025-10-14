@@ -7,12 +7,13 @@
 module purge
 module load cmake
 module load gcc/15
-module load boost/1.87.0-${build_type,,}
+module load boost/1.88.0-${build_type,,}
 module load hwloc
 module load openmpi
+module load ninja       # this loads ninja v1.13.1 needed for modules
 
 export HPXRUN_RUNWRAPPER=srun
-export CXX_STD="20"
+export CXX_STD="23"
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
 
 configure_extra_options+=" -DHPX_WITH_CXX_STANDARD=${CXX_STD}"
@@ -28,6 +29,9 @@ configure_extra_options+=" -DCMAKE_C_FLAGS=-fPIC"
 configure_extra_options+=" -DHPX_WITH_DATAPAR_BACKEND=EVE"
 configure_extra_options+=" -DHPX_WITH_FETCH_EVE=ON"
 configure_extra_options+=" -DHPX_WITH_EVE_TAG=main"
+
+# gcc-15 still has issues with C++ modules
+# configure_extra_options+=" -DHPX_WITH_CXX_MODULES=ON"
 
 # The pwrapi library still needs to be set up properly on rostam
 # configure_extra_options+=" -DHPX_WITH_POWER_COUNTER=ON"

@@ -33,7 +33,7 @@ void bulk_test_function(hpx::lcos::spmd_block block, std::size_t arg)
     HPX_TEST_EQ(arg, test_value * 10);
 
     for (std::size_t i = 0, test_count = images_per_locality; i < iterations;
-         i++, test_count += images_per_locality)
+        i++, test_count += images_per_locality)
     {
         ++c[0];
         block.sync_all();

@@ -64,6 +64,7 @@ add_hpx_module(
   DEPENDENCIES ${execution_base_optional_dependencies}
   MODULE_DEPENDENCIES
     hpx_assertion
+    hpx_concepts
     hpx_config
     hpx_coroutines
     hpx_errors
@@ -71,6 +72,8 @@ add_hpx_module(
     hpx_functional
     hpx_iterator_support
     hpx_lock_registration
+    hpx_preprocessor
+    hpx_tag_invoke
     hpx_timing
     hpx_type_support
   CMAKE_SUBDIRS examples tests

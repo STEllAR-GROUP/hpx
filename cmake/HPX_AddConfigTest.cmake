@@ -4,7 +4,7 @@
 # Copyright (c) 2017 Google
 # Copyright (c) 2017 Taeguk Kwon
 # Copyright (c) 2020 Giannis Gonidelis
-# Copyright (c) 2021-2024 Hartmut Kaiser
+# Copyright (c) 2021-2025 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -665,6 +665,15 @@ function(hpx_check_for_cxx23_std_generator)
   add_hpx_config_test(
     HPX_WITH_CXX23_STD_GENERATOR
     SOURCE cmake/tests/cxx23_std_generator.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx23_deprecated_std_aligned_storage)
+  add_hpx_config_test(
+    HPX_WITH_CXX23_DEPRECATED_STD_ALIGNED_STORAGE
+    SOURCE cmake/tests/cxx23_deprecated_std_aligned_storage.cpp
     FILE ${ARGN}
   )
 endfunction()

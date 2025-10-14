@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,9 +6,12 @@
 
 #include <hpx/config.hpp>
 
-// clang up to V12 refuses to compile the code below
+// clang up to V12 (Apple clang up to v15) and gcc above V13 refuse to compile
+// the code below
 #if defined(HPX_HAVE_CXX20_COROUTINES) &&                                      \
-    (!defined(HPX_CLANG_VERSION) || HPX_CLANG_VERSION >= 130000)
+    (!defined(HPX_CLANG_VERSION) || HPX_CLANG_VERSION >= 130000) &&            \
+    (!defined(HPX_GCC_VERSION) || HPX_GCC_VERSION < 140000) &&                 \
+    (!defined(HPX_APPLE_CLANG_VERSION) || HPX_APPLE_CLANG_VERSION >= 160000)
 
 #include <hpx/algorithm.hpp>
 #include <hpx/generator.hpp>
@@ -48,13 +51,12 @@ namespace test {
         }
     };
 
-    hpx::generator<int&, int> iterate(index_pair p) noexcept
+    hpx::generator<int&, int> iterate(index_pair const p) noexcept
     {
         auto const lo = p.first;
         auto const hi = p.last;
-        auto const stride = p.stride;
 
-        if (stride > 0)
+        if (auto const stride = p.stride; stride > 0)
         {
             for (auto i = lo; i < hi; i += stride)
                 co_yield i;
@@ -82,7 +84,7 @@ namespace test {
     }
 
     index_pair subrange(
-        index_pair const& p, std::ptrdiff_t first, std::size_t size)
+        index_pair const& p, std::ptrdiff_t const first, std::size_t const size)
     {
         return {static_cast<int>(p.first + first),
             static_cast<int>(p.first + first + size), p.stride};
@@ -103,14 +105,15 @@ void test_for_loop(ExPolicy&& policy)
 
     hpx::ranges::experimental::for_loop(std::forward<ExPolicy>(policy),
         test::index_pair{0, static_cast<int>(c.size())},
-        [&](int i) { c[i] = 42; });
+        [&](int const i) { c[i] = 42; });
 
     // verify values
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, static_cast<std::size_t>(42));
-        ++count;
-    });
+    std::for_each(
+        std::begin(c), std::end(c), [&count](std::size_t const v) -> void {
+            HPX_TEST_EQ(v, static_cast<std::size_t>(42));
+            ++count;
+        });
     HPX_TEST_EQ(count, c.size());
 }
 
@@ -122,15 +125,16 @@ void test_for_loop_async(ExPolicy&& p)
 
     auto f = hpx::ranges::experimental::for_loop(std::forward<ExPolicy>(p),
         test::index_pair{0, static_cast<int>(c.size())},
-        [&](int i) { c[i] = 42; });
+        [&](int const i) { c[i] = 42; });
     f.wait();
 
     // verify values
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, static_cast<std::size_t>(42));
-        ++count;
-    });
+    std::for_each(
+        std::begin(c), std::end(c), [&count](std::size_t const v) -> void {
+            HPX_TEST_EQ(v, static_cast<std::size_t>(42));
+            ++count;
+        });
     HPX_TEST_EQ(count, c.size());
 }
 
@@ -168,7 +172,7 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()("seed,s", value<unsigned int>(),
         "the random number generator seed to use for this run");
 
-    // By default this test should run on all available cores
+    // By default, this test should run on all available cores
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX

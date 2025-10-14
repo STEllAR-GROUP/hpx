@@ -16,9 +16,9 @@
 #include <hpx/resiliency/resiliency_cpos.hpp>
 #include <hpx/resiliency/util.hpp>
 
-#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/async_local.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -55,7 +55,7 @@ namespace hpx::resiliency::experimental {
                 hpx::launch::sync,
                 [pred = HPX_FORWARD(Pred, pred), vote = HPX_FORWARD(Vote, vote),
                     n](std::vector<hpx::future<result_type>>&& results) mutable
-                -> result_type {
+                    -> result_type {
                     // Store all valid results
                     std::vector<result_type> valid_results;
                     valid_results.reserve(n);

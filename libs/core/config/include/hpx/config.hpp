@@ -21,6 +21,7 @@
 #include <hpx/config/debug.hpp>
 #include <hpx/config/deprecation.hpp>
 #include <hpx/config/emulate_deleted.hpp>
+#include <hpx/config/endian.hpp>
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/forward.hpp>
@@ -39,8 +40,7 @@
 #error HPX cannot be compiled with a Boost version earlier than 1.71.0
 #endif
 
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <cstddef>
 

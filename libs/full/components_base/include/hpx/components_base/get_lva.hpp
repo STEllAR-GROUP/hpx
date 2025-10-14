@@ -19,7 +19,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a get_lva template is a helper structure allowing to convert a
     /// local virtual address as stored in a local address (returned from
-    /// the function \a resolver_client#resolve) to the address of the
+    /// the function \a agas::addressing_service#resolve) to the address of the
     /// component implementing the action.
     ///
     /// The default implementation uses the template argument \a Component

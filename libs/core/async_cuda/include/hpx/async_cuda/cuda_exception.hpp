@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors/exception.hpp>
+#include <hpx/modules/errors.hpp>
 
 // CUDA runtime
 #include <hpx/async_cuda/custom_gpu_api.hpp>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2016      Thomas Heller
 //  Copyright (c) 2011      Bryce Adelstein-Lelbach
 //
@@ -17,9 +17,8 @@
 #include <hpx/components_base/traits/component_type_database.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/type_support/unused.hpp>
-
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <exception>
 #include <utility>
 
@@ -191,8 +190,9 @@ namespace hpx {
                     to_int(hpx::components::component_enum_type::invalid))
                 {
                     value = components::derived_component_type(
-                        ++detail::unique_type,
-                        to_int(hpx::components::component_enum_type::
+                        static_cast<components::component_type>(
+                            ++detail::unique_type),
+                        to_int(components::component_enum_type::
                                 base_lco_with_value));
                 }
                 return value;

@@ -1,4 +1,4 @@
-//  Copyright (c) 2018-2023 Hartmut Kaiser
+//  Copyright (c) 2018-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/resiliency/config.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/modules/async_local.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <utility>
 
@@ -19,6 +19,7 @@ namespace hpx::resiliency::experimental {
     namespace detail {
 
         template <typename Tag, typename BaseTag>
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         struct tag_deferred : hpx::functional::tag<Tag>
         {
             // force unwrapping of the inner future on return

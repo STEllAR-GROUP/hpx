@@ -353,6 +353,7 @@ void test_for_each_sender(Policy l, ExPolicy&& p, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
     auto result = hpx::get<0>(
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         *tt::sync_wait(ex::just(rng, f) | hpx::ranges::for_each(p.on(exec))));
     HPX_TEST(result == iterator(std::end(c)));
 

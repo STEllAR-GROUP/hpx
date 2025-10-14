@@ -9,8 +9,8 @@
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/errors/throw_exception.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
@@ -25,7 +25,7 @@
 #include <hpx/threading_base/detail/reset_lco_description.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-#include <hpx/debugging/backtrace.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/threading_base/detail/reset_backtrace.hpp>
 #endif
 

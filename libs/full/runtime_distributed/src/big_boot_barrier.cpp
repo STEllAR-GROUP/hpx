@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach & Katelyn Kufahl
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2015 Anton Bikineev
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,6 +21,7 @@
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/agas_base.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/parcelset/detail/parcel_await.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
@@ -34,7 +35,6 @@
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -85,7 +85,7 @@ namespace hpx::agas::detail {
                 hpx::serialization::detail::id_registry::instance()
                     .get_unassigned_typenames())
           , action_typenames(hpx::actions::detail::action_registry::instance()
-                                 .get_unassigned_typenames())
+                    .get_unassigned_typenames())
         {
         }
 
@@ -452,7 +452,7 @@ namespace hpx::agas {
         // its dtor calls big_boot_barrier::notify().
         big_boot_barrier::scoped_lock lock(get_big_boot_barrier());
 
-        naming::resolver_client& agas_client = naming::get_agas_client();
+        agas::addressing_service& agas_client = naming::get_agas_client();
 
         if (HPX_UNLIKELY(agas_client.is_connecting()))
         {
@@ -570,7 +570,7 @@ namespace hpx::agas {
         header.ids.register_ids_on_worker_loc();
 
         runtime_distributed& rt = get_runtime_distributed();
-        naming::resolver_client& agas_client = naming::get_agas_client();
+        agas::addressing_service& agas_client = naming::get_agas_client();
 
         if (HPX_UNLIKELY(agas_client.get_status() != hpx::state::starting))
         {
@@ -652,7 +652,7 @@ namespace hpx::agas {
         // pre-cache all known locality endpoints in local AGAS on locality 0 as well
         if (service_mode::bootstrap == service_type)
         {
-            naming::resolver_client& agas_client = naming::get_agas_client();
+            agas::addressing_service& agas_client = naming::get_agas_client();
             agas_client.pre_cache_endpoints(localities);
         }
     }
@@ -774,7 +774,7 @@ namespace hpx::agas {
 #endif
     void big_boot_barrier::notify()
     {
-        naming::resolver_client& agas_client = naming::get_agas_client();
+        agas::addressing_service& agas_client = naming::get_agas_client();
 
         bool notify = false;
         {

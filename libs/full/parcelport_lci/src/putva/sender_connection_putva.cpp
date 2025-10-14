@@ -141,7 +141,9 @@ namespace hpx::parcelset::policies::lci {
                 {
                     serialization::serialization_chunk& c = buffer_.chunks_[j];
                     if (c.type_ ==
-                        serialization::chunk_type::chunk_type_pointer)
+                            serialization::chunk_type::chunk_type_pointer ||
+                        c.type_ ==
+                            serialization::chunk_type::chunk_type_const_pointer)
                     {
                         HPX_ASSERT(long_msg_num > i);
                         iovec.lbuffers[i].address =

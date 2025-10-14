@@ -471,7 +471,7 @@ namespace details
     template<typename T>
     static inline T const& nomove(T const& x)
     {
-        return x;
+        return x;   // NOLINT(bugprone-return-const-ref-from-parameter)
     }
 
     template<bool Enable>
@@ -480,7 +480,7 @@ namespace details
         template<typename T>
         static inline T const& eval(T const& x)
         {
-            return x;
+            return x;   // NOLINT(bugprone-return-const-ref-from-parameter)
         }
     };
 
@@ -1192,6 +1192,7 @@ public:
 
         size_t count = static_cast<ProducerBase*>(token.currentProducer)->dequeue_bulk(itemFirst, max);
         if (count == max) {
+            // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
             if ((token.itemsConsumedFromCurrent += static_cast<std::uint32_t>(max)) >= EXPLICIT_CONSUMER_CONSUMPTION_QUOTA_BEFORE_ROTATE) {
                 globalExplicitConsumerOffset.fetch_add(1, std::memory_order_relaxed);
             }
@@ -1599,8 +1600,10 @@ private:
             }
         }
 
+        // NOLINTBEGIN(bugprone-casting-through-void)
         inline T* operator[](index_t idx) MOODYCAMEL_NOEXCEPT { return static_cast<T*>(static_cast<void*>(elements)) + static_cast<size_t>(idx & static_cast<index_t>(BLOCK_SIZE - 1)); }
         inline T const* operator[](index_t idx) const MOODYCAMEL_NOEXCEPT { return static_cast<T const*>(static_cast<void const*>(elements)) + static_cast<size_t>(idx & static_cast<index_t>(BLOCK_SIZE - 1)); }
+        // NOLINTEND(bugprone-casting-through-void)
 
     private:
         // IMPORTANT: This must be the first member in Block, so that if T depends on the alignment of
@@ -1970,6 +1973,7 @@ private:
 
                     // Dequeue
                     auto& el = *((*block)[index]);
+                    // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
                     if (!MOODYCAMEL_NOEXCEPT_ASSIGN(T, T&&, element = HPX_MOVE(el))) {
                         // Make sure the element is still fully dequeued and destroyed even if the assignment
                         // throws
@@ -2228,11 +2232,12 @@ private:
                         auto endIndex = (index & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
                         endIndex = details::circular_less_than<index_t>(firstIndex + static_cast<index_t>(actualCount), endIndex) ? firstIndex + static_cast<index_t>(actualCount) : endIndex;
                         auto block = localBlockIndex->entries[indexIndex].block;
+                        // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
                         if (MOODYCAMEL_NOEXCEPT_ASSIGN(T, T&&, details::deref_noexcept(itemFirst) = HPX_MOVE((*(*block)[index])))) {
                             while (index != endIndex) {
                                 auto& el = *((*block)[index]);
                                 *itemFirst++ = HPX_MOVE(el);
-                                el.~T();
+                                el.~T();    // NOLINT(bugprone-use-after-move)
                                 ++index;
                             }
                         }
@@ -2242,7 +2247,7 @@ private:
                                     auto& el = *((*block)[index]);
                                     *itemFirst = HPX_MOVE(el);
                                     ++itemFirst;
-                                    el.~T();
+                                    el.~T();    // NOLINT(bugprone-use-after-move)
                                     ++index;
                                 }
                             }
@@ -2463,6 +2468,7 @@ private:
                 if (!MOODYCAMEL_NOEXCEPT_CTOR(T, U, new (nullptr) T(HPX_FORWARD(U, element)))) {
                     // May throw, try to insert now before we publish the fact that we have this new block
                     MOODYCAMEL_TRY {
+                        // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
                         new ((*newBlock)[currentTailIndex]) T(HPX_FORWARD(U, element));
                     }
                     MOODYCAMEL_CATCH (...) {
@@ -2485,6 +2491,7 @@ private:
             }
 
             // Enqueue
+            // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion,bugprone-use-after-move)
             new ((*this->tailBlock)[currentTailIndex]) T(HPX_FORWARD(U, element));
 
             this->tailIndex.store(newTailIndex, std::memory_order_release);
@@ -2512,6 +2519,7 @@ private:
                     auto block = entry->value.load(std::memory_order_relaxed);
                     auto& el = *((*block)[index]);
 
+                    // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
                     if (!MOODYCAMEL_NOEXCEPT_ASSIGN(T, T&&, element = HPX_MOVE(el))) {
 #if MCDBGQ_NOLOCKFREE_IMPLICITPRODBLOCKINDEX
                         // Note: Acquiring the mutex with every dequeue instead of only when a block
@@ -2597,6 +2605,7 @@ private:
                     auto head = this->headIndex.load(std::memory_order_relaxed);
                     assert(!details::circular_less_than<index_t>(currentTailIndex, head));
                     bool full = !details::circular_less_than<index_t>(head, currentTailIndex + BLOCK_SIZE) || (MAX_SUBQUEUE_SIZE != details::const_numeric_max<size_t>::value && (MAX_SUBQUEUE_SIZE == 0 || MAX_SUBQUEUE_SIZE - BLOCK_SIZE < currentTailIndex - head));
+                    // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
                     if (full || !(indexInserted = insert_block_index_entry<allocMode>(idxEntry, currentTailIndex)) || (newBlock = this->parent->ConcurrentQueue::template requisition_block<allocMode>()) == nullptr) {
                         // Index allocation or block allocation failed; revert any other allocations
                         // and index insertions done so far for this operation
@@ -2747,11 +2756,12 @@ private:
 
                         auto entry = localBlockIndex->index[indexIndex];
                         auto block = entry->value.load(std::memory_order_relaxed);
+                        // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
                         if (MOODYCAMEL_NOEXCEPT_ASSIGN(T, T&&, details::deref_noexcept(itemFirst) = HPX_MOVE((*(*block)[index])))) {
                             while (index != endIndex) {
                                 auto& el = *((*block)[index]);
                                 *itemFirst++ = HPX_MOVE(el);
-                                el.~T();
+                                el.~T();    // NOLINT(bugprone-use-after-move)
                                 ++index;
                             }
                         }
@@ -2761,7 +2771,7 @@ private:
                                     auto& el = *((*block)[index]);
                                     *itemFirst = HPX_MOVE(el);
                                     ++itemFirst;
-                                    el.~T();
+                                    el.~T();    // NOLINT(bugprone-use-after-move)
                                     ++index;
                                 }
                             }

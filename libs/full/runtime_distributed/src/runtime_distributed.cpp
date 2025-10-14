@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -16,19 +16,20 @@
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/format.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/itt_notify/thread_name.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/io_service.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/static_reinit.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/topology.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
@@ -60,12 +61,9 @@
 #include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/thread_pools/detail/scoped_background_timer.hpp>
-#include <hpx/thread_support/set_thread_name.hpp>
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/type_support/unused.hpp>
-#include <hpx/util/from_string.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>
@@ -889,7 +887,7 @@ namespace hpx {
             active_counters_->stop_evaluating_counters(terminate);
     }
 
-    naming::resolver_client& runtime_distributed::get_agas_client()
+    agas::addressing_service& runtime_distributed::get_agas_client()
     {
         return agas_client_;
     }
@@ -1881,13 +1879,13 @@ namespace hpx {
 namespace hpx::naming {
 
     // shortcut for get_runtime().get_agas_client()
-    resolver_client& get_agas_client()
+    agas::addressing_service& get_agas_client()
     {
         return get_runtime_distributed().get_agas_client();
     }
 
     // shortcut for get_runtime_ptr()->get_agas_client()
-    resolver_client* get_agas_client_ptr()
+    agas::addressing_service* get_agas_client_ptr()
     {
         auto* rtd = get_runtime_distributed_ptr();
         return rtd ? &rtd->get_agas_client() : nullptr;

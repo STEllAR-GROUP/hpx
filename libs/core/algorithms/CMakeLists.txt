@@ -265,6 +265,7 @@ add_hpx_module(
     hpx_iterator_support
     hpx_lcos_local
     hpx_pack_traversal
+    hpx_properties
     hpx_serialization
     hpx_util
   CMAKE_SUBDIRS examples tests

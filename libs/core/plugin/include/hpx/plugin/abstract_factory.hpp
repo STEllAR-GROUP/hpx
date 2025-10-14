@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/plugin/config.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/plugin/virtual_constructor.hpp>
-#include <hpx/type_support/pack.hpp>
 
 namespace hpx::util::plugin {
 

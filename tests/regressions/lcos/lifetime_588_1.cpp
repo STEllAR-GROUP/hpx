@@ -12,7 +12,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <cstddef>
 #include <vector>

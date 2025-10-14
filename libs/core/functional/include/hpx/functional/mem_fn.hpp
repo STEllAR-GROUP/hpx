@@ -10,8 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <utility>
 
@@ -67,7 +66,7 @@ namespace hpx {
     ///         Each argument in \c vs is perfectly forwarded,
     ///         as if by \c std::forward<Ts>(vs)... .
     template <typename M, typename C>
-    constexpr detail::mem_fn<M C::*> mem_fn(M C::*pm) noexcept
+    constexpr detail::mem_fn<M C::*> mem_fn(M C::* pm) noexcept
     {
         return detail::mem_fn<M C::*>(pm);
     }
@@ -94,7 +93,7 @@ namespace hpx::util {
     template <typename M, typename C>
     HPX_DEPRECATED_V(
         1, 9, "hpx::util::mem_fn is deprecated, use hpx::mem_fn instead")
-    constexpr hpx::detail::mem_fn<M C::*> mem_fn(M C::*pm)
+    constexpr hpx::detail::mem_fn<M C::*> mem_fn(M C::* pm)
     {
         return hpx::detail::mem_fn<M C::*>(pm);
     }

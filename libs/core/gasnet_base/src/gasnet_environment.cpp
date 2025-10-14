@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/gasnet_base.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
@@ -171,10 +172,10 @@ static void AM_copy_payload(gasnet_token_t token, void* buf, size_t nbytes,
 }
 
 [[maybe_unused]] static gasnet_handlerentry_t ftable[] = {
-    {SIGNAL, (void (*)()) & AM_signal},
-    {SIGNAL_LONG, (void (*)()) & AM_signal_long},
-    {DO_REPLY_PUT, (void (*)()) & AM_reply_put},
-    {DO_COPY_PAYLOAD, (void (*)()) & AM_copy_payload}};
+    {SIGNAL, (void (*)()) &AM_signal},
+    {SIGNAL_LONG, (void (*)()) &AM_signal_long},
+    {DO_REPLY_PUT, (void (*)()) &AM_reply_put},
+    {DO_COPY_PAYLOAD, (void (*)()) &AM_copy_payload}};
 
 //
 // Initialize one of the above.

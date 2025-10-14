@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2022 Bhumit Attarde
 //  Copyright (c) 2013 Agustin Berge
 //
@@ -17,13 +17,13 @@
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/synchronization/stop_token.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <mutex>
 #include <utility>
@@ -1252,14 +1252,3 @@ namespace hpx {
         hpx::util::cache_aligned_data_derived<data_type> data_;
     };
 }    // namespace hpx
-
-namespace hpx::lcos::local {
-
-    using condition_variable HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::condition_variable is deprecated, use "
-        "hpx::condition_variable instead") = hpx::condition_variable;
-
-    using condition_variable_any HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::condition_variable_any is deprecated, use "
-        "hpx::condition_variable_any instead") = hpx::condition_variable_any;
-}    // namespace hpx::lcos::local

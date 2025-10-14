@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/unique.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -382,6 +382,7 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
             input_iterator(std::begin(c)), input_iterator(std::end(c)),
             output_iterator(std::begin(dest_res)),
             [](DataType const& a, DataType const& b) -> bool { return a == b; },
+            // NOLINTNEXTLINE(bugprone-return-const-ref-from-parameter)
             [](DataType const& t) -> DataType const& { return t; },
             std::false_type());
         auto solution =

@@ -327,10 +327,11 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/find.hpp>
@@ -340,7 +341,6 @@ namespace hpx {
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -582,12 +582,12 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<none_of_t>
     {
     private:
+        template <typename ExPolicy, typename FwdIter, typename F>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             none_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
@@ -600,11 +600,11 @@ namespace hpx {
                 hpx::identity_v);
         }
 
+        template <typename InIter, typename F>
         // clang-format off
-        template <typename InIter, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter>
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(
             none_of_t, InIter first, InIter last, F f)
@@ -623,12 +623,12 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<any_of_t>
     {
     private:
+        template <typename ExPolicy, typename FwdIter, typename F>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             any_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
@@ -641,11 +641,11 @@ namespace hpx {
                 hpx::identity_v);
         }
 
+        template <typename InIter, typename F>
         // clang-format off
-        template <typename InIter, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter>
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(
             any_of_t, InIter first, InIter last, F f)
@@ -664,12 +664,12 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<all_of_t>
     {
     private:
+        template <typename ExPolicy, typename FwdIter, typename F>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             all_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
@@ -682,11 +682,11 @@ namespace hpx {
                 hpx::identity_v);
         }
 
+        template <typename InIter, typename F>
         // clang-format off
-        template <typename InIter, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter>
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(
             all_of_t, InIter first, InIter last, F f)

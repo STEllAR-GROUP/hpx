@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -83,7 +83,7 @@ namespace performance_counters { namespace sine { namespace server {
     {
         std::lock_guard<mutex_type> mtx(mtx_);
         evaluated_at_ = static_cast<std::int64_t>(hpx::get_system_uptime());
-        current_value_ = std::sin(evaluated_at_ / 1e10);
+        current_value_ = std::sin(static_cast<double>(evaluated_at_) / 1e10);
         return true;
     }
 }}}    // namespace performance_counters::sine::server

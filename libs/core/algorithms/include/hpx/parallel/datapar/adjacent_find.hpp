@@ -9,9 +9,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution/traits/vector_pack_find.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_find.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/datapar/loop.hpp>
@@ -69,12 +69,12 @@ namespace hpx::parallel::detail {
         }
     };
 
-    // clang-format off
     template <typename ExPolicy, typename InIter, typename Sent_,
-        typename PredProj,
-        HPX_CONCEPT_REQUIRES_(
+        typename PredProj>
+    // clang-format off
+        requires (
             hpx::is_vectorpack_execution_policy_v<ExPolicy>
-        )>
+        )
     // clang-format on
     constexpr InIter tag_invoke(sequential_adjacent_find_t<ExPolicy>,
         InIter first, Sent_ last, PredProj&& pred_projected)
@@ -97,12 +97,12 @@ namespace hpx::parallel::detail {
         }
     }
 
-    // clang-format off
     template <typename ExPolicy, typename ZipIter, typename Token,
-        typename PredProj,
-        HPX_CONCEPT_REQUIRES_(
+        typename PredProj>
+    // clang-format off
+        requires (
             hpx::is_vectorpack_execution_policy_v<ExPolicy>
-        )>
+        )
     // clang-format on
     constexpr void tag_invoke(sequential_adjacent_find_t<ExPolicy>,
         std::size_t base_idx, ZipIter part_begin, std::size_t part_count,

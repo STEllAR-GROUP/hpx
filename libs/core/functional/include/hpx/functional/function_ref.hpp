@@ -17,7 +17,7 @@
 #include <hpx/functional/detail/vtable/vtable.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <cstddef>
 #include <cstring>
@@ -76,7 +76,7 @@ namespace hpx {
         }
 
         template <typename T, typename C>
-        [[nodiscard]] constexpr bool is_empty_function_ptr(T C::*mp) noexcept
+        [[nodiscard]] constexpr bool is_empty_function_ptr(T C::* mp) noexcept
         {
             return mp == nullptr;
         }
@@ -225,14 +225,6 @@ namespace hpx {
         void* object;
     };
 }    // namespace hpx
-
-namespace hpx::util {
-
-    template <typename Sig>
-    using function_ref HPX_DEPRECATED_V(1, 8,
-        "hpx::util::function_ref is deprecated. Please use hpx::function_ref "
-        "instead.") = hpx::function_ref<Sig>;
-}
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////

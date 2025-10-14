@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,10 +29,12 @@ namespace hpx::parcelset {
         using parcel_buffer_type = parcel_buffer<>;
 
     protected:
-        parcelport_connection(parcelport_connection const&) = delete;
-        parcelport_connection(parcelport_connection&&) = delete;
         parcelport_connection& operator=(parcelport_connection const&) = delete;
         parcelport_connection& operator=(parcelport_connection&&) = delete;
+
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
+        parcelport_connection(parcelport_connection const&) = delete;
+        parcelport_connection(parcelport_connection&&) = delete;
 
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
         // clang-format off
@@ -87,6 +89,7 @@ namespace hpx::parcelset {
         {
         }
 #endif
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
 
     public:
         virtual ~parcelport_connection() = default;

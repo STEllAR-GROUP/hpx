@@ -33,6 +33,7 @@ namespace hpx::parcelset::detail {
         using put_parcel_type =
             hpx::move_only_function<void(Parcel&&, Handler&&)>;
 
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         parcel_await_base(Parcel&& parcel, Handler&& handler,
             std::uint32_t archive_flags, put_parcel_type pp) noexcept
           : put_parcel_(HPX_MOVE(pp))

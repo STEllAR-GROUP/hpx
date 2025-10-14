@@ -18,9 +18,6 @@ namespace hpx {
 
     namespace naming {
 
-        // FIXME: obsolete name, replace with agas::addressing_serve
-        using resolver_client = agas::addressing_service;
-
         HPX_EXPORT agas::addressing_service& get_agas_client();
         HPX_EXPORT agas::addressing_service* get_agas_client_ptr();
     }    // namespace naming

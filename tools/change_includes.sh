@@ -21,8 +21,8 @@ old_filenames=(
   hpx/util/cache/lru_cache.hpp
 )
 new_filenames=(
-  hpx/cache/local_cache.hpp
-  hpx/cache/lru_cache.hpp
+  hpx/modules/cache.hpp
+  hpx/modules/cache.hpp
 )
 
 function extra_usage_message() {

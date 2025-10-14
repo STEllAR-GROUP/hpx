@@ -8,8 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/allocator_support/thread_local_caching_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
@@ -19,13 +17,14 @@
 #include <hpx/execution/traits/future_then_result_exec.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/packaged_continuation.hpp>
 #include <hpx/futures/traits/future_access.hpp>
+#include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/threading_base/register_thread.hpp>
 #include <hpx/threading_base/thread_description.hpp>

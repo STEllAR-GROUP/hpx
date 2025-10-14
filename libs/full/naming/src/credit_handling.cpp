@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -18,6 +18,7 @@
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/naming/credit_handling.hpp>
 #include <hpx/naming/detail/preprocess_gid_types.hpp>
 #include <hpx/naming/split_gid.hpp>
@@ -26,7 +27,6 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <cstdint>
 #include <mutex>
@@ -228,7 +228,7 @@ namespace hpx::naming {
             HPX_ASSERT(overflow_credit >= 0);
 
             new_credit =
-                (std::min)(static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL),
+                (std::min) (static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL),
                     new_credit);
             naming::detail::set_credit_for_gid(gid, new_credit);
 
@@ -372,10 +372,12 @@ namespace hpx::naming {
 
             gid_type newid = id;    // strips lock-bit
 
-            set_log2credit_for_gid(id, log2credits - 1);
+            set_log2credit_for_gid(
+                id, static_cast<std::int16_t>(log2credits - 1));
             set_credit_split_mask_for_gid(id);
 
-            set_log2credit_for_gid(newid, log2credits - 1);
+            set_log2credit_for_gid(
+                newid, static_cast<std::int16_t>(log2credits - 1));
             set_credit_split_mask_for_gid(newid);
 
             return newid;

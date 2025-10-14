@@ -22,72 +22,70 @@
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
-namespace initializers {
+    namespace initializers {
 
-template <class Range>
-class set_env_ : public initializer_base
-{
-public:
-    set_env_()
-    {
-        env_.resize(1);
-        env_[0] = nullptr;
-    }
-
-    explicit set_env_(const Range &envs)
-    {
-        string_env_.resize(envs.size());
-        env_.resize(envs.size() + 1);
-        for (std::size_t i = 0; i != envs.size(); ++i)
+        template <class Range>
+        class set_env_ : public initializer_base
         {
-            string_env_[i] = envs[i];
-            env_[i] = const_cast<char*>(string_env_[i].c_str());
-        }
-        env_[envs.size()] = nullptr;
-    }
+        public:
+            set_env_()
+            {
+                env_.resize(1);
+                env_[0] = nullptr;
+            }
 
-    template <class PosixExecutor>
-    void on_fork_setup(PosixExecutor &e) const
-    {
-        e.env = const_cast<char**>(env_.data());
-    }
+            explicit set_env_(const Range& envs)
+            {
+                string_env_.resize(envs.size());
+                env_.resize(envs.size() + 1);
+                for (std::size_t i = 0; i != envs.size(); ++i)
+                {
+                    string_env_[i] = envs[i];
+                    env_[i] = const_cast<char*>(string_env_[i].c_str());
+                }
+                env_[envs.size()] = nullptr;
+            }
 
-private:
-    friend class hpx::serialization::access;
+            template <class PosixExecutor>
+            void on_fork_setup(PosixExecutor& e) const
+            {
+                e.env = const_cast<char**>(env_.data());
+            }
 
-    template <typename Archive>
-    void save(Archive& ar, unsigned const) const
-    {
-        ar & string_env_;
-    }
+        private:
+            friend class hpx::serialization::access;
 
-    template <typename Archive>
-    void load(Archive& ar, unsigned const)
-    {
-        ar & string_env_;
+            template <typename Archive>
+            void save(Archive& ar, unsigned const) const
+            {
+                ar & string_env_;
+            }
 
-        env_.resize(string_env_.size() + 1);
-        for (std::size_t i = 0; i != string_env_.size(); ++i)
+            template <typename Archive>
+            void load(Archive& ar, unsigned const)
+            {
+                ar & string_env_;
+
+                env_.resize(string_env_.size() + 1);
+                for (std::size_t i = 0; i != string_env_.size(); ++i)
+                {
+                    env_[i] = const_cast<char*>(string_env_[i].c_str());
+                }
+                env_[string_env_.size()] = nullptr;
+            }
+
+            HPX_SERIALIZATION_SPLIT_MEMBER()
+
+            std::vector<std::string> string_env_;
+            std::vector<char*> env_;
+        };
+
+        template <class Range>
+        set_env_<Range> set_env(const Range& envs)
         {
-            env_[i] = const_cast<char*>(string_env_[i].c_str());
+            return set_env_<Range>(envs);
         }
-        env_[string_env_.size()] = nullptr;
-    }
 
-    HPX_SERIALIZATION_SPLIT_MEMBER()
-
-    std::vector<std::string> string_env_;
-    std::vector<char*> env_;
-};
-
-template <class Range>
-set_env_<Range> set_env(const Range &envs)
-{
-    return set_env_<Range>(envs);
-}
-
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::posix::initializers
 
 #endif

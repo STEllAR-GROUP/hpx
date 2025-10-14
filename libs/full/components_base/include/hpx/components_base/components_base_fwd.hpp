@@ -46,12 +46,6 @@ namespace hpx::components {
     template <typename Component = void>
     class abstract_component_base;
 
-    template <typename Component>
-    using abstract_simple_component_base HPX_DEPRECATED_V(1, 8,
-        "The type hpx::components::abstract_simple_component_base is "
-        "deprecated. Please use hpx::components::abstract_component_base "
-        "instead.") = abstract_component_base<Component>;
-
     template <typename Component, typename Derived = void>
     class abstract_managed_component_base;
 

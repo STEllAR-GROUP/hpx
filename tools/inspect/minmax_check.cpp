@@ -9,7 +9,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/util/to_string.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <algorithm>
 
@@ -57,6 +57,7 @@ namespace boost { namespace inspect {
         register_signature(".hxx");
         register_signature(".inc");
         register_signature(".ipp");
+        register_signature(".ixx");
     }
 
     //  inspect ( C++ source files )  ---------------------------------------//

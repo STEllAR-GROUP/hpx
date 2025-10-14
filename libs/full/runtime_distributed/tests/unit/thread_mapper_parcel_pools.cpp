@@ -6,9 +6,9 @@
 
 #include <hpx/hpx_init.hpp>
 
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <string>

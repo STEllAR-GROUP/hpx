@@ -118,7 +118,9 @@ add_hpx_module(
     hpx_logging
     hpx_memory
     hpx_timing
+    hpx_tag_invoke
     hpx_type_support
+    hpx_thread_support
     ${additional_dependencies}
   CMAKE_SUBDIRS examples tests
 )

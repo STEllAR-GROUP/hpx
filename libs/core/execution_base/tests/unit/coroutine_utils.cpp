@@ -9,7 +9,7 @@
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/coroutine_utils.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/type_support/coroutines_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include "coroutine_task.hpp"
 
@@ -241,7 +241,7 @@ int main()
         static_assert(ex::is_awaiter_v<awaiter>);
 
         static_assert(!ex::detail::has_free_operator_co_await_v<
-                      awaitable_sender_1<awaiter>>);
+            awaitable_sender_1<awaiter>>);
 #if !defined(HPX_HAVE_STDEXEC)
         static_assert(
             ex::detail::has_free_operator_co_await_v<awaitable_sender_2>);
@@ -369,6 +369,8 @@ int main()
     try
     {
         // Awaitables are implicitly senders:
+
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         auto i = hpx::this_thread::experimental::sync_wait(
             async_answer(hpx::execution::experimental::just(42),
                 hpx::execution::experimental::just()))

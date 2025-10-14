@@ -12,7 +12,7 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/datapar/execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/datapar/transform_loop.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/transfer.hpp>
@@ -38,7 +38,7 @@ namespace hpx { namespace parallel { namespace util {
             {
                 auto ret =
                     util::transform_loop_n_ind<hpx::execution::simd_policy>(
-                        first, count, dest, [](auto& v) { return v; });
+                        first, count, dest, [](auto&& v) { return v; });
 
                 return util::in_out_result<InIter, OutIter>{
                     HPX_MOVE(ret.first), HPX_MOVE(ret.second)};

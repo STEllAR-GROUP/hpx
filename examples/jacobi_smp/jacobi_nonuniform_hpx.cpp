@@ -50,7 +50,7 @@ namespace jacobi_smp {
         for (std::size_t b = 0; b < block_ranges.size(); ++b)
         {
             for (std::size_t i = block_ranges[b].begin();
-                 i < block_ranges[b].end(); ++i)
+                i < block_ranges[b].end(); ++i)
             {
                 std::size_t begin = A.row_begin(i);
                 std::size_t end = A.row_end(i);

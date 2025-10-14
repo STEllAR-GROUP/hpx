@@ -10,7 +10,7 @@
 #include <hpx/config/forward.hpp>
 #include <hpx/config/move.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <memory>

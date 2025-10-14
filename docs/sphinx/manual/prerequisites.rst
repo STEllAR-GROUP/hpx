@@ -37,13 +37,13 @@ The table below shows the supported compilers for |hpx|.
 
 .. table:: Supported Compilers for |hpx|
 
-   =================== ==================
-   Name                Minimum Version
-   =================== ==================
-   |gcc|_              9.0
-   |clang|_            10.0
-   |visual_cxx|_ (x64) 2019
-   =================== ==================
+   =================== ================== ==================
+   Name                Minimum Version    Latest tested
+   =================== ================== ==================
+   |gcc|_              11.0               15.0
+   |clang|_            16.0               20.0
+   |visual_cxx|_ (x64) 2022               2022
+   =================== ================== ==================
 
 Software and libraries
 ======================
@@ -52,13 +52,13 @@ The table below presents all the necessary prerequisites for building |hpx|.
 
 .. table:: Software prerequisites for |hpx|
 
-   ====================== =================== ==================
-   \                      Name                Minimum Version
-   ====================== =================== ==================
-   **Build System**       |cmake|_            3.18
-   **Required Libraries** |boost|_            1.71.0
-   \                      |hwloc|_            1.5
-   ====================== =================== ==================
+   ====================== =================== ================== ==================
+   \                      Name                Minimum Version    Latest tested
+   ====================== =================== ================== ==================
+   **Build System**       |cmake|_            3.20               4.0
+   **Required Libraries** |boost|_            1.71.0             1.88.0
+   \                      |hwloc|_            1.5                2.4
+   ====================== =================== ================== ==================
 
 The most important dependencies are |boost|_ and |hwloc|_. The installation of Boost
 is described in detail in Boost's `Getting Started <https://www.boost.org/more/getting_started/index.html>`_
@@ -73,7 +73,7 @@ standard library features when available.
 .. note::
 
    When building Boost using gcc, please note that it is required to specify a
-   ``cxxflags=-std=c++17`` command line argument to ``b2`` (``bjam``).
+   ``cxxflags=-std=c++20`` command line argument to ``b2`` (``bjam``).
 
 .. note::
 

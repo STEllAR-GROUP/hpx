@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <random>
@@ -44,7 +45,8 @@ void function01(void)
     for (std::uint64_t i = 0; i <= NELEM; ++i)
     {
         B = A;
-        hpx::partial_sort(B.begin(), B.begin() + i, B.end(), compare_t());
+        hpx::partial_sort(B.begin(), B.begin() + static_cast<std::ptrdiff_t>(i),
+            B.end(), compare_t());
     }
 
     auto end = std::chrono::high_resolution_clock::now();
@@ -56,7 +58,8 @@ void function01(void)
     for (std::uint64_t i = 0; i <= NELEM; ++i)
     {
         B = A;
-        std::partial_sort(B.begin(), B.begin() + i, B.end(), compare_t());
+        std::partial_sort(B.begin(), B.begin() + static_cast<std::ptrdiff_t>(i),
+            B.end(), compare_t());
     }
     end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<long unsigned, std::nano> nanotime2 = end - start;

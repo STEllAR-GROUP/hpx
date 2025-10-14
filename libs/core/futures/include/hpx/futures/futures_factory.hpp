@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,17 +9,15 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 
-#include <hpx/allocator_support/allocator_deleter.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concurrency/stack.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
+#include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>

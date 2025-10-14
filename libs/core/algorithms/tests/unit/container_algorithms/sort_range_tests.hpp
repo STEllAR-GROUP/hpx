@@ -96,13 +96,13 @@ int verify_(
     {
         IA temp = *(A.begin());
         for (typename std::vector<IA>::const_iterator it = A.begin();
-             it != A.end(); ++it)
+            it != A.end(); ++it)
         {
             if (comp((*it), temp))
             {
                 if (print)
-                    hpx::util::format_to(
-                        std::cout, "fail {:8.6}", elapsed / 1e9)
+                    hpx::util::format_to(std::cout, "fail {:8.6}",
+                        static_cast<double>(elapsed) / 1e9)
                         << A.size() << std::endl;
                 return 0;
             }
@@ -110,7 +110,8 @@ int verify_(
         }
     }
     if (print)
-        hpx::util::format_to(std::cout, "OK {:8.6}", elapsed / 1e9)
+        hpx::util::format_to(
+            std::cout, "OK {:8.6}", static_cast<double>(elapsed) / 1e9)
             << A.size() << std::endl;
     return 1;
 }
@@ -125,7 +126,7 @@ template <typename T>
 void test_sort1_sent(T)
 {
     auto rand_max_val = std::rand() + 1;
-    std::size_t N = std::rand() % 10007;
+    std::size_t N = std::rand() % 10007 + 1;    // At least one element
 
     // Fill vector with random values
     std::vector<T> c(N);
@@ -150,7 +151,7 @@ void test_sort1_sent(ExPolicy&& policy, T)
     msg(typeid(ExPolicy).name(), typeid(T).name(), "default", sync, random);
 
     auto rand_max_val = std::rand() + 1;
-    std::size_t N = std::rand() % 10007;
+    std::size_t N = std::rand() % 10007 + 1;    // At least one element
 
     // Fill vector with random values
     std::vector<T> c(N);
@@ -176,7 +177,7 @@ void test_sort1_comp_sent(ExPolicy&& policy, T, Compare comp = Compare())
         random);
 
     auto rand_max_val = std::rand() + 1;
-    std::size_t N = std::rand() % 10007;
+    std::size_t N = std::rand() % 10007 + 1;    // At least one element
 
     // Fill vector with random values
     std::vector<T> c(N);

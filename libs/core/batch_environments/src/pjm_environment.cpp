@@ -1,12 +1,12 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/batch_environments/pjm_environment.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/string_util/tokenizer.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -61,10 +61,12 @@ namespace hpx::util::batch_environments {
             {
                 num_threads_ = from_string<std::size_t>(var);
             }
+            // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
             else if ((var = std::getenv("PJM_TOTAL_CORE")) != nullptr)
             {
                 num_threads_ = from_string<std::size_t>(var) / num_localities_;
             }
+            // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
             else if ((var = std::getenv("FLIB_AFFINITY_ON_PROCESS")) != nullptr)
             {
                 hpx::string_util::char_separator<char> sep(",");

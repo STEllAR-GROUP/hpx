@@ -29,14 +29,14 @@
 
 namespace hpx::util::logging::detail {
 
-    template <typename T>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
     struct named
     {
         std::string name;
         T value;
     };
 
-    template <typename C, typename S>
+    HPX_CORE_MODULE_EXPORT_EXTERN template <typename C, typename S>
     typename C::iterator find_named(C& c, S const& name)
     {
         for (auto iter = c.begin(), end = c.end(); iter != end; ++iter)
@@ -91,9 +91,12 @@ You could have an output like this:
 @endcode
 
 */
-    struct named_formatters
+    HPX_CORE_MODULE_EXPORT_EXTERN struct named_formatters
     {
-        HPX_NON_COPYABLE(named_formatters);
+        named_formatters(named_formatters const&) = delete;
+        named_formatters(named_formatters&&) = delete;
+        named_formatters& operator=(named_formatters const&) = delete;
+        named_formatters& operator=(named_formatters&&) = delete;
 
         using ptr_type = std::unique_ptr<formatter::manipulator>;
 
@@ -216,7 +219,7 @@ In the above example, I know that the available destinations are @c out_file,
 @c debug_window and @c console, but I'm not writing to @c debug_window.
 
 */
-    struct named_destinations
+    HPX_CORE_MODULE_EXPORT_EXTERN struct named_destinations
     {
         HPX_NON_COPYABLE(named_destinations);
 
@@ -356,7 +359,7 @@ namespace hpx::util::logging::writer {
     @param format_write_ the underlying format writer
 
 */
-    struct named_write
+    HPX_CORE_MODULE_EXPORT_EXTERN struct named_write
     {
         HPX_CORE_EXPORT named_write();
 

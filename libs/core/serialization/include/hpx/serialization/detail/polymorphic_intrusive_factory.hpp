@@ -9,11 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/debugging/demangle_helper.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/debugging.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <functional>
@@ -227,7 +224,7 @@ namespace hpx::serialization::detail {
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_2(Class, Override)              \
     HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_3(                                 \
-        Class, hpx::util::debug::type_id<Class>::typeid_.type_id(), Override)  \
+        Class, hpx::util::debug::type_id<Class>(), Override)                   \
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_1(Class)                        \
@@ -246,7 +243,7 @@ namespace hpx::serialization::detail {
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED_2(Class, Override)     \
     HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED_3(                        \
-        Class, hpx::util::debug::type_id<T>::typeid_.type_id(), Override)      \
+        Class, hpx::util::debug::type_id<T>(), Override)                       \
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED_1(Class)               \

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -45,10 +45,31 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_CORE_EXPORTS)
-# define  HPX_CORE_EXPORT        HPX_SYMBOL_EXPORT
+# define  HPX_CORE_EXPORT       HPX_SYMBOL_EXPORT
 #else
-# define  HPX_CORE_EXPORT        HPX_SYMBOL_IMPORT
+# define  HPX_CORE_EXPORT       HPX_SYMBOL_IMPORT
 #endif
+
+///////////////////////////////////////////////////////////////////////////////
+// C++20 module export definitions
+#if defined(HPX_BUILD_MODULE)
+# if defined(HPX_HAVE_ELF_HIDDEN_VISIBILITY)
+#  undef HPX_CORE_EXPORT
+#  define HPX_CORE_EXPORT                /* empty */
+# endif
+# define HPX_CXX_EXPORT                  export
+# define HPX_CXX_EXTERN                  extern "C++"
+#else
+# define HPX_CXX_EXPORT                  /* empty */
+# define HPX_CXX_EXTERN                  /* empty */
+#endif
+
+#define HPX_CORE_MODULE_EXPORT_EXTERN    HPX_CXX_EXPORT HPX_CXX_EXTERN
+
+#define HPX_CORE_MODULE_EXPORT                                                 \
+    HPX_CORE_MODULE_EXPORT_EXTERN HPX_CORE_EXPORT
+#define HPX_CORE_MODULE_EXPORT_NODISCARD                                       \
+    HPX_CORE_MODULE_EXPORT_EXTERN [[nodiscard]] HPX_CORE_EXPORT
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_EXPORTS) || defined(HPX_FULL_EXPORTS)
@@ -66,7 +87,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// define the export/import helper macros to be used for component modules
+// define the export/import helper macros to be used for library modules
 #if defined(HPX_LIBRARY_EXPORTS)
 # define  HPX_LIBRARY_EXPORT     HPX_SYMBOL_EXPORT
 #else
@@ -87,4 +108,27 @@
 # define HPX_ALWAYS_IMPORT       HPX_SYMBOL_IMPORT
 #endif
 #endif
+
+// Simplify the condition whether HPX modules should be imported or not
+#if defined(HPX_HAVE_BUILD_USING_CXX_MODULES)
+
+#if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_BUILD_MODULE) ||             \
+    defined(HPX_BINARY_DOESNT_USE_CXX_MODULES)
+#undef HPX_COMPILE_WITH_MODULES
+#else
+#define HPX_COMPILE_WITH_MODULES
+#endif
+
+#else
+
+#if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_BUILD_MODULE) ||             \
+    defined(HPX_CORE_EXPORTS) || defined(HPX_FULL_EXPORTS) ||                  \
+    defined(HPX_BINARY_DOESNT_USE_CXX_MODULES)
+#undef HPX_COMPILE_WITH_MODULES
+#else
+#define HPX_COMPILE_WITH_MODULES
+#endif
+
+#endif  // HPX_HAVE_BUILD_USING_CXX_MODULES
+
 // clang-format on

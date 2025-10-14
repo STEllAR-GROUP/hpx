@@ -11,12 +11,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
+#include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <exception>
 #include <memory>
@@ -582,14 +582,6 @@ namespace hpx {
         using base_type::set_exception;
     };
 }    // namespace hpx
-
-namespace hpx::lcos::local {
-
-    template <typename R>
-    using promise HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::promise is deprecated, use hpx::promise instead") =
-        hpx::promise<R>;
-}
 
 namespace std {
 

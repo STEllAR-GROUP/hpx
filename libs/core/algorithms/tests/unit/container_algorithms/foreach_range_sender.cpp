@@ -78,6 +78,7 @@ void test_for_each_explicit_sender_direct_async(
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
     auto result = tt::sync_wait(hpx::ranges::for_each(policy.on(exec), rng, f));
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     HPX_TEST(hpx::get<0>(*result) == iterator(std::end(c)));
 
     // verify values
@@ -115,6 +116,7 @@ void test_for_each_explicit_sender(Policy l, ExPolicy&& policy, IteratorTag)
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
     auto result = tt::sync_wait(
         ex::just(rng, f) | hpx::ranges::for_each(policy.on(exec)));
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     HPX_TEST(hpx::get<0>(*result) == iterator(std::end(c)));
 
     // verify values

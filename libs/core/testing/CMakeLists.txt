@@ -22,12 +22,13 @@ set(testing_sources testing.cpp performance.cpp)
 
 set(module_deps
     hpx_assertion
+    hpx_command_line_handling_local
     hpx_config
     hpx_format
     hpx_functional
     hpx_preprocessor
+    hpx_thread_support
     hpx_util
-    hpx_command_line_handling_local
 )
 
 if(HPX_WITH_NANOBENCH)

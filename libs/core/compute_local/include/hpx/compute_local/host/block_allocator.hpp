@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2016-2024 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,6 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/allocator_support/detail/new.hpp>
 #include <hpx/compute_local/host/block_executor.hpp>
 #include <hpx/compute_local/host/target.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -21,6 +20,7 @@
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/allocator_support.hpp>
 #include <hpx/parallel/container_algorithms/for_each.hpp>
 #include <hpx/parallel/util/adapt_sharing_mode.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
@@ -112,6 +112,7 @@ namespace hpx::compute::host {
                 {
                     hpx::threads::create_topology().deallocate(p, n);
                 }
+                // NOLINTNEXTLINE(bugprone-empty-catch)
                 catch (...)
                 {
                     // just ignore errors from create_topology

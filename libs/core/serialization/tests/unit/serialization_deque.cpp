@@ -36,7 +36,7 @@ struct A
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& t_;
+        ar & t_;
     }
 };
 
@@ -57,7 +57,7 @@ public:
     template <class Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& b;
+        ar & b;
     }
 
     int get_a() const

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -25,6 +25,7 @@
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/variables_map.hpp>
@@ -42,8 +43,6 @@
 #include <hpx/string_util/split.hpp>
 #include <hpx/threading/thread.hpp>
 #include <hpx/threading_base/detail/get_default_timer_service.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__)
 #include <cstdlib>
@@ -447,7 +446,8 @@ namespace hpx {
                 int result;
                 try
                 {
-                    if ((result = ensure_no_runtime_is_up()) != 0)
+                    result = ensure_no_runtime_is_up();
+                    if (result != 0)
                     {
                         return result;
                     }
@@ -550,5 +550,5 @@ namespace hpx {
                 return default_desc_;
             }
         }    // namespace detail
-    }        // namespace local
+    }    // namespace local
 }    // namespace hpx

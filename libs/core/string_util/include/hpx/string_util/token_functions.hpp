@@ -513,8 +513,8 @@ namespace hpx::string_util {
                 {
                     // append all the non delim characters
                     for (/**/;
-                         next != end && !is_dropped(*next) && !is_kept(*next);
-                         ++next)
+                        next != end && !is_dropped(*next) && !is_kept(*next);
+                        ++next)
                     {
                         assigner::plus_equal(tok, *next);
                     }
@@ -564,8 +564,8 @@ namespace hpx::string_util {
                     }
 
                     for (/**/;
-                         next != end && !is_dropped(*next) && !is_kept(*next);
-                         ++next)
+                        next != end && !is_dropped(*next) && !is_kept(*next);
+                        ++next)
                     {
                         assigner::plus_equal(tok, *next);
                     }
@@ -700,8 +700,8 @@ namespace hpx::string_util {
             // skip past all nonreturnable delims
             // skip past the returnable only if we are not returning delims
             for (/**/; next != end &&
-                 (is_nonret(*next) || (is_ret(*next) && !return_delims_));
-                 ++next)
+                (is_nonret(*next) || (is_ret(*next) && !return_delims_));
+                ++next)
             {
             }
 
@@ -721,7 +721,7 @@ namespace hpx::string_util {
             {
                 // append all the non delim characters
                 for (/**/; next != end && !is_nonret(*next) && !is_ret(*next);
-                     ++next)
+                    ++next)
                 {
                     tok += *next;
                 }

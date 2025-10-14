@@ -152,7 +152,7 @@ namespace hpx { namespace performance_counters { namespace papi {
             static ttable_type thread_state_;
 
         public:
-            papi_counter_base(){};
+            papi_counter_base() {};
 
             // lookup or create thread_counters instance for thread tix
             thread_counters* get_thread_counters(std::uint32_t tix);

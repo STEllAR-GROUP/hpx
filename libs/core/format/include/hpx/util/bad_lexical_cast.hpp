@@ -14,7 +14,8 @@
 
 namespace hpx::util {
 
-    class HPX_ALWAYS_EXPORT bad_lexical_cast : public std::bad_cast
+    HPX_CORE_MODULE_EXPORT_EXTERN class HPX_ALWAYS_EXPORT bad_lexical_cast
+      : public std::bad_cast
     {
     public:
         bad_lexical_cast() noexcept
@@ -51,11 +52,12 @@ namespace hpx::util {
 
     namespace detail {
 
-        [[noreturn]] HPX_CORE_EXPORT void throw_bad_lexical_cast(
-            std::type_info const& source_type,
+        HPX_CORE_MODULE_EXPORT_EXTERN [[noreturn]] HPX_CORE_EXPORT void
+        throw_bad_lexical_cast(std::type_info const& source_type,
             std::type_info const& target_type);
 
-        template <typename Source, typename Target>
+        HPX_CORE_MODULE_EXPORT_EXTERN template <typename Source,
+            typename Target>
         [[noreturn]] Target throw_bad_lexical_cast()
         {
             detail::throw_bad_lexical_cast(typeid(Source), typeid(Target));

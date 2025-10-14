@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,10 +7,6 @@
 
 #pragma once
 
-#include <hpx/allocator_support/allocator_deleter.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/allocator_support/traits/is_allocator.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/inject_scheduler.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
@@ -19,13 +15,13 @@
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/detail/tag_priority_invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/promise.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <exception>
 #include <memory>
@@ -116,7 +112,8 @@ namespace hpx::execution::experimental {
                     future_data<T, Allocator, OperationState, Derived>,
                     Derived>>
         {
-            HPX_NON_COPYABLE(future_data);
+            future_data& operator=(future_data const&) = delete;
+            future_data& operator=(future_data&&) = delete;
 
             using derived_type = std::conditional_t<std::is_void_v<Derived>,
                 future_data, Derived>;
@@ -129,6 +126,10 @@ namespace hpx::execution::experimental {
 
             operation_state_type op_state;
 
+            // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
+            future_data(future_data const&) = delete;
+            future_data(future_data&&) = delete;
+
             template <typename Sender>
             future_data(init_no_addref no_addref, other_allocator const& alloc,
                 Sender&& sender)
@@ -139,6 +140,7 @@ namespace hpx::execution::experimental {
             {
                 hpx::execution::experimental::start(op_state);
             }
+            // NOLINTEND(bugprone-crtp-constructor-accessibility)
         };
 
         template <typename T, typename Allocator, typename OperationState>
@@ -158,7 +160,7 @@ namespace hpx::execution::experimental {
                 other_allocator const& alloc,
 #if defined(HPX_HAVE_STDEXEC)
                 decltype(std::declval<hpx::execution::experimental::run_loop>()
-                             .get_scheduler()) const& sched,
+                        .get_scheduler()) const& sched,
 #else
                 hpx::execution::experimental::run_loop_scheduler const& sched,
 #endif
@@ -169,7 +171,7 @@ namespace hpx::execution::experimental {
               // stdexec, so it is subect to change. This is currently relying
               // on the env struct to expose __loop_ as a public member.
               , loop(*hpx::execution::experimental::get_env(schedule(sched))
-                          .__loop_)
+                        .__loop_)
 #else
               , loop(sched.get_run_loop())
 #endif
@@ -234,7 +236,7 @@ namespace hpx::execution::experimental {
         auto make_future_with_run_loop(
 #if defined(HPX_HAVE_STDEXEC)
             decltype(std::declval<hpx::execution::experimental::run_loop>()
-                         .get_scheduler()) const& sched,
+                    .get_scheduler()) const& sched,
 #else
             hpx::execution::experimental::run_loop_scheduler const& sched,
 #endif
@@ -363,7 +365,7 @@ namespace hpx::execution::experimental {
         friend auto tag_invoke(make_future_t,
 #if defined(HPX_HAVE_STDEXEC)
             decltype(std::declval<hpx::execution::experimental::run_loop>()
-                         .get_scheduler()) const& sched,
+                    .get_scheduler()) const& sched,
 #else
             hpx::execution::experimental::run_loop_scheduler const& sched,
 #endif

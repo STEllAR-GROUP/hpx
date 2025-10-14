@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Bibek Wagle
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,11 +11,11 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/runtime_local/pool_timer.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <asio/basic_waitable_timer.hpp>
 
@@ -146,7 +146,7 @@ namespace hpx::util::detail {
             }
 
             HPX_ASSERT(timer_ != nullptr);
-            timer_->expires_from_now(time_duration.value());
+            timer_->expires_at(time_duration.from_now());
             timer_->async_wait(hpx::bind_front(    //-V779
                 &pool_timer::timer_handler, this->shared_from_this()));
 
@@ -199,6 +199,7 @@ namespace hpx::util::detail {
         {
             terminate();
         }
+        // NOLINTNEXTLINE(bugprone-empty-catch)
         catch (...)
         {
         }

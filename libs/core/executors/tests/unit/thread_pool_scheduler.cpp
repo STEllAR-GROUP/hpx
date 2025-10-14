@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -37,7 +37,7 @@ struct custom_type_non_default_constructible_non_copyable
     int x;
     custom_type_non_default_constructible_non_copyable() = delete;
     explicit custom_type_non_default_constructible_non_copyable(int x)
-      : x(x){};
+      : x(x) {};
     custom_type_non_default_constructible_non_copyable(
         custom_type_non_default_constructible_non_copyable&&) = default;
     custom_type_non_default_constructible_non_copyable& operator=(
@@ -171,6 +171,7 @@ void test_sender_receiver_then_wait()
     HPX_TEST(executed);
 }
 
+// NOLINTBEGIN(bugprone-unchecked-optional-access)
 void test_sender_receiver_then_sync_wait()
 {
     ex::thread_pool_scheduler sched{};
@@ -2085,6 +2086,7 @@ void test_bulk()
         }
     }
 }
+// NOLINTEND(bugprone-unchecked-optional-access)
 
 void test_completion_scheduler()
 {

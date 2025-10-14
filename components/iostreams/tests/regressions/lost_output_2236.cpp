@@ -1,4 +1,4 @@
-//  Copyright (c) 2012016 Steven R. Brandt
+//  Copyright (c) 2012-2016 Steven R. Brandt
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -128,10 +128,10 @@ namespace gc {
             }
             ~collectable() {}
 
-            int add_ref(hpx::id_type id)
+            std::size_t add_ref(hpx::id_type id)
             {
                 // use a mutex here?
-                int n = out_refs.size();
+                std::size_t n = out_refs.size();
                 if (id != hpx::invalid_id)
                 {
                     out_refs.push_back(id);
@@ -141,7 +141,7 @@ namespace gc {
             }
             HPX_DEFINE_COMPONENT_ACTION(collectable, add_ref)
 
-            void set_ref(unsigned int index, hpx::id_type id)
+            void set_ref(std::size_t index, hpx::id_type id)
             {
                 hpx::id_type old_id = out_refs.at(index);
                 if (id == old_id)
@@ -238,12 +238,12 @@ namespace gc {
             decref(0);
         }
 
-        hpx::future<int> add_ref(hpx::id_type id)
+        hpx::future<std::size_t> add_ref(hpx::id_type id)
         {
             return hpx::async<server::collectable::add_ref_action>(
                 this->get_id(), id);
         }
-        hpx::future<void> set_ref(int index, hpx::id_type id)
+        hpx::future<void> set_ref(std::size_t index, hpx::id_type id)
         {
             return hpx::async<server::collectable::set_ref_action>(
                 this->get_id(), index, id);
@@ -465,8 +465,8 @@ namespace gc { namespace server {
     void collectable::clean()
     {
         generate_output("Definitely garbage ", id);
-        int n = out_refs.size();
-        for (int i = 0; i < n; i++)
+        std::size_t n = out_refs.size();
+        for (std::size_t i = 0; i < n; i++)
         {
             set_ref(i, hpx::invalid_id);
         }
@@ -525,7 +525,7 @@ int hpx_main()
         {
             gc::collectable c2(
                 hpx::components::new_<gc::server::collectable>(loc));
-            int index = c1.add_ref(c2.get_id()).get();
+            std::size_t index = c1.add_ref(c2.get_id()).get();
             (void) index;
             c2.add_ref(c1.get_id()).wait();
         }

@@ -127,7 +127,6 @@ namespace hpx {
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/futures/traits/acquire_future.hpp>
@@ -135,7 +134,8 @@ namespace hpx {
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/is_future_range.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/util/detail/reserve.hpp>
 
 #include <algorithm>
@@ -479,31 +479,5 @@ namespace hpx {
         }
     } when_any_n{};
 }    // namespace hpx
-
-namespace hpx::lcos {
-
-    template <typename... Ts>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::when_any is deprecated. Use hpx::when_any instead.")
-    auto when_any(Ts&&... ts)
-    {
-        return hpx::when_any(HPX_FORWARD(Ts, ts)...);
-    }
-
-    template <typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::when_any_n is deprecated. Use hpx::when_any_n instead.")
-    auto when_any_n(Iterator begin, std::size_t count)
-    {
-        return hpx::when_any_n(begin, count);
-    }
-
-    template <typename Container>
-    using when_any_result HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::when_all_result is deprecated. Use hpx::when_all_result "
-        "instead.") = hpx::when_any_result<Container>;
-}    // namespace hpx::lcos
 
 #endif    // DOXYGEN

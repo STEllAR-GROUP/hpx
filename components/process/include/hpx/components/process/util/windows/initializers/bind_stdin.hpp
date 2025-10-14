@@ -20,31 +20,31 @@
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
-namespace initializers {
+    namespace initializers {
 
-class bind_stdin : public initializer_base
-{
-public:
-    explicit bind_stdin(const boost::iostreams::file_descriptor_source &source)
-      : source_(source)
-    {}
+        class bind_stdin : public initializer_base
+        {
+        public:
+            explicit bind_stdin(
+                const boost::iostreams::file_descriptor_source& source)
+              : source_(source)
+            {
+            }
 
-    template <class WindowsExecutor>
-    void on_CreateProcess_setup(WindowsExecutor &e) const
-    {
-        ::SetHandleInformation(source_.handle(), HANDLE_FLAG_INHERIT,
-            HANDLE_FLAG_INHERIT);
-        e.startup_info.hStdInput = source_.handle();
-        e.startup_info.dwFlags |= STARTF_USESTDHANDLES;
-        e.inherit_handles = true;
-    }
+            template <class WindowsExecutor>
+            void on_CreateProcess_setup(WindowsExecutor& e) const
+            {
+                ::SetHandleInformation(
+                    source_.handle(), HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+                e.startup_info.hStdInput = source_.handle();
+                e.startup_info.dwFlags |= STARTF_USESTDHANDLES;
+                e.inherit_handles = true;
+            }
 
-private:
-    boost::iostreams::file_descriptor_source source_;
-};
+        private:
+            boost::iostreams::file_descriptor_source source_;
+        };
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::windows::initializers
 
 #endif

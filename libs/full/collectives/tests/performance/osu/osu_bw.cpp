@@ -1,4 +1,4 @@
-//  Copyright (c) 2013-2015 Hartmut Kaiser
+//  Copyright (c) 2013-2025 Hartmut Kaiser
 //  Copyright (c) 2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -95,7 +95,9 @@ double ireceive(hpx::id_type dest, std::size_t loop, std::size_t size,
     }
 
     double elapsed = t.elapsed();
-    return (size / 1e6 * loop * window_size) / elapsed;
+    return (static_cast<double>(size) / 1e6 *
+               static_cast<double>(loop * window_size)) /
+        elapsed;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

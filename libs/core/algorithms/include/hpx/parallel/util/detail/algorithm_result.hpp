@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,16 +7,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/just.hpp>
 #include <hpx/execution/algorithms/sync_wait.hpp>
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy_fwd.hpp>
-#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)
 // for is_sender
@@ -165,6 +165,7 @@ namespace hpx::parallel::util::detail {
                 }
                 else
                 {
+                    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                     return hpx::get<0>(*result);
                 }
             }
@@ -256,12 +257,13 @@ namespace hpx::parallel::util::detail {
     using algorithm_result_t = typename algorithm_result<ExPolicy, T>::type;
 
     ///////////////////////////////////////////////////////////////////////////
+
+    template <typename U, typename Conv>
     // clang-format off
-    template <typename U, typename Conv,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
            !hpx::execution::experimental::is_sender_v<U> &&
             hpx::is_invocable_v<Conv, U>
-        )>
+        )
     // clang-format on
     constexpr hpx::util::invoke_result_t<Conv, U> convert_to_result(
         U&& val, Conv&& conv)
@@ -269,11 +271,11 @@ namespace hpx::parallel::util::detail {
         return HPX_INVOKE(conv, val);
     }
 
+    template <typename Sender, typename Conv>
     // clang-format off
-    template <typename Sender, typename Conv,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
             hpx::execution::experimental::is_sender_v<Sender>
-        )>
+        )
     // clang-format on
     constexpr decltype(auto) convert_to_result(Sender&& sender, Conv&& conv)
     {
@@ -283,8 +285,8 @@ namespace hpx::parallel::util::detail {
             });
     }
 
-    template <typename U, typename Conv,
-        HPX_CONCEPT_REQUIRES_(hpx::is_invocable_v<Conv, U>)>
+    template <typename U, typename Conv>
+        requires(hpx::is_invocable_v<Conv, U>)
     hpx::future<hpx::util::invoke_result_t<Conv, U>> convert_to_result(
         hpx::future<U>&& f, Conv&& conv)
     {

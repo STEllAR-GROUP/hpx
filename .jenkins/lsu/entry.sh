@@ -48,7 +48,7 @@ sbatch \
     --nodes="${configuration_slurm_num_nodes}" \
     --partition="${configuration_slurm_partition}" \
     --exclude="bahram" \
-    --time="03:00:00" \
+    --time="06:00:00" \
     --output="jenkins-hpx-${configuration_name_with_build_type}.out" \
     --error="jenkins-hpx-${configuration_name_with_build_type}.err" \
     --wait .jenkins/lsu/batch.sh

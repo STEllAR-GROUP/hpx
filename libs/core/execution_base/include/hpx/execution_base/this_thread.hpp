@@ -11,14 +11,14 @@
 #include <hpx/execution_base/agent_base.hpp>
 #include <hpx/execution_base/agent_ref.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-#include <hpx/errors/throw_exception.hpp>
 #include <hpx/execution_base/detail/spinlock_deadlock_detection.hpp>
+#include <hpx/modules/errors.hpp>
 #endif
 
 #include <chrono>

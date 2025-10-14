@@ -21,7 +21,6 @@ set(async_combinators_headers
 
 # cmake-format: off
 set(async_combinators_compat_headers
-    hpx/lcos/future_wait.hpp => hpx/future.hpp
     hpx/lcos/split_future.hpp => hpx/future.hpp
     hpx/lcos/wait_all.hpp => hpx/future.hpp
     hpx/lcos/wait_any.hpp => hpx/future.hpp
@@ -40,8 +39,8 @@ add_hpx_module(
   GLOBAL_HEADER_GEN ON
   HEADERS ${async_combinators_headers}
   COMPAT_HEADERS ${async_combinators_compat_headers}
-  EXCLUDE_FROM_GLOBAL_HEADER "hpx/async_combinators/future_wait.hpp"
   MODULE_DEPENDENCIES
+    hpx_allocator_support
     hpx_async_base
     hpx_concurrency
     hpx_config
@@ -49,6 +48,9 @@ add_hpx_module(
     hpx_futures
     hpx_memory
     hpx_pack_traversal
+    hpx_preprocessor
     hpx_tag_invoke
+    hpx_thread_support
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

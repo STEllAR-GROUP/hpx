@@ -8,9 +8,9 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <array>
 #include <cstddef>
@@ -74,6 +74,7 @@ private:
     mutable counter_type ref_counter;
 
 public:
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     intrusive_ref_counter() noexcept
       : ref_counter(1)
     {
@@ -115,6 +116,7 @@ class async_counter_base : public intrusive_ref_counter<Child>
     std::size_t counter_ = 0;
 
 public:
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     async_counter_base() = default;
 
     virtual ~async_counter_base() {}

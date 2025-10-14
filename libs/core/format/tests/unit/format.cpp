@@ -1,5 +1,5 @@
 //  Copyright (c) 2018 Agustin Berge
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,11 +9,13 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <hpx/hpx_main.hpp>
+
 #include <ctime>
 #include <string>
 #include <vector>
 
-int main(int argc, char* argv[])
+int main(int, char*[])
 {
     {
         HPX_TEST_EQ((hpx::util::format("Hello")), "Hello");

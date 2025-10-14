@@ -11,10 +11,10 @@ on: [pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: stellargroup/hip_build_env:10
+    container: stellargroup/hip_build_env:15
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Configure
       shell: bash
       run: |

@@ -12,7 +12,7 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution/traits/vector_pack_alignment_size.hpp>
 #include <hpx/execution/traits/vector_pack_type.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/generate.hpp>
 #include <hpx/parallel/datapar/handle_local_exceptions.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
@@ -46,14 +46,14 @@ namespace hpx { namespace parallel { namespace detail {
         {
             std::size_t len = count;
             for (; !hpx::parallel::util::detail::is_data_aligned(first) &&
-                 len != 0;
-                 --len)
+                len != 0;
+                --len)
             {
                 *first++ = f.template operator()<value_type>();
             }
 
             for (std::int64_t len_v = std::int64_t(len - (size + 1)); len_v > 0;
-                 len_v -= size, len -= size)
+                len_v -= size, len -= size)
             {
                 auto tmp = f.template operator()<V>();
                 traits::vector_pack_store<V, value_type>::aligned(tmp, first);

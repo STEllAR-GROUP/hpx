@@ -298,11 +298,12 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
@@ -313,8 +314,6 @@ namespace hpx {
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
@@ -429,6 +428,7 @@ namespace hpx::parallel {
                             bool r = hpx::invoke(pred, hpx::invoke(proj, *base),
                                 hpx::invoke(proj, get<0>(*it)));
 
+                            // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
                             if (!((get<1>(*it) = r)))
                                 base = get<0>(it.get_iterator_tuple());
                         });
@@ -482,39 +482,6 @@ namespace hpx::parallel {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter,
-        typename Pred = detail::equal_to, typename Proj = hpx::identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<FwdIter> &&
-            traits::is_projected_v<Proj, FwdIter> &&
-            traits::is_indirect_callable<ExPolicy, Pred,
-                    traits::projected<Proj, FwdIter>,
-                    traits::projected<Proj, FwdIter>>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::unique is deprecated, use "
-        "hpx::unique instead")
-        util::detail::algorithm_result_t<ExPolicy, FwdIter> unique(
-            ExPolicy&& policy, FwdIter first, FwdIter last,
-            Pred&& pred = Pred(), Proj&& proj = Proj())
-    {
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-            "Required at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::unique<FwdIter>().call(HPX_FORWARD(ExPolicy, policy),
-            first, last, HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
 
     template <typename I, typename O>
     using unique_copy_result = util::in_out_result<I, O>;
@@ -664,6 +631,7 @@ namespace hpx::parallel {
                             bool r = HPX_INVOKE(pred, HPX_INVOKE(proj, *base),
                                 HPX_INVOKE(proj, get<0>(*it)));
 
+                            // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
                             if (!((get<1>(*it) = r)))
                             {
                                 base = get<0>(it.get_iterator_tuple());
@@ -718,46 +686,6 @@ namespace hpx::parallel {
         /// \endcond
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::equal_to,
-        typename Proj = hpx::identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<FwdIter1> &&
-            hpx::traits::is_iterator_v<FwdIter2> &&
-            traits::is_projected_v<Proj, FwdIter1> &&
-            traits::is_indirect_callable<ExPolicy, Pred,
-                traits::projected<Proj, FwdIter1>,
-                traits::projected<Proj, FwdIter1>>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::unique_copy is deprecated, use "
-        "hpx::unique_copy instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
-        unique_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, Pred&& pred = Pred(), Proj&& proj = Proj())
-    {
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-            "Required at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-            "Requires at least forward iterator.");
-
-        using result_type = parallel::util::in_out_result<FwdIter1, FwdIter2>;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::unique_copy<result_type>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, dest,
-            HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
 }    // namespace hpx::parallel
 
 namespace hpx {
@@ -767,16 +695,16 @@ namespace hpx {
     inline constexpr struct unique_t final
       : hpx::detail::tag_parallel_algorithm<unique_t>
     {
-        // clang-format off
         template <typename FwdIter,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     hpx::traits::iter_value_t<FwdIter>,
                     hpx::traits::iter_value_t<FwdIter>
                 >
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::unique_t, FwdIter first, FwdIter last, Pred pred = Pred())
@@ -789,17 +717,17 @@ namespace hpx {
                 hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     hpx::traits::iter_value_t<FwdIter>,
                     hpx::traits::iter_value_t<FwdIter>
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::unique_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())
@@ -818,17 +746,17 @@ namespace hpx {
     inline constexpr struct unique_copy_t final
       : hpx::detail::tag_parallel_algorithm<unique_copy_t>
     {
-        // clang-format off
         template <typename InIter, typename OutIter,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<Pred,
                     hpx::traits::iter_value_t<InIter>,
                     hpx::traits::iter_value_t<OutIter>
                 >
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::unique_copy_t, InIter first,
             InIter last, OutIter dest, Pred pred = Pred())
@@ -844,10 +772,10 @@ namespace hpx {
                     hpx::identity_v));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -855,7 +783,7 @@ namespace hpx {
                     hpx::traits::iter_value_t<FwdIter1>,
                     hpx::traits::iter_value_t<FwdIter2>
                 >
-            )>
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type

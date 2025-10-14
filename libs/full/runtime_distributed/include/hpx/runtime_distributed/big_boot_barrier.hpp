@@ -12,9 +12,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/allocator_support/aligned_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/queue.hpp>
+#include <hpx/modules/allocator_support.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/locality.hpp>

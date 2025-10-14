@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/detail/agas_interface_functions.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
@@ -172,13 +173,13 @@ namespace hpx::agas::detail::impl {
     bool resolve_local(
         naming::gid_type const& gid, naming::address& addr, error_code& ec)
     {
-        naming::resolver_client* agas_ = naming::get_agas_client_ptr();
+        agas::addressing_service* agas_ = naming::get_agas_client_ptr();
         return (agas_ != nullptr) ? agas_->resolve_local(gid, addr, ec) : false;
     }
 
     bool resolve_cached(naming::gid_type const& gid, naming::address& addr)
     {
-        naming::resolver_client* agas_ = naming::get_agas_client_ptr();
+        agas::addressing_service* agas_ = naming::get_agas_client_ptr();
         return (agas_ != nullptr) ? agas_->resolve_cached(gid, addr) : false;
     }
 
@@ -224,7 +225,7 @@ namespace hpx::agas::detail::impl {
 
     ///////////////////////////////////////////////////////////////////////////
     // helper functions allowing to bind and unbind a GID to a given address
-    // without having to directly refer to the resolver_client
+    // without having to directly refer to the agas::addressing_service
     bool bind_gid_local(naming::gid_type const& gid_,
         naming::address const& addr, error_code& ec)
     {
@@ -406,7 +407,7 @@ namespace hpx::agas::detail::impl {
     {
         HPX_ASSERT(!naming::detail::is_locked(gid));
 
-        naming::resolver_client& resolver = naming::get_agas_client();
+        agas::addressing_service& resolver = naming::get_agas_client();
         if (keep_alive_)
             return resolver.incref_async(gid, credits, keep_alive_);
 

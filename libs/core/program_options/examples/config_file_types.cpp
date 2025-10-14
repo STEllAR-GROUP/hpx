@@ -7,8 +7,8 @@
 // This example shows a config file (in ini format) being parsed by the
 // program_options library. It includes a number of different value types.
 
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/program_options.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 
 #include <iostream>
 #include <sstream>

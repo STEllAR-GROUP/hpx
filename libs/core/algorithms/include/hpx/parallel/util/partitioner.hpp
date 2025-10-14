@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,14 +19,12 @@
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/partitioner_iteration.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/detail/select_partitioner.hpp>
-#include <hpx/type_support/empty_function.hpp>
-#include <hpx/type_support/unused.hpp>
-#include <hpx/type_support/void_guard.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -163,7 +161,7 @@ namespace hpx::parallel::util::detail {
 
         while (count != 0)
         {
-            std::size_t chunk = (std::min)(count, *chunk_size_it);
+            std::size_t chunk = (std::min) (count, *chunk_size_it);
             HPX_ASSERT(chunk != 0);
 
             shape.emplace_back(*data_it, first, chunk);
@@ -507,9 +505,10 @@ namespace hpx::parallel::util::detail {
 
                     handle_local_exceptions::call(r);
 
-                    return hpx::util::void_guard<R>(), f(HPX_MOVE(r));
+                    return hpx::util::void_guard<R>(),
+                           f(HPX_FORWARD(decltype(r), r));
                 },
-                HPX_MOVE(workitems));
+                HPX_FORWARD(Items, workitems));
 #endif
         }
     };

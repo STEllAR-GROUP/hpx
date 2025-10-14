@@ -111,6 +111,14 @@ namespace hpx::collectives::detail {
     private:
         using client_type = components::client<channel_communicator_server>;
 
+    public:
+        HPX_EXPORT channel_communicator(char const* basename,
+            std::size_t num_sites, std::size_t this_site, client_type here);
+
+        HPX_EXPORT channel_communicator(hpx::launch::sync_policy,
+            char const* basename, std::size_t num_sites, std::size_t this_site,
+            client_type here);
+
         channel_communicator(channel_communicator const& rhs) = delete;
         channel_communicator(channel_communicator&& rhs) noexcept = delete;
 
@@ -119,13 +127,7 @@ namespace hpx::collectives::detail {
         channel_communicator& operator=(
             channel_communicator&& rhs) noexcept = delete;
 
-    public:
-        HPX_EXPORT channel_communicator(char const* basename,
-            std::size_t num_sites, std::size_t this_site, client_type here);
-
-        HPX_EXPORT channel_communicator(hpx::launch::sync_policy,
-            char const* basename, std::size_t num_sites, std::size_t this_site,
-            client_type here);
+        HPX_EXPORT ~channel_communicator();
 
         template <typename T>
         hpx::future<T> get(std::size_t site, std::size_t tag) const
@@ -148,7 +150,8 @@ namespace hpx::collectives::detail {
                 HPX_FORWARD(T, value), tag);
         }
 
-        std::pair<std::size_t, std::size_t> get_info() const noexcept
+        [[nodiscard]] std::pair<std::size_t, std::size_t> get_info()
+            const noexcept
         {
             return std::make_pair(clients_.size(), this_site_);
         }

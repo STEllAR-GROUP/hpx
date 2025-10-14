@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -33,6 +33,7 @@
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/program_options/parsers.hpp>
@@ -53,9 +54,6 @@
 #include <hpx/string_util/split.hpp>
 #include <hpx/threading/thread.hpp>
 #include <hpx/threading_base/detail/get_default_timer_service.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/unused.hpp>
-#include <hpx/util/from_string.hpp>
 
 #ifdef HPX_HAVE_MODULE_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
@@ -872,7 +870,8 @@ namespace hpx {
             try
             {
                 // make sure the runtime system is not active yet
-                if ((result = ensure_no_runtime_is_up()) != 0)
+                result = ensure_no_runtime_is_up();
+                if (result != 0)
                 {
                     return result;
                 }
@@ -930,7 +929,7 @@ namespace hpx {
                     // contain --hpx:help or --hpx:version, on error result is < 0)
                     if (result != 0)
                     {
-                        result = (std::min)(result, 0);
+                        result = (std::min) (result, 0);
                         return result;
                     }
 
@@ -1022,6 +1021,7 @@ namespace hpx {
                     return hpx::util::from_string<T>(
                         get_runtime().get_config().get_entry(config, default_));
                 }
+                // NOLINTNEXTLINE(bugprone-empty-catch)
                 catch (hpx::util::bad_lexical_cast const&)
                 {
                     // do nothing

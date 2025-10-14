@@ -42,7 +42,8 @@ void test_find_if(IteratorTag)
     iterator index = hpx::find_if(iterator(std::begin(c)),
         iterator(std::end(c)), [](auto v) { return v == int(1); });
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -64,7 +65,8 @@ void test_find_if(ExPolicy&& policy, IteratorTag)
     iterator index = hpx::find_if(policy, iterator(std::begin(c)),
         iterator(std::end(c)), [](auto v) { return v == int(1); });
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -97,7 +99,8 @@ void test_find_if_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     iterator index = hpx::get<0>(*snd_result);
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -119,7 +122,8 @@ void test_find_if_async(ExPolicy&& p, IteratorTag)
     f.wait();
 
     //create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
     auto res = f.get();
     std::cout << "Expected : " << *(iterator(test_index)) << " Got : " << *res
               << std::endl;

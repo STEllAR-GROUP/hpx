@@ -571,7 +571,7 @@ namespace hpx::threads {
                 int const pu_depth =
                     hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
                 for (unsigned int i = 0;
-                     static_cast<std::size_t>(i) != num_of_pus_; ++i)
+                    static_cast<std::size_t>(i) != num_of_pus_; ++i)
                 {
                     hwloc_obj_t const pu_obj =
                         hwloc_get_obj_by_depth(topo, pu_depth, i);
@@ -1462,8 +1462,8 @@ namespace hpx::threads {
     static void iterate(hwloc_bitmap_t cpuset, F&& f)
     {
         for (auto id = hwloc_bitmap_first(cpuset);
-             static_cast<unsigned>(id) != static_cast<unsigned>(-1);
-             id = hwloc_bitmap_next(cpuset, id))
+            static_cast<unsigned>(id) != static_cast<unsigned>(-1);
+            id = hwloc_bitmap_next(cpuset, id))
         {
             if (hwloc_bitmap_isset(cpuset, id))
             {
@@ -1585,7 +1585,7 @@ namespace hpx::threads {
 
         int const pu_depth = hwloc_get_type_or_below_depth(topo, htype);
         for (unsigned int i = 0; static_cast<std::size_t>(i) != num;
-             ++i)    //-V104
+            ++i)    //-V104
         {
             hwloc_obj_t const pu_obj =
                 hwloc_get_obj_by_depth(topo, pu_depth, i);

@@ -14,13 +14,13 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/thread_queue.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -723,6 +723,7 @@ namespace hpx::threads::policies {
                 low_priority_queue_.create_thread(data, id, ec);
                 break;
 
+            case thread_priority::initially_bound:
             case thread_priority::bound:
                 HPX_ASSERT(num_thread < num_queues_);
                 data_[num_thread].data_.bound_queue_->create_thread(
@@ -1057,6 +1058,7 @@ namespace hpx::threads::policies {
                 data_[num_thread].data_.queue_->schedule_thread(HPX_MOVE(thrd));
                 break;
 
+            case thread_priority::initially_bound:
             case thread_priority::bound:
                 data_[num_thread].data_.bound_queue_->schedule_thread(
                     HPX_MOVE(thrd));
@@ -1127,6 +1129,7 @@ namespace hpx::threads::policies {
                     HPX_MOVE(thrd), true);
                 break;
 
+            case thread_priority::initially_bound:
             case thread_priority::bound:
                 data_[num_thread].data_.bound_queue_->schedule_thread(
                     HPX_MOVE(thrd), true);
@@ -1227,6 +1230,7 @@ namespace hpx::threads::policies {
                 case thread_priority::normal:
                     return d.queue_->get_thread_count(state);
 
+                case thread_priority::initially_bound:
                 case thread_priority::bound:
                     return d.bound_queue_->get_thread_count(state);
 
@@ -1284,6 +1288,7 @@ namespace hpx::threads::policies {
                 break;
             }
 
+            case thread_priority::initially_bound:
             case thread_priority::bound:
             {
                 for (std::size_t i = 0; i != num_queues_; ++i)

@@ -109,7 +109,6 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_local/dataflow.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
@@ -117,6 +116,8 @@ namespace hpx {
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
@@ -124,7 +125,6 @@ namespace hpx {
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -562,16 +562,16 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<partial_sort_t>
     {
     private:
-        // clang-format off
         template <typename RandIter,
-            typename Comp = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend RandIter tag_fallback_invoke(hpx::partial_sort_t, RandIter first,
             RandIter middle, RandIter last, Comp comp = Comp())
@@ -583,17 +583,17 @@ namespace hpx {
                 first, middle, last, HPX_MOVE(comp), hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename RandIter,
-            typename Comp = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, RandIter>
         tag_fallback_invoke(hpx::partial_sort_t, ExPolicy&& policy,

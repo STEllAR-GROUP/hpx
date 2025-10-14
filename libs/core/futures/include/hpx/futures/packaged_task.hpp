@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,13 +11,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/move_only_function.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/promise.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 
 #include <exception>
@@ -147,14 +146,6 @@ namespace hpx {
         hpx::promise<R> promise_;
     };
 }    // namespace hpx
-
-namespace hpx::lcos::local {
-
-    template <typename Sig>
-    using packaged_task HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::packaged_task is deprecated, use hpx::packaged_task "
-        "instead") = hpx::packaged_task<Sig>;
-}
 
 namespace std {    //-V1061
 

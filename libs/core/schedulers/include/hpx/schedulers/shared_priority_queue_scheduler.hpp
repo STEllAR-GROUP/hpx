@@ -12,8 +12,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/debugging/print.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/queue_holder_numa.hpp>
@@ -984,7 +984,7 @@ namespace hpx::threads::policies {
 
                 std::map<std::size_t, std::size_t> domain_map;
                 for (std::size_t local_id = 0; local_id != num_workers_;
-                     ++local_id)
+                    ++local_id)
                 {
                     std::size_t const global_id =
                         local_to_global_thread_index(local_id);
@@ -1010,7 +1010,7 @@ namespace hpx::threads::policies {
                 // unusual numa topologies with (e.g.) High Bandwidth Memory on
                 // numa nodes with no processors
                 for (std::size_t local_id = 0; local_id < num_workers_;
-                     ++local_id)
+                    ++local_id)
                 {
                     d_lookup_[local_id] = static_cast<std::size_t>(
                         domain_map[d_lookup_[local_id]]);

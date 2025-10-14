@@ -10,7 +10,7 @@
 
 namespace hpx::util {
 
-    const char* bad_lexical_cast::what() const noexcept
+    char const* bad_lexical_cast::what() const noexcept
     {
         return "bad lexical cast: source type value could not be interpreted "
                "as target";

@@ -515,9 +515,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::uint64_t t = 0;
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_full();
-            std::cout << "full: " << (t * 1e-9) / test_count << std::endl;
+            std::cout << "full: "
+                      << (static_cast<double>(t) * 1e-9) / test_count
+                      << std::endl;
             hpx::util::print_cdash_timing(
-                "Stencil3Full", (t * 1e-9) / test_count);
+                "Stencil3Full", (static_cast<double>(t) * 1e-9) / test_count);
         }
 
         // now run explicit (no-check) stencil3 tests
@@ -525,20 +527,22 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::uint64_t t = 0;
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_v1();
-            std::cout << "nocheck(v1): " << (t * 1e-9) / test_count
+            std::cout << "nocheck(v1): "
+                      << (static_cast<double>(t) * 1e-9) / test_count
                       << std::endl;
-            hpx::util::print_cdash_timing(
-                "Stencil3NocheckV1", (t * 1e-9) / test_count);
+            hpx::util::print_cdash_timing("Stencil3NocheckV1",
+                (static_cast<double>(t) * 1e-9) / test_count);
         }
 
         {
             std::uint64_t t = 0;
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_v2();
-            std::cout << "nocheck(v2): " << (t * 1e-9) / test_count
+            std::cout << "nocheck(v2): "
+                      << (static_cast<double>(t) * 1e-9) / test_count
                       << std::endl;
-            hpx::util::print_cdash_timing(
-                "Stencil3NocheckV2", (t * 1e-9) / test_count);
+            hpx::util::print_cdash_timing("Stencil3NocheckV2",
+                (static_cast<double>(t) * 1e-9) / test_count);
         }
 
         // now run explicit tests
@@ -546,9 +550,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::uint64_t t = 0;
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_explicit();
-            std::cout << "explicit: " << (t * 1e-9) / test_count << std::endl;
-            hpx::util::print_cdash_timing(
-                "Stencil3Explicit", (t * 1e-9) / test_count);
+            std::cout << "explicit: "
+                      << (static_cast<double>(t) * 1e-9) / test_count
+                      << std::endl;
+            hpx::util::print_cdash_timing("Stencil3Explicit",
+                (static_cast<double>(t) * 1e-9) / test_count);
         }
     }
 

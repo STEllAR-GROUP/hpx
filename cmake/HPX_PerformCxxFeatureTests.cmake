@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2024 Hartmut Kaiser
+# Copyright (c) 2007-2025 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2013-2016 Agustin Berge
 # Copyright (c)      2017 Taeguk Kwon
@@ -159,8 +159,14 @@ function(hpx_perform_cxx_feature_tests)
     )
   endif()
 
-  if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 23)
+  if(HPX_WITH_CXX20_COROUTINES)
     hpx_check_for_cxx23_std_generator(DEFINITIONS HPX_HAVE_CXX23_STD_GENERATOR)
+  endif()
+
+  if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 23)
+    hpx_check_for_cxx23_deprecated_std_aligned_storage(
+      DEFINITIONS HPX_HAVE_CXX23_DEPRECATED_STD_ALIGNED_STORAGE
+    )
   endif()
 
   hpx_check_for_cxx26_experimental_scope(

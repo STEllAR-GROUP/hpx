@@ -300,7 +300,7 @@ namespace hpx { namespace performance_counters {
         std::int64_t instanceindex_;          ///< the instance index
         std::int64_t subinstanceindex_;       ///< the sub-instance index
         bool parentinstance_is_basename_;     ///< the parentinstancename_
-            ///member holds a base counter name
+        ///member holds a base counter name
 
     private:
         // serialization support

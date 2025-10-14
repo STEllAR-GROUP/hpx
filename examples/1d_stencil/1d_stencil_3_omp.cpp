@@ -63,18 +63,18 @@ struct partition_data
     partition_data(std::size_t size, double initial_value)
       : data_(size)
     {
-        double base_value = double(initial_value * size);
-        for (std::size_t i = 0; i != size; ++i)
+        double base_value = initial_value * double(size);
+        for (std::ptrdiff_t i = 0; i != static_cast<std::ptrdiff_t>(size); ++i)
             data_[i] = base_value + double(i);
     }
 
     double& operator[](std::size_t idx)
     {
-        return data_[idx];
+        return data_[static_cast<std::ptrdiff_t>(idx)];
     }
     double operator[](std::size_t idx) const
     {
-        return data_[idx];
+        return data_[static_cast<std::ptrdiff_t>(idx)];
     }
 
     std::size_t size() const

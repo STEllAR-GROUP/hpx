@@ -8,7 +8,7 @@
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/type_support/coroutines_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <exception>
 #include <utility>
@@ -517,8 +517,8 @@ void test_awaitable_sender1(Signatures&&, Awaiter&&)
     static_assert(ex::is_awaitable_v<awaitable_sender_1<Awaiter>>);
 
     awaitable_sender_1<Awaiter> s;
-    static_assert(!hpx::meta::value<ex::detail::has_completion_signatures<
-                      awaitable_sender_1<Awaiter>>>);
+    static_assert(!hpx::meta::value<
+        ex::detail::has_completion_signatures<awaitable_sender_1<Awaiter>>>);
 #if defined(HPX_HAVE_STDEXEC)
     static_assert(std::is_same_v<decltype(ex::get_completion_signatures(
                                      s, ex::empty_env{})),

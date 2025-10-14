@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2021 Hartmut Kaiser
+//  Copyright (c) 2012-2025 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,6 +12,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/naming/credit_handling.hpp>
@@ -315,7 +316,7 @@ namespace hpx { namespace agas { namespace server {
 
         partition_table_type::iterator end = partitions_.end();
         for (partition_table_type::iterator it = partitions_.begin(); it != end;
-             ++it)
+            ++it)
         {
             using hpx::get;
             num_threads.push_back(get<1>(it->second));
@@ -336,7 +337,7 @@ namespace hpx { namespace agas { namespace server {
 
         partition_table_type::iterator end = partitions_.end();
         for (partition_table_type::iterator it = partitions_.begin(); it != end;
-             ++it)
+            ++it)
         {
             using hpx::get;
             num_threads += get<1>(it->second);

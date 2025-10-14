@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2014-2022 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //  Copyright (c) 2014 Patricia Grubel
 //  Copyright (c) 2019 Nikunj Gupta
 //
@@ -66,7 +66,8 @@ public:
         for (std::size_t k = 0; k != subdomain_width + 1; ++k)
         {
             data_[k] = std::sin(2 * pi *
-                ((0.0 + subdomain_width * subdomain_index + k) /
+                ((0.0 + static_cast<double>(subdomain_width) * subdomain_index +
+                     static_cast<double>(k)) /
                     static_cast<double>(subdomain_width * subdomains)));
         }
     }
@@ -168,10 +169,11 @@ struct stepper
         const std::size_t size = center_input.size() - 1;
         partition_data workspace(size + 2 * sti + 1);
 
-        std::copy(
-            end(left_input) - sti - 1, end(left_input) - 1, &workspace[0]);
+        std::copy(end(left_input) - static_cast<std::ptrdiff_t>(sti) - 1,
+            end(left_input) - 1, &workspace[0]);
         std::copy(begin(center_input), end(center_input) - 1, &workspace[sti]);
-        std::copy(begin(right_input), begin(right_input) + sti + 1,
+        std::copy(begin(right_input),
+            begin(right_input) + static_cast<std::ptrdiff_t>(sti) + 1,
             &workspace[size + sti]);
 
         for (std::size_t t = 0; t != sti; ++t)
@@ -233,13 +235,13 @@ struct stepper
             {
                 next[0].then([sem, t](partition&&) {
                     // inform semaphore about new lower limit
-                    sem->signal(t);
+                    sem->signal(static_cast<std::int64_t>(t));
                 });
             }
 
             // suspend if the tree has become too deep, the continuation above
             // will resume this thread once the computation has caught up
-            sem->wait(t);
+            sem->wait(static_cast<std::int64_t>(t));
         }
 
         // Return the solution at time-step 'iterations'.

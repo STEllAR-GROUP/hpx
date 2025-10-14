@@ -120,10 +120,10 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/async_combinators/detail/throw_if_exceptional.hpp>
 #include <hpx/async_combinators/when_each.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -261,26 +261,5 @@ namespace hpx {
         }
     } wait_each_n{};    // namespace hpx
 }    // namespace hpx
-
-namespace hpx::lcos {
-
-    template <typename F, typename... Ts>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_each is deprecated. Use hpx::wait_each instead.")
-    void wait_each(F&& f, Ts&&... ts)
-    {
-        hpx::wait_each(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-    }
-
-    template <typename F, typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_each is deprecated. Use hpx::wait_each instead.")
-    void wait_each_n(F&& f, Iterator begin, std::size_t count)
-    {
-        hpx::wait_each_n(HPX_FORWARD(F, f), begin, count);
-    }
-}    // namespace hpx::lcos
 
 #endif    // DOXYGEN

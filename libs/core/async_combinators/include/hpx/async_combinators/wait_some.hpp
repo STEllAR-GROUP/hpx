@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -146,7 +146,6 @@ namespace hpx {
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/detail/throw_if_exceptional.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/futures/traits/future_access.hpp>
@@ -154,7 +153,9 @@ namespace hpx {
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <algorithm>
@@ -708,126 +709,5 @@ namespace hpx {
         }
     } wait_some_n{};
 }    // namespace hpx
-
-namespace hpx::lcos {
-
-    template <typename Future>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(std::size_t n, std::vector<Future> const& lazy_values,
-        error_code& = throws)
-    {
-        hpx::wait_some(n, lazy_values);
-    }
-
-    template <typename Future>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(
-        std::size_t n, std::vector<Future>& lazy_values, error_code& = throws)
-    {
-        hpx::wait_some(n, const_cast<std::vector<Future> const&>(lazy_values));
-    }
-
-    template <typename Future>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(
-        std::size_t n, std::vector<Future>&& lazy_values, error_code& = throws)
-    {
-        hpx::wait_some(n, const_cast<std::vector<Future> const&>(lazy_values));
-    }
-
-    template <typename Future, std::size_t N>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(std::size_t n, std::array<Future, N> const& lazy_values,
-        error_code& = throws)
-    {
-        hpx::wait_some(n, lazy_values);
-    }
-
-    template <typename Future, std::size_t N>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(
-        std::size_t n, std::array<Future, N>& lazy_values, error_code& = throws)
-    {
-        hpx::wait_some(
-            n, const_cast<std::array<Future, N> const&>(lazy_values));
-    }
-
-    template <typename Future, std::size_t N>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(std::size_t n, std::array<Future, N>&& lazy_values,
-        error_code& = throws)
-    {
-        hpx::wait_some(
-            n, const_cast<std::array<Future, N> const&>(lazy_values));
-    }
-
-    template <typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(
-        std::size_t n, Iterator begin, Iterator end, error_code& = throws)
-    {
-        hpx::wait_some(n, begin, end);
-    }
-
-    template <typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    Iterator wait_some_n(
-        std::size_t n, Iterator begin, std::size_t count, error_code& = throws)
-    {
-        return hpx::wait_some(n, begin, count);
-    }
-
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    inline void wait_some(std::size_t n, error_code& = throws)
-    {
-        hpx::wait_some(n);
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(std::size_t n, hpx::future<T>&& f, error_code& = throws)
-    {
-        hpx::wait_some(n, HPX_MOVE(f));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(
-        std::size_t n, hpx::shared_future<T>&& f, error_code& = throws)
-    {
-        hpx::wait_some(n, HPX_MOVE(f));
-    }
-
-    template <typename... Ts>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(std::size_t n, error_code&, Ts&&... ts)
-    {
-        hpx::wait_some(n, HPX_FORWARD(Ts, ts)...);
-    }
-
-    template <typename... Ts>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::lcos::wait_some is deprecated. Use hpx::wait_some instead.")
-    void wait_some(std::size_t n, Ts&&... ts)
-    {
-        hpx::wait_some(n, HPX_FORWARD(Ts, ts)...);
-    }
-}    // namespace hpx::lcos
 
 #endif    // DOXYGEN

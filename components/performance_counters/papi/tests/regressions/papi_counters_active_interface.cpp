@@ -13,8 +13,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx_start.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/program_options.hpp>
-#include <hpx/util/from_string.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 const char* counter_name = "/papi{locality#0/worker-thread#0}/PAPI_SR_INS";

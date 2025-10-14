@@ -86,11 +86,12 @@ namespace hpx::threads::policies {
             static constexpr std::int64_t const max_exponent =
                 std::numeric_limits<double>::max_exponent;
             double const exponent =
-                (std::min)(static_cast<double>(data.wait_count_),
+                (std::min) (static_cast<double>(data.wait_count_),
                     static_cast<double>(max_exponent - 1));
 
-            std::chrono::milliseconds const period(std::lround((std::min)(
-                data.max_idle_backoff_time_, std::pow(2.0, exponent))));
+            std::chrono::milliseconds const period(
+                std::lround((std::min) (data.max_idle_backoff_time_,
+                    std::pow(2.0, exponent))));
 
             ++data.wait_count_;
 
@@ -312,8 +313,8 @@ namespace hpx::threads::policies {
         for (auto const& state_iter : states_)
         {
             hpx::state s = state_iter.data_.load(std::memory_order_relaxed);
-            result.first = (std::min)(result.first, s);
-            result.second = (std::max)(result.second, s);
+            result.first = (std::min) (result.first, s);
+            result.second = (std::max) (result.second, s);
         }
 
         return result;

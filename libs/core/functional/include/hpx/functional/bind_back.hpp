@@ -14,12 +14,11 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/member_pack.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/one_shot.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -193,17 +192,6 @@ namespace hpx {
         return HPX_FORWARD(F, f);
     }
 }    // namespace hpx
-
-namespace hpx::util {
-
-    template <typename F, typename... Ts>
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::util::bind_back is deprecated, use hpx::bind_back instead")
-    constexpr decltype(auto) bind_back(F&& f, Ts&&... ts)
-    {
-        return hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-    }
-}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)

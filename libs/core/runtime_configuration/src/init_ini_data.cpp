@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2023 Hartmut Kaiser
+//  Copyright (c) 2005-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -206,11 +206,13 @@ namespace hpx::util {
                         LBT_(info).format(
                             "loaded configuration: {}", p.string());
                     }
+                    // NOLINTNEXTLINE(bugprone-empty-catch)
                     catch (hpx::exception const& /*e*/)
                     {
                     }
                 }
             }
+            // NOLINTNEXTLINE(bugprone-empty-catch)
             catch (fs::filesystem_error const& /*e*/)
             {
             }

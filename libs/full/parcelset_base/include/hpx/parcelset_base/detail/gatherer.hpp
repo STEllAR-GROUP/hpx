@@ -71,11 +71,11 @@ namespace hpx::parcelset {
             ++num_messages_;
             buffer_allocate_time_ += x.buffer_allocate_time_;
             num_zchunks_ += x.num_zchunks_;
-            num_zchunks_per_msg_max_ = (std::max)(
-                num_zchunks_per_msg_max_, x.num_zchunks_per_msg_max_);
+            num_zchunks_per_msg_max_ = (std::max) (num_zchunks_per_msg_max_,
+                x.num_zchunks_per_msg_max_);
             size_zchunks_total_ += x.size_zchunks_total_;
             size_zchunks_max_ =
-                (std::max)(size_zchunks_max_, x.size_zchunks_max_);
+                (std::max) (size_zchunks_max_, x.size_zchunks_max_);
         }
 
         template <typename Mutex>

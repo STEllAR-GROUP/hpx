@@ -11,8 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/modules/plugin.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <map>
 #include <string>
@@ -59,10 +58,7 @@ namespace hpx::components {
 // clang-format on
 
 #define HPX_DEFINE_FACTORY_STATIC(module, name, base)                          \
-    {                                                                          \
-        HPX_PP_STRINGIZE(module), HPX_PLUGIN_LIST_NAME(name, base)             \
-    }                                                                          \
-    /**/
+    {HPX_PP_STRINGIZE(module), HPX_PLUGIN_LIST_NAME(name, base)} /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INIT_REGISTRY_MODULE_STATIC(name, base)                            \

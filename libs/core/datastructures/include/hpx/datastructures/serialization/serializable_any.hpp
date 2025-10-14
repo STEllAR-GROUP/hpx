@@ -1,6 +1,6 @@
 /*=============================================================================
     Copyright (c) 2013 Shuangyang Yang
-    Copyright (c) 2007-2024 Hartmut Kaiser
+    Copyright (c) 2007-2025 Hartmut Kaiser
     Copyright (c) Christopher Diggins 2005
     Copyright (c) Pablo Aguilar 2005
     Copyright (c) Kevlin Henney 2001
@@ -23,10 +23,10 @@
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/serialization/detail/raw_ptr.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/type_support/construct_at.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -243,6 +243,7 @@ namespace hpx::util {
         static void new_object(void*& object, std::true_type, Ts&&... ts)
         {
             using value_type = std::decay_t<T>;
+            // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             new (&object) value_type(HPX_FORWARD(Ts, ts)...);
         }
 

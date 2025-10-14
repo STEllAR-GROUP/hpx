@@ -236,7 +236,7 @@ namespace hpx {
         ///////////////////////////////////////////////////////////////////////
         /// \brief Allow access to the AGAS client instance used by the HPX
         ///        runtime.
-        naming::resolver_client& get_agas_client();
+        agas::addressing_service& get_agas_client();
 
 #if defined(HPX_HAVE_NETWORKING)
         /// \brief Allow access to the parcel handler instance used by the HPX
@@ -404,7 +404,7 @@ namespace hpx {
         notification_policy_type parcel_handler_notifier_;
         parcelset::parcelhandler parcel_handler_;
 #endif
-        naming::resolver_client agas_client_;
+        agas::addressing_service agas_client_;
         applier::applier applier_;
 
         // locality basename -> used cores

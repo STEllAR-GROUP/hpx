@@ -49,7 +49,7 @@ General changes
 - Copy button shortkey was added at the top-right of code-blocks.
 - Pragma directive that reports warnings as errors on MSVC was fixed. 
 - Command line argument ``--hpx:loopback_network`` was added to
-  facilitie debugging with networks.
+  facilitate debugging with networks.
 - We added an HPX-SYCL integration, allowing users to obtain HPX futures
   for SYCL events. This effectively enables the integration of arbitrary
   asynchronous SYCL operations into the HPX task graph. Bolted on top 
@@ -158,7 +158,7 @@ Closed pull requests
 * :hpx-pr:`6130` - Remove the mutex lock in the critical path of get_partitioner.
 * :hpx-pr:`6129` - Modernize module from levels 22, 23
 * :hpx-pr:`6127` - Working around gccV9 problem that prevent us from storing enum classes in bit fields
-* :hpx-pr:`6126` - Deprecate hpx::parallel::task_block in favor of hpx::experimental::ta…
+* :hpx-pr:`6126` - Deprecate hpx::parallel::task_block in favor of hpx::experimental::task_block
 * :hpx-pr:`6125` - Making sure sync_wait compiles when used with an lvalue sender involving bulk
 * :hpx-pr:`6124` - Fixing use of any_sender in combination with when_all
 * :hpx-pr:`6123` - Fixed issues found by PVS-Studio
@@ -247,7 +247,7 @@ Closed pull requests
 * :hpx-pr:`6030` - Adding parcelport initialization hook for resource partitioner operation
 * :hpx-pr:`6029` - Simplify startup code
 * :hpx-pr:`6027` - Add/Fix documentation in Public API page
-* :hpx-pr:`6026` - add option hpx:force_ipv4 to force resolving hostnames to ipv4 adresses
+* :hpx-pr:`6026` - add option hpx:force_ipv4 to force resolving hostnames to ipv4 addresses
 * :hpx-pr:`6025` - build(docs): remove leftover sections
 * :hpx-pr:`6023` - Minor fixes on "How to build on Windows"
 * :hpx-pr:`6022` - build(doxy): don't extract private members
@@ -277,7 +277,7 @@ Closed pull requests
 * :hpx-pr:`5985` - Re-add deprecated tag_policy_tag et.al. types that were removed in V1.8.1
 * :hpx-pr:`5981` - docs: add docs for condition_variable.hpp
 * :hpx-pr:`5980` - More work on execution::read
-* :hpx-pr:`5979` - Unsupport clang-v8 and clang-v9, switch LSU clang-v13 to C++17
+* :hpx-pr:`5979` - Remove support for clang-v8 and clang-v9, switch LSU clang-v13 to C++17
 * :hpx-pr:`5977` - fix: Compilation errors for -std=c++17 builders
 * :hpx-pr:`5975` - docs: fix & improve parallel algorithms documentation 5
 * :hpx-pr:`5974` - [P2300] Adapt get completion signatures for awaitable senders

@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config/defines.hpp>
-#include <hpx/preprocessor/identity.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #if defined(HPX_HAVE_CXX20_LAMBDA_CAPTURE)
 #define HPX_CXX20_CAPTURE_THIS(...) HPX_PP_IDENTITY(__VA_ARGS__, this)

@@ -12,9 +12,8 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/void_guard.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -76,6 +75,7 @@ namespace hpx {
 #endif
 
             return HPX_INVOKE(
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 HPX_FORWARD(F, f), hpx::get<Is>(HPX_FORWARD(Tuple, t))...);
 
 #if defined(HPX_MSVC)

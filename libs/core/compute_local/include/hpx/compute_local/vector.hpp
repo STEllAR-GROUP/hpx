@@ -14,6 +14,7 @@
 #include <hpx/compute_local/traits/access_target.hpp>
 #include <hpx/compute_local/traits/allocator_traits.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/runtime_local/report_error.hpp>
 
@@ -387,3 +388,9 @@ namespace hpx::compute {
         x.swap(y);
     }
 }    // namespace hpx::compute
+
+template <typename T, typename Allocator>
+struct hpx::traits::is_contiguous_iterator<
+    hpx::compute::detail::iterator<T, Allocator>> : std::true_type
+{
+};

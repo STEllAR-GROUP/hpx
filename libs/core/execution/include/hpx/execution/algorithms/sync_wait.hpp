@@ -23,7 +23,6 @@ namespace hpx::this_thread::experimental {
 #else
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -37,10 +36,9 @@ namespace hpx::this_thread::experimental {
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/detail/tag_priority_invoke.hpp>
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <atomic>
 #include <exception>
@@ -237,7 +235,7 @@ namespace hpx::execution::experimental::detail {
                 else if constexpr (std::is_same_v<error_t, std::error_code>)
                 {
                     r.state.value.template emplace<error_type>(
-                        std::exception_ptr(std::system_error(error)));
+                        std::make_exception_ptr(std::system_error(error)));
                 }
                 else
                 {

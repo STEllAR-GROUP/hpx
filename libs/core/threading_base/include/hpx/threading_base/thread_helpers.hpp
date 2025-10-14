@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2018 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
@@ -18,7 +18,7 @@
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #if !defined(HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION)
-#include <hpx/debugging/backtrace.hpp>
+#include <hpx/modules/debugging.hpp>
 #endif
 
 #include <atomic>
@@ -656,6 +656,7 @@ namespace hpx::this_thread {
     // returns whether the remaining stack-space is at least as large as
     // requested
     HPX_CORE_EXPORT bool has_sufficient_stack_space(
-        std::size_t space_needed = 8 * HPX_THREADS_STACK_OVERHEAD) noexcept;
+        std::size_t space_needed = static_cast<std::size_t>(
+            8 * HPX_THREADS_STACK_OVERHEAD)) noexcept;
     /// \endcond
 }    // namespace hpx::this_thread

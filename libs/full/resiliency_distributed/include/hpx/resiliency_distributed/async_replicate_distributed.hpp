@@ -60,7 +60,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                 [pred = HPX_FORWARD(Pred, pred), vote = HPX_FORWARD(Vote, vote),
                     ids](
                     std::vector<hpx::future<result_type>>&& results) mutable
-                -> result_type {
+                    -> result_type {
                     // Store all valid results
                     std::vector<result_type> valid_results;
                     valid_results.reserve(ids.size());

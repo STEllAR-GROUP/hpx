@@ -52,9 +52,9 @@ namespace hpx::parallel::util {
                     std::size_t len = count;
 
                     for (/* */;
-                         !(is_data_aligned(first) && is_data_aligned(dest)) &&
-                         len != 0;
-                         --len)
+                        !(is_data_aligned(first) && is_data_aligned(dest)) &&
+                        len != 0;
+                        --len)
                     {
                         datapar_transform_loop_step::call1(f, first, dest);
                     }
@@ -63,7 +63,7 @@ namespace hpx::parallel::util {
 
                     for (std::int64_t len_v =
                              static_cast<std::int64_t>(len - (size + 1));
-                         len_v > 0; len_v -= size, len -= size)
+                        len_v > 0; len_v -= size, len -= size)
                     {
                         datapar_transform_loop_step::callv(f, first, dest);
                     }
@@ -122,9 +122,9 @@ namespace hpx::parallel::util {
                     std::size_t len = count;
 
                     for (/* */;
-                         !(is_data_aligned(first) && is_data_aligned(dest)) &&
-                         len != 0;
-                         --len)
+                        !(is_data_aligned(first) && is_data_aligned(dest)) &&
+                        len != 0;
+                        --len)
                     {
                         datapar_transform_loop_step_ind::call1(f, first, dest);
                     }
@@ -133,7 +133,7 @@ namespace hpx::parallel::util {
 
                     for (std::int64_t len_v =
                              static_cast<std::int64_t>(len - (size + 1));
-                         len_v > 0; len_v -= size, len -= size)
+                        len_v > 0; len_v -= size, len -= size)
                     {
                         datapar_transform_loop_step_ind::callv(f, first, dest);
                     }
@@ -331,10 +331,10 @@ namespace hpx::parallel::util {
                     std::size_t len = count;
 
                     for (/* */;
-                         !(is_data_aligned(first1) && is_data_aligned(first2) &&
-                             is_data_aligned(dest)) &&
-                         len != 0;
-                         --len)
+                        !(is_data_aligned(first1) && is_data_aligned(first2) &&
+                            is_data_aligned(dest)) &&
+                        len != 0;
+                        --len)
                     {
                         datapar_transform_loop_step::call1(
                             f, first1, first2, dest);
@@ -344,8 +344,8 @@ namespace hpx::parallel::util {
 
                     for (auto len_v =
                              static_cast<std::int64_t>(len - (size + 1));
-                         len_v > 0;
-                         len_v -= static_cast<std::int64_t>(size), len -= size)
+                        len_v > 0;
+                        len_v -= static_cast<std::int64_t>(size), len -= size)
                     {
                         datapar_transform_loop_step::callv(
                             f, first1, first2, dest);
@@ -532,10 +532,10 @@ namespace hpx::parallel::util {
                     std::size_t len = count;
 
                     for (/* */;
-                         !(is_data_aligned(first1) && is_data_aligned(first2) &&
-                             is_data_aligned(dest)) &&
-                         len != 0;
-                         --len)
+                        !(is_data_aligned(first1) && is_data_aligned(first2) &&
+                            is_data_aligned(dest)) &&
+                        len != 0;
+                        --len)
                     {
                         datapar_transform_loop_step_ind::call1(
                             f, first1, first2, dest);
@@ -545,8 +545,8 @@ namespace hpx::parallel::util {
 
                     for (auto len_v =
                              static_cast<std::int64_t>(len - (size + 1));
-                         len_v > 0;
-                         len_v -= static_cast<std::int64_t>(size), len -= size)
+                        len_v > 0;
+                        len_v -= static_cast<std::int64_t>(size), len -= size)
                     {
                         datapar_transform_loop_step_ind::callv(
                             f, first1, first2, dest);
@@ -653,8 +653,8 @@ namespace hpx::parallel::util {
             call(InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
                 OutIter dest, F&& f)
             {
-                std::size_t count = (std::min)(
-                    std::distance(first1, last1), std::distance(first2, last2));
+                std::size_t count = (std::min) (std::distance(first1, last1),
+                    std::distance(first2, last2));
 
                 auto ret = util::transform_binary_loop_ind_n<
                     hpx::execution::par_simd_policy>(

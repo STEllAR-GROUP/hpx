@@ -113,8 +113,9 @@ namespace hpx::execution::experimental {
 
         embedded_executor generate_executor(std::uint16_t thread_num) const
         {
-            return hpx::execution::experimental::with_hint(
-                exec_, threads::thread_schedule_hint(thread_num));
+            return hpx::execution::experimental::with_hint(exec_,
+                threads::thread_schedule_hint(
+                    static_cast<std::int16_t>(thread_num)));
         }
 
     private:

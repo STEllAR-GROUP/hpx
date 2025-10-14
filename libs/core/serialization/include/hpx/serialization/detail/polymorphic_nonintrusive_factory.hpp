@@ -1,7 +1,7 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
 //  Copyright (c) 2015 Andreas Schaefer
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
@@ -12,15 +12,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/debugging/demangle_helper.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/preprocessor/stringize.hpp>
-#include <hpx/preprocessor/strip_parens.hpp>
+#include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/needs_automatic_registration.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
-#include <hpx/type_support/static.hpp>
 
 #include <functional>
 #include <memory>
@@ -48,7 +47,7 @@ namespace hpx::serialization::detail {
             // HPX_REGISTER_ACTION_DECLARATION
             static_assert(traits::needs_automatic_registration_v<T>,
                 "HPX_REGISTER_ACTION_DECLARATION missing");
-            return util::debug::type_id<T>::typeid_.type_id();
+            return util::debug::type_id<T>();
         }
     };
 #endif
@@ -80,7 +79,7 @@ namespace hpx::serialization::detail {
             else
             {
                 using storage_type =
-                    std::aligned_storage_t<sizeof(T), alignof(T)>;
+                    hpx::aligned_storage_t<sizeof(T), alignof(T)>;
 
                 t.reset(reinterpret_cast<T*>(new storage_type));    //-V572
                 load_construct_data(ar, t.get(), 0);
@@ -246,8 +245,7 @@ namespace hpx::serialization::detail {
 /**/
 #define HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE(Parameters, Template)        \
     HPX_SERIALIZATION_REGISTER_CLASS_NAME_TEMPLATE(Parameters, Template,       \
-        hpx::util::debug::type_id<HPX_PP_STRIP_PARENS(Template)>::typeid_      \
-            .type_id())                                                        \
+        hpx::util::debug::type_id<HPX_PP_STRIP_PARENS(Template)>())            \
     HPX_PP_STRIP_PARENS(Parameters)                                            \
     hpx::serialization::detail::register_class<HPX_PP_STRIP_PARENS(Template)>  \
         HPX_PP_STRIP_PARENS(Template)::hpx_register_class_instance;            \

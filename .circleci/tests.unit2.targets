@@ -1,4 +1,4 @@
-#  Copyright (c) 2021-2022 Hartmut Kaiser
+#  Copyright (c) 2021-2025 Hartmut Kaiser
 #
 #  SPDX-License-Identifier: BSL-1.0
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,26 +25,3 @@ tests.unit.modules.lcos_local
 tests.unit.modules.memory
 tests.unit.modules.naming
 tests.unit.modules.naming_base
-tests.unit.modules.pack_traversal
-tests.unit.modules.parcelport_tcp
-tests.unit.modules.parcelset
-tests.unit.modules.parcelset_base
-tests.unit.modules.performance_counters
-tests.unit.modules.plugin_factories
-tests.unit.modules.program_options
-tests.unit.modules.properties
-tests.unit.modules.resiliency
-tests.unit.modules.resiliency_distributed
-tests.unit.modules.resource_partitioner
-tests.unit.modules.runtime_components
-tests.unit.modules.runtime_distributed
-tests.unit.modules.runtime_local
-tests.unit.modules.schedulers
-tests.unit.modules.serialization
-tests.unit.modules.statistics
-tests.unit.modules.string_util
-tests.unit.modules.synchronization
-tests.unit.modules.tag_invoke
-tests.unit.modules.testing
-tests.unit.modules.threading
-tests.unit.modules.timed_execution

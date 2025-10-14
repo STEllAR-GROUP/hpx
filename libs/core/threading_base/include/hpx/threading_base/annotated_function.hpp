@@ -12,13 +12,13 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/threading_base/scoped_annotation.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #if HPX_HAVE_ITTNOTIFY != 0
 #include <hpx/modules/itt_notify.hpp>
@@ -171,22 +171,3 @@ struct hpx::traits::get_function_annotation<hpx::detail::annotated_function<F>>
     }
 };
 #endif
-
-namespace hpx::util {
-
-    template <typename F>
-    HPX_DEPRECATED_V(1, 8, "Please use hpx::annotated_function instead.")
-    constexpr decltype(auto)
-        annotated_function(F&& f, char const* name = nullptr) noexcept
-    {
-        return hpx::annotated_function(HPX_FORWARD(F, f), name);
-    }
-
-    template <typename F>
-    HPX_DEPRECATED_V(1, 8, "Please use hpx::annotated_function instead.")
-    constexpr decltype(auto)
-        annotated_function(F&& f, std::string const& name) noexcept
-    {
-        return hpx::annotated_function(HPX_FORWARD(F, f), name);
-    }
-}    // namespace hpx::util

@@ -7,4 +7,4 @@
 #pragma once
 
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/modules/thread_support.hpp>
