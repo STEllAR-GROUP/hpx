@@ -8,9 +8,7 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/contracts/include
-set(contracts_headers
-    hpx/contracts.hpp hpx/modules/contracts.hpp
-)
+set(contracts_headers hpx/contracts.hpp hpx/modules/contracts.hpp)
 
 # Default location is $HPX_ROOT/libs/contracts/include_compatibility
 # cmake-format: off
@@ -21,8 +19,7 @@ set(contracts_compat_headers
 # cmake-format: on
 
 # Default location is $HPX_ROOT/libs/contracts/src
-set(contracts_sources
-    # Add source files here when implementation is added
+set(contracts_sources # Add source files here when implementation is added
     # contracts.cpp
 )
 
