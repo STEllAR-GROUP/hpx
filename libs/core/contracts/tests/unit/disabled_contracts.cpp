@@ -11,14 +11,13 @@
 // This test runs when HPX_WITH_CONTRACTS=OFF
 // Verifies that PRE/POST are disabled but CONTRACT_ASSERT still works
 
-int main() 
-HPX_PRE(false) 
-HPX_POST(false) // Should be no-op, not trigger assertion
+int main() HPX_PRE(false)
+    HPX_POST(false)    // Should be no-op, not trigger assertion
 {
     // This should still work (maps to HPX_ASSERT)
     HPX_CONTRACT_ASSERT(true);
-    
-    HPX_TEST(true);  // If we get here, disabled mode works correctly
-    
+
+    HPX_TEST(true);    // If we get here, disabled mode works correctly
+
     return hpx::util::report_errors();
 }

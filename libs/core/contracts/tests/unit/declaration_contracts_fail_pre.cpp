@@ -7,7 +7,7 @@
 
 // Test: Declaration contracts fail (precondition)
 // Tests C++26 declaration-based precondition failure
-// This uses proper contracts syntax (pre in function declaration) 
+// This uses proper contracts syntax (pre in function declaration)
 // Expected to fail when __cpp_contracts is available
 
 #include <hpx/contracts.hpp>
@@ -21,5 +21,5 @@ int multiply_positive(int x) HPX_PRE(x > 0)
 int main()
 {
     // This should trigger precondition violation when __cpp_contracts is available
-    return multiply_positive(-5);  // Violates x > 0
+    return multiply_positive(-5);    // Violates x > 0
 }

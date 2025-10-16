@@ -7,15 +7,15 @@
 
 // Test: Declaration contracts fail (postcondition)
 // Tests C++26 declaration-based postcondition failure
-// This uses proper contracts syntax (post in function declaration) 
+// This uses proper contracts syntax (post in function declaration)
 // Expected to fail when __cpp_contracts is available
 
 #include <hpx/contracts.hpp>
 
 // Function with postcondition that requires positive result
-int get_positive_number(int x) HPX_POST(r: r > 0)
+int get_positive_number(int x) HPX_POST(r : r > 0)
 {
-    return -10;  // This violates the postcondition r > 0
+    return -10;    // This violates the postcondition r > 0
 }
 
 int main()

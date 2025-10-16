@@ -6,7 +6,7 @@
 
 // Test: Declaration contracts succeed
 // Tests the C++26 declaration-based contract syntax
-// This uses proper contracts syntax (pre and post in function declaration) 
+// This uses proper contracts syntax (pre and post in function declaration)
 // that will run when __cpp_contracts is available
 
 #include <hpx/contracts.hpp>
@@ -23,30 +23,30 @@ int divide(int a, int b) HPX_PRE(b != 0)
 }
 
 // Function with both pre and post conditions
-int safe_multiply(int a, int b) HPX_PRE(a > 0 && b > 0) HPX_POST(r: r > 0)
+int safe_multiply(int a, int b) HPX_PRE(a > 0 && b > 0) HPX_POST(r : r > 0)
 {
     return a * b;
 }
 
 int main()
 {
-    std::cout << "Testing native C++26 contracts with declaration syntax..." << std::endl;
-    
+    std::cout << "Testing native C++26 contracts with declaration syntax..."
+              << std::endl;
+
     // Test functions with proper contract syntax
     int result1 = divide(10, 2);
     HPX_TEST_EQ(result1, 5);
 
-    
     int result2 = safe_multiply(3, 4);
     HPX_TEST_EQ(result2, 12);
-    
+
     // Test contract assertions
     HPX_CONTRACT_ASSERT(true);
     HPX_CONTRACT_ASSERT(result1 == 5);
-    
+
     std::cout << "✓ All native contract tests passed" << std::endl;
-    
+
     HPX_TEST_MSG(true, "Native C++26 contracts work correctly");
-    
+
     return hpx::util::report_errors();
 }
