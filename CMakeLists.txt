@@ -1500,20 +1500,13 @@ if(HPX_WITH_CONTRACTS)
 endif()
 
 hpx_option(
-  HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS BOOL "Swap hpx_assert with hpx_contract_assert" OFF
-  CATEGORY "Debugging"
+  HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS BOOL
+  "Swap hpx_assert with hpx_contract_assert" OFF CATEGORY "Debugging"
 )
 
 if(HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS)
   hpx_add_config_define(HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS)
 endif()
-
-
-
-
-
-
-
 
 hpx_option(
   HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support." OFF
