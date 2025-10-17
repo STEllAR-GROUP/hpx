@@ -26,9 +26,7 @@ configure_extra_options+=" -DHPX_WITH_PARCELPORT_LCI=ON"
 configure_extra_options+=" -DHPX_WITH_FETCH_LCI=ON"
 configure_extra_options+=" -DCMAKE_C_COMPILER=gcc"
 configure_extra_options+=" -DCMAKE_C_FLAGS=-fPIC"
-configure_extra_options+=" -DHPX_WITH_DATAPAR_BACKEND=EVE"
-configure_extra_options+=" -DHPX_WITH_FETCH_EVE=ON"
-configure_extra_options+=" -DHPX_WITH_EVE_TAG=main"
+configure_extra_options+=" -DHPX_WITH_DATAPAR_BACKEND=STD_EXPERIMENTAL_SIMD"
 
 # gcc-15 still has issues with C++ modules
 # configure_extra_options+=" -DHPX_WITH_CXX_MODULES=ON"
