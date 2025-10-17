@@ -30,9 +30,6 @@ int safe_multiply(int a, int b) HPX_PRE(a > 0 && b > 0) HPX_POST(r : r > 0)
 
 int main()
 {
-    std::cout << "Testing native C++26 contracts with declaration syntax..."
-              << std::endl;
-
     // Test functions with proper contract syntax
     int result1 = divide(10, 2);
     HPX_TEST_EQ(result1, 5);
@@ -43,8 +40,6 @@ int main()
     // Test contract assertions
     HPX_CONTRACT_ASSERT(true);
     HPX_CONTRACT_ASSERT(result1 == 5);
-
-    std::cout << "✓ All native contract tests passed" << std::endl;
 
     HPX_TEST_MSG(true, "Native C++26 contracts work correctly");
 
