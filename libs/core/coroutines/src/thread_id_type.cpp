@@ -10,6 +10,7 @@
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/modules/format.hpp>
 
+#include <atomic>
 #include <cstdio>
 #include <ostream>
 #include <string_view>
@@ -37,14 +38,19 @@ namespace hpx::threads {
         // reference counting
         void intrusive_ptr_add_ref(thread_data_reference_counting* p) noexcept
         {
-            ++p->count_;
+            p->count_.increment();
         }
 
         void intrusive_ptr_release(thread_data_reference_counting* p) noexcept
         {
             HPX_ASSERT(p->count_ != 0);
-            if (--p->count_ == 0)
+            if (p->count_.decrement() == 0)
             {
+                // The thread that decrements the reference count to zero must
+                // perform an acquire to ensure that it doesn't start destructing
+                // the object until all previous writes have drained.
+                std::atomic_thread_fence(std::memory_order_acquire);
+
                 // give this object back to the system
                 p->destroy_thread();
             }

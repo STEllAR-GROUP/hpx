@@ -65,11 +65,11 @@ namespace hpx::lcos::local {
             }
             long addref() noexcept
             {
-                return ++count_;
+                return count_.increment();
             }
             long release() noexcept
             {
-                return --count_;
+                return count_.decrement();
             }
 
         private:
@@ -88,6 +88,12 @@ namespace hpx::lcos::local {
         {
             if (p->requires_delete())
             {
+                // The thread that decrements the reference count to zero must
+                // perform an acquire to ensure that it doesn't start
+                // destructing the object until all previous writes have
+                // drained.
+                std::atomic_thread_fence(std::memory_order_acquire);
+
                 p->destroy();
             }
         }

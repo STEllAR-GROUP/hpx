@@ -21,6 +21,7 @@
 #include <hpx/synchronization/barrier.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -89,14 +90,20 @@ namespace hpx { namespace distributed { namespace detail {
         // intrusive reference counting
         friend void intrusive_ptr_add_ref(barrier_node* p) noexcept
         {
-            ++p->count_;
+            p->count_.increment();
         }
 
         // intrusive reference counting
         friend void intrusive_ptr_release(barrier_node* p) noexcept
         {
-            if (p && --p->count_ == 0)
+            if (p && p->count_.decrement() == 0)
             {
+                // The thread that decrements the reference count to zero must
+                // perform an acquire to ensure that it doesn't start
+                // destructing the object until all previous writes have
+                // drained.
+                std::atomic_thread_fence(std::memory_order_acquire);
+
                 delete p;
             }
         }

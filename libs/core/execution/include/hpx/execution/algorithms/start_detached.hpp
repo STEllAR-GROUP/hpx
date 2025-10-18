@@ -102,14 +102,20 @@ namespace hpx::execution::experimental {
             friend void intrusive_ptr_add_ref(
                 operation_state_holder_base* p) noexcept
             {
-                ++p->count;
+                p->count.increment();
             }
 
             friend void intrusive_ptr_release(
                 operation_state_holder_base* p) noexcept
             {
-                if (--p->count == 0)
+                if (p->count.decrement() == 0)
                 {
+                    // The thread that decrements the reference count to zero
+                    // must perform an acquire to ensure that it doesn't start
+                    // destructing the object until all previous writes have
+                    // drained.
+                    std::atomic_thread_fence(std::memory_order_acquire);
+
                     allocator_type other_alloc(p->alloc);
                     std::allocator_traits<allocator_type>::destroy(
                         other_alloc, static_cast<Derived*>(p));

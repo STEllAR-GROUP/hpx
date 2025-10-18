@@ -87,7 +87,7 @@ namespace hpx::lcos::detail {
 
         HPX_FORCEINLINE bool requires_delete() noexcept
         {
-            return 0 == --count_;
+            return 0 == count_.decrement();
         }
 
         virtual void destroy() noexcept
@@ -121,12 +121,17 @@ namespace hpx::lcos::detail {
     // support functions for hpx::intrusive_ptr
     inline void intrusive_ptr_add_ref(future_data_refcnt_base* p) noexcept
     {
-        ++p->count_;
+        p->count_.increment();
     }
     inline void intrusive_ptr_release(future_data_refcnt_base* p) noexcept
     {
         if (p->requires_delete())
         {
+            // The thread that decrements the reference count to zero must
+            // perform an acquire to ensure that it doesn't start destructing
+            // the object until all previous writes have drained.
+            std::atomic_thread_fence(std::memory_order_acquire);
+
             p->destroy();
         }
     }

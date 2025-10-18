@@ -348,13 +348,17 @@ namespace hpx {
         private:
             friend void intrusive_ptr_add_ref(wait_some* p) noexcept
             {
-                ++p->refcount_;
+                p->refcount_.increment();
             }
 
             friend void intrusive_ptr_release(wait_some* p) noexcept
             {
-                if (0 == --p->refcount_)
+                if (0 == p->refcount_.decrement())
                 {
+                    // The thread that decrements the reference count to zero must
+                    // perform an acquire to ensure that it doesn't start destructing
+                    // the object until all previous writes have drained.
+                    std::atomic_thread_fence(std::memory_order_acquire);
                     delete p;
                 }
             }
