@@ -292,8 +292,8 @@ namespace hpx::lcos::detail {
                 },
                 [&](std::exception_ptr const& ep) {
                     // If an exception while creating the new task or inside the
-                    // completion handler is thrown, there is nothing we can do...
-                    // ... but terminate and report the error
+                    // completion handler is thrown, there is nothing we can
+                    // do... ... but terminate and report the error
                     if (run_on_completed_error_handler)
                     {
                         run_on_completed_error_handler(ep);

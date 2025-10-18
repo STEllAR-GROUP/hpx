@@ -132,10 +132,8 @@ namespace hpx::threads::detail {
            << std::bitset<HPX_HAVE_MAX_CPU_COUNT>(get_used_processing_units())
 #endif
            << '\n';
-        os << "on numa domains : \n" << get_numa_domain_bitmap() << '\n';
-        os << "pool offset : \n"
-           << std::dec << static_cast<std::uint64_t>(this->thread_offset_)
-           << "\n";
+        os << "on numa domains: " << get_numa_domain_bitmap() << '\n';
+        os << "pool offset: " << std::dec << this->thread_offset_ << "\n";
     }
 
     template <typename Scheduler>

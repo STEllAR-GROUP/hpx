@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -252,8 +252,8 @@ namespace hpx::detail {
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
-            threads::thread_id_ref_type tid =
-                p.post(pool, desc.get_description(), policy);
+            threads::thread_id_ref_type tid = p.post(
+                pool, desc.get_description(), HPX_FORWARD(Policy, policy));
 
             // make sure this thread is executed last
             threads::thread_id_type const tid_self = threads::get_self_id();
