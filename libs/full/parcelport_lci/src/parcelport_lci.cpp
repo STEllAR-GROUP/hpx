@@ -314,6 +314,17 @@ namespace hpx::parcelset::policies::lci {
 
         auto attr = ::lci::get_g_default_attr();
         attr.npackets = attr.npackets * config_t::ndevices;
+        // We will make sure the total packet number is always at least twice as large as the total preposted receives.
+        // We also set a minimum of 1024 preposted receives per device and increase the total number of packets if needed.
+        if (attr.net_max_recvs * config_t::ndevices > attr.npackets / 2)
+        {
+            attr.net_max_recvs = attr.npackets / 2 / config_t::ndevices;
+            if (attr.net_max_recvs < 1024)
+            {
+                attr.net_max_recvs = 1024;
+                attr.npackets = 1024 * config_t::ndevices * 2;
+            }
+        }
         ::lci::set_g_default_attr(attr);
         ::lci::g_runtime_init();
 
