@@ -217,8 +217,8 @@ namespace hpx::parcelset::policies::tcp {
                 // the handler needs to be reset on an HPX thread (it destroys
                 // the parcel, which in turn might invoke HPX functions)
                 threads::thread_init_data data(
-                    threads::make_thread_function_nullary(util::deferred_call(
-                        &sender::reset_handler, HPX_MOVE(handler))),
+                    threads::make_thread_function_nullary(
+                        &sender::reset_handler, HPX_MOVE(handler)),
                     "sender::reset_handler");
                 threads::register_thread(data);
             }

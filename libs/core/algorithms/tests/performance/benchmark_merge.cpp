@@ -36,6 +36,10 @@ template <typename InIter1, typename InIter2, typename OutIter>
 double run_merge_benchmark_std(int const test_count, InIter1 first1,
     InIter1 last1, InIter2 first2, InIter2 last2, OutIter dest)
 {
+    // warmup
+    std::merge(first1, last1, first2, last2, dest);
+
+    // actual measurement
     std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)
@@ -55,6 +59,10 @@ double run_merge_benchmark_hpx(int const test_count, ExPolicy policy,
     FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
     FwdIter3 dest)
 {
+    // warmup
+    hpx::merge(policy, first1, last1, first2, last2, dest);
+
+    // actual measurement
     std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)
@@ -243,14 +251,31 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     double const time_par = run_merge_benchmark_hpx(
         test_count, policy.with(ccs), first1, last1, first2, last2, dest);
 
+    std::cout << "--- run_merge_benchmark_par_stackless ---" << std::endl;
+
+    HPX_ITT_PAUSE();
+
+    hpx::this_thread::sleep_for(std::chrono::seconds(1));
+
+    HPX_ITT_RESUME();
+
+    double time_par_stackless = 0;
+    {
+        auto const stackless_policy =
+            hpx::execution::experimental::with_stacksize(
+                policy, hpx::threads::thread_stacksize::nostack);
+        time_par_stackless = run_merge_benchmark_hpx(test_count,
+            stackless_policy.with(ccs), first1, last1, first2, last2, dest);
+    }
+
     HPX_ITT_PAUSE();
 
     std::cout << "--- run_merge_benchmark_par_fork_join ---" << std::endl;
     double time_par_fork_join = 0;
     {
         hpx::execution::experimental::fork_join_executor exec;
-        time_par_fork_join = run_merge_benchmark_hpx(
-            test_count, par.on(exec), first1, last1, first2, last2, dest);
+        time_par_fork_join = run_merge_benchmark_hpx(test_count,
+            policy.on(exec).with(ccs), first1, last1, first2, last2, dest);
     }
 
     std::cout << "--- run_merge_benchmark_par_unseq ---" << std::endl;
@@ -263,6 +288,8 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "par_stackless", time_par_stackless)
+        << std::endl;
     hpx::util::format_to(std::cout, fmt, "par_fork_join", time_par_fork_join)
         << std::endl;
     hpx::util::format_to(std::cout, fmt, "par_unseq", time_par_unseq)

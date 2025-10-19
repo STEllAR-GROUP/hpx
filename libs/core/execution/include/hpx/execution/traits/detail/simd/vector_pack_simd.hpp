@@ -41,9 +41,18 @@ namespace hpx::datapar::experimental {
         std::experimental::simd<T, Abi> const& v_true,
         std::experimental::simd<T, Abi> const& v_false) noexcept
     {
+#if defined(HPX_GCC_VERSION)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
+#endif
+
         std::experimental::simd<T, Abi> v;
         where(msk, v) = v_true;
         where(!msk, v) = v_false;
+
+#if defined(HPX_GCC_VERSION)
+#pragma GCC diagnostic pop
+#endif
         return v;
     }
 

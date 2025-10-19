@@ -619,8 +619,8 @@ namespace hpx::parcelset {
                     parcel, write_handler_type) = &parcelhandler::put_parcel;
 
                 threads::thread_init_data data(
-                    threads::make_thread_function_nullary(util::deferred_call(
-                        put_parcel_ptr, this, HPX_MOVE(p), HPX_MOVE(f))),
+                    threads::make_thread_function_nullary(
+                        put_parcel_ptr, this, HPX_MOVE(p), HPX_MOVE(f)),
                     "parcelhandler::put_parcel",
                     threads::thread_priority::boost,
                     threads::thread_schedule_hint(),
@@ -764,9 +764,8 @@ namespace hpx::parcelset {
                 std::vector<write_handler_type>) = &parcelhandler::put_parcels;
 
             threads::thread_init_data data(
-                threads::make_thread_function_nullary(
-                    util::deferred_call(put_parcels_ptr, this,
-                        HPX_MOVE(parcels), HPX_MOVE(handlers))),
+                threads::make_thread_function_nullary(put_parcels_ptr, this,
+                    HPX_MOVE(parcels), HPX_MOVE(handlers)),
                 "parcelhandler::put_parcels", threads::thread_priority::boost,
                 threads::thread_schedule_hint(),
                 threads::thread_stacksize::medium,

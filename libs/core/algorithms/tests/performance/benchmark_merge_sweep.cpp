@@ -37,6 +37,10 @@ template <typename InIter1, typename InIter2, typename OutIter>
 double run_merge_benchmark_std(int const test_count, InIter1 first1,
     InIter1 last1, InIter2 first2, InIter2 last2, OutIter dest)
 {
+    // warmup
+    std::merge(first1, last1, first2, last2, dest);
+
+    // actual measurement
     std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)
@@ -56,6 +60,10 @@ double run_merge_benchmark_hpx(int const test_count, ExPolicy policy,
     FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
     FwdIter3 dest)
 {
+    // warmup
+    hpx::merge(policy, first1, last1, first2, last2, dest);
+
+    // actual measurement
     std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)
@@ -311,10 +319,10 @@ void run_merge_benchmark_sweep(std::string label, int const test_count,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag, typename Allocator>
-void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
-    int test_count, IteratorTag, Allocator const& alloc,
-    std::string const& type, int entropy)
+template <typename Policy, typename IteratorTag, typename Allocator>
+void run_benchmark(Policy policy, std::size_t vector_size1,
+    std::size_t vector_size2, int test_count, IteratorTag,
+    Allocator const& alloc, std::string const& type, int entropy)
 {
     std::cout << "* Preparing Benchmark Data... (" << type << ")\n";
 
@@ -391,8 +399,8 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
     std::cout << "--- run_merge_benchmark_sweep_par ---\n";
-    auto const policy = hpx::execution::experimental::with_priority(
-        par, hpx::threads::thread_priority::initially_bound);
+    policy = hpx::execution::experimental::with_priority(
+        policy, hpx::threads::thread_priority::initially_bound);
 
     run_merge_benchmark_sweep("par", test_count, policy, first1, last1, first2,
         last2, dest, time_seq);
@@ -442,8 +450,17 @@ int hpx_main(hpx::program_options::variables_map& vm)
         using allocator_type = std::allocator<data_type>;
         allocator_type alloc;
 
-        run_benchmark(vector_size1, vector_size2, test_count,
-            std::random_access_iterator_tag(), alloc, "std::vector", entropy);
+        run_benchmark(hpx::execution::par, vector_size1, vector_size2,
+            test_count, std::random_access_iterator_tag(), alloc, "std::vector",
+            entropy);
+
+        auto const stackless_policy =
+            hpx::execution::experimental::with_stacksize(
+                hpx::execution::par, hpx::threads::thread_stacksize::nostack);
+
+        run_benchmark(stackless_policy, vector_size1, vector_size2, test_count,
+            std::random_access_iterator_tag(), alloc, "std::vector (stackless)",
+            entropy);
     }
 
     {
@@ -453,9 +470,17 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 decltype(policy)>;
         allocator_type const alloc(policy);
 
-        run_benchmark(vector_size1, vector_size2, test_count,
+        run_benchmark(policy, vector_size1, vector_size2, test_count,
             std::random_access_iterator_tag(), alloc, "hpx::compute::vector",
             entropy);
+
+        auto const stackless_policy =
+            hpx::execution::experimental::with_stacksize(
+                policy, hpx::threads::thread_stacksize::nostack);
+
+        run_benchmark(stackless_policy, vector_size1, vector_size2, test_count,
+            std::random_access_iterator_tag(), alloc,
+            "hpx::compute::vector (stackless)", entropy);
     }
 
     return hpx::local::finalize();

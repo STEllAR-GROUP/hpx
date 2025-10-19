@@ -152,7 +152,8 @@ namespace hpx::util::itt {
 
     HPX_CORE_MODULE_EXPORT_EXTERN struct caller_context
     {
-        HPX_CORE_EXPORT explicit caller_context(stack_context& ctx);
+        HPX_CORE_EXPORT explicit caller_context(
+            stack_context& ctx, bool enter = true);
         HPX_CORE_EXPORT ~caller_context();
 
         caller_context(caller_context const&) = delete;
@@ -161,6 +162,7 @@ namespace hpx::util::itt {
         caller_context& operator=(caller_context&&) = delete;
 
         stack_context& ctx_;
+        bool enter_;
     };
 
     //////////////////////////////////////////////////////////////////////////
@@ -717,7 +719,9 @@ namespace hpx::util::itt {
 
     HPX_CORE_MODULE_EXPORT_EXTERN struct caller_context
     {
-        constexpr explicit caller_context(stack_context&) noexcept {}
+        constexpr explicit caller_context(stack_context&, bool = true) noexcept
+        {
+        }
         ~caller_context() = default;
     };
 

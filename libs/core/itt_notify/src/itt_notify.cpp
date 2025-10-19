@@ -283,10 +283,11 @@ namespace hpx::util::itt {
         }
     }
 
-    caller_context::caller_context(stack_context& ctx)
+    caller_context::caller_context(stack_context& ctx, bool enter)
       : ctx_(ctx)
+      , enter_(enter)
     {
-        if (ctx.itt_context_)
+        if (enter && ctx.itt_context_)
         {
             HPX_ITT_STACK_CALLEE_ENTER(ctx_.itt_context_);
         }
@@ -294,7 +295,7 @@ namespace hpx::util::itt {
 
     caller_context::~caller_context()
     {
-        if (ctx_.itt_context_)
+        if (enter_ && ctx_.itt_context_)
         {
             HPX_ITT_STACK_CALLEE_LEAVE(ctx_.itt_context_);
         }

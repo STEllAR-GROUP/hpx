@@ -270,8 +270,7 @@ namespace hpx::threads::coroutines {
     {
         HPX_ASSERT(is_ready());
 
-        result_type result(
-            thread_schedule_state::terminated, invalid_thread_id);
+        result_type result;
 
         {
             detail::coroutine_stackless_self self(this);

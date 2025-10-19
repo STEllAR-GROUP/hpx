@@ -24,9 +24,25 @@ namespace hpx::parallel::util::detail {
         std::decay_t<F> f_;
 
         template <typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE Result operator()(T&& t)
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(T&& t)
         {
             return hpx::invoke_fused_r<Result>(f_, HPX_FORWARD(T, t));
+        }
+
+        template <std::size_t... Is, typename... Ts>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(
+            hpx::util::index_pack<Is...>, hpx::tuple<Ts...>& t)
+        {
+            return HPX_INVOKE(f_, hpx::get<Is>(t)...);
+        }
+
+        template <std::size_t... Is, typename... Ts>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(
+            hpx::util::index_pack<Is...>, hpx::tuple<Ts...>&& t)
+        {
+            // NOLINTBEGIN(bugprone-use-after-move)
+            return HPX_INVOKE(f_, hpx::get<Is>(HPX_MOVE(t))...);
+            // NOLINTEND(bugprone-use-after-move)
         }
 
         template <typename Archive>

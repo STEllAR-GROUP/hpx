@@ -55,7 +55,7 @@ namespace hpx::threads {
         static util::internal_allocator<thread_data_stackless> thread_alloc_;
 
     public:
-        stackless_coroutine_type::result_type call()
+        HPX_FORCEINLINE stackless_coroutine_type::result_type call()
         {
             HPX_ASSERT(get_state().state() == thread_schedule_state::active);
             HPX_ASSERT(this == coroutine_.get_thread_id().get());

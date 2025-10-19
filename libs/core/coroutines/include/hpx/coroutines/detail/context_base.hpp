@@ -309,7 +309,7 @@ namespace hpx::threads::coroutines::detail {
 
     public:
         // global coroutine state
-        enum class context_state
+        enum class context_state : std::uint8_t
         {
             running = 0,    // context running.
             ready,          // context at yield point.
@@ -318,7 +318,7 @@ namespace hpx::threads::coroutines::detail {
 
     protected:
         // exit request state
-        enum class context_exit_state
+        enum class context_exit_state : std::uint8_t
         {
             not_requested = 0,    // exit not requested.
             pending,              // exit requested.
@@ -326,9 +326,9 @@ namespace hpx::threads::coroutines::detail {
         };
 
         // exit status
-        enum class context_exit_status
+        enum class context_exit_status : std::uint8_t
         {
-            not_exited,
+            not_exited = 0,
             exited_return,       // process exited by return.
             exited_abnormally    // process exited uncleanly.
         };
