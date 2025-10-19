@@ -20,6 +20,7 @@
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
+#include <atomic>
 #include <cstdint>
 #include <mutex>
 #include <type_traits>
@@ -59,13 +60,19 @@ namespace hpx::components {
             friend void intrusive_ptr_add_ref(
                 migration_support_data* p) noexcept
             {
-                ++p->count_;
+                p->count_.increment();
             }
             friend void intrusive_ptr_release(
                 migration_support_data* p) noexcept
             {
-                if (0 == --p->count_)
+                if (0 == p->count_.decrement())
                 {
+                    // The thread that decrements the reference count to zero
+                    // must perform an acquire to ensure that it doesn't start
+                    // destructing the object until all previous writes have
+                    // drained.
+                    std::atomic_thread_fence(std::memory_order_acquire);
+
                     delete p;
                 }
             }

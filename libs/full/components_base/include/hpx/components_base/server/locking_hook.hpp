@@ -18,6 +18,7 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 
+#include <atomic>
 #include <mutex>
 #include <type_traits>
 #include <utility>
@@ -31,13 +32,18 @@ namespace hpx::components {
         {
             friend void intrusive_ptr_add_ref(refcounted_mutex* p) noexcept
             {
-                ++p->reference_count;
+                p->reference_count.increment();
             }
 
             friend void intrusive_ptr_release(refcounted_mutex* p) noexcept
             {
-                if (--p->reference_count == 0)
+                if (p->reference_count.decrement() == 0)
                 {
+                    // The thread that decrements the reference count to zero must
+                    // perform an acquire to ensure that it doesn't start destructing
+                    // the object until all previous writes have drained.
+                    std::atomic_thread_fence(std::memory_order_acquire);
+
                     delete p;
                 }
             }

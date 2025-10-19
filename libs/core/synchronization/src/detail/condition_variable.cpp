@@ -19,6 +19,7 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <exception>
 #include <mutex>
@@ -325,13 +326,18 @@ namespace hpx::lcos::local::detail {
     ///////////////////////////////////////////////////////////////////////////
     void intrusive_ptr_add_ref(condition_variable_data* p) noexcept
     {
-        ++p->count_;
+        p->count_.increment();
     }
 
     void intrusive_ptr_release(condition_variable_data* p) noexcept
     {
-        if (0 == --p->count_)
+        if (0 == p->count_.decrement())
         {
+            // The thread that decrements the reference count to zero must
+            // perform an acquire to ensure that it doesn't start destructing
+            // the object until all previous writes have drained.
+            std::atomic_thread_fence(std::memory_order_acquire);
+
             delete p;
         }
     }

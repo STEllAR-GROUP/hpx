@@ -462,13 +462,18 @@ namespace hpx::detail {
     private:
         friend void intrusive_ptr_add_ref(shared_mutex_data* p) noexcept
         {
-            ++p->count_;
+            p->count_.increment();
         }
 
         friend void intrusive_ptr_release(shared_mutex_data* p) noexcept
         {
-            if (0 == --p->count_)
+            if (0 == p->count_.decrement())
             {
+                // The thread that decrements the reference count to zero must
+                // perform an acquire to ensure that it doesn't start destructing
+                // the object until all previous writes have drained.
+                std::atomic_thread_fence(std::memory_order_acquire);
+
                 delete p;
             }
         }
