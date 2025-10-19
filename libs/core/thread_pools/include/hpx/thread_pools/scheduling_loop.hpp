@@ -140,8 +140,12 @@ namespace hpx::threads::detail {
         thread_id_ref_type next_thrd;
         while (true)
         {
-            thread_id_ref_type thrd = HPX_MOVE(next_thrd);
-            next_thrd = thread_id_ref_type();
+            thread_id_ref_type thrd;
+            if (HPX_UNLIKELY(next_thrd))
+            {
+                thrd = HPX_MOVE(next_thrd);
+                next_thrd = thread_id_ref_type();
+            }
 
             // Get the next HPX thread from the queue
             bool running = this_state.load(std::memory_order_relaxed) <
@@ -220,7 +224,8 @@ namespace hpx::threads::detail {
 
 #if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
     !defined(HPX_HAVE_APEX)
-                                util::itt::caller_context cctx(ctx);
+                                util::itt::caller_context cctx(
+                                    ctx, !thrdptr->is_stackless());
                                 // util::itt::undo_frame_context undoframe(fctx);
                                 util::itt::task task =
                                     thrdptr->get_description().get_task_itt(

@@ -183,8 +183,6 @@ namespace hpx::concurrency::detail {
         hpx::optional<T> pop_right() noexcept
         {
             range desired_range{0, 0};
-            T index = 0;
-
             range expected_range =
                 current_range.data_.load(std::memory_order_relaxed);
 
@@ -199,12 +197,11 @@ namespace hpx::concurrency::detail {
                 HPX_SMT_PAUSE;
 
                 desired_range = expected_range.decrement_last(step);
-                index = desired_range.last;
 
             } while (!current_range.data_.compare_exchange_weak(
                 expected_range, desired_range));
 
-            return hpx::optional<T>(HPX_MOVE(index));
+            return hpx::optional<T>(HPX_MOVE(desired_range.last));
         }
 
         /// \brief Attempt to pop an item from the given end of the queue.
