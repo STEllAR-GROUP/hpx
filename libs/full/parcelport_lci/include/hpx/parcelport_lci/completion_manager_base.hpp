@@ -20,13 +20,11 @@ namespace hpx::parcelset::policies::lci {
         completion_manager_base(parcelport* pp) noexcept
           : pp_(pp) {};
         virtual ~completion_manager_base() {}
-        virtual LCI_comp_t alloc_completion() = 0;
-        virtual void enqueue_completion(LCI_comp_t comp) = 0;
-        virtual LCI_request_t poll() = 0;
-        virtual LCI_comp_t get_completion_object()
-        {
-            return nullptr;
-        }
+        virtual ::lci::comp_t alloc_completion() = 0;
+        virtual void free_completion(::lci::comp_t comp) = 0;
+        virtual void enqueue_completion(::lci::comp_t comp) = 0;
+        virtual ::lci::status_t poll() = 0;
+        virtual ::lci::comp_t get_completion_object() = 0;
         parcelport* pp_;
     };
 }    // namespace hpx::parcelset::policies::lci

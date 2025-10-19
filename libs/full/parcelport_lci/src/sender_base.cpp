@@ -14,7 +14,6 @@
 #include <hpx/assert.hpp>
 
 #include <hpx/modules/lci_base.hpp>
-#include <hpx/parcelport_lci/backlog_queue.hpp>
 #include <hpx/parcelport_lci/completion_manager_base.hpp>
 #include <hpx/parcelport_lci/header.hpp>
 #include <hpx/parcelport_lci/locality.hpp>
@@ -33,21 +32,20 @@ namespace hpx::parcelset::policies::lci {
         bool did_some_work = false;
         auto poll_comp_start = util::lci_environment::pcounter_now();
         auto completion_manager_p = pp_->get_tls_device().completion_manager_p;
-        LCI_request_t request = completion_manager_p->send->poll();
+        ::lci::status_t status = completion_manager_p->send->poll();
         util::lci_environment::pcounter_add(util::lci_environment::poll_comp,
             util::lci_environment::pcounter_since(poll_comp_start));
 
-        if (request.flag == LCI_OK)
+        if (status.is_done())
         {
             auto useful_bg_start = util::lci_environment::pcounter_now();
             did_some_work = true;
-            auto* sharedPtr_p = (connection_ptr*) request.user_context;
+            auto* sharedPtr_p = (connection_ptr*) status.get_user_context();
             HPX_ASSERT(sharedPtr_p->get());
             sender_connection_base::return_t ret = (*sharedPtr_p)->send(true);
             if (ret.status == sender_connection_base::return_status_t::done)
             {
                 (*sharedPtr_p)->done();
-                delete sharedPtr_p;
             }
             else if (ret.status ==
                 sender_connection_base::return_status_t::wait)

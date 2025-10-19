@@ -43,7 +43,7 @@
 
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)) ||      \
     defined(HPX_HAVE_MODULE_LCI_BASE)
-#include <lci.h>
+#include <lci.hpp>
 #endif
 
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \

@@ -37,7 +37,6 @@
 #include <hpx/parcelset_base/parcelport.hpp>
 
 #include <hpx/modules/lci_base.hpp>
-#include <hpx/parcelport_lci/backlog_queue.hpp>
 #include <hpx/parcelport_lci/header.hpp>
 #include <hpx/parcelport_lci/locality.hpp>
 #include <hpx/parcelport_lci/sender_base.hpp>

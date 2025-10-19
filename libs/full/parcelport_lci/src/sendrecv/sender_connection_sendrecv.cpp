@@ -28,7 +28,7 @@
 
 namespace hpx::parcelset::policies::lci {
 
-    std::atomic<int> sender_connection_sendrecv::next_tag = 0;
+    std::atomic<::lci::tag_t> sender_connection_sendrecv::next_tag = 0;
 
     void sender_connection_sendrecv::load(
         sender_connection_sendrecv::handler_type&& handler,
@@ -49,25 +49,23 @@ namespace hpx::parcelset::policies::lci {
         if (config_t::enable_in_buffer_assembly)
         {
             int retry_count = 0;
-            while (
-                LCI_mbuffer_alloc(device_p->device, &header_buffer) != LCI_OK)
+            while ((header_buffer = ::lci::get_upacket()) == nullptr)
             {
                 if (config_t::bg_work_when_send)
                     pp_->do_background_work(0, parcelport_background_mode::all);
                 yield_k(retry_count, config_t::mbuffer_alloc_max_retry);
             }
-            HPX_ASSERT(header_buffer.length == (size_t) LCI_MEDIUM_SIZE);
             header_ = header(
-                buffer_, (char*) header_buffer.address, header_buffer.length);
-            header_buffer.length = header_.size();
+                buffer_, (char*) header_buffer, ::lci::get_max_bcopy_size());
+            header_buffer_size = header_.size();
         }
         else
         {
-            header_buffer_vector.resize(
-                header::get_header_size(buffer_, LCI_MEDIUM_SIZE));
-            header_ =
-                header(buffer_, static_cast<char*>(header_buffer_vector.data()),
-                    header_buffer_vector.size());
+            header_buffer_size =
+                header::get_header_size(buffer_, ::lci::get_max_bcopy_size());
+            header_buffer = malloc(header_buffer_size);
+            header_ = header(
+                buffer_, static_cast<char*>(header_buffer), header_buffer_size);
         }
         HPX_ASSERT((header_.num_zero_copy_chunks() == 0) ==
             buffer_.transmission_chunks_.empty());
@@ -90,39 +88,20 @@ namespace hpx::parcelset::policies::lci {
             num_send += header_.num_zero_copy_chunks();
         }
         tag = 0;    // If no need to post send, then tag can be ignored.
-        sharedPtr_p = nullptr;
-        if (config_t::enable_sendmc || num_send > 0)
-        {
-            sharedPtr_p = new std::shared_ptr<sender_connection_sendrecv>(
-                std::dynamic_pointer_cast<sender_connection_sendrecv>(
-                    shared_from_this()));
-            if (num_send > 0)
-                tag = next_tag.fetch_add(num_send) % LCI_MAX_TAG;
-        }
-        if ((int) tag <= LCI_MAX_TAG && (int) tag + num_send > LCI_MAX_TAG)
+        sharedPtr_p = new std::shared_ptr<sender_connection_sendrecv>(
+            std::dynamic_pointer_cast<sender_connection_sendrecv>(
+                shared_from_this()));
+        if (num_send > 0)
+            tag = next_tag.fetch_add(num_send) %
+                util::lci_environment::get_max_tag();
+        if ((int) tag <= util::lci_environment::get_max_tag() &&
+            (int) tag + num_send > util::lci_environment::get_max_tag())
             util::lci_environment::log(
                 util::lci_environment::log_level_t::debug, "tag",
-                "Rank %d Wrap around!\n", LCI_RANK);
-        header_.set_device_idx(device_p->idx);
+                "Rank %d Wrap around!\n", util::lci_environment::rank());
         header_.set_tag(tag);
-        if (!config_t::enable_in_buffer_assembly)
-        {
-            int retry_count = 0;
-            while (
-                LCI_mbuffer_alloc(device_p->device, &header_buffer) != LCI_OK)
-            {
-                if (config_t::bg_work_when_send)
-                    pp_->do_background_work(0, parcelport_background_mode::all);
-                yield_k(retry_count, config_t::mbuffer_alloc_max_retry);
-            }
-            memcpy(header_buffer.address, header_buffer_vector.data(),
-                header_buffer_vector.size());
-            header_buffer.length = header_buffer_vector.size();
-        }
         send_chunks_idx = 0;
         completion = nullptr;
-        segment_to_use = LCI_SEGMENT_ALL;
-        segment_used = LCI_SEGMENT_ALL;
         // set state
         profile_start_hook(header_);
         state.store(connection_state::initialized, std::memory_order_release);
@@ -131,7 +110,7 @@ namespace hpx::parcelset::policies::lci {
             "send",
             "send connection (%d, %d, %d, %d) tchunks "
             "%d data %d chunks %d start!\n",
-            LCI_RANK, dst_rank, original_tag, num_send,
+            util::lci_environment::rank(), dst_rank, original_tag, num_send,
             header_.piggy_back_tchunk() != nullptr,
             header_.piggy_back_data() != nullptr,
             header_.num_zero_copy_chunks());
@@ -174,38 +153,41 @@ namespace hpx::parcelset::policies::lci {
         const auto next_state = connection_state::sent_header;
         HPX_ASSERT(state.load(std::memory_order_acquire) == current_state);
         HPX_UNUSED(current_state);
-        LCI_error_t ret;
-        if (config_t::enable_sendmc)
+        ::lci::status_t status;
+        if (completion == nullptr)
         {
-            if (completion == nullptr)
-            {
-                completion =
-                    device_p->completion_manager_p->send->alloc_completion();
-            }
-            state.store(connection_state::locked, std::memory_order_relaxed);
+            completion =
+                device_p->completion_manager_p->send->alloc_completion();
         }
+        state.store(connection_state::locked, std::memory_order_relaxed);
         if (config_t::protocol == config_t::protocol_t::putsendrecv)
         {
-            ret = LCI_putmac(device_p->endpoint_new, header_buffer, dst_rank, 0,
-                LCI_DEFAULT_COMP_REMOTE,
-                config_t::enable_sendmc ? completion : nullptr, sharedPtr_p);
+            ::lci::rcomp_t rcomp =
+                device_p->completion_manager_p->recv_new_rcomp;
+            status = ::lci::post_am_x(
+                dst_rank, header_buffer, header_buffer_size, completion, rcomp)
+                         .device(device_p->device)
+                         .user_context(sharedPtr_p)();
         }
         else
         {
             HPX_ASSERT(config_t::protocol == config_t::protocol_t::sendrecv);
-            ret = LCI_sendmc(device_p->endpoint_new, header_buffer, dst_rank, 0,
-                config_t::enable_sendmc ? completion : nullptr, sharedPtr_p);
+            status = ::lci::post_send_x(
+                dst_rank, header_buffer, header_buffer_size, 0, completion)
+                         .device(device_p->device)
+                         .user_context(sharedPtr_p)();
         }
-        if (ret == LCI_OK)
+        if (status.is_done() || status.is_posted())
         {
             util::lci_environment::log(
                 util::lci_environment::log_level_t::debug, "send",
-                "%s (%d, %d, %d) length %lu\n",
+                "%s (%d, %d, %d) length %lu status %s\n",
                 config_t::protocol == config_t::protocol_t::putsendrecv ?
-                    "LCI_putmna" :
-                    "LCI_sendmn",
-                LCI_RANK, dst_rank, tag, header_buffer.length);
-            if (config_t::enable_sendmc)
+                    "post_am" :
+                    "post_send",
+                util::lci_environment::rank(), dst_rank, tag,
+                header_buffer_size, status.get_error().get_str());
+            if (status.is_posted())
             {
                 auto ret_comp = completion;
                 completion = nullptr;
@@ -220,9 +202,7 @@ namespace hpx::parcelset::policies::lci {
         }
         else
         {
-            HPX_ASSERT(ret == LCI_ERR_RETRY);
-            if (config_t::enable_sendmc)
-                state.store(current_state, std::memory_order_release);
+            state.store(current_state, std::memory_order_release);
             return {return_status_t::retry, nullptr};
         }
     }
@@ -231,82 +211,35 @@ namespace hpx::parcelset::policies::lci {
     sender_connection_sendrecv::unified_followup_send(
         void* address, size_t length)
     {
-        if (length <= (size_t) LCI_MEDIUM_SIZE)
+        if (completion == nullptr)
         {
-            LCI_mbuffer_t buffer;
-            buffer.address = address;
-            buffer.length = length;
-            if (config_t::enable_sendmc && completion == nullptr)
-            {
-                completion =
-                    device_p->completion_manager_p->send->alloc_completion();
-            }
-            LCI_error_t ret = LCI_sendmc(device_p->endpoint_followup, buffer,
-                dst_rank, tag, config_t::enable_sendmc ? completion : nullptr,
-                sharedPtr_p);
-            if (ret == LCI_OK)
-            {
-                util::lci_environment::log(
-                    util::lci_environment::log_level_t::debug, "send",
-                    "sendm (%d, %d, %d) device %d tag %d size %d\n", LCI_RANK,
-                    dst_rank, original_tag, device_p->idx, tag, length);
-                tag = (tag + 1) % LCI_MAX_TAG;
-                if (config_t::enable_sendmc)
-                {
-                    auto ret_comp = completion;
-                    completion = nullptr;
-                    return {return_status_t::wait, ret_comp};
-                }
-                else
-                    return {return_status_t::done, nullptr};
-            }
-            else
-            {
-                HPX_ASSERT(ret == LCI_ERR_RETRY);
-                return {return_status_t::retry, nullptr};
-            }
+            completion =
+                device_p->completion_manager_p->send->alloc_completion();
         }
-        else
+        auto status =
+            ::lci::post_send_x(dst_rank, address, length, tag, completion)
+                .user_context(sharedPtr_p)
+                .device(device_p->device)();
+        if (status.is_done() || status.is_posted())
         {
-            if (config_t::reg_mem && segment_to_use == LCI_SEGMENT_ALL)
+            util::lci_environment::log(
+                util::lci_environment::log_level_t::debug, "send",
+                "post_send (%d, %d, %d) device %d tag %d size %d status %s\n",
+                util::lci_environment::rank(), dst_rank, original_tag,
+                device_p->idx, tag, length, status.get_error().get_str());
+            tag = (tag + 1) % util::lci_environment::get_max_tag();
+            if (status.is_posted())
             {
-                LCI_memory_register(
-                    device_p->device, address, length, &segment_to_use);
-            }
-            if (completion == nullptr)
-            {
-                completion =
-                    device_p->completion_manager_p->send->alloc_completion();
-            }
-            LCI_lbuffer_t buffer;
-            buffer.segment = segment_to_use;
-            buffer.address = address;
-            buffer.length = length;
-            LCI_error_t ret = LCI_sendl(device_p->endpoint_followup, buffer,
-                dst_rank, tag, completion, sharedPtr_p);
-            if (ret == LCI_OK)
-            {
-                util::lci_environment::log(
-                    util::lci_environment::log_level_t::debug, "send",
-                    "sendl (%d, %d, %d) device %d, tag %d size %d\n", LCI_RANK,
-                    dst_rank, original_tag, device_p->idx, tag, length);
-                tag = (tag + 1) % LCI_MAX_TAG;
-                if (segment_used != LCI_SEGMENT_ALL)
-                {
-                    LCI_memory_deregister(&segment_used);
-                    segment_used = LCI_SEGMENT_ALL;
-                }
-                segment_used = segment_to_use;
-                segment_to_use = LCI_SEGMENT_ALL;
                 auto ret_comp = completion;
                 completion = nullptr;
                 return {return_status_t::wait, ret_comp};
             }
             else
-            {
-                HPX_ASSERT(ret == LCI_ERR_RETRY);
-                return {return_status_t::retry, nullptr};
-            }
+                return {return_status_t::done, nullptr};
+        }
+        else
+        {
+            return {return_status_t::retry, nullptr};
         }
     }
 
@@ -425,8 +358,9 @@ namespace hpx::parcelset::policies::lci {
     void sender_connection_sendrecv::done()
     {
         util::lci_environment::log(util::lci_environment::log_level_t::debug,
-            "send", "send connection (%d, %d, %d, %d) done!\n", LCI_RANK,
-            dst_rank, original_tag, tag - original_tag + 1);
+            "send", "send connection (%d, %d, %d, %d) done!\n",
+            util::lci_environment::rank(), dst_rank, original_tag,
+            tag - original_tag + 1);
         profile_end_hook();
         error_code ec;
         handler_(ec);
@@ -435,22 +369,17 @@ namespace hpx::parcelset::policies::lci {
         data_point_.time_ = timer_.elapsed_nanoseconds();
         pp_->add_sent_data(data_point_);
 #endif
-        if (segment_used != LCI_SEGMENT_ALL)
+        if (!completion.is_empty())
         {
-            LCI_memory_deregister(&segment_used);
-            segment_used = LCI_SEGMENT_ALL;
+            device_p->completion_manager_p->send->free_completion(completion);
         }
-        if (config_t::enable_sendmc)
-        {
-            LCI_mbuffer_free(header_buffer);
-        }
-        HPX_ASSERT(completion == nullptr);
-        HPX_ASSERT(segment_to_use == LCI_SEGMENT_ALL);
         buffer_.clear();
         util::lci_environment::pcounter_add(
             util::lci_environment::send_conn_timer,
             util::lci_environment::pcounter_since(conn_start_time));
 
+        auto keep_alive = shared_from_this();
+        delete sharedPtr_p;
         if (postprocess_handler_)
         {
             // Return this connection to the connection cache.
@@ -463,17 +392,10 @@ namespace hpx::parcelset::policies::lci {
                 postprocess_handler;
             std::swap(postprocess_handler, postprocess_handler_);
             error_code ec2;
-            postprocess_handler(ec2, there_, shared_from_this());
+            postprocess_handler(ec2, there_, std::move(keep_alive));
         }
     }
 
-    bool sender_connection_sendrecv::tryMerge(
-        const std::shared_ptr<sender_connection_base>& other_base)
-    {
-        // We cannot merge any message here.
-        HPX_UNUSED(other_base);
-        return false;
-    }
 }    // namespace hpx::parcelset::policies::lci
 
 #endif
