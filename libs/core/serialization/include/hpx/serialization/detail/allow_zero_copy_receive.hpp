@@ -11,7 +11,7 @@
 
 namespace hpx::serialization::detail {
 
-    HPX_CXX_EXPORT struct allow_zero_copy_receive
+    HPX_CXX_EXPORT HPX_CXX_EXTERN struct allow_zero_copy_receive
     {
     };
 }    // namespace hpx::serialization::detail

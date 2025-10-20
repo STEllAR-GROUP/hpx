@@ -29,7 +29,7 @@
 
 namespace hpx::serialization::detail {
 
-    HPX_CXX_EXPORT class id_registry
+    HPX_CXX_EXPORT HPX_CXX_EXTERN class id_registry
     {
     public:
         id_registry(id_registry const&) = delete;
@@ -85,7 +85,7 @@ namespace hpx::serialization::detail {
         cache_t cache;
     };
 
-    HPX_CXX_EXPORT class polymorphic_id_factory
+    HPX_CXX_EXPORT HPX_CXX_EXTERN class polymorphic_id_factory
     {
     public:
         polymorphic_id_factory(polymorphic_id_factory const&) = delete;

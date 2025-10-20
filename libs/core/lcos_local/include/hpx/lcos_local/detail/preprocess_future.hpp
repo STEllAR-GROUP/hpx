@@ -197,7 +197,7 @@ namespace hpx::serialization::detail {
 
 // This is explicitly instantiated to ensure that the id is stable across
 // shared libraries.
-template <>
+HPX_CXX_EXTERN template <>
 struct hpx::util::extra_data_helper<
     hpx::serialization::detail::preprocess_futures>
 {

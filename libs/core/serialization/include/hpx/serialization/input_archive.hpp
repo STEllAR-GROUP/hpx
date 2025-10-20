@@ -30,7 +30,8 @@
 
 namespace hpx::serialization {
 
-    HPX_CXX_EXPORT struct input_archive : basic_archive<input_archive>
+    HPX_CXX_EXPORT HPX_CXX_EXTERN struct input_archive
+      : basic_archive<input_archive>
     {
         using base_type = basic_archive<input_archive>;
 

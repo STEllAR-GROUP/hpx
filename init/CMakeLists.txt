@@ -1,10 +1,12 @@
-# Copyright (c) 2007-2023 Hartmut Kaiser
+# Copyright (c) 2007-2025 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2018 Nikunj Gupta
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+include(HPX_CXXModules)
 
 set(hpx_init_HEADERS
     ""
@@ -57,8 +59,7 @@ target_include_directories(
                   $<INSTALL_INTERFACE:include>
 )
 if(HPX_WITH_CXX_MODULES)
-  target_link_libraries(hpx_init PRIVATE hpx_core_module_if)
-  set_target_properties(hpx_init PROPERTIES CXX_SCAN_FOR_MODULES ON)
+  hpx_configure_module_consumer(hpx_init hpx_core_module_if)
 endif()
 
 set_property(TARGET hpx_init PROPERTY FOLDER "Core")

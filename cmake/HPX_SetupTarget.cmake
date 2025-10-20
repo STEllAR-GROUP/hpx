@@ -6,6 +6,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+include(HPX_CXXModules)
+
 cmake_policy(PUSH)
 
 hpx_set_cmake_policy(CMP0054 NEW)
@@ -223,8 +225,8 @@ function(hpx_setup_target target)
 
   set_target_properties(${target} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-  if(HPX_WITH_CXX_MODULES AND ${target}_SCAN_FOR_MODULES)
-    set_target_properties(${target} PROPERTIES CXX_SCAN_FOR_MODULES ON)
+  if(HPX_WITH_CXX_MODULES OR ${target}_SCAN_FOR_MODULES)
+    hpx_configure_module_consumer(${target} hpx_core_module_if)
   else()
     set_target_properties(${target} PROPERTIES CXX_SCAN_FOR_MODULES OFF)
     target_compile_definitions(

@@ -321,9 +321,23 @@ foreach(lib ${HPX_LIBS})
   # creation can move here as well.
   if(${lib} STREQUAL "full")
     add_subdirectory(${lib})
+    if(HPX_WITH_CXX_MODULES)
+      hpx_configure_module_consumer(hpx_${lib} hpx_core_module_if)
+    endif()
   else()
     add_library(hpx_${lib} ${hpx_library_link_mode} src/empty.cpp)
     target_compile_definitions(hpx_${lib} PRIVATE HPX_${uppercase_lib}_EXPORTS)
+    set_target_properties(hpx_${lib} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+    if(HPX_WITH_CXX_MODULES)
+      add_library(hpx_${lib}_module STATIC)
+      set_target_properties(
+        hpx_${lib}_module PROPERTIES POSITION_INDEPENDENT_CODE ON
+      )
+
+      # This creates an interface target hpx_${lib}_module_if
+      hpx_configure_module_producer(hpx_${lib}_module)
+    endif()
 
     add_subdirectory(${lib})
 
@@ -350,7 +364,9 @@ foreach(lib ${HPX_LIBS})
       endforeach()
 
       set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib})
-      set(lib_module_file "${lib_module_basedir}/hpx_${lib}.ixx")
+      set(lib_module_file
+          "${lib_module_basedir}/hpx_${lib}${HPX_MODULE_INTERFACE_EXTENSION}"
+      )
       set(modulename_upper "${uppercase_lib}")
       configure_file(
         "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in" ${lib_module_file} @ONLY
@@ -364,16 +380,12 @@ foreach(lib ${HPX_LIBS})
         ${std_header_file} @ONLY
       )
 
-      add_library(hpx_${lib}_module STATIC)
       target_link_libraries(
         hpx_${lib}_module
         PUBLIC hpx_${lib} hpx_public_flags
         PRIVATE hpx_private_flags
       )
       set_target_properties(hpx_${lib}_module PROPERTIES FOLDER "Core")
-
-      # This creates an interface target hpx_${lib}_module_if
-      hpx_configure_module_producer(hpx_${lib}_module)
 
       add_hpx_source_group(
         NAME hpx_${lib}_module
