@@ -5,12 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/serialization/base_object.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
-
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <memory>
@@ -73,7 +68,7 @@ struct D : B
       , d(89)
     {
     }
-    void f() {}
+    void f() override {}
 
     int d;
 };
@@ -97,6 +92,8 @@ struct C
       : c(c)
     {
     }
+
+    virtual ~C() = default;
 
     T c;
 };
@@ -135,7 +132,7 @@ public:
     C<T> c;
 };
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <class Archive, class T>
     void serialize(Archive& archive, E<T>& s, unsigned)
@@ -143,7 +140,7 @@ namespace hpx { namespace serialization {
         archive& hpx::serialization::base_object<A>(s);
         archive & s.c;
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization
 
 template <typename T>
 E<T>* e_factory(hpx::serialization::input_archive& ar, E<T>* /*unused*/)

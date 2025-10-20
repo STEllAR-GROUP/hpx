@@ -18,6 +18,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/performance_counters/base_performance_counter.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counter_interface.hpp>
@@ -28,10 +29,6 @@
 #include <hpx/runtime_local/get_os_thread_count.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
-#include <hpx/serialization/base_object.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/string.hpp>
-#include <hpx/serialization/vector.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 
 #include <cstddef>

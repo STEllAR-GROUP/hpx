@@ -22,7 +22,7 @@ namespace hpx::util::cache::statistics {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN class no_statistics
+    HPX_CXX_EXPORT class no_statistics
     {
     public:
         /// \brief  The function \a got_hit will be called by a cache instance

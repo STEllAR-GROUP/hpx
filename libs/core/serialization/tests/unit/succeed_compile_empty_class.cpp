@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/modules/serialization.hpp>
 
 struct A
 {

@@ -18,13 +18,12 @@ namespace hpx::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T,
-            typename Enable = void>
+        HPX_CXX_EXPORT template <typename T, typename Enable = void>
         struct invoke_result_impl
         {
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Ts>
+        HPX_CXX_EXPORT template <typename F, typename... Ts>
         struct invoke_result_impl<F(Ts...),
             std::void_t<decltype(HPX_INVOKE(
                 std::declval<F>(), std::declval<Ts>()...))>>
@@ -35,11 +34,11 @@ namespace hpx::util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     struct invoke_result : detail::invoke_result_impl<F && (Ts && ...)>
     {
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     using invoke_result_t = typename invoke_result<F, Ts...>::type;
 }    // namespace hpx::util

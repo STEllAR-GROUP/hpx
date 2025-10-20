@@ -16,11 +16,11 @@
 
 namespace hpx {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN using std::coroutine_handle;
-    HPX_CORE_MODULE_EXPORT_EXTERN using std::coroutine_traits;
-    HPX_CORE_MODULE_EXPORT_EXTERN using std::noop_coroutine;
-    HPX_CORE_MODULE_EXPORT_EXTERN using std::suspend_always;
-    HPX_CORE_MODULE_EXPORT_EXTERN using std::suspend_never;
+    HPX_CXX_EXPORT using std::coroutine_handle;
+    HPX_CXX_EXPORT using std::coroutine_traits;
+    HPX_CXX_EXPORT using std::noop_coroutine;
+    HPX_CXX_EXPORT using std::suspend_always;
+    HPX_CXX_EXPORT using std::suspend_never;
 }    // namespace hpx
 
 #elif __has_include(<experimental/coroutine>)
@@ -28,11 +28,11 @@ namespace hpx {
 
 namespace hpx {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN using std::experimental::coroutine_handle;
-    HPX_CORE_MODULE_EXPORT_EXTERN using std::experimental::coroutine_traits;
-    HPX_CORE_MODULE_EXPORT_EXTERN using std::experimental::noop_coroutine;
-    HPX_CORE_MODULE_EXPORT_EXTERN using std::experimental::suspend_always;
-    HPX_CORE_MODULE_EXPORT_EXTERN using std::experimental::suspend_never;
+    HPX_CXX_EXPORT using std::experimental::coroutine_handle;
+    HPX_CXX_EXPORT using std::experimental::coroutine_traits;
+    HPX_CXX_EXPORT using std::experimental::noop_coroutine;
+    HPX_CXX_EXPORT using std::experimental::suspend_always;
+    HPX_CXX_EXPORT using std::experimental::suspend_never;
 }    // namespace hpx
 
 #endif

@@ -51,13 +51,14 @@ add_hpx_module(
     hpx_allocator_support
     hpx_concurrency
     hpx_config
+    hpx_errors
     hpx_execution
     hpx_executors
     hpx_futures
     hpx_lock_registration
-    hpx_pack_traversal
-    hpx_errors
     hpx_memory
+    hpx_pack_traversal
+    hpx_serialization
     hpx_thread_support
     hpx_type_support
   CMAKE_SUBDIRS examples tests

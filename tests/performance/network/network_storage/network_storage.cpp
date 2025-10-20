@@ -35,7 +35,6 @@
 #include <utility>
 #include <vector>
 
-#include <hpx/serialization/serialize.hpp>
 #include <simple_profiler.hpp>
 
 //

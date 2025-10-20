@@ -10,6 +10,7 @@
 include(HPX_Message)
 include(HPX_AddPseudoDependencies)
 include(HPX_AddPseudoTarget)
+include(HPX_CXXModules)
 
 # ##############################################################################
 # gather headers and sources
@@ -350,6 +351,7 @@ foreach(lib ${HPX_LIBS})
 
       set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib})
       set(lib_module_file "${lib_module_basedir}/hpx_${lib}.ixx")
+      set(modulename_upper "${uppercase_lib}")
       configure_file(
         "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in" ${lib_module_file} @ONLY
       )
@@ -361,46 +363,67 @@ foreach(lib ${HPX_LIBS})
         "${HPX_SOURCE_DIR}/cmake/templates/std_headers.hpp.in"
         ${std_header_file} @ONLY
       )
+
+      add_library(hpx_${lib}_module STATIC)
+      target_link_libraries(
+        hpx_${lib}_module
+        PUBLIC hpx_${lib} hpx_public_flags
+        PRIVATE hpx_private_flags
+      )
+      set_target_properties(hpx_${lib}_module PROPERTIES FOLDER "Core")
+
+      # This creates an interface target hpx_${lib}_module_if
+      hpx_configure_module_producer(hpx_${lib}_module)
+
       add_hpx_source_group(
-        NAME hpx_${lib}
+        NAME hpx_${lib}_module
         ROOT ${lib_module_basedir}
-        CLASS "Generated Files"
+        CLASS "Source Files"
         TARGETS ${lib_module_file}
       )
 
       # cmake-format: off
       target_sources(
-        hpx_${lib} PUBLIC
+        hpx_${lib}_module PUBLIC
             FILE_SET hpx_${lib}_public_sources
                 TYPE CXX_MODULES
                 BASE_DIRS ${lib_module_basedir}
                 FILES ${lib_module_file}
       )
-      set(module_installation
-          FILE_SET hpx_${lib}_public_sources
-              DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx/miu
-          CXX_MODULES_BMI
-              DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx/bmi
-              COMPONENT runtime
+
+      target_include_directories(hpx_${lib}_module PUBLIC
+          $<BUILD_INTERFACE:${lib_module_basedir}>
+          $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/cxx>
       )
+
+      set(module_install
+        FILE_SET hpx_${lib}_public_sources
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
+        CXX_MODULES_BMI
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
+            COMPONENT runtime
+      )
+      set(module_install_targets hpx_${lib}_module hpx_${lib}_module_if)
       # cmake-format: on
 
       if(HPX_WITH_BUILD_USING_CXX_MODULES AND MSVC)
         # suppress linker MSVC warning LNK4286: defined symbol imported
         target_link_options(hpx_${lib} PRIVATE "/ignore:4286")
       endif()
+
+      target_link_libraries(hpx INTERFACE hpx_${lib}_module_if)
     endif()
 
     set_target_properties(hpx_${lib} PROPERTIES FOLDER "Core")
 
     install(
-      TARGETS hpx_${lib}
+      TARGETS hpx_${lib} ${module_install_targets}
       EXPORT HPXInternalTargets
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
               COMPONENT runtime
-              ${module_installation}
+              ${module_install}
     )
 
     # install PDB if needed
@@ -414,7 +437,7 @@ foreach(lib ${HPX_LIBS})
       )
     endif()
 
-    hpx_export_internal_targets(hpx_${lib})
+    hpx_export_internal_targets(hpx_${lib} ${module_install_targets})
   endif()
 
   set(_hpx_${lib}_modules

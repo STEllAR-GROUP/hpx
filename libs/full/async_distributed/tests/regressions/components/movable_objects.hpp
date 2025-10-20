@@ -7,8 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/serialization/access.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
 

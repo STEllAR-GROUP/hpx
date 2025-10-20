@@ -21,9 +21,9 @@
 #include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/serialization/serialize.hpp>
 
 #include <array>
 #include <atomic>

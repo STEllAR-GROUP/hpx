@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -23,7 +23,7 @@
 
 namespace hpx::serialization {
 
-    template <typename Container>
+    HPX_CXX_EXPORT template <typename Container>
     struct input_container : erased_input_container
     {
     private:
@@ -102,7 +102,7 @@ namespace hpx::serialization {
                 {
                     HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                         "input_container::set_filter",
-                        "archive data bstream is too short");
+                        "archive data binary stream is too short");
                 }
             }
         }
@@ -132,7 +132,7 @@ namespace hpx::serialization {
                 {
                     HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                         "input_container::load_binary",
-                        "archive data bstream is too short");
+                        "archive data binary stream is too short");
                 }
 
                 access_traits::read(cont_, count, current_, address);
@@ -155,7 +155,8 @@ namespace hpx::serialization {
                         {
                             HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                                 "input_container::load_binary",
-                                "archive data bstream structure mismatch");
+                                "archive data binary stream structure "
+                                "mismatch");
                         }
                         ++current_chunk_;
                         current_chunk_size_ = 0;
@@ -186,7 +187,7 @@ namespace hpx::serialization {
                 {
                     HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                         "input_container::load_binary_chunk",
-                        "archive data bstream data chunk size mismatch");
+                        "archive data binary stream data chunk size mismatch");
                 }
 
                 auto*& buffer = get_chunk_data(current_chunk_).pos_;

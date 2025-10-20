@@ -12,13 +12,11 @@
 
 namespace hpx::util {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <bool Enable, typename C1,
-        typename C2>
+    HPX_CXX_EXPORT template <bool Enable, typename C1, typename C2>
     struct lazy_conditional : std::conditional_t<Enable, C1, C2>
     {
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <bool Enable, typename C1,
-        typename C2>
+    HPX_CXX_EXPORT template <bool Enable, typename C1, typename C2>
     using lazy_conditional_t = typename lazy_conditional<Enable, C1, C2>::type;
 }    // namespace hpx::util

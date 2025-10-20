@@ -23,7 +23,7 @@ namespace hpx::util {
     // turned into an associate namespace, as this interferes with ADL in
     // unexpected ways. We rather copy the full unused_type implementation.
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT_EXTERN struct unused_type
+    HPX_CXX_EXPORT struct unused_type
     {
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type() noexcept =
             default;
@@ -82,7 +82,7 @@ namespace hpx::util {
 #if defined(HPX_MSVC_NVCC)
     HPX_CONSTANT
 #else
-    HPX_CORE_MODULE_EXPORT_EXTERN inline constexpr
+    HPX_CXX_EXPORT inline constexpr
 #endif
     unused_type unused = unused_type();
 }    // namespace hpx::util

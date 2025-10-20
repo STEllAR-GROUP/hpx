@@ -10,9 +10,9 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -21,9 +21,8 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/serialization/base_object.hpp>
-#include <hpx/serialization/serialize.hpp>
 
 #include <exception>
 #include <type_traits>

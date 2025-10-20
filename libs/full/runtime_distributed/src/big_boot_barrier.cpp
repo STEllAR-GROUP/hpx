@@ -23,6 +23,7 @@
 #include <hpx/modules/agas_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/parcelset/detail/parcel_await.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
 #include <hpx/parcelset_base/parcelport.hpp>
@@ -30,8 +31,6 @@
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/big_boot_barrier.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
-#include <hpx/serialization/detail/polymorphic_id_factory.hpp>
-#include <hpx/serialization/vector.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>

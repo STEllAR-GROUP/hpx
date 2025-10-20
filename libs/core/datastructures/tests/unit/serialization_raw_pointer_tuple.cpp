@@ -12,12 +12,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/init.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/tuple.hpp>
-
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/tuple.hpp>
 
 #include <cstddef>
 #include <string>

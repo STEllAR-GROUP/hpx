@@ -12,13 +12,12 @@
 #include <hpx/compute/host/get_targets.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
 #include <hpx/runtime_local/get_os_thread_count.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/vector.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <vector>

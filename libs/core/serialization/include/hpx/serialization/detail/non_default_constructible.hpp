@@ -17,14 +17,14 @@ namespace hpx::serialization::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // default fall-backs for serializing non-default-constructible types
-    template <typename Archive, typename T,
+    HPX_CXX_EXPORT template <typename Archive, typename T,
         std::enable_if_t<traits::is_not_bitwise_serializable_v<T>, int> = 0>
     void save_construct_data(Archive&, T const*, unsigned)
     {
     }
 
     // by default fall back to in-place default construction
-    template <typename Archive, typename T,
+    HPX_CXX_EXPORT template <typename Archive, typename T,
         std::enable_if_t<traits::is_not_bitwise_serializable_v<T>, int> = 0>
     void load_construct_data(Archive&, T* t, unsigned)
     {
@@ -32,14 +32,14 @@ namespace hpx::serialization::detail {
     }
 
 #if defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
-    template <typename Archive, typename T,
+    HPX_CXX_EXPORT template <typename Archive, typename T,
         std::enable_if_t<!traits::is_not_bitwise_serializable_v<T>, int> = 0>
     void save_construct_data(Archive&, T const*, unsigned)
     {
     }
 
     // by default fall back to in-place default construction
-    template <typename Archive, typename T,
+    HPX_CXX_EXPORT template <typename Archive, typename T,
         std::enable_if_t<!traits::is_not_bitwise_serializable_v<T>, int> = 0>
     void load_construct_data(Archive&, T* t, unsigned)
     {

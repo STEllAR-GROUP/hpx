@@ -12,7 +12,7 @@
 #include <hpx/functional/detail/function_registration.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
 #include <hpx/functional/serialization/detail/vtable/serializable_vtable.hpp>
-#include <hpx/serialization/detail/polymorphic_intrusive_factory.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <string>
 #include <type_traits>

@@ -111,6 +111,7 @@ add_hpx_module(
     hpx_memory
     hpx_properties
     hpx_resource_partitioner
+    hpx_serialization
     hpx_synchronization
     hpx_tag_invoke
     hpx_threading

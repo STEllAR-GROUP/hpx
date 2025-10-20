@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Christopher Taylor
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +17,7 @@
 
 namespace hpx::serialization {
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     void serialize(input_archive& ar, std::valarray<T>& arr, int /* version */)
     {
         std::uint64_t sz = 0;
@@ -30,7 +31,7 @@ namespace hpx::serialization {
             ar >> arr[i];
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     void serialize(
         output_archive& ar, std::valarray<T> const& arr, int /* version */)
     {

@@ -35,7 +35,7 @@ namespace hpx {
     ///          mutex is owned again. In this way, the mutex is unlocked in the
     ///          constructor and locked in the destructor, so that one can have
     ///          an unlocked section within a locked one.
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Mutex>
+    HPX_CXX_EXPORT template <typename Mutex>
     class unlock_guard
     {
     public:

@@ -6,10 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/modules/format.hpp>
-#include <hpx/serialization/detail/preprocess_container.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/string.hpp>
-#include <hpx/serialization/vector.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/version.hpp>
 
 #include <chrono>

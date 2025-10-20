@@ -19,7 +19,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN class backtrace
+    HPX_CXX_EXPORT HPX_CXX_EXTERN class backtrace
     {
     public:
         HPX_CORE_EXPORT explicit backtrace(
@@ -60,7 +60,7 @@ namespace hpx::util {
 
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN class trace_manip
+        HPX_CXX_EXPORT class trace_manip
         {
         public:
             explicit constexpr trace_manip(backtrace const* tr) noexcept
@@ -77,7 +77,7 @@ namespace hpx::util {
             std::ostream& out, trace_manip const& t);
     }    // namespace detail
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename E>
+    HPX_CXX_EXPORT template <typename E>
     [[nodiscard]] detail::trace_manip trace(E const& e)
     {
         auto const* tr = dynamic_cast<backtrace const*>(&e);

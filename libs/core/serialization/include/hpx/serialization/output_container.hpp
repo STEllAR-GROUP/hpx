@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2014 Thomas Heller
 //  Copyright (c)      2015 Anton Bikineev
 //
@@ -27,7 +27,7 @@ namespace hpx::serialization {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        struct basic_chunker
+        HPX_CXX_EXPORT struct basic_chunker
         {
             explicit constexpr basic_chunker(
                 std::vector<serialization_chunk>*) noexcept
@@ -65,7 +65,7 @@ namespace hpx::serialization {
             static constexpr void reset() noexcept {}
         };
 
-        struct vector_chunker
+        HPX_CXX_EXPORT struct vector_chunker
         {
             explicit constexpr vector_chunker(
                 std::vector<serialization_chunk>* chunks) noexcept
@@ -112,7 +112,7 @@ namespace hpx::serialization {
             std::vector<serialization_chunk>* chunks_;
         };
 
-        struct counting_chunker
+        HPX_CXX_EXPORT struct counting_chunker
         {
             explicit constexpr counting_chunker(
                 std::vector<serialization_chunk>*) noexcept
@@ -165,7 +165,7 @@ namespace hpx::serialization {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Container, typename Chunker>
+    HPX_CXX_EXPORT template <typename Container, typename Chunker>
     struct output_container : erased_output_container
     {
         using access_traits = traits::serialization_access_data<Container>;
@@ -294,7 +294,7 @@ namespace hpx::serialization {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Container, typename Chunker>
+    HPX_CXX_EXPORT template <typename Container, typename Chunker>
     struct filtered_output_container : output_container<Container, Chunker>
     {
         using access_traits = traits::serialization_access_data<Container>;

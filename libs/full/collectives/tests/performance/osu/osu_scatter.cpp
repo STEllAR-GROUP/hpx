@@ -12,7 +12,7 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/iostream.hpp>
-#include <hpx/serialization/serialize_buffer.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
 #include <memory>

@@ -1,6 +1,6 @@
 //  Copyright (c) 2015 Anton Bikineev
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
@@ -29,12 +29,16 @@
 
 namespace hpx::serialization::detail {
 
-    class id_registry
+    HPX_CXX_EXPORT class id_registry
     {
     public:
-        HPX_NON_COPYABLE(id_registry);
+        id_registry(id_registry const&) = delete;
+        id_registry(id_registry&&) = delete;
+        id_registry& operator=(id_registry const&) = delete;
+        id_registry& operator=(id_registry&&) = delete;
 
-    public:
+        ~id_registry() = default;
+
         using ctor_t = void* (*) ();
         using typename_to_ctor_t = std::map<std::string, ctor_t>;
         using typename_to_id_t = std::map<std::string, std::uint32_t>;
@@ -53,7 +57,8 @@ namespace hpx::serialization::detail {
         [[nodiscard]] HPX_CORE_EXPORT std::uint32_t try_get_id(
             std::string const& type_name) const;
 
-        [[nodiscard]] std::uint32_t get_max_registered_id() const noexcept
+        [[nodiscard]] constexpr std::uint32_t get_max_registered_id()
+            const noexcept
         {
             return max_id;
         }
@@ -80,10 +85,16 @@ namespace hpx::serialization::detail {
         cache_t cache;
     };
 
-    class polymorphic_id_factory
+    HPX_CXX_EXPORT class polymorphic_id_factory
     {
     public:
-        HPX_NON_COPYABLE(polymorphic_id_factory);
+        polymorphic_id_factory(polymorphic_id_factory const&) = delete;
+        polymorphic_id_factory(polymorphic_id_factory&&) = delete;
+        polymorphic_id_factory& operator=(
+            polymorphic_id_factory const&) = delete;
+        polymorphic_id_factory& operator=(polymorphic_id_factory&&) = delete;
+
+        ~polymorphic_id_factory() = default;
 
     private:
         using ctor_t = id_registry::ctor_t;
@@ -93,29 +104,10 @@ namespace hpx::serialization::detail {
 
     public:
         template <class T>
-        [[nodiscard]] static T* create(std::uint32_t id,
-            [[maybe_unused]] std::string const* name = nullptr)
+        [[nodiscard]] static T* create(
+            std::uint32_t const id, std::string const* name = nullptr)
         {
-            cache_t const& vec = id_registry::instance().cache;
-
-            if (id >= vec.size())    //-V104
-            {
-                std::string msg(
-                    "Unknown type descriptor " + std::to_string(id));
-#if defined(HPX_DEBUG)
-                if (name != nullptr)
-                {
-                    msg += ", for typename " + *name + "\n";
-                    msg += collect_registered_typenames();
-                }
-#endif
-                HPX_THROW_EXCEPTION(hpx::error::serialization_error,
-                    "polymorphic_id_factory::create", msg);
-            }
-
-            ctor_t const ctor = vec[static_cast<std::size_t>(id)];
-            HPX_ASSERT(ctor != nullptr);    //-V108
-            return static_cast<T*>(ctor());
+            return static_cast<T*>(get_ctor_function(id, name));
         }
 
         [[nodiscard]] HPX_CORE_EXPORT static std::uint32_t get_id(
@@ -125,6 +117,8 @@ namespace hpx::serialization::detail {
         polymorphic_id_factory() = default;
 
         HPX_CORE_EXPORT static polymorphic_id_factory& instance();
+        [[nodiscard]] HPX_CORE_EXPORT static ctor_t get_ctor_function(
+            std::uint32_t id, std::string const* name);
 
         [[nodiscard]] HPX_CORE_EXPORT static std::string
         collect_registered_typenames();
@@ -132,7 +126,7 @@ namespace hpx::serialization::detail {
         friend struct hpx::util::static_<polymorphic_id_factory>;
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct register_class_name<T,
         std::enable_if_t<traits::is_serialized_with_id_v<T>>>
     {
@@ -147,23 +141,17 @@ namespace hpx::serialization::detail {
             return new T;
         }
 
-        register_class_name& instantiate()
+        static register_class_name& instance()
         {
-            return *this;
+            static register_class_name instance_;
+            return instance_;
         }
-
-        static register_class_name instance;
     };
 
-    template <class T>
-    register_class_name<T, std::enable_if_t<traits::is_serialized_with_id_v<T>>>
-        register_class_name<T,
-            std::enable_if_t<traits::is_serialized_with_id_v<T>>>::instance;
-
-    template <std::uint32_t desc>
+    HPX_CXX_EXPORT template <std::uint32_t desc>
     [[nodiscard]] std::string get_constant_entry_name();
 
-    template <std::uint32_t Id>
+    HPX_CXX_EXPORT template <std::uint32_t Id>
     struct add_constant_entry
     {
         add_constant_entry()
@@ -172,23 +160,12 @@ namespace hpx::serialization::detail {
                 get_constant_entry_name<Id>(), Id);
         }
 
-        static add_constant_entry instance;
+        static add_constant_entry& instance()
+        {
+            static add_constant_entry instance_;
+            return instance_;
+        }
     };
-
-    template <std::uint32_t Id>
-    add_constant_entry<Id> add_constant_entry<Id>::instance;
-
 }    // namespace hpx::serialization::detail
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#define HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(String, Id)                       \
-    namespace hpx::serialization::detail {                                     \
-        template <>                                                            \
-        std::string get_constant_entry_name</**/ Id>()                         \
-        {                                                                      \
-            return HPX_PP_STRINGIZE(String);                                   \
-        }                                                                      \
-        template add_constant_entry<Id> add_constant_entry</**/ Id>::instance; \
-    }                                                                          \
-    /**/

@@ -7,10 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/naming_base/gid_type.hpp>
 #include <hpx/naming_base/naming_base.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
 #include <cstdint>
 #include <ostream>

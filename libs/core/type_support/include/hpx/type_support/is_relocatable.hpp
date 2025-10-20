@@ -12,7 +12,7 @@
 
 namespace hpx::experimental {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct is_relocatable
       : std::bool_constant<std::is_move_constructible_v<T> &&
             std::is_object_v<T>>
@@ -20,7 +20,7 @@ namespace hpx::experimental {
     };
 
     // ToTp(FromTp&&) must be well-formed
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename ToTp, typename FromTp>
+    HPX_CXX_EXPORT template <typename ToTp, typename FromTp>
     struct is_relocatable_from
       : std::bool_constant<
             std::is_constructible_v<std::remove_cv_t<ToTp>, FromTp> &&
@@ -28,10 +28,10 @@ namespace hpx::experimental {
     {
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_relocatable_v = is_relocatable<T>::value;
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename ToTp, typename FromTp>
+    HPX_CXX_EXPORT template <typename ToTp, typename FromTp>
     inline constexpr bool is_relocatable_from_v =
         is_relocatable_from<ToTp, FromTp>::value;
 }    // namespace hpx::experimental

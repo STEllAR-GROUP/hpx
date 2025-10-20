@@ -24,8 +24,8 @@
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/tag_invoke.hpp>
-#include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/threading_base/register_thread.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>

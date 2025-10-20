@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/config/endian.hpp>
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/serialization/access.hpp>
@@ -32,7 +31,7 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        template <typename Container>
+        HPX_CXX_EXPORT template <typename Container>
         std::unique_ptr<erased_output_container> create_output_container(
             Container& buffer, std::vector<serialization_chunk>* chunks,
             binary_filter* filter,
@@ -70,7 +69,7 @@ namespace hpx::serialization {
             return res;
         }
 
-        template <typename Container>
+        HPX_CXX_EXPORT template <typename Container>
         std::unique_ptr<erased_output_container> create_output_container(
             Container& buffer, std::vector<serialization_chunk>* chunks,
             binary_filter* filter,
@@ -93,7 +92,7 @@ namespace hpx::serialization {
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
-    struct output_archive : basic_archive<output_archive>
+    HPX_CXX_EXPORT struct output_archive : basic_archive<output_archive>
     {
     private:
         static constexpr std::uint32_t make_flags(std::uint32_t flags,

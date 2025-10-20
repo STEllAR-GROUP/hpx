@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Hartmut Kaiser
+//  Copyright (c) 2023-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. See accompanying
@@ -11,7 +11,7 @@
 
 namespace hpx::serialization::detail {
 
-    struct allow_zero_copy_receive
+    HPX_CXX_EXPORT struct allow_zero_copy_receive
     {
     };
 }    // namespace hpx::serialization::detail

@@ -10,6 +10,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(preprocessor_headers
     hpx/preprocessor/cat.hpp
     hpx/preprocessor/config.hpp
+    hpx/preprocessor/empty.hpp
     hpx/preprocessor/expand.hpp
     hpx/preprocessor/identity.hpp
     hpx/preprocessor/nargs.hpp
@@ -24,14 +25,10 @@ set(preprocessor_compat_headers
 )
 # cmake-format: on
 
-# Default location is $HPX_ROOT/libs/preprocessor/src
-set(preprocessor_sources)
-
 include(HPX_AddModule)
 add_hpx_module(
   core preprocessor NO_CONFIG_IN_GENERATED_HEADERS
   GLOBAL_HEADER_GEN ON
-  SOURCES ${preprocessor_sources}
   HEADERS ${preprocessor_headers}
   COMPAT_HEADERS ${preprocessor_compat_headers}
   CMAKE_SUBDIRS tests

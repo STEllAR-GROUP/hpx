@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/serialization/config/defines.hpp>
+#include <hpx/serialization/macros.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <type_traits>
@@ -16,7 +17,7 @@
 namespace hpx::traits {
 
 #if !defined(HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION)
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_bitwise_serializable
       : std::integral_constant<bool,
             (std::is_trivially_copy_assignable_v<T> ||
@@ -26,7 +27,7 @@ namespace hpx::traits {
     {
     };
 #else
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_bitwise_serializable
       : std::integral_constant<bool,
             std::is_trivially_copy_assignable_v<T> ||
@@ -36,17 +37,8 @@ namespace hpx::traits {
     };
 #endif
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_bitwise_serializable_v =
         is_bitwise_serializable<T>::value;
 
 }    // namespace hpx::traits
-
-#define HPX_IS_BITWISE_SERIALIZABLE(T)                                         \
-    namespace hpx::traits {                                                    \
-        template <>                                                            \
-        struct is_bitwise_serializable<T> : std::true_type                     \
-        {                                                                      \
-        };                                                                     \
-    }                                                                          \
-    /**/

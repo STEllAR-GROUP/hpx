@@ -150,56 +150,47 @@ namespace hpx {
         /// \endcond
     };
 
-    HPX_CORE_MODULE_EXPORT_EXTERN constexpr bool operator==(
-        int lhs, error rhs) noexcept
+    HPX_CXX_EXPORT constexpr bool operator==(int lhs, error rhs) noexcept
     {
         return lhs == static_cast<int>(rhs);
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN constexpr bool operator==(
-        error lhs, int rhs) noexcept
+    HPX_CXX_EXPORT constexpr bool operator==(error lhs, int rhs) noexcept
     {
         return static_cast<int>(lhs) == rhs;
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN constexpr bool operator!=(
-        int lhs, error rhs) noexcept
+    HPX_CXX_EXPORT constexpr bool operator!=(int lhs, error rhs) noexcept
     {
         return !(lhs == rhs);
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN constexpr bool operator!=(
-        error lhs, int rhs) noexcept
+    HPX_CXX_EXPORT constexpr bool operator!=(error lhs, int rhs) noexcept
     {
         return !(lhs == rhs);
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN constexpr bool operator<(
-        int lhs, error rhs) noexcept
+    HPX_CXX_EXPORT constexpr bool operator<(int lhs, error rhs) noexcept
     {
         return lhs < static_cast<int>(rhs);
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN constexpr bool operator>=(
-        int lhs, error rhs) noexcept
+    HPX_CXX_EXPORT constexpr bool operator>=(int lhs, error rhs) noexcept
     {
         return !(lhs < rhs);
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN constexpr int operator&(
-        error lhs, error rhs) noexcept
+    HPX_CXX_EXPORT constexpr int operator&(error lhs, error rhs) noexcept
     {
         return static_cast<int>(lhs) & static_cast<int>(rhs);
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN constexpr int operator&(
-        int lhs, error rhs) noexcept
+    HPX_CXX_EXPORT constexpr int operator&(int lhs, error rhs) noexcept
     {
         return lhs & static_cast<int>(rhs);
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN constexpr int operator|=(
-        int& lhs, error rhs) noexcept
+    HPX_CXX_EXPORT constexpr int operator|=(int& lhs, error rhs) noexcept
     {
         lhs = lhs | static_cast<int>(rhs);
         return lhs;

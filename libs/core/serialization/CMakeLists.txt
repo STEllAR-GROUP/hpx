@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -111,7 +111,6 @@ set(serialization_headers
     hpx/serialization/detail/polymorphic_id_factory.hpp
     hpx/serialization/detail/polymorphic_intrusive_factory.hpp
     hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp
-    hpx/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp
     hpx/serialization/detail/preprocess_container.hpp
     hpx/serialization/detail/raw_ptr.hpp
     hpx/serialization/detail/serialize_collection.hpp
@@ -123,6 +122,7 @@ set(serialization_headers
     hpx/serialization/deque.hpp
     hpx/serialization/exception_ptr.hpp
     hpx/serialization/list.hpp
+    hpx/serialization/macros.hpp
     hpx/serialization/map.hpp
     hpx/serialization/set.hpp
     hpx/serialization/serialize_buffer_fwd.hpp
@@ -157,6 +157,7 @@ set(serialization_headers
     hpx/serialization/traits/polymorphic_traits.hpp
     hpx/serialization/traits/serialization_access_data.hpp
 )
+set(serialization_macro_headers hpx/serialization/macros.hpp)
 
 # Default location is $HPX_ROOT/libs/serialization/include_compatibility
 # cmake-format: off
@@ -236,8 +237,10 @@ include(HPX_AddModule)
 add_hpx_module(
   core serialization
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${serialization_sources}
   HEADERS ${serialization_headers}
+  MACRO_HEADERS ${serialization_macro_headers}
   COMPAT_HEADERS ${serialization_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
@@ -249,7 +252,11 @@ add_hpx_module(
     hpx_preprocessor
     hpx_type_support
   DEPENDENCIES ${serialization_optional_dependencies}
-  ADD_TO_GLOBAL_HEADER hpx/serialization/detail/allow_zero_copy_receive.hpp
-  EXCLUDE_FROM_GLOBAL_HEADER ${boost_serialization_headers}
+  ADD_TO_GLOBAL_HEADER
+    hpx/serialization/detail/allow_zero_copy_receive.hpp
+    hpx/serialization/detail/polymorphic_id_factory.hpp
+    hpx/serialization/detail/polymorphic_intrusive_factory.hpp
+    hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp
+    hpx/serialization/detail/preprocess_container.hpp
   CMAKE_SUBDIRS examples tests
 )

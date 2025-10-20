@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Hartmut Kaiser
+//  Copyright (c) 2023-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,11 +6,13 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <memory>
 
 namespace hpx::serialization {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Allocator = std::allocator<T>>
+    HPX_CXX_EXPORT template <typename T, typename Allocator = std::allocator<T>>
     class serialize_buffer;
 }    // namespace hpx::serialization

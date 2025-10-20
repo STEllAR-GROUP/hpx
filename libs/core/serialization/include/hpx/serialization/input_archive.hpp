@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/config/endian.hpp>
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
@@ -31,7 +30,7 @@
 
 namespace hpx::serialization {
 
-    struct input_archive : basic_archive<input_archive>
+    HPX_CXX_EXPORT struct input_archive : basic_archive<input_archive>
     {
         using base_type = basic_archive<input_archive>;
 

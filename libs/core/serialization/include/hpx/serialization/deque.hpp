@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2023 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/serialization/detail/serialize_collection.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
@@ -14,7 +15,7 @@
 
 namespace hpx::serialization {
 
-    template <typename T, typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Allocator>
     void serialize(
         input_archive& ar, std::deque<T, Allocator>& d, unsigned)    //-V826
     {
@@ -27,7 +28,7 @@ namespace hpx::serialization {
         detail::load_collection(ar, d, size);
     }
 
-    template <typename T, typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Allocator>
     void serialize(output_archive& ar,
         std::deque<T, Allocator> const& d,    //-V826
         unsigned)

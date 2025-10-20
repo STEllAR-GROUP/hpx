@@ -19,7 +19,7 @@
 
 namespace hpx::serialization::detail {
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     class constructor_selector
     {
     public:

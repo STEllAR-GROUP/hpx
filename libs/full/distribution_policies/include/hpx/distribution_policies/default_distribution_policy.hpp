@@ -21,11 +21,9 @@
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_components/create_component_helpers.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
-#include <hpx/serialization/vector.hpp>
 
 #include <algorithm>
 #include <cstddef>

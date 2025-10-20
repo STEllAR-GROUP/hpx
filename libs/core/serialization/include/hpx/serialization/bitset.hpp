@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,7 @@
 
 namespace hpx::serialization {
 
-    template <std::size_t N>
+    HPX_CXX_EXPORT template <std::size_t N>
     void serialize(input_archive& ar, std::bitset<N>& d, unsigned)
     {
         if constexpr (N <= CHAR_BIT * sizeof(std::uint64_t))
@@ -33,7 +33,7 @@ namespace hpx::serialization {
         }
     }
 
-    template <std::size_t N>
+    HPX_CXX_EXPORT template <std::size_t N>
     void serialize(output_archive& ar, std::bitset<N> const& bs, unsigned)
     {
         if constexpr (N <= CHAR_BIT * sizeof(std::uint64_t))

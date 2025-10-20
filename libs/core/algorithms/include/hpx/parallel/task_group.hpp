@@ -21,7 +21,7 @@
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/synchronization/latch.hpp>
 
 #include <atomic>

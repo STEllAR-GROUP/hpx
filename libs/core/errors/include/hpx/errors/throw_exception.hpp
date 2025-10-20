@@ -27,28 +27,28 @@
 /// \cond NODETAIL
 namespace hpx::detail {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Exception>
+    HPX_CXX_EXPORT HPX_CXX_EXTERN template <typename Exception>
     [[noreturn]] HPX_CORE_EXPORT void throw_exception(Exception const& e,
         std::string const& func, std::string const& file, long line);
 
-    HPX_CORE_MODULE_EXPORT_EXTERN [[noreturn]] HPX_CORE_EXPORT void
-    throw_exception(error errcode, std::string const& msg,
+    HPX_CXX_EXPORT HPX_CXX_EXTERN [[noreturn]] HPX_CORE_EXPORT void
+    throw_exception(hpx::error errcode, std::string const& msg,
         std::string const& func, std::string const& file, long line);
 
-    HPX_CORE_MODULE_EXPORT_EXTERN [[noreturn]] HPX_CORE_EXPORT void
+    HPX_CXX_EXPORT HPX_CXX_EXTERN [[noreturn]] HPX_CORE_EXPORT void
     throw_bad_alloc_exception(char const* func, char const* file, long line);
 
-    HPX_CORE_MODULE_EXPORT_EXTERN [[noreturn]] HPX_CORE_EXPORT void
+    HPX_CXX_EXPORT HPX_CXX_EXTERN [[noreturn]] HPX_CORE_EXPORT void
     rethrow_exception(exception const& e, std::string const& func);
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename Exception>
+    HPX_CXX_EXPORT HPX_CXX_EXTERN template <typename Exception>
     [[nodiscard]] HPX_CORE_EXPORT std::exception_ptr get_exception(
         Exception const& e, std::string const& func = "<unknown>",
         std::string const& file = "<unknown>", long line = -1,
         std::string const& auxinfo = "");
 
     HPX_CORE_MODULE_EXPORT_NODISCARD std::exception_ptr get_exception(
-        error errcode, std::string const& msg, throwmode mode,
+        hpx::error errcode, std::string const& msg, throwmode mode,
         std::string const& func = "<unknown>",
         std::string const& file = "<unknown>", long line = -1,
         std::string const& auxinfo = "");
@@ -59,8 +59,8 @@ namespace hpx::detail {
         std::string const& file = "<unknown>", long line = -1,
         std::string const& auxinfo = "");
 
-    HPX_CORE_MODULE_EXPORT void throws_if(hpx::error_code& ec, error errcode,
-        std::string const& msg, std::string const& func,
+    HPX_CORE_MODULE_EXPORT void throws_if(hpx::error_code& ec,
+        hpx::error errcode, std::string const& msg, std::string const& func,
         std::string const& file, long line);
 
     HPX_CORE_MODULE_EXPORT void throws_bad_alloc_if(
@@ -69,7 +69,7 @@ namespace hpx::detail {
     HPX_CORE_MODULE_EXPORT void rethrows_if(
         hpx::error_code& ec, exception const& e, std::string const& func);
 
-    HPX_CORE_MODULE_EXPORT_EXTERN [[noreturn]] HPX_CORE_EXPORT void
+    HPX_CXX_EXPORT HPX_CXX_EXTERN [[noreturn]] HPX_CORE_EXPORT void
     throw_thread_interrupted_exception();
 }    // namespace hpx::detail
 /// \endcond
@@ -78,8 +78,8 @@ namespace hpx {
     /// \cond NOINTERNAL
 
     /// \brief throw a hpx::exception initialized from the given arguments
-    HPX_CORE_MODULE_EXPORT_EXTERN [[noreturn]] inline void throw_exception(
-        error e, std::string const& msg, std::string const& func,
+    HPX_CXX_EXPORT [[noreturn]] inline void throw_exception(error e,
+        std::string const& msg, std::string const& func,
         std::string const& file = "", long line = -1)
     {
         detail::throw_exception(e, msg, func, file, line);

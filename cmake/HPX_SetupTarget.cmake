@@ -184,6 +184,8 @@ function(hpx_setup_target target)
         )
       endif()
     endif()
+  elseif(HPX_WITH_CXX_MODULES AND ${target}_SCAN_FOR_MODULES)
+    set(${target}_SCAN_FOR_MODULES OFF)
   endif()
 
   if(("${_type}" STREQUAL "EXECUTABLE") AND MINGW)
@@ -224,6 +226,7 @@ function(hpx_setup_target target)
   if(HPX_WITH_CXX_MODULES AND ${target}_SCAN_FOR_MODULES)
     set_target_properties(${target} PROPERTIES CXX_SCAN_FOR_MODULES ON)
   else()
+    set_target_properties(${target} PROPERTIES CXX_SCAN_FOR_MODULES OFF)
     target_compile_definitions(
       ${target} PRIVATE HPX_BINARY_DOESNT_USE_CXX_MODULES
     )

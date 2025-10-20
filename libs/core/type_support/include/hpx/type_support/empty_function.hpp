@@ -10,7 +10,7 @@
 
 namespace hpx::util {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN struct empty_function
+    HPX_CXX_EXPORT struct empty_function
     {
         template <typename... Ts>
         constexpr void operator()(Ts&&...) const noexcept

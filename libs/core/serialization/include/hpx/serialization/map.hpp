@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config/endian.hpp>
+#include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -22,7 +22,7 @@
 
 namespace hpx::traits {
 
-    template <typename Key, typename Value>
+    HPX_CXX_EXPORT template <typename Key, typename Value>
     struct is_bitwise_serializable<std::pair<Key, Value>>
       : std::integral_constant<bool,
             is_bitwise_serializable_v<std::remove_const_t<Key>> &&
@@ -30,7 +30,7 @@ namespace hpx::traits {
     {
     };
 
-    template <typename Key, typename Value>
+    HPX_CXX_EXPORT template <typename Key, typename Value>
     struct is_not_bitwise_serializable<std::pair<Key, Value>>
       : std::integral_constant<bool,
             !is_bitwise_serializable_v<std::pair<Key, Value>>>
@@ -40,7 +40,7 @@ namespace hpx::traits {
 
 namespace hpx::serialization {
 
-    template <typename Key, typename Value>
+    HPX_CXX_EXPORT template <typename Key, typename Value>
     void serialize(input_archive& ar, std::pair<Key, Value>& t, unsigned)
     {
         using pair_type = std::pair<Key, Value>;
@@ -76,7 +76,7 @@ namespace hpx::serialization {
         }
     }
 
-    template <typename Key, typename Value>
+    HPX_CXX_EXPORT template <typename Key, typename Value>
     void serialize(output_archive& ar, std::pair<Key, Value> const& t, unsigned)
     {
         using pair_type = std::pair<Key, Value>;
@@ -105,7 +105,8 @@ namespace hpx::serialization {
         }
     }
 
-    template <typename Key, typename Value, typename Comp, typename Alloc>
+    HPX_CXX_EXPORT template <typename Key, typename Value, typename Comp,
+        typename Alloc>
     void serialize(
         input_archive& ar, std::map<Key, Value, Comp, Alloc>& t, unsigned)
     {
@@ -124,7 +125,8 @@ namespace hpx::serialization {
         }
     }
 
-    template <typename Key, typename Value, typename Comp, typename Alloc>
+    HPX_CXX_EXPORT template <typename Key, typename Value, typename Comp,
+        typename Alloc>
     void serialize(output_archive& ar,
         std::map<Key, Value, Comp, Alloc> const& t, unsigned)
     {

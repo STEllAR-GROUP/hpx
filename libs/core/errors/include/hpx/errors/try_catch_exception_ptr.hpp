@@ -27,8 +27,7 @@ namespace hpx::detail {
     /// Note: Windows does not seem to have problems resuming a catch block on a
     /// different worker thread, but we use this nonetheless on Windows since it
     /// doesn't hurt.
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename TryCallable,
-        typename CatchCallable>
+    HPX_CXX_EXPORT template <typename TryCallable, typename CatchCallable>
     HPX_FORCEINLINE decltype(auto) try_catch_exception_ptr(
         TryCallable&& t, CatchCallable&& c)
     {

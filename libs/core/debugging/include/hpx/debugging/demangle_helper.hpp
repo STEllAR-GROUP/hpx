@@ -17,7 +17,7 @@
 // --------------------------------------------------------------------
 namespace hpx::util::debug {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct demangle_helper
     {
         [[nodiscard]] static char const* type_id() noexcept
@@ -39,7 +39,7 @@ namespace hpx::util::debug {
 // --------------------------------------------------------------------
 namespace hpx::util::debug {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     class cxxabi_demangle_helper
     {
     public:
@@ -64,7 +64,7 @@ namespace hpx::util::debug {
 
 namespace hpx::util::debug {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using cxxabi_demangle_helper = demangle_helper<T>;
 }    // namespace hpx::util::debug
 
@@ -73,7 +73,7 @@ namespace hpx::util::debug {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util::debug {
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     char const* type_id()
     {
         static cxxabi_demangle_helper<T> id = cxxabi_demangle_helper<T>();
@@ -85,7 +85,7 @@ namespace hpx::util::debug {
     // usage : std::cout << print_type<args...>("separator")
     // separator is appended if the number of types > 1
     // --------------------------------------------------------------------
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T = void>
+    HPX_CXX_EXPORT template <typename T = void>
     std::string print_type(char const* = "")
     {
         return std::string(type_id<T>());
@@ -97,7 +97,7 @@ namespace hpx::util::debug {
         return "void";
     }
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T, typename... Args>
+    HPX_CXX_EXPORT template <typename T, typename... Args>
         requires(sizeof...(Args) != 0)
     std::string print_type(char const* delim = "")
     {

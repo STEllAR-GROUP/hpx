@@ -8,7 +8,6 @@
 
 #include <hpx/functional/serialization/serializable_function.hpp>
 #include <hpx/modules/serialization.hpp>
-#include <hpx/serialization/access.hpp>
 
 #include <cstdint>
 #include <iostream>

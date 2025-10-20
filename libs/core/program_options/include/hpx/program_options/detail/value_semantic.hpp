@@ -21,7 +21,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
     extern HPX_CORE_EXPORT std::string arg;
 
@@ -37,15 +37,11 @@ namespace hpx { namespace program_options {
                 msg += " (=" + m_default_value_as_text + ")";
             return msg;
         }
-        else if (m_default_value.has_value() &&
-            !m_default_value_as_text.empty())
+        if (m_default_value.has_value() && !m_default_value_as_text.empty())
         {
             return var + " (=" + m_default_value_as_text + ")";
         }
-        else
-        {
-            return var;
-        }
+        return var;
     }
 
     template <typename T, typename Char>
@@ -217,5 +213,4 @@ namespace hpx { namespace program_options {
         typed_value<T, wchar_t>* r = new typed_value<T, wchar_t>(v);
         return r;
     }
-
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options

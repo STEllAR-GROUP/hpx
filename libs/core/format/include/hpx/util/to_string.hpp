@@ -19,8 +19,7 @@ namespace hpx::util {
 
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T,
-            typename Enable = void>
+        HPX_CXX_EXPORT template <typename T, typename Enable = void>
         struct to_string
         {
             [[nodiscard]] static std::string call(T const& value)
@@ -29,7 +28,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct to_string<T,
             std::enable_if_t<std::is_integral_v<T> ||
                 std::is_floating_point_v<T>>>
@@ -41,7 +40,7 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    HPX_CORE_MODULE_EXPORT_EXTERN template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     [[nodiscard]] std::string to_string(T const& v)
     {
         try
