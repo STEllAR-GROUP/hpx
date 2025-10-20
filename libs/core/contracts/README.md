@@ -35,7 +35,7 @@ void process(std::vector<int>& data, size_t index) {
 cmake -DHPX_WITH_CONTRACTS=ON -DCMAKE_CXX_STANDARD=26
 
 # Enable contract-enhanced assertions (optional)
-cmake -DHPX_WITH_CONTRACTS=ON -DHPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS=ON
+cmake -DHPX_WITH_CONTRACTS=ON -DHPX_WITH_ASSERTS_AS_CONTRACT_ASSERTS=ON
 
 # Contracts disabled (hpx_contract_assert will work as hpx_assert)
 cmake -DHPX_WITH_CONTRACTS=OFF #default
@@ -44,7 +44,7 @@ cmake -DHPX_WITH_CONTRACTS=OFF #default
 ## Advanced Features
 
 ### Contract-Enhanced Assertions
-When `HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS=ON`, regular `HPX_ASSERT` calls are automatically upgraded to use contract assertions:
+When `HPX_WITH_ASSERTS_AS_CONTRACT_ASSERTS=ON`, regular `HPX_ASSERT` calls are automatically upgraded to use contract assertions:
 
 ```cpp
 void process_data(std::vector<int>& data, size_t index) {

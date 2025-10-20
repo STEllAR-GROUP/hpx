@@ -38,7 +38,7 @@ Enable contracts in CMake::
 
 Enable contract-enhanced assertions (optional)::
 
-    cmake -DHPX_WITH_CONTRACTS=ON -DHPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS=ON
+    cmake -DHPX_WITH_CONTRACTS=ON -DHPX_WITH_ASSERTS_AS_CONTRACT_ASSERTS=ON
 
 Contract assertions work even when contracts are disabled::
 
@@ -50,7 +50,7 @@ Advanced Features
 Contract-Enhanced Assertions
 ----------------------------
 
-When ``HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS=ON`` is enabled, regular 
+When ``HPX_WITH_ASSERTS_AS_CONTRACT_ASSERTS=ON`` is enabled, regular 
 :c:macro:`HPX_ASSERT` calls are automatically upgraded to use contract 
 assertions in C++26 mode::
 
@@ -69,10 +69,10 @@ assertions in C++26 mode::
 This provides enhanced contract semantics throughout your existing codebase 
 without requiring changes to assertion code. The transformation occurs in the
 contracts module (``contracts.hpp``) where the ``HPX_ASSERT`` macro is 
-overridden to use ``HPX_CONTRACT_ASSERT`` when ``HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS=ON``:
+overridden to use ``HPX_CONTRACT_ASSERT`` when ``HPX_WITH_ASSERTS_AS_CONTRACT_ASSERTS=ON``:
 
 * ``HPX_WITH_CONTRACTS=ON`` - Contracts module is enabled
-* ``HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS=ON`` - Assertion enhancement is enabled  
+* ``HPX_WITH_ASSERTS_AS_CONTRACT_ASSERTS=ON`` - Assertion enhancement is enabled  
 * ``HPX_HAVE_NATIVE_CONTRACTS=ON`` - C++26 native contracts are available (from config test)
 
 The implementation works by redefining ``HPX_ASSERT`` in ``contracts.hpp`` to 
