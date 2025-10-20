@@ -12,7 +12,7 @@
 
 namespace hpx {
 
-    HPX_CXX_EXPORT enum class logging_destination {
+    HPX_CXX_EXPORT HPX_CXX_EXTERN enum class logging_destination {
         hpx = 0,
         timing = 1,
         agas = 2,

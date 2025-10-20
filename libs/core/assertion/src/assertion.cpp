@@ -33,8 +33,8 @@ namespace hpx::assertion {
 
     namespace detail {
 
-        HPX_CORE_EXPORT void handle_assert(hpx::source_location const& loc,
-            char const* expr, std::string const& msg) noexcept
+        void handle_assert(hpx::source_location const& loc, char const* expr,
+            std::string const& msg) noexcept
         {
             if (get_handler() == nullptr)
             {

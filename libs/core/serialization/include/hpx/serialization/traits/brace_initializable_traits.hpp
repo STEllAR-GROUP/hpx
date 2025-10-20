@@ -69,6 +69,16 @@ namespace hpx::traits {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_MSVC) && defined(HPX_HAVE_CXX_MODULES)
+    // MSVC fails to properly implement the is_paren_constructible trait below
+    // if C++ modules are enabled.
+    HPX_CXX_EXPORT template <typename T, std::size_t N>
+    constexpr auto is_paren_constructible() noexcept
+    {
+        // assume the struct is paren-constructible if it is brace-initializable
+        return is_brace_constructible<T, N>();
+    }
+#else
     namespace detail {
 
         HPX_CXX_EXPORT template <typename T, typename U>
@@ -87,6 +97,7 @@ namespace hpx::traits {
     {
         return {};
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {

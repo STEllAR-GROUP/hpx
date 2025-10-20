@@ -10,6 +10,7 @@ include(HPX_ExportTargets)
 include(HPX_Message)
 include(HPX_Option)
 include(HPX_PrintSummary)
+include(HPX_CXXModules)
 
 function(add_hpx_module libname modulename)
   # Retrieve arguments
@@ -265,7 +266,9 @@ function(add_hpx_module libname modulename)
         )
 
         set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib}/${modulename})
-        set(lib_module_file "${lib_module_basedir}/hpx_${modulename}.ixx")
+        set(lib_module_file
+            "${lib_module_basedir}/hpx_${modulename}${HPX_MODULE_INTERFACE_EXTENSION}"
+        )
         configure_file(
           "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in" ${lib_module_file}
           @ONLY
@@ -504,10 +507,17 @@ function(add_hpx_module libname modulename)
     hpx_${modulename} PRIVATE HPX_${libname_upper}_EXPORTS
   )
 
-  # This is a temporary solution until all of HPX has been modularized as it
-  # enables using header files from HPX for compiling this module.
   if("${libname}" STREQUAL "full")
+    # This is a temporary solution until all of HPX has been modularized as it
+    # enables using header files from HPX for compiling this module.
     target_include_directories(hpx_${modulename} PRIVATE ${HPX_SOURCE_DIR})
+
+    # We build the full library module using the C++ module definitions for
+    # core.
+    if(HPX_WITH_CXX_MODULES)
+      hpx_configure_module_consumer(hpx_${modulename} hpx_core_module_if)
+      target_link_libraries(hpx_${modulename} PRIVATE hpx_core_module_if)
+    endif()
   endif()
 
   add_hpx_source_group(
@@ -664,17 +674,9 @@ function(add_hpx_module libname modulename)
     target_link_libraries(hpx_${libname} PRIVATE ${${modulename}_OBJECTS})
   endif()
 
-  set(_hpx_prev_scan "${CMAKE_CXX_SCAN_FOR_MODULES}")
-  if(HPX_WITH_CXX_MODULES AND ${modulename}_GLOBAL_HEADER_MODULE_GEN)
-    set(CMAKE_CXX_SCAN_FOR_MODULES ON)
-  endif()
-
   foreach(dir ${${modulename}_CMAKE_SUBDIRS})
     add_subdirectory(${dir})
   endforeach(dir)
-
-  # Restore previous default so sibling modules are unaffected.
-  set(CMAKE_CXX_SCAN_FOR_MODULES "${_hpx_prev_scan}")
 
   create_configuration_summary(
     "    Module configuration (${modulename}):" "${modulename}"

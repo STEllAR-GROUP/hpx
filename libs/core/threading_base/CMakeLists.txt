@@ -108,6 +108,7 @@ add_hpx_module(
     hpx_config
     hpx_concurrency
     hpx_coroutines
+    hpx_datastructures
     hpx_debugging
     hpx_errors
     hpx_format

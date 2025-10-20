@@ -35,6 +35,7 @@ namespace boost { namespace inspect {
         register_signature(".ipp");
         register_signature(".inl");
         register_signature(".ixx");
+        register_signature(".cppm");
     }
 
     void unnamed_namespace_check::inspect(const string& library_name,

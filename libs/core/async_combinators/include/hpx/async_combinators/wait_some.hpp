@@ -156,7 +156,6 @@ namespace hpx {
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <algorithm>
 #include <array>

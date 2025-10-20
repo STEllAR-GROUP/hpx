@@ -636,7 +636,7 @@ namespace hpx::util::detail::any {
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename IArch, typename OArch,
+    HPX_CXX_EXPORT HPX_CXX_EXTERN template <typename IArch, typename OArch,
         typename Char = char, typename Copyable = std::true_type>
     class basic_any;
 
