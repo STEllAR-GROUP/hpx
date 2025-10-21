@@ -313,7 +313,6 @@ namespace hpx::parcelset::policies::lci {
         HPX_UNUSED(rtcfg);
 
         auto attr = ::lci::get_g_default_attr();
-        attr.npackets = attr.npackets * config_t::ndevices;
         // We will make sure the total packet number is always at least twice as large as the total preposted receives.
         // We also set a minimum of 1024 preposted receives per device and increase the total number of packets if needed.
         if (attr.net_max_recvs * config_t::ndevices > attr.npackets / 2)
