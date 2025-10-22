@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/modules/affinity.hpp>
 #include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/synchronization.hpp>

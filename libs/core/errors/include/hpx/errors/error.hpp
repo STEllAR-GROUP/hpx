@@ -23,7 +23,7 @@ namespace hpx {
     ///
     /// This enumeration lists all possible error conditions which can be
     /// reported from any of the API functions.
-    HPX_CXX_EXPORT enum class error : std::int16_t {
+    HPX_CXX_EXPORT HPX_CXX_EXTERN enum class error : std::int16_t {
         success = 0,
         ///< The operation was successful
         no_success = 1,

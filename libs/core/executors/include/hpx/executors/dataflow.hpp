@@ -8,13 +8,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>

@@ -11,7 +11,6 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/detail/agas_interface_functions.hpp>
 #include <hpx/lcos_local/detail/preprocess_future.hpp>
-#include <hpx/memory/serialization/intrusive_ptr.hpp>
 #include <hpx/modules/checkpoint_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>

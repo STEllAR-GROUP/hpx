@@ -10,7 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
-#include <hpx/datastructures/optional.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>

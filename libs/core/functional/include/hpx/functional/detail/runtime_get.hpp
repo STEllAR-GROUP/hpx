@@ -7,9 +7,8 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/datastructures/variant.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <array>

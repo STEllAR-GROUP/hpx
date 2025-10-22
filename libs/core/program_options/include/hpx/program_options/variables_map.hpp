@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/program_options/config.hpp>
-#include <hpx/datastructures/any.hpp>
+#include <hpx/modules/datastructures.hpp>
 
 #include <map>
 #include <memory>

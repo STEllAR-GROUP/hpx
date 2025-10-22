@@ -13,7 +13,7 @@
 // Copyright (c) 2014 Glen Joseph Fernandes (glenjofe@gmail.com)
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
+#include <hpx/modules/datastructures.hpp>
 
 #include "bitset_test.hpp"
 

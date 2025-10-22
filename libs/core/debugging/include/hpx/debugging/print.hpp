@@ -63,7 +63,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Int>
+        HPX_CXX_EXPORT HPX_CXX_EXTERN template <typename Int>
         HPX_CORE_EXPORT void print_dec(std::ostream& os, Int const& v, int n);
 
         HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
@@ -112,7 +112,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     // format as pointer
     // ------------------------------------------------------------------
-    HPX_CXX_EXPORT struct ptr
+    HPX_CXX_EXPORT HPX_CXX_EXTERN struct ptr
     {
         HPX_CORE_EXPORT explicit ptr(void const* v) noexcept;
         HPX_CORE_EXPORT explicit ptr(std::uintptr_t v) noexcept;
@@ -128,7 +128,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Int>
+        HPX_CXX_EXPORT HPX_CXX_EXTERN template <typename Int>
         HPX_CORE_EXPORT void print_hex(std::ostream& os, Int v, int n);
 
         HPX_CXX_EXPORT template <int N = 4, typename T = int,
@@ -243,7 +243,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     // format as ip address
     // ------------------------------------------------------------------
-    HPX_CXX_EXPORT struct ipaddr
+    HPX_CXX_EXPORT HPX_CXX_EXTERN struct ipaddr
     {
         HPX_CORE_EXPORT explicit ipaddr(void const* a) noexcept;
         HPX_CORE_EXPORT explicit ipaddr(std::uint32_t a) noexcept;
@@ -260,7 +260,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     namespace detail {
 
-        HPX_CXX_EXPORT struct current_time_print_helper
+        HPX_CXX_EXPORT HPX_CXX_EXTERN struct current_time_print_helper
         {
             HPX_CORE_EXPORT friend std::ostream& operator<<(
                 std::ostream& os, current_time_print_helper);
@@ -281,7 +281,7 @@ namespace hpx::debug {
     // useful for debugging corruptions in buffers during
     // rma or other transfers
     // ------------------------------------------------------------------
-    HPX_CXX_EXPORT struct mem_crc32
+    HPX_CXX_EXPORT HPX_CXX_EXTERN struct mem_crc32
     {
         HPX_CORE_EXPORT mem_crc32(
             void const* a, std::size_t len, char const* txt) noexcept;
@@ -315,7 +315,7 @@ namespace hpx::debug {
         // ------------------------------------------------------------------
         // helper class for printing time since start
         // ------------------------------------------------------------------
-        HPX_CXX_EXPORT struct hostname_print_helper
+        HPX_CXX_EXPORT HPX_CXX_EXTERN struct hostname_print_helper
         {
             [[nodiscard]] HPX_CORE_EXPORT char const* get_hostname() const;
             [[nodiscard]] HPX_CORE_EXPORT int guess_rank() const;
@@ -544,7 +544,7 @@ namespace hpx::debug {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_EXPORT HPX_CXX_EXTERN template <typename T>
         HPX_CORE_EXPORT void print_array(
             std::string const& name, T const* data, std::size_t size);
     }

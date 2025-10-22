@@ -13,8 +13,6 @@
 #include <hpx/execution_base/stdexec_forward.hpp>
 #endif
 
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
@@ -23,6 +21,7 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>

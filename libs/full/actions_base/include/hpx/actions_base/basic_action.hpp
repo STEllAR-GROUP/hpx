@@ -32,10 +32,10 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>

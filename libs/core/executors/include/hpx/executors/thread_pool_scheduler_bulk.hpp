@@ -16,8 +16,6 @@
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/concurrency/detail/non_contiguous_index_queue.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
@@ -30,6 +28,7 @@
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>

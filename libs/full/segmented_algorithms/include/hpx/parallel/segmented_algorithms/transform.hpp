@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
 #include <hpx/executors/execution_policy.hpp>

@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/traits/is_action.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <type_traits>
 
 namespace hpx::util {

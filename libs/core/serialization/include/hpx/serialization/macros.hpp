@@ -277,6 +277,15 @@
     /**/
 #define HPX_SERIALIZATION_REGISTER_CLASS_NAME(Class, Name)                     \
     namespace hpx::serialization::detail {                                     \
+        inline struct HPX_PP_CAT(register_class_helper_, Class)                \
+        {                                                                      \
+            HPX_PP_CAT(register_class_helper_, Class)()                        \
+            {                                                                  \
+                [[maybe_unused]] auto& _ =                                     \
+                    hpx::serialization::detail::register_class<                \
+                        /**/ Class>::instance(); /* force instantiation */     \
+            }                                                                  \
+        } HPX_PP_CAT(register_class_helper_instance_, Class);                  \
         template <>                                                            \
         struct HPX_ALWAYS_EXPORT get_serialization_name</**/ Class>            \
         {                                                                      \

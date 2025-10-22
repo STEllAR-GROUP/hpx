@@ -16,7 +16,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/async_combinators/when_all.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/future_then_result_exec.hpp>
@@ -28,6 +27,7 @@
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>

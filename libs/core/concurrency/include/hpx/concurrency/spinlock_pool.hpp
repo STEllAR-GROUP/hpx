@@ -1,4 +1,4 @@
-//  Copyright (c) 2012-2023 Hartmut Kaiser
+//  Copyright (c) 2012-2025 Hartmut Kaiser
 //
 //  taken from:
 //  boost/detail/spinlock_pool.hpp
@@ -14,8 +14,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/hashing/fibhash.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/hashing.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/thread_support.hpp>
 

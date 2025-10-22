@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/loop.hpp>
 

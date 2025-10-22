@@ -21,7 +21,7 @@
 // clang-format on
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/testing.hpp>
 
 // clang-format off

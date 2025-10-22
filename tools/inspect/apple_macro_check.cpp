@@ -56,6 +56,7 @@ namespace boost { namespace inspect {
         register_signature(".hxx");
         register_signature(".ipp");
         register_signature(".ixx");
+        register_signature(".cppm");
     }
 
     void apple_macro_check::inspect(const string& library_name,

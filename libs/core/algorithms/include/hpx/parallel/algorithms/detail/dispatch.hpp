@@ -9,10 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

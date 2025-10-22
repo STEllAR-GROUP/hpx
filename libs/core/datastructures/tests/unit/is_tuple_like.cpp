@@ -4,14 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/testing.hpp>
+
 #include <array>
 #include <utility>
 #include <vector>
-
-#include <hpx/config.hpp>
-#include <hpx/datastructures/traits/is_tuple_like.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/modules/testing.hpp>
 
 void tuple_like_true()
 {

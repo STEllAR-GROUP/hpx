@@ -737,11 +737,11 @@ namespace hpx { namespace experimental {
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/threading_base.hpp>
