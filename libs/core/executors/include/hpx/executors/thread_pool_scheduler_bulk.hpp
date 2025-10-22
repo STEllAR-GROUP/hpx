@@ -37,6 +37,12 @@
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 
+// Added for stop token support
+#if defined(HPX_HAVE_STDEXEC)
+#include <hpx/execution/queries/get_stop_token.hpp>
+#include <hpx/synchronization/stop_token.hpp>
+#endif
+
 #include <algorithm>
 #include <atomic>
 #include <cstddef>
@@ -70,6 +76,14 @@ namespace hpx::execution::experimental::detail {
         hpx::util::index_pack<Is...>, F&& f, T&& t, Ts& ts)
     {
         HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t), hpx::get<Is>(ts)...);
+    }
+
+    // Modified to support range-based invocation for P2079R10
+    template <std::size_t... Is, typename F, typename Ts>
+    constexpr void bulk_scheduler_invoke_helper(hpx::util::index_pack<Is...>,
+        F&& f, std::size_t begin, std::size_t end, Ts& ts)
+    {
+        HPX_INVOKE(HPX_FORWARD(F, f), begin, end, hpx::get<Is>(ts)...);
     }
 
     inline hpx::threads::mask_type full_mask(
@@ -128,8 +142,9 @@ namespace hpx::execution::experimental::detail {
         }
 
     private:
-        // Perform the work in one element indexed by index. The index
-        // represents a range of indices (iterators) in the given shape.
+        // Perform the work in one chunk indexed by index. The index
+        // represents a range of indices in the given shape.
+        // Modified for P2079R10 compliance: Invoke f with [begin, end] range
         template <typename Ts>
         void do_work_chunk(Ts& ts, std::uint32_t const index) const
         {
@@ -146,12 +161,8 @@ namespace hpx::execution::experimental::detail {
             auto const i_end =
                 (std::min) (i_begin + task_f->chunk_size, task_f->size);
 
-            auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
-            for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
-            {
-                bulk_scheduler_invoke_helper(
-                    index_pack_type{}, op_state->f, *it, ts);
-            }
+            bulk_scheduler_invoke_helper(
+                index_pack_type{}, op_state->f, i_begin, i_end, ts);
         }
 
         template <hpx::concurrency::detail::queue_end Which, typename Ts>
@@ -256,8 +267,19 @@ namespace hpx::execution::experimental::detail {
         bool allow_stealing;
 
         // Visit the values sent by the predecessor sender.
+        // Modified for P2079R10 compliance: Check stop token before processing
         void do_work() const
         {
+            // Check stop token before starting work
+            if (auto stop_token = hpx::execution::experimental::get_stop_token(
+                    op_state->receiver);
+                stop_token.stop_requested())
+            {
+                hpx::execution::experimental::set_stopped(
+                    HPX_MOVE(op_state->receiver));
+                return;
+            }
+
             auto visitor =
                 set_value_loop_visitor<OperationState>{op_state, this};
             hpx::visit(HPX_MOVE(visitor), op_state->ts);
