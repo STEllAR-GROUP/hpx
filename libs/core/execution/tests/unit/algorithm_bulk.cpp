@@ -39,6 +39,7 @@ struct custom_bulk_operation
     }
 };
 
+#if !defined(HPX_HAVE_STDEXEC)
 template <typename S>
 auto tag_invoke(ex::bulk_t, S&& s, int num, custom_bulk_operation t)
 {
@@ -46,6 +47,7 @@ auto tag_invoke(ex::bulk_t, S&& s, int num, custom_bulk_operation t)
     return ex::bulk(
         std::forward<S>(s), num, [t = std::move(t)](int n) { t(n); });
 }
+#endif
 
 int main()
 {
@@ -284,7 +286,12 @@ int main()
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(receiver_set_value_called);
+#if defined(HPX_HAVE_STDEXEC)
+        // stdexec doesn't use tag_invoke for bulk customization
+        HPX_TEST(!tag_invoke_overload_called);
+#else
         HPX_TEST(tag_invoke_overload_called);
+#endif
         HPX_TEST(custom_bulk_call_operator_called);
         HPX_TEST_EQ(custom_bulk_call_count, 10);
     }
@@ -395,7 +402,12 @@ int main()
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(receiver_set_error_called);
+#if defined(HPX_HAVE_STDEXEC)
+        // stdexec doesn't use tag_invoke for bulk customization
+        HPX_TEST(!tag_invoke_overload_called);
+#else
         HPX_TEST(tag_invoke_overload_called);
+#endif
         HPX_TEST(custom_bulk_call_operator_called);
         HPX_TEST_EQ(custom_bulk_call_count, 3);
     }
