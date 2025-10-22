@@ -16,9 +16,8 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/functional/function_ref.hpp>
 #include <hpx/functional/move_only_function.hpp>
-#include <hpx/iterator_support/iterator_adaptor.hpp>
-#include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/modules/thread_support.hpp>

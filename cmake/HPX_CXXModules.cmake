@@ -108,7 +108,7 @@ function(hpx_configure_module_consumer consumer producer)
     hpx_error("hpx_configure_module_consumer: target '${producer}' not found")
   endif()
 
-  target_link_libraries(${consumer} PUBLIC ${producer})
+  target_link_libraries(${consumer} PRIVATE ${producer})
   get_target_property(_scan ${producer} INTERFACE_CXX_SCAN_FOR_MODULES)
   if(_scan)
     set_target_properties(${consumer} PROPERTIES CXX_SCAN_FOR_MODULES ${_scan})

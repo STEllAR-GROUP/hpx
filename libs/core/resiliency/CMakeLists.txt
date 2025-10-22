@@ -36,6 +36,7 @@ add_hpx_module(
     hpx_datastructures
     hpx_execution
     hpx_futures
+    hpx_iterator_support
     hpx_tag_invoke
     hpx_type_support
   CMAKE_SUBDIRS examples tests

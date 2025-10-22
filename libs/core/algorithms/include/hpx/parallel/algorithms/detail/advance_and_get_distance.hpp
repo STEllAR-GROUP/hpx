@@ -8,8 +8,7 @@
 #pragma once
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/iterator_support/traits/is_sentinel_for.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <iterator>
 #include <type_traits>

@@ -16,10 +16,9 @@
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/fork_join_executor.hpp>
-#include <hpx/iterator_support/counting_shape.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 
 #include <chrono>

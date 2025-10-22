@@ -518,7 +518,6 @@ function(add_hpx_module libname modulename)
     # core.
     if(HPX_WITH_CXX_MODULES)
       hpx_configure_module_consumer(hpx_${modulename} hpx_core_module_if)
-      target_link_libraries(hpx_${modulename} PRIVATE hpx_core_module_if)
     endif()
   endif()
 
@@ -676,9 +675,17 @@ function(add_hpx_module libname modulename)
     target_link_libraries(hpx_${libname} PRIVATE ${${modulename}_OBJECTS})
   endif()
 
+  set(_hpx_prev_scan "${CMAKE_CXX_SCAN_FOR_MODULES}")
+  if(HPX_WITH_CXX_MODULES AND ${modulename}_GLOBAL_HEADER_MODULE_GEN)
+    set(CMAKE_CXX_SCAN_FOR_MODULES ON)
+  endif()
+
   foreach(dir ${${modulename}_CMAKE_SUBDIRS})
     add_subdirectory(${dir})
   endforeach(dir)
+
+  # Restore previous default so sibling modules are unaffected.
+  set(CMAKE_CXX_SCAN_FOR_MODULES "${_hpx_prev_scan}")
 
   create_configuration_summary(
     "    Module configuration (${modulename}):" "${modulename}"

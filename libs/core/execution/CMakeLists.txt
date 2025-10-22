@@ -168,6 +168,7 @@ add_hpx_module(
     hpx_config
     hpx_datastructures
     hpx_errors
+    hpx_iterator_support
     hpx_lock_registration
     hpx_memory
     hpx_pack_traversal

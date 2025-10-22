@@ -8,7 +8,7 @@
 #include <hpx/functional.hpp>
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <cstddef>
 #include <iostream>

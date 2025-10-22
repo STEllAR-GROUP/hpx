@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/futures/traits/is_future.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <functional>
 #include <type_traits>

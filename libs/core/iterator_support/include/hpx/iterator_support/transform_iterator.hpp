@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,15 +18,16 @@
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterator, typename Transformer,
+    HPX_CXX_EXPORT template <typename Iterator, typename Transformer,
         typename Reference = void, typename Value = void,
         typename Category = void, typename Difference = void>
     class transform_iterator;
 
     namespace detail {
 
-        template <typename Iterator, typename Transformer, typename Reference,
-            typename Value, typename Category, typename Difference>
+        HPX_CXX_EXPORT template <typename Iterator, typename Transformer,
+            typename Reference, typename Value, typename Category,
+            typename Difference>
         struct transform_iterator_base
         {
             // the following type calculations use lazy_conditional to avoid
@@ -62,8 +63,9 @@ namespace hpx::util {
     // The main difference to boost::transform_iterator is that the transformer
     // function will be invoked with the iterator, not with the result of
     // dereferencing the base iterator.
-    template <typename Iterator, typename Transformer, typename Reference,
-        typename Value, typename Category, typename Difference>
+    HPX_CXX_EXPORT template <typename Iterator, typename Transformer,
+        typename Reference, typename Value, typename Category,
+        typename Difference>
     class transform_iterator
       : public detail::transform_iterator_base<Iterator, Transformer, Reference,
             Value, Category, Difference>::type
@@ -117,7 +119,7 @@ namespace hpx::util {
         Transformer transformer_;
     };
 
-    template <typename Iterator, typename Transformer>
+    HPX_CXX_EXPORT template <typename Iterator, typename Transformer>
     transform_iterator(Iterator const&, Transformer const&)
         -> transform_iterator<Iterator, Transformer>;
 
@@ -132,7 +134,7 @@ namespace hpx::util {
         return transform_iterator<Iterator, Transformer>(it, f);
     }
 
-    template <typename Transformer, typename Iterator>
+    HPX_CXX_EXPORT template <typename Transformer, typename Iterator>
     transform_iterator<Iterator, Transformer> make_transform_iterator(
         Iterator const& it)
     {

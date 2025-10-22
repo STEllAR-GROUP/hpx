@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 namespace hpx::util::detail {
 

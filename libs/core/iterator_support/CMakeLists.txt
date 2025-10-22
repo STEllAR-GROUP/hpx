@@ -8,6 +8,7 @@ set(iterator_support_headers
     hpx/iterator_support/detail/minimum_category.hpp
     hpx/iterator_support/traits/is_iterator.hpp
     hpx/iterator_support/traits/is_range.hpp
+    hpx/iterator_support/traits/is_segmented_iterator.hpp
     hpx/iterator_support/traits/is_sentinel_for.hpp
     hpx/iterator_support/boost_iterator_categories.hpp
     hpx/iterator_support/counting_iterator.hpp
@@ -20,6 +21,13 @@ set(iterator_support_headers
     hpx/iterator_support/transform_iterator.hpp
     hpx/iterator_support/unwrap_iterator.hpp
     hpx/iterator_support/zip_iterator.hpp
+)
+
+# This header is not really a macro-header. However we specialize the templates
+# in other, non-C++-modularized places, which requires to leave it outside of
+# the module for now.
+set(iterator_support_macro_headers
+    hpx/iterator_support/traits/is_segmented_iterator.hpp
 )
 
 # cmake-format: off
@@ -38,13 +46,14 @@ set(iterator_support_compat_headers
 set(iterator_support_sources)
 
 include(HPX_AddModule)
+
 add_hpx_module(
   core iterator_support
   GLOBAL_HEADER_GEN ON
-  EXCLUDE_FROM_GLOBAL_HEADER "hpx/iterator_support/traits/is_iterator.hpp"
-                             "hpx/iterator_support/traits/is_range.hpp"
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${iterator_support_sources}
   HEADERS ${iterator_support_headers}
+  MACRO_HEADERS ${iterator_support_macro_headers}
   COMPAT_HEADERS ${iterator_support_compat_headers}
   MODULE_DEPENDENCIES
     hpx_concepts

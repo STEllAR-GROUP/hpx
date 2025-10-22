@@ -8,9 +8,8 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/iterator_support/counting_iterator.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/algorithms/detail/spin_sort.hpp>
 #include <hpx/parallel/util/merge_four.hpp>

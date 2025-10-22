@@ -17,10 +17,9 @@
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/restricted_thread_pool_executor.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/iterator_support/counting_shape.hpp>
-#include <hpx/iterator_support/range.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/container_algorithms/for_each.hpp>
 #include <hpx/parallel/util/adapt_sharing_mode.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>

@@ -16,8 +16,7 @@
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/restricted_thread_pool_executor.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
-#include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <algorithm>
 #include <atomic>

@@ -11,10 +11,10 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/packaged_task.hpp>
-#include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/lcos_local/receive_buffer.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
