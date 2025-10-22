@@ -19,7 +19,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions {
+namespace hpx::actions {
 
     continuation::continuation() = default;
 
@@ -126,7 +126,7 @@ namespace hpx { namespace actions {
         // clang-format on
     }
 
-    void typed_continuation<void, util::unused_type>::trigger()
+    void typed_continuation<void, util::unused_type>::trigger() const
     {
         LLCO_(info).format(
             "typed_continuation<void>::trigger({})", this->get_id());
@@ -147,4 +147,45 @@ namespace hpx { namespace actions {
             f_(this->get_id());
         }
     }
-}}    // namespace hpx::actions
+
+    typed_continuation<void, util::unused_type>::typed_continuation(
+        hpx::id_type const& id)
+      : continuation(id)
+    {
+    }
+
+    typed_continuation<void, util::unused_type>::typed_continuation(
+        hpx::id_type&& id) noexcept
+      : continuation(HPX_MOVE(id))
+    {
+    }
+
+    typed_continuation<void, util::unused_type>::typed_continuation(
+        hpx::id_type const& id, naming::address&& addr)
+      : continuation(id, HPX_MOVE(addr))
+    {
+    }
+
+    typed_continuation<void, util::unused_type>::typed_continuation(
+        hpx::id_type&& id, naming::address&& addr) noexcept
+      : continuation(HPX_MOVE(id), HPX_MOVE(addr))
+    {
+    }
+
+    typed_continuation<void, util::unused_type>::typed_continuation(
+        typed_continuation&&) noexcept = default;
+    typed_continuation<void, util::unused_type>& typed_continuation<void,
+        util::unused_type>::operator=(typed_continuation&&) noexcept = default;
+
+    void typed_continuation<void, util::unused_type>::trigger_value(
+        util::unused_type&&) const
+    {
+        trigger();
+    }
+
+    void typed_continuation<void, util::unused_type>::trigger_value(
+        util::unused_type const&) const
+    {
+        trigger();
+    }
+}    // namespace hpx::actions

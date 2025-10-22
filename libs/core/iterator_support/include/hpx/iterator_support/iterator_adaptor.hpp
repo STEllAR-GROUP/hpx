@@ -26,26 +26,26 @@ namespace hpx::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         struct value_type_iterator_traits_helper
         {
             using type = typename std::iterator_traits<Iterator>::value_type;
         };
 
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         struct reference_iterator_traits_helper
         {
             using type = typename std::iterator_traits<Iterator>::reference;
         };
 
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         struct category_iterator_traits_helper
         {
             using type =
                 typename std::iterator_traits<Iterator>::iterator_category;
         };
 
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         struct difference_type_iterator_traits_helper
         {
             using type =
@@ -54,9 +54,9 @@ namespace hpx::util {
 
         // A meta-function which computes an iterator_adaptor's base class,
         // a specialization of iterator_facade.
-        template <typename Derived, typename Base, typename Value,
-            typename Category, typename Reference, typename Difference,
-            typename Pointer>
+        HPX_CXX_EXPORT template <typename Derived, typename Base,
+            typename Value, typename Category, typename Reference,
+            typename Difference, typename Pointer>
         struct iterator_adaptor_base
         {
             // the following type calculations use lazy_conditional to avoid
@@ -111,9 +111,10 @@ namespace hpx::util {
     //   Difference - the difference_type of the resulting iterator. If not
     //      supplied, iterator_traits<Base>::difference_type is used.
     //
-    template <typename Derived, typename Base, typename Value = void,
-        typename Category = void, typename Reference = void,
-        typename Difference = void, typename Pointer = void>
+    HPX_CXX_EXPORT template <typename Derived, typename Base,
+        typename Value = void, typename Category = void,
+        typename Reference = void, typename Difference = void,
+        typename Pointer = void>
     class iterator_adaptor
       : public hpx::util::detail::iterator_adaptor_base<Derived, Base, Value,
             Category, Reference, Difference, Pointer>::type

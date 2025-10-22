@@ -47,6 +47,7 @@ add_hpx_module(
     hpx_datastructures
     hpx_errors
     hpx_futures
+    hpx_iterator_support
     hpx_memory
     hpx_pack_traversal
     hpx_preprocessor

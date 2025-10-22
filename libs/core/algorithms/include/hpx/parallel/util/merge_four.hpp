@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config/move.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/util/low_level.hpp>
 #include <hpx/parallel/util/range.hpp>
 

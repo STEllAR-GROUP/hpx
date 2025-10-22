@@ -108,6 +108,7 @@ add_hpx_module(
     hpx_futures
     hpx_hardware
     hpx_io_service
+    hpx_iterator_support
     hpx_itt_notify
     hpx_memory
     hpx_properties

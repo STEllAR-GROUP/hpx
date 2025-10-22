@@ -18,8 +18,7 @@
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/iterator_support/iterator_adaptor.hpp>
-#include <hpx/iterator_support/iterator_facade.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>

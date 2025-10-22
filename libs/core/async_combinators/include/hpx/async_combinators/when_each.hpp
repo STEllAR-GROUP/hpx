@@ -136,8 +136,8 @@ namespace hpx {
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/is_future_range.hpp>
-#include <hpx/iterator_support/range.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/type_support.hpp>
 

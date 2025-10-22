@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Agustin Berge
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,7 +19,7 @@
 
 namespace hpx::util {
 
-    template <typename Iterator, typename Sentinel = Iterator>
+    HPX_CXX_EXPORT template <typename Iterator, typename Sentinel = Iterator>
     class iterator_range
     {
         static_assert(hpx::traits::is_iterator_v<Iterator>);
@@ -72,15 +72,15 @@ namespace hpx::util {
         Sentinel _sentinel;
     };
 
-    template <typename Range>
+    HPX_CXX_EXPORT template <typename Range>
     iterator_range(Range& r)
         -> iterator_range<hpx::traits::range_iterator_t<Range>>;
 
-    template <typename Range>
+    HPX_CXX_EXPORT template <typename Range>
     iterator_range(Range const& r)
         -> iterator_range<hpx::traits::range_iterator_t<Range const>>;
 
-    template <typename Iterator, typename Sentinel>
+    HPX_CXX_EXPORT template <typename Iterator, typename Sentinel>
     iterator_range(Iterator it, Sentinel sent)
         -> iterator_range<Iterator, Sentinel>;
 
@@ -124,7 +124,7 @@ namespace hpx::util {
 
 namespace hpx::ranges {
 
-    template <typename I, typename S = I>
+    HPX_CXX_EXPORT template <typename I, typename S = I>
     using subrange_t = hpx::util::iterator_range<I, S>;
 }
 // namespace hpx::ranges

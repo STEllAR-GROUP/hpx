@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/program_options/config.hpp>
-#include <hpx/iterator_support/iterator_facade.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <iterator>
 

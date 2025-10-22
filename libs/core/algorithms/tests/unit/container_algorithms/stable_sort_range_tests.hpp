@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/container_algorithms/stable_sort.hpp>
 

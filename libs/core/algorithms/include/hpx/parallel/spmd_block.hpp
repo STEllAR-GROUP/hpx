@@ -9,8 +9,7 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/first_argument.hpp>
-#include <hpx/iterator_support/counting_shape.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/adapt_sharing_mode.hpp>
 #include <hpx/synchronization/barrier.hpp>

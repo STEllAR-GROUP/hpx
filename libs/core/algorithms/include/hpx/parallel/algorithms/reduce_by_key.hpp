@@ -122,9 +122,8 @@ namespace hpx { namespace experimental {
 
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/transform_iterator.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
 #include <hpx/parallel/container_algorithms/copy.hpp>
