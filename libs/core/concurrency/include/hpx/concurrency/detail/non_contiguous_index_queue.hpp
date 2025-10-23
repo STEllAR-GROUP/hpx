@@ -10,8 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/concurrency/detail/contiguous_index_queue.hpp>
-#include <hpx/datastructures/optional.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 
 #include <atomic>
 #include <cstdint>

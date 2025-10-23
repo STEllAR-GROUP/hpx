@@ -53,10 +53,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // C++20 module export definitions
 #if defined(HPX_COMPILE_BMI)
-# if defined(HPX_HAVE_ELF_HIDDEN_VISIBILITY)
-#  undef HPX_CORE_EXPORT
-#  define HPX_CORE_EXPORT                /* empty */
-# endif
 # define HPX_CXX_EXPORT                  export
 # define HPX_CXX_EXTERN                  extern "C++"
 # define HPX_EXTERN                      /* empty */
@@ -99,8 +95,7 @@
 // components
 #if defined(HPX_CORE_EXPORTS) || \
     defined(HPX_FULL_EXPORTS) || defined(HPX_EXPORTS) || \
-    defined(HPX_COMPONENT_EXPORTS) || defined(HPX_APPLICATION_EXPORTS) || \
-    defined(HPX_LIBRARY_EXPORTS)
+    defined(HPX_COMPONENT_EXPORTS) || defined(HPX_APPLICATION_EXPORTS)
 # define HPX_ALWAYS_EXPORT       HPX_SYMBOL_EXPORT
 # define HPX_ALWAYS_IMPORT       HPX_SYMBOL_IMPORT
 #else
@@ -123,7 +118,7 @@
 #else
 
 #if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_CORE_EXPORTS) ||             \
-    defined(HPX_FULL_EXPORTS) || defined(HPX_BINARY_DOESNT_USE_CXX_MODULES)
+    defined(HPX_BINARY_DOESNT_USE_CXX_MODULES)
 #undef HPX_COMPILE_WITH_MODULES
 #else
 #define HPX_COMPILE_WITH_MODULES

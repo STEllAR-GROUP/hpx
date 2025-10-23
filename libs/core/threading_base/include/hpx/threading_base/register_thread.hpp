@@ -10,8 +10,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/member_pack.hpp>
 #include <hpx/functional/experimental/scope_exit.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>

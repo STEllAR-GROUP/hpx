@@ -52,16 +52,18 @@ namespace hpx::detail {
     using namespace std::experimental;
 #endif
 
-    template <typename T1, typename T2>
+    HPX_CXX_EXPORT template <typename T1, typename T2>
     struct ref_pair
     {
         static_assert(std::is_reference<T1>{} && std::is_reference<T2>{});
 
-        using pair_type = std::pair<remove_cvref_t<T1>, remove_cvref_t<T2>>;
+        using pair_type =
+            std::pair<std::remove_cvref_t<T1>, std::remove_cvref_t<T2>>;
         using pair_of_references_type =
-            std::pair<remove_cvref_t<T1>&, remove_cvref_t<T2>&>;
+            std::pair<std::remove_cvref_t<T1>&, std::remove_cvref_t<T2>&>;
         using const_pair_of_references_type =
-            std::pair<remove_cvref_t<T1> const&, remove_cvref_t<T2> const&>;
+            std::pair<std::remove_cvref_t<T1> const&,
+                std::remove_cvref_t<T2> const&>;
 
         ref_pair(T1 t1, T2 t2)
           : first(t1)
@@ -137,7 +139,7 @@ namespace hpx::detail {
         T2 second;
     };
 
-    template <typename T1, typename T2>
+    HPX_CXX_EXPORT template <typename T1, typename T2>
     void swap(ref_pair<T1, T2> const& lhs, ref_pair<T1, T2> const& rhs)
     {
         using std::swap;
@@ -145,7 +147,7 @@ namespace hpx::detail {
         swap(lhs.second, rhs.second);
     }
 
-    template <typename KeyRef, typename TRef, typename KeyIter,
+    HPX_CXX_EXPORT template <typename KeyRef, typename TRef, typename KeyIter,
         typename MappedIter>
     struct flat_map_iterator
     {
@@ -153,7 +155,7 @@ namespace hpx::detail {
 
         using iterator_category = std::random_access_iterator_tag;
         using value_type =
-            std::pair<remove_cvref_t<KeyRef>, remove_cvref_t<TRef>>;
+            std::pair<std::remove_cvref_t<KeyRef>, std::remove_cvref_t<TRef>>;
         using difference_type =
             typename std::iterator_traits<KeyIter>::difference_type;
         using reference = ref_pair<KeyRef, TRef>;
@@ -185,9 +187,9 @@ namespace hpx::detail {
         {
         }
 
-        template <typename TRef2, typename MappedIter2,
-            typename = std::enable_if_t<std::is_convertible_v<TRef2, TRef> &&
-                std::is_convertible_v<MappedIter2, MappedIter>>>
+        template <typename TRef2, typename MappedIter2>
+            requires(std::is_convertible_v<TRef2, TRef> &&
+                        std::is_convertible_v<MappedIter2, MappedIter>)
         flat_map_iterator(
             flat_map_iterator<KeyRef, TRef2, KeyIter, MappedIter2> other)
           : key_it_(other.key_it_)
@@ -317,7 +319,7 @@ namespace hpx::detail {
     // NOTE: This overload was necessary, since iter_swap(it1, it2) calls
     // swap(*it1, *it2).  All std::swap() overloads expect lvalues, and
     // flat_map's iterators produce proxy rvalues when dereferenced.
-    template <typename KeyRef, class TRef>
+    HPX_CXX_EXPORT template <typename KeyRef, class TRef>
     inline void swap(
         std::pair<KeyRef, TRef>&& lhs, std::pair<KeyRef, TRef>&& rhs)
     {
@@ -326,15 +328,16 @@ namespace hpx::detail {
         swap(lhs.second, rhs.second);
     }
 
-    template <typename Key, typename T, typename Compare = std::less<Key>,
+    HPX_CXX_EXPORT template <typename Key, typename T,
+        typename Compare = std::less<Key>,
         typename KeyContainer = std::vector<Key>,
         typename MappedContainer = std::vector<T>>
     class flat_map
     {
         template <typename Alloc>
-        using uses =
-            std::enable_if_t<std::uses_allocator<KeyContainer, Alloc>::value &&
-                std::uses_allocator<MappedContainer, Alloc>::value>;
+        static constexpr bool uses =
+            std::uses_allocator_v<KeyContainer, Alloc> &&
+            std::uses_allocator_v<MappedContainer, Alloc>;
 
         template <typename Container, typename = void>
         struct has_begin_end : std::false_type
@@ -347,7 +350,7 @@ namespace hpx::detail {
         {
         };
         template <typename Container>
-        using container = std::enable_if_t<has_begin_end<Container>::value>;
+        static constexpr bool container = has_begin_end<Container>::value;
 
     public:
         // types:
@@ -415,7 +418,8 @@ namespace hpx::detail {
             std::sort(first, last, value_comp());
 #endif
         }
-        template <typename Alloc, typename Enable = uses<Alloc>>
+        template <typename Alloc>
+            requires(uses<Alloc>)
         flat_map(key_container_type const& key_cont,
             mapped_container_type const& mapped_cont, Alloc const& a)
           : c{key_container_type(key_cont, a),
@@ -430,15 +434,15 @@ namespace hpx::detail {
             std::sort(first, last, value_comp());
 #endif
         }
-        template <typename Container, typename Enable = container<Container>>
+        template <typename Container>
+            requires(container<Container>)
         explicit flat_map(
             Container const& cont, key_compare const& comp = key_compare())
           : flat_map(std::begin(cont), std::end(cont), comp)
         {
         }
-        template <typename Container, typename Alloc,
-            typename Enable1 = container<Container>,
-            typename Enable2 = uses<Alloc>>
+        template <typename Container, typename Alloc>
+            requires(uses<Alloc> && container<Container>)
         flat_map(Container const& cont, Alloc const& a)
           : flat_map(std::begin(cont), std::end(cont), a)
         {
@@ -449,7 +453,8 @@ namespace hpx::detail {
           , compare(key_compare())
         {
         }
-        template <typename Alloc, typename Enable = uses<Alloc>>
+        template <typename Alloc>
+            requires(uses<Alloc>)
         flat_map(sorted_unique_t, key_container_type const& key_cont,
             mapped_container_type const& mapped_cont, Alloc const& a)
           : c{key_container_type(key_cont, a),
@@ -457,15 +462,15 @@ namespace hpx::detail {
           , compare()
         {
         }
-        template <typename Container, typename Enable = container<Container>>
+        template <typename Container>
+            requires(container<Container>)
         flat_map(sorted_unique_t s, Container const& cont,
             key_compare const& comp = key_compare())
           : flat_map(s, std::begin(cont), std::end(cont), comp)
         {
         }
-        template <typename Container, typename Alloc,
-            typename Enable1 = container<Container>,
-            typename Enable2 = uses<Alloc>>
+        template <typename Container, typename Alloc>
+            requires(uses<Alloc> && container<Container>)
         flat_map(sorted_unique_t s, Container const& cont, Alloc const& a)
           : c{key_container_type(a), mapped_container_type(a)}
           , compare()
@@ -479,13 +484,16 @@ namespace hpx::detail {
           , compare(comp)
         {
         }
-        template <typename Alloc, typename Enable = uses<Alloc>>
+        template <typename Alloc>
+            requires(uses<Alloc>)
+
         flat_map(key_compare const& comp, Alloc const& a)
           : c{key_container_type(a), mapped_container_type(a)}
           , compare(comp)
         {
         }
-        template <typename Alloc, typename Enable = uses<Alloc>>
+        template <typename Alloc>
+            requires(uses<Alloc>)
         explicit flat_map(Alloc const& a)
           : c{key_container_type(a), mapped_container_type(a)}
           , compare()
@@ -499,8 +507,8 @@ namespace hpx::detail {
         {
             insert(first, last);
         }
-        template <typename InputIterator, typename Alloc,
-            typename Enable = uses<Alloc>>
+        template <typename InputIterator, typename Alloc>
+            requires(uses<Alloc>)
         flat_map(InputIterator first, InputIterator last,
             key_compare const& comp, Alloc const& a)
           : c{key_container_type(a), mapped_container_type(a)}
@@ -508,8 +516,8 @@ namespace hpx::detail {
         {
             insert(first, last);
         }
-        template <typename InputIterator, typename Alloc,
-            typename Enable = uses<Alloc>>
+        template <typename InputIterator, typename Alloc>
+            requires(uses<Alloc>)
         flat_map(InputIterator first, InputIterator last, Alloc const& a)
           : flat_map(first, last, key_compare(), a)
         {
@@ -522,8 +530,8 @@ namespace hpx::detail {
         {
             insert(s, first, last);
         }
-        template <typename InputIterator, typename Alloc,
-            typename Enable = uses<Alloc>>
+        template <typename InputIterator, typename Alloc>
+            requires(uses<Alloc>)
         flat_map(sorted_unique_t s, InputIterator first, InputIterator last,
             key_compare const& comp, Alloc const& a)
           : c{key_container_type(a), mapped_container_type(a)}
@@ -531,8 +539,8 @@ namespace hpx::detail {
         {
             insert(s, first, last);
         }
-        template <typename InputIterator, typename Alloc,
-            typename Enable = uses<Alloc>>
+        template <typename InputIterator, typename Alloc>
+            requires(uses<Alloc>)
         flat_map(sorted_unique_t s, InputIterator first, InputIterator last,
             Alloc const& a)
           : flat_map(s, first, last, key_compare(), a)
@@ -543,13 +551,15 @@ namespace hpx::detail {
           : flat_map(il, comp)
         {
         }
-        template <typename Alloc, typename Enable = uses<Alloc>>
+        template <typename Alloc>
+            requires(uses<Alloc>)
         flat_map(std::initializer_list<value_type>&& il,
             key_compare const& comp, Alloc const& a)
           : flat_map(std::begin(il), std::end(il), comp, a)
         {
         }
-        template <typename Alloc, typename Enable = uses<Alloc>>
+        template <typename Alloc>
+            requires(uses<Alloc>)
         flat_map(std::initializer_list<value_type>&& il, Alloc const& a)
           : flat_map(std::begin(il), std::end(il), key_compare(), a)
         {
@@ -559,13 +569,15 @@ namespace hpx::detail {
           : flat_map(s, il, comp)
         {
         }
-        template <typename Alloc, typename Enable = uses<Alloc>>
+        template <typename Alloc>
+            requires(uses<Alloc>)
         flat_map(sorted_unique_t s, std::initializer_list<value_type>&& il,
             key_compare const& comp, Alloc const& a)
           : flat_map(s, std::begin(il), std::end(il), comp, a)
         {
         }
-        template <typename Alloc, typename Enable = uses<Alloc>>
+        template <typename Alloc>
+            requires(uses<Alloc>)
         flat_map(sorted_unique_t s, std::initializer_list<value_type>&& il,
             Alloc const& a)
           : flat_map(s, std::begin(il), std::end(il), key_compare(), a)
@@ -668,17 +680,17 @@ namespace hpx::detail {
         }
 
         // ??, modifiers
-        template <typename... Args,
-            typename Enable = std::enable_if_t<std::is_constructible_v<
-                std::pair<key_type, mapped_type>, Args&&...>>>
+        template <typename... Args>
+            requires(std::is_constructible_v<std::pair<key_type, mapped_type>,
+                Args && ...>)
         std::pair<iterator, bool> emplace(Args&&... args)
         {
             std::pair<key_type, mapped_type> p(HPX_FORWARD(Args, args)...);
             return try_emplace(HPX_MOVE(p.first), HPX_MOVE(p.second));
         }
-        template <typename... Args,
-            typename Enable = std::enable_if_t<std::is_constructible_v<
-                std::pair<key_type, mapped_type>, Args&&...>>>
+        template <typename... Args>
+            requires(std::is_constructible_v<std::pair<key_type, mapped_type>,
+                Args && ...>)
         iterator emplace_hint(const_iterator, Args&&... args)
         {
             return emplace(HPX_FORWARD(Args, args)...).first;
@@ -699,16 +711,16 @@ namespace hpx::detail {
         {
             return emplace_hint(position, HPX_MOVE(x));
         }
-        template <typename P,
-            typename Enable = std::enable_if_t<
-                std::is_constructible_v<std::pair<key_type, mapped_type>, P&&>>>
+        template <typename P>
+            requires(
+                std::is_constructible_v<std::pair<key_type, mapped_type>, P &&>)
         std::pair<iterator, bool> insert(P&& x)
         {
             return emplace(HPX_FORWARD(P, x));
         }
-        template <typename P,
-            typename Enable = std::enable_if_t<
-                std::is_constructible_v<std::pair<key_type, mapped_type>, P&&>>>
+        template <typename P>
+            requires(
+                std::is_constructible_v<std::pair<key_type, mapped_type>, P &&>)
         iterator insert(const_iterator position, P&& x)
         {
             return emplace_hint(position, HPX_FORWARD(P, x));
@@ -793,9 +805,8 @@ namespace hpx::detail {
             _.release();
         }
 
-        template <typename... Args,
-            typename Enable = std::enable_if_t<
-                std::is_constructible_v<mapped_type, Args&&...>>>
+        template <typename... Args>
+            requires(std::is_constructible_v<mapped_type, Args && ...>)
         std::pair<iterator, bool> try_emplace(key_type const& k, Args&&... args)
         {
             auto it = key_lower_bound(k);
@@ -808,9 +819,8 @@ namespace hpx::detail {
             }
             return std::pair<iterator, bool>(iterator(it, project(it)), false);
         }
-        template <typename... Args,
-            typename Enable = std::enable_if_t<
-                std::is_constructible_v<mapped_type, Args&&...>>>
+        template <typename... Args>
+            requires(std::is_constructible_v<mapped_type, Args && ...>)
         std::pair<iterator, bool> try_emplace(key_type&& k, Args&&... args)
         {
             auto it = key_lower_bound(k);
@@ -823,16 +833,14 @@ namespace hpx::detail {
             }
             return std::pair<iterator, bool>(iterator(it, project(it)), false);
         }
-        template <typename... Args,
-            typename Enable = std::enable_if_t<
-                std::is_constructible_v<mapped_type, Args&&...>>>
+        template <typename... Args>
+            requires(std::is_constructible_v<mapped_type, Args && ...>)
         iterator try_emplace(const_iterator, key_type const& k, Args&&... args)
         {
             return try_emplace(k, HPX_FORWARD(Args, args)...).first;
         }
-        template <typename... Args,
-            typename Enable = std::enable_if_t<
-                std::is_constructible_v<mapped_type, Args&&...>>>
+        template <typename... Args>
+            requires(std::is_constructible_v<mapped_type, Args && ...>)
         iterator try_emplace(const_iterator, key_type&& k, Args&&... args)
         {
             return try_emplace(
@@ -840,10 +848,9 @@ namespace hpx::detail {
                 .first;
         }
 
-        template <typename M,
-            typename Enable =
-                std::enable_if_t<std::is_assignable_v<mapped_type&, M> &&
-                    std::is_constructible_v<mapped_type, M&&>>>
+        template <typename M>
+            requires(std::is_assignable_v<mapped_type&, M> &&
+                std::is_constructible_v<mapped_type, M &&>)
         std::pair<iterator, bool> insert_or_assign(key_type const& k, M&& obj)
         {
             auto it = key_lower_bound(k);
@@ -858,10 +865,9 @@ namespace hpx::detail {
             *values_it = HPX_FORWARD(M, obj);
             return std::pair<iterator, bool>(iterator(it, values_it), false);
         }
-        template <typename M,
-            typename Enable =
-                std::enable_if_t<std::is_assignable_v<mapped_type&, M> &&
-                    std::is_constructible_v<mapped_type, M&&>>>
+        template <typename M>
+            requires(std::is_assignable_v<mapped_type&, M> &&
+                std::is_constructible_v<mapped_type, M &&>)
         std::pair<iterator, bool> insert_or_assign(key_type&& k, M&& obj)
         {
             auto it = key_lower_bound(k);
@@ -876,10 +882,9 @@ namespace hpx::detail {
             *values_it = HPX_FORWARD(M, obj);
             return std::pair<iterator, bool>(iterator(it, values_it), false);
         }
-        template <typename M,
-            typename Enable =
-                std::enable_if_t<std::is_assignable_v<mapped_type&, M> &&
-                    std::is_constructible_v<mapped_type, M&&>>>
+        template <typename M>
+            requires(std::is_assignable_v<mapped_type&, M> &&
+                std::is_constructible_v<mapped_type, M &&>)
         iterator insert_or_assign(const_iterator, key_type const& k, M&& obj)
         {
             return insert_or_assign(k, HPX_FORWARD(M, obj)).first;
@@ -1114,6 +1119,7 @@ namespace hpx::detail {
     private:
         containers c;           // exposition only
         key_compare compare;    // exposition only
+
         // exposition only
         struct scoped_clear
         {

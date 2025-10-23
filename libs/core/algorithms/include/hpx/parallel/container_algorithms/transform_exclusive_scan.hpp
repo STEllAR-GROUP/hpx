@@ -428,7 +428,7 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/transform_exclusive_scan.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

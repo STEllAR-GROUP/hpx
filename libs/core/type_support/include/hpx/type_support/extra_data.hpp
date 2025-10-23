@@ -17,7 +17,7 @@ namespace hpx::util {
 
     HPX_CXX_EXPORT using extra_data_id_type = void const*;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_EXPORT HPX_CXX_EXTERN template <typename T>
     struct extra_data_helper
     {
         // this is intentionally left unimplemented, will lead to linker errors

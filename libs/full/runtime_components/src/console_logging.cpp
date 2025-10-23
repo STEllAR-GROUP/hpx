@@ -12,7 +12,7 @@
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/concurrency/spinlock.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/thread_support.hpp>

@@ -13,7 +13,7 @@
 
 namespace hpx::util {
 
-    template <typename Iter>
+    HPX_CXX_EXPORT template <typename Iter>
     HPX_FORCEINLINE auto get_unwrapped(Iter it)
     {
         // is_contiguous_iterator_v is true for pointers

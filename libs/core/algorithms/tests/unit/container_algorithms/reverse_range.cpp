@@ -7,8 +7,8 @@
 
 #include <hpx/algorithm.hpp>
 #include <hpx/init.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/iterator_support/tests/iter_sent.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>

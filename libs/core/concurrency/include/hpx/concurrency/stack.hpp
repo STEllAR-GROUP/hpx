@@ -13,7 +13,7 @@
 #include <hpx/concurrency/detail/copy_payload.hpp>
 #include <hpx/concurrency/detail/freelist_stack.hpp>
 #include <hpx/concurrency/detail/tagged_ptr.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 
 #include <atomic>
 #include <cstddef>

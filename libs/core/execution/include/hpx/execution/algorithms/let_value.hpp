@@ -13,8 +13,6 @@
 #else
 
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/inject_scheduler.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/run_loop.hpp>
@@ -25,6 +23,7 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>

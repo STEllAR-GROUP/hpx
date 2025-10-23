@@ -25,7 +25,7 @@
 #  if defined(HPX_HAVE_MAX_CPU_COUNT)
 #    include <bitset>
 #  else
-#    include <hpx/datastructures/detail/dynamic_bitset.hpp>
+#    include <hpx/modules/datastructures.hpp>
 #  endif
 
 #endif

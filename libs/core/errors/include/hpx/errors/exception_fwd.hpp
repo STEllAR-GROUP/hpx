@@ -25,11 +25,13 @@ namespace hpx {
     HPX_CXX_EXPORT HPX_CXX_EXTERN class HPX_ALWAYS_EXPORT exception;
 
     HPX_CXX_EXPORT HPX_CXX_EXTERN struct HPX_ALWAYS_EXPORT thread_interrupted;
+
+    HPX_CXX_EXPORT HPX_CXX_EXTERN class HPX_CORE_EXPORT exception_list;
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Encode error category for new error_code.
-    HPX_CXX_EXPORT enum class throwmode : std::uint8_t {
+    HPX_CXX_EXPORT HPX_CXX_EXTERN enum class throwmode : std::uint8_t {
         plain = 0,
         rethrow = 1,
 
@@ -87,14 +89,16 @@ namespace hpx {
 
     /// \cond NOINTERNAL
     namespace detail {
-        HPX_CXX_EXPORT template <typename Exception>
-        [[nodiscard]] HPX_CORE_EXPORT std::exception_ptr get_exception(
-            hpx::exception const& e, std::string const& func,
-            std::string const& file, long line, std::string const& auxinfo);
 
-        HPX_CXX_EXPORT template <typename Exception>
+        ////////////////////////////////////////////////////////////////////////
+        HPX_CXX_EXPORT HPX_CXX_EXTERN template <typename Exception>
         [[nodiscard]] HPX_CORE_EXPORT std::exception_ptr
         construct_lightweight_exception(Exception const& e);
+
+        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT std::exception_ptr
+        construct_lightweight_exception(hpx::exception_list const&);
+        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT std::exception_ptr
+        construct_lightweight_exception(hpx::thread_interrupted const&);
     }    // namespace detail
     /// \endcond
 }    // namespace hpx

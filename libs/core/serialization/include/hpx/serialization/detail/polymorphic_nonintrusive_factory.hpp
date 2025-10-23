@@ -97,7 +97,7 @@ namespace hpx::serialization::detail {
         }
     };
 
-    HPX_CXX_EXPORT class polymorphic_nonintrusive_factory
+    HPX_CXX_EXPORT HPX_CXX_EXTERN class polymorphic_nonintrusive_factory
     {
     public:
         polymorphic_nonintrusive_factory(

@@ -8,7 +8,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/datastructures/serialization/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
 

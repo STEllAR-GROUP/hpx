@@ -7,14 +7,34 @@
 include(HPX_AddCompileFlag)
 include(HPX_Message)
 
+if(NOT HPX_WITH_CXX_MODULES)
+  return()
+endif()
+
+# Unfortunately, different compilers expect different file extensions for the
+# C++ module definition files.
+if(MSVC)
+  set(HPX_MODULE_INTERFACE_EXTENSION ".ixx")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES
+                                                "AppleClang"
+)
+  set(HPX_MODULE_INTERFACE_EXTENSION ".cppm")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  set(HPX_MODULE_INTERFACE_EXTENSION ".cxx")
+else()
+  hpx_error(
+    "C++ modules are not supported for the used compiler ('${CMAKE_CXX_COMPILER_ID}')"
+  )
+endif()
+
 # hpx_configure_module_producer(<producer> [MODULE_OUT_DIR <dir>])
 #
 # * Ensures a stable module output dir for producer target
 # * Adds compiler flags to write module cache there (Clang/GCC)
-# * Creates a target '<producer>_module' for consumers to link to
+# * Creates an interface target '<producer>_if' for consumers to link to
 function(hpx_configure_module_producer producer)
   if(NOT TARGET ${producer})
-    hpx_error("configure_module_producer: target '${producer}' not found")
+    hpx_error("hpx_configure_module_producer: target '${producer}' not found")
   endif()
 
   # parse optional args
@@ -35,13 +55,16 @@ function(hpx_configure_module_producer producer)
   if(NOT TARGET ${_iface})
     add_library(${_iface} INTERFACE)
     target_link_libraries(${_iface} INTERFACE ${producer})
-    # target_include_directories(${_iface} INTERFACE "${_moddir}")
   endif()
 
   # Set a property so consumers can query the BMI directory via
   # get_target_property.
-  set_target_properties(${producer} PROPERTIES EXPORT_MODULE_DIR "${_moddir}")
-  set_target_properties(${producer} PROPERTIES CXX_SCAN_FOR_MODULES On)
+  set_target_properties(
+    ${_iface} PROPERTIES INTERFACE_EXPORT_MODULE_DIR "${_moddir}"
+  )
+
+  # Make sure consumers scan for the BMI
+  set_target_properties(${_iface} PROPERTIES INTERFACE_CXX_SCAN_FOR_MODULES On)
 
   if(MSVC)
     # MSVC: CMake/MSVC handle IFCs automatically; create a target for
@@ -55,32 +78,71 @@ function(hpx_configure_module_producer producer)
   )
     # Clang common flags
     target_compile_options(${producer} PRIVATE "-fmodule-output=${_moddir}")
-    target_compile_options(
-      ${_iface} INTERFACE "-fprebuilt-module-path=${_moddir}"
-    )
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    # GCC: try a few likely flags depending on version Prefer flags used in GCC
-    # 11+: -fmodules-ts, -fmodules-cache-path (or -fmodule-cache-path)
+    # GCC: modern flags
     hpx_add_target_compile_option_if_available(
       ${producer} PRIVATE "-fmodule-output=${_moddir}" RESULT ok
     )
     if(NOT ok)
       hpx_error(
-        "configure_module_producer: the used version of gcc does not support '-fmodule-output'"
-      )
-    endif()
-    hpx_add_target_compile_option_if_available(
-      ${_iface} INTERFACE "-fprebuilt-module-path=${_moddir}" RESULT ok
-    )
-    if(NOT ok)
-      hpx_error(
-        "configure_module_producer: the used version of gcc does not support '-fprebuilt-module-path='"
+        "hpx_configure_module_producer: the used version of gcc does not support '-fmodule-output'"
       )
     endif()
   else()
     hpx_warn(
-      "configure_module_producer: unknown compiler '${CMAKE_CXX_COMPILER_ID}'; "
-      "exposing CXX_MODULE_OUTPUT_DIRECTORY='${_moddir}' for manual handling"
+      "hpx_configure_module_producer: unknown compiler '${CMAKE_CXX_COMPILER_ID}'; "
+      "exposing EXPORT_MODULE_DIR='${_moddir}' for manual handling"
     )
+  endif()
+endfunction()
+
+# hpx_configure_module_consumer(<consumer> <producer>])
+#
+# * propagates module-related properties from producer interface target
+# * sets necessary consumer compiler flags for clang and gcc
+function(hpx_configure_module_consumer consumer producer)
+  if(NOT TARGET ${consumer})
+    hpx_error("hpx_configure_module_consumer: target '${consumer}' not found")
+  endif()
+  if(NOT TARGET ${producer})
+    hpx_error("hpx_configure_module_consumer: target '${producer}' not found")
+  endif()
+
+  target_link_libraries(${consumer} PRIVATE ${producer})
+  get_target_property(_scan ${producer} INTERFACE_CXX_SCAN_FOR_MODULES)
+  if(_scan)
+    set_target_properties(${consumer} PROPERTIES CXX_SCAN_FOR_MODULES ${_scan})
+  endif()
+
+  get_target_property(_module_dir ${producer} INTERFACE_EXPORT_MODULE_DIR)
+  if(_module_dir)
+    if(MSVC)
+      return()
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID
+                                                    MATCHES "AppleClang"
+    )
+      target_compile_options(
+        ${consumer} PRIVATE "-fprebuilt-module-path=${_module_dir}"
+      )
+      get_target_property(_type ${consumer} TYPE)
+      if((_type STREQUAL "SHARED_LIBRARY") OR (_type STREQUAL "EXECUTABLE"))
+        target_link_options(${consumer} PRIVATE "-fuse-ld=lld")
+        target_link_options(${consumer} PRIVATE "-Wl,--error-limit=0")
+      endif()
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+      hpx_add_target_compile_option_if_available(
+        ${consumer} PRIVATE "-fprebuilt-module-path=${_module_dir}" RESULT ok
+      )
+      if(NOT ok)
+        hpx_error(
+          "hpx_configure_module_consumer: the used version of clang does not "
+          "support '-fprebuilt-module-path='"
+        )
+      endif()
+    else()
+      hpx_warn(
+        "hpx_configure_module_consumer: unknown compiler '${CMAKE_CXX_COMPILER_ID}'"
+      )
+    endif()
   endif()
 endfunction()

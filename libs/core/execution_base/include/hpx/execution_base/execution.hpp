@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 
 #include <type_traits>

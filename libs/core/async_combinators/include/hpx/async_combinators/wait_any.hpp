@@ -123,9 +123,9 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/async_combinators/wait_some.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 

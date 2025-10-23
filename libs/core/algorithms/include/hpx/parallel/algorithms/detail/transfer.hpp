@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #endif

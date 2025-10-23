@@ -8,8 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/program_options/config/defines.hpp>
-#include <hpx/datastructures/any.hpp>
-#include <hpx/datastructures/optional.hpp>
+#include <hpx/modules/datastructures.hpp>
 
 namespace hpx::program_options {
 

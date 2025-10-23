@@ -70,14 +70,14 @@ add_hpx_module(
     hpx_config
     hpx_allocator_support
     hpx_assertion
-    hpx_execution_base
+    hpx_datastructures
     hpx_concurrency
     hpx_coroutines
     hpx_errors
+    hpx_execution_base
     hpx_functional
     hpx_hashing
     hpx_itt_notify
-    hpx_memory
     hpx_lock_registration
     hpx_logging
     hpx_memory

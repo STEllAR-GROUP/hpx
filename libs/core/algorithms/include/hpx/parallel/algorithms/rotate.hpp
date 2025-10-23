@@ -191,9 +191,9 @@ namespace hpx {
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/execution_policy_parameters.hpp>
 #include <hpx/futures/traits/is_future.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/rotate.hpp>

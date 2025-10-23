@@ -10,8 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/ini/ini.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>

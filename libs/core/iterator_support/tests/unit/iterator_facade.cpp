@@ -10,9 +10,8 @@
 
 // This is really an incomplete test; should be fleshed out.
 
-#include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/tests/iterator_tests.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <type_traits>

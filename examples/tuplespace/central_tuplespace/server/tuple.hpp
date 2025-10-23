@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/datastructures/serialization/serializable_any.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/serialization.hpp>
 
 #include <type_traits>

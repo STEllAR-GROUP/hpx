@@ -19,8 +19,8 @@
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/executors/detail/hierarchical_spawning.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/iterator_support/range.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/tag_invoke.hpp>
