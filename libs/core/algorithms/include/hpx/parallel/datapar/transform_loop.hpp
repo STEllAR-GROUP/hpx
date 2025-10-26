@@ -12,8 +12,8 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/datapar/execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/util/transform_loop.hpp>
 

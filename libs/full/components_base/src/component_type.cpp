@@ -7,8 +7,8 @@
 #include <hpx/config.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/functional/move_only_function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>

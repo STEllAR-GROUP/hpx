@@ -11,13 +11,12 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/init_runtime/detail/run_or_start.hpp>
 #include <hpx/init_runtime_local/init_runtime_local.hpp>
 #include <hpx/modules/debugging.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>

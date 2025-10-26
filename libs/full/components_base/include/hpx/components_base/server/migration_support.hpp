@@ -11,8 +11,7 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>

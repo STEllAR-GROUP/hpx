@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/command_line_handling_local.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <cstddef>
 #include <string>

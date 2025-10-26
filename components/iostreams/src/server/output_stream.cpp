@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <hpx/modules/serialization.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>

@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/functional/serialization/serializable_function.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/serialization.hpp>
 
 #include <cstdint>

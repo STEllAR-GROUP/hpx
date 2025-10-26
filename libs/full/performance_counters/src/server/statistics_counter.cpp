@@ -8,8 +8,8 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>

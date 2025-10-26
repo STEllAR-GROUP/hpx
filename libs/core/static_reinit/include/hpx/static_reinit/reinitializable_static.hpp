@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/static_reinit/static_reinit.hpp>
 

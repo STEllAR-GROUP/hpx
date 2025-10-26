@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/functional/bind.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/runtime_local/config_entry.hpp>

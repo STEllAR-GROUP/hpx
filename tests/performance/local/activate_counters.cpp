@@ -11,7 +11,7 @@
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>

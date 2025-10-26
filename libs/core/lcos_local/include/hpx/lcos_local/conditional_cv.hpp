@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/move_only_function.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 
 #include <utility>

@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/concurrency/spinlock.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 #include <hpx/static_reinit/static_reinit.hpp>

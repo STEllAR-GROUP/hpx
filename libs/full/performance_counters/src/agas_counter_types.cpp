@@ -7,9 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/agas/addressing_service.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/performance_counters/agas_counter_types.hpp>
 #include <hpx/performance_counters/component_namespace_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>

@@ -11,10 +11,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/promise.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/threading_base/annotated_function.hpp>

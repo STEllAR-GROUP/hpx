@@ -13,9 +13,8 @@
 #include <hpx/execution/detail/future_exec.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
 

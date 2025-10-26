@@ -14,7 +14,7 @@
 #include <hpx/components_base/component_commandline.hpp>
 #include <hpx/components_base/component_startup_shutdown.hpp>
 #include <hpx/components_base/server/create_component.hpp>
-#include <hpx/functional/bind_back.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/runtime_local.hpp>

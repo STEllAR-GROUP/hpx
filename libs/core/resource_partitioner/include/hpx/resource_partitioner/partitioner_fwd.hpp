@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/threading_base/network_background_callback.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>

@@ -8,10 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/plugin/abstract_factory.hpp>
 #include <hpx/plugin/dll.hpp>
 #include <hpx/plugin/export_plugin.hpp>

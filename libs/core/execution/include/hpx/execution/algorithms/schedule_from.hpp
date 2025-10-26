@@ -18,10 +18,9 @@
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/invoke_fused.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 

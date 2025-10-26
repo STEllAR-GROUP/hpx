@@ -14,12 +14,11 @@
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
-#include <hpx/functional/invoke_fused.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/synchronization/latch.hpp>

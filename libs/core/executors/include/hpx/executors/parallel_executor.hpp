@@ -22,12 +22,10 @@
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/detail/index_queue_spawning.hpp>
 #include <hpx/executors/execution_policy_mappings.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/one_shot.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/threading_base/annotated_function.hpp>

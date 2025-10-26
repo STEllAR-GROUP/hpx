@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/util/loop.hpp>
 

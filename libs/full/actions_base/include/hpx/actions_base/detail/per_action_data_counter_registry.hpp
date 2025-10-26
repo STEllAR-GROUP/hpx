@@ -11,7 +11,7 @@
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
     defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS) &&                            \
     defined(HPX_HAVE_NETWORKING)
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/hashing.hpp>
 #include <hpx/modules/type_support.hpp>
 

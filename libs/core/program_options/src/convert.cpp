@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
-#include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/program_options/detail/convert.hpp>
 #include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
 

@@ -313,7 +313,7 @@ function(add_hpx_component name)
   # special preprocessor constant preventing the code from trying to use the
   # module interface unit exposed from the HPX libraries
   if(HPX_WITH_CXX_MODULES)
-    if(NOT (CMAKE_CXX_SCAN_FOR_MODULES OR ${name}_SCAN_FOR_MODULES))
+    if((NOT CMAKE_CXX_SCAN_FOR_MODULES) AND (NOT ${name}_SCAN_FOR_MODULES))
       set(${name}_SCAN_FOR_MODULES OFF)
     else()
       set(${name}_SCAN_FOR_MODULES ON)

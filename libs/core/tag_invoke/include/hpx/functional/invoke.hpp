@@ -10,15 +10,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/modules/type_support.hpp>
+#include <hpx/tag_invoke/macros.hpp>
 
 #include <utility>
 
 namespace hpx {
-
-#define HPX_INVOKE_R(R, F, ...)                                                \
-    (::hpx::util::void_guard<R>(), HPX_INVOKE(F, __VA_ARGS__))
 
     /// Invokes the given callable object f with the content of
     /// the argument pack vs
@@ -36,7 +34,7 @@ namespace hpx {
     ///         with the argument types vs.
     ///
     /// \note This function is similar to `std::invoke` (C++17)
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     constexpr HPX_HOST_DEVICE util::invoke_result_t<F, Ts&&...> invoke(
         F&& f, Ts&&... vs) noexcept(noexcept(HPX_INVOKE(HPX_FORWARD(F, f),
         HPX_FORWARD(Ts, vs)...)))
@@ -49,7 +47,7 @@ namespace hpx {
     ///
     /// \tparam R The result type of the function when it's called with the
     ///           content of the given argument types vs.
-    template <typename R, typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename R, typename F, typename... Ts>
     constexpr HPX_HOST_DEVICE R invoke_r(F&& f, Ts&&... vs) noexcept(
         noexcept(HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...)))
     {
@@ -59,7 +57,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     namespace functional {
 
-        struct invoke
+        HPX_CXX_EXPORT struct invoke
         {
             template <typename F, typename... Ts>
             constexpr HPX_HOST_DEVICE util::invoke_result_t<F, Ts&&...>
@@ -70,7 +68,7 @@ namespace hpx {
             }
         };
 
-        template <typename R>
+        HPX_CXX_EXPORT template <typename R>
         struct invoke_r
         {
             template <typename F, typename... Ts>

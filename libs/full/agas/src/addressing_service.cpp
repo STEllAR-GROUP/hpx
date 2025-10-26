@@ -16,15 +16,13 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/bind_front.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/serialization.hpp>

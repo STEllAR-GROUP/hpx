@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/functional/function.hpp>
 #include <hpx/hpx_init_params.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/program_options.hpp>
 
 namespace hpx {

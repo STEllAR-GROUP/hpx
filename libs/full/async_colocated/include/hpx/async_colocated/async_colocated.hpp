@@ -18,11 +18,10 @@
 #include <hpx/async_distributed/async_continue_fwd.hpp>
 #include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/async_local/async_fwd.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
 

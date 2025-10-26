@@ -15,9 +15,9 @@
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/invoke.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/mpi_base/mpi.hpp>
 

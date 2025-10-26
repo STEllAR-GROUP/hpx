@@ -10,8 +10,10 @@
 
 #if !defined(HPX_COMPILE_WITH_MODULES) ||                                      \
     (defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_TAG_INVOKE_WITH_MODULES))
-#include <hpx/functional/detail/invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 #endif
 
 #define HPX_INVOKE(F, ...)                                                     \
     (::hpx::util::detail::invoke<decltype((F))>(F)(__VA_ARGS__))
+#define HPX_INVOKE_R(R, F, ...)                                                \
+    (::hpx::util::void_guard<R>(), HPX_INVOKE(F, __VA_ARGS__))

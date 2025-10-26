@@ -7,9 +7,8 @@
 #include <hpx/config.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 

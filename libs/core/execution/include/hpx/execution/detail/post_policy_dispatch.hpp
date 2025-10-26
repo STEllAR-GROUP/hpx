@@ -11,7 +11,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>

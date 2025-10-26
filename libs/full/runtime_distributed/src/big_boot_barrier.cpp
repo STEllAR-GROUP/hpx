@@ -19,10 +19,10 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/agas_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/parcelset/detail/parcel_await.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>

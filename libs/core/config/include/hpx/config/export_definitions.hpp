@@ -58,7 +58,7 @@
 # define HPX_EXTERN                      /* empty */
 #else
 # define HPX_CXX_EXPORT                  /* empty */
-# define HPX_CXX_EXTERN                  /* empty */
+# define HPX_CXX_EXTERN                  extern "C++"
 # define HPX_EXTERN                      extern
 #endif
 

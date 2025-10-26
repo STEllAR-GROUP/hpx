@@ -15,7 +15,7 @@
 
 #ifdef HPX_HAVE_APEX
 #include <hpx/assert.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <string>
 

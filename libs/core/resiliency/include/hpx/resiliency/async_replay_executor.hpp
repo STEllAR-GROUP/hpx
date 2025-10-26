@@ -15,10 +15,10 @@
 #include <hpx/resiliency/async_replay.hpp>
 #include <hpx/resiliency/resiliency_cpos.hpp>
 
-#include <hpx/functional/deferred_call.hpp>
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>

@@ -13,8 +13,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/functional/config/defines.hpp>
 
+#if defined(HPX_FUNCTIONAL_HAVE_BOOST_PLACEHOLDERS)
 #include <boost/bind/arg.hpp>
+#endif
 
 #include <functional>
 #include <type_traits>
@@ -35,20 +38,28 @@ namespace hpx {
     template <typename T>
     struct is_placeholder;
 #else
-    template <typename T>
+
+#if defined(HPX_FUNCTIONAL_HAVE_BOOST_PLACEHOLDERS)
+    HPX_CXX_EXPORT template <typename T>
     struct is_placeholder
       : std::integral_constant<int,
             std::is_placeholder_v<T> != 0 ? std::is_placeholder_v<T> :
                                             boost::is_placeholder<T>::value>
     {
     };
+#else
+    HPX_CXX_EXPORT template <typename T>
+    struct is_placeholder : std::is_placeholder<T>
+    {
+    };
+#endif
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct is_placeholder<T const> : is_placeholder<T>
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr int is_placeholder_v = is_placeholder<T>::value;
 #endif
 }    // namespace hpx
