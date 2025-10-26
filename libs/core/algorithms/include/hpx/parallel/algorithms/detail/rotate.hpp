@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 
 #include <algorithm>

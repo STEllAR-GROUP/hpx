@@ -20,7 +20,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename MemberPointer>
+        HPX_CXX_EXPORT template <typename MemberPointer>
         struct mem_fn
         {
             constexpr explicit mem_fn(MemberPointer pm) noexcept
@@ -65,21 +65,21 @@ namespace hpx {
     ///         \c std::is_nothrow_invocable_v<decltype(pm),Ts&&...>) .
     ///         Each argument in \c vs is perfectly forwarded,
     ///         as if by \c std::forward<Ts>(vs)... .
-    template <typename M, typename C>
+    HPX_CXX_EXPORT template <typename M, typename C>
     constexpr detail::mem_fn<M C::*> mem_fn(M C::* pm) noexcept
     {
         return detail::mem_fn<M C::*>(pm);
     }
 
     /// \copydoc hpx::mem_fn
-    template <typename R, typename C, typename... Ps>
+    HPX_CXX_EXPORT template <typename R, typename C, typename... Ps>
     constexpr detail::mem_fn<R (C::*)(Ps...)> mem_fn(R (C::*pm)(Ps...)) noexcept
     {
         return detail::mem_fn<R (C::*)(Ps...)>(pm);
     }
 
     /// \copydoc hpx::mem_fn
-    template <typename R, typename C, typename... Ps>
+    HPX_CXX_EXPORT template <typename R, typename C, typename... Ps>
     constexpr detail::mem_fn<R (C::*)(Ps...) const> mem_fn(
         R (C::*pm)(Ps...) const) noexcept
     {

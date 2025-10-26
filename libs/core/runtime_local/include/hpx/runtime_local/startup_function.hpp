@@ -12,7 +12,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/move_only_function.hpp>
+#include <hpx/modules/functional.hpp>
 
 namespace hpx {
 

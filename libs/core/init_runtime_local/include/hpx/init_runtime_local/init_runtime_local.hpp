@@ -12,9 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>

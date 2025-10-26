@@ -293,8 +293,7 @@ namespace hpx {
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/functional/traits/get_function_address.hpp>
-#include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/modules/functional.hpp>
 #endif
 
 #include <algorithm>

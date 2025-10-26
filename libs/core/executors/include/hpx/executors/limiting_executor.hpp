@@ -12,8 +12,8 @@
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/threading_base/print.hpp>
 

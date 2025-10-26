@@ -235,7 +235,7 @@ function(add_hpx_module libname modulename)
     )
     set(generated_headers ${global_header})
 
-    if(${modulename}_GLOBAL_HEADER_MODULE_GEN)
+    if(HPX_WITH_CXX_MODULES AND ${modulename}_GLOBAL_HEADER_MODULE_GEN)
       # collect all standard header files used by this module
       set(found_includes)
       hpx_collect_std_headers(

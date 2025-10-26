@@ -12,9 +12,8 @@
 #include <hpx/agas_base/server/symbol_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/format.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/performance_counters/agas_namespace_action_code.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>

@@ -12,7 +12,7 @@
 
 // For more information, see http://www.boost.org
 
-#include <hpx/functional/function_ref.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <functional>

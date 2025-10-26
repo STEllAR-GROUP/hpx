@@ -8,6 +8,7 @@
 
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/modules/datastructures.hpp>
+
 #include <type_traits>
 
 namespace hpx::util {
@@ -15,7 +16,7 @@ namespace hpx::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Tuple>
+        HPX_CXX_EXPORT template <typename Tuple>
         struct tuple_first_argument;
 
         template <>
@@ -24,40 +25,41 @@ namespace hpx::util {
             using type = std::false_type;
         };
 
-        template <typename Arg0, typename... Args>
+        HPX_CXX_EXPORT template <typename Arg0, typename... Args>
         struct tuple_first_argument<hpx::tuple<Arg0, Args...>>
         {
             using type = std::decay_t<Arg0>;
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F>
+        HPX_CXX_EXPORT template <typename F>
         struct function_first_argument;
 
-        template <typename ReturnType>
+        HPX_CXX_EXPORT template <typename ReturnType>
         struct function_first_argument<ReturnType (*)()>
         {
             using type = std::false_type;
         };
 
-        template <typename ReturnType, typename Arg0, typename... Args>
+        HPX_CXX_EXPORT template <typename ReturnType, typename Arg0,
+            typename... Args>
         struct function_first_argument<ReturnType (*)(Arg0, Args...)>
         {
             using type = std::decay_t<Arg0>;
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F>
+        HPX_CXX_EXPORT template <typename F>
         struct lambda_first_argument;
 
-        template <typename ClassType, typename ReturnType>
+        HPX_CXX_EXPORT template <typename ClassType, typename ReturnType>
         struct lambda_first_argument<ReturnType (ClassType::*)() const>
         {
             using type = std::false_type;
         };
 
-        template <typename ClassType, typename ReturnType, typename Arg0,
-            typename... Args>
+        HPX_CXX_EXPORT template <typename ClassType, typename ReturnType,
+            typename Arg0, typename... Args>
         struct lambda_first_argument<ReturnType (ClassType::*)(Arg0, Args...)
                 const>
         {
@@ -65,20 +67,20 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    template <typename F, typename Enable = void>
+    HPX_CXX_EXPORT template <typename F, typename Enable = void>
     struct first_argument
     {
     };
 
     // Specialization for actions
-    template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     struct first_argument<F, std::enable_if_t<hpx::traits::is_action_v<F>>>
       : detail::tuple_first_argument<typename F::arguments_type>
     {
     };
 
     // Specialization for functions
-    template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     struct first_argument<F,
         std::enable_if_t<!hpx::traits::is_action_v<F> &&
             std::is_function_v<std::remove_pointer_t<F>>>>
@@ -87,7 +89,7 @@ namespace hpx::util {
     };
 
     // Specialization for lambdas
-    template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     struct first_argument<F,
         std::enable_if_t<!hpx::traits::is_action_v<F> &&
             !std::is_function_v<std::remove_pointer_t<F>>>>
@@ -95,6 +97,6 @@ namespace hpx::util {
     {
     };
 
-    template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     using first_argument_t = typename first_argument<F>::type;
 }    // namespace hpx::util

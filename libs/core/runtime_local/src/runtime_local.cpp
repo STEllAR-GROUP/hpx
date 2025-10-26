@@ -12,13 +12,12 @@
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/signal_handler_debugging.hpp>
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threadmanager.hpp>

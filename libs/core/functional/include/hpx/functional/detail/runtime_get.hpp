@@ -19,7 +19,8 @@
 namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename R, typename Tuple, typename F, std::size_t... Is>
+    HPX_CXX_EXPORT template <typename R, typename Tuple, typename F,
+        std::size_t... Is>
     struct access_table
     {
         using tuple_type = Tuple;
@@ -40,7 +41,8 @@ namespace hpx::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename R, typename Tuple, typename F, std::size_t... Is>
+    HPX_CXX_EXPORT template <typename R, typename Tuple, typename F,
+        std::size_t... Is>
     [[nodiscard]] constexpr decltype(auto) call_access_function(
         Tuple& t, std::size_t i, F&& f, hpx::util::index_pack<Is...>) noexcept
     {
@@ -52,11 +54,11 @@ namespace hpx::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Tuple>
+    HPX_CXX_EXPORT template <typename Tuple>
     using first_tuple_element_t =
         hpx::tuple_element_t<0, std::remove_reference_t<Tuple>>;
 
-    template <typename Tuple>
+    HPX_CXX_EXPORT template <typename Tuple>
     [[nodiscard]] constexpr decltype(auto) homogenous_runtime_get(
         Tuple& t, std::size_t i) noexcept
     {
@@ -68,10 +70,10 @@ namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // Generate variant that uniquely holds all of the tuple types
-    template <typename Tuple>
+    HPX_CXX_EXPORT template <typename Tuple>
     struct variant_from_tuple;
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     struct variant_from_tuple<hpx::tuple<Ts...>>
     {
         using type =
@@ -79,11 +81,11 @@ namespace hpx::detail {
                 std::reference_wrapper<std::decay_t<Ts>>...>;
     };
 
-    template <typename Tuple>
+    HPX_CXX_EXPORT template <typename Tuple>
     using variant_from_tuple_t = typename variant_from_tuple<Tuple>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Tuple>
+    HPX_CXX_EXPORT template <typename Tuple>
     [[nodiscard]] constexpr decltype(auto) runtime_get(
         Tuple& t, std::size_t i) noexcept
     {

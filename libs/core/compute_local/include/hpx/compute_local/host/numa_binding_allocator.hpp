@@ -12,8 +12,8 @@
 #include <hpx/async_local/async.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/guided_pool_executor.hpp>
-#include <hpx/functional/bind.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>

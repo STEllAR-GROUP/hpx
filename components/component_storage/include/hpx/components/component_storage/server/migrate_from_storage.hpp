@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/components_base/traits/component_pin_support.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
-#include <hpx/functional/bind_back.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>

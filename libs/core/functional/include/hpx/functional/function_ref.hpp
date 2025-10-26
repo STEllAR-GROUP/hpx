@@ -55,7 +55,7 @@ namespace hpx {
 
     namespace util::detail {
 
-        template <typename Sig>
+        HPX_CXX_EXPORT template <typename Sig>
         struct function_ref_vtable
           : callable_vtable<Sig>
           , callable_info_vtable
@@ -69,19 +69,19 @@ namespace hpx {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F>
+        HPX_CXX_EXPORT template <typename F>
         [[nodiscard]] constexpr bool is_empty_function_ptr(F* fp) noexcept
         {
             return fp == nullptr;
         }
 
-        template <typename T, typename C>
+        HPX_CXX_EXPORT template <typename T, typename C>
         [[nodiscard]] constexpr bool is_empty_function_ptr(T C::* mp) noexcept
         {
             return mp == nullptr;
         }
 
-        template <typename F>
+        HPX_CXX_EXPORT template <typename F>
         [[nodiscard]] constexpr bool is_empty_function_ptr(F const&) noexcept
         {
             return false;
@@ -89,7 +89,7 @@ namespace hpx {
     }    // namespace util::detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename R, typename... Ts>
+    HPX_CXX_EXPORT template <typename R, typename... Ts>
     class function_ref<R(Ts...)>
     {
         using VTable = util::detail::function_ref_vtable<R(Ts...)>;
@@ -230,7 +230,7 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::traits {
 
-    template <typename Sig>
+    HPX_CXX_EXPORT template <typename Sig>
     struct get_function_address<hpx::function_ref<Sig>>
     {
         [[nodiscard]] static constexpr std::size_t call(
@@ -240,7 +240,7 @@ namespace hpx::traits {
         }
     };
 
-    template <typename Sig>
+    HPX_CXX_EXPORT template <typename Sig>
     struct get_function_annotation<hpx::function_ref<Sig>>
     {
         [[nodiscard]] static constexpr char const* call(
@@ -251,7 +251,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename Sig>
+    HPX_CXX_EXPORT template <typename Sig>
     struct get_function_annotation_itt<hpx::function_ref<Sig>>
     {
         [[nodiscard]] static util::itt::string_handle call(

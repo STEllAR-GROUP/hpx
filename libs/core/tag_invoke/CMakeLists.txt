@@ -10,12 +10,13 @@ set(tag_invoke_headers
     hpx/functional/detail/invoke.hpp
     hpx/functional/detail/tag_fallback_invoke.hpp
     hpx/functional/detail/tag_priority_invoke.hpp
+    hpx/functional/invoke.hpp
     hpx/functional/invoke_result.hpp
-    hpx/functional/macros.hpp
     hpx/functional/tag_invoke.hpp
     hpx/functional/traits/is_invocable.hpp
+    hpx/tag_invoke/macros.hpp
 )
-set(tag_invoke_macro_headers hpx/functional/macros.hpp)
+set(tag_invoke_macro_headers hpx/tag_invoke/macros.hpp)
 
 # cmake-format: off
 set(tag_invoke_compat_headers

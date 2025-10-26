@@ -10,13 +10,8 @@
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/functional/function_ref.hpp>
-#include <hpx/functional/move_only_function.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/string_util.hpp>
