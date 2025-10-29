@@ -1,5 +1,4 @@
-//  Copyright (c) 2013-2015 Thomas Heller
-//  Copyright (c)      2020 Google
+//  Copyright (c) 2025 Jiakun Yan
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -104,6 +103,7 @@ namespace hpx { namespace util {
     HPX_LCI_PCOUNTER_NONE_FOR_EACH(HPX_LCI_PCOUNTER_HANDLE_DEF)
     HPX_LCI_PCOUNTER_TREND_FOR_EACH(HPX_LCI_PCOUNTER_HANDLE_DEF)
     HPX_LCI_PCOUNTER_TIMER_FOR_EACH(HPX_LCI_PCOUNTER_HANDLE_DEF)
+
     ///////////////////////////////////////////////////////////////////////////
     void lci_environment::init(
         int*, char***, util::runtime_configuration& rtcfg)
@@ -111,20 +111,8 @@ namespace hpx { namespace util {
         if (enabled_)
             return;    // don't call twice
 
-        LCI_error_t retval;
-        int lci_initialized = 0;
-        LCI_initialized(&lci_initialized);
-        if (!lci_initialized)
-        {
-            retval = LCI_initialize();
-            if (LCI_OK != retval)
-            {
-                rtcfg.add_entry("hpx.parcel.lci.enable", "0");
-                enabled_ = false;
-                throw std::runtime_error(
-                    "lci_environment::init: LCI_initialize failed");
-            }
-        }
+        LCT_init();
+        ::lci::global_initialize();
 
         int this_rank = rank();
 
@@ -145,8 +133,7 @@ namespace hpx { namespace util {
 
         rtcfg.add_entry("hpx.parcel.bootstrap", "lci");
         rtcfg.add_entry("hpx.parcel.lci.rank", std::to_string(this_rank));
-        LCT_init();
-        // initialize the log context
+
 #ifdef HPX_HAVE_PARCELPORT_LCI_LOG
         const char* const log_levels[] = {"none", "profile", "debug"};
         log_ctx = LCT_log_ctx_alloc(log_levels,
@@ -158,7 +145,6 @@ namespace hpx { namespace util {
         log_level = log_level_t::none;
 #endif
 #ifdef HPX_HAVE_PARCELPORT_LCI_PCOUNTER
-        // initialize the performance counters
         pcounter_ctx = LCT_pcounter_ctx_alloc("hpx-lci");
 
 #define HPX_LCI_PCOUNTER_NONE_REGISTER(name)                                   \
@@ -192,23 +178,9 @@ namespace hpx { namespace util {
 #ifdef HPX_HAVE_PARCELPORT_LCI_LOG
             LCT_log_ctx_free(&log_ctx);
 #endif
+            ::lci::global_finalize();
             LCT_fina();
-            int lci_init = 0;
-            LCI_initialized(&lci_init);
-            if (lci_init)
-            {
-                LCI_finalize();
-            }
         }
-    }
-
-    bool lci_environment::do_progress(LCI_device_t device)
-    {
-        if (!device)
-            return false;
-        LCI_error_t ret = LCI_progress(device);
-        HPX_ASSERT(ret == LCI_OK || ret == LCI_ERR_RETRY);
-        return ret == LCI_OK;
     }
 
     bool lci_environment::enabled()
@@ -220,7 +192,7 @@ namespace hpx { namespace util {
     {
         int res(-1);
         if (enabled())
-            res = LCI_NUM_PROCESSES;
+            res = lci::get_rank_n();
         return res;
     }
 
@@ -228,8 +200,23 @@ namespace hpx { namespace util {
     {
         int res(-1);
         if (enabled())
-            res = LCI_RANK;
+            res = lci::get_rank_me();
         return res;
+    }
+
+    int lci_environment::get_max_tag()
+    {
+        if (enabled())
+            return ::lci::get_g_runtime().get_attr_max_tag();
+        return -1;
+    }
+
+    bool lci_environment::do_progress(::lci::device_t device)
+    {
+        if (device.is_empty())
+            return false;
+        auto ret = ::lci::progress_x().device(device)();
+        return ret.is_done();
     }
 
     void lci_environment::log([[maybe_unused]] log_level_t level,
@@ -241,9 +228,7 @@ namespace hpx { namespace util {
             return;
         va_list args;
         va_start(args, format);
-
         LCT_Logv(log_ctx, static_cast<int>(level), tag, format, args);
-
         va_end(args);
 #endif
     }
@@ -252,16 +237,18 @@ namespace hpx { namespace util {
     {
 #ifdef HPX_HAVE_PARCELPORT_LCI_PCOUNTER
         return static_cast<int64_t>(LCT_now());
-#endif
+#else
         return 0;
+#endif
     }
 
     int64_t lci_environment::pcounter_since([[maybe_unused]] int64_t then)
     {
 #ifdef HPX_HAVE_PARCELPORT_LCI_PCOUNTER
         return static_cast<int64_t>(LCT_now()) - then;
-#endif
+#else
         return 0;
+#endif
     }
 
     void lci_environment::pcounter_add(

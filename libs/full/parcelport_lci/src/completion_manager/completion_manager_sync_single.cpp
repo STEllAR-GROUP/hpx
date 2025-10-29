@@ -8,22 +8,21 @@
 #include <hpx/parcelport_lci/parcelport_lci.hpp>
 
 namespace hpx::parcelset::policies::lci {
-    LCI_request_t completion_manager_sync_single::poll()
+    ::lci::status_t completion_manager_sync_single::poll()
     {
-        LCI_request_t request;
-        request.flag = LCI_ERR_RETRY;
+        ::lci::status_t status;
 
         bool succeed = lock.try_lock();
         if (succeed)
         {
-            LCI_error_t ret = LCI_sync_test(sync, &request);
-            if (ret == LCI_ERR_RETRY)
+            ::lci::sync_test(sync, &status);
+            if (status.is_retry())
             {
                 if (config_t::progress_type == config_t::progress_type_t::poll)
                     pp_->do_progress_local();
                 lock.unlock();
             }
         }
-        return request;
+        return status;
     }
 }    // namespace hpx::parcelset::policies::lci

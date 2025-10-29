@@ -14,7 +14,6 @@
 #include <hpx/assert.hpp>
 
 #include <hpx/modules/lci_base.hpp>
-#include <hpx/parcelport_lci/backlog_queue.hpp>
 #include <hpx/parcelport_lci/header.hpp>
 #include <hpx/parcelport_lci/helper.hpp>
 #include <hpx/parcelport_lci/locality.hpp>
@@ -55,57 +54,35 @@ namespace hpx::parcelset::policies::lci {
     sender_connection_base::return_t sender_connection_base::send(
         bool in_bg_work)
     {
-        //         FIXME: set it properly in the future
-        //        if (HPX_LIKELY(pp_->is_initialized))
-        //            in_bg_work = false;
         auto start_time = util::lci_environment::pcounter_now();
         return_t ret;
-        if (!config_t::enable_lci_backlog_queue ||
-            HPX_UNLIKELY(!pp_->is_initialized))
+        int retry_count = 0;
+        do
         {
-            // If we are sending early parcels, we should not expect the thread
-            // make progress on the backlog queue.
-            int retry_count = 0;
-            do
+            ret = send_nb();
+            if (ret.status == return_status_t::retry)
             {
-                ret = send_nb();
-                if (ret.status == return_status_t::retry)
+                if (config_t::bg_work_when_send)
                 {
-                    if (config_t::bg_work_when_send)
-                    {
-                        pp_->do_background_work(0,
-                            in_bg_work ? parcelport_background_mode::receive :
-                                         parcelport_background_mode::all);
-                    }
-                    else if (config_t::progress_type ==
-                            config_t::progress_type_t::worker ||
-                        config_t::progress_type ==
-                            config_t::progress_type_t::pthread_worker ||
-                        config_t::progress_type ==
-                            config_t::progress_type_t::poll)
-                    {
-                        pp_->do_progress_local();
-                    }
-                    yield_k(retry_count, config_t::send_nb_max_retry);
+                    pp_->do_background_work(0,
+                        in_bg_work ? parcelport_background_mode::receive :
+                                     parcelport_background_mode::all);
                 }
-            } while (ret.status == return_status_t::retry);
-        }
-        else
-        {
-            if (!backlog_queue::empty(dst_rank))
-            {
-                backlog_queue::push(shared_from_this());
-                ret = {return_status_t::retry, nullptr};
-            }
-            else
-            {
-                ret = send_nb();
-                if (ret.status == return_status_t::retry)
+                else if (config_t::progress_type ==
+                        config_t::progress_type_t::worker ||
+                    config_t::progress_type ==
+                        config_t::progress_type_t::pthread_worker ||
+                    config_t::progress_type == config_t::progress_type_t::poll)
                 {
-                    backlog_queue::push(shared_from_this());
+                    // We will just make progress on this device
+                    // instead of progress_local that can be affected
+                    // by the progress strategy
+                    while (util::lci_environment::do_progress(device_p->device))
+                        continue;
                 }
+                yield_k(retry_count, config_t::send_nb_max_retry);
             }
-        }
+        } while (ret.status == return_status_t::retry);
         if (config_t::bg_work_when_send)
             pp_->do_background_work(0,
                 in_bg_work ? parcelport_background_mode::receive :
@@ -125,7 +102,8 @@ namespace hpx::parcelset::policies::lci {
         char buf[1024];
         size_t consumed = 0;
         consumed += snprintf(buf + consumed, sizeof(buf) - consumed,
-            "%d:%lf:send_connection(%p) start:%d:%lu:%d:%d:[", LCI_RANK,
+            "%d:%lf:send_connection(%p) start:%d:%lu:%d:%d:[",
+            util::lci_environment::rank(),
             hpx::chrono::high_resolution_clock::now() / 1e9, (void*) this,
             dst_rank, header_.numbytes_nonzero_copy(),
             header_.numbytes_tchunk(), header_.num_zero_copy_chunks());
@@ -148,7 +126,8 @@ namespace hpx::parcelset::policies::lci {
     void sender_connection_base::profile_end_hook()
     {
         util::lci_environment::log(util::lci_environment::log_level_t::profile,
-            "send", "%d:%lf:send_connection(%p) end\n", LCI_RANK,
+            "send", "%d:%lf:send_connection(%p) end\n",
+            util::lci_environment::rank(),
             hpx::chrono::high_resolution_clock::now() / 1e9, (void*) this);
         util::lci_environment::pcounter_add(
             util::lci_environment::send_conn_end, 1);

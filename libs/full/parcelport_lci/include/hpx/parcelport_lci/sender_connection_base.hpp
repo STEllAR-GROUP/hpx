@@ -46,7 +46,7 @@ namespace hpx::parcelset::policies::lci {
         struct return_t
         {
             return_status_t status;
-            LCI_comp_t completion;
+            ::lci::comp_t completion;
         };
         sender_connection_base(int dst, parcelset::parcelport* pp)
           : dst_rank(dst)
@@ -75,8 +75,6 @@ namespace hpx::parcelset::policies::lci {
         return_t send(bool in_bg_work);
         virtual return_t send_nb() = 0;
         virtual void done() = 0;
-        virtual bool tryMerge(
-            const std::shared_ptr<sender_connection_base>& other_base) = 0;
         void profile_start_hook(const header& header_);
         void profile_end_hook();
 
