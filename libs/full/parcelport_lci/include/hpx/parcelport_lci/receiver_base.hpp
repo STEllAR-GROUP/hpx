@@ -83,39 +83,6 @@ namespace hpx::parcelset::policies::lci {
         }
     };
 
-    struct request_wrapper_t
-    {
-        LCI_request_t request;
-        request_wrapper_t()
-        {
-            request.flag = LCI_ERR_RETRY;
-        }
-        ~request_wrapper_t()
-        {
-            if (request.flag == LCI_OK)
-            {
-                if (request.type == LCI_IOVEC)
-                {
-                    for (int j = 0; j < request.data.iovec.count; ++j)
-                    {
-                        LCI_lbuffer_free(request.data.iovec.lbuffers[j]);
-                    }
-                    free(request.data.iovec.lbuffers);
-                    free(request.data.iovec.piggy_back.address);
-                }
-                else
-                {
-                    HPX_ASSERT(request.type = LCI_MEDIUM);
-                    LCI_mbuffer_free(request.data.mbuffer);
-                }
-            }
-            else
-            {
-                HPX_ASSERT(request.flag == LCI_ERR_RETRY);
-            }
-        }
-    };
-
     struct receiver_base
     {
         using buffer_type = parcel_buffer<buffer_wrapper>;

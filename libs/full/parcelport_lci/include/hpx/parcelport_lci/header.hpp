@@ -28,8 +28,6 @@ namespace hpx::parcelset::policies::lci {
         {
             // signature for assert_valid
             int signature;
-            // device idx
-            int device_idx;
             // tag
             int tag;
             // non-zero-copy chunk size
@@ -166,17 +164,7 @@ namespace hpx::parcelset::policies::lci {
             return reinterpret_cast<header_format_t*>(data_)->signature;
         }
 
-        void set_device_idx(int device_idx) noexcept
-        {
-            reinterpret_cast<header_format_t*>(data_)->device_idx = device_idx;
-        }
-
-        [[nodiscard]] int get_device_idx() const noexcept
-        {
-            return reinterpret_cast<header_format_t*>(data_)->device_idx;
-        }
-
-        void set_tag(LCI_tag_t tag) noexcept
+        void set_tag(::lci::tag_t tag) noexcept
         {
             reinterpret_cast<header_format_t*>(data_)->tag = tag;
         }
