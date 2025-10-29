@@ -62,24 +62,28 @@ namespace hpx::threads {
         do_yield(desc, hpx::threads::thread_schedule_state::pending);
     }
 
-    void execution_agent::yield_k(std::size_t k, char const* desc)
+    bool execution_agent::yield_k(std::size_t k, char const* desc)
     {
         if (k < 4)    //-V112
         {
+            return false;
         }
 #if defined(HPX_SMT_PAUSE)
         else if (k < 16)
         {
             HPX_SMT_PAUSE;
+            return false;
         }
 #endif
         else if (k < 32 || k & 1)    //-V112
         {
             do_yield(desc, hpx::threads::thread_schedule_state::pending_boost);
+            return true;
         }
         else
         {
             do_yield(desc, hpx::threads::thread_schedule_state::pending);
+            return true;
         }
     }
 

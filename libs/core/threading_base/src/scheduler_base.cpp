@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
@@ -39,7 +40,12 @@ namespace hpx::threads::policies {
         char const* description,
         thread_queue_init_parameters const& thread_queue_init,
         scheduler_mode mode)
-      : suspend_mtxs_(num_threads)
+      : mode_(mode)
+#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
+      , max_idle_backoff_time_(thread_queue_init.max_idle_backoff_time_)
+      , wait_count_data_(num_threads)
+#endif
+      , suspend_mtxs_(num_threads)
       , suspend_conds_(num_threads)
       , pu_mtxs_(num_threads)
       , states_(num_threads)
@@ -56,17 +62,6 @@ namespace hpx::threads::policies {
     {
         scheduler_base::set_scheduler_mode(mode);
 
-#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-        double const max_time = thread_queue_init.max_idle_backoff_time_;
-
-        wait_counts_.resize(num_threads);
-        for (auto&& data : wait_counts_)
-        {
-            data.data_.wait_count_ = 0;
-            data.data_.max_idle_backoff_time_ = max_time;
-        }
-#endif
-
         for (std::size_t i = 0; i != num_threads; ++i)
             states_[i].data_.store(hpx::state::initialized);
     }
@@ -77,30 +72,32 @@ namespace hpx::threads::policies {
         if (mode_.data_.load(std::memory_order_relaxed) &
             policies::scheduler_mode::enable_idle_backoff)
         {
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            static hpx::util::itt::event notify_event("idle_callback");
+            hpx::util::itt::mark_event e(notify_event);
+#endif
             // Put this thread to sleep for some time, additionally it gets
             // woken up on new work.
 
-            idle_backoff_data& data = wait_counts_[num_thread].data_;
+            auto& data = wait_count_data_[num_thread].data_;
 
             // Exponential back-off with a maximum sleep time.
-            static constexpr std::int64_t const max_exponent =
-                std::numeric_limits<double>::max_exponent;
+            constexpr double max_exponent =
+                std::numeric_limits<double>::max_exponent - 1;
             double const exponent =
-                (std::min) (static_cast<double>(data.wait_count_),
-                    static_cast<double>(max_exponent - 1));
+                (std::min) (static_cast<double>(data.wait_count), max_exponent);
 
-            std::chrono::milliseconds const period(
-                std::lround((std::min) (data.max_idle_backoff_time_,
-                    std::pow(2.0, exponent))));
+            std::chrono::microseconds const period(std::lround(
+                (std::min) (max_idle_backoff_time_, std::pow(2.0, exponent))));
 
-            ++data.wait_count_;
+            ++data.wait_count;
 
-            std::unique_lock<pu_mutex_type> l(mtx_);
-            if (cond_.wait_for(l, period) ==    //-V1089
+            std::unique_lock<pu_mutex_type> l(data.wait_mtx);
+            if (data.wait_cond.wait_for(l, period) ==    //-V1089
                 std::cv_status::no_timeout)
             {
                 // reset counter if thread was woken up
-                data.wait_count_ = 0;
+                data.wait_count = 0;
             }
         }
 #endif
@@ -109,13 +106,30 @@ namespace hpx::threads::policies {
     /// This function gets called by the thread-manager whenever new work
     /// has been added, allowing the scheduler to reactivate one or more of
     /// possibly idling OS threads
-    void scheduler_base::do_some_work(std::size_t)
+    void scheduler_base::do_some_work([[maybe_unused]] std::size_t num_thread)
     {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         if (mode_.data_.load(std::memory_order_relaxed) &
             policies::scheduler_mode::enable_idle_backoff)
         {
-            cond_.notify_all();
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            static hpx::util::itt::event notify_event("do_some_work");
+            hpx::util::itt::mark_event e(notify_event);
+#endif
+            //if (num_thread == static_cast<std::size_t>(-1))
+            //{
+            auto const size = wait_count_data_.size();
+            for (std::size_t i = 0; i != size; ++i)
+            {
+                wait_count_data_[i].data_.wait_count = 0;
+                wait_count_data_[i].data_.wait_cond.notify_one();
+            }
+            //}
+            //else
+            //{
+            //    wait_count_data_[num_thread].data_.wait_count = 0;
+            //    wait_count_data_[num_thread].data_.wait_cond.notify_one();
+            //}
         }
 #endif
     }

@@ -61,7 +61,7 @@ namespace hpx::execution_base {
 
         HPX_CORE_EXPORT void yield(
             char const* desc = "hpx::execution_base::this_thread::yield");
-        HPX_CORE_EXPORT void yield_k(std::size_t k,
+        HPX_CORE_EXPORT bool yield_k(std::size_t k,
             char const* desc = "hpx::execution_base::this_thread::yield_k");
         HPX_CORE_EXPORT void suspend(
             char const* desc = "hpx::execution_base::this_thread::suspend");
@@ -148,7 +148,7 @@ namespace hpx::util {
 
     namespace detail {
 
-        inline void yield_k(std::size_t k, char const* thread_name)
+        inline bool yield_k(std::size_t k, char const* thread_name)
         {
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
             if (k > 32 && get_spinlock_break_on_deadlock_enabled() &&
@@ -158,7 +158,7 @@ namespace hpx::util {
                     "possible deadlock detected");
             }
 #endif
-            hpx::execution_base::this_thread::yield_k(k, thread_name);
+            return hpx::execution_base::this_thread::yield_k(k, thread_name);
         }
     }    // namespace detail
 

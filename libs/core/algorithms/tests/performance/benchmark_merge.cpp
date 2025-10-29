@@ -133,6 +133,33 @@ struct hpx::execution::experimental::is_executor_parameters<compute_chunk_size>
 {
 };
 
+struct enable_fast_idle_mode
+{
+    template <typename Executor>
+    friend void tag_override_invoke(
+        hpx::execution::experimental::mark_begin_execution_t,
+        enable_fast_idle_mode, Executor&&)
+    {
+        hpx::threads::add_scheduler_mode(
+            hpx::threads::policies::scheduler_mode::fast_idle_mode);
+    }
+
+    template <typename Executor>
+    friend void tag_override_invoke(
+        hpx::execution::experimental::mark_end_execution_t,
+        enable_fast_idle_mode, Executor&&)
+    {
+        hpx::threads::remove_scheduler_mode(
+            hpx::threads::policies::scheduler_mode::fast_idle_mode);
+    }
+};
+
+template <>
+struct hpx::execution::experimental::is_executor_parameters<
+    enable_fast_idle_mode> : std::true_type
+{
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 struct random_to_item_t
@@ -234,7 +261,7 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     double const time_seq = run_merge_benchmark_hpx(
         test_count, seq, first1, last1, first2, last2, dest);
 
-    hpx::this_thread::sleep_for(std::chrono::seconds(1));
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(200));
 
     std::cout << "--- run_merge_benchmark_par ---" << std::endl;
 
@@ -251,11 +278,11 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     double const time_par = run_merge_benchmark_hpx(
         test_count, policy.with(ccs), first1, last1, first2, last2, dest);
 
-    std::cout << "--- run_merge_benchmark_par_stackless ---" << std::endl;
-
     HPX_ITT_PAUSE();
 
-    hpx::this_thread::sleep_for(std::chrono::seconds(1));
+    std::cout << "--- run_merge_benchmark_par_stackless ---" << std::endl;
+
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(200));
 
     HPX_ITT_RESUME();
 
@@ -266,6 +293,26 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
                 policy, hpx::threads::thread_stacksize::nostack);
         time_par_stackless = run_merge_benchmark_hpx(test_count,
             stackless_policy.with(ccs), first1, last1, first2, last2, dest);
+    }
+
+    HPX_ITT_PAUSE();
+
+    std::cout << "--- run_merge_benchmark_par_stackless_fast_idle ---"
+              << std::endl;
+
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    HPX_ITT_RESUME();
+
+    double time_par_stackless_fast_idle = 0;
+    {
+        enable_fast_idle_mode efim;
+        auto const stackless_policy =
+            hpx::execution::experimental::with_stacksize(
+                policy, hpx::threads::thread_stacksize::nostack);
+        time_par_stackless_fast_idle = run_merge_benchmark_hpx(test_count,
+            stackless_policy.with(ccs, efim), first1, last1, first2, last2,
+            dest);
     }
 
     HPX_ITT_PAUSE();
@@ -289,6 +336,9 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par_stackless", time_par_stackless)
+        << std::endl;
+    hpx::util::format_to(
+        std::cout, fmt, "par_stackless_fast_idle", time_par_stackless_fast_idle)
         << std::endl;
     hpx::util::format_to(std::cout, fmt, "par_fork_join", time_par_fork_join)
         << std::endl;

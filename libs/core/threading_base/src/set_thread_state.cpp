@@ -100,8 +100,7 @@ namespace hpx::threads::detail {
     thread_state set_thread_state(thread_id_type const& thrd,
         thread_schedule_state const new_state,
         thread_restart_state const new_state_ex, thread_priority const priority,
-        thread_schedule_hint schedulehint, bool const retry_on_active,
-        error_code& ec)
+        thread_schedule_hint schedulehint, bool retry_on_active, error_code& ec)
     {
         if (HPX_UNLIKELY(!thrd))
         {
@@ -158,8 +157,11 @@ namespace hpx::threads::detail {
                         priority, previous_state, schedulehint, ec);
                 }
 
-                hpx::execution_base::this_thread::yield_k(
-                    k, "hpx::threads::detail::set_thread_state");
+                if (hpx::execution_base::this_thread::yield_k(
+                        k, "hpx::threads::detail::set_thread_state"))
+                {
+                    retry_on_active = true;    // don't wait too long
+                }
                 ++k;
 
                 LTM_(warning).format(

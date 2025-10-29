@@ -223,6 +223,42 @@ namespace hpx::parallel::execution::detail {
     }
 
     template <typename Launch, typename F, typename S, typename... Ts>
+    decltype(auto) hierarchical_bulk_sync_execute(
+        hpx::threads::thread_description const& desc,
+        threads::thread_pool_base* pool, std::size_t first_thread,
+        std::size_t num_threads, std::size_t hierarchical_threshold,
+        Launch policy, F&& f, S const& shape, Ts&&... ts)
+    {
+        using result_type = detail::bulk_function_result_t<F, S, Ts...>;
+        if constexpr (!std::is_void_v<result_type>)
+        {
+            return hpx::unwrap(hierarchical_bulk_async_execute_helper(desc,
+                pool, first_thread, num_threads, hierarchical_threshold, policy,
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
+        }
+        else
+        {
+            return hpx::unwrap(hierarchical_bulk_async_execute_void(desc, pool,
+                first_thread, num_threads, hierarchical_threshold, policy,
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
+        }
+    }
+
+    template <typename Launch, typename F, typename S, typename... Ts>
+    decltype(auto) hierarchical_bulk_sync_execute(
+        threads::thread_pool_base* pool, std::size_t first_thread,
+        std::size_t num_threads, std::size_t hierarchical_threshold,
+        Launch policy, F&& f, S const& shape, Ts&&... ts)
+    {
+        hpx::threads::thread_description const desc(
+            f, "hierarchical_bulk_sync_execute");
+
+        return hierarchical_bulk_sync_execute(desc, pool, first_thread,
+            num_threads, hierarchical_threshold, policy, HPX_FORWARD(F, f),
+            shape, HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename Launch, typename F, typename S, typename... Ts>
     decltype(auto) hierarchical_bulk_async_execute(
         hpx::threads::thread_description const& desc,
         threads::thread_pool_base* pool, std::size_t first_thread,

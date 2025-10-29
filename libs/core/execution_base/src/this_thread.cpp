@@ -65,7 +65,7 @@ namespace hpx::execution_base {
             }
 
             void yield(char const* desc) override;
-            void yield_k(std::size_t k, char const* desc) override;
+            bool yield_k(std::size_t k, char const* desc) override;
             void suspend(char const* desc) override;
             void resume(hpx::threads::thread_priority priority,
                 char const* desc) override;
@@ -102,27 +102,32 @@ namespace hpx::execution_base {
 #endif
         }
 
-        void default_agent::yield_k(std::size_t k, char const* /* desc */)
+        bool default_agent::yield_k(std::size_t k, char const* /* desc */)
         {
             if (k < 4)    //-V112
             {
+                return false;
             }
             else if (k < 16)
             {
                 HPX_SMT_PAUSE;
+                return false;
             }
             else if (k < 32 || k & 1)    //-V112
             {
 #if defined(HPX_WINDOWS)
                 Sleep(0);
+                return true;
 #else
                 sched_yield();
+                return true;
 #endif
             }
             else
             {
 #if defined(HPX_WINDOWS)
                 Sleep(1);
+                return true;
 #else
                 // g++ -Wextra warns on {} or {0}
                 struct timespec rqtp = {0, 0};
@@ -134,6 +139,7 @@ namespace hpx::execution_base {
                 rqtp.tv_nsec = 1000;
 
                 nanosleep(&rqtp, nullptr);
+                return true;
 #endif
             }
         }
@@ -263,9 +269,9 @@ namespace hpx::execution_base {
             agent().yield(desc);
         }
 
-        void yield_k(std::size_t k, char const* desc)
+        bool yield_k(std::size_t k, char const* desc)
         {
-            agent().yield_k(k, desc);
+            return agent().yield_k(k, desc);
         }
 
         void suspend(char const* desc)

@@ -256,7 +256,8 @@ namespace hpx::parallel::execution::detail {
     ////////////////////////////////////////////////////////////////////////////
     // Extend the shared state of the returned future allowing to keep alive all
     // data needed for the scheduling
-    template <typename Launch, typename F, typename Shape, typename... Ts>
+    template <bool Sync, typename Launch, typename F, typename Shape,
+        typename... Ts>
     struct index_queue_bulk_state final : lcos::detail::future_data<void>
     {
     private:
@@ -298,7 +299,7 @@ namespace hpx::parallel::execution::detail {
             auto const& rp = hpx::resource::get_partitioner();
             for (std::uint32_t i = 0; i != num_threads; ++i)
             {
-                auto thread_mask = rp.get_pu_mask(
+                auto const thread_mask = rp.get_pu_mask(
                     wrapped_pu_num(i, needs_wraparound) + first_thread);
                 for (std::uint32_t j = 0; j != overall_threads; ++j)
                 {
@@ -312,7 +313,8 @@ namespace hpx::parallel::execution::detail {
         }
 
         static hpx::threads::mask_type limit_mask(
-            hpx::threads::mask_cref_type orgmask, std::uint32_t num_threads)
+            hpx::threads::mask_cref_type orgmask,
+            std::uint32_t const num_threads)
         {
             std::uint32_t const num_cores =    //-V101
                 hpx::threads::hardware_concurrency();
@@ -598,11 +600,31 @@ namespace hpx::parallel::execution::detail {
             if (main_thread_ok)
             {
                 // Handle the queue for the local thread.
-                do_work_task(desc, pool, true, needs_wraparound,
-                    task_function<index_queue_bulk_state>{
-                        hpx::intrusive_ptr<index_queue_bulk_state>(this), size,
-                        chunk_size, local_worker_thread, reverse_placement,
-                        allow_stealing});
+                hpx::intrusive_ptr<index_queue_bulk_state> this_(this);
+                if constexpr (Sync)
+                {
+                    // execute directly, if non-async
+                    task_function<index_queue_bulk_state> f{HPX_MOVE(this_),
+                        size, chunk_size, local_worker_thread,
+                        reverse_placement, allow_stealing};
+
+                    if (queues[local_worker_thread].data_.empty())
+                    {
+                        // If the queue is empty we don't execute the task. We
+                        // only signal that this "task" is ready.
+                        f.finish();
+                        return;
+                    }
+
+                    f();
+                }
+                else
+                {
+                    do_work_task(desc, pool, true, needs_wraparound,
+                        task_function<index_queue_bulk_state>{HPX_MOVE(this_),
+                            size, chunk_size, local_worker_thread,
+                            reverse_placement, allow_stealing});
+                }
             }
         }
 
@@ -630,6 +652,69 @@ namespace hpx::parallel::execution::detail {
     // tasks. It also avoids an additional allocation by directly returning a
     // hpx::future.
     template <typename Launch, typename F, typename S, typename... Ts>
+    void index_queue_bulk_sync_execute_void(
+        hpx::threads::thread_description const& desc,
+        threads::thread_pool_base* pool, std::size_t first_thread,
+        std::size_t num_threads, Launch policy, F&& f, S const& shape,
+        Ts&&... ts)
+    {
+        HPX_ASSERT(pool);
+
+        // Don't spawn tasks if there is no work to be done
+        if (hpx::util::begin(shape) != hpx::util::end(shape))
+        {
+            std::size_t available_threads = pool->get_active_os_thread_count();
+            using shared_state =
+                index_queue_bulk_state<true, Launch, F, S, Ts...>;
+            hpx::intrusive_ptr<shared_state> p(
+                new shared_state(first_thread, num_threads, available_threads,
+                    HPX_MOVE(policy), HPX_FORWARD(F, f), shape,
+                    HPX_FORWARD(Ts, ts)...),
+                false);
+
+            p->execute(desc, pool);
+            p->wait();
+        }
+    }
+
+    template <typename Launch, typename F, typename S, typename... Ts>
+    decltype(auto) index_queue_bulk_sync_execute(
+        hpx::threads::thread_description const& desc,
+        threads::thread_pool_base* pool, std::size_t first_thread,
+        std::size_t num_threads, std::size_t hierarchical_threshold,
+        Launch policy, F&& f, S const& shape, Ts&&... ts)
+    {
+        using result_type = detail::bulk_function_result_t<F, S, Ts...>;
+        if constexpr (!std::is_void_v<result_type>)
+        {
+            return hierarchical_bulk_sync_execute_helper(desc, pool,
+                first_thread, num_threads, hierarchical_threshold, policy,
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+        }
+        else
+        {
+            return index_queue_bulk_sync_execute_void(desc, pool, first_thread,
+                num_threads, policy, HPX_FORWARD(F, f), shape,
+                HPX_FORWARD(Ts, ts)...);
+        }
+    }
+
+    template <typename Launch, typename F, typename S, typename... Ts>
+    decltype(auto) index_queue_bulk_sync_execute(
+        threads::thread_pool_base* pool, std::size_t first_thread,
+        std::size_t num_threads, std::size_t hierarchical_threshold,
+        Launch policy, F&& f, S const& shape, Ts&&... ts)
+    {
+        hpx::threads::thread_description const desc(
+            f, "hierarchical_bulk_sync_execute");
+
+        return index_queue_bulk_sync_execute(desc, pool, first_thread,
+            num_threads, hierarchical_threshold, policy, HPX_FORWARD(F, f),
+            shape, HPX_FORWARD(Ts, ts)...);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename Launch, typename F, typename S, typename... Ts>
     decltype(auto) index_queue_bulk_async_execute_void(
         hpx::threads::thread_description const& desc,
         threads::thread_pool_base* pool, std::size_t first_thread,
@@ -645,7 +730,7 @@ namespace hpx::parallel::execution::detail {
         }
 
         std::size_t available_threads = pool->get_active_os_thread_count();
-        using shared_state = index_queue_bulk_state<Launch, F, S, Ts...>;
+        using shared_state = index_queue_bulk_state<false, Launch, F, S, Ts...>;
         hpx::intrusive_ptr<shared_state> p(
             new shared_state(first_thread, num_threads, available_threads,
                 HPX_MOVE(policy), HPX_FORWARD(F, f), shape,

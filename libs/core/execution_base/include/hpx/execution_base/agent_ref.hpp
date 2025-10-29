@@ -47,7 +47,7 @@ namespace hpx::execution_base {
 
         void yield(
             char const* desc = "hpx::execution_base::agent_ref::yield") const;
-        void yield_k(std::size_t k,
+        bool yield_k(std::size_t k,
             char const* desc = "hpx::execution_base::agent_ref::yield_k") const;
         void suspend(
             char const* desc = "hpx::execution_base::agent_ref::suspend") const;

@@ -27,7 +27,6 @@
 #include <hpx/functional/one_shot.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/allocator_support.hpp>
-#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
@@ -87,7 +86,7 @@ namespace hpx::execution {
     struct parallel_policy_executor
     {
         /// Associate the parallel_execution_tag executor tag type as a default
-        /// with this executor, except if the given launch policy is synch.
+        /// with this executor, except if the given launch policy is sync.
         using execution_category =
             std::conditional_t<std::is_same_v<Policy, launch::sync_policy>,
                 sequenced_execution_tag, parallel_execution_tag>;
@@ -181,12 +180,8 @@ namespace hpx::execution {
         // property implementations
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, parallel_policy_executor>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(std::is_convertible_v<Executor_, parallel_policy_executor>)
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             Executor_ const& exec, char const* annotation)
@@ -196,12 +191,8 @@ namespace hpx::execution {
             return exec_with_annotation;
         }
 
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, parallel_policy_executor>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(std::is_convertible_v<Executor_, parallel_policy_executor>)
         friend auto tag_invoke(hpx::execution::experimental::with_annotation_t,
             Executor_ const& exec, std::string annotation)
         {
@@ -219,12 +210,8 @@ namespace hpx::execution {
         }
 #endif
 
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, parallel_policy_executor>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(std::is_convertible_v<Executor_, parallel_policy_executor>)
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_processing_units_count_t,
             Executor_ const& exec, std::size_t num_cores) noexcept
@@ -234,12 +221,8 @@ namespace hpx::execution {
             return exec_with_num_cores;
         }
 
-        // clang-format off
-        template <typename Parameters,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters>
-            )>
-        // clang-format on
+        template <typename Parameters>
+            requires(hpx::traits::is_executor_parameters_v<Parameters>)
         friend constexpr std::size_t tag_invoke(
             hpx::execution::experimental::processing_units_count_t,
             Parameters&&, parallel_policy_executor const& exec,
@@ -249,12 +232,8 @@ namespace hpx::execution {
             return exec.get_num_cores();
         }
 
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, parallel_policy_executor>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(std::is_convertible_v<Executor_, parallel_policy_executor>)
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_first_core_t,
             Executor_ const& exec, std::size_t first_core) noexcept
@@ -424,12 +403,45 @@ namespace hpx::execution {
         }
 
         // BulkTwoWayExecutor interface
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::bulk_sync_execute_t,
+            parallel_policy_executor const& exec, F&& f, S const& shape,
+            Ts&&... ts)
+        {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            hpx::threads::thread_description desc(f, exec.annotation_);
+#else
+            hpx::threads::thread_description desc(f);
+#endif
+            auto pool = exec.pool_ ?
+                exec.pool_ :
+                threads::detail::get_self_or_default_pool();
+
+            // use scheduling based on index_queue if no hierarchical threshold
+            // is given
+            bool const do_not_combine_tasks =
+                hpx::threads::do_not_combine_tasks(
+                    exec.policy().get_hint().sharing_mode());
+
+            if (exec.hierarchical_threshold_ == 0 && !do_not_combine_tasks)
+            {
+                return parallel::execution::detail::
+                    index_queue_bulk_sync_execute(desc, pool,
+                        exec.get_first_core(), exec.get_num_cores(),
+                        exec.hierarchical_threshold_, exec.policy_,
+                        HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+            }
+
+            return parallel::execution::detail::hierarchical_bulk_sync_execute(
+                desc, pool, exec.get_first_core(), exec.get_num_cores(),
+                exec.hierarchical_threshold_, exec.policy_, HPX_FORWARD(F, f),
+                shape, HPX_FORWARD(Ts, ts)...);
+        }
+
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             parallel_policy_executor const& exec, F&& f, S const& shape,
@@ -465,12 +477,8 @@ namespace hpx::execution {
                 shape, HPX_FORWARD(Ts, ts)...);
         }
 
-        // clang-format off
-        template <typename F, typename S, typename Future, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename Future, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_then_execute_t,
             parallel_policy_executor const& exec, F&& f, S const& shape,
@@ -576,12 +584,8 @@ namespace hpx::execution {
     };
 
     // support all properties exposed by the embedded policy
-    // clang-format off
-    template <typename Tag, typename Policy, typename Property,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
-    // clang-format on
+    template <typename Tag, typename Policy, typename Property>
+        requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(
         Tag tag, parallel_policy_executor<Policy> const& exec, Property&& prop)
         -> decltype(std::declval<parallel_policy_executor<Policy>>().policy(
@@ -594,12 +598,8 @@ namespace hpx::execution {
         return exec_with_prop;
     }
 
-    // clang-format off
-    template <typename Tag,typename Policy,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
-    // clang-format on
+    template <typename Tag, typename Policy>
+        requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(Tag tag, parallel_policy_executor<Policy> const& exec)
         -> decltype(std::declval<Tag>()(std::declval<Policy>()))
     {

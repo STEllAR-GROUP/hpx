@@ -283,14 +283,14 @@ namespace hpx::threads::policies {
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues
-        pu_mutex_type mtx_;
-        std::condition_variable cond_;
+        double max_idle_backoff_time_;
         struct idle_backoff_data
         {
-            std::uint32_t wait_count_;
-            double max_idle_backoff_time_;
+            pu_mutex_type wait_mtx;
+            std::condition_variable wait_cond;
+            std::uint32_t wait_count = 0;
         };
-        std::vector<util::cache_line_data<idle_backoff_data>> wait_counts_;
+        std::vector<util::cache_line_data<idle_backoff_data>> wait_count_data_;
 #endif
 
         // support for suspension of pus
