@@ -164,6 +164,33 @@ struct hpx::execution::experimental::is_executor_parameters<adaptive_chunk_size>
 {
 };
 
+struct enable_fast_idle_mode
+{
+    template <typename Executor>
+    friend void tag_override_invoke(
+        hpx::execution::experimental::mark_begin_execution_t,
+        enable_fast_idle_mode, Executor&&)
+    {
+        hpx::threads::add_scheduler_mode(
+            hpx::threads::policies::scheduler_mode::fast_idle_mode);
+    }
+
+    template <typename Executor>
+    friend void tag_override_invoke(
+        hpx::execution::experimental::mark_end_execution_t,
+        enable_fast_idle_mode, Executor&&)
+    {
+        hpx::threads::remove_scheduler_mode(
+            hpx::threads::policies::scheduler_mode::fast_idle_mode);
+    }
+};
+
+template <>
+struct hpx::execution::experimental::is_executor_parameters<
+    enable_fast_idle_mode> : std::true_type
+{
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 struct random_to_item_t
@@ -461,6 +488,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
         run_benchmark(stackless_policy, vector_size1, vector_size2, test_count,
             std::random_access_iterator_tag(), alloc, "std::vector (stackless)",
             entropy);
+
+        enable_fast_idle_mode efim;
+        run_benchmark(stackless_policy.with(efim), vector_size1, vector_size2,
+            test_count, std::random_access_iterator_tag(), alloc,
+            "std::vector (stackless, fast-idle mode)", entropy);
     }
 
     {
@@ -481,6 +513,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
         run_benchmark(stackless_policy, vector_size1, vector_size2, test_count,
             std::random_access_iterator_tag(), alloc,
             "hpx::compute::vector (stackless)", entropy);
+
+        enable_fast_idle_mode efim;
+        run_benchmark(stackless_policy.with(efim), vector_size1, vector_size2,
+            test_count, std::random_access_iterator_tag(), alloc,
+            "hpx::compute::vector (stackless, fast-idle mode)", entropy);
     }
 
     return hpx::local::finalize();

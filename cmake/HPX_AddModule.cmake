@@ -69,7 +69,9 @@ function(add_hpx_module libname modulename)
             FORCE
   )
 
-  if(${modulename}_GLOBAL_HEADER_MODULE_GEN OR ${modulename}_MODULE_SOURCE)
+  if(HPX_WITH_CXX_MODULES AND (${modulename}_GLOBAL_HEADER_MODULE_GEN
+                               OR ${modulename}_MODULE_SOURCE)
+  )
     # Mark the module as exposing C++ modules
     set(cxx_modules ${HPX_ENABLED_CXX_MODULES})
     list(APPEND cxx_modules ${modulename})
@@ -193,7 +195,7 @@ function(add_hpx_module libname modulename)
     set(global_header
         "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/modules/${modulename}.hpp"
     )
-    if(${modulename}_GLOBAL_HEADER_MODULE_GEN)
+    if(HPX_WITH_CXX_MODULES AND ${modulename}_GLOBAL_HEADER_MODULE_GEN)
       # generate list of macro headers to #include
       list(LENGTH ${modulename}_MACRO_HEADERS macro_headers)
       if(macro_headers GREATER 0)
@@ -236,7 +238,7 @@ function(add_hpx_module libname modulename)
     )
     set(generated_headers ${global_header})
 
-    if(${modulename}_GLOBAL_HEADER_MODULE_GEN)
+    if(HPX_WITH_CXX_MODULES AND ${modulename}_GLOBAL_HEADER_MODULE_GEN)
       # collect all standard header files used by this module
       set(found_includes)
       hpx_collect_std_headers(
