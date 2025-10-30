@@ -21,12 +21,9 @@
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/detail/runtime_get.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/functional/invoke_fused.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/hardware.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/topology.hpp>

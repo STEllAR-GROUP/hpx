@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/datastructures/detail/intrusive_list.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/synchronization/spinlock.hpp>

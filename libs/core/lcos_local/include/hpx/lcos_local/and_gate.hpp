@@ -9,13 +9,12 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/stack.hpp>
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
-#include <hpx/datastructures/detail/intrusive_list.hpp>
-#include <hpx/functional/bind_front.hpp>
 #include <hpx/futures/promise.hpp>
 #include <hpx/lcos_local/conditional_cv.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>

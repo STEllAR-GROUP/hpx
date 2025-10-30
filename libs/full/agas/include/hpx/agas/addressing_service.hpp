@@ -12,11 +12,11 @@
 #include <hpx/config.hpp>
 #include <hpx/agas/agas_fwd.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/agas_base.hpp>
 #include <hpx/modules/cache.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/naming_base/address.hpp>

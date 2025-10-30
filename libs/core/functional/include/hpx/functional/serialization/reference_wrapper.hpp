@@ -12,9 +12,8 @@
 
 namespace hpx::serialization {
 
-    template <typename T,
-        typename Enable =
-            std::enable_if_t<traits::needs_reference_semantics_v<T>>>
+    HPX_CXX_EXPORT template <typename T>
+        requires(traits::needs_reference_semantics_v<T>)
     void serialize(input_archive& ar, hpx::reference_wrapper<T>& ref, unsigned)
     {
         T val;
@@ -22,9 +21,8 @@ namespace hpx::serialization {
         ref = hpx::ref(HPX_MOVE(val));
     }
 
-    template <typename T,
-        typename Enable =
-            std::enable_if_t<traits::needs_reference_semantics_v<T>>>
+    HPX_CXX_EXPORT template <typename T>
+        requires(traits::needs_reference_semantics_v<T>)
     void serialize(output_archive& ar, hpx::reference_wrapper<T>& ref, unsigned)
     {
         ar << ref.get();

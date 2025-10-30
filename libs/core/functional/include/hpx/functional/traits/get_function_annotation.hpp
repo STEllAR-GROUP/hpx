@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,8 +14,8 @@
 
 namespace hpx::traits {
 
-    // By default we don't know anything about the function's name
-    template <typename F, typename Enable = void>
+    // By default, we don't know anything about the function's name
+    HPX_CXX_EXPORT template <typename F, typename Enable = void>
     struct get_function_annotation
     {
         static constexpr char const* call(F const& /*f*/) noexcept
@@ -25,7 +25,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename F, typename Enable = void>
+    HPX_CXX_EXPORT template <typename F, typename Enable = void>
     struct get_function_annotation_itt
     {
         static util::itt::string_handle call(F const& f)

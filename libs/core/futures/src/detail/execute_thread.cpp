@@ -9,10 +9,10 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/detail/execute_thread.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/threading_base/detail/switch_status.hpp>
 #include <hpx/threading_base/register_thread.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>

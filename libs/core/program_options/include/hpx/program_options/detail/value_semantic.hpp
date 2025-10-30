@@ -11,8 +11,7 @@
 
 #include <hpx/program_options/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/any.hpp>
-#include <hpx/datastructures/optional.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/program_options/errors.hpp>
 

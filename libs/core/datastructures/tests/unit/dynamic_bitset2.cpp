@@ -12,7 +12,7 @@
 // Copyright (c) 2018 Evgeny Shulgin
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
+#include <hpx/modules/datastructures.hpp>
 
 #include <cstddef>
 #include <string>

@@ -10,8 +10,8 @@
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/coroutines/coroutine.hpp>
-#include <hpx/functional/bind_front.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>

@@ -10,7 +10,7 @@
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/functional/deferred_call.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_description.hpp>

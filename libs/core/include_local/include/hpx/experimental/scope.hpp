@@ -21,8 +21,6 @@ namespace hpx::experimental {
 
 #else
 
-#include <hpx/functional/experimental/scope_exit.hpp>
-#include <hpx/functional/experimental/scope_fail.hpp>
-#include <hpx/functional/experimental/scope_success.hpp>
+#include <hpx/modules/functional.hpp>
 
 #endif

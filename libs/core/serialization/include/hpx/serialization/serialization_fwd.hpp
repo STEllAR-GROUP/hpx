@@ -16,10 +16,10 @@
 
 namespace hpx::serialization {
 
-    HPX_CXX_EXPORT class access;
+    HPX_CXX_EXPORT HPX_CXX_EXTERN class access;
 
-    HPX_CXX_EXPORT struct input_archive;
-    HPX_CXX_EXPORT struct output_archive;
+    HPX_CXX_EXPORT HPX_CXX_EXTERN struct input_archive;
+    HPX_CXX_EXPORT HPX_CXX_EXTERN struct output_archive;
 
     HPX_CXX_EXPORT struct binary_filter;
 

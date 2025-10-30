@@ -13,10 +13,10 @@
 #include <hpx/execution_base/stdexec_forward.hpp>
 #else
 
-#include <hpx/datastructures/member_pack.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/type_support.hpp>
 

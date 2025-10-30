@@ -25,7 +25,7 @@
 #include <hpx/components/client_base.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/traits/component_type_is_compatible.hpp>
-#include <hpx/functional/traits/is_action.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>

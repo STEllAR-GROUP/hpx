@@ -21,7 +21,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdouble-promotion"
 #endif
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #elif defined(__GNUC__)

@@ -16,7 +16,7 @@
 #include <hpx/components/get_ptr.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/distribution_policies/container_distribution_policy.hpp>
-#include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_components/distributed_metadata_base.hpp>

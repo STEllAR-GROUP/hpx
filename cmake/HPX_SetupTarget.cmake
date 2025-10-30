@@ -6,6 +6,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+include(HPX_CXXModules)
+
 cmake_policy(PUSH)
 
 hpx_set_cmake_policy(CMP0054 NEW)
@@ -224,8 +226,19 @@ function(hpx_setup_target target)
   set_target_properties(${target} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
   if(HPX_WITH_CXX_MODULES AND ${target}_SCAN_FOR_MODULES)
-    set_target_properties(${target} PROPERTIES CXX_SCAN_FOR_MODULES ON)
+    hpx_configure_module_consumer(${target} hpx_core_module_if)
   else()
+    # If modules are enabled, Clang emits DWARF v5, which requires using lld
+    # instead of ld.
+    if(HPX_WITH_CXX_MODULES AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang"
+                                 OR CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
+    )
+      get_target_property(_type ${target} TYPE)
+      if((_type STREQUAL "SHARED_LIBRARY") OR (_type STREQUAL "EXECUTABLE"))
+        target_link_options(${target} PRIVATE "-fuse-ld=lld")
+      endif()
+    endif()
+
     set_target_properties(${target} PROPERTIES CXX_SCAN_FOR_MODULES OFF)
     target_compile_definitions(
       ${target} PRIVATE HPX_BINARY_DOESNT_USE_CXX_MODULES

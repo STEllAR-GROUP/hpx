@@ -8,7 +8,7 @@
 
 // For more information, see http://www.boost.org
 
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <iostream>

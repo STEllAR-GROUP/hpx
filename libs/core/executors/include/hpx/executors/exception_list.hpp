@@ -11,9 +11,9 @@
 #include <hpx/assert.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy_fwd.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <exception>
 #include <type_traits>

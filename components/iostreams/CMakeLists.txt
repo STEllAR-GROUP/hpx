@@ -41,6 +41,7 @@ add_hpx_component(
   PREPEND_SOURCE_ROOT
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
   SOURCES ${iostreams_sources} ${HPX_WITH_UNITY_BUILD_OPTION}
+  SCAN_FOR_MODULES ON
 )
 
 target_compile_definitions(

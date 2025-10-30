@@ -6,8 +6,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/executors/service_executors.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <asio/io_context.hpp>
 #include <asio/version.hpp>

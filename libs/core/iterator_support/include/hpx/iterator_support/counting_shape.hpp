@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2022 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +13,7 @@
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Incrementable>
+    HPX_CXX_EXPORT template <typename Incrementable>
     struct counting_shape
       : hpx::util::iterator_range<hpx::util::counting_iterator<Incrementable>>
     {
@@ -35,10 +35,10 @@ namespace hpx::util {
         }
     };
 
-    template <typename Incrementable>
+    HPX_CXX_EXPORT template <typename Incrementable>
     counting_shape(Incrementable) -> counting_shape<Incrementable>;
 
-    template <typename Incrementable>
+    HPX_CXX_EXPORT template <typename Incrementable>
     counting_shape(Incrementable, Incrementable)
         -> counting_shape<Incrementable>;
 

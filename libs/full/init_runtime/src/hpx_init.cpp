@@ -15,8 +15,6 @@
 #include <hpx/coroutines/detail/context_impl.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/executors/exception_list.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_main_winsocket.hpp>
@@ -29,6 +27,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>

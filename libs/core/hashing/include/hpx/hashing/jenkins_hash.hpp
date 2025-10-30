@@ -68,7 +68,7 @@ namespace hpx::util {
         // my hands on, and rotates are much kinder to the top and bottom bits,
         // so I used rotates.
         // ------------------------------------------------------------------------
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         inline constexpr void mix(T& a, T& b, T& c) noexcept
         {
             // clang-format off
@@ -88,7 +88,7 @@ namespace hpx::util {
     /////////////////////////////////////////////////////////////////////////////
     /// The jenkins_hash class encapsulates a hash calculation function published
     /// by Bob Jenkins here: http://burtleburtle.net/bob/hash
-    class jenkins_hash
+    HPX_CXX_EXPORT class jenkins_hash
     {
     public:
         /// this is the type representing the result of this hash

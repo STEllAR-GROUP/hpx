@@ -21,7 +21,7 @@
 
 #endif
 
-#include <hpx/functional/bind.hpp>
+#include <hpx/modules/functional.hpp>
 
 namespace placeholders = hpx::placeholders;
 

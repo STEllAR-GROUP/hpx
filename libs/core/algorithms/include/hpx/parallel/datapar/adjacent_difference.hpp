@@ -10,9 +10,9 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_difference.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>

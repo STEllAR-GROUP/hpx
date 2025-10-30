@@ -34,7 +34,7 @@
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <cstddef>
 #include <utility>

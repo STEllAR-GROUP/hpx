@@ -17,7 +17,7 @@
 #include <hpx/components/client_base.hpp>
 #include <hpx/distribution_policies/container_distribution_policy.hpp>
 #include <hpx/distribution_policies/explicit_container_distribution_policy.hpp>
-#include <hpx/functional/reference_wrapper.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_components/distributed_metadata_base.hpp>
 #include <hpx/runtime_components/new.hpp>

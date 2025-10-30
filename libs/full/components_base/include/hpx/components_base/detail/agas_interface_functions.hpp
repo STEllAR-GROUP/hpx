@@ -9,9 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/functional/move_only_function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset_base/locality.hpp>

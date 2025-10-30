@@ -51,10 +51,12 @@ add_hpx_module(
     hpx_allocator_support
     hpx_concurrency
     hpx_config
+    hpx_datastructures
     hpx_errors
     hpx_execution
     hpx_executors
     hpx_futures
+    hpx_iterator_support
     hpx_lock_registration
     hpx_memory
     hpx_pack_traversal

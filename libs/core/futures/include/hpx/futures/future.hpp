@@ -15,7 +15,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concurrency/stack.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
@@ -27,6 +26,7 @@
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/tag_invoke.hpp>

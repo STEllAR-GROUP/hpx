@@ -18,10 +18,10 @@
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 #include <hpx/async_cuda/detail/cuda_debug.hpp>
 #include <hpx/async_cuda/detail/cuda_event_callback.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>

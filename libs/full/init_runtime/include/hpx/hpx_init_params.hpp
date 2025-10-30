@@ -12,8 +12,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/init_runtime_local/init_runtime_local.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>

@@ -48,6 +48,7 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_errors
     hpx_coroutines
+    hpx_datastructures
     hpx_filesystem
     hpx_format
     hpx_ini

@@ -29,10 +29,11 @@
 
 namespace hpx::util::detail {
 
-    inline constexpr std::size_t function_storage_size = 3 * sizeof(void*);
+    HPX_CXX_EXPORT inline constexpr std::size_t function_storage_size =
+        3 * sizeof(void*);
 
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_CORE_EXPORT function_base
+    HPX_CXX_EXPORT HPX_CXX_EXTERN class HPX_CORE_EXPORT function_base
     {
         using vtable = function_base_vtable;
 
@@ -84,36 +85,37 @@ namespace hpx::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     [[nodiscard]] constexpr bool is_empty_function(F* fp) noexcept
     {
         return fp == nullptr;
     }
 
-    template <typename T, typename C>
+    HPX_CXX_EXPORT template <typename T, typename C>
     [[nodiscard]] constexpr bool is_empty_function(T C::* mp) noexcept
     {
         return mp == nullptr;
     }
 
-    [[nodiscard]] constexpr bool is_empty_function_impl(
+    HPX_CXX_EXPORT [[nodiscard]] constexpr bool is_empty_function_impl(
         function_base const* f) noexcept
     {
         return f->empty();
     }
 
-    [[nodiscard]] constexpr bool is_empty_function_impl(...) noexcept
+    HPX_CXX_EXPORT [[nodiscard]] constexpr bool is_empty_function_impl(
+        ...) noexcept
     {
         return false;
     }
 
-    template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     [[nodiscard]] constexpr bool is_empty_function(F const& f) noexcept
     {
         return detail::is_empty_function_impl(&f);
     }
 
-    template <typename Sig>
+    HPX_CXX_EXPORT template <typename Sig>
     [[nodiscard]] constexpr bool is_empty_function(
         std::function<Sig> const& f) noexcept
     {
@@ -121,10 +123,10 @@ namespace hpx::util::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig, bool Copyable, bool Serializable>
+    HPX_CXX_EXPORT template <typename Sig, bool Copyable, bool Serializable>
     class basic_function;
 
-    template <bool Copyable, typename R, typename... Ts>
+    HPX_CXX_EXPORT template <bool Copyable, typename R, typename... Ts>
     class basic_function<R(Ts...), Copyable, /*Serializable*/ false>
       : public function_base
     {

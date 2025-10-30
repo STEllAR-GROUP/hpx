@@ -9,9 +9,9 @@
 
 #ifdef HPX_HAVE_VERIFY_LOCKS
 #include <hpx/assert.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
 #include <hpx/modules/debugging.hpp>
 #endif

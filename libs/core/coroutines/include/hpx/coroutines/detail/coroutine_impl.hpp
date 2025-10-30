@@ -36,7 +36,7 @@
 #include <hpx/coroutines/detail/context_base.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/functional/move_only_function.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <cstddef>
 #include <utility>

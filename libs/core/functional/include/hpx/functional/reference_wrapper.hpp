@@ -1,4 +1,4 @@
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,7 +19,7 @@
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct reference_wrapper : std::reference_wrapper<T>
     {
         reference_wrapper() = delete;
@@ -27,36 +27,36 @@ namespace hpx {
         using std::reference_wrapper<T>::reference_wrapper;
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     reference_wrapper(T&) -> reference_wrapper<T>;
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     [[nodiscard]] constexpr reference_wrapper<T> ref(T& val) noexcept
     {
         return reference_wrapper<T>(val);
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     void ref(T const&&) = delete;
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     [[nodiscard]] constexpr reference_wrapper<T> ref(
         reference_wrapper<T> val) noexcept
     {
         return val;
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     [[nodiscard]] constexpr reference_wrapper<T const> cref(
         T const& val) noexcept
     {
         return reference_wrapper<T const>(val);
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     void cref(T const&&) = delete;
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     [[nodiscard]] constexpr reference_wrapper<T const> cref(
         reference_wrapper<T> val) noexcept
     {
@@ -66,22 +66,22 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     namespace traits {
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct needs_reference_semantics : std::false_type
         {
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct needs_reference_semantics<T const> : needs_reference_semantics<T>
         {
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         inline constexpr bool needs_reference_semantics_v =
             needs_reference_semantics<T>::value;
     }    // namespace traits
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct reference_wrapper<T,
         std::enable_if_t<traits::needs_reference_semantics_v<T>>>
     {
@@ -127,9 +127,8 @@ namespace hpx {
         T ptr{};
     };
 
-    template <typename T,
-        typename Enable =
-            std::enable_if_t<traits::needs_reference_semantics_v<T>>>
+    HPX_CXX_EXPORT template <typename T>
+        requires(traits::needs_reference_semantics_v<T>)
     reference_wrapper<T> ref(T&& val) noexcept
     {
         return reference_wrapper<T>(HPX_FORWARD(T, val));

@@ -17,7 +17,7 @@
 
 namespace hpx::util::detail {
 
-    struct serializable_vtable
+    HPX_CXX_EXPORT struct serializable_vtable
     {
         template <typename T>
         static void _save_object(void const* obj,
