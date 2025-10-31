@@ -528,15 +528,6 @@ namespace hpx::threads::detail {
                 }
             }
 
-#if defined(HPX_HAVE_MODULE_ASYNC_MPI) ||                                      \
-    defined(HPX_HAVE_MODULE_ASYNC_CUDA) || defined(HPX_HAVE_MODULE_ASYNC_SYCL)
-            if (scheduler.custom_polling_function() ==
-                policies::detail::polling_status::busy)
-            {
-                idle_loop_count = 0;
-            }
-#endif
-
             // something went badly wrong, give up
             if (HPX_UNLIKELY(this_state.load(std::memory_order_relaxed) ==
                     hpx::state::terminating))
@@ -557,7 +548,21 @@ namespace hpx::threads::detail {
                         background_running, idle_loop_count);
                 }
             }
-            else if (idle_loop_count > params.max_idle_loop_count_ || may_exit)
+            else if (idle_loop_count > params.max_idle_loop_count_)
+            {
+                idle_loop_count = 0;
+
+                // call back into invoking context
+                if (!params.outer_.empty())
+                {
+                    params.outer_();
+                    context_storage = hpx::execution_base::this_thread::detail::
+                        get_agent_storage();
+                }
+
+                scheduler.SchedulingPolicy::cleanup_terminated(true);
+            }
+            else if (may_exit)
             {
                 if (idle_loop_count > params.max_idle_loop_count_)
                     idle_loop_count = 0;
@@ -571,53 +576,54 @@ namespace hpx::threads::detail {
                 }
 
                 // break if we were idling after 'may_exit'
-                if (may_exit)
+                HPX_ASSERT(this_state.load(std::memory_order_relaxed) !=
+                    hpx::state::pre_sleep);
+
+                if (background_thread)
                 {
-                    HPX_ASSERT(this_state.load(std::memory_order_relaxed) !=
-                        hpx::state::pre_sleep);
+                    HPX_ASSERT(background_running);
+                    *background_running = false;
 
-                    if (background_thread)
-                    {
-                        HPX_ASSERT(background_running);
-                        *background_running = false;
+                    // do background work in parcel layer and in agas
+                    [[maybe_unused]] bool const has_exited =
+                        call_background_thread(background_thread, next_thrd,
+                            scheduler, num_thread, bg_work_exec_time_init,
+                            context_storage);
 
-                        // do background work in parcel layer and in agas
-                        [[maybe_unused]] bool const has_exited =
-                            call_background_thread(background_thread, next_thrd,
-                                scheduler, num_thread, bg_work_exec_time_init,
-                                context_storage);
+                    // the background thread should have exited
+                    HPX_ASSERT(has_exited);
 
-                        // the background thread should have exited
-                        HPX_ASSERT(has_exited);
-
-                        background_thread.reset();
-                        background_running.reset();
-                    }
-                    else
-                    {
-                        bool const can_exit = !running &&
-                            scheduler.SchedulingPolicy::cleanup_terminated(
-                                true) &&
-                            scheduler.SchedulingPolicy::get_thread_count(
-                                thread_schedule_state::suspended,
-                                thread_priority::default_, num_thread) == 0 &&
-                            scheduler.SchedulingPolicy::get_queue_length(
-                                num_thread) == 0;
-
-                        if (can_exit)
-                        {
-                            this_state.store(hpx::state::stopped);
-                            break;
-                        }
-                    }
-
-                    may_exit = false;
+                    background_thread.reset();
+                    background_running.reset();
                 }
                 else
                 {
-                    scheduler.SchedulingPolicy::cleanup_terminated(true);
+                    bool const can_exit = !running &&
+                        scheduler.SchedulingPolicy::cleanup_terminated(true) &&
+                        scheduler.SchedulingPolicy::get_thread_count(
+                            thread_schedule_state::suspended,
+                            thread_priority::default_, num_thread) == 0 &&
+                        scheduler.SchedulingPolicy::get_queue_length(
+                            num_thread) == 0;
+
+                    if (can_exit)
+                    {
+                        this_state.store(hpx::state::stopped);
+                        break;
+                    }
                 }
+
+                may_exit = false;
             }
+
+#if defined(HPX_HAVE_MODULE_ASYNC_MPI) ||                                      \
+    defined(HPX_HAVE_MODULE_ASYNC_CUDA) || defined(HPX_HAVE_MODULE_ASYNC_SYCL)
+            if (scheduler.custom_polling_function() ==
+                policies::detail::polling_status::busy)
+            {
+                idle_loop_count = 0;
+            }
+#endif
         }
     }
 }    // namespace hpx::threads::detail

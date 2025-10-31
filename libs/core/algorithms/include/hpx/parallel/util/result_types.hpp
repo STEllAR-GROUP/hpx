@@ -416,13 +416,15 @@ namespace hpx::parallel::util {
     namespace detail {
 
         template <typename ZipIter>
-        in_out_result<typename hpx::tuple_element<0,
-                          typename ZipIter::iterator_tuple_type>::type,
+        in_out_result<
+            typename hpx::tuple_element<0,
+                typename std::decay_t<ZipIter>::iterator_tuple_type>::type,
             typename hpx::tuple_element<1,
-                typename ZipIter::iterator_tuple_type>::type>
+                typename std::decay_t<ZipIter>::iterator_tuple_type>::type>
         get_in_out_result(ZipIter&& zipiter)
         {
-            using iterator_tuple_type = typename ZipIter::iterator_tuple_type;
+            using iterator_tuple_type =
+                typename std::decay_t<ZipIter>::iterator_tuple_type;
 
             using result_type = in_out_result<
                 typename hpx::tuple_element<0, iterator_tuple_type>::type,
@@ -433,11 +435,7 @@ namespace hpx::parallel::util {
         }
 
         template <typename ZipIterSender>
-        // clang-format off
-            requires (
-                hpx::execution::experimental::is_sender_v<ZipIterSender>
-            )
-        // clang-format on
+            requires(hpx::execution::experimental::is_sender_v<ZipIterSender>)
         decltype(auto) get_in_out_result(ZipIterSender&& zipiter_sender)
         {
             return hpx::execution::experimental::then(
@@ -498,15 +496,17 @@ namespace hpx::parallel::util {
         }
 
         template <typename ZipIter>
-        in_in_out_result<typename hpx::tuple_element<0,
-                             typename ZipIter::iterator_tuple_type>::type,
+        in_in_out_result<
+            typename hpx::tuple_element<0,
+                typename std::decay_t<ZipIter>::iterator_tuple_type>::type,
             typename hpx::tuple_element<1,
-                typename ZipIter::iterator_tuple_type>::type,
+                typename std::decay_t<ZipIter>::iterator_tuple_type>::type,
             typename hpx::tuple_element<2,
-                typename ZipIter::iterator_tuple_type>::type>
+                typename std::decay_t<ZipIter>::iterator_tuple_type>::type>
         get_in_in_out_result(ZipIter&& zipiter)
         {
-            using iterator_tuple_type = typename ZipIter::iterator_tuple_type;
+            using iterator_tuple_type =
+                typename std::decay_t<ZipIter>::iterator_tuple_type;
 
             using result_type = in_in_out_result<
                 typename hpx::tuple_element<0, iterator_tuple_type>::type,
@@ -518,11 +518,7 @@ namespace hpx::parallel::util {
         }
 
         template <typename ZipIterSender>
-        // clang-format off
-            requires (
-                hpx::execution::experimental::is_sender_v<ZipIterSender>
-            )
-        // clang-format on
+            requires(hpx::execution::experimental::is_sender_v<ZipIterSender>)
         decltype(auto) get_in_in_out_result(ZipIterSender&& zipiter_sender)
         {
             return hpx::execution::experimental::then(
