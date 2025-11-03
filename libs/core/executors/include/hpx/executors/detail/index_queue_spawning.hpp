@@ -111,8 +111,9 @@ namespace hpx::parallel::execution::detail {
 
         // Perform the work in one element indexed by index. The index
         // represents a range of indices (iterators) in the given shape.
+        // Returns the number of processed shape elements.
         template <hpx::concurrency::detail::queue_end Which>
-        void do_work() const
+        std::uint32_t do_work() const
         {
             // explicitly copy function (object) and arguments
             auto f = state->f;
@@ -122,6 +123,7 @@ namespace hpx::parallel::execution::detail {
                 hpx::detail::fused_index_pack_t<decltype(ts)>;
 
             hpx::optional<std::uint32_t> index;
+            std::uint32_t processed = 0;
 
             // Handle local queue first
             auto& local_queue = state->queues[worker_thread].data_;
@@ -140,6 +142,7 @@ namespace hpx::parallel::execution::detail {
                 {
                     bulk_invoke_helper(index_pack_type{}, f, *it, ts);
                 }
+                ++processed;
             }
 
             if (allow_stealing)
@@ -175,9 +178,11 @@ namespace hpx::parallel::execution::detail {
                         {
                             bulk_invoke_helper(index_pack_type{}, f, *it, ts);
                         }
+                        ++processed;
                     }
                 }
             }
+            return processed;
         }
 
         // Store an exception and mark that an exception was thrown in the
@@ -194,9 +199,13 @@ namespace hpx::parallel::execution::detail {
         // thread to finish, it will only decrement the counter. If it is the
         // last thread it will call set_exception if there is an exception.
         // Otherwise, it will call set_value on the shared state.
-        void finish() const noexcept
+        void finish(std::uint32_t processed) const noexcept
         {
-            if (--(state->tasks_remaining.data_) == 0)
+            // Subtract how many chunks have been processed by this thread
+            std::uint32_t prev_value = state->tasks_remaining.data_.fetch_sub(
+                processed, std::memory_order_acq_rel);
+            bool const is_last = (prev_value != 0 && prev_value == processed);
+            if (is_last)
             {
                 if (state->bad_alloc_thrown.load(std::memory_order_relaxed))
                 {
@@ -227,17 +236,20 @@ namespace hpx::parallel::execution::detail {
         // on the shared state.
         void operator()() const noexcept
         {
+            std::uint32_t processed = 0;
             try
             {
                 // Execute task function
                 if (reverse_placement)
                 {
                     // schedule chunks from the end, if needed
-                    do_work<hpx::concurrency::detail::queue_end::right>();
+                    processed = do_work<
+                        hpx::concurrency::detail::queue_end::right>();
                 }
                 else
                 {
-                    do_work<hpx::concurrency::detail::queue_end::left>();
+                    processed = do_work<
+                        hpx::concurrency::detail::queue_end::left>();
                 }
             }
             catch (std::bad_alloc const&)
@@ -249,7 +261,7 @@ namespace hpx::parallel::execution::detail {
                 store_exception(std::current_exception());
             }
 
-            finish();
+            finish(processed);
         }
     };
 
@@ -387,7 +399,7 @@ namespace hpx::parallel::execution::detail {
             {
                 // If the queue is empty we don't spawn a task. We only signal
                 // that this "task" is ready.
-                task_f.finish();
+                task_f.finish(0);
                 return;
             }
 
@@ -459,7 +471,8 @@ namespace hpx::parallel::execution::detail {
           , pu_mask(full_mask())
           , queues(num_threads)
         {
-            tasks_remaining.data_.store(num_threads, std::memory_order_relaxed);
+            auto const size = static_cast<std::uint32_t>(hpx::util::size(shape));
+            tasks_remaining.data_.store(size, std::memory_order_relaxed);
             HPX_ASSERT(hpx::threads::count(pu_mask) == available_threads);
         }
 
@@ -485,7 +498,7 @@ namespace hpx::parallel::execution::detail {
             if (num_chunks < static_cast<std::uint32_t>(num_threads))
             {
                 num_threads = num_chunks;
-                tasks_remaining.data_ = num_chunks;
+                //tasks_remaining.data_ = num_chunks;
                 pu_mask = limit_mask(pu_mask, num_chunks);
 
                 available_threads = (std::min) (available_threads, num_threads);
@@ -612,7 +625,7 @@ namespace hpx::parallel::execution::detail {
                     {
                         // If the queue is empty we don't execute the task. We
                         // only signal that this "task" is ready.
-                        f.finish();
+                        f.finish(0);
                         return;
                     }
 
