@@ -22,6 +22,10 @@
 #include <type_traits>
 #include <utility>
 
+#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+#include <experimental/meta>
+#endif
+
 namespace hpx::serialization {
 
     namespace detail {
@@ -39,6 +43,15 @@ namespace hpx::serialization {
         {
             serialize(ar, t, 0);
         }
+
+        #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+        // This function uses C++26 reflection capabilities to generate
+        // serialization functions for types that don't have them already.
+        // This is forward declared here and defined in refl_serialize_impl.hpp
+        // to avoid circular dependencies.
+        HPX_CXX_EXPORT template <typename Archive, typename T>
+        void refl_serialize(Archive& ar, T& t, unsigned /*version*/);
+        #endif
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -118,11 +131,20 @@ namespace hpx::serialization {
                 }
                 else
                 {
+                    // If we have cpp 26 reflection, then codegen can be used
+                    // to generate serialization functions for types that
+                    // don't have them already.
+                    #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+                        // We can generate serialization functions for this type
+                        // Using C++26 reflection capabilities.
+                        detail::refl_serialize(ar, t, 0);
+                    #else
                     static_assert(hpx::traits::has_serialize_adl_v<dT> ||
                             hpx::traits::has_struct_serialization_v<dT> ||
                             hpx::traits::is_bitwise_serializable_v<dT> ||
                             !hpx::traits::is_not_bitwise_serializable_v<dT>,
                         "No serialization method found");
+                    #endif
                 }
             }
         }
@@ -166,4 +188,10 @@ namespace hpx::traits {
     {
     };
 }    // namespace hpx::traits
+#endif
+
+#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+// We need to include refl_serialize_impl.hpp here to avoid circular
+// dependencies as refl_serialize_impl.hpp depends on base_object.hpp
+#include <hpx/serialization/detail/refl_serialize_impl.hpp>
 #endif
