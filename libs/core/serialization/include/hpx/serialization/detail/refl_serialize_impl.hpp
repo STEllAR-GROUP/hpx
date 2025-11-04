@@ -6,15 +6,9 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/serialization/config/defines.hpp>
-#include <hpx/serialization/brace_initializable_fwd.hpp>
-
-#include <hpx/serialization/serialization_fwd.hpp>
+// These need to be included before base_object.hpp
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/traits/polymorphic_traits.hpp>
 
 #include <hpx/serialization/base_object.hpp>
 
@@ -24,25 +18,25 @@
 #include <experimental/meta>
 
 namespace hpx::serialization::detail {
-    // This function uses C++26 reflection capabilities to generate
-    // serialization functions for types that don't have them already.
     HPX_CXX_EXPORT template <typename Archive, typename T>
     void refl_serialize(Archive& ar, T& t, unsigned /*version*/)
     {
         constexpr auto ctx = std::meta::access_context::unchecked();
 
         // Serialize all bases
-        template for (constexpr auto base_info : std::meta::bases_of(^^T, ctx)) {
+        template for (
+            constexpr auto base_info :
+                std::define_static_array(std::meta::bases_of(^^T, ctx)))
+        {
             using BaseType = typename[:std::meta::type_of(base_info):];
             ar & hpx::serialization::base_object<BaseType>(t);
         }
 
         // Serialize all members
         template for (
-            constexpr auto member : std::meta::nonstatic_data_members_of(^^T, ctx))
+            constexpr auto member :
+                std::define_static_array(std::meta::nonstatic_data_members_of(^^T, ctx)))
         {
-            using MemberType = typename[:std::meta::type_of(member):];
-
             // Since we are using an unchecked context, this might
             // be a private/protected member, we will have to do manual
             // pointer arithmetic to get the member and codegen the
@@ -51,9 +45,28 @@ namespace hpx::serialization::detail {
             if constexpr (std::meta::is_public(member)) {
                 ar & t.[:member:];
             } else {
-                constexpr size_t offset = std::meta::offset_of(member);
-                ar & *static_cast<MemberType*>(
-                        reinterpret_cast<char*>(&t) + offset);
+                constexpr auto offset_info = std::meta::offset_of(member);
+                static_assert(
+                    offset_info.bits == 0, 
+                    "Reflection serialization does not support bitfields");
+
+                using MemberType = typename[:std::meta::type_of(member):];
+                constexpr size_t offset = offset_info.bytes;
+                
+                if constexpr (std::is_const_v<T>)
+                {
+                    // This is the 'save' path (T is 'const A')
+                    auto* member_ptr = reinterpret_cast<const MemberType*>(
+                        reinterpret_cast<const std::byte*>(&t) + offset);
+                    ar & *member_ptr;
+                }
+                else
+                {
+                    // This is the 'load' path (T is 'A')
+                    auto* member_ptr = reinterpret_cast<MemberType*>(
+                        reinterpret_cast<std::byte*>(&t) + offset);
+                    ar & *member_ptr;
+                }
             }
         }
     }
