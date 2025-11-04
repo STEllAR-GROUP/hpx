@@ -122,6 +122,14 @@ namespace hpx::serialization {
                     // the archive functions
                     ar.invoke(t);
                 }
+                else if constexpr (std::is_class_v<dT>) {
+                    // If we have cpp 26 reflection, then codegen can be used
+                    // to generate serialization functions for types that
+                    // don't have them already.
+                    #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+                        detail::refl_serialize(ar, t, 0);
+                    #endif
+                }
                 else if constexpr (hpx::traits::has_struct_serialization_v<dT>)
                 {
                     // This is automatic serialization for types that are simple
@@ -131,20 +139,11 @@ namespace hpx::serialization {
                 }
                 else
                 {
-                    // If we have cpp 26 reflection, then codegen can be used
-                    // to generate serialization functions for types that
-                    // don't have them already.
-                    #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
-                        // We can generate serialization functions for this type
-                        // Using C++26 reflection capabilities.
-                        detail::refl_serialize(ar, t, 0);
-                    #else
                     static_assert(hpx::traits::has_serialize_adl_v<dT> ||
                             hpx::traits::has_struct_serialization_v<dT> ||
                             hpx::traits::is_bitwise_serializable_v<dT> ||
                             !hpx::traits::is_not_bitwise_serializable_v<dT>,
                         "No serialization method found");
-                    #endif
                 }
             }
         }
