@@ -164,12 +164,38 @@ namespace hpx::serialization::detail {
     {
         static void save(output_archive& ar, void const* base)
         {
-            serialize(ar, *static_cast<Derived*>(const_cast<void*>(base)), 0);
+            #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+                if constexpr (std::is_class_v<Derived>) {
+                    // member serialization
+                    // Todo, check if this is the right dispatch
+                    refl_serialize(ar, *static_cast<Derived const*>(
+                                                const_cast<void*>(base)),
+                        0);
+                }
+                else {
+                    serialize(ar, *static_cast<Derived const*>(
+                                        const_cast<void*>(base)),
+                        0);
+                }
+            #else
+                serialize(ar, *static_cast<Derived*>(const_cast<void*>(base)), 0);
+            #endif
         }
 
         static void load(input_archive& ar, void* base)
         {
-            serialize(ar, *static_cast<Derived*>(base), 0);
+            #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+                if constexpr (std::is_class_v<Derived>) {
+                    // member serialization
+                    // Todo, check if this is the right dispatch
+                    refl_serialize(ar, *static_cast<Derived*>(base), 0);
+                }
+                else {
+                    serialize(ar, *static_cast<Derived*>(base), 0);
+                }
+            #else
+                serialize(ar, *static_cast<Derived*>(base), 0);
+            #endif
         }
 
         // this function is needed for pointer type serialization
