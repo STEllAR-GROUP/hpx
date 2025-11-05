@@ -42,6 +42,15 @@ namespace hpx::serialization {
 
         HPX_CXX_CORE_EXPORT template <typename T>
         void serialize_one(input_archive& ar, T& t);
+
+        #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+        // This function uses C++26 reflection capabilities to generate
+        // serialization functions for types that don't have them already.
+        // This is forward declared here and defined in refl_serialize_impl.hpp
+        // to avoid circular dependencies.
+        HPX_CXX_EXPORT template <typename Archive, typename T>
+        void refl_serialize(Archive& ar, T& t, unsigned /*version*/);
+        #endif
     }    // namespace detail
 
     HPX_CXX_CORE_EXPORT template <typename T>
