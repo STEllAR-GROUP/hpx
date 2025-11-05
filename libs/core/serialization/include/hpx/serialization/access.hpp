@@ -43,15 +43,6 @@ namespace hpx::serialization {
         {
             serialize(ar, t, 0);
         }
-
-        #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
-        // This function uses C++26 reflection capabilities to generate
-        // serialization functions for types that don't have them already.
-        // This is forward declared here and defined in refl_serialize_impl.hpp
-        // to avoid circular dependencies.
-        HPX_CXX_EXPORT template <typename Archive, typename T>
-        void refl_serialize(Archive& ar, T& t, unsigned /*version*/);
-        #endif
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -115,6 +106,14 @@ namespace hpx::serialization {
                     // serialize-member function and doesn't perform ADL
                     detail::serialize_force_adl(ar, t, 0);
                 }
+                else if constexpr (std::is_aggregate_v<dT> &&
+                    hpx::traits::has_struct_serialization_v<dT>)
+                {
+                    // This is automatic serialization for types that are simple
+                    // (brace-initializable) structs, that means every struct's
+                    // field has to be serializable and public.
+                    serialize_struct(ar, t, 0);
+                }
                 else if constexpr (hpx::traits::is_bitwise_serializable_v<dT> ||
                     !hpx::traits::is_not_bitwise_serializable_v<dT>)
                 {
@@ -129,13 +128,6 @@ namespace hpx::serialization {
                     #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
                         detail::refl_serialize(ar, t, 0);
                     #endif
-                }
-                else if constexpr (hpx::traits::has_struct_serialization_v<dT>)
-                {
-                    // This is automatic serialization for types that are simple
-                    // (brace-initializable) structs, that means every struct's
-                    // field has to be serializable and public.
-                    serialize_struct(ar, t, 0);
                 }
                 else
                 {

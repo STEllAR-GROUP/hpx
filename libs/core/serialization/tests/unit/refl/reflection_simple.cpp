@@ -1,5 +1,7 @@
 //  Copyright (c) 2025 Ujjwal Shekhar
 //  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 #include <hpx/modules/serialization.hpp>
@@ -52,24 +54,22 @@ int main()
 {
     using simple_test_struct = A;
 
-    // 1. Create the object to serialize
     std::vector<char> buffer;
     hpx::serialization::output_archive oarchive(buffer);
 
     simple_test_struct input_data(42, "hello reflection", {1, 2, 3, 4, 5});
 
-    // 2. Serialize
+    // Serialize
     // This will fail to compile if reflection is not working,
     // as it will hit the static_assert in access.hpp
     oarchive << input_data;
 
-    // 3. Deserialize
+    // Deserialize
     hpx::serialization::input_archive iarchive(buffer);
     simple_test_struct output_data;
 
     iarchive >> output_data;
 
-    // 4. Verify
     HPX_TEST_EQ(input_data.get_a(), output_data.get_a());
     HPX_TEST_EQ(input_data.get_b(), output_data.get_b());
     HPX_TEST_EQ(input_data.get_c().size(), output_data.get_c().size());

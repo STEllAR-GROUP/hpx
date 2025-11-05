@@ -118,6 +118,12 @@ namespace hpx::serialization {
                     access::has_serialize_v<T> || std::is_empty_v<T> ||
                     hpx::traits::has_serialize_adl_v<T>;
 
+                #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+                    constexpr bool has_refl_serialize = true;
+                #else
+                    constexpr bool has_refl_serialize = false;
+                #endif
+
                 constexpr bool optimized =
                     hpx::traits::is_bitwise_serializable_v<T> ||
                     !hpx::traits::is_not_bitwise_serializable_v<T>;
@@ -128,7 +134,7 @@ namespace hpx::serialization {
                     detail::polymorphic_nonintrusive_factory::instance().load(
                         *this, t);
                 }
-                else if constexpr (has_serialize)
+                else if constexpr (has_serialize || has_refl_serialize)
                 {
                     // non-bitwise normal serialization
                     access::serialize(*this, t, 0);
