@@ -6,6 +6,12 @@
 
 set(tests
     reflection_simple
+    reflection_polymorphic
+    reflection_containers
+    reflection_compound
+    reflection_pointers
+    reflection_bitwise_regression
+    reflection_kitchen_sink
 )
 
 foreach(test ${tests})
