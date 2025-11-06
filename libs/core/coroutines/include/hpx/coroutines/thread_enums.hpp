@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -210,7 +210,7 @@ namespace hpx::threads {
         /// local thread number associated with this hint. Local thread numbers
         /// are indexed from zero. It is up to the scheduler to decide how to
         /// interpret thread numbers that are larger than the number of threads
-        /// available to the scheduler. Typically thread numbers will wrap
+        /// available to the scheduler. Typically, thread numbers will wrap
         /// around when too large.
         thread = 1,
 
@@ -218,7 +218,7 @@ namespace hpx::threads {
         /// NUMA domain associated with this hint. NUMA domains are indexed from
         /// zero. It is up to the scheduler to decide how to interpret NUMA
         /// domain indices that are larger than the number of available NUMA
-        /// domains to the scheduler. Typically indices will wrap around when
+        /// domains to the scheduler. Typically, indices will wrap around when
         /// too large.
         numa = 2,
     };

@@ -205,7 +205,10 @@ namespace hpx::threads::detail {
             auto const hint = thread_schedule_hint(static_cast<std::int16_t>(
                 thrdptr->get_last_worker_thread_num()));
             scheduler->schedule_thread_last(HPX_MOVE(thrd), hint);
-            scheduler->do_some_work(hint.hint);
+            scheduler->do_some_work(
+                hint.mode == hpx::threads::thread_schedule_hint_mode::numa ?
+                    static_cast<std::size_t>(-1) :
+                    hint.hint);
         }
 
         HPX_ASSERT(state_val != thread_schedule_state::terminated);

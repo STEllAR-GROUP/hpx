@@ -27,15 +27,15 @@ add_hpx_module(
   HEADERS ${threadmanager_headers}
   COMPAT_HEADERS ${threadmanager_compat_headers}
   MODULE_DEPENDENCIES
+    hpx_async_combinators
+    hpx_errors
+    hpx_io_service
     hpx_program_options
+    hpx_logging
     hpx_resource_partitioner
     hpx_runtime_configuration
-    hpx_errors
-    hpx_logging
     hpx_schedulers
-    hpx_async_combinators
     hpx_thread_pools
-    hpx_io_service
     hpx_thread_pool_util
     hpx_type_support
   CMAKE_SUBDIRS examples tests

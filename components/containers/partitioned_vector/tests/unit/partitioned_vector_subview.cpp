@@ -125,7 +125,7 @@ int main()
     my_vector.register_as(hpx::launch::sync, vec_name);
 
     hpx::future<void> join = hpx::lcos::define_spmd_block(
-        "block", 4, bulk_test_action(), N, tile, elt_size, vec_name);
+        "block", 2, bulk_test_action(), N, tile, elt_size, vec_name);
 
     join.get();
 

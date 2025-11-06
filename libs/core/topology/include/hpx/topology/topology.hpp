@@ -428,6 +428,12 @@ namespace hpx::threads {
     ///////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT topology& create_topology();
 
+    /// Get the global topology instance
+    inline topology const& get_topology()
+    {
+        return create_topology();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // abstract away memory page size, calls to system functions are
     // expensive, so return a value initialized at startup

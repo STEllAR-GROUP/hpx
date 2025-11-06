@@ -144,7 +144,7 @@ namespace hpx::threads {
         /// Suspends the given processing unit. Blocks until the processing unit
         /// has been suspended.
         ///
-        /// \param virt_core   [in] The processing unit on the the pool to be
+        /// \param virt_core   [in] The processing unit on the pool to be
         ///                    suspended. The processing units are indexed
         ///                    starting from 0.
         /// \param ec [in,out] this represents the error status on exit, if this
@@ -156,7 +156,7 @@ namespace hpx::threads {
         /// Resumes the given processing unit. Blocks until the processing unit
         /// has been resumed.
         ///
-        /// \param virt_core   [in] The processing unit on the the pool to be resumed.
+        /// \param virt_core   [in] The processing unit on the pool to be resumed.
         ///                    The processing units are indexed starting from 0.
         /// \param ec [in,out] this represents the error status on exit, if this
         ///           is pre-initialized to \a hpx#throws the function will

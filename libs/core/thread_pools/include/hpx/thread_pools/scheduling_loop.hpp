@@ -121,7 +121,7 @@ namespace hpx::threads::detail {
         thread_id_ref_type background_thread;
         bool const do_background_work =
             scheduler.has_scheduler_mode(
-                policies::scheduler_mode::do_background_work) &&
+                policies::scheduler_mode::do_background_work, num_thread) &&
             num_thread < params.max_background_threads_ &&
             !params.background_.empty();
 
@@ -155,7 +155,7 @@ namespace hpx::threads::detail {
             // shutdown)
             bool enable_stealing = !may_exit &&
                 scheduler.has_scheduler_mode(
-                    policies::scheduler_mode::enable_stealing);
+                    policies::scheduler_mode::enable_stealing, num_thread);
 
             // stealing staged threads is enabled if:
             // - fast idle mode is on: same as normal stealing
@@ -164,7 +164,7 @@ namespace hpx::threads::detail {
             bool enable_stealing_staged = enable_stealing;
             if (enable_stealing_staged &&
                 !scheduler.has_scheduler_mode(
-                    policies::scheduler_mode::fast_idle_mode))
+                    policies::scheduler_mode::fast_idle_mode, num_thread))
             {
                 enable_stealing_staged = !may_exit &&
                     idle_loop_count > params.max_idle_loop_count_ / 2;
@@ -455,7 +455,8 @@ namespace hpx::threads::detail {
                         if (can_exit)
                         {
                             if (!scheduler.has_scheduler_mode(
-                                    policies::scheduler_mode::delay_exit))
+                                    policies::scheduler_mode::delay_exit,
+                                    num_thread))
                             {
                                 // If this is an inner scheduler, try to exit
                                 // immediately
@@ -497,7 +498,7 @@ namespace hpx::threads::detail {
                 }
                 else if (!may_exit && added == 0 &&
                     (scheduler.has_scheduler_mode(
-                        policies::scheduler_mode::fast_idle_mode)))
+                        policies::scheduler_mode::fast_idle_mode, num_thread)))
                 {
                     // speed up idle suspend if no work was stolen
                     idle_loop_count += params.max_idle_loop_count_ / 1024;
@@ -550,12 +551,10 @@ namespace hpx::threads::detail {
             }
             else if (idle_loop_count > params.max_idle_loop_count_)
             {
-                idle_loop_count = 0;
-
                 // call back into invoking context
-                if (!params.outer_.empty())
+                if (!params.outer_.empty() && params.outer_())
                 {
-                    params.outer_();
+                    idle_loop_count = 0;
                     context_storage = hpx::execution_base::this_thread::detail::
                         get_agent_storage();
                 }
@@ -568,9 +567,8 @@ namespace hpx::threads::detail {
                     idle_loop_count = 0;
 
                 // call back into invoking context
-                if (!params.outer_.empty())
+                if (!params.outer_.empty() && params.outer_())
                 {
-                    params.outer_();
                     context_storage = hpx::execution_base::this_thread::detail::
                         get_agent_storage();
                 }

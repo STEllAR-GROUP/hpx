@@ -32,9 +32,9 @@ namespace executor_example {
         using executor_parameters_type =
             typename BaseExecutor::executor_parameters_type;
 
-        template <typename Executor,
-            typename Enable = std::enable_if_t<!std::is_same_v<
-                std::decay_t<Executor>, disable_thread_stealing_executor>>>
+        template <typename Executor>
+            requires(!std::is_same_v<std::decay_t<Executor>,
+                disable_thread_stealing_executor>)
         explicit disable_thread_stealing_executor(Executor&& exec)
           : BaseExecutor(std::forward<Executor>(exec))
         {
@@ -48,21 +48,28 @@ namespace executor_example {
         // Add two executor API functions that will be called before the
         // parallel algorithm starts executing and after it has finished
         // executing.
-        //
-        // Note that this method can cause problems if two parallel algorithms
-        // are executed concurrently.
         template <typename Parameters>
-        static void mark_begin_execution(Parameters&&)
+        friend void tag_invoke(
+            hpx::execution::experimental::mark_begin_execution_t, Parameters&&,
+            disable_thread_stealing_executor const& exec)
         {
+            auto const pu_mask =
+                hpx::execution::experimental::get_processing_units_mask(exec);
             hpx::threads::remove_scheduler_mode(
-                hpx::threads::policies::scheduler_mode::enable_stealing);
+                hpx::threads::policies::scheduler_mode::enable_stealing,
+                pu_mask);
         }
 
         template <typename Parameters>
-        static void mark_end_execution(Parameters&&)
+        friend void tag_invoke(
+            hpx::execution::experimental::mark_end_execution_t, Parameters&&,
+            disable_thread_stealing_executor const& exec)
         {
+            auto const pu_mask =
+                hpx::execution::experimental::get_processing_units_mask(exec);
             hpx::threads::add_scheduler_mode(
-                hpx::threads::policies::scheduler_mode::enable_stealing);
+                hpx::threads::policies::scheduler_mode::enable_stealing,
+                pu_mask);
         }
     };
 
@@ -155,8 +162,15 @@ int hpx_main()
     auto exec = executor_example::make_disable_thread_stealing_executor(
         hpx::execution::par.executor());
 
-    hpx::experimental::for_loop(
-        hpx::execution::par.on(exec), 0, v.size(), [](std::size_t) {});
+    // This may lead to deadlock situations if the main thread executes some of
+    // the chunks synchronously.
+    auto hint = hpx::execution::experimental::get_hint(exec);
+    hint.sharing_mode(hpx::threads::thread_sharing_hint::do_not_share_function |
+        hpx::threads::thread_sharing_hint::do_not_combine_tasks);
+    auto no_sharing_exec = hpx::execution::experimental::with_hint(exec, hint);
+
+    hpx::experimental::for_loop(hpx::execution::par.on(no_sharing_exec), 0,
+        v.size(), [](std::size_t) {});
 
     return hpx::local::finalize();
 }

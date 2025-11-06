@@ -54,7 +54,7 @@ namespace hpx::threads::detail {
         scheduled_thread_pool& operator=(scheduled_thread_pool const&) = delete;
         scheduled_thread_pool& operator=(scheduled_thread_pool&&) = delete;
 
-        virtual ~scheduled_thread_pool();
+        ~scheduled_thread_pool() override;
 
         void print_pool(std::ostream& os) const override;
 
@@ -166,7 +166,7 @@ namespace hpx::threads::detail {
         }
 
         void thread_func(std::size_t thread_num, std::size_t global_thread_num,
-            std::shared_ptr<util::barrier> startup);
+            std::shared_ptr<util::barrier> const& startup);
 
         std::size_t get_os_thread_count() const override
         {

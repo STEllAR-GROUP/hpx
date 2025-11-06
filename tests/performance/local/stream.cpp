@@ -17,6 +17,8 @@
 #define BOOST_NO_CXX11_ALLOCATOR
 #endif
 
+#include <hpx/config.hpp>
+
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/format.hpp>

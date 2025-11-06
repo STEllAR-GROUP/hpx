@@ -614,12 +614,11 @@ namespace hpx::compute::host {
                     T volatile* vaddr = const_cast<T volatile*>(page_ptr);
                     *vaddr = *vaddr;
 #ifdef NUMA_BINDING_ALLOCATOR_INIT_MEMORY
+                    // show which cpu is actually being used
 #if defined(NUMA_ALLOCATOR_LINUX)
-                    int Vmem =
-                        sched_getcpu();    // show which cpu is actually being used
+                    std::size_t Vmem = sched_getcpu();
 #else
-                    int Vmem =
-                        numa_domain;    // show just the domain we think we're on
+                    std::size_t Vmem = numa_domain;
 #endif
                     pointer elem_ptr = page_ptr;
                     for (size_type j = 0; j < pageN; ++j)

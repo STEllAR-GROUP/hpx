@@ -47,6 +47,8 @@ namespace hpx::resource::detail {
 
         void assign_first_core(std::size_t first_core);
 
+        hpx::threads::mask_type get_pu_mask() const;
+
         // counter ... overall, in all the thread pools
         static std::size_t num_threads_overall;
 
@@ -167,7 +169,10 @@ namespace hpx::resource::detail {
         std::size_t get_pu_num(std::size_t global_thread_num) const;
         threads::mask_type get_pu_mask(std::size_t global_thread_num) const;
         std::size_t get_thread_occupancy(std::size_t pu_num) const;
-        threads::mask_type get_used_pus_mask(std::size_t pu_num) const;
+        threads::mask_type get_used_pus_mask(
+            std::size_t pu_num = static_cast<std::size_t>(-1)) const;
+        threads::mask_type get_pool_pus_mask(
+            std::string const& pool_name) const;
 
         void init(resource::partitioner_mode rpmode,
             hpx::util::section const& cfg,

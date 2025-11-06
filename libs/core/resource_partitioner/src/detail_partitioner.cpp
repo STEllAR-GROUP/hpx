@@ -231,6 +231,20 @@ namespace hpx::resource::detail {
         }
     }
 
+    hpx::threads::mask_type init_pool_data::get_pu_mask() const
+    {
+        threads::mask_type pu_mask = threads::mask_type();
+        threads::resize(
+            pu_mask, static_cast<std::size_t>(threads::hardware_concurrency()));
+
+        for (std::size_t i = 0; i != num_threads_; ++i)
+        {
+            pu_mask |= assigned_pus_[i];
+        }
+
+        return pu_mask;
+    }
+
     ////////////////////////////////////////////////////////////////////////
     partitioner::partitioner()
       : first_core_(static_cast<std::size_t>(-1))
@@ -974,6 +988,13 @@ namespace hpx::resource::detail {
             static_cast<std::size_t>(hpx::threads::hardware_concurrency()));
         threads::set(mask, global_thread_num);
         return mask;
+    }
+
+    threads::mask_type partitioner::get_pool_pus_mask(
+        std::string const& pool_name) const
+    {
+        std::unique_lock<mutex_type> l(mtx_);
+        return get_pool_data(l, pool_name).get_pu_mask();
     }
 
     void partitioner::init(resource::partitioner_mode rpmode,

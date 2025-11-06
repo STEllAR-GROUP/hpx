@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Shoshana Jakobovits
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -442,7 +442,7 @@ namespace hpx::threads::detail {
     template <typename Scheduler>
     void hpx::threads::detail::scheduled_thread_pool<Scheduler>::thread_func(
         std::size_t thread_num, std::size_t global_thread_num,
-        std::shared_ptr<util::barrier> startup)
+        std::shared_ptr<util::barrier> const& startup)
     {
         topology const& topo = create_topology();
 
@@ -474,7 +474,7 @@ namespace hpx::threads::detail {
         // Setting priority of worker threads to a lower priority, this needs to
         // be done in order to give the parcel pool threads higher priority
         if (get_scheduler()->has_scheduler_mode(
-                policies::scheduler_mode::reduce_thread_priority))
+                policies::scheduler_mode::reduce_thread_priority, thread_num))
         {
             topo.reduce_thread_priority(ec);
             if (ec)
@@ -543,7 +543,8 @@ namespace hpx::threads::detail {
                     max_idle_loop_count_, max_busy_loop_count_);
 
                 if (get_scheduler()->has_scheduler_mode(
-                        policies::scheduler_mode::do_background_work) &&
+                        policies::scheduler_mode::do_background_work,
+                        thread_num) &&
                     network_background_callback_)
                 {
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \

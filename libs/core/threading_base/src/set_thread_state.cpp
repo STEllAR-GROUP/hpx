@@ -290,9 +290,10 @@ namespace hpx::threads::detail {
                     thrd, schedulehint, false, current_priority);
             }
 
-            // NOTE: Don't care if the hint is a NUMA hint, just want to wake up
-            // a thread.
-            scheduler->do_some_work(schedulehint.hint);
+            scheduler->do_some_work(schedulehint.mode ==
+                        hpx::threads::thread_schedule_hint_mode::numa ?
+                    static_cast<std::size_t>(-1) :
+                    schedulehint.hint);
         }
 
         if (&ec != &throws)

@@ -58,8 +58,8 @@ namespace hpx::threads::policies::detail {
         mask_type get_pu_mask(
             threads::topology const& topo, std::size_t global_thread_num) const;
 
-        mask_type get_used_pus_mask(
-            threads::topology const& topo, std::size_t pu_num) const;
+        mask_type get_used_pus_mask(threads::topology const& topo,
+            std::size_t pu_num = static_cast<std::size_t>(-1)) const;
         std::size_t get_thread_occupancy(
             threads::topology const& topo, std::size_t pu_num) const;
 

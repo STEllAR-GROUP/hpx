@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -1861,13 +1861,15 @@ namespace hpx::threads::policies {
             curr_queue_.store(0, std::memory_order_release);
         }
 
-        void set_scheduler_mode(scheduler_mode mode) noexcept override
+        void set_scheduler_mode(scheduler_mode mode,
+            hpx::threads::mask_cref_type pu_mask) noexcept override
         {
             // we should not disable stealing for this scheduler, this would
             // possibly lead to deadlocks
             scheduler_base::set_scheduler_mode(mode |
-                policies::scheduler_mode::enable_stealing |
-                policies::scheduler_mode::enable_stealing_numa);
+                    policies::scheduler_mode::enable_stealing |
+                    policies::scheduler_mode::enable_stealing_numa,
+                pu_mask);
         }
 
     protected:

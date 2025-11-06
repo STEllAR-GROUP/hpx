@@ -147,7 +147,7 @@ namespace hpx::execution::experimental::detail {
                 (std::min) (i_begin + task_f->chunk_size, task_f->size);
 
             auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
-            for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
+            for (auto i = i_begin; i != i_end; (void) ++it, ++i)
             {
                 bulk_scheduler_invoke_helper(
                     index_pack_type{}, op_state->f, *it, ts);
@@ -173,7 +173,7 @@ namespace hpx::execution::experimental::detail {
                 static constexpr auto opposite_end =
                     hpx::concurrency::detail::opposite_end_v<Which>;
 
-                for (std::uint32_t offset = 1;
+                for (std::size_t offset = 1;
                     offset != op_state->num_worker_threads; ++offset)
                 {
                     std::size_t neighbor_thread =
@@ -406,7 +406,8 @@ namespace hpx::execution::experimental::detail {
             {
                 // apply hint if none was given
                 hint.mode = hpx::threads::thread_schedule_hint_mode::thread;
-                hint.hint = worker_thread + op_state->first_thread;
+                hint.hint = static_cast<std::int16_t>(
+                    worker_thread + op_state->first_thread);
 
                 auto policy = hpx::execution::experimental::with_hint(
                     op_state->scheduler.policy(), hint);
@@ -459,7 +460,7 @@ namespace hpx::execution::experimental::detail {
 
             // Calculate chunk size and number of chunks
             std::uint32_t chunk_size = get_bulk_scheduler_chunk_size(
-                op_state->num_worker_threads, size);
+                static_cast<std::uint32_t>(op_state->num_worker_threads), size);
             std::uint32_t num_chunks = (size + chunk_size - 1) / chunk_size;
 
             // launch only as many tasks as we have chunks
@@ -495,13 +496,15 @@ namespace hpx::execution::experimental::detail {
                     hint.placement_mode() == placement::breadth_first_reverse)
                 {
                     init_queue_breadth_first(worker_thread, num_chunks,
-                        op_state->num_worker_threads);
+                        static_cast<std::uint32_t>(
+                            op_state->num_worker_threads));
                 }
                 else
                 {
                     // the default for this scheduler is depth-first placement
                     init_queue_depth_first(worker_thread, num_chunks,
-                        op_state->num_worker_threads);
+                        static_cast<std::uint32_t>(
+                            op_state->num_worker_threads));
                 }
             }
 

@@ -46,7 +46,12 @@ std::size_t bulk_test(
 
     local_count.store(0);
 
-    hpx::parallel::execution::bulk_sync_execute(hpx::execution::par.executor(),
+    auto hint = hpx::execution::experimental::get_hint(hpx::execution::par);
+    hint.sharing_mode(hpx::threads::thread_sharing_hint::do_not_share_function |
+        hpx::threads::thread_sharing_hint::do_not_combine_tasks);
+
+    hpx::parallel::execution::bulk_sync_execute(
+        hpx::execution::experimental::with_hint(hpx::execution::par, hint),
         spmd_block_helper{name, num_images},
         hpx::util::counting_shape(offset, offset + images_per_locality));
 

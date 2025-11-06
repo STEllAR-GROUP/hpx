@@ -169,19 +169,37 @@ struct enable_fast_idle_mode
     template <typename Executor>
     friend void tag_override_invoke(
         hpx::execution::experimental::mark_begin_execution_t,
-        enable_fast_idle_mode, Executor&&)
+        enable_fast_idle_mode, Executor&& exec)
     {
-        hpx::threads::add_scheduler_mode(
-            hpx::threads::policies::scheduler_mode::fast_idle_mode);
+        auto const pu_mask =
+            hpx::execution::experimental::get_processing_units_mask(exec);
+        auto const full_pu_mask =
+            hpx::resource::get_partitioner().get_used_pus_mask();
+
+        // Enable fast-idle mode only for PU's that are not used by this
+        // algorithm invocation.
+        hpx::threads::add_remove_scheduler_mode(
+            hpx::threads::policies::scheduler_mode::fast_idle_mode,
+            hpx::threads::policies::scheduler_mode::enable_stealing |
+                hpx::threads::policies::scheduler_mode::enable_stealing_numa,
+            full_pu_mask & ~pu_mask);
     }
 
     template <typename Executor>
     friend void tag_override_invoke(
         hpx::execution::experimental::mark_end_execution_t,
-        enable_fast_idle_mode, Executor&&)
+        enable_fast_idle_mode, Executor&& exec)
     {
-        hpx::threads::remove_scheduler_mode(
-            hpx::threads::policies::scheduler_mode::fast_idle_mode);
+        auto const pu_mask =
+            hpx::execution::experimental::get_processing_units_mask(exec);
+        auto const full_pu_mask =
+            hpx::resource::get_partitioner().get_used_pus_mask();
+
+        hpx::threads::add_remove_scheduler_mode(
+            hpx::threads::policies::scheduler_mode::enable_stealing |
+                hpx::threads::policies::scheduler_mode::enable_stealing_numa,
+            hpx::threads::policies::scheduler_mode::fast_idle_mode,
+            full_pu_mask & ~pu_mask);
     }
 };
 
