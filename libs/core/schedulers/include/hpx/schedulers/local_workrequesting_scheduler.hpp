@@ -963,20 +963,25 @@ namespace hpx::threads::policies {
                 return true;
             }
 
-            if (allow_stealing &&
-                (get_thread(d.bound_queue_, thrd) ||
-                    get_thread(d.queue_, thrd)))
+            if (get_thread(d.bound_queue_, thrd) || get_thread(d.queue_, thrd))
             {
                 // We found a task to run, however before running it we handle
                 // steal requests (assuming that there is more work left that
                 // could be used to satisfy steal requests).
                 if (!d.requests_->is_empty())
                 {
-                    steal_request req;
-                    while (try_receiving_steal_request(d, req))
+                    if (allow_stealing)
                     {
-                        if (!handle_steal_request(d, req))
-                            break;
+                        steal_request req;
+                        while (try_receiving_steal_request(d, req))
+                        {
+                            if (!handle_steal_request(d, req))
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        decline_or_forward_one_steal_requests(d);
                     }
                 }
 
@@ -1068,7 +1073,8 @@ namespace hpx::threads::policies {
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "local_workrequesting_scheduler::schedule_thread",
-                    "unknown thread priority value (thread_priority::unknown)");
+                    "unknown thread priority value "
+                    "(thread_priority::unknown)");
             }
             }
         }
@@ -1138,8 +1144,10 @@ namespace hpx::threads::policies {
             case thread_priority::unknown:
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                    "local_workrequesting_scheduler::schedule_thread_last",
-                    "unknown thread priority value (thread_priority::unknown)");
+                    "local_workrequesting_scheduler::schedule_thread_"
+                    "last",
+                    "unknown thread priority value "
+                    "(thread_priority::unknown)");
             }
             }
         }
