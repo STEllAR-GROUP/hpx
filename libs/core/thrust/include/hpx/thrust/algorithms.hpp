@@ -10,24 +10,20 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/tag_invoke.hpp>
-#include <hpx/parallel/algorithms/fill.hpp>
-#include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/thrust/detail/algorithm_map.hpp>
 #include <hpx/thrust/policy.hpp>
 #include <cuda_runtime.h>
 
-
 namespace hpx::thrust {
 
     template <typename HPXTag, typename ThrustPolicy, typename... Args>
-        requires(
-            is_thrust_execution_policy_v<std::decay_t<ThrustPolicy>> &&
+        requires(is_thrust_execution_policy_v<std::decay_t<ThrustPolicy>> &&
             detail::is_algorithm_mapped<HPXTag, ThrustPolicy, Args...>)
     decltype(auto) tag_invoke(HPXTag tag, ThrustPolicy&& policy, Args&&... args)
     {
         if constexpr (hpx::is_async_execution_policy_v<
                           std::decay_t<ThrustPolicy>>)
-        {   
+        {
             if constexpr (std::is_void_v<decltype(detail::algorithm_map<
                               HPXTag>::invoke(std::declval<ThrustPolicy>(),
                               std::declval<Args>()...))>)
