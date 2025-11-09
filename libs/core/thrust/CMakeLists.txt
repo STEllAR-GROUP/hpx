@@ -10,10 +10,8 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(thrust_headers
-    hpx/thrust/policy.hpp
-    hpx/thrust/algorithms.hpp
-    hpx/thrust/detail/algorithm_map.hpp
+set(thrust_headers hpx/thrust/policy.hpp hpx/thrust/algorithms.hpp
+                   hpx/thrust/detail/algorithm_map.hpp
 )
 
 # cmake-format: off

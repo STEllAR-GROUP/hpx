@@ -613,7 +613,8 @@ if(HPX_WITH_CUDA)
 endif()
 
 hpx_option(
-  HPX_WITH_THRUST BOOL
+  HPX_WITH_THRUST
+  BOOL
   "Enable support for NVIDIA Thrust integration (default: ON when CUDA is enabled, OFF otherwise)"
   ${HPX_WITH_THRUST_DEFAULT}
   ADVANCED
