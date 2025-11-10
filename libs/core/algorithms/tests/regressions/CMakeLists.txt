@@ -8,6 +8,7 @@ set(tests
     count_3646
     fill_executor_5016
     findfirstof_more_searched_for
+    find_proxy_support
     for_each_annotated_function
     for_each_on_main_thread
     for_loop_2281
