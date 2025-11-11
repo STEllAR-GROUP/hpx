@@ -17,13 +17,13 @@
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/algorithms/transfer.hpp>
 #include <hpx/execution/algorithms/transfer_just.hpp>
-#include <hpx/execution/executors/default_parameters.hpp>
+#include <hpx/execution/algorithms/when_all.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/modules/concepts.hpp>
@@ -239,18 +239,21 @@ namespace hpx::execution::experimental {
 #if defined(HPX_HAVE_STDEXEC)
                 return just(HPX_MOVE(result_vector), shape, HPX_FORWARD(F, f),
                            HPX_FORWARD(Ts, ts)...) |
-                    continue_on(exec.sched_) |
+                    continues_on(exec.sched_) |
                     bulk(shape_size, HPX_MOVE(f_wrapper)) |
                     then(HPX_MOVE(get_result));
 #else
-                return transfer_just(exec.sched_, HPX_MOVE(result_vector),
-                           shape, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...) |
+                // When stdexec is not available, use HPX's original bulk implementation
+                return just(HPX_MOVE(result_vector), shape, HPX_FORWARD(F, f),
+                           HPX_FORWARD(Ts, ts)...) |
+                    continues_on(exec.sched_) |
                     bulk(shape_size, HPX_MOVE(f_wrapper)) |
                     then(HPX_MOVE(get_result));
 #endif
             }
         }
 
+#if !defined(HPX_HAVE_STDEXEC)
         // clang-format off
         template <typename F, typename S, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
@@ -266,7 +269,9 @@ namespace hpx::execution::experimental {
                 hpx::parallel::execution::bulk_async_execute(
                     exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
         }
+#endif
 
+#if !defined(HPX_HAVE_STDEXEC)
         // clang-format off
         template <typename F, typename S, typename Future, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
@@ -287,9 +292,11 @@ namespace hpx::execution::experimental {
             auto pre_req =
                 when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
-            return bulk(transfer(HPX_MOVE(pre_req), exec.sched_), shape,
-                hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+            return transfer(HPX_MOVE(pre_req), exec.sched_) |
+                bulk(shape,
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
         }
+#endif
 
     private:
         std::decay_t<BaseScheduler> sched_;
