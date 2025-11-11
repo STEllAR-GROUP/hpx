@@ -264,8 +264,8 @@ int main()
 {
     using vector_type = hpx::partitioned_vector<double>;
 
-    const std::size_t height = 16;
-    const std::size_t width = 16;
+    std::size_t const height = 16;
+    std::size_t const width = 16;
 
     std::size_t local_height = 16;
     std::size_t local_width = 16;
@@ -297,11 +297,11 @@ int main()
     out2.register_as(hpx::launch::sync, out2_name);
 
     // Launch tests
-    hpx::future<void> join1 = hpx::lcos::define_spmd_block("block1", 4,
+    hpx::future<void> join1 = hpx::lcos::define_spmd_block("block1", 2,
         bulk_test_action(), height, width, local_height, local_width,
         local_leading_dimension, in1_name, out1_name);
 
-    hpx::future<void> join2 = hpx::lcos::define_spmd_block("block2", 4,
+    hpx::future<void> join2 = hpx::lcos::define_spmd_block("block2", 2,
         async_bulk_test_action(), height, width, local_height, local_width,
         local_leading_dimension, in2_name, out2_name);
 

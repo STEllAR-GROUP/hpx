@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,7 +20,7 @@ namespace hpx::threads::detail {
 
     ///////////////////////////////////////////////////////////////////////
     void write_state_log(policies::scheduler_base const& scheduler,
-        std::size_t num_thread, thread_id_ref_type const& thrd,
+        std::size_t const num_thread, thread_id_ref_type const& thrd,
         thread_schedule_state const old_state,
         thread_schedule_state const new_state)
     {
@@ -34,8 +34,8 @@ namespace hpx::threads::detail {
     }
 
     void write_state_log_warning(policies::scheduler_base const& scheduler,
-        std::size_t num_thread, thread_id_ref_type const& thrd,
-        thread_schedule_state state, char const* info)
+        std::size_t const num_thread, thread_id_ref_type const& thrd,
+        thread_schedule_state const state, char const* info)
     {
         LTM_(warning).format("scheduling_loop state change failed: pool({}), "
                              "scheduler({}), worker thread ({}), thread({}), "
@@ -47,7 +47,7 @@ namespace hpx::threads::detail {
     }
 
     void write_rescheduling_log_warning(
-        policies::scheduler_base const& scheduler, std::size_t num_thread,
+        policies::scheduler_base const& scheduler, std::size_t const num_thread,
         thread_id_ref_type const& thrd)
     {
         LTM_(warning).format("pool({}), scheduler({}), worker_thread({}), "

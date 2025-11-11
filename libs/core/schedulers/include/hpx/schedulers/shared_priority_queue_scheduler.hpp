@@ -171,7 +171,6 @@ namespace hpx::threads::policies {
           , thread_init_counter_(0)
           , pool_index_(static_cast<std::size_t>(-1))
         {
-            scheduler_base::set_scheduler_mode(scheduler_mode::default_);
             HPX_ASSERT(num_workers_ != 0);
         }
 
@@ -192,10 +191,11 @@ namespace hpx::threads::policies {
         }
 
         // get/set scheduler mode
-        void set_scheduler_mode(scheduler_mode mode) noexcept override
+        void set_scheduler_mode(scheduler_mode mode,
+            hpx::threads::mask_cref_type pu_mask) noexcept override
         {
             // clang-format off
-            scheduler_base::set_scheduler_mode(mode);
+            scheduler_base::set_scheduler_mode(mode, pu_mask);
             round_robin_ = mode & policies::scheduler_mode::assign_work_round_robin;
             steal_hp_first_ =
                 mode & policies::scheduler_mode::steal_high_priority_first;

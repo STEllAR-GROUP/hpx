@@ -215,6 +215,9 @@ void measure_function_futures_limiting_executor(
     if (std::string("core-shared_priority_queue_scheduler") ==
         sched->get_description())
     {
+        auto const full_mask =
+            hpx::resource::get_partitioner().get_pool_pus_mask(
+                sched->get_parent_pool()->get_pool_name());
         sched->add_remove_scheduler_mode(
             // add these flags
             hpx::threads::policies::scheduler_mode::enable_stealing |
@@ -226,7 +229,8 @@ void measure_function_futures_limiting_executor(
                 hpx::threads::policies::scheduler_mode::
                     assign_work_thread_parent |
                 hpx::threads::policies::scheduler_mode::
-                    steal_high_priority_first);
+                    steal_high_priority_first,
+            full_mask);
     }
 
     // test a parallel algorithm on custom pool with high priority
@@ -387,6 +391,9 @@ void measure_function_futures_create_thread_hierarchical_placement(
     if (std::string("core-shared_priority_queue_scheduler") ==
         sched->get_description())
     {
+        auto const full_mask =
+            hpx::resource::get_partitioner().get_pool_pus_mask(
+                sched->get_parent_pool()->get_pool_name());
         sched->add_remove_scheduler_mode(
             hpx::threads::policies::scheduler_mode::assign_work_thread_parent,
             hpx::threads::policies::scheduler_mode::enable_stealing |
@@ -395,7 +402,8 @@ void measure_function_futures_create_thread_hierarchical_placement(
                     assign_work_round_robin |
                 hpx::threads::policies::scheduler_mode::steal_after_local |
                 hpx::threads::policies::scheduler_mode::
-                    steal_high_priority_first);
+                    steal_high_priority_first,
+            full_mask);
     }
     auto const func = [&l]() {
         null_function();

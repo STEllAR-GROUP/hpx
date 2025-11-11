@@ -42,7 +42,10 @@ struct dummy_agent : hpx::execution_base::agent_base
     {
         ++dummy_called;
     }
-    void yield_k(std::size_t, char const*) override {}
+    bool yield_k(std::size_t, char const*) override
+    {
+        return true;
+    }
     void suspend(char const*) override {}
     void resume(hpx::threads::thread_priority, char const*) override {}
     void abort(char const*) override {}

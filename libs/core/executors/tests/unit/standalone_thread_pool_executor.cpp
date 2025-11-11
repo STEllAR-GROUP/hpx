@@ -89,9 +89,15 @@ void test_bulk_sync(Executor& exec)
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
 
+    auto hint = hpx::execution::experimental::get_hint(exec);
+    hint.sharing_mode(hpx::threads::thread_sharing_hint::do_not_share_function |
+        hpx::threads::thread_sharing_hint::do_not_combine_tasks);
+    auto no_sharing_exec = hpx::execution::experimental::with_hint(exec, hint);
+
     hpx::parallel::execution::bulk_sync_execute(
-        exec, hpx::bind(&bulk_test, _1, tid, _2), v, 42);
-    hpx::parallel::execution::bulk_sync_execute(exec, &bulk_test, v, tid, 42);
+        no_sharing_exec, hpx::bind(&bulk_test, _1, tid, _2), v, 42);
+    hpx::parallel::execution::bulk_sync_execute(
+        no_sharing_exec, &bulk_test, v, tid, 42);
 }
 
 template <typename Executor>

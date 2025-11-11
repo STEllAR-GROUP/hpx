@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +13,8 @@
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
+
+#include <cstddef>
 
 namespace hpx::threads::detail {
 
@@ -105,9 +107,10 @@ namespace hpx::threads::detail {
         thread_id_ref_type id = invalid_thread_id;
         scheduler->create_thread(data, data.run_now ? &id : nullptr, ec);
 
-        // NOTE: Don't care if the hint is a NUMA hint, just want to wake up a
-        // thread.
-        scheduler->do_some_work(data.schedulehint.hint);
+        scheduler->do_some_work(data.schedulehint.mode ==
+                    hpx::threads::thread_schedule_hint_mode::numa ?
+                static_cast<std::size_t>(-1) :
+                data.schedulehint.hint);
 
         return id;
     }

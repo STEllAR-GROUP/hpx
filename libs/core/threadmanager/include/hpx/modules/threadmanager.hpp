@@ -206,15 +206,16 @@ namespace hpx::threads {
         hwloc_bitmap_ptr get_pool_numa_bitmap(
             std::string const& pool_name) const;
 
-        void set_scheduler_mode(
-            threads::policies::scheduler_mode mode) const noexcept;
-        void add_scheduler_mode(
-            threads::policies::scheduler_mode mode) const noexcept;
+        void set_scheduler_mode(threads::policies::scheduler_mode mode,
+            hpx::threads::mask_cref_type pu_mask) const noexcept;
+        void add_scheduler_mode(threads::policies::scheduler_mode mode,
+            hpx::threads::mask_cref_type pu_mask) const noexcept;
         void add_remove_scheduler_mode(
             threads::policies::scheduler_mode to_add_mode,
-            threads::policies::scheduler_mode to_remove_mode) const noexcept;
-        void remove_scheduler_mode(
-            threads::policies::scheduler_mode mode) const noexcept;
+            threads::policies::scheduler_mode to_remove_mode,
+            hpx::threads::mask_cref_type pu_mask) const noexcept;
+        void remove_scheduler_mode(threads::policies::scheduler_mode mode,
+            hpx::threads::mask_cref_type pu_mask) const noexcept;
 
         void reset_thread_distribution() const noexcept;
 

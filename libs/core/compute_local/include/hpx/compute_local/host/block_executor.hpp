@@ -224,34 +224,54 @@ namespace hpx::compute::host {
                 hpx::parallel::execution::detail::bulk_execute_result_t<F,
                     Shape, Ts...>;
 
-            std::vector<result_type> results;
             std::size_t cnt = util::size(shape);
             std::size_t const num_executors = executors_.size();
 
-            results.reserve(cnt);
-
             try
             {
-                auto begin = util::begin(shape);
-                for (std::size_t i = 0; i != num_executors; ++i)
+                if constexpr (!std::is_void_v<result_type>)
                 {
-                    std::size_t part_begin_offset = (i * cnt) / num_executors;
-                    std::size_t part_end_offset =
-                        ((i + 1) * cnt) / num_executors;
-                    auto part_begin = begin;
-                    auto part_end = begin;
-                    std::advance(part_begin, part_begin_offset);
-                    std::advance(part_end, part_end_offset);
-                    auto part_results =
-                        hpx::parallel::execution::bulk_sync_execute(
-                            executors_[i], HPX_FORWARD(F, f),
-                            util::iterator_range(begin, part_end),
-                            HPX_FORWARD(Ts, ts)...);
-                    results.emplace(results.end(),
-                        std::make_move_iterator(part_results.begin()),
-                        std::make_move_iterator(part_results.end()));
+                    std::vector<result_type> results;
+                    results.reserve(cnt);
+
+                    auto begin = util::begin(shape);
+                    for (std::size_t i = 0; i != num_executors; ++i)
+                    {
+                        std::size_t part_begin_offset =
+                            (i * cnt) / num_executors;
+                        std::size_t part_end_offset =
+                            ((i + 1) * cnt) / num_executors;
+                        auto part_begin = std::next(begin, part_begin_offset);
+                        auto part_end = std::next(begin, part_end_offset);
+                        auto part_results =
+                            hpx::parallel::execution::bulk_sync_execute(
+                                executors_[i], f,
+                                util::iterator_range(part_begin, part_end),
+                                HPX_FORWARD(Ts, ts)...);
+                        results.emplace(results.end(),
+                            std::make_move_iterator(part_results.begin()),
+                            std::make_move_iterator(part_results.end()));
+                    }
+
+                    return results;
                 }
-                return results;
+                else
+                {
+                    auto begin = util::begin(shape);
+                    for (std::size_t i = 0; i != num_executors; ++i)
+                    {
+                        std::size_t part_begin_offset =
+                            (i * cnt) / num_executors;
+                        std::size_t part_end_offset =
+                            ((i + 1) * cnt) / num_executors;
+                        auto part_begin = std::next(begin, part_begin_offset);
+                        auto part_end = std::next(begin, part_end_offset);
+                        hpx::parallel::execution::bulk_sync_execute(
+                            executors_[i], f,
+                            util::iterator_range(part_begin, part_end),
+                            HPX_FORWARD(Ts, ts)...);
+                    }
+                }
             }
             catch (std::bad_alloc const&)
             {

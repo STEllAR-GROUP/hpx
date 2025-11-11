@@ -69,9 +69,18 @@ namespace hpx::parallel::util::detail {
             auto&& shape =
                 detail::get_bulk_iteration_shape_idx(policy, first, count);
 
-            return execution::bulk_async_execute(policy.executor(),
-                partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
-                reshape(HPX_MOVE(shape)));
+            if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
+            {
+                return execution::bulk_async_execute(policy.executor(),
+                    partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                    reshape(HPX_MOVE(shape)));
+            }
+            else
+            {
+                return execution::bulk_sync_execute(policy.executor(),
+                    partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                    reshape(HPX_MOVE(shape)));
+            }
         }
         else
         {
@@ -101,8 +110,8 @@ namespace hpx::parallel::util::detail {
 
         template <typename ExPolicy_, typename FwdIter, typename F1,
             typename F2, typename ReShape = hpx::identity>
-        static decltype(auto) call(ExPolicy_&& policy, FwdIter first,
-            std::size_t count, F1&& f1, F2&& f2, ReShape&& reshape = ReShape{})
+        static auto call(ExPolicy_&& policy, FwdIter first, std::size_t count,
+            F1&& f1, F2&& f2, ReShape&& reshape = ReShape{})
         {
             // inform parameter traits
             using scoped_executor_parameters =
@@ -115,14 +124,28 @@ namespace hpx::parallel::util::detail {
             FwdIter last = parallel::detail::next(first, count);
             try
             {
-                auto&& items = detail::foreach_partition<Result>(
-                    HPX_FORWARD(ExPolicy_, policy), first, count,
-                    HPX_FORWARD(F1, f1), HPX_FORWARD(ReShape, reshape));
+                if constexpr (std::is_void_v<decltype(foreach_partition<Result>(
+                                  policy, first, count, f1, reshape))>)
+                {
+                    detail::foreach_partition<Result>(
+                        HPX_FORWARD(ExPolicy_, policy), first, count,
+                        HPX_FORWARD(F1, f1), HPX_FORWARD(ReShape, reshape));
 
-                scoped_params.mark_end_of_scheduling();
+                    scoped_params.mark_end_of_scheduling();
 
-                return reduce(
-                    HPX_MOVE(items), HPX_FORWARD(F2, f2), HPX_MOVE(last));
+                    return HPX_INVOKE(f2, HPX_MOVE(last));
+                }
+                else
+                {
+                    auto&& items = foreach_partition<Result>(
+                        HPX_FORWARD(ExPolicy_, policy), first, count,
+                        HPX_FORWARD(F1, f1), HPX_FORWARD(ReShape, reshape));
+
+                    scoped_params.mark_end_of_scheduling();
+
+                    return reduce(
+                        HPX_MOVE(items), HPX_FORWARD(F2, f2), HPX_MOVE(last));
+                }
             }
             catch (...)
             {

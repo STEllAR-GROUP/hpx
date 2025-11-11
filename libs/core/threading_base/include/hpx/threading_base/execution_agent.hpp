@@ -49,7 +49,7 @@ namespace hpx::threads {
         }
 
         void yield(char const* desc) override;
-        void yield_k(std::size_t k, char const* desc) override;
+        bool yield_k(std::size_t k, char const* desc) override;
         void suspend(char const* desc) override;
         void resume(
             hpx::threads::thread_priority priority, char const* desc) override;

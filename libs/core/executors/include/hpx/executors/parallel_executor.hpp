@@ -37,6 +37,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -87,7 +88,7 @@ namespace hpx::execution {
     struct parallel_policy_executor
     {
         /// Associate the parallel_execution_tag executor tag type as a default
-        /// with this executor, except if the given launch policy is synch.
+        /// with this executor, except if the given launch policy is sync.
         using execution_category =
             std::conditional_t<std::is_same_v<Policy, launch::sync_policy>,
                 sequenced_execution_tag, parallel_execution_tag>;
@@ -275,10 +276,7 @@ namespace hpx::execution {
             hpx::execution::experimental::get_processing_units_mask_t,
             parallel_policy_executor const& exec)
         {
-            auto pool = exec.pool_ ?
-                exec.pool_ :
-                threads::detail::get_self_or_default_pool();
-            return pool->get_used_processing_units(exec.get_num_cores(), false);
+            return exec.pu_mask();
         }
 
         friend auto tag_invoke(hpx::execution::experimental::get_cores_mask_t,
@@ -431,6 +429,48 @@ namespace hpx::execution {
             )>
         // clang-format on
         friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::bulk_sync_execute_t,
+            parallel_policy_executor const& exec, F&& f, S const& shape,
+            Ts&&... ts)
+        {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            hpx::threads::thread_description desc(f, exec.annotation_);
+#else
+            hpx::threads::thread_description desc(f);
+#endif
+            auto pool = exec.pool_ ?
+                exec.pool_ :
+                threads::detail::get_self_or_default_pool();
+
+            // use scheduling based on index_queue if no hierarchical threshold
+            // is given
+            bool const do_not_combine_tasks =
+                hpx::threads::do_not_combine_tasks(
+                    exec.policy().get_hint().sharing_mode());
+
+            if (exec.hierarchical_threshold_ == 0 && !do_not_combine_tasks)
+            {
+                return parallel::execution::detail::
+                    index_queue_bulk_sync_execute(desc, pool,
+                        exec.get_first_core(), exec.get_num_cores(),
+                        exec.hierarchical_threshold_, exec.policy_,
+                        HPX_FORWARD(F, f), shape, exec.pu_mask(),
+                        HPX_FORWARD(Ts, ts)...);
+            }
+
+            return parallel::execution::detail::hierarchical_bulk_sync_execute(
+                desc, pool, exec.get_first_core(), exec.get_num_cores(),
+                exec.hierarchical_threshold_, exec.policy_, HPX_FORWARD(F, f),
+                shape, HPX_FORWARD(Ts, ts)...);
+        }
+
+        // clang-format off
+        template <typename F, typename S, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<S>
+            )>
+        // clang-format on
+        friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             parallel_policy_executor const& exec, F&& f, S const& shape,
             Ts&&... ts)
@@ -456,7 +496,8 @@ namespace hpx::execution {
                     index_queue_bulk_async_execute(desc, pool,
                         exec.get_first_core(), exec.get_num_cores(),
                         exec.hierarchical_threshold_, exec.policy_,
-                        HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+                        HPX_FORWARD(F, f), shape, exec.pu_mask(),
+                        HPX_FORWARD(Ts, ts)...);
             }
 
             return parallel::execution::detail::hierarchical_bulk_async_execute(
@@ -549,6 +590,49 @@ namespace hpx::execution {
             return first_core_;
         }
 
+        HPX_FORCEINLINE static constexpr std::uint32_t wrapped_pu_num(
+            std::uint32_t const pu, bool const needs_wraparound,
+            std::uint32_t const available_threads) noexcept
+        {
+            if (!needs_wraparound || pu < available_threads)
+            {
+                return pu;
+            }
+            return pu % available_threads;
+        }
+
+        hpx::threads::mask_type pu_mask() const noexcept
+        {
+            auto const num_threads = get_num_cores();
+            auto const* pool =
+                pool_ ? pool_ : threads::detail::get_self_or_default_pool();
+            auto const available_threads =
+                static_cast<std::uint32_t>(pool->get_active_os_thread_count());
+            bool const needs_wraparound =
+                num_threads > available_threads || get_first_core() != 0;
+
+            std::uint32_t const overall_threads =    //-V101
+                hpx::threads::hardware_concurrency();
+            auto mask = hpx::threads::mask_type();
+            hpx::threads::resize(mask, overall_threads);
+
+            auto const& rp = hpx::resource::get_partitioner();
+            for (std::uint32_t i = 0; i != num_threads; ++i)
+            {
+                auto const thread_mask = rp.get_pu_mask(wrapped_pu_num(
+                    static_cast<std::uint32_t>(i + get_first_core()),
+                    needs_wraparound, available_threads));
+                for (std::uint32_t j = 0; j != overall_threads; ++j)
+                {
+                    if (threads::test(thread_mask, j))
+                    {
+                        threads::set(mask, j);
+                    }
+                }
+            }
+            return mask;
+        }
+
         friend class hpx::serialization::access;
 
         template <typename Archive>
@@ -595,7 +679,7 @@ namespace hpx::execution {
     }
 
     // clang-format off
-    template <typename Tag,typename Policy,
+    template <typename Tag, typename Policy,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>

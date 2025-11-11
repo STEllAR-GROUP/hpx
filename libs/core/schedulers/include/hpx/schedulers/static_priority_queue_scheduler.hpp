@@ -60,20 +60,17 @@ namespace hpx::threads::policies {
             bool deferred_initialization = true)
           : base_type(init, deferred_initialization)
         {
-            // disable thread stealing to begin with
-            this->remove_scheduler_mode(
-                policies::scheduler_mode::enable_stealing |
-                policies::scheduler_mode::enable_stealing_numa);
         }
 
-        void set_scheduler_mode(scheduler_mode mode) noexcept override
+        void set_scheduler_mode(scheduler_mode mode,
+            hpx::threads::mask_cref_type pu_mask) noexcept override
         {
             // this scheduler does not support stealing or numa stealing
             mode = static_cast<policies::scheduler_mode>(
                 mode & ~policies::scheduler_mode::enable_stealing);
             mode = static_cast<policies::scheduler_mode>(
                 mode & ~policies::scheduler_mode::enable_stealing_numa);
-            scheduler_base::set_scheduler_mode(mode);
+            scheduler_base::set_scheduler_mode(mode, pu_mask);
         }
 
         static std::string_view get_scheduler_name()

@@ -31,6 +31,7 @@
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threadmanager/threadmanager_fwd.hpp>
+#include <hpx/topology/cpu_mask.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -169,22 +170,32 @@ namespace hpx {
         /// Set the new scheduler mode
         HPX_CORE_EXPORT void set_scheduler_mode(
             threads::policies::scheduler_mode new_mode);
+        HPX_CORE_EXPORT void set_scheduler_mode(
+            threads::policies::scheduler_mode new_mode,
+            hpx::threads::mask_cref_type pu_mask);
 
         /// Add the given flags to the scheduler mode
         HPX_CORE_EXPORT void add_scheduler_mode(
             threads::policies::scheduler_mode to_add);
+        HPX_CORE_EXPORT void add_scheduler_mode(
+            threads::policies::scheduler_mode to_add,
+            hpx::threads::mask_cref_type pu_mask);
 
         /// Add/remove the given flags to the scheduler mode
         HPX_CORE_EXPORT void add_remove_scheduler_mode(
             threads::policies::scheduler_mode to_add,
             threads::policies::scheduler_mode to_remove);
+        HPX_CORE_EXPORT void add_remove_scheduler_mode(
+            threads::policies::scheduler_mode to_add,
+            threads::policies::scheduler_mode to_remove,
+            hpx::threads::mask_cref_type pu_mask);
 
         /// Remove the given flags from the scheduler mode
         HPX_CORE_EXPORT void remove_scheduler_mode(
             threads::policies::scheduler_mode to_remove);
-
-        /// Get the global topology instance
-        HPX_CORE_EXPORT topology const& get_topology();
+        HPX_CORE_EXPORT void remove_scheduler_mode(
+            threads::policies::scheduler_mode to_remove,
+            hpx::threads::mask_cref_type pu_mask);
         /// \endcond
     }    // namespace threads
 

@@ -137,7 +137,7 @@ int main()
     std::string vec_name("my_vector");
     my_vector.register_as(hpx::launch::sync, vec_name);
 
-    hpx::future<void> join = hpx::lcos::define_spmd_block("block", 4,
+    hpx::future<void> join = hpx::lcos::define_spmd_block("block", 2,
         bulk_test_action(), size_x, size_y, size_z, elt_size, vec_name);
 
     join.get();

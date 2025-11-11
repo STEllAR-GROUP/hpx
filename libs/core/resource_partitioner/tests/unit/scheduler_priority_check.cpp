@@ -56,6 +56,9 @@ int hpx_main(variables_map& vm)
         sched->get_description())
     {
         std::cout << "Setting shared-priority mode flags" << std::endl;
+        auto const full_mask =
+            hpx::resource::get_partitioner().get_pool_pus_mask(
+                sched->get_parent_pool()->get_pool_name());
         sched->add_remove_scheduler_mode(
             // add these flags
             hpx::threads::policies::scheduler_mode::enable_stealing |
@@ -71,7 +74,8 @@ int hpx_main(variables_map& vm)
                 hpx::threads::policies::scheduler_mode::reduce_thread_priority |
                 hpx::threads::policies::scheduler_mode::delay_exit |
                 hpx::threads::policies::scheduler_mode::fast_idle_mode |
-                hpx::threads::policies::scheduler_mode::enable_elasticity);
+                hpx::threads::policies::scheduler_mode::enable_elasticity,
+            full_mask);
     }
 
     // setup executors for different task priorities on the pools

@@ -196,7 +196,15 @@ namespace hpx::parallel::execution::detail {
         // Otherwise, it will call set_value on the shared state.
         void finish() const noexcept
         {
-            if (--(state->tasks_remaining.data_) == 0)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            static hpx::util::itt::event notify_event("finish");
+            hpx::util::itt::mark_event e(notify_event);
+#endif
+
+            std::uint32_t const prev_value =
+                state->tasks_remaining.data_.fetch_sub(
+                    1, std::memory_order_acq_rel);
+            if (prev_value == 1)
             {
                 if (state->bad_alloc_thrown.load(std::memory_order_relaxed))
                 {
@@ -219,6 +227,15 @@ namespace hpx::parallel::execution::detail {
                 {
                     state->set_data(hpx::util::unused);
                 }
+            }
+
+            // tell the scheduler that this task has finished running
+            auto const* thread_data = hpx::threads::get_thread_id_data(
+                hpx::threads::get_outer_self_id());
+            if (thread_data != nullptr)
+            {
+                thread_data->get_scheduler_base()->do_some_work(
+                    static_cast<std::size_t>(-1));
             }
         }
 
@@ -256,7 +273,8 @@ namespace hpx::parallel::execution::detail {
     ////////////////////////////////////////////////////////////////////////////
     // Extend the shared state of the returned future allowing to keep alive all
     // data needed for the scheduling
-    template <typename Launch, typename F, typename Shape, typename... Ts>
+    template <bool Sync, typename Launch, typename F, typename Shape,
+        typename... Ts>
     struct index_queue_bulk_state final : lcos::detail::future_data<void>
     {
     private:
@@ -283,36 +301,12 @@ namespace hpx::parallel::execution::detail {
             {
                 return pu;
             }
-            return pu - available_threads;
-        }
-
-        hpx::threads::mask_type full_mask() const noexcept
-        {
-            bool const needs_wraparound = num_threads > available_threads;
-
-            std::uint32_t const overall_threads =    //-V101
-                hpx::threads::hardware_concurrency();
-            auto mask = hpx::threads::mask_type();
-            hpx::threads::resize(mask, overall_threads);
-
-            auto const& rp = hpx::resource::get_partitioner();
-            for (std::uint32_t i = 0; i != num_threads; ++i)
-            {
-                auto thread_mask = rp.get_pu_mask(
-                    wrapped_pu_num(i, needs_wraparound) + first_thread);
-                for (std::uint32_t j = 0; j != overall_threads; ++j)
-                {
-                    if (threads::test(thread_mask, j))
-                    {
-                        threads::set(mask, j);
-                    }
-                }
-            }
-            return mask;
+            return pu % available_threads;
         }
 
         static hpx::threads::mask_type limit_mask(
-            hpx::threads::mask_cref_type orgmask, std::uint32_t num_threads)
+            hpx::threads::mask_cref_type orgmask,
+            std::uint32_t const num_threads)
         {
             std::uint32_t const num_cores =    //-V101
                 hpx::threads::hardware_concurrency();
@@ -373,22 +367,9 @@ namespace hpx::parallel::execution::detail {
                 part_begin, part_end, static_cast<std::uint32_t>(num_threads));
         }
 
-        // Spawn a task which will process a number of chunks. If the queue
-        // contains no chunks no task will be spawned.
-        template <typename Task>
-        void do_work_task(hpx::threads::thread_description const& desc,
-            threads::thread_pool_base* pool, bool const dont_bind_to_core,
-            bool const needs_wraparound, Task&& task_f) const
+        // Prepare policy to be used for spawning new HPX threads
+        auto prepare_launch_policy(bool const dont_bind_to_core)
         {
-            std::uint32_t const worker_thread = task_f.worker_thread;
-            if (queues[worker_thread].data_.empty())
-            {
-                // If the queue is empty we don't spawn a task. We only signal
-                // that this "task" is ready.
-                task_f.finish();
-                return;
-            }
-
             auto post_policy = policy;
 
             // run task on small stack (except if stackless threads should be
@@ -416,6 +397,26 @@ namespace hpx::parallel::execution::detail {
                 }
             }
 
+            return post_policy;
+        }
+
+        // Spawn a task which will process a number of chunks. If the queue
+        // contains no chunks no task will be spawned.
+        template <typename Policy, typename Task>
+        void do_work_task(Policy&& post_policy,
+            hpx::threads::thread_description const& desc,
+            threads::thread_pool_base* pool, bool const needs_wraparound,
+            Task&& task_f) const
+        {
+            std::uint32_t const worker_thread = task_f.worker_thread;
+            if (queues[worker_thread].data_.empty())
+            {
+                // If the queue is empty we don't spawn a task. We only signal
+                // that this "task" is ready.
+                task_f.finish();
+                return;
+            }
+
             // launch task on new HPX-thread
             auto hint = hpx::execution::experimental::get_hint(policy);
             if (hint.mode == hpx::threads::thread_schedule_hint_mode::none &&
@@ -428,13 +429,15 @@ namespace hpx::parallel::execution::detail {
                     first_thread);
 
                 hpx::detail::post_policy_dispatch<Launch>::call(
-                    hpx::execution::experimental::with_hint(post_policy, hint),
+                    hpx::execution::experimental::with_hint(
+                        HPX_FORWARD(Policy, post_policy), hint),
                     desc, pool, HPX_FORWARD(Task, task_f));
             }
             else
             {
                 hpx::detail::post_policy_dispatch<Launch>::call(
-                    post_policy, desc, pool, HPX_FORWARD(Task, task_f));
+                    HPX_FORWARD(Policy, post_policy), desc, pool,
+                    HPX_FORWARD(Task, task_f));
             }
         }
 
@@ -443,7 +446,8 @@ namespace hpx::parallel::execution::detail {
         index_queue_bulk_state(std::size_t const first_thread_,
             std::size_t const num_threads_,
             std::size_t const available_threads_, Launch l, F_&& f,
-            Shape const& shape, Ts_&&... ts) noexcept
+            Shape const& shape, hpx::threads::mask_cref_type mask,
+            Ts_&&... ts) noexcept
           : base_type(init_no_addref{})
           , first_thread(static_cast<std::uint32_t>(first_thread_))
           , num_threads(static_cast<std::uint32_t>(num_threads_))
@@ -454,7 +458,7 @@ namespace hpx::parallel::execution::detail {
           , f(HPX_FORWARD(F_, f))
           , shape(shape)
           , ts(HPX_FORWARD(Ts_, ts)...)
-          , pu_mask(full_mask())
+          , pu_mask(mask)
           , queues(num_threads)
         {
             tasks_remaining.data_.store(num_threads, std::memory_order_relaxed);
@@ -521,17 +525,22 @@ namespace hpx::parallel::execution::detail {
             std::uint32_t worker_thread = 0;
             bool main_thread_ok = false;
 
-            bool const needs_wraparound = num_threads > available_threads;
+            bool const needs_wraparound =
+                num_threads > available_threads || first_thread != 0;
 
             auto const& rp = hpx::resource::get_partitioner();
-            std::size_t main_pu_num = get_first_core(pu_mask);
+            std::size_t main_pu_num;
             if (local_worker_thread != static_cast<std::uint32_t>(-1))
             {
                 main_pu_num = rp.get_pu_num(
                     wrapped_pu_num(local_worker_thread, needs_wraparound));
             }
+            else
+            {
+                main_pu_num = get_first_core(pu_mask);
+            }
 
-            if (!hpx::threads::test(pu_mask, main_pu_num) || num_threads == 1)
+            if (num_threads == 1 || !hpx::threads::test(pu_mask, main_pu_num))
             {
                 main_thread_ok = true;
                 local_worker_thread = worker_thread++;
@@ -539,6 +548,9 @@ namespace hpx::parallel::execution::detail {
                     wrapped_pu_num(local_worker_thread, needs_wraparound) +
                     first_thread);
             }
+
+            // prepare launch policy for all new HPX threads once
+            auto post_policy = prepare_launch_policy(false);
 
             bool const reverse_placement =
                 hint.placement_mode() == placement::depth_first_reverse ||
@@ -553,8 +565,8 @@ namespace hpx::parallel::execution::detail {
                     wrapped_pu_num(pu, needs_wraparound) + first_thread);
 
                 // The queue for the local thread is handled later inline.
-                if (allow_stealing && !main_thread_ok &&
-                    pu == local_worker_thread)
+                if (!main_thread_ok && pu == local_worker_thread &&
+                    allow_stealing)
                 {
                     // The initializing thread is expected to participate in
                     // evaluating parallel regions, but only if stealing is
@@ -568,7 +580,7 @@ namespace hpx::parallel::execution::detail {
                     continue;
                 }
 
-                // don't double-book core that runs main thread
+                // don't double-book the core that runs the main thread
                 if (main_thread_ok && main_pu_num == pu_num)
                 {
                     continue;
@@ -581,7 +593,7 @@ namespace hpx::parallel::execution::detail {
                 }
 
                 // Schedule task for this worker thread
-                do_work_task(desc, pool, false, needs_wraparound,
+                do_work_task(post_policy, desc, pool, needs_wraparound,
                     task_function<index_queue_bulk_state>{
                         hpx::intrusive_ptr<index_queue_bulk_state>(this), size,
                         chunk_size, worker_thread, reverse_placement,
@@ -598,11 +610,32 @@ namespace hpx::parallel::execution::detail {
             if (main_thread_ok)
             {
                 // Handle the queue for the local thread.
-                do_work_task(desc, pool, true, needs_wraparound,
-                    task_function<index_queue_bulk_state>{
-                        hpx::intrusive_ptr<index_queue_bulk_state>(this), size,
-                        chunk_size, local_worker_thread, reverse_placement,
-                        allow_stealing});
+                hpx::intrusive_ptr<index_queue_bulk_state> this_(this);
+                if constexpr (Sync)
+                {
+                    // execute directly, if non-async
+                    task_function<index_queue_bulk_state> f{HPX_MOVE(this_),
+                        size, chunk_size, local_worker_thread,
+                        reverse_placement, allow_stealing};
+
+                    if (queues[local_worker_thread].data_.empty())
+                    {
+                        // If the queue is empty we don't execute the task. We
+                        // only signal that this "task" is ready.
+                        f.finish();
+                        return;
+                    }
+
+                    f();
+                }
+                else
+                {
+                    do_work_task(prepare_launch_policy(true), desc, pool,
+                        needs_wraparound,
+                        task_function<index_queue_bulk_state>{HPX_MOVE(this_),
+                            size, chunk_size, local_worker_thread,
+                            reverse_placement, allow_stealing});
+                }
             }
         }
 
@@ -630,11 +663,76 @@ namespace hpx::parallel::execution::detail {
     // tasks. It also avoids an additional allocation by directly returning a
     // hpx::future.
     template <typename Launch, typename F, typename S, typename... Ts>
+    void index_queue_bulk_sync_execute_void(
+        hpx::threads::thread_description const& desc,
+        threads::thread_pool_base* pool, std::size_t first_thread,
+        std::size_t num_threads, Launch policy, F&& f, S const& shape,
+        hpx::threads::mask_cref_type mask, Ts&&... ts)
+    {
+        HPX_ASSERT(pool);
+
+        // Don't spawn tasks if there is no work to be done
+        if (hpx::util::begin(shape) != hpx::util::end(shape))
+        {
+            std::size_t available_threads = pool->get_active_os_thread_count();
+            using shared_state =
+                index_queue_bulk_state<true, Launch, F, S, Ts...>;
+            hpx::intrusive_ptr<shared_state> p(
+                new shared_state(first_thread, num_threads, available_threads,
+                    HPX_MOVE(policy), HPX_FORWARD(F, f), shape, mask,
+                    HPX_FORWARD(Ts, ts)...),
+                false);
+
+            p->execute(desc, pool);
+            p->get_result_void();    // waits and rethrows, if needed
+        }
+    }
+
+    template <typename Launch, typename F, typename S, typename... Ts>
+    decltype(auto) index_queue_bulk_sync_execute(
+        hpx::threads::thread_description const& desc,
+        threads::thread_pool_base* pool, std::size_t first_thread,
+        std::size_t num_threads, std::size_t hierarchical_threshold,
+        Launch policy, F&& f, S const& shape, hpx::threads::mask_cref_type mask,
+        Ts&&... ts)
+    {
+        using result_type = detail::bulk_function_result_t<F, S, Ts...>;
+        if constexpr (!std::is_void_v<result_type>)
+        {
+            return hierarchical_bulk_sync_execute(desc, pool, first_thread,
+                num_threads, hierarchical_threshold, policy, HPX_FORWARD(F, f),
+                shape, HPX_FORWARD(Ts, ts)...);
+        }
+        else
+        {
+            return index_queue_bulk_sync_execute_void(desc, pool, first_thread,
+                num_threads, policy, HPX_FORWARD(F, f), shape, mask,
+                HPX_FORWARD(Ts, ts)...);
+        }
+    }
+
+    template <typename Launch, typename F, typename S, typename... Ts>
+    decltype(auto) index_queue_bulk_sync_execute(
+        threads::thread_pool_base* pool, std::size_t first_thread,
+        std::size_t num_threads, std::size_t hierarchical_threshold,
+        Launch policy, F&& f, S const& shape, hpx::threads::mask_cref_type mask,
+        Ts&&... ts)
+    {
+        hpx::threads::thread_description const desc(
+            f, "index_queue_bulk_sync_execute");
+
+        return index_queue_bulk_sync_execute(desc, pool, first_thread,
+            num_threads, hierarchical_threshold, policy, HPX_FORWARD(F, f),
+            shape, mask, HPX_FORWARD(Ts, ts)...);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename Launch, typename F, typename S, typename... Ts>
     decltype(auto) index_queue_bulk_async_execute_void(
         hpx::threads::thread_description const& desc,
         threads::thread_pool_base* pool, std::size_t first_thread,
         std::size_t num_threads, Launch policy, F&& f, S const& shape,
-        Ts&&... ts)
+        hpx::threads::mask_cref_type mask, Ts&&... ts)
     {
         HPX_ASSERT(pool);
 
@@ -645,10 +743,10 @@ namespace hpx::parallel::execution::detail {
         }
 
         std::size_t available_threads = pool->get_active_os_thread_count();
-        using shared_state = index_queue_bulk_state<Launch, F, S, Ts...>;
+        using shared_state = index_queue_bulk_state<false, Launch, F, S, Ts...>;
         hpx::intrusive_ptr<shared_state> p(
             new shared_state(first_thread, num_threads, available_threads,
-                HPX_MOVE(policy), HPX_FORWARD(F, f), shape,
+                HPX_MOVE(policy), HPX_FORWARD(F, f), shape, mask,
                 HPX_FORWARD(Ts, ts)...),
             false);
 
@@ -663,7 +761,8 @@ namespace hpx::parallel::execution::detail {
         hpx::threads::thread_description const& desc,
         threads::thread_pool_base* pool, std::size_t first_thread,
         std::size_t num_threads, std::size_t hierarchical_threshold,
-        Launch policy, F&& f, S const& shape, Ts&&... ts)
+        Launch policy, F&& f, S const& shape, hpx::threads::mask_cref_type mask,
+        Ts&&... ts)
     {
         using result_type = detail::bulk_function_result_t<F, S, Ts...>;
         if constexpr (!std::is_void_v<result_type>)
@@ -675,7 +774,7 @@ namespace hpx::parallel::execution::detail {
         else
         {
             return index_queue_bulk_async_execute_void(desc, pool, first_thread,
-                num_threads, policy, HPX_FORWARD(F, f), shape,
+                num_threads, policy, HPX_FORWARD(F, f), shape, mask,
                 HPX_FORWARD(Ts, ts)...);
         }
     }
@@ -684,13 +783,14 @@ namespace hpx::parallel::execution::detail {
     decltype(auto) index_queue_bulk_async_execute(
         threads::thread_pool_base* pool, std::size_t first_thread,
         std::size_t num_threads, std::size_t hierarchical_threshold,
-        Launch policy, F&& f, S const& shape, Ts&&... ts)
+        Launch policy, F&& f, S const& shape, hpx::threads::mask_cref_type mask,
+        Ts&&... ts)
     {
         hpx::threads::thread_description const desc(
-            f, "hierarchical_bulk_async_execute");
+            f, "index_queue_bulk_async_execute");
 
         return index_queue_bulk_async_execute(desc, pool, first_thread,
             num_threads, hierarchical_threshold, policy, HPX_FORWARD(F, f),
-            shape, HPX_FORWARD(Ts, ts)...);
+            shape, mask, HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx::parallel::execution::detail

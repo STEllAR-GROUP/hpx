@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,11 +7,13 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
+
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 #include <hpx/coroutines/detail/tss.hpp>
 #endif
@@ -39,7 +41,12 @@ namespace hpx::threads::policies {
         char const* description,
         thread_queue_init_parameters const& thread_queue_init,
         scheduler_mode mode)
-      : suspend_mtxs_(num_threads)
+      : modes_(num_threads)
+#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
+      , max_idle_backoff_time_(thread_queue_init.max_idle_backoff_time_)
+      , wait_count_data_(num_threads)
+#endif
+      , suspend_mtxs_(num_threads)
       , suspend_conds_(num_threads)
       , pu_mtxs_(num_threads)
       , states_(num_threads)
@@ -54,68 +61,91 @@ namespace hpx::threads::policies {
       , polling_work_count_function_cuda_(&null_polling_work_count_function)
       , polling_work_count_function_sycl_(&null_polling_work_count_function)
     {
-        scheduler_base::set_scheduler_mode(mode);
-
-#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-        double const max_time = thread_queue_init.max_idle_backoff_time_;
-
-        wait_counts_.resize(num_threads);
-        for (auto&& data : wait_counts_)
-        {
-            data.data_.wait_count_ = 0;
-            data.data_.max_idle_backoff_time_ = max_time;
-        }
-#endif
-
         for (std::size_t i = 0; i != num_threads; ++i)
-            states_[i].data_.store(hpx::state::initialized);
+        {
+            modes_[i].data_.store(mode, std::memory_order::relaxed);
+            states_[i].data_.store(
+                hpx::state::initialized, std::memory_order::relaxed);
+        }
     }
 
-    void scheduler_base::idle_callback([[maybe_unused]] std::size_t num_thread)
+    bool scheduler_base::idle_callback([[maybe_unused]] std::size_t num_thread)
     {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-        if (mode_.data_.load(std::memory_order_relaxed) &
+        if (modes_[num_thread].data_.load(std::memory_order_relaxed) &
             policies::scheduler_mode::enable_idle_backoff)
         {
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            static hpx::util::itt::event notify_event("idle_callback");
+            hpx::util::itt::mark_event e(notify_event);
+#endif
             // Put this thread to sleep for some time, additionally it gets
             // woken up on new work.
 
-            idle_backoff_data& data = wait_counts_[num_thread].data_;
+            auto& data = wait_count_data_[num_thread].data_;
+
+            std::unique_lock<pu_mutex_type> l(data.wait_mtx, std::try_to_lock);
+            if (!l)
+            {
+                return false;
+            }
 
             // Exponential back-off with a maximum sleep time.
-            static constexpr std::int64_t const max_exponent =
-                std::numeric_limits<double>::max_exponent;
+            constexpr double max_exponent =
+                std::numeric_limits<double>::max_exponent - 1;
             double const exponent =
-                (std::min) (static_cast<double>(data.wait_count_),
-                    static_cast<double>(max_exponent - 1));
+                (std::min) (static_cast<double>(data.wait_count), max_exponent);
 
-            std::chrono::milliseconds const period(
-                std::lround((std::min) (data.max_idle_backoff_time_,
-                    std::pow(2.0, exponent))));
+            std::chrono::microseconds const period(std::lround(
+                (std::min) (max_idle_backoff_time_, std::pow(2.0, exponent))));
 
-            ++data.wait_count_;
+            ++data.wait_count;
 
-            std::unique_lock<pu_mutex_type> l(mtx_);
-            if (cond_.wait_for(l, period) ==    //-V1089
+            if (data.wait_cond.wait_for(l, period) ==    //-V1089
                 std::cv_status::no_timeout)
             {
                 // reset counter if thread was woken up
-                data.wait_count_ = 0;
+                data.wait_count = 0;
             }
+            return true;
         }
 #endif
+        return false;
     }
 
     /// This function gets called by the thread-manager whenever new work
     /// has been added, allowing the scheduler to reactivate one or more of
     /// possibly idling OS threads
-    void scheduler_base::do_some_work(std::size_t)
+    void scheduler_base::do_some_work([[maybe_unused]] std::size_t num_thread)
     {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-        if (mode_.data_.load(std::memory_order_relaxed) &
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+        static hpx::util::itt::event notify_event("do_some_work");
+        hpx::util::itt::mark_event e(notify_event);
+#endif
+
+        if (static_cast<std::size_t>(-1) == num_thread)
+        {
+            auto const size = wait_count_data_.size();
+            for (std::size_t i = 0; i != size; ++i)
+            {
+                if (modes_[i].data_.load(std::memory_order_relaxed) &
+                    policies::scheduler_mode::enable_idle_backoff)
+                {
+                    wait_count_data_[i].data_.wait_count = 0;
+                    wait_count_data_[i].data_.wait_cond.notify_one();
+                }
+            }
+        }
+        else if (modes_[num_thread].data_.load(std::memory_order_relaxed) &
             policies::scheduler_mode::enable_idle_backoff)
         {
-            cond_.notify_all();
+            auto const size = wait_count_data_.size();
+            for (std::size_t i = 0; i != size; ++i)
+            {
+                wait_count_data_[i].data_.wait_count = 0;
+                wait_count_data_[i].data_.wait_cond.notify_one();
+            }
         }
 #endif
     }
@@ -159,7 +189,7 @@ namespace hpx::threads::policies {
     std::size_t scheduler_base::select_active_pu(
         std::size_t num_thread, bool allow_fallback)
     {
-        if (mode_.data_.load(std::memory_order_relaxed) &
+        if (modes_[num_thread].data_.load(std::memory_order_relaxed) &
             threads::policies::scheduler_mode::enable_elasticity)
         {
             std::size_t states_size = states_.size();
@@ -321,43 +351,92 @@ namespace hpx::threads::policies {
     }
 
     // get/set scheduler mode
-    void scheduler_base::set_scheduler_mode(scheduler_mode mode) noexcept
+    void scheduler_base::set_scheduler_mode(
+        scheduler_mode mode, hpx::threads::mask_cref_type pu_mask) noexcept
     {
+        HPX_ASSERT(hpx::threads::count(pu_mask) <= modes_.size());
+
         // distribute the same value across all cores
-        mode_.data_.store(mode, std::memory_order_release);
+        std::size_t const size = hpx::threads::mask_size(pu_mask);
+        for (std::size_t i = 0, j = 0; i != size; ++i)
+        {
+            if (hpx::threads::test(pu_mask, i))
+            {
+                modes_[j++].data_.store(mode, std::memory_order_release);
+            }
+        }
         do_some_work(static_cast<std::size_t>(-1));
     }
 
-    void scheduler_base::add_scheduler_mode(scheduler_mode mode) noexcept
+    void scheduler_base::add_scheduler_mode(
+        scheduler_mode mode, hpx::threads::mask_cref_type pu_mask) noexcept
     {
+        HPX_ASSERT(hpx::threads::count(pu_mask) <= modes_.size());
+
         // distribute the same value across all cores
-        set_scheduler_mode(get_scheduler_mode() | mode);
+        std::size_t const size = hpx::threads::mask_size(pu_mask);
+        for (std::size_t i = 0, j = 0; i != size; ++i)
+        {
+            if (hpx::threads::test(pu_mask, i))
+            {
+                auto const old_mode =
+                    modes_[j].data_.load(std::memory_order::relaxed);
+                modes_[j++].data_.store(
+                    old_mode | mode, std::memory_order_release);
+            }
+        }
     }
 
-    void scheduler_base::remove_scheduler_mode(scheduler_mode mode) noexcept
+    void scheduler_base::remove_scheduler_mode(
+        scheduler_mode mode, hpx::threads::mask_cref_type pu_mask) noexcept
     {
-        mode = static_cast<scheduler_mode>(get_scheduler_mode() & ~mode);
-        set_scheduler_mode(mode);
+        HPX_ASSERT(hpx::threads::count(pu_mask) <= modes_.size());
+
+        std::size_t const size = hpx::threads::mask_size(pu_mask);
+        for (std::size_t i = 0, j = 0; i != size; ++i)
+        {
+            if (hpx::threads::test(pu_mask, i))
+            {
+                auto const old_mode =
+                    modes_[j].data_.load(std::memory_order::relaxed);
+                modes_[j++].data_.store(
+                    static_cast<scheduler_mode>(old_mode & ~mode),
+                    std::memory_order_release);
+            }
+        }
     }
 
-    void scheduler_base::add_remove_scheduler_mode(
-        scheduler_mode to_add_mode, scheduler_mode to_remove_mode) noexcept
+    void scheduler_base::add_remove_scheduler_mode(scheduler_mode to_add_mode,
+        scheduler_mode to_remove_mode,
+        hpx::threads::mask_cref_type pu_mask) noexcept
     {
-        scheduler_mode const mode = static_cast<scheduler_mode>(
-            (get_scheduler_mode() | to_add_mode) & ~to_remove_mode);
-        set_scheduler_mode(mode);
+        HPX_ASSERT(hpx::threads::count(pu_mask) <= modes_.size());
+
+        std::size_t const size = hpx::threads::mask_size(pu_mask);
+        for (std::size_t i = 0, j = 0; i != size; ++i)
+        {
+            if (hpx::threads::test(pu_mask, i))
+            {
+                auto const old_mode =
+                    modes_[j].data_.load(std::memory_order::relaxed);
+                modes_[j++].data_.store(
+                    static_cast<scheduler_mode>(
+                        (old_mode | to_add_mode) & ~to_remove_mode),
+                    std::memory_order_release);
+            }
+        }
     }
 
-    void scheduler_base::update_scheduler_mode(
-        scheduler_mode mode, bool set) noexcept
+    void scheduler_base::update_scheduler_mode(scheduler_mode mode, bool set,
+        hpx::threads::mask_cref_type pu_mask) noexcept
     {
         if (set)
         {
-            add_scheduler_mode(mode);
+            add_scheduler_mode(mode, pu_mask);
         }
         else
         {
-            remove_scheduler_mode(mode);
+            remove_scheduler_mode(mode, pu_mask);
         }
     }
 

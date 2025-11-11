@@ -321,7 +321,13 @@ namespace hpx { namespace lcos {
                     static_cast<std::size_t>(agas::get_locality_id());
                 offset *= images_per_locality;
 
-                hpx::parallel::execution::bulk_sync_execute(exec,
+                auto hint = hpx::execution::experimental::get_hint(exec);
+                hint.sharing_mode(
+                    hpx::threads::thread_sharing_hint::do_not_share_function |
+                    hpx::threads::thread_sharing_hint::do_not_combine_tasks);
+
+                hpx::parallel::execution::bulk_sync_execute(
+                    hpx::execution::experimental::with_hint(exec, hint),
                     detail::spmd_block_helper<F>{
                         name, images_per_locality, num_images},
                     hpx::util::counting_shape(

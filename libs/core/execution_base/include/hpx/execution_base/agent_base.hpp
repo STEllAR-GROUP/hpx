@@ -24,7 +24,7 @@ namespace hpx::execution_base {
         [[nodiscard]] virtual context_base const& context() const noexcept = 0;
 
         virtual void yield(char const* desc) = 0;
-        virtual void yield_k(std::size_t k, char const* desc) = 0;
+        virtual bool yield_k(std::size_t k, char const* desc) = 0;
         virtual void suspend(char const* desc) = 0;
         virtual void resume(
             hpx::threads::thread_priority priority, char const* desc) = 0;

@@ -1122,12 +1122,14 @@ namespace hpx::threads {
 
     void set_scheduler_mode(threads::policies::scheduler_mode m)
     {
-        get_runtime().get_thread_manager().set_scheduler_mode(m);
+        get_runtime().get_thread_manager().set_scheduler_mode(
+            m, hpx::resource::get_partitioner().get_used_pus_mask());
     }
 
     void add_scheduler_mode(threads::policies::scheduler_mode m)
     {
-        get_runtime().get_thread_manager().add_scheduler_mode(m);
+        get_runtime().get_thread_manager().add_scheduler_mode(
+            m, hpx::resource::get_partitioner().get_used_pus_mask());
     }
 
     void add_remove_scheduler_mode(
@@ -1135,24 +1137,41 @@ namespace hpx::threads {
         threads::policies::scheduler_mode to_remove_mode)
     {
         get_runtime().get_thread_manager().add_remove_scheduler_mode(
-            to_add_mode, to_remove_mode);
+            to_add_mode, to_remove_mode,
+            hpx::resource::get_partitioner().get_used_pus_mask());
     }
 
     void remove_scheduler_mode(threads::policies::scheduler_mode m)
     {
-        get_runtime().get_thread_manager().remove_scheduler_mode(m);
+        get_runtime().get_thread_manager().remove_scheduler_mode(
+            m, hpx::resource::get_partitioner().get_used_pus_mask());
     }
 
-    topology const& get_topology()
+    void set_scheduler_mode(threads::policies::scheduler_mode m,
+        hpx::threads::mask_cref_type pu_mask)
     {
-        hpx::runtime const* rt = hpx::get_runtime_ptr();
-        if (rt == nullptr)
-        {
-            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                "hpx::threads::get_topology",
-                "the hpx runtime system has not been initialized yet");
-        }
-        return rt->get_topology();
+        get_runtime().get_thread_manager().set_scheduler_mode(m, pu_mask);
+    }
+
+    void add_scheduler_mode(threads::policies::scheduler_mode m,
+        hpx::threads::mask_cref_type pu_mask)
+    {
+        get_runtime().get_thread_manager().add_scheduler_mode(m, pu_mask);
+    }
+
+    void add_remove_scheduler_mode(
+        threads::policies::scheduler_mode to_add_mode,
+        threads::policies::scheduler_mode to_remove_mode,
+        hpx::threads::mask_cref_type pu_mask)
+    {
+        get_runtime().get_thread_manager().add_remove_scheduler_mode(
+            to_add_mode, to_remove_mode, pu_mask);
+    }
+
+    void remove_scheduler_mode(threads::policies::scheduler_mode m,
+        hpx::threads::mask_cref_type pu_mask)
+    {
+        get_runtime().get_thread_manager().remove_scheduler_mode(m, pu_mask);
     }
 }    // namespace hpx::threads
 

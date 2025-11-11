@@ -18,10 +18,11 @@ namespace hpx::threads::detail {
 
     struct scheduling_callbacks
     {
+        using outer_callback_type = hpx::move_only_function<bool()>;
         using callback_type = hpx::move_only_function<void()>;
         using background_callback_type = hpx::move_only_function<bool()>;
 
-        explicit scheduling_callbacks(callback_type&& outer,
+        explicit scheduling_callbacks(outer_callback_type&& outer,
             callback_type&& inner = callback_type(),
             background_callback_type&& background = background_callback_type(),
             std::size_t max_background_threads =
@@ -37,7 +38,7 @@ namespace hpx::threads::detail {
         {
         }
 
-        callback_type outer_;
+        outer_callback_type outer_;
         callback_type inner_;
         background_callback_type background_;
         std::size_t const max_background_threads_;
