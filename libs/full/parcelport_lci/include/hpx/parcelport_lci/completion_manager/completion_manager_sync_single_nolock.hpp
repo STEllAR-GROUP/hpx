@@ -20,28 +20,38 @@ namespace hpx::parcelset::policies::lci {
         completion_manager_sync_single_nolock(parcelport* pp)
           : completion_manager_base(pp)
         {
-            LCI_sync_create(LCI_UR_DEVICE, 1, &sync);
+            sync = ::lci::alloc_sync();
         }
 
         ~completion_manager_sync_single_nolock()
         {
-            LCI_sync_free(&sync);
+            ::lci::free_comp(&sync);
         }
 
-        LCI_comp_t alloc_completion()
+        ::lci::comp_t alloc_completion()
         {
             return sync;
         }
 
-        void enqueue_completion(LCI_comp_t comp)
+        void free_completion(::lci::comp_t comp)
         {
             HPX_UNUSED(comp);
         }
 
-        LCI_request_t poll();
+        void enqueue_completion(::lci::comp_t comp)
+        {
+            HPX_UNUSED(comp);
+        }
+
+        ::lci::status_t poll();
+
+        ::lci::comp_t get_completion_object()
+        {
+            return sync;
+        }
 
     private:
-        LCI_comp_t sync;
+        ::lci::comp_t sync;
     };
 }    // namespace hpx::parcelset::policies::lci
 

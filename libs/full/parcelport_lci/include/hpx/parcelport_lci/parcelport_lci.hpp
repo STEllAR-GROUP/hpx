@@ -15,7 +15,6 @@
 
 #include <hpx/parcelport_lci/config.hpp>
 #include <hpx/modules/lci_base.hpp>
-#include <hpx/parcelport_lci/backlog_queue.hpp>
 #include <hpx/parcelport_lci/completion_manager_base.hpp>
 #include <hpx/parcelport_lci/header.hpp>
 #include <hpx/parcelport_lci/locality.hpp>
@@ -130,9 +129,7 @@ namespace hpx::parcelset {
                 // by LCI. They would not be modified once initialized.
                 // So we should not have false sharing here.
                 int idx;
-                LCI_device_t device;
-                LCI_endpoint_t endpoint_new;
-                LCI_endpoint_t endpoint_followup;
+                ::lci::device_t device;
                 completion_manager_t* completion_manager_p;
             };
             std::vector<device_t> devices;
@@ -145,10 +142,12 @@ namespace hpx::parcelset {
                 std::shared_ptr<completion_manager_base> send;
                 std::shared_ptr<completion_manager_base> recv_new;
                 std::shared_ptr<completion_manager_base> recv_followup;
+                ::lci::rcomp_t recv_new_rcomp;
             };
             std::vector<completion_manager_t> completion_managers;
 
             bool do_progress_local();
+            std::size_t get_tls_device_idx();
             device_t& get_tls_device();
 
         private:
@@ -259,14 +258,13 @@ namespace hpx::traits {
                 "log_level = none\n"
                 "log_outfile = stderr\n"
                 "sendimm = 1\n"
-                "backlog_queue = 0\n"
                 "prg_thread_num = 1\n"
                 "protocol = putsendrecv\n"
                 "comp_type_header = queue\n"
                 "comp_type_followup = queue\n"
                 "progress_type = worker\n"
+                "progress_strategy = local\n"
                 "prepost_recv_num = 1\n"
-                "reg_mem = 1\n"
                 "ndevices = 2\n"
                 "ncomps = 1\n"
                 "enable_in_buffer_assembly = 1\n"
@@ -274,7 +272,6 @@ namespace hpx::traits {
                 "mbuffer_alloc_max_retry = 32\n"
                 "bg_work_max_count = 32\n"
                 "bg_work_when_send = 0\n"
-                "enable_sendmc = 0\n"
                 "comp_type = deprecated\n";
         }
     };

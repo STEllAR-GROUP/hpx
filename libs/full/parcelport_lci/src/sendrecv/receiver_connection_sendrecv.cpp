@@ -43,7 +43,7 @@ namespace hpx::parcelset::policies::lci {
             static_cast<std::size_t>(header_.numbytes());
         timer_.restart();
 #endif
-        device_p = &pp_->devices[header_.get_device_idx()];
+        device_p = &pp_->get_tls_device();
         tag = header_.get_tag();
         // decode data
         buffer.data_.allocate(header_.numbytes_nonzero_copy());
@@ -99,11 +99,10 @@ namespace hpx::parcelset::policies::lci {
         recv_chunks_idx = 0;
         recv_zero_copy_chunks_idx = 0;
         original_tag = tag;
-        segment_used = LCI_SEGMENT_ALL;
         state.store(connection_state::initialized, std::memory_order_release);
         util::lci_environment::log(util::lci_environment::log_level_t::debug,
-            "recv", "recv connection (%d, %d, %d) start!\n", dst_rank, LCI_RANK,
-            tag);
+            "recv", "recv connection (%d, %d, %d) start!\n", dst_rank,
+            util::lci_environment::rank(), tag);
     }
 
     receiver_connection_sendrecv::return_t
@@ -134,57 +133,22 @@ namespace hpx::parcelset::policies::lci {
         }
     }
 
-    LCI_comp_t receiver_connection_sendrecv::unified_recv(
-        void* address, size_t length)
+    receiver_connection_sendrecv::return_t
+    receiver_connection_sendrecv::unified_recv(void* address, size_t length)
     {
-        LCI_comp_t completion =
+        ::lci::comp_t completion =
             device_p->completion_manager_p->recv_followup->alloc_completion();
-        if (length <= (size_t) LCI_MEDIUM_SIZE)
-        {
-            LCI_mbuffer_t mbuffer;
-            mbuffer.address = address;
-            mbuffer.length = length;
-            LCI_error_t ret = LCI_recvm(device_p->endpoint_followup, mbuffer,
-                dst_rank, tag, completion, sharedPtr_p);
-            HPX_ASSERT(ret == LCI_OK);
-            HPX_UNUSED(ret);
-            util::lci_environment::log(
-                util::lci_environment::log_level_t::debug, "recv",
-                "recvm (%d, %d, %d) device %d tag %d size %d\n", dst_rank,
-                LCI_RANK, original_tag, device_p->idx, tag, length);
-            tag = (tag + 1) % LCI_MAX_TAG;
-        }
-        else
-        {
-            LCI_lbuffer_t lbuffer;
-            lbuffer.address = address;
-            lbuffer.length = length;
-            if (config_t::reg_mem)
-            {
-                LCI_memory_register(device_p->device, lbuffer.address,
-                    lbuffer.length, &lbuffer.segment);
-            }
-            else
-            {
-                lbuffer.segment = LCI_SEGMENT_ALL;
-            }
-            LCI_error_t ret = LCI_recvl(device_p->endpoint_followup, lbuffer,
-                dst_rank, tag, completion, sharedPtr_p);
-            HPX_ASSERT(ret == LCI_OK);
-            HPX_UNUSED(ret);
-            util::lci_environment::log(
-                util::lci_environment::log_level_t::debug, "recv",
-                "recvl (%d, %d, %d) device %d tag %d size %d\n", dst_rank,
-                LCI_RANK, original_tag, device_p->idx, tag, length);
-            tag = (tag + 1) % LCI_MAX_TAG;
-            if (segment_used != LCI_SEGMENT_ALL)
-            {
-                LCI_memory_deregister(&segment_used);
-                segment_used = LCI_SEGMENT_ALL;
-            }
-            segment_used = lbuffer.segment;
-        }
-        return completion;
+        // TODO: optimize allow_done
+        auto status =
+            ::lci::post_recv_x(dst_rank, address, length, tag, completion)
+                .user_context(sharedPtr_p)
+                .device(device_p->device)();
+        util::lci_environment::log(util::lci_environment::log_level_t::debug,
+            "recv", "recvm (%d, %d, %d) device %d tag %d size %d ret %s\n",
+            dst_rank, util::lci_environment::rank(), original_tag,
+            device_p->idx, tag, length, status.get_error().get_str());
+        tag = (tag + 1) % util::lci_environment::get_max_tag();
+        return {status.is_done(), completion};
     }
 
     receiver_connection_sendrecv::return_t
@@ -200,15 +164,16 @@ namespace hpx::parcelset::policies::lci {
             size_t tchunk_length = tchunks.size() *
                 sizeof(receiver_base::buffer_type::transmission_chunk_type);
             state.store(connection_state::locked, std::memory_order_relaxed);
-            LCI_comp_t completion = unified_recv(tchunks.data(), tchunk_length);
-            state.store(next_state, std::memory_order_release);
-            return {false, completion};
+            auto ret = unified_recv(tchunks.data(), tchunk_length);
+            if (!ret.isDone)
+            {
+                state.store(next_state, std::memory_order_release);
+                return ret;
+            }
         }
-        else
-        {
-            state.store(next_state, std::memory_order_release);
-            return receive_data();
-        }
+        // either we didn't need to recv tchunks, or the receive was immediately done
+        state.store(next_state, std::memory_order_release);
+        return receive_data();
     }
 
     receiver_connection_sendrecv::return_t
@@ -221,16 +186,16 @@ namespace hpx::parcelset::policies::lci {
         if (need_recv_data)
         {
             state.store(connection_state::locked, std::memory_order_relaxed);
-            LCI_comp_t completion =
-                unified_recv(buffer.data_.data(), buffer.data_.size());
-            state.store(next_state, std::memory_order_release);
-            return {false, completion};
+            auto ret = unified_recv(buffer.data_.data(), buffer.data_.size());
+            if (!ret.isDone)
+            {
+                state.store(next_state, std::memory_order_release);
+                return ret;
+            }
         }
-        else
-        {
-            state.store(next_state, std::memory_order_release);
-            return receive_chunks();
-        }
+        // either we didn't need to recv data, or the receive was immediately done
+        state.store(next_state, std::memory_order_release);
+        return receive_chunks();
     }
 
     receiver_connection_sendrecv::return_t
@@ -316,9 +281,12 @@ namespace hpx::parcelset::policies::lci {
             HPX_UNUSED(chunk_size);
 
             state.store(connection_state::locked, std::memory_order_relaxed);
-            LCI_comp_t completion = unified_recv(chunk.data(), chunk.size());
+            auto ret = unified_recv(chunk.data(), chunk.size());
             state.store(current_state, std::memory_order_release);
-            return {false, completion};
+            if (!ret.isDone)
+            {
+                return ret;
+            }
         }
         HPX_ASSERT_MSG(recv_zero_copy_chunks_idx == buffer.num_chunks_.first,
             "observed: {}, expected {}", recv_zero_copy_chunks_idx,
@@ -343,9 +311,12 @@ namespace hpx::parcelset::policies::lci {
             buffer.chunks_[idx] =
                 serialization::create_pointer_chunk(chunk.data(), chunk.size());
             state.store(connection_state::locked, std::memory_order_relaxed);
-            LCI_comp_t completion = unified_recv(chunk.data(), chunk.size());
+            auto ret = unified_recv(chunk.data(), chunk.size());
             state.store(current_state, std::memory_order_release);
-            return {false, completion};
+            if (!ret.isDone)
+            {
+                return ret;
+            }
         }
         state.store(next_state, std::memory_order_release);
         return {true, nullptr};
@@ -357,12 +328,8 @@ namespace hpx::parcelset::policies::lci {
             util::lci_environment::recv_conn_end, 1);
         util::lci_environment::log(util::lci_environment::log_level_t::debug,
             "recv", "recv connection (%d, %d, %d, %d) done!\n", dst_rank,
-            LCI_RANK, original_tag, tag - original_tag + 1);
-        if (segment_used != LCI_SEGMENT_ALL)
-        {
-            LCI_memory_deregister(&segment_used);
-            segment_used = LCI_SEGMENT_ALL;
-        }
+            util::lci_environment::rank(), original_tag,
+            tag - original_tag + 1);
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         buffer.data_point_.time_ = timer_.elapsed_nanoseconds();
 #endif
@@ -390,6 +357,7 @@ namespace hpx::parcelset::policies::lci {
             util::lci_environment::pcounter_since(handle_parcels_start_time));
         buffer.data_.free();
         parcels_.clear();
+        delete sharedPtr_p;
     }
 }    // namespace hpx::parcelset::policies::lci
 

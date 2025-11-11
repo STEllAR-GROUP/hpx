@@ -25,24 +25,34 @@ namespace hpx::parcelset::policies::lci {
 
         ~completion_manager_sync() {}
 
-        LCI_comp_t alloc_completion()
+        ::lci::comp_t alloc_completion()
         {
-            LCI_comp_t sync;
-            LCI_sync_create(LCI_UR_DEVICE, 1, &sync);
+            ::lci::comp_t sync = ::lci::alloc_sync();
             return sync;
         }
 
-        void enqueue_completion(LCI_comp_t comp)
+        void free_completion(::lci::comp_t comp)
+        {
+            ::lci::free_comp(&comp);
+        }
+
+        void enqueue_completion(::lci::comp_t comp)
         {
             std::unique_lock l(lock);
             sync_list.push_back(comp);
         }
 
-        LCI_request_t poll();
+        ::lci::status_t poll();
+
+        ::lci::comp_t get_completion_object()
+        {
+            throw std::runtime_error("completion_manager_sync does not have a "
+                                     "single completion object");
+        }
 
     private:
         hpx::spinlock lock;
-        std::deque<LCI_comp_t> sync_list;
+        std::deque<::lci::comp_t> sync_list;
     };
 }    // namespace hpx::parcelset::policies::lci
 

@@ -9,12 +9,11 @@
 #include <hpx/parcelport_lci/parcelport_lci.hpp>
 
 namespace hpx::parcelset::policies::lci {
-    LCI_request_t completion_manager_sync::poll()
+    ::lci::status_t completion_manager_sync::poll()
     {
-        LCI_request_t request;
-        request.flag = LCI_ERR_RETRY;
+        ::lci::status_t status;
 
-        LCI_comp_t sync = nullptr;
+        ::lci::comp_t sync;
         {
             std::unique_lock l(lock, std::try_to_lock);
             if (l.owns_lock() && !sync_list.empty())
@@ -23,13 +22,12 @@ namespace hpx::parcelset::policies::lci {
                 sync_list.pop_front();
             }
         }
-        if (sync)
+        if (!sync.is_empty())
         {
-            LCI_error_t ret = LCI_sync_test(sync, &request);
-            if (ret == LCI_OK)
+            ::lci::sync_test(sync, &status);
+            if (status.is_done())
             {
-                HPX_ASSERT(request.flag == LCI_OK);
-                LCI_sync_free(&sync);
+                ::lci::free_comp(&sync);
             }
             else
             {
@@ -39,6 +37,6 @@ namespace hpx::parcelset::policies::lci {
                 sync_list.push_back(sync);
             }
         }
-        return request;
+        return status;
     }
 }    // namespace hpx::parcelset::policies::lci

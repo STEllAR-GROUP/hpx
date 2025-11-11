@@ -1269,7 +1269,15 @@ if(HPX_WITH_NETWORKING)
     ADVANCED
   )
   hpx_option(
-    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch" "v1.7.9"
+    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch"
+    "2c4d2c59d2b781f54d6c4e64421adcca16502df9" # latest commit as of 2025-10-29
+    CATEGORY "Build Targets"
+    ADVANCED
+  )
+  hpx_option(
+    HPX_WITH_LCI_BOOTSTRAP_MPI BOOL
+    "Configure the autofetched LCI with mpi bootstrap support (default: OFF)"
+    OFF
     CATEGORY "Build Targets"
     ADVANCED
   )
@@ -1404,8 +1412,8 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
   hpx_option(
     HPX_WITH_PARCELPORT_LCI_ENV
     STRING
-    "List of environment variables checked to detect LCI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID)."
-    "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID"
+    "List of environment variables checked to detect LCI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID;LCT_PMI_FILE_NRANKS)."
+    "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID;LCT_PMI_FILE_NRANKS"
     CATEGORY "Parcelport"
     ADVANCED
   )

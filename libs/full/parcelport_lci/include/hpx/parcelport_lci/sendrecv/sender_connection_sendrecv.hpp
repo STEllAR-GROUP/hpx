@@ -34,8 +34,6 @@ namespace hpx::parcelset::policies::lci {
             postprocess_handler_type&& parcel_postprocess);
         return_t send_nb();
         void done();
-        bool tryMerge(
-            const std::shared_ptr<sender_connection_base>& other_base);
 
     private:
         enum class connection_state
@@ -58,20 +56,19 @@ namespace hpx::parcelset::policies::lci {
         // related information about this connection
         hpx::chrono::high_resolution_timer timer_;
         header header_;
-        LCI_mbuffer_t header_buffer;
-        std::vector<char> header_buffer_vector;
+        void* header_buffer;
+        size_t header_buffer_size;
         bool need_send_data;
         bool need_send_tchunks;
-        LCI_tag_t tag;
-        LCI_tag_t original_tag;
+        ::lci::tag_t tag;
+        ::lci::tag_t original_tag;
         std::shared_ptr<sender_connection_sendrecv>* sharedPtr_p;
         // temporary data
-        LCI_comp_t completion;
-        LCI_segment_t segment_to_use, segment_used;
+        ::lci::comp_t completion;
         // for profiling
         LCT_time_t conn_start_time;
 
-        static std::atomic<int> next_tag;
+        static std::atomic<::lci::tag_t> next_tag;
     };
 }    // namespace hpx::parcelset::policies::lci
 

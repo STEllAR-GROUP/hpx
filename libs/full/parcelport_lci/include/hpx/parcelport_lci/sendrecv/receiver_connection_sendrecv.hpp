@@ -29,7 +29,7 @@ namespace hpx::parcelset::policies::lci {
         struct return_t
         {
             bool isDone;
-            LCI_comp_t completion;
+            ::lci::comp_t completion;
         };
 
     public:
@@ -48,7 +48,7 @@ namespace hpx::parcelset::policies::lci {
             rcvd_chunks,
             locked
         };
-        LCI_comp_t unified_recv(void* address, size_t length);
+        return_t unified_recv(void* address, size_t length);
         return_t receive_transmission_chunks();
         return_t receive_data();
         return_t receive_chunks();
@@ -64,16 +64,14 @@ namespace hpx::parcelset::policies::lci {
         int dst_rank;
         bool need_recv_data;
         bool need_recv_tchunks;
-        LCI_tag_t tag;
-        LCI_tag_t original_tag;
+        ::lci::tag_t tag;
+        ::lci::tag_t original_tag;
         receiver_base::buffer_type buffer;
         std::vector<parcelset::parcel> parcels_;
         std::vector<std::vector<char>> chunk_buffers_;
         parcelport* pp_;
         parcelport::device_t* device_p;
         std::shared_ptr<receiver_connection_sendrecv>* sharedPtr_p;
-        // temporary data
-        LCI_segment_t segment_used;
         // for profiling
         LCT_time_t conn_start_time;
     };
