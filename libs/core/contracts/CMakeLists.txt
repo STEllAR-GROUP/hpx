@@ -7,21 +7,27 @@
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+if(HPX_WITH_CXX26_CONTRACTS)
+  # Map existing HPX_ASSERT to contract_assert
+  hpx_option(
+    HPX_CONTRACTS_WITH_ASSERTS_AS_CONTRACT_ASSERTS BOOL
+    "Map existing HPX_ASERT to contract_assert. (default: ON)" ON ADVANCED
+    CATEGORY "Modules"
+    MODULE CONTRACTS
+  )
+
+  if(HPX_CONTRACTS_WITH_ASSERTS_AS_CONTRACT_ASSERTS)
+    hpx_add_config_define_namespace(
+      DEFINE HPX_CONTRACTS_HAVE_ASSERTS_AS_CONTRACT_ASSERTS NAMESPACE CONTRACTS
+    )
+  endif()
+endif()
+
 # Default location is $HPX_ROOT/libs/contracts/include
 set(contracts_headers hpx/contracts.hpp hpx/modules/contracts.hpp)
 
-# Default location is $HPX_ROOT/libs/contracts/include_compatibility
-# cmake-format: off
-set(contracts_compat_headers
-    # Add any legacy header mappings here if needed in the future
-    # hpx/old_contracts.hpp => hpx/contracts.hpp
-)
-# cmake-format: on
-
 # Default location is $HPX_ROOT/libs/contracts/src
-set(contracts_sources # Add source files here when implementation is added
-    # contracts.cpp
-)
+set(contracts_sources)
 
 include(HPX_AddModule)
 add_hpx_module(
