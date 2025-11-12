@@ -145,27 +145,27 @@ namespace hpx::detail {
     get_exception(std::invalid_argument const&, std::string const&,
         std::string const&, long, std::string const&);
 
-    HPX_CORE_MODULE_EXPORT_NODISCARD std::exception_ptr get_exception(
-        hpx::error errcode, std::string const& msg, throwmode mode,
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::exception_ptr
+    get_exception(hpx::error errcode, std::string const& msg, throwmode mode,
         std::string const& func = "<unknown>",
         std::string const& file = "<unknown>", long line = -1,
         std::string const& auxinfo = "");
 
-    HPX_CORE_MODULE_EXPORT_NODISCARD std::exception_ptr get_exception(
-        std::error_code const& ec, std::string const& msg, throwmode mode,
-        std::string const& func = "<unknown>",
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::exception_ptr
+    get_exception(std::error_code const& ec, std::string const& msg,
+        throwmode mode, std::string const& func = "<unknown>",
         std::string const& file = "<unknown>", long line = -1,
         std::string const& auxinfo = "");
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT void throws_if(hpx::error_code& ec,
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void throws_if(hpx::error_code& ec,
         hpx::error errcode, std::string const& msg, std::string const& func,
         std::string const& file, long line);
 
-    HPX_CORE_MODULE_EXPORT void throws_bad_alloc_if(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void throws_bad_alloc_if(
         hpx::error_code& ec, char const* func, char const* file, long line);
 
-    HPX_CORE_MODULE_EXPORT void rethrows_if(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void rethrows_if(
         hpx::error_code& ec, exception const& e, std::string const& func);
 
     HPX_CXX_EXPORT [[noreturn]] HPX_CORE_EXPORT void

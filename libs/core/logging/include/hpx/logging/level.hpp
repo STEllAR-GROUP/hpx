@@ -55,6 +55,6 @@ namespace hpx::util::logging {
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CORE_MODULE_EXPORT void format_value(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void format_value(
         std::ostream& os, std::string_view spec, level value);
 }    // namespace hpx::util::logging

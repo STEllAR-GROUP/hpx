@@ -28,7 +28,7 @@
 # define HPX_SYMBOL_INTERNAL    /* empty */
 #elif defined(HPX_HAVE_ELF_HIDDEN_VISIBILITY)
 # define HPX_SYMBOL_EXPORT      __attribute__((visibility("default")))
-# define HPX_SYMBOL_IMPORT      /* empty */
+# define HPX_SYMBOL_IMPORT      __attribute__((visibility("default")))
 # define HPX_SYMBOL_INTERNAL    __attribute__((visibility("hidden")))
 #endif
 
@@ -57,10 +57,6 @@
 #else
 # define HPX_CXX_EXPORT                  /* empty */
 #endif
-
-#define HPX_CORE_MODULE_EXPORT           HPX_CXX_EXPORT HPX_CORE_EXPORT
-#define HPX_CORE_MODULE_EXPORT_NODISCARD                                       \
-    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_EXPORTS) || defined(HPX_FULL_EXPORTS)

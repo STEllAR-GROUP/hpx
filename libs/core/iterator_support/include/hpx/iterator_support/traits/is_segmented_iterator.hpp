@@ -12,24 +12,24 @@
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterator, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Iterator, typename Enable = void>
     struct is_segmented_iterator;
 
-    template <typename Iter>
+    HPX_CXX_EXPORT template <typename Iter>
     using is_segmented_iterator_t = typename is_segmented_iterator<Iter>::type;
 
-    template <typename Iter>
+    HPX_CXX_EXPORT template <typename Iter>
     inline constexpr bool is_segmented_iterator_v =
         is_segmented_iterator<Iter>::value;
 
-    template <typename Iterator, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Iterator, typename Enable = void>
     struct is_segmented_local_iterator;
 
-    template <typename Iter>
+    HPX_CXX_EXPORT template <typename Iter>
     using is_segmented_local_iterator_t =
         typename is_segmented_local_iterator<Iter>::type;
 
-    template <typename Iter>
+    HPX_CXX_EXPORT template <typename Iter>
     inline constexpr bool is_segmented_local_iterator_v =
         is_segmented_local_iterator<Iter>::value;
 }    // namespace hpx::traits

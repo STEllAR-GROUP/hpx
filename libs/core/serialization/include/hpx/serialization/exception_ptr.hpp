@@ -58,9 +58,9 @@ namespace hpx::serialization {
             std::function<void(hpx::serialization::input_archive&,
                 std::exception_ptr&, unsigned int)>;
 
-        HPX_CORE_MODULE_EXPORT void set_save_custom_exception_handler(
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void set_save_custom_exception_handler(
             save_custom_exception_handler_type f);
-        HPX_CORE_MODULE_EXPORT void set_load_custom_exception_handler(
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void set_load_custom_exception_handler(
             load_custom_exception_handler_type f);
     }    // namespace detail
 

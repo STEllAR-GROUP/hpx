@@ -328,7 +328,7 @@ namespace hpx {
 #undef HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG
 
     // Return a textual representation of a given error code
-    HPX_CORE_MODULE_EXPORT char const* get_error_name(error e) noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT char const* get_error_name(error e) noexcept;
 
 }    // namespace hpx
 

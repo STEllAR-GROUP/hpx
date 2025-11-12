@@ -78,6 +78,6 @@ namespace hpx {
     };
 #endif
 
-    HPX_CORE_MODULE_EXPORT std::ostream& operator<<(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, source_location const& loc);
 }    // namespace hpx

@@ -20,8 +20,11 @@ module;
 
 export module HPX.Core@cxx_sub_module@;
 
+// Make sure the exported symbols are name-mangled using standard C++ rules.
+// This is necessary as otherwise the symbols exported from the shared libraries
+// will be exported from the module using a differently encoded name.
 extern "C++" {
-    
+
 #if defined(HPX_MSVC)
 // disable warning C5244: '#include <filename>' in the purview of module
 // 'HPX.Core' appears erroneous.  Consider moving that directive before
