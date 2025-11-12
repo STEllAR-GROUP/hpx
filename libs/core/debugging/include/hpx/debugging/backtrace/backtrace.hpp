@@ -19,7 +19,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN class backtrace
+    HPX_CXX_EXPORT class backtrace
     {
     public:
         HPX_CORE_EXPORT explicit backtrace(
@@ -60,7 +60,7 @@ namespace hpx::util {
 
     namespace detail {
 
-        HPX_CXX_EXPORT HPX_CXX_EXTERN class trace_manip
+        HPX_CXX_EXPORT class trace_manip
         {
         public:
             explicit constexpr trace_manip(backtrace const* tr) noexcept

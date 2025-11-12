@@ -31,8 +31,7 @@ namespace hpx {
     /// The type exception_list::const_iterator fulfills the requirements of
     /// a forward iterator.
     ///
-    HPX_CXX_EXPORT HPX_CXX_EXTERN class HPX_CORE_EXPORT exception_list
-      : public hpx::exception
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT exception_list : public hpx::exception
     {
     private:
         /// \cond NOINTERNAL

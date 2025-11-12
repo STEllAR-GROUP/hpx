@@ -22,7 +22,7 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        HPX_CXX_EXPORT HPX_CXX_EXTERN struct ptr_helper
+        HPX_CXX_EXPORT struct ptr_helper
         {
             virtual ~ptr_helper() = default;
         };

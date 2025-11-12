@@ -92,8 +92,7 @@ namespace hpx::serialization {
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct output_archive
-      : basic_archive<output_archive>
+    HPX_CXX_EXPORT struct output_archive : basic_archive<output_archive>
     {
     private:
         static constexpr std::uint32_t make_flags(std::uint32_t flags,

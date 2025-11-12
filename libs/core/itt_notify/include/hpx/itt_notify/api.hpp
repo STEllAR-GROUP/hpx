@@ -124,7 +124,7 @@ namespace hpx::threads {
 
 namespace hpx::util::itt {
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct stack_context
+    HPX_CXX_EXPORT struct stack_context
     {
         HPX_CORE_EXPORT stack_context();
         HPX_CORE_EXPORT ~stack_context();
@@ -150,7 +150,7 @@ namespace hpx::util::itt {
         ___itt_caller* itt_context_ = nullptr;
     };
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct caller_context
+    HPX_CXX_EXPORT struct caller_context
     {
         HPX_CORE_EXPORT explicit caller_context(
             stack_context& ctx, bool enter = true);
@@ -166,7 +166,7 @@ namespace hpx::util::itt {
     };
 
     //////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct domain
+    HPX_CXX_EXPORT struct domain
     {
         domain(domain const&) = delete;
         domain(domain&&) = delete;
@@ -181,7 +181,7 @@ namespace hpx::util::itt {
         ___itt_domain* domain_ = nullptr;
     };
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct thread_domain : domain
+    HPX_CXX_EXPORT struct thread_domain : domain
     {
         thread_domain(thread_domain const&) = delete;
         thread_domain(thread_domain&&) = delete;
@@ -192,7 +192,7 @@ namespace hpx::util::itt {
         ~thread_domain() = default;
     };
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct id
+    HPX_CXX_EXPORT struct id
     {
         HPX_CORE_EXPORT id(
             domain const& domain, void* addr, unsigned long extra = 0) noexcept;
@@ -220,7 +220,7 @@ namespace hpx::util::itt {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct frame_context
+    HPX_CXX_EXPORT struct frame_context
     {
         HPX_CORE_EXPORT explicit frame_context(
             domain const& domain, id* ident = nullptr) noexcept;
@@ -235,7 +235,7 @@ namespace hpx::util::itt {
         id* ident_ = nullptr;
     };
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct undo_frame_context
+    HPX_CXX_EXPORT struct undo_frame_context
     {
         HPX_CORE_EXPORT explicit undo_frame_context(
             frame_context& frame) noexcept;
@@ -250,7 +250,7 @@ namespace hpx::util::itt {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct mark_context
+    HPX_CXX_EXPORT struct mark_context
     {
         HPX_CORE_EXPORT explicit mark_context(char const* name) noexcept;
         HPX_CORE_EXPORT ~mark_context();
@@ -264,7 +264,7 @@ namespace hpx::util::itt {
         char const* name_ = nullptr;
     };
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct undo_mark_context
+    HPX_CXX_EXPORT struct undo_mark_context
     {
         HPX_CORE_EXPORT explicit undo_mark_context(mark_context& mark) noexcept;
         HPX_CORE_EXPORT ~undo_mark_context();
@@ -278,7 +278,7 @@ namespace hpx::util::itt {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct string_handle
+    HPX_CXX_EXPORT struct string_handle
     {
         string_handle() noexcept = default;
         ~string_handle() = default;
@@ -323,7 +323,7 @@ namespace hpx::util::itt {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct task
+    HPX_CXX_EXPORT struct task
     {
         HPX_CORE_EXPORT task(
             domain const&, string_handle, std::uint64_t metadata) noexcept;
@@ -357,7 +357,7 @@ namespace hpx::util::itt {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct heap_function
+    HPX_CXX_EXPORT struct heap_function
     {
         HPX_CORE_EXPORT heap_function(
             char const* name, char const* domain) noexcept;
@@ -365,7 +365,7 @@ namespace hpx::util::itt {
         __itt_heap_function heap_function_ = nullptr;
     };
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct heap_internal_access
+    HPX_CXX_EXPORT struct heap_internal_access
     {
         HPX_CORE_EXPORT heap_internal_access() noexcept;
         HPX_CORE_EXPORT ~heap_internal_access();
@@ -376,7 +376,7 @@ namespace hpx::util::itt {
         heap_internal_access& operator=(heap_internal_access&&) = delete;
     };
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct heap_allocate
+    HPX_CXX_EXPORT struct heap_allocate
     {
         template <typename T>
         heap_allocate(heap_function& heap_function, T**& addr, std::size_t size,
@@ -405,7 +405,7 @@ namespace hpx::util::itt {
         int init_;
     };
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct heap_free
+    HPX_CXX_EXPORT struct heap_free
     {
         HPX_CORE_EXPORT heap_free(
             heap_function& heap_function, void* addr) noexcept;
@@ -422,7 +422,7 @@ namespace hpx::util::itt {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct counter
+    HPX_CXX_EXPORT struct counter
     {
         HPX_CORE_EXPORT counter(char const* name, char const* domain) noexcept;
         HPX_CORE_EXPORT counter(

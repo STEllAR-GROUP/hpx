@@ -36,8 +36,7 @@ namespace hpx {
     /// are either of this type or of a type derived from it. This implies that
     /// it is always safe to use this type only in catch statements guarding
     /// HPX library calls.
-    HPX_CXX_EXPORT HPX_CXX_EXTERN class HPX_ALWAYS_EXPORT exception
-      : public std::system_error
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT exception : public std::system_error
     {
     public:
         /// Construct a hpx::exception from a \a hpx::error.
@@ -107,7 +106,7 @@ namespace hpx {
             throwmode mode = throwmode::plain) const noexcept;
     };
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN class HPX_ALWAYS_EXPORT bad_alloc_exception
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT bad_alloc_exception
       : public hpx::exception
       , public std::bad_alloc
     {
@@ -213,8 +212,7 @@ namespace hpx {
     ///
     /// At any point, the interruption state for the current thread can be
     /// queried by calling \a hpx::this_thread::interruption_enabled().
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct HPX_ALWAYS_EXPORT thread_interrupted
-      : std::exception
+    HPX_CXX_EXPORT struct HPX_ALWAYS_EXPORT thread_interrupted : std::exception
     {
     };
 

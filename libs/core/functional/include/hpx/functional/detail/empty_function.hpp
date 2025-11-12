@@ -18,8 +18,7 @@ namespace hpx::util::detail {
     {
     };    // must be trivial and empty
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN [[noreturn]] HPX_CORE_EXPORT void
-    throw_bad_function_call();
+    HPX_CXX_EXPORT [[noreturn]] HPX_CORE_EXPORT void throw_bad_function_call();
 
     HPX_CXX_EXPORT template <typename R>
     [[noreturn]] inline R throw_bad_function_call()

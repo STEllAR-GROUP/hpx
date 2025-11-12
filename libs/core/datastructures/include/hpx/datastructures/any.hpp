@@ -48,8 +48,7 @@ namespace hpx {
     ////////////////////////////////////////////////////////////////////////////
     /// Defines a type of object to be thrown by the value-returning forms of
     /// hpx::any_cast on failure.
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct HPX_ALWAYS_EXPORT bad_any_cast
-      : std::bad_cast
+    HPX_CXX_EXPORT struct HPX_ALWAYS_EXPORT bad_any_cast : std::bad_cast
     {
         /// Constructs a new bad_any_cast object with an implementation-defined
         /// null-terminated byte string which is accessible through what().
@@ -636,7 +635,7 @@ namespace hpx::util::detail::any {
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN template <typename IArch, typename OArch,
+    HPX_CXX_EXPORT template <typename IArch, typename OArch,
         typename Char = char, typename Copyable = std::true_type>
     class basic_any;
 

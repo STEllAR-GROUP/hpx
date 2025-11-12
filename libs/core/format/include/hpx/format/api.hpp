@@ -238,7 +238,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CXX_EXPORT HPX_CXX_EXTERN struct format_arg
+        HPX_CXX_EXPORT struct format_arg
         {
             format_arg() = default;
 

@@ -11,14 +11,14 @@
 
 namespace hpx::serialization::detail {
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct allow_zero_copy_receive
+    HPX_CXX_EXPORT struct allow_zero_copy_receive
     {
     };
 }    // namespace hpx::serialization::detail
 
 // This is explicitly instantiated to ensure that the id is stable across shared
 // libraries.
-HPX_CXX_EXTERN template <>
+template <>
 struct hpx::util::extra_data_helper<
     hpx::serialization::detail::allow_zero_copy_receive>
 {

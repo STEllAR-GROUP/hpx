@@ -28,7 +28,7 @@
 # define HPX_SYMBOL_INTERNAL    /* empty */
 #elif defined(HPX_HAVE_ELF_HIDDEN_VISIBILITY)
 # define HPX_SYMBOL_EXPORT      __attribute__((visibility("default")))
-# define HPX_SYMBOL_IMPORT      __attribute__((visibility("default")))
+# define HPX_SYMBOL_IMPORT      /* empty */
 # define HPX_SYMBOL_INTERNAL    __attribute__((visibility("hidden")))
 #endif
 
@@ -54,18 +54,13 @@
 // C++20 module export definitions
 #if defined(HPX_COMPILE_BMI)
 # define HPX_CXX_EXPORT                  export
-# define HPX_CXX_EXTERN                  extern "C++"
-# define HPX_EXTERN                      /* empty */
 #else
 # define HPX_CXX_EXPORT                  /* empty */
-# define HPX_CXX_EXTERN                  extern "C++"
-# define HPX_EXTERN                      extern
 #endif
 
-#define HPX_CORE_MODULE_EXPORT                                                 \
-    HPX_CXX_EXPORT HPX_CXX_EXTERN HPX_CORE_EXPORT
+#define HPX_CORE_MODULE_EXPORT           HPX_CXX_EXPORT HPX_CORE_EXPORT
 #define HPX_CORE_MODULE_EXPORT_NODISCARD                                       \
-    HPX_CXX_EXPORT HPX_CXX_EXTERN [[nodiscard]] HPX_CORE_EXPORT
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_EXPORTS) || defined(HPX_FULL_EXPORTS)

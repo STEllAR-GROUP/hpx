@@ -31,7 +31,7 @@ namespace hpx::optional_ns {
     };
     HPX_CXX_EXPORT constexpr nullopt_t nullopt{nullopt_t::init()};
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN class HPX_ALWAYS_EXPORT bad_optional_access
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT bad_optional_access
       : public std::logic_error
     {
     public:

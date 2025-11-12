@@ -30,7 +30,7 @@
 
 namespace hpx::serialization::detail {
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct ptr_helper;
+    HPX_CXX_EXPORT struct ptr_helper;
 
     // we need top use shared_ptr as util::any requires for the held type
     // to be copy-constructible
@@ -46,7 +46,7 @@ namespace hpx::util {
 
     // This is explicitly instantiated to ensure that the id is stable across
     // shared libraries.
-    HPX_CXX_EXTERN template <>
+    template <>
     struct extra_data_helper<serialization::detail::input_pointer_tracker>
     {
         HPX_CORE_EXPORT static extra_data_id_type id() noexcept;
@@ -56,7 +56,7 @@ namespace hpx::util {
         }
     };
 
-    HPX_CXX_EXTERN template <>
+    template <>
     struct extra_data_helper<serialization::detail::output_pointer_tracker>
     {
         HPX_CORE_EXPORT static extra_data_id_type id() noexcept;
@@ -68,15 +68,15 @@ namespace hpx::util {
 namespace hpx::serialization {
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN HPX_CORE_EXPORT void register_pointer(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void register_pointer(
         input_archive& ar, std::uint64_t pos, detail::ptr_helper_ptr helper);
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN
-        [[nodiscard]] HPX_CORE_EXPORT detail::ptr_helper&
-        tracked_pointer(input_archive& ar, std::uint64_t pos);
+    HPX_CXX_EXPORT
+    [[nodiscard]] HPX_CORE_EXPORT detail::ptr_helper& tracked_pointer(
+        input_archive& ar, std::uint64_t pos);
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN [[nodiscard]] HPX_CORE_EXPORT std::uint64_t
-    track_pointer(output_archive& ar, void const* pos);
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::uint64_t track_pointer(
+        output_archive& ar, void const* pos);
 
     ////////////////////////////////////////////////////////////////////////////
     namespace detail {

@@ -20,6 +20,8 @@ module;
 
 export module HPX.Core@cxx_sub_module@;
 
+extern "C++" {
+    
 #if defined(HPX_MSVC)
 // disable warning C5244: '#include <filename>' in the purview of module
 // 'HPX.Core' appears erroneous.  Consider moving that directive before
@@ -47,3 +49,5 @@ export module HPX.Core@cxx_sub_module@;
 #if defined(HPX_MSVC)
 #pragma warning(pop)
 #endif
+
+}

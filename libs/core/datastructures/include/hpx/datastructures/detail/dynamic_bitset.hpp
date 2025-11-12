@@ -243,7 +243,7 @@ namespace hpx::detail {
     }    // namespace dynamic_bitset_impl
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN template <typename Block = std::uint64_t,
+    HPX_CXX_EXPORT template <typename Block = std::uint64_t,
         typename Allocator = std::allocator<Block>>
     class dynamic_bitset
     {

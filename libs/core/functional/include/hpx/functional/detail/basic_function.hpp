@@ -33,7 +33,7 @@ namespace hpx::util::detail {
         3 * sizeof(void*);
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN class HPX_CORE_EXPORT function_base
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT function_base
     {
         using vtable = function_base_vtable;
 

@@ -34,7 +34,7 @@ namespace hpx::detail {
     HPX_CXX_EXPORT struct bad_typeid;
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN template <typename Exception>
+    HPX_CXX_EXPORT template <typename Exception>
     [[noreturn]] HPX_CORE_EXPORT void throw_exception(Exception const& e,
         std::string const& func, std::string const& file, long line);
 
@@ -79,18 +79,18 @@ namespace hpx::detail {
         std::invalid_argument const&, std::string const&, std::string const&,
         long);
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN [[noreturn]] HPX_CORE_EXPORT void
-    throw_exception(hpx::error errcode, std::string const& msg,
-        std::string const& func, std::string const& file, long line);
+    HPX_CXX_EXPORT [[noreturn]] HPX_CORE_EXPORT void throw_exception(
+        hpx::error errcode, std::string const& msg, std::string const& func,
+        std::string const& file, long line);
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN [[noreturn]] HPX_CORE_EXPORT void
-    throw_bad_alloc_exception(char const* func, char const* file, long line);
+    HPX_CXX_EXPORT [[noreturn]] HPX_CORE_EXPORT void throw_bad_alloc_exception(
+        char const* func, char const* file, long line);
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN [[noreturn]] HPX_CORE_EXPORT void
-    rethrow_exception(exception const& e, std::string const& func);
+    HPX_CXX_EXPORT [[noreturn]] HPX_CORE_EXPORT void rethrow_exception(
+        exception const& e, std::string const& func);
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN template <typename Exception>
+    HPX_CXX_EXPORT template <typename Exception>
     [[nodiscard]] HPX_CORE_EXPORT std::exception_ptr get_exception(
         Exception const& e, std::string const& func = "<unknown>",
         std::string const& file = "<unknown>", long line = -1,
@@ -168,7 +168,7 @@ namespace hpx::detail {
     HPX_CORE_MODULE_EXPORT void rethrows_if(
         hpx::error_code& ec, exception const& e, std::string const& func);
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN [[noreturn]] HPX_CORE_EXPORT void
+    HPX_CXX_EXPORT [[noreturn]] HPX_CORE_EXPORT void
     throw_thread_interrupted_exception();
 }    // namespace hpx::detail
 /// \endcond

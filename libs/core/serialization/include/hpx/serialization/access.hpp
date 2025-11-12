@@ -42,7 +42,7 @@ namespace hpx::serialization {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN class access
+    HPX_CXX_EXPORT class access
     {
     public:
         template <typename T>

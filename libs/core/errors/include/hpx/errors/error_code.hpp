@@ -32,8 +32,8 @@ namespace hpx {
             error_code const&);
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT HPX_CXX_EXTERN struct HPX_ALWAYS_EXPORT
-            command_line_error final : std::logic_error
+        HPX_CXX_EXPORT struct HPX_ALWAYS_EXPORT command_line_error final
+          : std::logic_error
         {
             explicit command_line_error(char const* msg)
               : std::logic_error(msg)
@@ -92,7 +92,7 @@ namespace hpx {
     /// \note Class hpx::error_code is an adjunct to error reporting by
     /// exception
     ///
-    HPX_CXX_EXPORT HPX_CXX_EXTERN class HPX_CORE_EXPORT error_code
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT error_code
       : public std::error_code    //-V690
     {
     public:

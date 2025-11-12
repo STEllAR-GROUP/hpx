@@ -217,8 +217,8 @@ namespace hpx::detail {
     }
 
     // note: Allocator is currently unused
-    HPX_CXX_EXPORT HPX_CXX_EXTERN template <typename T,
-        std::size_t MinInlineCapacity, typename Allocator = std::allocator<T>>
+    HPX_CXX_EXPORT template <typename T, std::size_t MinInlineCapacity,
+        typename Allocator = std::allocator<T>>
     class small_vector
     {
         static_assert(MinInlineCapacity <= 127,

@@ -91,7 +91,7 @@ You could have an output like this:
 @endcode
 
 */
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct named_formatters
+    HPX_CXX_EXPORT struct named_formatters
     {
         named_formatters(named_formatters const&) = delete;
         named_formatters(named_formatters&&) = delete;
@@ -219,7 +219,7 @@ In the above example, I know that the available destinations are @c out_file,
 @c debug_window and @c console, but I'm not writing to @c debug_window.
 
 */
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct named_destinations
+    HPX_CXX_EXPORT struct named_destinations
     {
         HPX_NON_COPYABLE(named_destinations);
 
@@ -359,7 +359,7 @@ namespace hpx::util::logging::writer {
     @param format_write_ the underlying format writer
 
 */
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct named_write
+    HPX_CXX_EXPORT struct named_write
     {
         HPX_CORE_EXPORT named_write();
 

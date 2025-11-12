@@ -21,7 +21,7 @@
 
 namespace hpx::serialization::detail {
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN class polymorphic_intrusive_factory
+    HPX_CXX_EXPORT class polymorphic_intrusive_factory
     {
     public:
         polymorphic_intrusive_factory(

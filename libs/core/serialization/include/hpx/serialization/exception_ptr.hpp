@@ -65,12 +65,12 @@ namespace hpx::serialization {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN template <typename Archive>
+    HPX_CXX_EXPORT template <typename Archive>
     HPX_CORE_EXPORT void save(
         Archive& ar, std::exception_ptr const& e, unsigned int);
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN template <typename Archive>
+    HPX_CXX_EXPORT template <typename Archive>
     HPX_CORE_EXPORT void load(Archive& ar, std::exception_ptr& e, unsigned int);
 
     HPX_SERIALIZATION_SPLIT_FREE(HPX_CXX_EXPORT, std::exception_ptr)

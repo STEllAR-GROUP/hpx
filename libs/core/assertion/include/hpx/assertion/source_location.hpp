@@ -45,7 +45,7 @@ namespace hpx {
     /// efficiently.
     /// It is unspecified whether the copy/move constructors and the copy/move
     /// assignment operators of \a source_location are trivial and/or constexpr.
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct source_location
+    HPX_CXX_EXPORT struct source_location
     {
         char const* filename;
         std::uint_least32_t line_number;

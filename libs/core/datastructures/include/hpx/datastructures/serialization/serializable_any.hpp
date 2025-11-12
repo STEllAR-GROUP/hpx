@@ -412,7 +412,7 @@ namespace hpx::util {
 
     ////////////////////////////////////////////////////////////////////////////
     // support for hashing any
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct hash_any
+    HPX_CXX_EXPORT struct hash_any
     {
         template <typename Char>
         HPX_CORE_EXPORT std::size_t operator()(
