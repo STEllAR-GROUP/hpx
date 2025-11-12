@@ -35,6 +35,7 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_allocator_support
     hpx_datastructures
+    hpx_functional
     hpx_futures
     hpx_iterator_support
     hpx_memory

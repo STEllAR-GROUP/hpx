@@ -36,6 +36,7 @@ add_hpx_module(
     hpx_datastructures
     hpx_errors
     hpx_format
+    hpx_functional
     hpx_ini
     hpx_prefix
     hpx_runtime_configuration

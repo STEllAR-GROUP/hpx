@@ -97,6 +97,7 @@ add_hpx_module(
     hpx_datastructures
     hpx_execution
     hpx_format
+    hpx_functional
     hpx_futures
     hpx_io_service
     hpx_logging

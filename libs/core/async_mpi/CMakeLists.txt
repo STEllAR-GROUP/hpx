@@ -43,6 +43,7 @@ add_hpx_module(
     hpx_datastructures
     hpx_errors
     hpx_execution_base
+    hpx_functional
     hpx_memory
     hpx_mpi_base
     hpx_threading_base

@@ -70,43 +70,43 @@ namespace hpx::util {
     ////////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT  [[nodiscard]] HPX_CORE_EXPORT
+        HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT
         hpx::util::logging::level get_log_level(std::string const& env,
             bool allow_always = false);
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT  HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx)
-    HPX_CXX_EXPORT  HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx_console)
+    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx)
+    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx_console)
 
     ////////////////////////////////////////////////////////////////////////////
     // errors are logged in a special manner (always to cerr and additionally,
     // if enabled to 'normal' logging destination as well)
-    HPX_CXX_EXPORT  HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx_error)
+    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx_error)
 
 #if defined(HPX_LOGGING_HAVE_SEPARATE_DESTINATIONS)
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT  HPX_CORE_EXPORT HPX_DECLARE_LOG(agas)
-    HPX_CXX_EXPORT  HPX_CORE_EXPORT HPX_DECLARE_LOG(agas_console)
+    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(agas)
+    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(agas_console)
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT  HPX_CORE_EXPORT HPX_DECLARE_LOG(parcel)
-    HPX_CXX_EXPORT  HPX_CORE_EXPORT HPX_DECLARE_LOG(parcel_console)
+    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(parcel)
+    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(parcel_console)
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT  HPX_CORE_EXPORT HPX_DECLARE_LOG(timing)
-    HPX_CXX_EXPORT  HPX_CORE_EXPORT HPX_DECLARE_LOG(timing_console)
+    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(timing)
+    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(timing_console)
 #endif
 
     ////////////////////////////////////////////////////////////////////////////
     // Application specific logging
-    HPX_CXX_EXPORT  HPX_CORE_EXPORT HPX_DECLARE_LOG(app)
-    HPX_CXX_EXPORT  HPX_CORE_EXPORT HPX_DECLARE_LOG(app_console)
+    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(app)
+    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(app_console)
 
     ////////////////////////////////////////////////////////////////////////////
     // special debug logging channel
-    HPX_CXX_EXPORT  HPX_CORE_EXPORT HPX_DECLARE_LOG(debuglog)
-    HPX_CXX_EXPORT  HPX_CORE_EXPORT HPX_DECLARE_LOG(debuglog_console)
+    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(debuglog)
+    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(debuglog_console)
 }    // namespace hpx::util
 // clang-format on
 

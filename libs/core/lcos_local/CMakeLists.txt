@@ -55,6 +55,7 @@ add_hpx_module(
     hpx_errors
     hpx_execution
     hpx_executors
+    hpx_functional
     hpx_futures
     hpx_iterator_support
     hpx_lock_registration

@@ -35,6 +35,7 @@ add_hpx_module(
     hpx_concepts
     hpx_datastructures
     hpx_execution
+    hpx_functional
     hpx_futures
     hpx_iterator_support
     hpx_tag_invoke

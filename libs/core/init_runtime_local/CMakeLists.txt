@@ -41,6 +41,7 @@ add_hpx_module(
     hpx_errors
     hpx_filesystem
     hpx_format
+    hpx_functional
     hpx_lock_registration
     hpx_logging
     hpx_preprocessor
