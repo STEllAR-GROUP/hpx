@@ -16,8 +16,10 @@
 #include <hpx/thrust/policy.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <iostream>
 #include <numeric>
+#include <type_traits>
 #include <vector>
 
 #include <hpx/async_cuda/cuda_polling_helper.hpp>
