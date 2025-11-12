@@ -24,6 +24,7 @@
 #include <memory>
 #include <thrust/system/cuda/execution_policy.h>
 #include <type_traits>
+#include <utility>
 
 namespace hpx::thrust {
 

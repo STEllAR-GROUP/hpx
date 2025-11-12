@@ -13,6 +13,7 @@
 #include <hpx/thrust/detail/algorithm_map.hpp>
 #include <hpx/thrust/policy.hpp>
 #include <cuda_runtime.h>
+#include <utility>
 
 namespace hpx::thrust {
 
