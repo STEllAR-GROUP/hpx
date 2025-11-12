@@ -13,7 +13,7 @@
 #include <hpx/contracts.hpp>
 
 // Function with precondition that requires positive input
-int multiply_positive(int x) HPX_PRE(x > 0)
+int multiply_positive(int const x) HPX_PRE(x > 0)
 {
     return x * 2;
 }

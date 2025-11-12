@@ -173,6 +173,8 @@ function(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX26_EXPERIMENTAL_SCOPE
   )
 
+  hpx_check_for_cxx26_contracts(DEFINITIONS HPX_HAVE_CXX26_CONTRACTS)
+
   hpx_check_for_cxx_lambda_capture_decltype(
     DEFINITIONS HPX_HAVE_CXX_LAMBDA_CAPTURE_DECLTYPE
   )

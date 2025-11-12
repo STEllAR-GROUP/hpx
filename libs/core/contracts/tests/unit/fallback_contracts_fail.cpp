@@ -17,7 +17,7 @@ int main() HPX_PRE(false)    // This precondition is ignored in fallback mode
     HPX_POST(false)          // This postcondition is ignored in fallback mode
 {
     HPX_CONTRACT_ASSERT(true);
-    // Add a failing assertion to test WILL_FAIL behavior
+    // Add a failing assertion to test WILL_FAIL behavior.
     HPX_CONTRACT_ASSERT(false);    // This should abort in Debug mode
     HPX_TEST(true);
 

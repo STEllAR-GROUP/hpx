@@ -23,10 +23,7 @@ automatically adapt their behavior based on compiler capabilities:
 
 * When C++26 native contracts are available (``__cpp_contracts`` defined), 
   they map to standard contract syntax
-* When contracts are not available but ``HPX_WITH_CONTRACTS=ON``, preconditions 
-  and postconditions become no-ops while contract assertions fall back to 
-  :c:macro:`HPX_ASSERT` for compatibility
-* When ``HPX_WITH_CONTRACTS=OFF``, preconditions and postconditions become 
+* When ``HPX_WITH_CX26_CONTRACTS=OFF``, preconditions and postconditions become 
   no-ops while contract assertions remain available as enhanced assertions
 
 Configuration
@@ -34,15 +31,15 @@ Configuration
 
 Enable contracts in CMake::
 
-    cmake -DHPX_WITH_CONTRACTS=ON -DCMAKE_CXX_STANDARD=26
+    cmake -DHPX_WITH_CXX26_CONTRACTS=ON -DCMAKE_CXX_STANDARD=26
 
 Enable contract-enhanced assertions (optional)::
 
-    cmake -DHPX_WITH_CONTRACTS=ON -DHPX_WITH_ASSERTS_AS_CONTRACT_ASSERTS=ON
+    cmake -DHPX_WITH_CXX26_CONTRACTS=ON -DHPX_CONTRACTS_WITH_ASSERTS_AS_CONTRACT_ASSERTS=ON
 
 Contract assertions work even when contracts are disabled::
 
-    cmake -DHPX_WITH_CONTRACTS=OFF  # HPX_CONTRACT_ASSERT still maps to HPX_ASSERT
+    cmake -DHPX_WITH_CXX26_CONTRACTS=OFF  # HPX_CONTRACT_ASSERT still maps to HPX_ASSERT
 
 Advanced Features
 =================
@@ -50,7 +47,7 @@ Advanced Features
 Contract-Enhanced Assertions
 ----------------------------
 
-When ``HPX_WITH_ASSERTS_AS_CONTRACT_ASSERTS=ON`` is enabled, regular 
+When ``HPX_CONTRACTS_WITH_ASSERTS_AS_CONTRACT_ASSERTS=ON`` is enabled, regular 
 :c:macro:`HPX_ASSERT` calls are automatically upgraded to use contract 
 assertions in C++26 mode::
 
@@ -63,7 +60,7 @@ assertions in C++26 mode::
 .. warning::
    Enhanced assertions only provide benefits when native C++26 contracts are 
    supported by the compiler. Without native contract support, 
-   ``HPX_ASSERT`` → ``HPX_CONTRACT_ASSERT`` → ``HPX_ASSERT`` (no enhancement).
+   ``HPX_ASSERT`` -> ``HPX_CONTRACT_ASSERT`` -> ``HPX_ASSERT`` (no enhancement).
    CMake will issue a warning if you enable this option without native contract support.
 
 This provides enhanced contract semantics throughout your existing codebase 
@@ -71,9 +68,8 @@ without requiring changes to assertion code. The transformation occurs in the
 contracts module (``contracts.hpp``) where the ``HPX_ASSERT`` macro is 
 overridden to use ``HPX_CONTRACT_ASSERT`` when ``HPX_WITH_ASSERTS_AS_CONTRACT_ASSERTS=ON``:
 
-* ``HPX_WITH_CONTRACTS=ON`` - Contracts module is enabled
-* ``HPX_WITH_ASSERTS_AS_CONTRACT_ASSERTS=ON`` - Assertion enhancement is enabled  
-* ``HPX_HAVE_NATIVE_CONTRACTS=ON`` - C++26 native contracts are available (from config test)
+* ``HPX_WITH_CXX26_CONTRACTS=ON`` - Contracts module is enabled
+* ``HPX_CONTRACTS_WITH_ASSERTS_AS_CONTRACT_ASSERTS=ON`` - Assertion enhancement is enabled  
 
 The implementation works by redefining ``HPX_ASSERT`` in ``contracts.hpp`` to 
 use ``HPX_CONTRACT_ASSERT``, which automatically adapts to the current contract 

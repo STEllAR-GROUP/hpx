@@ -22,7 +22,7 @@ int divide(int a, int b) HPX_PRE(b != 0)
     return a / b;
 }
 
-// Function with both pre and post conditions
+// Function with both pre- and post-conditions
 int safe_multiply(int a, int b) HPX_PRE(a > 0 && b > 0) HPX_POST(r : r > 0)
 {
     return a * b;
@@ -31,10 +31,10 @@ int safe_multiply(int a, int b) HPX_PRE(a > 0 && b > 0) HPX_POST(r : r > 0)
 int main()
 {
     // Test functions with proper contract syntax
-    int result1 = divide(10, 2);
+    int const result1 = divide(10, 2);
     HPX_TEST_EQ(result1, 5);
 
-    int result2 = safe_multiply(3, 4);
+    int const result2 = safe_multiply(3, 4);
     HPX_TEST_EQ(result2, 12);
 
     // Test contract assertions

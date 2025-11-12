@@ -29,30 +29,24 @@
 
 // Contract implementation: automatically selects native C++26 contracts
 // or provides appropriate fallback behavior based on compiler capabilities
-#ifdef HPX_HAVE_CONTRACTS
-#if HPX_HAVE_NATIVE_CONTRACTS
+#if defined(HPX_HAVE_CXX26_CONTRACTS)
+
 // Native C++26 contracts mode
 #define HPX_PRE(x) pre(x)
 #define HPX_CONTRACT_ASSERT(x) contract_assert(x)
 #define HPX_POST(x) post(x)
-#else
-// Fallback mode: PRE/POST become no-ops for forward compatibility,
-// CONTRACT_ASSERT maps to HPX_ASSERT for runtime validation
-#pragma message(                                                               \
-    "HPX Contracts: Using assertion fallback mode. "                           \
-    "HPX_PRE/HPX_POST are no-ops, HPX_CONTRACT_ASSERT maps to HPX_ASSERT.")
-#define HPX_PRE(x)
-#define HPX_CONTRACT_ASSERT(x) HPX_ASSERT((x))
-#define HPX_POST(x)
-#endif
-#else
-// Contracts disabled: PRE/POST are no-ops, CONTRACT_ASSERT remains available
-#define HPX_PRE(x)
-#define HPX_CONTRACT_ASSERT(x) HPX_ASSERT((x))
-#define HPX_POST(x)
+
+#if defined(HPX_CONTRACTS_HAVE_ASSERTS_AS_CONTRACT_ASSERTS)
+// Override HPX_ASSERT to use contract assertions
+#define HPX_ASSERT(x) contract_assert(x)
 #endif
 
-#ifdef HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS
-// Override HPX_ASSERT to use contract assertions
-#define HPX_ASSERT(x) HPX_CONTRACT_ASSERT(x)
+#else
+
+// Fallback mode: PRE/POST become no-ops for forward compatibility,
+// CONTRACT_ASSERT maps to HPX_ASSERT for runtime validation
+#define HPX_PRE(x)
+#define HPX_CONTRACT_ASSERT(x) HPX_ASSERT((x))
+#define HPX_POST(x)
+
 #endif
