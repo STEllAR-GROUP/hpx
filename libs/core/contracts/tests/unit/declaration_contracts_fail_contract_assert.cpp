@@ -12,7 +12,7 @@
 #include <hpx/contracts.hpp>
 
 // Function that uses contract_assert internally
-int process_data(int x) HPX_PRE(x >= 0)
+int process_data(int const x) HPX_PRE(x >= 0)
 {
     // Internal contract check that always fails
     HPX_CONTRACT_ASSERT(false);
