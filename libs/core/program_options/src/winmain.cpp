@@ -108,11 +108,11 @@ namespace hpx::program_options {
     {
         std::vector<std::wstring> result;
         std::vector<std::string> const aux =
-            split_winmain(to_internal(cmdline));
+            split_winmain(detail::to_internal(cmdline));
         result.reserve(aux.size());
         for (auto const& i : aux)
         {
-            result.emplace_back(from_utf8(i));
+            result.emplace_back(detail::from_utf8(i));
         }
         return result;
     }

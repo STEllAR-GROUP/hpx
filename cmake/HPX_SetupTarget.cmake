@@ -225,9 +225,12 @@ function(hpx_setup_target target)
 
   set_target_properties(${target} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-  if(HPX_WITH_CXX_MODULES AND ${target}_SCAN_FOR_MODULES)
+  if(HPX_WITH_CXX_MODULES AND target_SCAN_FOR_MODULES)
+    hpx_debug("setup_target.${target} SCAN_FOR_MODULES: ON")
     hpx_configure_module_consumer(${target} hpx_core_module_if)
   else()
+    hpx_debug("setup_target.${target} SCAN_FOR_MODULES: OFF")
+
     # If modules are enabled, Clang emits DWARF v5, which requires using lld
     # instead of ld.
     if(HPX_WITH_CXX_MODULES AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang"

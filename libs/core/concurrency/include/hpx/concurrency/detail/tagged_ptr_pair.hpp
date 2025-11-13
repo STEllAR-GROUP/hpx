@@ -19,7 +19,7 @@
 
 namespace hpx::lockfree {
 
-    struct HPX_LOCKFREE_DCAS_ALIGNMENT uint128_type
+    HPX_CXX_EXPORT struct HPX_LOCKFREE_DCAS_ALIGNMENT uint128_type
     {
         std::uint64_t left = 0;
         std::uint64_t right = 0;
@@ -70,7 +70,7 @@ namespace hpx::lockfree {
         };
     }    // namespace detail
 
-    template <typename Left, typename Right>
+    HPX_CXX_EXPORT template <typename Left, typename Right>
     struct HPX_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     {
         using compressed_ptr_pair_t = uint128_type;

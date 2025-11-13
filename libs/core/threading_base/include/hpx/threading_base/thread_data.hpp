@@ -11,11 +11,11 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 
-#include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>

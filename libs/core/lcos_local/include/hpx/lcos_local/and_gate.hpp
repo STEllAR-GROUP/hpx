@@ -8,10 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/stack.hpp>
 #include <hpx/futures/promise.hpp>
 #include <hpx/lcos_local/conditional_cv.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>

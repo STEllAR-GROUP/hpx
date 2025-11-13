@@ -37,6 +37,7 @@ add_hpx_module(
   COMPAT_HEADERS ${thread_pools_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
+    hpx_concurrency
     hpx_config
     hpx_debugging
     hpx_errors

@@ -26,6 +26,7 @@
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/prefix.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/modules/synchronization.hpp>
@@ -36,7 +37,6 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/plugin_factories/binary_filter_factory_base.hpp>
 #include <hpx/plugin_factories/message_handler_factory_base.hpp>
-#include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_configuration/component_commandline_base.hpp>
 #include <hpx/runtime_configuration/component_factory_base.hpp>

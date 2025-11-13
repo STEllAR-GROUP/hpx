@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <hpx/program_options/config.hpp>
-
 /** The version of the source interface.
     The value will be incremented whenever a change is made which might
     cause compilation errors for existing code.

@@ -56,7 +56,7 @@ namespace hpx::lockfree {
      *  - T must have a copy constructor
      *
      */
-    template <typename T, typename Allocator = std::allocator<T>,
+    HPX_CXX_EXPORT template <typename T, typename Allocator = std::allocator<T>,
         std::size_t Capacity = 0, bool IsFixedSize = false>
     class stack
     {
@@ -771,7 +771,7 @@ namespace hpx::lockfree {
         pool_t pool;
     };
 
-    template <typename T, typename Allocator = std::allocator<T>>
+    HPX_CXX_EXPORT template <typename T, typename Allocator = std::allocator<T>>
     class variable_size_stack : public stack<T, Allocator>
     {
         using stack<T, Allocator>::stack;

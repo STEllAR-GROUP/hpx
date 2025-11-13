@@ -13,7 +13,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/type_support.hpp>

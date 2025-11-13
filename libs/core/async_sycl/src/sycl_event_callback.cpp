@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Gregor Dai√ü
+//  Copyright (c) 2022 Gregor Daiﬂ
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,7 @@
 //
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/concurrentqueue.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>

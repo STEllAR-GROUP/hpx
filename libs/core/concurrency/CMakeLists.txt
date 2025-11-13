@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -47,9 +47,12 @@ include(HPX_AddModule)
 add_hpx_module(
   core concurrency
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${concurrency_sources}
   HEADERS ${concurrency_headers}
   COMPAT_HEADERS ${concurrency_compat_headers}
+  ADD_TO_GLOBAL_HEADER "hpx/concurrency/detail/contiguous_index_queue.hpp"
+                       "hpx/concurrency/detail/non_contiguous_index_queue.hpp"
   MODULE_DEPENDENCIES
     hpx_allocator_support
     hpx_assertion

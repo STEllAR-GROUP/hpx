@@ -20,7 +20,7 @@ namespace hpx::lockfree::detail {
 
 #if defined(HPX_LOCKFREE_PTR_COMPRESSION)
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     class tagged_ptr
     {
         using compressed_ptr_t = std::uint64_t;

@@ -6,7 +6,7 @@
 
 #include "worker_timed.hpp"
 
-#include <hpx/concurrency/barrier.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/timing.hpp>
 
