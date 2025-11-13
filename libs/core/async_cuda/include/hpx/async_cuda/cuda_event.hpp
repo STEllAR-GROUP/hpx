@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Gregor Dai√ü
+//  Copyright (c) 2023 Gregor Daiﬂ
 //  Copyright (c) 2020 John Biddiscombe
 //  Copyright (c) 2020 Teodor Nikolov
 //
@@ -16,7 +16,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_cuda/cuda_exception.hpp>
 #include <hpx/async_cuda/custom_gpu_api.hpp>
-#include <hpx/concurrency/stack.hpp>
+#include <hpx/modules/concurrency.hpp>
 
 namespace hpx { namespace cuda { namespace experimental {
 

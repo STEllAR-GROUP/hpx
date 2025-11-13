@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # Default location is $HPX_ROOT/libs/program_options/include
 set(program_options_headers
     hpx/program_options.hpp
-    hpx/modules/program_options.hpp
     hpx/program_options/cmdline.hpp
     hpx/program_options/config.hpp
     hpx/program_options/environment_iterator.hpp
@@ -30,9 +29,9 @@ set(program_options_headers
     hpx/program_options/detail/value_semantic.hpp
 )
 
-# cmake-format: off
+set(program_options_macro_headers hpx/program_options/version.hpp)
+
 set(program_options_compat_headers)
-# cmake-format: on
 
 # Default location is $HPX_ROOT/libs/program_options/src
 set(program_options_sources
@@ -53,11 +52,13 @@ set(program_options_sources
 include(HPX_AddModule)
 add_hpx_module(
   core program_options
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${program_options_sources}
   HEADERS ${program_options_headers}
+  MACRO_HEADERS ${program_options_macro_headers}
   COMPAT_HEADERS ${program_options_compat_headers}
-  DEPENDENCIES ${__boost_program_options}
+  ADD_TO_GLOBAL_HEADER "hpx/program_options/detail/value_semantic.hpp"
   MODULE_DEPENDENCIES
     hpx_config
     hpx_datastructures

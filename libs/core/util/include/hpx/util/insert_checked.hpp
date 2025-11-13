@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <utility>
 
 namespace hpx::util {

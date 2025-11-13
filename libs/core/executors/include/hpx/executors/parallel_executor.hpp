@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/concurrency/stack.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/future_exec.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
@@ -25,6 +24,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/topology.hpp>

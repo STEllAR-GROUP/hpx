@@ -10,10 +10,10 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/prefix.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_configuration/agas_service_mode.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime_configuration/init_ini_data.hpp>

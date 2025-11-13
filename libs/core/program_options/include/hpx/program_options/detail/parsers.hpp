@@ -22,7 +22,7 @@ namespace hpx::program_options {
     template <typename Char>
     basic_command_line_parser<Char>::basic_command_line_parser(
         std::vector<std::basic_string<Char>> const& xargs)
-      : detail::cmdline(to_internal(xargs))
+      : detail::cmdline(detail::to_internal(xargs))
     {
         this->cmdline::m_desc = nullptr;
     }
@@ -30,7 +30,7 @@ namespace hpx::program_options {
     template <typename Char>
     basic_command_line_parser<Char>::basic_command_line_parser(
         int argc, Char const* const argv[])
-      : detail::cmdline(to_internal(
+      : detail::cmdline(detail::to_internal(
             std::vector<std::basic_string<Char>>(argv + 1, argv + argc)))
     {
         this->cmdline::m_desc = nullptr;
@@ -124,7 +124,8 @@ namespace hpx::program_options {
         for (std::size_t i = 0; i < options.size(); ++i)
         {
             if (options[i].unregistered ||
-                (mode == include_positional && options[i].position_key != -1))
+                (mode == collect_unrecognized_mode::include_positional &&
+                    options[i].position_key != -1))
             {
                 std::copy(options[i].original_tokens.begin(),
                     options[i].original_tokens.end(),

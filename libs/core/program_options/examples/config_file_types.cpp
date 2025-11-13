@@ -161,8 +161,8 @@ vector<string> parse_file(
         parse_config_file(file, opts, ALLOW_UNREGISTERED);
 
     store(parsed, vm);
-    vector<string> unregistered =
-        po::collect_unrecognized(parsed.options, po::exclude_positional);
+    vector<string> unregistered = po::collect_unrecognized(
+        parsed.options, po::collect_unrecognized_mode::exclude_positional);
     notify(vm);
 
     return unregistered;

@@ -13,8 +13,8 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/queue.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/locality.hpp>

@@ -4,7 +4,7 @@
 //  Link: http://www.research.ibm.com/people/m/michael/europar-2003.pdf
 //
 //  C++ implementation - Copyright (C) 2011 Bryce Lelbach
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -38,24 +38,25 @@ namespace hpx::lockfree {
 
     // The "left" and "right" terminology is used instead of top and bottom to
     // stay consistent with the paper that this code is based on..
-    enum class deque_status_type : std::int8_t
-    {
+    HPX_CXX_EXPORT enum class deque_status_type : std::int8_t {
         stable,
         rpush,
         lpush
     };
 
-    constexpr bool operator==(int lhs, deque_status_type rhs) noexcept
+    HPX_CXX_EXPORT constexpr bool operator==(
+        int lhs, deque_status_type rhs) noexcept
     {
         return lhs == static_cast<int>(rhs);
     }
 
-    constexpr bool operator==(deque_status_type lhs, int rhs) noexcept
+    HPX_CXX_EXPORT constexpr bool operator==(
+        deque_status_type lhs, int rhs) noexcept
     {
         return static_cast<int>(lhs) == rhs;
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct deque_node    //-V690
     {
         using pointer = hpx::lockfree::detail::tagged_ptr<deque_node>;
@@ -99,7 +100,7 @@ namespace hpx::lockfree {
 
     // FIXME: A lot of these methods can be dropped; in fact, it may make sense
     // to re-structure this class like deque_node.
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct deque_anchor    //-V690
     {
         using node = deque_node<T>;
@@ -236,9 +237,8 @@ namespace hpx::lockfree {
         }
     };
 
-    // TODO: Experiment with memory ordering to see where we can optimize
-    // without breaking things.
-    template <typename T, typename freelist_t = caching_freelist_t,
+    HPX_CXX_EXPORT template <typename T,
+        typename freelist_t = caching_freelist_t,
         typename Alloc = std::allocator<T>>
     struct deque
     {

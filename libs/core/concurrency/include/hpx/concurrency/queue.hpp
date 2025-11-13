@@ -1,5 +1,5 @@
 //  Copyright (C) 2008-2013 Tim Blechmann
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -56,7 +56,7 @@ namespace hpx::lockfree {
      *   - T must have a trivial assignment operator
      *   - T must have a trivial destructor
      */
-    template <typename T, typename Allocator = std::allocator<T>,
+    HPX_CXX_EXPORT template <typename T, typename Allocator = std::allocator<T>,
         std::size_t Capacity = 0, bool IsFixedSize = false>
     class queue
     {

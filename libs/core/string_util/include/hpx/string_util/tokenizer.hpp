@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/string_util/token_iterator.hpp>
 

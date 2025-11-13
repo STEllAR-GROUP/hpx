@@ -6,7 +6,8 @@
 
 #pragma once
 
-#include <cctype>
+#include <hpx/config.hpp>
+
 #include <string>
 
 namespace hpx::string_util {

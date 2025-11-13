@@ -9,8 +9,8 @@
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/concurrency/spinlock.hpp>
 #include <hpx/ini/ini.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/type_support.hpp>

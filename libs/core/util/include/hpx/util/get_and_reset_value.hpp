@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <atomic>
 #include <cstdint>
 #include <vector>

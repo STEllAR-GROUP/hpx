@@ -7,9 +7,9 @@
 #include <hpx/config.hpp>
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/barrier.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/io_service/io_service_thread_pool.hpp>
+#include <hpx/modules/concurrency.hpp>
 
 #include <cstddef>
 #include <exception>

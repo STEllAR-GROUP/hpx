@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 
-namespace hpx::program_options {
+namespace hpx::program_options::detail {
 
     /** Converts from local 8 bit encoding into wchar_t string using
         the specified locale facet. */
@@ -58,4 +58,4 @@ namespace hpx::program_options {
             result.push_back(to_internal(s[i]));
         return result;
     }
-}    // namespace hpx::program_options
+}    // namespace hpx::program_options::detail
