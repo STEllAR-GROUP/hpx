@@ -72,7 +72,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <std::size_t I>
+        template <std::size_t I>
         struct bind_eval_placeholder
         {
             template <typename T, typename... Us>

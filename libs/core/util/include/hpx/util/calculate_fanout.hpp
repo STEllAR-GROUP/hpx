@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <cstddef>
 
 namespace hpx::util {

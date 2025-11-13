@@ -23,7 +23,7 @@ namespace hpx::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename VTable, typename F>
+    template <typename VTable, typename F>
     struct get_function_name_impl
     {
         static char const* call()

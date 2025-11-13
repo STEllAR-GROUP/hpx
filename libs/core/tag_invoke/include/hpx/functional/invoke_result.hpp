@@ -18,12 +18,12 @@ namespace hpx::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename T, typename Enable = void>
+        template <typename T, typename Enable = void>
         struct invoke_result_impl
         {
         };
 
-        HPX_CXX_EXPORT template <typename F, typename... Ts>
+        template <typename F, typename... Ts>
         struct invoke_result_impl<F(Ts...),
             std::void_t<decltype(HPX_INVOKE(
                 std::declval<F>(), std::declval<Ts>()...))>>

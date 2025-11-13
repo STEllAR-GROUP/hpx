@@ -63,28 +63,28 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Int>
+        template <typename Int>
         HPX_CORE_EXPORT void print_dec(std::ostream& os, Int const& v, int n);
 
-        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::int16_t const&, int);
-        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::uint16_t const&, int);
-        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::int32_t const&, int);
-        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::uint32_t const&, int);
-        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::int64_t const&, int);
-        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::uint64_t const&, int);
 
-        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::atomic<int> const&, int);
-        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::atomic<unsigned int> const&, int);
 
-        HPX_CXX_EXPORT template <int N, typename T>
+        template <int N, typename T>
         struct dec
         {
             explicit constexpr dec(T const& v) noexcept
@@ -128,14 +128,13 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Int>
+        template <typename Int>
         HPX_CORE_EXPORT void print_hex(std::ostream& os, Int v, int n);
 
-        HPX_CXX_EXPORT template <int N = 4, typename T = int,
-            typename Enable = void>
+        template <int N = 4, typename T = int, typename Enable = void>
         struct hex;
 
-        HPX_CXX_EXPORT template <int N, typename T>
+        template <int N, typename T>
         struct hex<N, T, std::enable_if_t<!std::is_pointer_v<T>>>
         {
             explicit constexpr hex(T const& v) noexcept
@@ -153,10 +152,9 @@ namespace hpx::debug {
             }
         };
 
-        HPX_CXX_EXPORT HPX_CORE_EXPORT void print_ptr(
-            std::ostream& os, void const* v, int n);
+        HPX_CORE_EXPORT void print_ptr(std::ostream& os, void const* v, int n);
 
-        HPX_CXX_EXPORT template <int N, typename T>
+        template <int N, typename T>
         struct hex<N, T, std::enable_if_t<std::is_pointer_v<T>>>
         {
             explicit constexpr hex(T const& v) noexcept
@@ -186,10 +184,10 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Int>
+        template <typename Int>
         HPX_CORE_EXPORT void print_bin(std::ostream& os, Int v, int n);
 
-        HPX_CXX_EXPORT template <int N = 8, typename T = int>
+        template <int N = 8, typename T = int>
         struct bin
         {
             explicit constexpr bin(T const& v) noexcept
@@ -219,8 +217,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     namespace detail {
 
-        HPX_CXX_EXPORT HPX_CORE_EXPORT void print_str(
-            std::ostream& os, char const* v, int n);
+        HPX_CORE_EXPORT void print_str(std::ostream& os, char const* v, int n);
     }
 
     HPX_CXX_EXPORT template <int N = 20>
@@ -260,7 +257,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     namespace detail {
 
-        HPX_CXX_EXPORT struct current_time_print_helper
+        struct current_time_print_helper
         {
             HPX_CORE_EXPORT friend std::ostream& operator<<(
                 std::ostream& os, current_time_print_helper);
@@ -296,14 +293,14 @@ namespace hpx::debug {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename TupleType, std::size_t... I>
+        template <typename TupleType, std::size_t... I>
         void tuple_print(
             std::ostream& os, TupleType const& t, std::index_sequence<I...>)
         {
             (..., (os << (I == 0 ? "" : " ") << std::get<I>(t)));
         }
 
-        HPX_CXX_EXPORT template <typename... Args>
+        template <typename... Args>
         void tuple_print(std::ostream& os, std::tuple<Args...> const& t)
         {
             tuple_print(os, t, std::make_index_sequence<sizeof...(Args)>());
@@ -315,7 +312,7 @@ namespace hpx::debug {
         // ------------------------------------------------------------------
         // helper class for printing time since start
         // ------------------------------------------------------------------
-        HPX_CXX_EXPORT struct hostname_print_helper
+        struct hostname_print_helper
         {
             [[nodiscard]] HPX_CORE_EXPORT char const* get_hostname() const;
             [[nodiscard]] HPX_CORE_EXPORT int guess_rank() const;
@@ -325,15 +322,13 @@ namespace hpx::debug {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT HPX_CORE_EXPORT void register_print_info(
-            void (*)(std::ostream&));
-        HPX_CXX_EXPORT HPX_CORE_EXPORT void generate_prefix(std::ostream& os);
+        HPX_CORE_EXPORT void register_print_info(void (*)(std::ostream&));
+        HPX_CORE_EXPORT void generate_prefix(std::ostream& os);
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT HPX_CORE_EXPORT void display_to_cout(
-            std::string const& str);
+        HPX_CORE_EXPORT void display_to_cout(std::string const& str);
 
-        HPX_CXX_EXPORT template <typename... Args>
+        template <typename... Args>
         void display(char const* prefix, Args const&... args)
         {
             // using a temp stream object with a single copy to cout at the end
@@ -346,37 +341,37 @@ namespace hpx::debug {
             display_to_cout(tempstream.str());
         }
 
-        HPX_CXX_EXPORT template <typename... Args>
+        template <typename... Args>
         void debug(Args const&... args)
         {
             display("<DEB> ", args...);
         }
 
-        HPX_CXX_EXPORT template <typename... Args>
+        template <typename... Args>
         void warning(Args const&... args)
         {
             display("<WAR> ", args...);
         }
 
-        HPX_CXX_EXPORT template <typename... Args>
+        template <typename... Args>
         void error(Args const&... args)
         {
             display("<ERR> ", args...);
         }
 
-        HPX_CXX_EXPORT template <typename... Args>
+        template <typename... Args>
         void scope(Args const&... args)
         {
             display("<SCO> ", args...);
         }
 
-        HPX_CXX_EXPORT template <typename... Args>
+        template <typename... Args>
         void trace(Args const&... args)
         {
             display("<TRC> ", args...);
         }
 
-        HPX_CXX_EXPORT template <typename... Args>
+        template <typename... Args>
         void timed(Args const&... args)
         {
             display("<TIM> ", args...);
@@ -545,7 +540,7 @@ namespace hpx::debug {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         HPX_CORE_EXPORT void print_array(
             std::string const& name, T const* data, std::size_t size);
     }

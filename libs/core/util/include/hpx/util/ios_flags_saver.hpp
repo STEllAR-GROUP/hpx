@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <ios>
 
 namespace hpx::util {

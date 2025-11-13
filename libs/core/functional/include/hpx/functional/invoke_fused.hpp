@@ -34,17 +34,17 @@ namespace hpx {
         using fused_index_pack_t = typename fused_index_pack<Tuple>::type;
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename F, typename Tuple, typename Is>
+        template <typename F, typename Tuple, typename Is>
         struct invoke_fused_result_impl;
 
-        HPX_CXX_EXPORT template <typename F, typename Tuple, std::size_t... Is>
+        template <typename F, typename Tuple, std::size_t... Is>
         struct invoke_fused_result_impl<F, Tuple&, util::index_pack<Is...>>
           : hpx::util::invoke_result<F,
                 typename hpx::tuple_element<Is, Tuple>::type&...>
         {
         };
 
-        HPX_CXX_EXPORT template <typename F, typename Tuple, std::size_t... Is>
+        template <typename F, typename Tuple, std::size_t... Is>
         struct invoke_fused_result_impl<F, Tuple&&, util::index_pack<Is...>>
           : hpx::util::invoke_result<F,
                 typename hpx::tuple_element<Is, Tuple>::type&&...>
@@ -62,7 +62,7 @@ namespace hpx {
             typename invoke_fused_result<F, Tuple>::type;
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <std::size_t... Is, typename F, typename Tuple>
+        template <std::size_t... Is, typename F, typename Tuple>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             invoke_fused_result_t<F, Tuple>
             invoke_fused_impl(util::index_pack<Is...>, F&& f,

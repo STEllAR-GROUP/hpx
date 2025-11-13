@@ -23,9 +23,9 @@ namespace hpx::serialization::detail {
     ////////////////////////////////////////////////////////////////////////////
     // not every random access sequence is reservable, so we need an explicit
     // trait to determine this
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CXX_EXPORT, reserve)
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(reserve)
 
-    HPX_CXX_EXPORT template <typename Container>
+    template <typename Container>
     HPX_FORCEINLINE void reserve_if_container(
         Container& v, std::size_t n) noexcept(!has_reserve_v<Container>)
     {
@@ -36,7 +36,7 @@ namespace hpx::serialization::detail {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Archive, typename Collection>
+    template <typename Archive, typename Collection>
     void save_collection(Archive& ar, const Collection& collection)
     {
         using value_type = typename Collection::value_type;
@@ -54,7 +54,7 @@ namespace hpx::serialization::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename Archive, typename Collection>
+    template <typename Archive, typename Collection>
     void load_collection(Archive& ar, Collection& collection,
         typename Collection::size_type size)
     {

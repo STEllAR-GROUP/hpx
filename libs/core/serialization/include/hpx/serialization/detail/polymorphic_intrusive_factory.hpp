@@ -21,7 +21,7 @@
 
 namespace hpx::serialization::detail {
 
-    HPX_CXX_EXPORT class polymorphic_intrusive_factory
+    class polymorphic_intrusive_factory
     {
     public:
         polymorphic_intrusive_factory(
@@ -60,7 +60,7 @@ namespace hpx::serialization::detail {
         ctor_map_type map_;
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    template <typename T, typename Enable = void>
     struct register_class_name
     {
         register_class_name()

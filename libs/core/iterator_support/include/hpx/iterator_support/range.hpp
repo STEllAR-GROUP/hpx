@@ -19,28 +19,28 @@ namespace hpx::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename T, std::size_t N>
+        template <typename T, std::size_t N>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE T* begin_impl(
             T (&array)[N], long) noexcept
         {
             return &array[0];
         }
 
-        HPX_CXX_EXPORT template <typename T, std::size_t N>
+        template <typename T, std::size_t N>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE T* end_impl(
             T (&array)[N], long) noexcept
         {
             return &array[N];
         }
 
-        HPX_CXX_EXPORT template <typename T, std::size_t N>
+        template <typename T, std::size_t N>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE std::size_t
         size_impl(T const (&)[N], long) noexcept
         {
             return N;
         }
 
-        HPX_CXX_EXPORT template <typename T, std::size_t N>
+        template <typename T, std::size_t N>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE bool empty_impl(
             T const (&)[N], long) noexcept
         {
@@ -48,23 +48,21 @@ namespace hpx::util {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename C,
-            typename R = decltype(std::declval<C&>().begin())>
+        template <typename C, typename R = decltype(std::declval<C&>().begin())>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R begin_impl(
             C& c, long) noexcept(noexcept(c.begin()))
         {
             return c.begin();
         }
 
-        HPX_CXX_EXPORT template <typename C,
-            typename R = decltype(std::declval<C&>().end())>
+        template <typename C, typename R = decltype(std::declval<C&>().end())>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R end_impl(
             C& c, long) noexcept(noexcept(c.begin()))
         {
             return c.end();
         }
 
-        HPX_CXX_EXPORT template <typename C,
+        template <typename C,
             typename R = decltype(std::declval<C const&>().size())>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R size_impl(
             C const& c, long) noexcept(noexcept(c.size()))
@@ -72,7 +70,7 @@ namespace hpx::util {
             return c.size();
         }
 
-        HPX_CXX_EXPORT template <typename C,
+        template <typename C,
             typename R = decltype(std::declval<C const&>().empty())>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R empty_impl(
             C const& c, long) noexcept(noexcept(c.empty()))
@@ -80,7 +78,7 @@ namespace hpx::util {
             return c.empty();
         }
 
-        HPX_CXX_EXPORT template <typename C,
+        template <typename C,
             typename R = decltype(std::declval<C&>().subrange(
                 std::declval<std::ptrdiff_t>(), std::declval<std::size_t>()))>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R subrange_impl(
@@ -90,7 +88,7 @@ namespace hpx::util {
             return c.subrange(delta, size);
         }
 
-        HPX_CXX_EXPORT template <typename C,
+        template <typename C,
             typename R = decltype(std::declval<C&>().iterate())>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R iterate_impl(
             C& c, long) noexcept(noexcept(c.iterate()))
@@ -101,7 +99,7 @@ namespace hpx::util {
         ///////////////////////////////////////////////////////////////////////
         namespace range_impl {
 
-            HPX_CXX_EXPORT struct fallback
+            struct fallback
             {
                 template <typename T>
                 fallback(T const&)
@@ -109,9 +107,9 @@ namespace hpx::util {
                 }
             };
 
-            HPX_CXX_EXPORT fallback begin(fallback);
+            fallback begin(fallback);
 
-            HPX_CXX_EXPORT template <typename C,
+            template <typename C,
                 typename R = decltype(begin(std::declval<C&>()))>
             [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R
             begin_impl(C& c, int) noexcept(noexcept(begin(c)))
@@ -119,9 +117,9 @@ namespace hpx::util {
                 return begin(c);
             }
 
-            HPX_CXX_EXPORT fallback end(fallback);
+            fallback end(fallback);
 
-            HPX_CXX_EXPORT template <typename C,
+            template <typename C,
                 typename R = decltype(end(std::declval<C&>()))>
             [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R end_impl(
                 C& c, int) noexcept(noexcept(end(c)))
@@ -129,11 +127,10 @@ namespace hpx::util {
                 return end(c);
             }
 
-            HPX_CXX_EXPORT fallback subrange(
-                fallback, std::ptrdiff_t, std::size_t);
+            fallback subrange(fallback, std::ptrdiff_t, std::size_t);
 
             // clang-format off
-            HPX_CXX_EXPORT template <typename C,
+             template <typename C,
                 typename R = decltype(
                     subrange(std::declval<C&>(), std::declval<std::ptrdiff_t>(),
                         std::declval<std::size_t>()))>
@@ -145,9 +142,9 @@ namespace hpx::util {
                 return subrange(c, delta, size);
             }
 
-            HPX_CXX_EXPORT fallback empty(fallback);
+            fallback empty(fallback);
 
-            HPX_CXX_EXPORT template <typename C,
+            template <typename C,
                 typename R = decltype(empty(std::declval<C&>()))>
             [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R
             empty_impl(C& c) noexcept(noexcept(empty(c)))
@@ -155,9 +152,9 @@ namespace hpx::util {
                 return empty(c);
             }
 
-            HPX_CXX_EXPORT fallback size(fallback);
+            fallback size(fallback);
 
-            HPX_CXX_EXPORT template <typename C,
+            template <typename C,
                 typename R = decltype(size(std::declval<C&>()))>
             [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R size_impl(
                 C& c) noexcept(noexcept(size(c)))
@@ -165,9 +162,9 @@ namespace hpx::util {
                 return size(c);
             }
 
-            HPX_CXX_EXPORT fallback iterate(fallback);
+            fallback iterate(fallback);
 
-            HPX_CXX_EXPORT template <typename C,
+            template <typename C,
                 typename R = decltype(iterate(std::declval<C&>()))>
             [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R
             iterate_impl(C& c, int) noexcept(noexcept(iterate(c)))
@@ -189,7 +186,7 @@ namespace hpx::util {
         inline constexpr bool has_size_v<T,
             std::void_t<decltype(size(std::declval<T const&>()))>> = true;
 
-        HPX_CXX_EXPORT template <typename C>
+        template <typename C>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE std::ptrdiff_t
         size_impl(C const& c, int)
         {
@@ -210,7 +207,7 @@ namespace hpx::util {
         inline constexpr bool has_empty_v<T,
             std::void_t<decltype(empty(std::declval<T const&>()))>> = true;
 
-        HPX_CXX_EXPORT template <typename C>
+        template <typename C>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE bool empty_impl(
             C const& c, int)
         {

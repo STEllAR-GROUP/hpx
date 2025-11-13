@@ -20,7 +20,7 @@ namespace hpx::util {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename F>
+        template <typename F>
         class protected_bind : public F
         {
         public:

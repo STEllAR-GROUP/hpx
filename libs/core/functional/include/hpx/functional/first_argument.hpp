@@ -16,7 +16,7 @@ namespace hpx::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Tuple>
+        template <typename Tuple>
         struct tuple_first_argument;
 
         template <>
@@ -25,41 +25,40 @@ namespace hpx::util {
             using type = std::false_type;
         };
 
-        HPX_CXX_EXPORT template <typename Arg0, typename... Args>
+        template <typename Arg0, typename... Args>
         struct tuple_first_argument<hpx::tuple<Arg0, Args...>>
         {
             using type = std::decay_t<Arg0>;
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename F>
+        template <typename F>
         struct function_first_argument;
 
-        HPX_CXX_EXPORT template <typename ReturnType>
+        template <typename ReturnType>
         struct function_first_argument<ReturnType (*)()>
         {
             using type = std::false_type;
         };
 
-        HPX_CXX_EXPORT template <typename ReturnType, typename Arg0,
-            typename... Args>
+        template <typename ReturnType, typename Arg0, typename... Args>
         struct function_first_argument<ReturnType (*)(Arg0, Args...)>
         {
             using type = std::decay_t<Arg0>;
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename F>
+        template <typename F>
         struct lambda_first_argument;
 
-        HPX_CXX_EXPORT template <typename ClassType, typename ReturnType>
+        template <typename ClassType, typename ReturnType>
         struct lambda_first_argument<ReturnType (ClassType::*)() const>
         {
             using type = std::false_type;
         };
 
-        HPX_CXX_EXPORT template <typename ClassType, typename ReturnType,
-            typename Arg0, typename... Args>
+        template <typename ClassType, typename ReturnType, typename Arg0,
+            typename... Args>
         struct lambda_first_argument<ReturnType (ClassType::*)(Arg0, Args...)
                 const>
         {
