@@ -12,7 +12,7 @@
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/iterator_support.hpp>
-#include <hpx/util/min.hpp>
+#include <hpx/modules/util.hpp>
 
 #include <algorithm>
 #include <cstddef>

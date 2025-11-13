@@ -16,7 +16,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
@@ -24,16 +23,16 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/naming/split_gid.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
-#include <hpx/util/get_entry_as.hpp>
-#include <hpx/util/insert_checked.hpp>
 
 #include <cstddef>
 #include <cstdint>

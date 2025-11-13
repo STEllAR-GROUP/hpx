@@ -1,5 +1,5 @@
 // Copyright Vladimir Prus 2004.
-// Copyright (c) 2005-2022 Hartmut Kaiser
+// Copyright (c) 2005-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,11 +9,17 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/plugin/config.hpp>
+#include <hpx/plugin/config/defines.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/preprocessor.hpp>
+
+#if !defined(HPX_COMPILE_WITH_MODULES) ||                                      \
+    (defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_PLUGIN_WITH_MODULES))
 #include <hpx/plugin/abstract_factory.hpp>
 #include <hpx/plugin/concrete_factory.hpp>
+#endif
 
 #include <algorithm>
 #include <cctype>

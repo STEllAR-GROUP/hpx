@@ -8,10 +8,10 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/futures/futures_factory.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threading.hpp>
 #include <hpx/modules/threading_base.hpp>

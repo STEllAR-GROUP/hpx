@@ -14,8 +14,8 @@
 #include <hpx/components/client_base.hpp>
 #include <hpx/components/iostreams/manipulators.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <boost/iostreams/stream.hpp>

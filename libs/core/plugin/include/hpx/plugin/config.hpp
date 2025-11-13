@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2022 Hartmut Kaiser
+//  Copyright (c) 2005-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,7 +19,7 @@
 
 namespace hpx::util::plugin {
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using shared_ptr = std::shared_ptr<T>;
 }    // namespace hpx::util::plugin
 
@@ -32,7 +32,7 @@ namespace hpx::util::plugin {
 
 namespace hpx::util::plugin {
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using shared_ptr = boost::shared_ptr<T>;
 }    // namespace hpx::util::plugin
 

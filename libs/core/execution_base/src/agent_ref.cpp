@@ -8,8 +8,8 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution_base/agent_ref.hpp>
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/lock_registration.hpp>
 
 #include <cstddef>
 #include <ostream>

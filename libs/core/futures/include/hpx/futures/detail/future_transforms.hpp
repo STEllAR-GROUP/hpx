@@ -11,7 +11,7 @@
 #include <hpx/futures/traits/detail/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/util/detail/reserve.hpp>
+#include <hpx/modules/util.hpp>
 
 #include <algorithm>
 #include <cstddef>

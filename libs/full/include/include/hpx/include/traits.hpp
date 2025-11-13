@@ -27,6 +27,7 @@
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
@@ -60,4 +61,3 @@
 #include <hpx/parcelset_base/traits/action_get_embedded_parcel.hpp>
 #include <hpx/parcelset_base/traits/action_message_handler.hpp>
 #include <hpx/parcelset_base/traits/action_serialization_filter.hpp>
-#include <hpx/plugin/traits/plugin_config_data.hpp>

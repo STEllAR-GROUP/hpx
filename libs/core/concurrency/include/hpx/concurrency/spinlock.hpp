@@ -9,8 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/thread_support.hpp>
 
 #include <utility>

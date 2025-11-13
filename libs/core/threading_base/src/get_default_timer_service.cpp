@@ -24,7 +24,7 @@ namespace hpx::threads::detail {
         get_default_timer_service_f = HPX_MOVE(f);
     }
 
-    asio::io_context& get_default_timer_service()
+    ::asio::io_context& get_default_timer_service()
     {
         if (detail::get_default_timer_service_f)
         {

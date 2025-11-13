@@ -14,10 +14,9 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/naming/credit_handling.hpp>
 #include <hpx/timing/scoped_timer.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/insert_checked.hpp>
 
 #include <atomic>
 #include <cstddef>

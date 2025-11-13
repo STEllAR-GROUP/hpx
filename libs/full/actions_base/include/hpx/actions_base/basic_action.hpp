@@ -40,10 +40,10 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_local/report_error.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
 #if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
     !defined(HPX_HAVE_APEX)
 #include <hpx/modules/itt_notify.hpp>

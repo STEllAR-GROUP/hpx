@@ -20,9 +20,9 @@
 namespace hpx { namespace components { namespace process { namespace util {
 
 #if defined(HPX_WINDOWS)
-    typedef asio::windows::stream_handle pipe_end;
+    typedef ::asio::windows::stream_handle pipe_end;
 #else
-    typedef asio::posix::stream_descriptor pipe_end;
+    typedef ::asio::posix::stream_descriptor pipe_end;
 #endif
 
     inline const char* zero_device()

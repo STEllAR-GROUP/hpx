@@ -38,5 +38,6 @@ add_hpx_module(
     hpx_thread_pools
     hpx_thread_pool_util
     hpx_type_support
+    hpx_util
   CMAKE_SUBDIRS examples tests
 )

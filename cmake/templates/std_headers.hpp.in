@@ -14,6 +14,7 @@
 
 @cxx_standard_headers@
 // Some standard headers include the following headers.
+#include <filesystem>
 #include <numeric>
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
@@ -45,3 +46,5 @@
 #include <excpt.h>
 #undef exception_info
 #endif
+
+#include <asio.hpp>

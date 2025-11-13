@@ -106,6 +106,7 @@ add_hpx_module(
     hpx_lcos_local
     hpx_memory
     hpx_runtime_local
+    hpx_string_util
     hpx_synchronization
     hpx_tag_invoke
     hpx_threading
@@ -114,5 +115,6 @@ add_hpx_module(
     hpx_timed_execution
     hpx_timing
     hpx_type_support
+    hpx_util
   CMAKE_SUBDIRS examples tests
 )

@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -36,6 +36,7 @@
 #include <algorithm>    // for find_if
 #include <cctype>
 #include <cstddef>
+#include <cstdint>
 #include <cwctype>
 #include <initializer_list>
 #include <iterator>
@@ -54,7 +55,7 @@ namespace hpx::string_util {
     // there can be escape sequences using the \ much like C. The role of the
     // comma, the quotation mark, and the escape character (backslash \), can be
     // assigned to other characters.
-    template <typename Char,
+    HPX_CXX_EXPORT template <typename Char,
         typename Traits = typename std::basic_string<Char>::traits_type,
         typename Allocator = typename std::basic_string<Char>::allocator_type>
     class escaped_list_separator
@@ -219,7 +220,7 @@ namespace hpx::string_util {
         // conditional will always get optimized out in the function
         // implementations, argument types are not a problem since both forms of
         // character classifiers expect an int.
-        template <typename Traits, int N>
+        HPX_CXX_EXPORT template <typename Traits, int N>
         struct traits_extension_details : public Traits
         {
             using char_type = typename Traits::char_type;
@@ -235,7 +236,7 @@ namespace hpx::string_util {
             }
         };
 
-        template <typename Traits>
+        HPX_CXX_EXPORT template <typename Traits>
         struct traits_extension_details<Traits, 1> : public Traits
         {
             using char_type = typename Traits::char_type;
@@ -254,7 +255,7 @@ namespace hpx::string_util {
         // In case there is no cwctype header, we implement the checks manually.
         // We make use of the fact that the tested categories should fit in
         // ASCII.
-        template <typename Traits>
+        HPX_CXX_EXPORT template <typename Traits>
         struct traits_extension : public Traits
         {
             using char_type = typename Traits::char_type;
@@ -281,7 +282,7 @@ namespace hpx::string_util {
         // assign method does nothing, plus_equal invokes operator +=, and the
         // clearing method sets the supplied token to the default token
         // constructor's result.
-        template <typename IteratorTag>
+        HPX_CXX_EXPORT template <typename IteratorTag>
         struct assign_or_plus_equal
         {
             template <typename Iterator, typename Token>
@@ -323,7 +324,7 @@ namespace hpx::string_util {
             }
         };
 
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         struct class_iterator_category
         {
             using type = typename Iterator::iterator_category;
@@ -331,7 +332,7 @@ namespace hpx::string_util {
 
         // This portably gets the iterator_tag without partial template
         // specialization
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         struct get_iterator_category
         {
             using iterator_category =
@@ -344,7 +345,7 @@ namespace hpx::string_util {
     //===========================================================================
     // The offset_separator class, which is a model of TokenizerFunction. Offset
     // breaks a string into tokens based on a range of offsets
-    class offset_separator
+    HPX_CXX_EXPORT class offset_separator
     {
     private:
         std::vector<int> offsets_;
@@ -445,13 +446,9 @@ namespace hpx::string_util {
     // constructor, adding the new constructor would cause ambiguity, so instead
     // I deprecated the whole class. The implementation of the class was also
     // simplified considerably.
-    enum class empty_token_policy
-    {
-        drop,
-        keep
-    };
+    HPX_CXX_EXPORT enum class empty_token_policy : std::uint8_t { drop, keep };
 
-    template <typename Char,
+    HPX_CXX_EXPORT template <typename Char,
         typename Traits = typename std::basic_string<Char>::traits_type,
         typename Allocator = typename std::basic_string<Char>::allocator_type>
     class char_separator
@@ -618,7 +615,7 @@ namespace hpx::string_util {
     // punctuation. Nonreturnable delimiters cannot be returned as tokens. These
     // are often whitespace
 
-    template <typename Char,
+    HPX_CXX_EXPORT template <typename Char,
         typename Traits = typename std::basic_string<Char>::traits_type,
         typename Allocator = typename std::basic_string<Char>::allocator_type>
     class char_delimiters_separator
