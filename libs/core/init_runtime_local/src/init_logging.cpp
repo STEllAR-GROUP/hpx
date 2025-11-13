@@ -1096,7 +1096,7 @@ namespace hpx::util {
 
 #include <hpx/init_runtime_local/detail/init_logging.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/util/get_entry_as.hpp>
+#include <hpx/modules/util.hpp>
 
 #include <iostream>
 #include <string>

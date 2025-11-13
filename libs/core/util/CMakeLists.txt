@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,6 +30,8 @@ include(HPX_AddModule)
 add_hpx_module(
   core util
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
+  ADD_TO_GLOBAL_HEADER "hpx/util/detail/reserve.hpp"
   SOURCES ${util_sources}
   HEADERS ${util_headers}
   COMPAT_HEADERS ${util_compat_headers}

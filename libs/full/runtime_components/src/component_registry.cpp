@@ -8,12 +8,11 @@
 
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_components/component_registry.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
 
 #include <algorithm>
 #include <string>

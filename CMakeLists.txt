@@ -1,5 +1,5 @@
 # Copyright (c)      2020 Mikael Simberg
-# Copyright (c) 2007-2024 Hartmut Kaiser
+# Copyright (c) 2007-2025 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c)      2024 Isidoros Tsaousis-Seiras
 # Copyright (c) 2007-2008 Chirag Dekate
@@ -1709,6 +1709,12 @@ hpx_option(
 if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
+
+hpx_option(
+  HPX_WITH_MODULE_COMPATIBILITY_HEADERS BOOL
+  "Generate backwards-compatibility headers for HPX Modules (default: OFF)" OFF
+  ADVANCED
+)
 
 # ##############################################################################
 # Special diagnostic flags, do not enable by default, only if needed

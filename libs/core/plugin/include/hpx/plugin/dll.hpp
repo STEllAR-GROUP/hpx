@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2013 Hartmut Kaiser
+// Copyright (c) 2005-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,10 +8,8 @@
 
 #include <hpx/plugin/config.hpp>
 
-#if !defined(HPX_MSVC)
-#if !defined(HPX_HAS_DLOPEN)
+#if !defined(HPX_MSVC) && !defined(HPX_HAS_DLOPEN)
 #define HPX_HAS_DLOPEN 1
-#endif
 #endif
 
 #if defined(HPX_MSVC) || defined(HPX_MINGW)

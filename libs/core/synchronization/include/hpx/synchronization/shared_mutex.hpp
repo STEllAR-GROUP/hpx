@@ -14,7 +14,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
