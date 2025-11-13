@@ -121,6 +121,7 @@ namespace boost { namespace inspect {
         register_signature(".inc");
         register_signature(".ipp");
         register_signature(".ixx");
+        register_signature(".cppm");
 
         for (deprecated_names const* names_it = &names[0];
             names_it->name_regex != nullptr; ++names_it)

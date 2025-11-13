@@ -15,8 +15,6 @@
 #endif
 
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/optional.hpp>
-#include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution/queries/get_stop_token.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
@@ -24,6 +22,7 @@
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/stop_token.hpp>

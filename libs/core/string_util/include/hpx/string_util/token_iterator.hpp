@@ -18,8 +18,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/iterator_support/detail/minimum_category.hpp>
-#include <hpx/iterator_support/iterator_facade.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/string_util/token_functions.hpp>
 
 #include <string>

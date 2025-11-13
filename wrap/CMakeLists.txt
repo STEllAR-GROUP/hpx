@@ -6,6 +6,8 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+include(HPX_CXXModules)
+
 set(hpx_wrap_HEADERS
     ""
     CACHE INTERNAL "Headers for libhpx_wrap." FORCE
@@ -44,14 +46,14 @@ set_target_properties(hpx_wrap PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(hpx_wrap PRIVATE hpx_full)
 target_link_libraries(hpx_wrap PRIVATE hpx_init)
 target_link_libraries(hpx_wrap PRIVATE hpx_private_flags)
-target_compile_definitions(
-  hpx_wrap PRIVATE HPX_APPLICATION_EXPORTS HPX_LIBRARY_EXPORTS
-                   HPX_BINARY_DOESNT_USE_CXX_MODULES
-)
+target_compile_definitions(hpx_wrap PRIVATE HPX_LIBRARY_EXPORTS)
 target_include_directories(
   hpx_wrap PUBLIC $<BUILD_INTERFACE:${hpx_wrap_HEADER_ROOT}>
                   $<INSTALL_INTERFACE:include>
 )
+if(HPX_WITH_CXX_MODULES)
+  hpx_configure_module_consumer(hpx_wrap hpx_core_module_if)
+endif()
 
 set_property(TARGET hpx_wrap PROPERTY FOLDER "Core")
 

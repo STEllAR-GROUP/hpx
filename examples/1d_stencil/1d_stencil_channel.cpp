@@ -19,7 +19,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/iterator_support/counting_shape.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/program_options.hpp>
 
 #include <algorithm>

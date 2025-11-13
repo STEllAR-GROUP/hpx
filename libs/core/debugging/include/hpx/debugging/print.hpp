@@ -153,7 +153,7 @@ namespace hpx::debug {
             }
         };
 
-        HPX_CORE_MODULE_EXPORT void print_ptr(
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void print_ptr(
             std::ostream& os, void const* v, int n);
 
         HPX_CXX_EXPORT template <int N, typename T>
@@ -219,7 +219,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT void print_str(
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void print_str(
             std::ostream& os, char const* v, int n);
     }
 
@@ -325,12 +325,13 @@ namespace hpx::debug {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CORE_MODULE_EXPORT void register_print_info(
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void register_print_info(
             void (*)(std::ostream&));
-        HPX_CORE_MODULE_EXPORT void generate_prefix(std::ostream& os);
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void generate_prefix(std::ostream& os);
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CORE_MODULE_EXPORT void display_to_cout(std::string const& str);
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void display_to_cout(
+            std::string const& str);
 
         HPX_CXX_EXPORT template <typename... Args>
         void display(char const* prefix, Args const&... args)

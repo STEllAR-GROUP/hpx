@@ -16,7 +16,8 @@
 namespace hpx::assertion::detail {
 
     /// \cond NOINTERNAL
-    HPX_CORE_MODULE_EXPORT void handle_assert(hpx::source_location const& loc,
-        char const* expr, std::string const& msg) noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void handle_assert(
+        hpx::source_location const& loc, char const* expr,
+        std::string const& msg) noexcept;
     /// \endcond
 }    // namespace hpx::assertion::detail

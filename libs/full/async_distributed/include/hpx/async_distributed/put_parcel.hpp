@@ -19,7 +19,7 @@
 #include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/async_distributed/put_parcel_fwd.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/functional/traits/is_action.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/naming/credit_handling.hpp>
 #include <hpx/naming/split_gid.hpp>
 #include <hpx/naming_base/address.hpp>

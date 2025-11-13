@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/hardware/timestamp.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/thread_pools/detail/background_thread.hpp>
 #include <hpx/thread_pools/detail/scheduling_callbacks.hpp>
 #include <hpx/thread_pools/detail/scheduling_counters.hpp>

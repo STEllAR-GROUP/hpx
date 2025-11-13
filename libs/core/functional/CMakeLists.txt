@@ -6,6 +6,20 @@
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+# Compatibility with Boost placeholder types, introduced in V2.0.0
+hpx_option(
+  HPX_FUNCTIONAL_WITH_BOOST_PLACEHOLDERS BOOL
+  "Enable support for Boost placeholder types. (default: OFF)" OFF ADVANCED
+  CATEGORY "Modules"
+  MODULE FUNCTIONAL
+)
+
+if(HPX_FUNCTIONAL_WITH_BOOST_PLACEHOLDERS)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_FUNCTIONAL_HAVE_BOOST_PLACEHOLDERS NAMESPACE FUNCTIONAL
+  )
+endif()
+
 # Default location is $HPX_ROOT/libs/functional/include
 set(functional_headers
     hpx/functional/deferred_call.hpp
@@ -24,8 +38,8 @@ set(functional_headers
     hpx/functional/first_argument.hpp
     hpx/functional/function.hpp
     hpx/functional/function_ref.hpp
-    hpx/functional/invoke.hpp
     hpx/functional/invoke_fused.hpp
+    hpx/functional/macros.hpp
     hpx/functional/mem_fn.hpp
     hpx/functional/move_only_function.hpp
     hpx/functional/one_shot.hpp
@@ -47,6 +61,7 @@ set(functional_headers
     hpx/functional/traits/is_bind_expression.hpp
     hpx/functional/traits/is_placeholder.hpp
 )
+set(functional_macro_headers hpx/functional/macros.hpp)
 
 # Default location is $HPX_ROOT/libs/functional/include_compatibility
 # cmake-format: off
@@ -77,15 +92,13 @@ include(HPX_AddModule)
 add_hpx_module(
   core functional
   GLOBAL_HEADER_GEN ON
-  EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/functional/traits/get_function_address.hpp"
-    "hpx/functional/traits/get_function_annotation.hpp"
-    "hpx/functional/traits/is_action.hpp"
-    "hpx/functional/traits/is_bind_expression.hpp"
-    "hpx/functional/traits/is_placeholder.hpp"
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${functional_sources}
   HEADERS ${functional_headers}
+  MACRO_HEADERS ${functional_macro_headers}
   COMPAT_HEADERS ${functional_compat_headers}
+  ADD_TO_GLOBAL_HEADER "hpx/functional/detail/reset_function.hpp"
+                       "hpx/functional/detail/runtime_get.hpp"
   MODULE_DEPENDENCIES
     hpx_assertion
     hpx_config

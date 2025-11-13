@@ -28,12 +28,12 @@ namespace hpx {
     /// \cond NODETAIL
     namespace detail {
 
-        HPX_CORE_MODULE_EXPORT_NODISCARD std::exception_ptr access_exception(
-            error_code const&);
+        HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::exception_ptr
+        access_exception(error_code const&);
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT HPX_CXX_EXTERN struct HPX_ALWAYS_EXPORT
-            command_line_error final : std::logic_error
+        HPX_CXX_EXPORT struct HPX_ALWAYS_EXPORT command_line_error final
+          : std::logic_error
         {
             explicit command_line_error(char const* msg)
               : std::logic_error(msg)
@@ -50,19 +50,19 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Returns generic HPX error category used for new errors.
-    HPX_CORE_MODULE_EXPORT_NODISCARD std::error_category const&
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::error_category const&
     get_hpx_category() noexcept;
 
     /// \brief Returns generic HPX error category used for errors re-thrown
     ///        after the exception has been de-serialized.
-    HPX_CORE_MODULE_EXPORT_NODISCARD std::error_category const&
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::error_category const&
     get_hpx_rethrow_category() noexcept;
 
     /// \cond NOINTERNAL
-    HPX_CORE_MODULE_EXPORT_NODISCARD std::error_category const&
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::error_category const&
     get_lightweight_hpx_category() noexcept;
 
-    HPX_CORE_MODULE_EXPORT_NODISCARD std::error_category const&
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::error_category const&
     get_hpx_category(throwmode mode) noexcept;
 
     HPX_CXX_EXPORT [[nodiscard]] inline std::error_code make_system_error_code(
@@ -92,7 +92,7 @@ namespace hpx {
     /// \note Class hpx::error_code is an adjunct to error reporting by
     /// exception
     ///
-    HPX_CXX_EXPORT HPX_CXX_EXTERN class HPX_CORE_EXPORT error_code
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT error_code
       : public std::error_code    //-V690
     {
     public:

@@ -10,6 +10,7 @@ include(HPX_ExportTargets)
 include(HPX_Message)
 include(HPX_Option)
 include(HPX_PrintSummary)
+include(HPX_CXXModules)
 
 function(add_hpx_module libname modulename)
   # Retrieve arguments
@@ -191,16 +192,14 @@ function(add_hpx_module libname modulename)
     endif()
 
     # Decide output path and template file
-    set(module_macro_headers)
+    set(module_macro_headers
+        "\n#include <hpx/${modulename}/config/defines.hpp>\n"
+    )
     set(global_header
         "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/modules/${modulename}.hpp"
     )
     if(HPX_WITH_CXX_MODULES AND ${modulename}_GLOBAL_HEADER_MODULE_GEN)
       # generate list of macro headers to #include
-      list(LENGTH ${modulename}_MACRO_HEADERS macro_headers)
-      if(macro_headers GREATER 0)
-        set(module_macro_headers "\n")
-      endif()
       foreach(header_file ${${modulename}_MACRO_HEADERS})
         set(module_macro_headers
             "${module_macro_headers}#include <${header_file}>\n"
@@ -269,7 +268,9 @@ function(add_hpx_module libname modulename)
         )
 
         set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib}/${modulename})
-        set(lib_module_file "${lib_module_basedir}/hpx_${modulename}.ixx")
+        set(lib_module_file
+            "${lib_module_basedir}/hpx_${modulename}${HPX_MODULE_INTERFACE_EXTENSION}"
+        )
         configure_file(
           "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in" ${lib_module_file}
           @ONLY
@@ -508,10 +509,16 @@ function(add_hpx_module libname modulename)
     hpx_${modulename} PRIVATE HPX_${libname_upper}_EXPORTS
   )
 
-  # This is a temporary solution until all of HPX has been modularized as it
-  # enables using header files from HPX for compiling this module.
   if("${libname}" STREQUAL "full")
+    # This is a temporary solution until all of HPX has been modularized as it
+    # enables using header files from HPX for compiling this module.
     target_include_directories(hpx_${modulename} PRIVATE ${HPX_SOURCE_DIR})
+
+    # We build the full library module using the C++ module definitions for
+    # core.
+    if(HPX_WITH_CXX_MODULES)
+      hpx_configure_module_consumer(hpx_${modulename} hpx_core_module_if)
+    endif()
   endif()
 
   add_hpx_source_group(

@@ -13,8 +13,8 @@
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <type_traits>
 #include <utility>

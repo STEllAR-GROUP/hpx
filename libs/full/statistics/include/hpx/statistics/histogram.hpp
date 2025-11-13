@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <boost/accumulators/framework/accumulator_base.hpp>
 #include <boost/accumulators/framework/depends_on.hpp>

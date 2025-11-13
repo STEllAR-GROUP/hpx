@@ -13,8 +13,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/functional/bind.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>

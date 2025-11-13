@@ -19,7 +19,7 @@
 namespace hpx::util::detail {
 
     /// Lockable spinlock class
-    HPX_CXX_EXPORT HPX_CXX_EXTERN struct spinlock
+    HPX_CXX_EXPORT struct spinlock
     {
     private:
         std::atomic<bool> m;

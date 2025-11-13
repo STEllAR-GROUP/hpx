@@ -6,8 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <hpx/lcos_local/composable_guard.hpp>
 

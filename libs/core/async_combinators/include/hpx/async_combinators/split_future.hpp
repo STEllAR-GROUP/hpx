@@ -64,8 +64,6 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/packaged_continuation.hpp>
@@ -73,7 +71,9 @@ namespace hpx {
 #include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/type_support.hpp>
 

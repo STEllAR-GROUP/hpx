@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution/algorithms/keep_future.hpp>
 #include <hpx/execution/algorithms/make_future.hpp>
@@ -25,11 +24,9 @@
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/invoke_fused.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/timing/steady_clock.hpp>

@@ -13,9 +13,7 @@
 #include <hpx/coroutines/detail/coroutine_self.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/functional/detail/reset_function.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
-#include <hpx/functional/move_only_function.hpp>
+#include <hpx/modules/functional.hpp>
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
 #include <hpx/coroutines/detail/tss.hpp>
 #endif

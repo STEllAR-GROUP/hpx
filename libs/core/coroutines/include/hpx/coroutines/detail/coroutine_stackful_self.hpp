@@ -11,7 +11,7 @@
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/detail/coroutine_self.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <cstddef>
 #include <limits>

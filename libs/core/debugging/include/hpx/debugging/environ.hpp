@@ -25,7 +25,7 @@
 // On FreeBSD the environment is available for executables only, so needs to be
 // handled explicitly (e.g. see hpx_init_impl.hpp)
 // The variable is defined in debugging/src/print.cpp
-HPX_CORE_MODULE_EXPORT char** freebsd_environ;
+HPX_CXX_EXPORT HPX_CORE_EXPORT char** freebsd_environ;
 #else
 // this case is handled in debugging/macros.hpp
 extern char** environ;

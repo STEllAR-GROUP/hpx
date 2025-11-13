@@ -6,8 +6,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/detail/invocation_count_registry.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/performance_counters/action_invocation_counter_discoverer.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>

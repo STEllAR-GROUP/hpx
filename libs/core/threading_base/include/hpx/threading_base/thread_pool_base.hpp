@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/network_background_callback.hpp>

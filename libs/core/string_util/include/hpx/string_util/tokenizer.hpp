@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/string_util/token_iterator.hpp>
 
 #include <string>

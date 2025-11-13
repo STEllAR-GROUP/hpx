@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013-2022 Hartmut Kaiser
+//  Copyright (c) 2013-2025 Hartmut Kaiser
 //  Copyright (c) 2014-2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,13 +14,13 @@
 namespace hpx::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct empty_function
+    HPX_CXX_EXPORT struct empty_function
     {
     };    // must be trivial and empty
 
-    [[noreturn]] HPX_CORE_EXPORT void throw_bad_function_call();
+    HPX_CXX_EXPORT [[noreturn]] HPX_CORE_EXPORT void throw_bad_function_call();
 
-    template <typename R>
+    HPX_CXX_EXPORT template <typename R>
     [[noreturn]] inline R throw_bad_function_call()
     {
         throw_bad_function_call();
@@ -29,14 +29,14 @@ namespace hpx::util::detail {
     ///////////////////////////////////////////////////////////////////////////
     // make sure the empty table instance is initialized in time, even
     // during early startup
-    template <typename Sig, bool Copyable>
+    HPX_CXX_EXPORT template <typename Sig, bool Copyable>
     struct function_vtable;
 
     // NOTE: nvcc (at least CUDA 9.2 and 10.1) fails with an internal compiler
     // error ("there was an error in verifying the lgenfe output!") with this
     // enabled, so we explicitly use the fallback.
 #if !defined(HPX_HAVE_CUDA)
-    template <typename Sig>
+    HPX_CXX_EXPORT template <typename Sig>
     [[nodiscard]] constexpr function_vtable<Sig, true> const*
     get_empty_function_vtable() noexcept
     {

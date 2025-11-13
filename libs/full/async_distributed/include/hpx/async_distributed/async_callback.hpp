@@ -16,9 +16,9 @@
 #include <hpx/async_distributed/async_callback_fwd.hpp>
 #include <hpx/async_distributed/detail/async_implementations_fwd.hpp>
 #include <hpx/components/client_base.hpp>
-#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <type_traits>
 #include <utility>

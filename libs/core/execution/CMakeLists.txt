@@ -166,15 +166,18 @@ add_hpx_module(
     hpx_concepts
     hpx_concurrency
     hpx_config
-    hpx_threading
-    hpx_pack_traversal
+    hpx_datastructures
     hpx_errors
+    hpx_functional
+    hpx_iterator_support
     hpx_lock_registration
     hpx_memory
+    hpx_pack_traversal
     hpx_preprocessor
     hpx_serialization
     hpx_synchronization
     hpx_tag_invoke
+    hpx_threading
     hpx_thread_support
     hpx_timing
     hpx_topology

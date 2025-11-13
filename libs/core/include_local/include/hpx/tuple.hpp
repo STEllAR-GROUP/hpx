@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/datastructures/serialization/tuple.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>

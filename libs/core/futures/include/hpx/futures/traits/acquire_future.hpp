@@ -10,9 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/is_future_range.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/util/detail/reserve.hpp>
 
 #include <algorithm>

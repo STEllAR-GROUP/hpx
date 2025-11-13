@@ -19,7 +19,7 @@
 #include <hpx/async_colocated/register_post_colocated.hpp>
 #include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/async_distributed/detail/post_continue_callback.hpp>
-#include <hpx/functional/bind.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <utility>
 

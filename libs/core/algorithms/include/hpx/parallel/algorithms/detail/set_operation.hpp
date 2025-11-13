@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/modules/type_support.hpp>

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <cstdint>
 #include <string>

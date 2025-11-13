@@ -1,4 +1,4 @@
-//  Copyright (c) 2012-2023 Hartmut Kaiser
+//  Copyright (c) 2012-2025 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //
 //  adapted from:
@@ -15,7 +15,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/hashing/fibhash.hpp>
+#include <hpx/modules/hashing.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>

@@ -30,7 +30,7 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     // Helper class to gain access to the implementation functions in the
     // derived (user-defined) iterator classes.
-    class iterator_core_access
+    HPX_CXX_EXPORT class iterator_core_access
     {
     public:
         template <typename Iterator1, typename Iterator2>
@@ -96,7 +96,7 @@ namespace hpx::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Reference>
+        HPX_CXX_EXPORT template <typename Reference>
         struct arrow_dispatch    // proxy references
         {
             struct proxy
@@ -125,7 +125,7 @@ namespace hpx::util {
             }
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct arrow_dispatch<T&>    // "real" references
         {
             using type = T*;
@@ -137,13 +137,14 @@ namespace hpx::util {
             }
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         using arrow_dispatch_t = typename arrow_dispatch<T>::type;
 
         ///////////////////////////////////////////////////////////////////////
         // Implementation for input and forward iterators
-        template <typename Derived, typename T, typename Category,
-            typename Reference, typename Distance, typename Pointer>
+        HPX_CXX_EXPORT template <typename Derived, typename T,
+            typename Category, typename Reference, typename Distance,
+            typename Pointer>
         class iterator_facade_base
         {
         public:
@@ -195,8 +196,8 @@ namespace hpx::util {
 
         ////////////////////////////////////////////////////////////////////////
         // Implementation for bidirectional iterators
-        template <typename Derived, typename T, typename Reference,
-            typename Distance, typename Pointer>
+        HPX_CXX_EXPORT template <typename Derived, typename T,
+            typename Reference, typename Distance, typename Pointer>
         class iterator_facade_base<Derived, T, std::bidirectional_iterator_tag,
             Reference, Distance, Pointer>
           : public iterator_facade_base<Derived, T, std::forward_iterator_tag,
@@ -238,7 +239,7 @@ namespace hpx::util {
         // A proxy return type for operator[], needed to deal with iterators
         // that may invalidate references upon destruction. Consider the
         // temporary iterator in *(a + n)
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         class operator_brackets_proxy
         {
             // Iterator is actually an iterator_facade, so we do not have to
@@ -273,11 +274,12 @@ namespace hpx::util {
         // We can force (not) using the operator_brackets_proxy by adding an
         // embedded type use_brackets_proxy to the iterator that evaluates to
         // either std::true_type of std::false_type.
-        HPX_HAS_XXX_TRAIT_DEF(use_brackets_proxy)
+        HPX_HAS_XXX_TRAIT_DEF(HPX_CXX_EXPORT, use_brackets_proxy)
 
         // A meta-function that determines whether operator[] must return a
         // proxy, or whether it can simply return a copy of the value_type.
-        template <typename Iterator, typename Value, typename Enable = void>
+        HPX_CXX_EXPORT template <typename Iterator, typename Value,
+            typename Enable = void>
         struct use_operator_brackets_proxy
           : std::integral_constant<bool,
                 !(std::is_copy_constructible_v<Value> &&
@@ -285,14 +287,14 @@ namespace hpx::util {
         {
         };
 
-        template <typename Iterator, typename Value>
+        HPX_CXX_EXPORT template <typename Iterator, typename Value>
         struct use_operator_brackets_proxy<Iterator, Value,
             std::enable_if_t<has_use_brackets_proxy_v<Iterator>>>
           : Iterator::use_brackets_proxy
         {
         };
 
-        template <typename Iterator, typename Value>
+        HPX_CXX_EXPORT template <typename Iterator, typename Value>
         struct operator_brackets_result
         {
             using type = std::conditional_t<
@@ -300,22 +302,22 @@ namespace hpx::util {
                 operator_brackets_proxy<Iterator>, Value>;
         };
 
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         HPX_HOST_DEVICE operator_brackets_proxy<Iterator>
         make_operator_brackets_result(Iterator const& iter, std::true_type)
         {
             return operator_brackets_proxy<Iterator>(iter);
         }
 
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         HPX_HOST_DEVICE typename Iterator::value_type
         make_operator_brackets_result(Iterator const& iter, std::false_type)
         {
             return *iter;
         }
 
-        template <typename Derived, typename T, typename Reference,
-            typename Distance, typename Pointer>
+        HPX_CXX_EXPORT template <typename Derived, typename T,
+            typename Reference, typename Distance, typename Pointer>
         class iterator_facade_base<Derived, T, std::random_access_iterator_tag,
             Reference, Distance, Pointer>
           : public iterator_facade_base<Derived, T,
@@ -380,7 +382,7 @@ namespace hpx::util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived, typename T, typename Category,
+    HPX_CXX_EXPORT template <typename Derived, typename T, typename Category,
         typename Reference = T&, typename Distance = std::ptrdiff_t,
         typename Pointer = void>
     struct iterator_facade
@@ -422,7 +424,7 @@ namespace hpx::util {
         // help with their postfix ++: the referenced value must be read and
         // stored away before the increment occurs so that *a++ yields the
         // originally referenced element and not the next one.
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         class postfix_increment_proxy
         {
             using value_type =
@@ -450,7 +452,7 @@ namespace hpx::util {
         // In general, we can't determine that such an iterator isn't writable
         // -- we also need to store a copy of the old iterator so that it can
         // be written into.
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         class writable_postfix_increment_proxy
         {
             using value_type =
@@ -507,7 +509,7 @@ namespace hpx::util {
             Iterator stored_iterator;
         };
 
-        template <typename Reference, typename Value>
+        HPX_CXX_EXPORT template <typename Reference, typename Value>
         struct is_non_proxy_reference
           : std::is_convertible<
                 std::remove_reference_t<Reference> const volatile*,
@@ -515,7 +517,7 @@ namespace hpx::util {
         {
         };
 
-        template <typename Reference, typename Value>
+        HPX_CXX_EXPORT template <typename Reference, typename Value>
         inline constexpr bool is_non_proxy_reference_v =
             is_non_proxy_reference<Reference, Value>::value;
 
@@ -531,14 +533,15 @@ namespace hpx::util {
         // operations, we're not going to try to support them.  Therefore,
         // even if r++ returns a proxy, *r++ will only return a proxy if *r also
         // returns a proxy.
-        template <typename Iterator, typename Value, typename Reference,
-            typename Enable = void>
+        HPX_CXX_EXPORT template <typename Iterator, typename Value,
+            typename Reference, typename Enable = void>
         struct postfix_increment_result
         {
             using type = Iterator;
         };
 
-        template <typename Iterator, typename Value, typename Reference>
+        HPX_CXX_EXPORT template <typename Iterator, typename Value,
+            typename Reference>
         struct postfix_increment_result<Iterator, Value, Reference,
             std::enable_if_t<
                 traits::has_category_v<Iterator, std::input_iterator_tag> &&
@@ -547,7 +550,8 @@ namespace hpx::util {
             using type = postfix_increment_proxy<Iterator>;
         };
 
-        template <typename Iterator, typename Value, typename Reference>
+        HPX_CXX_EXPORT template <typename Iterator, typename Value,
+            typename Reference>
         struct postfix_increment_result<Iterator, Value, Reference,
             std::enable_if_t<
                 traits::has_category_v<Iterator, std::input_iterator_tag> &&
@@ -556,13 +560,14 @@ namespace hpx::util {
             using type = writable_postfix_increment_proxy<Iterator>;
         };
 
-        template <typename Iterator, typename Value, typename Reference>
+        HPX_CXX_EXPORT template <typename Iterator, typename Value,
+            typename Reference>
         using postfix_increment_result_t =
             typename postfix_increment_result<Iterator, Value, Reference>::type;
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived, typename T, typename Category,
+    HPX_CXX_EXPORT template <typename Derived, typename T, typename Category,
         typename Reference, typename Distance, typename Pointer>
     HPX_HOST_DEVICE inline util::detail::postfix_increment_result_t<Derived,
         typename Derived::value_type, typename Derived::reference>
@@ -579,7 +584,9 @@ namespace hpx::util {
     }
 
     namespace detail {
-        template <typename Facade1, typename Facade2, typename Return,
+
+        HPX_CXX_EXPORT template <typename Facade1, typename Facade2,
+            typename Return,
             typename = std::void_t<decltype(iterator_core_access::equal(
                 std::declval<Facade1>(), std::declval<Facade2>()))>>
         struct enable_operator_equal_interoperable
@@ -599,9 +606,9 @@ namespace hpx::util {
     }    // namespace detail
 
 #define HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(prefix, op, result_type)         \
-    template <typename Derived1, typename T1, typename Category1,              \
-        typename Reference1, typename Distance1, typename Pointer1,            \
-        typename Derived2, typename T2, typename Category2,                    \
+    HPX_CXX_EXPORT template <typename Derived1, typename T1,                   \
+        typename Category1, typename Reference1, typename Distance1,           \
+        typename Pointer1, typename Derived2, typename T2, typename Category2, \
         typename Reference2, typename Distance2, typename Pointer2>            \
     HPX_HOST_DEVICE prefix                                                     \
         typename hpx::util::detail::enable_operator_equal_interoperable<       \
@@ -613,9 +620,9 @@ namespace hpx::util {
 
 #define HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX(                              \
     prefix, op, result_type, cond)                                             \
-    template <typename Derived1, typename T1, typename Category1,              \
-        typename Reference1, typename Distance1, typename Pointer1,            \
-        typename Derived2, typename T2, typename Category2,                    \
+    HPX_CXX_EXPORT template <typename Derived1, typename T1,                   \
+        typename Category1, typename Reference1, typename Distance1,           \
+        typename Pointer1, typename Derived2, typename T2, typename Category2, \
         typename Reference2, typename Distance2, typename Pointer2>            \
     HPX_HOST_DEVICE prefix                                                     \
         typename hpx::util::detail::enable_operator_interoperable_ex<Derived1, \
@@ -641,7 +648,7 @@ namespace hpx::util {
 
     namespace detail {
 
-        template <typename Category1, typename Category2>
+        HPX_CXX_EXPORT template <typename Category1, typename Category2>
         struct enable_random_access_operations
           : std::integral_constant<bool,
                 std::is_same_v<Category1, std::random_access_iterator_tag> &&
@@ -694,7 +701,7 @@ namespace hpx::util {
 #undef HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX
 #undef HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD
 
-    template <typename Derived, typename T, typename Category,
+    HPX_CXX_EXPORT template <typename Derived, typename T, typename Category,
         typename Reference, typename Distance, typename Pointer>
     HPX_HOST_DEVICE constexpr std::enable_if_t<
         std::is_same_v<typename Derived::iterator_category,
@@ -710,7 +717,7 @@ namespace hpx::util {
         return tmp += n;
     }
 
-    template <typename Derived, typename T, typename Category,
+    HPX_CXX_EXPORT template <typename Derived, typename T, typename Category,
         typename Reference, typename Distance, typename Pointer>
     HPX_HOST_DEVICE constexpr std::enable_if_t<
         std::is_same_v<typename Derived::iterator_category,

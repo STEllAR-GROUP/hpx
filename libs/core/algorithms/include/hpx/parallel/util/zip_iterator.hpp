@@ -8,10 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/iterator_support/zip_iterator.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
 #include <utility>

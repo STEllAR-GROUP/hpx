@@ -12,16 +12,16 @@
 namespace hpx::util::detail {
 
     ///////////////////////////////////////////////////////////////////////
-    std::random_access_iterator_tag minimum_category_impl(
+    HPX_CXX_EXPORT std::random_access_iterator_tag minimum_category_impl(
         std::random_access_iterator_tag, std::random_access_iterator_tag);
-    std::bidirectional_iterator_tag minimum_category_impl(
+    HPX_CXX_EXPORT std::bidirectional_iterator_tag minimum_category_impl(
         std::bidirectional_iterator_tag, std::bidirectional_iterator_tag);
-    std::forward_iterator_tag minimum_category_impl(
+    HPX_CXX_EXPORT std::forward_iterator_tag minimum_category_impl(
         std::forward_iterator_tag, std::forward_iterator_tag);
-    std::input_iterator_tag minimum_category_impl(
+    HPX_CXX_EXPORT std::input_iterator_tag minimum_category_impl(
         std::input_iterator_tag, std::input_iterator_tag);
 
-    template <typename T, typename U>
+    HPX_CXX_EXPORT template <typename T, typename U>
     struct minimum_category
     {
         // clang-format off

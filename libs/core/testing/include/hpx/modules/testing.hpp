@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/testing/performance.hpp>

@@ -9,13 +9,13 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/scheduling_properties.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/properties.hpp>
 #include <hpx/parallel/util/detail/chunk_size_iterator.hpp>
 

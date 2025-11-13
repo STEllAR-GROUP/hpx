@@ -68,15 +68,15 @@ namespace hpx::util {
 namespace hpx::serialization {
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CXX_EXTERN HPX_CORE_EXPORT void register_pointer(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void register_pointer(
         input_archive& ar, std::uint64_t pos, detail::ptr_helper_ptr helper);
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN
-        [[nodiscard]] HPX_CORE_EXPORT detail::ptr_helper&
-        tracked_pointer(input_archive& ar, std::uint64_t pos);
+    HPX_CXX_EXPORT
+    [[nodiscard]] HPX_CORE_EXPORT detail::ptr_helper& tracked_pointer(
+        input_archive& ar, std::uint64_t pos);
 
-    HPX_CXX_EXPORT HPX_CXX_EXTERN [[nodiscard]] HPX_CORE_EXPORT std::uint64_t
-    track_pointer(output_archive& ar, void const* pos);
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::uint64_t track_pointer(
+        output_archive& ar, void const* pos);
 
     ////////////////////////////////////////////////////////////////////////////
     namespace detail {

@@ -12,8 +12,8 @@
 
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/components_base/server/component_base.hpp>
-#include <hpx/datastructures/any.hpp>
 #include <hpx/lcos_local/and_gate.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>

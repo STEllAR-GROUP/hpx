@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/invoke_fused.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -56,8 +56,7 @@ namespace hpx::parallel::util::detail {
 }    // namespace hpx::parallel::util::detail
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/functional/traits/get_function_address.hpp>
-#include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/modules/functional.hpp>
 
 namespace hpx::traits {
 

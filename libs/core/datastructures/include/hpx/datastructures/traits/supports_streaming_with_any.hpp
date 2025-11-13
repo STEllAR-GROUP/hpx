@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +14,7 @@ namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for streaming with util::any
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct supports_streaming_with_any
       : std::true_type    // the default is to support streaming
     {
@@ -23,7 +23,7 @@ namespace hpx::traits {
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for streaming with util::any, we don't want
     // serialization::serialize_buffer to be streamable
-    template <typename T, typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Allocator>
     struct supports_streaming_with_any<
         serialization::serialize_buffer<T, Allocator>> : std::false_type
     {

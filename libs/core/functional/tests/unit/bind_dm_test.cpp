@@ -19,7 +19,7 @@
 #pragma warning(disable : 4514)    // unreferenced inline removed
 #endif
 
-#include <hpx/functional/bind.hpp>
+#include <hpx/modules/functional.hpp>
 
 namespace placeholders = hpx::placeholders;
 

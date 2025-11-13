@@ -12,11 +12,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>

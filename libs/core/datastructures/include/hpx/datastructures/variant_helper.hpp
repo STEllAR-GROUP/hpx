@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2023 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,14 +24,14 @@ namespace hpx {
     // tuple.hpp
     namespace adl_barrier {
 
-        template <std::size_t I, typename... Ts>
+        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE util::at_index_t<I, Ts...>&
         get(std::variant<Ts...>& var) noexcept
         {
             return std::get<I>(var);
         }
 
-        template <std::size_t I, typename... Ts>
+        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             util::at_index_t<I, Ts...> const&
             get(std::variant<Ts...> const& var) noexcept
@@ -39,14 +39,14 @@ namespace hpx {
             return std::get<I>(var);
         }
 
-        template <std::size_t I, typename... Ts>
+        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE util::at_index_t<I, Ts...>&&
         get(std::variant<Ts...>&& var) noexcept
         {
             return std::get<I>(HPX_MOVE(var));
         }
 
-        template <std::size_t I, typename... Ts>
+        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             util::at_index_t<I, Ts...> const&&
             get(std::variant<Ts...> const&& var) noexcept

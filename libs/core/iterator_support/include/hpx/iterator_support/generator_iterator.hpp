@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,7 @@
 
 namespace hpx::util {
 
-    template <typename Generator>
+    HPX_CXX_EXPORT template <typename Generator>
     class generator_iterator
       : public iterator_facade<generator_iterator<Generator>,
             typename Generator::result_type, std::forward_iterator_tag,
@@ -68,7 +68,7 @@ namespace hpx::util {
 
     // clang-format produces inconsistent result between different versions
     // clang-format off
-    template <typename Generator>
+    HPX_CXX_EXPORT template <typename Generator>
     generator_iterator(Generator*)->generator_iterator<Generator>;
     // clang-format on
 }    // namespace hpx::util

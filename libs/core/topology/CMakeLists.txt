@@ -59,6 +59,7 @@ add_hpx_module(
     hpx_async_base
     hpx_config
     hpx_concurrency
+    hpx_datastructures
     hpx_errors
     hpx_format
     hpx_logging

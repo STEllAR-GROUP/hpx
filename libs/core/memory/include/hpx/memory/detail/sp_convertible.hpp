@@ -16,29 +16,29 @@
 
 namespace hpx::memory::detail {
 
-    template <typename Y, typename T>
+    HPX_CXX_EXPORT template <typename Y, typename T>
     struct sp_convertible : std::is_convertible<Y*, T*>
     {
     };
 
-    template <typename Y, typename T>
+    HPX_CXX_EXPORT template <typename Y, typename T>
     struct sp_convertible<Y, T[]>
     {
         static constexpr bool value = false;
     };
 
-    template <typename Y, typename T>
+    HPX_CXX_EXPORT template <typename Y, typename T>
     struct sp_convertible<Y[], T[]>
     {
         static constexpr bool value = sp_convertible<Y[1], T[1]>::value;
     };
 
-    template <typename Y, std::size_t N, typename T>
+    HPX_CXX_EXPORT template <typename Y, std::size_t N, typename T>
     struct sp_convertible<Y[N], T[]>
     {
         static constexpr bool value = sp_convertible<Y[1], T[1]>::value;
     };
 
-    template <typename Y, typename T>
+    HPX_CXX_EXPORT template <typename Y, typename T>
     inline constexpr bool sp_convertible_v = sp_convertible<Y, T>::value;
 }    // namespace hpx::memory::detail

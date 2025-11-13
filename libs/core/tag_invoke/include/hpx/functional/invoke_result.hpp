@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/macros.hpp>
+#include <hpx/tag_invoke/macros.hpp>
 
 #include <type_traits>
 #include <utility>

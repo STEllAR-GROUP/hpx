@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -14,14 +14,9 @@
 #include <hpx/actions_base/actions_base_fwd.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
-#include <hpx/modules/debugging.hpp>
-#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
-#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
-    !defined(HPX_HAVE_APEX)
-#include <hpx/modules/itt_notify.hpp>
-#endif
 
 #include <cstdint>
 
@@ -94,31 +89,6 @@ namespace hpx::actions::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_NETWORKING)
-    template <typename Action>
-    char const* get_action_name() noexcept
-#if !defined(HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION)
-        ;
-#else
-    {
-        /// If you encounter this assert while compiling code, that means that
-        /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
-        /// but the header in which the action is defined misses a
-        /// HPX_REGISTER_ACTION_DECLARATION
-        static_assert(traits::needs_automatic_registration_v<Action>,
-            "HPX_REGISTER_ACTION_DECLARATION missing");
-        return util::debug::type_id<Action>();
-    }
-#endif
-#else    // HPX_HAVE_NETWORKING
-    template <typename Action>
-    char const* get_action_name() noexcept
-    {
-        return util::debug::type_id<Action>();
-    }
-#endif
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
     std::uint32_t get_action_id()
     {
@@ -126,23 +96,6 @@ namespace hpx::actions::detail {
             get_action_id_from_name(get_action_name<Action>());
         return id;
     }
-
-#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
-    !defined(HPX_HAVE_APEX)
-
-    template <typename Action>
-    util::itt::string_handle const& get_action_name_itt() noexcept
-#if !defined(HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION)
-        ;
-#else
-    {
-        static util::itt::string_handle sh =
-            util::itt::string_handle(get_action_name<Action>());
-        return sh;
-    }
-#endif
-#endif
-
     /// \endcond
 }    // namespace hpx::actions::detail
 

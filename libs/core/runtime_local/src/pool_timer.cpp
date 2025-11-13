@@ -7,10 +7,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/runtime_local/pool_timer.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>

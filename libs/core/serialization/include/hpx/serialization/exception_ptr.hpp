@@ -58,19 +58,20 @@ namespace hpx::serialization {
             std::function<void(hpx::serialization::input_archive&,
                 std::exception_ptr&, unsigned int)>;
 
-        HPX_CXX_EXPORT HPX_CXX_EXTERN HPX_CORE_EXPORT void
-        set_save_custom_exception_handler(save_custom_exception_handler_type f);
-        HPX_CXX_EXPORT HPX_CXX_EXTERN HPX_CORE_EXPORT void
-        set_load_custom_exception_handler(load_custom_exception_handler_type f);
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void set_save_custom_exception_handler(
+            save_custom_exception_handler_type f);
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void set_load_custom_exception_handler(
+            load_custom_exception_handler_type f);
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_EXPORT template <typename Archive>
-    void save(Archive& ar, std::exception_ptr const& e, unsigned int);
+    HPX_CORE_EXPORT void save(
+        Archive& ar, std::exception_ptr const& e, unsigned int);
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_EXPORT template <typename Archive>
-    void load(Archive& ar, std::exception_ptr& e, unsigned int);
+    HPX_CORE_EXPORT void load(Archive& ar, std::exception_ptr& e, unsigned int);
 
     HPX_SERIALIZATION_SPLIT_FREE(HPX_CXX_EXPORT, std::exception_ptr)
 }    // namespace hpx::serialization

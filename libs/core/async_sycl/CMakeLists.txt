@@ -39,6 +39,7 @@ add_hpx_module(
     hpx_debugging
     hpx_errors
     hpx_execution_base
+    hpx_functional
     hpx_futures
     hpx_memory
     hpx_runtime_local

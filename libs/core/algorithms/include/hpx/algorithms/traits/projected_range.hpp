@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <type_traits>
 

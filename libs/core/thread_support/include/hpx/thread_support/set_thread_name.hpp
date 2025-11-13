@@ -10,6 +10,6 @@
 
 namespace hpx::util {
 
-    HPX_CORE_MODULE_EXPORT void set_thread_name(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_thread_name(
         char const* thread_name) noexcept;
 }    // namespace hpx::util

@@ -7,9 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/iterator_support/unwrap_iterator.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/util/result_types.hpp>

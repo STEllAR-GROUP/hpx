@@ -33,13 +33,15 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_affinity
     hpx_config
-    hpx_runtime_configuration
+    hpx_datastructures
     hpx_errors
     hpx_format
+    hpx_functional
     hpx_ini
     hpx_prefix
-    hpx_threading_base
+    hpx_runtime_configuration
     hpx_synchronization
+    hpx_threading_base
     hpx_thread_pools
     hpx_type_support
   CMAKE_SUBDIRS examples tests

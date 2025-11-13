@@ -77,7 +77,7 @@ namespace hpx::util::logging {
     - check out the writer namespace
 
     */
-    HPX_CXX_EXPORT HPX_CXX_EXTERN class logger
+    HPX_CXX_EXPORT class logger
     {
         logger(logger const&) = delete;
         logger(logger&&) = delete;
