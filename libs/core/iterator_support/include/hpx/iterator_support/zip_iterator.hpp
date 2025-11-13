@@ -26,10 +26,10 @@ namespace hpx::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename IteratorTuple>
+        template <typename IteratorTuple>
         struct zip_iterator_value;
 
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         struct zip_iterator_element_value
         {
             using type = hpx::traits::iter_value_t<T>;
@@ -41,7 +41,7 @@ namespace hpx::util {
             using type = hpx::util::unused_type;
         };
 
-        HPX_CXX_EXPORT template <typename... Ts>
+        template <typename... Ts>
         struct zip_iterator_value<hpx::tuple<Ts...>>
         {
             using type =
@@ -49,10 +49,10 @@ namespace hpx::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename IteratorTuple>
+        template <typename IteratorTuple>
         struct zip_iterator_reference;
 
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         struct zip_iterator_reference_value
         {
             using type = hpx::traits::iter_reference_t<T>;
@@ -64,7 +64,7 @@ namespace hpx::util {
             using type = hpx::util::unused_type;
         };
 
-        HPX_CXX_EXPORT template <typename... Ts>
+        template <typename... Ts>
         struct zip_iterator_reference<hpx::tuple<Ts...>>
         {
             using type =
@@ -72,10 +72,10 @@ namespace hpx::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename IteratorTuple, typename Enable = void>
+        template <typename IteratorTuple, typename Enable = void>
         struct zip_iterator_category;
 
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         struct zip_iterator_element_category
         {
             using type = hpx::traits::iter_category_t<T>;
@@ -87,14 +87,14 @@ namespace hpx::util {
             using type = std::random_access_iterator_tag;
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         struct zip_iterator_category<hpx::tuple<T>,
             std::enable_if_t<hpx::tuple_size<hpx::tuple<T>>::value == 1>>
         {
             using type = typename zip_iterator_element_category<T>::type;
         };
 
-        HPX_CXX_EXPORT template <typename T, typename U>
+        template <typename T, typename U>
         struct zip_iterator_category<hpx::tuple<T, U>,
             std::enable_if_t<hpx::tuple_size<hpx::tuple<T, U>>::value == 2>>
           : minimum_category<typename zip_iterator_element_category<T>::type,
@@ -102,7 +102,7 @@ namespace hpx::util {
         {
         };
 
-        HPX_CXX_EXPORT template <typename T, typename U, typename... Tail>
+        template <typename T, typename U, typename... Tail>
         struct zip_iterator_category<hpx::tuple<T, U, Tail...>,
             std::enable_if_t<(
                 hpx::tuple_size<hpx::tuple<T, U, Tail...>>::value > 2)>>
@@ -115,10 +115,10 @@ namespace hpx::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename IteratorTuple>
+        template <typename IteratorTuple>
         struct dereference_iterator;
 
-        HPX_CXX_EXPORT template <typename... Ts>
+        template <typename... Ts>
         struct dereference_iterator<hpx::tuple<Ts...>>
         {
             template <std::size_t... Is>
@@ -131,7 +131,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CXX_EXPORT struct increment_iterator
+        struct increment_iterator
         {
             template <typename T>
             HPX_HOST_DEVICE constexpr void operator()(T& iter) const
@@ -141,7 +141,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CXX_EXPORT struct decrement_iterator
+        struct decrement_iterator
         {
             template <typename T>
             HPX_HOST_DEVICE constexpr void operator()(T& iter) const
@@ -151,7 +151,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CXX_EXPORT struct advance_iterator
+        struct advance_iterator
         {
             explicit constexpr advance_iterator(std::ptrdiff_t n) noexcept
               : n_(n)
@@ -169,24 +169,23 @@ namespace hpx::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         struct has_default_sentinel
           : std::is_same<std::decay_t<T>, hpx::default_sentinel_t>
         {
         };
 
-        HPX_CXX_EXPORT template <typename... Ts>
+        template <typename... Ts>
         struct has_default_sentinel<hpx::tuple<Ts...>>
           : util::any_of<has_default_sentinel<Ts>...>
         {
         };
 
-        HPX_CXX_EXPORT template <typename Tuple>
+        template <typename Tuple>
         inline constexpr bool has_default_sentinel_v =
             has_default_sentinel<Tuple>::value;
 
-        HPX_CXX_EXPORT template <std::size_t I, std::size_t Size,
-            typename Enable = void>
+        template <std::size_t I, std::size_t Size, typename Enable = void>
         struct one_tuple_element_equal_to
         {
             template <typename TTuple, typename UTuple>
@@ -198,7 +197,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CXX_EXPORT template <std::size_t I, std::size_t Size>
+        template <std::size_t I, std::size_t Size>
         struct one_tuple_element_equal_to<I, Size,
             std::enable_if_t<I + 1 == Size>>
         {
@@ -211,7 +210,7 @@ namespace hpx::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename IteratorTuple, typename Derived>
+        template <typename IteratorTuple, typename Derived>
         class zip_iterator_base
           : public hpx::util::iterator_facade<Derived,
                 typename zip_iterator_value<IteratorTuple>::type,

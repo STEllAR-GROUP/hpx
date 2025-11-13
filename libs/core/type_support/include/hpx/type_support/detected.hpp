@@ -27,7 +27,7 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Default, typename AlwaysVoid,
+        template <typename Default, typename AlwaysVoid,
             template <typename...> class Op, typename... Args>
         struct detector
         {
@@ -35,8 +35,8 @@ namespace hpx::util {
             using type = Default;
         };
 
-        HPX_CXX_EXPORT template <typename Default,
-            template <typename...> class Op, typename... Args>
+        template <typename Default, template <typename...> class Op,
+            typename... Args>
         struct detector<Default, std::void_t<Op<Args...>>, Op, Args...>
         {
             using value_t = std::true_type;

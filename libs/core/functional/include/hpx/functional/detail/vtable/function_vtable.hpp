@@ -17,7 +17,7 @@
 
 namespace hpx::util::detail {
 
-    HPX_CXX_EXPORT struct function_base_vtable
+    struct function_base_vtable
       : vtable
       , copyable_vtable
       , callable_info_vtable

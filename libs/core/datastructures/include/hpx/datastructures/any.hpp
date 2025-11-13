@@ -81,12 +81,11 @@ namespace hpx {
 namespace hpx::util::detail::any {
 
     ////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    template <typename T>
     struct get_table;
 
     // function pointer table
-    HPX_CXX_EXPORT template <typename IArch, typename OArch, typename Char,
-        typename Copyable>
+    template <typename IArch, typename OArch, typename Char, typename Copyable>
     struct fxn_ptr_table;
 
     template <>
@@ -130,7 +129,7 @@ namespace hpx::util::detail::any {
     };
 
     ////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Char, typename Copyable>
+    template <typename Char, typename Copyable>
     struct fxn_ptr_table<void, void, Char, Copyable>
       : fxn_ptr_table<void, void, void, Copyable>
     {
@@ -152,32 +151,32 @@ namespace hpx::util::detail::any {
     };
 
     ////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Small, typename Char,
+    template <typename T, typename Small, typename Char,
         typename Enable = typename traits::supports_streaming_with_any<T>::type>
     struct streaming_base;
 
     // no streaming support
-    HPX_CXX_EXPORT template <typename T>
+    template <typename T>
     struct streaming_base<T, std::true_type, void, std::true_type>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    template <typename T>
     struct streaming_base<T, std::true_type, void, std::false_type>
     {
     };
-    HPX_CXX_EXPORT template <typename T>
+    template <typename T>
     struct streaming_base<T, std::false_type, void, std::true_type>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    template <typename T>
     struct streaming_base<T, std::false_type, void, std::false_type>
     {
     };
 
     // streaming support is enabled
-    HPX_CXX_EXPORT template <typename T, typename Char>
+    template <typename T, typename Char>
     struct streaming_base<T, std::true_type, Char, std::true_type>
     {
         template <typename Char_>
@@ -197,7 +196,7 @@ namespace hpx::util::detail::any {
         }
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Char>
+    template <typename T, typename Char>
     struct streaming_base<T, std::false_type, Char, std::true_type>
     {
         template <typename Char_>
@@ -217,7 +216,7 @@ namespace hpx::util::detail::any {
         }
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Small, typename Char>
+    template <typename T, typename Small, typename Char>
     struct streaming_base<T, Small, Char, std::false_type>
     {
         template <typename Char_>
@@ -237,7 +236,7 @@ namespace hpx::util::detail::any {
 
     ////////////////////////////////////////////////////////////////////////
     // static functions for small value-types
-    HPX_CXX_EXPORT template <typename Small, typename Copyable>
+    template <typename Small, typename Copyable>
     struct fxns;
 
     template <>
@@ -454,11 +453,11 @@ namespace hpx::util::detail::any {
     };
 
     ////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename IArch, typename OArch, typename Vtable,
-        typename Char, typename Copyable>
+    template <typename IArch, typename OArch, typename Vtable, typename Char,
+        typename Copyable>
     struct fxn_ptr;
 
-    HPX_CXX_EXPORT template <typename Vtable>
+    template <typename Vtable>
     struct fxn_ptr<void, void, Vtable, void, std::true_type>
       : fxn_ptr_table<void, void, void, std::true_type>
     {
@@ -481,7 +480,7 @@ namespace hpx::util::detail::any {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Vtable, typename Char>
+    template <typename Vtable, typename Char>
     struct fxn_ptr<void, void, Vtable, Char, std::true_type>
       : fxn_ptr_table<void, void, Char, std::true_type>
     {
@@ -506,7 +505,7 @@ namespace hpx::util::detail::any {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Vtable>
+    template <typename Vtable>
     struct fxn_ptr<void, void, Vtable, void, std::false_type>
       : fxn_ptr_table<void, void, void, std::false_type>
     {
@@ -527,7 +526,7 @@ namespace hpx::util::detail::any {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Vtable, typename Char>
+    template <typename Vtable, typename Char>
     struct fxn_ptr<void, void, Vtable, Char, std::false_type>
       : fxn_ptr_table<void, void, Char, std::false_type>
     {
@@ -551,7 +550,7 @@ namespace hpx::util::detail::any {
     };
 
     ////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Vtable, typename T>
+    template <typename Vtable, typename T>
     struct any_vtable
     {
         static_assert(
@@ -569,7 +568,7 @@ namespace hpx::util::detail::any {
         }
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    template <typename T>
     struct get_table
     {
         using is_small =
@@ -592,7 +591,7 @@ namespace hpx::util::detail::any {
     };
 
     ////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct empty
+    struct empty
     {
         [[nodiscard]] constexpr bool operator==(empty) const noexcept
         {
@@ -604,7 +603,7 @@ namespace hpx::util::detail::any {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Char>
+    template <typename Char>
     std::basic_istream<Char>& operator>>(std::basic_istream<Char>& i, empty&)
     {
         // If this assertion fires you tried to insert from a std istream
@@ -621,15 +620,15 @@ namespace hpx::util::detail::any {
         return i;
     }
 
-    HPX_CXX_EXPORT template <typename Char>
+    template <typename Char>
     std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& o, empty)
     {
         return o;
     }
 
     // helper types allowing to access internal data of basic_any
-    HPX_CXX_EXPORT struct stream_support;
-    HPX_CXX_EXPORT struct any_cast_support;
+    struct stream_support;
+    struct any_cast_support;
 }    // namespace hpx::util::detail::any
 
 namespace hpx::util {

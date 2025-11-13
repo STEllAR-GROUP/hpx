@@ -121,9 +121,9 @@ namespace hpx::functional::detail {
     namespace tag_fallback_invoke_t_ns {
 
         // poison pill
-        HPX_CXX_EXPORT void tag_fallback_invoke();
+        void tag_fallback_invoke();
 
-        HPX_CXX_EXPORT struct tag_fallback_invoke_t
+        struct tag_fallback_invoke_t
         {
             template <typename Tag, typename... Ts>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(

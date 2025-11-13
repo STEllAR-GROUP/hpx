@@ -30,8 +30,8 @@ namespace hpx::util {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Incrementable,
-            typename CategoryOrTraversal, typename Difference>
+        template <typename Incrementable, typename CategoryOrTraversal,
+            typename Difference>
         struct counting_iterator_base
         {
             // calculate category of the resulting iterator

@@ -54,7 +54,7 @@ namespace hpx::iterators {
         // This is broken out into a separate meta-function to reduce
         // the cost of instantiating iterator_category_to_traversal, below,
         // for new-style types.
-        HPX_CXX_EXPORT template <typename Cat>
+        template <typename Cat>
         struct std_category_to_traversal
           : hpx::util::lazy_conditional<
                 std::is_convertible_v<Cat, std::random_access_iterator_tag>,

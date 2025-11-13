@@ -20,7 +20,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename MemberPointer>
+        template <typename MemberPointer>
         struct mem_fn
         {
             constexpr explicit mem_fn(MemberPointer pm) noexcept
