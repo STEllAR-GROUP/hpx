@@ -100,6 +100,7 @@ add_hpx_module(
     hpx_functional
     hpx_futures
     hpx_io_service
+    hpx_lock_registration
     hpx_logging
     hpx_plugin
     hpx_program_options
@@ -115,5 +116,6 @@ add_hpx_module(
     hpx_timing
     hpx_topology
     hpx_type_support
+    hpx_util
   CMAKE_SUBDIRS examples tests
 )

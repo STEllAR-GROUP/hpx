@@ -14,8 +14,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/iostream.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 

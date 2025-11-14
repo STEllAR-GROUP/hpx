@@ -25,7 +25,7 @@ namespace hpx::util {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename T, typename Enable = void>
+        template <typename T, typename Enable = void>
         struct from_string
         {
             template <typename Char>
@@ -37,7 +37,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CXX_EXPORT template <typename T, typename U>
+        template <typename T, typename U>
         [[nodiscard]] T check_out_of_range(U const& value)
         {
             U const min = (std::numeric_limits<T>::min)();
@@ -54,7 +54,7 @@ namespace hpx::util {
             return static_cast<T>(value);
         }
 
-        HPX_CXX_EXPORT template <typename Char>
+        template <typename Char>
         void check_only_whitespace(
             std::basic_string<Char> const& s, std::size_t pos)
         {
@@ -70,7 +70,7 @@ namespace hpx::util {
             }
         }
 
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         struct from_string<T, std::enable_if_t<std::is_integral_v<T>>>
         {
             template <typename Char>
@@ -138,7 +138,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         struct from_string<T, std::enable_if_t<std::is_floating_point_v<T>>>
         {
             template <typename Char>

@@ -24,20 +24,20 @@ namespace hpx::traits {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Iter>
+        template <typename Iter>
         using iter_value_type_t =
             typename std::iterator_traits<Iter>::value_type;
 
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         inline constexpr bool has_valid_array_v =
             std::is_copy_assignable_v<T> && !std::is_function_v<T>;
 
-        HPX_CXX_EXPORT template <typename Iter, typename Enable = void>
+        template <typename Iter, typename Enable = void>
         struct is_std_array_iterator : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Iter>
+        template <typename Iter>
         struct is_std_array_iterator<Iter,
             std::enable_if_t<has_valid_array_v<iter_value_type_t<Iter>>>>
           : std::bool_constant<(
@@ -51,17 +51,17 @@ namespace hpx::traits {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         inline constexpr bool has_valid_vector_v =
             std::is_copy_assignable_v<T> && !std::is_function_v<T> &&
             !std::is_same_v<T, bool>;
 
-        HPX_CXX_EXPORT template <typename T, typename Enable = void>
+        template <typename T, typename Enable = void>
         struct is_std_vector_iterator : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Iter>
+        template <typename Iter>
         struct is_std_vector_iterator<Iter,
             std::enable_if_t<has_valid_vector_v<iter_value_type_t<Iter>>>>
           : std::bool_constant<
@@ -75,7 +75,7 @@ namespace hpx::traits {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Char>
+        template <typename Char>
         struct is_valid_char_type : std::false_type
         {
         };
@@ -112,7 +112,7 @@ namespace hpx::traits {
         // This implementation of has_value_type seems to work fine even for
         // VS2013 which has an implementation of std::iterator_traits that is
         // SFINAE-unfriendly.
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         struct has_value_type_helper
         {
 #if defined(HPX_MSVC) && defined(__CUDACC__)
@@ -133,12 +133,12 @@ namespace hpx::traits {
                 sizeof(test(std::declval<T>())) == sizeof(void*);
         };
 
-        HPX_CXX_EXPORT template <typename Iter, typename Enable = void>
+        template <typename Iter, typename Enable = void>
         struct is_std_basic_string_iterator : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Iter>
+        template <typename Iter>
         struct is_std_basic_string_iterator<Iter,
             std::enable_if_t<has_value_type_helper<Iter>::value &&
                 is_valid_char_type<iter_value_type_t<Iter>>::value>>
@@ -152,7 +152,7 @@ namespace hpx::traits {
         {
         };
 
-        HPX_CXX_EXPORT template <typename Iter, typename Enable = void>
+        template <typename Iter, typename Enable = void>
         struct is_known_contiguous_iterator
           : std::bool_constant<is_std_array_iterator<Iter>::value ||
                 is_std_vector_iterator<Iter>::value ||
@@ -160,7 +160,7 @@ namespace hpx::traits {
         {
         };
 
-        HPX_CXX_EXPORT template <typename Iter>
+        template <typename Iter>
         struct is_known_contiguous_iterator<Iter,
             std::enable_if_t<std::is_pointer_v<Iter>>> : std::true_type
         {

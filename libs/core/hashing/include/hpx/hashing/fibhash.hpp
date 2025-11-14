@@ -17,17 +17,16 @@ namespace hpx::util {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <std::uint64_t N>
+        template <std::uint64_t N>
         inline constexpr std::uint64_t log2 = log2<(N >> 1)> + 1;    //-V573
 
-        HPX_CXX_EXPORT template <>
+        template <>
         inline constexpr std::uint64_t log2<0> = -1;
 
-        HPX_CXX_EXPORT template <std::uint64_t N>
+        template <std::uint64_t N>
         inline constexpr std::uint64_t shift_amount = 64 - log2<N>;
 
-        HPX_CXX_EXPORT inline constexpr std::uint64_t golden_ratio =
-            11400714819323198485llu;
+        inline constexpr std::uint64_t golden_ratio = 11400714819323198485llu;
     }    // namespace detail
 
     // This function calculates the hash based on a multiplicative Fibonacci

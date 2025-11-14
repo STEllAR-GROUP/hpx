@@ -31,7 +31,7 @@
 namespace hpx::serialization::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    template <typename T>
     struct get_serialization_name
 #ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
         ;
@@ -50,7 +50,7 @@ namespace hpx::serialization::detail {
     };
 #endif
 
-    HPX_CXX_EXPORT struct function_bunch_type
+    struct function_bunch_type
     {
         using save_function_type = void (*)(output_archive&, void const* base);
         using load_function_type = void (*)(input_archive&, void* base);
@@ -61,7 +61,7 @@ namespace hpx::serialization::detail {
         create_function_type create_function;
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    template <typename T>
     class constructor_selector_ptr
     {
     public:
@@ -97,7 +97,7 @@ namespace hpx::serialization::detail {
         }
     };
 
-    HPX_CXX_EXPORT class polymorphic_nonintrusive_factory
+    class polymorphic_nonintrusive_factory
     {
     public:
         polymorphic_nonintrusive_factory(
@@ -159,7 +159,7 @@ namespace hpx::serialization::detail {
         serializer_typeinfo_map_type typeinfo_map_;
     };
 
-    HPX_CXX_EXPORT template <typename Derived>
+    template <typename Derived>
     struct register_class
     {
         static void save(output_archive& ar, void const* base)

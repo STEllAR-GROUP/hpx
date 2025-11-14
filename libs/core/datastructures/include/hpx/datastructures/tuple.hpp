@@ -214,14 +214,13 @@ namespace hpx {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Indices, typename TTuple,
-            typename UTuple, typename Enable = void>
+        template <typename Indices, typename TTuple, typename UTuple,
+            typename Enable = void>
         struct are_tuples_compatible_impl : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <std::size_t... Is, typename... Ts,
-            typename UTuple>
+        template <std::size_t... Is, typename... Ts, typename UTuple>
         struct are_tuples_compatible_impl<util::index_pack<Is...>, tuple<Ts...>,
             UTuple,
             std::enable_if_t<tuple_size<std::remove_reference_t<UTuple>>::
@@ -231,10 +230,10 @@ namespace hpx {
         {
         };
 
-        HPX_CXX_EXPORT template <typename TTuple, typename UTuple>
+        template <typename TTuple, typename UTuple>
         struct are_tuples_compatible;
 
-        HPX_CXX_EXPORT template <typename... Ts, typename UTuple>
+        template <typename... Ts, typename UTuple>
         struct are_tuples_compatible<tuple<Ts...>, UTuple>
           : are_tuples_compatible_impl<util::make_index_pack_t<sizeof...(Ts)>,
                 hpx::tuple<Ts...>, UTuple>
@@ -242,7 +241,7 @@ namespace hpx {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct ignore_type
+        struct ignore_type
         {
             template <typename T>
             constexpr void operator=(T&&) const noexcept
@@ -873,34 +872,32 @@ namespace hpx {
     namespace detail {
 
         /// Deduces to the overall size of all given tuples
-        HPX_CXX_EXPORT template <std::size_t Size, typename Tuples>
+        template <std::size_t Size, typename Tuples>
         struct tuple_cat_size_impl;
 
-        HPX_CXX_EXPORT template <std::size_t Size>
+        template <std::size_t Size>
         struct tuple_cat_size_impl<Size, util::pack<>>
           : std::integral_constant<std::size_t, Size>
         {
         };
 
-        HPX_CXX_EXPORT template <std::size_t Size, typename Head,
-            typename... Tail>
+        template <std::size_t Size, typename Head, typename... Tail>
         struct tuple_cat_size_impl<Size, util::pack<Head, Tail...>>
           : tuple_cat_size_impl<(Size + tuple_size<Head>::value),
                 util::pack<Tail...>>
         {
         };
 
-        HPX_CXX_EXPORT template <typename... Tuples>
+        template <typename... Tuples>
         struct tuple_cat_size : tuple_cat_size_impl<0, util::pack<Tuples...>>
         {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <std::size_t I, typename Tuples,
-            typename Enable = void>
+        template <std::size_t I, typename Tuples, typename Enable = void>
         struct tuple_cat_element;
 
-        HPX_CXX_EXPORT template <std::size_t I, typename Head, typename... Tail>
+        template <std::size_t I, typename Head, typename... Tail>
         struct tuple_cat_element<I, util::pack<Head, Tail...>,
             std::enable_if_t<(I < tuple_size<Head>::value)>>
           : tuple_element<I, Head>
@@ -914,7 +911,7 @@ namespace hpx {
             }
         };
 
-        HPX_CXX_EXPORT template <std::size_t I, typename Head, typename... Tail>
+        template <std::size_t I, typename Head, typename... Tail>
         struct tuple_cat_element<I, util::pack<Head, Tail...>,
             std::enable_if_t<(I >= tuple_size<Head>::value)>>
           : tuple_cat_element<I - tuple_size<Head>::value, util::pack<Tail...>>
@@ -932,10 +929,10 @@ namespace hpx {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Indices, typename Tuples>
+        template <typename Indices, typename Tuples>
         struct tuple_cat_result_impl;
 
-        HPX_CXX_EXPORT template <std::size_t... Is, typename... Tuples>
+        template <std::size_t... Is, typename... Tuples>
         struct tuple_cat_result_impl<util::index_pack<Is...>,
             util::pack<Tuples...>>
         {
@@ -943,12 +940,11 @@ namespace hpx {
                 typename tuple_cat_element<Is, util::pack<Tuples...>>::type...>;
         };
 
-        HPX_CXX_EXPORT template <typename Indices, typename Tuples>
+        template <typename Indices, typename Tuples>
         using tuple_cat_result_of_t =
             typename tuple_cat_result_impl<Indices, Tuples>::type;
 
-        HPX_CXX_EXPORT template <std::size_t... Is, typename... Tuples,
-            typename... Tuples_>
+        template <std::size_t... Is, typename... Tuples, typename... Tuples_>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat_impl(
             util::index_pack<Is...> is_pack, util::pack<Tuples...> tuple_pack,
             Tuples_&&... tuples)
@@ -998,7 +994,7 @@ namespace hpx {
     // first equality comparison that evaluates to false.
     namespace detail {
 
-        HPX_CXX_EXPORT template <std::size_t I, std::size_t Size>
+        template <std::size_t I, std::size_t Size>
         struct tuple_equal_to
         {
             template <typename TTuple, typename UTuple>
@@ -1010,7 +1006,7 @@ namespace hpx {
             }
         };
 
-        HPX_CXX_EXPORT template <std::size_t Size>
+        template <std::size_t Size>
         struct tuple_equal_to<Size, Size>
         {
             template <typename TTuple, typename UTuple>
@@ -1050,7 +1046,7 @@ namespace hpx {
     // two zero-length tuples e and f, e < f returns false.
     namespace detail {
 
-        HPX_CXX_EXPORT template <std::size_t I, std::size_t Size>
+        template <std::size_t I, std::size_t Size>
         struct tuple_less_than
         {
             template <typename TTuple, typename UTuple>
@@ -1063,7 +1059,7 @@ namespace hpx {
             }
         };
 
-        HPX_CXX_EXPORT template <std::size_t Size>
+        template <std::size_t Size>
         struct tuple_less_than<Size, Size>
         {
             template <typename TTuple, typename UTuple>

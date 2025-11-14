@@ -80,7 +80,7 @@ namespace hpx::util {
         bool debug_;
 
 #if defined(HPX_HAVE_PARCELPORT_TCP)
-        using node_map_type = std::map<asio::ip::tcp::endpoint,
+        using node_map_type = std::map<::asio::ip::tcp::endpoint,
             std::pair<std::string, std::size_t>>;
 
         node_map_type nodes_;

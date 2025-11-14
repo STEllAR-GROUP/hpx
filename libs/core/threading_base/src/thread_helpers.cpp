@@ -20,7 +20,7 @@
 #include <hpx/timing/steady_clock.hpp>
 
 #ifdef HPX_HAVE_VERIFY_LOCKS
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
 #include <hpx/threading_base/detail/reset_lco_description.hpp>

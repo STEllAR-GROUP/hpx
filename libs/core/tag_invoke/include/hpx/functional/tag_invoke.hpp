@@ -117,9 +117,9 @@ namespace hpx::functional {
     namespace tag_invoke_t_ns {
 
         // poison pill
-        HPX_CXX_EXPORT void tag_invoke();
+        void tag_invoke();
 
-        HPX_CXX_EXPORT struct tag_invoke_t
+        struct tag_invoke_t
         {
             // different versions of clang-format disagree
             // clang-format off

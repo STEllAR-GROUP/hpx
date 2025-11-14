@@ -62,8 +62,7 @@ namespace hpx::agas::detail {
 
     void register_unassigned_typenames()
     {
-        // supposed to be run on locality 0 before
-        // before locality communication
+        // supposed to be run on locality 0 locality communication
         hpx::serialization::detail::id_registry& serialization_registry =
             hpx::serialization::detail::id_registry::instance();
 

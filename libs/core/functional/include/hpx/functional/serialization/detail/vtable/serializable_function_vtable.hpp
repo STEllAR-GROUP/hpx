@@ -19,10 +19,10 @@
 
 namespace hpx::util::detail {
 
-    HPX_CXX_EXPORT template <typename VTable>
+    template <typename VTable>
     struct serializable_function_vtable;
 
-    HPX_CXX_EXPORT template <typename VTable, typename T>
+    template <typename VTable, typename T>
     struct serializable_vtables
     {
         static serializable_function_vtable<VTable> const instance;
@@ -33,7 +33,7 @@ namespace hpx::util::detail {
         serializable_vtables<VTable, T>::instance =
             serializable_function_vtable<VTable>(detail::construct_vtable<T>());
 
-    HPX_CXX_EXPORT template <typename VTable, typename T>
+    template <typename VTable, typename T>
     constexpr serializable_function_vtable<VTable> const*
     get_serializable_vtable() noexcept
     {
@@ -44,7 +44,7 @@ namespace hpx::util::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename VTable>
+    template <typename VTable>
     struct serializable_function_vtable : serializable_vtable
     {
         VTable const* vptr;
@@ -79,7 +79,7 @@ namespace hpx::util::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename VTable>
+    template <typename VTable>
     [[nodiscard]] serializable_function_vtable<VTable> const*
     get_serializable_vtable(std::string const& name)
     {

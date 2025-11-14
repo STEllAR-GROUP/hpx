@@ -6,7 +6,7 @@
 
 #include <hpx/batch_environments/pjm_environment.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/string_util/tokenizer.hpp>
+#include <hpx/modules/string_util.hpp>
 
 #include <cstddef>
 #include <iterator>

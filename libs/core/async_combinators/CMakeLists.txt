@@ -55,5 +55,6 @@ add_hpx_module(
     hpx_tag_invoke
     hpx_thread_support
     hpx_type_support
+    hpx_util
   CMAKE_SUBDIRS examples tests
 )

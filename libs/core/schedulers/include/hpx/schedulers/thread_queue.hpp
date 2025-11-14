@@ -31,11 +31,11 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
+#include <hpx/modules/util.hpp>
 #include <hpx/timing/tick_counter.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-#include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/modules/util.hpp>
 #endif
 
 #include <algorithm>

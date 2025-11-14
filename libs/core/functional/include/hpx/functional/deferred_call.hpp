@@ -49,10 +49,10 @@ namespace hpx::util {
             typename invoke_deferred_result<F, Ts...>::type;
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename F, typename Is, typename... Ts>
+        template <typename F, typename Is, typename... Ts>
         class deferred;
 
-        HPX_CXX_EXPORT template <typename F, std::size_t... Is, typename... Ts>
+        template <typename F, std::size_t... Is, typename... Ts>
         class deferred<F, index_pack<Is...>, Ts...>
         {
         public:

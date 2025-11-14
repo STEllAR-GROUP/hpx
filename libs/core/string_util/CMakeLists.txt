@@ -22,6 +22,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core string_util
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${string_util_sources}
   HEADERS ${string_util_headers}
   MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_errors hpx_iterator_support

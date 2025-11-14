@@ -13,9 +13,9 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util/ios_flags_saver.hpp>
 
 #include <cstddef>
 #include <cstdint>

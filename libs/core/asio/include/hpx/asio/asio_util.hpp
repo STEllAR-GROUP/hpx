@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -29,70 +29,76 @@
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT bool get_endpoint(std::string const& addr,
-        std::uint16_t port, asio::ip::tcp::endpoint& ep,
+    HPX_CXX_EXPORT HPX_CORE_EXPORT bool get_endpoint(std::string const& addr,
+        std::uint16_t port, ::asio::ip::tcp::endpoint& ep,
         bool force_ipv4 = false);
 
-    HPX_CORE_EXPORT std::string get_endpoint_name(
-        asio::ip::tcp::endpoint const& ep);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::string get_endpoint_name(
+        ::asio::ip::tcp::endpoint const& ep);
 
     ///////////////////////////////////////////////////////////////////////////
     // properly resolve a give host name to the corresponding IP address
-    HPX_CORE_EXPORT asio::ip::tcp::endpoint resolve_hostname(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT ::asio::ip::tcp::endpoint resolve_hostname(
         std::string const& hostname, std::uint16_t port,
-        asio::io_context& io_service, bool force_ipv4 = false);
+        ::asio::io_context& io_service, bool force_ipv4 = false);
 
     ///////////////////////////////////////////////////////////////////////////
     // return the public IP address of the local node
-    [[nodiscard]] HPX_CORE_EXPORT std::string resolve_public_ip_address();
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::string
+    resolve_public_ip_address();
 
     ///////////////////////////////////////////////////////////////////////
     // Take an ip v4 or v6 address and "standardize" it for comparison checks
-    [[nodiscard]] HPX_CORE_EXPORT std::string cleanup_ip_address(
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::string cleanup_ip_address(
         std::string const& addr);
 
+    namespace detail {
 #if ASIO_VERSION >= 103400
-    using endpoint_iterator_type =
-        asio::ip::basic_resolver_iterator<asio::ip::tcp>;
+        HPX_CXX_EXPORT using endpoint_iterator_type =
+            ::asio::ip::basic_resolver_iterator<asio::ip::tcp>;
 #else
-    using endpoint_iterator_type = asio::ip::tcp::resolver::iterator;
+        HPX_CXX_EXPORT using endpoint_iterator_type =
+            ::asio::ip::tcp::resolver::iterator;
 #endif
+    }    // namespace detail
 
-    [[nodiscard]] endpoint_iterator_type HPX_CORE_EXPORT connect_begin(
-        std::string const& address, std::uint16_t port,
-        asio::io_context& io_service);
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT detail::endpoint_iterator_type
+    connect_begin(std::string const& address, std::uint16_t port,
+        ::asio::io_context& io_service);
 
     /// \brief Returns an iterator which when dereferenced will give an
     ///        endpoint suitable for a call to connect() related to this
     ///        locality
-    template <typename Locality>
-    [[nodiscard]] endpoint_iterator_type connect_begin(
-        Locality const& loc, asio::io_context& io_service)
+    HPX_CXX_EXPORT template <typename Locality>
+    [[nodiscard]] detail::endpoint_iterator_type connect_begin(
+        Locality const& loc, ::asio::io_context& io_service)
     {
         return connect_begin(loc.address(), loc.port(), io_service);
     }
 
-    [[nodiscard]] inline endpoint_iterator_type connect_end()
+    HPX_CXX_EXPORT [[nodiscard]] inline detail::endpoint_iterator_type
+    connect_end()
     {
         return {};
     }
 
-    [[nodiscard]] endpoint_iterator_type HPX_CORE_EXPORT accept_begin(
-        std::string const& address, std::uint16_t port,
-        asio::io_context& io_service);
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT detail::endpoint_iterator_type
+    accept_begin(std::string const& address, std::uint16_t port,
+        ::asio::io_context& io_service);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Returns an iterator which when dereferenced will give an
     ///        endpoint suitable for a call to accept() related to this
     ///        locality
-    template <typename Locality>
-    [[nodiscard]] endpoint_iterator_type accept_begin(
-        Locality const& loc, asio::io_context& io_service)
+    HPX_CXX_EXPORT template <typename Locality>
+    [[nodiscard]] detail::endpoint_iterator_type accept_begin(
+        Locality const& loc, ::asio::io_context& io_service)
     {
         return accept_begin(loc.address(), loc.port(), io_service);
     }
 
-    [[nodiscard]] inline endpoint_iterator_type accept_end()    //-V524
+    HPX_CXX_EXPORT [[nodiscard]] inline detail::endpoint_iterator_type
+    accept_end()    //-V524
     {
         return {};
     }
@@ -102,6 +108,6 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
-    HPX_CORE_EXPORT bool split_ip_address(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT bool split_ip_address(
         std::string const& v, std::string& host, std::uint16_t& port);
 }    // namespace hpx::util

@@ -20,7 +20,7 @@ namespace hpx::util {
 #if defined(HPX_HAVE_MSVC_NO_UNIQUE_ADDRESS_ATTRIBUTE) ||                      \
     defined(HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE)
 
-        HPX_CXX_EXPORT template <std::size_t I, typename T>
+        template <std::size_t I, typename T>
         struct member_leaf
         {
             HPX_NO_UNIQUE_ADDRESS T member;
@@ -34,22 +34,22 @@ namespace hpx::util {
             }
         };
 
-        HPX_CXX_EXPORT template <std::size_t I, typename T>
+        template <std::size_t I, typename T>
         T member_type(member_leaf<I, T> const& /*leaf*/) noexcept;
 
-        HPX_CXX_EXPORT template <std::size_t I, typename T>
+        template <std::size_t I, typename T>
         constexpr T& member_get(member_leaf<I, T>& leaf) noexcept
         {
             return leaf.member;
         }
 
-        HPX_CXX_EXPORT template <std::size_t I, typename T>
+        template <std::size_t I, typename T>
         constexpr T const& member_get(member_leaf<I, T> const& leaf) noexcept
         {
             return leaf.member;
         }
 #else
-        HPX_CXX_EXPORT template <std::size_t I, typename T,
+        template <std::size_t I, typename T,
             bool Empty = std::is_empty_v<T> && !std::is_final_v<T>>
         struct member_leaf
         {
@@ -64,7 +64,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CXX_EXPORT template <std::size_t I, typename T>
+        template <std::size_t I, typename T>
         struct member_leaf<I, T, /*Empty*/ true> : T
         {
             member_leaf() = default;
@@ -76,29 +76,29 @@ namespace hpx::util {
             }
         };
 
-        HPX_CXX_EXPORT template <std::size_t I, typename T>
+        template <std::size_t I, typename T>
         T member_type(member_leaf<I, T> const& /*leaf*/) noexcept;
 
-        HPX_CXX_EXPORT template <std::size_t I, typename T>
+        template <std::size_t I, typename T>
         constexpr T& member_get(member_leaf<I, T, false>& leaf) noexcept
         {
             return leaf.member;
         }
 
-        HPX_CXX_EXPORT template <std::size_t I, typename T>
+        template <std::size_t I, typename T>
         constexpr T& member_get(member_leaf<I, T, true>& leaf) noexcept
         {
             return leaf;
         }
 
-        HPX_CXX_EXPORT template <std::size_t I, typename T>
+        template <std::size_t I, typename T>
         constexpr T const& member_get(
             member_leaf<I, T, false> const& leaf) noexcept
         {
             return leaf.member;
         }
 
-        HPX_CXX_EXPORT template <std::size_t I, typename T>
+        template <std::size_t I, typename T>
         constexpr T const& member_get(
             member_leaf<I, T, true> const& leaf) noexcept
         {

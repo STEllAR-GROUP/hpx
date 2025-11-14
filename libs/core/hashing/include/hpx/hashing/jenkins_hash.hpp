@@ -68,7 +68,7 @@ namespace hpx::util {
         // my hands on, and rotates are much kinder to the top and bottom bits,
         // so I used rotates.
         // ------------------------------------------------------------------------
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         inline constexpr void mix(T& a, T& b, T& c) noexcept
         {
             // clang-format off

@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //  Copyright 2002, 2005 Daryle Walker
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -7,12 +7,14 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <ios>
 
 namespace hpx::util {
 
     // this is taken from the Boost.Io library
-    class ios_flags_saver
+    HPX_CXX_EXPORT class ios_flags_saver
     {
     public:
         using state_type = ::std::ios_base;

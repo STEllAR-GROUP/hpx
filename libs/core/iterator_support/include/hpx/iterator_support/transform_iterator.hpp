@@ -25,9 +25,8 @@ namespace hpx::util {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Iterator, typename Transformer,
-            typename Reference, typename Value, typename Category,
-            typename Difference>
+        template <typename Iterator, typename Transformer, typename Reference,
+            typename Value, typename Category, typename Difference>
         struct transform_iterator_base
         {
             // the following type calculations use lazy_conditional to avoid
