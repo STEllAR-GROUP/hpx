@@ -65,7 +65,7 @@ namespace hpx::iostreams::server {
         // enough.
         hpx::id_type this_id = this->get_id();
 #if ASIO_VERSION >= 103400
-        asio::post(hpx::get_thread_pool("io_pool")->get_io_service(),
+        ::asio::post(hpx::get_thread_pool("io_pool")->get_io_service(),
             hpx::bind_front(&output_stream::call_write_async, this, locality_id,
                 count, HPX_MOVE(in), HPX_MOVE(this_id)));
 #else
@@ -94,7 +94,7 @@ namespace hpx::iostreams::server {
         // Perform the IO in another OS thread.
         detail::buffer in(buf_in);
 #if ASIO_VERSION >= 103400
-        asio::post(hpx::get_thread_pool("io_pool")->get_io_service(),
+        ::asio::post(hpx::get_thread_pool("io_pool")->get_io_service(),
             hpx::bind_front(&output_stream::call_write_sync, this, locality_id,
                 count, std::ref(in),
                 threads::thread_id_ref_type(threads::get_outer_self_id())));

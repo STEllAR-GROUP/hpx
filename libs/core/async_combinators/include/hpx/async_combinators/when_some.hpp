@@ -197,7 +197,7 @@ namespace hpx {
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/util/detail/reserve.hpp>
+#include <hpx/modules/util.hpp>
 
 #include <algorithm>
 #include <atomic>

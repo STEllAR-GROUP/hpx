@@ -14,7 +14,7 @@
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/coroutines/detail/swap_context.hpp>
 #if defined(HPX_HAVE_COROUTINE_COUNTERS)
-#include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/modules/util.hpp>
 #endif
 
 // include unistd.h conditionally to check for POSIX version. Not all OSs have

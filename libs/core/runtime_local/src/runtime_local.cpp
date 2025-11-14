@@ -22,6 +22,7 @@
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_local/debugging.hpp>
@@ -38,7 +39,6 @@
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/util/get_entry_as.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>

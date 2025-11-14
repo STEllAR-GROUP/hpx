@@ -14,9 +14,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/hashing.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/thread_support.hpp>
 
 #include <cstddef>

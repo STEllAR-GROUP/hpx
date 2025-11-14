@@ -106,7 +106,7 @@ function(add_hpx_module libname modulename)
   hpx_debug("Add module ${modulename}: SOURCE_ROOT: ${SOURCE_ROOT}")
   hpx_debug("Add module ${modulename}: HEADER_ROOT: ${HEADER_ROOT}")
 
-  if(${modulename}_COMPAT_HEADERS)
+  if(HPX_WITH_MODULE_COMPATIBILITY_HEADERS AND ${modulename}_COMPAT_HEADERS)
     set(COMPAT_HEADER_ROOT "${CMAKE_CURRENT_BINARY_DIR}/include_compatibility")
     file(MAKE_DIRECTORY ${COMPAT_HEADER_ROOT})
     hpx_debug(
@@ -123,7 +123,7 @@ function(add_hpx_module libname modulename)
   list(TRANSFORM ${modulename}_HEADERS PREPEND ${HEADER_ROOT}/ OUTPUT_VARIABLE
                                                                headers
   )
-  if(${modulename}_COMPAT_HEADERS)
+  if(HPX_WITH_MODULE_COMPATIBILITY_HEADERS AND ${modulename}_COMPAT_HEADERS)
     string(REPLACE ";=>;" "=>" ${modulename}_COMPAT_HEADERS
                    "${${modulename}_COMPAT_HEADERS}"
     )
@@ -499,7 +499,7 @@ function(add_hpx_module libname modulename)
     target_link_libraries(hpx_${modulename} PUBLIC hpx_config_registry)
   endif()
 
-  if(${modulename}_COMPAT_HEADERS)
+  if(HPX_WITH_MODULE_COMPATIBILITY_HEADERS AND ${modulename}_COMPAT_HEADERS)
     target_include_directories(
       hpx_${modulename} PUBLIC $<BUILD_INTERFACE:${COMPAT_HEADER_ROOT}>
     )
@@ -533,7 +533,7 @@ function(add_hpx_module libname modulename)
     CLASS "Source Files"
     TARGETS ${sources}
   )
-  if(${modulename}_COMPAT_HEADERS)
+  if(HPX_WITH_MODULE_COMPATIBILITY_HEADERS AND ${modulename}_COMPAT_HEADERS)
     add_hpx_source_group(
       NAME hpx_${modulename}
       ROOT ${COMPAT_HEADER_ROOT}/hpx
@@ -603,7 +603,7 @@ function(add_hpx_module libname modulename)
   )
 
   # Install the compatibility headers from the source
-  if(${modulename}_COMPAT_HEADERS)
+  if(HPX_WITH_MODULE_COMPATIBILITY_HEADERS AND ${modulename}_COMPAT_HEADERS)
     install(
       DIRECTORY ${COMPAT_HEADER_ROOT}/hpx
       DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/config/forward.hpp>
+#include <hpx/config.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -18,7 +18,7 @@ namespace hpx::string_util {
 
     namespace detail {
 
-        template <typename It, typename Char, typename Traits,
+        HPX_CXX_EXPORT template <typename It, typename Char, typename Traits,
             typename Allocator>
         std::basic_string<Char, Traits, Allocator> substr(
             std::basic_string<Char, Traits, Allocator> const& s,
@@ -30,14 +30,10 @@ namespace hpx::string_util {
         }
     }    // namespace detail
 
-    enum class token_compress_mode
-    {
-        off,
-        on
-    };
+    HPX_CXX_EXPORT enum class token_compress_mode { off, on };
 
-    template <typename Container, typename Predicate, typename Char,
-        typename Traits, typename Allocator>
+    HPX_CXX_EXPORT template <typename Container, typename Predicate,
+        typename Char, typename Traits, typename Allocator>
     void split(Container& container,
         std::basic_string<Char, Traits, Allocator> const& str, Predicate&& pred,
         token_compress_mode compress_mode = token_compress_mode::off)
@@ -70,7 +66,7 @@ namespace hpx::string_util {
         } while (token_end != std::end(str));
     }
 
-    template <typename Container, typename Predicate>
+    HPX_CXX_EXPORT template <typename Container, typename Predicate>
     void split(Container& container, char const* str, Predicate&& pred,
         token_compress_mode compress_mode = token_compress_mode::off)
     {

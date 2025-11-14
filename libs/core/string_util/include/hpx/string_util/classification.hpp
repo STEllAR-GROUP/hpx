@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <cctype>
 #include <string>
 
@@ -13,7 +15,8 @@ namespace hpx::string_util {
 
     namespace detail {
 
-        template <typename Char, typename Traits, typename Allocator>
+        HPX_CXX_EXPORT template <typename Char, typename Traits,
+            typename Allocator>
         struct is_any_of_pred
         {
             using string_type = std::basic_string<Char, Traits, Allocator>;
@@ -27,27 +30,27 @@ namespace hpx::string_util {
         };
     }    // namespace detail
 
-    template <typename Char, typename Traits, typename Allocator>
+    HPX_CXX_EXPORT template <typename Char, typename Traits, typename Allocator>
     detail::is_any_of_pred<Char, Traits, Allocator> is_any_of(
         std::basic_string<Char, Traits, Allocator> const& chars)
     {
         return detail::is_any_of_pred<Char, Traits, Allocator>{chars};
     }
 
-    template <typename Char, typename Traits, typename Allocator>
+    HPX_CXX_EXPORT template <typename Char, typename Traits, typename Allocator>
     detail::is_any_of_pred<Char, Traits, Allocator> is_any_of(
         std::basic_string<Char, Traits, Allocator>&& chars)
     {
         return detail::is_any_of_pred<Char, Traits, Allocator>{HPX_MOVE(chars)};
     }
 
-    inline auto is_any_of(char const* chars)
+    HPX_CXX_EXPORT inline auto is_any_of(char const* chars)
     {
         return detail::is_any_of_pred<char, std::char_traits<char>,
             std::allocator<char>>{std::string{chars}};
     }
 
-    struct is_space
+    HPX_CXX_EXPORT struct is_space
     {
         bool operator()(int c) const noexcept
         {
