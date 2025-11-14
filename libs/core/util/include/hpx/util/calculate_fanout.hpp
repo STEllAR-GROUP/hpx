@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,12 +6,14 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <cstddef>
 
 namespace hpx::util {
 
-    constexpr std::size_t calculate_fanout(
-        std::size_t size, std::size_t local_fanout) noexcept
+    HPX_CXX_EXPORT constexpr std::size_t calculate_fanout(
+        std::size_t size, std::size_t const local_fanout) noexcept
     {
         if (size == 0 || local_fanout == 0)
             return 1;

@@ -49,9 +49,10 @@ add_hpx_component(
   INSTALL_COMPONENT runtime
   HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
   HEADERS ${partitioned_vector_headers}
-  PREPEND_SOURCE_ROOT
+  PREPEND_SOURCE_ROOT ${HPX_WITH_UNITY_BUILD_OPTION}
+  ${HPX_WITH_CXX_MODULES_OPTION}
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
-  SOURCES ${partitioned_vector_sources} ${HPX_WITH_UNITY_BUILD_OPTION}
+  SOURCES ${partitioned_vector_sources}
 )
 
 target_compile_definitions(

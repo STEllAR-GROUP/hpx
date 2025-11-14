@@ -8,11 +8,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <algorithm>
 
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/coroutines/detail/context_impl.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/futures/detail/future_data.hpp>
@@ -23,20 +21,21 @@
 #include <hpx/init_runtime/detail/init_logging.hpp>
 #include <hpx/init_runtime/detail/run_or_start.hpp>
 #include <hpx/init_runtime_local/init_runtime_local.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/prefix.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/modules/schedulers.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
-#include <hpx/prefix/find_prefix.hpp>
-#include <hpx/program_options/parsers.hpp>
-#include <hpx/program_options/variables_map.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
@@ -49,8 +48,6 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
 #include <hpx/threading/thread.hpp>
 #include <hpx/threading_base/detail/get_default_timer_service.hpp>
 
@@ -76,6 +73,7 @@
 #include <hpx/runtime_distributed/runtime_support.hpp>
 #endif
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>

@@ -1,5 +1,5 @@
 //  Copyright Vladimir Prus 2004.
-//  Copyright (c) 2005-2022 Hartmut Kaiser
+//  Copyright (c) 2005-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,12 +33,6 @@
     "This file shouldn't be included directly, use the file hpx/plugin/dll.hpp only."
 #endif
 
-#if !defined(_WIN32)
-using HMODULE = void*;
-#else
-using HMODULE = struct HINSTANCE__*;
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(RTLD_LOCAL)
 #define RTLD_LOCAL 0    // some systems do not have RTLD_LOCAL
@@ -48,16 +42,33 @@ using HMODULE = struct HINSTANCE__*;
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#define MyFreeLibrary(x) dlclose(x)
-#define MyLoadLibrary(x)                                                       \
-    reinterpret_cast<HMODULE>(dlopen(x, RTLD_GLOBAL | RTLD_LAZY))
-#define MyGetProcAddress(x, y) dlsym(x, y)
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util::plugin {
 
+    ///////////////////////////////////////////////////////////////////////////////
+#if !defined(_WIN32)
+    HPX_CXX_EXPORT using HMODULE = void*;
+#else
+    HPX_CXX_EXPORT using HMODULE = struct HINSTANCE__*;
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////////
+    inline int MyFreeLibrary(HMODULE x)
+    {
+        return dlclose(x);
+    }
+
+    inline HMODULE MyLoadLibrary(const char* path)
+    {
+        return reinterpret_cast<HMODULE>(dlopen(path, RTLD_GLOBAL | RTLD_LAZY));
+    }
+
+    inline void* MyGetProcAddress(HMODULE x, char const* y)
+    {
+        return dlsym(x, y);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
-    class dll
+    HPX_CXX_EXPORT class dll
     {
     protected:
         ///////////////////////////////////////////////////////////////////////

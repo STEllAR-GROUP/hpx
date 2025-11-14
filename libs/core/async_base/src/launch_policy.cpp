@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/serialization.hpp>
 
 #include <cstdint>

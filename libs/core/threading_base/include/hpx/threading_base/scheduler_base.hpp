@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
@@ -20,7 +20,7 @@
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
-#include <hpx/coroutines/detail/tss.hpp>
+#include <hpx/modules/coroutines.hpp>
 #endif
 
 #include <atomic>

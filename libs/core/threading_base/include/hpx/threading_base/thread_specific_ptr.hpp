@@ -14,7 +14,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
-#include <hpx/coroutines/detail/tss.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 
 #include <memory>

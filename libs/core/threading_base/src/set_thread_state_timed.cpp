@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/coroutines/coroutine.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/threading_base/create_thread.hpp>
@@ -98,7 +98,7 @@ namespace hpx::threads::detail {
 
         // create timer firing in correspondence with given time
         using deadline_timer =
-            asio::basic_waitable_timer<std::chrono::steady_clock>;
+            ::asio::basic_waitable_timer<std::chrono::steady_clock>;
 
         deadline_timer t(get_default_timer_service(), abs_time);
 

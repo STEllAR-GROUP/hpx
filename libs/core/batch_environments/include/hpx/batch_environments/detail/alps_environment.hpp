@@ -13,12 +13,12 @@
 #include <string>
 #include <vector>
 
-namespace hpx::util::batch_environments {
+namespace hpx::util::batch_environments::detail {
 
-    struct pbs_environment
+    struct alps_environment
     {
-        HPX_CORE_EXPORT pbs_environment(
-            std::vector<std::string>& nodelist, bool have_mpi, bool debug);
+        HPX_CORE_EXPORT alps_environment(
+            std::vector<std::string>& nodelist, bool debug);
 
         constexpr bool valid() const noexcept
         {
@@ -42,13 +42,8 @@ namespace hpx::util::batch_environments {
 
     private:
         std::size_t node_num_;
-        std::size_t num_localities_;
         std::size_t num_threads_;
+        std::size_t num_localities_;
         bool valid_;
-
-        HPX_CORE_EXPORT void read_nodefile(
-            std::vector<std::string>& nodelist, bool have_mpi, bool debug);
-        HPX_CORE_EXPORT void read_nodelist(
-            std::vector<std::string> const& nodelist, bool debug);
     };
-}    // namespace hpx::util::batch_environments
+}    // namespace hpx::util::batch_environments::detail

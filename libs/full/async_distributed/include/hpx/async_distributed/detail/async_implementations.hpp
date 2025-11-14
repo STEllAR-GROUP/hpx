@@ -17,9 +17,9 @@
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
-#include <hpx/concurrency/stack.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/runtime_local.hpp>

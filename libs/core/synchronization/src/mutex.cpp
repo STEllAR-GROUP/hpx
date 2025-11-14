@@ -8,10 +8,10 @@
 #include <hpx/synchronization/mutex.hpp>
 
 #include <hpx/assert.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/thread_data.hpp>

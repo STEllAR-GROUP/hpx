@@ -15,7 +15,7 @@ namespace hpx::util::plugin {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        struct dll_handle_holder
+        HPX_CXX_EXPORT struct dll_handle_holder
         {
             explicit dll_handle_holder(dll_handle dll) noexcept
               : m_dll(HPX_MOVE(dll))
@@ -30,7 +30,7 @@ namespace hpx::util::plugin {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Wrapped, typename... Parameters>
+    HPX_CXX_EXPORT template <typename Wrapped, typename... Parameters>
     struct plugin_wrapper
       : public detail::dll_handle_holder
       , public Wrapped

@@ -308,7 +308,8 @@ void test_unregistered()
     HPX_TEST_EQ(a1[2].string_key, "");
     HPX_TEST_EQ(a1[2].unregistered, false);
 
-    vector<string> a2 = collect_unrecognized(a1, include_positional);
+    vector<string> a2 =
+        collect_unrecognized(a1, collect_unrecognized_mode::include_positional);
     HPX_TEST_EQ(a2[0], "--foo=12");
     HPX_TEST_EQ(a2[1], "--bar");
     HPX_TEST_EQ(a2[2], "1");

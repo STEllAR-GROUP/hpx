@@ -13,9 +13,10 @@
 #include <string>
 #include <vector>
 
-namespace hpx::util::batch_environments {
+namespace hpx::util::batch_environments::detail {
 
-    struct slurm_environment
+    // export this for tests
+    HPX_CXX_EXPORT struct slurm_environment
     {
         HPX_CORE_EXPORT slurm_environment(
             std::vector<std::string>& nodelist, bool debug);
@@ -53,4 +54,4 @@ namespace hpx::util::batch_environments {
             std::vector<std::string>& nodes, bool debug);
         HPX_CORE_EXPORT void retrieve_number_of_threads();
     };
-}    // namespace hpx::util::batch_environments
+}    // namespace hpx::util::batch_environments::detail

@@ -30,7 +30,7 @@ namespace hpx::concurrency::detail {
     ///
     /// The range of integers is non-contiguous in the sense that the returned
     /// integers are apart by a given step.
-    template <typename T = std::uint32_t>
+    HPX_CXX_EXPORT template <typename T = std::uint32_t>
     class non_contiguous_index_queue
     {
         static_assert(sizeof(T) <= 4,    //-V112

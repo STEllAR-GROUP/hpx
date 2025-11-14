@@ -13,8 +13,8 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/testing/performance.hpp>
-#include <hpx/util/ios_flags_saver.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -16,6 +16,8 @@
 #include <string>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::util {
 
     int handle_late_commandline_options(util::runtime_configuration& ini,
@@ -100,3 +102,5 @@ namespace hpx::util {
         return 0;
     }
 }    // namespace hpx::util
+
+#include <hpx/config/warnings_suffix.hpp>

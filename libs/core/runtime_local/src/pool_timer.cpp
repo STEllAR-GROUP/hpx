@@ -66,7 +66,7 @@ namespace hpx::util::detail {
 
     private:
         using deadline_timer =
-            asio::basic_waitable_timer<std::chrono::steady_clock>;
+            ::asio::basic_waitable_timer<std::chrono::steady_clock>;
 
         mutable mutex_type mtx_;
         hpx::function<bool()> f_;          ///< function to call

@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/config/asio.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/barrier.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 
@@ -59,8 +59,8 @@ namespace hpx::util {
         // will not exit until they are explicitly stopped.
         for (std::size_t i = 0; i < pool_size_; ++i)
         {
-            std::unique_ptr<asio::io_context> p =
-                std::make_unique<asio::io_context>();
+            std::unique_ptr<::asio::io_context> p =
+                std::make_unique<::asio::io_context>();
             io_services_.emplace_back(HPX_MOVE(p));
             work_.emplace_back(initialize_work(*io_services_[i]));
         }
@@ -178,8 +178,8 @@ namespace hpx::util {
 
             for (std::size_t i = 0; i < num_threads; ++i)
             {
-                std::unique_ptr<asio::io_context> p =
-                    std::make_unique<asio::io_context>();
+                std::unique_ptr<::asio::io_context> p =
+                    std::make_unique<::asio::io_context>();
                 io_services_.emplace_back(HPX_MOVE(p));
                 work_.emplace_back(initialize_work(*io_services_[i]));
             }
@@ -294,12 +294,12 @@ namespace hpx::util {
     }
 
     io_service_pool::work_type io_service_pool::initialize_work(
-        asio::io_context& io_service)
+        ::asio::io_context& io_service)
     {
         return std::make_unique<raw_work_type>(io_service.get_executor());
     }
 
-    asio::io_context& io_service_pool::get_io_service(int index)
+    ::asio::io_context& io_service_pool::get_io_service(int index)
     {
         // use this function for single group io_service pools only
         std::lock_guard<std::mutex> l(mtx_);

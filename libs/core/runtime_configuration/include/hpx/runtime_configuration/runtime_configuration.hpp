@@ -8,9 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/ini/ini.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/ini.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/runtime_configuration/agas_service_mode.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
@@ -26,6 +26,8 @@
 #include <set>
 #include <string>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
@@ -200,3 +202,5 @@ namespace hpx::util {
         std::map<std::string, hpx::util::plugin::dll> modules_;
     };
 }    // namespace hpx::util
+
+#include <hpx/config/warnings_suffix.hpp>
