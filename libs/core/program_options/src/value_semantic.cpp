@@ -25,7 +25,7 @@ namespace hpx::program_options {
         {
             try
             {
-                return to_local_8_bit(s);
+                return detail::to_local_8_bit(s);
             }
             catch (std::exception const&)
             {
@@ -44,8 +44,8 @@ namespace hpx::program_options {
             std::vector<std::string> local_tokens;
             for (auto const& new_token : new_tokens)
             {
-                std::wstring w = from_utf8(new_token);
-                local_tokens.emplace_back(to_local_8_bit(w));
+                std::wstring w = detail::from_utf8(new_token);
+                local_tokens.emplace_back(detail::to_local_8_bit(w));
             }
             xparse(value_store, local_tokens);
         }
@@ -66,7 +66,7 @@ namespace hpx::program_options {
             // Convert from utf8
             for (auto const& new_token : new_tokens)
             {
-                tokens.emplace_back(from_utf8(new_token));
+                tokens.emplace_back(detail::from_utf8(new_token));
             }
         }
         else
@@ -74,7 +74,7 @@ namespace hpx::program_options {
             // Convert from local encoding
             for (auto const& new_token : new_tokens)
             {
-                tokens.emplace_back(from_local_8_bit(new_token));
+                tokens.emplace_back(detail::from_local_8_bit(new_token));
             }
         }
 
@@ -160,7 +160,6 @@ namespace hpx::program_options {
     // since wstring can't be constructed/compared with char*. We'd need to
     // create auxiliary 'widen' routine to convert from char* into
     // needed string type, and that's more work.
-    HPX_CORE_EXPORT
     void validate(
         hpx::any_nonser& v, std::vector<std::wstring> const& xs, bool*, int)
     {
@@ -186,7 +185,6 @@ namespace hpx::program_options {
         }
     }
 
-    HPX_CORE_EXPORT
     void validate(hpx::any_nonser& v, std::vector<std::string> const& xs,
         std::string*, int)
     {
@@ -194,7 +192,6 @@ namespace hpx::program_options {
         v = hpx::any_nonser(get_single_string(xs));
     }
 
-    HPX_CORE_EXPORT
     void validate(hpx::any_nonser& v, std::vector<std::wstring> const& xs,
         std::string*, int)
     {
@@ -204,7 +201,6 @@ namespace hpx::program_options {
 
     namespace validators {
 
-        HPX_CORE_EXPORT
         void check_first_occurrence(hpx::any_nonser const& value)
         {
             if (value.has_value())

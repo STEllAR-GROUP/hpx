@@ -145,8 +145,8 @@ namespace hpx { namespace lcos {
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/util/calculate_fanout.hpp>
 
 #include <cstddef>
 #include <type_traits>

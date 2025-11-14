@@ -22,7 +22,7 @@
 #include <hpx/coroutines/signal_handler_debugging.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/version.hpp>
 
 #if defined(HPX_HAVE_STACKTRACES)

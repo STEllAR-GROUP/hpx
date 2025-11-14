@@ -5,7 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/batch_environments/pbs_environment.hpp>
+#include <hpx/batch_environments/detail/pbs_environment.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 
@@ -18,7 +18,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::util::batch_environments {
+namespace hpx::util::batch_environments::detail {
 
     pbs_environment::pbs_environment(
         std::vector<std::string>& nodelist, bool have_mpi, bool debug)
@@ -147,6 +147,6 @@ namespace hpx::util::batch_environments {
         }
         num_localities_ = nodes.size();
     }
-}    // namespace hpx::util::batch_environments
+}    // namespace hpx::util::batch_environments::detail
 
 #include <hpx/config/warnings_suffix.hpp>

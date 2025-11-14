@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/spinlock.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
 #include <cstddef>

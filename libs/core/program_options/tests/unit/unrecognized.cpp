@@ -37,7 +37,8 @@ void test_unrecognize_cmdline()
     cmd.allow_unregistered();
 
     vector<option> opts = cmd.run();
-    vector<string> result = collect_unrecognized(opts, include_positional);
+    vector<string> result = collect_unrecognized(
+        opts, collect_unrecognized_mode::include_positional);
 
     HPX_TEST_EQ(result.size(), std::size_t(7));
     HPX_TEST_EQ(result[0], "prg");
@@ -59,7 +60,8 @@ void test_unrecognize_config()
 
     stringstream ss(content);
     vector<option> opts = parse_config_file(ss, desc, true).options;
-    vector<string> result = collect_unrecognized(opts, include_positional);
+    vector<string> result = collect_unrecognized(
+        opts, collect_unrecognized_mode::include_positional);
 
     HPX_TEST_EQ(result.size(), std::size_t(6));
     HPX_TEST_EQ(result[0], "input");

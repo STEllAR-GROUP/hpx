@@ -294,7 +294,7 @@ namespace hpx { namespace performance_counters { namespace papi {
         // list available events with descriptions
         void list_events(std::string const& scope)
         {
-            using asio::ip::host_name;
+            using ::asio::ip::host_name;
 
             std::string host(host_name());
             // print header

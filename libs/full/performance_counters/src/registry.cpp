@@ -11,6 +11,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/performance_counters/server/arithmetics_counter.hpp>
@@ -21,7 +22,6 @@
 #include <hpx/performance_counters/server/statistics_counter.hpp>
 #include <hpx/statistics/rolling_max.hpp>
 #include <hpx/statistics/rolling_min.hpp>
-#include <hpx/util/regex_from_pattern.hpp>
 
 #include <boost/accumulators/statistics/rolling_variance.hpp>
 #include <boost/accumulators/statistics_fwd.hpp>

@@ -16,8 +16,8 @@
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos_local/channel.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>

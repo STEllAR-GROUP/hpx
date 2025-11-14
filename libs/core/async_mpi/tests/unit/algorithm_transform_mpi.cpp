@@ -8,8 +8,8 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/async_mpi.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/string_util/case_conv.hpp>
 #include <hpx/tuple.hpp>
 
 #include "algorithm_test_utils.hpp"
