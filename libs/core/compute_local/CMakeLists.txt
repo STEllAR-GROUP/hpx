@@ -50,6 +50,7 @@ add_hpx_module(
     hpx_async_combinators
     hpx_concepts
     hpx_config
+    hpx_coroutines
     hpx_datastructures
     hpx_execution
     hpx_executors

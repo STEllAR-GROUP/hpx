@@ -74,6 +74,7 @@ add_hpx_module(
     hpx_filesystem
     hpx_format
     hpx_functional
+    hpx_ini
     hpx_logging
     hpx_preprocessor
     hpx_program_options

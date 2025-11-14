@@ -1,5 +1,5 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  This code may be used under either of the following two licences:
 //
@@ -30,14 +30,19 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 namespace hpx::threads::coroutines {
 
     namespace detail {
 
-        class coroutine_self;
-        class coroutine_impl;
+        HPX_CXX_EXPORT class coroutine_self;
+        HPX_CXX_EXPORT class coroutine_stackful_self;
+        HPX_CXX_EXPORT class coroutine_stackful_self_direct;
+
+        HPX_CXX_EXPORT class coroutine_impl;
     }    // namespace detail
 
-    class coroutine;
-    class stackless_coroutine;
+    HPX_CXX_EXPORT class coroutine;
+    HPX_CXX_EXPORT class stackless_coroutine;
 }    // namespace hpx::threads::coroutines

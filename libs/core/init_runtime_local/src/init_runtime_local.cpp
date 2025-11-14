@@ -9,7 +9,6 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling_local/command_line_handling_local.hpp>
-#include <hpx/coroutines/detail/context_impl.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/futures/detail/future_data.hpp>

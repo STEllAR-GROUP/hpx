@@ -9,10 +9,10 @@
 #if defined(HPX_COMMAND_LINE_HANDLING_HAVE_JSON_CONFIGURATION_FILES)
 #include <hpx/command_line_handling_local/json_config_file.hpp>
 #endif
-#include <hpx/ini/ini.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/ini.hpp>
 
 #include <cstddef>
 #include <fstream>

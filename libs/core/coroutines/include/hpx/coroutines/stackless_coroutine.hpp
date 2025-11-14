@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2024 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
@@ -25,7 +25,7 @@
 namespace hpx::threads::coroutines {
 
     ////////////////////////////////////////////////////////////////////////////
-    class stackless_coroutine
+    HPX_CXX_EXPORT class stackless_coroutine
     {
     private:
         friend struct detail::coroutine_accessor;
@@ -119,7 +119,7 @@ namespace hpx::threads::coroutines {
             return detail::set_tss_thread_data(thread_data_, data);
         }
 #else
-        std::size_t set_thread_data(std::size_t data) const noexcept
+        std::size_t set_thread_data(std::size_t const data) const noexcept
         {
             std::size_t const olddata = thread_data_;
             thread_data_ = data;
@@ -264,7 +264,7 @@ namespace hpx::threads::coroutines {
 namespace hpx::threads::coroutines {
 
     HPX_FORCEINLINE stackless_coroutine::result_type
-    stackless_coroutine::operator()(arg_type arg)
+    stackless_coroutine::operator()(arg_type const arg)
     {
         HPX_ASSERT(is_ready());
 

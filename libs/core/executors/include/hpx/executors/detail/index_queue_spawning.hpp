@@ -11,13 +11,13 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/scheduling_properties.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/executors/detail/hierarchical_spawning.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/itt_notify.hpp>

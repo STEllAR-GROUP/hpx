@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/scheduling_properties.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/executors/execution_policy_scheduling_property.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/coroutines.hpp>
 
 namespace hpx::execution::experimental {
 

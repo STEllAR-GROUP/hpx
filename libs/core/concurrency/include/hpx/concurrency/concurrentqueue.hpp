@@ -47,8 +47,7 @@
 
 #pragma once
 
-#include <hpx/config/move.hpp>
-#include <hpx/config/forward.hpp>
+#include <hpx/config.hpp>
 
 #if defined(__GNUC__)
 // Disable -Wconversion warnings (spuriously triggered when Traits::size_t and

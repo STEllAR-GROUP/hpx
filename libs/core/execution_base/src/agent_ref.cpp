@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution_base/agent_ref.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/lock_registration.hpp>
 
