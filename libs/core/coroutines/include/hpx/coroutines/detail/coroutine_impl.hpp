@@ -48,10 +48,13 @@ namespace hpx::threads::coroutines::detail {
     ///////////////////////////////////////////////////////////////////////////
     // This type augments the context_base type with the type of the stored
     // functor.
-    class coroutine_impl : public context_base<coroutine_impl>
+    HPX_CXX_EXPORT class coroutine_impl : public context_base<coroutine_impl>
     {
     public:
-        HPX_NON_COPYABLE(coroutine_impl);
+        coroutine_impl(coroutine_impl const&) = delete;
+        coroutine_impl(coroutine_impl&&) = delete;
+        coroutine_impl& operator=(coroutine_impl const&) = delete;
+        coroutine_impl& operator=(coroutine_impl&&) = delete;
 
     public:
         using super_type = context_base;

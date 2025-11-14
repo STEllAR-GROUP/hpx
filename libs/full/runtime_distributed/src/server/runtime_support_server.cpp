@@ -20,11 +20,11 @@
 #include <hpx/components_base/server/create_component.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/futures/packaged_task.hpp>
-#include <hpx/ini/ini.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/ini.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/prefix.hpp>
 #include <hpx/modules/serialization.hpp>

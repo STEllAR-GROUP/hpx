@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>

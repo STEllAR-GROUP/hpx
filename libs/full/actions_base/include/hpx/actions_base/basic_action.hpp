@@ -31,8 +31,8 @@
 #include <hpx/async_local/sync_fwd.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>

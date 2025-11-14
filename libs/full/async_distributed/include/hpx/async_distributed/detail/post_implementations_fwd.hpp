@@ -11,7 +11,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/components_base/traits/component_pin_support.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset_base/parcelset_base_fwd.hpp>

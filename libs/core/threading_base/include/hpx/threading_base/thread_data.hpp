@@ -10,12 +10,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-
-#include <hpx/coroutines/coroutine.hpp>
-#include <hpx/coroutines/detail/combined_tagged_state.hpp>
-#include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
@@ -85,7 +82,7 @@ namespace hpx::threads {
         ///                 thread. It will return one of the values as defined
         ///                 by the \a thread_state enumeration.
         ///
-        /// \note           This function will be seldom used directly. Most of
+        /// \note           This function will seldom be used directly. Most of
         ///                 the time the state of a thread will be retrieved
         ///                 by using the function \a threadmanager#get_state.
         thread_state get_state(std::memory_order const order =
@@ -101,7 +98,7 @@ namespace hpx::threads {
         /// \param load_order     [in]
         /// \param exchange_order [in]
         ///
-        /// \note           This function will be seldom used directly. Most of
+        /// \note           This function will seldom be used directly. Most of
         ///                 the time the state of a thread will have to be
         ///                 changed using the thread-manager. Moreover,
         ///                 changing the thread state using this function does
@@ -155,7 +152,7 @@ namespace hpx::threads {
         /// The restore_state function changes the state of this thread
         /// instance depending on its current state. It will change the state
         /// atomically only if the current state is still the same as passed
-        /// as the second parameter. Otherwise it won't touch the thread state
+        /// as the second parameter. Otherwise, it won't touch the thread state
         /// of this instance.
         ///
         /// \param new_state [in] The new state to be set for the thread.
@@ -164,7 +161,7 @@ namespace hpx::threads {
         /// \param load_order    [in]
         /// \param load_exchange [in]
         ///
-        /// \note           This function will be seldom used directly. Most of
+        /// \note           This function will seldom be used directly. Most of
         ///                 the time the state of a thread will have to be
         ///                 changed using the threadmanager. Moreover,
         ///                 changing the thread state using this function does
@@ -220,7 +217,7 @@ namespace hpx::threads {
         /// \param load_order [in]
         /// \param load_exchange [in]
         ///
-        /// \note           This function will be seldom used directly. Most of
+        /// \note           This function will seldom be used directly. Most of
         ///                 the time the state of a thread will have to be
         ///                 changed using the threadmanager.
         thread_restart_state set_state_ex(thread_restart_state const new_state,
@@ -602,7 +599,7 @@ namespace hpx::threads {
             std::ptrdiff_t stacksize, bool is_stackless = false,
             thread_id_addref addref = thread_id_addref::yes);
 
-        virtual ~thread_data() override;
+        ~thread_data() override;
         virtual void destroy() noexcept = 0;
 
     protected:
@@ -665,13 +662,13 @@ namespace hpx::threads {
 #endif
     };
 
-    HPX_FORCEINLINE constexpr thread_data* get_thread_id_data(
+    HPX_CXX_EXPORT HPX_FORCEINLINE constexpr thread_data* get_thread_id_data(
         thread_id_ref_type const& tid) noexcept
     {
         return static_cast<thread_data*>(tid.get().get());
     }
 
-    HPX_FORCEINLINE constexpr thread_data* get_thread_id_data(
+    HPX_CXX_EXPORT HPX_FORCEINLINE constexpr thread_data* get_thread_id_data(
         thread_id_type const& tid) noexcept
     {
         return static_cast<thread_data*>(tid.get());

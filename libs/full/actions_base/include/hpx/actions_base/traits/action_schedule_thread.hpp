@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/naming_base.hpp>
 #include <hpx/threading_base/register_thread.hpp>

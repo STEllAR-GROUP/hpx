@@ -43,7 +43,6 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/async_local/dataflow.hpp>
-#include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/modules/actions_base.hpp>

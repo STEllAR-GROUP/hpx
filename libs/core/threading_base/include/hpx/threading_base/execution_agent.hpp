@@ -8,13 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#include <hpx/coroutines/detail/coroutine_impl.hpp>
-#include <hpx/coroutines/detail/coroutine_stackful_self.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution_base/agent_base.hpp>
 #include <hpx/execution_base/context_base.hpp>
 #include <hpx/execution_base/resource_base.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>

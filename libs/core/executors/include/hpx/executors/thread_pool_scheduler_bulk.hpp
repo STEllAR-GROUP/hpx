@@ -13,7 +13,6 @@
 #endif
 
 #include <hpx/assert.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
@@ -23,6 +22,7 @@
 #include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>

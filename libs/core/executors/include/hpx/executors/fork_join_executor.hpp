@@ -12,7 +12,6 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/executors/default_parameters.hpp>
 #include <hpx/execution/executors/execution.hpp>
@@ -20,6 +19,7 @@
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
