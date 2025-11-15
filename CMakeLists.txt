@@ -713,6 +713,22 @@ if(HPX_WITH_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
 
 hpx_option(
+  HPX_WITH_WRAP_MAIN_AUTO_ACTIVATE
+  BOOL
+  "Automatically activate HPX::wrap_main without including hpx/hpx_main.hpp (default OFF)"
+  OFF
+  ADVANCED
+)
+if(HPX_WITH_WRAP_MAIN_AUTO_ACTIVATE)
+  if(NOT HPX_WITH_DYNAMIC_HPX_MAIN)
+    hpx_error(
+      "HPX_WITH_WRAP_MAIN_AUTO_ACTIVATE requires HPX_WITH_DYNMAIC_HPX_MAIN to be enabled."
+    )
+  endif()
+  hpx_add_config_define(HPX_HAVE_WRAP_MAIN_AUTO_ACTIVATE)
+endif()
+
+hpx_option(
   HPX_WITH_ZERO_COPY_SERIALIZATION_THRESHOLD
   STRING
   "The threshold in bytes to when perform zero copy optimizations (default: 8192)"
