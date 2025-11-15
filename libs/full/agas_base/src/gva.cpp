@@ -8,7 +8,7 @@
 #include <hpx/agas_base/gva.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/serialization.hpp>
-#include <hpx/util/ios_flags_saver.hpp>
+#include <hpx/modules/util.hpp>
 
 #include <cstddef>
 #include <ostream>

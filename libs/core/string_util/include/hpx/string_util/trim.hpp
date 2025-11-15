@@ -6,35 +6,29 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <algorithm>
 #include <cstddef>
 #include <string>
 
 namespace hpx::string_util {
 
-    template <typename Char, typename Traits, typename Alloc>
+    HPX_CXX_EXPORT template <typename Char, typename Traits, typename Alloc>
     void trim(std::basic_string<Char, Traits, Alloc>& s)
     {
         // When using the pre-C++11 ABI in libstdc++, basic_string::erase
         // does not have an overload taking different begin and end iterators.
-#if defined(_GLIBCXX_USE_CXX11_ABI) && _GLIBCXX_USE_CXX11_ABI == 0
-        auto first = std::find_if_not(std::begin(s), std::end(s),
-#else
         auto first = std::find_if_not(std::cbegin(s), std::cend(s),
-#endif
             [](int c) { return std::isspace(c); });
         s.erase(std::begin(s), first);
 
-#if defined(_GLIBCXX_USE_CXX11_ABI) && _GLIBCXX_USE_CXX11_ABI == 0
-        auto last = std::find_if_not(std::rbegin(s), std::rend(s),
-#else
         auto last = std::find_if_not(std::crbegin(s), std::crend(s),
-#endif
             [](int c) { return std::isspace(c); });
         s.erase(last.base(), std::end(s));
     }
 
-    template <typename Char, typename Traits, typename Alloc>
+    HPX_CXX_EXPORT template <typename Char, typename Traits, typename Alloc>
     std::basic_string<Char, Traits, Alloc> trim_copy(
         std::basic_string<Char, Traits, Alloc> const& s)
     {

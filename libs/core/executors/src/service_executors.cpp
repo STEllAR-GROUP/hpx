@@ -21,7 +21,7 @@ namespace hpx::parallel::execution::detail {
         hpx::util::io_service_pool* pool, hpx::function<void()>&& f)
     {
 #if ASIO_VERSION >= 103400
-        asio::post(pool->get_io_service(), HPX_MOVE(f));
+        ::asio::post(pool->get_io_service(), HPX_MOVE(f));
 #else
         pool->get_io_service().post(HPX_MOVE(f));
 #endif

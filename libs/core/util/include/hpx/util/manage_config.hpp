@@ -17,7 +17,7 @@
 
 namespace hpx::util {
 
-    struct HPX_CORE_EXPORT manage_config
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT manage_config
     {
         using map_type = std::map<std::string, std::string>;
 

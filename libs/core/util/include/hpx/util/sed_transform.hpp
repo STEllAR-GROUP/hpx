@@ -13,10 +13,7 @@
 #include <memory>
 #include <string>
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::util {
 
@@ -38,7 +35,7 @@ namespace hpx::util {
     /// returns the resulting string.
     ///
     /// \note Currently, only supports search and replace syntax (s/search/replace/)
-    struct HPX_CORE_EXPORT sed_transform
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT sed_transform
     {
     private:
         struct command;
@@ -65,6 +62,4 @@ namespace hpx::util {
     };
 }    // namespace hpx::util
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
-#endif
+#include <hpx/config/warnings_suffix.hpp>

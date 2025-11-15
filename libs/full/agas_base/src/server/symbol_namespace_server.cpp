@@ -12,12 +12,10 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/naming/credit_handling.hpp>
 #include <hpx/naming/split_gid.hpp>
 #include <hpx/timing/scoped_timer.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/insert_checked.hpp>
-#include <hpx/util/regex_from_pattern.hpp>
 
 #include <atomic>
 #include <cstdint>

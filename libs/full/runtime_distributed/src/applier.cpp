@@ -14,8 +14,8 @@
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parcelset/parcel.hpp>

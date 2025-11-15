@@ -10,12 +10,12 @@
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/modules/plugin.hpp>
 #include <hpx/modules/prefix.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/string_util.hpp>
-#include <hpx/plugin/traits/plugin_config_data.hpp>
 
 #include <hpx/plugin_factories/parcelport_factory_base.hpp>
 #include <hpx/plugin_factories/plugin_factory_base.hpp>

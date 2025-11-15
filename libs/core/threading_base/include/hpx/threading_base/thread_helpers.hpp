@@ -11,8 +11,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/threading_base/register_thread.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -25,6 +25,8 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads {
@@ -49,7 +51,7 @@ namespace hpx::threads {
     /// \note             If the thread referenced by the parameter \a id
     ///                   is in \a thread_state#active state this function
     ///                   schedules a new thread which will set the state of
-    ///                   the thread as soon as its not active anymore. The
+    ///                   the thread as soon as it is not active anymore. The
     ///                   function returns \a thread_state#active in this case.
     ///
     /// \returns          This function returns the previous state of the
@@ -62,13 +64,13 @@ namespace hpx::threads {
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
     ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   parameter \a ec. Otherwise, it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT thread_state set_thread_state(thread_id_type const& id,
         thread_schedule_state state = thread_schedule_state::pending,
         thread_restart_state stateex = thread_restart_state::signaled,
         thread_priority priority = thread_priority::normal,
-        bool retry_on_active = true, hpx::error_code& ec = throws);
+        bool retry_on_active = true, hpx::error_code& ec = hpx::throws);
 
     ///////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the
@@ -98,7 +100,7 @@ namespace hpx::threads {
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
     ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   parameter \a ec. Otherwise, it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT thread_id_ref_type set_thread_state(
         thread_id_type const& id,
@@ -107,14 +109,14 @@ namespace hpx::threads {
         thread_schedule_state state = thread_schedule_state::pending,
         thread_restart_state stateex = thread_restart_state::timeout,
         thread_priority priority = thread_priority::normal,
-        bool retry_on_active = true, error_code& ec = throws);
+        bool retry_on_active = true, hpx::error_code& ec = hpx::throws);
 
     inline thread_id_ref_type set_thread_state(thread_id_type const& id,
         hpx::chrono::steady_time_point const& abs_time,
         thread_schedule_state state = thread_schedule_state::pending,
         thread_restart_state stateex = thread_restart_state::timeout,
         thread_priority priority = thread_priority::normal,
-        bool retry_on_active = true, error_code& /*ec*/ = throws)
+        bool retry_on_active = true, hpx::error_code& /*ec*/ = throws)
     {
         return set_thread_state(id, abs_time, nullptr, state, stateex, priority,
             retry_on_active, throws);
@@ -146,14 +148,14 @@ namespace hpx::threads {
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
     ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   parameter \a ec. Otherwise, it throws an instance
     ///                   of hpx#exception.
     inline thread_id_ref_type set_thread_state(thread_id_type const& id,
         hpx::chrono::steady_duration const& rel_time,
         thread_schedule_state state = thread_schedule_state::pending,
         thread_restart_state stateex = thread_restart_state::timeout,
         thread_priority priority = thread_priority::normal,
-        bool retry_on_active = true, error_code& ec = throws)
+        bool retry_on_active = true, hpx::error_code& ec = hpx::throws)
     {
         return set_thread_state(id, rel_time.from_now(), state, stateex,
             priority, retry_on_active, ec);
@@ -177,20 +179,20 @@ namespace hpx::threads {
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
     ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   parameter \a ec. Otherwise, it throws an instance
     ///                   of hpx#exception.
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
     HPX_CORE_EXPORT char const* get_thread_backtrace(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, hpx::hpx::error_code& ec = hpx::throws);
     HPX_CORE_EXPORT char const* set_thread_backtrace(thread_id_type const& id,
-        char const* bt = nullptr, error_code& ec = throws);
+        char const* bt = nullptr, hpx::error_code& ec = hpx::throws);
 #else
 #if !defined(DOXYGEN)
     HPX_CORE_EXPORT util::backtrace const* get_thread_backtrace(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws);
     HPX_CORE_EXPORT util::backtrace const* set_thread_backtrace(
         thread_id_type const& id, util::backtrace const* bt = nullptr,
-        error_code& ec = throws);
+        hpx::error_code& ec = hpx::throws);
 #endif
 #endif
 
@@ -212,10 +214,10 @@ namespace hpx::threads {
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
     ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   parameter \a ec. Otherwise, it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT thread_state get_thread_state(
-        thread_id_type const& id, error_code& ec = throws) noexcept;
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_phase is part of the thread related API.
@@ -235,10 +237,10 @@ namespace hpx::threads {
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
     ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   parameter \a ec. Otherwise, it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT std::size_t get_thread_phase(
-        thread_id_type const& id, error_code& ec = throws) noexcept;
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// Returns whether the given thread can be interrupted at this point.
@@ -256,10 +258,10 @@ namespace hpx::threads {
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
     ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   parameter \a ec. Otherwise, it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT bool get_thread_interruption_enabled(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws);
 
     /// Set whether the given thread can be interrupted at this point.
     ///
@@ -277,10 +279,11 @@ namespace hpx::threads {
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
     ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   parameter \a ec. Otherwise, it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT bool set_thread_interruption_enabled(
-        thread_id_type const& id, bool enable, error_code& ec = throws);
+        thread_id_type const& id, bool enable,
+        hpx::error_code& ec = hpx::throws);
 
     /// Returns whether the given thread has been flagged for interruption.
     ///
@@ -297,10 +300,10 @@ namespace hpx::threads {
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
     ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   parameter \a ec. Otherwise, it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT bool get_thread_interruption_requested(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws);
 
     /// Flag the given thread for interruption.
     ///
@@ -316,13 +319,13 @@ namespace hpx::threads {
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
     ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   parameter \a ec. Otherwise, it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT void interrupt_thread(
-        thread_id_type const& id, bool flag, error_code& ec = throws);
+        thread_id_type const& id, bool flag, hpx::error_code& ec = hpx::throws);
 
     inline void interrupt_thread(
-        thread_id_type const& id, error_code& ec = throws)
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws)
     {
         interrupt_thread(id, true, ec);
     }
@@ -340,10 +343,10 @@ namespace hpx::threads {
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
     ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   parameter \a ec. Otherwise, it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT void interruption_point(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Return priority of the given thread
@@ -357,10 +360,10 @@ namespace hpx::threads {
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
     ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   parameter \a ec. Otherwise, it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT threads::thread_priority get_thread_priority(
-        thread_id_type const& id, error_code& ec = throws) noexcept;
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// Return stack size of the given thread
@@ -374,47 +377,49 @@ namespace hpx::threads {
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
     ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   parameter \a ec. Otherwise, it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT std::ptrdiff_t get_stack_size(
-        thread_id_type const& id, error_code& ec = throws) noexcept;
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
     HPX_CORE_EXPORT void run_thread_exit_callbacks(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws);
 
     HPX_CORE_EXPORT bool add_thread_exit_callback(thread_id_type const& id,
-        hpx::function<void()> const& f, error_code& ec = throws);
+        hpx::function<void()> const& f, hpx::error_code& ec = hpx::throws);
 
     HPX_CORE_EXPORT void free_thread_exit_callbacks(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws);
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT std::size_t get_thread_data(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws);
 
-    HPX_CORE_EXPORT std::size_t set_thread_data(
-        thread_id_type const& id, std::size_t data, error_code& ec = throws);
+    HPX_CORE_EXPORT std::size_t set_thread_data(thread_id_type const& id,
+        std::size_t data, hpx::error_code& ec = hpx::throws);
 
 #if defined(HPX_HAVE_LIBCDS)
     HPX_CORE_EXPORT std::size_t get_libcds_data(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws);
 
-    HPX_CORE_EXPORT std::size_t set_libcds_data(
-        thread_id_type const& id, std::size_t data, error_code& ec = throws);
+    HPX_CORE_EXPORT std::size_t set_libcds_data(thread_id_type const& id,
+        std::size_t data, hpx::error_code& ec = hpx::throws);
 
     HPX_CORE_EXPORT std::size_t get_libcds_hazard_pointer_data(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws);
 
     HPX_CORE_EXPORT std::size_t set_libcds_hazard_pointer_data(
-        thread_id_type const& id, std::size_t data, error_code& ec = throws);
+        thread_id_type const& id, std::size_t data,
+        hpx::error_code& ec = hpx::throws);
 
     HPX_CORE_EXPORT std::size_t get_libcds_dynamic_hazard_pointer_data(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws);
 
     HPX_CORE_EXPORT std::size_t set_libcds_dynamic_hazard_pointer_data(
-        thread_id_type const& id, std::size_t data, error_code& ec = throws);
+        thread_id_type const& id, std::size_t data,
+        hpx::error_code& ec = hpx::throws);
 #endif
 
     HPX_CORE_EXPORT std::size_t& get_continuation_recursion_count() noexcept;
@@ -435,7 +440,7 @@ namespace hpx::threads {
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#error#invalid_status.
     HPX_CORE_EXPORT threads::thread_pool_base* get_pool(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws);
 }    // namespace hpx::threads
 
 namespace hpx::this_thread {
@@ -463,7 +468,7 @@ namespace hpx::this_thread {
         threads::thread_schedule_state state, threads::thread_id_type nextid,
         threads::thread_description const& description =
             threads::thread_description("this_thread::suspend"),
-        error_code& ec = throws);
+        hpx::error_code& ec = hpx::throws);
 
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread to
@@ -488,7 +493,7 @@ namespace hpx::this_thread {
             threads::thread_schedule_state::pending,
         threads::thread_description const& description =
             threads::thread_description("this_thread::suspend"),
-        error_code& ec = throws)
+        hpx::error_code& ec = hpx::throws)
     {
         return suspend(state, threads::invalid_thread_id, description, ec);
     }
@@ -517,7 +522,7 @@ namespace hpx::this_thread {
         threads::thread_id_type id,
         threads::thread_description const& description =
             threads::thread_description("this_thread::suspend"),
-        error_code& ec = throws);
+        hpx::error_code& ec = hpx::throws);
 
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread to
@@ -542,7 +547,7 @@ namespace hpx::this_thread {
         hpx::chrono::steady_time_point const& abs_time,
         threads::thread_description const& description =
             threads::thread_description("this_thread::suspend"),
-        error_code& ec = throws)
+        hpx::error_code& ec = hpx::throws)
     {
         return suspend(abs_time, threads::invalid_thread_id, description, ec);
     }
@@ -570,7 +575,7 @@ namespace hpx::this_thread {
         hpx::chrono::steady_duration const& rel_time,
         threads::thread_description const& description =
             threads::thread_description("this_thread::suspend"),
-        error_code& ec = throws)
+        hpx::error_code& ec = hpx::throws)
     {
         return suspend(
             rel_time.from_now(), threads::invalid_thread_id, description, ec);
@@ -600,7 +605,7 @@ namespace hpx::this_thread {
         threads::thread_id_type const& id,
         threads::thread_description const& description =
             threads::thread_description("this_thread::suspend"),
-        error_code& ec = throws)
+        hpx::error_code& ec = hpx::throws)
     {
         return suspend(rel_time.from_now(), id, description, ec);
     }
@@ -627,7 +632,7 @@ namespace hpx::this_thread {
     inline threads::thread_restart_state suspend(std::uint64_t ms,
         threads::thread_description const& description =
             threads::thread_description("this_thread::suspend"),
-        error_code& ec = throws)
+        hpx::error_code& ec = hpx::throws)
     {
         return suspend(std::chrono::milliseconds(ms),
             threads::invalid_thread_id, description, ec);
@@ -647,7 +652,7 @@ namespace hpx::this_thread {
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#error#invalid_status.
     HPX_CORE_EXPORT threads::thread_pool_base* get_pool(
-        error_code& ec = throws);
+        hpx::error_code& ec = hpx::throws);
 
     /// \cond NOINTERNAL
     // returns the remaining available stack space
@@ -660,3 +665,5 @@ namespace hpx::this_thread {
             8 * HPX_THREADS_STACK_OVERHEAD)) noexcept;
     /// \endcond
 }    // namespace hpx::this_thread
+
+#include <hpx/config/warnings_suffix.hpp>

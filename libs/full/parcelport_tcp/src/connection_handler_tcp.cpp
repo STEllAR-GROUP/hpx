@@ -86,16 +86,16 @@ namespace hpx::parcelset::policies::tcp {
 
     bool connection_handler::do_run()
     {
-        using asio::ip::tcp;
-        asio::io_context& io_service = io_service_pool_.get_io_service();
+        using ::asio::ip::tcp;
+        ::asio::io_context& io_service = io_service_pool_.get_io_service();
         if (nullptr == acceptor_)
             acceptor_ = new tcp::acceptor(io_service);
 
         // initialize network
         std::size_t tried = 0;
         exception_list errors;
-        util::endpoint_iterator_type const end = util::accept_end();
-        for (util::endpoint_iterator_type it =
+        util::detail::endpoint_iterator_type const end = util::accept_end();
+        for (util::detail::endpoint_iterator_type it =
                  util::accept_begin(here_.get<locality>(), io_service);
             it != end; ++it, ++tried)
         {
@@ -157,14 +157,14 @@ namespace hpx::parcelset::policies::tcp {
     std::shared_ptr<sender> connection_handler::create_connection(
         parcelset::locality const& l, error_code& ec)
     {
-        asio::io_context& io_service = io_service_pool_.get_io_service();
+        ::asio::io_context& io_service = io_service_pool_.get_io_service();
 
         // The parcel gets serialized inside the connection constructor, no
         // need to keep the original parcel alive after this call returned.
         auto sender_connection = std::make_shared<sender>(io_service, l, this);
 
         // Connect to the target locality, retry if needed
-        std::error_code error = asio::error::try_again;
+        std::error_code error = ::asio::error::try_again;
         for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
         {
             // The acceptor is only nullptr when the parcelport has been stopped.
@@ -174,12 +174,12 @@ namespace hpx::parcelset::policies::tcp {
                 return std::shared_ptr<sender>();
             try
             {
-                util::endpoint_iterator_type end = util::connect_end();
-                for (util::endpoint_iterator_type it =
+                util::detail::endpoint_iterator_type end = util::connect_end();
+                for (util::detail::endpoint_iterator_type it =
                          util::connect_begin(l.get<locality>(), io_service);
                     it != end; ++it)
                 {
-                    asio::ip::tcp::socket& s = sender_connection->socket();
+                    ::asio::ip::tcp::socket& s = sender_connection->socket();
                     s.close();
                     // NOLINTNEXTLINE(bugprone-unused-return-value)
                     s.connect(*it, error);
@@ -229,10 +229,10 @@ namespace hpx::parcelset::policies::tcp {
 
         // make sure the Nagle algorithm is disabled for this socket,
         // disable lingering on close
-        asio::ip::tcp::socket& s = sender_connection->socket();
+        ::asio::ip::tcp::socket& s = sender_connection->socket();
 
-        s.set_option(asio::ip::tcp::no_delay(true));
-        s.set_option(asio::socket_base::linger(true, 0));
+        s.set_option(::asio::ip::tcp::no_delay(true));
+        s.set_option(::asio::socket_base::linger(true, 0));
 
 #if defined(HPX_HOLDON_TO_OUTGOING_CONNECTIONS)
         {
@@ -291,7 +291,7 @@ namespace hpx::parcelset::policies::tcp {
             // handle this incoming connection
             std::shared_ptr<receiver> c(receiver_conn);
 
-            asio::io_context& io_service = io_service_pool_.get_io_service();
+            ::asio::io_context& io_service = io_service_pool_.get_io_service();
             receiver_conn.reset(new receiver(
                 io_service, get_max_inbound_message_size(), *this));
             acceptor_->async_accept(receiver_conn->socket(),
@@ -305,9 +305,9 @@ namespace hpx::parcelset::policies::tcp {
             }
 
             // disable Nagle algorithm, disable lingering on close
-            asio::ip::tcp::socket& s = c->socket();
-            s.set_option(asio::ip::tcp::no_delay(true));
-            s.set_option(asio::socket_base::linger(true, 0));
+            ::asio::ip::tcp::socket& s = c->socket();
+            s.set_option(::asio::ip::tcp::no_delay(true));
+            s.set_option(::asio::socket_base::linger(true, 0));
 
             // now accept the incoming connection by starting to read from the
             // socket
@@ -331,7 +331,7 @@ namespace hpx::parcelset::policies::tcp {
             return;
         }
 
-        if (e != asio::error::operation_aborted && e != asio::error::eof)
+        if (e != ::asio::error::operation_aborted && e != asio::error::eof)
         {
             LPT_(error).format(
                 "handle read operation completion: error: {}", e.message());

@@ -13,12 +13,12 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/mpi_base.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/plugin/traits/plugin_config_data.hpp>
 
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/parcelport_mpi/locality.hpp>
@@ -182,7 +182,7 @@ namespace hpx::parcelset {
                 for (std::size_t i = 0; i != io_service_pool_.size(); ++i)
                 {
 #if ASIO_VERSION >= 103400
-                    asio::post(
+                    ::asio::post(
                         io_service_pool_.get_io_service(static_cast<int>(i)),
                         hpx::bind(&parcelport::io_service_work, this));
 #else

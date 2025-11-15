@@ -8,11 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/ini.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/modules/prefix.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/string_util.hpp>
-#include <hpx/plugin/traits/plugin_config_data.hpp>
 
 #include <hpx/plugin_factories/unique_plugin_name.hpp>
 

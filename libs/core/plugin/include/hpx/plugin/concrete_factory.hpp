@@ -1,5 +1,5 @@
 //  Copyright Vladimir Prus 2004.
-//  Copyright (c) 2005-2022 Hartmut Kaiser
+//  Copyright (c) 2005-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,12 +17,12 @@ namespace hpx::util::plugin {
 
     namespace detail {
 
-        template <typename BasePlugin, typename Concrete, typename Base,
-            typename Parameter>
+        HPX_CXX_EXPORT template <typename BasePlugin, typename Concrete,
+            typename Base, typename Parameter>
         struct concrete_factory_item;
 
-        template <typename BasePlugin, typename Concrete, typename Base,
-            typename... Parameters>
+        HPX_CXX_EXPORT template <typename BasePlugin, typename Concrete,
+            typename Base, typename... Parameters>
         struct concrete_factory_item<BasePlugin, Concrete, Base,
             hpx::util::pack<Parameters...>> : public Base
         {
@@ -36,7 +36,7 @@ namespace hpx::util::plugin {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename BasePlugin, typename Concrete>
+    HPX_CXX_EXPORT template <typename BasePlugin, typename Concrete>
     struct concrete_factory
       : detail::concrete_factory_item<BasePlugin, Concrete,
             abstract_factory<BasePlugin>, virtual_constructor_t<BasePlugin>>

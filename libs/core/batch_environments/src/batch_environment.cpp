@@ -6,13 +6,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/asio/asio_util.hpp>
 #include <hpx/batch_environments/alps_environment.hpp>
 #include <hpx/batch_environments/batch_environment.hpp>
 #include <hpx/batch_environments/flux_environment.hpp>
 #include <hpx/batch_environments/pbs_environment.hpp>
 #include <hpx/batch_environments/pjm_environment.hpp>
 #include <hpx/batch_environments/slurm_environment.hpp>
+#include <hpx/modules/asio.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/type_support.hpp>
 
@@ -142,7 +142,7 @@ namespace hpx::util {
         bool found_agas_host = false;
 
 #if defined(HPX_HAVE_NETWORKING)
-        asio::io_context io_service;
+        ::asio::io_context io_service;
 
         std::size_t agas_node_num = 0;
         for (std::string const& s : nodes)
@@ -163,7 +163,7 @@ namespace hpx::util {
 
                 if (have_tcp)
                 {
-                    asio::ip::tcp::endpoint ep =
+                    ::asio::ip::tcp::endpoint ep =
                         util::resolve_hostname(s, 0, io_service);
 
                     if (0 == nodes_.count(ep))
@@ -253,7 +253,7 @@ namespace hpx::util {
 
     std::string batch_environment::host_name() const
     {
-        std::string hostname = asio::ip::host_name();
+        std::string hostname = ::asio::ip::host_name();
         if (debug_)
             std::cerr << "asio host_name: " << hostname << std::endl;
         return hostname;

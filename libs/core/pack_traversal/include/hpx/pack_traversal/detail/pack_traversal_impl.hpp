@@ -11,9 +11,9 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/pack_traversal/detail/container_category.hpp>
 #include <hpx/pack_traversal/traits/pack_traversal_rebind_container.hpp>
-#include <hpx/util/detail/reserve.hpp>
 
 #include <cstddef>
 #include <iterator>

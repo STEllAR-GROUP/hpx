@@ -12,8 +12,8 @@
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/naming_base/naming_base.hpp>
 

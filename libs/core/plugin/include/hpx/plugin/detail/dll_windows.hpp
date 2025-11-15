@@ -1,5 +1,5 @@
 //  Copyright Vladimir Prus 2004.
-//  Copyright (c) 2005-2023 Hartmut Kaiser
+//  Copyright (c) 2005-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,7 +32,7 @@ namespace hpx::util::plugin {
 
     namespace detail {
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct free_dll
         {
             explicit free_dll(HMODULE h) noexcept
@@ -50,7 +50,7 @@ namespace hpx::util::plugin {
         };
     }    // namespace detail
 
-    class dll
+    HPX_CXX_EXPORT class dll
     {
     public:
         dll() = default;
