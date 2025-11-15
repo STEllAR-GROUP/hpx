@@ -57,6 +57,16 @@ explicitly if you are using targets directly (:ref:`using_hpx_cmake_targets`).
 All |hpx| API functions can be used from within the ``main()`` function now.
 
 .. note::
+   on Linux and macOS you can enable automatic activation of the runtime
+   override by configuring |hpx| with
+   ``-DHPX_WITH_WRAP_MAIN_AUTO_ACTIVATE=ON``. When this CMake option is set and
+   |hpx| is built with ``-DHPX_WITH_DYNAMIC_HPX_MAIN=ON`` (the default on those
+   platforms), linking an executable against ``HPX::wrap_main`` is sufficient
+   even if you do not include ``hpx/hpx_main.hpp``. The include remains required
+   when the option is disabled and on other platforms, and it is still useful
+   for macro redefinition provided there.
+
+.. note::
 
    The function ``main()`` does not need to expect receiving ``argc`` and
    ``argv`` as shown above, but could expose the signature ``int main()``. This
@@ -106,11 +116,12 @@ to the operating system as usual.
 
 .. caution::
 
-   We make use of an *override* variable ``include_libhpx_wrap`` in the header
-   file ``hpx/hpx_main.hpp`` to swiftly choose the function call stack at
-   runtime. Therefore, the header file should *only* be included in the main
-   executable. Including it in the components will result in multiple definition
-   of the variable.
+   If you enable ``-DHPX_WITH_WRAP_MAIN_AUTO_ACTIVATE`` (with
+   ``-DHPX_WITH_DYNAMIC_HPX_MAIN`` also enabled) the wrappped ``main`` entry point
+   becomes active as soon as you link against ``HPX::wrap_main``. Even in that
+   case ``hpx/hpx_main.hpp`` should *only* be included in the executable that 
+   provideds ``main``. Including it in components will still lead to multiple
+   definitions of the override variable ``include_libhpx_wrap``.
 
 .. _medium:
 

@@ -14,6 +14,44 @@
 #include <string>
 
 namespace hpx_start {
+    HPX_SYMBOL_EXPORT extern bool include_libhpx_wrap;
+    HPX_SYMBOL_EXPORT extern const char* app_name_libhpx_wrap;
+} // namespace hpx_start
+
+namespace {
+#if defined(HPX_HAVE_WRAP_MAIN_AUTO_ACTIVATE)
+    constexpr char const default_app_name[] = "unknown HPX application";
+
+    void ensure_wrap_main_activation(char** argv)
+    {
+        // Linking HPX::wrap_main already indicates that we want HPX to take over
+        // the application's entry point. Make sure the weak defaults get promoted
+        // to the active values even if the user did not include hpx_main.hpp explicitly.
+        hpx_start::include_libhpx_wrap = true;
+
+        if (hpx_start::app_name_libhpx_wrap == nullptr ||
+            hpx_start::app_name_libhpx_wrap[0] == '\0')
+        {
+            if (argv != nullptr && argv[0] != nullptr && argv[0][0] != '\0') 
+            {
+                hpx_start::app_name_libhpx_wrap = argv[0];
+            }
+            else
+            {
+                hpx_start::app_name_libhpx_wrap = default_app_name;
+            }
+        }
+
+    }
+#else
+    void ensure_wrap_main_activation(char** argv)
+    {
+    }
+
+#endif
+} // namespace
+
+namespace hpx_start {
     // include_libhpx_wrap is a weak symbol which helps to determine the course
     // of function calls at runtime. It has a default value of `false` which
     // corresponds to the program's entry point being main().
@@ -90,6 +128,7 @@ namespace hpx_start {
 // the hpx_main() as the entry point.
 extern "C" int initialize_main(int argc, char** argv)
 {
+    ensure_wrap_main_activation(argv);
 #if defined(__APPLE__)
     if (hpx_start::include_libhpx_wrap)
     {
@@ -125,6 +164,8 @@ extern "C" int initialize_main(int argc, char** argv)
 // runtime system prior to real main call.
 extern "C" int __wrap_main(int argc, char** argv)
 {
+    ensure_wrap_main_activation(argv);
+
     // We determine the function call stack at runtime
     // from the value of include_libhpx_wrap. If hpx_main
     // is included include_libhpx_wrap is set to 1
