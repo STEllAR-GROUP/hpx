@@ -5,16 +5,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/components_base/agas_interface.hpp>
+#include <hpx/components_base/detail/agas_interface_functions.hpp>
+#include <hpx/components_base/pinned_ptr.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
-
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/detail/agas_interface_functions.hpp>
-#include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/naming_base/naming_base.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
 

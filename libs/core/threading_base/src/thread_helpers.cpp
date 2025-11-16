@@ -6,9 +6,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
@@ -16,7 +17,6 @@
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #ifdef HPX_HAVE_VERIFY_LOCKS
 #include <hpx/modules/lock_registration.hpp>

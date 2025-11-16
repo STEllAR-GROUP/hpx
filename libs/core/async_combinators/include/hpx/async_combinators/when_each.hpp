@@ -128,7 +128,6 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_future.hpp>
 #include <hpx/futures/traits/detail/future_traits.hpp>
@@ -136,6 +135,7 @@ namespace hpx {
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/is_future_range.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/memory.hpp>

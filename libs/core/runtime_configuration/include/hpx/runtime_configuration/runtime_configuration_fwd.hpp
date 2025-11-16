@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,5 +12,5 @@
 namespace hpx::util {
 
     // forward declaration only
-    class HPX_CORE_EXPORT runtime_configuration;
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT runtime_configuration;
 }    // namespace hpx::util

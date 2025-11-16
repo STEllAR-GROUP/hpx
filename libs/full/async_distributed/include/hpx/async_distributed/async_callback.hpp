@@ -11,13 +11,12 @@
 #include <hpx/actions_base/traits/is_client.hpp>
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/actions_base/traits/is_valid_action.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/async_distributed/async_callback_fwd.hpp>
 #include <hpx/async_distributed/detail/async_implementations_fwd.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/functional.hpp>
 
 #include <type_traits>
@@ -91,7 +90,7 @@ namespace hpx::detail {
         call(hpx::id_type const& id, Callback&& cb, Ts&&... ts)
         {
             return async_cb_action_dispatch<Action,
-                hpx::detail::async_policy>::call(launch::async, id,
+                hpx::launch::async_policy>::call(launch::async, id,
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, ts)...);
         }
     };
@@ -116,7 +115,7 @@ namespace hpx::detail {
                 "The action to invoke is not supported by the target");
 
             return async_cb_action_dispatch<Action,
-                hpx::detail::async_policy>::call(launch::async, c.get_id(),
+                hpx::launch::async_policy>::call(launch::async, c.get_id(),
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, ts)...);
         }
     };
@@ -133,7 +132,7 @@ namespace hpx::detail {
         call(DistPolicy const& policy, Callback&& cb, Ts&&... ts)
         {
             return async_cb_action_dispatch<Action,
-                hpx::detail::async_policy>::call(launch::async, policy,
+                hpx::launch::async_policy>::call(launch::async, policy,
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, ts)...);
         }
     };

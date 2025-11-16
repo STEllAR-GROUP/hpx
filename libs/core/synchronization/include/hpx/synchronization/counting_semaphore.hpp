@@ -14,9 +14,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/synchronization/detail/counting_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <cstdint>

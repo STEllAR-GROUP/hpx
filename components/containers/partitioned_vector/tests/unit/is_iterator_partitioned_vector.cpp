@@ -6,7 +6,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/iterator_support.hpp>
-#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)

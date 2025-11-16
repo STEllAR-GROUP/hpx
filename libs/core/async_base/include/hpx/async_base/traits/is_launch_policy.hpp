@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -27,11 +27,11 @@ namespace hpx::traits {
         };
     }    // namespace detail
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct is_launch_policy : detail::is_launch_policy<std::decay_t<Policy>>
     {
     };
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     inline constexpr bool is_launch_policy_v = is_launch_policy<Policy>::value;
 }    // namespace hpx::traits

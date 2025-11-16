@@ -29,6 +29,7 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_async_combinators
     hpx_errors
+    hpx_execution_base
     hpx_io_service
     hpx_program_options
     hpx_logging
@@ -37,6 +38,7 @@ add_hpx_module(
     hpx_schedulers
     hpx_thread_pools
     hpx_thread_pool_util
+    hpx_timing
     hpx_type_support
     hpx_util
   CMAKE_SUBDIRS examples tests

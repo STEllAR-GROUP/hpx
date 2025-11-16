@@ -21,11 +21,11 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/modules/program_options.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/plugin_factories/plugin_factory_base.hpp>
 #include <hpx/runtime_components/components_fwd.hpp>
-#include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
 #include <hpx/synchronization/latch.hpp>
 #include <hpx/synchronization/mutex.hpp>

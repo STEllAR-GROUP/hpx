@@ -16,9 +16,9 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/timing/scoped_timer.hpp>
 
 #include <atomic>
 #include <cstdint>

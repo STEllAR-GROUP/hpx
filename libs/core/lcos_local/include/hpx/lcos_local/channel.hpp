@@ -8,10 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/packaged_task.hpp>
 #include <hpx/lcos_local/receive_buffer.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/lock_registration.hpp>

@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/async_base.hpp>
@@ -16,6 +15,7 @@
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
@@ -238,7 +238,7 @@ namespace hpx::lcos::detail {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Futures_>
-        void finalize(hpx::detail::async_policy policy, Futures_&& futures)
+        void finalize(hpx::launch::async_policy policy, Futures_&& futures)
         {
             detail::dataflow_finalization<dataflow_type> this_f_(this);
 
@@ -250,7 +250,7 @@ namespace hpx::lcos::detail {
         }
 
         template <typename Futures_>
-        void finalize(hpx::detail::fork_policy policy, Futures_&& futures)
+        void finalize(hpx::launch::fork_policy policy, Futures_&& futures)
         {
             detail::dataflow_finalization<dataflow_type> this_f_(this);
 
@@ -263,7 +263,7 @@ namespace hpx::lcos::detail {
 
         template <typename Futures_>
         HPX_FORCEINLINE void finalize(
-            hpx::detail::sync_policy, Futures_&& futures)
+            hpx::launch::sync_policy, Futures_&& futures)
         {
             // We need to run the completion on a new thread if we are on a
             // non HPX thread.

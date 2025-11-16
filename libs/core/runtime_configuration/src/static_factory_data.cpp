@@ -39,7 +39,7 @@ namespace hpx::components {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::map<std::string, util::plugin::get_plugins_list_type>&
+    static std::map<std::string, util::plugin::get_plugins_list_type>&
     get_static_factory_data()
     {
         static std::map<std::string, util::plugin::get_plugins_list_type>
@@ -72,7 +72,7 @@ namespace hpx::components {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::map<std::string, util::plugin::get_plugins_list_type>&
+    static std::map<std::string, util::plugin::get_plugins_list_type>&
     get_static_commandline_data()
     {
         static std::map<std::string, util::plugin::get_plugins_list_type>
@@ -105,7 +105,7 @@ namespace hpx::components {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::map<std::string, util::plugin::get_plugins_list_type>&
+    static std::map<std::string, util::plugin::get_plugins_list_type>&
     get_static_startup_shutdown_data()
     {
         static std::map<std::string, util::plugin::get_plugins_list_type>

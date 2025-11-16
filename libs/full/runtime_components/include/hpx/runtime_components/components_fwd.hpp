@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components/components_fwd.hpp>
-#include <hpx/runtime_configuration/component_factory_base.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 
 #include <cstddef>
 #include <string>

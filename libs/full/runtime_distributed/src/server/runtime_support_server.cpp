@@ -18,15 +18,16 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/create_component.hpp>
-#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/futures/packaged_task.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/ini.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/prefix.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/modules/synchronization.hpp>
@@ -38,9 +39,6 @@
 #include <hpx/plugin_factories/binary_filter_factory_base.hpp>
 #include <hpx/plugin_factories/message_handler_factory_base.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
-#include <hpx/runtime_configuration/component_commandline_base.hpp>
-#include <hpx/runtime_configuration/component_factory_base.hpp>
-#include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>

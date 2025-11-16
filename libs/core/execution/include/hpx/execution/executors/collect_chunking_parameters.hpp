@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution_base/traits/is_executor_parameters.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/serialization.hpp>
 
 #include <cstddef>

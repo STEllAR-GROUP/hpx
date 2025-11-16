@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution_base/this_thread.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/thread_pools/detail/background_thread.hpp>
 #include <hpx/thread_pools/detail/scheduling_callbacks.hpp>

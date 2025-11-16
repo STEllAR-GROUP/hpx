@@ -41,8 +41,6 @@ namespace hpx {
 #include <hpx/actions_base/traits/is_client.hpp>
 #include <hpx/actions_base/traits/is_valid_action.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/async_distributed/detail/sync_implementations.hpp>
 #include <hpx/async_distributed/sync.hpp>
@@ -53,6 +51,7 @@ namespace hpx {
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
@@ -142,7 +141,7 @@ namespace hpx::detail {
         HPX_FORCEINLINE static decltype(auto) call(
             hpx::id_type const& id, Ts&&... ts)
         {
-            return sync_action_dispatch<Action, hpx::detail::sync_policy>::call(
+            return sync_action_dispatch<Action, hpx::launch::sync_policy>::call(
                 launch::sync, id, HPX_FORWARD(Ts, ts)...);
         }
     };
@@ -157,7 +156,7 @@ namespace hpx::detail {
         HPX_FORCEINLINE static decltype(auto) call(
             components::client_base<Client_, Stub, Data> const& c, Ts&&... ts)
         {
-            return sync_action_dispatch<Action, hpx::detail::sync_policy>::call(
+            return sync_action_dispatch<Action, hpx::launch::sync_policy>::call(
                 launch::sync, c, HPX_FORWARD(Ts, ts)...);
         }
     };

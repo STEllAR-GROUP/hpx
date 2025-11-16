@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2023 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 // Necessary to avoid circular include
-#include <hpx/execution_base/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
 
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
@@ -19,13 +19,12 @@
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/future_then_result_exec.hpp>
-#include <hpx/execution_base/execution.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/tag_invoke.hpp>
@@ -724,14 +723,12 @@ namespace hpx::parallel::execution {
         using bulk_function_result_t =
             typename bulk_function_result<F, Shape, Ts...>::type;
 
-        // clang-format off
         template <typename Executor>
         struct bulk_async_execute_fn_helper<Executor,
             std::enable_if_t<
                 (hpx::traits::is_one_way_executor_v<Executor> ||
-                 hpx::traits::is_two_way_executor_v<Executor>) &&
+                    hpx::traits::is_two_way_executor_v<Executor>) &&
                 !hpx::traits::is_bulk_two_way_executor_v<Executor>>>
-        // clang-format on
         {
             template <typename BulkExecutor, typename F, typename Shape,
                 typename... Ts>

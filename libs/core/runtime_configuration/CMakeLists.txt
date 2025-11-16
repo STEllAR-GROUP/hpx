@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,12 +12,15 @@ set(runtime_configuration_headers
     hpx/runtime_configuration/component_factory_base.hpp
     hpx/runtime_configuration/component_registry_base.hpp
     hpx/runtime_configuration/init_ini_data.hpp
+    hpx/runtime_configuration/macros.hpp
     hpx/runtime_configuration/plugin_registry_base.hpp
     hpx/runtime_configuration/runtime_configuration.hpp
     hpx/runtime_configuration/runtime_configuration_fwd.hpp
     hpx/runtime_configuration/runtime_mode.hpp
     hpx/runtime_configuration/static_factory_data.hpp
 )
+
+set(runtime_configuration_macro_headers hpx/runtime_configuration/macros.hpp)
 
 # cmake-format: off
 set(
@@ -42,8 +45,10 @@ include(HPX_AddModule)
 add_hpx_module(
   core runtime_configuration
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${runtime_configuration_sources}
   HEADERS ${runtime_configuration_headers}
+  MACRO_HEADERS ${runtime_configuration_macro_headers}
   COMPAT_HEADERS ${runtime_configuration_compat_headers}
   MODULE_DEPENDENCIES
     hpx_errors

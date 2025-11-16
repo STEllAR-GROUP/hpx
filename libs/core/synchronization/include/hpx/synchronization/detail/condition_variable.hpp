@@ -13,8 +13,8 @@
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <mutex>

@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/coroutines.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -17,9 +17,9 @@
 
 namespace hpx::execution_base {
 
-    struct agent_base;
+    HPX_CXX_EXPORT struct agent_base;
 
-    class HPX_CORE_EXPORT agent_ref
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT agent_ref
     {
     public:
         agent_ref() = default;

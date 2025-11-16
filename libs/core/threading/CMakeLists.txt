@@ -31,5 +31,6 @@ add_hpx_module(
     hpx_memory
     hpx_tag_invoke
     hpx_thread_support
+    hpx_timing
   CMAKE_SUBDIRS examples tests
 )

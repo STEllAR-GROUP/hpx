@@ -17,7 +17,6 @@
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/actions_base/traits/is_valid_action.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
 #include <hpx/async_distributed/put_parcel_fwd.hpp>
@@ -25,6 +24,7 @@
 #include <hpx/components/client_base.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/traits/component_type_is_compatible.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/naming_base/address.hpp>

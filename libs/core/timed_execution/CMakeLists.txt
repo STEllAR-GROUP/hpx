@@ -31,6 +31,7 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_concepts
     hpx_execution
+    hpx_execution_base
     hpx_executors
     hpx_tag_invoke
     hpx_threading

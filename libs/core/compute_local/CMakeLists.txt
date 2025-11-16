@@ -53,6 +53,7 @@ add_hpx_module(
     hpx_coroutines
     hpx_datastructures
     hpx_execution
+    hpx_execution_base
     hpx_executors
     hpx_errors
     hpx_functional

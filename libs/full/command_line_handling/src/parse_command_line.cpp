@@ -19,6 +19,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
 
@@ -517,3 +519,5 @@ namespace hpx::util {
             visible, unregistered_options);
     }
 }    // namespace hpx::util
+
+#include <hpx/config/warnings_suffix.hpp>

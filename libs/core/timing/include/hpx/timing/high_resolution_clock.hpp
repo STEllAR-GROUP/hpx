@@ -20,13 +20,14 @@
 #include <cstdint>
 
 namespace hpx::chrono {
+
     /// \brief Class \c hpx::chrono::high_resolution_clock represents the clock
     ///        with the smallest tick period provided by the implementation. It
     ///        may be an alias of \c std::chrono::system_clock or
     ///        \c std::chrono::steady_clock, or a third, independent clock.
     ///        \c hpx::chrono::high_resolution_clock meets the requirements of
     ///        \a TrivialClock.
-    struct high_resolution_clock
+    HPX_CXX_EXPORT struct high_resolution_clock
     {
         // This function returns a tick count with a resolution (not
         // precision!) of 1 ns.

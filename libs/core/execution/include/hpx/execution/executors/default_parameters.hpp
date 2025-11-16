@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution/executors/execution_parameters_fwd.hpp>
-#include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstddef>
 #include <type_traits>

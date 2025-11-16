@@ -6,12 +6,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/futures/detail/execute_thread.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/threading_base/detail/switch_status.hpp>
 #include <hpx/threading_base/register_thread.hpp>

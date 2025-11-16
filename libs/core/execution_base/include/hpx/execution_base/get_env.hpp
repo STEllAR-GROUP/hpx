@@ -31,18 +31,18 @@
 #endif
 
 namespace hpx::execution::experimental {
-    using exec::with_t;
+    HPX_CXX_EXPORT using exec::with_t;
 
-    using exec::with;
-    using exec::without;
+    HPX_CXX_EXPORT using exec::with;
+    HPX_CXX_EXPORT using exec::without;
 
-    using exec::make_env;
-    using exec::make_env_t;
+    HPX_CXX_EXPORT using exec::make_env;
+    HPX_CXX_EXPORT using exec::make_env_t;
 
-    using exec::write;
-    using exec::write_env;
+    HPX_CXX_EXPORT using exec::write;
+    HPX_CXX_EXPORT using exec::write_env;
 
-    using exec::read_with_default;
+    HPX_CXX_EXPORT using exec::read_with_default;
 }    // namespace hpx::execution::experimental
 #else
 
@@ -67,14 +67,14 @@ namespace hpx::execution::experimental {
     //
     // Reference implementation avoids using libstdc++'s object concepts
     // because they instantiate a lot of templates.
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_queryable_v = std::is_destructible_v<T>;
 
     namespace detail {
 
         // checks whether tag_invoke(CPO, Args...) is contextually convertible
         // to bool, apply this meta function only for tag_invoke overloads
-        template <typename CPO>
+        HPX_CXX_EXPORT template <typename CPO>
         struct contextually_convertible_to_bool
         {
             template <typename EnableTag, typename... Args>
@@ -196,17 +196,17 @@ namespace hpx::execution::experimental {
 
     }    // namespace exec_envs
 
-    using exec_envs::empty_env;
-    using exec_envs::env;
-    using exec_envs::make_env;
-    using exec_envs::no_env;
+    HPX_CXX_EXPORT using exec_envs::empty_env;
+    HPX_CXX_EXPORT using exec_envs::env;
+    HPX_CXX_EXPORT using exec_envs::make_env;
+    HPX_CXX_EXPORT using exec_envs::no_env;
 
-    template <typename Env>
+    HPX_CXX_EXPORT template <typename Env>
     struct is_no_env : std::is_same<std::decay_t<Env>, no_env>
     {
     };
 
-    template <typename Env>
+    HPX_CXX_EXPORT template <typename Env>
     inline constexpr bool is_no_env_v = is_no_env<Env>::value;
 
     // get_env is a customization point object. For some subexpression r,
@@ -215,8 +215,8 @@ namespace hpx::execution::experimental {
     // 1. tag_invoke(execution::get_env, r) if that expression is well-formed.
     // 2. Otherwise, empty_env{}.
     //
-    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct get_env_t final
-      : hpx::functional::detail::tag_fallback<get_env_t>
+    HPX_CXX_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct get_env_t
+        final : hpx::functional::detail::tag_fallback<get_env_t>
     {
     private:
         template <typename EnvProvider>
@@ -227,15 +227,13 @@ namespace hpx::execution::experimental {
         }
     } get_env{};
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using env_of_t = decltype(get_env(std::declval<T>()));
 
-    // different versions of clang-format disagree
-    // clang-format off
-    template <typename Tag, typename Value, typename BaseEnv = empty_env>
-    using make_env_t = decltype(
-        make_env<Tag>(std::declval<Value&&>(), std::declval<BaseEnv&&>()));
-    // clang-format on
+    HPX_CXX_EXPORT template <typename Tag, typename Value,
+        typename BaseEnv = empty_env>
+    using make_env_t = decltype(make_env<Tag>(
+        std::declval<Value&&>(), std::declval<BaseEnv&&>()));
 
     // execution::forwarding_env_query is used to ask a customization point
     // object whether it is an environment query that should be forwarded
@@ -255,6 +253,7 @@ namespace hpx::execution::experimental {
     //
     // 2. Otherwise, false.
     //
+    HPX_CXX_EXPORT
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct forwarding_env_query_t
         final
       : hpx::functional::detail::tag_fallback_noexcept<forwarding_env_query_t,
@@ -269,8 +268,9 @@ namespace hpx::execution::experimental {
         }
     } forwarding_env_query{};
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_environment_provider_v =
         std::is_same_v<T, hpx::util::invoke_result_t<get_env_t, T>>;
 }    // namespace hpx::execution::experimental
+
 #endif

@@ -16,9 +16,9 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/threading.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/timed_execution/timed_execution.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <chrono>
 #include <functional>
