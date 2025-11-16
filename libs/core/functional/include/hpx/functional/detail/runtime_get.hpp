@@ -19,8 +19,7 @@
 namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename R, typename Tuple, typename F,
-        std::size_t... Is>
+    template <typename R, typename Tuple, typename F, std::size_t... Is>
     struct access_table
     {
         using tuple_type = Tuple;
@@ -41,8 +40,7 @@ namespace hpx::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename R, typename Tuple, typename F,
-        std::size_t... Is>
+    template <typename R, typename Tuple, typename F, std::size_t... Is>
     [[nodiscard]] constexpr decltype(auto) call_access_function(
         Tuple& t, std::size_t i, F&& f, hpx::util::index_pack<Is...>) noexcept
     {
@@ -54,7 +52,7 @@ namespace hpx::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Tuple>
+    template <typename Tuple>
     using first_tuple_element_t =
         hpx::tuple_element_t<0, std::remove_reference_t<Tuple>>;
 
@@ -69,11 +67,11 @@ namespace hpx::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Generate variant that uniquely holds all of the tuple types
-    HPX_CXX_EXPORT template <typename Tuple>
+    // Generate variant that uniquely holds all the tuple types
+    template <typename Tuple>
     struct variant_from_tuple;
 
-    HPX_CXX_EXPORT template <typename... Ts>
+    template <typename... Ts>
     struct variant_from_tuple<hpx::tuple<Ts...>>
     {
         using type =
@@ -81,7 +79,7 @@ namespace hpx::detail {
                 std::reference_wrapper<std::decay_t<Ts>>...>;
     };
 
-    HPX_CXX_EXPORT template <typename Tuple>
+    template <typename Tuple>
     using variant_from_tuple_t = typename variant_from_tuple<Tuple>::type;
 
     ///////////////////////////////////////////////////////////////////////////

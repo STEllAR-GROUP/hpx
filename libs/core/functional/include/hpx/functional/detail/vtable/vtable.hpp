@@ -18,19 +18,19 @@
 namespace hpx::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    template <typename T>
     struct construct_vtable
     {
     };
 
-    HPX_CXX_EXPORT template <typename VTable, typename T>
+    template <typename VTable, typename T>
     struct vtables
     {
         static constexpr VTable instance =
             VTable(detail::construct_vtable<T>());
     };
 
-    HPX_CXX_EXPORT template <typename VTable, typename T>
+    template <typename VTable, typename T>
     constexpr VTable const* get_vtable() noexcept
     {
         static_assert(
@@ -40,7 +40,7 @@ namespace hpx::util::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct vtable
+    struct vtable
     {
         template <typename T>
         static T& get(void* obj) noexcept

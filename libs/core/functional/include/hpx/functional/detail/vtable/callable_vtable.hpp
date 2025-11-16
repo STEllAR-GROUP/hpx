@@ -24,7 +24,7 @@ namespace hpx::util::detail {
     struct empty_function;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct callable_info_vtable
+    struct callable_info_vtable
     {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
         template <typename T>
@@ -76,10 +76,10 @@ namespace hpx::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Sig>
+    template <typename Sig>
     struct callable_vtable;
 
-    HPX_CXX_EXPORT template <typename R, typename... Ts>
+    template <typename R, typename... Ts>
     struct callable_vtable<R(Ts...)>
     {
         template <typename T>

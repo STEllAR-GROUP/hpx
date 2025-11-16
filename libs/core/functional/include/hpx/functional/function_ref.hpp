@@ -55,7 +55,7 @@ namespace hpx {
 
     namespace util::detail {
 
-        HPX_CXX_EXPORT template <typename Sig>
+        template <typename Sig>
         struct function_ref_vtable
           : callable_vtable<Sig>
           , callable_info_vtable
@@ -69,19 +69,19 @@ namespace hpx {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename F>
+        template <typename F>
         [[nodiscard]] constexpr bool is_empty_function_ptr(F* fp) noexcept
         {
             return fp == nullptr;
         }
 
-        HPX_CXX_EXPORT template <typename T, typename C>
+        template <typename T, typename C>
         [[nodiscard]] constexpr bool is_empty_function_ptr(T C::* mp) noexcept
         {
             return mp == nullptr;
         }
 
-        HPX_CXX_EXPORT template <typename F>
+        template <typename F>
         [[nodiscard]] constexpr bool is_empty_function_ptr(F const&) noexcept
         {
             return false;

@@ -25,14 +25,14 @@
 
 namespace hpx::util::detail {
 
-    HPX_CXX_EXPORT [[nodiscard]] inline void* __aligned_alloc(
+    [[nodiscard]] inline void* __aligned_alloc(
         std::size_t alignment, std::size_t size) noexcept
     {
         return HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, aligned_alloc)(
             alignment, size);
     }
 
-    HPX_CXX_EXPORT inline void __aligned_free(void* p, std::size_t) noexcept
+    inline void __aligned_free(void* p, std::size_t) noexcept
     {
         return HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, free)(p);
     }
@@ -44,13 +44,13 @@ namespace hpx::util::detail {
 
 namespace hpx::util::detail {
 
-    HPX_CXX_EXPORT [[nodiscard]] inline void* __aligned_alloc(
+    [[nodiscard]] inline void* __aligned_alloc(
         std::size_t alignment, std::size_t size) noexcept
     {
         return std::aligned_alloc(alignment, size);
     }
 
-    HPX_CXX_EXPORT inline void __aligned_free(void* p, std::size_t) noexcept
+    inline void __aligned_free(void* p, std::size_t) noexcept
     {
         std::free(p);
     }
@@ -62,13 +62,13 @@ namespace hpx::util::detail {
 
 namespace hpx::util::detail {
 
-    HPX_CXX_EXPORT [[nodiscard]] inline void* __aligned_alloc(
+    [[nodiscard]] inline void* __aligned_alloc(
         std::size_t alignment, std::size_t size) noexcept
     {
         return aligned_alloc(alignment, size);
     }
 
-    HPX_CXX_EXPORT inline void __aligned_free(void* p, std::size_t) noexcept
+    inline void __aligned_free(void* p, std::size_t) noexcept
     {
         free(p);
     }
@@ -81,7 +81,7 @@ namespace hpx::util::detail {
 namespace hpx::util::detail {
 
     // provide our own (simple) implementation of aligned_alloc
-    HPX_CXX_EXPORT [[nodiscard]] inline void* __aligned_alloc(
+    [[nodiscard]] inline void* __aligned_alloc(
         std::size_t alignment, std::size_t size) noexcept
     {
         if (alignment < alignof(void*))
@@ -105,7 +105,7 @@ namespace hpx::util::detail {
         return aligned_mem;
     }
 
-    HPX_CXX_EXPORT inline void __aligned_free(void* p, std::size_t) noexcept
+    inline void __aligned_free(void* p, std::size_t) noexcept
     {
         if (nullptr != p)
         {
@@ -118,7 +118,7 @@ namespace hpx::util::detail {
 
 namespace hpx::util::detail {
 
-    HPX_CXX_EXPORT template <typename Allocator>
+    template <typename Allocator>
     [[nodiscard]] void* __aligned_alloc(Allocator const& alloc,
         std::size_t alignment, std::size_t size) noexcept
     {
@@ -146,14 +146,14 @@ namespace hpx::util::detail {
         return aligned_mem;
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    template <typename T>
     [[nodiscard]] void* __aligned_alloc(std::allocator<T> const&,
         std::size_t alignment, std::size_t size) noexcept
     {
         return __aligned_alloc(alignment, size);
     }
 
-    HPX_CXX_EXPORT template <typename Allocator>
+    template <typename Allocator>
     void __aligned_free(
         Allocator const& alloc, void* p, std::size_t size) noexcept
     {
@@ -167,7 +167,7 @@ namespace hpx::util::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    template <typename T>
     inline void __aligned_free(
         std::allocator<T> const&, void* p, std::size_t size) noexcept
     {

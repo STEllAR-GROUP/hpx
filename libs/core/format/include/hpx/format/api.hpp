@@ -26,7 +26,7 @@ namespace hpx::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         struct type_specifier
         {
             static char const* value() noexcept = delete;
@@ -69,8 +69,7 @@ namespace hpx::util {
 #undef DECL_TYPE_SPECIFIER
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename T,
-            bool IsFundamental = std::is_fundamental_v<T>>
+        template <typename T, bool IsFundamental = std::is_fundamental_v<T>>
         struct formatter
         {
             static void call(
@@ -122,7 +121,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         struct formatter<T const*, /*IsFundamental=*/false>
           : formatter<void const*>
         {
@@ -217,7 +216,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         void format_value(
             std::ostream& os, std::string_view spec, T const& value)
         {
@@ -227,7 +226,7 @@ namespace hpx::util {
             os << value;
         }
 
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         struct formatter<T, /*IsFundamental=*/false>
         {
             static void call(
@@ -238,7 +237,7 @@ namespace hpx::util {
             }
         };
 
-        HPX_CXX_EXPORT struct format_arg
+        struct format_arg
         {
             format_arg() = default;
 
@@ -273,13 +272,12 @@ namespace hpx::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT HPX_CORE_EXPORT void format_to(std::ostream& os,
+        HPX_CORE_EXPORT void format_to(std::ostream& os,
             std::string_view format_str, format_arg const* args,
             std::size_t count);
 
-        HPX_CXX_EXPORT HPX_CORE_EXPORT std::string format(
-            std::string_view format_str, format_arg const* args,
-            std::size_t count);
+        HPX_CORE_EXPORT std::string format(std::string_view format_str,
+            format_arg const* args, std::size_t count);
     }    // namespace detail
 
     // enable using format in variadic contexts
@@ -306,7 +304,7 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Range>
+        template <typename Range>
         struct format_join
         {
             Range const& rng;

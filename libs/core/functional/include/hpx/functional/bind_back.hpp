@@ -26,24 +26,24 @@
 
 namespace hpx::detail {
 
-    HPX_CXX_EXPORT template <typename F, typename Ts, typename... Us>
+    template <typename F, typename Ts, typename... Us>
     struct invoke_bound_back_result;
 
-    HPX_CXX_EXPORT template <typename F, typename... Ts, typename... Us>
+    template <typename F, typename... Ts, typename... Us>
     struct invoke_bound_back_result<F, util::pack<Ts...>, Us...>
       : util::invoke_result<F, Us..., Ts...>
     {
     };
 
-    HPX_CXX_EXPORT template <typename F, typename Ts, typename... Us>
+    template <typename F, typename Ts, typename... Us>
     using invoke_bound_back_result_t =
         typename invoke_bound_back_result<F, Ts, Us...>::type;
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename F, typename Is, typename... Ts>
+    template <typename F, typename Is, typename... Ts>
     class bound_back;
 
-    HPX_CXX_EXPORT template <typename F, std::size_t... Is, typename... Ts>
+    template <typename F, std::size_t... Is, typename... Ts>
     class bound_back<F, util::index_pack<Is...>, Ts...>
     {
     public:

@@ -34,10 +34,10 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Left, typename Right>
+        template <typename Left, typename Right>
         struct make_index_pack_join;
 
-        HPX_CXX_EXPORT template <std::size_t... Left, std::size_t... Right>
+        template <std::size_t... Left, std::size_t... Right>
         struct make_index_pack_join<index_pack<Left...>, index_pack<Right...>>
           : index_pack<Left..., (sizeof...(Left) + Right)...>
         {
@@ -68,13 +68,13 @@ namespace hpx::util {
     // Workaround for clang bug [https://bugs.llvm.org/show_bug.cgi?id=35077]
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         struct is_true
           : std::integral_constant<bool, static_cast<bool>(T::value)>
         {
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         struct is_false
           : std::integral_constant<bool, !static_cast<bool>(T::value)>
         {
@@ -84,20 +84,20 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename... Ts>
+        template <typename... Ts>
         struct always_true : std::true_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename... Ts>
+        template <typename... Ts>
         struct always_false : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename... Ts>
+        template <typename... Ts>
         constexpr std::false_type all_of(...) noexcept;
 
-        HPX_CXX_EXPORT template <typename... Ts>
+        template <typename... Ts>
         constexpr auto all_of(int) noexcept
             -> always_true<std::enable_if_t<is_true<Ts>::value>...>;
     }    // namespace detail
@@ -118,10 +118,10 @@ namespace hpx::util {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename... Ts>
+        template <typename... Ts>
         constexpr std::true_type any_of(...) noexcept;
 
-        HPX_CXX_EXPORT template <typename... Ts>
+        template <typename... Ts>
         constexpr auto any_of(int) noexcept
             -> always_false<std::enable_if_t<is_false<Ts>::value>...>;
     }    // namespace detail
@@ -156,32 +156,32 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT struct empty_helper
+        struct empty_helper
         {
         };
 
-        HPX_CXX_EXPORT template <std::size_t I, typename T>
+        template <std::size_t I, typename T>
         struct indexed
         {
             using type = T;
         };
 
-        HPX_CXX_EXPORT template <typename Ts, typename Is>
+        template <typename Ts, typename Is>
         struct indexer;
 
-        HPX_CXX_EXPORT template <typename... Ts, std::size_t... Is>
+        template <typename... Ts, std::size_t... Is>
         struct indexer<pack<Ts...>, pack_c<std::size_t, Is...>>
           : indexed<Is, Ts>...
         {
         };
 
-        HPX_CXX_EXPORT template <std::size_t J>
+        template <std::size_t J>
         constexpr empty_helper at_index_check(...) noexcept;
 
-        HPX_CXX_EXPORT template <std::size_t J, typename T>
+        template <std::size_t J, typename T>
         constexpr indexed<J, T> at_index_check(indexed<J, T> const&) noexcept;
 
-        HPX_CXX_EXPORT template <std::size_t I, typename Ts>
+        template <std::size_t I, typename Ts>
         struct at_index_impl
           : decltype(detail::at_index_check<I>(
                 indexer<Ts, make_index_pack_t<Ts::size>>()))
@@ -215,18 +215,17 @@ namespace hpx::util {
             template <typename> class Transformer>
         using transform_t = typename transform<Pack, Transformer>::type;
 
-        HPX_CXX_EXPORT template <typename PackUnique, typename PackRest>
+        template <typename PackUnique, typename PackRest>
         struct unique_helper;
 
-        HPX_CXX_EXPORT template <template <typename...> class Pack,
-            typename... Ts>
+        template <template <typename...> class Pack, typename... Ts>
         struct unique_helper<Pack<Ts...>, Pack<>>
         {
             using type = Pack<Ts...>;
         };
 
-        HPX_CXX_EXPORT template <template <typename...> class Pack,
-            typename... Ts, typename U, typename... Us>
+        template <template <typename...> class Pack, typename... Ts, typename U,
+            typename... Us>
         struct unique_helper<Pack<Ts...>, Pack<U, Us...>>
           : std::conditional_t<contains<U, Ts...>::value,
                 unique_helper<Pack<Ts...>, Pack<Us...>>,

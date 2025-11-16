@@ -16,7 +16,7 @@
 
 namespace hpx::util::detail {
 
-    HPX_CXX_EXPORT struct copyable_vtable
+    struct copyable_vtable
     {
         template <typename T>
         static void* _copy(void* storage, std::size_t storage_size,

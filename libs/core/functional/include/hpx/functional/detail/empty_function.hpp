@@ -14,13 +14,13 @@
 namespace hpx::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct empty_function
+    struct empty_function
     {
     };    // must be trivial and empty
 
-    HPX_CXX_EXPORT [[noreturn]] HPX_CORE_EXPORT void throw_bad_function_call();
+    [[noreturn]] HPX_CORE_EXPORT void throw_bad_function_call();
 
-    HPX_CXX_EXPORT template <typename R>
+    template <typename R>
     [[noreturn]] inline R throw_bad_function_call()
     {
         throw_bad_function_call();
@@ -36,7 +36,7 @@ namespace hpx::util::detail {
     // error ("there was an error in verifying the lgenfe output!") with this
     // enabled, so we explicitly use the fallback.
 #if !defined(HPX_HAVE_CUDA)
-    HPX_CXX_EXPORT template <typename Sig>
+    template <typename Sig>
     [[nodiscard]] constexpr function_vtable<Sig, true> const*
     get_empty_function_vtable() noexcept
     {

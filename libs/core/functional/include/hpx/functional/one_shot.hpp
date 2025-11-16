@@ -23,7 +23,7 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename F>
+        template <typename F>
         class one_shot_wrapper    //-V690
         {
         public:

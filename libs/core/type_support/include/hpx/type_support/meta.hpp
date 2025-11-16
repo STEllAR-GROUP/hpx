@@ -24,7 +24,7 @@ namespace hpx::meta {
     // hide a template type parameter from ADL
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename T>
+        template <typename T>
         struct hidden
         {
             using type = struct _
@@ -215,7 +215,7 @@ namespace hpx::meta {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <bool>
+        template <bool>
         struct if_
         {
             template <typename TrueCase, typename>
@@ -237,34 +237,31 @@ namespace hpx::meta {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename... Ts>
+        template <typename... Ts>
         struct compose_args_helper_not_valid;
 
-        HPX_CXX_EXPORT template <typename F, typename Pack,
-            typename Enable = void>
+        template <typename F, typename Pack, typename Enable = void>
         struct compose_args_helper
         {
             using type = compose_args_helper_not_valid<F, Pack>;
         };
 
-        HPX_CXX_EXPORT template <typename F, template <class...> typename A,
-            typename... As>
+        template <typename F, template <class...> typename A, typename... As>
         struct compose_args_helper<F, pack<A<As...>>,
             std::enable_if_t<value<is_invocable<F, As...>>>>
         {
             using type = invoke<F, As...>;
         };
 
-        HPX_CXX_EXPORT template <typename F, template <class...> typename A,
-            typename... As, template <typename...> typename B, typename... Bs,
-            typename... Rest>
+        template <typename F, template <class...> typename A, typename... As,
+            template <typename...> typename B, typename... Bs, typename... Rest>
         struct compose_args_helper<F, pack<A<As...>, B<Bs...>, Rest...>>
           : compose_args_helper<F, pack<pack<As..., Bs...>, Rest...>>
         {
         };
 
-        HPX_CXX_EXPORT template <typename F, template <class...> typename A,
-            typename... As, template <class...> typename B, typename... Bs,
+        template <typename F, template <class...> typename A, typename... As,
+            template <class...> typename B, typename... Bs,
             template <class...> typename C, typename... Cs, typename... Rest>
         struct compose_args_helper<F,
             pack<A<As...>, B<Bs...>, C<Cs...>, Rest...>>
@@ -272,8 +269,8 @@ namespace hpx::meta {
         {
         };
 
-        HPX_CXX_EXPORT template <typename F, template <class...> typename A,
-            typename... As, template <class...> typename B, typename... Bs,
+        template <typename F, template <class...> typename A, typename... As,
+            template <class...> typename B, typename... Bs,
             template <class...> typename C, typename... Cs,
             template <class...> typename D, typename... Ds, typename... Rest>
         struct compose_args_helper<F,
@@ -283,7 +280,7 @@ namespace hpx::meta {
         {
         };
 
-        HPX_CXX_EXPORT template <typename F>
+        template <typename F>
         struct compose_args_helper<F, pack<>>
           : compose_args_helper<F, pack<pack<>>>
         {
@@ -299,13 +296,13 @@ namespace hpx::meta {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <template <class...> typename F, typename Pack,
+        template <template <class...> typename F, typename Pack,
             typename Enable = void>
         struct defer_helper
         {
         };
 
-        HPX_CXX_EXPORT template <template <class...> typename F, typename... Ts>
+        template <template <class...> typename F, typename... Ts>
         struct defer_helper<F, pack<Ts...>,
             std::enable_if_t<value<is_valid<F, Ts...>>>>
         {
@@ -409,21 +406,19 @@ namespace hpx::meta {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename F, typename Pack,
-            typename Enable = void>
+        template <typename F, typename Pack, typename Enable = void>
         struct right_fold_helper
         {
         };
 
-        HPX_CXX_EXPORT template <typename F, typename State, typename Head,
-            typename... Tail>
+        template <typename F, typename State, typename Head, typename... Tail>
         struct right_fold_helper<F, pack<State, Head, Tail...>,
             std::enable_if_t<value<is_invocable2<F, State, Head>>>>
           : right_fold_helper<F, pack<invoke2<F, State, Head>, Tail...>>
         {
         };
 
-        HPX_CXX_EXPORT template <typename F, typename State>
+        template <typename F, typename State>
         struct right_fold_helper<F, pack<State>>
         {
             using type = State;

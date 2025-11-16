@@ -30,16 +30,14 @@
 
 namespace hpx::serialization::detail {
 
-    HPX_CXX_EXPORT struct ptr_helper;
+    struct ptr_helper;
 
     // we need top use shared_ptr as util::any requires for the held type
     // to be copy-constructible
-    HPX_CXX_EXPORT using ptr_helper_ptr = std::unique_ptr<ptr_helper>;
+    using ptr_helper_ptr = std::unique_ptr<ptr_helper>;
 
-    HPX_CXX_EXPORT using input_pointer_tracker =
-        std::map<std::uint64_t, ptr_helper_ptr>;
-    HPX_CXX_EXPORT using output_pointer_tracker =
-        std::map<void const*, std::uint64_t>;
+    using input_pointer_tracker = std::map<std::uint64_t, ptr_helper_ptr>;
+    using output_pointer_tracker = std::map<void const*, std::uint64_t>;
 }    // namespace hpx::serialization::detail
 
 namespace hpx::util {
@@ -81,7 +79,7 @@ namespace hpx::serialization {
     ////////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Pointer>
+        template <typename Pointer>
         struct erase_ptr_helper : ptr_helper
         {
             using referred_type = typename Pointer::element_type;
@@ -95,7 +93,7 @@ namespace hpx::serialization {
             Pointer t_;
         };
 
-        HPX_CXX_EXPORT template <typename Pointer>
+        template <typename Pointer>
         class pointer_input_dispatcher
         {
             using referred_type = typename Pointer::element_type;
@@ -172,7 +170,7 @@ namespace hpx::serialization {
                         nonintrusive_polymorphic, usual>>>;
         };
 
-        HPX_CXX_EXPORT template <typename Pointer>
+        template <typename Pointer>
         class pointer_output_dispatcher
         {
             using referred_type = typename Pointer::element_type;
@@ -234,7 +232,7 @@ namespace hpx::serialization {
         };
 
         // forwarded serialize pointer functions
-        HPX_CXX_EXPORT template <typename Pointer>
+        template <typename Pointer>
         HPX_FORCEINLINE void serialize_pointer_tracked(
             output_archive& ar, Pointer const& ptr)
         {
@@ -254,7 +252,7 @@ namespace hpx::serialization {
             }
         }
 
-        HPX_CXX_EXPORT template <typename Pointer>
+        template <typename Pointer>
         HPX_FORCEINLINE void serialize_pointer_tracked(
             input_archive& ar, Pointer& ptr)
         {
@@ -286,7 +284,7 @@ namespace hpx::serialization {
             }
         }
 
-        HPX_CXX_EXPORT template <typename Pointer>
+        template <typename Pointer>
         HPX_FORCEINLINE void serialize_pointer_untracked(
             output_archive& ar, Pointer const& ptr)
         {
@@ -298,7 +296,7 @@ namespace hpx::serialization {
             }
         }
 
-        HPX_CXX_EXPORT template <typename Pointer>
+        template <typename Pointer>
         HPX_FORCEINLINE void serialize_pointer_untracked(
             input_archive& ar, Pointer& ptr)
         {

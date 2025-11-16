@@ -22,7 +22,7 @@
 
 namespace hpx::util::detail {
 
-    HPX_CXX_EXPORT template <bool Copyable, typename R, typename... Ts>
+    template <bool Copyable, typename R, typename... Ts>
     class basic_function<R(Ts...), Copyable, /*Serializable*/ true>
       : public basic_function<R(Ts...), Copyable, /*Serializable*/ false>
     {
