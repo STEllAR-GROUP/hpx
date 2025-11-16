@@ -18,12 +18,12 @@
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/synchronization/stop_token.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <mutex>
 #include <utility>

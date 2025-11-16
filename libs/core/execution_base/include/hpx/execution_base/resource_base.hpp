@@ -8,10 +8,12 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 namespace hpx::execution_base {
 
     /// TODO: implement, this is currently just a dummy
-    struct resource_base
+    HPX_CXX_EXPORT struct resource_base
     {
         virtual ~resource_base() = default;
     };

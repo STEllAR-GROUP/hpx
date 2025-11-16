@@ -8,10 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/dataflow.hpp>
+#include <hpx/modules/async_base.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/modules/execution_base.hpp>
 
 namespace hpx::execution::experimental {
     template <typename F, typename Sender, typename... Senders>
@@ -42,18 +42,15 @@ namespace hpx::execution::experimental {
             HPX_FORWARD(F, f));
     }
 }    // namespace hpx::execution::experimental
+
 #else
-#include <hpx/async_base/launch_policy.hpp>
+
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution/algorithms/transfer.hpp>
 #include <hpx/execution/queries/get_stop_token.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/get_env.hpp>
-#include <hpx/execution_base/operation_state.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>

@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/plugin.hpp>
 #include <hpx/runtime_configuration/runtime_configuration_fwd.hpp>
 
 #include <string>
@@ -19,7 +18,7 @@ namespace hpx::plugins {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a plugin_registry_base has to be used as a base class for all
     /// plugin registries.
-    struct HPX_CORE_EXPORT plugin_registry_base
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT plugin_registry_base
     {
         virtual ~plugin_registry_base() = default;
 
@@ -41,21 +40,3 @@ namespace hpx::plugins {
         }
     };
 }    // namespace hpx::plugins
-
-////////////////////////////////////////////////////////////////////////////////
-/// This macro is used to register the given component factory with Hpx.Plugin.
-/// This macro has to be used for each of the components.
-#define HPX_REGISTER_PLUGIN_BASE_REGISTRY(PluginType, name)                    \
-    HPX_PLUGIN_EXPORT(HPX_PLUGIN_PLUGIN_PREFIX,                                \
-        hpx::plugins::plugin_registry_base, PluginType, name, plugin)          \
-    /**/
-
-/// This macro is used to define the required Hpx.Plugin entry points. This
-/// macro has to be used in exactly one compilation unit of a component module.
-#define HPX_REGISTER_PLUGIN_REGISTRY_MODULE()                                  \
-    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PLUGIN_PREFIX, plugin)                   \
-    /**/
-
-#define HPX_REGISTER_PLUGIN_REGISTRY_MODULE_DYNAMIC()                          \
-    HPX_PLUGIN_EXPORT_LIST_DYNAMIC(HPX_PLUGIN_PLUGIN_PREFIX, plugin)           \
-    /**/

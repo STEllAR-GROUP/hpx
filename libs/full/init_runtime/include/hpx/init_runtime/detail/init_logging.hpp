@@ -11,7 +11,7 @@
 #include <hpx/init_runtime_local/detail/init_logging.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace detail {

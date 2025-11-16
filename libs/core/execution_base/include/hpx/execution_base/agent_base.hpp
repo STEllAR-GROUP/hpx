@@ -9,14 +9,14 @@
 #include <hpx/config.hpp>
 #include <hpx/execution_base/context_base.hpp>
 #include <hpx/modules/coroutines.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstddef>
 #include <string>
 
 namespace hpx::execution_base {
 
-    struct agent_base
+    HPX_CXX_EXPORT struct agent_base
     {
         virtual ~agent_base() = default;
 

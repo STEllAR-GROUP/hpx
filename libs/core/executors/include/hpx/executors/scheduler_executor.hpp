@@ -21,15 +21,13 @@
 #include <hpx/execution/executors/default_parameters.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution_base/execution.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <exception>

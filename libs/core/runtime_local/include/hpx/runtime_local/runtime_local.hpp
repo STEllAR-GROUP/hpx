@@ -11,9 +11,9 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/io_service/io_service_pool_fwd.hpp>
 #include <hpx/modules/program_options.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/topology.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_local/os_thread_type.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>

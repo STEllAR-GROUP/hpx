@@ -9,11 +9,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/futures/detail/execute_thread.hpp>
 #include <hpx/futures/futures_factory.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/memory.hpp>

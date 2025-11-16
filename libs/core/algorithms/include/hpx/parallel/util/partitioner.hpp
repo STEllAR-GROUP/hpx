@@ -15,9 +15,8 @@
 #include <hpx/algorithms/traits/is_pair.hpp>
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>

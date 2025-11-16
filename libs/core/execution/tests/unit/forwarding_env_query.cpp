@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/execution/queries/get_scheduler.hpp>
-#include <hpx/execution_base/get_env.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/testing.hpp>
 

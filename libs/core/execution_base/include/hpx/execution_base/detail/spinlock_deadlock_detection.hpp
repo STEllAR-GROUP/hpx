@@ -14,12 +14,13 @@
 
 namespace hpx::util::detail {
 
-    HPX_CORE_EXPORT void set_spinlock_break_on_deadlock_enabled(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_spinlock_break_on_deadlock_enabled(
         bool enabled) noexcept;
-    HPX_CORE_EXPORT bool get_spinlock_break_on_deadlock_enabled() noexcept;
-    HPX_CORE_EXPORT void set_spinlock_deadlock_detection_limit(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT bool
+    get_spinlock_break_on_deadlock_enabled() noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_spinlock_deadlock_detection_limit(
         std::size_t limit) noexcept;
-    HPX_CORE_EXPORT std::size_t
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t
     get_spinlock_deadlock_detection_limit() noexcept;
 }    // namespace hpx::util::detail
 

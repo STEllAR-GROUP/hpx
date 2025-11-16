@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components/get_ptr.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
 

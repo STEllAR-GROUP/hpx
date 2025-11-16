@@ -9,8 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/service_executors.hpp>
+#include <hpx/modules/execution_base.hpp>
 
 #include <cstdint>
 #include <type_traits>

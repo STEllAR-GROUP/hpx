@@ -10,8 +10,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/executors/parallel_executor.hpp>
+#include <hpx/modules/async_base.hpp>
 
 namespace hpx::parallel::execution {
 

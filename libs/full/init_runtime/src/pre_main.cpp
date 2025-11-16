@@ -20,12 +20,12 @@
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/performance_counters/agas_counter_types.hpp>
 #include <hpx/performance_counters/parcelhandler_counter_types.hpp>
 #include <hpx/performance_counters/threadmanager_counter_types.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
-#include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>

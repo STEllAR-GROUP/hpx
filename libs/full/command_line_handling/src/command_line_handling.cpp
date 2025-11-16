@@ -43,6 +43,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::util {
 
     namespace detail {
@@ -1066,3 +1068,5 @@ namespace hpx::util {
             argc, argv, help, unregistered_options);
     }
 }    // namespace hpx::util
+
+#include <hpx/config/warnings_suffix.hpp>

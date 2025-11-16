@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/naming_base.hpp>
 

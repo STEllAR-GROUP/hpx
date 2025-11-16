@@ -7,10 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/futures/traits/is_future.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 
@@ -96,7 +96,7 @@ namespace hpx::detail {
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
-            if (hpx::detail::has_async_policy(policy))
+            if (hpx::has_async_policy(policy))
             {
                 // if one of the arguments is a future we play it conservatively
                 if constexpr (hpx::traits::is_future_any_v<std::decay_t<Ts>...>)

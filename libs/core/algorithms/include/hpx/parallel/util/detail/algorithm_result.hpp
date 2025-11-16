@@ -20,7 +20,7 @@
 
 #if defined(HPX_HAVE_STDEXEC)
 // for is_sender
-#include <hpx/execution_base/completion_signatures.hpp>
+#include <hpx/modules/execution_base.hpp>
 #endif
 
 #include <type_traits>

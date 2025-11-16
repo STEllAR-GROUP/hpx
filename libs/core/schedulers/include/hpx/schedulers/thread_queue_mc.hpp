@@ -18,7 +18,7 @@
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-#include <hpx/timing/tick_counter.hpp>
+#include <hpx/modules/timing.hpp>
 #endif
 
 #include <atomic>

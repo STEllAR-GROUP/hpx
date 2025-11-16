@@ -14,10 +14,10 @@
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution_base/execution.hpp>
 #include <hpx/executors/current_executor.hpp>
 #include <hpx/io_service/io_service_pool_fwd.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>

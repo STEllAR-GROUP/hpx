@@ -11,7 +11,6 @@
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/detail/async_implementations_fwd.hpp>
 #include <hpx/async_distributed/packaged_action.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
@@ -19,6 +18,7 @@
 #include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
@@ -310,7 +310,7 @@ namespace hpx::detail {
             return async_remote_impl<Action>(
                 launch::sync, id, HPX_MOVE(addr), HPX_FORWARD(Ts, vs)...);
         }
-        if (hpx::detail::has_async_policy(policy))
+        if (hpx::has_async_policy(policy))
         {
             return async_remote_impl<Action>(
                 launch::async, id, HPX_MOVE(addr), HPX_FORWARD(Ts, vs)...);
@@ -402,7 +402,7 @@ namespace hpx::detail {
             return hpx::detail::sync_local_invoke<action_type,
                 result_type>::call(id, HPX_MOVE(addr), HPX_FORWARD(Ts, vs)...);
         }
-        if (hpx::detail::has_async_policy(policy))
+        if (hpx::has_async_policy(policy))
         {
             return keep_alive(
                 hpx::async(policy, action_invoker<action_type>(), addr.address_,
@@ -546,7 +546,7 @@ namespace hpx::detail {
         {
             handle_managed_target<result_type> hmt(id, f);
 
-            if (policy == launch::sync || hpx::detail::has_async_policy(policy))
+            if (policy == launch::sync || hpx::has_async_policy(policy))
             {
                 using allocator_type =
                     hpx::util::thread_local_caching_allocator<
@@ -586,7 +586,7 @@ namespace hpx::detail {
     template <typename Action, typename Callback, typename... Ts>
     hpx::future<
         typename hpx::traits::extract_action_t<Action>::local_result_type>
-    async_cb_impl(hpx::detail::sync_policy policy, hpx::id_type const& id,
+    async_cb_impl(hpx::launch::sync_policy policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;
@@ -650,7 +650,7 @@ namespace hpx::detail {
     template <typename Action, typename Callback, typename... Ts>
     hpx::future<
         typename hpx::traits::extract_action_t<Action>::local_result_type>
-    async_cb_impl(hpx::detail::async_policy async_policy,
+    async_cb_impl(hpx::launch::async_policy async_policy,
         hpx::id_type const& id, Callback&& cb, Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;
@@ -729,7 +729,7 @@ namespace hpx::detail {
     template <typename Action, typename Callback, typename... Ts>
     hpx::future<
         typename hpx::traits::extract_action_t<Action>::local_result_type>
-    async_cb_impl(hpx::detail::deferred_policy policy, hpx::id_type const& id,
+    async_cb_impl(hpx::launch::deferred_policy policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;

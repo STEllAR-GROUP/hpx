@@ -13,9 +13,9 @@
 #include <hpx/execution/executors/default_parameters.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/restricted_thread_pool_executor.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/iterator_support.hpp>
 
 #include <algorithm>

@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/program_options.hpp>
-#include <hpx/runtime_configuration/component_commandline_base.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::components {

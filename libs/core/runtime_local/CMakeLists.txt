@@ -91,12 +91,14 @@ add_hpx_module(
   HEADERS ${runtime_local_headers}
   COMPAT_HEADERS ${runtime_local_compat_headers}
   MODULE_DEPENDENCIES
+    hpx_async_base
     hpx_command_line_handling_local
     hpx_coroutines
     hpx_debugging
     hpx_errors
     hpx_datastructures
     hpx_execution
+    hpx_execution_base
     hpx_format
     hpx_functional
     hpx_futures

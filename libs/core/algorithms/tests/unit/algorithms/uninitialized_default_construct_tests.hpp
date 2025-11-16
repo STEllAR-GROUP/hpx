@@ -8,8 +8,8 @@
 
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
-#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/memory.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>

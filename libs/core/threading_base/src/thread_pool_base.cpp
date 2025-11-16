@@ -6,10 +6,10 @@
 
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/hardware/timestamp.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <cstddef>

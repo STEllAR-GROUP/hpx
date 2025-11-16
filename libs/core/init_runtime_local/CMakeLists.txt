@@ -45,6 +45,7 @@ add_hpx_module(
     hpx_lock_registration
     hpx_logging
     hpx_preprocessor
+    hpx_runtime_configuration
     hpx_schedulers
     hpx_string_util
     hpx_testing

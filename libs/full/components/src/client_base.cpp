@@ -6,9 +6,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/type_support.hpp>
 

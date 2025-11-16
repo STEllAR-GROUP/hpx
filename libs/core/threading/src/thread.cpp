@@ -13,10 +13,10 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threading.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <exception>

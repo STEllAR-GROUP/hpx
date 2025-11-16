@@ -8,10 +8,7 @@
 #include <hpx/execution/queries/get_delegatee_scheduler.hpp>
 #include <hpx/execution/queries/get_scheduler.hpp>
 #include <hpx/execution/queries/get_stop_token.hpp>
-#include <hpx/execution_base/get_env.hpp>
-#include <hpx/execution_base/operation_state.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include "algorithm_test_utils.hpp"

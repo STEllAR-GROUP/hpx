@@ -164,8 +164,8 @@ Custom executors
 While |hpx| provides a variety of built-in executors, you may sometimes need to
 adapt task execution to your own requirements. This is where **custom
 executors** come in. By writing a small wrapper around an existing executor, you
-can extend its behavior—for example, to add logging, profiling information, or
-special scheduling rules—while still taking advantage of the |hpx| executor API.
+can extend its behavior?for example, to add logging, profiling information, or
+special scheduling rules?while still taking advantage of the |hpx| executor API.
 
 Custom annotating executor
 --------------------------
@@ -188,7 +188,7 @@ Full example code
     #include <hpx/include/parallel_executors.hpp>
     #include <hpx/include/async.hpp>
     #include <hpx/execution.hpp>
-    #include <hpx/async_base/post.hpp>
+    #include <hpx/modules/async_base.hpp>
     #include <hpx/threading_base/annotated_function.hpp>
 
     #include <iostream>

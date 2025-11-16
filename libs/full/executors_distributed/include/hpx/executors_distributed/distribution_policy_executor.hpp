@@ -13,8 +13,8 @@
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/execution/execution.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 
 #include <type_traits>

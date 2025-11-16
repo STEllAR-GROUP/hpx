@@ -10,14 +10,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/async.hpp>
 #include <hpx/async_sycl/sycl_future.hpp>
-#include <hpx/execution_base/execution.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/include/post.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 
 #include <cstddef>
 #include <exception>

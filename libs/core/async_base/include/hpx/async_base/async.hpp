@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,7 +18,7 @@
 namespace hpx::detail {
 
     // dispatch point used for async implementations
-    template <typename Func, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Func, typename Enable = void>
     struct async_dispatch;
 }    // namespace hpx::detail
 
@@ -26,7 +26,7 @@ namespace hpx {
 
     /// The function template \a async runs the function \a f asynchronously
     /// (potentially in a separate thread which might be a part of a thread
-    /// pool) and returns an \a hpx::future that will eventually hold the result
+    /// pool) and returns a \a hpx::future that will eventually hold the result
     /// of that function call. If no policy is defined, \a async behaves as if
     /// it is called with policy being
     /// \a hpx::launch::async | hpx::launch::deferred. Otherwise, it calls a
@@ -45,7 +45,7 @@ namespace hpx {
     ///       execution. Instead, lazy evaluation is performed: the first call
     ///       to a non-timed wait function on the hpx::future that async
     ///       returned to the caller will cause the copy of f to be invoked (as
-    ///       an rvalue) with the copies of ts... (also passed as rvalues) in
+    ///       a rvalue) with the copies of ts... (also passed as rvalues) in
     ///       the current thread (which does not have to be the thread that
     ///       originally called hpx::async). The result or exception is placed
     ///       in the shared state associated with the future and only then it is
@@ -77,7 +77,7 @@ namespace hpx {
     /// \returns hpx::future referring to the shared state created by this call
     ///          to \a hpx::async.
     ///
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     HPX_FORCEINLINE decltype(auto) async(F&& f, Ts&&... ts)
     {
         return detail::async_dispatch<std::decay_t<F>>::call(

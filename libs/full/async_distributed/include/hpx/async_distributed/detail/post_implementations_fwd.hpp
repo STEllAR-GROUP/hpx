@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/is_continuation.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/components_base/traits/component_pin_support.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
