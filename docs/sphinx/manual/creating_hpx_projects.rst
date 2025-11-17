@@ -261,10 +261,13 @@ point in your application you must additionally link your application to the
 |cmake| target ``HPX::wrap_main``. This target is automatically linked to
 executables if you are using the macros described below
 (:ref:`using_hpx_cmake_macros`). See :ref:`minimal` for more information on
-implicitly using ``main()`` as the entry point. On Linux and macOS you can 
-configure |hpx| with ``-DHPX_WITH_WRAP_MAIN_AUTO_ACTIVATE=ON``.
-Without the auto-activation option (the default) you must
-still include ``hpx/hpx_main.hpp`` when you want |hpx| to take over ``main()``.
+implicitly using ``main()`` as the entry point. On Linux and macOS, HPX now
+activates the custom startup automatically when linking against
+``HPX::wrap_main`` as long as ``HPX_WITH_DYNAMIC_HPX_MAIN`` is enabled (the
+default when supported). You can disable this behaviour with 
+``-DHPX_WITH_WRAP_MAIN_AUTO_ACTIVATE=OFF``. Including ``hpx/hpx_main.hpp`` is 
+still supported and will continue to work even the automatic activation is
+enabled.
 
 If you want to use the facilities exposed by ``hpx::runtime_manager`` in binaries
 that were not linked as executables (e.g., in shared libraries), you will need
