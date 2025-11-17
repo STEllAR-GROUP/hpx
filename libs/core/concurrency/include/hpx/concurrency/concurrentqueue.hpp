@@ -99,12 +99,12 @@ namespace hpx::concurrency::details {
     };
 }
 #if defined(MCDBGQ_USE_RELACY)
-namespace hpx { namespace concurrency { namespace details {
+namespace hpx::concurrency::details {
     typedef std::uint32_t thread_id_t;
     static const thread_id_t invalid_thread_id  = 0xFFFFFFFFU;
     static const thread_id_t invalid_thread_id2 = 0xFFFFFFFEU;
     static inline thread_id_t thread_id() { return rl::thread_index(); }
-} } }
+}
 #elif defined(_WIN32) || defined(__WINDOWS__) || defined(__WIN32__)
 // No sense pulling in windows.h in a header, we'll manually declare the function
 // we use and rely on backwards-compatibility for this not to break
@@ -280,7 +280,7 @@ namespace details {
 // since the traits are used as a template type parameter, the
 // shadowed declarations will be used where defined, and the defaults
 // otherwise.
-struct ConcurrentQueueDefaultTraits
+HPX_CXX_EXPORT struct ConcurrentQueueDefaultTraits
 {
     // General-purpose size type. std::size_t is strongly recommended.
     typedef std::size_t size_t;
@@ -367,11 +367,11 @@ struct ConcurrentQueueDefaultTraits
 //    4) Failing that, use the single-parameter methods of the queue
 // Having said that, don't create tokens willy-nilly -- ideally there should be
 // a maximum of one token per thread (of each kind).
-struct ProducerToken;
-struct ConsumerToken;
+HPX_CXX_EXPORT struct ProducerToken;
+HPX_CXX_EXPORT struct ConsumerToken;
 
-template<typename T, typename Traits> class ConcurrentQueue;
-template<typename T, typename Traits> class BlockingConcurrentQueue;
+HPX_CXX_EXPORT template<typename T, typename Traits> class ConcurrentQueue;
+HPX_CXX_EXPORT template<typename T, typename Traits> class BlockingConcurrentQueue;
 class ConcurrentQueueTests;
 
 
@@ -584,7 +584,7 @@ namespace details
 }
 
 
-struct ProducerToken
+HPX_CXX_EXPORT struct ProducerToken
 {
     template<typename T, typename Traits>
     explicit ProducerToken(ConcurrentQueue<T, Traits>& queue);
@@ -649,7 +649,7 @@ protected:
 };
 
 
-struct ConsumerToken
+HPX_CXX_EXPORT struct ConsumerToken
 {
     template<typename T, typename Traits>
     explicit ConsumerToken(ConcurrentQueue<T, Traits>& q);
@@ -695,11 +695,11 @@ private: // but shared with ConcurrentQueue
 
 // Need to forward-declare this swap because it's in a namespace.
 // See http://stackoverflow.com/questions/4492062/why-does-a-c-friend-class-need-a-forward-declaration-only-in-other-namespaces
-template<typename T, typename Traits>
+HPX_CXX_EXPORT template<typename T, typename Traits>
 inline void swap(typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& b) MOODYCAMEL_NOEXCEPT;
 
 
-template<typename T, typename Traits = ConcurrentQueueDefaultTraits>
+HPX_CXX_EXPORT template<typename T, typename Traits = ConcurrentQueueDefaultTraits>
 class ConcurrentQueue
 {
 public:
@@ -3638,23 +3638,23 @@ ConsumerToken::ConsumerToken(BlockingConcurrentQueue<T, Traits>& queue)
     lastKnownGlobalOffset = -1;
 }
 
-template<typename T, typename Traits>
+HPX_CXX_EXPORT template<typename T, typename Traits>
 inline void swap(ConcurrentQueue<T, Traits>& a, ConcurrentQueue<T, Traits>& b) MOODYCAMEL_NOEXCEPT
 {
     a.swap(b);
 }
 
-inline void swap(ProducerToken& a, ProducerToken& b) MOODYCAMEL_NOEXCEPT
+HPX_CXX_EXPORT inline void swap(ProducerToken& a, ProducerToken& b) MOODYCAMEL_NOEXCEPT
 {
     a.swap(b);
 }
 
-inline void swap(ConsumerToken& a, ConsumerToken& b) MOODYCAMEL_NOEXCEPT
+HPX_CXX_EXPORT inline void swap(ConsumerToken& a, ConsumerToken& b) MOODYCAMEL_NOEXCEPT
 {
     a.swap(b);
 }
 
-template<typename T, typename Traits>
+HPX_CXX_EXPORT template<typename T, typename Traits>
 inline void swap(typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& b) MOODYCAMEL_NOEXCEPT
 {
     a.swap(b);

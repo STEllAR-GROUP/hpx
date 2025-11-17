@@ -29,15 +29,14 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/prefix.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
-#include <hpx/prefix/find_prefix.hpp>
-#include <hpx/program_options/parsers.hpp>
-#include <hpx/program_options/variables_map.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>

@@ -11,7 +11,7 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>

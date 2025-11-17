@@ -7,7 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/batch_environments/slurm_environment.hpp>
+#include <hpx/batch_environments/detail/slurm_environment.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/string_util.hpp>
 
@@ -171,7 +171,7 @@ namespace {
 
 }    // namespace
 
-namespace hpx::util::batch_environments {
+namespace hpx::util::batch_environments::detail {
 
     slurm_environment::slurm_environment(
         std::vector<std::string>& nodelist, bool debug)
@@ -359,4 +359,4 @@ namespace hpx::util::batch_environments {
             }
         }
     }
-}    // namespace hpx::util::batch_environments
+}    // namespace hpx::util::batch_environments::detail

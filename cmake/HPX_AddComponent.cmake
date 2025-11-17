@@ -314,8 +314,10 @@ function(add_hpx_component name)
   # module interface unit exposed from the HPX libraries
   if(HPX_WITH_CXX_MODULES)
     if((NOT CMAKE_CXX_SCAN_FOR_MODULES) AND (NOT ${name}_SCAN_FOR_MODULES))
+      hpx_debug("add_component.${name} SCAN_FOR_MODULES: OFF")
       set(${name}_SCAN_FOR_MODULES OFF)
     else()
+      hpx_debug("add_component.${name} SCAN_FOR_MODULES: ON")
       set(${name}_SCAN_FOR_MODULES ON)
     endif()
   endif()
@@ -328,8 +330,8 @@ function(add_hpx_component name)
     COMPILE_FLAGS ${${name}_COMPILE_FLAGS}
     LINK_FLAGS ${${name}_LINK_FLAGS}
     DEPENDENCIES ${${name}_DEPENDENCIES}
-    COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES} ${_target_flags}
-    SCAN_FOR_MODULES ${${name}_SCAN_FOR_MODULES}
+    COMPONENT_DEPENDENCIES ${${name}_COMPONENT_DEPENDENCIES}
+    SCAN_FOR_MODULES ${${name}_SCAN_FOR_MODULES} ${_target_flags}
   )
 
 endfunction()

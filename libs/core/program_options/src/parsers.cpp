@@ -43,13 +43,13 @@ namespace hpx::program_options {
 
             std::transform(opt.value.begin(), opt.value.end(),
                 back_inserter(result.value), [](auto&& arg) {
-                    return from_utf8(std::forward<decltype(arg)>(arg));
+                    return detail::from_utf8(std::forward<decltype(arg)>(arg));
                 });
 
             std::transform(opt.original_tokens.begin(),
                 opt.original_tokens.end(),
                 back_inserter(result.original_tokens), [](auto&& arg) {
-                    return from_utf8(std::forward<decltype(arg)>(arg));
+                    return detail::from_utf8(std::forward<decltype(arg)>(arg));
                 });
             return result;
         }

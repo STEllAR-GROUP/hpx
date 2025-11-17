@@ -29,9 +29,9 @@ namespace hpx {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/stack.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 
 #include <type_traits>

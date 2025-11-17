@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/prefix/find_prefix.hpp>
+#include <hpx/modules/prefix.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
 
 #include <cstddef>

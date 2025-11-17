@@ -30,7 +30,7 @@ namespace hpx::program_options {
         options should be given the name X1, following M options should be given
         the name X2 and so on.
     */
-    class HPX_CORE_EXPORT positional_options_description
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT positional_options_description
     {
     public:
         positional_options_description() = default;

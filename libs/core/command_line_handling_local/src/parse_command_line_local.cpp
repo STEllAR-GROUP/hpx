@@ -385,7 +385,8 @@ namespace hpx::local::detail {
             if (unregistered_options)
             {
                 using hpx::program_options::collect_unrecognized;
-                using hpx::program_options::exclude_positional;
+                using hpx::program_options::collect_unrecognized_mode::
+                    exclude_positional;
                 *unregistered_options =
                     collect_unrecognized(opts.options, exclude_positional);
 
@@ -414,7 +415,8 @@ namespace hpx::local::detail {
             if (unregistered_options)
             {
                 using hpx::program_options::collect_unrecognized;
-                using hpx::program_options::include_positional;
+                using hpx::program_options::collect_unrecognized_mode::
+                    include_positional;
                 *unregistered_options =
                     collect_unrecognized(opts.options, include_positional);
 

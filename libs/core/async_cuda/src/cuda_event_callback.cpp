@@ -16,7 +16,7 @@
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 #include <hpx/async_cuda/detail/cuda_debug.hpp>
 #include <hpx/async_cuda/detail/cuda_event_callback.hpp>
-#include <hpx/concurrency/concurrentqueue.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>

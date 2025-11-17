@@ -331,16 +331,7 @@ if(HPX_WITH_CXX_MODULES)
   )
   hpx_add_config_define(HPX_HAVE_CXX_MODULES)
 
-  hpx_option(
-    HPX_WITH_BUILD_USING_CXX_MODULES
-    BOOL
-    "Enable building HPX itself using C++20 modules (experimental, default: OFF)."
-    OFF
-    ADVANCED
-  )
-  if(HPX_WITH_BUILD_USING_CXX_MODULES)
-    hpx_add_config_define(HPX_HAVE_BUILD_USING_CXX_MODULES)
-  endif()
+  set(HPX_WITH_CXX_MODULES_OPTION SCAN_FOR_MODULES ON)
 else()
   hpx_info("HPX will be built and used with traditional headers only.")
 endif()

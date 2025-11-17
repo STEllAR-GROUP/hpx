@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/batch_environments/pjm_environment.hpp>
+#include <hpx/batch_environments/detail/pjm_environment.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/string_util.hpp>
 
@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-namespace hpx::util::batch_environments {
+namespace hpx::util::batch_environments::detail {
 
     // PJM_MPI_PROC: number of overall localities
     // PJM_NODE: number of physical nodes
@@ -76,4 +76,4 @@ namespace hpx::util::batch_environments {
             }
         }
     }
-}    // namespace hpx::util::batch_environments
+}    // namespace hpx::util::batch_environments::detail

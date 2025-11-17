@@ -11,7 +11,7 @@
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/concurrency/spinlock.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>

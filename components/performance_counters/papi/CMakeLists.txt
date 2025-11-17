@@ -24,10 +24,11 @@ if(HPX_WITH_PAPI)
     INSTALL_COMPONENT runtime
     HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
     HEADERS ${papi_counters_headers}
-    PREPEND_SOURCE_ROOT
+    PREPEND_SOURCE_ROOT ${HPX_WITH_UNITY_BUILD_OPTION}
+    ${HPX_WITH_CXX_MODULES_OPTION}
     SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
     SOURCES ${papi_counters_sources}
-    DEPENDENCIES Papi::papi ${HPX_WITH_UNITY_BUILD_OPTION}
+    DEPENDENCIES Papi::papi
   )
 
   add_hpx_pseudo_dependencies(

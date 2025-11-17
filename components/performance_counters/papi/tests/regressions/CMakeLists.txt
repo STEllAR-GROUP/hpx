@@ -23,7 +23,7 @@ foreach(test ${tests})
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources}
     COMPONENT_DEPENDENCIES papi_counters ${${test}_FLAGS}
-    EXCLUDE_FROM_ALL
+    EXCLUDE_FROM_ALL ${HPX_WITH_CXX_MODULES_OPTION}
     HPX_PREFIX ${HPX_BUILD_PREFIX}
     FOLDER "Tests/Regressions/Components/Counters/Papi"
   )

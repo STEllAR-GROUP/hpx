@@ -18,10 +18,13 @@
 namespace hpx::util {
 
     // Lockable spinlock class
-    struct spinlock
+    HPX_CXX_EXPORT struct spinlock
     {
     public:
-        HPX_NON_COPYABLE(spinlock);
+        spinlock(spinlock const&) = delete;
+        spinlock(spinlock&&) = delete;
+        spinlock& operator=(spinlock const&) = delete;
+        spinlock& operator=(spinlock&&) = delete;
 
     private:
         hpx::util::detail::spinlock m;
