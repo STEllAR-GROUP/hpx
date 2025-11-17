@@ -842,9 +842,9 @@ shortcuts. For more information about commandline options, see the section
 
   The short options listed above are disabled by default if the application
   is built using ``#include <hpx/hpx_main.hpp>``. **or** (on Linux and macOS)
-  if |hpx| was configured with ``-DHPX_WITH_WRAP_MAIN_AUTO_ACTIVATE=ON`` and 
-  ``-DHPX_WITH_DYNAMIC_HPX_MAIN=ON`` and the executable links against
-  ``HPX::wrap_main``. See :ref:`minimal` for more  information.
+  if |hpx| was configured with ``-DHPX_WITH_WRAP_MAIN_AUTO_ACTIVATE=ON`` (by
+  default) and ``-DHPX_WITH_DYNAMIC_HPX_MAIN=ON`` and the executable links 
+  against ``HPX::wrap_main``. See :ref:`minimal` for more  information.
   The rationale behind this is that in this case the user's application may
   handle its own command line options, since |hpx| passes all unknown options
   to ``main()``. Short options like ``-t`` are prone to create ambiguities regarding

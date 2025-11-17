@@ -57,14 +57,13 @@ explicitly if you are using targets directly (:ref:`using_hpx_cmake_targets`).
 All |hpx| API functions can be used from within the ``main()`` function now.
 
 .. note::
-   on Linux and macOS you can enable automatic activation of the runtime
-   override by configuring |hpx| with
-   ``-DHPX_WITH_WRAP_MAIN_AUTO_ACTIVATE=ON``. When this CMake option is set and
-   |hpx| is built with ``-DHPX_WITH_DYNAMIC_HPX_MAIN=ON`` (the default on those
-   platforms), linking an executable against ``HPX::wrap_main`` is sufficient
-   even if you do not include ``hpx/hpx_main.hpp``. The include remains required
-   when the option is disabled and on other platforms, and it is still useful
-   for macro redefinition provided there.
+   On Linux and macOS the runtime override is activated automatically when
+   linking an executable against ``HPX::wrap_main`` as long as |hpx| is built
+   with ``-DHPX_WITH_WRAP_MAIN_AUTO_ACTIVATE=ON`` (enabled by default) and
+   ``-DHPX_WITH_DYNAMIC_HPX_MAIN=ON``. You can disable the automatic behaviour
+   by configuring with ``-DHPX_WITH_WRAP_MAIN_AUTO_ACTIVATE=OFF``. Including
+   ``hpx/hpx_main.hpp`` remains supported on all platforms and continues to work
+   even when the automatic activation is enabled.
 
 .. note::
 
@@ -116,12 +115,13 @@ to the operating system as usual.
 
 .. caution::
 
-   If you enable ``-DHPX_WITH_WRAP_MAIN_AUTO_ACTIVATE`` (with
-   ``-DHPX_WITH_DYNAMIC_HPX_MAIN`` also enabled) the wrappped ``main`` entry point
-   becomes active as soon as you link against ``HPX::wrap_main``. Even in that
-   case ``hpx/hpx_main.hpp`` should *only* be included in the executable that 
-   provideds ``main``. Including it in components will still lead to multiple
-   definitions of the override variable ``include_libhpx_wrap``.
+   With ``HPX_WITH_WRAP_MAIN_AUTO_ACTIVATE`` enabled (the default when
+   supported) and ``HPX_WITH_DYNAMIC_HPX_MAIN`` also enabled, the wrapped
+   ``main`` entry point becomes active as soon as you link against
+   ``HPX::wrap_main``. Even in that case ``hpx/hpx_main.hpp`` should *only* be
+   included in the executable that provides ``main``. Including it in components
+   will still lead to multiple definitions of the override variable
+   ``include_libhpx_wrap``.
 
 .. _medium:
 

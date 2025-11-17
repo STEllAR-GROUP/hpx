@@ -716,7 +716,7 @@ hpx_option(
   HPX_WITH_WRAP_MAIN_AUTO_ACTIVATE
   BOOL
   "Automatically activate HPX::wrap_main without including hpx/hpx_main.hpp (default OFF)"
-  OFF
+  ON
   ADVANCED
 )
 if(HPX_WITH_WRAP_MAIN_AUTO_ACTIVATE)

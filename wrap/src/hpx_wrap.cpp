@@ -44,7 +44,7 @@ namespace {
 
     }
 #else
-    void ensure_wrap_main_activation(char** argv)
+    void ensure_wrap_main_activation(char**)
     {
     }
 
