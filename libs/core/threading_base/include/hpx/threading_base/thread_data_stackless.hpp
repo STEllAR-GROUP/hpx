@@ -10,9 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/coroutines/stackless_coroutine.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/threading_base/thread_data.hpp>

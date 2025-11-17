@@ -10,8 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/ini/ini.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/ini.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
@@ -24,6 +24,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::resource::detail {
 
@@ -273,3 +275,5 @@ namespace hpx::resource::detail {
         bool is_initialized_ = false;
     };
 }    // namespace hpx::resource::detail
+
+#include <hpx/config/warnings_suffix.hpp>

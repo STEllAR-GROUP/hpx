@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/ini/ini.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/ini.hpp>
 #include <hpx/resource_partitioner/detail/create_partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>

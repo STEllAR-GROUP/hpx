@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/modules/coroutines.hpp>
 
 namespace hpx::traits {
 

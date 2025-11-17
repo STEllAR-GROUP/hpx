@@ -6,10 +6,10 @@
 
 #include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/command_line_handling_local/parse_command_line_local.hpp>
-#include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/ini.hpp>
 
 #include <cctype>
 #include <cstddef>

@@ -14,7 +14,6 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/components_base/server/component_base.hpp>
-#include <hpx/coroutines/coroutine.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>

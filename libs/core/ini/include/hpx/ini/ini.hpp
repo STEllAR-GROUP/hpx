@@ -14,9 +14,9 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/serialization.hpp>
 
+#include <iosfwd>
 #include <map>
 #include <mutex>
-#include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -35,7 +35,7 @@
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_CORE_EXPORT section
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT section
     {
     public:
         using entry_changed_func =
@@ -64,10 +64,10 @@ namespace hpx::util {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void save(Archive& ar, unsigned int const version) const;
+        void save(Archive& ar, unsigned int version) const;
 
         template <typename Archive>
-        void load(Archive& ar, unsigned int const version);
+        void load(Archive& ar, unsigned int version);
 
         HPX_SERIALIZATION_SPLIT_MEMBER()
 

@@ -15,7 +15,7 @@
 #include <hpx/threading_base/thread_pool_base.hpp>
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
-#include <hpx/coroutines/detail/tss.hpp>
+#include <hpx/modules/coroutines.hpp>
 #endif
 
 #include <algorithm>

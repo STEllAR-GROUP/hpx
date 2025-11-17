@@ -11,7 +11,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/future_then_result_exec.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
@@ -21,6 +20,7 @@
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/memory.hpp>

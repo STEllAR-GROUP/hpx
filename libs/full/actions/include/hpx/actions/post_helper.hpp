@@ -15,7 +15,7 @@
 #include <hpx/actions_base/traits/action_schedule_thread.hpp>
 #include <hpx/actions_base/traits/action_select_direct_execution.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/runtime_local/state.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
