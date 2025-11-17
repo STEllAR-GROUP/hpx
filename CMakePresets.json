@@ -1,0 +1,164 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 19,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/cmake-build-${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "HPX_WITH_MALLOC": "tcmalloc",
+        "HPX_WITH_NETWORKING": "ON",
+        "HPX_WITH_PARCELPORT_MPI": "AUTO",
+        "HPX_WITH_PARCELPORT_TCP": "ON",
+        "HPX_WITH_TESTS": "ON",
+        "HPX_WITH_EXAMPLES": "ON",
+        "HPX_WITH_COMPILER_WARNINGS": "ON",
+        "HPX_WITH_COMPILER_WARNINGS_AS_ERRORS": "OFF"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Release build with optimizations",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS": "-O3 -DNDEBUG"
+      }
+    },
+    {
+      "name": "debug",
+      "displayName": "Debug build with debug symbols",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HPX_WITH_DEBUGGING": "ON",
+        "HPX_WITH_LOGGING": "ON",
+        "HPX_WITH_STACKOVERFLOW_DETECTION": "ON",
+        "HPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION": "ON"
+      }
+    },
+    {
+      "name": "relwithdebinfo",
+      "displayName": "Release with debug info",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "minimal",
+      "displayName": "Minimal build with essential features",
+      "inherits": "base",
+      "cacheVariables": {
+        "HPX_WITH_EXAMPLES": "OFF",
+        "HPX_WITH_TESTS": "OFF",
+        "HPX_WITH_DOCUMENTATION": "OFF",
+        "HPX_WITH_TOOLS": "OFF",
+        "HPX_WITH_PARCELPORT_MPI": "OFF",
+        "HPX_WITH_PARCELPORT_TCP": "ON"
+      }
+    },
+    {
+      "name": "full",
+      "displayName": "Full build with all features",
+      "inherits": "base",
+      "cacheVariables": {
+        "HPX_WITH_EXAMPLES": "ON",
+        "HPX_WITH_TESTS": "ON",
+        "HPX_WITH_DOCUMENTATION": "ON",
+        "HPX_WITH_TOOLS": "ON",
+        "HPX_WITH_COMPONENT_GET_FUTURE_FROM_RECEIVE": "ON",
+        "HPX_WITH_ASYNC_MPI": "ON",
+        "HPX_WITH_PARCELPORT_MPI": "AUTO",
+        "HPX_WITH_PARCELPORT_TCP": "ON",
+        "HPX_WITH_PARCELPORT_LCI": "AUTO",
+        "HPX_WITH_APEX": "AUTO"
+      }
+    },
+    {
+      "name": "mpi",
+      "displayName": "MPI-enabled build",
+      "inherits": "release",
+      "cacheVariables": {
+        "HPX_WITH_PARCELPORT_MPI": "ON",
+        "MPI_CXX_COMPILER": "mpicxx"
+      }
+    },
+    {
+      "name": "asan",
+      "displayName": "Address Sanitizer build",
+      "inherits": "debug",
+      "cacheVariables": {
+        "HPX_WITH_SANITIZERS": "address",
+        "HPX_WITH_COMPILER_SANITIZERS": "address"
+      }
+    },
+    {
+      "name": "tsan",
+      "displayName": "Thread Sanitizer build",
+      "inherits": "debug",
+      "cacheVariables": {
+        "HPX_WITH_SANITIZERS": "thread",
+        "HPX_WITH_COMPILER_SANITIZERS": "thread"
+      }
+    },
+    {
+      "name": "ubsan",
+      "displayName": "Undefined Behavior Sanitizer build",
+      "inherits": "debug",
+      "cacheVariables": {
+        "HPX_WITH_SANITIZERS": "undefined",
+        "HPX_WITH_COMPILER_SANITIZERS": "undefined"
+      }
+    },
+    {
+      "name": "coverage",
+      "displayName": "Code coverage build",
+      "inherits": "debug",
+      "cacheVariables": {
+        "HPX_WITH_CXX_STANDARD": "17",
+        "HPX_WITH_COMPILER_COVERAGE": "ON",
+        "HPX_WITH_TESTS": "ON",
+        "HPX_WITH_EXAMPLES": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "release",
+      "configuration": "Release"
+    },
+    {
+      "name": "debug",
+      "configurePreset": "debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "relwithdebinfo",
+      "configurePreset": "relwithdebinfo",
+      "configuration": "RelWithDebInfo"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "debug",
+      "configuration": "Debug",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "release",
+      "configurePreset": "release",
+      "configuration": "Release",
+      "output": {"outputOnFailure": true}
+    }
+  ]
+}
