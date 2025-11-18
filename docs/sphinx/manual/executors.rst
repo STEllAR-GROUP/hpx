@@ -189,7 +189,7 @@ Full example code
     #include <hpx/include/async.hpp>
     #include <hpx/execution.hpp>
     #include <hpx/modules/async_base.hpp>
-    #include <hpx/threading_base/annotated_function.hpp>
+    #include <hpx/modules/threading_base.hpp>
 
     #include <iostream>
     #include <string>
@@ -379,7 +379,7 @@ Full example code
     #include <hpx/hpx_main.hpp>
     #include <hpx/include/parallel_algorithm.hpp>
     #include <hpx/include/parallel_executors.hpp>
-    #include <hpx/threading_base/annotated_function.hpp>
+    #include <hpx/modules/threading_base.hpp>
 
     #include <iostream>
     #include <utility>

@@ -24,13 +24,12 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/hardware.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/synchronization/latch.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading/thread.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/threading_base/set_thread_state.hpp>
 
 #include <atomic>
 #include <chrono>

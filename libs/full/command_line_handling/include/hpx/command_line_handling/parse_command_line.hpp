@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/command_line_handling_local/parse_command_line_local.hpp>
+#include <hpx/modules/command_line_handling_local.hpp>
 #include <hpx/modules/ini.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 

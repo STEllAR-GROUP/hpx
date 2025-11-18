@@ -8,10 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/schedulers/queue_holder_thread.hpp>
 #include <hpx/schedulers/thread_queue_mc.hpp>
-#include <hpx/threading_base/print.hpp>
-#include <hpx/threading_base/thread_data.hpp>
 
 #include <cstddef>
 #include <cstdint>

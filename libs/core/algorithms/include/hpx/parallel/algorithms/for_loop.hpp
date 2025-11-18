@@ -753,7 +753,6 @@ namespace hpx { namespace experimental {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
 
 #include <cstddef>
 #include <cstdint>

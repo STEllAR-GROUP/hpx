@@ -15,16 +15,12 @@
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/queue_holder_numa.hpp>
 #include <hpx/schedulers/queue_holder_thread.hpp>
 #include <hpx/schedulers/thread_queue_mc.hpp>
-#include <hpx/threading_base/print.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <array>
 #include <atomic>

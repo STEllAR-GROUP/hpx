@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/topology/topology.hpp>
+#include <hpx/modules/topology.hpp>
 
 #include <cstddef>
 

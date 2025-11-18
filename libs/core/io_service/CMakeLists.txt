@@ -28,6 +28,7 @@ add_hpx_module(
   COMPAT_HEADERS ${io_service_compat_headers}
   DEPENDENCIES Asio::asio
   MODULE_DEPENDENCIES
+    hpx_affinity
     hpx_assertion
     hpx_concurrency
     hpx_config

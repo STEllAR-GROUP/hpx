@@ -12,9 +12,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/schedulers/deadlock_detection.hpp>
-#include <hpx/threading_base/thread_data.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -6,9 +6,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/runtime_local/thread_stacktrace.hpp>
-#include <hpx/threading_base/thread_data.hpp>
 
 #include <cstdint>
 #include <sstream>

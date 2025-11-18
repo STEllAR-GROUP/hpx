@@ -26,6 +26,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core affinity
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${affinity_sources}
   HEADERS ${affinity_headers}
   COMPAT_HEADERS ${affinity_compat_headers}

@@ -18,9 +18,7 @@
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/threading_base/scoped_annotation.hpp>
-#include <hpx/threading_base/thread_description.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <exception>
 #include <functional>

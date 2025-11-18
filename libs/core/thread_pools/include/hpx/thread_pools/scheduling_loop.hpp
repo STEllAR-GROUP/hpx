@@ -11,21 +11,15 @@
 #include <hpx/hardware/timestamp.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/thread_pools/detail/background_thread.hpp>
 #include <hpx/thread_pools/detail/scheduling_callbacks.hpp>
 #include <hpx/thread_pools/detail/scheduling_counters.hpp>
 #include <hpx/thread_pools/detail/scheduling_log.hpp>
-#include <hpx/threading_base/detail/switch_status.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/scheduler_state.hpp>
-#include <hpx/threading_base/thread_data.hpp>
 
 #if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
     !defined(HPX_HAVE_APEX)
 #include <hpx/modules/itt_notify.hpp>
-#endif
-#if defined(HPX_HAVE_APEX)
-#include <hpx/threading_base/external_timer.hpp>
 #endif
 
 #include <atomic>

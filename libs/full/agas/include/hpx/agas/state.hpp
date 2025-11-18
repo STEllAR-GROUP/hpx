@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/threading_base/scheduler_state.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 namespace hpx { namespace agas {
 

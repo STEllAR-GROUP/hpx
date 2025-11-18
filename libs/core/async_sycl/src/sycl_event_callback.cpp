@@ -17,10 +17,9 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <algorithm>
 #include <atomic>

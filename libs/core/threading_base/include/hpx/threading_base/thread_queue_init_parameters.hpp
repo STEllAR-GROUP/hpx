@@ -16,7 +16,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
 
-    struct thread_queue_init_parameters
+    HPX_CXX_EXPORT struct thread_queue_init_parameters
     {
         explicit thread_queue_init_parameters(
             std::int64_t max_thread_count = static_cast<std::int64_t>(

@@ -13,8 +13,7 @@
 namespace hpx::threads::policies {
 
     /// This enumeration describes the possible modes of a scheduler.
-    enum class scheduler_mode : std::uint32_t
-    {
+    HPX_CXX_EXPORT enum class scheduler_mode : std::uint32_t {
         /// As the name suggests, this option can be used to disable all other
         /// options.
         nothing_special = 0x0000,
@@ -53,7 +52,7 @@ namespace hpx::threads::policies {
         /// between numa domains
         enable_stealing_numa = 0x0040,
 
-        /// This option tells schedulers that support it to add tasks round robin
+        /// This option tells schedulers that support it to add tasks round-robin
         /// to queues on each core
         assign_work_round_robin = 0x0080,
 
@@ -110,47 +109,48 @@ namespace hpx::threads::policies {
         // clang-format on
     };
 
-    constexpr scheduler_mode operator|(
+    HPX_CXX_EXPORT constexpr scheduler_mode operator|(
         scheduler_mode lhs, scheduler_mode rhs) noexcept
     {
         return static_cast<scheduler_mode>(
             static_cast<std::uint32_t>(lhs) | static_cast<std::uint32_t>(rhs));
     }
 
-    constexpr scheduler_mode operator|(
+    HPX_CXX_EXPORT constexpr scheduler_mode operator|(
         std::uint32_t lhs, scheduler_mode rhs) noexcept
     {
         return static_cast<scheduler_mode>(
             lhs | static_cast<std::uint32_t>(rhs));
     }
 
-    constexpr scheduler_mode operator|(
+    HPX_CXX_EXPORT constexpr scheduler_mode operator|(
         scheduler_mode lhs, std::uint32_t rhs) noexcept
     {
         return static_cast<scheduler_mode>(
             static_cast<std::uint32_t>(lhs) | rhs);
     }
 
-    constexpr std::uint32_t operator&(
+    HPX_CXX_EXPORT constexpr std::uint32_t operator&(
         scheduler_mode lhs, scheduler_mode rhs) noexcept
     {
         return static_cast<std::uint32_t>(lhs) &
             static_cast<std::uint32_t>(rhs);
     }
 
-    constexpr std::uint32_t operator&(
+    HPX_CXX_EXPORT constexpr std::uint32_t operator&(
         std::uint32_t lhs, scheduler_mode rhs) noexcept
     {
         return lhs & static_cast<std::uint32_t>(rhs);
     }
 
-    constexpr std::uint32_t operator&(
+    HPX_CXX_EXPORT constexpr std::uint32_t operator&(
         scheduler_mode lhs, std::uint32_t rhs) noexcept
     {
         return static_cast<std::uint32_t>(lhs) & rhs;
     }
 
-    constexpr std::uint32_t operator~(scheduler_mode mode) noexcept
+    HPX_CXX_EXPORT constexpr std::uint32_t operator~(
+        scheduler_mode mode) noexcept
     {
         return ~static_cast<std::uint32_t>(mode);
     }

@@ -9,8 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/topology/cpu_mask.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/topology.hpp>
 
 #include <cstddef>
 #include <cstdint>
