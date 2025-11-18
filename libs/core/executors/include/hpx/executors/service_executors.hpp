@@ -20,8 +20,8 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 
 #include <algorithm>
 #include <exception>

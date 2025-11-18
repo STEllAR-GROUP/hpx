@@ -50,12 +50,12 @@ namespace hpx::threads::policies {
             /// poll for
             busy = 1
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     /// The scheduler_base defines the interface to be implemented by all
     /// scheduler policies
-    struct scheduler_base
+    HPX_CXX_EXPORT struct scheduler_base
     {
         scheduler_base(scheduler_base const&) = delete;
         scheduler_base(scheduler_base&&) = delete;
@@ -346,7 +346,7 @@ namespace hpx::threads::policies {
 #endif
     };
 
-    HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, scheduler_base const& scheduler);
 }    // namespace hpx::threads::policies
 

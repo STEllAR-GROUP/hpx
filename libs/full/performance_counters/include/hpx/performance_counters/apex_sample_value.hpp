@@ -10,8 +10,8 @@
 
 #ifdef HPX_HAVE_APEX
 
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/threading_base/external_timer.hpp>
 
 #include <cstdint>
 #include <string>

@@ -65,7 +65,8 @@ namespace hpx::threads {
     /// Generally, \a threads are not created or executed directly. All
     /// functionality related to the management of \a threads is implemented by
     /// the thread-manager.
-    class thread_data : public detail::thread_data_reference_counting
+    HPX_CXX_EXPORT class thread_data
+      : public detail::thread_data_reference_counting
     {
     public:
         thread_data(thread_data const&) = delete;

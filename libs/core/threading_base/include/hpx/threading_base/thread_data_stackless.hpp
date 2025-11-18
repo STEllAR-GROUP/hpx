@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -42,7 +42,8 @@ namespace hpx::threads {
     /// Generally, \a threads are not created or executed directly. All
     /// functionality related to the management of \a threads is implemented by
     /// the thread-manager.
-    class HPX_CORE_EXPORT thread_data_stackless : public thread_data
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT thread_data_stackless
+      : public thread_data
     {
     private:
         // Avoid warning about using 'this' in initializer list

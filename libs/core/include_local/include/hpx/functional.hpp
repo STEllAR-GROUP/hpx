@@ -8,8 +8,7 @@
 #pragma once
 
 #include <hpx/modules/functional.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/threading_base/scoped_annotation.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 namespace hpx {
 

@@ -14,6 +14,7 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/performance_counters/apex_sample_value.hpp>
@@ -23,8 +24,6 @@
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/runtime_local/get_thread_name.hpp>
-#include <hpx/threading_base/external_timer.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -335,7 +334,7 @@ namespace hpx::util {
                 bool first = true;
                 for (std::size_t i = 0; i != infos.size(); ++i)
                 {
-                    using namespace performance_counters;
+                    using performance_counters::counter_type;
                     if (infos[i].type_ != counter_type::raw &&
                         infos[i].type_ !=
                             counter_type::monotonically_increasing &&
@@ -377,7 +376,7 @@ namespace hpx::util {
                 bool first = true;
                 for (std::size_t i = 0; i != counter_shortnames_.size(); ++i)
                 {
-                    using namespace performance_counters;
+                    using performance_counters::counter_type;
                     if (infos[i].type_ != counter_type::raw &&
                         infos[i].type_ !=
                             counter_type::monotonically_increasing &&

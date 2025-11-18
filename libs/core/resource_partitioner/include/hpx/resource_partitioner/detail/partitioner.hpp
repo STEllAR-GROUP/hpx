@@ -8,15 +8,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/affinity.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/ini.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
-#include <hpx/topology/cpu_mask.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <atomic>
 #include <cstddef>

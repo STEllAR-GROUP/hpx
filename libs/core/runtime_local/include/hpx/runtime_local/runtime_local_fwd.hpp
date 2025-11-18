@@ -16,6 +16,8 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/detail/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
@@ -29,9 +31,7 @@
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threadmanager/threadmanager_fwd.hpp>
-#include <hpx/topology/cpu_mask.hpp>
 
 #include <cstddef>
 #include <cstdint>

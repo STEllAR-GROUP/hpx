@@ -16,11 +16,11 @@
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/modules/util.hpp>
 #include <hpx/runtime_local/interval_timer.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/unwrap.hpp>
 
 #include <hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp>

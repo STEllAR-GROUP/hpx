@@ -12,7 +12,7 @@
 #include <hpx/compute_local/host/get_targets.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/serialization.hpp>
-#include <hpx/topology/topology.hpp>
+#include <hpx/modules/topology.hpp>
 
 #include <cstddef>
 #include <utility>

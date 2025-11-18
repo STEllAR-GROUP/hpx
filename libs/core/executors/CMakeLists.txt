@@ -120,6 +120,7 @@ add_hpx_module(
     hpx_tag_invoke
     hpx_timing
     hpx_threading
+    hpx_threading_base
     hpx_topology
     hpx_type_support
   CMAKE_SUBDIRS examples tests
