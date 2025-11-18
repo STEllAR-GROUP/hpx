@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/io_service/io_service_thread_pool.hpp>
+#include <hpx/modules/affinity.hpp>
 #include <hpx/modules/concurrency.hpp>
 
 #include <cstddef>

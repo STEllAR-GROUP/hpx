@@ -18,9 +18,8 @@
 #include <hpx/async_cuda/detail/cuda_event_callback.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <algorithm>
 #include <atomic>

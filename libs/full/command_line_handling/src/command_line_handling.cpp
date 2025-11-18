@@ -1068,5 +1068,3 @@ namespace hpx::util {
             argc, argv, help, unregistered_options);
     }
 }    // namespace hpx::util
-
-#include <hpx/config/warnings_suffix.hpp>

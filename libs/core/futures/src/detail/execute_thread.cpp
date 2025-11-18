@@ -13,11 +13,7 @@
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/threading_base/detail/switch_status.hpp>
-#include <hpx/threading_base/register_thread.hpp>
-#include <hpx/threading_base/set_thread_state.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <cstddef>
 #include <cstdint>

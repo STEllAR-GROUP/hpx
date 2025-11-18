@@ -13,10 +13,10 @@
 #include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/runtime_local/get_worker_thread_num.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <limits>

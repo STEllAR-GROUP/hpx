@@ -180,6 +180,7 @@ add_hpx_module(
     hpx_synchronization
     hpx_tag_invoke
     hpx_threading
+    hpx_threading_base
     hpx_thread_support
     hpx_timing
     hpx_topology

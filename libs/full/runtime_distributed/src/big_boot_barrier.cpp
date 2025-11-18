@@ -27,13 +27,13 @@
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/static_reinit.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/parcelset/detail/parcel_await.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
 #include <hpx/parcelset_base/parcelport.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/big_boot_barrier.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -19,9 +19,8 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
 
 #include <cstddef>
 #include <exception>

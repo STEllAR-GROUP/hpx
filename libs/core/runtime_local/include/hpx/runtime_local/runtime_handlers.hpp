@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <cstddef>
 #include <string>

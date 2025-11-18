@@ -14,7 +14,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>
-#include <hpx/threading_base/threading_base_fwd.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <atomic>
 #include <cstddef>

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2012-2013 Thomas Heller
 //
@@ -30,7 +30,7 @@
 
 namespace hpx::threads {
 
-    struct hpx_hwloc_bitmap_wrapper
+    HPX_CXX_EXPORT struct hpx_hwloc_bitmap_wrapper
     {
         HPX_NON_COPYABLE(hpx_hwloc_bitmap_wrapper);
 
@@ -77,12 +77,12 @@ namespace hpx::threads {
         hwloc_bitmap_t bmp_;
     };
 
-    using hwloc_bitmap_ptr = std::shared_ptr<hpx_hwloc_bitmap_wrapper>;
+    HPX_CXX_EXPORT using hwloc_bitmap_ptr =
+        std::shared_ptr<hpx_hwloc_bitmap_wrapper>;
 
     /// \brief Please see hwloc documentation for the corresponding
     /// enums HWLOC_MEMBIND_XXX
-    enum hpx_hwloc_membind_policy : int
-    {
+    HPX_CXX_EXPORT enum hpx_hwloc_membind_policy : int {
         membind_default = HWLOC_MEMBIND_DEFAULT,
         membind_firsttouch = HWLOC_MEMBIND_FIRSTTOUCH,
         membind_bind = HWLOC_MEMBIND_BIND,
@@ -98,7 +98,7 @@ namespace hpx::threads {
 
 #include <hpx/config/warnings_prefix.hpp>
 
-    struct HPX_CORE_EXPORT topology
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT topology
     {
         topology();
 
@@ -225,7 +225,7 @@ namespace hpx::threads {
         mask_type get_thread_affinity_mask_from_lva(
             void const* lva, error_code& ec = throws) const;
 
-        /// \brief Prints the given mask \a m to os in a human readable form
+        /// \brief Prints the given mask \a m to os in a human-readable  form
         void print_affinity_mask(std::ostream& os, std::size_t num_thread,
             mask_cref_type m, std::string const& pool_name) const;
 
@@ -426,10 +426,10 @@ namespace hpx::threads {
 #include <hpx/config/warnings_suffix.hpp>
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT topology& create_topology();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT topology& create_topology();
 
     /// Get the global topology instance
-    inline topology const& get_topology()
+    HPX_CXX_EXPORT inline topology const& get_topology()
     {
         return create_topology();
     }
@@ -437,7 +437,7 @@ namespace hpx::threads {
     ///////////////////////////////////////////////////////////////////////////
     // abstract away memory page size, calls to system functions are
     // expensive, so return a value initialized at startup
-    inline std::size_t get_memory_page_size()
+    HPX_CXX_EXPORT inline std::size_t get_memory_page_size()
     {
         return hpx::threads::topology::memory_page_size_;
     }

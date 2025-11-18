@@ -9,10 +9,10 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_local/interval_timer.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 
 #include <chrono>
 #include <cstddef>

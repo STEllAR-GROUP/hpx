@@ -14,12 +14,11 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
-#include <hpx/threading_base/external_timer.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 
 #include "activate_counters.hpp"
 

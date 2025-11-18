@@ -4,13 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/affinity/affinity_data.hpp>
-#include <hpx/hardware/timestamp.hpp>
+#include <hpx/modules/affinity.hpp>
+#include <hpx/modules/hardware.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <cstdint>

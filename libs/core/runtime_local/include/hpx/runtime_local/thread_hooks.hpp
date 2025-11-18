@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 namespace hpx {
 

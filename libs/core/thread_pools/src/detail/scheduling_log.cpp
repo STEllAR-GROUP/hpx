@@ -9,10 +9,8 @@
 #if defined(HPX_HAVE_LOGGING)
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/thread_pools/detail/scheduling_log.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/threading_base_fwd.hpp>
 
 #include <cstddef>
 

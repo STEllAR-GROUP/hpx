@@ -8,17 +8,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/affinity.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/thread_pools/scheduling_loop.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
-#include <hpx/threading_base/network_background_callback.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/topology/cpu_mask.hpp>
 
 #include <atomic>
 #include <cstddef>

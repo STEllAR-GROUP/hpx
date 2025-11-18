@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <cstddef>
 
