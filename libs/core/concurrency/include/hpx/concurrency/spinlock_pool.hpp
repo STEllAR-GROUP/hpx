@@ -34,7 +34,8 @@ namespace hpx::util {
 #endif
     }    // namespace detail
 
-    template <typename Tag, std::size_t N = HPX_HAVE_SPINLOCK_POOL_NUM>
+    HPX_CXX_EXPORT template <typename Tag,
+        std::size_t N = HPX_HAVE_SPINLOCK_POOL_NUM>
     class spinlock_pool
     {
     private:

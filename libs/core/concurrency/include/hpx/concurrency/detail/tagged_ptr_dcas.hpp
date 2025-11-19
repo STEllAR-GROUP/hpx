@@ -16,7 +16,7 @@
 
 namespace hpx::lockfree::detail {
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     class HPX_LOCKFREE_DCAS_ALIGNMENT tagged_ptr
     {
     public:
@@ -119,5 +119,4 @@ namespace hpx::lockfree::detail {
         T* ptr;
         tag_t tag;
     };
-
 }    // namespace hpx::lockfree::detail

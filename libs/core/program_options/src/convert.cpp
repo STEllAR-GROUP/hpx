@@ -70,9 +70,6 @@ namespace hpx::program_options::detail {
 
         return result;
     }
-}    // namespace hpx::program_options::detail
-
-namespace hpx::program_options {
 
     std::wstring from_8_bit(std::string const& s,
         std::codecvt<wchar_t, char, std::mbstate_t> const& cvt)
@@ -126,4 +123,4 @@ namespace hpx::program_options {
     {
         return to_utf8(s);
     }
-}    // namespace hpx::program_options
+}    // namespace hpx::program_options::detail

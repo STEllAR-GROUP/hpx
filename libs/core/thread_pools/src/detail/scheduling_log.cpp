@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
-#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/thread_pools/detail/scheduling_log.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>

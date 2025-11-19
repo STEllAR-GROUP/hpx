@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2023 Hartmut Kaiser
+//  Copyright (c) 2019-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/coroutines/coroutine_fwd.hpp>
 #include <hpx/coroutines/detail/coroutine_self.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
@@ -16,14 +17,9 @@
 #include <limits>
 #include <utility>
 
-namespace hpx::threads::coroutines {
-
-    class stackless_coroutine;
-}    // namespace hpx::threads::coroutines
-
 namespace hpx::threads::coroutines::detail {
 
-    class coroutine_stackless_self : public coroutine_self
+    HPX_CXX_EXPORT class coroutine_stackless_self : public coroutine_self
     {
     public:
         explicit coroutine_stackless_self(stackless_coroutine* pimpl) noexcept

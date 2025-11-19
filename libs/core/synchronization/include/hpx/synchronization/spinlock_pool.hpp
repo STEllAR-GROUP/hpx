@@ -14,7 +14,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/hashing.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 

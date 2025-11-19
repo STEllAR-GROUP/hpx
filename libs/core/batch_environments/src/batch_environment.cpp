@@ -6,12 +6,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/batch_environments/alps_environment.hpp>
 #include <hpx/batch_environments/batch_environment.hpp>
-#include <hpx/batch_environments/flux_environment.hpp>
-#include <hpx/batch_environments/pbs_environment.hpp>
-#include <hpx/batch_environments/pjm_environment.hpp>
-#include <hpx/batch_environments/slurm_environment.hpp>
+#include <hpx/batch_environments/detail/alps_environment.hpp>
+#include <hpx/batch_environments/detail/flux_environment.hpp>
+#include <hpx/batch_environments/detail/pbs_environment.hpp>
+#include <hpx/batch_environments/detail/pjm_environment.hpp>
+#include <hpx/batch_environments/detail/slurm_environment.hpp>
 #include <hpx/modules/asio.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/type_support.hpp>
@@ -72,7 +72,8 @@ namespace hpx::util {
 
         onexit _(*this);
 
-        batch_environments::alps_environment const alps_env(nodelist, debug);
+        batch_environments::detail::alps_environment const alps_env(
+            nodelist, debug);
         if (alps_env.valid())
         {
             batch_name_ = "ALPS";
@@ -82,7 +83,7 @@ namespace hpx::util {
             return;
         }
 
-        batch_environments::pjm_environment const pjm_env(
+        batch_environments::detail::pjm_environment const pjm_env(
             nodelist, have_mpi, debug);
         if (pjm_env.valid())
         {
@@ -93,7 +94,7 @@ namespace hpx::util {
             return;
         }
 
-        batch_environments::flux_environment const flux_env;
+        batch_environments::detail::flux_environment const flux_env;
         if (flux_env.valid())
         {
             batch_name_ = "FLUX";
@@ -102,7 +103,8 @@ namespace hpx::util {
             return;
         }
 
-        batch_environments::slurm_environment const slurm_env(nodelist, debug);
+        batch_environments::detail::slurm_environment const slurm_env(
+            nodelist, debug);
         if (slurm_env.valid())
         {
             batch_name_ = "SLURM";
@@ -112,7 +114,7 @@ namespace hpx::util {
             return;
         }
 
-        batch_environments::pbs_environment const pbs_env(
+        batch_environments::detail::pbs_environment const pbs_env(
             nodelist, have_mpi, debug);
         if (pbs_env.valid())
         {

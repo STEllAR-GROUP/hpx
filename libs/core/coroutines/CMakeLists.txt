@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2023 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -132,10 +132,16 @@ include(HPX_AddModule)
 add_hpx_module(
   core coroutines
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${coroutines_sources}
   HEADERS ${coroutines_headers}
   OBJECTS "${switch_to_fiber_object}"
   COMPAT_HEADERS ${coroutines_compat_headers}
+  ADD_TO_GLOBAL_HEADER
+    "hpx/coroutines/detail/coroutine_impl.hpp"
+    "hpx/coroutines/detail/coroutine_accessor.hpp"
+    "hpx/coroutines/detail/coroutine_stackful_self.hpp"
+    "hpx/coroutines/detail/tss.hpp"
   MODULE_DEPENDENCIES
     hpx_assertion
     hpx_config

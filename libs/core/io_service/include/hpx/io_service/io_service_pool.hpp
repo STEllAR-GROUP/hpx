@@ -10,8 +10,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/barrier.hpp>
 #include <hpx/io_service/io_service_pool_fwd.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)

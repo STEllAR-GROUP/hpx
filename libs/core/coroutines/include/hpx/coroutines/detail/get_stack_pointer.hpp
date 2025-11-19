@@ -28,6 +28,7 @@
 #include <limits>
 
 namespace hpx::threads::coroutines::detail {
-    HPX_CORE_EXPORT std::size_t get_stack_ptr() noexcept;
+
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t get_stack_ptr() noexcept;
 }    // namespace hpx::threads::coroutines::detail
 #endif

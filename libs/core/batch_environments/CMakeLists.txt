@@ -7,12 +7,12 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(batch_environments_headers
-    hpx/batch_environments/alps_environment.hpp
+    hpx/batch_environments/detail/alps_environment.hpp
+    hpx/batch_environments/detail/flux_environment.hpp
+    hpx/batch_environments/detail/pjm_environment.hpp
+    hpx/batch_environments/detail/pbs_environment.hpp
+    hpx/batch_environments/detail/slurm_environment.hpp
     hpx/batch_environments/batch_environment.hpp
-    hpx/batch_environments/flux_environment.hpp
-    hpx/batch_environments/pjm_environment.hpp
-    hpx/batch_environments/pbs_environment.hpp
-    hpx/batch_environments/slurm_environment.hpp
 )
 
 # cmake-format: off
@@ -26,14 +26,16 @@ set(batch_environments_compat_headers
 # cmake-format: on
 
 set(batch_environments_sources
-    alps_environment.cpp batch_environment.cpp flux_environment.cpp
-    pbs_environment.cpp pjm_environment.cpp slurm_environment.cpp
+    batch_environment.cpp detail/alps_environment.cpp
+    detail/flux_environment.cpp detail/pbs_environment.cpp
+    detail/pjm_environment.cpp detail/slurm_environment.cpp
 )
 
 include(HPX_AddModule)
 add_hpx_module(
   core batch_environments
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${batch_environments_sources}
   HEADERS ${batch_environments_headers}
   COMPAT_HEADERS ${batch_environments_compat_headers}

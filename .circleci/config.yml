@@ -466,6 +466,20 @@ jobs:
               ninja -j1 git_docs
           no_output_timeout: 1h
 
+  core_local:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Core
+          command: |
+              ninja -j2 -k 0 hpx_core
+      - persist_to_workspace:
+          root: /hpx
+          paths:
+            - ./build
+
   core:
     <<: *defaults
     steps:
@@ -1377,9 +1391,13 @@ workflows:
           <<: *gh_pages_filter
       - spellcheck:
           <<: *gh_pages_filter
-      - core:
+      - core_local:
           requires:
             - configure
+          <<: *gh_pages_filter
+      - core:
+          requires:
+            - core_local
           <<: *gh_pages_filter
       - components:
           requires:

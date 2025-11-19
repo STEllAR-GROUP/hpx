@@ -92,6 +92,7 @@ add_hpx_module(
   COMPAT_HEADERS ${runtime_local_compat_headers}
   MODULE_DEPENDENCIES
     hpx_command_line_handling_local
+    hpx_coroutines
     hpx_debugging
     hpx_errors
     hpx_datastructures

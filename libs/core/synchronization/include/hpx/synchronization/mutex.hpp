@@ -12,8 +12,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/coroutines/coroutine_fwd.hpp>
-#include <hpx/coroutines/thread_id_type.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>

@@ -29,9 +29,10 @@ add_hpx_library(
   HEADERS "hpx/include/compression_snappy.hpp"
           "hpx/binary_filter/snappy_serialization_filter.hpp"
           "hpx/binary_filter/snappy_serialization_filter_registration.hpp"
-  PREPEND_HEADER_ROOT INSTALL_HEADERS
+  PREPEND_HEADER_ROOT INSTALL_HEADERS ${HPX_WITH_UNITY_BUILD_OPTION}
+  ${HPX_WITH_CXX_MODULES_OPTION}
   FOLDER "Core/Plugins/Compression"
-  DEPENDENCIES ${Snappy_LIBRARY} ${HPX_WITH_UNITY_BUILD_OPTION}
+  DEPENDENCIES ${Snappy_LIBRARY}
 )
 
 target_include_directories(

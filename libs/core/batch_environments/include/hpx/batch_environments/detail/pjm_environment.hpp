@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,12 +10,14 @@
 
 #include <cstddef>
 #include <string>
+#include <vector>
 
-namespace hpx::util::batch_environments {
+namespace hpx::util::batch_environments::detail {
 
-    struct flux_environment
+    struct pjm_environment
     {
-        HPX_CORE_EXPORT flux_environment();
+        HPX_CORE_EXPORT pjm_environment(
+            std::vector<std::string>& nodelist, bool have_mpi, bool debug);
 
         constexpr bool valid() const noexcept
         {
@@ -27,6 +29,11 @@ namespace hpx::util::batch_environments {
             return node_num_;
         }
 
+        constexpr std::size_t num_threads() const noexcept
+        {
+            return num_threads_;
+        }
+
         constexpr std::size_t num_localities() const noexcept
         {
             return num_localities_;
@@ -34,7 +41,8 @@ namespace hpx::util::batch_environments {
 
     private:
         std::size_t node_num_;
+        std::size_t num_threads_;
         std::size_t num_localities_;
         bool valid_;
     };
-}    // namespace hpx::util::batch_environments
+}    // namespace hpx::util::batch_environments::detail

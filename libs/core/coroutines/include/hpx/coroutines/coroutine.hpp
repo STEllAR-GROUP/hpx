@@ -1,5 +1,5 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  This code may be used under either of the following two licences:
 //
@@ -47,7 +47,7 @@
 namespace hpx::threads::coroutines {
 
     ///////////////////////////////////////////////////////////////////////////
-    class coroutine
+    HPX_CXX_EXPORT class coroutine
     {
     private:
         friend struct detail::coroutine_accessor;

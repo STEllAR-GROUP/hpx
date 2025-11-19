@@ -76,7 +76,7 @@
  */
 namespace hpx::threads::coroutines::detail::posix {
 
-    HPX_CORE_EXPORT extern bool use_guard_pages;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT extern bool use_guard_pages;
 
 #if defined(HPX_HAVE_THREAD_STACK_MMAP) && defined(_POSIX_MAPPED_FILES) &&     \
     _POSIX_MAPPED_FILES > 0

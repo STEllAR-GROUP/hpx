@@ -19,8 +19,8 @@
 #include <hpx/components_base/server/component_heap.hpp>
 #include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
-#include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/ini.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
