@@ -12,9 +12,9 @@
 #include <hpx/format.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/schedulers/local_priority_queue_scheduler.hpp>
 
 #include <algorithm>
 #include <cmath>

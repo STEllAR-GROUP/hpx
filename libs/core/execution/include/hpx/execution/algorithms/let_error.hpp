@@ -33,7 +33,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename PredecessorSender, typename F,
+        HPX_CXX_EXPORT template <typename PredecessorSender, typename F,
             typename Scheduler = no_scheduler>
         struct let_error_sender
         {
@@ -389,7 +389,7 @@ namespace hpx::execution::experimental {
     // let_error and let_stopped are similar to let_value, but where let_value
     // works with values sent by the input sender, let_error works with errors,
     // and let_stopped is invoked when the "stopped" signal is sent.
-    inline constexpr struct let_error_t final
+    HPX_CXX_EXPORT inline constexpr struct let_error_t final
       : hpx::functional::detail::tag_priority<let_error_t>
     {
     private:

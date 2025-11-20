@@ -7,12 +7,12 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/futures/future.hpp>
 #include <hpx/hpx_start.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/iostream.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <utility>

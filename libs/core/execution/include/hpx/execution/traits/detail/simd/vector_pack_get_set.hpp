@@ -20,14 +20,15 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Vector, HPX_CONCEPT_REQUIRES_(is_vector_pack_v<Vector>)>
+    HPX_CXX_EXPORT template <typename Vector,
+        HPX_CONCEPT_REQUIRES_(is_vector_pack_v<Vector>)>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
         Vector& vec, std::size_t index) noexcept
     {
         return vec[index];
     }
 
-    template <typename Scalar,
+    HPX_CXX_EXPORT template <typename Scalar,
         HPX_CONCEPT_REQUIRES_(is_scalar_vector_pack_v<Scalar>)>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
         Scalar& sc, [[maybe_unused]] std::size_t index) noexcept
@@ -37,7 +38,7 @@ namespace hpx::parallel::traits {
     }
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Vector, typename T,
+    HPX_CXX_EXPORT template <typename Vector, typename T,
         HPX_CONCEPT_REQUIRES_(is_vector_pack_v<Vector>)>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto set(
         Vector& vec, std::size_t index, T val) noexcept
@@ -45,7 +46,7 @@ namespace hpx::parallel::traits {
         hpx::datapar::experimental::set(vec, index, val);
     }
 
-    template <typename Scalar, typename T,
+    HPX_CXX_EXPORT template <typename Scalar, typename T,
         HPX_CONCEPT_REQUIRES_(is_scalar_vector_pack_v<Scalar>)>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto set(
         Scalar& sc, [[maybe_unused]] std::size_t index, T val) noexcept

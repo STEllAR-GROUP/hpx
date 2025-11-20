@@ -13,9 +13,10 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/prefix.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/program_options.hpp>
-#include <hpx/resource_partitioner/partitioner.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
@@ -49,6 +50,8 @@
 extern HPX_CORE_EXPORT char** freebsd_environ;
 extern char** environ;
 #endif
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx {
 
@@ -234,3 +237,5 @@ namespace hpx {
     // Allow applications to add a finalizer if HPX_MAIN is set
     HPX_CORE_EXPORT extern void (*on_finalize)();
 }    // namespace hpx
+
+#include <hpx/config/warnings_suffix.hpp>

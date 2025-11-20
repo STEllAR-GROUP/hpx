@@ -6,11 +6,6 @@
 
 #pragma once
 
-#include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/modules/execution.hpp>
 
-#include <hpx/execution/executors/auto_chunk_size.hpp>
-#include <hpx/execution/executors/default_parameters.hpp>
-#include <hpx/execution/executors/dynamic_chunk_size.hpp>
-#include <hpx/execution/executors/guided_chunk_size.hpp>
-#include <hpx/execution/executors/persistent_auto_chunk_size.hpp>
-#include <hpx/execution/executors/static_chunk_size.hpp>
+#include <hpx/modules/execution.hpp>

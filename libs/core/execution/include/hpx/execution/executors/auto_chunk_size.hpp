@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/detail/future_exec.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/serialization.hpp>
@@ -33,7 +34,7 @@ namespace hpx::execution::experimental {
     /// This executor parameters type makes sure that as many loop iterations
     /// are combined as necessary to run for the amount of time specified.
     ///
-    struct auto_chunk_size
+    HPX_CXX_EXPORT struct auto_chunk_size
     {
     public:
         /// Construct an \a auto_chunk_size executor parameters object
@@ -43,7 +44,7 @@ namespace hpx::execution::experimental {
         ///       any of the scheduled chunks should run.
         ///
         constexpr explicit auto_chunk_size(
-            std::uint64_t num_iters_for_timing = 0) noexcept
+            std::uint64_t const num_iters_for_timing = 0) noexcept
           : min_time_(200000)
           , num_iters_for_timing_(num_iters_for_timing)
         {
@@ -58,7 +59,7 @@ namespace hpx::execution::experimental {
         ///                             the timing operation
         ///
         explicit auto_chunk_size(hpx::chrono::steady_duration const& rel_time,
-            std::uint64_t num_iters_for_timing = 0) noexcept
+            std::uint64_t const num_iters_for_timing = 0) noexcept
           : min_time_(rel_time.value().count())
           , num_iters_for_timing_(num_iters_for_timing)
         {
@@ -73,7 +74,8 @@ namespace hpx::execution::experimental {
         template <typename Executor, typename F>
         friend auto tag_override_invoke(
             hpx::execution::experimental::measure_iteration_t,
-            auto_chunk_size& this_, Executor&& exec, F&& f, std::size_t count)
+            auto_chunk_size& this_, Executor&& exec, F&& f,
+            std::size_t const count)
         {
             // by default use 1% of the iterations
             if (this_.num_iters_for_timing_ == 0)
@@ -113,7 +115,7 @@ namespace hpx::execution::experimental {
             hpx::execution::experimental::get_chunk_size_t,
             auto_chunk_size const& this_, Executor&&,
             hpx::chrono::steady_duration const& iteration_duration,
-            std::size_t cores, std::size_t count) noexcept
+            std::size_t const cores, std::size_t const count) noexcept
         {
             // return chunk size which will create the required amount of work
             if (iteration_duration.value().count() != 0)
@@ -166,4 +168,4 @@ namespace hpx::execution {
         "hpx::execution::auto_chunk_size is deprecated, use "
         "hpx::execution::experimental::auto_chunk_size instead") =
         hpx::execution::experimental::auto_chunk_size;
-}
+}    // namespace hpx::execution

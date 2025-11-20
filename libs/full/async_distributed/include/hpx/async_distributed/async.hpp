@@ -47,11 +47,10 @@ namespace hpx {
 #include <hpx/async_distributed/detail/async_implementations.hpp>
 #include <hpx/async_local/async.hpp>
 #include <hpx/components/client_base.hpp>
-#include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
 

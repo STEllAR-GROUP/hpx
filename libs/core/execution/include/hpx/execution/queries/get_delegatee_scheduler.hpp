@@ -21,22 +21,22 @@ namespace hpx::execution::experimental {
     //    forward progress delegation.
     //
     // 2. The name execution::get_scheduler denotes a customization point
-    //    object.
-    //    For some subexpression r, if the type of r is (possibly cv-qualified)
-    //    no_env, then execution::get_delegatee_scheduler(r) is ill-formed.
-    //    Otherwise, it is expression equivalent to:
+    //    object. For some subexpression r, if the type of r is (possibly
+    //    cv-qualified) no_env, then execution::get_delegatee_scheduler(r) is
+    //    ill-formed. Otherwise, it is expression equivalent to:
     //
     //    1. tag_invoke(execution::get_delegatee_scheduler, as_const(r)), if
-    //       this expression is well formed.
+    //       this expression is well-formed.
     //          Mandates: The tag_invoke expression above is not potentially-
     //          throwing and its type satisfies execution::scheduler.
     //
     //    2. Otherwise, execution::get_delegatee_scheduler(r) is ill-formed.
     //
-    // 3. execution::get_delegatee_scheduler() (with no arguments) is expression-
-    //    equivalent to execution::read(execution::get_delegatee_scheduler).
+    // 3. execution::get_delegatee_scheduler() (with no arguments) is
+    //    expression-equivalent to
+    //    execution::read(execution::get_delegatee_scheduler).
     //
-    inline constexpr struct get_delegatee_scheduler_t final
+    HPX_CXX_EXPORT inline constexpr struct get_delegatee_scheduler_t final
       : hpx::functional::detail::tag_fallback<get_delegatee_scheduler_t>
     {
     private:
@@ -45,7 +45,8 @@ namespace hpx::execution::experimental {
 
     } get_delegatee_scheduler{};
 
-    constexpr auto tag_fallback_invoke(get_delegatee_scheduler_t) noexcept
+    HPX_CXX_EXPORT constexpr auto tag_fallback_invoke(
+        get_delegatee_scheduler_t) noexcept
     {
         return hpx::execution::experimental::read(get_delegatee_scheduler);
     }

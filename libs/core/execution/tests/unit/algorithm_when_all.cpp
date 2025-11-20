@@ -18,7 +18,7 @@
 #if defined(HPX_HAVE_STDEXEC)
 // TODO: Figure out why this is necessary for stdexec
 // but causes dataflow to be unresolvable without stdexec
-#include <hpx/execution/algorithms/when_all.hpp>
+#include <hpx/modules/execution.hpp>
 #endif
 
 #include "algorithm_test_utils.hpp"

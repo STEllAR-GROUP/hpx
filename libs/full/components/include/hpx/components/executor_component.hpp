@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components_base/get_lva.hpp>
-#include <hpx/execution/executors/execution.hpp>
 #include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/naming_base/address.hpp>

@@ -7,12 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <type_traits>
 #include <utility>

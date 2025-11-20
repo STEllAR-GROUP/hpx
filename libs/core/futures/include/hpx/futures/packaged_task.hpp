@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/futures/detail/future_data.hpp>
+#include <hpx/futures/future_fwd.hpp>
 #include <hpx/futures/promise.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
@@ -33,10 +34,10 @@ namespace hpx {
     /// through hpx::future objects. Just like hpx::function, hpx::packaged_task
     /// is a polymorphic, allocator-aware container: the stored callable target
     /// may be allocated on heap or with a provided allocator.
-    template <typename Sig>
+    HPX_CXX_EXPORT template <typename Sig>
     class packaged_task;
 
-    template <typename R, typename... Ts>
+    HPX_CXX_EXPORT template <typename R, typename... Ts>
     class packaged_task<R(Ts...)>
     {
         using function_type = hpx::move_only_function<R(Ts...)>;
@@ -150,12 +151,12 @@ namespace hpx {
 namespace std {    //-V1061
 
     // Requires: Allocator shall be an allocator (17.6.3.5)
-    template <typename Sig, typename Allocator>
+    HPX_CXX_EXPORT template <typename Sig, typename Allocator>
     struct uses_allocator<hpx::packaged_task<Sig>, Allocator> : std::true_type
     {
     };
 
-    template <typename Sig>
+    HPX_CXX_EXPORT template <typename Sig>
     void swap(
         hpx::packaged_task<Sig>& lhs, hpx::packaged_task<Sig>& rhs) noexcept
     {

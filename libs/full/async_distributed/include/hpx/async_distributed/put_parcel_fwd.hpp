@@ -10,7 +10,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions_base/actions_base_fwd.hpp>
-#include <hpx/futures/future_fwd.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/gid_type.hpp>
 #include <hpx/naming_base/id_type.hpp>

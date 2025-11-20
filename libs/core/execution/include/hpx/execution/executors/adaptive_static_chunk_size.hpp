@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2022 Karame M.Shokooh
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,6 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/detail/future_exec.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/serialization.hpp>
@@ -30,7 +31,7 @@ namespace hpx::execution::experimental {
     /// \note This executor parameters type is equivalent to OpenMP's STATIC
     ///       scheduling directive.
     ///
-    struct adaptive_static_chunk_size
+    HPX_CXX_EXPORT struct adaptive_static_chunk_size
     {
         /// Construct a \a adaptive_static_chunk_size executor parameters object
         ///
@@ -47,7 +48,7 @@ namespace hpx::execution::experimental {
         ///                     thread.
         ///
         constexpr explicit adaptive_static_chunk_size(
-            std::size_t chunk_size) noexcept
+            std::size_t const chunk_size) noexcept
           : chunk_size_(chunk_size)
         {
         }
@@ -57,8 +58,8 @@ namespace hpx::execution::experimental {
         friend std::size_t tag_override_invoke(
             hpx::execution::experimental::get_chunk_size_t,
             adaptive_static_chunk_size const& this_, Executor& exec,
-            hpx::chrono::steady_duration const&, std::size_t cores,
-            std::size_t input_size)
+            hpx::chrono::steady_duration const&, std::size_t const cores,
+            std::size_t const input_size)
         {
             // Make sure the internal round-robin counter of the executor is
             // reset
@@ -103,7 +104,7 @@ namespace hpx::execution::experimental {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int /* version */)
+        void serialize(Archive& ar, unsigned int const /* version */)
         {
             // clang-format off
             ar & chunk_size_;
@@ -133,4 +134,4 @@ namespace hpx::execution {
         "hpx::execution::adaptive_static_chunk_size is deprecated, use "
         "hpx::execution::experimental::adaptive_static_chunk_size instead") =
         hpx::execution::experimental::adaptive_static_chunk_size;
-}
+}    // namespace hpx::execution

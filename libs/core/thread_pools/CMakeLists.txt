@@ -32,6 +32,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core thread_pools
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${thread_pools_sources}
   HEADERS ${thread_pools_headers}
   COMPAT_HEADERS ${thread_pools_compat_headers}

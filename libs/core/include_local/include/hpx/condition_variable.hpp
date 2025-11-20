@@ -6,4 +6,4 @@
 
 #pragma once
 
-#include <hpx/synchronization/condition_variable.hpp>
+#include <hpx/modules/synchronization.hpp>

@@ -13,7 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/collectives/detail/latch.hpp>
 #include <hpx/components/client_base.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <cstddef>
 #include <exception>

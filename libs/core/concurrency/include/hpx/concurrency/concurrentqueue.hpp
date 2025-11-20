@@ -100,9 +100,9 @@ namespace hpx::concurrency::details {
 #if defined(MCDBGQ_USE_RELACY)
 namespace hpx::concurrency::details {
     typedef std::uint32_t thread_id_t;
-    static const thread_id_t invalid_thread_id  = 0xFFFFFFFFU;
-    static const thread_id_t invalid_thread_id2 = 0xFFFFFFFEU;
-    static inline thread_id_t thread_id() { return rl::thread_index(); }
+    inline const thread_id_t invalid_thread_id  = 0xFFFFFFFFU;
+    inline const thread_id_t invalid_thread_id2 = 0xFFFFFFFEU;
+    inline thread_id_t thread_id() { return rl::thread_index(); }
 }
 #elif defined(_WIN32) || defined(__WINDOWS__) || defined(__WIN32__)
 // No sense pulling in windows.h in a header, we'll manually declare the function
@@ -111,9 +111,9 @@ extern "C" __declspec(dllimport) unsigned long __stdcall GetCurrentThreadId(void
 namespace hpx::concurrency::details {
     static_assert(sizeof(unsigned long) == sizeof(std::uint32_t), "Expected size of unsigned long to be 32 bits on Windows");
     typedef std::uint32_t thread_id_t;
-    static constexpr thread_id_t invalid_thread_id  = 0;      // See http://blogs.msdn.com/b/oldnewthing/archive/2004/02/23/78395.aspx
-    static constexpr thread_id_t invalid_thread_id2 = 0xFFFFFFFFU;  // Not technically guaranteed to be invalid, but is never used in practice. Note that all Win32 thread IDs are presently multiples of 4.
-    static inline thread_id_t thread_id() { return static_cast<thread_id_t>(::GetCurrentThreadId()); }
+    inline constexpr thread_id_t invalid_thread_id  = 0;      // See http://blogs.msdn.com/b/oldnewthing/archive/2004/02/23/78395.aspx
+    inline constexpr thread_id_t invalid_thread_id2 = 0xFFFFFFFFU;  // Not technically guaranteed to be invalid, but is never used in practice. Note that all Win32 thread IDs are presently multiples of 4.
+    inline thread_id_t thread_id() { return static_cast<thread_id_t>(::GetCurrentThreadId()); }
 }
 #elif defined(__arm__) || defined(_M_ARM) || defined(__aarch64__) || (defined(__APPLE__) && TARGET_OS_IPHONE)
 namespace hpx::concurrency::details {
@@ -125,7 +125,7 @@ namespace hpx::concurrency::details {
     // Note we don't define a invalid_thread_id2 since std::thread::id doesn't have one; it's
     // only used if MOODYCAMEL_CPP11_THREAD_LOCAL_SUPPORTED is defined anyway, which it won't
     // be.
-    static inline thread_id_t thread_id() { return std::this_thread::get_id(); }
+    inline thread_id_t thread_id() { return std::this_thread::get_id(); }
 
     template<std::size_t> struct thread_id_size { };
     template<> struct thread_id_size<4> { typedef std::uint32_t numeric_t; };
@@ -163,9 +163,9 @@ namespace hpx::concurrency::details {
 #endif
 namespace hpx::concurrency::details {
     typedef std::uintptr_t thread_id_t;
-    static constexpr thread_id_t invalid_thread_id  = 0;    // Address can't be nullptr
-    static constexpr thread_id_t invalid_thread_id2 = 1;    // Member accesses off a null pointer are also generally invalid. Plus it's not aligned.
-    static inline thread_id_t thread_id() { static MOODYCAMEL_THREADLOCAL int x; return reinterpret_cast<thread_id_t>(&x); }
+    inline constexpr thread_id_t invalid_thread_id  = 0;    // Address can't be nullptr
+    inline constexpr thread_id_t invalid_thread_id2 = 1;    // Member accesses off a null pointer are also generally invalid. Plus it's not aligned.
+    inline thread_id_t thread_id() { static MOODYCAMEL_THREADLOCAL int x; return reinterpret_cast<thread_id_t>(&x); }
 }
 #endif
 
@@ -236,11 +236,11 @@ namespace hpx::concurrency::details {
 // Compiler-specific likely/unlikely hints
 namespace hpx::concurrency::details {
 #if defined(__GNUC__)
-    static inline bool (likely)(bool x) { return __builtin_expect((x), true); }
-    static inline bool (unlikely)(bool x) { return __builtin_expect((x), false); }
+    inline bool (likely)(bool x) { return __builtin_expect((x), true); }
+    inline bool (unlikely)(bool x) { return __builtin_expect((x), false); }
 #else
-    static inline bool (likely)(bool x) { return x; }
-    static inline bool (unlikely)(bool x) { return x; }
+    inline bool (likely)(bool x) { return x; }
+    inline bool (unlikely)(bool x) { return x; }
 #endif
 }
 
@@ -414,7 +414,7 @@ namespace details
     };
     template<std::size_t size> struct hash_32_or_64 : public _hash_32_or_64<(size > 4)> {  };
 
-    static inline size_t hash_thread_id(thread_id_t id)
+    HPX_CXX_EXPORT inline size_t hash_thread_id(thread_id_t id)
     {
         static_assert(sizeof(thread_id_t) <= 8, "Expected a platform where thread IDs are at most 64-bit values");
         return static_cast<size_t>(hash_32_or_64<sizeof(thread_id_converter<thread_id_t>::thread_id_hash_t)>::hash(

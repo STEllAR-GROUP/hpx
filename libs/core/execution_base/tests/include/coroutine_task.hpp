@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include <hpx/execution/queries/get_stop_token.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/synchronization/stop_token.hpp>
 
 #include <any>
 #include <exception>

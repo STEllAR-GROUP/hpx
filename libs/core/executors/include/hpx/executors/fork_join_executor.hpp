@@ -11,25 +11,21 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution/detail/post_policy_dispatch.hpp>
-#include <hpx/execution/executors/default_parameters.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/hardware.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/threading.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/topology.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/synchronization/latch.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/threading/thread.hpp>
 
 #include <atomic>
 #include <chrono>

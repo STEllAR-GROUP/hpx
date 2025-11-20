@@ -20,6 +20,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
@@ -409,3 +411,5 @@ namespace hpx { namespace performance_counters {
         return f.get(ec);
     }
 }}    // namespace hpx::performance_counters
+
+#include <hpx/config/warnings_suffix.hpp>

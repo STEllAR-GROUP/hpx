@@ -8,9 +8,9 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/async_cuda/target.hpp>
-#include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/threading_base.hpp>
 
 #include <cstddef>

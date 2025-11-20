@@ -10,9 +10,9 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <chrono>
 #include <condition_variable>

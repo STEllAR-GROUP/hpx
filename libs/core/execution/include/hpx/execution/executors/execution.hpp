@@ -14,22 +14,20 @@
 #include <hpx/modules/execution_base.hpp>
 
 #include <hpx/assert.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/async_combinators/when_all.hpp>
+#include <hpx/execution/detail/future_exec.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/future_then_result_exec.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/future_traits.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <cstddef>
 #include <functional>
@@ -710,7 +708,7 @@ namespace hpx::parallel::execution {
                 HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
-        template <typename F, typename Shape, typename... Ts>
+        HPX_CXX_EXPORT template <typename F, typename Shape, typename... Ts>
         struct bulk_function_result
         {
             using value_type =
@@ -719,7 +717,7 @@ namespace hpx::parallel::execution {
                 value_type, Ts...>;
         };
 
-        template <typename F, typename Shape, typename... Ts>
+        HPX_CXX_EXPORT template <typename F, typename Shape, typename... Ts>
         using bulk_function_result_t =
             typename bulk_function_result<F, Shape, Ts...>::type;
 
@@ -903,14 +901,14 @@ namespace hpx::parallel::execution {
         using bulk_execute_result_impl_t =
             typename bulk_execute_result_impl<F, Shape, IsVoid, Ts...>::type;
 
-        template <typename F, typename Shape, typename... Ts>
+        HPX_CXX_EXPORT template <typename F, typename Shape, typename... Ts>
         struct bulk_execute_result
           : bulk_execute_result_impl<F, Shape,
                 std::is_void_v<bulk_function_result_t<F, Shape, Ts...>>, Ts...>
         {
         };
 
-        template <typename F, typename Shape, typename... Ts>
+        HPX_CXX_EXPORT template <typename F, typename Shape, typename... Ts>
         using bulk_execute_result_t =
             typename bulk_execute_result<F, Shape, Ts...>::type;
 

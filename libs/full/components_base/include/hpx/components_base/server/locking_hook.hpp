@@ -12,10 +12,10 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>
 #include <mutex>

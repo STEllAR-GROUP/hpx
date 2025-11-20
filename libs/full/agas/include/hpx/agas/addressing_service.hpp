@@ -19,11 +19,10 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/synchronization/shared_mutex.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>
 #include <cstddef>

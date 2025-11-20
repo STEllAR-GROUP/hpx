@@ -18,11 +18,10 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/synchronization/condition_variable.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -50,23 +49,25 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::lcos::detail {
 
-    using run_on_completed_error_handler_type =
+    HPX_CXX_EXPORT using run_on_completed_error_handler_type =
         hpx::function<void(std::exception_ptr const& e)>;
-    HPX_CORE_EXPORT void set_run_on_completed_error_handler(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_run_on_completed_error_handler(
         run_on_completed_error_handler_type f);
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Result>
+    HPX_CXX_EXPORT template <typename Result>
     struct future_data;
 
     ///////////////////////////////////////////////////////////////////////
-    struct future_data_refcnt_base;
+    HPX_CXX_EXPORT struct future_data_refcnt_base;
 
-    void intrusive_ptr_add_ref(future_data_refcnt_base* p) noexcept;
-    void intrusive_ptr_release(future_data_refcnt_base* p) noexcept;
+    HPX_CXX_EXPORT void intrusive_ptr_add_ref(
+        future_data_refcnt_base* p) noexcept;
+    HPX_CXX_EXPORT void intrusive_ptr_release(
+        future_data_refcnt_base* p) noexcept;
 
     ///////////////////////////////////////////////////////////////////////
-    struct HPX_CORE_EXPORT future_data_refcnt_base
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT future_data_refcnt_base
     {
         // future shared states are non-copyable and non-movable
         future_data_refcnt_base(future_data_refcnt_base const&) = delete;
@@ -119,11 +120,13 @@ namespace hpx::lcos::detail {
     };
 
     // support functions for hpx::intrusive_ptr
-    inline void intrusive_ptr_add_ref(future_data_refcnt_base* p) noexcept
+    HPX_CXX_EXPORT inline void intrusive_ptr_add_ref(
+        future_data_refcnt_base* p) noexcept
     {
         p->count_.increment();
     }
-    inline void intrusive_ptr_release(future_data_refcnt_base* p) noexcept
+    HPX_CXX_EXPORT inline void intrusive_ptr_release(
+        future_data_refcnt_base* p) noexcept
     {
         if (p->requires_delete())
         {
@@ -206,7 +209,7 @@ namespace hpx::lcos::detail {
     using future_data_storage_t = typename future_data_storage<Result>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result>
+    HPX_CXX_EXPORT template <typename Result>
     struct future_data_base;
 
     // make sure continuation invocation does not recurse deeper than allowed
@@ -331,7 +334,7 @@ namespace hpx::lcos::detail {
         threads::thread_id_ref_type runs_child_;
     };
 
-    template <typename Result>
+    HPX_CXX_EXPORT template <typename Result>
     struct future_data_base : future_data_base<traits::detail::future_data_void>
     {
     private:
@@ -693,7 +696,7 @@ namespace hpx::lcos::detail {
     ///////////////////////////////////////////////////////////////////////////
     // Customization point to have the ability for creating distinct shared
     // states depending on the value type held.
-    template <typename Result>
+    HPX_CXX_EXPORT template <typename Result>
     struct future_data : future_data_base<Result>
     {
         using init_no_addref =
@@ -731,7 +734,8 @@ namespace hpx::lcos::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result, typename Allocator, typename Derived = void>
+    HPX_CXX_EXPORT template <typename Result, typename Allocator,
+        typename Derived = void>
     struct future_data_allocator : future_data<Result>
     {
         using init_no_addref = typename future_data<Result>::init_no_addref;
@@ -791,7 +795,7 @@ namespace hpx::lcos::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result>
+    HPX_CXX_EXPORT template <typename Result>
     struct timed_future_data : future_data<Result>
     {
     public:
@@ -848,7 +852,7 @@ namespace hpx::lcos::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result>
+    HPX_CXX_EXPORT template <typename Result>
     struct task_base : future_data<Result>
     {
     protected:
@@ -997,7 +1001,7 @@ namespace hpx::lcos::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result>
+    HPX_CXX_EXPORT template <typename Result>
     struct cancelable_task_base : task_base<Result>
     {
     protected:
@@ -1120,7 +1124,7 @@ namespace hpx::lcos::detail {
     };
 }    // namespace hpx::lcos::detail
 
-template <typename R, typename Allocator>
+HPX_CXX_EXPORT template <typename R, typename Allocator>
 struct hpx::traits::detail::shared_state_allocator<
     hpx::lcos::detail::future_data<R>, Allocator>
 {

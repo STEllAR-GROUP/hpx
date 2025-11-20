@@ -13,7 +13,7 @@
 #include <hpx/async_colocated/async_colocated.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_distributed/server/copy_component.hpp>
 

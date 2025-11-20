@@ -13,8 +13,8 @@
     defined(HPX_HAVE_MODULE_MPI_BASE)
 
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/mpi_base/mpi.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstdlib>
 #include <string>

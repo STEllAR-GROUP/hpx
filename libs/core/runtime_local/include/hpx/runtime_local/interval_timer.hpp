@@ -9,9 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstdint>
 #include <memory>

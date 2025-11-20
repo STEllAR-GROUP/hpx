@@ -145,12 +145,9 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/detail/throw_if_exceptional.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/acquire_shared_state.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/tag_invoke.hpp>
@@ -375,7 +372,7 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_some_nothrow_t final
+    HPX_CXX_EXPORT inline constexpr struct wait_some_nothrow_t final
       : hpx::functional::tag<wait_some_nothrow_t>
     {
     private:
@@ -550,7 +547,7 @@ namespace hpx {
     } wait_some_nothrow{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_some_t final
+    HPX_CXX_EXPORT inline constexpr struct wait_some_t final
       : hpx::functional::tag<wait_some_t>
     {
     private:
@@ -672,7 +669,7 @@ namespace hpx {
     } wait_some{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_some_n_nothrow_t final
+    HPX_CXX_EXPORT inline constexpr struct wait_some_n_nothrow_t final
       : hpx::functional::tag<wait_some_n_nothrow_t>
     {
     private:

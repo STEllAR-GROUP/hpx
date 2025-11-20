@@ -15,6 +15,8 @@
 #include <string>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server {
     ///////////////////////////////////////////////////////////////////////////
@@ -54,3 +56,5 @@ namespace hpx { namespace performance_counters { namespace server {
         performance_counter_set counters_;
     };
 }}}    // namespace hpx::performance_counters::server
+
+#include <hpx/config/warnings_suffix.hpp>
