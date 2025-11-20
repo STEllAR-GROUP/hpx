@@ -31,7 +31,8 @@ namespace hpx {
 
     namespace detail {
 
-        HPX_CORE_EXPORT char const* store_function_annotation(std::string name);
+        HPX_CXX_EXPORT HPX_CORE_EXPORT char const* store_function_annotation(
+            std::string name);
     }    // namespace detail
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
@@ -39,7 +40,10 @@ namespace hpx {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
     HPX_CXX_EXPORT struct [[nodiscard]] scoped_annotation
     {
-        HPX_NON_COPYABLE(scoped_annotation);
+        scoped_annotation(scoped_annotation const&) = delete;
+        scoped_annotation(scoped_annotation&&) = delete;
+        scoped_annotation& operator=(scoped_annotation const&) = delete;
+        scoped_annotation& operator=(scoped_annotation&&) = delete;
 
         explicit constexpr scoped_annotation(char const*) noexcept {}
 
@@ -54,7 +58,10 @@ namespace hpx {
 #elif HPX_HAVE_ITTNOTIFY != 0
     HPX_CXX_EXPORT struct [[nodiscard]] scoped_annotation
     {
-        HPX_NON_COPYABLE(scoped_annotation);
+        scoped_annotation(scoped_annotation const&) = delete;
+        scoped_annotation(scoped_annotation&&) = delete;
+        scoped_annotation& operator=(scoped_annotation const&) = delete;
+        scoped_annotation& operator=(scoped_annotation&&) = delete;
 
         explicit scoped_annotation(char const* name)
           : task_(thread_domain_, hpx::util::itt::string_handle(name))
@@ -117,7 +124,10 @@ namespace hpx {
 #else
     HPX_CXX_EXPORT struct [[nodiscard]] scoped_annotation
     {
-        HPX_NON_COPYABLE(scoped_annotation);
+        scoped_annotation(scoped_annotation const&) = delete;
+        scoped_annotation(scoped_annotation&&) = delete;
+        scoped_annotation& operator=(scoped_annotation const&) = delete;
+        scoped_annotation& operator=(scoped_annotation&&) = delete;
 
         explicit scoped_annotation(char const* name)
         {
@@ -198,7 +208,10 @@ namespace hpx {
     ///        is (are) responsible for performance degradation, etc.
     HPX_CXX_EXPORT struct [[nodiscard]] scoped_annotation
     {
-        HPX_NON_COPYABLE(scoped_annotation);
+        scoped_annotation(scoped_annotation const&) = delete;
+        scoped_annotation(scoped_annotation&&) = delete;
+        scoped_annotation& operator=(scoped_annotation const&) = delete;
+        scoped_annotation& operator=(scoped_annotation&&) = delete;
 
         explicit constexpr scoped_annotation(char const* /*name*/) noexcept {}
 

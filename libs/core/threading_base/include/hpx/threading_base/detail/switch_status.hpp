@@ -15,7 +15,7 @@ namespace hpx::threads::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // helper class for switching thread state in and out during execution
-    class switch_status
+    HPX_CXX_EXPORT class switch_status
     {
     public:
         switch_status(

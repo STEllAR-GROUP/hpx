@@ -23,19 +23,16 @@
 
 namespace hpx::util {
 
-    using test_failure_handler_type = hpx::function<void()>;
+    HPX_CXX_EXPORT using test_failure_handler_type = hpx::function<void()>;
 
-    HPX_CORE_EXPORT void set_test_failure_handler(test_failure_handler_type f);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_test_failure_handler(
+        test_failure_handler_type f);
 
-    enum class counter_type
-    {
-        sanity,
-        test
-    };
+    HPX_CXX_EXPORT enum class counter_type { sanity, test };
 
     namespace detail {
 
-        struct fixture
+        HPX_CXX_EXPORT struct fixture
         {
         public:
             using mutex_type = hpx::util::detail::spinlock;
@@ -169,14 +166,15 @@ namespace hpx::util {
             }
         };
 
-        HPX_CORE_EXPORT fixture& global_fixture() noexcept;
+        HPX_CXX_EXPORT HPX_CORE_EXPORT fixture& global_fixture() noexcept;
 
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT int report_errors();
-    HPX_CORE_EXPORT int report_errors(std::ostream& stream);
-    HPX_CORE_EXPORT void print_cdash_timing(char const* name, double time);
-    HPX_CORE_EXPORT void print_cdash_timing(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT int report_errors();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT int report_errors(std::ostream& stream);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void print_cdash_timing(
+        char const* name, double time);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void print_cdash_timing(
         char const* name, std::uint64_t time);
 }    // namespace hpx::util
