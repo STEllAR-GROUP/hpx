@@ -33,7 +33,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename PredecessorSender, typename F,
+        HPX_CXX_EXPORT template <typename PredecessorSender, typename F,
             typename Scheduler = no_scheduler>
         struct let_value_sender
         {
@@ -402,7 +402,7 @@ namespace hpx::execution::experimental {
     //
     // let_value is guaranteed to not begin executing function until the
     // returned sender is started.
-    inline constexpr struct let_value_t final
+    HPX_CXX_EXPORT inline constexpr struct let_value_t final
       : hpx::functional::detail::tag_priority<let_value_t>
     {
     private:

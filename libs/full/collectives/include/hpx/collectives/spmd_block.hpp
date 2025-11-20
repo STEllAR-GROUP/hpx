@@ -12,11 +12,11 @@
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/broadcast_direct.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/execution/execution.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/hashing.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/serialization.hpp>

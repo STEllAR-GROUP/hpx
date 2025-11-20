@@ -29,13 +29,13 @@
 #include <hpx/async_local/sync_fwd.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/type_support.hpp>
@@ -56,6 +56,8 @@
 #include <string_view>
 #include <type_traits>
 #include <utility>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::actions {
 
@@ -529,6 +531,8 @@ namespace hpx::actions {
     /// \endcond
 }    // namespace hpx::actions
 // namespace hpx::actions
+
+#include <hpx/config/warnings_suffix.hpp>
 
 /// \cond NOINTERNAL
 

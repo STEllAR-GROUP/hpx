@@ -12,8 +12,9 @@
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
 namespace hpx::threads::policies {
 
-    HPX_CORE_EXPORT void set_maintain_queue_wait_times_enabled(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_maintain_queue_wait_times_enabled(
         bool enabled) noexcept;
-    HPX_CORE_EXPORT bool get_maintain_queue_wait_times_enabled() noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT bool
+    get_maintain_queue_wait_times_enabled() noexcept;
 }    // namespace hpx::threads::policies
 #endif

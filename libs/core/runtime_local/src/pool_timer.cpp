@@ -7,13 +7,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/io_service.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/runtime_local/pool_timer.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <asio/basic_waitable_timer.hpp>
 

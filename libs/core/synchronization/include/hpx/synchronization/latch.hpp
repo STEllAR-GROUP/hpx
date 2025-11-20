@@ -30,7 +30,7 @@ namespace hpx {
     /// threads to block until an operation is completed. An individual latch is
     /// a single-use object; once the operation has been completed, the latch
     /// cannot be reused.
-    class latch
+    HPX_CXX_EXPORT class latch
     {
     public:
         latch(latch const&) = delete;
@@ -125,7 +125,7 @@ namespace hpx {
 #endif
         }
 
-        /// Returns:        With very low probability false. Otherwise
+        /// Returns:        With very low probability false. Otherwise,
         ///                 counter == 0.
         bool try_wait() const noexcept
         {
@@ -235,14 +235,17 @@ namespace hpx::lcos::local {
     /// count_up() , and reset() behave as atomic operations.
     ///
     /// \note   A \a hpx::latch is not an LCO in the sense that it has no global
-    /// id and it can't be triggered using the action (parcel) mechanism. Use
+    /// id, and it can't be triggered using the action (parcel) mechanism. Use
     /// hpx::distributed::latch instead if this is required. It is just a low
     /// level synchronization primitive allowing to synchronize a given number
     /// of \a threads.
-    class latch : public hpx::latch
+    HPX_CXX_EXPORT class latch : public hpx::latch
     {
     public:
-        HPX_NON_COPYABLE(latch);
+        latch(latch const&) = delete;
+        latch(latch&&) = delete;
+        latch& operator=(latch const&) = delete;
+        latch& operator=(latch&&) = delete;
 
     public:
         /// Initialize the latch

@@ -15,8 +15,8 @@
 #include <hpx/init_runtime_local/init_runtime_local.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/program_options.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
-#include <hpx/resource_partitioner/partitioner_fwd.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 

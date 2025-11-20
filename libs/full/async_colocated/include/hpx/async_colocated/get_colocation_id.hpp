@@ -11,9 +11,9 @@
 
 #pragma once
 
-#include <hpx/futures/future_fwd.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
 namespace hpx {

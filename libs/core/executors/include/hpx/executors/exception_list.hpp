@@ -9,11 +9,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy_fwd.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -263,5 +263,5 @@ namespace hpx::parallel {
     }    // namespace detail
 
     // we're just reusing our existing implementation
-    using hpx::exception_list;
+    HPX_CXX_EXPORT using hpx::exception_list;
 }    // namespace hpx::parallel

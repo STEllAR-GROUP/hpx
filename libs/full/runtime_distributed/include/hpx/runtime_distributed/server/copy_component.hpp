@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/components/get_ptr.hpp>
-#include <hpx/futures/traits/get_remote_result.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_components/components_fwd.hpp>
 #include <hpx/runtime_distributed/stubs/runtime_support.hpp>

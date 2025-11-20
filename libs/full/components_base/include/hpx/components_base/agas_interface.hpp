@@ -27,6 +27,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 // FIXME: this is pulled from the main library
 namespace hpx::detail {
 
@@ -317,3 +319,5 @@ namespace hpx::agas {
     // initialize AGAS interface function wrappers
     struct agas_interface_functions& agas_init();
 }    // namespace hpx::agas
+
+#include <hpx/config/warnings_suffix.hpp>

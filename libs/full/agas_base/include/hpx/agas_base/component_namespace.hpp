@@ -10,7 +10,7 @@
 #include <hpx/agas_base/agas_fwd.hpp>
 #include <hpx/agas_base/server/component_namespace.hpp>
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 

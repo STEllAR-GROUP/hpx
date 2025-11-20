@@ -9,15 +9,13 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/functional.hpp>
 
+#include <hpx/modules/io_service.hpp>
 #include <hpx/modules/serialization.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
-#include <hpx/modules/threading_base.hpp>
-#include <hpx/modules/threading_base.hpp>
 
 #include <hpx/components/iostreams/server/buffer.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
-
-#include <hpx/io_service/io_service_pool.hpp>
 
 #include <cstdint>
 #include <functional>

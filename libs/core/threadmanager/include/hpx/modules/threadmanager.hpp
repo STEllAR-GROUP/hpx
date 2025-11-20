@@ -9,14 +9,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/io_service/io_service_pool_fwd.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/io_service.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/thread_pools.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/threadmanager/threadmanager_fwd.hpp>
 
 #include <cstddef>

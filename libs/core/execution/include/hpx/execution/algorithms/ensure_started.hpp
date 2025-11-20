@@ -53,7 +53,7 @@ namespace hpx::execution::experimental {
     // way to signal completion of the operation so that resource release can be
     // sequenced after the completion.
     //
-    inline constexpr struct ensure_started_t final
+    HPX_CXX_EXPORT inline constexpr struct ensure_started_t final
       : hpx::functional::detail::tag_priority<ensure_started_t>
     {
     private:

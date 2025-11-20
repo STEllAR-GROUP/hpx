@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/modules/execution.hpp>
 
 #include <cstddef>
 #include <type_traits>

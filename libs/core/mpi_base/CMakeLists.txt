@@ -42,6 +42,7 @@ add_hpx_module(
     hpx_logging
     hpx_runtime_configuration
     hpx_string_util
+    hpx_synchronization
     hpx_util
   DEPENDENCIES ${additional_dependencies}
   CMAKE_SUBDIRS examples tests

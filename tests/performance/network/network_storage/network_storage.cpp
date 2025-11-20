@@ -11,8 +11,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/serialization.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/synchronization/detail/sliding_semaphore.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>

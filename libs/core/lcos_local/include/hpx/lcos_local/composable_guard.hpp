@@ -129,7 +129,7 @@ namespace hpx::lcos::local {
         using guard_function = hpx::move_only_function<void()>;
     }    // namespace detail
 
-    class guard : public detail::debug_object
+    HPX_CXX_EXPORT class guard : public detail::debug_object
     {
     public:
         using guard_atomic = std::atomic<detail::guard_task*>;
@@ -144,7 +144,7 @@ namespace hpx::lcos::local {
         HPX_CORE_EXPORT ~guard();
     };
 
-    class guard_set : public detail::debug_object
+    HPX_CXX_EXPORT class guard_set : public detail::debug_object
     {
         std::vector<std::shared_ptr<guard>> guards;
 
@@ -185,10 +185,11 @@ namespace hpx::lcos::local {
     };
 
     /// Conceptually, a guard acts like a mutex on an asynchronous task. The
-    /// mutex is locked before the task runs, and unlocked afterwards.
-    HPX_CORE_EXPORT void run_guarded(guard& guard, detail::guard_function task);
+    /// mutex is locked before the task runs, and unlocked afterward.
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void run_guarded(
+        guard& guard, detail::guard_function task);
 
-    template <typename F, typename... Args>
+    HPX_CXX_EXPORT template <typename F, typename... Args>
     void run_guarded(guard& guard, F&& f, Args&&... args)
     {
         return run_guarded(guard,
@@ -198,11 +199,11 @@ namespace hpx::lcos::local {
 
     /// Conceptually, a guard_set acts like a set of mutexes on an asynchronous
     /// task. The mutexes are locked before the task runs, and unlocked
-    /// afterwards.
-    HPX_CORE_EXPORT void run_guarded(
+    /// afterward.
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void run_guarded(
         guard_set& guards, detail::guard_function task);
 
-    template <typename F, typename... Args>
+    HPX_CXX_EXPORT template <typename F, typename... Args>
     void run_guarded(guard_set& guards, F&& f, Args&&... args)
     {
         return run_guarded(guards,

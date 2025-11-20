@@ -32,16 +32,16 @@ namespace hpx::traits {
         struct acquire_shared_state_impl;
     }
 
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct acquire_shared_state
       : detail::acquire_shared_state_impl<std::decay_t<T>>
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using acquire_shared_state_t = typename acquire_shared_state<T>::type;
 
-    struct acquire_shared_state_disp
+    HPX_CXX_EXPORT struct acquire_shared_state_disp
     {
         template <typename T>
         HPX_FORCEINLINE acquire_shared_state_t<T> operator()(T&& t) const
@@ -163,13 +163,13 @@ namespace hpx::traits {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         HPX_FORCEINLINE acquire_shared_state_t<T> get_shared_state(T&& t)
         {
             return acquire_shared_state<T>()(HPX_FORWARD(T, t));
         }
 
-        template <typename R>
+        HPX_CXX_EXPORT template <typename R>
         HPX_FORCEINLINE
             hpx::intrusive_ptr<lcos::detail::future_data_base<R>> const&
             get_shared_state(
@@ -179,7 +179,7 @@ namespace hpx::traits {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Future>
+        HPX_CXX_EXPORT template <typename Future>
         struct wait_get_shared_state
         {
             HPX_FORCEINLINE

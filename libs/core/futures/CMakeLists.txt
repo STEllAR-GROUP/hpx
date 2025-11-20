@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2024 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,12 +8,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(futures_headers
     hpx/futures/detail/execute_thread.hpp
+    hpx/futures/detail/future_data.hpp
+    hpx/futures/detail/future_transforms.hpp
     hpx/futures/future.hpp
     hpx/futures/future_fwd.hpp
     hpx/futures/futures_factory.hpp
     hpx/futures/future_or_value.hpp
-    hpx/futures/detail/future_data.hpp
-    hpx/futures/detail/future_transforms.hpp
+    hpx/futures/macros.hpp
     hpx/futures/packaged_continuation.hpp
     hpx/futures/packaged_task.hpp
     hpx/futures/promise.hpp
@@ -31,6 +32,8 @@ set(futures_headers
     hpx/futures/traits/promise_local_result.hpp
     hpx/futures/traits/promise_remote_result.hpp
 )
+
+set(futures_macro_headers hpx/futures/macros.hpp)
 
 # cmake-format: off
 set(futures_compat_headers
@@ -59,10 +62,13 @@ include(HPX_AddModule)
 add_hpx_module(
   core futures
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${futures_sources}
   HEADERS ${futures_headers}
+  MACRO_HEADERS ${futures_macro_headers}
   COMPAT_HEADERS ${futures_compat_headers}
   ADD_TO_GLOBAL_HEADER "hpx/futures/detail/future_transforms.hpp"
+                       "hpx/futures/detail/future_data.hpp"
   MODULE_DEPENDENCIES
     hpx_allocator_support
     hpx_assertion

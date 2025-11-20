@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution/executors/execution.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/runtime_local/service_executors.hpp>
 

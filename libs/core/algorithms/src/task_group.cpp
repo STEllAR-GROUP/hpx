@@ -6,9 +6,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/lcos_local/detail/preprocess_future.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/lcos_local.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/parallel/task_group.hpp>
 

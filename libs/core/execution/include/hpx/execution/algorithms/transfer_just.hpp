@@ -29,7 +29,7 @@ namespace hpx::execution::experimental {
     //
     // This adaptor is provided as it greatly simplifies lifting values into
     // senders.
-    inline constexpr struct transfer_just_t final
+    HPX_CXX_EXPORT inline constexpr struct transfer_just_t final
       : hpx::functional::detail::tag_fallback<transfer_just_t>
     {
     private:

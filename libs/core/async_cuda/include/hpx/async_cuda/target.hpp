@@ -14,11 +14,10 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_cuda/cuda_future.hpp>
 #include <hpx/async_cuda/get_targets.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 

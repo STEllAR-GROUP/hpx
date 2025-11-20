@@ -10,24 +10,22 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
-#include <hpx/execution/detail/post_policy_dispatch.hpp>
-#include <hpx/execution/executors/execution.hpp>
 #include <hpx/executors/detail/hierarchical_spawning.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/threading.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/threading/thread.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -37,6 +35,8 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::parallel::execution::detail {
 
@@ -793,3 +793,5 @@ namespace hpx::parallel::execution::detail {
             shape, mask, HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx::parallel::execution::detail
+
+#include <hpx/config/warnings_suffix.hpp>

@@ -17,8 +17,8 @@
 #include <hpx/components_base/server/fixed_component_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>
 #include <cstdint>

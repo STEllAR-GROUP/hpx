@@ -15,7 +15,7 @@
 #include <hpx/components_base/server/component_heap.hpp>
 #include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/components_base/traits/component_type_database.hpp>
-#include <hpx/futures/detail/future_data.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>

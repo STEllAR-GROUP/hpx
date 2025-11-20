@@ -29,7 +29,7 @@ namespace hpx {
 
         /// An exclusive-ownership recursive mutex which implements
         /// Boost.Thread's TimedLockable concept.
-        template <typename Mutex = hpx::spinlock>
+        HPX_CXX_EXPORT template <typename Mutex = hpx::spinlock>
         struct recursive_mutex_impl
         {
         public:
@@ -134,5 +134,5 @@ namespace hpx {
         };
     }    // namespace detail
 
-    using recursive_mutex = detail::recursive_mutex_impl<>;
+    HPX_CXX_EXPORT using recursive_mutex = detail::recursive_mutex_impl<>;
 }    // namespace hpx

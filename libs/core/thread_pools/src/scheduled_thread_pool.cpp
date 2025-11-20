@@ -6,15 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/schedulers/background_scheduler.hpp>
-#include <hpx/schedulers/local_priority_queue_scheduler.hpp>
-#include <hpx/schedulers/local_queue_scheduler.hpp>
-#if defined(HPX_HAVE_WORK_REQUESTING_SCHEDULERS)
-#include <hpx/schedulers/local_workrequesting_scheduler.hpp>
-#endif
-#include <hpx/schedulers/shared_priority_queue_scheduler.hpp>
-#include <hpx/schedulers/static_priority_queue_scheduler.hpp>
-#include <hpx/schedulers/static_queue_scheduler.hpp>
+#include <hpx/modules/schedulers.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
 

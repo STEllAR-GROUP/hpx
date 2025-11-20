@@ -9,9 +9,9 @@
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/compute/host/distributed_target.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/topology.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime_local/get_os_thread_count.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 

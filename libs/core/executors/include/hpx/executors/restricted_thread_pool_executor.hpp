@@ -11,10 +11,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution/execution.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
 
 #include <atomic>
 #include <cstddef>

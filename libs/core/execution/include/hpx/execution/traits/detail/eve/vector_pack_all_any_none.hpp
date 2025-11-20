@@ -16,21 +16,21 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Mask>
+    HPX_CXX_EXPORT template <typename Mask>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t all_of(Mask const& msk) noexcept
     {
         return eve::all(msk);
     }
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Mask>
+    HPX_CXX_EXPORT template <typename Mask>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t any_of(Mask const& msk) noexcept
     {
         return eve::any(msk);
     }
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Mask>
+    HPX_CXX_EXPORT template <typename Mask>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t none_of(
         Mask const& msk) noexcept
     {
