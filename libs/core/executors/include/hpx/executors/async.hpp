@@ -38,7 +38,7 @@ namespace hpx::detail {
         }
     };
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct async_dispatch<Policy,
         std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
@@ -61,7 +61,7 @@ namespace hpx::detail {
 
     // Launch the given function or function object asynchronously and return a
     // future allowing to synchronize with the returned result.
-    template <typename Func, typename Enable>
+    HPX_CXX_EXPORT template <typename Func, typename Enable>
     struct async_dispatch
     {
         template <typename F, typename... Ts>
@@ -80,7 +80,7 @@ namespace hpx::detail {
     //
     // parallel::execution::executor
     // threads::executor
-    template <typename Executor>
+    HPX_CXX_EXPORT template <typename Executor>
     struct async_dispatch<Executor,
         std::enable_if_t<traits::is_one_way_executor_v<Executor> ||
             traits::is_two_way_executor_v<Executor>>>
