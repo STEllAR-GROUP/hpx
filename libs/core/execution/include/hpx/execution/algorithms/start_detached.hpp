@@ -179,7 +179,7 @@ namespace hpx::execution::experimental {
     //
     // Like ensure_started, but does not return a value; if the provided sender
     // sends an error instead of a value, std::terminate is called.
-    inline constexpr struct start_detached_t final
+    HPX_CXX_EXPORT inline constexpr struct start_detached_t final
       : hpx::functional::detail::tag_priority<start_detached_t>
     {
     private:

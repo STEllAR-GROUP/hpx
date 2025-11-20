@@ -49,7 +49,7 @@ namespace hpx {
     ///          contained in the arguments.
     ///
     /// \param   args the arguments that are unwrapped which may contain any
-    ///          arbitrary future or non future type.
+    ///          arbitrary future or non-future type.
     ///
     /// \returns Depending on the count of arguments this function returns a
     ///          hpx::tuple containing the unwrapped arguments if multiple
@@ -60,7 +60,7 @@ namespace hpx {
     ///          hpx::future objects were resolved through an exception. See
     ///          hpx::future::get() for details.
     ///
-    template <typename... Args>
+    HPX_CXX_EXPORT template <typename... Args>
     auto unwrap(Args&&... args) -> decltype(util::detail::unwrap_depth_impl<1U>(
         HPX_FORWARD(Args, args)...))
     {
@@ -71,7 +71,7 @@ namespace hpx {
 
         /// A helper function object for functionally invoking `hpx::unwrap`.
         /// For more information please refer to its documentation.
-        struct unwrap
+        HPX_CXX_EXPORT struct unwrap
         {
             /// \cond NOINTERNAL
             template <typename... Args>
@@ -84,7 +84,7 @@ namespace hpx {
         };
     }    // namespace functional
 
-    /// An alterntive version of hpx::unwrap(), which unwraps the given
+    /// An alternative version of hpx::unwrap(), which unwraps the given
     /// arguments to a certain depth of hpx::future like objects.
     ///
     /// \tparam Depth The count of hpx::future like objects which are
@@ -92,7 +92,7 @@ namespace hpx {
     ///
     /// See unwrap for a detailed description.
     ///
-    template <std::size_t Depth, typename... Args>
+    HPX_CXX_EXPORT template <std::size_t Depth, typename... Args>
     auto unwrap_n(Args&&... args)
         -> decltype(util::detail::unwrap_depth_impl<Depth>(
             HPX_FORWARD(Args, args)...))
@@ -106,7 +106,7 @@ namespace hpx {
 
         /// A helper function object for functionally invoking `hpx::unwrap_n`.
         /// For more information please refer to its documentation.
-        template <std::size_t Depth>
+        HPX_CXX_EXPORT template <std::size_t Depth>
         struct unwrap_n
         {
             /// \cond NOINTERNAL
@@ -120,13 +120,13 @@ namespace hpx {
         };
     }    // namespace functional
 
-    /// An alterntive version of hpx::unwrap(), which unwraps the given
+    /// An alternative version of hpx::unwrap(), which unwraps the given
     /// arguments recursively so that all contained hpx::future like objects are
     /// replaced by their actual value.
     ///
     /// See hpx::unwrap() for a detailed description.
     ///
-    template <typename... Args>
+    HPX_CXX_EXPORT template <typename... Args>
     auto unwrap_all(Args&&... args)
         -> decltype(util::detail::unwrap_depth_impl<0U>(
             HPX_FORWARD(Args, args)...))
@@ -139,7 +139,7 @@ namespace hpx {
         /// A helper function object for functionally invoking
         /// `hpx::unwrap_all`. For more information please refer to its
         /// documentation.
-        struct unwrap_all
+        HPX_CXX_EXPORT struct unwrap_all
         {
             /// \cond NOINTERNAL
             template <typename... Args>
@@ -166,10 +166,10 @@ namespace hpx {
     ///
     /// See hpx::unwrap() for a detailed description.
     ///
-    /// \param callable the callable object which which is called with the
+    /// \param callable the callable object which is called with the
     ///        result of the corresponding unwrap function.
     ///
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     auto unwrapping(T&& callable)
         -> decltype(util::detail::functional_unwrap_depth_impl<1U>(
             HPX_FORWARD(T, callable)))
@@ -184,7 +184,7 @@ namespace hpx {
     ///
     /// See hpx::unwrapping() for a detailed description.
     ///
-    template <std::size_t Depth, typename T>
+    HPX_CXX_EXPORT template <std::size_t Depth, typename T>
     auto unwrapping_n(T&& callable)
         -> decltype(util::detail::functional_unwrap_depth_impl<Depth>(
             HPX_FORWARD(T, callable)))
@@ -200,7 +200,7 @@ namespace hpx {
     ///
     /// See hpx::unwrapping() for a detailed description.
     ///
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     auto unwrapping_all(T&& callable)
         -> decltype(util::detail::functional_unwrap_depth_impl<0U>(
             HPX_FORWARD(T, callable)))

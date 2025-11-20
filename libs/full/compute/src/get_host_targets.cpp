@@ -10,8 +10,8 @@
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/compute/host/distributed_target.hpp>
 #include <hpx/compute/host/get_targets.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/naming_base/id_type.hpp>

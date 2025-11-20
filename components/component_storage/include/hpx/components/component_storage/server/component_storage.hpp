@@ -11,16 +11,17 @@
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-
-#include <hpx/components/containers/unordered/unordered_map.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>
+#include <hpx/components/containers/unordered/unordered_map.hpp>
 
 #include <cstddef>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::components::server {
@@ -50,6 +51,8 @@ namespace hpx::components::server {
         hpx::unordered_map<naming::gid_type, std::vector<char>> data_;
     };
 }    // namespace hpx::components::server
+
+#include <hpx/config/warnings_suffix.hpp>
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::component_storage::migrate_to_here_action,

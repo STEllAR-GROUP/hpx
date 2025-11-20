@@ -18,10 +18,10 @@
 
 namespace hpx {
 
-    template <typename Mutex>
+    HPX_CXX_EXPORT template <typename Mutex>
     class upgrade_to_unique_lock;
 
-    template <typename Mutex>
+    HPX_CXX_EXPORT template <typename Mutex>
     class upgrade_lock
     {
     protected:
@@ -181,13 +181,13 @@ namespace hpx {
         }
     };
 
-    template <typename Mutex>
+    HPX_CXX_EXPORT template <typename Mutex>
     void swap(upgrade_lock<Mutex>& lhs, upgrade_lock<Mutex>& rhs) noexcept
     {
         lhs.swap(rhs);
     }
 
-    template <typename Mutex>
+    HPX_CXX_EXPORT template <typename Mutex>
     class upgrade_to_unique_lock
     {
     private:

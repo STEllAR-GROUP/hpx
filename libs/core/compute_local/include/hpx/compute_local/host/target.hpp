@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compute_local/host/get_targets.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/topology.hpp>
 

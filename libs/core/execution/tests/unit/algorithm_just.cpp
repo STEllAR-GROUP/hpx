@@ -10,7 +10,7 @@
 #include <hpx/modules/datastructures.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution/algorithms/just.hpp>
+#include <hpx/modules/execution.hpp>
 #else
 #include <hpx/modules/execution.hpp>
 #endif

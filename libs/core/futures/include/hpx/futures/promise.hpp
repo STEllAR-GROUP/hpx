@@ -250,7 +250,7 @@ namespace hpx {
     /// conflict otherwise: for example multiple callers of
     /// hpx::shared_future::get must either all be read-only or provide external
     /// synchronization.
-    template <typename R>
+    HPX_CXX_EXPORT template <typename R>
     class promise : public detail::promise_base<R>
     {
         using base_type = detail::promise_base<R>;
@@ -388,7 +388,7 @@ namespace hpx {
         using base_type::set_exception;
     };
 
-    template <typename R>
+    HPX_CXX_EXPORT template <typename R>
     class promise<R&> : public detail::promise_base<R&>
     {
         using base_type = detail::promise_base<R&>;
@@ -586,12 +586,12 @@ namespace hpx {
 namespace std {
 
     // Requires: Allocator shall be an allocator (17.6.3.5)
-    template <typename R, typename Allocator>
+    HPX_CXX_EXPORT template <typename R, typename Allocator>
     struct uses_allocator<hpx::promise<R>, Allocator> : std::true_type
     {
     };
 
-    template <typename R>
+    HPX_CXX_EXPORT template <typename R>
     void swap(hpx::promise<R>& x, hpx::promise<R>& y) noexcept
     {
         x.swap(y);

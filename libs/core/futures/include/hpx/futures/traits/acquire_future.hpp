@@ -29,15 +29,15 @@ namespace hpx::traits {
         struct acquire_future_impl;
     }
 
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct acquire_future : detail::acquire_future_impl<std::decay_t<T>>
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using acquire_future_t = typename acquire_future<T>::type;
 
-    struct acquire_future_disp
+    HPX_CXX_EXPORT struct acquire_future_disp
     {
         template <typename T>
         HPX_FORCEINLINE acquire_future_t<T> operator()(T&& t) const

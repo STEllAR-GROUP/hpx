@@ -131,7 +131,7 @@ namespace hpx {
     /// Cpp17MoveConstructible (Table 28), Cpp17MoveAssignable (Table 30), and
     /// Cpp17Destructible (Table 32) requirements.
     ///
-    template <typename OnCompletion = detail::empty_oncompletion>
+    HPX_CXX_EXPORT template <typename OnCompletion = detail::empty_oncompletion>
     class barrier
     {
     public:
@@ -311,11 +311,11 @@ namespace hpx {
 
         //////////////////////////////////////////////////////////////////////////
         // A barrier can be used to synchronize a specific number of threads,
-        // blocking all of the entering threads until all of the threads have
+        // blocking all the entering threads until all the threads have
         // entered the barrier.
         //
         // \note   A \a barrier is not a LCO in the sense that it has no global
-        //         id and it can't be triggered using the action (parcel)
+        //         id, and it can't be triggered using the action (parcel)
         //         mechanism. It is just a low level synchronization primitive
         //         allowing to synchronize a given number of \a threads.
         class HPX_CORE_EXPORT barrier

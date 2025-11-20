@@ -8,10 +8,9 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/executors/dataflow.hpp>
-#include <hpx/futures/traits/acquire_shared_state.hpp>
-#include <hpx/futures/traits/is_future_tuple.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/threading_base.hpp>
 
 #include <cstddef>

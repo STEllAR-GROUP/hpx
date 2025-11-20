@@ -14,16 +14,16 @@
 
 namespace hpx::traits {
 
-    template <typename Tuple, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Tuple, typename Enable = void>
     struct is_future_tuple : std::false_type
     {
     };
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     struct is_future_tuple<hpx::tuple<Ts...>> : util::all_of<is_future<Ts>...>
     {
     };
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     inline constexpr bool is_future_tuple_v = is_future_tuple<Ts...>::value;
 }    // namespace hpx::traits

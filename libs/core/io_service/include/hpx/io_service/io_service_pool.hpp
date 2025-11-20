@@ -42,7 +42,7 @@
 namespace hpx::util {
 
     /// A pool of io_service objects.
-    class io_service_pool
+    HPX_CXX_EXPORT class io_service_pool
     {
     public:
         /// \brief Construct the io_service pool.

@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,6 +22,7 @@ set(synchronization_headers
     hpx/synchronization/event.hpp
     hpx/synchronization/latch.hpp
     hpx/synchronization/lock_types.hpp
+    hpx/synchronization/macros.hpp
     hpx/synchronization/mutex.hpp
     hpx/synchronization/no_mutex.hpp
     hpx/synchronization/once.hpp
@@ -32,6 +33,8 @@ set(synchronization_headers
     hpx/synchronization/spinlock_pool.hpp
     hpx/synchronization/stop_token.hpp
 )
+
+set(synchronization_macro_headers hpx/synchronization/macros.hpp)
 
 # Default location is $HPX_ROOT/libs/synchronization/include_compatibility
 # cmake-format: off
@@ -63,8 +66,10 @@ include(HPX_AddModule)
 add_hpx_module(
   core synchronization
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${synchronization_sources}
   HEADERS ${synchronization_headers}
+  MACRO_HEADERS ${synchronization_macro_headers}
   COMPAT_HEADERS ${synchronization_compat_headers}
   MODULE_DEPENDENCIES
     hpx_config

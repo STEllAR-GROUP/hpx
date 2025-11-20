@@ -15,6 +15,8 @@
 #include <cstdint>
 #include <type_traits>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::execution::experimental {
 
     enum class service_executor_type : std::uint8_t
@@ -157,3 +159,5 @@ namespace hpx::execution::experimental {
     };
     /// \endcond
 }    // namespace hpx::execution::experimental
+
+#include <hpx/config/warnings_suffix.hpp>

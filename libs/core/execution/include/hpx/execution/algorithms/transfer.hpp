@@ -37,7 +37,7 @@ namespace hpx::execution::experimental {
     // where the given sender is going to be started, but will ensure that the
     // completion signal of will be transferred to the given context.
     //
-    inline constexpr struct transfer_t final
+    HPX_CXX_EXPORT inline constexpr struct transfer_t final
       : hpx::functional::detail::tag_priority<transfer_t>
     {
     private:

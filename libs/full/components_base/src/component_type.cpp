@@ -10,9 +10,9 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/static_reinit.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/naming_base/address.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstdint>
 #include <map>

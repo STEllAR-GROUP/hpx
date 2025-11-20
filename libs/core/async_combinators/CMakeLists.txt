@@ -37,6 +37,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core async_combinators
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   HEADERS ${async_combinators_headers}
   COMPAT_HEADERS ${async_combinators_compat_headers}
   MODULE_DEPENDENCIES

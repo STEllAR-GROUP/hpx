@@ -20,9 +20,9 @@
 #include <hpx/components_base/server/fixed_component_base.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset_base/traits/action_get_embedded_parcel.hpp>
-#include <hpx/synchronization/condition_variable.hpp>
 
 #include <atomic>
 #include <cstddef>

@@ -13,7 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/agas_base/agas_fwd.hpp>
 #include <hpx/agas_base/server/symbol_namespace.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 

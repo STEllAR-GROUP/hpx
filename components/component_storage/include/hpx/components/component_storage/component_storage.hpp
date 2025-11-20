@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components/client_base.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -17,6 +17,8 @@
 
 #include <cstddef>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace components {
     ///////////////////////////////////////////////////////////////////////////
@@ -45,3 +47,5 @@ namespace hpx { namespace components {
         std::size_t size(launch::sync_policy) const;
     };
 }}    // namespace hpx::components
+
+#include <hpx/config/warnings_suffix.hpp>

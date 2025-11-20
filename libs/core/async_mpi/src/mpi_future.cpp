@@ -9,9 +9,9 @@
 #include <hpx/async_mpi/mpi_exception.hpp>
 #include <hpx/async_mpi/mpi_future.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/mpi_base/mpi_environment.hpp>
-#include <hpx/synchronization/mutex.hpp>
 
 #include <atomic>
 #include <cstddef>

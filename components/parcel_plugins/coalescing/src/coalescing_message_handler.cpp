@@ -32,6 +32,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::traits {
 
     // Inject additional configuration data into the factory registry for this

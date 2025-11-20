@@ -32,16 +32,16 @@ namespace hpx::traits {
         struct acquire_shared_state_impl;
     }
 
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct acquire_shared_state
       : detail::acquire_shared_state_impl<std::decay_t<T>>
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using acquire_shared_state_t = typename acquire_shared_state<T>::type;
 
-    struct acquire_shared_state_disp
+    HPX_CXX_EXPORT struct acquire_shared_state_disp
     {
         template <typename T>
         HPX_FORCEINLINE acquire_shared_state_t<T> operator()(T&& t) const

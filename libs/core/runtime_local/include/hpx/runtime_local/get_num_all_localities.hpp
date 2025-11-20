@@ -12,9 +12,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/futures/future_fwd.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <cstdint>
 

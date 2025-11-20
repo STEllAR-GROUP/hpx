@@ -8,10 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components/client_base.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>

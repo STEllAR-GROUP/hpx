@@ -27,7 +27,7 @@ namespace hpx::lcos::local {
     // This channel is bounded to a size given at construction time and supports
     // multiple producers and multiple consumers. The data is stored in a
     // ring-buffer.
-    template <typename T, typename Mutex = hpx::util::spinlock>
+    HPX_CXX_EXPORT template <typename T, typename Mutex = hpx::util::spinlock>
     class bounded_channel
     {
     private:
@@ -35,12 +35,12 @@ namespace hpx::lcos::local {
 
         [[nodiscard]] constexpr bool is_full(std::size_t tail) const noexcept
         {
-            std::size_t const numitems = size_ + tail - head_.data_;
-            if (numitems < size_)
+            std::size_t const num_items = size_ + tail - head_.data_;
+            if (num_items < size_)
             {
-                return numitems == size_ - 1;
+                return num_items == size_ - 1;
             }
-            return numitems - size_ == size_ - 1;
+            return num_items - size_ == size_ - 1;
         }
 
         [[nodiscard]] constexpr bool is_empty(std::size_t head) const noexcept
@@ -214,6 +214,6 @@ namespace hpx::lcos::local {
     // means of synchronization enables the use of this channel with non-HPX
     // threads, however the performance degrades by a factor of ten compared to
     // using hpx::spinlock.
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using channel_mpmc = bounded_channel<T, hpx::spinlock>;
 }    // namespace hpx::lcos::local

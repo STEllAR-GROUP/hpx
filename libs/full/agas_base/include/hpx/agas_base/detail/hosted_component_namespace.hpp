@@ -11,8 +11,8 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/agas_base/component_namespace.hpp>
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
 #include <cstdint>

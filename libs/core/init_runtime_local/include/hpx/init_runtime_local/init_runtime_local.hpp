@@ -50,6 +50,8 @@ extern HPX_CORE_EXPORT char** freebsd_environ;
 extern char** environ;
 #endif
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx {
 
     namespace detail {
@@ -234,3 +236,5 @@ namespace hpx {
     // Allow applications to add a finalizer if HPX_MAIN is set
     HPX_CORE_EXPORT extern void (*on_finalize)();
 }    // namespace hpx
+
+#include <hpx/config/warnings_suffix.hpp>

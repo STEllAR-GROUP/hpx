@@ -14,8 +14,7 @@
 
 #include <hpx/gasnet_base/gasnet.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
-#include <hpx/synchronization/mutex.hpp>
-#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <cstddef>
 #include <cstdint>

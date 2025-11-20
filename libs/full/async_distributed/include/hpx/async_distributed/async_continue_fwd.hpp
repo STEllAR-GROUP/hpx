@@ -13,8 +13,7 @@
 #include <hpx/actions_base/traits/action_remote_result.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 

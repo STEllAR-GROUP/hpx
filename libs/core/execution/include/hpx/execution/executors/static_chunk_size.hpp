@@ -30,7 +30,7 @@ namespace hpx::execution::experimental {
     /// \note This executor parameters type is equivalent to OpenMP's STATIC
     ///       scheduling directive.
     ///
-    struct static_chunk_size
+    HPX_CXX_EXPORT struct static_chunk_size
     {
         /// Construct a \a static_chunk_size executor parameters object
         ///
@@ -132,4 +132,4 @@ namespace hpx::execution {
         "hpx::execution::static_chunk_size is deprecated, use "
         "hpx::execution::experimental::static_chunk_size instead") =
         hpx::execution::experimental::static_chunk_size;
-}
+}    // namespace hpx::execution

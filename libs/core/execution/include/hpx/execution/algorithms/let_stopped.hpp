@@ -284,7 +284,7 @@ namespace hpx::execution::experimental {
     //
     // let_stopped is guaranteed to not begin executing function until the
     // returned sender is started.
-    inline constexpr struct let_stopped_t final
+    HPX_CXX_EXPORT inline constexpr struct let_stopped_t final
       : hpx::functional::detail::tag_priority<let_stopped_t>
     {
     private:

@@ -14,8 +14,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/iostream.hpp>
-#include <hpx/lcos_local/and_gate.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/lcos_local.hpp>
 
 #include <cstddef>
 #include <memory>

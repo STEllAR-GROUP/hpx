@@ -521,10 +521,11 @@ namespace hpx::lcos::local {
     // We provide this class to avoid semantic differences to the C++11
     // std::packaged_task, while otoh it is a very convenient way for us to
     // implement hpx::async.
-    template <typename Func, bool Cancelable = false>
+    HPX_CXX_EXPORT template <typename Func, bool Cancelable = false>
     class futures_factory;
 
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Result, bool Cancelable, typename Executor = void>
         struct create_task_object;
@@ -732,7 +733,7 @@ namespace hpx::lcos::local {
         };
     }    // namespace detail
 
-    template <typename Result, bool Cancelable>
+    HPX_CXX_EXPORT template <typename Result, bool Cancelable>
     class futures_factory<Result(), Cancelable>
     {
     protected:

@@ -67,3 +67,4 @@
 #endif
 
 #include <asio.hpp>
+#include <hwloc.h>

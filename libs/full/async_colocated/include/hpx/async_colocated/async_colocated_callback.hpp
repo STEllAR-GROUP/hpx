@@ -13,7 +13,7 @@
 #include <hpx/async_colocated/async_colocated.hpp>
 #include <hpx/async_colocated/async_colocated_callback_fwd.hpp>
 #include <hpx/async_distributed/async_continue_callback.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <utility>
 

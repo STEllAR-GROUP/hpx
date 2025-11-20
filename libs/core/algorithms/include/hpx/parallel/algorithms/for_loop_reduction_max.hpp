@@ -11,7 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/parallel/algorithms/for_loop_reduction.hpp>
 
 namespace hpx::experimental {

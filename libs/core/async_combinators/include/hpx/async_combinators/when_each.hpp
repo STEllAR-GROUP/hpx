@@ -128,15 +128,9 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/acquire_future.hpp>
-#include <hpx/futures/traits/detail/future_traits.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/future_traits.hpp>
-#include <hpx/futures/traits/is_future.hpp>
-#include <hpx/futures/traits/is_future_range.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/type_support.hpp>
@@ -341,7 +335,7 @@ namespace hpx::lcos::detail {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct when_each_t final
+    HPX_CXX_EXPORT inline constexpr struct when_each_t final
       : hpx::functional::tag<when_each_t>
     {
     private:
@@ -433,7 +427,7 @@ namespace hpx {
     } when_each{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct when_each_n_t final
+    HPX_CXX_EXPORT inline constexpr struct when_each_n_t final
       : hpx::functional::tag<when_each_n_t>
     {
     private:

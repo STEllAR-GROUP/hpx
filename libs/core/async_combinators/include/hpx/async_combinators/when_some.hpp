@@ -184,17 +184,10 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/futures_factory.hpp>
-#include <hpx/futures/traits/acquire_future.hpp>
-#include <hpx/futures/traits/acquire_shared_state.hpp>
-#include <hpx/futures/traits/detail/future_traits.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/is_future.hpp>
-#include <hpx/futures/traits/is_future_range.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/modules/util.hpp>
@@ -212,7 +205,7 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
 
-    template <typename Sequence>
+    HPX_CXX_EXPORT template <typename Sequence>
     struct when_some_result
     {
         when_some_result() = default;
@@ -383,7 +376,7 @@ namespace hpx::lcos::detail {
             // set callback functions to executed when future is ready
             set_on_completed_callback(*this);
 
-            // if all of the requested futures are already set, our
+            // if all the requested futures are already set, our
             // callback above has already been called often enough, otherwise
             // we suspend ourselves
             if (!goal_reached_on_calling_thread_.load(
@@ -411,7 +404,7 @@ namespace hpx::lcos::detail {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct when_some_t final
+    HPX_CXX_EXPORT inline constexpr struct when_some_t final
       : hpx::functional::tag<when_some_t>
     {
     private:
@@ -526,7 +519,7 @@ namespace hpx {
     } when_some{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct when_some_n_t final
+    HPX_CXX_EXPORT inline constexpr struct when_some_n_t final
       : hpx::functional::tag<when_some_n_t>
     {
     private:

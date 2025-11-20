@@ -8,14 +8,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/compute_local/host/target.hpp>
-#include <hpx/execution/executors/default_parameters.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/executors/restricted_thread_pool_executor.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/iterator_support.hpp>
 
 #include <algorithm>

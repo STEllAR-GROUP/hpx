@@ -20,6 +20,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core threading
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${threading_sources}
   HEADERS ${threading_headers}
   COMPAT_HEADERS ${threading_compat_headers}

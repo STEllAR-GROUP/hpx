@@ -173,6 +173,6 @@ namespace hpx {
     /// \brief \c spinlock is a type of lock that causes a thread attempting to
     ///        obtain it to check for its availability while waiting in a loop
     ///        continuously.
-    using spinlock = detail::spinlock<true>;
-    using spinlock_no_backoff = detail::spinlock<false>;
+    HPX_CXX_EXPORT using spinlock = detail::spinlock<true>;
+    HPX_CXX_EXPORT using spinlock_no_backoff = detail::spinlock<false>;
 }    // namespace hpx

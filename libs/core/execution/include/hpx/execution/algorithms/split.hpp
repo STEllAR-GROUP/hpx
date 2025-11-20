@@ -25,10 +25,10 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -596,7 +596,7 @@ namespace hpx::execution::experimental {
     // Multi-shot senders should also define overloads of execution::connect
     // that accept rvalue-qualified senders to allow the sender to be also used
     // in places where only a single-shot sender is required.
-    inline constexpr struct split_t final
+    HPX_CXX_EXPORT inline constexpr struct split_t final
       : hpx::functional::detail::tag_priority<split_t>
     {
     private:

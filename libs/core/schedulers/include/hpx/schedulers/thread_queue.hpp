@@ -47,6 +47,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
 
@@ -82,8 +84,8 @@ namespace hpx::threads::policies {
     //         typedef ... type;
     //     };
     // };
-    template <typename Mutex, typename PendingQueuing, typename StagedQueuing,
-        typename TerminatedQueuing>
+    HPX_CXX_EXPORT template <typename Mutex, typename PendingQueuing,
+        typename StagedQueuing, typename TerminatedQueuing>
     class thread_queue
     {
     private:
@@ -1348,3 +1350,5 @@ namespace hpx::threads::policies {
         thread_queue<Mutex, PendingQueuing, StagedQueuing,
             TerminatedQueuing>::task_description_alloc_;
 }    // namespace hpx::threads::policies
+
+#include <hpx/config/warnings_suffix.hpp>

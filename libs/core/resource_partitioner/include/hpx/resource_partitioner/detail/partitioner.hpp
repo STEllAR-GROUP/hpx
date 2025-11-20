@@ -12,10 +12,10 @@
 #include <hpx/modules/affinity.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/ini.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>
 #include <cstddef>

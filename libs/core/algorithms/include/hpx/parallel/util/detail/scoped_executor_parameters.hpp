@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/modules/execution.hpp>
 
 namespace hpx::parallel::util::detail {
 

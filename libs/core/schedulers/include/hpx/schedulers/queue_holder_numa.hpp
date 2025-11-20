@@ -36,7 +36,7 @@ namespace hpx::threads::policies {
     // ----------------------------------------------------------------
     // Helper class to hold a set of thread queue holders.
     // ----------------------------------------------------------------
-    template <typename QueueType>
+    HPX_CXX_EXPORT template <typename QueueType>
     struct queue_holder_numa
     {
         // ----------------------------------------------------------------

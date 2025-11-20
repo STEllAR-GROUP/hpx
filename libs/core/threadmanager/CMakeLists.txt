@@ -29,6 +29,7 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_async_combinators
     hpx_errors
+    hpx_execution
     hpx_execution_base
     hpx_io_service
     hpx_program_options
