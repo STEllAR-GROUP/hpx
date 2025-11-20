@@ -109,6 +109,7 @@ add_hpx_module(
     "hpx/threading_base/detail/get_default_timer_service.hpp"
     "hpx/threading_base/detail/reset_backtrace.hpp"
     "hpx/threading_base/detail/reset_lco_description.hpp"
+    "hpx/threading_base/detail/switch_status.hpp"
   SOURCES ${threading_base_sources}
   HEADERS ${threading_base_headers}
   COMPAT_HEADERS ${threading_base_compat_headers}
