@@ -544,6 +544,14 @@ namespace hpx {
     inline constexpr struct for_each_t final
       : hpx::detail::tag_parallel_algorithm<for_each_t>
     {
+        // this gives the compiler a place within for_each.hpp to point to,
+        // otherwise errors will only mention tag_fallback_invoke.hpp
+        template <typename ...Ts>
+        decltype(auto) operator()(Ts&&... vs) const
+        {
+            return tag_parallel_algorithm::operator()(HPX_FORWARD(Ts, vs)...);
+        }
+
     private:
         template <typename InIter, typename F>
         // clang-format off
