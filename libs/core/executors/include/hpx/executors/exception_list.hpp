@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //                2017-2018 Taeguk Kwon
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -20,6 +20,7 @@
 #include <utility>
 
 namespace hpx::parallel {
+
     namespace detail {
 
         /// \cond NOINTERNAL

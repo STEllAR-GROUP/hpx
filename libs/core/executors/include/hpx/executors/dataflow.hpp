@@ -38,24 +38,24 @@ namespace hpx::lcos::detail {
 }    // namespace hpx::lcos::detail
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-namespace hpx::traits {
 
-    ///////////////////////////////////////////////////////////////////////////
-    // traits specialization to get annotation from dataflow_finalization
-    template <typename Frame>
-    struct get_function_annotation<lcos::detail::dataflow_finalization<Frame>>
+///////////////////////////////////////////////////////////////////////////
+// traits specialization to get annotation from dataflow_finalization
+template <typename Frame>
+struct hpx::traits::get_function_annotation<
+    hpx::lcos::detail::dataflow_finalization<Frame>>
+{
+    using function_type = typename Frame::function_type;
+
+    static constexpr char const* call(
+        lcos::detail::dataflow_finalization<Frame> const& f) noexcept
     {
-        using function_type = typename Frame::function_type;
+        char const* annotation = hpx::traits::get_function_annotation<
+            std::decay_t<function_type>>::call(f.this_->func_);
+        return annotation;
+    }
+};    // namespace hpx::traits
 
-        static constexpr char const* call(
-            lcos::detail::dataflow_finalization<Frame> const& f) noexcept
-        {
-            char const* annotation = hpx::traits::get_function_annotation<
-                std::decay_t<function_type>>::call(f.this_->func_);
-            return annotation;
-        }
-    };
-}    // namespace hpx::traits
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -459,7 +459,8 @@ namespace hpx::lcos::detail {
 namespace hpx::detail {
 
     // clang-format off
-    template <typename Allocator, typename Policy, typename F, typename... Ts,
+    HPX_CXX_EXPORT template <typename Allocator, typename Policy, typename F,
+        typename... Ts,
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_allocator_v<Allocator> &&
             hpx::traits::is_launch_policy_v<Policy> &&
@@ -480,7 +481,8 @@ namespace hpx::detail {
     }
 
     // clang-format off
-    template <typename Allocator, typename Policy, typename F, typename... Ts,
+   HPX_CXX_EXPORT  template <typename Allocator, typename Policy, typename F,
+        typename... Ts,
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_allocator_v<Allocator> &&
             hpx::traits::is_launch_policy_v<Policy> &&
@@ -503,7 +505,8 @@ namespace hpx::detail {
     // executors
     //
     // clang-format off
-    template <typename Allocator, typename Executor, typename F, typename... Ts,
+   HPX_CXX_EXPORT  template <typename Allocator, typename Executor, typename F,
+        typename... Ts,
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_allocator_v<Allocator> &&
            (hpx::traits::is_one_way_executor_v<Executor> ||
@@ -521,7 +524,7 @@ namespace hpx::detail {
     // any action, plain function, or function object
     //
     // clang-format off
-    template <typename Allocator, typename F, typename... Ts,
+   HPX_CXX_EXPORT  template <typename Allocator, typename F, typename... Ts,
         HPX_CONCEPT_REQUIRES_(
              hpx::traits::is_allocator_v<Allocator> &&
             !hpx::traits::is_launch_policy_v<F> &&
