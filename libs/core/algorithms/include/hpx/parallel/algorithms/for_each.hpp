@@ -544,9 +544,30 @@ namespace hpx {
     inline constexpr struct for_each_t final
       : hpx::detail::tag_parallel_algorithm<for_each_t>
     {
-        // this gives the compiler a place within for_each.hpp to point to,
-        // otherwise errors will only mention tag_fallback_invoke.hpp
-        template <typename ...Ts>
+        // this would help get meaningful error messages (but doesn't, see below)
+        // at least it provides signatures for users to see in IDEs
+        template <typename InIter, typename F>
+            requires hpx::traits::is_iterator_v<InIter> &&
+            std::indirectly_unary_invocable<F, InIter>
+        F operator()(InIter first, InIter last, F f) const
+        {
+            return tag_parallel_algorithm::operator()(first, last, f);
+        }
+
+        // ditto
+        template <typename ExPolicy, typename FwdIter, typename F>
+            requires hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter> &&
+            std::indirectly_unary_invocable<F, FwdIter>
+        decltype(auto) operator()(
+            ExPolicy&& policy, FwdIter first, FwdIter last, F f) const
+        {
+            return tag_parallel_algorithm::operator()(policy, first, last, f);
+        }
+
+        // FIXME: this is needed to support overloading, it will prevent getting good error messages
+        // from the overloads above since it matches whenever the constrains aren't satisfied
+        template <typename... Ts>
         decltype(auto) operator()(Ts&&... vs) const
         {
             return tag_parallel_algorithm::operator()(HPX_FORWARD(Ts, vs)...);
