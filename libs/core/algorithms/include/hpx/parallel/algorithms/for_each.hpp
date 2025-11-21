@@ -551,7 +551,25 @@ namespace hpx {
             std::indirectly_unary_invocable<F, InIter>
         F operator()(InIter first, InIter last, F f) const
         {
-            return tag_parallel_algorithm::operator()(first, last, f);
+            // enforce even when customized
+            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+                "Requires at least input iterator.");
+
+            if constexpr (hpx::functional::is_tag_invocable_v<for_each_t,
+                              InIter, InIter, F>)
+            {
+                return tag_invoke(*this, first, last, f);
+            }
+            else
+            {
+                // embed fallback to reduce stack noise
+                if (first != last)
+                {
+                    hpx::parallel::detail::for_each<InIter>().call(
+                        hpx::execution::seq, first, last, f, hpx::identity_v);
+                }
+                return HPX_MOVE(f);
+            }
         }
 
         // ditto
@@ -562,7 +580,24 @@ namespace hpx {
         decltype(auto) operator()(
             ExPolicy&& policy, FwdIter first, FwdIter last, F f) const
         {
-            return tag_parallel_algorithm::operator()(policy, first, last, f);
+            // enforce even when customized
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+                "Requires at least forward iterator.");
+
+            if constexpr (hpx::functional::is_tag_invocable_v<for_each_t,
+                              ExPolicy, FwdIter, FwdIter, F>)
+            {
+                return tag_invoke(
+                    *this, HPX_FORWARD(ExPolicy, policy), first, last, f);
+            }
+            else
+            {
+                // embed fallback to reduce stack noise
+                return hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                    FwdIter>::get(hpx::parallel::detail::for_each<FwdIter>()
+                        .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                            HPX_MOVE(f), hpx::identity_v));
+            }
         }
 
         // FIXME: this is needed to support overloading, it will prevent getting good error messages
@@ -571,47 +606,6 @@ namespace hpx {
         decltype(auto) operator()(Ts&&... vs) const
         {
             return tag_parallel_algorithm::operator()(HPX_FORWARD(Ts, vs)...);
-        }
-
-    private:
-        template <typename InIter, typename F>
-        // clang-format off
-            requires (
-                hpx::traits::is_iterator_v<InIter>
-            )
-        // clang-format on
-        friend F tag_fallback_invoke(
-            hpx::for_each_t, InIter first, InIter last, F f)
-        {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
-                "Requires at least input iterator.");
-
-            if (first != last)
-            {
-                hpx::parallel::detail::for_each<InIter>().call(
-                    hpx::execution::seq, first, last, std::ref(f),
-                    hpx::identity_v);
-            }
-            return HPX_FORWARD(F, f);
-        }
-
-        template <typename ExPolicy, typename FwdIter, typename F>
-        // clang-format off
-            requires (
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter>
-            )
-        // clang-format on
-        friend decltype(auto) tag_fallback_invoke(hpx::for_each_t,
-            ExPolicy&& policy, FwdIter first, FwdIter last, F f)
-        {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
-
-            return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                FwdIter>::get(hpx::parallel::detail::for_each<FwdIter>()
-                    .call(HPX_FORWARD(ExPolicy, policy), first, last,
-                        HPX_MOVE(f), hpx::identity_v));
         }
     } for_each{};
 
