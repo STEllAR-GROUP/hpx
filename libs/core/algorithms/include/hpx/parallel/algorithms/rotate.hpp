@@ -184,13 +184,13 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/scheduling_properties.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/execution/algorithms/when_all.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/execution_policy_parameters.hpp>
 #include <hpx/futures/traits/is_future.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/iterator_support.hpp>

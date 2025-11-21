@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -47,12 +47,13 @@ namespace hpx {
 namespace hpx::detail {
 
     // dispatch point used for post implementations
-    template <typename Func, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Func, typename Enable = void>
     struct post_dispatch;
 }    // namespace hpx::detail
 
 namespace hpx {
-    template <typename F, typename... Ts>
+
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     HPX_FORCEINLINE bool post(F&& f, Ts&&... ts)
     {
         return detail::post_dispatch<std::decay_t<F>>::call(

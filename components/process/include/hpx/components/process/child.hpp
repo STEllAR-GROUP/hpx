@@ -9,9 +9,9 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_distributed.hpp>
 
 #include <hpx/components/process/server/child.hpp>

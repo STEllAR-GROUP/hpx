@@ -24,7 +24,7 @@ namespace hpx {
             "local",      // 3
             "default",    // 4
         };
-    }
+    }    // namespace strings
 
     char const* get_runtime_mode_name(runtime_mode state) noexcept
     {

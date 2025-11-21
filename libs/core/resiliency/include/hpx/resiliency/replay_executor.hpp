@@ -8,12 +8,12 @@
 
 #include <hpx/resiliency/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/current_executor.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/resiliency/async_replay_executor.hpp>
 #include <hpx/synchronization/latch.hpp>

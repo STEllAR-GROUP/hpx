@@ -21,7 +21,7 @@
 #include <hpx/async_distributed/traits/action_trigger_continuation.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>

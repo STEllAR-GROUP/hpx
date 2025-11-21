@@ -9,9 +9,9 @@
 
 #include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/tag_invoke.hpp>

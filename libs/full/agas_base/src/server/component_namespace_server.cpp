@@ -14,9 +14,9 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/util.hpp>
 #include <hpx/naming/credit_handling.hpp>
-#include <hpx/timing/scoped_timer.hpp>
 
 #include <atomic>
 #include <cstddef>

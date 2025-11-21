@@ -9,12 +9,12 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/plain_action.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/broadcast_direct.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/execution/execution.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/hashing.hpp>

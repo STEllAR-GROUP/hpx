@@ -51,14 +51,14 @@ namespace hpx::execution::experimental {
 
     // Condition: T meets the syntactic requirements for OneWayExecutor
     // Precondition: T is a complete type
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_one_way_executor : detail::is_one_way_executor<std::decay_t<T>>
     {
     };
 
     // Condition: T meets the syntactic requirements for NonBlockingOneWayExecutor
     // Precondition: T is a complete type
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_never_blocking_one_way_executor
       : detail::is_never_blocking_one_way_executor<std::decay_t<T>>
     {
@@ -66,7 +66,7 @@ namespace hpx::execution::experimental {
 
     // Condition: T meets the syntactic requirements for BulkOneWayExecutor
     // Precondition: T is a complete type
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_bulk_one_way_executor
       : detail::is_bulk_one_way_executor<std::decay_t<T>>
     {
@@ -74,14 +74,14 @@ namespace hpx::execution::experimental {
 
     // Condition: T meets the syntactic requirements for TwoWayExecutor
     // Precondition: T is a complete type
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_two_way_executor : detail::is_two_way_executor<std::decay_t<T>>
     {
     };
 
     // Condition: T meets the syntactic requirements for BulkTwoWayExecutor
     // Precondition: T is a complete type
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_bulk_two_way_executor
       : detail::is_bulk_two_way_executor<std::decay_t<T>>
     {
@@ -90,7 +90,7 @@ namespace hpx::execution::experimental {
     ///////////////////////////////////////////////////////////////////////////
     // is_scheduler_executor evaluates to true for executors that return senders
     // from their scheduling functions
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_scheduler_executor
       : detail::is_scheduler_executor<std::decay_t<T>>
     {
@@ -100,57 +100,57 @@ namespace hpx::execution::experimental {
 namespace hpx::traits {
 
     // Concurrency TS V2: executor framework
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_one_way_executor
       : execution::experimental::is_one_way_executor<std::decay_t<T>>
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_one_way_executor_v = is_one_way_executor<T>::value;
 
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_never_blocking_one_way_executor
       : execution::experimental::is_never_blocking_one_way_executor<
             std::decay_t<T>>
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_never_blocking_one_way_executor_v =
         is_never_blocking_one_way_executor<T>::value;
 
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_bulk_one_way_executor
       : execution::experimental::is_bulk_one_way_executor<std::decay_t<T>>
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_bulk_one_way_executor_v =
         is_bulk_one_way_executor<T>::value;
 
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_two_way_executor
       : execution::experimental::is_two_way_executor<std::decay_t<T>>
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_two_way_executor_v = is_two_way_executor<T>::value;
 
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_bulk_two_way_executor
       : execution::experimental::is_bulk_two_way_executor<std::decay_t<T>>
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_bulk_two_way_executor_v =
         is_bulk_two_way_executor<T>::value;
 
     // trait testing for any of the above
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_executor_any
       : util::any_of<is_one_way_executor<T>,
             is_never_blocking_one_way_executor<T>, is_bulk_one_way_executor<T>,
@@ -158,19 +158,19 @@ namespace hpx::traits {
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_executor_any_v = is_executor_any<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     // is_scheduler_executor evaluates to true for executors that return senders
     // from their scheduling functions
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_scheduler_executor
       : execution::experimental::is_scheduler_executor<T>
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_scheduler_executor_v =
         is_scheduler_executor<T>::value;
 }    // namespace hpx::traits

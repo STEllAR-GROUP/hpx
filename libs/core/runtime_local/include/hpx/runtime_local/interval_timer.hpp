@@ -10,8 +10,8 @@
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <cstdint>
 #include <memory>

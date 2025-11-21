@@ -26,11 +26,11 @@ namespace hpx {
         detail::select_policy_generator{};
 
     detail::policy_holder<> const launch::all =
-        detail::policy_holder<>{detail::launch_policy::all};
+        detail::policy_holder<>{launch_policy::all};
     detail::policy_holder<> const launch::sync_policies =
-        detail::policy_holder<>{detail::launch_policy::sync_policies};
+        detail::policy_holder<>{launch_policy::sync_policies};
     detail::policy_holder<> const launch::async_policies =
-        detail::policy_holder<>{detail::launch_policy::async_policies};
+        detail::policy_holder<>{launch_policy::async_policies};
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {

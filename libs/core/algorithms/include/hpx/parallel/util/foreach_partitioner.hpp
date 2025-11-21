@@ -16,8 +16,7 @@
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/traits/is_executor_parameters.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/partitioner_iteration.hpp>

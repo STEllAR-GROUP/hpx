@@ -8,12 +8,9 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/operation_state.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/synchronization/mutex.hpp>
 

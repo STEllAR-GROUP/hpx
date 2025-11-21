@@ -7,9 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution_base/execution.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/execution_base.hpp>
 
 #include <type_traits>
 #include <utility>

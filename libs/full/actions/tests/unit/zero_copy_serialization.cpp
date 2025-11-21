@@ -17,7 +17,6 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/parcelset/parcel.hpp>
-#include <hpx/timing/high_resolution_timer.hpp>
 
 #include <cstddef>
 #include <cstdint>

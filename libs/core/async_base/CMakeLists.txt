@@ -30,6 +30,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core async_base
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   HEADERS ${async_base_headers}
   COMPAT_HEADERS ${async_base_compat_headers}
   SOURCES ${async_base_sources}

@@ -9,5 +9,5 @@
 #include <hpx/config.hpp>
 
 #include <hpx/components/client_base.hpp>
-#include <hpx/runtime_configuration/component_factory_base.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/runtime_distributed/stubs/runtime_support.hpp>

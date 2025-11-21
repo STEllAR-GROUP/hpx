@@ -8,10 +8,10 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_colocated/post_colocated.hpp>
 #include <hpx/async_distributed/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/ini.hpp>

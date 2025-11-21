@@ -6,14 +6,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/performance_counters/apex_sample_value.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -24,7 +25,6 @@
 #include <hpx/runtime_local/get_thread_name.hpp>
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstddef>
 #include <cstdint>

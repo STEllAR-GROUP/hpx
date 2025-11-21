@@ -16,9 +16,9 @@
 
 namespace hpx::chrono {
 
-    using std::chrono::steady_clock;
+    HPX_CXX_EXPORT using std::chrono::steady_clock;
 
-    class steady_time_point
+    HPX_CXX_EXPORT class steady_time_point
     {
         using value_type = steady_clock::time_point;
 
@@ -46,7 +46,7 @@ namespace hpx::chrono {
         value_type _abs_time;
     };
 
-    class steady_duration
+    HPX_CXX_EXPORT class steady_duration
     {
         using value_type = steady_clock::duration;
 
@@ -85,6 +85,6 @@ namespace hpx::chrono {
         value_type _rel_time;
     };
 
-    inline constexpr steady_duration null_duration{};
+    HPX_CXX_EXPORT inline constexpr steady_duration null_duration{};
 
 }    // namespace hpx::chrono

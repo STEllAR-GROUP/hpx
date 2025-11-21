@@ -18,7 +18,7 @@
 #include <hpx/actions_base/actions_base_support.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>

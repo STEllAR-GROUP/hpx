@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,8 +11,7 @@
 
 namespace hpx::agas {
 
-    enum class service_mode
-    {
+    HPX_CXX_EXPORT enum class service_mode {
         invalid = -1,
         bootstrap = 0,
         hosted = 1

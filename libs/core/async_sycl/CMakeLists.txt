@@ -34,6 +34,7 @@ add_hpx_module(
   DEPENDENCIES
     hpx_allocator_support
     hpx_assertion
+    hpx_async_base
     hpx_concurrency
     hpx_config
     hpx_debugging

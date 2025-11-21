@@ -14,10 +14,10 @@
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution_base/execution.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/for_loop_reduction.hpp>
 

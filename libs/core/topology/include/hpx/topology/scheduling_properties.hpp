@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/scheduling_properties.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/topology/topology.hpp>
 

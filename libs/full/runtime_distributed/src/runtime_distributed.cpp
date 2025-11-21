@@ -9,22 +9,24 @@
 
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/components_base/server/component_base.hpp>
-#include <hpx/execution_base/this_thread.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/io_service.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/static_reinit.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threadmanager.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -39,7 +41,6 @@
 #include <hpx/runtime_components/console_error_sink.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_components/server/console_error_sink.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/big_boot_barrier.hpp>
@@ -60,7 +61,6 @@
 #include <hpx/thread_pools/detail/scoped_background_timer.hpp>
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>

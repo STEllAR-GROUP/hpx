@@ -11,14 +11,11 @@
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution/algorithms/run_loop.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/operation_state.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/promise.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>

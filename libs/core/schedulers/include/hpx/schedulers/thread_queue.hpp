@@ -27,12 +27,12 @@
 #include <hpx/schedulers/deadlock_detection.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
+#include <hpx/modules/timing.hpp>
 #include <hpx/schedulers/maintain_queue_wait_times.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/timing/tick_counter.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
 #include <hpx/modules/util.hpp>

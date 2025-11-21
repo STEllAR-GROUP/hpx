@@ -14,7 +14,7 @@
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <condition_variable>
 #include <cstddef>

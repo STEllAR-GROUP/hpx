@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/sync.hpp>
+#include <hpx/modules/async_base.hpp>
 
 #include <type_traits>
 #include <utility>

@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/modules/execution_base.hpp>
 #else
 
 #include <hpx/execution/algorithms/just.hpp>

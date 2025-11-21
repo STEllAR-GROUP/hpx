@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/command_line_handling_local/parse_command_line_local.hpp>
 #include <hpx/modules/ini.hpp>
-#include <hpx/runtime_configuration/runtime_mode.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 
 #include <hpx/modules/program_options.hpp>
 

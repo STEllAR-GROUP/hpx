@@ -383,10 +383,9 @@ namespace hpx {
 #include <hpx/algorithms/traits/pointer_category.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/execution/algorithms/just.hpp>
-#include <hpx/execution_base/any_sender.hpp>
-#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
