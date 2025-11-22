@@ -1240,7 +1240,10 @@ if(HPX_WITH_NETWORKING)
   endif()
 
   hpx_option(
-    HPX_WITH_PARCELPORT_MPI STRING "Enable the MPI based parcelport. Leave empty to auto-detect." ""
+    HPX_WITH_PARCELPORT_MPI
+    STRING
+    "Enable the MPI based parcelport. Leave empty to auto-detect."
+    ""
     CATEGORY "Parcelport"
   )
   if("${HPX_WITH_PARCELPORT_MPI}" STREQUAL "")
