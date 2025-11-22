@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <memory>
 #include <string>

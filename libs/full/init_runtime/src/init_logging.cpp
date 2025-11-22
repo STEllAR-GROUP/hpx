@@ -9,11 +9,11 @@
 #if defined(HPX_HAVE_LOGGING)
 #include <hpx/init_runtime/detail/init_logging.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/runtime_configuration/runtime_mode.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
-#include <hpx/threading_base/thread_data.hpp>
 #endif
 
 #include <cstddef>

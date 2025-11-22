@@ -18,22 +18,22 @@
 #include <hpx/async_distributed/put_parcel.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/managed_component_base.hpp>
-#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/modules/agas_base.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/static_reinit.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/parcelset/detail/parcel_await.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
 #include <hpx/parcelset_base/parcelport.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/big_boot_barrier.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <cstdint>

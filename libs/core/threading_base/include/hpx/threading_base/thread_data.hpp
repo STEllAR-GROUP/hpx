@@ -10,11 +10,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/thread_description.hpp>
@@ -44,9 +44,12 @@ namespace hpx::threads {
 
     namespace detail {
 
-        using get_locality_id_type = std::uint32_t(hpx::error_code&);
-        HPX_CORE_EXPORT void set_get_locality_id(get_locality_id_type* f);
-        HPX_CORE_EXPORT std::uint32_t get_locality_id(hpx::error_code&);
+        HPX_CXX_EXPORT using get_locality_id_type =
+            std::uint32_t(hpx::error_code&);
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void set_get_locality_id(
+            get_locality_id_type* f);
+        HPX_CXX_EXPORT HPX_CORE_EXPORT std::uint32_t get_locality_id(
+            hpx::error_code&);
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
@@ -65,7 +68,8 @@ namespace hpx::threads {
     /// Generally, \a threads are not created or executed directly. All
     /// functionality related to the management of \a threads is implemented by
     /// the thread-manager.
-    class thread_data : public detail::thread_data_reference_counting
+    HPX_CXX_EXPORT class thread_data
+      : public detail::thread_data_reference_counting
     {
     public:
         thread_data(thread_data const&) = delete;

@@ -10,12 +10,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/scheduling_properties.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/executors/detail/hierarchical_spawning.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
@@ -23,11 +23,11 @@
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/threading/thread.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/topology/cpu_mask.hpp>
 
 #include <algorithm>
 #include <atomic>

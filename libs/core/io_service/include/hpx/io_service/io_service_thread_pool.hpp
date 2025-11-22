@@ -8,8 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/io_service/io_service_pool_fwd.hpp>
-#include <hpx/threading_base/scheduler_state.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <cstddef>
 #include <exception>

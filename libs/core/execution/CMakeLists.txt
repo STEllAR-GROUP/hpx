@@ -169,6 +169,7 @@ add_hpx_module(
     hpx_coroutines
     hpx_datastructures
     hpx_errors
+    hpx_execution_base
     hpx_functional
     hpx_iterator_support
     hpx_lock_registration
@@ -179,6 +180,7 @@ add_hpx_module(
     hpx_synchronization
     hpx_tag_invoke
     hpx_threading
+    hpx_threading_base
     hpx_thread_support
     hpx_timing
     hpx_topology

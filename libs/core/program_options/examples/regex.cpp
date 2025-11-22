@@ -29,6 +29,8 @@
 #include <string>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 using namespace hpx::program_options;
 
 /* Define a completely non-sensical class. */

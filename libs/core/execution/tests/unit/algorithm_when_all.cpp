@@ -11,7 +11,7 @@
 #if !defined(HPX_CLANG_VERSION) ||                                             \
     ((HPX_CLANG_VERSION / 10000) != 11 && (HPX_CLANG_VERSION / 10000) != 8)
 
-#include <hpx/async_base/dataflow.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
 

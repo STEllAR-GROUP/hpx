@@ -76,7 +76,7 @@ namespace hpx::util {
         // CMake does not deal with explicit semicolons well, for this reason,
         // the paths are delimited with ':'. On Windows those need to be
         // converted to ';'.
-        std::string convert_delimiters(std::string paths)
+        static std::string convert_delimiters(std::string paths)
         {
 #if defined(HPX_WINDOWS)
             std::replace(paths.begin(), paths.end(), ':', ';');
@@ -594,12 +594,10 @@ namespace hpx::util {
         std::set<std::string>& component_paths,
         std::map<std::string, filesystem::path>& basenames)
     {
-        namespace fs = filesystem;
-
         // try to build default ini structure from shared libraries in default
         // installation location, this allows to install simple components
-        // without the need to install an ini file
-        // split of the separate paths from the given path list
+        // without the need to install an ini file split of the separate paths
+        // from the given path list
         hpx::string_util::char_separator sep(HPX_INI_PATH_DELIMITER);
         hpx::string_util::tokenizer tok_path(component_base_paths, sep);
         hpx::string_util::tokenizer tok_suffixes(component_path_suffixes, sep);
@@ -681,7 +679,8 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     runtime_configuration::runtime_configuration(char const* argv0_,
-        runtime_mode mode, std::vector<std::string> extra_static_ini_defs_)
+        runtime_mode const mode,
+        std::vector<std::string> extra_static_ini_defs_)
       : extra_static_ini_defs(HPX_MOVE(extra_static_ini_defs_))
       , mode_(mode)
       , num_localities(0)
@@ -797,7 +796,7 @@ namespace hpx::util {
     }
 
     void runtime_configuration::set_num_localities(
-        std::uint32_t num_localities_)
+        std::uint32_t const num_localities_)
     {
         // this function should not be called on the AGAS server
         HPX_ASSERT(agas::service_mode::bootstrap != get_agas_service_mode());
@@ -866,7 +865,7 @@ namespace hpx::util {
     }
 
     void runtime_configuration::set_first_used_core(
-        std::uint32_t first_used_core)
+        std::uint32_t const first_used_core)
     {
         if (util::section* sec = get_section("hpx"); nullptr != sec)
         {
@@ -875,7 +874,7 @@ namespace hpx::util {
     }
 
     std::size_t runtime_configuration::get_agas_local_cache_size(
-        std::size_t dflt) const
+        std::size_t const dflt) const
     {
         std::size_t cache_size = dflt;
 
@@ -1078,7 +1077,7 @@ namespace hpx::util {
 
     // Will return the stack size to use for all HPX-threads.
     std::ptrdiff_t runtime_configuration::init_stack_size(char const* entryname,
-        char const* defaultvaluestr, std::ptrdiff_t defaultvalue) const
+        char const* defaultvaluestr, std::ptrdiff_t const defaultvalue) const
     {
         if (util::section const* sec = get_section("hpx.stacks");
             nullptr != sec)
@@ -1188,7 +1187,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     std::ptrdiff_t runtime_configuration::get_stack_size(
-        threads::thread_stacksize stacksize) const
+        threads::thread_stacksize const stacksize) const
     {
         switch (stacksize)
         {

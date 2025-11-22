@@ -8,4 +8,4 @@
 
 #pragma once
 
-#include <hpx/threading_base/thread_num_tss.hpp>
+#include <hpx/modules/threading_base.hpp>

@@ -15,24 +15,20 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/schedulers/queue_helpers.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_data_stackful.hpp>
-#include <hpx/threading_base/thread_data_stackless.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 
 #if defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
 #include <hpx/schedulers/deadlock_detection.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
+#include <hpx/modules/timing.hpp>
 #include <hpx/schedulers/maintain_queue_wait_times.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/timing/tick_counter.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
 #include <hpx/modules/util.hpp>

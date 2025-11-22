@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,7 @@
 
 namespace hpx::threads::detail {
 
-    HPX_CORE_EXPORT thread_id_ref_type create_work(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT thread_id_ref_type create_work(
         policies::scheduler_base* scheduler, threads::thread_init_data& data,
         error_code& ec = throws);
 }    // namespace hpx::threads::detail

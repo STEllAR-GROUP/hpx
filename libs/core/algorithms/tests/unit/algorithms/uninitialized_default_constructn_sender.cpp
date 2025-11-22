@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/algorithm.hpp>
-#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/init.hpp>
 #include <hpx/memory.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>

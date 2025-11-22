@@ -8,14 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/threading_base/detail/get_default_pool.hpp>
-#include <hpx/threading_base/thread_description.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <cstdint>
 #include <type_traits>

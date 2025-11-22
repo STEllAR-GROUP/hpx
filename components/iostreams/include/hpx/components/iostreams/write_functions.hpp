@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/modules/functional.hpp>
 
 #include <algorithm>
 #include <deque>

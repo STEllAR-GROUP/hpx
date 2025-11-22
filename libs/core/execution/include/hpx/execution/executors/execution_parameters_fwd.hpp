@@ -7,15 +7,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/scheduling_properties.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution_base/execution.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/execution_base/traits/is_executor_parameters.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <type_traits>

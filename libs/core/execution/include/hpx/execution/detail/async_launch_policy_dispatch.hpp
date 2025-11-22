@@ -8,18 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/futures/traits/is_future.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/threading_base/detail/get_default_pool.hpp>
-#include <hpx/threading_base/scoped_annotation.hpp>
-#include <hpx/threading_base/thread_description.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <exception>
 #include <type_traits>

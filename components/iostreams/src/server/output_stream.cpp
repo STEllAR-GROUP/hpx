@@ -11,8 +11,8 @@
 
 #include <hpx/modules/serialization.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <hpx/components/iostreams/server/buffer.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>

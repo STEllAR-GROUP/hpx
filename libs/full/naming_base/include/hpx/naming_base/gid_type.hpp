@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/serialization.hpp>

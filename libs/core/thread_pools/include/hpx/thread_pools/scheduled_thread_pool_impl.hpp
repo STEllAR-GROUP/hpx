@@ -7,27 +7,18 @@
 
 #pragma once
 
-#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution_base/this_thread.hpp>
+#include <hpx/modules/affinity.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/thread_pools/scheduling_loop.hpp>
-#include <hpx/threading_base/create_thread.hpp>
-#include <hpx/threading_base/create_work.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
-#include <hpx/threading_base/scheduler_state.hpp>
-#include <hpx/threading_base/set_thread_state.hpp>
-#include <hpx/threading_base/set_thread_state_timed.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <algorithm>
 #include <atomic>

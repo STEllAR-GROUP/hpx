@@ -8,13 +8,14 @@
 
 #pragma once
 
-#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/config.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstdint>
 
 namespace hpx::util {
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct scoped_timer
     {
         explicit scoped_timer(T& t, bool enabled = true) noexcept

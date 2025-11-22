@@ -40,6 +40,12 @@ set(threading_base_headers
     hpx/threading_base/threading_base_fwd.hpp
 )
 
+if(HPX_WITH_APEX)
+  set(threading_base_headers ${threading_base_headers}
+                             hpx/threading_base/external_timer.hpp
+  )
+endif()
+
 # cmake-format: off
 set(threading_base_compat_headers
     hpx/runtime/threads/execution_agent.hpp => hpx/modules/threading_base.hpp
@@ -94,8 +100,16 @@ include(HPX_AddModule)
 add_hpx_module(
   core threading_base
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   EXCLUDE_FROM_GLOBAL_HEADER "hpx/threading_base/thread_data_stackful.hpp"
                              "hpx/threading_base/thread_data_stackless.hpp"
+  ADD_TO_GLOBAL_HEADER
+    "hpx/threading_base/detail/switch_status.hpp"
+    "hpx/threading_base/detail/get_default_pool.hpp"
+    "hpx/threading_base/detail/get_default_timer_service.hpp"
+    "hpx/threading_base/detail/reset_backtrace.hpp"
+    "hpx/threading_base/detail/reset_lco_description.hpp"
+    "hpx/threading_base/detail/switch_status.hpp"
   SOURCES ${threading_base_sources}
   HEADERS ${threading_base_headers}
   COMPAT_HEADERS ${threading_base_compat_headers}
@@ -120,6 +134,7 @@ add_hpx_module(
     hpx_memory
     hpx_timing
     hpx_tag_invoke
+    hpx_topology
     hpx_type_support
     hpx_thread_support
     ${additional_dependencies}

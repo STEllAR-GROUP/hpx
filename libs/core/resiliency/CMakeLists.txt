@@ -31,10 +31,12 @@ add_hpx_module(
   SOURCES ${resiliency_sources}
   HEADERS ${resiliency_headers}
   MODULE_DEPENDENCIES
+    hpx_async_base
     hpx_async_local
     hpx_concepts
     hpx_datastructures
     hpx_execution
+    hpx_execution_base
     hpx_functional
     hpx_futures
     hpx_iterator_support

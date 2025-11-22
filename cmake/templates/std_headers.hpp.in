@@ -14,8 +14,27 @@
 
 @cxx_standard_headers@
 // Some standard headers include the following headers.
-#include <filesystem>
 #include <numeric>
+
+#if defined(HPX_HAVE_STDEXEC)
+# if defined(HPX_GCC_VERSION)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wall"
+#  pragma GCC diagnostic ignored "-Wextra"
+#  pragma GCC diagnostic ignored "-Wmissing-braces"
+# elif defined(HPX_CLANG_VERSION)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Weverything"
+# endif
+
+# include <stdexec/execution.hpp>
+
+# if defined(HPX_GCC_VERSION)
+#  pragma GCC diagnostic pop
+# elif defined(HPX_CLANG_VERSION)
+#  pragma clang diagnostic pop
+# endif
+#endif
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 # if defined(__has_include)
@@ -48,3 +67,4 @@
 #endif
 
 #include <asio.hpp>
+#include <hwloc.h>

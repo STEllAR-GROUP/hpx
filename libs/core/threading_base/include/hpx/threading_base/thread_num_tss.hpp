@@ -19,40 +19,44 @@
 namespace hpx::threads::detail {
 
     /// Set the global thread id to thread local storage.
-    HPX_CORE_EXPORT std::size_t set_global_thread_num_tss(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t set_global_thread_num_tss(
         std::size_t num) noexcept;
 
     /// Get the global thread id from thread local storage.
-    HPX_CORE_EXPORT std::size_t get_global_thread_num_tss() noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t
+    get_global_thread_num_tss() noexcept;
 
     /// Set the local thread id to thread local storage.
-    HPX_CORE_EXPORT std::size_t set_local_thread_num_tss(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t set_local_thread_num_tss(
         std::size_t num) noexcept;
 
     /// Get the local thread id from thread local storage.
-    HPX_CORE_EXPORT std::size_t get_local_thread_num_tss() noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t
+    get_local_thread_num_tss() noexcept;
 
     /// Set the thread pool id to thread local storage.
-    HPX_CORE_EXPORT std::size_t set_thread_pool_num_tss(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t set_thread_pool_num_tss(
         std::size_t num) noexcept;
 
     /// Get the thread pool id from thread local storage.
-    HPX_CORE_EXPORT std::size_t get_thread_pool_num_tss() noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t
+    get_thread_pool_num_tss() noexcept;
 
     /// Holds the global and local thread numbers, and the pool number
     /// associated with the thread.
-    struct thread_nums
+    HPX_CXX_EXPORT struct thread_nums
     {
         std::size_t global_thread_num;
         std::size_t local_thread_num;
         std::size_t thread_pool_num;
     };
 
-    HPX_CORE_EXPORT void set_thread_nums_tss(thread_nums const&) noexcept;
-    HPX_CORE_EXPORT thread_nums get_thread_nums_tss() noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_thread_nums_tss(
+        thread_nums const&) noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT thread_nums get_thread_nums_tss() noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
-    struct reset_tss_helper
+    HPX_CXX_EXPORT struct reset_tss_helper
     {
         explicit reset_tss_helper(std::size_t global_thread_num) noexcept
           : global_thread_num_(set_global_thread_num_tss(global_thread_num))
@@ -91,11 +95,11 @@ namespace hpx {
     ///
     /// \note   The returned value is zero based and its maximum value is
     ///         smaller than the overall number of OS-threads executed (as
-    ///         returned by \a get_os_thread_count().
+    ///         returned by \a get_os_thread_count()).
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         fail otherwise (it will return -1).
-    HPX_CORE_EXPORT std::size_t get_worker_thread_num() noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t get_worker_thread_num() noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the current OS-thread running in the runtime
@@ -109,13 +113,14 @@ namespace hpx {
     ///
     /// \note   The returned value is zero based and its maximum value is
     ///         smaller than the overall number of OS-threads executed (as
-    ///         returned by \a get_os_thread_count(). It will return -1 if the
+    ///         returned by \a get_os_thread_count()). It will return -1 if the
     ///         current thread is not a known thread or if the runtime is not in
     ///         running state.
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         fail otherwise (it will return -1).
-    HPX_CORE_EXPORT std::size_t get_worker_thread_num(error_code&) noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t get_worker_thread_num(
+        error_code& ec) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the current OS-thread running in the current
@@ -131,7 +136,8 @@ namespace hpx {
     ///
     /// \note This function needs to be executed on a HPX-thread. It will fail
     ///         otherwise (it will return -1).
-    HPX_CORE_EXPORT std::size_t get_local_worker_thread_num() noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t
+    get_local_worker_thread_num() noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the current OS-thread running in the current
@@ -150,8 +156,8 @@ namespace hpx {
     ///
     /// \note This function needs to be executed on a HPX-thread. It will fail
     ///         otherwise (it will return -1).
-    HPX_CORE_EXPORT std::size_t get_local_worker_thread_num(
-        error_code&) noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t get_local_worker_thread_num(
+        error_code& ec) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the current thread pool the current
@@ -167,7 +173,7 @@ namespace hpx {
     ///
     /// \note This function needs to be executed on a HPX-thread. It will fail
     ///         otherwise (it will return -1).
-    HPX_CORE_EXPORT std::size_t get_thread_pool_num() noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t get_thread_pool_num() noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the current thread pool the current
@@ -186,7 +192,8 @@ namespace hpx {
     ///
     /// \note This function needs to be executed on a HPX-thread. It will fail
     ///         otherwise (it will return -1).
-    HPX_CORE_EXPORT std::size_t get_thread_pool_num(error_code&) noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t get_thread_pool_num(
+        error_code& ec) noexcept;
 }    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>

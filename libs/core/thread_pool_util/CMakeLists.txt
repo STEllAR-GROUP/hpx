@@ -21,5 +21,6 @@ add_hpx_module(
   SOURCES ${thread_pool_util_sources}
   HEADERS ${thread_pool_util_headers}
   MODULE_DEPENDENCIES hpx_async_local hpx_errors hpx_futures hpx_functional
+                      hpx_threading_base
   CMAKE_SUBDIRS examples tests
 )

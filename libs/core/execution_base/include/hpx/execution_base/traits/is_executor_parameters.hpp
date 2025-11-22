@@ -15,7 +15,7 @@
 namespace hpx::traits {
 
     // new executor framework
-    template <typename Parameters, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Parameters, typename Enable = void>
     struct is_executor_parameters;
 }    // namespace hpx::traits
 
@@ -23,27 +23,27 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // Default sequential executor parameters
-    struct sequential_executor_parameters
+    HPX_CXX_EXPORT struct sequential_executor_parameters
     {
     };
 
     // If an executor exposes 'executor_parameter_type' this type is assumed to
     // represent the default parameters for the given executor type.
-    template <typename Executor, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
     struct extract_executor_parameters
     {
         // by default, assume sequential execution
         using type = sequential_executor_parameters;
     };
 
-    template <typename Executor>
+    HPX_CXX_EXPORT template <typename Executor>
     struct extract_executor_parameters<Executor,
         std::void_t<typename Executor::executor_parameters_type>>
     {
         using type = typename Executor::executor_parameters_type;
     };
 
-    template <typename Executor>
+    HPX_CXX_EXPORT template <typename Executor>
     using extract_executor_parameters_t =
         typename extract_executor_parameters<Executor>::type;
 
@@ -51,26 +51,26 @@ namespace hpx::execution::experimental {
     // If a parameters type exposes an embedded type  'has_variable_chunk_size'
     // it is assumed that the number of loop iterations to combine is different
     // for each of the generated chunks.
-    template <typename Parameters, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Parameters, typename Enable = void>
     struct extract_has_variable_chunk_size : std::false_type
     {
         // by default, assume equally sized chunks
     };
 
-    template <typename Parameters>
+    HPX_CXX_EXPORT template <typename Parameters>
     struct extract_has_variable_chunk_size<Parameters,
         std::void_t<typename Parameters::has_variable_chunk_size>>
       : std::true_type
     {
     };
 
-    template <typename Parameters>
+    HPX_CXX_EXPORT template <typename Parameters>
     struct extract_has_variable_chunk_size<::std::reference_wrapper<Parameters>>
       : extract_has_variable_chunk_size<Parameters>
     {
     };
 
-    template <typename Parameters>
+    HPX_CXX_EXPORT template <typename Parameters>
     inline constexpr bool extract_has_variable_chunk_size_v =
         extract_has_variable_chunk_size<Parameters>::value;
 
@@ -78,7 +78,7 @@ namespace hpx::execution::experimental {
     // If a parameters type exposes an embedded type 'invokes_testing_function'
     // it is assumed that the parameters object uses the given function to
     // determine the number of chunks to apply.
-    template <typename Parameters, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Parameters, typename Enable = void>
     struct extract_invokes_testing_function : std::false_type
     {
         // by default, assume equally sized chunks
@@ -86,7 +86,7 @@ namespace hpx::execution::experimental {
 
 #if !defined(DOXYGEN)
     // doxygen gets confused by the following construct
-    template <typename Parameters>
+    HPX_CXX_EXPORT template <typename Parameters>
     struct extract_invokes_testing_function<Parameters,
         std::void_t<typename Parameters::invokes_testing_function>>
       : std::true_type
@@ -94,14 +94,14 @@ namespace hpx::execution::experimental {
     };
 #endif
 
-    template <typename Parameters>
+    HPX_CXX_EXPORT template <typename Parameters>
     struct extract_invokes_testing_function<
         ::std::reference_wrapper<Parameters>>
       : extract_invokes_testing_function<Parameters>
     {
     };
 
-    template <typename Parameters>
+    HPX_CXX_EXPORT template <typename Parameters>
     inline constexpr bool extract_invokes_testing_function_v =
         extract_invokes_testing_function<Parameters>::value;
 
@@ -128,13 +128,13 @@ namespace hpx::execution::experimental {
         /// \endcond
     }    // namespace detail
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct is_executor_parameters
       : detail::is_executor_parameters<std::decay_t<T>>
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_executor_parameters_v =
         is_executor_parameters<T>::value;
 }    // namespace hpx::execution::experimental
@@ -142,14 +142,14 @@ namespace hpx::execution::experimental {
 namespace hpx::traits {
 
     // new executor framework
-    template <typename Parameters, typename Enable>
+    HPX_CXX_EXPORT template <typename Parameters, typename Enable>
     struct is_executor_parameters
       : hpx::execution::experimental::is_executor_parameters<
             std::decay_t<Parameters>>
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_executor_parameters_v =
         is_executor_parameters<T>::value;
 }    // namespace hpx::traits

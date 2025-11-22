@@ -104,6 +104,7 @@ add_hpx_module(
     hpx_debugging
     hpx_errors
     hpx_execution
+    hpx_execution_base
     hpx_format
     hpx_functional
     hpx_futures
@@ -117,7 +118,9 @@ add_hpx_module(
     hpx_serialization
     hpx_synchronization
     hpx_tag_invoke
+    hpx_timing
     hpx_threading
+    hpx_threading_base
     hpx_topology
     hpx_type_support
   CMAKE_SUBDIRS examples tests

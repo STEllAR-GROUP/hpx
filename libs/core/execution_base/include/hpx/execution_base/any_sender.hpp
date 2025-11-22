@@ -24,7 +24,6 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::detail {
-
     template <typename T>
     struct empty_vtable_type
     {
@@ -735,7 +734,7 @@ namespace hpx::execution::experimental {
     }    // namespace detail
 #endif
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     class unique_any_sender
 #if defined(HPX_MSVC) || !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
       : private detail::any_sender_static_empty_vtable_helper<Ts...>
@@ -812,7 +811,7 @@ namespace hpx::execution::experimental {
         }
     };
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     class any_sender
 #if defined(HPX_MSVC) || !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
       : private detail::any_sender_static_empty_vtable_helper<Ts...>

@@ -14,7 +14,7 @@
 #endif
 #include <hpx/execution/algorithms/just.hpp>
 #include <hpx/execution/algorithms/let_value.hpp>
-#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>

@@ -6,8 +6,7 @@
 
 #include <hpx/execution/algorithms/just.hpp>
 #include <hpx/execution/algorithms/sync_wait.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/coroutine_utils.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/type_support.hpp>
 

@@ -12,13 +12,12 @@
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/queue_holder_thread.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-#include <hpx/timing/tick_counter.hpp>
+#include <hpx/modules/timing.hpp>
 #endif
 
 #include <atomic>

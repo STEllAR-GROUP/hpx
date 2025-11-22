@@ -9,27 +9,24 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/future_then_result_exec.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/packaged_continuation.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/tag_invoke.hpp>
-#include <hpx/threading_base/register_thread.hpp>
-#include <hpx/threading_base/thread_description.hpp>
-#include <hpx/threading_base/thread_init_data.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <exception>
 #include <iterator>

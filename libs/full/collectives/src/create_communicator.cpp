@@ -9,11 +9,11 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>

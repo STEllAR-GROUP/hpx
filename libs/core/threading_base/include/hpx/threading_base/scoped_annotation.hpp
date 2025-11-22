@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2023 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,7 +20,7 @@
 #if HPX_HAVE_ITTNOTIFY != 0
 #include <hpx/modules/itt_notify.hpp>
 #elif defined(HPX_HAVE_APEX)
-#include <hpx/threading_base/external_timer.hpp>
+#include <hpx/modules/threading_base.hpp>
 #endif
 #endif
 
@@ -31,15 +31,19 @@ namespace hpx {
 
     namespace detail {
 
-        HPX_CORE_EXPORT char const* store_function_annotation(std::string name);
+        HPX_CXX_EXPORT HPX_CORE_EXPORT char const* store_function_annotation(
+            std::string name);
     }    // namespace detail
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-    struct [[nodiscard]] scoped_annotation
+    HPX_CXX_EXPORT struct [[nodiscard]] scoped_annotation
     {
-        HPX_NON_COPYABLE(scoped_annotation);
+        scoped_annotation(scoped_annotation const&) = delete;
+        scoped_annotation(scoped_annotation&&) = delete;
+        scoped_annotation& operator=(scoped_annotation const&) = delete;
+        scoped_annotation& operator=(scoped_annotation&&) = delete;
 
         explicit constexpr scoped_annotation(char const*) noexcept {}
 
@@ -52,9 +56,12 @@ namespace hpx {
         HPX_HOST_DEVICE ~scoped_annotation() {}
     };
 #elif HPX_HAVE_ITTNOTIFY != 0
-    struct [[nodiscard]] scoped_annotation
+    HPX_CXX_EXPORT struct [[nodiscard]] scoped_annotation
     {
-        HPX_NON_COPYABLE(scoped_annotation);
+        scoped_annotation(scoped_annotation const&) = delete;
+        scoped_annotation(scoped_annotation&&) = delete;
+        scoped_annotation& operator=(scoped_annotation const&) = delete;
+        scoped_annotation& operator=(scoped_annotation&&) = delete;
 
         explicit scoped_annotation(char const* name)
           : task_(thread_domain_, hpx::util::itt::string_handle(name))
@@ -115,9 +122,12 @@ namespace hpx {
         hpx::threads::thread_description desc_;
     };
 #else
-    struct [[nodiscard]] scoped_annotation
+    HPX_CXX_EXPORT struct [[nodiscard]] scoped_annotation
     {
-        HPX_NON_COPYABLE(scoped_annotation);
+        scoped_annotation(scoped_annotation const&) = delete;
+        scoped_annotation(scoped_annotation&&) = delete;
+        scoped_annotation& operator=(scoped_annotation const&) = delete;
+        scoped_annotation& operator=(scoped_annotation&&) = delete;
 
         explicit scoped_annotation(char const* name)
         {
@@ -196,9 +206,12 @@ namespace hpx {
     ///        tools like \a Intel \a VTune, \a Apex \a Profiler, etc. That
     ///        allows analyzing performance to figure out which part(s) of code
     ///        is (are) responsible for performance degradation, etc.
-    struct [[nodiscard]] scoped_annotation
+    HPX_CXX_EXPORT struct [[nodiscard]] scoped_annotation
     {
-        HPX_NON_COPYABLE(scoped_annotation);
+        scoped_annotation(scoped_annotation const&) = delete;
+        scoped_annotation(scoped_annotation&&) = delete;
+        scoped_annotation& operator=(scoped_annotation const&) = delete;
+        scoped_annotation& operator=(scoped_annotation&&) = delete;
 
         explicit constexpr scoped_annotation(char const* /*name*/) noexcept {}
 

@@ -21,23 +21,23 @@
 #include <utility>
 
 namespace hpx {
+
+    HPX_CXX_EXPORT enum class launch_policy : std::int8_t {
+        async = 0x01,
+        deferred = 0x02,
+        task = 0x04,    // see N3632
+        sync = 0x08,
+        fork = 0x10,    // same as async, but forces continuation stealing
+        apply = 0x20,
+
+        sync_policies = 0x0a,     // sync | deferred
+        async_policies = 0x15,    // async | task | fork
+        all = 0x3f                // async | deferred | task | sync |
+                                  // fork | apply
+    };
+
     /// \cond NOINTERNAL
     namespace detail {
-
-        enum class launch_policy : std::int8_t
-        {
-            async = 0x01,
-            deferred = 0x02,
-            task = 0x04,    // see N3632
-            sync = 0x08,
-            fork = 0x10,    // same as async, but forces continuation stealing
-            apply = 0x20,
-
-            sync_policies = 0x0a,     // sync | deferred
-            async_policies = 0x15,    // async | task | fork
-            all = 0x3f                // async | deferred | task | sync |
-                                      // fork | apply
-        };
 
         struct policy_holder_base
         {
@@ -745,13 +745,13 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Launch policies for \a hpx::async etc.
-    struct launch : detail::policy_holder<>
+    HPX_CXX_EXPORT struct launch : detail::policy_holder<>
     {
         ///////////////////////////////////////////////////////////////////////
         /// Default constructor. This creates a launch policy representing all
         /// possible launch modes
         constexpr launch() noexcept
-          : detail::policy_holder<>{detail::launch_policy::all}
+          : detail::policy_holder<>{launch_policy::all}
         {
         }
 
@@ -770,37 +770,37 @@ namespace hpx {
 
         /// Create a launch policy representing asynchronous execution
         constexpr launch(detail::async_policy const p) noexcept
-          : detail::policy_holder<>{detail::launch_policy::async, p.priority(),
-                p.stacksize(), p.hint()}
+          : detail::policy_holder<>{
+                launch_policy::async, p.priority(), p.stacksize(), p.hint()}
         {
         }
 
         /// Create a launch policy representing asynchronous execution. The
         /// new thread is executed in a preferred way
         constexpr launch(detail::fork_policy const p) noexcept
-          : detail::policy_holder<>{detail::launch_policy::fork, p.priority(),
-                p.stacksize(), p.hint()}
+          : detail::policy_holder<>{
+                launch_policy::fork, p.priority(), p.stacksize(), p.hint()}
         {
         }
 
         /// Create a launch policy representing synchronous execution
         constexpr launch(detail::sync_policy const p) noexcept
-          : detail::policy_holder<>{detail::launch_policy::sync, p.priority(),
-                p.stacksize(), p.hint()}
+          : detail::policy_holder<>{
+                launch_policy::sync, p.priority(), p.stacksize(), p.hint()}
         {
         }
 
         /// Create a launch policy representing deferred execution
         constexpr launch(detail::deferred_policy const p) noexcept
-          : detail::policy_holder<>{detail::launch_policy::deferred,
-                p.priority(), p.stacksize(), p.hint()}
+          : detail::policy_holder<>{
+                launch_policy::deferred, p.priority(), p.stacksize(), p.hint()}
         {
         }
 
         /// Create a launch policy representing fire and forget execution
         constexpr launch(detail::apply_policy const p) noexcept
-          : detail::policy_holder<>{detail::launch_policy::apply, p.priority(),
-                p.stacksize(), p.hint()}
+          : detail::policy_holder<>{
+                launch_policy::apply, p.priority(), p.stacksize(), p.hint()}
         {
         }
 
@@ -911,21 +911,19 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
-    namespace detail {
+    HPX_CXX_EXPORT HPX_FORCEINLINE constexpr bool has_async_policy(
+        launch const p) noexcept
+    {
+        return static_cast<bool>(static_cast<int>(p.get_policy()) &
+            static_cast<int>(launch_policy::async_policies));
+    }
 
-        HPX_FORCEINLINE constexpr bool has_async_policy(launch const p) noexcept
-        {
-            return static_cast<bool>(static_cast<int>(p.get_policy()) &
-                static_cast<int>(detail::launch_policy::async_policies));
-        }
-
-        template <typename F>
-        HPX_FORCEINLINE constexpr bool has_async_policy(
-            detail::policy_holder<F> const& p) noexcept
-        {
-            return static_cast<bool>(static_cast<int>(p.policy()) &
-                static_cast<int>(detail::launch_policy::async_policies));
-        }
-    }    // namespace detail
+    HPX_CXX_EXPORT template <typename F>
+    HPX_FORCEINLINE constexpr bool has_async_policy(
+        detail::policy_holder<F> const& p) noexcept
+    {
+        return static_cast<bool>(static_cast<int>(p.policy()) &
+            static_cast<int>(launch_policy::async_policies));
+    }
     /// \endcond
 }    // namespace hpx

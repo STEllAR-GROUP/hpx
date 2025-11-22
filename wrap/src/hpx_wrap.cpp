@@ -71,10 +71,10 @@ namespace hpx_start {
     HPX_SYMBOL_EXPORT bool is_linked = true;
 }    // namespace hpx_start
 
-#include <hpx/modules/functional.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/runtime_configuration/runtime_mode.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 
 #include <vector>
 

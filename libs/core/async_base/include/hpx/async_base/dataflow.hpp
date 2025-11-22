@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -49,7 +49,7 @@ namespace hpx {
         // real function based API that dispatches to the CPO. Once
         // dataflow<Action>(...) has been removed, this CPO can be moved to
         // namespace hpx.
-        inline constexpr struct dataflow_t final
+        HPX_CXX_EXPORT inline constexpr struct dataflow_t final
           : hpx::functional::detail::tag_fallback<dataflow_t>
         {
         private:
@@ -76,7 +76,7 @@ namespace hpx {
         } dataflow{};
     }    // namespace detail
 
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     HPX_FORCEINLINE decltype(auto) dataflow(F&& f, Ts&&... ts)
     {
         return hpx::detail::dataflow(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);

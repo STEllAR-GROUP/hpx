@@ -8,21 +8,21 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 
 #include <atomic>
 #include <chrono>

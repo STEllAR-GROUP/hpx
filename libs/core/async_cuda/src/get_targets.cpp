@@ -8,7 +8,7 @@
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <iostream>
 #include <string>

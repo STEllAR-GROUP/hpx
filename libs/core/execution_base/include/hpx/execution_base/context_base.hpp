@@ -6,11 +6,12 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/execution_base/resource_base.hpp>
 
 namespace hpx::execution_base {
 
-    struct context_base
+    HPX_CXX_EXPORT struct context_base
     {
         virtual ~context_base() = default;
 
