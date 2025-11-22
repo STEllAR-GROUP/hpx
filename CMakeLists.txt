@@ -1233,9 +1233,17 @@ if(HPX_WITH_NETWORKING)
   endif()
 
   hpx_option(
-    HPX_WITH_PARCELPORT_MPI BOOL "Enable the MPI based parcelport." OFF
+    HPX_WITH_PARCELPORT_MPI STRING "Enable the MPI based parcelport. Leave empty to auto-detect." ""
     CATEGORY "Parcelport"
   )
+  if("${HPX_WITH_PARCELPORT_MPI}" STREQUAL "")
+    find_package(MPI QUIET COMPONENTS CXX)
+    if(MPI_FOUND)
+      set(HPX_WITH_PARCELPORT_MPI ON)
+    else()
+      set(HPX_WITH_PARCELPORT_MPI OFF)
+    endif()
+  endif()
   if(HPX_WITH_PARCELPORT_MPI)
     hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI)
   endif()
