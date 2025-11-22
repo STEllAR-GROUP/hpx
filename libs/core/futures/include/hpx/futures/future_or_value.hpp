@@ -12,7 +12,7 @@
 
 namespace hpx {
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct future_or_value
     {
         constexpr future_or_value(T const& value)

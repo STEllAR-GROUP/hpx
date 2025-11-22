@@ -73,6 +73,7 @@ namespace hpx {
         bool try_acquire_for(hpx::chrono::steady_duration const& rel_time);
     };
 }    // namespace hpx
+
 #else
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,7 +103,7 @@ namespace hpx {
         };
     }    // namespace detail
 
-    using binary_semaphore = detail::binary_semaphore<>;
+    HPX_CXX_EXPORT using binary_semaphore = detail::binary_semaphore<>;
 }    // namespace hpx
 
 #endif

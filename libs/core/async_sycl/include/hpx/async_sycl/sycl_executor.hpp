@@ -11,12 +11,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_sycl/sycl_future.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/future_access.hpp>
 #include <hpx/include/post.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <cstddef>
 #include <exception>

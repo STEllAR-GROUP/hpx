@@ -13,7 +13,7 @@
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/init_runtime_local/init_runtime_local.hpp>
-#include <hpx/threading_base/print.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <hpx/hpx_main.hpp>
 

@@ -60,7 +60,7 @@ namespace hpx::threads::detail {
         }
 
         // Get the state this thread was in before execution (usually pending),
-        // this helps making sure no other worker-thread is started to execute
+        // this helps to make sure no other worker-thread is started to execute
         // this HPX-thread in the meantime.
         thread_schedule_state get_previous() const noexcept
         {

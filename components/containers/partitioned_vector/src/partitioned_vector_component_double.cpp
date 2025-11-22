@@ -25,6 +25,8 @@ HPX_REGISTER_PARTITIONED_VECTOR(double)
 #pragma warning(disable : 5037)
 #endif
 
+#include <hpx/config/warnings_prefix.hpp>
+
 template class HPX_PARTITIONED_VECTOR_EXPORT
     hpx::server::partitioned_vector<double, std::vector<double>>;
 template class HPX_PARTITIONED_VECTOR_EXPORT

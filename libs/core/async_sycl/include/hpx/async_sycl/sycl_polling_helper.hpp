@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Gregor Dai√ü
+//  Copyright (c) 2022 Gregor Daiﬂ
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,8 +17,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_sycl/detail/sycl_event_callback.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <string>
 

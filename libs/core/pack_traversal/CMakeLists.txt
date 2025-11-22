@@ -30,6 +30,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core pack_traversal
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   HEADERS ${pack_traversal_headers}
   COMPAT_HEADERS ${pack_traversal_compat_headers}
   MODULE_DEPENDENCIES

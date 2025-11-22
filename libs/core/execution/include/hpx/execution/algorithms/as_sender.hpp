@@ -9,12 +9,10 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
-#include <hpx/futures/detail/future_data.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 
 #include <exception>
@@ -261,7 +259,7 @@ namespace hpx::execution::experimental {
     // The difference to keep_future is that as_future propagates the value
     // stored in the future while keep_future will propagate the future instance
     // itself.
-    inline constexpr struct as_sender_t final
+    HPX_CXX_EXPORT inline constexpr struct as_sender_t final
     {
         // clang-format off
         template <typename Future,

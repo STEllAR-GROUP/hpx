@@ -13,9 +13,8 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/runtime_local/state.hpp>
-#include <hpx/threading_base/register_thread.hpp>
-#include <hpx/threading_base/thread_data.hpp>
 #if defined(HPX_DEBUG)
 #include <hpx/modules/logging.hpp>
 #endif

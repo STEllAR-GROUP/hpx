@@ -30,7 +30,7 @@ namespace hpx::execution::experimental {
     /// \note This executor parameters type is equivalent to OpenMP's DYNAMIC
     ///       scheduling directive.
     ///
-    struct dynamic_chunk_size
+    HPX_CXX_EXPORT struct dynamic_chunk_size
     {
         /// Construct an \a dynamic_chunk_size executor parameters object
         ///
@@ -67,7 +67,7 @@ namespace hpx::execution::experimental {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int /* version */)
+        void serialize(Archive& ar, unsigned int const /* version */)
         {
             // clang-format off
             ar & chunk_size_;

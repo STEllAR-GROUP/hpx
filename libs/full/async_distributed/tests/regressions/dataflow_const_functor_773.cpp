@@ -12,7 +12,7 @@
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 
 typedef hpx::shared_future<double> future_type;
 

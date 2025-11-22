@@ -8,4 +8,4 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/execution/executors/execution_information.hpp>
+#include <hpx/modules/execution.hpp>

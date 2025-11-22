@@ -62,20 +62,20 @@ namespace hpx::parallel::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool is_negative(
         T const& val) noexcept
     {
         return is_negative_helper<T>::call(val);
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T abs(T const& val) noexcept
     {
         return is_negative_helper<T>::abs(val);
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T negate(T const& val) noexcept
     {
         return is_negative_helper<T>::negate(val);

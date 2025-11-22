@@ -19,10 +19,9 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/synchronization/detail/condition_variable.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <exception>
 #include <mutex>
@@ -81,7 +80,7 @@ namespace hpx::execution::experimental {
     // operation states to hold the work units to make scheduling
     // allocation-free. -- end note]
     //
-    class run_loop
+    HPX_CXX_EXPORT class run_loop
     {
         struct run_loop_opstate_base
         {
@@ -396,10 +395,10 @@ namespace hpx::execution::experimental {
         }
     };
 
-    using run_loop_scheduler = run_loop::run_loop_scheduler;
+    HPX_CXX_EXPORT using run_loop_scheduler = run_loop::run_loop_scheduler;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ReceiverId>
+    HPX_CXX_EXPORT template <typename ReceiverId>
     inline void run_loop::run_loop_opstate<ReceiverId>::type::start() & noexcept
     try
     {

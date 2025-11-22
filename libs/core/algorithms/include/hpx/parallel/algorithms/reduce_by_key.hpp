@@ -121,8 +121,8 @@ namespace hpx { namespace experimental {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/execution/executors/execution.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>

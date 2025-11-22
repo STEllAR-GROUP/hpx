@@ -8,12 +8,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
-#include <hpx/threading_base/print.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <atomic>
 #include <cstddef>

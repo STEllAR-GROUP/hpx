@@ -13,6 +13,8 @@
 
 #include <cstdint>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::performance_counters::server {
 
@@ -45,3 +47,5 @@ namespace hpx::performance_counters::server {
         bool reset_;
     };
 }    // namespace hpx::performance_counters::server
+
+#include <hpx/config/warnings_suffix.hpp>

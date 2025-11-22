@@ -358,7 +358,7 @@ namespace hpx {
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/iterator_support.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/parallel/algorithms/detail/accumulate.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>

@@ -7,13 +7,11 @@
 
 #include <hpx/async_local/async.hpp>
 #include <hpx/async_local/post.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/thread_pool_util/thread_pool_suspension_helpers.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <cstddef>
 #include <utility>

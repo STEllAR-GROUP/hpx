@@ -12,8 +12,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/synchronization/no_mutex.hpp>
-#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -25,7 +24,7 @@
 namespace hpx::lcos::local {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Mutex = hpx::spinlock>
+    HPX_CXX_EXPORT template <typename T, typename Mutex = hpx::spinlock>
     struct receive_buffer
     {
     protected:
@@ -244,7 +243,7 @@ namespace hpx::lcos::local {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Mutex>
+    HPX_CXX_EXPORT template <typename Mutex>
     struct receive_buffer<void, Mutex>
     {
     protected:

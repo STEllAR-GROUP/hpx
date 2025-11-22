@@ -15,13 +15,9 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/schedulers/queue_helpers.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_data_stackful.hpp>
-#include <hpx/threading_base/thread_data_stackless.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 
 #if defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
 #include <hpx/schedulers/deadlock_detection.hpp>
@@ -50,6 +46,8 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
@@ -86,8 +84,8 @@ namespace hpx::threads::policies {
     //         typedef ... type;
     //     };
     // };
-    template <typename Mutex, typename PendingQueuing, typename StagedQueuing,
-        typename TerminatedQueuing>
+    HPX_CXX_EXPORT template <typename Mutex, typename PendingQueuing,
+        typename StagedQueuing, typename TerminatedQueuing>
     class thread_queue
     {
     private:
@@ -1352,3 +1350,5 @@ namespace hpx::threads::policies {
         thread_queue<Mutex, PendingQueuing, StagedQueuing,
             TerminatedQueuing>::task_description_alloc_;
 }    // namespace hpx::threads::policies
+
+#include <hpx/config/warnings_suffix.hpp>

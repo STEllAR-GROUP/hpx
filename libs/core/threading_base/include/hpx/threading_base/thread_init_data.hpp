@@ -26,7 +26,7 @@
 namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
-    class thread_init_data
+    HPX_CXX_EXPORT class thread_init_data
     {
     public:
         thread_init_data()

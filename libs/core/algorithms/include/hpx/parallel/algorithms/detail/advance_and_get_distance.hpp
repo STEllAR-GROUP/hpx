@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/iterator_support.hpp>
 
 #include <iterator>

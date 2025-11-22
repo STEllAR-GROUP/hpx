@@ -9,9 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/ini.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/resource_partitioner/detail/create_partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
 
 #include <cstddef>
 #include <memory>

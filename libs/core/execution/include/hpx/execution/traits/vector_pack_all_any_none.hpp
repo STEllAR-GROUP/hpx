@@ -14,22 +14,22 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::size_t all_of(
+    HPX_CXX_EXPORT HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::size_t all_of(
         bool msk) noexcept
     {
         return msk;
     }
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::size_t any_of(
+    HPX_CXX_EXPORT HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::size_t any_of(
         bool msk) noexcept
     {
         return msk;
     }
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::size_t none_of(
-        bool msk) noexcept
+    HPX_CXX_EXPORT HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::size_t
+    none_of(bool msk) noexcept
     {
         return !msk;
     }

@@ -7,9 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/futures/traits/get_remote_result.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/thread_support.hpp>

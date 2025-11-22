@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2023 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,11 +23,14 @@ include(HPX_AddModule)
 add_hpx_module(
   core io_service
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${io_service_sources}
   HEADERS ${io_service_headers}
   COMPAT_HEADERS ${io_service_compat_headers}
+  EXCLUDE_FROM_GLOBAL_HEADER "hpx/io_service/io_service_pool_fwd.hpp"
   DEPENDENCIES Asio::asio
   MODULE_DEPENDENCIES
+    hpx_affinity
     hpx_assertion
     hpx_concurrency
     hpx_config

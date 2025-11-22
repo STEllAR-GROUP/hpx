@@ -481,7 +481,7 @@ namespace hpx::detail {
         hpx::util::atomic_count count_;
     };
 
-    template <typename Mutex = hpx::spinlock>
+    HPX_CXX_EXPORT template <typename Mutex = hpx::spinlock>
     class shared_mutex
     {
     private:
@@ -608,5 +608,5 @@ namespace hpx {
     ///          no other thread is reading or writing at the same time. The \a
     ///          shared_mutex class satisfies all requirements of \a SharedMutex
     ///          and \a StandardLayoutType.
-    using shared_mutex = detail::shared_mutex<>;
+    HPX_CXX_EXPORT using shared_mutex = detail::shared_mutex<>;
 }    // namespace hpx

@@ -10,8 +10,8 @@
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/components_base/server/migration_support.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
 

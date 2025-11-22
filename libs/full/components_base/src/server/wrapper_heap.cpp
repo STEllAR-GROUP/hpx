@@ -11,9 +11,9 @@
 #include <hpx/components_base/server/wrapper_heap.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>
 #include <cstdint>

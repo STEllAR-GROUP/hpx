@@ -13,10 +13,10 @@
 #else
 
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
@@ -198,7 +198,7 @@ namespace hpx::execution::experimental {
     //
     // execution::then is guaranteed to not begin executing the function before
     // the returned sender is started.
-    inline constexpr struct then_t final
+    HPX_CXX_EXPORT inline constexpr struct then_t final
       : hpx::functional::detail::tag_priority<then_t>
     {
     private:

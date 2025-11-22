@@ -12,15 +12,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/executors/parallel_executor.hpp>
-#include <hpx/futures/detail/future_data.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/serialization.hpp>
-#include <hpx/synchronization/latch.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <atomic>
 #include <exception>

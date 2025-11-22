@@ -36,7 +36,7 @@ namespace hpx::execution::experimental {
     /// \note This executor parameters type is equivalent to OpenMP's GUIDED
     ///       scheduling directive.
     ///
-    struct guided_chunk_size
+    HPX_CXX_EXPORT struct guided_chunk_size
     {
         /// Construct an \a dynamic_chunk_size executor parameters object
         ///
@@ -53,7 +53,7 @@ namespace hpx::execution::experimental {
         ///                     The default minimal chunk size is 1.
         ///
         constexpr explicit guided_chunk_size(
-            std::size_t min_chunk_size) noexcept
+            std::size_t const min_chunk_size) noexcept
           : min_chunk_size_(min_chunk_size)
         {
         }
@@ -67,8 +67,8 @@ namespace hpx::execution::experimental {
         friend constexpr std::size_t tag_override_invoke(
             hpx::execution::experimental::get_chunk_size_t,
             guided_chunk_size const& this_, Executor&& /* exec */,
-            hpx::chrono::steady_duration const&, std::size_t cores,
-            std::size_t num_tasks) noexcept
+            hpx::chrono::steady_duration const&, std::size_t const cores,
+            std::size_t const num_tasks) noexcept
         {
             return (std::max) (this_.min_chunk_size_,
                 (num_tasks + cores - 1) / cores);
@@ -109,4 +109,4 @@ namespace hpx::execution {
         "hpx::execution::guided_chunk_size is deprecated, use "
         "hpx::execution::experimental::guided_chunk_size instead") =
         hpx::execution::experimental::guided_chunk_size;
-}
+}    // namespace hpx::execution

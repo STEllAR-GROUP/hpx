@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::plugins {
 

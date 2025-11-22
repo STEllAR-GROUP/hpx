@@ -737,9 +737,9 @@ namespace hpx { namespace experimental {
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/tag_invoke.hpp>
@@ -753,7 +753,6 @@ namespace hpx { namespace experimental {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
 
 #include <cstddef>
 #include <cstdint>

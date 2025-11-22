@@ -233,7 +233,7 @@ namespace hpx::execution::experimental {
     // additional operations such as let_value to deliver dynamic shape
     // information to the bulk operation.
     //
-    inline constexpr struct bulk_t final
+    HPX_CXX_EXPORT inline constexpr struct bulk_t final
       : hpx::functional::detail::tag_priority<bulk_t>
     {
     private:

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/modules/execution.hpp>
 
 #include <type_traits>
 

@@ -12,7 +12,7 @@
     defined(HPX_HAVE_MODULE_LCI_BASE)
 
 #include <hpx/modules/runtime_configuration.hpp>
-#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <atomic>
 #include <cstdlib>

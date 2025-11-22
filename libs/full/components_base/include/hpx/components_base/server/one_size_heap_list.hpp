@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components_base/server/wrapper_heap_base.hpp>
-#include <hpx/synchronization/shared_mutex.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <cstddef>
 #include <list>

@@ -37,7 +37,7 @@ else
 fi
 
 # delay things for a random amount of time
-sleep $[(RANDOM % 10) + 1].$[(RANDOM % 10)]s
+sleep $[(RANDOM % 20) + 1].$[(RANDOM % 20)]s
 
 # Start the actual build
 set +e

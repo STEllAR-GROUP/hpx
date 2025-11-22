@@ -107,7 +107,7 @@ namespace hpx {
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

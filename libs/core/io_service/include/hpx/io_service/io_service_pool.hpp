@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/io_service/io_service_pool_fwd.hpp>
 #include <hpx/modules/concurrency.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <winsock2.h>
@@ -42,7 +42,7 @@
 namespace hpx::util {
 
     /// A pool of io_service objects.
-    class io_service_pool
+    HPX_CXX_EXPORT class io_service_pool
     {
     public:
         /// \brief Construct the io_service pool.

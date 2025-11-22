@@ -12,12 +12,13 @@
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/futures/packaged_continuation.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/serialization.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/performance_counters/base_performance_counter.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counter_interface.hpp>
@@ -28,7 +29,6 @@
 #include <hpx/runtime_local/get_os_thread_count.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 
 #include <cstddef>
 #include <cstdint>

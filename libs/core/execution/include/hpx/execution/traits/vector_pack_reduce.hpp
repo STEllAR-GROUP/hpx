@@ -13,7 +13,7 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename T, typename Reduce>
+    HPX_CXX_EXPORT template <typename T, typename Reduce>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T reduce(Reduce, T val) noexcept
     {
         return val;

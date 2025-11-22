@@ -9,10 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/schedulers/local_queue_scheduler.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/thread_queue.hpp>
-#include <hpx/threading_base/thread_data.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -26,14 +26,16 @@ namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    using default_background_scheduler_terminated_queue = lockfree_lifo;
+    HPX_CXX_EXPORT using default_background_scheduler_terminated_queue =
+        lockfree_lifo;
 #else
-    using default_background_scheduler_terminated_queue = lockfree_fifo;
+    HPX_CXX_EXPORT using default_background_scheduler_terminated_queue =
+        lockfree_fifo;
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
     // The background_scheduler_scheduler runs only background work
-    template <typename Mutex = std::mutex,
+    HPX_CXX_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =

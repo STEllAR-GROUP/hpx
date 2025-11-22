@@ -8,9 +8,9 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/threadmanager.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
-#include <hpx/topology/cpu_mask.hpp>
 
 #include <cstddef>
 #include <cstdint>

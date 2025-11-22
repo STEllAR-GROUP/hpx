@@ -8,20 +8,17 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/affinity.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/thread_queue.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <atomic>
 #include <cmath>
@@ -41,10 +38,10 @@ namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    using default_local_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_EXPORT using default_local_priority_queue_scheduler_terminated_queue =
         lockfree_lifo;
 #else
-    using default_local_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_EXPORT using default_local_priority_queue_scheduler_terminated_queue =
         lockfree_fifo;
 #endif
 
@@ -56,7 +53,7 @@ namespace hpx::threads::policies {
     /// are executed by the first N OS threads before any other work is
     /// executed. Low priority threads are executed by the last OS thread
     /// whenever no other work is available.
-    template <typename Mutex = std::mutex,
+    HPX_CXX_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =

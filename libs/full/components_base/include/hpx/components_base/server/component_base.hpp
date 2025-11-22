@@ -20,6 +20,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::components {
 
     namespace detail {
@@ -146,3 +148,5 @@ namespace hpx::components {
         }
     };
 }    // namespace hpx::components
+
+#include <hpx/config/warnings_suffix.hpp>

@@ -6,14 +6,13 @@
 
 #pragma once
 
-#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/adapt_sharing_mode.hpp>
-#include <hpx/synchronization/barrier.hpp>
-#include <hpx/synchronization/mutex.hpp>
 
 #include <cstddef>
 #include <functional>

@@ -8,7 +8,7 @@
 
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_colocated/async_colocated_fwd.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/futures.hpp>
 
 namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////

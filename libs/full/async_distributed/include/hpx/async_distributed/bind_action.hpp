@@ -13,10 +13,9 @@
 #include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/async_local/async_fwd.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <cstddef>

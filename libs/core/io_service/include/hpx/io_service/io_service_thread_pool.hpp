@@ -8,8 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/io_service/io_service_pool_fwd.hpp>
-#include <hpx/threading_base/scheduler_state.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -22,7 +21,8 @@
 namespace hpx::threads::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_CORE_EXPORT io_service_thread_pool : public thread_pool_base
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT io_service_thread_pool
+      : public thread_pool_base
     {
     public:
         explicit io_service_thread_pool(

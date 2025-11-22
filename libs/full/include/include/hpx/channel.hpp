@@ -7,4 +7,4 @@
 #pragma once
 
 #include <hpx/lcos_distributed/channel.hpp>
-#include <hpx/lcos_local/channel.hpp>
+#include <hpx/modules/lcos_local.hpp>

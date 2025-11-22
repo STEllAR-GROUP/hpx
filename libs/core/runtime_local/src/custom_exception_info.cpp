@@ -7,10 +7,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/futures/futures_factory.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threading.hpp>
@@ -23,7 +23,6 @@
 #include <hpx/runtime_local/get_worker_thread_num.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/state.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/version.hpp>
 
 #if defined(HPX_WINDOWS)

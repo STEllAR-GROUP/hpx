@@ -11,11 +11,10 @@
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution/algorithms/run_loop.hpp>
-#include <hpx/futures/detail/future_data.hpp>
-#include <hpx/futures/promise.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
@@ -318,7 +317,7 @@ namespace hpx::execution::experimental {
     // If the provided sender sends the "stopped" signal instead of values,
     // make_future calls std::terminate.
     //
-    inline constexpr struct make_future_t final
+    HPX_CXX_EXPORT inline constexpr struct make_future_t final
       : hpx::functional::detail::tag_priority<make_future_t>
     {
     private:

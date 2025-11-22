@@ -10,8 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/async_colocated/async_colocated_fwd.hpp>
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/ini.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>

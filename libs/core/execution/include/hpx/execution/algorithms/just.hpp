@@ -156,7 +156,7 @@ namespace hpx::execution::experimental {
     // the operation state if the sender is an rvalue; otherwise, they are
     // copied. Then xvalues referencing the values in the operation state are
     // passed to the receiver's set_value.
-    inline constexpr struct just_t final
+    HPX_CXX_EXPORT inline constexpr struct just_t final
     {
         template <typename... Ts>
         constexpr HPX_FORCEINLINE auto operator()(Ts&&... ts) const
@@ -174,7 +174,7 @@ namespace hpx::execution::experimental {
     // copy is sent to the receiver's set_error. If the provided value is an
     // rvalue reference, it is moved into the returned sender and an rvalue
     // reference to it is sent to the receiver's set_error.
-    inline constexpr struct just_error_t final
+    HPX_CXX_EXPORT inline constexpr struct just_error_t final
     {
         template <typename Error>
         constexpr HPX_FORCEINLINE auto operator()(Error&& error) const
@@ -188,7 +188,7 @@ namespace hpx::execution::experimental {
 
     // Returns a sender with no completion schedulers, which completes
     // immediately by calling the receiver's set_stopped.
-    inline constexpr struct just_stopped_t final
+    HPX_CXX_EXPORT inline constexpr struct just_stopped_t final
     {
         template <typename... Ts>
         constexpr HPX_FORCEINLINE auto operator()(Ts&&... ts) const

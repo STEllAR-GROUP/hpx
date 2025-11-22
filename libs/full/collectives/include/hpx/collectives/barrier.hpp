@@ -92,8 +92,8 @@ namespace hpx { namespace distributed {
 #include <hpx/config.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/components_base/server/managed_component_base.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
 
 #include <array>

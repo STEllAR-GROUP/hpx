@@ -134,5 +134,5 @@ namespace hpx {
         };
     }    // namespace detail
 
-    using recursive_mutex = detail::recursive_mutex_impl<>;
+    HPX_CXX_EXPORT using recursive_mutex = detail::recursive_mutex_impl<>;
 }    // namespace hpx

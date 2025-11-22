@@ -20,11 +20,7 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/threading_base/detail/get_default_pool.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_description.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -525,10 +521,11 @@ namespace hpx::lcos::local {
     // We provide this class to avoid semantic differences to the C++11
     // std::packaged_task, while otoh it is a very convenient way for us to
     // implement hpx::async.
-    template <typename Func, bool Cancelable = false>
+    HPX_CXX_EXPORT template <typename Func, bool Cancelable = false>
     class futures_factory;
 
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Result, bool Cancelable, typename Executor = void>
         struct create_task_object;
@@ -736,7 +733,7 @@ namespace hpx::lcos::local {
         };
     }    // namespace detail
 
-    template <typename Result, bool Cancelable>
+    HPX_CXX_EXPORT template <typename Result, bool Cancelable>
     class futures_factory<Result(), Cancelable>
     {
     protected:

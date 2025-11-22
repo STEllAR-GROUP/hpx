@@ -9,18 +9,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/algorithms/bulk.hpp>
-#include <hpx/execution/algorithms/keep_future.hpp>
-#include <hpx/execution/algorithms/start_detached.hpp>
-#include <hpx/execution/algorithms/sync_wait.hpp>
-#include <hpx/execution/algorithms/then.hpp>
-#include <hpx/execution/algorithms/transfer.hpp>
-#include <hpx/execution/algorithms/transfer_just.hpp>
-#include <hpx/execution/executors/default_parameters.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>

@@ -12,8 +12,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/algorithms/then.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/futures.hpp>
 

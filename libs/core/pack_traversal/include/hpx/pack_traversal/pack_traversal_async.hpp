@@ -14,19 +14,19 @@ namespace hpx::util {
 
     /// A tag which is passed to the `operator()` of the visitor if an element
     /// is visited synchronously.
-    using detail::async_traverse_visit_tag;
+    HPX_CXX_EXPORT using detail::async_traverse_visit_tag;
 
     /// A tag which is passed to the `operator()` of the visitor if an element
     /// is visited after the traversal was detached.
-    using detail::async_traverse_detach_tag;
+    HPX_CXX_EXPORT using detail::async_traverse_detach_tag;
 
     /// A tag which is passed to the `operator()` of the visitor if the
     /// asynchronous pack traversal was finished.
-    using detail::async_traverse_complete_tag;
+    HPX_CXX_EXPORT using detail::async_traverse_complete_tag;
 
     /// A tag to identify that a mapper shall be constructed in-place from the
     /// first argument passed.
-    using detail::async_traverse_in_place_tag;
+    HPX_CXX_EXPORT using detail::async_traverse_in_place_tag;
 
     /// Traverses the pack with the given visitor in an asynchronous way.
     ///
@@ -74,7 +74,7 @@ namespace hpx::util {
     /// See `traverse_pack` for a detailed description about the traversal
     /// behavior and capabilities.
     ///
-    template <typename Visitor, typename... T>
+    HPX_CXX_EXPORT template <typename Visitor, typename... T>
     auto traverse_pack_async(Visitor&& visitor, T&&... pack)
         -> decltype(detail::apply_pack_transform_async(
             HPX_FORWARD(Visitor, visitor), HPX_FORWARD(T, pack)...))
@@ -132,7 +132,8 @@ namespace hpx::util {
     /// See `traverse_pack` for a detailed description about the traversal
     /// behavior and capabilities.
     ///
-    template <typename Allocator, typename Visitor, typename... T>
+    HPX_CXX_EXPORT template <typename Allocator, typename Visitor,
+        typename... T>
     auto traverse_pack_async_allocator(
         Allocator const& alloc, Visitor&& visitor, T&&... pack)
         -> decltype(detail::apply_pack_transform_async_allocator(

@@ -15,8 +15,8 @@
 #include <hpx/iostream.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
 
 #include <hpx/include/parallel_execution.hpp>
 #include <hpx/modules/synchronization.hpp>

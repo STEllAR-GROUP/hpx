@@ -9,12 +9,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/topology.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
 
 #include <string>
 #include <type_traits>

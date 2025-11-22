@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <array>
 #include <cstddef>

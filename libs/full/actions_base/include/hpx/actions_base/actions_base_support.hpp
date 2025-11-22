@@ -15,8 +15,7 @@
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/threading_base/thread_init_data.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <cstdint>
 

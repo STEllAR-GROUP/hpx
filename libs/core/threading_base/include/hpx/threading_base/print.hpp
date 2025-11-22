@@ -17,7 +17,7 @@
 namespace hpx::debug {
 
     // safely dump thread pointer/description
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct threadinfo;
 
     // safely dump thread pointer/description

@@ -24,7 +24,9 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/static_reinit.hpp>
+#include <hpx/modules/thread_pools.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
@@ -58,9 +60,6 @@
 #include <hpx/runtime_local/state.hpp>
 #include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
-#include <hpx/thread_pools/detail/scoped_background_timer.hpp>
-#include <hpx/threading_base/external_timer.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>
