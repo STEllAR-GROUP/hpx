@@ -7,6 +7,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/assert.hpp>
@@ -33,6 +34,7 @@
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
@@ -49,7 +51,6 @@
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/threading/thread.hpp>
-#include <hpx/threading_base/detail/get_default_timer_service.hpp>
 
 #ifdef HPX_HAVE_MODULE_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>

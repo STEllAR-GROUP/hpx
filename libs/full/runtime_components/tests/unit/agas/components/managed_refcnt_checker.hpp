@@ -13,8 +13,7 @@
 #include <hpx/async_distributed/promise.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/client.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include "stubs/managed_refcnt_checker.hpp"
 

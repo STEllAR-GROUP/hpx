@@ -11,9 +11,8 @@
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/threading_base/threading_base_fwd.hpp>
 
 #include <chrono>
 #include <condition_variable>

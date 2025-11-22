@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/topology/topology.hpp>
+#include <hpx/modules/topology.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -21,7 +21,7 @@ namespace hpx::threads::policies::detail {
     ///////////////////////////////////////////////////////////////////////////
     // Structure holding the information related to thread affinity selection
     // for the shepherd threads of this instance
-    struct HPX_CORE_EXPORT affinity_data
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT affinity_data
     {
         affinity_data();
 

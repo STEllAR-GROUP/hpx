@@ -20,11 +20,11 @@
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/parallel/container_algorithms/for_each.hpp>
 #include <hpx/parallel/util/adapt_sharing_mode.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <limits>

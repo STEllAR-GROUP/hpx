@@ -15,10 +15,10 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/threadmanager.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <memory>

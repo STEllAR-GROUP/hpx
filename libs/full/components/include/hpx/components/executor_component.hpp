@@ -11,10 +11,8 @@
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/naming_base/address.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/threading_base/thread_description.hpp>
-#include <hpx/threading_base/thread_init_data.hpp>
 
 #include <type_traits>
 #include <utility>

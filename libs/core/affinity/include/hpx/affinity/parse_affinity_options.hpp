@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/topology/cpu_mask.hpp>
+#include <hpx/modules/topology.hpp>
 
 #include <cstddef>
 #include <string>
@@ -22,14 +22,14 @@
 
 namespace hpx::threads {
 
-    HPX_CORE_EXPORT void parse_affinity_options(std::string const& spec,
-        std::vector<mask_type>& affinities, std::size_t used_cores,
-        std::size_t max_cores, std::size_t num_threads,
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void parse_affinity_options(
+        std::string const& spec, std::vector<mask_type>& affinities,
+        std::size_t used_cores, std::size_t max_cores, std::size_t num_threads,
         std::vector<std::size_t>& num_pus, bool use_process_mask,
         error_code& ec = throws);
 
     // backwards compatibility helper
-    inline void parse_affinity_options(std::string const& spec,
+    HPX_CXX_EXPORT inline void parse_affinity_options(std::string const& spec,
         std::vector<mask_type>& affinities, error_code& ec = throws)
     {
         std::vector<std::size_t> num_pus;

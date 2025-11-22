@@ -11,7 +11,7 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/threading_base/thread_data.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <cstring>
 #include <iostream>

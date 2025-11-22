@@ -12,12 +12,12 @@
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_local/debugging.hpp>
 #include <hpx/runtime_local/runtime_handlers.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
 #if defined(HPX_HAVE_VERIFY_LOCKS)
 #include <hpx/modules/debugging.hpp>
 #include <hpx/runtime_local/config_entry.hpp>

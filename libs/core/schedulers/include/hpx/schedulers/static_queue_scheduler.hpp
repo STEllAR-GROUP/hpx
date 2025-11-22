@@ -10,10 +10,10 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/schedulers/local_queue_scheduler.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
-#include <hpx/threading_base/thread_data.hpp>
 
 #include <cstddef>
 #include <cstdint>
