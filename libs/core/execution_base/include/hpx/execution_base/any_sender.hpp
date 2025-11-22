@@ -34,7 +34,9 @@ namespace hpx::detail {
     template <typename T>
     using empty_vtable_t = typename empty_vtable_type<T>::type;
 
-#if !defined(HPX_MSVC) && defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
+#if !defined(HPX_MSVC) &&                                                      \
+    defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR) &&                      \
+    !defined(__CUDACC__) && !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename T>
     inline constexpr empty_vtable_t<T> empty_vtable{};
 

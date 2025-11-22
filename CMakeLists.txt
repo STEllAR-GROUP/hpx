@@ -606,6 +606,21 @@ if(HPX_WITH_CUDA AND HPX_WITH_HIP)
   )
 endif()
 
+# HPX THRUST configuration
+set(HPX_WITH_THRUST_DEFAULT OFF)
+if(HPX_WITH_CUDA)
+  set(HPX_WITH_THRUST_DEFAULT ON)
+endif()
+
+hpx_option(
+  HPX_WITH_THRUST
+  BOOL
+  "Enable support for NVIDIA Thrust integration (default: ON when CUDA is enabled, OFF otherwise)"
+  ${HPX_WITH_THRUST_DEFAULT}
+  ADVANCED
+  CATEGORY "Build Targets"
+)
+
 # ## HPX STDEXEC configuration ##
 
 hpx_option(

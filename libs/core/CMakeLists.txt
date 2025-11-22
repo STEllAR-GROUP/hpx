@@ -79,6 +79,7 @@ set(_hpx_core_modules
     threading
     threading_base
     threadmanager
+    thrust
     timed_execution
     timing
     topology
