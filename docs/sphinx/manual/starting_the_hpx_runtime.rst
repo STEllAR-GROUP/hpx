@@ -54,16 +54,11 @@ you must link your application to the |cmake|_ target ``HPX::wrap_main``. This i
 done automatically if you are using the provided macros
 (:ref:`using_hpx_cmake_macros`) to set up your application, but must be done
 explicitly if you are using targets directly (:ref:`using_hpx_cmake_targets`).
-All |hpx| API functions can be used from within the ``main()`` function now.
+All |hpx| API functions can be used from within the ``main()`` function now. If
+you cannot or do not want to include ``hpx/hpx_main.hpp`` in ``main.cpp``, you
+can instead link against ``HPX::auto_wrap_main``. That target enables the same
+runtime startup path without needing the header-triggered opt-in.
 
-.. note::
-   On Linux and macOS the runtime override is activated automatically when
-   linking an executable against ``HPX::wrap_main`` as long as |hpx| is built
-   with ``-DHPX_WITH_WRAP_MAIN_AUTO_ACTIVATE=ON`` (enabled by default) and
-   ``-DHPX_WITH_DYNAMIC_HPX_MAIN=ON``. You can disable the automatic behaviour
-   by configuring with ``-DHPX_WITH_WRAP_MAIN_AUTO_ACTIVATE=OFF``. Including
-   ``hpx/hpx_main.hpp`` remains supported on all platforms and continues to work
-   even when the automatic activation is enabled.
 
 .. note::
 
@@ -114,14 +109,11 @@ to the operating system as usual.
    result in unexpected behavior.
 
 .. caution::
-
-   With ``HPX_WITH_WRAP_MAIN_AUTO_ACTIVATE`` enabled (the default when
-   supported) and ``HPX_WITH_DYNAMIC_HPX_MAIN`` also enabled, the wrapped
-   ``main`` entry point becomes active as soon as you link against
-   ``HPX::wrap_main``. Even in that case ``hpx/hpx_main.hpp`` should *only* be
-   included in the executable that provides ``main``. Including it in components
-   will still lead to multiple definitions of the override variable
-   ``include_libhpx_wrap``.
+   We make use of an *override* variable ``include_libhpx_wrap`` in the header
+   file ``hpx/hpx_main.hpp`` to swiftly choose the function call stack at
+   runtime. Therefore, the header file should *only* be included in the main
+   executable. Including it in the components will result in multiple definition
+   of the variable.
 
 .. _medium:
 

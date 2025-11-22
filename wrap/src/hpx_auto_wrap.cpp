@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/hpx_init.hpp>
 
 // The following implementation has been divided for Linux and Mac OSX
 #if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) &&                                      \
@@ -22,9 +23,9 @@ namespace hpx_start {
     // initialize_main. Subsequent calls before entering main() are handled
     // by this code.
     HPX_SYMBOL_EXPORT extern bool include_libhpx_wrap;
-    HPX_SYMBOL_EXPORT bool include_libhpx_wrap __attribute__((weak)) = false;
+    HPX_SYMBOL_EXPORT bool include_libhpx_wrap __attribute__((weak)) = true;
     HPX_SYMBOL_EXPORT extern const char* app_name_libhpx_wrap;
-    HPX_SYMBOL_EXPORT const char* app_name_libhpx_wrap __attribute__((weak));
+    HPX_SYMBOL_EXPORT const char* app_name_libhpx_wrap __attribute__((weak)) = HPX_APPLICATION_STRING;
 
     // Provide a definition of is_linked variable defined weak in hpx_main.hpp
     // header. This variable is solely to trigger a different exception when
@@ -33,10 +34,11 @@ namespace hpx_start {
     HPX_SYMBOL_EXPORT bool is_linked = true;
 }    // namespace hpx_start
 
-#include <hpx/hpx_finalize.hpp>
-#include <hpx/hpx_init.hpp>
+
 #include <hpx/modules/functional.hpp>
-#include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/hpx_finalize.hpp>
+
+#include <hpx/runtime_configuration/runtime_mode.hpp>
 
 #include <vector>
 
