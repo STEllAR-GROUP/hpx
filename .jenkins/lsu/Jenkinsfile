@@ -26,9 +26,9 @@ pipeline {
     stages {
         stage('checkout') {
             steps {
-                dir('hpx') {
+                dir("hpx_${env.BUILD_ID}") {
                     checkout scm
-                    echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                    echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL} (base directory: ${env.WORKSPACE})"
                 }
             }
         }
@@ -47,7 +47,7 @@ pipeline {
                 stages {
                     stage('build') {
                         steps {
-                            dir('hpx') {
+                            dir("hpx_${env.BUILD_ID}") {
                                 sh '''
                                 #!/bin/bash -l
                                 .jenkins/lsu/entry.sh
@@ -62,8 +62,8 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: 'hpx/jenkins-hpx-*', fingerprint: true
-            archiveArtifacts artifacts: 'hpx/build/*/Testing/**', fingerprint: true
+            archiveArtifacts artifacts: "hpx_${env.BUILD_ID}/jenkins-hpx-*", fingerprint: true
+            archiveArtifacts artifacts: "hpx_${env.BUILD_ID}/build/*/Testing/**", fingerprint: true
         }
     }
 }
