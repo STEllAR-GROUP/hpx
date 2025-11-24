@@ -103,15 +103,6 @@ if(MSVC)
                COMPILE_PDB_OUTPUT_DIRECTORY_RELWITHDEBINFO
                ${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo
   )
-  set_target_properties(
-    hpx_auto_wrap
-    PROPERTIES COMPILE_PDB_NAME_DEBUG hpx_auto_wrapd
-               COMPILE_PDB_NAME_RELWITHDEBINFO hpx_auto_wrap
-               COMPILE_PDB_OUTPUT_DIRECTORY_DEBUG
-               ${CMAKE_CURRENT_BINARY_DIR}/Debug
-               COMPILE_PDB_OUTPUT_DIRECTORY_RELWITHDEBINFO
-               ${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo
-  )
 endif()
 
 if(HPX_WITH_DYNAMIC_HPX_MAIN)
@@ -155,16 +146,6 @@ if(MSVC)
     get_target_property(_pdb_dir hpx_wrap COMPILE_PDB_OUTPUT_DIRECTORY_${cfg})
     install(
       FILES ${_pdb_dir}/${_pdb_file}.pdb
-      DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      CONFIGURATIONS ${cfg}
-      COMPONENT runtime
-      OPTIONAL
-    )
-
-    get_target_property(_pdb_file_auto hpx_auto_wrap COMPILE_PDB_NAME_${cfg})
-    get_target_property(_pdb_dir_auto hpx_auto_wrap COMPILE_PDB_OUTPUT_DIRECTORY_${cfg})
-    install(
-      FILES ${_pdb_dir_auto}/${_pdb_file_auto}.pdb
       DESTINATION ${CMAKE_INSTALL_LIBDIR}
       CONFIGURATIONS ${cfg}
       COMPONENT runtime
