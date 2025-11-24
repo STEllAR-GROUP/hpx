@@ -6,11 +6,9 @@
 
 #pragma once
 
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/thread_pool_util.hpp>
 #include <hpx/modules/thread_pools.hpp>
 #include <hpx/modules/threading.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/topology.hpp>
-#include <hpx/runtime_local/run_as_hpx_thread.hpp>
-#include <hpx/runtime_local/run_as_os_thread.hpp>
-#include <hpx/runtime_local/thread_pool_helpers.hpp>
-#include <hpx/thread_pool_util/thread_pool_suspension_helpers.hpp>

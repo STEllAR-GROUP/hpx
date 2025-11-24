@@ -7,7 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/program_options.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #include <cstddef>
 #include <string>

@@ -14,7 +14,7 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/threads.hpp>
 
-#include <hpx/async_local/dataflow.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>

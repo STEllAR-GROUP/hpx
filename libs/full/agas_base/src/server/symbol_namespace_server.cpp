@@ -27,6 +27,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::agas {
 
     naming::gid_type bootstrap_symbol_namespace_gid()

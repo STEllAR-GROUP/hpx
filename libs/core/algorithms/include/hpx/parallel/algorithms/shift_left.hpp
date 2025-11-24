@@ -107,9 +107,9 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/async_local/dataflow.hpp>
-#include <hpx/executors/execution_policy.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

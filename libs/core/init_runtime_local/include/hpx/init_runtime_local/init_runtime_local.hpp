@@ -17,9 +17,7 @@
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/runtime_local/shutdown_function.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #include <csignal>
 #include <cstddef>

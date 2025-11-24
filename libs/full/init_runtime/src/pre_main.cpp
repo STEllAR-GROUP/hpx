@@ -21,6 +21,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/performance_counters/agas_counter_types.hpp>
 #include <hpx/performance_counters/parcelhandler_counter_types.hpp>
@@ -30,12 +31,11 @@
 #include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/runtime_support.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/runtime_local/shutdown_function.hpp>
 
 #include <string>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace detail {
 

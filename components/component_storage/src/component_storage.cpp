@@ -16,6 +16,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace components {
     component_storage::component_storage(hpx::id_type target_locality)
       : base_type(hpx::new_<server::component_storage>(target_locality))

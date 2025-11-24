@@ -8,8 +8,8 @@
 //  Ensures that the find-family algorithms correctly handle proxy-reference
 
 #include <hpx/algorithm.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <vector>

@@ -315,8 +315,8 @@ namespace hpx {
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>

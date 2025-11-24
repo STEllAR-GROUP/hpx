@@ -12,7 +12,6 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/executors/exception_list.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_main_winsocket.hpp>
 #include <hpx/hpx_suspend.hpp>
@@ -23,6 +22,7 @@
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
@@ -32,6 +32,7 @@
 #include <hpx/modules/prefix.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/modules/testing.hpp>
@@ -40,17 +41,6 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
-#include <hpx/runtime_local/debugging.hpp>
-#include <hpx/runtime_local/detail/serialize_exception.hpp>
-#include <hpx/runtime_local/get_locality_id.hpp>
-#include <hpx/runtime_local/report_error.hpp>
-#include <hpx/runtime_local/runtime_handlers.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/runtime_local/shutdown_function.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
 
 #ifdef HPX_HAVE_MODULE_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>

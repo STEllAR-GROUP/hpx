@@ -30,7 +30,7 @@
 namespace hpx {
 
     // cppcheck-suppress ConfigurationNotChecked
-    static hpx::debug::enable_print<GUIDED_POOL_EXECUTOR_DEBUG> gpx_deb(
+    inline hpx::debug::enable_print<GUIDED_POOL_EXECUTOR_DEBUG> gpx_deb(
         "GP_EXEC");
 }    // namespace hpx
 
@@ -238,22 +238,22 @@ namespace hpx::execution::experimental {
 
     // --------------------------------------------------------------------
     // Template type for a numa domain scheduling hint
-    template <typename... Args>
+    HPX_CXX_EXPORT template <typename... Args>
     struct pool_numa_hint
     {
     };
 
     // Template type for a core scheduling hint
-    template <typename... Args>
+    HPX_CXX_EXPORT template <typename... Args>
     struct pool_core_hint
     {
     };
 
     // --------------------------------------------------------------------
-    template <typename H>
+    HPX_CXX_EXPORT template <typename H>
     struct guided_pool_executor;
 
-    template <typename H>
+    HPX_CXX_EXPORT template <typename H>
     struct guided_pool_executor_shim;
 
     // --------------------------------------------------------------------
@@ -261,7 +261,7 @@ namespace hpx::execution::experimental {
     // the args should be the same as those that would be called
     // for an async function or continuation. This makes it possible to
     // guide a lambda rather than a full function.
-    template <typename Tag>
+    HPX_CXX_EXPORT template <typename Tag>
     struct guided_pool_executor<pool_numa_hint<Tag>>
     {
         template <typename Executor, typename NumaFunction>
@@ -528,7 +528,7 @@ namespace hpx::execution::experimental {
     // guided_pool_executor_shim
     // an executor compatible with scheduled executor API
     // --------------------------------------------------------------------
-    template <typename H>
+    HPX_CXX_EXPORT template <typename H>
     struct guided_pool_executor_shim
     {
     public:
@@ -634,25 +634,25 @@ namespace hpx::execution::experimental {
         guided_pool_executor<H> guided_exec_;
     };
 
-    template <typename Hint>
+    HPX_CXX_EXPORT template <typename Hint>
     struct executor_execution_category<guided_pool_executor<Hint>>
     {
         using type = hpx::execution::parallel_execution_tag;
     };
 
-    template <typename Hint>
+    HPX_CXX_EXPORT template <typename Hint>
     struct is_two_way_executor<guided_pool_executor<Hint>> : std::true_type
     {
     };
 
     // ----------------------------
-    template <typename Hint>
+    HPX_CXX_EXPORT template <typename Hint>
     struct executor_execution_category<guided_pool_executor_shim<Hint>>
     {
         using type = hpx::execution::parallel_execution_tag;
     };
 
-    template <typename Hint>
+    HPX_CXX_EXPORT template <typename Hint>
     struct is_two_way_executor<guided_pool_executor_shim<Hint>> : std::true_type
     {
     };

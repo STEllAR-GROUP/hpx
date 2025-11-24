@@ -19,6 +19,8 @@
 #include <string>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(std::int64_t, int64_t,
     hpx::actions::base_lco_with_value_int64_get,
     hpx::actions::base_lco_with_value_int64_set)

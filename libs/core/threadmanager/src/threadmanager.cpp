@@ -20,6 +20,7 @@
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/schedulers.hpp>
+#include <hpx/modules/thread_pool_util.hpp>
 #include <hpx/modules/thread_pools.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
@@ -27,7 +28,6 @@
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/thread_pool_util/thread_pool_suspension_helpers.hpp>
 
 #include <cstddef>
 #include <cstdint>

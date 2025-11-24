@@ -15,11 +15,11 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/locality.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
 
 #include <condition_variable>
 #include <cstddef>

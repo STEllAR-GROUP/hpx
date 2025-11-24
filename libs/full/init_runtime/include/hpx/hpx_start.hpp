@@ -16,8 +16,7 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
-#include <hpx/runtime_local/shutdown_function.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #include <cstddef>
 #include <functional>

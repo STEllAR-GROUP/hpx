@@ -10,7 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/functional.hpp>
 
-#include <hpx/executors/execution_policy.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/upper_lower_bound.hpp>

@@ -45,9 +45,9 @@ namespace hpx {
 #include <hpx/async_distributed/async_continue.hpp>
 #include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/async_distributed/detail/async_implementations.hpp>
-#include <hpx/async_local/async.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>

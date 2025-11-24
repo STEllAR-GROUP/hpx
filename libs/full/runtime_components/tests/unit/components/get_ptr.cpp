@@ -10,8 +10,8 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
 
 #include <cstddef>
 #include <memory>

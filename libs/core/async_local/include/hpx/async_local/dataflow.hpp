@@ -7,5 +7,5 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/executors/dataflow.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/executors.hpp>

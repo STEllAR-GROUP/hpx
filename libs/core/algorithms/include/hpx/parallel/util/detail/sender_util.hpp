@@ -7,12 +7,10 @@
 
 #pragma once
 
-#include <hpx/executors/execute_on.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/executors/explicit_scheduler_executor.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/executors.hpp>
 
 #include <type_traits>
 #include <utility>

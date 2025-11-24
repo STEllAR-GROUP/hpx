@@ -5,9 +5,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/async_local/async.hpp>
-#include <hpx/async_local/post.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/threading_base.hpp>

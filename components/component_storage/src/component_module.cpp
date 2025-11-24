@@ -13,6 +13,8 @@
 
 #include <hpx/components/component_storage/server/migrate_to_storage.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality.
 HPX_REGISTER_COMPONENT_MODULE()

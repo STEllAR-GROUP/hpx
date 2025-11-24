@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/runtime_local/run_as_os_thread.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #include <hpx/components/process/child.hpp>
 #include <hpx/components/process/server/child.hpp>
