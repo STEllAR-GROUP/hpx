@@ -12,8 +12,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 
-#include <hpx/async_local/dataflow.hpp>
 #include <hpx/iostream.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/pack_traversal.hpp>
 

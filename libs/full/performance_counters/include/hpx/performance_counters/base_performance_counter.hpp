@@ -10,9 +10,9 @@
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/component_base.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
-#include <hpx/runtime_local/get_locality_id.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 //[performance_counter_base_class

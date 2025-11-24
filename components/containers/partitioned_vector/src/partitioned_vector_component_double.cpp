@@ -16,6 +16,8 @@
 
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 HPX_REGISTER_PARTITIONED_VECTOR(double)
 
 // an out-of-line definition of a member of a class template cannot have default

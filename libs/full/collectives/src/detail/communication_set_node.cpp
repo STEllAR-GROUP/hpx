@@ -24,6 +24,8 @@
 #include <string>
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 using communication_set_node_component = hpx::components::component<
     hpx::collectives::detail::communication_set_node>;

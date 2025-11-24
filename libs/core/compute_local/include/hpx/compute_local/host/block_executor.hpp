@@ -9,10 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compute_local/host/target.hpp>
-#include <hpx/executors/restricted_thread_pool_executor.hpp>
 #include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/iterator_support.hpp>
 

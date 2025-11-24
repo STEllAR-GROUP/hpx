@@ -9,9 +9,9 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/async_local/dataflow.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/pack_traversal.hpp>
 
 typedef hpx::shared_future<double> future_type;

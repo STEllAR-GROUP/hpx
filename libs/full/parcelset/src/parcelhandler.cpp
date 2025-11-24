@@ -58,6 +58,8 @@
 #include <chrono>
 #endif
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::detail {
 

@@ -9,11 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/executors/exception_list.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>

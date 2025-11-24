@@ -48,6 +48,7 @@ add_hpx_module(
     hpx_algorithms
     hpx_allocator_support
     hpx_async_combinators
+    hpx_async_local
     hpx_concepts
     hpx_config
     hpx_coroutines

@@ -9,7 +9,7 @@
 #include <hpx/collectives/spmd_block.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_local_view.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
-#include <hpx/executors/execution_policy.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/partitioned_vector_view.hpp>

@@ -73,7 +73,7 @@ namespace hpx::execution {
     ///
     /// This executor conforms to the concepts of a TwoWayExecutor,
     /// and a BulkTwoWayExecutor
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct parallel_policy_executor
     {
         /// Associate the parallel_execution_tag executor tag type as a default
@@ -650,7 +650,7 @@ namespace hpx::execution {
 
     // support all properties exposed by the embedded policy
     // clang-format off
-    template <typename Tag, typename Policy, typename Property,
+    HPX_CXX_EXPORT template <typename Tag, typename Policy, typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>
@@ -668,7 +668,7 @@ namespace hpx::execution {
     }
 
     // clang-format off
-    template <typename Tag, typename Policy,
+    HPX_CXX_EXPORT template <typename Tag, typename Policy,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>
@@ -679,31 +679,32 @@ namespace hpx::execution {
         return tag(exec.policy());
     }
 
-    using parallel_executor = parallel_policy_executor<hpx::launch>;
+    HPX_CXX_EXPORT using parallel_executor =
+        parallel_policy_executor<hpx::launch>;
 }    // namespace hpx::execution
 
 namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct is_one_way_executor<hpx::execution::parallel_policy_executor<Policy>>
       : std::true_type
     {
     };
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct is_never_blocking_one_way_executor<
         hpx::execution::parallel_policy_executor<Policy>> : std::true_type
     {
     };
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct is_two_way_executor<hpx::execution::parallel_policy_executor<Policy>>
       : std::true_type
     {
     };
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct is_bulk_two_way_executor<
         hpx::execution::parallel_policy_executor<Policy>> : std::true_type
     {

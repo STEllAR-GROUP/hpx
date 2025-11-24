@@ -16,6 +16,8 @@
 
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 HPX_REGISTER_PARTITIONED_VECTOR(int)
 using long_long = long long;
 HPX_REGISTER_PARTITIONED_VECTOR(long_long)

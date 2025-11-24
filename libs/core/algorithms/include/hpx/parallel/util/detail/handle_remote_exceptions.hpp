@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
 

@@ -7,8 +7,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/manage_runtime.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/runtime_local/run_as_hpx_thread.hpp>
 
 void hpx_thread_func()
 {

@@ -255,7 +255,7 @@ namespace hpx { namespace ranges {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/executors/execution_policy.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/uninitialized_default_construct.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

@@ -13,7 +13,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #include <algorithm>
 #include <cstddef>

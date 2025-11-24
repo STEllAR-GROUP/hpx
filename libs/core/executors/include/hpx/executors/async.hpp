@@ -18,10 +18,10 @@
 
 namespace hpx::detail {
 
-    template <typename Func, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Func, typename Enable = void>
     struct async_dispatch_launch_policy_helper;
 
-    template <typename Func>
+    HPX_CXX_EXPORT template <typename Func>
     struct async_dispatch_launch_policy_helper<Func,
         std::enable_if_t<!traits::is_action_v<Func>>>
     {

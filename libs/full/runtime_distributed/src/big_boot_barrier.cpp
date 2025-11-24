@@ -47,10 +47,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx::detail {
-
-    std::string get_locality_base_name();
-}
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::parcelset {
 

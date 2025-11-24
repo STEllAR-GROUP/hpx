@@ -13,6 +13,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
@@ -21,9 +22,6 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
-#include <hpx/runtime_local/get_locality_id.hpp>
-#include <hpx/runtime_local/get_thread_name.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -40,6 +38,8 @@
 #include <hpx/modules/itt_notify.hpp>
 #include <map>
 #endif
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::util {
 

@@ -13,6 +13,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace components { namespace detail {
 
     std::vector<std::size_t> get_items_count(

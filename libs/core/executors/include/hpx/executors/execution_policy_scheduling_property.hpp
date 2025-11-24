@@ -21,7 +21,7 @@ namespace hpx::execution::experimental {
     // forwards to the embedded executor
 
     // clang-format off
-    template <typename Tag, typename ExPolicy, typename Property,
+    HPX_CXX_EXPORT template <typename Tag, typename ExPolicy, typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag> &&
             hpx::is_execution_policy_v<ExPolicy> &&
@@ -38,7 +38,7 @@ namespace hpx::execution::experimental {
     }
 
     // clang-format off
-    template <typename Tag, typename ExPolicy,
+    HPX_CXX_EXPORT template <typename Tag, typename ExPolicy,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag> &&
             hpx::is_execution_policy_v<ExPolicy> &&

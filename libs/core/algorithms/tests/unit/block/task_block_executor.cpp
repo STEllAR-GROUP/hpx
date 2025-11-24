@@ -6,8 +6,8 @@
 
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/task_block.hpp>
 
 #include <iostream>

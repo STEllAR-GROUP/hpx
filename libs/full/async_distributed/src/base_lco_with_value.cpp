@@ -17,6 +17,8 @@
 
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(hpx::naming::gid_type, gid_type,
     hpx::actions::base_lco_with_value_gid_get,

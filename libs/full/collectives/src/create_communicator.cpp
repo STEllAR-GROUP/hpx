@@ -30,6 +30,8 @@
 #include <string>
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::util {
 
     // This is explicitly instantiated to ensure that the id is stable across

@@ -11,7 +11,7 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 
-#include <hpx/executors/datapar/execution_policy.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/parallel/datapar/adjacent_difference.hpp>
 #include <hpx/parallel/datapar/adjacent_find.hpp>
 #include <hpx/parallel/datapar/equal.hpp>

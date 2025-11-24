@@ -11,11 +11,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_local/async.hpp>
-#include <hpx/executors/execution_policy.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/parallel/task_group.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

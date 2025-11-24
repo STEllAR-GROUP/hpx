@@ -6,7 +6,7 @@
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(threadmanager_headers hpx/modules/threadmanager.hpp
+set(threadmanager_headers hpx/threadmanager/threadmanager.hpp
                           hpx/threadmanager/threadmanager_fwd.hpp
 )
 
@@ -22,7 +22,8 @@ set(threadmanager_sources threadmanager.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   core threadmanager
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${threadmanager_sources}
   HEADERS ${threadmanager_headers}
   COMPAT_HEADERS ${threadmanager_compat_headers}

@@ -18,10 +18,10 @@
 
 namespace hpx::detail {
 
-    template <typename Func, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Func, typename Enable = void>
     struct sync_dispatch_launch_policy_helper;
 
-    template <typename Func>
+    HPX_CXX_EXPORT template <typename Func>
     struct sync_dispatch_launch_policy_helper<Func,
         std::enable_if_t<!traits::is_action_v<Func>>>
     {
@@ -38,7 +38,7 @@ namespace hpx::detail {
         }
     };
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct sync_dispatch<Policy,
         std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
@@ -59,7 +59,7 @@ namespace hpx::detail {
 
     // Launch the given function or function object synchronously. This exists
     // mostly for symmetry with hpx::async.
-    template <typename Func, typename Enable>
+    HPX_CXX_EXPORT template <typename Func, typename Enable>
     struct sync_dispatch
     {
         // clang-format off
@@ -78,7 +78,7 @@ namespace hpx::detail {
 
     // The overload for hpx::sync taking an executor simply forwards to the
     // corresponding executor customization point.
-    template <typename Executor>
+    HPX_CXX_EXPORT template <typename Executor>
     struct sync_dispatch<Executor,
         std::enable_if_t<traits::is_one_way_executor_v<Executor> ||
             traits::is_two_way_executor_v<Executor>>>

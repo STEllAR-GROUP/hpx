@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/executors/execution_policy.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/fill.hpp>
 #include <hpx/parallel/segmented_algorithms/for_each.hpp>

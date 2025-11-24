@@ -18,6 +18,8 @@
 #include <exception>
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx {
 
     void trigger_lco_event([[maybe_unused]] hpx::id_type id,

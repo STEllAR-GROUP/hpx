@@ -9,8 +9,8 @@
 #include <hpx/compute_local/host/numa_domains.hpp>
 #include <hpx/compute_local/host/target.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/topology.hpp>
-#include <hpx/runtime_local/get_os_thread_count.hpp>
 
 #include <cstddef>
 #include <vector>
