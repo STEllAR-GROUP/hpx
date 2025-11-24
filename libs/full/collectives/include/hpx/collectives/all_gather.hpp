@@ -214,8 +214,8 @@ namespace hpx { namespace collectives {
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <cstddef>

@@ -46,6 +46,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parcelset {
 
@@ -1051,5 +1053,7 @@ namespace hpx::parcelset {
         std::size_t const max_background_thread_;
     };
 }    // namespace hpx::parcelset
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

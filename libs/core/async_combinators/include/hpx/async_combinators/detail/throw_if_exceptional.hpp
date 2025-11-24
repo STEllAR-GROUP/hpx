@@ -6,10 +6,7 @@
 
 #pragma once
 
-#include <hpx/futures/detail/future_data.hpp>
-#include <hpx/futures/traits/acquire_shared_state.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/is_future.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <array>
 #include <cstddef>

@@ -9,10 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/futures/traits/future_then_result.hpp>
-#include <hpx/futures/traits/future_traits.hpp>
-#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
@@ -51,13 +49,13 @@ namespace hpx::traits {
         };
     }    // namespace detail
 
-    template <typename Executor, typename Future, typename F>
+    HPX_CXX_EXPORT template <typename Executor, typename Future, typename F>
     struct future_then_executor_result
       : detail::future_then_executor_result<std::decay_t<Executor>, Future, F>
     {
     };
 
-    template <typename Executor, typename Future, typename F>
+    HPX_CXX_EXPORT template <typename Executor, typename Future, typename F>
     using future_then_executor_result_t =
         typename future_then_executor_result<Executor, Future, F>::type;
 }    // namespace hpx::traits

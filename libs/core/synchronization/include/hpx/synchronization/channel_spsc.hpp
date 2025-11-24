@@ -26,13 +26,12 @@ namespace hpx::lcos::local {
     // This channel is bounded to a size given at construction time and supports
     // a single producer and a single consumer. The data is stored in a
     // ring-buffer.
-    enum class channel_mode : std::uint8_t
-    {
+    HPX_CXX_EXPORT enum class channel_mode : std::uint8_t {
         normal,
         dont_support_close
     };
 
-    template <typename T, channel_mode = channel_mode::normal>
+    HPX_CXX_EXPORT template <typename T, channel_mode = channel_mode::normal>
     class channel_spsc
     {
     private:
@@ -206,21 +205,21 @@ namespace hpx::lcos::local {
     // Same as above, except that the channel doesn't support close(). This is
     // an optimization that can be applied in use cases where the surrounding
     // code ensures that the channel is always in proper state.
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     class channel_spsc<T, channel_mode::dont_support_close>
     {
     private:
         [[nodiscard]] HPX_FORCEINLINE bool is_full(
             std::size_t tail) const noexcept
         {
-            std::size_t const numitems =
+            std::size_t const num_items =
                 size_ + tail - head_.data_.load(std::memory_order_acquire);
 
-            if (numitems < size_)
+            if (num_items < size_)
             {
-                return numitems == size_ - 1;
+                return num_items == size_ - 1;
             }
-            return (numitems - size_ == size_ - 1);
+            return (num_items - size_ == size_ - 1);
         }
 
         [[nodiscard]] HPX_FORCEINLINE bool is_empty(

@@ -12,6 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/futures/future_fwd.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/errors.hpp>
@@ -27,11 +28,11 @@ namespace hpx {
 
     namespace detail {
 
-        template <typename R,
+        HPX_CXX_EXPORT template <typename R,
             typename SharedState = lcos::detail::future_data<R>>
         class promise_base;
 
-        template <typename R, typename SharedState>
+        HPX_CXX_EXPORT template <typename R, typename SharedState>
         class promise_base
         {
             using shared_state_type = SharedState;
@@ -250,7 +251,7 @@ namespace hpx {
     /// conflict otherwise: for example multiple callers of
     /// hpx::shared_future::get must either all be read-only or provide external
     /// synchronization.
-    template <typename R>
+    HPX_CXX_EXPORT template <typename R>
     class promise : public detail::promise_base<R>
     {
         using base_type = detail::promise_base<R>;
@@ -388,7 +389,7 @@ namespace hpx {
         using base_type::set_exception;
     };
 
-    template <typename R>
+    HPX_CXX_EXPORT template <typename R>
     class promise<R&> : public detail::promise_base<R&>
     {
         using base_type = detail::promise_base<R&>;
@@ -586,12 +587,12 @@ namespace hpx {
 namespace std {
 
     // Requires: Allocator shall be an allocator (17.6.3.5)
-    template <typename R, typename Allocator>
+    HPX_CXX_EXPORT template <typename R, typename Allocator>
     struct uses_allocator<hpx::promise<R>, Allocator> : std::true_type
     {
     };
 
-    template <typename R>
+    HPX_CXX_EXPORT template <typename R>
     void swap(hpx::promise<R>& x, hpx::promise<R>& y) noexcept
     {
         x.swap(y);

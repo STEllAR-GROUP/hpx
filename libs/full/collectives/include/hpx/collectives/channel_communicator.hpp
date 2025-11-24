@@ -107,8 +107,8 @@ namespace hpx { namespace collectives {
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/detail/channel_communicator.hpp>
 #include <hpx/components/client.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <cstddef>
 #include <memory>

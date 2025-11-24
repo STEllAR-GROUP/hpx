@@ -15,7 +15,7 @@
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/iostream.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 
 #include <chrono>
 #include <iostream>

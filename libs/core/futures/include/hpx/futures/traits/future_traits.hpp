@@ -7,58 +7,50 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/futures/future_fwd.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 
 #include <type_traits>
-
-namespace hpx {
-
-    template <typename R>
-    class future;
-
-    template <typename R>
-    class shared_future;
-}    // namespace hpx
 
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename Future, typename Enable = void>
+        HPX_CXX_EXPORT template <typename Future, typename Enable = void>
         struct future_traits_customization_point
         {
         };
     }    // namespace detail
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct future_traits : detail::future_traits_customization_point<T>
     {
     };
 
-    template <typename Future>
+    HPX_CXX_EXPORT template <typename Future>
     struct future_traits<Future const> : future_traits<Future>
     {
     };
 
-    template <typename Future>
+    HPX_CXX_EXPORT template <typename Future>
     struct future_traits<Future&> : future_traits<Future>
     {
     };
 
-    template <typename Future>
+    HPX_CXX_EXPORT template <typename Future>
     struct future_traits<Future const&> : future_traits<Future>
     {
     };
 
-    template <typename R>
+    HPX_CXX_EXPORT template <typename R>
     struct future_traits<hpx::future<R>>
     {
         using type = R;
         using result_type = R;
     };
 
-    template <typename R>
+    HPX_CXX_EXPORT template <typename R>
     struct future_traits<hpx::shared_future<R>>
     {
         using type = R;
@@ -72,21 +64,21 @@ namespace hpx::traits {
         using result_type = void;
     };
 
-    template <typename Future>
+    HPX_CXX_EXPORT template <typename Future>
     using future_traits_t = typename future_traits<Future>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Future, typename Enable = void>
     struct is_future_void : std::false_type
     {
     };
 
-    template <typename Future>
+    HPX_CXX_EXPORT template <typename Future>
     struct is_future_void<Future, std::enable_if_t<is_future_v<Future>>>
       : std::is_void<future_traits_t<Future>>
     {
     };
 
-    template <typename Future>
+    HPX_CXX_EXPORT template <typename Future>
     inline constexpr bool is_future_void_v = is_future_void<Future>::value;
 }    // namespace hpx::traits

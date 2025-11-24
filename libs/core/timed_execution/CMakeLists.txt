@@ -33,6 +33,7 @@ add_hpx_module(
     hpx_execution
     hpx_execution_base
     hpx_executors
+    hpx_futures
     hpx_tag_invoke
     hpx_threading
     hpx_timing

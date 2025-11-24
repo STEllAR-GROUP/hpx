@@ -10,23 +10,24 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/io_service.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/schedulers.hpp>
+#include <hpx/modules/thread_pools.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/thread_pool_util/thread_pool_suspension_helpers.hpp>
-#include <hpx/thread_pools/scheduled_thread_pool.hpp>
 
 #include <cstddef>
 #include <cstdint>

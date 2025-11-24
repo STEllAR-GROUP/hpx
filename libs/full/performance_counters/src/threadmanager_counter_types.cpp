@@ -19,7 +19,7 @@
 #include <hpx/performance_counters/threadmanager_counter_types.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-#include <hpx/schedulers/maintain_queue_wait_times.hpp>
+#include <hpx/modules/schedulers.hpp>
 #endif
 
 #include <cstddef>

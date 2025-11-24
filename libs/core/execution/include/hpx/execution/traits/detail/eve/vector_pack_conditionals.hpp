@@ -14,7 +14,7 @@
 namespace hpx::parallel::traits {
 
     ////////////////////////////////////////////////////////////////////
-    template <typename T, typename Abi>
+    HPX_CXX_EXPORT template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE eve::wide<T, Abi> choose(
         eve::logical<eve::wide<T, Abi>> const& msk,
         eve::wide<T, Abi> const& v_true,
@@ -24,7 +24,7 @@ namespace hpx::parallel::traits {
     }
 
     ////////////////////////////////////////////////////////////////////
-    template <typename T, typename Abi>
+    HPX_CXX_EXPORT template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE void mask_assign(
         eve::logical<eve::wide<T, Abi>> const& msk, eve::wide<T, Abi>& v,
         eve::wide<T, Abi> const& val) noexcept

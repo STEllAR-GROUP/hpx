@@ -73,6 +73,7 @@ namespace hpx {
         bool try_acquire_for(hpx::chrono::steady_duration const& rel_time);
     };
 }    // namespace hpx
+
 #else
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +84,7 @@ namespace hpx {
     // implementation of a counting semaphore with a unit resource count.
     namespace detail {
 
-        template <typename Mutex = hpx::spinlock>
+        HPX_CXX_EXPORT template <typename Mutex = hpx::spinlock>
         class binary_semaphore : public counting_semaphore<1, Mutex>
         {
         public:
@@ -102,7 +103,7 @@ namespace hpx {
         };
     }    // namespace detail
 
-    using binary_semaphore = detail::binary_semaphore<>;
+    HPX_CXX_EXPORT using binary_semaphore = detail::binary_semaphore<>;
 }    // namespace hpx
 
 #endif

@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2024 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -44,9 +44,12 @@ set(lcos_local_sources composable_guard.cpp preprocess_future.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   core lcos_local
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${lcos_local_sources}
   HEADERS ${lcos_local_headers}
   COMPAT_HEADERS ${lcos_local_compat_headers}
+  ADD_TO_GLOBAL_HEADER "hpx/lcos_local/detail/preprocess_future.hpp"
   MODULE_DEPENDENCIES
     hpx_allocator_support
     hpx_async_base
@@ -63,6 +66,7 @@ add_hpx_module(
     hpx_memory
     hpx_pack_traversal
     hpx_serialization
+    hpx_synchronization
     hpx_thread_support
     hpx_type_support
   CMAKE_SUBDIRS examples tests

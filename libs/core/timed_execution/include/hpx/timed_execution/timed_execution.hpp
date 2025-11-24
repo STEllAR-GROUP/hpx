@@ -8,10 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/timed_execution/timed_execution_fwd.hpp>

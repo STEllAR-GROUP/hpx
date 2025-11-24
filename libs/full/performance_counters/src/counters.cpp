@@ -12,11 +12,11 @@
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/futures/packaged_continuation.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/performance_counters/base_performance_counter.hpp>

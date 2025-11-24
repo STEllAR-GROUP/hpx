@@ -17,25 +17,25 @@
 
 namespace hpx::datapar::experimental {
 
-    using std::experimental::fixed_size_simd;
-    using std::experimental::is_simd_v;
-    using std::experimental::native_simd;
-    using std::experimental::simd;
-    using std::experimental::simd_mask;
+    HPX_CXX_EXPORT using std::experimental::fixed_size_simd;
+    HPX_CXX_EXPORT using std::experimental::is_simd_v;
+    HPX_CXX_EXPORT using std::experimental::native_simd;
+    HPX_CXX_EXPORT using std::experimental::simd;
+    HPX_CXX_EXPORT using std::experimental::simd_mask;
 
-    using std::experimental::simd_abi::native;
+    HPX_CXX_EXPORT using std::experimental::simd_abi::native;
 
-    using std::experimental::memory_alignment_v;
-    using std::experimental::vector_aligned;
+    HPX_CXX_EXPORT using std::experimental::memory_alignment_v;
+    HPX_CXX_EXPORT using std::experimental::vector_aligned;
 
-    using std::experimental::all_of;
-    using std::experimental::any_of;
-    using std::experimental::find_first_set;
-    using std::experimental::none_of;
-    using std::experimental::popcount;
-    using std::experimental::reduce;
+    HPX_CXX_EXPORT using std::experimental::all_of;
+    HPX_CXX_EXPORT using std::experimental::any_of;
+    HPX_CXX_EXPORT using std::experimental::find_first_set;
+    HPX_CXX_EXPORT using std::experimental::none_of;
+    HPX_CXX_EXPORT using std::experimental::popcount;
+    HPX_CXX_EXPORT using std::experimental::reduce;
 
-    template <typename T, typename Abi>
+    HPX_CXX_EXPORT template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto choose(
         std::experimental::simd_mask<T, Abi> const& msk,
         std::experimental::simd<T, Abi> const& v_true,
@@ -56,7 +56,7 @@ namespace hpx::datapar::experimental {
         return v;
     }
 
-    template <typename T, typename Abi>
+    HPX_CXX_EXPORT template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE void mask_assign(
         std::experimental::simd_mask<T, Abi> const& msk,
         std::experimental::simd<T, Abi>& v,
@@ -65,7 +65,7 @@ namespace hpx::datapar::experimental {
         where(msk, v) = val;
     }
 
-    template <typename Vector, typename T>
+    HPX_CXX_EXPORT template <typename Vector, typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto set(
         Vector& vec, std::size_t index, T val) noexcept
     {
@@ -79,10 +79,10 @@ namespace hpx::datapar::experimental {
 
 namespace hpx::datapar::experimental {
 
-    using namespace sve::experimental;
-    using simd_abi::native;
+    HPX_CXX_EXPORT using namespace sve::experimental;
+    HPX_CXX_EXPORT using simd_abi::native;
 
-    template <typename Vector, typename T>
+    HPX_CXX_EXPORT template <typename Vector, typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto set(
         Vector& vec, std::size_t index, T val) noexcept
     {

@@ -8,12 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_local/dataflow.hpp>
 #endif
-#include <hpx/execution/algorithms/just.hpp>
-#include <hpx/execution/algorithms/let_value.hpp>
+#include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>

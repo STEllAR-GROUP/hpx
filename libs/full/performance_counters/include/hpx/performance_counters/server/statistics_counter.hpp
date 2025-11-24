@@ -8,15 +8,17 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components_base/server/component_base.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 #include <hpx/runtime_local/interval_timer.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server {
@@ -102,3 +104,5 @@ namespace hpx { namespace performance_counters { namespace server {
         bool reset_base_counter_;
     };
 }}}    // namespace hpx::performance_counters::server
+
+#include <hpx/config/warnings_suffix.hpp>

@@ -36,7 +36,8 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename Derived, typename Sender, typename Allocator>
+        HPX_CXX_EXPORT template <typename Derived, typename Sender,
+            typename Allocator>
         struct operation_state_holder_base
         {
             struct start_detached_receiver
@@ -121,7 +122,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        template <typename Sender, typename Allocator>
+        HPX_CXX_EXPORT template <typename Sender, typename Allocator>
         struct operation_state_holder
           : operation_state_holder_base<
                 operation_state_holder<Sender, Allocator>, Sender, Allocator>
@@ -140,7 +141,7 @@ namespace hpx::execution::experimental {
             static constexpr void finish() noexcept {}
         };
 
-        template <typename Sender, typename Allocator>
+        HPX_CXX_EXPORT template <typename Sender, typename Allocator>
         struct operation_state_holder_with_run_loop
           : operation_state_holder_base<
                 operation_state_holder_with_run_loop<Sender, Allocator>, Sender,
@@ -179,7 +180,7 @@ namespace hpx::execution::experimental {
     //
     // Like ensure_started, but does not return a value; if the provided sender
     // sends an error instead of a value, std::terminate is called.
-    inline constexpr struct start_detached_t final
+    HPX_CXX_EXPORT inline constexpr struct start_detached_t final
       : hpx::functional::detail::tag_priority<start_detached_t>
     {
     private:

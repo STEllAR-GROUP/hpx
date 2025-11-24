@@ -54,15 +54,14 @@ namespace hpx::traits {
 
             using type = hpx::future<result_type>;
         };
-
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future, typename F>
+    HPX_CXX_EXPORT template <typename Future, typename F>
     struct future_then_result : detail::future_then_result<Future, F>
     {
     };
 
-    template <typename Future, typename F>
+    HPX_CXX_EXPORT template <typename Future, typename F>
     using future_then_result_t = typename future_then_result<Future, F>::type;
 }    // namespace hpx::traits
