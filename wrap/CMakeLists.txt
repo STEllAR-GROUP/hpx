@@ -20,27 +20,14 @@ set(hpx_wrap_SOURCES
 )
 list(APPEND hpx_wrap_SOURCES hpx_wrap.cpp hpx_main.cpp)
 
-set(hpx_auto_wrap_SOURCES
-    ""
-    CACHE INTERNAL "Sources for libhpx_auto_wrap." FORCE
-)
-list(APPEND hpx_auto_wrap_SOURCES hpx_auto_wrap.cpp hpx_main.cpp)
-
 # make source groups
 set(hpx_wrap_SOURCE_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/src)
 list(TRANSFORM hpx_wrap_SOURCES PREPEND ${hpx_wrap_SOURCE_ROOT}/)
-list(TRANSFORM hpx_auto_wrap_SOURCES PREPEND ${hpx_wrap_SOURCE_ROOT}/)
 add_hpx_source_group(
   NAME hpx_wrap
   CLASS "Source Files"
   ROOT "${hpx_wrap_SOURCE_ROOT}"
   TARGETS ${hpx_wrap_SOURCES}
-)
-add_hpx_source_group(
-  NAME hpx_auto_wrap
-  CLASS "Source Files"
-  ROOT "${hpx_wrap_SOURCE_ROOT}"
-  TARGETS ${hpx_auto_wrap_SOURCES}
 )
 
 set(hpx_wrap_HEADER_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -51,18 +38,12 @@ add_hpx_source_group(
   ROOT "${hpx_wrap_HEADER_ROOT}"
   TARGETS ${hpx_wrap_HEADERS}
 )
-add_hpx_source_group(
-  NAME hpx_auto_wrap
-  CLASS "Header Files"
-  ROOT "${hpx_wrap_HEADER_ROOT}"
-  TARGETS ${hpx_wrap_HEADERS}
-)
 
 add_library(
   hpx_wrap STATIC ${hpx_wrap_SOURCES} ${hpx_wrap_HEADERS} ${config_header}
 )
 add_library(
-  hpx_auto_wrap STATIC ${hpx_auto_wrap_SOURCES} ${hpx_wrap_HEADERS} ${config_header}
+  hpx_auto_wrap STATIC ${hpx_wrap_SOURCES} ${hpx_wrap_HEADERS} ${config_header}
 )
 
 set_target_properties(hpx_wrap PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -79,10 +60,12 @@ set_target_properties(hpx_auto_wrap PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(hpx_auto_wrap PRIVATE hpx_full)
 target_link_libraries(hpx_auto_wrap PRIVATE hpx_init)
 target_link_libraries(hpx_auto_wrap PRIVATE hpx_private_flags)
-target_compile_definitions(hpx_auto_wrap PRIVATE HPX_LIBRARY_EXPORTS)
+target_compile_definitions(
+  hpx_auto_wrap PRIVATE HPX_LIBRARY_EXPORTS HPX_AUTO_WRAP_MAIN_ACTIVATE
+)
 target_include_directories(
   hpx_auto_wrap PUBLIC $<BUILD_INTERFACE:${hpx_wrap_HEADER_ROOT}>
-                  $<INSTALL_INTERFACE:include>
+                       $<INSTALL_INTERFACE:include>
 )
 
 if(HPX_WITH_CXX_MODULES)
