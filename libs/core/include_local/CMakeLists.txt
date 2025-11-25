@@ -105,6 +105,7 @@ add_hpx_module(
     hpx_futures
     hpx_lcos_local
     hpx_memory
+    hpx_pack_traversal
     hpx_runtime_local
     hpx_string_util
     hpx_synchronization

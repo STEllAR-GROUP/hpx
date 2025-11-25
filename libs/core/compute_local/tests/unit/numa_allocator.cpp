@@ -41,7 +41,7 @@
 #include "allocator_binder_linear.hpp"
 #include "allocator_binder_matrix.hpp"
 // Scheduler that honours numa placement hints for tasks
-#include <hpx/schedulers/shared_priority_queue_scheduler.hpp>
+#include <hpx/modules/schedulers.hpp>
 
 // ------------------------------------------------------------------------
 // allocator maker for this test

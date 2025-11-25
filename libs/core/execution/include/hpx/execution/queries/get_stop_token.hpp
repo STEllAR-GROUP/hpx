@@ -12,8 +12,8 @@
 #else
 #include <hpx/execution/queries/read.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/tag_invoke.hpp>
-#include <hpx/synchronization/stop_token.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -30,16 +30,17 @@ namespace hpx::execution::experimental {
     //    Otherwise, it is expression equivalent to:
     //
     //    1. tag_invoke(execution::get_stop_token, as_const(r)), if this
-    //       expression is well formed.
+    //       expression is well-formed.
     //
     //          Mandates: The tag_invoke expression above is not potentially
     //          -throwing and its type satisfies stoppable_token.
     //
     //    2. Otherwise, never_stop_token{}.
     //
-    // 3.  execution::get_stop_token() (with no arguments) is expression-
-    //     equivalent to execution::read(execution::get_stop_token).
+    // 3.  execution::get_stop_token() (with no arguments) is
+    //     expression-equivalent to execution::read(execution::get_stop_token).
     //
+    HPX_CXX_EXPORT
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct get_stop_token_t final
       : hpx::functional::detail::tag_fallback<get_stop_token_t>
     {
@@ -56,14 +57,14 @@ namespace hpx::execution::experimental {
 
     } get_stop_token{};
 
-    constexpr auto tag_fallback_invoke(get_stop_token_t) noexcept
+    HPX_CXX_EXPORT constexpr auto tag_fallback_invoke(get_stop_token_t) noexcept
     {
         return hpx::execution::experimental::read(get_stop_token);
     }
 
-    // Helper template allowing to extract the type of a stop_token extracted
+    // Helper template allowing to extract the type of the stop_token extracted
     // from a receiver environment.
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using stop_token_of_t = std::remove_cv_t<
         std::remove_reference_t<decltype(get_stop_token(std::declval<T>()))>>;
 }    // namespace hpx::execution::experimental

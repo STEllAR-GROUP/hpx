@@ -9,10 +9,10 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 #include <hpx/performance_counters/performance_counter_set.hpp>
 #include <hpx/runtime_local/interval_timer.hpp>
-#include <hpx/synchronization/mutex.hpp>
 
 #include <cstddef>
 #include <cstdint>

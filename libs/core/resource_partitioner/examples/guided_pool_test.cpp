@@ -210,7 +210,7 @@ void init_resource_partitioner_handler(
     // a user supplied scheduler attached
     rp.create_thread_pool(CUSTOM_POOL_NAME,
         [](hpx::threads::thread_pool_init_parameters init,
-            hpx::threads::policies::thread_queue_init_parameters
+            hpx::threads::policies::thread_queue_init_parameters const&
                 thread_queue_init)
             -> std::unique_ptr<hpx::threads::thread_pool_base> {
             std::cout << "User defined scheduler creation callback "
@@ -274,7 +274,7 @@ int main(int argc, char* argv[])
 
     pool_threads = vm["pool-threads"].as<int>();
 
-    // Setup the init parameters
+    // Set up the init parameters
     hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_cmdline;
 

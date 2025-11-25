@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2024 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,7 +21,6 @@ set(schedulers_headers
     hpx/schedulers/static_queue_scheduler.hpp
     hpx/schedulers/thread_queue.hpp
     hpx/schedulers/thread_queue_mc.hpp
-    hpx/modules/schedulers.hpp
 )
 
 if(HPX_WITH_WORK_REQUESTING_SCHEDULERS)
@@ -52,7 +51,8 @@ set(schedulers_sources deadlock_detection.cpp maintain_queue_wait_times.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   core schedulers
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${schedulers_sources}
   HEADERS ${schedulers_headers}
   COMPAT_HEADERS ${schedulers_compat_headers}

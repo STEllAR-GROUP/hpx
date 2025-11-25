@@ -66,6 +66,7 @@ add_hpx_module(
     hpx_futures
     hpx_memory
     hpx_runtime_local
+    hpx_synchronization
     hpx_tag_invoke
     hpx_threading_base
     hpx_type_support

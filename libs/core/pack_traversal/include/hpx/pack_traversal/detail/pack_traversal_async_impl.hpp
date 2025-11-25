@@ -8,10 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
@@ -229,7 +229,8 @@ namespace hpx::util::detail {
 
 namespace hpx::traits::detail {
 
-    template <typename Visitor, typename... Args, typename Allocator>
+    HPX_CXX_EXPORT template <typename Visitor, typename... Args,
+        typename Allocator>
     struct shared_state_allocator<
         util::detail::async_traversal_frame<Visitor, Args...>, Allocator>
     {

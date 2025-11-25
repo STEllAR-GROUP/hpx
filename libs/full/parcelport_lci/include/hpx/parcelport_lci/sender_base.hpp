@@ -25,12 +25,12 @@
 #include <hpx/modules/util.hpp>
 
 #include <hpx/command_line_handling/command_line_handling.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/parcelset/parcelport_connection.hpp>
 #include <hpx/parcelset/parcelport_impl.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/plugin_factories/parcelport_factory.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <hpx/parcelset/parcelport_connection.hpp>
 #include <hpx/parcelset_base/detail/gatherer.hpp>

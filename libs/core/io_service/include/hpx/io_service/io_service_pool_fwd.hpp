@@ -10,5 +10,5 @@
 
 namespace hpx::util {
 
-    class HPX_CORE_EXPORT io_service_pool;
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT io_service_pool;
 }    // namespace hpx::util

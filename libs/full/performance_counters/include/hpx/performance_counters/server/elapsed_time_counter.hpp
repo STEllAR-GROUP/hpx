@@ -10,6 +10,8 @@
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::performance_counters::server {
 
@@ -39,3 +41,5 @@ namespace hpx::performance_counters::server {
         naming::address get_current_address() const;
     };
 }    // namespace hpx::performance_counters::server
+
+#include <hpx/config/warnings_suffix.hpp>

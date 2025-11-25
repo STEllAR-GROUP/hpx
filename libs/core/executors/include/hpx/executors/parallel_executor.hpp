@@ -9,22 +9,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
-#include <hpx/execution/detail/future_exec.hpp>
-#include <hpx/execution/detail/post_policy_dispatch.hpp>
-#include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
-#include <hpx/execution/executors/default_parameters.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/executors/detail/index_queue_spawning.hpp>
 #include <hpx/executors/execution_policy_mappings.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>

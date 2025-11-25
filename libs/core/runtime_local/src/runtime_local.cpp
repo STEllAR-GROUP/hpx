@@ -7,7 +7,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
 #include <hpx/modules/command_line_handling_local.hpp>
 #include <hpx/modules/coroutines.hpp>
@@ -16,6 +15,7 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/io_service.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/static_reinit.hpp>
 #include <hpx/modules/thread_support.hpp>

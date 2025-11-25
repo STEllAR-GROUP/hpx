@@ -7,16 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/functional.hpp>
 #include <hpx/modules/ini.hpp>
-#include <hpx/modules/prefix.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
-
-#include <cstddef>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
 
 namespace hpx::resource::detail {
 

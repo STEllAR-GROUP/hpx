@@ -11,7 +11,7 @@
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Result, typename Enable = void>
     struct promise_local_result
     {
         using type = Result;
@@ -23,6 +23,6 @@ namespace hpx::traits {
         using type = void;
     };
 
-    template <typename Result>
+    HPX_CXX_EXPORT template <typename Result>
     using promise_local_result_t = typename promise_local_result<Result>::type;
 }    // namespace hpx::traits

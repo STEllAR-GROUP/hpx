@@ -23,7 +23,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::lcos::local::detail {
 
-    class condition_variable
+    HPX_CXX_EXPORT class condition_variable
     {
     private:
         using mutex_type = hpx::spinlock;

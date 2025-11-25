@@ -11,6 +11,7 @@
 #include <hpx/modules/ini.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/resource_partitioner/detail/create_partitioner.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
 
 #include <cstddef>
@@ -22,13 +23,15 @@
 namespace hpx::resource {
 
     ///////////////////////////////////////////////////////////////////////////
-    class pu
+    HPX_CXX_EXPORT class pu
     {
-        static constexpr const std::size_t invalid_pu_id = std::size_t(-1);
+        static constexpr std::size_t const invalid_pu_id =
+            static_cast<std::size_t>(-1);
 
     public:
-        explicit constexpr pu(std::size_t id = invalid_pu_id,
-            core* core = nullptr, std::size_t thread_occupancy = 0) noexcept
+        explicit constexpr pu(std::size_t const id = invalid_pu_id,
+            core* core = nullptr,
+            std::size_t const thread_occupancy = 0) noexcept
           : id_(id)
           , core_(core)
           , thread_occupancy_(thread_occupancy)
@@ -62,12 +65,13 @@ namespace hpx::resource {
         mutable std::size_t thread_occupancy_count_;
     };
 
-    class core
+    HPX_CXX_EXPORT class core
     {
-        static constexpr const std::size_t invalid_core_id = std::size_t(-1);
+        static constexpr std::size_t const invalid_core_id =
+            static_cast<std::size_t>(-1);
 
     public:
-        explicit core(std::size_t id = invalid_core_id,
+        explicit core(std::size_t const id = invalid_core_id,
             numa_domain* domain = nullptr) noexcept
           : id_(id)
           , domain_(domain)
@@ -95,13 +99,14 @@ namespace hpx::resource {
         std::vector<pu> pus_;
     };
 
-    class numa_domain
+    HPX_CXX_EXPORT class numa_domain
     {
-        static constexpr const std::size_t invalid_numa_domain_id =
-            std::size_t(-1);
+        static constexpr std::size_t const invalid_numa_domain_id =
+            static_cast<std::size_t>(-1);
 
     public:
-        explicit numa_domain(std::size_t id = invalid_numa_domain_id) noexcept
+        explicit numa_domain(
+            std::size_t const id = invalid_numa_domain_id) noexcept
           : id_(id)
         {
         }
@@ -132,14 +137,14 @@ namespace hpx::resource {
             hpx::threads::policies::detail::affinity_data const& affinity_data);
     }
 
-    class partitioner
+    HPX_CXX_EXPORT class partitioner
     {
     private:
         friend ::hpx::resource::partitioner detail::make_partitioner(
             resource::partitioner_mode rpmode, hpx::util::section const& rtcfg,
             hpx::threads::policies::detail::affinity_data const& affinity_data);
 
-        partitioner(resource::partitioner_mode rpmode,
+        partitioner(resource::partitioner_mode const rpmode,
             hpx::util::section const& rtcfg,
             hpx::threads::policies::detail::affinity_data const& affinity_data)
           : partitioner_(
@@ -170,7 +175,7 @@ namespace hpx::resource {
         // Functions to add processing units to thread pools via the
         // pu/core/numa_domain API
         void add_resource(hpx::resource::pu const& p,
-            std::string const& pool_name, std::size_t num_threads = 1)
+            std::string const& pool_name, std::size_t const num_threads = 1)
         {
             add_resource(p, pool_name, true, num_threads);
         }
@@ -215,7 +220,8 @@ namespace hpx::resource {
     namespace detail {
 
         ::hpx::resource::partitioner make_partitioner(
-            resource::partitioner_mode rpmode, hpx::util::section const& rtcfg,
+            resource::partitioner_mode const rpmode,
+            hpx::util::section const& rtcfg,
             hpx::threads::policies::detail::affinity_data const& affinity_data)
         {
             return ::hpx::resource::partitioner(rpmode, rtcfg, affinity_data);

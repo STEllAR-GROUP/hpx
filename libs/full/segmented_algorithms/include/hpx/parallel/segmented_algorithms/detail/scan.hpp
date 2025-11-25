@@ -12,16 +12,16 @@
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 
-#include <hpx/execution/executors/execution.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

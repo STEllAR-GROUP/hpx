@@ -11,9 +11,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_mpi/mpi_future.hpp>
-#include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>

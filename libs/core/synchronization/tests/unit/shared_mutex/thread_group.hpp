@@ -10,9 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/threading.hpp>
-#include <hpx/synchronization/mutex.hpp>
-#include <hpx/synchronization/shared_mutex.hpp>
 
 #include <algorithm>
 #include <list>

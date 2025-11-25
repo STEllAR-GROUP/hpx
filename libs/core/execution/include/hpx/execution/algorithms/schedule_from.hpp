@@ -30,7 +30,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename Sender, typename Scheduler>
+        HPX_CXX_EXPORT template <typename Sender, typename Scheduler>
         struct schedule_from_sender
         {
             using is_sender = void;
@@ -342,6 +342,7 @@ namespace hpx::execution::experimental {
     // get_completion_scheduler<set_error_t> is not implemented, as the
     // scheduler cannot be guaranteed in case an error is thrown while trying to
     // schedule work on the given scheduler object.
+    HPX_CXX_EXPORT
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct schedule_from_t final
       : hpx::functional::detail::tag_fallback<schedule_from_t>
     {

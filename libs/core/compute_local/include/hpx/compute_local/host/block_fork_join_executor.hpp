@@ -11,14 +11,14 @@
 #include <hpx/config.hpp>
 #include <hpx/compute_local/host/numa_domains.hpp>
 #include <hpx/compute_local/host/target.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/fork_join_executor.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/iterator_support.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 
 #include <chrono>
 #include <cstddef>

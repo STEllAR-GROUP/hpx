@@ -10,8 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/runtime_local/os_thread_type.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -39,12 +39,16 @@ add_hpx_module(
     hpx_program_options
     hpx_runtime_local
     hpx_errors
+    hpx_execution
     hpx_filesystem
     hpx_format
     hpx_functional
+    hpx_futures
     hpx_lock_registration
     hpx_logging
+    hpx_prefix
     hpx_preprocessor
+    hpx_resource_partitioner
     hpx_runtime_configuration
     hpx_schedulers
     hpx_string_util

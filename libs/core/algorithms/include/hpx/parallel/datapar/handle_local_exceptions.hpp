@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////

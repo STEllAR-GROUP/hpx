@@ -6,7 +6,7 @@
 
 // This must fail compiling
 
-#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <utility>
 

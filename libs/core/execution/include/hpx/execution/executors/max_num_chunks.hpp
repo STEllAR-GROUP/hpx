@@ -11,6 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/detail/future_exec.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/serialization.hpp>
@@ -25,12 +26,12 @@ namespace hpx::execution::experimental {
     /// that are assigned to threads. If \a num_chunks is not specified, the
     /// number of chunks is determined based on the number of available cores.
     ///
-    struct max_num_chunks
+    HPX_CXX_EXPORT struct max_num_chunks
     {
         /// Construct a \a max_num_chunks executor parameters object
         ///
-        /// \note By default the number of number of chunks is determined from
-        ///       the number of available cores.
+        /// \note By default, the number of chunks is determined from the number
+        ///       of available cores.
         ///
         max_num_chunks() = default;
 
@@ -39,7 +40,7 @@ namespace hpx::execution::experimental {
         /// \param num_chunks   [in] The optional number of chunks to use to run
         ///                     on a single thread.
         ///
-        constexpr explicit max_num_chunks(std::size_t num_chunks) noexcept
+        constexpr explicit max_num_chunks(std::size_t const num_chunks) noexcept
           : num_chunks_(num_chunks)
         {
         }
@@ -48,7 +49,8 @@ namespace hpx::execution::experimental {
         template <typename Executor>
         friend std::size_t tag_override_invoke(
             hpx::execution::experimental::maximal_number_of_chunks_t,
-            max_num_chunks& this_, Executor&&, std::size_t cores, std::size_t)
+            max_num_chunks& this_, Executor&&, std::size_t const cores,
+            std::size_t)
         {
             // use the given number of chunks if given
             if (this_.num_chunks_ != 0)

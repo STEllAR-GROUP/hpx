@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/io_service.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/threadmanager.hpp>

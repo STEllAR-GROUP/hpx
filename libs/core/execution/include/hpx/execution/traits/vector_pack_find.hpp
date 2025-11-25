@@ -13,7 +13,7 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr int find_first_of(
+    HPX_CXX_EXPORT HPX_HOST_DEVICE HPX_FORCEINLINE constexpr int find_first_of(
         bool msk) noexcept
     {
         return msk ? 0 : -1;

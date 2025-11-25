@@ -16,8 +16,8 @@
 #include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
 #include <hpx/async_distributed/detail/sync_implementations.hpp>
 #include <hpx/components/client_base.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
 #include <type_traits>

@@ -24,7 +24,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx::lcos::local::detail {
 
-    class counting_semaphore
+    HPX_CXX_EXPORT class counting_semaphore
     {
     private:
         using mutex_type = hpx::spinlock;

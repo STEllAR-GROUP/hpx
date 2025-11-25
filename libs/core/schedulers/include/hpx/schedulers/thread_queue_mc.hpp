@@ -50,8 +50,8 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
 
-    template <typename Mutex, typename PendingQueuing, typename StagedQueuing,
-        typename TerminatedQueuing>
+    HPX_CXX_EXPORT template <typename Mutex, typename PendingQueuing,
+        typename StagedQueuing, typename TerminatedQueuing>
     class thread_queue_mc
     {
     public:

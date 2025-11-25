@@ -12,8 +12,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/execution.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>

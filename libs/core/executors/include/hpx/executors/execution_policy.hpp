@@ -12,16 +12,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution/executors/rebind_executor.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy_fwd.hpp>
 #include <hpx/executors/execution_policy_mappings.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/executors/sequenced_executor.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/properties.hpp>
 #include <hpx/modules/serialization.hpp>

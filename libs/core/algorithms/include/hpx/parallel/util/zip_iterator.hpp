@@ -8,9 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 

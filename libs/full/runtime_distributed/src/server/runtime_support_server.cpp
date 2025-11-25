@@ -10,7 +10,6 @@
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/command_line_handling/late_command_line_handling.hpp>
@@ -18,12 +17,13 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/create_component.hpp>
-#include <hpx/futures/packaged_task.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/ini.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/prefix.hpp>

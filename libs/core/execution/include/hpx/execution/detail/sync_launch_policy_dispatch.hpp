@@ -7,11 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/futures_factory.hpp>
-#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 
 #include <functional>
@@ -21,7 +19,7 @@
 namespace hpx::detail {
 
     // dispatch point used for launch_policy implementations
-    template <typename Action, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Action, typename Enable = void>
     struct sync_launch_policy_dispatch;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -69,7 +67,7 @@ namespace hpx::detail {
         }
     };
 
-    template <typename Action>
+    HPX_CXX_EXPORT template <typename Action>
     struct sync_launch_policy_dispatch<Action,
         std::enable_if_t<!traits::is_action_v<Action>>>
     {

@@ -9,8 +9,8 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>
 #include <mutex>
@@ -22,7 +22,7 @@ namespace hpx::serialization::detail {
 
     // This class allows to register futures during serialization preprocessing
     // to ensure each future is ready before serializing it.
-    class preprocess_futures
+    HPX_CXX_EXPORT class preprocess_futures
     {
         using mutex_type = hpx::spinlock;
 

@@ -16,9 +16,9 @@
 #include <hpx/async_distributed/continuation_fwd.hpp>
 #include <hpx/async_distributed/trigger_lco_fwd.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/serialization.hpp>

@@ -44,10 +44,12 @@ add_hpx_module(
     hpx_errors
     hpx_execution_base
     hpx_functional
+    hpx_futures
     hpx_memory
     hpx_mpi_base
     hpx_threading_base
     hpx_runtime_local
+    hpx_synchronization
     hpx_tag_invoke
   CMAKE_SUBDIRS examples tests
 )

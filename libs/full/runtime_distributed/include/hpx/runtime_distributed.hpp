@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/components_base/generate_unique_ids.hpp>
-#include <hpx/io_service/io_service_pool_fwd.hpp>
+#include <hpx/modules/io_service.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>

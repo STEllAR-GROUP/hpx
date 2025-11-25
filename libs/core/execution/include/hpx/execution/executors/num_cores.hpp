@@ -12,6 +12,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/detail/future_exec.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/serialization.hpp>
@@ -26,14 +27,14 @@ namespace hpx::execution::experimental {
     /// Control number of cores in executors which need a functionality
     /// for setting the number of cores to be used by an algorithm directly
     ///
-    struct num_cores
+    HPX_CXX_EXPORT struct num_cores
     {
         /// Construct a \a num_cores executor parameters object
         ///
         /// \note make sure the minimal number of cores is  and the maximum
         ///       number of cores is what's available to HPX
         ///
-        constexpr explicit num_cores(std::size_t cores = 1) noexcept
+        constexpr explicit num_cores(std::size_t const cores = 1) noexcept
           : num_cores_(cores == 0 ? 1 : cores)
         {
         }
@@ -89,4 +90,4 @@ namespace hpx::execution {
         "hpx::execution::num_cores is deprecated, use "
         "hpx::execution::experimental::num_cores instead") =
         hpx::execution::experimental::num_cores;
-}
+}    // namespace hpx::execution
