@@ -186,7 +186,8 @@ target_link_libraries(
 )
 add_library(hpx_interface_auto_wrap_main INTERFACE)
 target_link_libraries(
-  hpx_interface_auto_wrap_main INTERFACE $<${_is_executable}:HPXInternal::hpx_auto_wrap>
+  hpx_interface_auto_wrap_main
+  INTERFACE $<${_is_executable}:HPXInternal::hpx_auto_wrap>
 )
 
 target_link_libraries(wrap_main INTERFACE hpx_interface_wrap_main)
@@ -219,7 +220,9 @@ target_compile_definitions(
 )
 
 set(hpx_targets hpx wrap_main auto_wrap_main init plugin component)
-set(hpx_internal_targets hpx_full hpx_interface hpx_interface_wrap_main hpx_interface_auto_wrap_main)
+set(hpx_internal_targets hpx_full hpx_interface hpx_interface_wrap_main
+                         hpx_interface_auto_wrap_main
+)
 
 # cmake-format: off
 install(
