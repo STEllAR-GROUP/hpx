@@ -6,7 +6,6 @@
 
 #pragma once
 
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/parallel/container_memory.hpp>
-#include <hpx/parallel/memory.hpp>

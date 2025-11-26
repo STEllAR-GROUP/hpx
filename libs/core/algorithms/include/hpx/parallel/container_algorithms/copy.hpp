@@ -526,18 +526,18 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     using copy_result = parallel::util::in_out_result<I, O>;
 
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     using copy_n_result = parallel::util::in_out_result<I, O>;
 
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     using copy_if_result = parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::copy
-    inline constexpr struct copy_t final
+    HPX_CXX_EXPORT inline constexpr struct copy_t final
       : hpx::detail::tag_parallel_algorithm<copy_t>
     {
     private:
@@ -628,7 +628,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::copy_n
-    inline constexpr struct copy_n_t final
+    HPX_CXX_EXPORT inline constexpr struct copy_n_t final
       : hpx::detail::tag_parallel_algorithm<copy_n_t>
     {
     private:
@@ -698,7 +698,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::copy_if
-    inline constexpr struct copy_if_t final
+    HPX_CXX_EXPORT inline constexpr struct copy_if_t final
       : hpx::detail::tag_parallel_algorithm<copy_if_t>
     {
     private:

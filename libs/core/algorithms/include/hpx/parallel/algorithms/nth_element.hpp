@@ -164,7 +164,7 @@ namespace hpx::parallel {
         ///
         /// \brief : The element placed in the nth position is exactly the
         ///          element that would occur in this position if the range
-        ///          was fully sorted. All of the elements before this new nth
+        ///          was fully sorted. All the elements before this new nth
         ///          element are less than or equal to the elements after the
         ///          new nth element.
         ///
@@ -175,8 +175,9 @@ namespace hpx::parallel {
         /// \param comp : object for to Compare elements
         /// \param proj : projection
         ///
-        template <class RandomIt, typename Compare, typename Proj>
-        static constexpr void nth_element_seq(RandomIt first, RandomIt nth,
+        HPX_CXX_EXPORT template <class RandomIt, typename Compare,
+            typename Proj>
+        constexpr void nth_element_seq(RandomIt first, RandomIt nth,
             RandomIt end, std::uint32_t level, Compare&& comp, Proj&& proj)
         {
             constexpr std::uint32_t nmin_sort = 24;
@@ -232,7 +233,7 @@ namespace hpx::parallel {
             }
         }
 
-        template <typename Iter>
+        HPX_CXX_EXPORT template <typename Iter>
         struct nth_element : public algorithm<nth_element<Iter>, Iter>
         {
             constexpr nth_element() noexcept
@@ -350,7 +351,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::nth_element
-    inline constexpr struct nth_element_t final
+    HPX_CXX_EXPORT inline constexpr struct nth_element_t final
       : hpx::detail::tag_parallel_algorithm<nth_element_t>
     {
         template <typename RandomIt,

@@ -14,9 +14,6 @@
 #include <hpx/config/modules_enabled.hpp>
 
 @cxx_standard_headers@
-// Some standard headers include the following headers.
-#include <numeric>
-
 #if defined(HPX_HAVE_STDEXEC)
 # if defined(HPX_GCC_VERSION)
 #  pragma GCC diagnostic push

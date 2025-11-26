@@ -36,11 +36,12 @@ namespace hpx::parallel::util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         // The static partitioner simply spawns one chunk of iterations for
         // each available core.
-        template <typename ExPolicy, typename R, typename Result1,
-            typename Result2>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename R,
+            typename Result1, typename Result2>
         struct scan_static_partitioner
         {
             using parameters_type = typename ExPolicy::executor_parameters_type;
@@ -202,8 +203,8 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename R, typename Result1,
-            typename Result2>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename R,
+            typename Result1, typename Result2>
         struct scan_task_static_partitioner
         {
             template <typename ExPolicy_, typename FwdIter, typename T,
@@ -231,8 +232,8 @@ namespace hpx::parallel::util {
     // R:           overall result type
     // Result1:     intermediate result type of first and second step
     // Result2:     intermediate result of the third step
-    template <typename ExPolicy, typename R = void, typename Result1 = R,
-        typename Result2 = void>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename R = void,
+        typename Result1 = R, typename Result2 = void>
     struct scan_partitioner
       : detail::select_partitioner<std::decay_t<ExPolicy>,
             detail::scan_static_partitioner,

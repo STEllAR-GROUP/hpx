@@ -33,7 +33,7 @@ namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // search
-    template <typename FwdIter, typename Sent>
+    HPX_CXX_EXPORT template <typename FwdIter, typename Sent>
     struct search final : public algorithm<search<FwdIter, Sent>, FwdIter>
     {
         constexpr search() noexcept
@@ -195,7 +195,7 @@ namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // search_n
-    template <typename FwdIter, typename Sent>
+    HPX_CXX_EXPORT template <typename FwdIter, typename Sent>
     struct search_n final : public algorithm<search_n<FwdIter, Sent>, FwdIter>
     {
         constexpr search_n() noexcept

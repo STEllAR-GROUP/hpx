@@ -379,21 +379,21 @@ namespace hpx::ranges {
 
     /// `reverse_copy_result` is equivalent to
     /// `hpx::parallel::util::in_out_result`
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     using reverse_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::reverse
-    inline constexpr struct reverse_t final
+    HPX_CXX_EXPORT inline constexpr struct reverse_t final
       : hpx::detail::tag_parallel_algorithm<reverse_t>
     {
     private:
         template <typename Iter, typename Sent>
         // clang-format off
-        requires (
-            hpx::traits::is_iterator_v<Iter> &&
-            hpx::traits::is_sentinel_for_v<Sent, Iter>
-        )
+            requires(
+                hpx::traits::is_iterator_v<Iter> &&
+                hpx::traits::is_sentinel_for_v<Sent, Iter>
+            )
         // clang-format on
         friend Iter tag_fallback_invoke(
             hpx::ranges::reverse_t, Iter first, Sent sent)
@@ -406,11 +406,7 @@ namespace hpx::ranges {
         }
 
         template <typename Rng>
-        // clang-format off
-        requires (
-            hpx::traits::is_range_v<Rng>
-        )
-        // clang-format on
+            requires(hpx::traits::is_range_v<Rng>)
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::reverse_t, Rng&& rng)
         {
@@ -426,9 +422,11 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename Iter, typename Sent>
         // clang-format off
-            requires(hpx::is_execution_policy_v<ExPolicy> &&
+            requires(
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter>)
+                hpx::traits::is_sentinel_for_v<Sent, Iter>
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
@@ -444,10 +442,10 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename Rng>
         // clang-format off
-        requires (
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_range_v<Rng>
-        )
+            requires(
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_range_v<Rng>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             hpx::traits::range_iterator_t<Rng>>
@@ -467,17 +465,17 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::reverse_copy
-    inline constexpr struct reverse_copy_t final
+    HPX_CXX_EXPORT inline constexpr struct reverse_copy_t final
       : hpx::detail::tag_parallel_algorithm<reverse_copy_t>
     {
     private:
         template <typename Iter, typename Sent, typename OutIter>
         // clang-format off
-        requires (
-            hpx::traits::is_iterator_v<Iter> &&
-            hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-            hpx::traits::is_iterator_v<OutIter>
-        )
+            requires(
+                hpx::traits::is_iterator_v<Iter> &&
+                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_iterator_v<OutIter>
+            )
         // clang-format on
         friend reverse_copy_result<Iter, OutIter> tag_fallback_invoke(
             hpx::ranges::reverse_copy_t, Iter first, Sent last, OutIter result)
@@ -495,10 +493,10 @@ namespace hpx::ranges {
 
         template <typename Rng, typename OutIter>
         // clang-format off
-        requires (
-            hpx::traits::is_range_v<Rng> &&
-            hpx::traits::is_iterator_v<OutIter>
-        )
+            requires(
+                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_iterator_v<OutIter>
+            )
         // clang-format on
         friend reverse_copy_result<hpx::traits::range_iterator_t<Rng>, OutIter>
         tag_fallback_invoke(
@@ -521,12 +519,12 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Iter, typename Sent,
             typename FwdIter>
         // clang-format off
-        requires (
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<Iter> &&
-            hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-            hpx::traits::is_iterator_v<FwdIter>
-        )
+            requires(
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<Iter> &&
+                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_iterator_v<FwdIter>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             reverse_copy_result<Iter, FwdIter>>
@@ -546,11 +544,11 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename Rng, typename OutIter>
         // clang-format off
-        requires (
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_range_v<Rng> &&
-            hpx::traits::is_iterator_v<OutIter>
-        )
+            requires(
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_iterator_v<OutIter>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             reverse_copy_result<hpx::traits::range_iterator_t<Rng>, OutIter>>

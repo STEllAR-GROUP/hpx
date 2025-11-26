@@ -447,7 +447,7 @@ namespace hpx::parallel {
     // transform_reduce
     namespace detail {
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct transform_reduce : public algorithm<transform_reduce<T>, T>
         {
             constexpr transform_reduce() noexcept
@@ -509,7 +509,7 @@ namespace hpx::parallel {
     // transform_reduce_binary
     namespace detail {
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct transform_reduce_binary
           : public algorithm<transform_reduce_binary<T>, T>
         {
@@ -592,7 +592,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::transform_reduce
-    inline constexpr struct transform_reduce_t final
+    HPX_CXX_EXPORT inline constexpr struct transform_reduce_t final
       : hpx::detail::tag_parallel_algorithm<transform_reduce_t>
     {
     private:

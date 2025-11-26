@@ -371,7 +371,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::equal
-    inline constexpr struct equal_t final
+    HPX_CXX_EXPORT inline constexpr struct equal_t final
       : hpx::detail::tag_parallel_algorithm<equal_t>
     {
     private:
@@ -379,7 +379,7 @@ namespace hpx::ranges {
             typename Iter2, typename Sent2, typename Pred = equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-        requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
@@ -408,7 +408,7 @@ namespace hpx::ranges {
             typename Pred = equal_to, typename Proj1 = hpx::identity,
             typename Proj2 = hpx::identity>
         // clang-format off
-        requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
@@ -445,7 +445,7 @@ namespace hpx::ranges {
             typename Sent2, typename Pred = equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -472,7 +472,7 @@ namespace hpx::ranges {
         template <typename Rng1, typename Rng2, typename Pred = equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 hpx::parallel::traits::is_indirect_callable_v<

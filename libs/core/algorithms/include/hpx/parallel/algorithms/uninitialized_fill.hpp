@@ -196,7 +196,8 @@ namespace hpx::parallel {
 
         // provide our own implementation of std::uninitialized_fill as some
         // versions of MSVC horribly fail at compiling it for some types T
-        template <typename ExPolicy, typename InIter, typename Sent, typename T>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename InIter,
+            typename Sent, typename T>
         InIter sequential_uninitialized_fill(
             ExPolicy&& policy, InIter first, Sent last, T const& value)
         {
@@ -210,7 +211,7 @@ namespace hpx::parallel {
                 });
         }
 
-        template <typename ExPolicy, typename InIter, typename T>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename InIter, typename T>
         InIter sequential_uninitialized_fill_n(
             ExPolicy&& policy, InIter first, std::size_t count, T const& value)
         {
@@ -225,7 +226,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename Iter, typename T>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename T>
         decltype(auto) parallel_uninitialized_fill_n(
             ExPolicy&& policy, Iter first, std::size_t count, T const& value)
         {
@@ -275,7 +276,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iter>
+        HPX_CXX_EXPORT template <typename Iter>
         struct uninitialized_fill
           : public algorithm<uninitialized_fill<Iter>, Iter>
         {
@@ -319,8 +320,9 @@ namespace hpx::parallel {
     /////////////////////////////////////////////////////////////////////////////
     // uninitialized_fill_n
     namespace detail {
+
         /// \cond NOINTERNAL
-        template <typename Iter>
+        HPX_CXX_EXPORT template <typename Iter>
         struct uninitialized_fill_n
           : public algorithm<uninitialized_fill_n<Iter>, Iter>
         {
@@ -353,7 +355,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_fill
-    inline constexpr struct uninitialized_fill_t final
+    HPX_CXX_EXPORT inline constexpr struct uninitialized_fill_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_fill_t>
     {
         template <typename FwdIter, typename T>
@@ -398,7 +400,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_fill_n
-    inline constexpr struct uninitialized_fill_n_t final
+    HPX_CXX_EXPORT inline constexpr struct uninitialized_fill_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_fill_n_t>
     {
         template <typename FwdIter, typename Size, typename T>

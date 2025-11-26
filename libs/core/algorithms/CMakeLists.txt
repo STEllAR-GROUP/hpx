@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2023 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -172,22 +172,6 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/unique.hpp
     hpx/parallel/container_memory.hpp
     hpx/parallel/container_numeric.hpp
-    hpx/parallel/datapar.hpp
-    hpx/parallel/datapar/adjacent_difference.hpp
-    hpx/parallel/datapar/adjacent_find.hpp
-    hpx/parallel/datapar/equal.hpp
-    hpx/parallel/datapar/fill.hpp
-    hpx/parallel/datapar/find.hpp
-    hpx/parallel/datapar/generate.hpp
-    hpx/parallel/datapar/handle_local_exceptions.hpp
-    hpx/parallel/datapar/iterator_helpers.hpp
-    hpx/parallel/datapar/loop.hpp
-    hpx/parallel/datapar/mismatch.hpp
-    hpx/parallel/datapar/reduce.hpp
-    hpx/parallel/datapar/replace.hpp
-    hpx/parallel/datapar/transfer.hpp
-    hpx/parallel/datapar/transform_loop.hpp
-    hpx/parallel/datapar/zip_iterator.hpp
     hpx/parallel/memory.hpp
     hpx/parallel/numeric.hpp
     hpx/parallel/run_on_all.hpp
@@ -236,6 +220,28 @@ set(algorithms_headers
     hpx/parallel/util/zip_iterator.hpp
 )
 
+if(HPX_WITH_DATAPAR)
+  set(algorithms_headers
+      ${algorithms_headers}
+      hpx/parallel/datapar.hpp
+      hpx/parallel/datapar/adjacent_difference.hpp
+      hpx/parallel/datapar/adjacent_find.hpp
+      hpx/parallel/datapar/equal.hpp
+      hpx/parallel/datapar/fill.hpp
+      hpx/parallel/datapar/find.hpp
+      hpx/parallel/datapar/generate.hpp
+      hpx/parallel/datapar/handle_local_exceptions.hpp
+      hpx/parallel/datapar/iterator_helpers.hpp
+      hpx/parallel/datapar/loop.hpp
+      hpx/parallel/datapar/mismatch.hpp
+      hpx/parallel/datapar/reduce.hpp
+      hpx/parallel/datapar/replace.hpp
+      hpx/parallel/datapar/transfer.hpp
+      hpx/parallel/datapar/transform_loop.hpp
+      hpx/parallel/datapar/zip_iterator.hpp
+  )
+endif()
+
 # cmake-format: off
 set(algorithms_compat_headers
     hpx/algorithms.hpp => hpx/algorithm.hpp
@@ -252,8 +258,11 @@ set(algorithms_sources handle_exception_termination_handler.cpp task_group.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   core algorithms
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   HEADERS ${algorithms_headers}
   COMPAT_HEADERS ${algorithms_compat_headers}
+  ADD_TO_GLOBAL_HEADER "hpx/parallel/util/detail/handle_remote_exceptions.hpp"
   SOURCES ${algorithms_sources}
   MODULE_DEPENDENCIES
     hpx_async_combinators

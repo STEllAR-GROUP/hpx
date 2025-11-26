@@ -26,7 +26,7 @@
 namespace hpx { namespace parallel { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct datapar_replace
     {
         template <typename InIter, typename T1, typename T2, typename Proj>
@@ -60,8 +60,8 @@ namespace hpx { namespace parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename InIter, typename T1, typename T2,
-        typename Proj>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter, typename T1,
+        typename T2, typename Proj>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_invoke(
         sequential_replace_t<ExPolicy>, ExPolicy&& policy, InIter first,
@@ -86,7 +86,7 @@ namespace hpx { namespace parallel { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct datapar_replace_if
     {
         template <typename InIter, typename Sent, typename F, typename T,
@@ -122,8 +122,8 @@ namespace hpx { namespace parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename InIter, typename Sent, typename F,
-        typename T, typename Proj>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter, typename Sent,
+        typename F, typename T, typename Proj>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_invoke(
         sequential_replace_if_t<ExPolicy>, ExPolicy&& policy, InIter first,
@@ -148,7 +148,7 @@ namespace hpx { namespace parallel { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct datapar_replace_copy
     {
         template <typename InIter, typename Sent, typename OutIter, typename T,
@@ -195,7 +195,7 @@ namespace hpx { namespace parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename InIter, typename Sent,
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter, typename Sent,
         typename OutIter, typename T, typename Proj>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_invoke(
@@ -222,7 +222,7 @@ namespace hpx { namespace parallel { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct datapar_replace_copy_if
     {
         template <typename InIter, typename Sent, typename OutIter, typename F,
@@ -270,7 +270,7 @@ namespace hpx { namespace parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename InIter, typename Sent,
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter, typename Sent,
         typename OutIter, typename F, typename T, typename Proj>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_invoke(

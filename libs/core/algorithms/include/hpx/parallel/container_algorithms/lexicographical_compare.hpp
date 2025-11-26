@@ -356,6 +356,7 @@ namespace hpx { namespace ranges {
         Pred&& pred = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
     // clang-format on
 }}    // namespace hpx::ranges
+
 #else
 
 #include <hpx/config.hpp>
@@ -376,7 +377,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    inline constexpr struct lexicographical_compare_t final
+    HPX_CXX_EXPORT inline constexpr struct lexicographical_compare_t final
       : hpx::detail::tag_parallel_algorithm<lexicographical_compare_t>
     {
     private:
@@ -385,7 +386,8 @@ namespace hpx::ranges {
             typename Proj2 = hpx::identity,
             typename Pred = hpx::parallel::detail::less>
         // clang-format off
-            requires(hpx::traits::is_iterator_v<InIter1> &&
+            requires(
+                hpx::traits::is_iterator_v<InIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, InIter1> &&
                 hpx::traits::is_iterator_v<InIter2> &&
                 hpx::traits::is_sentinel_for_v<Sent2, InIter2> &&
@@ -394,7 +396,9 @@ namespace hpx::ranges {
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected<Proj1, InIter1>,
-                    hpx::parallel::traits::projected<Proj2, InIter2>>)
+                    hpx::parallel::traits::projected<Proj2, InIter2>
+                >
+            )
         // clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
             InIter1 first1, Sent1 last1, InIter2 first2, Sent2 last2,
@@ -415,7 +419,7 @@ namespace hpx::ranges {
             typename Proj2 = hpx::identity,
             typename Pred = hpx::parallel::detail::less>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
@@ -450,7 +454,7 @@ namespace hpx::ranges {
             typename Proj2 = hpx::identity,
             typename Pred = hpx::parallel::detail::less>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
@@ -487,7 +491,7 @@ namespace hpx::ranges {
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
             typename Pred = hpx::parallel::detail::less>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&

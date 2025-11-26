@@ -722,7 +722,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::none_of
-    inline constexpr struct none_of_t final
+    HPX_CXX_EXPORT inline constexpr struct none_of_t final
       : hpx::detail::tag_parallel_algorithm<none_of_t>
     {
     private:
@@ -762,8 +762,8 @@ namespace hpx::ranges {
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, F,
                     hpx::parallel::traits::projected<Proj, Iter>
-                    >
-                )
+                >
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(none_of_t, ExPolicy&& policy, Iter first, Sent last,
@@ -827,7 +827,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::any_of
-    inline constexpr struct any_of_t final
+    HPX_CXX_EXPORT inline constexpr struct any_of_t final
       : hpx::detail::tag_parallel_algorithm<any_of_t>
     {
     private:
@@ -838,7 +838,9 @@ namespace hpx::ranges {
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, F,
-                    hpx::parallel::traits::projected_range<Proj, Rng>>)
+                    hpx::parallel::traits::projected_range<Proj, Rng>
+                >
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(
@@ -929,7 +931,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::all_of
-    inline constexpr struct all_of_t final
+    HPX_CXX_EXPORT inline constexpr struct all_of_t final
       : hpx::detail::tag_parallel_algorithm<all_of_t>
     {
     private:

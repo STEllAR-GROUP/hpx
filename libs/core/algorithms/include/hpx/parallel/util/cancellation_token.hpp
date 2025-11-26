@@ -17,12 +17,13 @@ namespace hpx::parallel::util {
 
     namespace detail {
 
-        struct no_data;
+        HPX_CXX_EXPORT struct no_data;
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // cancellation_token is used for premature cancellation of algorithms
-    template <typename T = detail::no_data, typename Pred = std::less_equal<>>
+    HPX_CXX_EXPORT template <typename T = detail::no_data,
+        typename Pred = std::less_equal<>>
     class cancellation_token
     {
         using flag_type = std::atomic<T>;
