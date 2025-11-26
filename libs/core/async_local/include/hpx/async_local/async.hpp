@@ -8,5 +8,5 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_local/async_fwd.hpp>
-#include <hpx/executors/async.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/executors.hpp>

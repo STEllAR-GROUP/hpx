@@ -90,6 +90,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core executors
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${executors_sources}
   HEADERS ${executors_headers}
   COMPAT_HEADERS ${executors_compat_headers}

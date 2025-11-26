@@ -17,7 +17,7 @@
 #include <hpx/async_colocated/functional/colocated_helpers.hpp>
 #include <hpx/async_distributed/async_continue_fwd.hpp>
 #include <hpx/async_distributed/bind_action.hpp>
-#include <hpx/async_local/async_fwd.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>

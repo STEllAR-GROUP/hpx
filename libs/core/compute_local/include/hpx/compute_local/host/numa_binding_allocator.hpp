@@ -9,16 +9,14 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assert.hpp>
-#include <hpx/async_local/async.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/executors/guided_pool_executor.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/runtime_local/thread_pool_helpers.hpp>
 
 #include <cstddef>
 #include <memory>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //                2017-2018 Taeguk Kwon
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -20,14 +20,15 @@
 #include <utility>
 
 namespace hpx::parallel {
+
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename Result = void,
+        HPX_CXX_EXPORT template <typename ExPolicy, typename Result = void,
             typename Enable = void>
         struct handle_exception_impl;
 
-        template <typename ExPolicy, typename Result>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename Result>
         struct handle_exception_impl<ExPolicy, Result,
             std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy> &&
                 !hpx::execution_policy_has_scheduler_executor_v<ExPolicy> &&
@@ -83,7 +84,7 @@ namespace hpx::parallel {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename Result>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename Result>
         struct handle_exception_impl<ExPolicy, Result,
             std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
                 !hpx::execution_policy_has_scheduler_executor_v<ExPolicy> &&
@@ -146,17 +147,20 @@ namespace hpx::parallel {
             }
         };
 
-        using exception_list_termination_handler_type = hpx::function<void()>;
+        HPX_CXX_EXPORT using exception_list_termination_handler_type =
+            hpx::function<void()>;
 
-        HPX_CORE_EXPORT void set_exception_list_termination_handler(
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void
+        set_exception_list_termination_handler(
             exception_list_termination_handler_type f);
 
-        [[noreturn]] HPX_CORE_EXPORT void exception_list_termination_handler();
+        HPX_CXX_EXPORT [[noreturn]] HPX_CORE_EXPORT void
+        exception_list_termination_handler();
 
         ///////////////////////////////////////////////////////////////////////
         // any exceptions thrown by algorithms executed with an unsequenced
         // policy are to call terminate.
-        template <typename ExPolicy, typename Result>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename Result>
         struct handle_exception_impl<ExPolicy, Result,
             std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy> &&
                 !hpx::execution_policy_has_scheduler_executor_v<ExPolicy> &&
@@ -181,7 +185,7 @@ namespace hpx::parallel {
             }
         };
 
-        template <typename ExPolicy, typename Result>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename Result>
         struct handle_exception_impl<ExPolicy, Result,
             std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
                 !hpx::execution_policy_has_scheduler_executor_v<ExPolicy> &&
@@ -206,7 +210,7 @@ namespace hpx::parallel {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename Result>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename Result>
         struct handle_exception_impl<ExPolicy, Result,
             std::enable_if_t<
                 hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
@@ -254,7 +258,7 @@ namespace hpx::parallel {
             }
         };
 
-        template <typename ExPolicy, typename Result = void>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename Result = void>
         struct handle_exception
           : handle_exception_impl<std::decay_t<ExPolicy>, Result>
         {

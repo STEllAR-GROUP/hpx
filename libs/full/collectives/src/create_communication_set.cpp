@@ -15,8 +15,8 @@
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
 
 #include <cstddef>
 #include <cstdint>

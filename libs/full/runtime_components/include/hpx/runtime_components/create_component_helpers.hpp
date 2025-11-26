@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/async_colocated/async_colocated_fwd.hpp>
 #include <hpx/async_distributed/detail/async_implementations_fwd.hpp>
-#include <hpx/async_local/async_fwd.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>

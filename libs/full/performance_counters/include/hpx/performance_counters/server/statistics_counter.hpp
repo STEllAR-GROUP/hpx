@@ -8,10 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components_base/server/component_base.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
-#include <hpx/runtime_local/interval_timer.hpp>
 
 #include <cstddef>
 #include <cstdint>

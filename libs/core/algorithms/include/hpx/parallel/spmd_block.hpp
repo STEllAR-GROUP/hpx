@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/synchronization.hpp>

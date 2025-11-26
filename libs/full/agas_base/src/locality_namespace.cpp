@@ -13,6 +13,8 @@
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/modules/serialization.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 using hpx::agas::server::locality_namespace;
 
 HPX_DEFINE_COMPONENT_NAME(locality_namespace, hpx_locality_namespace)

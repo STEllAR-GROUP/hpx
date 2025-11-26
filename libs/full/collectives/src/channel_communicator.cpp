@@ -26,6 +26,8 @@
 #include <mutex>
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::collectives {
 

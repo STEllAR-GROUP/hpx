@@ -13,10 +13,8 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/runtime_local/run_as_hpx_thread.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/runtime_local/state.hpp>
 
 #include <array>
 #include <atomic>
@@ -24,6 +22,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace distributed {

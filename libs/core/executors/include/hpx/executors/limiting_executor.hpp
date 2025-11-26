@@ -30,15 +30,16 @@
 namespace hpx::execution::experimental {
 
     // by convention the title is 7 chars (for alignment)
-    using print_on = hpx::debug::enable_print<false>;
-    static constexpr print_on lim_debug("LIMEXEC");
+    HPX_CXX_EXPORT using print_on = hpx::debug::enable_print<false>;
+    inline constexpr print_on lim_debug("LIMEXEC");
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(in_flight_estimate)
     }    // namespace detail
 
-    template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <typename BaseExecutor>
     struct limiting_executor
     {
         // --------------------------------------------------------------------
@@ -316,42 +317,42 @@ namespace hpx::execution::experimental {
     // --------------------------------------------------------------------
     // simple forwarding implementations of executor traits
     // --------------------------------------------------------------------
-    template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <typename BaseExecutor>
     struct is_one_way_executor<
         hpx::execution::experimental::limiting_executor<BaseExecutor>>
       : is_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <typename BaseExecutor>
     struct is_never_blocking_one_way_executor<
         hpx::execution::experimental::limiting_executor<BaseExecutor>>
       : is_never_blocking_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <typename BaseExecutor>
     struct is_two_way_executor<
         hpx::execution::experimental::limiting_executor<BaseExecutor>>
       : is_two_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <typename BaseExecutor>
     struct is_bulk_one_way_executor<
         hpx::execution::experimental::limiting_executor<BaseExecutor>>
       : is_bulk_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <typename BaseExecutor>
     struct is_bulk_two_way_executor<
         hpx::execution::experimental::limiting_executor<BaseExecutor>>
       : is_bulk_two_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <typename BaseExecutor>
     struct is_scheduler_executor<
         hpx::execution::experimental::limiting_executor<BaseExecutor>>
       : is_scheduler_executor<std::decay_t<BaseExecutor>>

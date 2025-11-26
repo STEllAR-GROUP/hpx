@@ -23,9 +23,8 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/runtime_local/thread_pool_helpers.hpp>
 
 #include <memory>
 #include <string>

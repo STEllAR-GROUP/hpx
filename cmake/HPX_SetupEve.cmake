@@ -29,7 +29,7 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE") AND NOT TARGET eve::eve)
     fetchcontent_declare(
       eve
       GIT_REPOSITORY https://github.com/jfalcou/eve.git
-      GIT_TAG ${HPX_WITH_EVE_TAG}
+      GIT_TAG ${HPX_WITH_Eve_TAG}
     )
 
     fetchcontent_getproperties(eve)

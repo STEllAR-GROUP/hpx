@@ -28,6 +28,7 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/prefix.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/modules/synchronization.hpp>
@@ -44,10 +45,6 @@
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
 #include <hpx/runtime_distributed/stubs/runtime_support.hpp>
-#include <hpx/runtime_local/component_startup_shutdown_base.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/runtime_local/shutdown_function.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
 
 #ifdef HPX_HAVE_LIB_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
@@ -69,6 +66,8 @@
 #include <thread>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions

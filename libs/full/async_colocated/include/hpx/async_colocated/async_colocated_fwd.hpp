@@ -10,7 +10,7 @@
 #include <hpx/actions_base/basic_action_fwd.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_continuation.hpp>
-#include <hpx/async_local/async_fwd.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
 

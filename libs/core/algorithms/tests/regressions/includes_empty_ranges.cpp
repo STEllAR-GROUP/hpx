@@ -9,8 +9,8 @@
 // is empty.
 
 #include <hpx/algorithm.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>

@@ -153,6 +153,5 @@ namespace hpx::parallel::execution::detail {
                 std::declval<F>(), std::declval<Ts>()...));
         };
     };
-
     /// \endcond
 }    // namespace hpx::parallel::execution::detail

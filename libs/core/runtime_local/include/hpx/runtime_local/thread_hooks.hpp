@@ -22,8 +22,9 @@ namespace hpx {
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_CORE_EXPORT threads::policies::callback_notifier::on_startstop_type
-    get_thread_on_start_func();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT
+        threads::policies::callback_notifier::on_startstop_type
+        get_thread_on_start_func();
 
     /// Retrieve the currently installed stop handler function. This is a
     /// function that will be called by HPX for each newly created thread that
@@ -36,8 +37,9 @@ namespace hpx {
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_CORE_EXPORT threads::policies::callback_notifier::on_startstop_type
-    get_thread_on_stop_func();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT
+        threads::policies::callback_notifier::on_startstop_type
+        get_thread_on_stop_func();
 
     /// Retrieve the currently installed error handler function. This is a
     /// function that will be called by HPX for each newly created thread that
@@ -50,8 +52,9 @@ namespace hpx {
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_CORE_EXPORT threads::policies::callback_notifier::on_error_type
-    get_thread_on_error_func();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT
+        threads::policies::callback_notifier::on_error_type
+        get_thread_on_error_func();
 
     /// Set the currently installed start handler function. This is a
     /// function that will be called by HPX for each newly created thread that
@@ -68,9 +71,10 @@ namespace hpx {
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_CORE_EXPORT threads::policies::callback_notifier::on_startstop_type
-    register_thread_on_start_func(
-        threads::policies::callback_notifier::on_startstop_type&& f);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT
+        threads::policies::callback_notifier::on_startstop_type
+        register_thread_on_start_func(
+            threads::policies::callback_notifier::on_startstop_type&& f);
 
     /// Set the currently installed stop handler function. This is a
     /// function that will be called by HPX for each newly created thread that
@@ -87,9 +91,10 @@ namespace hpx {
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_CORE_EXPORT threads::policies::callback_notifier::on_startstop_type
-    register_thread_on_stop_func(
-        threads::policies::callback_notifier::on_startstop_type&& f);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT
+        threads::policies::callback_notifier::on_startstop_type
+        register_thread_on_stop_func(
+            threads::policies::callback_notifier::on_startstop_type&& f);
 
     /// Set the currently installed error handler function. This is a
     /// function that will be called by HPX for each newly created thread that
@@ -106,7 +111,8 @@ namespace hpx {
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_CORE_EXPORT threads::policies::callback_notifier::on_error_type
-    register_thread_on_error_func(
-        threads::policies::callback_notifier::on_error_type&& f);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT
+        threads::policies::callback_notifier::on_error_type
+        register_thread_on_error_func(
+            threads::policies::callback_notifier::on_error_type&& f);
 }    // namespace hpx

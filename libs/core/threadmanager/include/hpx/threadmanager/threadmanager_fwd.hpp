@@ -12,6 +12,5 @@ namespace hpx::threads {
 
     // The thread-manager class is the central instance of management for
     // all (non-depleted) threads
-    class HPX_CORE_EXPORT threadmanager;
-
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT threadmanager;
 }    // namespace hpx::threads

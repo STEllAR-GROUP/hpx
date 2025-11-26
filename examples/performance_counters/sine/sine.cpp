@@ -9,7 +9,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #include <cstdint>
 

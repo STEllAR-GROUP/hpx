@@ -11,6 +11,8 @@
 
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace components { namespace server {
     component_storage::component_storage()
       : data_(container_layout(find_all_localities()))

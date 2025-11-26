@@ -20,8 +20,8 @@
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>

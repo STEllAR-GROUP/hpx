@@ -105,10 +105,10 @@ namespace hpx::execution::experimental::detail {
         return mask;
     }
 
-    template <typename OperationState>
+    HPX_CXX_EXPORT template <typename OperationState>
     struct task_function;
 
-    template <typename OperationState>
+    HPX_CXX_EXPORT template <typename OperationState>
     struct set_value_loop_visitor
     {
         OperationState* const op_state;
@@ -207,7 +207,7 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    template <typename OperationState>
+    HPX_CXX_EXPORT template <typename OperationState>
     struct set_value_end_loop_visitor
     {
         OperationState* const op_state;
@@ -237,7 +237,7 @@ namespace hpx::execution::experimental::detail {
     };
 
     // This struct encapsulates the work done by one worker thread.
-    template <typename OperationState>
+    HPX_CXX_EXPORT template <typename OperationState>
     struct task_function
     {
         OperationState* const op_state;
@@ -325,7 +325,8 @@ namespace hpx::execution::experimental::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename OperationState, typename F, typename Shape>
+    HPX_CXX_EXPORT template <typename OperationState, typename F,
+        typename Shape>
     struct bulk_receiver
     {
 #if defined(HPX_HAVE_STDEXEC)
@@ -611,7 +612,8 @@ namespace hpx::execution::experimental::detail {
     // in this file is not chosen) it will be reused as one of the worker
     // threads.
     //
-    template <typename Policy, typename Sender, typename Shape, typename F>
+    HPX_CXX_EXPORT template <typename Policy, typename Sender, typename Shape,
+        typename F>
     class thread_pool_bulk_sender
     {
     private:
@@ -842,7 +844,8 @@ namespace hpx::execution::experimental::detail {
 namespace hpx::execution::experimental {
 
     // clang-format off
-    template <typename Policy, typename Sender, typename Shape, typename F,
+    HPX_CXX_EXPORT template <typename Policy, typename Sender, typename Shape,
+        typename F,
         HPX_CONCEPT_REQUIRES_(
             !std::is_integral_v<Shape>
         )>
@@ -866,7 +869,8 @@ namespace hpx::execution::experimental {
     }
 
     // clang-format off
-    template <typename Policy, typename Sender, typename Count, typename F,
+    HPX_CXX_EXPORT template <typename Policy, typename Sender, typename Count,
+        typename F,
         HPX_CONCEPT_REQUIRES_(
             std::is_integral_v<Count>
         )>

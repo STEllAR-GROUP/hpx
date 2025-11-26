@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2023 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,6 +20,7 @@ set(runtime_local_headers
     hpx/runtime_local/get_thread_name.hpp
     hpx/runtime_local/get_worker_thread_num.hpp
     hpx/runtime_local/interval_timer.hpp
+    hpx/runtime_local/macros.hpp
     hpx/runtime_local/os_thread_type.hpp
     hpx/runtime_local/pool_timer.hpp
     hpx/runtime_local/report_error.hpp
@@ -37,6 +38,8 @@ set(runtime_local_headers
     hpx/runtime_local/thread_pool_helpers.hpp
     hpx/runtime_local/thread_stacktrace.hpp
 )
+
+set(runtime_local_macro_headers hpx/runtime_local/macros.hpp)
 
 # cmake-format: off
 set(runtime_local_compat_headers
@@ -87,9 +90,13 @@ include(HPX_AddModule)
 add_hpx_module(
   core runtime_local
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${runtime_local_sources}
   HEADERS ${runtime_local_headers}
+  MACRO_HEADERS ${runtime_local_macro_headers}
   COMPAT_HEADERS ${runtime_local_compat_headers}
+  ADD_TO_GLOBAL_HEADER "hpx/runtime_local/detail/runtime_local_fwd.hpp"
+                       "hpx/runtime_local/detail/serialize_exception.hpp"
   MODULE_DEPENDENCIES
     hpx_async_base
     hpx_command_line_handling_local
@@ -99,6 +106,7 @@ add_hpx_module(
     hpx_datastructures
     hpx_execution
     hpx_execution_base
+    hpx_executors
     hpx_format
     hpx_functional
     hpx_futures

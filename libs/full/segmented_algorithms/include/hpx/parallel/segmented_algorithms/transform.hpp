@@ -12,7 +12,7 @@
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
-#include <hpx/executors/execution_policy.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/transform.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>

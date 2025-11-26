@@ -42,9 +42,9 @@ namespace hpx {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/async_local/dataflow.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/execution.hpp>

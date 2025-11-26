@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -27,15 +27,15 @@ namespace hpx::threads {
     ///         function will throw an \a hpx#exception with an error code of
     ///         \a hpx#error#yield_aborted if it is signaled with \a
     ///            wait_aborted.
-    ///         If called outside of a HPX-thread, this function will throw an
+    ///         If called outside a HPX-thread, this function will throw a
     ///         \a hpx#exception with an error code of \a
     ///            hpx#error#null_thread_id.
     ///         If this function is called while the thread-manager is not
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#error#invalid_status.
     ///
-    HPX_CORE_EXPORT hpx::execution::parallel_executor get_executor(
-        thread_id_type const& id, error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT hpx::execution::parallel_executor
+    get_executor(thread_id_type const& id, error_code& ec = throws);
 }    // namespace hpx::threads
 
 namespace hpx::this_thread {
@@ -48,13 +48,13 @@ namespace hpx::this_thread {
     ///         function will throw an \a hpx#exception with an error code of
     ///         \a hpx#error#yield_aborted if it is signaled with \a
     ///            wait_aborted.
-    ///         If called outside of a HPX-thread, this function will throw an
+    ///         If called outside a HPX-thread, this function will throw a
     ///         \a hpx#exception with an error code of \a
     ///            hpx#error#null_thread_id.
     ///         If this function is called while the thread-manager is not
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#error#invalid_status.
     ///
-    HPX_CORE_EXPORT hpx::execution::parallel_executor get_executor(
-        error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT hpx::execution::parallel_executor
+    get_executor(error_code& ec = throws);
 }    // namespace hpx::this_thread

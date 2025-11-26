@@ -15,12 +15,12 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/ini.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/stubs/runtime_support.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
 
 #include <cstddef>
 #include <cstdint>

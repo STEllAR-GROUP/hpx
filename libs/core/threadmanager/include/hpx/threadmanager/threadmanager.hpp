@@ -37,7 +37,7 @@ namespace hpx::threads {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a thread-manager class is the central instance of management for
     /// all (non-depleted) threads
-    class threadmanager
+    HPX_CXX_EXPORT class threadmanager
     {
     private:
         // we use a simple mutex to protect the data members of the
