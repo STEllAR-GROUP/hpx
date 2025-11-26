@@ -225,9 +225,10 @@ namespace hpx::parallel {
     ///////////////////////////////////////////////////////////////////////////
     // uninitialized_move
     namespace detail {
+
         /// \cond NOINTERNAL
         ///////////////////////////////////////////////////////////////////////
-        template <typename InIter1, typename InIter2>
+        HPX_CXX_EXPORT template <typename InIter1, typename InIter2>
         util::in_out_result<InIter1, InIter2> sequential_uninitialized_move_n(
             InIter1 first, std::size_t count, InIter2 dest)
         {
@@ -244,11 +245,12 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename Iter, typename FwdIter2>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter,
+            typename FwdIter2>
         decltype(auto) parallel_uninitialized_move_n(
             ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
         {
-            const bool has_scheduler_executor =
+            bool const has_scheduler_executor =
                 hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
             if constexpr (!has_scheduler_executor)
@@ -303,7 +305,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct uninitialized_move
           : public algorithm<uninitialized_move<IterPair>, IterPair>
         {
@@ -340,7 +342,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct uninitialized_move_sent
           : public algorithm<uninitialized_move_sent<IterPair>, IterPair>
         {
@@ -383,8 +385,9 @@ namespace hpx::parallel {
     /////////////////////////////////////////////////////////////////////////////
     // uninitialized_move_n
     namespace detail {
+
         /// \cond NOINTERNAL
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct uninitialized_move_n
           : public algorithm<uninitialized_move_n<IterPair>, IterPair>
         {
@@ -418,7 +421,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_move
-    inline constexpr struct uninitialized_move_t final
+    HPX_CXX_EXPORT inline constexpr struct uninitialized_move_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_move_t>
     {
         template <typename InIter, typename FwdIter>
@@ -467,7 +470,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_move_n
-    inline constexpr struct uninitialized_move_n_t final
+    HPX_CXX_EXPORT inline constexpr struct uninitialized_move_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_move_n_t>
     {
         template <typename InIter, typename Size, typename FwdIter>

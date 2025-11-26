@@ -22,7 +22,7 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct induction_helper
     {
         explicit constexpr induction_helper(T var) noexcept
@@ -58,7 +58,7 @@ namespace hpx::parallel::detail {
         T curr_;
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct induction_helper<T&>
     {
         explicit constexpr induction_helper(T& var) noexcept
@@ -100,7 +100,7 @@ namespace hpx::parallel::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct induction_stride_helper
     {
         constexpr induction_stride_helper(T var, std::size_t stride) noexcept
@@ -138,7 +138,7 @@ namespace hpx::parallel::detail {
         std::size_t stride_;
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct induction_stride_helper<T&>
     {
         constexpr induction_stride_helper(T& var, std::size_t stride) noexcept
@@ -214,7 +214,7 @@ namespace hpx::experimental {
     ///          non-const type, \a value is used as the live-out object for the
     ///          induction object; otherwise there is no live-out object.
     ///
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::induction_stride_helper<T>
     induction(T&& value, std::size_t stride)
     {
@@ -222,7 +222,7 @@ namespace hpx::experimental {
             HPX_FORWARD(T, value), stride);
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::induction_helper<T>
     induction(T&& value)
     {

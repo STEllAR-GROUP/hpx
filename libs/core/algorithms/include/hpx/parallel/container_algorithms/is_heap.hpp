@@ -496,7 +496,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::is_heap
-    inline constexpr struct is_heap_t final
+    HPX_CXX_EXPORT inline constexpr struct is_heap_t final
       : hpx::detail::tag_parallel_algorithm<is_heap_t>
     {
     private:
@@ -504,7 +504,7 @@ namespace hpx::ranges {
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -533,7 +533,7 @@ namespace hpx::ranges {
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
@@ -557,7 +557,7 @@ namespace hpx::ranges {
         template <typename Rng, typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -585,7 +585,7 @@ namespace hpx::ranges {
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Comp,
@@ -608,7 +608,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::is_heap_until
-    inline constexpr struct is_heap_until_t final
+    HPX_CXX_EXPORT inline constexpr struct is_heap_until_t final
       : hpx::detail::tag_parallel_algorithm<is_heap_until_t>
     {
     private:
@@ -616,7 +616,7 @@ namespace hpx::ranges {
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -647,7 +647,7 @@ namespace hpx::ranges {
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
@@ -671,7 +671,7 @@ namespace hpx::ranges {
         template <typename Rng, typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -700,7 +700,7 @@ namespace hpx::ranges {
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Comp,

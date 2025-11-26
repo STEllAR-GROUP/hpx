@@ -226,7 +226,7 @@ namespace hpx::parallel {
     // generate
     namespace detail {
 
-        template <typename FwdIter>
+        HPX_CXX_EXPORT template <typename FwdIter>
         struct generate : public algorithm<generate<FwdIter>, FwdIter>
         {
             constexpr generate() noexcept
@@ -269,7 +269,7 @@ namespace hpx::parallel {
     // generate_n
     namespace detail {
 
-        template <typename FwdIter>
+        HPX_CXX_EXPORT template <typename FwdIter>
         struct generate_n : public algorithm<generate_n<FwdIter>, FwdIter>
         {
             constexpr generate_n() noexcept
@@ -310,7 +310,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::generate
-    inline constexpr struct generate_t
+    HPX_CXX_EXPORT inline constexpr struct generate_t
       : hpx::detail::tag_parallel_algorithm<generate_t>
     {
     private:
@@ -350,7 +350,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::generate_n
-    inline constexpr struct generate_n_t
+    HPX_CXX_EXPORT inline constexpr struct generate_n_t
       : hpx::detail::tag_parallel_algorithm<generate_n_t>
     {
     private:

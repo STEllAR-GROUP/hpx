@@ -308,7 +308,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    inline constexpr struct nth_element_t final
+    HPX_CXX_EXPORT inline constexpr struct nth_element_t final
       : hpx::detail::tag_parallel_algorithm<nth_element_t>
     {
     private:
@@ -316,7 +316,7 @@ namespace hpx::ranges {
             typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_random_access_iterator_v<RandomIt> &&
                 hpx::traits::is_sentinel_for_v<Sent, RandomIt> &&
                 hpx::parallel::traits::is_projected_v<Proj, RandomIt> &&
@@ -343,7 +343,7 @@ namespace hpx::ranges {
             typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_random_access_iterator_v<RandomIt> &&
                 hpx::traits::is_sentinel_for_v<Sent, RandomIt> &&
@@ -371,7 +371,7 @@ namespace hpx::ranges {
         template <typename Rng, typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -401,7 +401,7 @@ namespace hpx::ranges {
             typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&

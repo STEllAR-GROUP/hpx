@@ -414,14 +414,11 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-
-        template <typename ExPolicy, typename InIter, typename FwdIter,
-            typename Size>
-        // clang-format off
+        HPX_CXX_EXPORT template <typename ExPolicy, typename InIter,
+            typename FwdIter, typename Size>
             requires(hpx::traits::is_input_iterator_v<InIter> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>)
-        // clang-format on
         decltype(auto) parallel_uninitialized_relocate_n(
             ExPolicy&& policy, InIter first, Size count, FwdIter dest)
         {
@@ -485,7 +482,7 @@ namespace hpx::parallel {
         // uninitialized_relocate_n
 
         /// \cond NOINTERNAL
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct uninitialized_relocate_n
           : public algorithm<uninitialized_relocate_n<IterPair>, IterPair>
         {
@@ -540,7 +537,7 @@ namespace hpx::parallel {
         /////////////////////////////////////////////////////////////////////////////
         // uninitialized_relocate
         /// \cond NOINTERNAL
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct uninitialized_relocate
           : public algorithm<uninitialized_relocate<IterPair>, IterPair>
         {
@@ -600,7 +597,7 @@ namespace hpx::parallel {
         /////////////////////////////////////////////////////////////////////////////
         // uninitialized_relocate_backward
         /// \cond NOINTERNAL
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct uninitialized_relocate_backward
           : public algorithm<uninitialized_relocate_backward<IterPair>,
                 IterPair>
@@ -655,7 +652,6 @@ namespace hpx::parallel {
             }
         };
         /// \endcond
-
     }    // namespace detail
 }    // namespace hpx::parallel
 
@@ -663,7 +659,7 @@ namespace hpx::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_relocate_n
-    inline constexpr struct uninitialized_relocate_n_t final
+    HPX_CXX_EXPORT inline constexpr struct uninitialized_relocate_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_n_t>
     {
         template <typename InIter, typename Size, typename FwdIter>
@@ -810,7 +806,7 @@ namespace hpx::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_relocate
-    inline constexpr struct uninitialized_relocate_t final
+    HPX_CXX_EXPORT inline constexpr struct uninitialized_relocate_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_t>
     {
         template <typename InIter1, typename InIter2, typename FwdIter>
@@ -956,7 +952,8 @@ namespace hpx::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_relocate_backward
-    inline constexpr struct uninitialized_relocate_backward_t final
+    HPX_CXX_EXPORT inline constexpr struct uninitialized_relocate_backward_t
+        final
       : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_backward_t>
     {
         template <typename BiIter1, typename BiIter2>
@@ -1099,4 +1096,5 @@ namespace hpx::experimental {
         }
     } uninitialized_relocate_backward{};
 }    // namespace hpx::experimental
+
 #endif    // DOXYGEN

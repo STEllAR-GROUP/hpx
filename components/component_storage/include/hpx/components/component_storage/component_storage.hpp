@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components/client_base.hpp>
-#include <hpx/modules/futures.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 

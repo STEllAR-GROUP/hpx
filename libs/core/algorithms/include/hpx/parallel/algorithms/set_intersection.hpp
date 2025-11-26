@@ -204,7 +204,7 @@ namespace hpx::parallel {
     // set_intersection
     namespace detail {
 
-        template <typename Iter1, typename Sent1, typename Iter2,
+        HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
             typename Sent2, typename Iter3, typename Comp, typename Proj1,
             typename Proj2>
         constexpr parallel::util::in_in_out_result<Iter1, Iter2, Iter3>
@@ -233,7 +233,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Result>
+        HPX_CXX_EXPORT template <typename Result>
         struct set_intersection
           : public algorithm<set_intersection<Result>, Result>
         {
@@ -307,7 +307,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::set_intersection
-    inline constexpr struct set_intersection_t final
+    HPX_CXX_EXPORT inline constexpr struct set_intersection_t final
       : hpx::detail::tag_parallel_algorithm<set_intersection_t>
     {
     private:

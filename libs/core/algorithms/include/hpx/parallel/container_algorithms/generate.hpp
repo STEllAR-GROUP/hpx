@@ -301,13 +301,13 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::generate
-    inline constexpr struct generate_t final
+    HPX_CXX_EXPORT inline constexpr struct generate_t final
       : hpx::detail::tag_parallel_algorithm<generate_t>
     {
     private:
         template <typename ExPolicy, typename Rng, typename F>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng>
             )
@@ -328,7 +328,7 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename Iter, typename Sent, typename F>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter>
             )
@@ -345,11 +345,7 @@ namespace hpx::ranges {
         }
 
         template <typename Rng, typename F>
-        // clang-format off
-            requires (
-                hpx::traits::is_range_v<Rng>
-            )
-        // clang-format on
+            requires(hpx::traits::is_range_v<Rng>)
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             generate_t, Rng&& rng, F f)
         {
@@ -364,11 +360,7 @@ namespace hpx::ranges {
         }
 
         template <typename Iter, typename Sent, typename F>
-        // clang-format off
-            requires (
-                hpx::traits::is_sentinel_for_v<Sent, Iter>
-            )
-        // clang-format on
+            requires(hpx::traits::is_sentinel_for_v<Sent, Iter>)
         friend Iter tag_fallback_invoke(generate_t, Iter first, Sent last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<Iter>,
@@ -381,14 +373,14 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::generate_n
-    inline constexpr struct generate_n_t final
+    HPX_CXX_EXPORT inline constexpr struct generate_n_t final
       : hpx::detail::tag_parallel_algorithm<generate_n_t>
     {
     private:
         template <typename ExPolicy, typename FwdIter, typename Size,
             typename F>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
@@ -415,7 +407,7 @@ namespace hpx::ranges {
 
         template <typename FwdIter, typename Size, typename F>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
             )

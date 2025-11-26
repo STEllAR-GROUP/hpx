@@ -426,21 +426,21 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    template <typename I, typename F>
+    HPX_CXX_EXPORT template <typename I, typename F>
     using for_each_result = in_fun_result<I, F>;
 
-    template <typename I, typename F>
+    HPX_CXX_EXPORT template <typename I, typename F>
     using for_each_n_result = in_fun_result<I, F>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::for_each
-    inline constexpr struct for_each_t final
+    HPX_CXX_EXPORT inline constexpr struct for_each_t final
       : hpx::detail::tag_parallel_algorithm<for_each_t>
     {
         template <typename InIter, typename Sent, typename F,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, InIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, InIter> &&
@@ -464,7 +464,7 @@ namespace hpx::ranges {
 
         template <typename Rng, typename F, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -492,7 +492,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename F, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -518,7 +518,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename F,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -545,13 +545,13 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::for_each_n
-    inline constexpr struct for_each_n_t final
+    HPX_CXX_EXPORT inline constexpr struct for_each_n_t final
       : hpx::detail::tag_parallel_algorithm<for_each_n_t>
     {
         template <typename InIter, typename Size, typename F,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<InIter> &&
                 std::is_integral_v<Size> &&
                 hpx::parallel::traits::is_projected_v<Proj, InIter> &&
@@ -582,7 +582,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter, typename Size,
             typename F, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 std::is_integral_v<Size> &&

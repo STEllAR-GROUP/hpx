@@ -7,4 +7,4 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/swap_ranges.hpp>
+#include <hpx/modules/algorithms.hpp>

@@ -127,15 +127,15 @@ namespace hpx {
 
 namespace hpx::parallel {
 
-    template <typename Iter1, typename Iter2>
+    HPX_CXX_EXPORT template <typename Iter1, typename Iter2>
     using swap_ranges_result = hpx::parallel::util::in_in_result<Iter1, Iter2>;
 
     ///////////////////////////////////////////////////////////////////////////
     // swap ranges
     namespace detail {
 
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Size>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter1,
+            typename FwdIter2, typename Size>
         decltype(auto) parallel_swap_ranges(
             ExPolicy&& policy, FwdIter1 first1, FwdIter2 first2, Size n)
         {
