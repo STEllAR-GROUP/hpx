@@ -295,14 +295,14 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::stable_sort
-    inline constexpr struct stable_sort_t final
+    HPX_CXX_EXPORT inline constexpr struct stable_sort_t final
       : hpx::detail::tag_parallel_algorithm<stable_sort_t>
     {
     private:
         template <typename RandomIt, typename Sent,
             typename Comp = ranges::less, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::traits::is_sentinel_for_v<Sent, RandomIt> &&
                 parallel::traits::is_projected_v<Proj, RandomIt> &&
@@ -328,7 +328,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename RandomIt, typename Sent,
             typename Comp = ranges::less, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::traits::is_sentinel_for_v<Sent, RandomIt> &&
@@ -356,7 +356,7 @@ namespace hpx::ranges {
         template <typename Rng, typename Comp = ranges::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
                 parallel::traits::is_indirect_callable<
@@ -385,7 +385,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename Comp = ranges::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&

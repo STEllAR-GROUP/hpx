@@ -612,19 +612,19 @@ namespace hpx { namespace ranges {
 namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename I, typename S>
+    HPX_CXX_EXPORT template <typename I, typename S>
     using subrange_t = hpx::util::iterator_range<I, S>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::unique
-    inline constexpr struct unique_t final
+    HPX_CXX_EXPORT inline constexpr struct unique_t final
       : hpx::detail::tag_parallel_algorithm<unique_t>
     {
     private:
         template <typename FwdIter, typename Sent,
             typename Pred = ranges::equal_to, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
                 parallel::traits::is_projected_v<Proj, FwdIter> &&
@@ -652,7 +652,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename Pred = ranges::equal_to, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -682,7 +682,7 @@ namespace hpx::ranges {
         template <typename Rng, typename Pred = ranges::equal_to,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -715,7 +715,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng,
             typename Pred = ranges::equal_to, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -748,19 +748,19 @@ namespace hpx::ranges {
         }
     } unique{};
 
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     using unique_copy_result = parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::unique_copy
-    inline constexpr struct unique_copy_t final
+    HPX_CXX_EXPORT inline constexpr struct unique_copy_t final
       : hpx::detail::tag_parallel_algorithm<unique_copy_t>
     {
     private:
         template <typename InIter, typename Sent, typename O,
             typename Pred = ranges::equal_to, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, InIter> &&
                 parallel::traits::is_projected_v<Proj, InIter> &&
@@ -789,7 +789,7 @@ namespace hpx::ranges {
             typename O, typename Pred = ranges::equal_to,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -820,7 +820,7 @@ namespace hpx::ranges {
         template <typename Rng, typename O, typename Pred = ranges::equal_to,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -849,7 +849,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename O,
             typename Pred = ranges::equal_to, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&

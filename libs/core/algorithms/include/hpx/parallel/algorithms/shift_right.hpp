@@ -127,11 +127,13 @@ namespace hpx {
 #include <utility>
 
 namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // shift_right
     namespace detail {
 
-        template <typename ExPolicy, typename FwdIter, typename Sent>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+            typename Sent>
         hpx::future<FwdIter> shift_right_helper(
             ExPolicy policy, FwdIter first, Sent last, FwdIter new_first)
         {
@@ -159,23 +161,23 @@ namespace hpx::parallel {
         // Sequential shift_right implementation borrowed from
         // https://github.com/danra/shift_proposal
 
-        template <typename I>
+        HPX_CXX_EXPORT template <typename I>
         using difference_type_t =
             typename std::iterator_traits<I>::difference_type;
 
-        template <typename I>
+        HPX_CXX_EXPORT template <typename I>
         using iterator_category_t =
             typename std::iterator_traits<I>::iterator_category;
 
-        template <typename I, typename Tag, typename = void>
+        HPX_CXX_EXPORT template <typename I, typename Tag, typename = void>
         inline constexpr bool is_category = false;
 
-        template <typename I, typename Tag>
+        HPX_CXX_EXPORT template <typename I, typename Tag>
         inline constexpr bool is_category<I, Tag,
             std::enable_if_t<
                 std::is_convertible_v<iterator_category_t<I>, Tag>>> = true;
 
-        template <typename FwdIter>
+        HPX_CXX_EXPORT template <typename FwdIter>
         constexpr FwdIter sequential_shift_right(FwdIter first, FwdIter last,
             difference_type_t<FwdIter> n, std::size_t dist)
         {
@@ -218,7 +220,7 @@ namespace hpx::parallel {
             }
         }
 
-        template <typename FwdIter2>
+        HPX_CXX_EXPORT template <typename FwdIter2>
         struct shift_right : public algorithm<shift_right<FwdIter2>, FwdIter2>
         {
             constexpr shift_right() noexcept
@@ -269,7 +271,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::shift_right
-    inline constexpr struct shift_right_t final
+    HPX_CXX_EXPORT inline constexpr struct shift_right_t final
       : hpx::functional::detail::tag_fallback<shift_right_t>
     {
     private:

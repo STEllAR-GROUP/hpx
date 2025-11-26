@@ -130,7 +130,8 @@ namespace hpx::parallel {
     // shift_left
     namespace detail {
 
-        template <typename ExPolicy, typename FwdIter, typename Sent>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+            typename Sent>
         hpx::future<FwdIter> shift_left_helper(
             ExPolicy policy, FwdIter first, Sent last, FwdIter new_first)
         {
@@ -159,7 +160,7 @@ namespace hpx::parallel {
         // Sequential shift_left implementation inspired from
         // https://github.com/danra/shift_proposal
 
-        template <typename FwdIter, typename Sent, typename Size>
+        HPX_CXX_EXPORT template <typename FwdIter, typename Sent, typename Size>
         static constexpr FwdIter sequential_shift_left(
             FwdIter first, Sent last, Size n, std::size_t dist)
         {
@@ -177,7 +178,7 @@ namespace hpx::parallel {
             }
         }
 
-        template <typename FwdIter2>
+        HPX_CXX_EXPORT template <typename FwdIter2>
         struct shift_left : public algorithm<shift_left<FwdIter2>, FwdIter2>
         {
             constexpr shift_left() noexcept
@@ -226,7 +227,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::shift_left
-    inline constexpr struct shift_left_t final
+    HPX_CXX_EXPORT inline constexpr struct shift_left_t final
       : hpx::functional::detail::tag_fallback<shift_left_t>
     {
     private:

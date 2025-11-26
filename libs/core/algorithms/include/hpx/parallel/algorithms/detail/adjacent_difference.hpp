@@ -17,7 +17,7 @@
 
 namespace hpx::parallel::detail {
 
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct sequential_adjacent_difference_t
       : hpx::functional::detail::tag_fallback<
             sequential_adjacent_difference_t<ExPolicy>>
@@ -45,12 +45,12 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr sequential_adjacent_difference_t<ExPolicy>
         sequential_adjacent_difference =
             sequential_adjacent_difference_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename InIter, typename Sent,
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter, typename Sent,
         typename OutIter, typename Op>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr OutIter
     sequential_adjacent_difference(

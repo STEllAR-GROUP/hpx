@@ -23,7 +23,7 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct sequential_replace_t final
       : hpx::functional::detail::tag_fallback<sequential_replace_t<ExPolicy>>
     {
@@ -63,11 +63,11 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr sequential_replace_t<ExPolicy> sequential_replace =
         sequential_replace_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename... Args>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename... Args>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_replace(Args&&... args)
     {
         return sequential_replace_t<ExPolicy>{}(std::forward<Args>(args)...);
@@ -75,7 +75,7 @@ namespace hpx::parallel::detail {
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct sequential_replace_if_t final
       : hpx::functional::detail::tag_fallback<sequential_replace_if_t<ExPolicy>>
     {
@@ -117,11 +117,11 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr sequential_replace_if_t<ExPolicy> sequential_replace_if =
         sequential_replace_if_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename... Args>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename... Args>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_replace_if(Args&&... args)
     {
         return sequential_replace_if_t<ExPolicy>{}(std::forward<Args>(args)...);
@@ -129,7 +129,7 @@ namespace hpx::parallel::detail {
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct sequential_replace_copy_t final
       : hpx::functional::detail::tag_fallback<
             sequential_replace_copy_t<ExPolicy>>
@@ -176,11 +176,11 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr sequential_replace_copy_t<ExPolicy>
         sequential_replace_copy = sequential_replace_copy_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename... Args>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename... Args>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_replace_copy(Args&&... args)
     {
         return sequential_replace_copy_t<ExPolicy>{}(
@@ -189,7 +189,7 @@ namespace hpx::parallel::detail {
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct sequential_replace_copy_if_t final
       : hpx::functional::detail::tag_fallback<
             sequential_replace_copy_if_t<ExPolicy>>
@@ -245,11 +245,11 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr sequential_replace_copy_if_t<ExPolicy>
         sequential_replace_copy_if = sequential_replace_copy_if_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename... Args>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename... Args>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_replace_copy_if(
         Args&&... args)
     {

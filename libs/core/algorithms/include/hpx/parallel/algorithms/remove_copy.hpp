@@ -285,8 +285,8 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential remove_copy
-        template <typename InIter, typename Sent, typename OutIter, typename T,
-            typename Proj>
+        HPX_CXX_EXPORT template <typename InIter, typename Sent,
+            typename OutIter, typename T, typename Proj>
         constexpr util::in_out_result<InIter, OutIter> sequential_remove_copy(
             InIter first, Sent last, OutIter dest, T const& value, Proj&& proj)
         {
@@ -300,7 +300,7 @@ namespace hpx::parallel {
             return util::in_out_result<InIter, OutIter>{first, dest};
         }
 
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct remove_copy : public algorithm<remove_copy<IterPair>, IterPair>
         {
             constexpr remove_copy() noexcept
@@ -340,8 +340,8 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential remove_copy_if
-        template <typename InIter, typename Sent, typename OutIter, typename F,
-            typename Proj>
+        HPX_CXX_EXPORT template <typename InIter, typename Sent,
+            typename OutIter, typename F, typename Proj>
         constexpr util::in_out_result<InIter, OutIter>
         sequential_remove_copy_if(
             InIter first, Sent last, OutIter dest, F p, Proj&& proj)
@@ -356,7 +356,7 @@ namespace hpx::parallel {
             return util::in_out_result<InIter, OutIter>{first, dest};
         }
 
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct remove_copy_if
           : public algorithm<remove_copy_if<IterPair>, IterPair>
         {
@@ -401,7 +401,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::remove_copy_if
-    inline constexpr struct remove_copy_if_t final
+    HPX_CXX_EXPORT inline constexpr struct remove_copy_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_copy_if_t>
     {
         template <typename InIter, typename OutIter, typename Pred>
@@ -465,7 +465,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::remove_copy
-    inline constexpr struct remove_copy_t final
+    HPX_CXX_EXPORT inline constexpr struct remove_copy_t final
       : hpx::detail::tag_parallel_algorithm<remove_copy_t>
     {
     private:

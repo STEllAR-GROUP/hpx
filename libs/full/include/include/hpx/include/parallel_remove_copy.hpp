@@ -6,5 +6,5 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/remove_copy.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/parallel/container_algorithms/remove_copy.hpp>

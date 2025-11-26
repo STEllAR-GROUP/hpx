@@ -489,14 +489,14 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::remove_if
-    inline constexpr struct remove_if_t final
+    HPX_CXX_EXPORT inline constexpr struct remove_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_if_t>
     {
     private:
         template <typename Iter, typename Sent, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
@@ -521,7 +521,7 @@ namespace hpx::ranges {
 
         template <typename Rng, typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::is_invocable_v<Pred,
@@ -552,7 +552,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -580,7 +580,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -611,7 +611,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::remove
-    inline constexpr struct remove_t final
+    HPX_CXX_EXPORT inline constexpr struct remove_t final
       : hpx::detail::tag_parallel_algorithm<remove_t>
     {
     private:
@@ -619,7 +619,7 @@ namespace hpx::ranges {
             typename T = typename hpx::parallel::traits::projected<Iter,
                 Proj>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter>
@@ -643,7 +643,7 @@ namespace hpx::ranges {
             typename T = typename hpx::parallel::traits::projected<
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
             )
@@ -670,7 +670,7 @@ namespace hpx::ranges {
             typename T = typename hpx::parallel::traits::projected<FwdIter,
                 Proj>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -698,7 +698,7 @@ namespace hpx::ranges {
             typename T = typename hpx::parallel::traits::projected<
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>

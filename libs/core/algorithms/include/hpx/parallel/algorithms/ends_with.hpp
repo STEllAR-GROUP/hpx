@@ -133,7 +133,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        struct ends_with : public algorithm<ends_with, bool>
+        HPX_CXX_EXPORT struct ends_with : public algorithm<ends_with, bool>
         {
             constexpr ends_with() noexcept
               : algorithm("ends_with")
@@ -205,7 +205,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ends_with
-    inline constexpr struct ends_with_t final
+    HPX_CXX_EXPORT inline constexpr struct ends_with_t final
       : hpx::detail::tag_parallel_algorithm<ends_with_t>
     {
     private:

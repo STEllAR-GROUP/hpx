@@ -9,11 +9,9 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/executors.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/fill.hpp>
 #include <hpx/parallel/segmented_algorithms/for_each.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
 
 #include <algorithm>
 #include <exception>

@@ -26,7 +26,7 @@
 namespace hpx::parallel::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename Future, typename FwdIter>
+    HPX_CXX_EXPORT template <typename F, typename Future, typename FwdIter>
     // requires traits::is_future<Future>
     void add_ready_future(
         std::vector<Future>& workitems, F&& f, FwdIter first, std::size_t count)
@@ -35,7 +35,7 @@ namespace hpx::parallel::util::detail {
             hpx::make_ready_future(HPX_FORWARD(F, f)(first, count)));
     }
 
-    template <typename F, typename FwdIter>
+    HPX_CXX_EXPORT template <typename F, typename FwdIter>
     void add_ready_future(std::vector<hpx::future<void>>& workitems, F&& f,
         FwdIter first, std::size_t count)
     {
@@ -43,7 +43,7 @@ namespace hpx::parallel::util::detail {
         workitems.push_back(hpx::make_ready_future());
     }
 
-    template <typename F, typename FwdIter>
+    HPX_CXX_EXPORT template <typename F, typename FwdIter>
     void add_ready_future(std::vector<hpx::shared_future<void>>& workitems,
         F&& f, FwdIter first, std::size_t count)
     {
@@ -52,9 +52,9 @@ namespace hpx::parallel::util::detail {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    constexpr void adjust_chunk_size_and_max_chunks(std::size_t const cores,
-        std::size_t const count, std::size_t& max_chunks,
-        std::size_t& chunk_size,
+    HPX_CXX_EXPORT constexpr void adjust_chunk_size_and_max_chunks(
+        std::size_t const cores, std::size_t const count,
+        std::size_t& max_chunks, std::size_t& chunk_size,
         bool const has_variable_chunk_size = false) noexcept
     {
         if (max_chunks == 0)
@@ -110,7 +110,7 @@ namespace hpx::parallel::util::detail {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    template <typename IterOrR>
+    HPX_CXX_EXPORT template <typename IterOrR>
     constexpr auto next_or_subrange(IterOrR const& target, std::size_t first,
         [[maybe_unused]] std::size_t size)
     {
@@ -125,7 +125,7 @@ namespace hpx::parallel::util::detail {
         }
     }
 
-    template <typename ExPolicy, typename IterOrR,
+    HPX_CXX_EXPORT template <typename ExPolicy, typename IterOrR,
         typename Stride = std::size_t>
     hpx::util::iterator_range<chunk_size_iterator<IterOrR>>
     get_bulk_iteration_shape(ExPolicy& policy, IterOrR& it_or_r,
@@ -179,8 +179,8 @@ namespace hpx::parallel::util::detail {
         return hpx::util::iterator_range(shape_begin, shape_end);
     }
 
-    template <typename ExPolicy, typename Future, typename F1, typename IterOrR,
-        typename Stride = std::size_t>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Future, typename F1,
+        typename IterOrR, typename Stride = std::size_t>
     hpx::util::iterator_range<chunk_size_iterator<IterOrR>>
     get_bulk_iteration_shape(ExPolicy& policy, std::vector<Future>& workitems,
         F1&& f1, IterOrR& it_or_r, std::size_t& count, Stride s = Stride(1))
@@ -260,7 +260,7 @@ namespace hpx::parallel::util::detail {
         return hpx::util::iterator_range(shape_begin, shape_end);
     }
 
-    template <typename ExPolicy, typename IterOrR,
+    HPX_CXX_EXPORT template <typename ExPolicy, typename IterOrR,
         typename Stride = std::size_t>
     std::vector<hpx::tuple<IterOrR, std::size_t>>
     get_bulk_iteration_shape_variable(ExPolicy& policy, IterOrR& it_or_r,
@@ -334,8 +334,8 @@ namespace hpx::parallel::util::detail {
         return shape;
     }
 
-    template <typename ExPolicy, typename Future, typename F1, typename FwdIter,
-        typename Stride = std::size_t>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Future, typename F1,
+        typename FwdIter, typename Stride = std::size_t>
     decltype(auto) get_bulk_iteration_shape(std::false_type, ExPolicy& policy,
         std::vector<Future>& workitems, F1&& f1, FwdIter& begin,
         std::size_t& count, Stride s = Stride(1))
@@ -344,8 +344,8 @@ namespace hpx::parallel::util::detail {
             policy, workitems, HPX_FORWARD(F1, f1), begin, count, s);
     }
 
-    template <typename ExPolicy, typename Future, typename F1, typename FwdIter,
-        typename Stride = std::size_t>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Future, typename F1,
+        typename FwdIter, typename Stride = std::size_t>
     decltype(auto) get_bulk_iteration_shape(std::true_type, ExPolicy& policy,
         std::vector<Future>& workitems, F1&& f1, FwdIter& begin,
         std::size_t& count, Stride s = Stride(1))
@@ -355,7 +355,7 @@ namespace hpx::parallel::util::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future, typename F, typename FwdIter>
+    HPX_CXX_EXPORT template <typename Future, typename F, typename FwdIter>
     void add_ready_future_idx(std::vector<Future>& workitems, F&& f,
         FwdIter first, std::size_t base_idx, std::size_t count)
     {
@@ -363,7 +363,7 @@ namespace hpx::parallel::util::detail {
             hpx::make_ready_future(HPX_FORWARD(F, f)(first, count, base_idx)));
     }
 
-    template <typename F, typename FwdIter>
+    HPX_CXX_EXPORT template <typename F, typename FwdIter>
     void add_ready_future_idx(std::vector<hpx::future<void>>& workitems, F&& f,
         FwdIter first, std::size_t base_idx, std::size_t count)
     {
@@ -371,7 +371,7 @@ namespace hpx::parallel::util::detail {
         workitems.push_back(hpx::make_ready_future());
     }
 
-    template <typename F, typename FwdIter>
+    HPX_CXX_EXPORT template <typename F, typename FwdIter>
     void add_ready_future_idx(std::vector<hpx::shared_future<void>>& workitems,
         F&& f, std::size_t base_idx, FwdIter first, std::size_t count)
     {
@@ -379,7 +379,7 @@ namespace hpx::parallel::util::detail {
         workitems.push_back(hpx::make_ready_future());
     }
 
-    template <typename ExPolicy, typename FwdIter,
+    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
         typename Stride = std::size_t>
     hpx::util::iterator_range<
         parallel::util::detail::chunk_size_idx_iterator<FwdIter>>
@@ -441,8 +441,8 @@ namespace hpx::parallel::util::detail {
         return hpx::util::iterator_range(shape_begin, shape_end);
     }
 
-    template <typename ExPolicy, typename Future, typename F1, typename FwdIter,
-        typename Stride = std::size_t>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Future, typename F1,
+        typename FwdIter, typename Stride = std::size_t>
     hpx::util::iterator_range<
         parallel::util::detail::chunk_size_idx_iterator<FwdIter>>
     get_bulk_iteration_shape_idx(ExPolicy& policy,
@@ -532,7 +532,7 @@ namespace hpx::parallel::util::detail {
         return hpx::util::iterator_range(shape_begin, shape_end);
     }
 
-    template <typename ExPolicy, typename FwdIter,
+    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
         typename Stride = std::size_t>
     std::vector<hpx::tuple<FwdIter, std::size_t, std::size_t>>
     get_bulk_iteration_shape_idx_variable(ExPolicy& policy, FwdIter first,

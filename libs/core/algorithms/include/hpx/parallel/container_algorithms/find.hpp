@@ -1410,7 +1410,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find
-    inline constexpr struct find_t final
+    HPX_CXX_EXPORT inline constexpr struct find_t final
       : hpx::detail::tag_parallel_algorithm<find_t>
     {
     private:
@@ -1419,7 +1419,7 @@ namespace hpx::ranges {
             typename T = typename hpx::parallel::traits::projected<Iter,
                 Proj>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter>
@@ -1442,7 +1442,7 @@ namespace hpx::ranges {
             typename T = typename hpx::parallel::traits::projected<
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
@@ -1467,7 +1467,7 @@ namespace hpx::ranges {
             typename T = typename hpx::parallel::traits::projected<Iter,
                 Proj>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter>
             )
@@ -1486,7 +1486,7 @@ namespace hpx::ranges {
             typename T = typename hpx::parallel::traits::projected<
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
             )
@@ -1507,14 +1507,14 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_if
-    inline constexpr struct find_if_t final
+    HPX_CXX_EXPORT inline constexpr struct find_if_t final
       : hpx::detail::tag_parallel_algorithm<find_if_t>
     {
     private:
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
@@ -1539,7 +1539,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -1568,7 +1568,7 @@ namespace hpx::ranges {
         template <typename Iter, typename Sent, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::is_invocable_v<Pred,
@@ -1588,11 +1588,15 @@ namespace hpx::ranges {
         }
 
         template <typename Rng, typename Pred, typename Proj = hpx::identity>
-            requires(hpx::traits::is_range_v<Rng> &&
+        // clang-format off
+            requires(
+                hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<
-                        hpx::traits::range_iterator_t<Rng>>::value_type>)
+                        hpx::traits::range_iterator_t<Rng>
+                    >::value_type>
+            )
         // clang-format on
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             find_if_t, Rng&& rng, Pred pred, Proj proj = Proj())
@@ -1610,14 +1614,14 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_if_not
-    inline constexpr struct find_if_not_t final
+    HPX_CXX_EXPORT inline constexpr struct find_if_not_t final
       : hpx::detail::tag_parallel_algorithm<find_if_not_t>
     {
     private:
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
@@ -1641,7 +1645,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -1670,7 +1674,7 @@ namespace hpx::ranges {
         template <typename Iter, typename Sent, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::is_invocable_v<Pred,
@@ -1691,7 +1695,7 @@ namespace hpx::ranges {
 
         template <typename Rng, typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::is_invocable_v<Pred,
@@ -1717,7 +1721,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_end
-    inline constexpr struct find_end_t final
+    HPX_CXX_EXPORT inline constexpr struct find_end_t final
       : hpx::detail::tag_parallel_algorithm<find_end_t>
     {
     private:
@@ -1725,7 +1729,7 @@ namespace hpx::ranges {
             typename Pred = equal_to, typename Proj1 = hpx::identity,
             typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
@@ -1760,7 +1764,7 @@ namespace hpx::ranges {
             typename Iter2, typename Sent2, typename Pred = equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
@@ -1788,7 +1792,7 @@ namespace hpx::ranges {
         template <typename Rng1, typename Rng2, typename Pred = equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -1821,7 +1825,7 @@ namespace hpx::ranges {
             typename Sent2, typename Pred = equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -1848,7 +1852,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_first_of
-    inline constexpr struct find_first_of_t final
+    HPX_CXX_EXPORT inline constexpr struct find_first_of_t final
       : hpx::detail::tag_parallel_algorithm<find_first_of_t>
     {
     private:
@@ -1856,7 +1860,7 @@ namespace hpx::ranges {
             typename Pred = equal_to, typename Proj1 = hpx::identity,
             typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
@@ -1891,7 +1895,7 @@ namespace hpx::ranges {
             typename Iter2, typename Sent2, typename Pred = equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
@@ -1919,7 +1923,7 @@ namespace hpx::ranges {
         template <typename Rng1, typename Rng2, typename Pred = equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -1952,7 +1956,7 @@ namespace hpx::ranges {
             typename Sent2, typename Pred = equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
                 hpx::parallel::traits::is_indirect_callable_v<

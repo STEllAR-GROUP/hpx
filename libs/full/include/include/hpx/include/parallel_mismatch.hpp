@@ -7,5 +7,5 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/mismatch.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/parallel/container_algorithms/mismatch.hpp>

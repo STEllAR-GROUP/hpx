@@ -271,7 +271,8 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename F, typename Proj = hpx::identity>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename F,
+            typename Proj = hpx::identity>
         struct for_each_iteration
         {
             using execution_policy_type = std::decay_t<ExPolicy>;
@@ -326,7 +327,7 @@ namespace hpx::parallel {
             }
         };
 
-        template <typename ExPolicy, typename F>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename F>
         struct for_each_iteration<ExPolicy, F, hpx::identity>
         {
             using execution_policy_type = std::decay_t<ExPolicy>;
@@ -393,7 +394,7 @@ namespace hpx::parallel {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iter>
+        HPX_CXX_EXPORT template <typename Iter>
         struct for_each_n : public algorithm<for_each_n<Iter>, Iter>
         {
             constexpr for_each_n() noexcept
@@ -451,7 +452,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename Iter>
+        HPX_CXX_EXPORT template <typename Iter>
         struct for_each : public algorithm<for_each<Iter>, Iter>
         {
             constexpr for_each() noexcept
@@ -541,7 +542,7 @@ namespace hpx {
     //       that the non-segmented algorithms do not need to be explicitly
     //       disabled for other, possibly external specializations.
     //
-    inline constexpr struct for_each_t final
+    HPX_CXX_EXPORT inline constexpr struct for_each_t final
       : hpx::detail::tag_parallel_algorithm<for_each_t>
     {
     private:
@@ -587,7 +588,7 @@ namespace hpx {
     } for_each{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct for_each_n_t final
+    HPX_CXX_EXPORT inline constexpr struct for_each_n_t final
       : hpx::detail::tag_parallel_algorithm<for_each_n_t>
     {
     private:
@@ -659,7 +660,7 @@ namespace hpx {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 namespace hpx::traits {
 
-    template <typename ExPolicy, typename F, typename Proj>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename Proj>
     struct get_function_address<
         parallel::detail::for_each_iteration<ExPolicy, F, Proj>>
     {
@@ -671,7 +672,7 @@ namespace hpx::traits {
         }
     };
 
-    template <typename ExPolicy, typename F, typename Proj>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename Proj>
     struct get_function_annotation<
         parallel::detail::for_each_iteration<ExPolicy, F, Proj>>
     {
@@ -684,7 +685,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename ExPolicy, typename F, typename Proj>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename Proj>
     struct get_function_annotation_itt<
         parallel::detail::for_each_iteration<ExPolicy, F, Proj>>
     {

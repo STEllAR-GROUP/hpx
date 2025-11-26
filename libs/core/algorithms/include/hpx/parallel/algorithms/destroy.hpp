@@ -178,7 +178,7 @@ namespace hpx::parallel {
 
         // provide our own implementation of std::destroy as some versions of
         // MSVC horribly fail at compiling it for some types T
-        template <typename Iter, typename Sent>
+        HPX_CXX_EXPORT template <typename Iter, typename Sent>
         Iter sequential_destroy(Iter first, Sent last)
         {
             for (/* */; first != last; ++first)
@@ -189,7 +189,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename Iter>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter>
         decltype(auto) parallel_sequential_destroy_n(
             ExPolicy&& policy, Iter first, std::size_t count)
         {
@@ -217,7 +217,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename FwdIter>
+        HPX_CXX_EXPORT template <typename FwdIter>
         struct destroy : public algorithm<destroy<FwdIter>, FwdIter>
         {
             constexpr destroy() noexcept
@@ -250,7 +250,7 @@ namespace hpx::parallel {
 
         // provide our own implementation of std::destroy as some versions of
         // MSVC horribly fail at compiling it for some types T
-        template <typename Iter>
+        HPX_CXX_EXPORT template <typename Iter>
         Iter sequential_destroy_n(Iter first, std::size_t count)
         {
             for (/* */; count != 0; (void) ++first, --count)
@@ -260,7 +260,7 @@ namespace hpx::parallel {
             return first;
         }
 
-        template <typename FwdIter>
+        HPX_CXX_EXPORT template <typename FwdIter>
         struct destroy_n : public algorithm<destroy_n<FwdIter>, FwdIter>
         {
             constexpr destroy_n() noexcept
@@ -290,7 +290,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::destroy
-    inline constexpr struct destroy_t final
+    HPX_CXX_EXPORT inline constexpr struct destroy_t final
       : hpx::detail::tag_parallel_algorithm<destroy_t>
     {
     private:
@@ -330,7 +330,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::destroy_n
-    inline constexpr struct destroy_n_t final
+    HPX_CXX_EXPORT inline constexpr struct destroy_n_t final
       : hpx::detail::tag_parallel_algorithm<destroy_n_t>
     {
     private:

@@ -206,8 +206,8 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // Our own version of the sequential transform_exclusive_scan.
-        template <typename InIter, typename Sent, typename OutIter,
-            typename Conv, typename T, typename Op>
+        HPX_CXX_EXPORT template <typename InIter, typename Sent,
+            typename OutIter, typename Conv, typename T, typename Op>
         static constexpr util::in_out_result<InIter, OutIter>
         sequential_transform_exclusive_scan(
             InIter first, Sent last, OutIter dest, Conv&& conv, T init, Op&& op)
@@ -222,8 +222,8 @@ namespace hpx::parallel {
             return util::in_out_result<InIter, OutIter>{first, dest};
         }
 
-        template <typename InIter, typename OutIter, typename Conv, typename T,
-            typename Op>
+        HPX_CXX_EXPORT template <typename InIter, typename OutIter,
+            typename Conv, typename T, typename Op>
         static constexpr T sequential_transform_exclusive_scan_n(InIter first,
             std::size_t count, OutIter dest, Conv&& conv, T init, Op&& op)
         {
@@ -238,7 +238,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct transform_exclusive_scan
           : public algorithm<transform_exclusive_scan<IterPair>, IterPair>
         {
@@ -339,7 +339,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::transform_exclusive_scan
-    inline constexpr struct transform_exclusive_scan_t final
+    HPX_CXX_EXPORT inline constexpr struct transform_exclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<transform_exclusive_scan_t>
     {
         template <typename InIter, typename OutIter, typename BinOp,

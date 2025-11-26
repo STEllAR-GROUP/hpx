@@ -6,5 +6,5 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/rotate.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/parallel/container_algorithms/rotate.hpp>
