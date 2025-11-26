@@ -33,6 +33,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core async_mpi
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${mpi_sources}
   HEADERS ${async_mpi_headers}
   DEPENDENCIES Mpi::mpi
