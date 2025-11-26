@@ -11,6 +11,7 @@
 
 #include <hpx/config/defines.hpp>
 #include <hpx/config/compiler_specific.hpp>
+#include <hpx/config/modules_enabled.hpp>
 
 @cxx_standard_headers@
 // Some standard headers include the following headers.
@@ -57,14 +58,45 @@
 # include <generator>
 #endif
 
-#if defined(__GNUG__)
+#if defined(HPX_GCC_VERSION)
 # include <cxxabi.h>
 #endif
 
 #if defined(HPX_WINDOWS)
-#include <excpt.h>
-#undef exception_info
+# include <excpt.h>
+# undef exception_info
 #endif
 
 #include <asio.hpp>
 #include <hwloc.h>
+
+// Include MPI headers if required
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
+    defined(HPX_HAVE_MODULE_MPI_BASE)
+
+# if defined(HPX_CLANG_VERSION)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wcast-qual"
+# elif defined(HPX_GCC_VERSION)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wcast-qual"
+# endif
+
+# include <mpi.h>
+
+# if defined(HPX_GCC_VERSION)
+#  pragma GCC diagnostic pop
+# elif defined(HPX_CLANG_VERSION)
+#  pragma clang diagnostic pop
+# endif
+
+#endif
+
+// Include LCI headers if required
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)) ||      \
+    defined(HPX_HAVE_MODULE_LCI_BASE)
+
+# include "lci.hpp"
+# include "lct.h"
+
+#endif

@@ -18,7 +18,7 @@
 
 namespace hpx::mpi::experimental {
 
-    struct executor
+    HPX_CXX_EXPORT struct executor
     {
         // Associate the parallel_execution_tag executor tag type as a default
         // with this executor.
@@ -70,7 +70,6 @@ namespace hpx::mpi::experimental {
         MPI_Comm communicator_;
     };
 }    // namespace hpx::mpi::experimental
-// namespace hpx::mpi::experimental
 
 /// \cond NOINTERNAL
 template <>
