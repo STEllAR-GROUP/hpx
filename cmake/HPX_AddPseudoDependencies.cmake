@@ -6,9 +6,7 @@
 
 set(HPX_ADDPSEUDODEPENDENCIES_LOADED TRUE)
 
-include(HPX_Include)
-
-hpx_include(Message)
+include(HPX_Message)
 
 function(add_hpx_pseudo_dependencies)
 

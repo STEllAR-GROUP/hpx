@@ -7,22 +7,13 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# compatibility with older CMake versions
-if(TCMALLOC_ROOT AND NOT Tcmalloc_ROOT)
-  set(Tcmalloc_ROOT
-      ${TCMALLOC_ROOT}
-      CACHE PATH "TcMalloc base directory"
-  )
-  unset(TCMALLOC_ROOT CACHE)
-endif()
-
 find_package(PkgConfig QUIET)
 pkg_check_modules(PC_Tcmalloc_MINIMAL QUIET libtcmalloc_minimal)
 pkg_check_modules(PC_Tcmalloc QUIET libtcmalloc)
 
 find_path(
   Tcmalloc_INCLUDE_DIR google/tcmalloc.h
-  HINTS ${Tcmalloc_ROOT}
+  HINTS ${TCMALLOC_ROOT}
         ENV
         TCMALLOC_ROOT
         ${HPX_TCMALLOC_ROOT}
@@ -30,13 +21,12 @@ find_path(
         ${PC_Tcmalloc_MINIMAL_INCLUDE_DIRS}
         ${PC_Tcmalloc_INCLUDEDIR}
         ${PC_Tcmalloc_INCLUDE_DIRS}
-  PATH_SUFFIXES include
 )
 
 find_library(
   Tcmalloc_LIBRARY
   NAMES tcmalloc_minimal libtcmalloc_minimal tcmalloc libtcmalloc
-  HINTS ${Tcmalloc_ROOT}
+  HINTS ${TCMALLOC_ROOT}
         ENV
         TCMALLOC_ROOT
         ${HPX_TCMALLOC_ROOT}
@@ -47,12 +37,8 @@ find_library(
   PATH_SUFFIXES lib lib64
 )
 
-# Set Tcmalloc_ROOT in case the other hints are used
-if(NOT Tcmalloc_ROOT AND DEFINED ENV{TCMALLOC_ROOT})
-  set(Tcmalloc_ROOT $ENV{TCMALLOC_ROOT})
-elseif(NOT Tcmalloc_ROOT)
-  string(REPLACE "/include" "" Tcmalloc_ROOT "${Tcmalloc_INCLUDE_DIR}")
-endif()
+# Set Tcmalloc_ROOT
+get_filename_component(Tcmalloc_ROOT ${Tcmalloc_INCLUDE_DIR} DIRECTORY)
 
 set(Tcmalloc_LIBRARIES ${Tcmalloc_LIBRARY})
 set(Tcmalloc_INCLUDE_DIRS ${Tcmalloc_INCLUDE_DIR})

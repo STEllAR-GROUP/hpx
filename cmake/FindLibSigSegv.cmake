@@ -4,23 +4,14 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# compatibility with older CMake versions
-if(LIBSIGSEGV_ROOT AND NOT Libsigsegv_ROOT)
-  set(Libsigsegv_ROOT
-      ${LIBSIGSEGV_ROOT}
-      CACHE PATH "Libsigsegv base directory"
-  )
-  unset(LIBSIGSEGV_ROOT CACHE)
-endif()
-
 find_package(PkgConfig QUIET)
 pkg_check_modules(PC_LIBSIGSEGV QUIET libsigsegv)
 
 find_path(
   Libsigsegv_INCLUDE_DIR sigsegv.h
-  HINTS ${Libsigsegv_ROOT}
+  HINTS ${LIBSIGSEGV_ROOT}
         ENV
-        Libsigsegv_ROOT
+        LIBSIGSEGV_ROOT
         ${PC_Libsigsegv_MINIMAL_INCLUDEDIR}
         ${PC_Libsigsegv_MINIMAL_INCLUDE_DIRS}
         ${PC_Libsigsegv_INCLUDEDIR}
@@ -31,9 +22,9 @@ find_path(
 find_library(
   Libsigsegv_LIBRARY
   NAMES sigsegv libsigsegv
-  HINTS ${Libsigsegv_ROOT}
+  HINTS ${LIBSIGSEGV_ROOT}
         ENV
-        Libsigsegv_ROOT
+        LIBSIGSEGV_ROOT
         ${PC_Libsigsegv_MINIMAL_LIBDIR}
         ${PC_Libsigsegv_MINIMAL_LIBRARY_DIRS}
         ${PC_Libsigsegv_LIBDIR}
@@ -41,16 +32,7 @@ find_library(
   PATH_SUFFIXES lib lib64
 )
 
-# Set Libsigsegv_ROOT in case the other hints are used
-if(Libsigsegv_ROOT)
-  # The call to file is for compatibility with windows paths
-  file(TO_CMAKE_PATH ${Libsigsegv_ROOT} Libsigsegv_ROOT)
-elseif(DEFINED ENV{LIBSIGSEGV_ROOT})
-  file(TO_CMAKE_PATH $ENV{LIBSIGSEGV_ROOT} Libsigsegv_ROOT)
-else()
-  file(TO_CMAKE_PATH "${Libsigsegv_INCLUDE_DIR}" Libsigsegv_INCLUDE_DIR)
-  string(REPLACE "/include" "" Libsigsegv_ROOT "${Libsigsegv_INCLUDE_DIR}")
-endif()
+get_filename_component(Libsigsegv_ROOT ${Libsigsegv_INCLUDE_DIR} DIRECTORY)
 
 set(Libsigsegv_LIBRARIES ${Libsigsegv_LIBRARY})
 set(Libsigsegv_INCLUDE_DIRS ${Libsigsegv_INCLUDE_DIR})

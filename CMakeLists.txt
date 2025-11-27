@@ -17,6 +17,13 @@
 
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
+# Reassure CMake that <PACKAGENAME>_ROOT variables are meant to be used by
+# find_package Intentionally placed before project() statement, to precede
+# loading of package manager (vcpkg)
+if(POLICY CMP0144)
+  cmake_policy(SET CMP0144 NEW)
+endif()
+
 # Overrides must go before the project() statement, otherwise they are ignored.
 
 # ##############################################################################
@@ -2410,7 +2417,7 @@ endif()
 include(HPX_GitCommit)
 hpx_add_config_define(HPX_HAVE_GIT_COMMIT "\"${HPX_WITH_GIT_COMMIT}\"")
 
-hpx_include(SetOutputPaths)
+include(HPX_SetOutputPaths)
 
 # ##############################################################################
 # Fixing git tag, if necessary
@@ -2508,7 +2515,7 @@ add_subdirectory(wrap)
 # ##############################################################################
 # Documentation toolchain (Sphinx, Doxygen, Breathe)
 # ##############################################################################
-hpx_include(Documentation)
+include(HPX_Documentation)
 
 # ##############################################################################
 # Add core configuration
