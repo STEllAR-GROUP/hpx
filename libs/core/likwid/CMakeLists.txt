@@ -29,6 +29,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core likwid
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${likwid_sources}
   HEADERS ${likwid_headers}
   MODULE_DEPENDENCIES hpx_config

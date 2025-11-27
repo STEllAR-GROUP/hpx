@@ -11,6 +11,7 @@
 
 #include <hpx/config/defines.hpp>
 #include <hpx/config/compiler_specific.hpp>
+#include <hpx/config/modules_enabled.hpp>
 
 @cxx_standard_headers@
 // Some standard headers include the following headers.
@@ -68,3 +69,7 @@
 
 #include <asio.hpp>
 #include <hwloc.h>
+
+#if defined(HPX_HAVE_MODULE_LIKWID)
+# include <likwid.h>
+#endif

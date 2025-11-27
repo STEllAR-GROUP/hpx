@@ -351,7 +351,7 @@ function(add_hpx_module libname modulename)
     )
     set(generated_headers ${generated_headers} ${cache_line_size_file})
 
-    # Generate an empty placeholder file for hpx/config/std_headers.hpp This
+    # Generate an empty placeholder file for hpx/config/std_headers.hpp. This
     # will be overwritten in libs/CMakeLists.txt with some real content.
     if(HPX_WITH_CXX_MODULES)
       set(std_header_file
@@ -360,6 +360,15 @@ function(add_hpx_module libname modulename)
       file(WRITE ${std_header_file} "")
       set(generated_headers ${generated_headers} ${std_header_file})
     endif()
+
+    # Generate an empty placeholder file for hpx/config/modules_enabled.hpp.
+    # This will be overwritten in libs/CMakeLists.txt with the list of enabled
+    # modules.
+    set(modules_enabled_header_file
+        "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/config/modules_enabled.hpp"
+    )
+    file(WRITE ${modules_enabled_header_file} "")
+    set(generated_headers ${generated_headers} ${modules_enabled_header_file})
 
   endif()
 

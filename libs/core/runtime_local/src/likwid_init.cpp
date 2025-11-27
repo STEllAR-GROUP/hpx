@@ -8,7 +8,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_MODULE_LIKWID)
-#include <hpx/runtime_local/thread_hooks.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #include <cstddef>
 
