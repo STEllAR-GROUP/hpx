@@ -7,21 +7,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# compatibility with older CMake versions
-if(TBBMALLOC_ROOT AND NOT Tbbmalloc_ROOT)
-  set(Tbbmalloc_ROOT
-      ${TBBMALLOC_ROOT}
-      CACHE PATH "TBBMalloc base directory"
-  )
-  unset(TBBMALLOC_ROOT CACHE)
-endif()
-
 find_package(PkgConfig QUIET)
 pkg_check_modules(PC_Tbbmalloc QUIET libtbbmalloc)
 
 find_path(
   Tbbmalloc_INCLUDE_DIR tbb/scalable_allocator.h
-  HINTS ${Tbbmalloc_ROOT} ENV TBBMALLOC_ROOT ${HPX_TBBMALLOC_ROOT}
+  HINTS ${TBBMALLOC_ROOT} ENV TBBMALLOC_ROOT ${HPX_TBBMALLOC_ROOT}
         ${PC_Tbbmalloc_INCLUDEDIR} ${PC_Tbbmalloc_INCLUDE_DIRS}
   PATH_SUFFIXES include
 )
@@ -34,30 +25,22 @@ if(Tbbmalloc_PLATFORM STREQUAL "mic-knl")
   set(Tbbmalloc_PATH_SUFFIX "lib/intel64_lin_mic")
 endif()
 
-message("${Tbbmalloc_ROOT} ${Tbbmalloc_PATH_SUFFIX} ${Tbbmalloc_PLATFORM}")
-
 find_library(
   Tbbmalloc_LIBRARY
   NAMES tbbmalloc libtbbmalloc
-  HINTS ${Tbbmalloc_ROOT} ENV TBBMALLOC_ROOT ${HPX_TBBMALLOC_ROOT}
+  HINTS ${TBBMALLOC_ROOT} ENV TBBMALLOC_ROOT ${HPX_TBBMALLOC_ROOT}
         ${PC_Tbbmalloc_LIBDIR} ${PC_Tbbmalloc_LIBRARY_DIRS}
-  PATH_SUFFIXES ${Tbbmalloc_PATH_SUFFIX} lib lib64
 )
 
 find_library(
   Tbbmalloc_PROXY_LIBRARY
   NAMES tbbmalloc_proxy libtbbmalloc_proxy
-  HINTS ${Tbbmalloc_ROOT} ENV TBBMALLOC_ROOT ${HPX_TBBMALLOC_ROOT}
+  HINTS ${TBBMALLOC_ROOT} ENV TBBMALLOC_ROOT ${HPX_TBBMALLOC_ROOT}
         ${PC_Tbbmalloc_LIBDIR} ${PC_Tbbmalloc_LIBRARY_DIRS}
-  PATH_SUFFIXES ${Tbbmalloc_PATH_SUFFIX} lib lib64
 )
 
-# Set Tbbmalloc_ROOT in case the other hints are used
-if(NOT Tbbmalloc_ROOT AND DEFINED ENV{TBBMALLOC_ROOT})
-  set(Tbbmalloc_ROOT $ENV{TBBMALLOC_ROOT})
-elseif(NOT Tbbmalloc_ROOT)
-  string(REPLACE "/include" "" Tbbmalloc_ROOT "${Tbbmalloc_INCLUDE_DIR}")
-endif()
+# Set Tbbmalloc_ROOT
+get_filename_component(Tbbmalloc_ROOT ${Tbbmalloc_INCLUDE_DIR} DIRECTORY)
 
 set(Tbbmalloc_LIBRARIES ${Tbbmalloc_LIBRARY} ${Tbbmalloc_PROXY_LIBRARY})
 set(Tbbmalloc_INCLUDE_DIRS ${Tbbmalloc_INCLUDE_DIR})
