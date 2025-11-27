@@ -15,7 +15,7 @@
 #include <hpx/include/client.hpp>
 #include <hpx/modules/threading_base.hpp>
 #ifdef HPX_HAVE_MODULE_LIKWID
-#include <hpx/likwid/likwid_tls.hpp>
+#include <hpx/modules/likwid.hpp>
 #endif
 
 #include "stubs/managed_refcnt_checker.hpp"

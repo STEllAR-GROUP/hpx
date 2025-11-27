@@ -29,7 +29,7 @@
 #include <hpx/threading_base/detail/reset_backtrace.hpp>
 #endif
 #ifdef HPX_HAVE_MODULE_LIKWID
-#include <hpx/likwid/likwid_tls.hpp>
+#include <hpx/modules/likwid.hpp>
 #endif
 
 #include <atomic>
