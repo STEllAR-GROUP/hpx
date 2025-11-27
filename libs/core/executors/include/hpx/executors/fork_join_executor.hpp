@@ -57,7 +57,7 @@ namespace hpx::execution::experimental {
     /// worker threads is a slow operation the executor should be reused
     /// whenever possible for multiple adjacent parallel algorithms or
     /// invocations of bulk_(a)sync_execute.
-    class fork_join_executor
+    HPX_CXX_EXPORT class fork_join_executor
     {
     public:
         /// Type of loop schedule for use with the fork_join_executor.
@@ -1380,7 +1380,7 @@ namespace hpx::execution::experimental {
         /// \endcond
     };
 
-    HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, fork_join_executor::loop_schedule schedule);
 
     /// \cond NOINTERNAL

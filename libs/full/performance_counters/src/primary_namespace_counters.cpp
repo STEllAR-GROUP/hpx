@@ -26,6 +26,8 @@
 #include <cstdint>
 #include <string>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace agas { namespace server {
 
     // register all performance counter types exposed by this component

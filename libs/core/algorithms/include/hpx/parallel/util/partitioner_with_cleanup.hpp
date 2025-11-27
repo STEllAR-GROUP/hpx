@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/async_local/dataflow.hpp>
+#include <hpx/modules/async_local.hpp>
 #endif
 #include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/execution.hpp>

@@ -19,6 +19,8 @@
 
 using std_string = std::string;
 
+#include <hpx/config/warnings_prefix.hpp>
+
 HPX_REGISTER_PARTITIONED_VECTOR(std_string)
 
 // an out-of-line definition of a member of a class template cannot have default

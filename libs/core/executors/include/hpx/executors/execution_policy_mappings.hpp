@@ -19,18 +19,18 @@
 namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Tag>
+    HPX_CXX_EXPORT template <typename Tag>
     struct is_execution_policy_mapping : std::false_type
     {
     };
 
-    template <typename Tag>
+    HPX_CXX_EXPORT template <typename Tag>
     inline constexpr bool is_execution_policy_mapping_v =
         is_execution_policy_mapping<Tag>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     // Return the matching non-parallel (sequenced) execution policy
-    inline constexpr struct to_non_par_t final
+    HPX_CXX_EXPORT inline constexpr struct to_non_par_t final
       : hpx::functional::detail::tag_fallback<to_non_par_t>
     {
     private:
@@ -56,7 +56,7 @@ namespace hpx::execution::experimental {
     };
 
     // Return the matching parallel execution policy
-    inline constexpr struct to_par_t final
+    HPX_CXX_EXPORT inline constexpr struct to_par_t final
       : hpx::functional::detail::tag_fallback<to_par_t>
     {
     private:
@@ -83,7 +83,7 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // Return the matching non-task (synchronous) execution policy
-    inline constexpr struct to_non_task_t
+    HPX_CXX_EXPORT inline constexpr struct to_non_task_t
       : hpx::functional::detail::tag_fallback<to_non_task_t>
     {
     private:
@@ -109,7 +109,7 @@ namespace hpx::execution::experimental {
     };
 
     // Return the matching task (asynchronous) execution policy
-    inline constexpr struct to_task_t
+    HPX_CXX_EXPORT inline constexpr struct to_task_t
       : hpx::functional::detail::tag_fallback<to_task_t>
     {
     private:
@@ -136,7 +136,7 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // Return the matching non-unsequenced execution policy
-    inline constexpr struct to_non_unseq_t final
+    HPX_CXX_EXPORT inline constexpr struct to_non_unseq_t final
       : hpx::functional::detail::tag_fallback<to_non_unseq_t>
     {
     private:
@@ -162,7 +162,7 @@ namespace hpx::execution::experimental {
     };
 
     // Return the matching unsequenced execution policy
-    inline constexpr struct to_unseq_t final
+    HPX_CXX_EXPORT inline constexpr struct to_unseq_t final
       : hpx::functional::detail::tag_fallback<to_unseq_t>
     {
     private:

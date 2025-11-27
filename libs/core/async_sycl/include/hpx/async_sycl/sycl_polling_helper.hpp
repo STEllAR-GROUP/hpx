@@ -17,8 +17,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_sycl/detail/sycl_event_callback.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
 
 #include <string>
 

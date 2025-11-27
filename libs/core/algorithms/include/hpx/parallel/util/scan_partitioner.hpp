@@ -20,7 +20,7 @@
 #include <hpx/parallel/util/detail/select_partitioner.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/async_local/dataflow.hpp>
+#include <hpx/modules/async_local.hpp>
 #endif
 
 #include <algorithm>

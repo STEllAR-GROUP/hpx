@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/runtime_local/run_as_hpx_thread.hpp>
-#include <hpx/runtime_local/run_as_os_thread.hpp>
+#include <hpx/modules/runtime_local.hpp>

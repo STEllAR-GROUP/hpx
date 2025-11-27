@@ -14,6 +14,8 @@
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/modules/serialization.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 using hpx::agas::server::component_namespace;
 
 HPX_DEFINE_COMPONENT_NAME(component_namespace, hpx_component_namespace)

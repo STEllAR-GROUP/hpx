@@ -15,16 +15,16 @@
 namespace hpx::execution::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Executor, typename Parameters>
+    HPX_CXX_EXPORT template <typename Executor, typename Parameters>
     struct simd_policy_shim;
 
-    template <typename Executor, typename Parameters>
+    HPX_CXX_EXPORT template <typename Executor, typename Parameters>
     struct simd_task_policy_shim;
 
-    template <typename Executor, typename Parameters>
+    HPX_CXX_EXPORT template <typename Executor, typename Parameters>
     struct par_simd_policy_shim;
 
-    template <typename Executor, typename Parameters>
+    HPX_CXX_EXPORT template <typename Executor, typename Parameters>
     struct par_simd_task_policy_shim;
 }    // namespace hpx::execution::detail
 

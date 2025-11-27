@@ -26,6 +26,8 @@
 #include <string>
 #include <type_traits>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace iostreams { namespace detail {
     std::ostream& get_coutstream() noexcept

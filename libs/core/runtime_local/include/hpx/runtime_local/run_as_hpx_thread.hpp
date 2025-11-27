@@ -152,7 +152,7 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     util::invoke_result_t<F, Ts...> run_as_hpx_thread(
         hpx::launch policy, F&& f, Ts&&... vs)
     {
@@ -163,7 +163,7 @@ namespace hpx {
             policy, HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
     }
 
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
         requires(!hpx::traits::is_launch_policy_v<std::decay_t<F>>)
     util::invoke_result_t<F, Ts...> run_as_hpx_thread(F&& f, Ts&&... vs)
     {

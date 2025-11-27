@@ -22,7 +22,7 @@
 
 namespace hpx::util {
 
-    class interval_timer;
+    HPX_CXX_EXPORT class interval_timer;
 }    // namespace hpx::util
 
 namespace hpx::util::detail {
@@ -103,7 +103,7 @@ namespace hpx::util::detail {
 
 namespace hpx::util {
 
-    class HPX_CORE_EXPORT interval_timer
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT interval_timer
     {
     public:
         interval_timer();

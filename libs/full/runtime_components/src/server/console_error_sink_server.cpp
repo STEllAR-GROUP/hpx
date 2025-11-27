@@ -13,9 +13,9 @@
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/ini.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/runtime_components/server/console_error_sink.hpp>
 #include <hpx/runtime_components/server/console_error_sink_singleton.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
 
 #include <exception>
 

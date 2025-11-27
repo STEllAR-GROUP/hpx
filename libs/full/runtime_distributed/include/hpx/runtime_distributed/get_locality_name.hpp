@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime_local/get_locality_name.hpp>
 
 #include <string>
 

@@ -12,9 +12,8 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
-#include <hpx/runtime_local/shutdown_function.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
 
 #include <hpx/components/iostreams/ostream.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>

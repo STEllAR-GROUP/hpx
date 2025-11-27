@@ -40,6 +40,7 @@ add_hpx_module(
     hpx_runtime_local
     hpx_errors
     hpx_execution
+    hpx_executors
     hpx_filesystem
     hpx_format
     hpx_functional

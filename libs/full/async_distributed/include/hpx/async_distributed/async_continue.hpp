@@ -14,7 +14,7 @@
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/async_distributed/async_continue_fwd.hpp>
 #include <hpx/async_distributed/promise.hpp>
-#include <hpx/async_local/async_fwd.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/futures.hpp>
 
 #include <type_traits>

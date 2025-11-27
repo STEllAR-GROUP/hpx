@@ -31,7 +31,8 @@ namespace hpx::resiliency::experimental {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Vote, typename Pred, typename F, typename... Ts>
+        HPX_CXX_EXPORT template <typename Vote, typename Pred, typename F,
+            typename... Ts>
         hpx::future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
         async_replicate_vote_validate(
             std::size_t n, Vote&& vote, Pred&& pred, F&& f, Ts&&... ts)
@@ -101,7 +102,8 @@ namespace hpx::resiliency::experimental {
     // result of those invocations using the given predicate \a pred. Run all
     // the valid results against a user provided voting function. Return the
     // valid output.
-    template <typename Vote, typename Pred, typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename Vote, typename Pred, typename F,
+        typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
     tag_invoke(async_replicate_vote_validate_t, std::size_t n, Vote&& vote,
         Pred&& pred, F&& f, Ts&&... ts)
@@ -115,7 +117,7 @@ namespace hpx::resiliency::experimental {
     // result of those invocations using the given predicate \a pred. Run all
     // the valid results against a user provided voting function. Return the
     // valid output.
-    template <typename Vote, typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename Vote, typename F, typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
     tag_invoke(
         async_replicate_vote_t, std::size_t n, Vote&& vote, F&& f, Ts&&... ts)
@@ -129,7 +131,7 @@ namespace hpx::resiliency::experimental {
     // Asynchronously launch given function \a f exactly \a n times. Verify the
     // result of those invocations using the given predicate \a pred. Return the
     // first valid result.
-    template <typename Pred, typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename Pred, typename F, typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
     tag_invoke(async_replicate_validate_t, std::size_t n, Pred&& pred, F&& f,
         Ts&&... ts)
@@ -143,7 +145,7 @@ namespace hpx::resiliency::experimental {
     // Asynchronously launch given function \a f exactly \a n times. Verify the
     // result of those invocations by checking for exception. Return the first
     // valid result.
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
     tag_invoke(async_replicate_t, std::size_t n, F&& f, Ts&&... ts)
     {

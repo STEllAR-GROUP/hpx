@@ -9,13 +9,13 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/performance_counters/server/arithmetics_counter.hpp>
 #include <hpx/runtime_components/derived_component_factory.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -23,6 +23,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::performance_counters::server {

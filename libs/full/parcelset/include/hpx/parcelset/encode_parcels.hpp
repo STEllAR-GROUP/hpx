@@ -40,6 +40,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::parcelset {
 
     namespace detail {
@@ -304,5 +306,7 @@ namespace hpx::parcelset {
         return parcels_sent;
     }
 }    // namespace hpx::parcelset
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

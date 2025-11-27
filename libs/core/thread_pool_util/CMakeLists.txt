@@ -18,9 +18,10 @@ include(HPX_AddModule)
 add_hpx_module(
   core thread_pool_util
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${thread_pool_util_sources}
   HEADERS ${thread_pool_util_headers}
-  MODULE_DEPENDENCIES hpx_async_local hpx_errors hpx_futures hpx_functional
-                      hpx_threading_base
+  MODULE_DEPENDENCIES hpx_async_local hpx_errors hpx_executors hpx_futures
+                      hpx_functional hpx_threading_base
   CMAKE_SUBDIRS examples tests
 )

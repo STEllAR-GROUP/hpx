@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/init.hpp>
-#include <hpx/runtime_local/run_as_os_thread.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #include <iostream>
 #include <mutex>

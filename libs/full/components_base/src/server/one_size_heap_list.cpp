@@ -12,9 +12,9 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/runtime_local/state.hpp>
 #if defined(HPX_DEBUG)
 #include <hpx/modules/logging.hpp>
 #endif

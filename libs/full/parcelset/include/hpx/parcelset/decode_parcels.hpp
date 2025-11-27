@@ -34,6 +34,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::parcelset {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -504,5 +506,7 @@ namespace hpx::parcelset {
         return decode_message_zero_copy(parcelport, buffer, 0, num_thread);
     }
 }    // namespace hpx::parcelset
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

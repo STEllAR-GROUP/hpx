@@ -9,14 +9,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/runtime_local/get_worker_thread_num.hpp>
 
 #include <cstddef>
 #include <limits>

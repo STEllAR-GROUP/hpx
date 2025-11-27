@@ -10,8 +10,8 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
 
 #include <hpx/components/performance_counters/io/io_counters.hpp>
 

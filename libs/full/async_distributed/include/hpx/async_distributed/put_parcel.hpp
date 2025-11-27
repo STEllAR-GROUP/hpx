@@ -20,6 +20,7 @@
 #include <hpx/async_distributed/put_parcel_fwd.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/naming/credit_handling.hpp>
 #include <hpx/naming/split_gid.hpp>
 #include <hpx/naming_base/address.hpp>
@@ -27,7 +28,6 @@
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
 
 #include <cstddef>
 #include <memory>

@@ -10,9 +10,9 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/prefix.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/runtime_components/component_registry.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
 
 #include <algorithm>
 #include <string>

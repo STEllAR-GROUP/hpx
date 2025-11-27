@@ -23,6 +23,7 @@
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/static_reinit.hpp>
 #include <hpx/modules/thread_pools.hpp>
 #include <hpx/modules/thread_support.hpp>
@@ -51,15 +52,6 @@
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/runtime_support.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
-#include <hpx/runtime_local/debugging.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/runtime_local/shutdown_function.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/runtime_local/state.hpp>
-#include <hpx/runtime_local/thread_hooks.hpp>
-#include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>
@@ -83,6 +75,8 @@
     !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
 #endif
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {

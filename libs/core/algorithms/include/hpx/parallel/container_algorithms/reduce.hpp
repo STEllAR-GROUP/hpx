@@ -676,8 +676,8 @@ namespace hpx { namespace ranges {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
