@@ -14,7 +14,7 @@
 #include <hpx/threading_base/set_thread_state_timed.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 #ifdef HPX_HAVE_MODULE_LIKWID
-#include <hpx/likwid/likwid_tls.hpp>
+#include <hpx/modules/likwid.hpp>
 #endif
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)

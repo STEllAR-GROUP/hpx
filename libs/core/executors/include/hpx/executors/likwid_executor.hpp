@@ -10,10 +10,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_MODULE_LIKWID)
-#include <hpx/execution/execution.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
-
-#include <hpx/likwid/likwid_tls.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/likwid.hpp>
 
 #include <string>
 #include <utility>
@@ -21,7 +20,7 @@
 namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <typename BaseExecutor>
     class likwid_executor
     {
     private:
@@ -190,35 +189,35 @@ namespace hpx::execution::experimental {
 // simple forwarding implementations of executor traits
 namespace hpx::parallel::execution {
 
-    template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <typename BaseExecutor>
     struct is_one_way_executor<
         hpx::execution::experimental::likwid_executor<BaseExecutor>>
       : is_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <typename BaseExecutor>
     struct is_never_blocking_one_way_executor<
         hpx::execution::experimental::likwid_executor<BaseExecutor>>
       : is_never_blocking_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <typename BaseExecutor>
     struct is_two_way_executor<
         hpx::execution::experimental::likwid_executor<BaseExecutor>>
       : is_two_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <typename BaseExecutor>
     struct is_bulk_one_way_executor<
         hpx::execution::experimental::likwid_executor<BaseExecutor>>
       : is_bulk_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <typename BaseExecutor>
     struct is_bulk_two_way_executor<
         hpx::execution::experimental::likwid_executor<BaseExecutor>>
       : is_bulk_two_way_executor<std::decay_t<BaseExecutor>>
