@@ -54,7 +54,11 @@ you must link your application to the |cmake|_ target ``HPX::wrap_main``. This i
 done automatically if you are using the provided macros
 (:ref:`using_hpx_cmake_macros`) to set up your application, but must be done
 explicitly if you are using targets directly (:ref:`using_hpx_cmake_targets`).
-All |hpx| API functions can be used from within the ``main()`` function now.
+All |hpx| API functions can be used from within the ``main()`` function now. If
+you cannot or do not want to include ``hpx/hpx_main.hpp`` in ``main.cpp``, you
+can instead link against ``HPX::auto_wrap_main``. That target enables the same
+runtime startup path without needing the header-triggered opt-in.
+
 
 .. note::
 
@@ -105,7 +109,6 @@ to the operating system as usual.
    result in unexpected behavior.
 
 .. caution::
-
    We make use of an *override* variable ``include_libhpx_wrap`` in the header
    file ``hpx/hpx_main.hpp`` to swiftly choose the function call stack at
    runtime. Therefore, the header file should *only* be included in the main

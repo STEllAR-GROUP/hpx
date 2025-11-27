@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/hpx_init.hpp>
 
 // The following implementation has been divided for Linux and Mac OSX
 #if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) &&                                      \
@@ -17,14 +18,23 @@ namespace hpx_start {
     // include_libhpx_wrap is a weak symbol which helps to determine the course
     // of function calls at runtime. It has a default value of `false` which
     // corresponds to the program's entry point being main().
-    // It is overridden in hpx/hpx_main.hpp. Thus, inclusion of the header file
+    // It is overridden in hpx/hpx_main.hpp or set as TRUE if
+    // HPX_AUTO_WRAP_MAIN_ACTIVATE is defined.
+    // Thus, inclusion of the header file or defining HPX_AUTO_WRAP_MAIN_ACTIVATE
     // will change the program's entry point to HPX's own custom entry point
     // initialize_main. Subsequent calls before entering main() are handled
     // by this code.
     HPX_SYMBOL_EXPORT extern bool include_libhpx_wrap;
+#if defined(HPX_AUTO_WRAP_MAIN_ACTIVATE)
+    HPX_SYMBOL_EXPORT bool include_libhpx_wrap __attribute__((weak)) = true;
+#else
     HPX_SYMBOL_EXPORT bool include_libhpx_wrap __attribute__((weak)) = false;
+#endif
+    // The default application name is populated by including hpx/hpx_main.hpp
+    // or if HPX_AUTO_WRAP_MAIN_ACTIVATE is defined.
     HPX_SYMBOL_EXPORT extern const char* app_name_libhpx_wrap;
-    HPX_SYMBOL_EXPORT const char* app_name_libhpx_wrap __attribute__((weak));
+    HPX_SYMBOL_EXPORT const char* app_name_libhpx_wrap __attribute__((weak)) =
+        HPX_APPLICATION_STRING;
 
     // Provide a definition of is_linked variable defined weak in hpx_main.hpp
     // header. This variable is solely to trigger a different exception when
@@ -34,7 +44,6 @@ namespace hpx_start {
 }    // namespace hpx_start
 
 #include <hpx/hpx_finalize.hpp>
-#include <hpx/hpx_init.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 
