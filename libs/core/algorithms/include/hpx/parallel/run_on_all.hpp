@@ -30,7 +30,8 @@ namespace hpx::experimental {
     /// \cond NOINTERNAL
     namespace detail {
 
-        template <typename ExPolicy, typename F, typename... Reductions>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename F,
+            typename... Reductions>
         decltype(auto) run_on_all(
             ExPolicy&& policy, F&& f, Reductions&&... reductions)
         {
@@ -132,7 +133,7 @@ namespace hpx::experimental {
     ///                  invoke (last argument)
     /// \param ts        The list of reductions and the function to invoke (last
     ///                  argument)
-    template <typename ExPolicy, typename T, typename... Ts>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename T, typename... Ts>
         requires(hpx::is_execution_policy_v<ExPolicy>)
     decltype(auto) run_on_all(ExPolicy&& policy, T&& t, Ts&&... ts)
     {
@@ -152,7 +153,7 @@ namespace hpx::experimental {
     ///                  invoke (last argument)
     /// \param ts        The list of reductions and the function to invoke (last
     ///                  argument)
-    template <typename T, typename... Ts>
+    HPX_CXX_EXPORT template <typename T, typename... Ts>
         requires(!hpx::is_execution_policy_v<T>)
     decltype(auto) run_on_all(T&& t, Ts&&... ts)
     {

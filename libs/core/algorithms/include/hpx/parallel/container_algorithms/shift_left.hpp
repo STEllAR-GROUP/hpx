@@ -205,13 +205,13 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    inline constexpr struct shift_left_t final
+    HPX_CXX_EXPORT inline constexpr struct shift_left_t final
       : hpx::functional::detail::tag_fallback<shift_left_t>
     {
     private:
         template <typename FwdIter, typename Sent, typename Size>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
                 std::is_integral_v<Size>
@@ -230,7 +230,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename Size>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -251,7 +251,7 @@ namespace hpx::ranges {
 
         template <typename Rng, typename Size>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 std::is_integral_v<Size>
             )
@@ -270,7 +270,7 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename Rng, typename Size>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 std::is_integral_v<Size>

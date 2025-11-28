@@ -810,12 +810,12 @@ namespace hpx::ranges {
 
     /// `minmax_element_result` is equivalent to
     /// `hpx::parallel::util::min_max_result`
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using minmax_element_result = hpx::parallel::util::min_max_result<T>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::min_element
-    inline constexpr struct min_element_t final
+    HPX_CXX_EXPORT inline constexpr struct min_element_t final
       : hpx::detail::tag_parallel_algorithm<min_element_t>
     {
     private:
@@ -823,7 +823,7 @@ namespace hpx::ranges {
             typename F = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -847,7 +847,7 @@ namespace hpx::ranges {
         template <typename Rng, typename F = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -875,7 +875,7 @@ namespace hpx::ranges {
             typename F = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
@@ -904,7 +904,7 @@ namespace hpx::ranges {
             typename F = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -933,7 +933,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::max_element
-    inline constexpr struct max_element_t final
+    HPX_CXX_EXPORT inline constexpr struct max_element_t final
       : hpx::detail::tag_parallel_algorithm<max_element_t>
     {
     private:
@@ -941,7 +941,7 @@ namespace hpx::ranges {
             typename F = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -965,7 +965,7 @@ namespace hpx::ranges {
         template <typename Rng, typename F = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -993,7 +993,7 @@ namespace hpx::ranges {
             typename F = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
@@ -1022,7 +1022,7 @@ namespace hpx::ranges {
             typename F = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -1051,7 +1051,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::minmax_element
-    inline constexpr struct minmax_element_t final
+    HPX_CXX_EXPORT inline constexpr struct minmax_element_t final
       : hpx::detail::tag_parallel_algorithm<minmax_element_t>
     {
     private:
@@ -1059,7 +1059,7 @@ namespace hpx::ranges {
             typename F = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -1084,7 +1084,7 @@ namespace hpx::ranges {
         template <typename Rng, typename F = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -1112,7 +1112,7 @@ namespace hpx::ranges {
             typename F = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
@@ -1141,7 +1141,7 @@ namespace hpx::ranges {
             typename F = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&

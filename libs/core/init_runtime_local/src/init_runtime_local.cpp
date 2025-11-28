@@ -10,6 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/init_runtime_local/detail/init_logging.hpp>
 #include <hpx/init_runtime_local/init_runtime_local.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/command_line_handling_local.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
@@ -30,7 +31,6 @@
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__)
 #include <cstdlib>

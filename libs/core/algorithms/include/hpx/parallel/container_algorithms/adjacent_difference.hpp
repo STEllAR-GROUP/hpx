@@ -347,7 +347,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    inline constexpr struct adjacent_difference_t final
+    HPX_CXX_EXPORT inline constexpr struct adjacent_difference_t final
       : hpx::detail::tag_parallel_algorithm<adjacent_difference_t>
     {
     private:

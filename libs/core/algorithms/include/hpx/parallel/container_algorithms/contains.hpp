@@ -26,8 +26,9 @@
 #include <iterator>
 #include <type_traits>
 
-namespace hpx::parallel { namespace detail {
-    struct contains : public algorithm<contains, bool>
+namespace hpx::parallel::detail {
+
+    HPX_CXX_EXPORT struct contains : public algorithm<contains, bool>
     {
         constexpr contains() noexcept
           : algorithm("contains")
@@ -80,10 +81,11 @@ namespace hpx::parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename T,
+        typename Enable = void>
     struct contains_subrange_helper;
 
-    template <typename ExPolicy, typename T>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename T>
     struct contains_subrange_helper<ExPolicy, T,
         std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy>>>
     {
@@ -93,7 +95,7 @@ namespace hpx::parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename T>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename T>
     struct contains_subrange_helper<ExPolicy, T,
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
     {
@@ -104,7 +106,8 @@ namespace hpx::parallel { namespace detail {
         }
     };
 
-    struct contains_subrange : public algorithm<contains_subrange, bool>
+    HPX_CXX_EXPORT struct contains_subrange
+      : public algorithm<contains_subrange, bool>
     {
         constexpr contains_subrange() noexcept
           : algorithm("contains_subrange")
@@ -141,12 +144,11 @@ namespace hpx::parallel { namespace detail {
                 itr, last1);
         }
     };
-
-}}    // namespace hpx::parallel::detail
+}    // namespace hpx::parallel::detail
 
 namespace hpx::ranges {
 
-    inline constexpr struct contains_t final
+    HPX_CXX_EXPORT inline constexpr struct contains_t final
       : hpx::functional::detail::tag_fallback<contains_t>
     {
     private:
@@ -156,8 +158,8 @@ namespace hpx::ranges {
             requires(hpx::traits::is_iterator_v<Iterator> &&
                 hpx::traits::is_iterator_v<Iterator> &&
                 hpx::is_invocable_v<Proj,
-                    typename std::iterator_traits<Iterator>::value_type>)
-
+                    typename std::iterator_traits<Iterator>::value_type>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::contains_t, Iterator first,
             Sentinel last, const T& val, Proj&& proj = Proj())
@@ -177,8 +179,7 @@ namespace hpx::ranges {
             requires (
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
-                )
-
+            )
         // clang-format on
         friend bool tag_fallback_invoke(
             hpx::ranges::contains_t, Rng&& rng, const T& t, Proj proj = Proj())
@@ -196,8 +197,7 @@ namespace hpx::ranges {
                 is_iterator_v<Iterator> &&
                 hpx::is_invocable_v<Proj,
                 typename std::iterator_traits<Iterator>::value_type>
-                )
-
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
@@ -222,8 +222,7 @@ namespace hpx::ranges {
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
-                )
-
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
@@ -234,10 +233,9 @@ namespace hpx::ranges {
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), t, HPX_MOVE(proj));
         }
-
     } contains{};
 
-    inline constexpr struct contains_subrange_t final
+    HPX_CXX_EXPORT inline constexpr struct contains_subrange_t final
       : hpx::functional::detail::tag_fallback<contains_subrange_t>
     {
     private:
@@ -257,8 +255,7 @@ namespace hpx::ranges {
                     typename std::iterator_traits<FwdIter1>::value_type> &&
                 hpx::is_invocable_v<Proj2,
                     typename std::iterator_traits<FwdIter2>::value_type>
-                )
-
+            )
         // clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::contains_subrange_t,
             FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2,
@@ -281,7 +278,7 @@ namespace hpx::ranges {
             typename Pred = hpx::ranges::equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1,Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&
@@ -290,9 +287,8 @@ namespace hpx::ranges {
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
                     hpx::parallel::traits::projected_range<Proj2,Rng2>
-                    >
-                )
-
+                >
+            )
         // clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::contains_subrange_t,
             Rng1&& rng1, Rng2&& rng2, Pred pred = Pred(), Proj1 proj1 = Proj1(),
@@ -319,8 +315,7 @@ namespace hpx::ranges {
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type>
-                )
-
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
@@ -353,9 +348,8 @@ namespace hpx::ranges {
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
                     hpx::parallel::traits::projected_range<Proj2, Rng2>
-                    >
-                )
-
+                >
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
@@ -369,6 +363,5 @@ namespace hpx::ranges {
                 hpx::util::end(rng2), HPX_MOVE(pred), HPX_MOVE(proj1),
                 HPX_MOVE(proj2));
         }
-
     } contains_subrange{};
 }    // namespace hpx::ranges

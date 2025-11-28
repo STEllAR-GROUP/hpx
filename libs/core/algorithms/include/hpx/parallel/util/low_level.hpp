@@ -24,8 +24,9 @@ namespace hpx::parallel::util {
     // \tparam Args : parameters for the constructor
     // \param [in] ptr : pointer to the memory where to create the object
     // \param [in] args : arguments to the constructor
-    template <typename Value, typename... Args>
-    void construct_object(Value* ptr, Args&&... args)
+    HPX_CXX_EXPORT template <typename Value, typename... Args>
+    void construct_object(Value* ptr, Args&&... args) noexcept(
+        noexcept(hpx::construct_at(ptr, HPX_FORWARD(Args, args)...)))
     {
         hpx::construct_at(ptr, HPX_FORWARD(Args, args)...);
     }
@@ -33,8 +34,8 @@ namespace hpx::parallel::util {
     // \brief destroy an object in the memory specified by ptr
     // \tparam Value : typename of the object to create
     // \param [in] ptr : pointer to the object to destroy
-    template <typename Value>
-    void destroy_object(Value* ptr)
+    HPX_CXX_EXPORT template <typename Value>
+    void destroy_object(Value* ptr) noexcept
     {
         std::destroy_at(ptr);
     }
@@ -45,7 +46,7 @@ namespace hpx::parallel::util {
     // \param [in] r : range of elements not initialized
     // \param [in] val : object used for the initialization
     // \returns range initialized
-    template <typename Iter, typename Sent>
+    HPX_CXX_EXPORT template <typename Iter, typename Sent>
     void init(Iter first, Sent last, hpx::traits::iter_value_t<Iter>& val)
     {
         if (first == last)
@@ -70,8 +71,9 @@ namespace hpx::parallel::util {
     // \tparam Args : parameters for the constructor
     // \param [in] ptr : pointer to the memory where to create the object
     // \param [in] args : arguments to the constructor
-    template <typename Value, typename... Args>
-    void construct(Value* ptr, Args&&... args)
+    HPX_CXX_EXPORT template <typename Value, typename... Args>
+    void construct(Value* ptr, Args&&... args) noexcept(
+        noexcept(hpx::construct_at(ptr, HPX_FORWARD(Args, args)...)))
     {
         hpx::construct_at(ptr, HPX_FORWARD(Args, args)...);
     }
@@ -81,7 +83,7 @@ namespace hpx::parallel::util {
     // \tparam Value : typename of the object to create
     // \param [in] it_dest : iterator to the final place of the objects
     // \param [in] R : range to move
-    template <typename Iter1, typename Sent1, typename Iter2>
+    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2>
     Iter2 init_move(Iter2 it_dest, Iter1 first, Sent1 last)
     {
         while (first != last)
@@ -97,7 +99,7 @@ namespace hpx::parallel::util {
     // \tparam Value : typename of the object to construct
     // \param [in] ptr : pointer to the memory where to create the object
     // \param [in] R : range to move
-    template <typename Iter, typename Sent,
+    HPX_CXX_EXPORT template <typename Iter, typename Sent,
         typename Value = hpx::traits::iter_value_t<Iter>>
     Value* uninit_move(Value* ptr, Iter first, Sent last)
     {
@@ -122,8 +124,8 @@ namespace hpx::parallel::util {
     // \param [in] last : range to initialize
     // \param [in] ptr : pointer to the memory where to construct the object
     // \param [in] R : range to move
-    template <typename Iter, typename Sent>
-    void destroy(Iter first, Sent last)
+    HPX_CXX_EXPORT template <typename Iter, typename Sent>
+    void destroy(Iter first, Sent last) noexcept
     {
         while (first != last)
         {
@@ -139,7 +141,8 @@ namespace hpx::parallel::util {
     // \param [in] end_buf2 : final iterator of the second buffer
     // \param [in] buf_out : buffer where move the elements merged
     // \param [in] comp : comparison object
-    template <typename Iter1, typename Sent1, typename Iter2, typename Compare>
+    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
+        typename Compare>
     Iter2 full_merge(Iter1 buf1, Sent1 end_buf1, Iter1 buf2, Sent1 end_buf2,
         Iter2 buf_out, Compare comp)
     {
@@ -169,7 +172,8 @@ namespace hpx::parallel::util {
     // \param [in] last22 : final iterator of the second buffer
     // \param [in] it_out : uninitialized buffer where move the elements merged
     // \param [in] comp : comparison object
-    template <typename Iter, typename Sent, typename Value, typename Compare>
+    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Value,
+        typename Compare>
     Value* uninit_full_merge(Iter first1, Sent last1, Iter first2, Sent last2,
         Value* it_out, Compare comp)
     {
@@ -202,8 +206,8 @@ namespace hpx::parallel::util {
     // \param [in] comp : object for Compare two elements of the type pointed
     //                    by the Iter1 and Iter2
     // \note The elements pointed by Iter1 and Iter2 must be the same
-    template <typename Iter1, typename Sent1, typename Iter2, typename Sent2,
-        typename Compare>
+    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
+        typename Sent2, typename Compare>
     Iter2 half_merge(Iter1 buf1, Sent1 end_buf1, Iter2 buf2, Sent2 end_buf2,
         Iter2 buf_out, Compare comp)
     {
@@ -235,8 +239,8 @@ namespace hpx::parallel::util {
     // \exception
     // \returns true : not changes done
     //         false : changes in the buffers
-    template <typename Iter1, typename Sent1, typename Iter2, typename Sent2,
-        typename Iter3, typename Compare>
+    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
+        typename Sent2, typename Iter3, typename Compare>
     bool in_place_merge_uncontiguous(Iter1 src1, Sent1 end_src1, Iter2 src2,
         Sent2 end_src2, Iter3 aux, Compare comp)
     {
@@ -295,7 +299,8 @@ namespace hpx::parallel::util {
     // \exception
     // \returns true : not changes done
     //         false : changes in the buffers
-    template <typename Iter1, typename Sent1, typename Iter2, typename Compare>
+    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
+        typename Compare>
     bool in_place_merge(
         Iter1 src1, Iter1 src2, Sent1 end_src2, Iter2 buf, Compare comp)
     {

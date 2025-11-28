@@ -189,7 +189,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        struct lexicographical_compare
+        HPX_CXX_EXPORT struct lexicographical_compare
           : public algorithm<lexicographical_compare, bool>
         {
             constexpr lexicographical_compare() noexcept
@@ -326,7 +326,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::lexicographical_compare
-    inline constexpr struct lexicographical_compare_t final
+    HPX_CXX_EXPORT inline constexpr struct lexicographical_compare_t final
       : hpx::detail::tag_parallel_algorithm<lexicographical_compare_t>
     {
         template <typename InIter1, typename InIter2,

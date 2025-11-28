@@ -210,11 +210,12 @@ namespace hpx {
 #include <utility>
 
 namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // set_symmetric_difference
     namespace detail {
 
-        template <typename Iter1, typename Sent1, typename Iter2,
+        HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
             typename Sent2, typename Iter3, typename Comp, typename Proj1,
             typename Proj2>
         constexpr util::in_in_out_result<Iter1, Iter2, Iter3>
@@ -256,7 +257,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Result>
+        HPX_CXX_EXPORT template <typename Result>
         struct set_symmetric_difference
           : public algorithm<set_symmetric_difference<Result>, Result>
         {
@@ -342,7 +343,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::set_symmetric_difference
-    inline constexpr struct set_symmetric_difference_t final
+    HPX_CXX_EXPORT inline constexpr struct set_symmetric_difference_t final
       : hpx::detail::tag_parallel_algorithm<set_symmetric_difference_t>
     {
     private:

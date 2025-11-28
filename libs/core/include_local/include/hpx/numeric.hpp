@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/parallel/container_numeric.hpp>
-#include <hpx/parallel/numeric.hpp>
+#include <hpx/modules/algorithms.hpp>

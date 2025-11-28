@@ -700,7 +700,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    inline constexpr struct search_t final
+    HPX_CXX_EXPORT inline constexpr struct search_t final
       : hpx::detail::tag_parallel_algorithm<search_t>
     {
     private:
@@ -708,7 +708,7 @@ namespace hpx::ranges {
             typename Sent2, typename Pred = hpx::ranges::equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
                 parallel::traits::is_projected_v<Proj1, FwdIter> &&
@@ -736,7 +736,7 @@ namespace hpx::ranges {
             typename Pred = hpx::ranges::equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -765,7 +765,7 @@ namespace hpx::ranges {
             typename Pred = hpx::ranges::equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&
@@ -795,7 +795,7 @@ namespace hpx::ranges {
             typename Pred = hpx::ranges::equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
@@ -824,7 +824,7 @@ namespace hpx::ranges {
         }
     } search{};
 
-    inline constexpr struct search_n_t final
+    HPX_CXX_EXPORT inline constexpr struct search_n_t final
       : hpx::detail::tag_parallel_algorithm<search_n_t>
     {
     private:
@@ -832,7 +832,7 @@ namespace hpx::ranges {
             typename Pred = hpx::ranges::equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 parallel::traits::is_projected_v<Proj1, FwdIter> &&
                 hpx::traits::is_forward_iterator_v<FwdIter2> &&
@@ -858,7 +858,7 @@ namespace hpx::ranges {
             typename Sent2, typename Pred = hpx::ranges::equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 parallel::traits::is_projected_v<Proj1, FwdIter> &&
@@ -887,7 +887,7 @@ namespace hpx::ranges {
             typename Pred = hpx::ranges::equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&
@@ -917,7 +917,7 @@ namespace hpx::ranges {
             typename Pred = hpx::ranges::equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&

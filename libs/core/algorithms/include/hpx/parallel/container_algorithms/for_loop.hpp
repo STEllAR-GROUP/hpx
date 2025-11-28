@@ -739,14 +739,14 @@ namespace hpx { namespace ranges { namespace experimental {
 
 namespace hpx::ranges::experimental {
 
-    inline constexpr struct for_loop_t final
+    HPX_CXX_EXPORT inline constexpr struct for_loop_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_t>
     {
     private:
         template <typename ExPolicy, typename Iter, typename Sent,
             typename... Args>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<Iter> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter>
@@ -768,7 +768,7 @@ namespace hpx::ranges::experimental {
 
         template <typename Iter, typename Sent, typename... Args>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<Iter> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter>
             )
@@ -787,10 +787,10 @@ namespace hpx::ranges::experimental {
 
         template <typename ExPolicy, typename R, typename... Args>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 (hpx::traits::is_range_v<R> ||
-                 hpx::traits::is_range_generator_v<R>)
+                    hpx::traits::is_range_generator_v<R>)
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
@@ -820,7 +820,7 @@ namespace hpx::ranges::experimental {
 
         template <typename Rng, typename... Args>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> ||
                 hpx::traits::is_range_generator_v<Rng>
             )
@@ -849,14 +849,14 @@ namespace hpx::ranges::experimental {
         }
     } for_loop{};
 
-    inline constexpr struct for_loop_strided_t final
+    HPX_CXX_EXPORT inline constexpr struct for_loop_strided_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_strided_t>
     {
     private:
         template <typename ExPolicy, typename Iter, typename Sent, typename S,
             typename... Args>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 std::is_integral_v<S> &&
                 hpx::traits::is_iterator_v<Iter> &&
@@ -880,7 +880,7 @@ namespace hpx::ranges::experimental {
 
         template <typename Iter, typename Sent, typename S, typename... Args>
         // clang-format off
-            requires (
+            requires(
                 std::is_integral_v<S> &&
                 hpx::traits::is_iterator_v<Iter> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter>
@@ -902,7 +902,7 @@ namespace hpx::ranges::experimental {
 
         template <typename ExPolicy, typename Rng, typename S, typename... Args>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 std::is_integral_v<S> &&
                 hpx::traits::is_range_v<Rng>
@@ -926,7 +926,7 @@ namespace hpx::ranges::experimental {
 
         template <typename Rng, typename S, typename... Args>
         // clang-format off
-            requires (
+            requires(
                 std::is_integral_v<S> &&
                 hpx::traits::is_range_v<Rng>
             )

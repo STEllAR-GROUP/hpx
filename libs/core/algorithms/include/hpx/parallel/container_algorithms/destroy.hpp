@@ -224,13 +224,13 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::destroy
-    inline constexpr struct destroy_t final
+    HPX_CXX_EXPORT inline constexpr struct destroy_t final
       : hpx::detail::tag_parallel_algorithm<destroy_t>
     {
     private:
         template <typename ExPolicy, typename Rng>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng>
             )
@@ -251,7 +251,7 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename Iter, typename Sent>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter>
             )
@@ -295,13 +295,13 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::destroy_n
-    inline constexpr struct destroy_n_t final
+    HPX_CXX_EXPORT inline constexpr struct destroy_n_t final
       : hpx::detail::tag_parallel_algorithm<destroy_n_t>
     {
     private:
         template <typename ExPolicy, typename FwdIter, typename Size>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
@@ -329,7 +329,7 @@ namespace hpx::ranges {
 
         template <typename FwdIter, typename Size>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
             )

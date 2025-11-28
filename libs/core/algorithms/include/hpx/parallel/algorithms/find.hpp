@@ -806,7 +806,7 @@ namespace hpx::parallel {
     // find
     namespace detail {
 
-        template <typename FwdIter>
+        HPX_CXX_EXPORT template <typename FwdIter>
         struct find : public algorithm<find<FwdIter>, FwdIter>
         {
             constexpr find() noexcept
@@ -898,7 +898,7 @@ namespace hpx::parallel {
     // find_if
     namespace detail {
 
-        template <typename FwdIter>
+        HPX_CXX_EXPORT template <typename FwdIter>
         struct find_if : public algorithm<find_if<FwdIter>, FwdIter>
         {
             constexpr find_if() noexcept
@@ -990,7 +990,7 @@ namespace hpx::parallel {
     // find_if_not
     namespace detail {
 
-        template <typename FwdIter>
+        HPX_CXX_EXPORT template <typename FwdIter>
         struct find_if_not : public algorithm<find_if_not<FwdIter>, FwdIter>
         {
             constexpr find_if_not() noexcept
@@ -1082,7 +1082,7 @@ namespace hpx::parallel {
     // find_end
     namespace detail {
 
-        template <typename FwdIter>
+        HPX_CXX_EXPORT template <typename FwdIter>
         struct find_end : public algorithm<find_end<FwdIter>, FwdIter>
         {
             constexpr find_end() noexcept
@@ -1200,7 +1200,7 @@ namespace hpx::parallel {
     // find_first_of
     namespace detail {
 
-        template <typename FwdIter>
+        HPX_CXX_EXPORT template <typename FwdIter>
         struct find_first_of : public algorithm<find_first_of<FwdIter>, FwdIter>
         {
             constexpr find_first_of() noexcept
@@ -1309,7 +1309,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::find
-    inline constexpr struct find_t final
+    HPX_CXX_EXPORT inline constexpr struct find_t final
       : hpx::detail::tag_parallel_algorithm<find_t>
     {
     private:
@@ -1352,7 +1352,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::find_if
-    inline constexpr struct find_if_t final
+    HPX_CXX_EXPORT inline constexpr struct find_if_t final
       : hpx::detail::tag_parallel_algorithm<find_if_t>
     {
     private:
@@ -1395,7 +1395,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::find_if_not
-    inline constexpr struct find_if_not_t final
+    HPX_CXX_EXPORT inline constexpr struct find_if_not_t final
       : hpx::detail::tag_parallel_algorithm<find_if_not_t>
     {
     private:
@@ -1438,7 +1438,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::find_end
-    inline constexpr struct find_end_t final
+    HPX_CXX_EXPORT inline constexpr struct find_end_t final
       : hpx::detail::tag_parallel_algorithm<find_end_t>
     {
     private:
@@ -1537,7 +1537,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::find_first_of
-    inline constexpr struct find_first_of_t final
+    HPX_CXX_EXPORT inline constexpr struct find_first_of_t final
       : hpx::detail::tag_parallel_algorithm<find_first_of_t>
     {
     private:

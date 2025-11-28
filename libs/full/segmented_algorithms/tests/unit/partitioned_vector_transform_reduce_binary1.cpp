@@ -11,9 +11,9 @@
 #include <hpx/include/parallel_transform_reduce.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp>
-#include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <cstddef>
 #include <iterator>

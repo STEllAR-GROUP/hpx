@@ -254,7 +254,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename FwdIter, typename Sent>
+        HPX_CXX_EXPORT template <typename FwdIter, typename Sent>
         struct is_sorted : public algorithm<is_sorted<FwdIter, Sent>, bool>
         {
             constexpr is_sorted() noexcept
@@ -341,8 +341,9 @@ namespace hpx::parallel {
     ////////////////////////////////////////////////////////////////////////////
     // is_sorted_until
     namespace detail {
+
         /// \cond NOINTERNAL
-        template <typename FwdIter, typename Sent>
+        HPX_CXX_EXPORT template <typename FwdIter, typename Sent>
         struct is_sorted_until
           : public algorithm<is_sorted_until<FwdIter, Sent>, FwdIter>
         {
@@ -451,7 +452,7 @@ namespace hpx::parallel {
 
 namespace hpx {
 
-    inline constexpr struct is_sorted_t final
+    HPX_CXX_EXPORT inline constexpr struct is_sorted_t final
       : hpx::detail::tag_parallel_algorithm<is_sorted_t>
     {
     private:
@@ -494,7 +495,7 @@ namespace hpx {
         }
     } is_sorted{};
 
-    inline constexpr struct is_sorted_until_t final
+    HPX_CXX_EXPORT inline constexpr struct is_sorted_until_t final
       : hpx::detail::tag_parallel_algorithm<is_sorted_until_t>
     {
     private:

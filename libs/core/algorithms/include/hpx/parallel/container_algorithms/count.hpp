@@ -455,7 +455,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::count
-    inline constexpr struct count_t final
+    HPX_CXX_EXPORT inline constexpr struct count_t final
       : hpx::detail::tag_parallel_algorithm<count_t>
     {
     private:
@@ -569,7 +569,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::count_if
-    inline constexpr struct count_if_t final
+    HPX_CXX_EXPORT inline constexpr struct count_if_t final
       : hpx::detail::tag_parallel_algorithm<count_if_t>
     {
     private:

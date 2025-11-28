@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/sort.hpp>
-#include <hpx/parallel/algorithms/sort_by_key.hpp>
-#include <hpx/parallel/algorithms/stable_sort.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/parallel/container_algorithms/sort.hpp>
 #include <hpx/parallel/container_algorithms/stable_sort.hpp>

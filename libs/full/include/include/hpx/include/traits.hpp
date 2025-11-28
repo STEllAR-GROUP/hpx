@@ -8,8 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/algorithms/traits/pointer_category.hpp>
-#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>

@@ -205,19 +205,19 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     using move_result = parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::move
-    inline constexpr struct move_t final
+    HPX_CXX_EXPORT inline constexpr struct move_t final
       : hpx::detail::tag_parallel_algorithm<move_t>
     {
     private:
         template <typename ExPolicy, typename Iter1, typename Sent1,
             typename Iter2>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::traits::is_iterator_v<Iter2>
@@ -235,7 +235,7 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename Rng, typename Iter2>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2>
@@ -255,7 +255,7 @@ namespace hpx::ranges {
 
         template <typename Iter1, typename Sent1, typename Iter2>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::traits::is_iterator_v<Iter2>
             )
@@ -270,7 +270,7 @@ namespace hpx::ranges {
 
         template <typename Rng, typename Iter2>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2>
             )

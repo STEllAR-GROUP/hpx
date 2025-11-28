@@ -416,13 +416,13 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::rotate
-    inline constexpr struct rotate_t final
+    HPX_CXX_EXPORT inline constexpr struct rotate_t final
       : hpx::detail::tag_parallel_algorithm<rotate_t>
     {
     private:
         template <typename FwdIter, typename Sent>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
             )
@@ -441,7 +441,7 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename FwdIter, typename Sent>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
@@ -467,9 +467,7 @@ namespace hpx::ranges {
         }
 
         template <typename Rng>
-        // clang-format off
-            requires (hpx::traits::is_range_v<Rng>)
-        // clang-format on
+            requires(hpx::traits::is_range_v<Rng>)
         friend subrange_t<hpx::traits::range_iterator_t<Rng>,
             hpx::traits::range_iterator_t<Rng>>
         tag_fallback_invoke(hpx::ranges::rotate_t, Rng&& rng,
@@ -487,7 +485,7 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename Rng>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng>
             )
@@ -516,16 +514,16 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::rotate_copy
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     using rotate_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
-    inline constexpr struct rotate_copy_t final
+    HPX_CXX_EXPORT inline constexpr struct rotate_copy_t final
       : hpx::detail::tag_parallel_algorithm<rotate_copy_t>
     {
     private:
         template <typename FwdIter, typename Sent, typename OutIter>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
                 hpx::traits::is_iterator_v<OutIter>
@@ -548,7 +546,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter1, typename Sent,
             typename FwdIter2>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
@@ -577,7 +575,7 @@ namespace hpx::ranges {
 
         template <typename Rng, typename OutIter>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<OutIter>
             )
@@ -594,7 +592,7 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename Rng, typename OutIter>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<OutIter>

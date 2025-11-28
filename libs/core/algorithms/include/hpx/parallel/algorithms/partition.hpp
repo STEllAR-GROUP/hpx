@@ -496,7 +496,7 @@ namespace hpx {
 
 namespace hpx::parallel {
 
-    template <typename Tuple>
+    HPX_CXX_EXPORT template <typename Tuple>
     constexpr HPX_FORCEINLINE
         std::pair<typename hpx::tuple_element<1, Tuple>::type,
             typename hpx::tuple_element<2, Tuple>::type>
@@ -508,7 +508,7 @@ namespace hpx::parallel {
         // NOLINTEND(bugprone-use-after-move)
     }
 
-    template <typename Tuple>
+    HPX_CXX_EXPORT template <typename Tuple>
     hpx::future<std::pair<typename hpx::tuple_element<1, Tuple>::type,
         typename hpx::tuple_element<2, Tuple>::type>>
     tuple_to_pair(hpx::future<Tuple>&& f)
@@ -528,7 +528,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        struct stable_partition_helper
+        HPX_CXX_EXPORT struct stable_partition_helper
         {
             template <typename ExPolicy, typename RandIter, typename F,
                 typename Proj>
@@ -598,8 +598,9 @@ namespace hpx::parallel {
             }
         };
 
-        template <typename BidirIter, typename Sent, typename F, typename Proj>
-        static constexpr BidirIter stable_partition_seq(
+        HPX_CXX_EXPORT template <typename BidirIter, typename Sent, typename F,
+            typename Proj>
+        constexpr BidirIter stable_partition_seq(
             BidirIter first, Sent last, F&& f, Proj&& proj)
         {
             using value_type =
@@ -626,7 +627,7 @@ namespace hpx::parallel {
             return next;
         }
 
-        template <typename Iter>
+        HPX_CXX_EXPORT template <typename Iter>
         struct stable_partition : public algorithm<stable_partition<Iter>, Iter>
         {
             constexpr stable_partition() noexcept
@@ -717,12 +718,9 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential partition with projection function for bidirectional iterator.
-        template <typename BidirIter, typename Pred, typename Proj>
-        // clang-format off
-            requires (
-                hpx::traits::is_bidirectional_iterator_v<BidirIter>
-            )
-        // clang-format on
+        HPX_CXX_EXPORT template <typename BidirIter, typename Pred,
+            typename Proj>
+            requires(hpx::traits::is_bidirectional_iterator_v<BidirIter>)
         constexpr BidirIter sequential_partition(
             BidirIter first, BidirIter last, Pred&& pred, Proj&& proj)
         {
@@ -754,12 +752,9 @@ namespace hpx::parallel {
         }
 
         // sequential partition with projection function for forward iterator.
-        template <typename FwdIter, typename Pred, typename Proj>
-        // clang-format off
-        requires (hpx::traits::is_forward_iterator_v<FwdIter> &&
-            !hpx::traits::is_bidirectional_iterator_v<FwdIter>
-        )
-        // clang-format on
+        HPX_CXX_EXPORT template <typename FwdIter, typename Pred, typename Proj>
+            requires(hpx::traits::is_forward_iterator_v<FwdIter> &&
+                !hpx::traits::is_bidirectional_iterator_v<FwdIter>)
         constexpr FwdIter sequential_partition(
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
         {
@@ -784,7 +779,7 @@ namespace hpx::parallel {
             return first;
         }
 
-        struct partition_helper
+        HPX_CXX_EXPORT struct partition_helper
         {
             template <typename FwdIter>
             struct block
@@ -1186,12 +1181,8 @@ namespace hpx::parallel {
             // the left of boundary.
 
             template <typename FwdIter>
-            // clang-format off
-                requires (
-                    hpx::traits::is_forward_iterator_v<FwdIter> &&
-                    !hpx::traits::is_bidirectional_iterator_v<FwdIter>
-                )
-            // clang-format on
+                requires(hpx::traits::is_forward_iterator_v<FwdIter> &&
+                    !hpx::traits::is_bidirectional_iterator_v<FwdIter>)
             static block<FwdIter> merge_leftside_remaining_blocks(
                 std::vector<block<FwdIter>>& remaining_blocks, FwdIter boundary,
                 FwdIter first)
@@ -1375,8 +1366,8 @@ namespace hpx::parallel {
             }
         };
 
-        template <typename ExPolicy, typename FwdIter, typename Pred,
-            typename Proj>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+            typename Pred, typename Proj>
         hpx::future<FwdIter> parallel_partition(ExPolicy&& policy,
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
         {
@@ -1397,7 +1388,7 @@ namespace hpx::parallel {
                 });
         }
 
-        template <typename FwdIter>
+        HPX_CXX_EXPORT template <typename FwdIter>
         struct partition : public algorithm<partition<FwdIter>, FwdIter>
         {
             constexpr partition() noexcept
@@ -1448,8 +1439,8 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential partition_copy with projection function
-        template <typename InIter, typename OutIter1, typename OutIter2,
-            typename Pred, typename Proj>
+        HPX_CXX_EXPORT template <typename InIter, typename OutIter1,
+            typename OutIter2, typename Pred, typename Proj>
         constexpr hpx::tuple<InIter, OutIter1, OutIter2>
         sequential_partition_copy(InIter first, InIter last, OutIter1 dest_true,
             OutIter2 dest_false, Pred&& pred, Proj&& proj)
@@ -1470,7 +1461,7 @@ namespace hpx::parallel {
                 HPX_MOVE(last), HPX_MOVE(dest_true), HPX_MOVE(dest_false));
         }
 
-        template <typename IterTuple>
+        HPX_CXX_EXPORT template <typename IterTuple>
         struct partition_copy
           : public algorithm<partition_copy<IterTuple>, IterTuple>
         {
@@ -1611,8 +1602,9 @@ namespace hpx::parallel {
         /// \endcond
     }    // namespace detail
 
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename FwdIter3, typename Pred, typename Proj = hpx::identity>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter1,
+        typename FwdIter2, typename FwdIter3, typename Pred,
+        typename Proj = hpx::identity>
     // clang-format off
         requires (
             hpx::is_execution_policy_v<ExPolicy> &&
@@ -1656,7 +1648,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::stable_partition
-    inline constexpr struct stable_partition_t final
+    HPX_CXX_EXPORT inline constexpr struct stable_partition_t final
       : hpx::detail::tag_parallel_algorithm<stable_partition_t>
     {
         template <typename BidirIter, typename F>
@@ -1704,7 +1696,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::partition
-    inline constexpr struct partition_t final
+    HPX_CXX_EXPORT inline constexpr struct partition_t final
       : hpx::detail::tag_parallel_algorithm<partition_t>
     {
         template <typename FwdIter, typename Pred>
@@ -1748,7 +1740,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::partition_copy
-    inline constexpr struct partition_copy_t final
+    HPX_CXX_EXPORT inline constexpr struct partition_copy_t final
       : hpx::detail::tag_parallel_algorithm<partition_copy_t>
     {
         template <typename FwdIter1, typename FwdIter2, typename FwdIter3,

@@ -9,8 +9,10 @@
 #include <hpx/parallel/task_block.hpp>
 
 namespace hpx {
-    using task_cancelled_exception = hpx::experimental::task_canceled_exception;
-    using hpx::experimental::define_task_block;
-    using hpx::experimental::define_task_block_restore_thread;
-    using hpx::experimental::task_block;
+
+    HPX_CXX_EXPORT using task_cancelled_exception =
+        hpx::experimental::task_canceled_exception;
+    HPX_CXX_EXPORT using hpx::experimental::define_task_block;
+    HPX_CXX_EXPORT using hpx::experimental::define_task_block_restore_thread;
+    HPX_CXX_EXPORT using hpx::experimental::task_block;
 }    // namespace hpx

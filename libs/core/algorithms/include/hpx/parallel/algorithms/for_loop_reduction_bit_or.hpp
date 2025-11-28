@@ -65,7 +65,7 @@ namespace hpx::experimental {
     ///          views are combined by invoking the copy of combiner, passing it
     ///          the two views to be combined.
     ///
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::bit_or<T>>
     reduction_bit_or(T& var)
@@ -73,7 +73,7 @@ namespace hpx::experimental {
         return reduction(var, T(), std::bit_or<T>());
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::bit_or<T>>
     reduction_bit_or(T& var, T const& identity)

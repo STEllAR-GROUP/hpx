@@ -22,45 +22,45 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util::detail {
 
-    template <typename IterOrR, typename Enable = void>
+    HPX_CXX_EXPORT template <typename IterOrR, typename Enable = void>
     struct chunk_size_iterator_category;
 
-    template <typename IterOrR>
+    HPX_CXX_EXPORT template <typename IterOrR>
     struct chunk_size_iterator_category<IterOrR,
         std::enable_if_t<std::is_integral_v<IterOrR>>>
     {
         using type = std::random_access_iterator_tag;
     };
 
-    template <typename Iterator>
+    HPX_CXX_EXPORT template <typename Iterator>
     struct chunk_size_iterator_category<Iterator,
         std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
     {
         using type = hpx::traits::iter_category_t<Iterator>;
     };
 
-    template <typename Range>
+    HPX_CXX_EXPORT template <typename Range>
     struct chunk_size_iterator_category<Range,
         std::enable_if_t<hpx::traits::is_range_v<Range>>>
     {
         using type = hpx::traits::range_category_t<Range>;
     };
 
-    template <typename Range>
+    HPX_CXX_EXPORT template <typename Range>
     struct chunk_size_iterator_category<Range,
         std::enable_if_t<hpx::traits::is_range_generator_v<Range>>>
     {
         using type = std::random_access_iterator_tag;
     };
 
-    template <typename IterOrR>
+    HPX_CXX_EXPORT template <typename IterOrR>
     using chunk_size_iterator_category_t =
         typename chunk_size_iterator_category<IterOrR>::type;
 
-    template <typename IterOrR, typename Enable = void>
+    HPX_CXX_EXPORT template <typename IterOrR, typename Enable = void>
     struct iterator_type;
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct iterator_type<T,
         std::enable_if_t<std::is_integral_v<T> ||
             hpx::traits::is_range_generator_v<T>>>
@@ -68,25 +68,25 @@ namespace hpx::parallel::util::detail {
         using type = T;
     };
 
-    template <typename Iterator>
+    HPX_CXX_EXPORT template <typename Iterator>
     struct iterator_type<Iterator,
         std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
     {
         using type = Iterator;
     };
 
-    template <typename Range>
+    HPX_CXX_EXPORT template <typename Range>
     struct iterator_type<Range,
         std::enable_if_t<hpx::traits::is_range_v<Range>>>
     {
         using type = hpx::traits::range_iterator_t<Range>;
     };
 
-    template <typename IterOrR>
+    HPX_CXX_EXPORT template <typename IterOrR>
     using iterator_type_t = typename iterator_type<IterOrR>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename IterOrR>
+    HPX_CXX_EXPORT template <typename IterOrR>
     struct chunk_size_iterator
       : hpx::util::iterator_facade<chunk_size_iterator<IterOrR>,
             hpx::tuple<IterOrR, std::size_t> const,
@@ -317,7 +317,7 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename IterOrR>
+    HPX_CXX_EXPORT template <typename IterOrR>
     struct chunk_size_idx_iterator
       : hpx::util::iterator_facade<chunk_size_idx_iterator<IterOrR>,
             hpx::tuple<IterOrR, std::size_t, std::size_t> const,

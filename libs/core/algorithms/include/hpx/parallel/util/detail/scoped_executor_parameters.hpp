@@ -12,7 +12,7 @@
 namespace hpx::parallel::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Parameters, typename Executor>
+    HPX_CXX_EXPORT template <typename Parameters, typename Executor>
     struct scoped_executor_parameters
     {
     public:
@@ -41,7 +41,7 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Parameters, typename Executor>
+    HPX_CXX_EXPORT template <typename Parameters, typename Executor>
     struct scoped_executor_parameters_ref
     {
     public:

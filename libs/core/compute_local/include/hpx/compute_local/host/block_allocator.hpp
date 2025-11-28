@@ -14,6 +14,7 @@
 
 #include <hpx/compute_local/host/block_executor.hpp>
 #include <hpx/compute_local/host/target.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/executors.hpp>
@@ -21,9 +22,6 @@
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/parallel/container_algorithms/for_each.hpp>
-#include <hpx/parallel/util/adapt_sharing_mode.hpp>
-#include <hpx/parallel/util/cancellation_token.hpp>
-#include <hpx/parallel/util/partitioner_with_cleanup.hpp>
 
 #include <cstddef>
 #include <limits>

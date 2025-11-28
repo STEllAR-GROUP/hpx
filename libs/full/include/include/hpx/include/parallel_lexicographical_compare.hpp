@@ -6,4 +6,4 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/lexicographical_compare.hpp>
+#include <hpx/modules/algorithms.hpp>

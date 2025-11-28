@@ -227,8 +227,8 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-
-        template <typename ExPolicy, typename Iter, typename FwdIter2>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter,
+            typename FwdIter2>
         decltype(auto) parallel_uninitialized_copy_n(
             ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
         {
@@ -287,7 +287,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct uninitialized_copy
           : public algorithm<uninitialized_copy<IterPair>, IterPair>
         {
@@ -324,7 +324,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct uninitialized_copy_sent
           : public algorithm<uninitialized_copy_sent<IterPair>, IterPair>
         {
@@ -369,7 +369,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct uninitialized_copy_n
           : public algorithm<uninitialized_copy_n<IterPair>, IterPair>
         {
@@ -406,7 +406,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_copy
-    inline constexpr struct uninitialized_copy_t final
+    HPX_CXX_EXPORT inline constexpr struct uninitialized_copy_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_t>
     {
         template <typename InIter, typename FwdIter>
@@ -455,7 +455,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_copy_n
-    inline constexpr struct uninitialized_copy_n_t final
+    HPX_CXX_EXPORT inline constexpr struct uninitialized_copy_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_n_t>
     {
         template <typename InIter, typename Size, typename FwdIter>

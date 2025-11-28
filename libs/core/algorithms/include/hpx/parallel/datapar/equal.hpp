@@ -24,10 +24,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace detail {
+namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct datapar_equal
     {
         template <typename ZipIterator, typename Token, typename F>
@@ -57,11 +57,9 @@ namespace hpx { namespace parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename ZipIterator, typename Token,
-        typename F>
-    // clang-format off
-        requires (hpx::is_vectorpack_execution_policy_v<ExPolicy>)
-    // clang-format on
+    HPX_CXX_EXPORT template <typename ExPolicy, typename ZipIterator,
+        typename Token, typename F>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_equal_t<ExPolicy>, ZipIterator it, std::size_t part_count,
         Token& tok, F&& f)
@@ -82,7 +80,8 @@ namespace hpx { namespace parallel { namespace detail {
         }
     }
 
-    template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+        typename InIter2, typename F>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE bool tag_invoke(
         sequential_equal_t<ExPolicy>, InIter1 first1, InIter1 last1,
@@ -107,7 +106,7 @@ namespace hpx { namespace parallel { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct datapar_equal_binary
     {
         template <typename ZipIterator, typename Token, typename F,
@@ -142,8 +141,8 @@ namespace hpx { namespace parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename ZipIterator, typename Token,
-        typename F, typename Proj1, typename Proj2>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename ZipIterator,
+        typename Token, typename F, typename Proj1, typename Proj2>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_equal_binary_t<ExPolicy>, ZipIterator it,
@@ -167,9 +166,9 @@ namespace hpx { namespace parallel { namespace detail {
         }
     }
 
-    template <typename ExPolicy, typename InIter1, typename Sent1,
-        typename InIter2, typename Sent2, typename F, typename Proj1,
-        typename Proj2>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+        typename Sent1, typename InIter2, typename Sent2, typename F,
+        typename Proj1, typename Proj2>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE bool tag_invoke(
         sequential_equal_binary_t<ExPolicy>, InIter1 first1, Sent1 last1,
@@ -194,5 +193,6 @@ namespace hpx { namespace parallel { namespace detail {
                 HPX_FORWARD(Proj2, proj2));
         }
     }
-}}}    // namespace hpx::parallel::detail
+}    // namespace hpx::parallel::detail
+
 #endif

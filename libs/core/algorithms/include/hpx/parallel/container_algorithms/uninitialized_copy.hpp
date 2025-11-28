@@ -324,14 +324,15 @@ namespace hpx { namespace ranges {
 #include <utility>
 
 namespace hpx::ranges {
-    inline constexpr struct uninitialized_copy_t final
+
+    HPX_CXX_EXPORT inline constexpr struct uninitialized_copy_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_t>
     {
     private:
         template <typename InIter, typename Sent1, typename FwdIter,
             typename Sent2>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_sentinel_for_v<Sent1, InIter> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
@@ -355,7 +356,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter1, typename Sent1,
             typename FwdIter2, typename Sent2>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
@@ -382,7 +383,7 @@ namespace hpx::ranges {
 
         template <typename Rng1, typename Rng2>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2>
             )
@@ -412,7 +413,7 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename Rng1, typename Rng2>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2>
@@ -443,14 +444,14 @@ namespace hpx::ranges {
         }
     } uninitialized_copy{};
 
-    inline constexpr struct uninitialized_copy_n_t final
+    HPX_CXX_EXPORT inline constexpr struct uninitialized_copy_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_n_t>
     {
     private:
         template <typename InIter, typename Size, typename FwdIter,
             typename Sent2>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent2, FwdIter> &&
@@ -476,7 +477,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter1, typename Size,
             typename FwdIter2, typename Sent2>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter1> &&
                 hpx::traits::is_forward_iterator_v<FwdIter2> &&

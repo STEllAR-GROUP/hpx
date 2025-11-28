@@ -23,7 +23,7 @@
 namespace hpx::parallel::detail {
 
     // provide implementation of std::find supporting iterators/sentinels
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct sequential_find_t final
       : hpx::functional::detail::tag_fallback<sequential_find_t<ExPolicy>>
     {
@@ -57,20 +57,20 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr sequential_find_t<ExPolicy> sequential_find =
         sequential_find_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename Iterator, typename Sentinel,
-        typename T, typename Proj = hpx::identity>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Iterator,
+        typename Sentinel, typename T, typename Proj = hpx::identity>
     constexpr Iterator sequential_find(
         Iterator first, Sentinel last, T const& val, Proj proj = Proj())
     {
         return sequential_find_t<ExPolicy>{}(first, last, val, proj);
     }
 
-    template <typename ExPolicy, typename FwdIter, typename Token, typename T,
-        typename Proj>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+        typename Token, typename T, typename Proj>
     constexpr void sequential_find(std::size_t base_idx, FwdIter part_begin,
         std::size_t part_count, Token& tok, T const& val, Proj&& proj)
     {
@@ -80,7 +80,7 @@ namespace hpx::parallel::detail {
 #endif
 
     // provide implementation of std::find_if supporting iterators/sentinels
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct sequential_find_if_t final
       : hpx::functional::detail::tag_fallback<sequential_find_if_t<ExPolicy>>
     {
@@ -128,20 +128,20 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr sequential_find_if_t<ExPolicy> sequential_find_if =
         sequential_find_if_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename Iterator, typename Sentinel,
-        typename Pred, typename Proj = hpx::identity>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Iterator,
+        typename Sentinel, typename Pred, typename Proj = hpx::identity>
     inline constexpr Iterator sequential_find_if(
         Iterator first, Sentinel last, Pred pred, Proj proj = Proj())
     {
         return sequential_find_if_t<ExPolicy>{}(first, last, pred, proj);
     }
 
-    template <typename ExPolicy, typename FwdIter, typename Token, typename F,
-        typename Proj>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+        typename Token, typename F, typename Proj>
     inline constexpr void sequential_find_if(FwdIter part_begin,
         std::size_t part_count, Token& tok, F&& op, Proj&& proj)
     {
@@ -149,8 +149,8 @@ namespace hpx::parallel::detail {
             HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
-    template <typename ExPolicy, typename FwdIter, typename Token, typename F,
-        typename Proj>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+        typename Token, typename F, typename Proj>
     inline constexpr void sequential_find_if(std::size_t base_idx,
         FwdIter part_begin, std::size_t part_count, Token& tok, F&& f,
         Proj&& proj)
@@ -161,7 +161,7 @@ namespace hpx::parallel::detail {
 #endif
 
     // provide implementation of std::find_if_not supporting iterators/sentinels
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct sequential_find_if_not_t final
       : hpx::functional::detail::tag_fallback<
             sequential_find_if_not_t<ExPolicy>>
@@ -210,20 +210,20 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr sequential_find_if_not_t<ExPolicy> sequential_find_if_not =
         sequential_find_if_not_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename Iterator, typename Sentinel,
-        typename Pred, typename Proj = hpx::identity>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Iterator,
+        typename Sentinel, typename Pred, typename Proj = hpx::identity>
     inline constexpr Iterator sequential_find_if_not(
         Iterator first, Sentinel last, Pred pred, Proj proj = Proj())
     {
         return sequential_find_if_not_t<ExPolicy>{}(first, last, pred, proj);
     }
 
-    template <typename ExPolicy, typename FwdIter, typename Token, typename F,
-        typename Proj>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+        typename Token, typename F, typename Proj>
     inline constexpr void sequential_find_if_not(FwdIter part_begin,
         std::size_t part_count, Token& tok, F&& op, Proj&& proj)
     {
@@ -231,8 +231,8 @@ namespace hpx::parallel::detail {
             HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
-    template <typename ExPolicy, typename FwdIter, typename Token, typename F,
-        typename Proj>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+        typename Token, typename F, typename Proj>
     inline constexpr void sequential_find_if_not(std::size_t base_idx,
         FwdIter part_begin, std::size_t part_count, Token& tok, F&& f,
         Proj&& proj)
@@ -243,8 +243,8 @@ namespace hpx::parallel::detail {
 #endif
 
     // provide implementation of std::find_end supporting iterators/sentinels
-    template <typename Iter1, typename Sent1, typename Iter2, typename Sent2,
-        typename Pred, typename Proj1, typename Proj2>
+    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
+        typename Sent2, typename Pred, typename Proj1, typename Proj2>
     constexpr Iter1 sequential_search(Iter1 first1, Sent1 last1, Iter2 first2,
         Sent2 last2, Pred&& op, Proj1&& proj1, Proj2&& proj2)
     {
@@ -270,7 +270,7 @@ namespace hpx::parallel::detail {
         }
     }
 
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct sequential_find_end_t final
       : hpx::functional::detail::tag_fallback<sequential_find_end_t<ExPolicy>>
     {
@@ -348,12 +348,13 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr sequential_find_end_t<ExPolicy> sequential_find_end =
         sequential_find_end_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename Pred, typename Proj1, typename Proj2>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter1, typename Sent1,
+        typename Iter2, typename Sent2, typename Pred, typename Proj1,
+        typename Proj2>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter1 sequential_find_end(Iter1 first1,
         Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op, Proj1&& proj1,
         Proj2&& proj2)
@@ -363,8 +364,8 @@ namespace hpx::parallel::detail {
             HPX_FORWARD(Proj2, proj2));
     }
 
-    template <typename ExPolicy, typename Iter1, typename Iter2, typename Token,
-        typename Pred, typename Proj1, typename Proj2>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter1, typename Iter2,
+        typename Token, typename Pred, typename Proj1, typename Proj2>
     HPX_HOST_DEVICE HPX_FORCEINLINE void sequential_find_end(Iter1 it,
         Iter2 first2, std::size_t base_idx, std::size_t part_size,
         std::size_t diff, Token& tok, Pred&& op, Proj1&& proj1, Proj2&& proj2)
@@ -375,7 +376,7 @@ namespace hpx::parallel::detail {
     }
 #endif
 
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct sequential_find_first_of_t final
       : hpx::functional::detail::tag_fallback<
             sequential_find_first_of_t<ExPolicy>>
@@ -431,13 +432,14 @@ namespace hpx::parallel::detail {
                 });
         }
     };
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr sequential_find_first_of_t<ExPolicy>
         sequential_find_first_of = sequential_find_first_of_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename Pred, typename Proj1, typename Proj2>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+        typename InIter2, typename Pred, typename Proj1, typename Proj2>
     HPX_HOST_DEVICE HPX_FORCEINLINE InIter1 sequential_find_first_of(
         InIter1 first, InIter1 last, InIter2 s_first, InIter2 s_last, Pred&& op,
         Proj1&& proj1, Proj2&& proj2)
@@ -447,8 +449,9 @@ namespace hpx::parallel::detail {
             HPX_FORWARD(Proj2, proj2));
     }
 
-    template <typename ExPolicy, typename FwdIter, typename FwdIter2,
-        typename Token, typename Pred, typename Proj1, typename Proj2>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+        typename FwdIter2, typename Token, typename Pred, typename Proj1,
+        typename Proj2>
     HPX_HOST_DEVICE HPX_FORCEINLINE void sequential_find_first_of(FwdIter it,
         FwdIter2 s_first, FwdIter2 s_last, std::size_t base_idx,
         std::size_t part_size, Token& tok, Pred&& op, Proj1&& proj1,

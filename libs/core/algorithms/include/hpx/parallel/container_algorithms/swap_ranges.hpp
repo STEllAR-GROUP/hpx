@@ -226,19 +226,19 @@ namespace hpx { namespace ranges {
 namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter1, typename Iter2>
+    HPX_CXX_EXPORT template <typename Iter1, typename Iter2>
     using swap_ranges_result = hpx::parallel::util::in_in_result<Iter1, Iter2>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::swap_ranges
-    inline constexpr struct swap_ranges_t final
+    HPX_CXX_EXPORT inline constexpr struct swap_ranges_t final
       : hpx::detail::tag_parallel_algorithm<swap_ranges_t>
     {
     private:
         template <typename InIter1, typename Sent1, typename InIter2,
             typename Sent2>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<InIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, InIter1> &&
                 hpx::traits::is_iterator_v<InIter2> &&
@@ -262,7 +262,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter1, typename Sent1,
             typename FwdIter2, typename Sent2>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
@@ -288,7 +288,7 @@ namespace hpx::ranges {
 
         template <typename Rng1, typename Rng2>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2>
             )
@@ -314,7 +314,7 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename Rng1, typename Rng2>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2>

@@ -383,7 +383,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct reduce_deterministic
           : public algorithm<reduce_deterministic<T>, T>
         {
@@ -430,7 +430,7 @@ namespace hpx::parallel {
                     -> hpx::parallel::detail::rfa::
                         reproducible_floating_accumulator<T_> {
                             T_ val = *part_begin;
-                            // Assumed that hpx_rfa_bin_host_buffer is initiallized
+                            // Assumed that hpx_rfa_bin_host_buffer is initialized
                             return hpx::parallel::detail::
                                 sequential_reduce_deterministic_rfa<ExPolicy>(
                                     HPX_FORWARD(ExPolicy, policy), ++part_begin,
@@ -444,7 +444,7 @@ namespace hpx::parallel {
                     call(HPX_FORWARD(ExPolicy, policy), first,
                         detail::distance(first, last), HPX_MOVE(f1),
                         hpx::unwrapping([policy, init](auto&& results) -> T_ {
-                            // Assumed that hpx_rfa_bin_host_buffer is initiallized
+                            // Assumed that hpx_rfa_bin_host_buffer is initialized
                             hpx::parallel::detail::rfa::
                                 reproducible_floating_accumulator<T_>
                                     rfa;
@@ -468,7 +468,7 @@ namespace hpx::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::reduce
-    inline constexpr struct reduce_deterministic_t final
+    HPX_CXX_EXPORT inline constexpr struct reduce_deterministic_t final
       : hpx::detail::tag_parallel_algorithm<reduce_deterministic_t>
     {
     private:

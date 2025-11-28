@@ -30,7 +30,7 @@ namespace hpx::parallel::util {
     // \param [in] pos2 : position of the element pointed by it2
     // \param [in] comp : comparison object
     // \return result of the comparison
-    template <typename Iter, typename Sent, typename Compare>
+    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Compare>
     bool less_range(Iter it1, std::uint32_t pos1, Sent it2, std::uint32_t pos2,
         Compare comp)
     {
@@ -53,8 +53,8 @@ namespace hpx::parallel::util {
     // \param [in] nrange_input : number of ranges in R
     // \param [in] comp : comparison object
     // \return range with all the elements move with the size adjusted
-    template <typename Iter1, typename Sent1, typename Iter2, typename Sent2,
-        typename Compare>
+    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
+        typename Sent2, typename Compare>
     util::range<Iter1, Sent1> full_merge4(util::range<Iter1, Sent1>& rdest,
         util::range<Iter2, Sent2> vrange_input[4], std::uint32_t nrange_input,
         Compare comp)
@@ -197,7 +197,8 @@ namespace hpx::parallel::util {
     // \param [in] nrange_input : number of ranges in vrange_input
     // \param [in] comp : comparison object
     // \return range with all the elements move with the size adjusted
-    template <typename Value, typename Iter, typename Sent, typename Compare>
+    HPX_CXX_EXPORT template <typename Value, typename Iter, typename Sent,
+        typename Compare>
     util::range<Value*> uninit_full_merge4(util::range<Value*> const& dest,
         util::range<Iter, Sent> vrange_input[4], std::uint32_t nrange_input,
         Compare comp)

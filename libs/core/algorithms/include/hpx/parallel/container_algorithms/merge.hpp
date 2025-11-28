@@ -680,12 +680,12 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    template <typename I1, typename I2, typename O>
+    HPX_CXX_EXPORT template <typename I1, typename I2, typename O>
     using merge_result = parallel::util::in_in_out_result<I1, I2, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::merge
-    inline constexpr struct merge_t final
+    HPX_CXX_EXPORT inline constexpr struct merge_t final
       : hpx::detail::tag_parallel_algorithm<merge_t>
     {
     private:
@@ -693,7 +693,7 @@ namespace hpx::ranges {
             typename Iter3, typename Comp = hpx::ranges::less,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
@@ -740,7 +740,7 @@ namespace hpx::ranges {
             typename Comp = hpx::ranges::less, typename Proj1 = hpx::identity,
             typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::parallel::traits::is_projected_v<Proj1, Iter1> &&
@@ -777,7 +777,7 @@ namespace hpx::ranges {
             typename Comp = hpx::ranges::less, typename Proj1 = hpx::identity,
             typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&
@@ -821,7 +821,7 @@ namespace hpx::ranges {
             typename Sent2, typename Iter3, typename Comp = hpx::ranges::less,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::parallel::traits::is_projected_v<Proj1, Iter1> &&
                 hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
@@ -856,14 +856,14 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::inplace_merge
-    inline constexpr struct inplace_merge_t final
+    HPX_CXX_EXPORT inline constexpr struct inplace_merge_t final
       : hpx::detail::tag_parallel_algorithm<inplace_merge_t>
     {
     private:
         template <typename ExPolicy, typename Rng, typename Iter,
             typename Comp = hpx::ranges::less, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -895,7 +895,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Comp = hpx::ranges::less, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
@@ -920,7 +920,7 @@ namespace hpx::ranges {
         template <typename Rng, typename Iter,
             typename Comp = hpx::ranges::less, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::traits::is_iterator_v<Iter> &&
@@ -951,7 +951,7 @@ namespace hpx::ranges {
         template <typename Iter, typename Sent,
             typename Comp = hpx::ranges::less, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<

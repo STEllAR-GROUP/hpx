@@ -7,5 +7,5 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/partition.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/parallel/container_algorithms/partition.hpp>

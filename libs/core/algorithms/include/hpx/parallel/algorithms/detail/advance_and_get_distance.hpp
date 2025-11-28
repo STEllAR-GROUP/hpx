@@ -17,7 +17,7 @@ namespace hpx::parallel::detail {
 
     // helper facility to both advance the iterator to the sentinel and return the
     // distance
-    template <typename Iter, typename Sent>
+    HPX_CXX_EXPORT template <typename Iter, typename Sent>
     constexpr typename std::iterator_traits<Iter>::difference_type
     advance_and_get_distance(Iter& first, Sent last)
     {

@@ -698,22 +698,22 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     using unary_transform_result = parallel::util::in_out_result<I, O>;
 
-    template <typename I1, typename I2, typename O>
+    HPX_CXX_EXPORT template <typename I1, typename I2, typename O>
     using binary_transform_result = parallel::util::in_in_out_result<I1, I2, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // a for hpx::ranges::transform
-    inline constexpr struct transform_t final
+    HPX_CXX_EXPORT inline constexpr struct transform_t final
       : hpx::detail::tag_parallel_algorithm<transform_t>
     {
     private:
         template <typename ExPolicy, typename FwdIter1, typename Sent1,
             typename FwdIter2, typename F, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
@@ -736,7 +736,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename FwdIter, typename F,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter>
@@ -761,7 +761,7 @@ namespace hpx::ranges {
             typename FwdIter2, typename Sent2, typename FwdIter3, typename F,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
@@ -789,7 +789,7 @@ namespace hpx::ranges {
             typename FwdIter, typename F, typename Proj1 = hpx::identity,
             typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&
@@ -820,7 +820,7 @@ namespace hpx::ranges {
         template <typename FwdIter1, typename Sent1, typename FwdIter2,
             typename F, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
@@ -842,7 +842,7 @@ namespace hpx::ranges {
         template <typename Rng, typename FwdIter, typename F,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter>
             )
@@ -868,7 +868,7 @@ namespace hpx::ranges {
             typename Sent2, typename FwdIter3, typename F,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -894,9 +894,11 @@ namespace hpx::ranges {
         template <typename Rng1, typename Rng2, typename FwdIter, typename F,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires(hpx::traits::is_range_v<Rng1> &&
+            requires(
+                hpx::traits::is_range_v<Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&
-                hpx::traits::is_iterator_v<FwdIter>)
+                hpx::traits::is_iterator_v<FwdIter>
+            )
         // clang-format on
         friend ranges::binary_transform_result<
             hpx::traits::range_iterator_t<Rng1>,

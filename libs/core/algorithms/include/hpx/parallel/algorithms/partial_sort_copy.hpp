@@ -173,7 +173,7 @@ namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // partial_sort_copy
-    template <typename Iter>
+    HPX_CXX_EXPORT template <typename Iter>
     struct partial_sort_copy : public algorithm<partial_sort_copy<Iter>, Iter>
     {
         constexpr partial_sort_copy() noexcept
@@ -351,7 +351,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::partial_sort_copy
-    inline constexpr struct partial_sort_copy_t final
+    HPX_CXX_EXPORT inline constexpr struct partial_sort_copy_t final
       : hpx::detail::tag_parallel_algorithm<partial_sort_copy_t>
     {
     private:

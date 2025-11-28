@@ -53,7 +53,7 @@ Parallel Executor
 .. code-block:: c++
 
     #include <hpx/execution.hpp>
-    #include <hpx/parallel/algorithms/for_each.hpp>
+    #include <hpx/algorithm.hpp>
     #include <vector>
 
     std::vector<int> data(100, 1);
@@ -77,7 +77,7 @@ Fork-Join Executor
 .. code-block:: c++
 
     #include <hpx/execution.hpp>
-    #include <hpx/parallel/algorithms/for_each.hpp>
+    #include <hpx/algorithm.hpp>
     #include <vector>
 
     std::vector<int> data(100, 1);
@@ -103,7 +103,7 @@ Sequential Executor
 .. code-block:: c++
 
     #include <hpx/execution.hpp>
-    #include <hpx/parallel/algorithms/for_each.hpp>
+    #include <hpx/algorithm.hpp>
     #include <vector>
 
     std::vector<int> data(100, 1);

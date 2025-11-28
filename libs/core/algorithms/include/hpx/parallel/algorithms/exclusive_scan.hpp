@@ -320,8 +320,8 @@ namespace hpx::parallel {
 
         ///////////////////////////////////////////////////////////////////////
         // Our own version of the sequential exclusive_scan.
-        template <typename InIter, typename Sent, typename OutIter, typename T,
-            typename Op>
+        HPX_CXX_EXPORT template <typename InIter, typename Sent,
+            typename OutIter, typename T, typename Op>
         static constexpr util::in_out_result<InIter, OutIter>
         sequential_exclusive_scan(
             InIter first, Sent last, OutIter dest, T init, Op&& op)
@@ -336,7 +336,8 @@ namespace hpx::parallel {
             return util::in_out_result<InIter, OutIter>{first, dest};
         }
 
-        template <typename InIter, typename OutIter, typename T, typename Op>
+        HPX_CXX_EXPORT template <typename InIter, typename OutIter, typename T,
+            typename Op>
         static constexpr T sequential_exclusive_scan_n(
             InIter first, std::size_t count, OutIter dest, T init, Op&& op)
         {
@@ -351,7 +352,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct exclusive_scan
           : public algorithm<exclusive_scan<IterPair>, IterPair>
         {
@@ -457,7 +458,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::exclusive_scan
-    inline constexpr struct exclusive_scan_t final
+    HPX_CXX_EXPORT inline constexpr struct exclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<exclusive_scan_t>
     {
         template <typename InIter, typename OutIter,

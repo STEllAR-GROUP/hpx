@@ -224,10 +224,10 @@ namespace hpx { namespace collectives {
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/parallel/algorithms/reduce.hpp>
 
 #include <cstddef>
 #include <type_traits>

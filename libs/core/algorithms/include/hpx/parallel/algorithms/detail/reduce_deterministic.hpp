@@ -22,7 +22,7 @@
 
 namespace hpx::parallel::detail {
 
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct sequential_reduce_deterministic_t final
       : hpx::functional::detail::tag_fallback<
             sequential_reduce_deterministic_t<ExPolicy>>
@@ -67,7 +67,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct sequential_reduce_deterministic_rfa_t final
       : hpx::functional::detail::tag_fallback<
             sequential_reduce_deterministic_rfa_t<ExPolicy>>
@@ -132,12 +132,12 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr sequential_reduce_deterministic_t<ExPolicy>
         sequential_reduce_deterministic =
             sequential_reduce_deterministic_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename... Args>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename... Args>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_reduce_deterministic(
         Args&&... args)
     {
@@ -147,12 +147,12 @@ namespace hpx::parallel::detail {
 #endif
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr sequential_reduce_deterministic_rfa_t<ExPolicy>
         sequential_reduce_deterministic_rfa =
             sequential_reduce_deterministic_rfa_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename... Args>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename... Args>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_reduce_deterministic_rfa(
         Args&&... args)
     {

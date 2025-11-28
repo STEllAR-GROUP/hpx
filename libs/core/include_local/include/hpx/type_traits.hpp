@@ -11,5 +11,6 @@
 #include <hpx/modules/tag_invoke.hpp>
 
 namespace hpx {
-    using hpx::util::invoke_result;
+
+    HPX_CXX_EXPORT using hpx::util::invoke_result;
 }    // namespace hpx

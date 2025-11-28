@@ -23,7 +23,7 @@
 namespace hpx::parallel::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename I1, typename I2>
+    HPX_CXX_EXPORT template <typename I1, typename I2>
     struct in_in_result
     {
         HPX_NO_UNIQUE_ADDRESS I1 in1;
@@ -55,25 +55,21 @@ namespace hpx::parallel::util {
         }
     };
 
-    template <typename I1, typename I2>
+    HPX_CXX_EXPORT template <typename I1, typename I2>
     I2 get_in2_element(util::in_in_result<I1, I2>&& p)
     {
         return p.in2;
     }
 
-    template <typename I1, typename I2>
+    HPX_CXX_EXPORT template <typename I1, typename I2>
     hpx::future<I2> get_in2_element(hpx::future<util::in_in_result<I1, I2>>&& f)
     {
         return hpx::make_future<I2>(
             HPX_MOVE(f), [](util::in_in_result<I1, I2>&& p) { return p.in2; });
     }
 
-    template <typename InInResultSender>
-    // clang-format off
-        requires (
-            hpx::execution::experimental::is_sender_v<InInResultSender>
-        )
-    // clang-format on
+    HPX_CXX_EXPORT template <typename InInResultSender>
+        requires(hpx::execution::experimental::is_sender_v<InInResultSender>)
     decltype(auto) get_in2_element(InInResultSender&& result_sender)
     {
         return hpx::execution::experimental::then(
@@ -84,7 +80,7 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     struct in_out_result
     {
         HPX_NO_UNIQUE_ADDRESS I in;
@@ -117,13 +113,13 @@ namespace hpx::parallel::util {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     std::pair<I, O> get_pair(util::in_out_result<I, O>&& p)
     {
         return std::pair<I, O>{p.in, p.out};
     }
 
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     hpx::future<std::pair<I, O>> get_pair(
         hpx::future<util::in_out_result<I, O>>&& f)
     {
@@ -133,7 +129,7 @@ namespace hpx::parallel::util {
             });
     }
 
-    template <typename Sender>
+    HPX_CXX_EXPORT template <typename Sender>
         requires(hpx::execution::experimental::is_sender_v<Sender>)
     decltype(auto) get_pair(Sender&& sender)
     {
@@ -145,13 +141,13 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     O get_second_element(util::in_out_result<I, O>&& p)
     {
         return p.out;
     }
 
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     hpx::future<O> get_second_element(
         hpx::future<util::in_out_result<I, O>>&& f)
     {
@@ -161,25 +157,19 @@ namespace hpx::parallel::util {
 
     namespace functional {
 
-        struct get_second_element
+        HPX_CXX_EXPORT struct get_second_element
         {
-            // clang-format off
             template <typename T>
             decltype(auto) operator()(T&& val) const
             {
                 return hpx::parallel::util::get_second_element(
                     HPX_FORWARD(T, val));
             }
-            // clang-format on
         };
     }    // namespace functional
 
-    template <typename Sender>
-    // clang-format off
-        requires (
-            hpx::execution::experimental::is_sender_v<Sender>
-        )
-    // clang-format on
+    HPX_CXX_EXPORT template <typename Sender>
+        requires(hpx::execution::experimental::is_sender_v<Sender>)
     decltype(auto) get_second_element(Sender&& sender)
     {
         return hpx::execution::experimental::then(
@@ -187,13 +177,13 @@ namespace hpx::parallel::util {
     }
 
     // converts a in_out_result into a iterator_range
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     hpx::util::iterator_range<I, O> get_subrange(in_out_result<I, O> const& ior)
     {
         return hpx::util::iterator_range<I, O>(ior.in, ior.out);
     }
 
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     hpx::future<hpx::util::iterator_range<I, O>> get_subrange(
         hpx::future<in_out_result<I, O>>&& ior)
     {
@@ -204,7 +194,7 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct min_max_result
     {
         HPX_NO_UNIQUE_ADDRESS T min;
@@ -235,7 +225,7 @@ namespace hpx::parallel::util {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename I1, typename I2, typename O>
+    HPX_CXX_EXPORT template <typename I1, typename I2, typename O>
     struct in_in_out_result
     {
         HPX_NO_UNIQUE_ADDRESS I1 in1;
@@ -270,13 +260,13 @@ namespace hpx::parallel::util {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename I1, typename I2, typename O>
+    HPX_CXX_EXPORT template <typename I1, typename I2, typename O>
     O get_third_element(util::in_in_out_result<I1, I2, O>&& p)
     {
         return p.out;
     }
 
-    template <typename I1, typename I2, typename O>
+    HPX_CXX_EXPORT template <typename I1, typename I2, typename O>
     hpx::future<O> get_third_element(
         hpx::future<util::in_in_out_result<I1, I2, O>>&& f)
     {
@@ -284,12 +274,8 @@ namespace hpx::parallel::util {
             HPX_MOVE(f), [](in_in_out_result<I1, I2, O>&& p) { return p.out; });
     }
 
-    template <typename InInOutResultSender>
-    // clang-format off
-        requires (
-            hpx::execution::experimental::is_sender_v<InInOutResultSender>
-        )
-    // clang-format on
+    HPX_CXX_EXPORT template <typename InInOutResultSender>
+        requires(hpx::execution::experimental::is_sender_v<InInOutResultSender>)
     decltype(auto) get_third_element(InInOutResultSender&& result_sender)
     {
         return hpx::execution::experimental::then(
@@ -300,7 +286,7 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename I, typename O1, typename O2>
+    HPX_CXX_EXPORT template <typename I, typename O1, typename O2>
     struct in_out_out_result
     {
         HPX_NO_UNIQUE_ADDRESS I in;
@@ -335,7 +321,7 @@ namespace hpx::parallel::util {
         }
     };
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     constexpr HPX_FORCEINLINE in_out_out_result<Ts...> make_in_out_out_result(
         hpx::tuple<Ts...>&& t)
     {
@@ -347,7 +333,7 @@ namespace hpx::parallel::util {
         return result_type{hpx::get<0>(t), hpx::get<1>(t), hpx::get<2>(t)};
     }
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     hpx::future<in_out_out_result<Ts...>> make_in_out_out_result(
         hpx::future<hpx::tuple<Ts...>>&& f)
     {
@@ -363,7 +349,7 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename I, typename F>
+    HPX_CXX_EXPORT template <typename I, typename F>
     struct in_fun_result
     {
         HPX_NO_UNIQUE_ADDRESS I in;
@@ -395,14 +381,14 @@ namespace hpx::parallel::util {
         }
     };
 
-    template <typename Iterator, typename Sentinel = Iterator>
+    HPX_CXX_EXPORT template <typename Iterator, typename Sentinel = Iterator>
     hpx::util::iterator_range<Iterator, Sentinel> make_subrange(
         Iterator iterator, Sentinel sentinel)
     {
         return hpx::util::iterator_range(iterator, sentinel);
     }
 
-    template <typename Iterator, typename Sentinel = Iterator>
+    HPX_CXX_EXPORT template <typename Iterator, typename Sentinel = Iterator>
     hpx::future<hpx::util::iterator_range<Iterator, Sentinel>> make_subrange(
         hpx::future<Iterator>&& iterator, Sentinel sentinel)
     {
@@ -415,7 +401,7 @@ namespace hpx::parallel::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename ZipIter>
+        HPX_CXX_EXPORT template <typename ZipIter>
         in_out_result<
             typename hpx::tuple_element<0,
                 typename std::decay_t<ZipIter>::iterator_tuple_type>::type,
@@ -434,7 +420,7 @@ namespace hpx::parallel::util {
             return result_type{hpx::get<0>(t), hpx::get<1>(t)};
         }
 
-        template <typename ZipIterSender>
+        HPX_CXX_EXPORT template <typename ZipIterSender>
             requires(hpx::execution::experimental::is_sender_v<ZipIterSender>)
         decltype(auto) get_in_out_result(ZipIterSender&& zipiter_sender)
         {
@@ -445,7 +431,7 @@ namespace hpx::parallel::util {
                 });
         }
 
-        template <typename ZipIter>
+        HPX_CXX_EXPORT template <typename ZipIter>
         hpx::future<
             in_out_result<typename hpx::tuple_element<0,
                               typename ZipIter::iterator_tuple_type>::type,
@@ -465,7 +451,7 @@ namespace hpx::parallel::util {
                 });
         }
 
-        template <typename ZipIter>
+        HPX_CXX_EXPORT template <typename ZipIter>
         min_max_result<typename hpx::tuple_element<0,
             typename ZipIter::iterator_tuple_type>::type>
         get_min_max_result(ZipIter&& zipiter)
@@ -479,7 +465,7 @@ namespace hpx::parallel::util {
             return result_type{hpx::get<0>(t), hpx::get<1>(t)};
         }
 
-        template <typename ZipIter>
+        HPX_CXX_EXPORT template <typename ZipIter>
         hpx::future<min_max_result<typename hpx::tuple_element<0,
             typename ZipIter::iterator_tuple_type>::type>>
         get_min_max_result(hpx::future<ZipIter>&& zipiter)
@@ -495,7 +481,7 @@ namespace hpx::parallel::util {
                 });
         }
 
-        template <typename ZipIter>
+        HPX_CXX_EXPORT template <typename ZipIter>
         in_in_out_result<
             typename hpx::tuple_element<0,
                 typename std::decay_t<ZipIter>::iterator_tuple_type>::type,
@@ -517,7 +503,7 @@ namespace hpx::parallel::util {
             return result_type{hpx::get<0>(t), hpx::get<1>(t), hpx::get<2>(t)};
         }
 
-        template <typename ZipIterSender>
+        HPX_CXX_EXPORT template <typename ZipIterSender>
             requires(hpx::execution::experimental::is_sender_v<ZipIterSender>)
         decltype(auto) get_in_in_out_result(ZipIterSender&& zipiter_sender)
         {
@@ -528,7 +514,7 @@ namespace hpx::parallel::util {
                 });
         }
 
-        template <typename ZipIter>
+        HPX_CXX_EXPORT template <typename ZipIter>
         hpx::future<
             in_in_out_result<typename hpx::tuple_element<0,
                                  typename ZipIter::iterator_tuple_type>::type,
@@ -555,11 +541,11 @@ namespace hpx::parallel::util {
 
 namespace hpx::ranges {
 
-    using hpx::parallel::util::in_fun_result;
-    using hpx::parallel::util::in_in_out_result;
-    using hpx::parallel::util::in_in_result;
-    using hpx::parallel::util::in_out_out_result;
-    using hpx::parallel::util::in_out_result;
-    using hpx::parallel::util::min_max_result;
+    HPX_CXX_EXPORT using hpx::parallel::util::in_fun_result;
+    HPX_CXX_EXPORT using hpx::parallel::util::in_in_out_result;
+    HPX_CXX_EXPORT using hpx::parallel::util::in_in_result;
+    HPX_CXX_EXPORT using hpx::parallel::util::in_out_out_result;
+    HPX_CXX_EXPORT using hpx::parallel::util::in_out_result;
+    HPX_CXX_EXPORT using hpx::parallel::util::min_max_result;
 }    // namespace hpx::ranges
 // namespace hpx::ranges

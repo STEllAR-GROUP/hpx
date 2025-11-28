@@ -228,7 +228,7 @@ namespace hpx::parallel {
         // Perform bottom up heap construction given a range of elements.
         // sift_down_range will take a range from [start,start-count) and
         // apply sift_down to each element in the range
-        template <typename RndIter, typename Comp, typename Proj>
+        HPX_CXX_EXPORT template <typename RndIter, typename Comp, typename Proj>
         constexpr void sift_down(RndIter first, Comp&& comp, Proj&& proj,
             typename std::iterator_traits<RndIter>::difference_type len,
             RndIter start)
@@ -282,7 +282,7 @@ namespace hpx::parallel {
             *start = top;
         }
 
-        template <typename RndIter, typename Comp, typename Proj>
+        HPX_CXX_EXPORT template <typename RndIter, typename Comp, typename Proj>
         constexpr void sift_down_range(RndIter first, Comp&& comp, Proj&& proj,
             typename std::iterator_traits<RndIter>::difference_type len,
             RndIter start, std::size_t count)
@@ -293,7 +293,8 @@ namespace hpx::parallel {
             }
         }
 
-        template <typename Iter, typename Sent, typename Comp, typename Proj>
+        HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Comp,
+            typename Proj>
         constexpr Iter sequential_make_heap(
             Iter first, Sent last, Comp&& comp, Proj&& proj)
         {
@@ -313,7 +314,7 @@ namespace hpx::parallel {
         }
 
         //////////////////////////////////////////////////////////////////////
-        template <typename Iter>
+        HPX_CXX_EXPORT template <typename Iter>
         struct make_heap : public algorithm<make_heap<Iter>, Iter>
         {
             constexpr make_heap() noexcept
@@ -549,7 +550,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::make_heap
-    inline constexpr struct make_heap_t final
+    HPX_CXX_EXPORT inline constexpr struct make_heap_t final
       : hpx::detail::tag_parallel_algorithm<make_heap_t>
     {
     private:

@@ -407,14 +407,14 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::make_heap
-    inline constexpr struct make_heap_t final
+    HPX_CXX_EXPORT inline constexpr struct make_heap_t final
       : hpx::detail::tag_parallel_algorithm<make_heap_t>
     {
     private:
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Comp, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
@@ -438,7 +438,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename Comp,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
@@ -466,7 +466,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy,
@@ -494,7 +494,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy,
@@ -528,7 +528,7 @@ namespace hpx::ranges {
         template <typename Iter, typename Sent, typename Comp,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Comp,
@@ -550,7 +550,7 @@ namespace hpx::ranges {
 
         template <typename Rng, typename Comp, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Comp,
@@ -575,7 +575,7 @@ namespace hpx::ranges {
 
         template <typename Iter, typename Sent, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy,

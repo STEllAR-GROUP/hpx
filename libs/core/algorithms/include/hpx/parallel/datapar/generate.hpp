@@ -22,9 +22,9 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace detail {
+namespace hpx::parallel::detail {
 
-    template <typename Iterator>
+    HPX_CXX_EXPORT template <typename Iterator>
     struct datapar_generate_helper
     {
         using iterator_type = std::decay_t<Iterator>;
@@ -81,7 +81,7 @@ namespace hpx { namespace parallel { namespace detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct datapar_generate
+    HPX_CXX_EXPORT struct datapar_generate
     {
         template <typename ExPolicy, typename Iter, typename Sent, typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
@@ -93,7 +93,8 @@ namespace hpx { namespace parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename Iter, typename Sent, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename Sent,
+        typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<hpx::is_vectorpack_execution_policy_v<ExPolicy>,
             Iter>::type
@@ -105,7 +106,7 @@ namespace hpx { namespace parallel { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct datapar_generate_n
+    HPX_CXX_EXPORT struct datapar_generate_n
     {
         template <typename ExPolicy, typename Iter, typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
@@ -116,7 +117,7 @@ namespace hpx { namespace parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename Iter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<hpx::is_vectorpack_execution_policy_v<ExPolicy>,
             Iter>::type
@@ -126,5 +127,6 @@ namespace hpx { namespace parallel { namespace detail {
         return datapar_generate_n::call(
             HPX_FORWARD(ExPolicy, policy), first, count, HPX_FORWARD(F, f));
     }
-}}}    // namespace hpx::parallel::detail
+}    // namespace hpx::parallel::detail
+
 #endif

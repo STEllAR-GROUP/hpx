@@ -510,7 +510,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    inline constexpr struct is_sorted_t
+    HPX_CXX_EXPORT inline constexpr struct is_sorted_t
       : hpx::detail::tag_parallel_algorithm<is_sorted_t>
     {
     private:
@@ -518,7 +518,7 @@ namespace hpx::ranges {
             typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
@@ -541,7 +541,7 @@ namespace hpx::ranges {
             typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -565,7 +565,7 @@ namespace hpx::ranges {
         template <typename Rng, typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -589,7 +589,7 @@ namespace hpx::ranges {
             typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -612,7 +612,7 @@ namespace hpx::ranges {
         }
     } is_sorted{};
 
-    inline constexpr struct is_sorted_until_t final
+    HPX_CXX_EXPORT inline constexpr struct is_sorted_until_t final
       : hpx::detail::tag_parallel_algorithm<is_sorted_until_t>
     {
     private:
@@ -620,7 +620,7 @@ namespace hpx::ranges {
             typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
@@ -643,7 +643,7 @@ namespace hpx::ranges {
             typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
@@ -668,7 +668,7 @@ namespace hpx::ranges {
         template <typename Rng, typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -693,13 +693,16 @@ namespace hpx::ranges {
             typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires(hpx::is_execution_policy_v<ExPolicy> &&
+            requires(
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
-                    hpx::parallel::traits::projected_range<Proj, Rng>>)
+                    hpx::parallel::traits::projected_range<Proj, Rng>
+                >
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             hpx::traits::range_iterator_t<Rng>>

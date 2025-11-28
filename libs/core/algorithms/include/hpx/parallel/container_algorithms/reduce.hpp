@@ -692,14 +692,14 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::reduce
-    inline constexpr struct reduce_t final
+    HPX_CXX_EXPORT inline constexpr struct reduce_t final
       : hpx::detail::tag_parallel_algorithm<reduce_t>
     {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename F,
             typename T = typename std::iterator_traits<FwdIter>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
             )
@@ -721,7 +721,7 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng>
             )
@@ -744,7 +744,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename T = typename std::iterator_traits<FwdIter>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
             )
@@ -766,7 +766,7 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng>
             )
@@ -788,7 +788,7 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename FwdIter, typename Sent>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
             )
@@ -811,7 +811,7 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename Rng>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng>
             )
@@ -838,11 +838,7 @@ namespace hpx::ranges {
 
         template <typename FwdIter, typename Sent, typename F,
             typename T = typename std::iterator_traits<FwdIter>::value_type>
-        // clang-format off
-            requires (
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
-            )
-        // clang-format on
+            requires(hpx::traits::is_sentinel_for_v<Sent, FwdIter>)
         friend T tag_fallback_invoke(
             hpx::ranges::reduce_t, FwdIter first, Sent last, T init, F f)
         {
@@ -856,11 +852,7 @@ namespace hpx::ranges {
         template <typename Rng, typename F,
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type>
-        // clang-format off
-            requires (
-                hpx::traits::is_range_v<Rng>
-            )
-        // clang-format on
+            requires(hpx::traits::is_range_v<Rng>)
         friend T tag_fallback_invoke(
             hpx::ranges::reduce_t, Rng&& rng, T init, F f)
         {
@@ -875,11 +867,7 @@ namespace hpx::ranges {
 
         template <typename FwdIter, typename Sent,
             typename T = typename std::iterator_traits<FwdIter>::value_type>
-        // clang-format off
-            requires (
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
-            )
-        // clang-format on
+            requires(hpx::traits::is_sentinel_for_v<Sent, FwdIter>)
         friend T tag_fallback_invoke(
             hpx::ranges::reduce_t, FwdIter first, Sent last, T init)
         {
@@ -893,11 +881,7 @@ namespace hpx::ranges {
         template <typename Rng,
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type>
-        // clang-format off
-            requires (
-                hpx::traits::is_range_v<Rng>
-            )
-        // clang-format on
+            requires(hpx::traits::is_range_v<Rng>)
         friend T tag_fallback_invoke(hpx::ranges::reduce_t, Rng&& rng, T init)
         {
             static_assert(hpx::traits::is_input_iterator<typename hpx::traits::
@@ -910,11 +894,7 @@ namespace hpx::ranges {
         }
 
         template <typename FwdIter, typename Sent>
-        // clang-format off
-            requires (
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
-            )
-        // clang-format on
+            requires(hpx::traits::is_sentinel_for_v<Sent, FwdIter>)
         friend typename std::iterator_traits<FwdIter>::value_type
         tag_fallback_invoke(hpx::ranges::reduce_t, FwdIter first, Sent last)
         {
@@ -930,11 +910,7 @@ namespace hpx::ranges {
         }
 
         template <typename Rng>
-        // clang-format off
-            requires (
-                hpx::traits::is_range_v<Rng>
-            )
-        // clang-format on
+            requires(hpx::traits::is_range_v<Rng>)
         friend typename std::iterator_traits<
             typename hpx::traits::range_traits<Rng>::iterator_type>::value_type
         tag_fallback_invoke(hpx::ranges::reduce_t, Rng&& rng)

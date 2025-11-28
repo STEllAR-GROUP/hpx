@@ -436,12 +436,12 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    template <typename I1, typename I2, typename O>
+    HPX_CXX_EXPORT template <typename I1, typename I2, typename O>
     using set_union_result = parallel::util::in_in_out_result<I1, I2, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::set_union
-    inline constexpr struct set_union_t final
+    HPX_CXX_EXPORT inline constexpr struct set_union_t final
       : hpx::detail::tag_parallel_algorithm<set_union_t>
     {
     private:
@@ -450,7 +450,7 @@ namespace hpx::ranges {
             typename Pred = hpx::parallel::detail::less,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::parallel::traits::is_projected_v<Proj1, Iter1> &&
@@ -495,7 +495,7 @@ namespace hpx::ranges {
             typename Iter3, typename Pred = hpx::parallel::detail::less,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
@@ -548,7 +548,7 @@ namespace hpx::ranges {
             typename Pred = hpx::parallel::detail::less,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
                 hpx::parallel::traits::is_projected_v<Proj1, Iter1> &&
                 hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
@@ -584,7 +584,7 @@ namespace hpx::ranges {
             typename Pred = hpx::parallel::detail::less,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::traits::is_range_v<Rng2> &&

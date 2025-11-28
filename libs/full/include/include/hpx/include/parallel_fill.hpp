@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/algorithms/fill.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/parallel/container_algorithms/fill.hpp>
 
 #include <hpx/parallel/segmented_algorithms/fill.hpp>

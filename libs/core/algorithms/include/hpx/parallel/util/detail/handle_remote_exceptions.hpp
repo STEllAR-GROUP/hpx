@@ -21,7 +21,7 @@
 namespace hpx::parallel::util::detail {
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct handle_remote_exceptions
     {
         // std::bad_alloc has to be handled separately

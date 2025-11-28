@@ -28,14 +28,14 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result>
+    HPX_CXX_EXPORT template <typename Result>
     struct local_algorithm_result
     {
         using type = typename hpx::traits::segmented_local_iterator_traits<
             Result>::local_raw_iterator;
     };
 
-    template <typename Result1, typename Result2>
+    HPX_CXX_EXPORT template <typename Result1, typename Result2>
     struct local_algorithm_result<util::in_out_result<Result1, Result2>>
     {
         using type1 = typename hpx::traits::segmented_local_iterator_traits<
@@ -46,7 +46,7 @@ namespace hpx::parallel::detail {
         using type = util::in_out_result<type1, type2>;
     };
 
-    template <typename Result>
+    HPX_CXX_EXPORT template <typename Result>
     struct local_algorithm_result<util::min_max_result<Result>>
     {
         using type1 = typename hpx::traits::segmented_local_iterator_traits<
@@ -55,7 +55,8 @@ namespace hpx::parallel::detail {
         using type = util::min_max_result<type1>;
     };
 
-    template <typename Result1, typename Result2, typename Result3>
+    HPX_CXX_EXPORT template <typename Result1, typename Result2,
+        typename Result3>
     struct local_algorithm_result<
         util::in_in_out_result<Result1, Result2, Result3>>
     {
@@ -75,11 +76,11 @@ namespace hpx::parallel::detail {
         using type = void;
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using local_algorithm_result_t = typename local_algorithm_result<T>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived, typename Result = void>
+    HPX_CXX_EXPORT template <typename Derived, typename Result = void>
     struct algorithm
     {
     private:

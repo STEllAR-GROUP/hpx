@@ -1095,17 +1095,17 @@ namespace hpx::ranges {
 
     /// `replace_copy_if_result` is equivalent to
     /// `hpx::parallel::util::in_out_result`
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     using replace_copy_if_result = hpx::parallel::util::in_out_result<I, O>;
 
     /// `replace_copy_result` is equivalent to
     /// `hpx::parallel::util::in_out_result`
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     using replace_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::replace_if
-    inline constexpr struct replace_if_t final
+    HPX_CXX_EXPORT inline constexpr struct replace_if_t final
       : hpx::detail::tag_parallel_algorithm<replace_if_t>
     {
     private:
@@ -1114,7 +1114,7 @@ namespace hpx::ranges {
             typename T = typename hpx::parallel::traits::projected<Iter,
                 Proj>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
@@ -1138,7 +1138,7 @@ namespace hpx::ranges {
             typename T = typename hpx::parallel::traits::projected<
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::is_invocable_v<Pred,
@@ -1168,7 +1168,7 @@ namespace hpx::ranges {
             typename T = typename hpx::parallel::traits::projected<Iter,
                 Proj>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
@@ -1196,12 +1196,13 @@ namespace hpx::ranges {
             typename T = typename hpx::parallel::traits::projected<
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy,
-                    Pred, hpx::parallel::traits::projected_range<Proj, Rng>>::value
+                    Pred, hpx::parallel::traits::projected_range<Proj, Rng>
+                >::value
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
@@ -1223,7 +1224,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::replace
-    inline constexpr struct replace_t final
+    HPX_CXX_EXPORT inline constexpr struct replace_t final
       : hpx::detail::tag_parallel_algorithm<replace_t>
     {
     private:
@@ -1232,7 +1233,7 @@ namespace hpx::ranges {
                 Proj>::value_type,
             typename T2 = T1>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter>
@@ -1258,7 +1259,7 @@ namespace hpx::ranges {
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             typename T2 = T1>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
             )
@@ -1286,7 +1287,7 @@ namespace hpx::ranges {
                 Proj>::value_type,
             typename T2 = T1>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<Iter> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
@@ -1316,7 +1317,7 @@ namespace hpx::ranges {
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             typename T2 = T1>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
@@ -1344,7 +1345,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::replace_copy_if
-    inline constexpr struct replace_copy_if_t final
+    HPX_CXX_EXPORT inline constexpr struct replace_copy_if_t final
       : hpx::detail::tag_parallel_algorithm<replace_copy_if_t>
     {
     private:
@@ -1353,7 +1354,7 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<OutIter>::value_type,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, InIter> &&
@@ -1383,12 +1384,15 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<OutIter>::value_type,
             typename Proj = hpx::identity>
         // clang-format off
-            requires(hpx::traits::is_range_v<Rng> &&
+            requires(
+                hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<
-                        hpx::traits::range_iterator_t<Rng>>::value_type>)
+                        hpx::traits::range_iterator_t<Rng>>::value_type
+                >
+            )
         // clang-format on
         friend replace_copy_if_result<hpx::traits::range_iterator_t<Rng>,
             OutIter>
@@ -1415,7 +1419,7 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<FwdIter2>::value_type,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -1449,7 +1453,7 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<FwdIter>::value_type,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
@@ -1483,7 +1487,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::replace_copy
-    inline constexpr struct replace_copy_t final
+    HPX_CXX_EXPORT inline constexpr struct replace_copy_t final
       : hpx::detail::tag_parallel_algorithm<replace_copy_t>
     {
     private:
@@ -1493,7 +1497,7 @@ namespace hpx::ranges {
                 Proj>::value_type,
             typename T2 = T1>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, InIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, InIter>
@@ -1522,7 +1526,7 @@ namespace hpx::ranges {
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             typename T2 = T1>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
             )
@@ -1555,7 +1559,7 @@ namespace hpx::ranges {
                 Proj>::value_type,
             typename T2 = T1>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -1589,7 +1593,7 @@ namespace hpx::ranges {
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             typename T2 = T1>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>

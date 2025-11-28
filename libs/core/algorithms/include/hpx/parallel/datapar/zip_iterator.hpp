@@ -23,7 +23,7 @@
 namespace hpx::parallel::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename... Iter>
+    HPX_CXX_EXPORT template <typename... Iter>
     struct is_data_aligned_impl<hpx::util::zip_iterator<Iter...>>
     {
         template <std::size_t... Is>
@@ -43,7 +43,7 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename... Iter>
+    HPX_CXX_EXPORT template <typename... Iter>
     struct iterator_datapar_compatible_impl<hpx::util::zip_iterator<Iter...>>
       : hpx::util::all_of<std::is_arithmetic<
             typename std::iterator_traits<Iter>::value_type>...>
@@ -57,7 +57,8 @@ namespace hpx::parallel::traits {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename Tuple, typename... Iter, std::size_t... Is>
+        HPX_CXX_EXPORT template <typename Tuple, typename... Iter,
+            std::size_t... Is>
         constexpr Tuple aligned_pack(
             hpx::util::zip_iterator<Iter...> const& iter,
             hpx::util::index_pack<Is...>)
@@ -69,7 +70,8 @@ namespace hpx::parallel::traits {
                     aligned(hpx::get<Is>(t))...);
         }
 
-        template <typename Tuple, typename... Iter, std::size_t... Is>
+        HPX_CXX_EXPORT template <typename Tuple, typename... Iter,
+            std::size_t... Is>
         constexpr Tuple unaligned_pack(
             hpx::util::zip_iterator<Iter...> const& iter,
             hpx::util::index_pack<Is...>)
@@ -82,7 +84,7 @@ namespace hpx::parallel::traits {
         }
     }    // namespace detail
 
-    template <typename... Vector, typename ValueType>
+    HPX_CXX_EXPORT template <typename... Vector, typename ValueType>
     struct vector_pack_load<hpx::tuple<Vector...>, ValueType>
     {
         using value_type = hpx::tuple<Vector...>;
@@ -107,7 +109,8 @@ namespace hpx::parallel::traits {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename Tuple, typename... Iter, std::size_t... Is>
+        HPX_CXX_EXPORT template <typename Tuple, typename... Iter,
+            std::size_t... Is>
         constexpr void aligned_pack(Tuple& value,
             hpx::util::zip_iterator<Iter...> const& iter,
             hpx::util::index_pack<Is...>)
@@ -119,7 +122,8 @@ namespace hpx::parallel::traits {
                 ...);
         }
 
-        template <typename Tuple, typename... Iter, std::size_t... Is>
+        HPX_CXX_EXPORT template <typename Tuple, typename... Iter,
+            std::size_t... Is>
         constexpr void unaligned_pack(Tuple& value,
             hpx::util::zip_iterator<Iter...> const& iter,
             hpx::util::index_pack<Is...>)
@@ -132,7 +136,7 @@ namespace hpx::parallel::traits {
         }
     }    // namespace detail
 
-    template <typename... Vector, typename ValueType>
+    HPX_CXX_EXPORT template <typename... Vector, typename ValueType>
     struct vector_pack_store<hpx::tuple<Vector...>, ValueType>
     {
         template <typename V, typename... Iter>

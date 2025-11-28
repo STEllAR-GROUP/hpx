@@ -18,7 +18,7 @@
 
 namespace hpx::parallel::detail {
 
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct sequential_equal_t final
       : hpx::functional::detail::tag_fallback<sequential_equal_t<ExPolicy>>
     {
@@ -46,11 +46,12 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr sequential_equal_t<ExPolicy> sequential_equal =
         sequential_equal_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename InIter1, typename InIter2, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+        typename InIter2, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE bool sequential_equal(
         InIter1 first1, InIter1 last1, InIter2 first2, F&& f)
     {
@@ -58,8 +59,8 @@ namespace hpx::parallel::detail {
             first1, last1, first2, HPX_FORWARD(F, f));
     }
 
-    template <typename ExPolicy, typename ZipIterator, typename Token,
-        typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename ZipIterator,
+        typename Token, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE void sequential_equal(
         ZipIterator it, std::size_t part_count, Token& tok, F&& f)
     {
@@ -68,7 +69,7 @@ namespace hpx::parallel::detail {
     }
 #endif
 
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct sequential_equal_binary_t final
       : hpx::functional::detail::tag_fallback<
             sequential_equal_binary_t<ExPolicy>>
@@ -110,13 +111,13 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr sequential_equal_binary_t<ExPolicy>
         sequential_equal_binary = sequential_equal_binary_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename InIter1, typename Sent1,
-        typename InIter2, typename Sent2, typename F, typename Proj1,
-        typename Proj2>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+        typename Sent1, typename InIter2, typename Sent2, typename F,
+        typename Proj1, typename Proj2>
     HPX_HOST_DEVICE HPX_FORCEINLINE bool sequential_equal_binary(InIter1 first1,
         Sent1 last1, InIter2 first2, Sent2 last2, F&& f, Proj1&& proj1,
         Proj2&& proj2)
@@ -126,8 +127,8 @@ namespace hpx::parallel::detail {
             HPX_FORWARD(Proj2, proj2));
     }
 
-    template <typename ExPolicy, typename ZipIterator, typename Token,
-        typename F, typename Proj1, typename Proj2>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename ZipIterator,
+        typename Token, typename F, typename Proj1, typename Proj2>
     HPX_HOST_DEVICE HPX_FORCEINLINE void sequential_equal_binary(ZipIterator it,
         std::size_t part_count, Token& tok, F&& f, Proj1&& proj1, Proj2&& proj2)
     {

@@ -30,14 +30,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::detail {
 
-    static constexpr std::uint32_t sample_sort_limit_per_task = 1 << 16;
+    HPX_CXX_EXPORT static constexpr std::uint32_t sample_sort_limit_per_task = 1
+        << 16;
 
     /// \struct sample_sort
     /// \brief This a structure for to implement a sample sort, exception
     ///        safe
     /// \tparam
     /// \remarks
-    template <typename Iter, typename Sent, typename Compare>
+    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Compare>
     struct sample_sort_helper
     {
         using value_type = typename std::iterator_traits<Iter>::value_type;
@@ -231,7 +232,7 @@ namespace hpx::parallel::detail {
     /// \remarks this is the comparison object for pointers. Receive a object
     ///          for to compare the objects pointed. The pointers can't be
     ///          nullptr
-    template <typename Iter, typename Comp>
+    HPX_CXX_EXPORT template <typename Iter, typename Comp>
     struct less_ptr_no_null
     {
         Comp comp;
@@ -370,8 +371,8 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Exec, typename Iter, typename Sent, typename Compare,
-        typename Value>
+    HPX_CXX_EXPORT template <typename Exec, typename Iter, typename Sent,
+        typename Compare, typename Value>
     void sample_sort(Exec&& exec, Iter first, Sent last, Compare&& comp,
         std::uint32_t num_threads, Value* paux, std::size_t naux,
         std::size_t chunk_size)
@@ -383,7 +384,8 @@ namespace hpx::parallel::detail {
         sorter(HPX_FORWARD(Exec, exec), first, last, paux, naux, chunk_size);
     }
 
-    template <typename Exec, typename Iter, typename Sent, typename Compare>
+    HPX_CXX_EXPORT template <typename Exec, typename Iter, typename Sent,
+        typename Compare>
     void sample_sort(Exec&& exec, Iter first, Sent last, Compare&& comp,
         std::uint32_t num_threads)
     {
@@ -395,7 +397,8 @@ namespace hpx::parallel::detail {
             static_cast<std::size_t>(sample_sort_limit_per_task));
     }
 
-    template <typename Exec, typename Iter, typename Sent, typename Compare>
+    HPX_CXX_EXPORT template <typename Exec, typename Iter, typename Sent,
+        typename Compare>
     void sample_sort(Exec&& exec, Iter first, Sent last, Compare&& comp,
         std::uint32_t num_threads,
         util::range<typename std::iterator_traits<Iter>::value_type*>
@@ -412,7 +415,7 @@ namespace hpx::parallel::detail {
             range_buf_initial.size(), chunk_size);
     }
 
-    template <typename Exec, typename Iter, typename Sent>
+    HPX_CXX_EXPORT template <typename Exec, typename Iter, typename Sent>
     void sample_sort(
         Exec&& exec, Iter first, Sent last, std::uint32_t num_threads)
     {
@@ -425,7 +428,7 @@ namespace hpx::parallel::detail {
             static_cast<std::size_t>(sample_sort_limit_per_task));
     }
 
-    template <typename Exec, typename Iter, typename Sent>
+    HPX_CXX_EXPORT template <typename Exec, typename Iter, typename Sent>
     void sample_sort(Exec&& exec, Iter first, Sent last)
     {
         using value_type = typename std::iterator_traits<Iter>::value_type;
@@ -436,5 +439,4 @@ namespace hpx::parallel::detail {
             static_cast<value_type*>(nullptr), static_cast<std::size_t>(0),
             static_cast<std::size_t>(sample_sort_limit_per_task));
     }
-
 }    // namespace hpx::parallel::detail

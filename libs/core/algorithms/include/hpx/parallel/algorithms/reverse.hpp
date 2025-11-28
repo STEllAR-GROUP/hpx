@@ -209,7 +209,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename Iter>
+        HPX_CXX_EXPORT template <typename Iter>
         struct reverse : public algorithm<reverse<Iter>, Iter>
         {
             constexpr reverse() noexcept
@@ -270,7 +270,8 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential reverse_copy
-        template <typename BidirIt, typename Sent, typename OutIter>
+        HPX_CXX_EXPORT template <typename BidirIt, typename Sent,
+            typename OutIter>
         constexpr util::in_out_result<BidirIt, OutIter> sequential_reverse_copy(
             BidirIt first, Sent last, OutIter dest)
         {
@@ -325,7 +326,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::reverse
-    inline constexpr struct reverse_t final
+    HPX_CXX_EXPORT inline constexpr struct reverse_t final
       : hpx::detail::tag_parallel_algorithm<reverse_t>
     {
     private:
@@ -366,7 +367,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::reverse_copy
-    inline constexpr struct reverse_copy_t final
+    HPX_CXX_EXPORT inline constexpr struct reverse_copy_t final
       : hpx::detail::tag_parallel_algorithm<reverse_copy_t>
     {
     private:
