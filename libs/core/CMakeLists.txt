@@ -51,6 +51,7 @@ set(_hpx_core_modules
     iterator_support
     itt_notify
     lci_base
+    lcw_base
     lcos_local
     lock_registration
     logging
