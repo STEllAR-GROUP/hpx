@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -145,17 +145,14 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/detail/throw_if_exceptional.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/acquire_shared_state.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/is_future.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <array>
@@ -347,13 +344,17 @@ namespace hpx {
         private:
             friend void intrusive_ptr_add_ref(wait_some* p) noexcept
             {
-                ++p->refcount_;
+                p->refcount_.increment();
             }
 
             friend void intrusive_ptr_release(wait_some* p) noexcept
             {
-                if (0 == --p->refcount_)
+                if (0 == p->refcount_.decrement())
                 {
+                    // The thread that decrements the reference count to zero must
+                    // perform an acquire to ensure that it doesn't start destructing
+                    // the object until all previous writes have drained.
+                    std::atomic_thread_fence(std::memory_order_acquire);
                     delete p;
                 }
             }
@@ -371,7 +372,7 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_some_nothrow_t final
+    HPX_CXX_EXPORT inline constexpr struct wait_some_nothrow_t final
       : hpx::functional::tag<wait_some_nothrow_t>
     {
     private:
@@ -546,7 +547,7 @@ namespace hpx {
     } wait_some_nothrow{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_some_t final
+    HPX_CXX_EXPORT inline constexpr struct wait_some_t final
       : hpx::functional::tag<wait_some_t>
     {
     private:
@@ -668,7 +669,7 @@ namespace hpx {
     } wait_some{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_some_n_nothrow_t final
+    HPX_CXX_EXPORT inline constexpr struct wait_some_n_nothrow_t final
       : hpx::functional::tag<wait_some_n_nothrow_t>
     {
     private:

@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/scheduling_properties.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <type_traits>
@@ -16,7 +16,7 @@
 namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct get_processing_units_mask_t final
+    HPX_CXX_EXPORT inline constexpr struct get_processing_units_mask_t final
       : hpx::functional::detail::tag_fallback<get_processing_units_mask_t>
     {
     private:
@@ -36,7 +36,7 @@ namespace hpx::execution::experimental {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct get_cores_mask_t final
+    HPX_CXX_EXPORT inline constexpr struct get_cores_mask_t final
       : hpx::functional::detail::tag_fallback<get_cores_mask_t>
     {
     private:

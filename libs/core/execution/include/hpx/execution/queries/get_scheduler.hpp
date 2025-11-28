@@ -9,13 +9,14 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/modules/execution_base.hpp>
 #else
 
 #include <hpx/execution/queries/read.hpp>
-#include <hpx/execution_base/get_env.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+
+#include <cstdint>
 
 namespace hpx::execution::experimental {
 
@@ -33,7 +34,7 @@ namespace hpx::execution::experimental {
     //
     //      1. `tag_invoke(execution::forwarding_scheduler_query, t)`,
     //         contextually converted to bool, if the tag_invoke expression is
-    //         well formed.
+    //         well-formed.
     //
     //          - Mandates: The tag_invoke expression is indeed
     //                      contextually convertible to bool, that expression
@@ -43,7 +44,7 @@ namespace hpx::execution::experimental {
     //
     //     2. Otherwise, false.
     //
-    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
+    HPX_CXX_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
         forwarding_scheduler_query_t final
       : hpx::functional::detail::tag_fallback_noexcept<
             forwarding_scheduler_query_t,
@@ -59,8 +60,7 @@ namespace hpx::execution::experimental {
         }
     } forwarding_scheduler_query{};
 
-    enum class forward_progress_guarantee
-    {
+    HPX_CXX_EXPORT enum class forward_progress_guarantee : std::uint8_t {
         concurrent,
         parallel,
         weakly_parallel
@@ -78,7 +78,7 @@ namespace hpx::execution::experimental {
     //         execution::get_forward_progress_guarantee is ill-formed. Otherwise,
     //         execution::get_forward_progress_guarantee(s) is expression equivalent to:
     //      2. `tag_invoke(execution::get_forward_progress_guarantee, as_const(s))`,
-    //         if this expression is well formed.
+    //         if this expression is well-formed.
     //
     //          - Mandates: The tag_invoke expression above is not
     //                      potentially throwing and its type is
@@ -94,7 +94,7 @@ namespace hpx::execution::experimental {
     //    agents created by that scheduler shall provide at least the parallel
     //    forward progress guarantee.
     //
-    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
+    HPX_CXX_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
         get_forward_progress_guarantee_t final
       : hpx::functional::detail::tag_fallback_noexcept<
             get_forward_progress_guarantee_t>
@@ -118,7 +118,7 @@ namespace hpx::execution::experimental {
     //    Otherwise, it is expression equivalent to:
     //
     //    1. tag_invoke(execution::get_scheduler, as_const(r)), if this expression
-    //       is well formed.
+    //       is well-formed.
     //
     //       Mandates: The tag_invoke expression above is not potentially-
     //                 throwing and its type satisfies execution::scheduler.
@@ -128,7 +128,7 @@ namespace hpx::execution::experimental {
     // 3. execution::get_scheduler() (with no arguments) is expression-equivalent
     //    to execution::read(execution::get_scheduler).
     //
-    inline constexpr struct get_scheduler_t final
+    HPX_CXX_EXPORT inline constexpr struct get_scheduler_t final
       : hpx::functional::detail::tag_fallback<get_scheduler_t>
     {
     private:
@@ -137,7 +137,7 @@ namespace hpx::execution::experimental {
 
     } get_scheduler{};
 
-    constexpr auto tag_fallback_invoke(get_scheduler_t) noexcept
+    HPX_CXX_EXPORT constexpr auto tag_fallback_invoke(get_scheduler_t) noexcept
     {
         return hpx::execution::experimental::read(get_scheduler);
     }

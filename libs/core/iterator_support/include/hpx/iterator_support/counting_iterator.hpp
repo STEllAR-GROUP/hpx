@@ -14,8 +14,7 @@
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
-#include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/lazy_conditional.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -24,8 +23,9 @@
 
 namespace hpx::util {
 
-    template <typename Incrementable, typename CategoryOrTraversal = void,
-        typename Difference = void, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Incrementable,
+        typename CategoryOrTraversal = void, typename Difference = void,
+        typename Enable = void>
     class counting_iterator;
 
     namespace detail {
@@ -91,8 +91,8 @@ namespace hpx::util {
 
     ////////////////////////////////////////////////////////////////////////////
     // specialization for Iterators (non-integral types)
-    template <typename Incrementable, typename CategoryOrTraversal,
-        typename Difference, typename Enable>
+    HPX_CXX_EXPORT template <typename Incrementable,
+        typename CategoryOrTraversal, typename Difference, typename Enable>
     class counting_iterator
       : public detail::counting_iterator_base<Incrementable,
             CategoryOrTraversal, Difference>::type
@@ -124,8 +124,8 @@ namespace hpx::util {
         }
     };
 
-    template <typename Incrementable, typename CategoryOrTraversal,
-        typename Difference>
+    HPX_CXX_EXPORT template <typename Incrementable,
+        typename CategoryOrTraversal, typename Difference>
     class counting_iterator<Incrementable, CategoryOrTraversal, Difference,
         std::enable_if_t<std::is_integral_v<Incrementable>>>
       : public detail::counting_iterator_base<Incrementable,
@@ -193,7 +193,7 @@ namespace hpx::util {
     };
 
     // Manufacture a counting iterator for an arbitrary incrementable type
-    template <typename Incrementable>
+    HPX_CXX_EXPORT template <typename Incrementable>
     counting_iterator(Incrementable x) -> counting_iterator<Incrementable>;
 
     template <typename Incrementable>

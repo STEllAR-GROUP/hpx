@@ -1,15 +1,15 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/command_line_handling/parse_command_line.hpp>
-#include <hpx/command_line_handling_local/parse_command_line_local.hpp>
-#include <hpx/ini/ini.hpp>
+#include <hpx/modules/command_line_handling_local.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
-#include <hpx/util/from_string.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/ini.hpp>
 
 #include <cctype>
 #include <cstddef>
@@ -18,6 +18,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
@@ -517,3 +519,5 @@ namespace hpx::util {
             visible, unregistered_options);
     }
 }    // namespace hpx::util
+
+#include <hpx/config/warnings_suffix.hpp>

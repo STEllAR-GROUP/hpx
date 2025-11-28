@@ -261,7 +261,23 @@ point in your application you must additionally link your application to the
 |cmake| target ``HPX::wrap_main``. This target is automatically linked to
 executables if you are using the macros described below
 (:ref:`using_hpx_cmake_macros`). See :ref:`minimal` for more information on
-implicitly using ``main()`` as the entry point.
+implicitly using ``main()`` as the entry point. If you want the same wrapping
+behavior without including :hpx-header:`wrap/include,hpx/hpx_main.hpp`, link to
+the ``HPX::auto_wrap_main`` target instead. This enables the runtime
+initialization around ``main()`` unconditionally and is useful for codebases
+where adding the header to ``main.cpp`` is impractical.
+
+If you want to use the facilities exposed by ``hpx::runtime_manager`` in binaries
+that were not linked as executables (e.g., in shared libraries), you will need
+make your cmake target explicitly depend on the ``HPX::init`` target:
+
+.. code-block:: cmake
+
+   add_library(hello_world_component SHARED hello_world_component.cpp)
+   target_link_libraries(hello_world_component PRIVATE HPX::init)
+
+Otherwise you may see compilation errors complaining about the header file
+``hpx/runtime_manager.hpp`` not being found.
 
 Creating a component requires setting two additional compile definitions:
 

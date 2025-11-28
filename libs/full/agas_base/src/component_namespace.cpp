@@ -12,8 +12,9 @@
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
+#include <hpx/modules/serialization.hpp>
 
-#include <hpx/serialization/vector.hpp>
+#include <hpx/config/warnings_prefix.hpp>
 
 using hpx::agas::server::component_namespace;
 

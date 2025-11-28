@@ -1,5 +1,5 @@
 //  Copyright (c) 2019 Jan Melech
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,15 +20,15 @@
 
 namespace hpx::serialization {
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<0>)
     {
         serialize(archive, t, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<1>)
     {
         auto& [p1] = t;
@@ -36,8 +36,8 @@ namespace hpx::serialization {
         serialize(archive, data, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<2>)
     {
         auto& [p1, p2] = t;
@@ -45,8 +45,8 @@ namespace hpx::serialization {
         serialize(archive, data, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<3>)
     {
         auto& [p1, p2, p3] = t;
@@ -54,8 +54,8 @@ namespace hpx::serialization {
         serialize(archive, data, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<4>)
     {
         auto& [p1, p2, p3, p4] = t;
@@ -63,8 +63,8 @@ namespace hpx::serialization {
         serialize(archive, data, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<5>)
     {
         auto& [p1, p2, p3, p4, p5] = t;
@@ -72,8 +72,8 @@ namespace hpx::serialization {
         serialize(archive, data, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<6>)
     {
         auto& [p1, p2, p3, p4, p5, p6] = t;
@@ -81,8 +81,8 @@ namespace hpx::serialization {
         serialize(archive, data, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<7>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7] = t;
@@ -90,8 +90,8 @@ namespace hpx::serialization {
         serialize(archive, data, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<8>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8] = t;
@@ -99,8 +99,8 @@ namespace hpx::serialization {
         serialize(archive, data, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<9>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9] = t;
@@ -108,8 +108,8 @@ namespace hpx::serialization {
         serialize(archive, data, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<10>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10] = t;
@@ -118,8 +118,8 @@ namespace hpx::serialization {
         serialize(archive, data, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<11>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11] = t;
@@ -128,8 +128,8 @@ namespace hpx::serialization {
         serialize(archive, data, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<12>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12] = t;
@@ -138,8 +138,8 @@ namespace hpx::serialization {
         serialize(archive, data, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<13>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13] = t;
@@ -148,8 +148,8 @@ namespace hpx::serialization {
         serialize(archive, data, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<14>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14] = t;
@@ -158,8 +158,8 @@ namespace hpx::serialization {
         serialize(archive, data, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& archive, T& t, const unsigned int version,
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& archive, T& t, unsigned int const version,
         hpx::traits::detail::size<15>)
     {
         auto& [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14,
@@ -169,8 +169,8 @@ namespace hpx::serialization {
         serialize(archive, data, version);
     }
 
-    template <typename Archive, typename T>
-    void serialize_struct(Archive& ar, T& t, const unsigned int version)
+    HPX_CXX_EXPORT template <typename Archive, typename T>
+    void serialize_struct(Archive& ar, T& t, unsigned int const version)
     {
         serialize_struct(ar, t, version, hpx::traits::detail::arity<T>());
     }

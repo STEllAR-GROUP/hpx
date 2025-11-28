@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Vinay C Amatya
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,16 +16,19 @@
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset_base/detail/parcel_route_handler.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/timing/scoped_timer.hpp>
 
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
 #include <utility>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::detail {
 

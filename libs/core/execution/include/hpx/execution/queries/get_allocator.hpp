@@ -8,12 +8,12 @@
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/modules/execution_base.hpp>
 #else
 
 #include <hpx/execution/queries/read.hpp>
-#include <hpx/execution_base/get_env.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 namespace hpx::execution::experimental {
 
@@ -26,7 +26,7 @@ namespace hpx::execution::experimental {
     //     Otherwise, it is expression equivalent to:
     //
     //    1. tag_invoke(execution::get_allocator, as_const(r)), if this expression
-    //       is well formed.
+    //       is well-formed.
     //          Mandates: The tag_invoke expression above is not potentially-
     //          throwing and its type satisfies Allocator.
     //
@@ -35,7 +35,7 @@ namespace hpx::execution::experimental {
     // 3. execution::get_allocator() (with no arguments) is expression-equivalent
     //    to execution::read(execution::get_allocator).
     //
-    inline constexpr struct get_allocator_t final
+    HPX_CXX_EXPORT inline constexpr struct get_allocator_t final
       : hpx::functional::detail::tag_fallback<get_allocator_t>
     {
     private:
@@ -44,7 +44,7 @@ namespace hpx::execution::experimental {
 
     } get_allocator{};
 
-    constexpr auto tag_fallback_invoke(get_allocator_t) noexcept
+    HPX_CXX_EXPORT constexpr auto tag_fallback_invoke(get_allocator_t) noexcept
     {
         return hpx::execution::experimental::read(get_allocator);
     }

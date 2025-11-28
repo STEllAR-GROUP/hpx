@@ -15,7 +15,7 @@
 
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
-#include <hpx/serialization/string.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
 #include <cstring>
@@ -26,89 +26,88 @@
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
-namespace initializers {
+    namespace initializers {
 
-template <class Range, bool Unicode>
-class set_env_ : public initializer_base
-{
-private:
-    typedef typename Range::value_type String;
-    typedef typename String::value_type Char;
-
-    static std::size_t get_size(std::size_t len, String const& s)
-    {
-        return len + s.size() + 1;
-    }
-
-    struct copy_env
-    {
-        explicit copy_env(Char* curr)
-          : curr_(curr)
-        {}
-
-        void operator()(String const& s)
+        template <class Range, bool Unicode>
+        class set_env_ : public initializer_base
         {
-            std::memcpy(curr_, s.c_str(), s.size());
-            curr_ += s.size();
-            *curr_++ = 0;
-        }
+        private:
+            typedef typename Range::value_type String;
+            typedef typename String::value_type Char;
 
-        Char* curr_;
-    };
+            static std::size_t get_size(std::size_t len, String const& s)
+            {
+                return len + s.size() + 1;
+            }
 
-public:
-    set_env_()
-    {
-        env_.resize(1);
-        env_[0] = 0;
-    }
+            struct copy_env
+            {
+                explicit copy_env(Char* curr)
+                  : curr_(curr)
+                {
+                }
 
-    explicit set_env_(const Range &envs)
-    {
-        std::size_t s = std::accumulate(envs.begin(), envs.end(),
-            std::size_t(0), &set_env_::get_size);
+                void operator()(String const& s)
+                {
+                    std::memcpy(curr_, s.c_str(), s.size());
+                    curr_ += s.size();
+                    *curr_++ = 0;
+                }
 
-        env_.resize(s + 1);
-        std::for_each(envs.begin(), envs.end(), copy_env(env_.data()));
-        env_[env_.size() - 1] = 0;
-    }
+                Char* curr_;
+            };
 
-    template <class WindowsExecutor>
-    void on_CreateProcess_setup(WindowsExecutor &e) const
-    {
-        e.env = LPVOID(env_.data());
-        if (Unicode)
-            e.creation_flags |= CREATE_UNICODE_ENVIRONMENT;
-    }
+        public:
+            set_env_()
+            {
+                env_.resize(1);
+                env_[0] = 0;
+            }
 
-private:
-    friend class hpx::serialization::access;
+            explicit set_env_(const Range& envs)
+            {
+                std::size_t s = std::accumulate(envs.begin(), envs.end(),
+                    std::size_t(0), &set_env_::get_size);
 
-    template <typename Archive>
-    void serialize(Archive& ar, unsigned const)
-    {
-        ar & env_;
-    }
+                env_.resize(s + 1);
+                std::for_each(envs.begin(), envs.end(), copy_env(env_.data()));
+                env_[env_.size() - 1] = 0;
+            }
 
-    std::vector<Char> env_;
-};
+            template <class WindowsExecutor>
+            void on_CreateProcess_setup(WindowsExecutor& e) const
+            {
+                e.env = LPVOID(env_.data());
+                if (Unicode)
+                    e.creation_flags |= CREATE_UNICODE_ENVIRONMENT;
+            }
+
+        private:
+            friend class hpx::serialization::access;
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned const)
+            {
+                ar & env_;
+            }
+
+            std::vector<Char> env_;
+        };
 
 #if defined(_UNICODE) || defined(UNICODE)
-template <class Range>
-set_env_<Range, true> set_env(const Range &envs)
-{
-    return set_env_<Range, true>(envs);
-}
+        template <class Range>
+        set_env_<Range, true> set_env(const Range& envs)
+        {
+            return set_env_<Range, true>(envs);
+        }
 #else
-template <class Range>
-set_env_<Range, false> set_env(const Range &envs)
-{
-    return set_env_<Range, false>(envs);
-}
+        template <class Range>
+        set_env_<Range, false> set_env(const Range& envs)
+        {
+            return set_env_<Range, false>(envs);
+        }
 #endif
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::windows::initializers
 
 #endif

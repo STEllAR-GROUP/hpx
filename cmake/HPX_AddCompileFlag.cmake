@@ -178,8 +178,8 @@ function(hpx_add_compile_flag)
 endfunction()
 
 function(hpx_add_compile_flag_if_available FLAG)
-  set(options PUBLIC)
-  set(one_value_args NAME)
+  set(options PUBLIC PRIVATE)
+  set(one_value_args NAME RESULT)
   set(multi_value_args CONFIGURATIONS LANGUAGES)
   cmake_parse_arguments(
     HPX_ADD_COMPILE_FLAG_IA "${options}" "${one_value_args}"
@@ -188,6 +188,8 @@ function(hpx_add_compile_flag_if_available FLAG)
 
   if(HPX_ADD_COMPILE_FLAG_IA_PUBLIC)
     set(_public PUBLIC)
+  elseif(HPX_ADD_COMPILE_FLAG_IA_PRIVATE)
+    set(_public PRIVATE)
   endif()
 
   if(HPX_ADD_COMPILE_FLAG_IA_NAME)
@@ -206,6 +208,12 @@ function(hpx_add_compile_flag_if_available FLAG)
     set(_languages ${HPX_ADD_COMPILE_FLAG_IA_LANGUAGES})
   endif()
 
+  if(HPX_ADD_COMPILE_FLAG_IA_RESULT)
+    set(${HPX_ADD_COMPILE_FLAG_IA_RESULT}
+        Off
+        PARENT_SCOPE
+    )
+  endif()
   foreach(_lang ${_languages})
     if(_lang STREQUAL "CXX")
       check_cxx_compiler_flag(${FLAG} HPX_WITH_${_lang}_FLAG_${_name})
@@ -217,6 +225,12 @@ function(hpx_add_compile_flag_if_available FLAG)
         ${FLAG} CONFIGURATIONS ${HPX_ADD_COMPILE_FLAG_IA_CONFIGURATIONS}
         LANGUAGES ${_lang} ${_public}
       )
+      if(HPX_ADD_COMPILE_FLAG_IA_RESULT)
+        set(${HPX_ADD_COMPILE_FLAG_IA_RESULT}
+            On
+            PARENT_SCOPE
+        )
+      endif()
     else()
       hpx_info("\"${FLAG}\" not available for language ${_lang}.")
     endif()

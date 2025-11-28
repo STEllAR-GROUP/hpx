@@ -8,15 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/move_only_function.hpp>
-#include <hpx/synchronization/condition_variable.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <utility>
 
 namespace hpx::lcos::local {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct conditional_cv
+    HPX_CXX_EXPORT struct conditional_cv
     {
         conditional_cv() = default;
         ~conditional_cv() = default;

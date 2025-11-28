@@ -15,7 +15,7 @@
 
 namespace hpx::program_options {
 
-    class environment_iterator
+    HPX_CXX_EXPORT class environment_iterator
       : public eof_iterator<environment_iterator,
             std::pair<std::string, std::string>>
     {

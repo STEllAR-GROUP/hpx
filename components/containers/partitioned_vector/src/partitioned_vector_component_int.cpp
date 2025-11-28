@@ -16,6 +16,8 @@
 
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 HPX_REGISTER_PARTITIONED_VECTOR(int)
 using long_long = long long;
 HPX_REGISTER_PARTITIONED_VECTOR(long_long)
@@ -26,6 +28,8 @@ HPX_REGISTER_PARTITIONED_VECTOR(long_long)
 #pragma warning(push)
 #pragma warning(disable : 5037)
 #endif
+
+#include <hpx/config/warnings_prefix.hpp>
 
 template class HPX_PARTITIONED_VECTOR_EXPORT
     hpx::server::partitioned_vector<int, std::vector<int>>;

@@ -1,5 +1,5 @@
 //  Copyright (c) 2019-2020 ETH Zurich
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,25 +10,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_base/scheduling_properties.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
-#include <hpx/execution/detail/post_policy_dispatch.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/fused_bulk_execute.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/future_traits.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/synchronization/latch.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/pack_traversal.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -220,6 +211,42 @@ namespace hpx::parallel::execution::detail {
             },
             desc, pool, first_thread, num_threads, hierarchical_threshold,
             policy, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename Launch, typename F, typename S, typename... Ts>
+    decltype(auto) hierarchical_bulk_sync_execute(
+        hpx::threads::thread_description const& desc,
+        threads::thread_pool_base* pool, std::size_t first_thread,
+        std::size_t num_threads, std::size_t hierarchical_threshold,
+        Launch policy, F&& f, S const& shape, Ts&&... ts)
+    {
+        using result_type = detail::bulk_function_result_t<F, S, Ts...>;
+        if constexpr (!std::is_void_v<result_type>)
+        {
+            return hpx::unwrap(hierarchical_bulk_async_execute_helper(desc,
+                pool, first_thread, num_threads, hierarchical_threshold, policy,
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
+        }
+        else
+        {
+            return hpx::unwrap(hierarchical_bulk_async_execute_void(desc, pool,
+                first_thread, num_threads, hierarchical_threshold, policy,
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
+        }
+    }
+
+    template <typename Launch, typename F, typename S, typename... Ts>
+    decltype(auto) hierarchical_bulk_sync_execute(
+        threads::thread_pool_base* pool, std::size_t first_thread,
+        std::size_t num_threads, std::size_t hierarchical_threshold,
+        Launch policy, F&& f, S const& shape, Ts&&... ts)
+    {
+        hpx::threads::thread_description const desc(
+            f, "hierarchical_bulk_sync_execute");
+
+        return hierarchical_bulk_sync_execute(desc, pool, first_thread,
+            num_threads, hierarchical_threshold, policy, HPX_FORWARD(F, f),
+            shape, HPX_FORWARD(Ts, ts)...);
     }
 
     template <typename Launch, typename F, typename S, typename... Ts>

@@ -7,14 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/member_pack.hpp>
 #include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -23,13 +21,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::traits::detail {
 
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     struct is_deferred_invocable
       : hpx::is_invocable<util::decay_unwrap_t<F>, util::decay_unwrap_t<Ts>...>
     {
     };
 
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     inline constexpr bool is_deferred_invocable_v =
         is_deferred_invocable<F, Ts...>::value;
 }    // namespace hpx::traits::detail
@@ -39,14 +37,14 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename F, typename... Ts>
+        HPX_CXX_EXPORT template <typename F, typename... Ts>
         struct invoke_deferred_result
           : util::invoke_result<util::decay_unwrap_t<F>,
                 util::decay_unwrap_t<Ts>...>
         {
         };
 
-        template <typename F, typename... Ts>
+        HPX_CXX_EXPORT template <typename F, typename... Ts>
         using invoke_deferred_result_t =
             typename invoke_deferred_result<F, Ts...>::type;
 
@@ -134,7 +132,7 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     detail::deferred<std::decay_t<F>, util::make_index_pack_t<sizeof...(Ts)>,
         util::decay_unwrap_t<Ts>...>
     deferred_call(F&& f, Ts&&... vs)
@@ -150,7 +148,7 @@ namespace hpx::util {
     }
 
     // nullary functions do not need to be bound again
-    template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     std::decay_t<F> deferred_call(F&& f)
     {
         static_assert(traits::detail::is_deferred_invocable_v<F>,
@@ -165,7 +163,7 @@ namespace hpx::util {
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     struct get_function_address<util::detail::deferred<F, Ts...>>
     {
         [[nodiscard]] static constexpr std::size_t call(
@@ -176,7 +174,7 @@ namespace hpx::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     struct get_function_annotation<util::detail::deferred<F, Ts...>>
     {
         [[nodiscard]] static constexpr char const* call(
@@ -187,7 +185,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     struct get_function_annotation_itt<util::detail::deferred<F, Ts...>>
     {
         [[nodiscard]] static util::itt::string_handle call(
@@ -204,7 +202,7 @@ namespace hpx::traits {
 namespace hpx::serialization {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Archive, typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename Archive, typename F, typename... Ts>
     HPX_FORCEINLINE void serialize(Archive& ar,
         ::hpx::util::detail::deferred<F, Ts...>& d,
         unsigned int const version = 0)

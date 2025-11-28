@@ -16,6 +16,8 @@
 
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 HPX_REGISTER_PARTITIONED_VECTOR(double)
 
 // an out-of-line definition of a member of a class template cannot have default
@@ -24,6 +26,8 @@ HPX_REGISTER_PARTITIONED_VECTOR(double)
 #pragma warning(push)
 #pragma warning(disable : 5037)
 #endif
+
+#include <hpx/config/warnings_prefix.hpp>
 
 template class HPX_PARTITIONED_VECTOR_EXPORT
     hpx::server::partitioned_vector<double, std::vector<double>>;

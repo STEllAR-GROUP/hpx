@@ -8,6 +8,7 @@ set(iterator_support_headers
     hpx/iterator_support/detail/minimum_category.hpp
     hpx/iterator_support/traits/is_iterator.hpp
     hpx/iterator_support/traits/is_range.hpp
+    hpx/iterator_support/traits/is_segmented_iterator.hpp
     hpx/iterator_support/traits/is_sentinel_for.hpp
     hpx/iterator_support/boost_iterator_categories.hpp
     hpx/iterator_support/counting_iterator.hpp
@@ -38,15 +39,21 @@ set(iterator_support_compat_headers
 set(iterator_support_sources)
 
 include(HPX_AddModule)
+
 add_hpx_module(
   core iterator_support
   GLOBAL_HEADER_GEN ON
-  EXCLUDE_FROM_GLOBAL_HEADER "hpx/iterator_support/traits/is_iterator.hpp"
-                             "hpx/iterator_support/traits/is_range.hpp"
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${iterator_support_sources}
   HEADERS ${iterator_support_headers}
   COMPAT_HEADERS ${iterator_support_compat_headers}
-  MODULE_DEPENDENCIES hpx_config hpx_datastructures hpx_functional
-                      hpx_serialization hpx_type_support
+  MODULE_DEPENDENCIES
+    hpx_concepts
+    hpx_config
+    hpx_datastructures
+    hpx_functional
+    hpx_serialization
+    hpx_tag_invoke
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

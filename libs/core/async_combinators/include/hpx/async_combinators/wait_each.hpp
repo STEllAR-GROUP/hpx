@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //  Copyright (c) 2016 Lukas Troska
 //
@@ -120,10 +120,10 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/async_combinators/detail/throw_if_exceptional.hpp>
 #include <hpx/async_combinators/when_each.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/futures/traits/is_future.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -134,7 +134,7 @@ namespace hpx {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_each_nothrow_t final
+    HPX_CXX_EXPORT inline constexpr struct wait_each_nothrow_t final
       : hpx::functional::tag<wait_each_nothrow_t>
     {
     private:
@@ -178,7 +178,7 @@ namespace hpx {
     } wait_each_nothrow{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_each_t final
+    HPX_CXX_EXPORT inline constexpr struct wait_each_t final
       : hpx::functional::tag<wait_each_t>
     {
     private:
@@ -230,7 +230,7 @@ namespace hpx {
     } wait_each{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_each_n_nothrow_t final
+    HPX_CXX_EXPORT inline constexpr struct wait_each_n_nothrow_t final
       : hpx::functional::tag<wait_each_n_nothrow_t>
     {
     private:
@@ -245,7 +245,7 @@ namespace hpx {
     } wait_each_n_nothrow{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_each_n_t final
+    HPX_CXX_EXPORT inline constexpr struct wait_each_n_t final
       : hpx::functional::tag<wait_each_n_t>
     {
     private:

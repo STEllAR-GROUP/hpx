@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Anton Bikineev
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/serialization/detail/constructor_selector.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -25,10 +26,10 @@ namespace hpx::serialization::detail {
     HPX_HAS_MEMBER_XXX_TRAIT_DEF(reserve)
 
     template <typename Container>
-    HPX_FORCEINLINE void reserve_if_container(Container& v,
-        std::size_t n) noexcept(!has_reserve_v<std::decay_t<Container>>)
+    HPX_FORCEINLINE void reserve_if_container(
+        Container& v, std::size_t n) noexcept(!has_reserve_v<Container>)
     {
-        if constexpr (has_reserve_v<std::decay_t<Container>>)
+        if constexpr (has_reserve_v<Container>)
         {
             v.reserve(n);
         }
@@ -40,7 +41,7 @@ namespace hpx::serialization::detail {
     {
         using value_type = typename Collection::value_type;
 
-        for (const auto& i : collection)
+        for (auto const& i : collection)
         {
             if constexpr (!std::is_default_constructible_v<value_type>)
             {

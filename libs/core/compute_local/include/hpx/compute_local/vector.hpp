@@ -13,10 +13,10 @@
 #include <hpx/compute_local/detail/iterator.hpp>
 #include <hpx/compute_local/traits/access_target.hpp>
 #include <hpx/compute_local/traits/allocator_traits.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/transfer.hpp>
-#include <hpx/runtime_local/report_error.hpp>
-#include <hpx/type_support/is_contiguous_iterator.hpp>
 
 #include <cstddef>
 #include <initializer_list>

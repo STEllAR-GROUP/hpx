@@ -7,20 +7,24 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/command_line_handling_local/late_command_line_handling_local.hpp>
-#include <hpx/command_line_handling_local/parse_command_line_local.hpp>
-#include <hpx/coroutines/coroutine.hpp>
-#include <hpx/coroutines/signal_handler_debugging.hpp>
-#include <hpx/debugging/attach_debugger.hpp>
-#include <hpx/debugging/backtrace.hpp>
-#include <hpx/execution_base/this_thread.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
+#include <hpx/modules/command_line_handling_local.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/io_service.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/static_reinit.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/topology.hpp>
+#include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_local/debugging.hpp>
@@ -32,15 +36,6 @@
 #include <hpx/runtime_local/state.hpp>
 #include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
-#include <hpx/static_reinit/static_reinit.hpp>
-#include <hpx/thread_support/set_thread_name.hpp>
-#include <hpx/threading_base/external_timer.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/topology/topology.hpp>
-#include <hpx/type_support/unused.hpp>
-#include <hpx/util/from_string.hpp>
-#include <hpx/util/get_entry_as.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>
@@ -1123,12 +1118,14 @@ namespace hpx::threads {
 
     void set_scheduler_mode(threads::policies::scheduler_mode m)
     {
-        get_runtime().get_thread_manager().set_scheduler_mode(m);
+        get_runtime().get_thread_manager().set_scheduler_mode(
+            m, hpx::resource::get_partitioner().get_used_pus_mask());
     }
 
     void add_scheduler_mode(threads::policies::scheduler_mode m)
     {
-        get_runtime().get_thread_manager().add_scheduler_mode(m);
+        get_runtime().get_thread_manager().add_scheduler_mode(
+            m, hpx::resource::get_partitioner().get_used_pus_mask());
     }
 
     void add_remove_scheduler_mode(
@@ -1136,24 +1133,41 @@ namespace hpx::threads {
         threads::policies::scheduler_mode to_remove_mode)
     {
         get_runtime().get_thread_manager().add_remove_scheduler_mode(
-            to_add_mode, to_remove_mode);
+            to_add_mode, to_remove_mode,
+            hpx::resource::get_partitioner().get_used_pus_mask());
     }
 
     void remove_scheduler_mode(threads::policies::scheduler_mode m)
     {
-        get_runtime().get_thread_manager().remove_scheduler_mode(m);
+        get_runtime().get_thread_manager().remove_scheduler_mode(
+            m, hpx::resource::get_partitioner().get_used_pus_mask());
     }
 
-    topology const& get_topology()
+    void set_scheduler_mode(threads::policies::scheduler_mode m,
+        hpx::threads::mask_cref_type pu_mask)
     {
-        hpx::runtime const* rt = hpx::get_runtime_ptr();
-        if (rt == nullptr)
-        {
-            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                "hpx::threads::get_topology",
-                "the hpx runtime system has not been initialized yet");
-        }
-        return rt->get_topology();
+        get_runtime().get_thread_manager().set_scheduler_mode(m, pu_mask);
+    }
+
+    void add_scheduler_mode(threads::policies::scheduler_mode m,
+        hpx::threads::mask_cref_type pu_mask)
+    {
+        get_runtime().get_thread_manager().add_scheduler_mode(m, pu_mask);
+    }
+
+    void add_remove_scheduler_mode(
+        threads::policies::scheduler_mode to_add_mode,
+        threads::policies::scheduler_mode to_remove_mode,
+        hpx::threads::mask_cref_type pu_mask)
+    {
+        get_runtime().get_thread_manager().add_remove_scheduler_mode(
+            to_add_mode, to_remove_mode, pu_mask);
+    }
+
+    void remove_scheduler_mode(threads::policies::scheduler_mode m,
+        hpx::threads::mask_cref_type pu_mask)
+    {
+        get_runtime().get_thread_manager().remove_scheduler_mode(m, pu_mask);
     }
 }    // namespace hpx::threads
 

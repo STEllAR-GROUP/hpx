@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/config/endian.hpp>
 #include <hpx/serialization/config/defines.hpp>
-#include <hpx/type_support/extra_data.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -22,14 +22,13 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        struct ptr_helper
+        HPX_CXX_EXPORT struct ptr_helper
         {
             virtual ~ptr_helper() = default;
         };
     }    // namespace detail
 
-    enum class archive_flags
-    {
+    HPX_CXX_EXPORT enum class archive_flags {
         no_archive_flags = 0x00000000,
         enable_compression = 0x00002000,
         endian_big = 0x00004000,
@@ -42,38 +41,39 @@ namespace hpx::serialization {
         all_archive_flags = 0x001fe000    // all of the above
     };
 
-    constexpr archive_flags operator|(
+    HPX_CXX_EXPORT constexpr archive_flags operator|(
         archive_flags lhs, archive_flags rhs) noexcept
     {
         return static_cast<archive_flags>(
             static_cast<std::uint32_t>(lhs) | static_cast<std::uint32_t>(rhs));
     }
-    constexpr std::uint32_t operator|(
-        std::uint32_t lhs, archive_flags rhs) noexcept
+    HPX_CXX_EXPORT constexpr std::uint32_t operator|(
+        std::uint32_t const lhs, archive_flags rhs) noexcept
     {
         return lhs | static_cast<std::uint32_t>(rhs);
     }
-    constexpr std::uint32_t operator&(
-        std::uint32_t lhs, archive_flags rhs) noexcept
+    HPX_CXX_EXPORT constexpr std::uint32_t operator&(
+        std::uint32_t const lhs, archive_flags rhs) noexcept
     {
         return lhs & static_cast<std::uint32_t>(rhs);
     }
 
 #if defined(HPX_SERIALIZATION_HAVE_SUPPORTS_ENDIANESS)
-    HPX_FORCEINLINE void reverse_bytes(std::size_t size, char* address)
+    HPX_CXX_EXPORT HPX_FORCEINLINE void reverse_bytes(
+        std::size_t size, char* address)
     {
         std::reverse(address, address + size);
     }
 #endif
 
-    template <typename Archive>
+    HPX_CXX_EXPORT template <typename Archive>
     struct basic_archive
     {
         static constexpr std::uint64_t npos = static_cast<std::uint64_t>(-1);
 
     protected:
         // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
-        explicit constexpr basic_archive(std::uint32_t flags) noexcept
+        explicit constexpr basic_archive(std::uint32_t const flags) noexcept
           : flags_(flags)
           , size_(0)
         {
@@ -202,19 +202,19 @@ namespace hpx::serialization {
         util::extra_data extra_data_;
     };
 
-    template <typename Archive>
+    HPX_CXX_EXPORT template <typename Archive>
     void save_binary(Archive& ar, void const* address, std::size_t count)
     {
         ar.save_binary(address, count);
     }
 
-    template <typename Archive>
+    HPX_CXX_EXPORT template <typename Archive>
     void load_binary(Archive& ar, void* address, std::size_t count)
     {
         ar.load_binary(address, count);
     }
 
-    template <typename Archive>
+    HPX_CXX_EXPORT template <typename Archive>
     std::size_t current_pos(Archive const& ar) noexcept
     {
         return ar.current_pos();

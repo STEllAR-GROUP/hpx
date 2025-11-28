@@ -8,9 +8,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/functional/bind.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
 

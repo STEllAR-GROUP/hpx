@@ -41,7 +41,7 @@ namespace hpx::util::logging {
 
         Note : as strings are prepended, reserve() shrinks.
     */
-    class message
+    HPX_CXX_EXPORT class message
     {
     public:
         message() = default;

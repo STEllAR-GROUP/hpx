@@ -9,19 +9,22 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/itt_notify.hpp>
-#include <hpx/thread_support/spinlock.hpp>
+#include <hpx/modules/lock_registration.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <utility>
 
 namespace hpx::util {
 
     // Lockable spinlock class
-    struct spinlock
+    HPX_CXX_EXPORT struct spinlock
     {
     public:
-        HPX_NON_COPYABLE(spinlock);
+        spinlock(spinlock const&) = delete;
+        spinlock(spinlock&&) = delete;
+        spinlock& operator=(spinlock const&) = delete;
+        spinlock& operator=(spinlock&&) = delete;
 
     private:
         hpx::util::detail::spinlock m;

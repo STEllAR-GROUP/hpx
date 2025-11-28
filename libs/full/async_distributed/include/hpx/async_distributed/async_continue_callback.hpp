@@ -13,8 +13,7 @@
 #include <hpx/async_distributed/async_callback_fwd.hpp>
 #include <hpx/async_distributed/async_continue.hpp>
 #include <hpx/async_distributed/detail/post_callback.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
-#include <hpx/futures/traits/promise_remote_result.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <type_traits>
 #include <utility>

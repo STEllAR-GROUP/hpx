@@ -8,10 +8,10 @@
 #include <hpx/actions_base/detail/invocation_count_registry.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/performance_counters/action_invocation_counter_discoverer.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/util/regex_from_pattern.hpp>
 
 #include <regex>
 #include <sstream>

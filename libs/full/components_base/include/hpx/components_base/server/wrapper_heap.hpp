@@ -8,13 +8,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/server/wrapper_heap_base.hpp>
-#include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>
 #include <cstddef>

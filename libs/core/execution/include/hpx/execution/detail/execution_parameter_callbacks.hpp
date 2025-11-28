@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/topology/topology.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/topology.hpp>
 
 #include <cstddef>
 
@@ -16,14 +16,16 @@
 namespace hpx::parallel::execution::detail {
 
     /// \cond NOINTERNAL
-    using get_os_thread_count_type = hpx::function<std::size_t()>;
-    HPX_CORE_EXPORT void set_get_os_thread_count(get_os_thread_count_type f);
-    HPX_CORE_EXPORT std::size_t get_os_thread_count();
+    HPX_CXX_EXPORT using get_os_thread_count_type =
+        hpx::function<std::size_t()>;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_get_os_thread_count(
+        get_os_thread_count_type f);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t get_os_thread_count();
 
-    using get_pu_mask_type =
+    HPX_CXX_EXPORT using get_pu_mask_type =
         hpx::function<threads::mask_type(threads::topology&, std::size_t)>;
-    HPX_CORE_EXPORT void set_get_pu_mask(get_pu_mask_type f);
-    HPX_CORE_EXPORT threads::mask_type get_pu_mask(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_get_pu_mask(get_pu_mask_type f);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT threads::mask_type get_pu_mask(
         threads::topology&, std::size_t);
     /// \endcond
 }    // namespace hpx::parallel::execution::detail

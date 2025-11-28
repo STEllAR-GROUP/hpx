@@ -77,13 +77,19 @@ namespace hpx::util::logging {
     - check out the writer namespace
 
     */
-    class logger
+    HPX_CXX_EXPORT class logger
     {
-        HPX_NON_COPYABLE(logger);
+        logger(logger const&) = delete;
+        logger(logger&&) = delete;
+        logger& operator=(logger const&) = delete;
+        logger& operator=(logger&&) = delete;
 
         struct gather_holder : message
         {
-            HPX_NON_COPYABLE(gather_holder);
+            gather_holder(gather_holder const&) = delete;
+            gather_holder(gather_holder&&) = delete;
+            gather_holder& operator=(gather_holder const&) = delete;
+            gather_holder& operator=(gather_holder&&) = delete;
 
             explicit gather_holder(logger& p_this)
               : m_this(p_this)
@@ -162,7 +168,7 @@ namespace hpx::util::logging {
         g_l()->mark_as_initialized();
         @endcode
         */
-        void mark_as_initialized()
+        void mark_as_initialized() const
         {
             turn_cache_off();
         }

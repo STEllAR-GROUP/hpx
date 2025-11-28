@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/basic_action_fwd.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_local/async_fwd.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
 #include <type_traits>

@@ -8,14 +8,12 @@
 #include <hpx/parcelport_lci/parcelport_lci.hpp>
 
 namespace hpx::parcelset::policies::lci {
-    LCI_request_t completion_manager_queue::poll()
+    ::lci::status_t completion_manager_queue::poll()
     {
-        LCI_request_t request;
-        request.flag = LCI_ERR_RETRY;
-        LCI_queue_pop(queue, &request);
-        if (request.flag == LCI_ERR_RETRY)
+        ::lci::status_t status = ::lci::cq_pop(queue);
+        if (status.is_retry())
             if (config_t::progress_type == config_t::progress_type_t::poll)
                 pp_->do_progress_local();
-        return request;
+        return status;
     }
 }    // namespace hpx::parcelset::policies::lci

@@ -11,10 +11,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution/execution.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -25,7 +24,7 @@
 
 namespace hpx::execution::experimental {
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     class restricted_policy_executor
     {
     private:
@@ -255,7 +254,7 @@ namespace hpx::execution::experimental {
         embedded_executor exec_;
     };
 
-    using restricted_thread_pool_executor =
+    HPX_CXX_EXPORT using restricted_thread_pool_executor =
         restricted_policy_executor<hpx::launch>;
 }    // namespace hpx::execution::experimental
 
@@ -263,13 +262,13 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct is_one_way_executor<restricted_policy_executor<Policy>>
       : is_one_way_executor<hpx::execution::parallel_policy_executor<Policy>>
     {
     };
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct is_never_blocking_one_way_executor<
         restricted_policy_executor<Policy>>
       : is_never_blocking_one_way_executor<
@@ -277,27 +276,27 @@ namespace hpx::execution::experimental {
     {
     };
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct is_bulk_one_way_executor<restricted_policy_executor<Policy>>
       : is_bulk_one_way_executor<
             hpx::execution::parallel_policy_executor<Policy>>
     {
     };
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct is_two_way_executor<restricted_policy_executor<Policy>>
       : is_two_way_executor<hpx::execution::parallel_policy_executor<Policy>>
     {
     };
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct is_bulk_two_way_executor<restricted_policy_executor<Policy>>
       : is_bulk_two_way_executor<
             hpx::execution::parallel_policy_executor<Policy>>
     {
     };
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct is_scheduler_executor<restricted_policy_executor<Policy>>
       : is_scheduler_executor<hpx::execution::parallel_policy_executor<Policy>>
     {

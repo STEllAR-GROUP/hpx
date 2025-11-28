@@ -12,13 +12,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/move_only_function.hpp>
+#include <hpx/modules/functional.hpp>
 
 namespace hpx {
 
     /// The type of the function which is registered to be executed as a
     /// shutdown or pre-shutdown function.
-    using shutdown_function_type = hpx::move_only_function<void()>;
+    HPX_CXX_EXPORT using shutdown_function_type =
+        hpx::move_only_function<void()>;
 
     /// \brief Add a function to be executed by a HPX thread during
     /// \a hpx::finalize() but guaranteed before any shutdown function is
@@ -37,7 +38,7 @@ namespace hpx {
     ///       exception.
     ///
     /// \see    \a hpx::register_shutdown_function()
-    HPX_CORE_EXPORT void register_pre_shutdown_function(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void register_pre_shutdown_function(
         shutdown_function_type f);
 
     /// \brief Add a function to be executed by a HPX thread during
@@ -57,5 +58,6 @@ namespace hpx {
     ///       exception.
     ///
     /// \see    \a hpx::register_pre_shutdown_function()
-    HPX_CORE_EXPORT void register_shutdown_function(shutdown_function_type f);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void register_shutdown_function(
+        shutdown_function_type f);
 }    // namespace hpx

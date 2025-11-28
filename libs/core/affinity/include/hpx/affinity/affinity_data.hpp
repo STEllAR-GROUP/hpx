@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/topology/topology.hpp>
+#include <hpx/modules/topology.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -21,7 +21,7 @@ namespace hpx::threads::policies::detail {
     ///////////////////////////////////////////////////////////////////////////
     // Structure holding the information related to thread affinity selection
     // for the shepherd threads of this instance
-    struct HPX_CORE_EXPORT affinity_data
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT affinity_data
     {
         affinity_data();
 
@@ -58,8 +58,8 @@ namespace hpx::threads::policies::detail {
         mask_type get_pu_mask(
             threads::topology const& topo, std::size_t global_thread_num) const;
 
-        mask_type get_used_pus_mask(
-            threads::topology const& topo, std::size_t pu_num) const;
+        mask_type get_used_pus_mask(threads::topology const& topo,
+            std::size_t pu_num = static_cast<std::size_t>(-1)) const;
         std::size_t get_thread_occupancy(
             threads::topology const& topo, std::size_t pu_num) const;
 

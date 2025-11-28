@@ -6,7 +6,7 @@
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(version_headers hpx/version.hpp)
+set(version_headers hpx/version.hpp hpx/version/api.hpp)
 
 set(version_sources version.cpp)
 
@@ -32,12 +32,14 @@ endif()
 include(HPX_AddModule)
 add_hpx_module(
   core version
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${version_sources}
   HEADERS ${version_headers}
+  EXCLUDE_FROM_GLOBAL_HEADER hpx/version.hpp
   MODULE_DEPENDENCIES hpx_config hpx_config_registry hpx_format hpx_prefix
+                      hpx_preprocessor
   DEPENDENCIES Hwloc::hwloc ${additional_dependencies}
-  MODULE_DEPENDENCIES hpx_config hpx_format hpx_prefix
   CMAKE_SUBDIRS tests
 )
 

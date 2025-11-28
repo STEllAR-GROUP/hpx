@@ -17,15 +17,15 @@
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/actions_base/traits/is_valid_action.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
 #include <hpx/async_distributed/put_parcel_fwd.hpp>
-#include <hpx/async_local/post.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/traits/component_type_is_compatible.hpp>
-#include <hpx/functional/traits/is_action.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -33,7 +33,7 @@
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-#include <hpx/runtime_local/get_locality_id.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #endif
 
 #include <type_traits>

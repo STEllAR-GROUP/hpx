@@ -8,10 +8,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/lcos_local/detail/preprocess_future.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/lcos_local.hpp>
 #include <hpx/modules/serialization.hpp>
-#include <hpx/serialization/detail/preprocess_container.hpp>
 
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/naming/detail/preprocess_gid_types.hpp>

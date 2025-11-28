@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
-#include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/program_options/detail/convert.hpp>
 #include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
 
@@ -40,9 +40,9 @@ namespace hpx::program_options::detail {
         FromChar const* from = s.data();
         FromChar const* from_end = s.data() + s.size();
 
-        // The interface of cvt is not really iterator-like, and it's
-        // not possible the tell the required output size without the conversion.
-        // All we can is convert data by pieces.
+        // The interface of cvt is not really iterator-like, and it's not
+        // possible to tell the required output size without the conversion. All
+        // we can is convert data by pieces.
         while (from != from_end)
         {
             // std::basic_string does not provide non-const pointers to the data,
@@ -50,10 +50,8 @@ namespace hpx::program_options::detail {
             ToChar buffer[32];
 
             ToChar* to_next = buffer;
-            // Need variable because std::bind doesn't work with rvalues.
-            ToChar* to_end = buffer + 32;
-            std::codecvt_base::result const r =
-                fun(state, from, from_end, from, buffer, to_end, to_next);
+            std::codecvt_base::result const r = fun(
+                state, from, from_end, from, &buffer[0], &buffer[32], to_next);
 
             if (r == std::codecvt_base::error)
                 throw std::logic_error("character conversion failed");
@@ -72,9 +70,6 @@ namespace hpx::program_options::detail {
 
         return result;
     }
-}    // namespace hpx::program_options::detail
-
-namespace hpx::program_options {
 
     std::wstring from_8_bit(std::string const& s,
         std::codecvt<wchar_t, char, std::mbstate_t> const& cvt)
@@ -128,4 +123,4 @@ namespace hpx::program_options {
     {
         return to_utf8(s);
     }
-}    // namespace hpx::program_options
+}    // namespace hpx::program_options::detail

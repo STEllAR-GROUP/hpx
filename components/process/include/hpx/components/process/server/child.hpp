@@ -20,7 +20,10 @@
 #include <type_traits>
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace components { namespace process { namespace server {
+
     ///////////////////////////////////////////////////////////////////////////
     class HPX_PROCESS_EXPORT child : public component_base<child>
     {
@@ -41,6 +44,8 @@ namespace hpx { namespace components { namespace process { namespace server {
         process::util::child child_;
     };
 }}}}    // namespace hpx::components::process::server
+
+#include <hpx/config/warnings_suffix.hpp>
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::process::server::child::terminate_action,

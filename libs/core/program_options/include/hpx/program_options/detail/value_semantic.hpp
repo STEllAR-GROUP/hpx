@@ -11,19 +11,18 @@
 
 #include <hpx/program_options/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/any.hpp>
-#include <hpx/datastructures/optional.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/program_options/errors.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <string>
 #include <type_traits>
 #include <vector>
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
-    extern HPX_CORE_EXPORT std::string arg;
+    HPX_CXX_EXPORT extern HPX_CORE_EXPORT std::string arg;
 
     template <typename T, typename Char>
     std::string typed_value<T, Char>::name() const
@@ -37,15 +36,11 @@ namespace hpx { namespace program_options {
                 msg += " (=" + m_default_value_as_text + ")";
             return msg;
         }
-        else if (m_default_value.has_value() &&
-            !m_default_value_as_text.empty())
+        if (m_default_value.has_value() && !m_default_value_as_text.empty())
         {
             return var + " (=" + m_default_value_as_text + ")";
         }
-        else
-        {
-            return var;
-        }
+        return var;
     }
 
     template <typename T, typename Char>
@@ -69,7 +64,7 @@ namespace hpx { namespace program_options {
            Otherwise, returns a reference to a statically allocated
            empty string if 'allow_empty' and throws validation_error
            otherwise. */
-        template <typename Char>
+        HPX_CXX_EXPORT template <typename Char>
         std::basic_string<Char> const& get_single_string(
             std::vector<std::basic_string<Char>> const& v,
             bool allow_empty = false)
@@ -87,7 +82,7 @@ namespace hpx { namespace program_options {
         }
 
         /* Throws multiple_occurrences if 'value' is not empty. */
-        HPX_CORE_EXPORT void check_first_occurrence(
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void check_first_occurrence(
             hpx::any_nonser const& value);
     }    // namespace validators
 
@@ -100,7 +95,7 @@ namespace hpx { namespace program_options {
         pointer to the desired type. This is workaround for compilers without
         partial template ordering, just like the last 'long/int' parameter.
     */
-    template <typename T, typename Char>
+    HPX_CXX_EXPORT template <typename T, typename Char>
     void validate(hpx::any_nonser& v,
         std::vector<std::basic_string<Char>> const& xs, T*, long)
     {
@@ -116,23 +111,23 @@ namespace hpx { namespace program_options {
         }
     }
 
-    HPX_CORE_EXPORT void validate(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void validate(
         hpx::any_nonser& v, std::vector<std::string> const& xs, bool*, int);
 
-    HPX_CORE_EXPORT void validate(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void validate(
         hpx::any_nonser& v, std::vector<std::wstring> const& xs, bool*, int);
 
-    // For some reason, this declaration, which is require by the standard,
+    // For some reason, this declaration, which is required by the standard,
     // cause msvc 7.1 to not generate code to specialization defined in
     // value_semantic.cpp
-    HPX_CORE_EXPORT void validate(hpx::any_nonser& v,
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void validate(hpx::any_nonser& v,
         std::vector<std::string> const& xs, std::string*, int);
-    HPX_CORE_EXPORT void validate(hpx::any_nonser& v,
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void validate(hpx::any_nonser& v,
         std::vector<std::wstring> const& xs, std::string*, int);
 
     /** Validates sequences. Allows multiple values per option occurrence
        and multiple occurrences. */
-    template <typename T, typename Char>
+    HPX_CXX_EXPORT template <typename T, typename Char>
     void validate(hpx::any_nonser& v,
         std::vector<std::basic_string<Char>> const& s, std::vector<T>*, int)
     {
@@ -163,7 +158,7 @@ namespace hpx { namespace program_options {
     }
 
     /** Validates optional arguments. */
-    template <typename T, typename Char>
+    HPX_CXX_EXPORT template <typename T, typename Char>
     void validate(hpx::any_nonser& v,
         std::vector<std::basic_string<Char>> const& s, hpx::optional<T>*, int)
     {
@@ -191,31 +186,30 @@ namespace hpx { namespace program_options {
         }
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     typed_value<T>* value()
     {
         // Explicit qualification is vc6 workaround.
         return hpx::program_options::value<T>(nullptr);
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     typed_value<T>* value(T* v)
     {
         typed_value<T>* r = new typed_value<T>(v);
         return r;
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     typed_value<T, wchar_t>* wvalue()
     {
         return wvalue<T>(nullptr);
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     typed_value<T, wchar_t>* wvalue(T* v)
     {
         typed_value<T, wchar_t>* r = new typed_value<T, wchar_t>(v);
         return r;
     }
-
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options

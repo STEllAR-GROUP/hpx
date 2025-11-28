@@ -27,6 +27,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 using namespace hpx::program_options;
 using namespace std;
 

@@ -6,9 +6,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compute_local/host/target.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/runtime_local/get_os_thread_count.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #include <cstddef>
 #include <vector>

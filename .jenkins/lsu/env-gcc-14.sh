@@ -24,11 +24,10 @@ configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_MPI=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_LCI=ON"
 configure_extra_options+=" -DHPX_WITH_FETCH_LCI=ON"
+configure_extra_options+=" -DHPX_WITH_LCI_BOOTSTRAP_MPI=ON"
 configure_extra_options+=" -DCMAKE_C_COMPILER=gcc"
 configure_extra_options+=" -DCMAKE_C_FLAGS=-fPIC"
-configure_extra_options+=" -DHPX_WITH_DATAPAR_BACKEND=EVE"
-configure_extra_options+=" -DHPX_WITH_FETCH_EVE=ON"
-configure_extra_options+=" -DHPX_WITH_EVE_TAG=main"
+configure_extra_options+=" -DHPX_WITH_DATAPAR_BACKEND=STD_EXPERIMENTAL_SIMD"
 
 # The pwrapi library still needs to be set up properly on rostam
 # configure_extra_options+=" -DHPX_WITH_POWER_COUNTER=ON"

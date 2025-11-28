@@ -6,9 +6,9 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/manage_runtime.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/runtime_local/run_as_hpx_thread.hpp>
 
 hpx::runtime* hpx_thread_func()
 {

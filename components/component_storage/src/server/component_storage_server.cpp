@@ -6,9 +6,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
 
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace components { namespace server {
     component_storage::component_storage()

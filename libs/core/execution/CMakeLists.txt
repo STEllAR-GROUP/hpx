@@ -155,21 +155,46 @@ endif()
 include(HPX_AddModule)
 add_hpx_module(
   core execution
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${execution_sources}
   HEADERS ${execution_headers}
+  ADD_TO_GLOBAL_HEADER
+    "hpx/execution/algorithms/detail/is_negative.hpp"
+    "hpx/execution/algorithms/detail/inject_scheduler.hpp"
+    "hpx/execution/algorithms/detail/partial_algorithm.hpp"
+    "hpx/execution/algorithms/detail/predicates.hpp"
+    "hpx/execution/algorithms/detail/single_result.hpp"
+    "hpx/execution/detail/async_launch_policy_dispatch.hpp"
+    "hpx/execution/detail/execution_parameter_callbacks.hpp"
+    "hpx/execution/detail/future_exec.hpp"
+    "hpx/execution/detail/post_policy_dispatch.hpp"
+    "hpx/execution/detail/sync_launch_policy_dispatch.hpp"
   COMPAT_HEADERS ${execution_compat_headers}
   DEPENDENCIES ${execution_optional_dependencies}
   MODULE_DEPENDENCIES
+    hpx_allocator_support
     hpx_async_base
     hpx_async_combinators
+    hpx_concepts
     hpx_concurrency
     hpx_config
-    hpx_threading
-    hpx_pack_traversal
+    hpx_coroutines
+    hpx_datastructures
     hpx_errors
+    hpx_execution_base
+    hpx_functional
+    hpx_futures
+    hpx_iterator_support
     hpx_lock_registration
     hpx_memory
+    hpx_pack_traversal
+    hpx_preprocessor
+    hpx_serialization
     hpx_synchronization
+    hpx_tag_invoke
+    hpx_threading
+    hpx_threading_base
     hpx_thread_support
     hpx_timing
     hpx_topology

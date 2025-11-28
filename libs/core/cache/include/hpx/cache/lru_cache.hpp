@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/cache/statistics/no_statistics.hpp>
 
 #include <cstddef>
@@ -34,7 +35,7 @@ namespace hpx::util::cache {
     ///                       the type \a statistics#no_statistics which does
     ///                       not collect any numbers, but provides empty stubs
     ///                       allowing the code to compile.
-    template <typename Key, typename Entry,
+    HPX_CXX_EXPORT template <typename Key, typename Entry,
         typename Statistics = statistics::no_statistics>
     class lru_cache
     {

@@ -10,13 +10,13 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/modules/execution_base.hpp>
 #else
 
 #include <hpx/execution/algorithms/start_detached.hpp>
 #include <hpx/execution/algorithms/then.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <utility>
 
@@ -36,7 +36,7 @@ namespace hpx::execution::experimental {
     //      auto work = execution::then(snd, fn);
     //      execution::start_detached(work);
     //
-    inline constexpr struct execute_t final
+    HPX_CXX_EXPORT inline constexpr struct execute_t final
       : hpx::functional::detail::tag_fallback<execute_t>
     {
     private:

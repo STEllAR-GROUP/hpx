@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,14 +9,15 @@
 
 #if defined(HPX_HAVE_LOGGING)
 #include <hpx/logging/config/defines.hpp>
-
+#include <hpx/logging/api.hpp>
 #include <hpx/modules/filesystem.hpp>
-#include <hpx/modules/logging.hpp>
-#include <hpx/util/from_string.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
@@ -98,5 +99,7 @@ namespace hpx::util::logging {
             m_writer(msg);
     }
 }    // namespace hpx::util::logging
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif    // HPX_HAVE_LOGGING

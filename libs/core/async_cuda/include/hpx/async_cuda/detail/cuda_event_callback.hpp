@@ -16,8 +16,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_cuda/custom_gpu_api.hpp>
-#include <hpx/functional/move_only_function.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <string>
 

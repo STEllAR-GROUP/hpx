@@ -5,16 +5,15 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/logging/config/defines.hpp>
-
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>
-#include <hpx/functional/detail/reset_function.hpp>
 #include <hpx/modules/asio.hpp>
 #include <hpx/modules/batch_environments.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/logging.hpp>
 #if defined(HPX_HAVE_MODULE_MPI_BASE)
 #include <hpx/modules/mpi_base.hpp>
 #endif
@@ -29,9 +28,8 @@
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/util.hpp>
 #if defined(HPX_HAVE_MAX_CPU_COUNT)
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #endif
-#include <hpx/util/from_string.hpp>
 #include <hpx/version.hpp>
 
 #include <algorithm>
@@ -44,6 +42,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::util {
 

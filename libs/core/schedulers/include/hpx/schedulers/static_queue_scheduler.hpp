@@ -10,10 +10,10 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/schedulers/local_queue_scheduler.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
-#include <hpx/threading_base/thread_data.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -25,16 +25,18 @@ namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    using default_static_queue_scheduler_terminated_queue = lockfree_lifo;
+    HPX_CXX_EXPORT using default_static_queue_scheduler_terminated_queue =
+        lockfree_lifo;
 #else
-    using default_static_queue_scheduler_terminated_queue = lockfree_fifo;
+    HPX_CXX_EXPORT using default_static_queue_scheduler_terminated_queue =
+        lockfree_fifo;
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
     /// The local_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from.
-    template <typename Mutex = std::mutex,
+    HPX_CXX_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =
@@ -59,14 +61,15 @@ namespace hpx::threads::policies {
             return "static_queue_scheduler";
         }
 
-        void set_scheduler_mode(scheduler_mode mode) noexcept override
+        void set_scheduler_mode(scheduler_mode mode,
+            hpx::threads::mask_cref_type pu_mask) noexcept override
         {
             // this scheduler does not support stealing or numa stealing
             mode = static_cast<scheduler_mode>(
                 mode & ~scheduler_mode::enable_stealing);
             mode = static_cast<scheduler_mode>(
                 mode & ~scheduler_mode::enable_stealing_numa);
-            scheduler_base::set_scheduler_mode(mode);
+            scheduler_base::set_scheduler_mode(mode, pu_mask);
         }
 
         // Return the next thread to be executed, return false if none is

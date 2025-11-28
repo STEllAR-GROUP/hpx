@@ -9,6 +9,7 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
+#include <atomic>
 #include <ostream>
 #include <vector>
 
@@ -46,13 +47,19 @@ namespace hpx {
         // support functions for hpx::intrusive_ptr
         void intrusive_ptr_add_ref(id_type_impl* p) noexcept
         {
-            ++p->count_;
+            p->count_.increment();
         }
 
         void intrusive_ptr_release(id_type_impl* p) noexcept
         {
-            if (0 == --p->count_)
+            if (0 == p->count_.decrement())
             {
+                // The thread that decrements the reference count to zero must
+                // perform an acquire to ensure that it doesn't start
+                // destructing the object until all previous writes have
+                // drained.
+                std::atomic_thread_fence(std::memory_order_acquire);
+
                 id_type_impl::get_deleter(p->get_management_type())(p);
             }
         }
@@ -65,8 +72,7 @@ namespace hpx {
         return *this;
     }
 
-    id_type id_type::operator++(int) const
-    // post-increment
+    id_type id_type::operator++(int) const    // post-increment
     {
         return {(*gid_)++, management_type::unmanaged};
     }

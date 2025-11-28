@@ -9,11 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/errors/error.hpp>
-#include <hpx/errors/throw_exception.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <cstring>
@@ -25,7 +24,6 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::detail {
-
     template <typename T>
     struct empty_vtable_type
     {
@@ -36,7 +34,9 @@ namespace hpx::detail {
     template <typename T>
     using empty_vtable_t = typename empty_vtable_type<T>::type;
 
-#if !defined(HPX_MSVC) && defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
+#if !defined(HPX_MSVC) &&                                                      \
+    defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR) &&                      \
+    !defined(__CUDACC__) && !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename T>
     inline constexpr empty_vtable_t<T> empty_vtable{};
 
@@ -736,7 +736,7 @@ namespace hpx::execution::experimental {
     }    // namespace detail
 #endif
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     class unique_any_sender
 #if defined(HPX_MSVC) || !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
       : private detail::any_sender_static_empty_vtable_helper<Ts...>
@@ -813,7 +813,7 @@ namespace hpx::execution::experimental {
         }
     };
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     class any_sender
 #if defined(HPX_MSVC) || !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
       : private detail::any_sender_static_empty_vtable_helper<Ts...>

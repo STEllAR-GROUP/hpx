@@ -48,11 +48,15 @@ add_hpx_module(
     hpx_algorithms
     hpx_allocator_support
     hpx_async_combinators
+    hpx_async_local
     hpx_concepts
     hpx_config
+    hpx_coroutines
     hpx_datastructures
     hpx_execution
+    hpx_execution_base
     hpx_executors
+    hpx_errors
     hpx_functional
     hpx_futures
     hpx_iterator_support

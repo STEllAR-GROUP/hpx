@@ -8,17 +8,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/barrier.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/affinity.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/thread_pools/scheduling_loop.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
-#include <hpx/threading_base/network_background_callback.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/topology/cpu_mask.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -41,7 +38,7 @@ namespace hpx::threads::detail {
     struct init_tss_helper;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Scheduler>
+    HPX_CXX_EXPORT template <typename Scheduler>
     class scheduled_thread_pool final : public hpx::threads::thread_pool_base
     {
     public:
@@ -54,7 +51,7 @@ namespace hpx::threads::detail {
         scheduled_thread_pool& operator=(scheduled_thread_pool const&) = delete;
         scheduled_thread_pool& operator=(scheduled_thread_pool&&) = delete;
 
-        virtual ~scheduled_thread_pool();
+        ~scheduled_thread_pool() override;
 
         void print_pool(std::ostream& os) const override;
 
@@ -166,7 +163,7 @@ namespace hpx::threads::detail {
         }
 
         void thread_func(std::size_t thread_num, std::size_t global_thread_num,
-            std::shared_ptr<util::barrier> startup);
+            std::shared_ptr<util::barrier> const& startup);
 
         std::size_t get_os_thread_count() const override
         {

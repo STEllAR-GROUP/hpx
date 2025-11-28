@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2017-2-24 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <cstddef>
 #include <type_traits>

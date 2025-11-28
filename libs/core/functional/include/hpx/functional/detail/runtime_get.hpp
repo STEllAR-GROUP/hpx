@@ -7,12 +7,9 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/datastructures/variant.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <array>
 #include <cstddef>
@@ -59,7 +56,7 @@ namespace hpx::detail {
     using first_tuple_element_t =
         hpx::tuple_element_t<0, std::remove_reference_t<Tuple>>;
 
-    template <typename Tuple>
+    HPX_CXX_EXPORT template <typename Tuple>
     [[nodiscard]] constexpr decltype(auto) homogenous_runtime_get(
         Tuple& t, std::size_t i) noexcept
     {
@@ -70,7 +67,7 @@ namespace hpx::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Generate variant that uniquely holds all of the tuple types
+    // Generate variant that uniquely holds all the tuple types
     template <typename Tuple>
     struct variant_from_tuple;
 
@@ -86,7 +83,7 @@ namespace hpx::detail {
     using variant_from_tuple_t = typename variant_from_tuple<Tuple>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Tuple>
+    HPX_CXX_EXPORT template <typename Tuple>
     [[nodiscard]] constexpr decltype(auto) runtime_get(
         Tuple& t, std::size_t i) noexcept
     {

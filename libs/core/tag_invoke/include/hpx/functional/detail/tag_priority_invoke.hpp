@@ -112,7 +112,7 @@ namespace hpx::functional::detail {
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
-#include <hpx/type_support/meta.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -154,8 +154,8 @@ namespace hpx::functional::detail {
 
     namespace tag_override_invoke_ns {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        inline constexpr tag_override_invoke_t_ns::tag_override_invoke_t
-            tag_override_invoke = {};
+        HPX_CXX_EXPORT inline constexpr tag_override_invoke_t_ns::
+            tag_override_invoke_t tag_override_invoke = {};
 #else
         HPX_DEVICE static tag_override_invoke_t_ns::tag_override_invoke_t const
             tag_override_invoke = {};
@@ -163,24 +163,24 @@ namespace hpx::functional::detail {
     }    // namespace tag_override_invoke_ns
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Tag, typename... Args>
+    HPX_CXX_EXPORT template <typename Tag, typename... Args>
     using is_tag_override_invocable =
         hpx::is_invocable<decltype(tag_override_invoke_ns::tag_override_invoke),
             Tag, Args...>;
 
-    template <typename Tag, typename... Args>
+    HPX_CXX_EXPORT template <typename Tag, typename... Args>
     inline constexpr bool is_tag_override_invocable_v =
         is_tag_override_invocable<Tag, Args...>::value;
 
-    template <typename Sig, bool Invocable>
+    HPX_CXX_EXPORT template <typename Sig, bool Invocable>
     struct is_nothrow_tag_override_invocable_impl;
 
-    template <typename Sig>
+    HPX_CXX_EXPORT template <typename Sig>
     struct is_nothrow_tag_override_invocable_impl<Sig, false> : std::false_type
     {
     };
 
-    template <typename Tag, typename... Args>
+    HPX_CXX_EXPORT template <typename Tag, typename... Args>
     struct is_nothrow_tag_override_invocable_impl<
         decltype(tag_override_invoke_ns::tag_override_invoke)(Tag, Args...),
         true>
@@ -210,15 +210,15 @@ namespace hpx::functional::detail {
     };
 #endif
 
-    template <typename Tag, typename... Args>
+    HPX_CXX_EXPORT template <typename Tag, typename... Args>
     inline constexpr bool is_nothrow_tag_override_invocable_v =
         is_nothrow_tag_override_invocable<Tag, Args...>::value;
 
-    template <typename Tag, typename... Args>
+    HPX_CXX_EXPORT template <typename Tag, typename... Args>
     using tag_override_invoke_result = hpx::util::invoke_result<
         decltype(tag_override_invoke_ns::tag_override_invoke), Tag, Args...>;
 
-    template <typename Tag, typename... Args>
+    HPX_CXX_EXPORT template <typename Tag, typename... Args>
     using tag_override_invoke_result_t =
         typename tag_override_invoke_result<Tag, Args...>::type;
 
@@ -226,12 +226,12 @@ namespace hpx::functional::detail {
     namespace tag_base_ns {
 
         // poison pills
-        void tag_invoke();
-        void tag_fallback_invoke();
-        void tag_override_invoke();
+        HPX_CXX_EXPORT void tag_invoke();
+        HPX_CXX_EXPORT void tag_fallback_invoke();
+        HPX_CXX_EXPORT void tag_override_invoke();
 
         // use this tag type to enable the tag_override_invoke function overloads
-        struct enable_tag_override_invoke_t;
+        HPX_CXX_EXPORT struct enable_tag_override_invoke_t;
 
         ///////////////////////////////////////////////////////////////////////
         /// Helper base class implementing the tag_invoke logic for CPOs that
@@ -247,7 +247,7 @@ namespace hpx::functional::detail {
         ///
         /// template <typename T> auto tag_override_invoke(T&& t) ->
         /// decltype(t.foo()){ return t.foo(); }
-        template <typename Tag, typename Enable>
+        HPX_CXX_EXPORT template <typename Tag, typename Enable>
         // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         struct tag_priority
         {
@@ -306,7 +306,7 @@ namespace hpx::functional::detail {
         // that allow overriding user-defined tag_invoke overloads with
         // tag_override_invoke, and that allow setting a fallback with
         // tag_fallback_invoke.
-        template <typename Tag, typename Enable>
+        HPX_CXX_EXPORT template <typename Tag, typename Enable>
         // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         struct tag_priority_noexcept
         {
@@ -361,22 +361,22 @@ namespace hpx::functional::detail {
 
     inline namespace tag_invoke_base_ns {
 
-        template <typename Tag,
+        HPX_CXX_EXPORT template <typename Tag,
             typename Enable = meta::constant<meta::bool_<true>>>
         using tag_priority = tag_base_ns::tag_priority<Tag, Enable>;
 
-        template <typename Tag,
+        HPX_CXX_EXPORT template <typename Tag,
             typename Enable = meta::constant<meta::bool_<true>>>
         using tag_priority_noexcept =
             tag_base_ns::tag_priority_noexcept<Tag, Enable>;
 
-        using enable_tag_override_invoke_t =
+        HPX_CXX_EXPORT using enable_tag_override_invoke_t =
             tag_base_ns::enable_tag_override_invoke_t;
     }    // namespace tag_invoke_base_ns
 
     inline namespace tag_override_invoke_f_ns {
 
-        using tag_override_invoke_ns::tag_override_invoke;
+        HPX_CXX_EXPORT using tag_override_invoke_ns::tag_override_invoke;
     }    // namespace tag_override_invoke_f_ns
 }    // namespace hpx::functional::detail
 

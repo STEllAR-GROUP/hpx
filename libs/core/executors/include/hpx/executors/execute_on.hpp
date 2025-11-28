@@ -1,4 +1,4 @@
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/execution_base/sender.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/explicit_scheduler_executor.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -48,7 +48,7 @@ namespace hpx::execution::experimental {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Scheduler, typename ExPolicy>
+    HPX_CXX_EXPORT template <typename Scheduler, typename ExPolicy>
     struct scheduler_and_policy : std::decay_t<Scheduler>
     {
         using base_scheduler_type = std::decay_t<Scheduler>;
@@ -89,18 +89,15 @@ namespace hpx::execution::experimental {
         policy_type policy;
     };
 
-    // different versions of clang-format disagree
-    // clang-format off
-    template <typename Scheduler, typename ExPolicy>
+    HPX_CXX_EXPORT template <typename Scheduler, typename ExPolicy>
     scheduler_and_policy(Scheduler&&, ExPolicy&&)
         -> scheduler_and_policy<std::decay_t<Scheduler>,
             std::decay_t<ExPolicy>>;
-    // clang-format on
 
     ////////////////////////////////////////////////////////////////////////////
     // support all scheduling properties exposed by the embedded scheduler
     // clang-format off
-    template <typename Tag, typename Scheduler, typename ExPolicy,
+    HPX_CXX_EXPORT template <typename Tag, typename Scheduler, typename ExPolicy,
         typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
@@ -120,7 +117,7 @@ namespace hpx::execution::experimental {
     }
 
     // clang-format off
-    template <typename Tag, typename Scheduler, typename ExPolicy,
+    HPX_CXX_EXPORT template <typename Tag, typename Scheduler, typename ExPolicy,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>
@@ -144,12 +141,12 @@ namespace hpx::execution::experimental {
         // Customizations of the parallel algorithms can reuse the existing
         // implementation of parallel algorithms with ExecutionPolicy template
         // parameter for "known" base_scheduler_type type.
-        template <typename Scheduler, typename Enable = void>
+        HPX_CXX_EXPORT template <typename Scheduler, typename Enable = void>
         struct is_policy_aware_scheduler : std::false_type
         {
         };
 
-        template <typename Scheduler>
+        HPX_CXX_EXPORT template <typename Scheduler>
         struct is_policy_aware_scheduler<Scheduler,
             std::enable_if_t<is_scheduler_v<Scheduler> &&
                 detail::exposes_policy_aware_scheduler_types<
@@ -158,7 +155,7 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <typename Scheduler>
+        HPX_CXX_EXPORT template <typename Scheduler>
         inline constexpr bool is_policy_aware_scheduler_v =
             is_policy_aware_scheduler<Scheduler>::value;
 
@@ -168,7 +165,7 @@ namespace hpx::execution::experimental {
         //
         // It's up to scheduler customization to check if it can work with the
         // passed execution policy.
-        inline constexpr struct execute_on_t final
+        HPX_CXX_EXPORT inline constexpr struct execute_on_t final
           : hpx::functional::detail::tag_fallback<execute_on_t>
         {
         private:

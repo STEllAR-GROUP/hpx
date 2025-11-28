@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,8 @@
 
 #pragma once
 
-#include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/config.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/string_util/token_iterator.hpp>
 
 #include <string>
@@ -26,7 +27,7 @@ namespace hpx::string_util {
 
     //===========================================================================
     // A container-view of a tokenized "sequence"
-    template <typename TokenizerFunc = char_separator<char>,
+    HPX_CXX_EXPORT template <typename TokenizerFunc = char_separator<char>,
         typename Iterator = std::string::const_iterator,
         typename Type = std::string>
     class tokenizer
@@ -119,16 +120,13 @@ namespace hpx::string_util {
         TokenizerFunc f_;
     };
 
-    // different clang-format versions disagree
-    // clang-format off
-    template <typename Iterator, typename F>
+    HPX_CXX_EXPORT template <typename Iterator, typename F>
     tokenizer(Iterator, Iterator, F&&) -> tokenizer<std::decay_t<F>, Iterator,
         std::basic_string<typename std::iterator_traits<Iterator>::value_type>>;
 
-    template <typename Container, typename F>
+    HPX_CXX_EXPORT template <typename Container, typename F>
     tokenizer(Container const&, F&&)
         -> tokenizer<std::decay_t<F>, traits::range_iterator_t<Container const>,
             std::basic_string<typename std::iterator_traits<
                 traits::range_iterator_t<Container>>::value_type>>;
-    // clang-format on
 }    // namespace hpx::string_util

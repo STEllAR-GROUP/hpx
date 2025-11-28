@@ -8,12 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/is_future_range.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
-#include <hpx/util/detail/reserve.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/util.hpp>
 
 #include <algorithm>
 #include <array>
@@ -26,19 +25,19 @@ namespace hpx::traits {
 
     namespace detail {
 
-        template <typename T, typename Enable = void>
+        HPX_CXX_EXPORT template <typename T, typename Enable = void>
         struct acquire_future_impl;
-    }
+    }    // namespace detail
 
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct acquire_future : detail::acquire_future_impl<std::decay_t<T>>
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using acquire_future_t = typename acquire_future<T>::type;
 
-    struct acquire_future_disp
+    HPX_CXX_EXPORT struct acquire_future_disp
     {
         template <typename T>
         HPX_FORCEINLINE acquire_future_t<T> operator()(T&& t) const
@@ -50,7 +49,7 @@ namespace hpx::traits {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename Enable>
+        HPX_CXX_EXPORT template <typename T, typename Enable>
         struct acquire_future_impl
         {
             static_assert(!is_future_or_future_range_v<T>,
@@ -66,7 +65,7 @@ namespace hpx::traits {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename R>
+        HPX_CXX_EXPORT template <typename R>
         struct acquire_future_impl<hpx::future<R>>
         {
             using type = hpx::future<R>;
@@ -84,7 +83,7 @@ namespace hpx::traits {
             }
         };
 
-        template <typename R>
+        HPX_CXX_EXPORT template <typename R>
         struct acquire_future_impl<hpx::shared_future<R>>
         {
             using type = hpx::shared_future<R>;
@@ -106,7 +105,7 @@ namespace hpx::traits {
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(push_back)
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Range>
+        HPX_CXX_EXPORT template <typename Range>
         struct acquire_future_impl<Range,
             std::enable_if_t<hpx::traits::is_future_range_v<Range>>>
         {

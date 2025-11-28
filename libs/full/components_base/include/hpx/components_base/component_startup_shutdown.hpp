@@ -11,8 +11,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/runtime_local/component_startup_shutdown_base.hpp>
+#include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::components {

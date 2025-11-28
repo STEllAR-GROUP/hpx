@@ -7,11 +7,11 @@
 
 #define GUIDED_EXECUTOR_DEBUG 1
 
-#include <hpx/debugging/demangle_helper.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/functional.hpp>
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/testing.hpp>

@@ -7,18 +7,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#include <hpx/serialization/exception_ptr.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <exception>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::runtime_local::detail {
 
-    HPX_CORE_EXPORT void save_custom_exception(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void save_custom_exception(
         hpx::serialization::output_archive&, std::exception_ptr const&,
         unsigned int);
-    HPX_CORE_EXPORT void load_custom_exception(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void load_custom_exception(
         hpx::serialization::input_archive&, std::exception_ptr&, unsigned int);
 }    // namespace hpx::runtime_local::detail

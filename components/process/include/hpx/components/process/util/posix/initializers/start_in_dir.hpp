@@ -14,42 +14,43 @@
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <string>
 #include <unistd.h>
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
-namespace initializers {
+    namespace initializers {
 
-class start_in_dir : public initializer_base
-{
-public:
-    start_in_dir() {}
+        class start_in_dir : public initializer_base
+        {
+        public:
+            start_in_dir() {}
 
-    explicit start_in_dir(const std::string &s) : s_(s) {}
+            explicit start_in_dir(const std::string& s)
+              : s_(s)
+            {
+            }
 
-    template <class PosixExecutor>
-    void on_exec_setup(PosixExecutor&) const
-    {
-        ::chdir(s_.c_str());
-    }
+            template <class PosixExecutor>
+            void on_exec_setup(PosixExecutor&) const
+            {
+                ::chdir(s_.c_str());
+            }
 
-private:
-    friend class hpx::serialization::access;
+        private:
+            friend class hpx::serialization::access;
 
-    template <typename Archive>
-    void serialize(Archive& ar, unsigned const)
-    {
-        ar & s_;
-    }
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned const)
+            {
+                ar & s_;
+            }
 
-    std::string s_;
-};
+            std::string s_;
+        };
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::posix::initializers
 
 #endif

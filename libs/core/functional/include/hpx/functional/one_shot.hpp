@@ -10,9 +10,9 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -125,7 +125,7 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     constexpr detail::one_shot_wrapper<std::decay_t<F>> one_shot(F&& f)
     {
         using result_type = detail::one_shot_wrapper<std::decay_t<F>>;
@@ -138,7 +138,7 @@ namespace hpx::util {
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     struct get_function_address<util::detail::one_shot_wrapper<F>>
     {
         [[nodiscard]] static constexpr std::size_t call(
@@ -149,7 +149,7 @@ namespace hpx::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     struct get_function_annotation<util::detail::one_shot_wrapper<F>>
     {
         [[nodiscard]] static constexpr char const* call(
@@ -160,7 +160,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     struct get_function_annotation_itt<util::detail::one_shot_wrapper<F>>
     {
         [[nodiscard]] static util::itt::string_handle call(
@@ -176,7 +176,7 @@ namespace hpx::traits {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::serialization {
 
-    template <typename Archive, typename F>
+    HPX_CXX_EXPORT template <typename Archive, typename F>
     void serialize(Archive& ar,
         ::hpx::util::detail::one_shot_wrapper<F>& one_shot_wrapper,
         unsigned int const version = 0)

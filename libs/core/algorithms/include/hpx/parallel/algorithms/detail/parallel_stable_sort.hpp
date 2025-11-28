@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/executors/exception_list.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/parallel/algorithms/detail/sample_sort.hpp>
 
 #include <cstddef>

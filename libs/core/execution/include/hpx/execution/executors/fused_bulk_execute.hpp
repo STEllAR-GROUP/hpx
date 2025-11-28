@@ -7,12 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution_base/execution.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -22,7 +21,8 @@
 namespace hpx::parallel::execution::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename Shape, typename Future, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename Shape, typename Future,
+        typename... Ts>
     struct then_bulk_function_result
     {
         using value_type =
@@ -31,7 +31,8 @@ namespace hpx::parallel::execution::detail {
             Future, Ts...>;
     };
 
-    template <typename F, typename Shape, typename Future, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename Shape, typename Future,
+        typename... Ts>
     using then_bulk_function_result_t =
         typename then_bulk_function_result<F, Shape, Future, Ts...>::type;
 
@@ -53,7 +54,8 @@ namespace hpx::parallel::execution::detail {
         using type = void;
     };
 
-    template <typename F, typename Shape, typename Future, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename Shape, typename Future,
+        typename... Ts>
     struct bulk_then_execute_result
       : bulk_then_execute_result_impl<F, Shape, Future,
             std::is_void_v<
@@ -62,7 +64,8 @@ namespace hpx::parallel::execution::detail {
     {
     };
 
-    template <typename F, typename Shape, typename Future, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename Shape, typename Future,
+        typename... Ts>
     using bulk_then_execute_result_t =
         typename bulk_then_execute_result<F, Shape, Future, Ts...>::type;
 
@@ -101,7 +104,8 @@ namespace hpx::parallel::execution::detail {
         }
     };
 
-    template <typename Executor, typename F, typename Shape, typename Args>
+    HPX_CXX_EXPORT template <typename Executor, typename F, typename Shape,
+        typename Args>
     fused_bulk_sync_execute_helper<std::decay_t<Executor>, std::decay_t<F>,
         Shape, std::decay_t<Args>>
     make_fused_bulk_sync_execute_helper(
@@ -149,7 +153,8 @@ namespace hpx::parallel::execution::detail {
         }
     };
 
-    template <typename Executor, typename F, typename Shape, typename Args>
+    HPX_CXX_EXPORT template <typename Executor, typename F, typename Shape,
+        typename Args>
     fused_bulk_async_execute_helper<std::decay_t<Executor>, std::decay_t<F>,
         std::decay_t<Shape>, std::decay_t<Args>>
     make_fused_bulk_async_execute_helper(

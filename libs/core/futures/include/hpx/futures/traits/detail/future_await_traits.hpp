@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,14 +13,23 @@
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/type_support/coroutines_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <exception>
 #include <memory>
 #include <type_traits>
 #include <utility>
+
+#if defined(__has_include)
+#if __has_include(<coroutine>)
+#include <coroutine>
+#elif __has_include(<experimental/coroutine>)
+#include <experimental/coroutine>
+#endif
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::lcos::detail {
@@ -60,10 +69,10 @@ namespace hpx::lcos::detail {
 
     HPX_HAS_MEMBER_XXX_TRAIT_DEF(set_exception);
 
-    template <typename T, typename Promise,
-        typename = std::enable_if_t<has_set_exception_v<Promise>>>
+    template <typename T, typename Promise>
     HPX_FORCEINLINE void await_suspend(
         hpx::future<T>& f, coroutine_handle<Promise> rh)
+        requires(has_set_exception_v<Promise>)
     {
         // f.then([=](future<T> result) {});
         auto st = traits::detail::get_shared_state(f);
@@ -103,10 +112,10 @@ namespace hpx::lcos::detail {
         return f.is_ready();
     }
 
-    template <typename T, typename Promise,
-        typename = std::enable_if_t<has_set_exception_v<Promise>>>
+    template <typename T, typename Promise>
     HPX_FORCEINLINE void await_suspend(
         hpx::shared_future<T>& f, coroutine_handle<Promise> rh)
+        requires(has_set_exception_v<Promise>)
     {
         // f.then([=](shared_future<T> result) {})
         auto st = traits::detail::get_shared_state(f);
@@ -203,7 +212,7 @@ namespace hpx::lcos::detail {
 ///////////////////////////////////////////////////////////////////////////////
 namespace HPX_COROUTINE_NAMESPACE_STD {
 
-    // Allow for functions that use co_await to return an hpx::future<T>
+    // Allow for functions that use co_await to return a hpx::future<T>
     template <typename T, typename... Ts>
     struct coroutine_traits<hpx::future<T>, Ts...>
     {

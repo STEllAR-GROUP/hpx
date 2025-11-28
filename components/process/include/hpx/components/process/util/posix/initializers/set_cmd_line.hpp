@@ -14,8 +14,7 @@
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
-#include <hpx/serialization/string.hpp>
-#include <hpx/serialization/vector.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/string_util.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
@@ -70,13 +69,13 @@ namespace hpx::components::process::posix::initializers {
         template <typename Archive>
         void save(Archive& ar, unsigned const) const
         {
-            ar& args_;
+            ar & args_;
         }
 
         template <typename Archive>
         void load(Archive& ar, const unsigned int)
         {
-            ar& args_;
+            ar & args_;
             init_command_line_arguments();
         }
 

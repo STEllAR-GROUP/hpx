@@ -10,19 +10,17 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/modules/execution_base.hpp>
 #else
 
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/allocator_support/traits/is_allocator.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/inject_scheduler.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/run_loop.hpp>
 #include <hpx/execution/algorithms/split.hpp>
-#include <hpx/execution_base/completion_scheduler.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/functional/detail/tag_priority_invoke.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <exception>
 #include <memory>
@@ -55,7 +53,7 @@ namespace hpx::execution::experimental {
     // way to signal completion of the operation so that resource release can be
     // sequenced after the completion.
     //
-    inline constexpr struct ensure_started_t final
+    HPX_CXX_EXPORT inline constexpr struct ensure_started_t final
       : hpx::functional::detail::tag_priority<ensure_started_t>
     {
     private:

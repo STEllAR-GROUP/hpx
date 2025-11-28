@@ -7,13 +7,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/pack_traversal.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>
 #include <cstdint>

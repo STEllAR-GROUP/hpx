@@ -85,7 +85,7 @@ int main()
     std::string coarray_name("my_coarray");
 
     hpx::future<void> join = hpx::lcos::define_spmd_block(
-        "block", 4, bulk_test_action(), height, width, elt_size, coarray_name);
+        "block", 2, bulk_test_action(), height, width, elt_size, coarray_name);
 
     hpx::wait_all(join);
 

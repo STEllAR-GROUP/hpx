@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,28 +10,20 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/modules/execution_base.hpp>
 #else
 
-#include <hpx/allocator_support/allocator_deleter.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/allocator_support/traits/is_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/inject_scheduler.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/run_loop.hpp>
-#include <hpx/execution_base/completion_scheduler.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/operation_state.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/detail/tag_priority_invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -44,7 +36,8 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename Derived, typename Sender, typename Allocator>
+        HPX_CXX_EXPORT template <typename Derived, typename Sender,
+            typename Allocator>
         struct operation_state_holder_base
         {
             struct start_detached_receiver
@@ -106,14 +99,20 @@ namespace hpx::execution::experimental {
             friend void intrusive_ptr_add_ref(
                 operation_state_holder_base* p) noexcept
             {
-                ++p->count;
+                p->count.increment();
             }
 
             friend void intrusive_ptr_release(
                 operation_state_holder_base* p) noexcept
             {
-                if (--p->count == 0)
+                if (p->count.decrement() == 0)
                 {
+                    // The thread that decrements the reference count to zero
+                    // must perform an acquire to ensure that it doesn't start
+                    // destructing the object until all previous writes have
+                    // drained.
+                    std::atomic_thread_fence(std::memory_order_acquire);
+
                     allocator_type other_alloc(p->alloc);
                     std::allocator_traits<allocator_type>::destroy(
                         other_alloc, static_cast<Derived*>(p));
@@ -123,7 +122,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        template <typename Sender, typename Allocator>
+        HPX_CXX_EXPORT template <typename Sender, typename Allocator>
         struct operation_state_holder
           : operation_state_holder_base<
                 operation_state_holder<Sender, Allocator>, Sender, Allocator>
@@ -142,7 +141,7 @@ namespace hpx::execution::experimental {
             static constexpr void finish() noexcept {}
         };
 
-        template <typename Sender, typename Allocator>
+        HPX_CXX_EXPORT template <typename Sender, typename Allocator>
         struct operation_state_holder_with_run_loop
           : operation_state_holder_base<
                 operation_state_holder_with_run_loop<Sender, Allocator>, Sender,
@@ -181,7 +180,7 @@ namespace hpx::execution::experimental {
     //
     // Like ensure_started, but does not return a value; if the provided sender
     // sends an error instead of a value, std::terminate is called.
-    inline constexpr struct start_detached_t final
+    HPX_CXX_EXPORT inline constexpr struct start_detached_t final
       : hpx::functional::detail::tag_priority<start_detached_t>
     {
     private:

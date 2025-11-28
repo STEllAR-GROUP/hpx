@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,8 +18,8 @@
 
 namespace hpx::serialization {
 
-    template <typename Key, typename Value, typename Hash, typename KeyEqual,
-        typename Alloc>
+    HPX_CXX_EXPORT template <typename Key, typename Value, typename Hash,
+        typename KeyEqual, typename Alloc>
     void serialize(input_archive& ar,
         std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>& t, unsigned)
     {
@@ -41,8 +41,8 @@ namespace hpx::serialization {
         }
     }
 
-    template <typename Key, typename Value, typename Hash, typename KeyEqual,
-        typename Alloc>
+    HPX_CXX_EXPORT template <typename Key, typename Value, typename Hash,
+        typename KeyEqual, typename Alloc>
     void serialize(output_archive& ar,
         std::unordered_map<Key, Value, Hash, KeyEqual, Alloc> const& t,
         unsigned)

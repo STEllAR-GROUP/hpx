@@ -10,13 +10,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/spinlock_pool.hpp>
-#include <hpx/execution_base/this_thread.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/lock_registration.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/naming_base/naming_base.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
 #include <cstddef>
 #include <cstdint>

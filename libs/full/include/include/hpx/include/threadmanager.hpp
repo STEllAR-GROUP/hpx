@@ -9,9 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/threading.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
-#include <hpx/runtime_local/thread_pool_helpers.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/topology/topology.hpp>
+#include <hpx/modules/topology.hpp>

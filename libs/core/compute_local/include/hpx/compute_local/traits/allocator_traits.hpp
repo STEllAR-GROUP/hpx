@@ -12,7 +12,7 @@
 #include <hpx/compute_local/host/target.hpp>
 #include <hpx/compute_local/host/traits/access_target.hpp>
 #include <hpx/compute_local/traits/access_target.hpp>
-#include <hpx/type_support/detail/wrap_int.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <memory>
 #include <utility>

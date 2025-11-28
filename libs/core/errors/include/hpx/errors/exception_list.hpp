@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/errors/exception.hpp>
-#include <hpx/thread_support/spinlock.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -31,7 +31,7 @@ namespace hpx {
     /// The type exception_list::const_iterator fulfills the requirements of
     /// a forward iterator.
     ///
-    class HPX_CORE_EXPORT exception_list : public hpx::exception
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT exception_list : public hpx::exception
     {
     private:
         /// \cond NOINTERNAL

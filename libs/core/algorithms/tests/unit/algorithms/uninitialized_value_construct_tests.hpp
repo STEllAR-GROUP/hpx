@@ -81,6 +81,39 @@ void test_uninitialized_value_construct_async(ExPolicy&& policy, IteratorTag)
     std::free(p);
 }
 
+#if defined(HPX_HAVE_STDEXEC)
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_uninitialized_value_construct_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    using base_iterator = value_constructable*;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    value_constructable* p = (value_constructable*) std::malloc(
+        data_size * sizeof(value_constructable));
+    std::memset(
+        static_cast<void*>(p), 0xcd, data_size * sizeof(value_constructable));
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+    tt::sync_wait(ex::just(iterator(p), iterator(p + data_size)) |
+        hpx::uninitialized_value_construct(ex_policy.on(exec)));
+
+    std::size_t count = 0;
+    std::for_each(p, p + data_size, [&count](value_constructable v1) {
+        HPX_TEST_EQ(v1.value_, 0);
+        ++count;
+    });
+    HPX_TEST_EQ(count, data_size);
+
+    std::free(p);
+}
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_value_construct_exception(ExPolicy policy, IteratorTag)
@@ -184,6 +217,62 @@ void test_uninitialized_value_construct_exception_async(
     std::free(p);
 }
 
+#if defined(HPX_HAVE_STDEXEC)
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_uninitialized_value_construct_exception_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    using data_type = test::count_instances_v<value_constructable>;
+    using base_iterator = data_type*;
+    using decorated_iterator =
+        test::decorated_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    data_type* p = (data_type*) std::malloc(data_size * sizeof(data_type));
+    std::memset(static_cast<void*>(p), 0xcd, data_size * sizeof(data_type));
+
+    std::atomic<std::size_t> throw_after(std::rand() % data_size);    //-V104
+    std::size_t throw_after_ = throw_after.load();
+
+    data_type::instance_count.store(0);
+    data_type::max_instance_count.store(0);
+
+    bool caught_exception = false;
+    try
+    {
+        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+        tt::sync_wait(ex::just(decorated_iterator(p,
+                                   [&throw_after]() {
+                                       if (throw_after-- == 0)
+                                           throw std::runtime_error("test");
+                                   }),
+                          decorated_iterator(p + data_size)) |
+            hpx::uninitialized_value_construct(ex_policy.on(exec)));
+
+        HPX_TEST(false);
+    }
+    catch (hpx::exception_list const& e)
+    {
+        caught_exception = true;
+        test::test_num_exceptions<ExPolicy, IteratorTag>::call(ex_policy, e);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+    HPX_TEST_EQ(data_type::instance_count.load(), std::size_t(0));
+    HPX_TEST_LTE(throw_after_, data_type::max_instance_count.load());
+
+    std::free(p);
+}
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_value_construct_bad_alloc(ExPolicy policy, IteratorTag)
@@ -285,3 +374,58 @@ void test_uninitialized_value_construct_bad_alloc_async(
 
     std::free(p);
 }
+
+#if defined(HPX_HAVE_STDEXEC)
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_uninitialized_value_construct_bad_alloc_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    using data_type = test::count_instances_v<value_constructable>;
+    using base_iterator = data_type*;
+    using decorated_iterator =
+        test::decorated_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    data_type* p = (data_type*) std::malloc(data_size * sizeof(data_type));
+    std::memset(static_cast<void*>(p), 0xcd, data_size * sizeof(data_type));
+
+    std::atomic<std::size_t> throw_after(std::rand() % data_size);    //-V104
+    std::size_t throw_after_ = throw_after.load();
+
+    data_type::instance_count.store(0);
+    data_type::max_instance_count.store(0);
+
+    bool caught_bad_alloc = false;
+    try
+    {
+        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+        tt::sync_wait(ex::just(decorated_iterator(p,
+                                   [&throw_after]() {
+                                       if (throw_after-- == 0)
+                                           throw std::bad_alloc();
+                                   }),
+                          decorated_iterator(p + data_size)) |
+            hpx::uninitialized_value_construct(ex_policy.on(exec)));
+
+        HPX_TEST(false);
+    }
+    catch (std::bad_alloc const&)
+    {
+        caught_bad_alloc = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_bad_alloc);
+    HPX_TEST_EQ(data_type::instance_count.load(), std::size_t(0));
+    HPX_TEST_LTE(throw_after_, data_type::max_instance_count.load());
+
+    std::free(p);
+}
+#endif

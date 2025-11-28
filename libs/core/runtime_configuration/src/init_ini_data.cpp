@@ -7,13 +7,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/ini.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/plugin.hpp>
+#include <hpx/modules/prefix.hpp>
 #include <hpx/modules/string_util.hpp>
-#include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime_configuration/init_ini_data.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
@@ -31,6 +31,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
+
     ///////////////////////////////////////////////////////////////////////////
     bool handle_ini_file(section& ini, std::string const& loc)
     {
@@ -53,8 +54,7 @@ namespace hpx::util {
     bool handle_ini_file_env(
         section& ini, char const* env_var, char const* file_suffix)
     {
-        char const* env = getenv(env_var);
-        if (nullptr != env)
+        if (char const* env = getenv(env_var); nullptr != env)
         {
             namespace fs = filesystem;
 
@@ -123,7 +123,7 @@ namespace hpx::util {
         // look for master ini in the HPX_INI environment
         result = handle_ini_file_env(ini, "HPX_INI") || result;
 
-        // afterwards in the standard locations
+        // afterward in the standard locations
 #if !defined(HPX_WINDOWS)    // /etc/hpx.ini doesn't make sense for Windows
         {
             bool result2 = handle_ini_file(ini, "/etc/hpx.ini");
@@ -145,7 +145,7 @@ namespace hpx::util {
                 std::cerr
                     << "hpx::init: command line warning: file specified using "
                        "--hpx:config does not exist ("
-                    << hpx_ini_file << ")." << std::endl;
+                    << hpx_ini_file << ").\n";
                 hpx_ini_file.clear();
                 result = false;
             }
@@ -278,8 +278,8 @@ namespace hpx::util {
         return registries;
     }
 
-    void load_component_factory(hpx::util::plugin::dll& d, util::section& ini,
-        std::string const& curr,
+    static void load_component_factory(hpx::util::plugin::dll& d,
+        util::section& ini, std::string const& curr,
         std::vector<std::shared_ptr<components::component_registry_base>>&
             component_registries,
         std::string name, error_code& ec)
@@ -332,7 +332,7 @@ namespace hpx::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::vector<std::shared_ptr<plugins::plugin_registry_base>>
+    static std::vector<std::shared_ptr<plugins::plugin_registry_base>>
     load_plugin_factory(hpx::util::plugin::dll& d, util::section& ini,
         std::string const& /* curr */, std::string const& /* name */,
         error_code& ec)
@@ -372,22 +372,6 @@ namespace hpx::util {
         ini.parse("<plugin registry>", ini_data, false, false);
         return plugin_registries;
     }
-
-    namespace detail {
-        inline bool cmppath_less(
-            std::pair<filesystem::path, std::string> const& lhs,
-            std::pair<filesystem::path, std::string> const& rhs)
-        {
-            return lhs.first < rhs.first;
-        }
-
-        inline bool cmppath_equal(
-            std::pair<filesystem::path, std::string> const& lhs,
-            std::pair<filesystem::path, std::string> const& rhs)
-        {
-            return lhs.first == rhs.first;
-        }
-    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     std::vector<std::shared_ptr<plugins::plugin_registry_base>>

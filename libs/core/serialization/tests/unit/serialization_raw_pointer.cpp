@@ -1,22 +1,23 @@
-//  Copyright (c) 2021-2024 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
+// If C++ modules are enabled, we have no way of enforcing settings that were
+// not specified at configuration time.
+#if !defined(HPX_HAVE_CXX_MODULES)
 // enforce pointers being serializable
 #define HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION
 
 // allow for const tuple members
 #define HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS
+#endif
 
-#include <hpx/config.hpp>
 #include <hpx/init.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/std_tuple.hpp>
-
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -52,6 +53,7 @@ struct hpx::traits::is_bitwise_serializable<A> : std::false_type
 
 int hpx_main()
 {
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION)
     // serialize raw pointer
     {
         static_assert(hpx::traits::is_bitwise_serializable_v<int*>);
@@ -90,6 +92,7 @@ int hpx_main()
         HPX_TEST(outp == inp);
     }
 
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS)
     // serialize raw pointer as part of std::tuple
     {
         static_assert(hpx::traits::is_bitwise_serializable_v<
@@ -109,7 +112,10 @@ int hpx_main()
         iarchive >> it;
         HPX_TEST(ot == it);
     }
+#endif
+#endif
 
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS)
     // serialize tuple with a non-zero-copyable type and a const
     {
         static_assert(
@@ -129,6 +135,7 @@ int hpx_main()
         iarchive >> it;
         HPX_TEST(ot == it);
     }
+#endif
 
     return hpx::local::finalize();
 }

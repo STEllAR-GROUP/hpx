@@ -7,17 +7,10 @@
 // hpxinspect:nodeprecatedinclude:boost/intrusive_ptr.hpp
 // hpxinspect:nodeprecatedname:boost::intrusive_ptr
 
-#include <hpx/serialization/base_object.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
-
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <hpx/serialization/boost_intrusive_ptr.hpp>
-
 #include <boost/intrusive_ptr.hpp>
 #endif
 

@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/debugging/print.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 
 #include <iosfwd>
@@ -17,7 +17,7 @@
 namespace hpx::debug {
 
     // safely dump thread pointer/description
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct threadinfo;
 
     // safely dump thread pointer/description

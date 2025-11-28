@@ -10,9 +10,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/barrier.hpp>
 #include <hpx/io_service/io_service_pool_fwd.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <winsock2.h>
@@ -42,7 +42,7 @@
 namespace hpx::util {
 
     /// A pool of io_service objects.
-    class io_service_pool
+    HPX_CXX_EXPORT class io_service_pool
     {
     public:
         /// \brief Construct the io_service pool.
@@ -95,7 +95,7 @@ namespace hpx::util {
         bool stopped();
 
         /// \brief Get an io_service to use.
-        asio::io_context& get_io_service(int index = -1);
+        ::asio::io_context& get_io_service(int index = -1);
 
         /// \brief access underlying thread handle
         std::thread& get_os_thread_handle(std::size_t thread_num);
@@ -126,13 +126,13 @@ namespace hpx::util {
         void wait_locked();
 
     private:
-        using io_service_ptr = std::unique_ptr<asio::io_context>;
+        using io_service_ptr = std::unique_ptr<::asio::io_context>;
 
         using raw_work_type =
-            asio::executor_work_guard<asio::io_context::executor_type>;
+            ::asio::executor_work_guard<::asio::io_context::executor_type>;
         using work_type = std::unique_ptr<raw_work_type>;
 
-        static work_type initialize_work(asio::io_context& io_service);
+        static work_type initialize_work(::asio::io_context& io_service);
 
         std::mutex mtx_;
 

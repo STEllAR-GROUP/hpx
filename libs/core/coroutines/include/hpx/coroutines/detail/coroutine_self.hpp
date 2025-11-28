@@ -34,14 +34,14 @@
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <cstddef>
 #include <utility>
 
 namespace hpx::threads::coroutines::detail {
 
-    class coroutine_self
+    HPX_CXX_EXPORT class coroutine_self
     {
     public:
         using thread_id_type = hpx::threads::thread_id;

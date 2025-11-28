@@ -23,7 +23,7 @@ namespace hpx::experimental {
 
     namespace detail {
 
-        template <typename F>
+        HPX_CXX_EXPORT template <typename F>
         struct scope_success
         {
             explicit constexpr scope_success(F&& f) noexcept(
@@ -81,7 +81,7 @@ namespace hpx::experimental {
     /// \tparam F type of stored exit function
     ///
     /// \param f stored exit function
-    template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     auto scope_success(F&& f)
     {
         return detail::scope_success<std::decay_t<F>>(HPX_FORWARD(F, f));

@@ -9,13 +9,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/execution/traits/vector_pack_alignment_size.hpp>
-#include <hpx/execution/traits/vector_pack_get_set.hpp>
-#include <hpx/execution/traits/vector_pack_load_store.hpp>
-#include <hpx/execution/traits/vector_pack_type.hpp>
-#include <hpx/executors/datapar/execution_policy.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/util/loop.hpp>
 

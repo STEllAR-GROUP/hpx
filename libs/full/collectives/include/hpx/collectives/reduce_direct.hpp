@@ -79,18 +79,15 @@ namespace hpx { namespace lcos {
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_colocated/async_colocated.hpp>
-#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/serialization/vector.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/util/calculate_fanout.hpp>
 
 #include <cstddef>
 #include <type_traits>

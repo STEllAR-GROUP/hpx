@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 
 #include <utility>
@@ -17,7 +17,7 @@
 namespace hpx::lcos::local {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct conditional_trigger
+    HPX_CXX_EXPORT struct conditional_trigger
     {
     public:
         conditional_trigger() = default;

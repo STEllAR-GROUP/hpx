@@ -7,11 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution_base/this_thread.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/thread_pools/detail/scheduling_callbacks.hpp>
 #include <hpx/thread_pools/detail/scheduling_counters.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/threading_base_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>

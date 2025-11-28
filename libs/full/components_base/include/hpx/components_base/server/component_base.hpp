@@ -13,12 +13,14 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/components_base_fwd.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <cstdint>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::components {
 
@@ -146,3 +148,5 @@ namespace hpx::components {
         }
     };
 }    // namespace hpx::components
+
+#include <hpx/config/warnings_suffix.hpp>

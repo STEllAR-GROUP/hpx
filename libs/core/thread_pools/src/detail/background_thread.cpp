@@ -1,4 +1,4 @@
-//  Copyright (c) 2023-2024 Hartmut Kaiser
+//  Copyright (c) 2023-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,13 +6,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution_base/this_thread.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/thread_pools/detail/background_thread.hpp>
 #include <hpx/thread_pools/detail/scheduling_callbacks.hpp>
 #include <hpx/thread_pools/detail/scoped_background_timer.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -23,7 +22,7 @@ namespace hpx::threads::detail {
     ///////////////////////////////////////////////////////////////////////////
     thread_id_ref_type create_background_thread(
         threads::policies::scheduler_base& scheduler_base,
-        std::size_t num_thread, scheduling_callbacks const& callbacks,
+        std::size_t const num_thread, scheduling_callbacks const& callbacks,
         std::shared_ptr<bool>& background_running,
         std::int64_t& idle_loop_count)
     {
@@ -85,7 +84,7 @@ namespace hpx::threads::detail {
     {
     public:
         switch_status_background(
-            thread_id_ref_type const& t, thread_state prev_state) noexcept
+            thread_id_ref_type const& t, thread_state const prev_state) noexcept
           : thread_(get_thread_id_data(t))
           , prev_state_(prev_state)
           , next_thread_id_(nullptr)
@@ -184,7 +183,7 @@ namespace hpx::threads::detail {
     bool call_background_thread(thread_id_ref_type& background_thread,
         thread_id_ref_type& next_thrd,
         threads::policies::scheduler_base& scheduler_base,
-        std::size_t num_thread,
+        std::size_t const num_thread,
         [[maybe_unused]] background_work_exec_time& exec_time,
         hpx::execution_base::this_thread::detail::agent_storage*
             context_storage)
@@ -278,7 +277,7 @@ namespace hpx::threads::detail {
     bool call_and_create_background_thread(
         thread_id_ref_type& background_thread, thread_id_ref_type& next_thrd,
         threads::policies::scheduler_base& scheduler_base,
-        std::size_t num_thread, background_work_exec_time& exec_time,
+        std::size_t const num_thread, background_work_exec_time& exec_time,
         hpx::execution_base::this_thread::detail::agent_storage*
             context_storage,
         scheduling_callbacks const& callbacks, std::shared_ptr<bool>& running,

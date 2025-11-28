@@ -12,14 +12,14 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/allocator_support/aligned_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/queue.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/locality.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <condition_variable>
 #include <cstddef>

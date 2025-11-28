@@ -42,22 +42,19 @@ namespace hpx {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/async_local/dataflow.hpp>
-#include <hpx/coroutines/detail/get_stack_pointer.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/traits/is_action.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/naming.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/pack_traversal/pack_traversal_async.hpp>
 
 #include <atomic>
 #include <cstddef>

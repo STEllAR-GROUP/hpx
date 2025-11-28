@@ -8,21 +8,14 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution/detail/post_policy_dispatch.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution/queries/get_scheduler.hpp>
-#include <hpx/execution_base/completion_scheduler.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/threading_base/detail/get_default_pool.hpp>
-#include <hpx/threading_base/register_thread.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -53,7 +46,7 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct thread_pool_policy_scheduler
     {
         // Associate the parallel_execution_tag tag type as a default with this
@@ -352,7 +345,7 @@ namespace hpx::execution::experimental {
                 hpx::execution::experimental::get_forward_progress_guarantee_t,
                 thread_pool_policy_scheduler const& sched) noexcept
         {
-            if (hpx::detail::has_async_policy(sched.policy()))
+            if (hpx::has_async_policy(sched.policy()))
             {
                 return hpx::execution::experimental::
                     forward_progress_guarantee::parallel;
@@ -404,7 +397,7 @@ namespace hpx::execution::experimental {
             }
             else
             {
-                if (policy_.get_policy() == hpx::detail::launch_policy::sync)
+                if (policy_.get_policy() == hpx::launch_policy::sync)
                 {
                     return 1;
                 }
@@ -436,7 +429,7 @@ namespace hpx::execution::experimental {
 
     // support all properties exposed by the embedded policy
     // clang-format off
-    template <typename Tag, typename Policy, typename Property,
+    HPX_CXX_EXPORT template <typename Tag, typename Policy, typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>
@@ -455,7 +448,7 @@ namespace hpx::execution::experimental {
     }
 
     // clang-format off
-    template <typename Tag, typename Policy,
+    HPX_CXX_EXPORT template <typename Tag, typename Policy,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>
@@ -467,5 +460,6 @@ namespace hpx::execution::experimental {
         return tag(scheduler.policy());
     }
 
-    using thread_pool_scheduler = thread_pool_policy_scheduler<hpx::launch>;
+    HPX_CXX_EXPORT using thread_pool_scheduler =
+        thread_pool_policy_scheduler<hpx::launch>;
 }    // namespace hpx::execution::experimental

@@ -8,15 +8,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/ini/ini.hpp>
+#include <hpx/modules/affinity.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/ini.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
-#include <hpx/topology/cpu_mask.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -24,6 +23,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::resource::detail {
 
@@ -46,6 +47,8 @@ namespace hpx::resource::detail {
         bool pu_is_assigned(std::size_t virt_core) const;
 
         void assign_first_core(std::size_t first_core);
+
+        hpx::threads::mask_type get_pu_mask() const;
 
         // counter ... overall, in all the thread pools
         static std::size_t num_threads_overall;
@@ -167,7 +170,10 @@ namespace hpx::resource::detail {
         std::size_t get_pu_num(std::size_t global_thread_num) const;
         threads::mask_type get_pu_mask(std::size_t global_thread_num) const;
         std::size_t get_thread_occupancy(std::size_t pu_num) const;
-        threads::mask_type get_used_pus_mask(std::size_t pu_num) const;
+        threads::mask_type get_used_pus_mask(
+            std::size_t pu_num = static_cast<std::size_t>(-1)) const;
+        threads::mask_type get_pool_pus_mask(
+            std::string const& pool_name) const;
 
         void init(resource::partitioner_mode rpmode,
             hpx::util::section const& cfg,
@@ -268,3 +274,5 @@ namespace hpx::resource::detail {
         bool is_initialized_ = false;
     };
 }    // namespace hpx::resource::detail
+
+#include <hpx/config/warnings_suffix.hpp>

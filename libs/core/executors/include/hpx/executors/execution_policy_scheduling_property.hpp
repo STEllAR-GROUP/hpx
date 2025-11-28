@@ -8,11 +8,10 @@
 
 #pragma once
 
-#include <hpx/async_base/scheduling_properties.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/executors/rebind_executor.hpp>
-#include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <type_traits>
 
@@ -22,7 +21,7 @@ namespace hpx::execution::experimental {
     // forwards to the embedded executor
 
     // clang-format off
-    template <typename Tag, typename ExPolicy, typename Property,
+    HPX_CXX_EXPORT template <typename Tag, typename ExPolicy, typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag> &&
             hpx::is_execution_policy_v<ExPolicy> &&
@@ -39,7 +38,7 @@ namespace hpx::execution::experimental {
     }
 
     // clang-format off
-    template <typename Tag, typename ExPolicy,
+    HPX_CXX_EXPORT template <typename Tag, typename ExPolicy,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag> &&
             hpx::is_execution_policy_v<ExPolicy> &&

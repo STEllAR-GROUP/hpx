@@ -8,11 +8,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components_base/server/component_base.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 
 #include <cstdint>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::performance_counters::server {
@@ -47,3 +49,5 @@ namespace hpx::performance_counters::server {
         bool reset_;
     };
 }    // namespace hpx::performance_counters::server
+
+#include <hpx/config/warnings_suffix.hpp>

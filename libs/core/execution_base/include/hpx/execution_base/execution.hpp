@@ -8,10 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/iterator_support/counting_shape.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -21,7 +21,7 @@ namespace hpx::execution {
     ///////////////////////////////////////////////////////////////////////////
     /// Function invocations executed by a group of sequential execution agents
     /// execute in sequential order.
-    struct sequenced_execution_tag
+    HPX_CXX_EXPORT struct sequenced_execution_tag
     {
     };
 
@@ -31,7 +31,7 @@ namespace hpx::execution {
     ///
     /// \note \a parallel_execution_tag is weaker than
     ///       \a sequenced_execution_tag.
-    struct parallel_execution_tag
+    HPX_CXX_EXPORT struct parallel_execution_tag
     {
     };
 
@@ -42,7 +42,7 @@ namespace hpx::execution {
     ///
     /// \note \a unsequenced_execution_tag is weaker than
     ///       \a parallel_execution_tag.
-    struct unsequenced_execution_tag
+    HPX_CXX_EXPORT struct unsequenced_execution_tag
     {
     };
 }    // namespace hpx::execution
@@ -54,31 +54,31 @@ namespace hpx::parallel::execution {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename Executor, typename Enable = void>
+        HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
         struct async_execute_fn_helper;
 
-        template <typename Executor, typename Enable = void>
+        HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
         struct sync_execute_fn_helper;
 
-        template <typename Executor, typename Enable = void>
+        HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
         struct then_execute_fn_helper;
 
-        template <typename Executor, typename Enable = void>
+        HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
         struct post_fn_helper;
 
-        template <typename Executor, typename Enable = void>
+        HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
         struct bulk_async_execute_fn_helper;
 
-        template <typename Executor, typename Enable = void>
+        HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
         struct bulk_sync_execute_fn_helper;
 
-        template <typename Executor, typename Enable = void>
+        HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
         struct bulk_then_execute_fn_helper;
 
-        template <typename Executor, typename Enable = void>
+        HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
         struct async_invoke_fn_helper;
 
-        template <typename Executor, typename Enable = void>
+        HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
         struct sync_invoke_fn_helper;
         /// \endcond
     }    // namespace detail
@@ -106,7 +106,7 @@ namespace hpx::parallel::execution {
     ///       exists. For two-way executors it will invoke asynch_execute_t
     ///       and wait for the task's completion before returning.
     ///
-    inline constexpr struct sync_execute_t final
+    HPX_CXX_EXPORT inline constexpr struct sync_execute_t final
       : hpx::functional::detail::tag_fallback<sync_execute_t>
     {
     private:
@@ -153,7 +153,7 @@ namespace hpx::parallel::execution {
     ///
     /// \returns f(ts...)'s result through a future
     ///
-    inline constexpr struct async_execute_t final
+    HPX_CXX_EXPORT inline constexpr struct async_execute_t final
       : hpx::functional::detail::tag_fallback<async_execute_t>
     {
     private:
@@ -192,7 +192,7 @@ namespace hpx::parallel::execution {
     ///       exec.then_execute(f, predecessor, ts...) if it exists) and
     ///       for one way executors (calls predecessor.then(bind(f, ts...))).
     ///
-    inline constexpr struct then_execute_t final
+    HPX_CXX_EXPORT inline constexpr struct then_execute_t final
       : hpx::functional::detail::tag_fallback<then_execute_t>
     {
     private:
@@ -233,7 +233,7 @@ namespace hpx::parallel::execution {
     ///       returned future), and for non-blocking two way executors
     ///       (calls exec.post(f, ts...) if it exists).
     ///
-    inline constexpr struct post_t final
+    HPX_CXX_EXPORT inline constexpr struct post_t final
       : hpx::functional::detail::tag_fallback<post_t>
     {
     private:
@@ -291,7 +291,7 @@ namespace hpx::parallel::execution {
     ///       exists; otherwise it executes sync_execute(f, shape, ts...)
     ///       as often as needed.
     ///
-    inline constexpr struct bulk_sync_execute_t final
+    HPX_CXX_EXPORT inline constexpr struct bulk_sync_execute_t final
       : hpx::functional::detail::tag_fallback<bulk_sync_execute_t>
     {
     private:
@@ -360,7 +360,7 @@ namespace hpx::parallel::execution {
     ///       exists; otherwise it executes async_execute(f, shape, ts...)
     ///       as often as needed.
     ///
-    inline constexpr struct bulk_async_execute_t final
+    HPX_CXX_EXPORT inline constexpr struct bulk_async_execute_t final
       : hpx::functional::detail::tag_fallback<bulk_async_execute_t>
     {
     private:
@@ -433,7 +433,7 @@ namespace hpx::parallel::execution {
     ///       async_execute(f, shape, pred.share(), ts...) (if this executor
     ///       is also a TwoWayExecutor) - as often as needed.
     ///
-    inline constexpr struct bulk_then_execute_t final
+    HPX_CXX_EXPORT inline constexpr struct bulk_then_execute_t final
       : hpx::functional::detail::tag_fallback<bulk_then_execute_t>
     {
     private:
@@ -495,7 +495,7 @@ namespace hpx::parallel::execution {
     /// \note This calls exec.async_invoke(fs...) if it exists; otherwise it
     ///       executes async_execute(fs) for each fs.
     ///
-    inline constexpr struct async_invoke_t final
+    HPX_CXX_EXPORT inline constexpr struct async_invoke_t final
       : hpx::functional::detail::tag_fallback<async_invoke_t>
     {
     private:
@@ -535,7 +535,7 @@ namespace hpx::parallel::execution {
     /// \note This calls exec.sync_invoke(fs...) if it exists; otherwise it
     ///       executes sync_execute(fs) for each fs.
     ///
-    inline constexpr struct sync_invoke_t final
+    HPX_CXX_EXPORT inline constexpr struct sync_invoke_t final
       : hpx::functional::detail::tag_fallback<sync_invoke_t>
     {
     private:

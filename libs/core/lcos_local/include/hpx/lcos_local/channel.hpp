@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2024 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,20 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/packaged_task.hpp>
-#include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/lcos_local/receive_buffer.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/synchronization/no_mutex.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <cstdlib>
@@ -67,11 +63,11 @@ namespace hpx::lcos::local {
             }
             long addref() noexcept
             {
-                return ++count_;
+                return count_.increment();
             }
             long release() noexcept
             {
-                return --count_;
+                return count_.decrement();
             }
 
         private:
@@ -90,6 +86,12 @@ namespace hpx::lcos::local {
         {
             if (p->requires_delete())
             {
+                // The thread that decrements the reference count to zero must
+                // perform an acquire to ensure that it doesn't start
+                // destructing the object until all previous writes have
+                // drained.
+                std::atomic_thread_fence(std::memory_order_acquire);
+
                 p->destroy();
             }
         }
@@ -566,20 +568,20 @@ namespace hpx::lcos::local {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T = void>
+    HPX_CXX_EXPORT template <typename T = void>
     class channel;
 
-    template <typename T = void>
+    HPX_CXX_EXPORT template <typename T = void>
     class one_element_channel;
 
-    template <typename T = void>
+    HPX_CXX_EXPORT template <typename T = void>
     class receive_channel;
 
-    template <typename T = void>
+    HPX_CXX_EXPORT template <typename T = void>
     class send_channel;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     class channel_iterator
       : public hpx::util::iterator_facade<channel_iterator<T>, T const,
             std::input_iterator_tag>
@@ -636,7 +638,7 @@ namespace hpx::lcos::local {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     class channel_async_iterator
       : public hpx::util::iterator_facade<channel_async_iterator<T>,
             hpx::future<T>, std::input_iterator_tag, hpx::future<T>>
@@ -807,7 +809,7 @@ namespace hpx::lcos::local {
 
     ///////////////////////////////////////////////////////////////////////////
     // channel with unlimited buffer
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     class channel : protected detail::channel_base<T>
     {
         using base_type = detail::channel_base<T>;
@@ -834,7 +836,7 @@ namespace hpx::lcos::local {
     };
 
     // channel with a one-element buffer
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     class one_element_channel : protected detail::channel_base<T>
     {
         using base_type = detail::channel_base<T>;
@@ -861,7 +863,7 @@ namespace hpx::lcos::local {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     class receive_channel : protected detail::channel_base<T>
     {
         using base_type = detail::channel_base<T>;
@@ -887,7 +889,7 @@ namespace hpx::lcos::local {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     class send_channel : private detail::channel_base<T>
     {
         using base_type = detail::channel_base<T>;
@@ -1208,5 +1210,5 @@ namespace hpx::lcos::local {
 
 namespace hpx {
 
-    using hpx::lcos::local::channel;
+    HPX_CXX_EXPORT using hpx::lcos::local::channel;
 }

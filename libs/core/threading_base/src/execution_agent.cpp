@@ -7,12 +7,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/errors/throw_exception.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/execution_agent.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
@@ -25,7 +24,7 @@
 #include <hpx/threading_base/detail/reset_lco_description.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-#include <hpx/debugging/backtrace.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/threading_base/detail/reset_backtrace.hpp>
 #endif
 
@@ -62,24 +61,28 @@ namespace hpx::threads {
         do_yield(desc, hpx::threads::thread_schedule_state::pending);
     }
 
-    void execution_agent::yield_k(std::size_t k, char const* desc)
+    bool execution_agent::yield_k(std::size_t k, char const* desc)
     {
         if (k < 4)    //-V112
         {
+            return false;
         }
 #if defined(HPX_SMT_PAUSE)
         else if (k < 16)
         {
             HPX_SMT_PAUSE;
+            return false;
         }
 #endif
         else if (k < 32 || k & 1)    //-V112
         {
             do_yield(desc, hpx::threads::thread_schedule_state::pending_boost);
+            return true;
         }
         else
         {
             do_yield(desc, hpx::threads::thread_schedule_state::pending);
+            return true;
         }
     }
 

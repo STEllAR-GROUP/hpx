@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/util.hpp>
@@ -21,7 +21,7 @@
 namespace hpx::local::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_CORE_EXPORT command_line_handling
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT command_line_handling
     {
         command_line_handling(hpx::util::runtime_configuration rtcfg,
             std::vector<std::string> ini_config,
@@ -89,25 +89,26 @@ namespace hpx::local::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CORE_EXPORT std::string runtime_configuration_string(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::string runtime_configuration_string(
         command_line_handling const& cfg);
 
-    HPX_CORE_EXPORT std::vector<std::string> prepend_options(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::vector<std::string> prepend_options(
         std::vector<std::string>&& args, std::string&& options);
 
-    HPX_CORE_EXPORT std::string convert_to_log_file(std::string const& dest);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::string convert_to_log_file(
+        std::string const& dest);
 
-    HPX_CORE_EXPORT std::size_t handle_num_cores_default(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t handle_num_cores_default(
         util::manage_config& cfgmap,
         hpx::program_options::variables_map const& vm, std::size_t num_threads,
         std::size_t num_default_cores);
 
-    HPX_CORE_EXPORT std::size_t get_number_of_default_threads(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t get_number_of_default_threads(
         bool use_process_mask);
-    HPX_CORE_EXPORT std::size_t get_number_of_default_cores(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t get_number_of_default_cores(
         bool use_process_mask);
 
-    HPX_CORE_EXPORT void print_config(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void print_config(
         std::vector<std::string> const& ini_config);
 }    // namespace hpx::local::detail
 

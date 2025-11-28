@@ -8,15 +8,14 @@
 
 #include <hpx/resiliency/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/executors/current_executor.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/resiliency/async_replay_executor.hpp>
-#include <hpx/synchronization/latch.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -27,7 +26,7 @@
 namespace hpx::resiliency::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename BaseExecutor, typename Validate>
+    HPX_CXX_EXPORT template <typename BaseExecutor, typename Validate>
     class replay_executor
     {
     public:
@@ -177,7 +176,7 @@ namespace hpx::resiliency::experimental {
     ///////////////////////////////////////////////////////////////////////////
     // support all properties exposed by the wrapped executor
     // clang-format off
-    template <typename Tag, typename BaseExecutor,
+    HPX_CXX_EXPORT template <typename Tag, typename BaseExecutor,
         typename Validate, typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
@@ -196,7 +195,8 @@ namespace hpx::resiliency::experimental {
     }
 
     // clang-format off
-    template <typename Tag, typename BaseExecutor, typename Validate,
+    HPX_CXX_EXPORT template <typename Tag, typename BaseExecutor,
+        typename Validate,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>
@@ -209,7 +209,7 @@ namespace hpx::resiliency::experimental {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename BaseExecutor, typename Validate>
+    HPX_CXX_EXPORT template <typename BaseExecutor, typename Validate>
     replay_executor<BaseExecutor, std::decay_t<Validate>> make_replay_executor(
         BaseExecutor& exec, std::size_t n, Validate&& validate)
     {
@@ -217,7 +217,7 @@ namespace hpx::resiliency::experimental {
             exec, n, HPX_FORWARD(Validate, validate));
     }
 
-    template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <typename BaseExecutor>
     replay_executor<BaseExecutor, detail::replay_validator>
     make_replay_executor(BaseExecutor& exec, std::size_t n)
     {
@@ -228,14 +228,14 @@ namespace hpx::resiliency::experimental {
 
 namespace hpx::execution::experimental {
 
-    template <typename BaseExecutor, typename Validator>
+    HPX_CXX_EXPORT template <typename BaseExecutor, typename Validator>
     struct is_two_way_executor<
         hpx::resiliency::experimental::replay_executor<BaseExecutor, Validator>>
       : std::true_type
     {
     };
 
-    template <typename BaseExecutor, typename Validator>
+    HPX_CXX_EXPORT template <typename BaseExecutor, typename Validator>
     struct is_bulk_two_way_executor<
         hpx::resiliency::experimental::replay_executor<BaseExecutor, Validator>>
       : std::true_type

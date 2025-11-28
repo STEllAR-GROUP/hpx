@@ -19,9 +19,9 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/execution_base/this_thread.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/lock_registration.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -35,7 +35,7 @@ namespace hpx {
 
         // std::mutex-compatible spinlock class (Backoff == true)
         // boost::mutex-compatible spinlock class (Backoff == false)
-        template <bool Backoff = true>
+        HPX_CXX_EXPORT template <bool Backoff = true>
         struct spinlock
         {
         public:
@@ -173,6 +173,6 @@ namespace hpx {
     /// \brief \c spinlock is a type of lock that causes a thread attempting to
     ///        obtain it to check for its availability while waiting in a loop
     ///        continuously.
-    using spinlock = detail::spinlock<true>;
-    using spinlock_no_backoff = detail::spinlock<false>;
+    HPX_CXX_EXPORT using spinlock = detail::spinlock<true>;
+    HPX_CXX_EXPORT using spinlock_no_backoff = detail::spinlock<false>;
 }    // namespace hpx

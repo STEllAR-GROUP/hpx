@@ -29,8 +29,9 @@ add_hpx_library(
   HEADERS "hpx/include/compression_zlib.hpp"
           "hpx/binary_filter/zlib_serialization_filter.hpp"
           "hpx/binary_filter/zlib_serialization_filter_registration.hpp"
-  PREPEND_HEADER_ROOT INSTALL_HEADERS
-  FOLDER "Core/Plugins/Compression" ${HPX_WITH_UNITY_BUILD_OPTION}
+  PREPEND_HEADER_ROOT INSTALL_HEADERS ${HPX_WITH_UNITY_BUILD_OPTION}
+  ${HPX_WITH_CXX_MODULES_OPTION}
+  FOLDER "Core/Plugins/Compression"
 )
 
 target_include_directories(compression_zlib SYSTEM PRIVATE ${ZLIB_INCLUDE_DIRS})
@@ -41,6 +42,8 @@ target_link_libraries(
 add_hpx_pseudo_dependencies(
   components.parcel_plugins.binary_filter.zlib compression_zlib
 )
-add_hpx_pseudo_dependencies(core components.parcel_plugins.binary_filter.zlib)
+add_hpx_pseudo_dependencies(
+  components components.parcel_plugins.binary_filter.zlib
+)
 
 add_subdirectory(tests)

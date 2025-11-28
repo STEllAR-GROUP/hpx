@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/filesystem.hpp>
-#include <hpx/util/to_string.hpp>
+#include <hpx/modules/format.hpp>
 
 #include "assert_macro_check.hpp"
 #include "boost/regex.hpp"
@@ -56,6 +56,7 @@ namespace boost { namespace inspect {
         register_signature(".hxx");
         register_signature(".ipp");
         register_signature(".ixx");
+        register_signature(".cppm");
     }
 
     void assert_macro_check::inspect(const string& library_name,

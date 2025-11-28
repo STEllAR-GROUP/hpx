@@ -7,12 +7,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/coroutines/detail/coroutine_accessor.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #if defined(HPX_HAVE_APEX)
@@ -226,7 +226,9 @@ namespace hpx::threads {
         // from what the previous use required. However, the physical stack size
         // must be the same as before.
         stacksize_enum_ = init_data.stacksize;
-        HPX_ASSERT(stacksize_ == get_stack_size());
+
+        HPX_ASSERT(stacksize_enum_ == thread_stacksize::nostack ||
+            stacksize_ == get_stack_size());
         HPX_ASSERT(stacksize_ != 0);
 
         current_state_.store(thread_state(

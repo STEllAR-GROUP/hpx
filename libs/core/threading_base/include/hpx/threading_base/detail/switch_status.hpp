@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 
@@ -15,7 +15,7 @@ namespace hpx::threads::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // helper class for switching thread state in and out during execution
-    class switch_status
+    HPX_CXX_EXPORT class switch_status
     {
     public:
         switch_status(
@@ -60,7 +60,7 @@ namespace hpx::threads::detail {
         }
 
         // Get the state this thread was in before execution (usually pending),
-        // this helps making sure no other worker-thread is started to execute
+        // this helps to make sure no other worker-thread is started to execute
         // this HPX-thread in the meantime.
         thread_schedule_state get_previous() const noexcept
         {

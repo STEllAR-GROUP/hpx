@@ -7,16 +7,12 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
-#include <hpx/execution_base/operation_state.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/futures/detail/future_data.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/acquire_shared_state.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -26,7 +22,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename Receiver, typename Future>
+        HPX_CXX_EXPORT template <typename Receiver, typename Future>
         struct operation_state
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
@@ -62,7 +58,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        template <typename Future>
+        HPX_CXX_EXPORT template <typename Future>
         struct keep_future_sender_base
         {
             std::decay_t<Future> future;
@@ -88,10 +84,10 @@ namespace hpx::execution::experimental {
 #endif
         };
 
-        template <typename Future>
+        HPX_CXX_EXPORT template <typename Future>
         struct keep_future_sender;
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct keep_future_sender<hpx::future<T>>
           : public keep_future_sender_base<hpx::future<T>>
         {
@@ -121,7 +117,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct keep_future_sender<hpx::shared_future<T>>
           : keep_future_sender_base<hpx::shared_future<T>>
         {
@@ -159,7 +155,7 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
-    inline constexpr struct keep_future_t final
+    HPX_CXX_EXPORT inline constexpr struct keep_future_t final
     {
         // clang-format off
         template <typename Future,

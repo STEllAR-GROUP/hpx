@@ -17,11 +17,11 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of OS-threads running in the runtime instance
     ///        the current HPX-thread is associated with.
-    HPX_CORE_EXPORT std::size_t get_os_thread_count();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t get_os_thread_count();
 
     namespace threads {
 
-        class executor;
+        HPX_CXX_EXPORT class executor;
     }
 
     /// \brief Return the number of worker OS- threads used by the given
@@ -34,6 +34,6 @@ namespace hpx {
     /// threads used by HPX.
     ///
     /// \param exec [in] The executor to be used.
-    HPX_CORE_EXPORT std::size_t get_os_thread_count(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t get_os_thread_count(
         threads::executor const& exec);
 }    // namespace hpx

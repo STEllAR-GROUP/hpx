@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,34 +8,30 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/schedulers/queue_helpers.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_data_stackful.hpp>
-#include <hpx/threading_base/thread_data_stackless.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
 
 #if defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
 #include <hpx/schedulers/deadlock_detection.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
+#include <hpx/modules/timing.hpp>
 #include <hpx/schedulers/maintain_queue_wait_times.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-#include <hpx/timing/tick_counter.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/util.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-#include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/modules/util.hpp>
 #endif
 
 #include <algorithm>
@@ -50,6 +46,8 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
@@ -86,8 +84,8 @@ namespace hpx::threads::policies {
     //         typedef ... type;
     //     };
     // };
-    template <typename Mutex, typename PendingQueuing, typename StagedQueuing,
-        typename TerminatedQueuing>
+    HPX_CXX_EXPORT template <typename Mutex, typename PendingQueuing,
+        typename StagedQueuing, typename TerminatedQueuing>
     class thread_queue
     {
     private:
@@ -1352,3 +1350,5 @@ namespace hpx::threads::policies {
         thread_queue<Mutex, PendingQueuing, StagedQueuing,
             TerminatedQueuing>::task_description_alloc_;
 }    // namespace hpx::threads::policies
+
+#include <hpx/config/warnings_suffix.hpp>

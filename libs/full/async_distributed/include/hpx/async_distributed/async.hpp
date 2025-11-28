@@ -42,20 +42,17 @@ namespace hpx {
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/actions_base/traits/is_valid_action.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/async_distributed/async_continue.hpp>
 #include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/async_distributed/detail/async_implementations.hpp>
-#include <hpx/async_local/async.hpp>
 #include <hpx/components/client_base.hpp>
-#include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/traits/is_action.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/type_support/lazy_enable_if.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -150,7 +147,7 @@ namespace hpx::detail {
         call(hpx::id_type const& id, Ts&&... ts)
         {
             return async_action_dispatch<Action,
-                hpx::detail::async_policy>::call(launch::async, id,
+                hpx::launch::async_policy>::call(launch::async, id,
                 HPX_FORWARD(Ts, ts)...);
         }
     };
@@ -168,7 +165,7 @@ namespace hpx::detail {
         call(components::client_base<Client_, Stub, Data> const& c, Ts&&... ts)
         {
             return async_action_dispatch<Action,
-                hpx::detail::async_policy>::call(launch::async, c,
+                hpx::launch::async_policy>::call(launch::async, c,
                 HPX_FORWARD(Ts, ts)...);
         }
     };
@@ -183,7 +180,7 @@ namespace hpx::detail {
             DistPolicy const& policy, Ts&&... ts)
         {
             return async_action_dispatch<Action,
-                hpx::detail::async_policy>::call(launch::async, policy,
+                hpx::launch::async_policy>::call(launch::async, policy,
                 HPX_FORWARD(Ts, ts)...);
         }
     };

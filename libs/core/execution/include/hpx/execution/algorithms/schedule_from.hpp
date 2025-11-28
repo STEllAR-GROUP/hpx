@@ -10,24 +10,15 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/modules/execution_base.hpp>
 #else
 
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/datastructures/optional.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/datastructures/variant.hpp>
-#include <hpx/execution_base/completion_scheduler.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/get_env.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/functional/invoke_fused.hpp>
-#include <hpx/type_support/detail/with_result_of.hpp>
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -39,7 +30,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename Sender, typename Scheduler>
+        HPX_CXX_EXPORT template <typename Sender, typename Scheduler>
         struct schedule_from_sender
         {
             using is_sender = void;
@@ -351,6 +342,7 @@ namespace hpx::execution::experimental {
     // get_completion_scheduler<set_error_t> is not implemented, as the
     // scheduler cannot be guaranteed in case an error is thrown while trying to
     // schedule work on the given scheduler object.
+    HPX_CXX_EXPORT
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct schedule_from_t final
       : hpx::functional::detail::tag_fallback<schedule_from_t>
     {

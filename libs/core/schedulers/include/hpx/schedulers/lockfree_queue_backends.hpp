@@ -10,17 +10,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-#include <hpx/concurrency/deque.hpp>
-#else
-#include <hpx/concurrency/queue.hpp>
-#endif
-
-#include <hpx/allocator_support/aligned_allocator.hpp>
-
-// Does not rely on CXX11_STD_ATOMIC_128BIT
-#include <hpx/concurrency/concurrentqueue.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concurrency.hpp>
 
 #include <cstddef>
 #include <cstdint>

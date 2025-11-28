@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,7 +22,7 @@
 namespace hpx::serialization {
 
     // implement serialization for boost::array
-    template <typename Archive, typename T, std::size_t N>
+    HPX_CXX_EXPORT template <typename Archive, typename T, std::size_t N>
     void serialize(
         Archive& ar, boost::array<T, N>& a, unsigned int const /* version */)
     {

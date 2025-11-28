@@ -8,14 +8,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/program_options/config/defines.hpp>
-#include <hpx/datastructures/any.hpp>
-#include <hpx/datastructures/optional.hpp>
+#include <hpx/modules/datastructures.hpp>
 
 namespace hpx::program_options {
 
-    using any = hpx::any_nonser;
-    using hpx::any_cast;
+    HPX_CXX_EXPORT using any = hpx::any_nonser;
+    HPX_CXX_EXPORT using hpx::any_cast;
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using optional = hpx::optional<T>;
 }    // namespace hpx::program_options

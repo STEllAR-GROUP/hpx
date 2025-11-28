@@ -10,26 +10,24 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/execution_base/this_thread.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/io_service.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/schedulers.hpp>
+#include <hpx/modules/thread_pool_util.hpp>
+#include <hpx/modules/thread_pools.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/thread_pool_util/thread_pool_suspension_helpers.hpp>
-#include <hpx/thread_pools/scheduled_thread_pool.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/threading_base/thread_init_data.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/timing/steady_clock.hpp>
-#include <hpx/topology/topology.hpp>
-#include <hpx/type_support/unused.hpp>
-#include <hpx/util/get_entry_as.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/topology.hpp>
+#include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -173,13 +171,17 @@ namespace hpx::threads {
             thread_queue_init, "core-local_queue_scheduler");
 
         auto sched = std::make_unique<local_sched_type>(init);
+        auto const full_mask =
+            hpx::resource::get_partitioner().get_pool_pus_mask(
+                thread_pool_init.name_);
 
         // set the default scheduler flags
-        sched->set_scheduler_mode(thread_pool_init.mode_);
+        sched->set_scheduler_mode(thread_pool_init.mode_, full_mask);
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive);
+            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+            full_mask);
 
         // instantiate the pool
         std::unique_ptr<thread_pool_base> pool = std::make_unique<
@@ -214,13 +216,17 @@ namespace hpx::threads {
             "core-local_priority_queue_scheduler-fifo");
 
         auto sched = std::make_unique<local_sched_type>(init);
+        auto const full_mask =
+            hpx::resource::get_partitioner().get_pool_pus_mask(
+                thread_pool_init.name_);
 
         // set the default scheduler flags
-        sched->set_scheduler_mode(thread_pool_init.mode_);
+        sched->set_scheduler_mode(thread_pool_init.mode_, full_mask);
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive);
+            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+            full_mask);
 
         // instantiate the pool
         std::unique_ptr<thread_pool_base> pool = std::make_unique<
@@ -256,13 +262,17 @@ namespace hpx::threads {
             "core-local_priority_queue_scheduler-lifo");
 
         auto sched = std::make_unique<local_sched_type>(init);
+        auto const full_mask =
+            hpx::resource::get_partitioner().get_pool_pus_mask(
+                thread_pool_init.name_);
 
         // set the default scheduler flags
-        sched->set_scheduler_mode(thread_pool_init.mode_);
+        sched->set_scheduler_mode(thread_pool_init.mode_, full_mask);
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive);
+            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+            full_mask);
 
         // instantiate the pool
         std::unique_ptr<thread_pool_base> pool = std::make_unique<
@@ -288,6 +298,10 @@ namespace hpx::threads {
             init(thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
                 thread_queue_init, "core-static_queue_scheduler");
 
+        auto const full_mask =
+            hpx::resource::get_partitioner().get_pool_pus_mask(
+                thread_pool_init.name_);
+
         if (thread_pool_init.mode_ &
             policies::scheduler_mode::do_background_work_only)
         {
@@ -297,7 +311,7 @@ namespace hpx::threads {
             auto sched = std::make_unique<local_sched_type>(init);
 
             // set the default scheduler flags
-            sched->set_scheduler_mode(thread_pool_init.mode_);
+            sched->set_scheduler_mode(thread_pool_init.mode_, full_mask);
 
             // instantiate the pool
             pool = std::make_unique<
@@ -312,12 +326,12 @@ namespace hpx::threads {
             auto sched = std::make_unique<local_sched_type>(init);
 
             // set the default scheduler flags
-            sched->set_scheduler_mode(thread_pool_init.mode_);
+            sched->set_scheduler_mode(thread_pool_init.mode_, full_mask);
 
             // conditionally set/unset this flag
             sched->update_scheduler_mode(
-                policies::scheduler_mode::enable_stealing_numa,
-                !numa_sensitive);
+                policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+                full_mask);
 
             // instantiate the pool
             pool = std::make_unique<
@@ -331,7 +345,7 @@ namespace hpx::threads {
     void threadmanager::create_scheduler_static_priority(
         thread_pool_init_parameters const& thread_pool_init,
         policies::thread_queue_init_parameters const& thread_queue_init,
-        std::size_t const numa_sensitive)
+        std::size_t const)
     {
         // set parameters for scheduler and pool instantiation and perform
         // compatibility checks
@@ -352,13 +366,17 @@ namespace hpx::threads {
             "core-static_priority_queue_scheduler");
 
         auto sched = std::make_unique<local_sched_type>(init);
+        auto const full_mask =
+            hpx::resource::get_partitioner().get_pool_pus_mask(
+                thread_pool_init.name_);
 
         // set the default scheduler flags
-        sched->set_scheduler_mode(thread_pool_init.mode_);
+        sched->set_scheduler_mode(thread_pool_init.mode_, full_mask);
 
         // conditionally set/unset this flag
-        sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive);
+        sched->remove_scheduler_mode(policies::scheduler_mode::enable_stealing |
+                policies::scheduler_mode::enable_stealing_numa,
+            full_mask);
 
         // instantiate the pool
         std::unique_ptr<thread_pool_base> pool = std::make_unique<
@@ -394,13 +412,17 @@ namespace hpx::threads {
             "core-abp_priority_queue_scheduler-fifo");
 
         auto sched = std::make_unique<local_sched_type>(init);
+        auto const full_mask =
+            hpx::resource::get_partitioner().get_pool_pus_mask(
+                thread_pool_init.name_);
 
         // set the default scheduler flags
-        sched->set_scheduler_mode(thread_pool_init.mode_);
+        sched->set_scheduler_mode(thread_pool_init.mode_, full_mask);
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive);
+            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+            full_mask);
 
         // instantiate the pool
         std::unique_ptr<thread_pool_base> pool = std::make_unique<
@@ -442,13 +464,17 @@ namespace hpx::threads {
             "core-abp_priority_queue_scheduler-lifo");
 
         auto sched = std::make_unique<local_sched_type>(init);
+        auto const full_mask =
+            hpx::resource::get_partitioner().get_pool_pus_mask(
+                thread_pool_init.name_);
 
         // set the default scheduler flags
-        sched->set_scheduler_mode(thread_pool_init.mode_);
+        sched->set_scheduler_mode(thread_pool_init.mode_, full_mask);
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive);
+            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+            full_mask);
 
         // instantiate the pool
         std::unique_ptr<thread_pool_base> pool = std::make_unique<
@@ -476,14 +502,18 @@ namespace hpx::threads {
             thread_pool_init.affinity_data_, thread_queue_init,
             "core-shared_priority_queue_scheduler");
 
+        auto const full_mask =
+            hpx::resource::get_partitioner().get_pool_pus_mask(
+                thread_pool_init.name_);
         auto sched = std::make_unique<local_sched_type>(init);
 
         // set the default scheduler flags
-        sched->set_scheduler_mode(thread_pool_init.mode_);
+        sched->set_scheduler_mode(thread_pool_init.mode_, full_mask);
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive);
+            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+            full_mask);
 
         // instantiate the pool
         std::unique_ptr<thread_pool_base> pool = std::make_unique<
@@ -518,13 +548,17 @@ namespace hpx::threads {
             "core-local_workrequesting_scheduler-fifo");
 
         auto sched = std::make_unique<local_sched_type>(init);
+        auto const full_mask =
+            hpx::resource::get_partitioner().get_pool_pus_mask(
+                thread_pool_init.name_);
 
         // set the default scheduler flags
-        sched->set_scheduler_mode(thread_pool_init.mode_);
+        sched->set_scheduler_mode(thread_pool_init.mode_, full_mask);
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive);
+            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+            full_mask);
 
         // instantiate the pool
         std::unique_ptr<thread_pool_base> pool = std::make_unique<
@@ -566,13 +600,17 @@ namespace hpx::threads {
             "core-local_workrequesting_scheduler-mc");
 
         auto sched = std::make_unique<local_sched_type>(init);
+        auto const full_mask =
+            hpx::resource::get_partitioner().get_pool_pus_mask(
+                thread_pool_init.name_);
 
         // set the default scheduler flags
-        sched->set_scheduler_mode(thread_pool_init.mode_);
+        sched->set_scheduler_mode(thread_pool_init.mode_, full_mask);
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive);
+            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+            full_mask);
 
         // instantiate the pool
         std::unique_ptr<thread_pool_base> pool = std::make_unique<
@@ -615,13 +653,17 @@ namespace hpx::threads {
             "core-local_workrequesting_scheduler-lifo");
 
         auto sched = std::make_unique<local_sched_type>(init);
+        auto const full_mask =
+            hpx::resource::get_partitioner().get_pool_pus_mask(
+                thread_pool_init.name_);
 
         // set the default scheduler flags
-        sched->set_scheduler_mode(thread_pool_init.mode_);
+        sched->set_scheduler_mode(thread_pool_init.mode_, full_mask);
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive);
+            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+            full_mask);
 
         // instantiate the pool
         std::unique_ptr<thread_pool_base> pool = std::make_unique<
@@ -1096,40 +1138,44 @@ namespace hpx::threads {
     }
 
     void threadmanager::set_scheduler_mode(
-        threads::policies::scheduler_mode const mode) const noexcept
+        threads::policies::scheduler_mode const mode,
+        hpx::threads::mask_cref_type pu_mask) const noexcept
     {
         for (auto const& pool_iter : pools_)
         {
-            pool_iter->get_scheduler()->set_scheduler_mode(mode);
+            pool_iter->get_scheduler()->set_scheduler_mode(mode, pu_mask);
         }
     }
 
     void threadmanager::add_scheduler_mode(
-        threads::policies::scheduler_mode const mode) const noexcept
+        threads::policies::scheduler_mode const mode,
+        hpx::threads::mask_cref_type pu_mask) const noexcept
     {
         for (auto const& pool_iter : pools_)
         {
-            pool_iter->get_scheduler()->add_scheduler_mode(mode);
+            pool_iter->get_scheduler()->add_scheduler_mode(mode, pu_mask);
         }
     }
 
     void threadmanager::add_remove_scheduler_mode(
         threads::policies::scheduler_mode const to_add_mode,
-        threads::policies::scheduler_mode const to_remove_mode) const noexcept
+        threads::policies::scheduler_mode const to_remove_mode,
+        hpx::threads::mask_cref_type pu_mask) const noexcept
     {
         for (auto const& pool_iter : pools_)
         {
             pool_iter->get_scheduler()->add_remove_scheduler_mode(
-                to_add_mode, to_remove_mode);
+                to_add_mode, to_remove_mode, pu_mask);
         }
     }
 
     void threadmanager::remove_scheduler_mode(
-        threads::policies::scheduler_mode const mode) const noexcept
+        threads::policies::scheduler_mode const mode,
+        hpx::threads::mask_cref_type pu_mask) const noexcept
     {
         for (auto const& pool_iter : pools_)
         {
-            pool_iter->get_scheduler()->remove_scheduler_mode(mode);
+            pool_iter->get_scheduler()->remove_scheduler_mode(mode, pu_mask);
         }
     }
 

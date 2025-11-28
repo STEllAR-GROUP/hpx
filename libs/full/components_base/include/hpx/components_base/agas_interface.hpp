@@ -8,13 +8,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/components_base/pinned_ptr.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
-
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/naming_base/gid_type.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset_base/locality.hpp>
@@ -27,6 +26,8 @@
 #include <system_error>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 // FIXME: this is pulled from the main library
 namespace hpx::detail {
@@ -318,3 +319,5 @@ namespace hpx::agas {
     // initialize AGAS interface function wrappers
     struct agas_interface_functions& agas_init();
 }    // namespace hpx::agas
+
+#include <hpx/config/warnings_suffix.hpp>

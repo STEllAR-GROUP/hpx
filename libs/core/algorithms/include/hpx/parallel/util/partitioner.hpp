@@ -8,25 +8,21 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/async_local/dataflow.hpp>
+#include <hpx/modules/async_local.hpp>
 #endif
 #include <hpx/algorithms/traits/is_pair.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution/algorithms/then.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/partitioner_iteration.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/detail/select_partitioner.hpp>
-#include <hpx/type_support/empty_function.hpp>
-#include <hpx/type_support/unused.hpp>
-#include <hpx/type_support/void_guard.hpp>
 
 #include <cstddef>
 #include <exception>

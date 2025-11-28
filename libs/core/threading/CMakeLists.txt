@@ -20,9 +20,20 @@ include(HPX_AddModule)
 add_hpx_module(
   core threading
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${threading_sources}
   HEADERS ${threading_headers}
   COMPAT_HEADERS ${threading_compat_headers}
-  MODULE_DEPENDENCIES hpx_errors hpx_futures hpx_lock_registration hpx_memory
+  MODULE_DEPENDENCIES
+    hpx_errors
+    hpx_functional
+    hpx_futures
+    hpx_lock_registration
+    hpx_memory
+    hpx_synchronization
+    hpx_tag_invoke
+    hpx_threading_base
+    hpx_thread_support
+    hpx_timing
   CMAKE_SUBDIRS examples tests
 )

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <cstddef>
 #include <deque>
@@ -18,7 +18,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
 
-    class HPX_CORE_EXPORT callback_notifier
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT callback_notifier
     {
     public:
         using on_startstop_type = hpx::function<void(

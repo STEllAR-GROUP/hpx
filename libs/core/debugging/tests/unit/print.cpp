@@ -8,21 +8,28 @@
 // that function arguments and other parameters used in the print statements
 // are completely elided
 
-#include <hpx/debugging/print.hpp>
-#include <hpx/init_runtime_local/init_runtime_local.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/threading_base/print.hpp>
+
+#include <hpx/init_runtime_local/init_runtime_local.hpp>
+#include <hpx/modules/threading_base.hpp>
+
+#include <hpx/hpx_main.hpp>
 
 #include <atomic>
 #include <chrono>
 #include <iostream>
 #include <string>
 
+// Used to wrap function call parameters to prevent evaluation
+// when debugging is disabled
+#define HPX_DP_LAZY(Expr, printer) printer.eval([&] { return Expr; })
+
 namespace hpx {
     // this is an enabled debug object that should output messages
     static hpx::debug::enable_print<true> p_enabled("PRINT  ");
-    // this is disabled and we want it to have zero footprint
+    // this is disabled, and we want it to have zero footprint
     static hpx::debug::enable_print<false> p_disabled("PRINT  ");
 }    // namespace hpx
 
@@ -73,7 +80,7 @@ int main()
     {
         auto s_enabled = p_enabled.scope(
             "scoped block", HPX_DP_LAZY(increment(enabled_counter), p_enabled));
-        auto s_disabled = p_disabled.scope("scoped block",
+        auto const s_disabled = p_disabled.scope("scoped block",
             HPX_DP_LAZY(increment(disabled_counter), p_disabled));
         (void) s_disabled;    // silence warning about unused var
     }
@@ -118,7 +125,7 @@ int main()
         p_disabled.make_timer(1, debug::str<>("Timed (disabled)"));
 
     // run a loop for 2 seconds with a timed print every 1 sec
-    auto start = std::chrono::system_clock::now();
+    auto const start = std::chrono::system_clock::now();
     auto end = std::chrono::system_clock::now();
     while (
         std::chrono::duration_cast<std::chrono::seconds>(end - start).count() <

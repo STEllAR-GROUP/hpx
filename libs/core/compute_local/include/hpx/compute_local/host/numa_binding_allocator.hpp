@@ -9,15 +9,14 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assert.hpp>
-#include <hpx/async_local/async.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/executors/guided_pool_executor.hpp>
-#include <hpx/functional/bind.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/threadmanager.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/runtime_local/thread_pool_helpers.hpp>
-#include <hpx/topology/topology.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/topology.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -613,12 +612,11 @@ namespace hpx::compute::host {
                     T volatile* vaddr = const_cast<T volatile*>(page_ptr);
                     *vaddr = *vaddr;
 #ifdef NUMA_BINDING_ALLOCATOR_INIT_MEMORY
+                    // show which cpu is actually being used
 #if defined(NUMA_ALLOCATOR_LINUX)
-                    int Vmem =
-                        sched_getcpu();    // show which cpu is actually being used
+                    std::size_t Vmem = sched_getcpu();
 #else
-                    int Vmem =
-                        numa_domain;    // show just the domain we think we're on
+                    std::size_t Vmem = numa_domain;
 #endif
                     pointer elem_ptr = page_ptr;
                     for (size_type j = 0; j < pageN; ++j)

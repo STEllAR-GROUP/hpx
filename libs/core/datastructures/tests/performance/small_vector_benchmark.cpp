@@ -6,9 +6,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/chrono.hpp>
-#include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/functional.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>

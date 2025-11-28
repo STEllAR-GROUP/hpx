@@ -21,6 +21,7 @@
 #include <hpx/config/debug.hpp>
 #include <hpx/config/deprecation.hpp>
 #include <hpx/config/emulate_deleted.hpp>
+#include <hpx/config/endian.hpp>
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/forward.hpp>
@@ -39,8 +40,7 @@
 #error HPX cannot be compiled with a Boost version earlier than 1.71.0
 #endif
 
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <cstddef>
 
@@ -383,7 +383,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Maximum number of terminated threads to keep before cleaning them up.
 #if !defined(HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS)
-#  define HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS 100
+#  define HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS 1000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

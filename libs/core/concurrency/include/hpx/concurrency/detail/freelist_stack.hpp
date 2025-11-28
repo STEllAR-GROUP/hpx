@@ -14,10 +14,10 @@
 #include <memory>
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/aligned_allocator.hpp>
 #include <hpx/concurrency/detail/tagged_ptr.hpp>
+#include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/bit_cast.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <array>
 #include <atomic>
@@ -29,7 +29,7 @@
 namespace hpx::lockfree::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Alloc = std::allocator<T>>
+    HPX_CXX_EXPORT template <typename T, typename Alloc = std::allocator<T>>
     class freelist_stack : Alloc
     {
         struct freelist_node
@@ -252,7 +252,7 @@ namespace hpx::lockfree::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    class tagged_index_data
+    HPX_CXX_EXPORT class tagged_index_data
     {
     public:
         using tag_t = std::uint16_t;
@@ -332,10 +332,10 @@ namespace hpx::lockfree::detail {
         tag_t tag;
     };
 
-    using tagged_index = tagged_index_data;
+    HPX_CXX_EXPORT using tagged_index = tagged_index_data;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, std::size_t Size>
+    HPX_CXX_EXPORT template <typename T, std::size_t Size>
     struct compiletime_sized_freelist_storage_data
     {
         // array-based freelists only support a 16bit address space.
@@ -366,12 +366,12 @@ namespace hpx::lockfree::detail {
         }
     };
 
-    template <typename T, std::size_t Size>
+    HPX_CXX_EXPORT template <typename T, std::size_t Size>
     using compiletime_sized_freelist_storage = util::cache_aligned_data_derived<
         compiletime_sized_freelist_storage_data<T, Size>>;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Alloc = std::allocator<T>>
+    HPX_CXX_EXPORT template <typename T, typename Alloc = std::allocator<T>>
     struct runtime_sized_freelist_storage
       : hpx::util::aligned_allocator<T, Alloc>
     {
@@ -414,7 +414,7 @@ namespace hpx::lockfree::detail {
         }
     };
 
-    template <typename T,
+    HPX_CXX_EXPORT template <typename T,
         typename NodeStorage = runtime_sized_freelist_storage<T>>
     class fixed_size_freelist : NodeStorage
     {
@@ -625,8 +625,8 @@ namespace hpx::lockfree::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Alloc, bool IsCompileTimeSized,
-        bool IsFixedSize, std::size_t Capacity>
+    HPX_CXX_EXPORT template <typename T, typename Alloc,
+        bool IsCompileTimeSized, bool IsFixedSize, std::size_t Capacity>
     struct select_freelist
     {
         using fixed_sized_storage_type = std::conditional_t<IsCompileTimeSized,
@@ -638,7 +638,7 @@ namespace hpx::lockfree::detail {
             freelist_stack<T, Alloc>>;
     };
 
-    template <typename T, bool IsNodeBased>
+    HPX_CXX_EXPORT template <typename T, bool IsNodeBased>
     struct select_tagged_handle
     {
         using tagged_handle_type =

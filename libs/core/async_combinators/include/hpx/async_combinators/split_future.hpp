@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,8 +23,8 @@ namespace hpx {
     ///
     /// \return     Returns an equivalent container (same container type as
     ///             passed as the argument) of futures, where each future refers
-    ///             to the corresponding value in the input parameter. All of
-    ///             the returned futures become ready once the input future has
+    ///             to the corresponding value in the input parameter. All the
+    ///             returned futures become ready once the input future has
     ///             become ready. If the input future is exceptional, all output
     ///             futures will be exceptional as well.
     ///
@@ -51,7 +51,7 @@ namespace hpx {
     ///             input future has become ready
     ///
     /// \return     Returns a std::vector of futures, where each future refers
-    ///             to the corresponding value in the input parameter. All of
+    ///             to the corresponding value in the input parameter. All
     ///             the returned futures become ready once the input future has
     ///             become ready. If the input future is exceptional, all output
     ///             futures will be exceptional as well.
@@ -64,20 +64,12 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/futures/detail/future_data.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/packaged_continuation.hpp>
-#include <hpx/futures/traits/acquire_future.hpp>
-#include <hpx/futures/traits/acquire_shared_state.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/future_traits.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <array>
 #include <cstddef>
@@ -158,7 +150,7 @@ namespace hpx {
         HPX_FORCEINLINE hpx::future<typename hpx::tuple_element<I, Tuple>::type>
         extract_nth_future(hpx::future<Tuple>& future)
         {
-            using result_type = typename hpx::tuple_element<I, Tuple>::type;
+            using result_type = hpx::tuple_element_t<I, Tuple>;
 
             return hpx::traits::future_access<hpx::future<result_type>>::create(
                 extract_nth_continuation<result_type, Tuple, I>(future));
@@ -168,7 +160,7 @@ namespace hpx {
         HPX_FORCEINLINE hpx::future<typename hpx::tuple_element<I, Tuple>::type>
         extract_nth_future(hpx::shared_future<Tuple>& future)
         {
-            using result_type = typename hpx::tuple_element<I, Tuple>::type;
+            using result_type = hpx::tuple_element_t<I, Tuple>;
 
             return hpx::traits::future_access<hpx::future<result_type>>::create(
                 extract_nth_continuation<result_type, Tuple, I>(future));
@@ -317,7 +309,7 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     HPX_FORCEINLINE hpx::tuple<hpx::future<Ts>...> split_future(
         hpx::future<hpx::tuple<Ts...>>&& f)
     {
@@ -325,13 +317,13 @@ namespace hpx {
             HPX_MOVE(f), hpx::util::make_index_pack_t<sizeof...(Ts)>());
     }
 
-    HPX_FORCEINLINE hpx::tuple<hpx::future<void>> split_future(
+    HPX_CXX_EXPORT HPX_FORCEINLINE hpx::tuple<hpx::future<void>> split_future(
         hpx::future<hpx::tuple<>>&& f)
     {
         return hpx::make_tuple(hpx::future<void>(HPX_MOVE(f)));
     }
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     HPX_FORCEINLINE hpx::tuple<hpx::future<Ts>...> split_future(
         hpx::shared_future<hpx::tuple<Ts...>>&& f)
     {
@@ -339,7 +331,7 @@ namespace hpx {
             HPX_MOVE(f), hpx::util::make_index_pack_t<sizeof...(Ts)>());
     }
 
-    HPX_FORCEINLINE hpx::tuple<hpx::future<void>> split_future(
+    HPX_CXX_EXPORT HPX_FORCEINLINE hpx::tuple<hpx::future<void>> split_future(
         hpx::shared_future<hpx::tuple<>>&& f)
     {
         return hpx::make_tuple(hpx::make_future<void>(HPX_MOVE(f)));
@@ -347,7 +339,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE)
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     HPX_FORCEINLINE std::tuple<hpx::future<Ts>...> split_future(
         hpx::future<std::tuple<Ts...>>&& f)
     {
@@ -355,13 +347,13 @@ namespace hpx {
             HPX_MOVE(f), hpx::util::make_index_pack_t<sizeof...(Ts)>());
     }
 
-    HPX_FORCEINLINE std::tuple<hpx::future<void>> split_future(
+    HPX_CXX_EXPORT HPX_FORCEINLINE std::tuple<hpx::future<void>> split_future(
         hpx::future<std::tuple<>>&& f)
     {
         return std::make_tuple(hpx::future<void>(HPX_MOVE(f)));
     }
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     HPX_FORCEINLINE std::tuple<hpx::future<Ts>...> split_future(
         hpx::shared_future<std::tuple<Ts...>>&& f)
     {
@@ -377,14 +369,14 @@ namespace hpx {
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T1, typename T2>
+    HPX_CXX_EXPORT template <typename T1, typename T2>
     HPX_FORCEINLINE std::pair<hpx::future<T1>, hpx::future<T2>> split_future(
         hpx::future<std::pair<T1, T2>>&& f)
     {
         return detail::split_future_helper(HPX_MOVE(f));
     }
 
-    template <typename T1, typename T2>
+    HPX_CXX_EXPORT template <typename T1, typename T2>
     HPX_FORCEINLINE std::pair<hpx::future<T1>, hpx::future<T2>> split_future(
         hpx::shared_future<std::pair<T1, T2>>&& f)
     {
@@ -392,7 +384,7 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <std::size_t N, typename T>
+    HPX_CXX_EXPORT template <std::size_t N, typename T>
     HPX_FORCEINLINE std::array<hpx::future<T>, N> split_future(
         hpx::future<std::array<T, N>>&& f)
     {
@@ -408,14 +400,14 @@ namespace hpx {
         return result;
     }
 
-    template <std::size_t N, typename T>
+    HPX_CXX_EXPORT template <std::size_t N, typename T>
     HPX_FORCEINLINE std::array<hpx::future<T>, N> split_future(
         hpx::shared_future<std::array<T, N>>&& f)
     {
         return detail::split_future_helper_array<N, T>(HPX_MOVE(f));
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_FORCEINLINE std::array<hpx::future<void>, 1> split_future(
         hpx::shared_future<std::array<T, 0>>&& f)
     {
@@ -425,14 +417,14 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_FORCEINLINE std::vector<hpx::future<T>> split_future(
         hpx::future<std::vector<T>>&& f, std::size_t size)
     {
         return detail::split_future_helper_vector<T>(HPX_MOVE(f), size);
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_FORCEINLINE std::vector<hpx::future<T>> split_future(
         hpx::shared_future<std::vector<T>>&& f, std::size_t size)
     {

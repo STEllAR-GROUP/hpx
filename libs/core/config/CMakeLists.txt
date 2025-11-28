@@ -32,6 +32,7 @@ set(config_headers
     hpx/config/warnings_prefix.hpp
     hpx/config/warnings_suffix.hpp
     hpx/config/weak_symbol.hpp
+    hpx/modules/config.hpp
 )
 
 # Default location is $HPX_ROOT/libs/config/src
@@ -43,6 +44,7 @@ add_hpx_module(
   GLOBAL_HEADER_GEN OFF
   SOURCES ${config_sources}
   HEADERS ${config_headers}
+  EXCLUDE_FROM_GLOBAL_HEADER hpx/modules/config.hpp
   MODULE_DEPENDENCIES hpx_preprocessor
   DEPENDENCIES hpx_dependencies_boost
   CMAKE_SUBDIRS examples tests

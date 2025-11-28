@@ -6,8 +6,5 @@
 
 #pragma once
 
-#include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_local_view.hpp>
-
-
-
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>

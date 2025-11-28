@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,7 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 #if defined(HPX_HAVE_APEX)
@@ -25,7 +26,7 @@
 namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
-    class thread_init_data
+    HPX_CXX_EXPORT class thread_init_data
     {
     public:
         thread_init_data()
@@ -41,8 +42,8 @@ namespace hpx::threads {
 #ifdef HPX_HAVE_APEX
           , timer_data(nullptr)
 #endif
-          , priority(thread_priority::normal)
           , schedulehint()
+          , priority(thread_priority::normal)
           , stacksize(thread_stacksize::default_)
           , initial_state(thread_schedule_state::pending)
           , run_now(false)
@@ -60,8 +61,8 @@ namespace hpx::threads {
         thread_init_data& operator=(thread_init_data&& rhs) noexcept
         {
             func = HPX_MOVE(rhs.func);
-            priority = rhs.priority;
             schedulehint = rhs.schedulehint;
+            priority = rhs.priority;
             stacksize = rhs.stacksize;
             initial_state = rhs.initial_state;
             run_now = rhs.run_now;
@@ -99,8 +100,8 @@ namespace hpx::threads {
           , timer_data(util::external_timer::new_task(
                 description, parent_locality_id, parent_id))
 #endif
-          , priority(rhs.priority)
           , schedulehint(rhs.schedulehint)
+          , priority(rhs.priority)
           , stacksize(rhs.stacksize)
           , initial_state(rhs.initial_state)
           , run_now(rhs.run_now)
@@ -133,8 +134,8 @@ namespace hpx::threads {
           , timer_data(util::external_timer::new_task(
                 description, parent_locality_id, parent_id))
 #endif
-          , priority(priority_)
           , schedulehint(os_thread)
+          , priority(priority_)
           , stacksize(stacksize_)
           , initial_state(initial_state_)
           , run_now(run_now_)
@@ -164,8 +165,8 @@ namespace hpx::threads {
         std::shared_ptr<util::external_timer::task_wrapper> timer_data;
 #endif
 
-        thread_priority priority;
         thread_schedule_hint schedulehint;
+        thread_priority priority;
         thread_stacksize stacksize;
         thread_schedule_state initial_state;
         bool run_now;

@@ -12,14 +12,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/member_pack.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/one_shot.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -50,8 +49,8 @@ namespace hpx::detail {
     public:
         bound_back() = default;    // needed for serialization
 
-        template <typename F_, typename... Ts_,
-            typename = std::enable_if_t<std::is_constructible_v<F, F_>>>
+        template <typename F_, typename... Ts_>
+            requires(std::is_constructible_v<F, F_>)
         constexpr explicit bound_back(F_&& f, Ts_&&... vs)
           : _f(HPX_FORWARD(F_, f))
           , _args(std::piecewise_construct, HPX_FORWARD(Ts_, vs)...)
@@ -174,7 +173,7 @@ namespace hpx {
     /// \returns    A function object of type \c T that is unspecified, except that
     ///             the types of objects returned by two calls to \c hpx::bind_back
     ///             with the same arguments are the same.
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     constexpr hpx::detail::bound_back<std::decay_t<F>,
         util::make_index_pack_t<sizeof...(Ts)>, util::decay_unwrap_t<Ts>...>
     bind_back(F&& f, Ts&&... vs)
@@ -187,7 +186,7 @@ namespace hpx {
     }
 
     // nullary functions do not need to be bound again
-    template <typename F>
+    HPX_CXX_EXPORT template <typename F>
     constexpr std::decay_t<F> bind_back(F&& f)    //-V524
     {
         return HPX_FORWARD(F, f);
@@ -199,7 +198,7 @@ namespace hpx {
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     struct get_function_address<hpx::detail::bound_back<F, Ts...>>
     {
         [[nodiscard]] static constexpr std::size_t call(
@@ -210,7 +209,7 @@ namespace hpx::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     struct get_function_annotation<hpx::detail::bound_back<F, Ts...>>
     {
         [[nodiscard]] static constexpr char const* call(
@@ -221,7 +220,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     struct get_function_annotation_itt<hpx::detail::bound_back<F, Ts...>>
     {
         [[nodiscard]] static util::itt::string_handle call(
@@ -238,7 +237,7 @@ namespace hpx::traits {
 namespace hpx::serialization {
 
     // serialization of the bound_back object
-    template <typename Archive, typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename Archive, typename F, typename... Ts>
     void serialize(Archive& ar, ::hpx::detail::bound_back<F, Ts...>& bound,
         unsigned int const version = 0)
     {

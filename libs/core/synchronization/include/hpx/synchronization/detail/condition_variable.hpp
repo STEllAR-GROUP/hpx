@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,13 +8,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/datastructures/detail/intrusive_list.hpp>
+#include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <mutex>
@@ -23,7 +23,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::lcos::local::detail {
 
-    class condition_variable
+    HPX_CXX_EXPORT class condition_variable
     {
     private:
         using mutex_type = hpx::spinlock;

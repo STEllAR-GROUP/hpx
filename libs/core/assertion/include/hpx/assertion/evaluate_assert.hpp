@@ -1,4 +1,5 @@
 //  Copyright (c) 2019 Thomas Heller
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,12 +12,12 @@
 #include <hpx/assertion/source_location.hpp>
 
 #include <string>
-#include <utility>
 
 namespace hpx::assertion::detail {
 
     /// \cond NOINTERNAL
-    HPX_CORE_EXPORT void handle_assert(hpx::source_location const& loc,
-        const char* expr, std::string const& msg) noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void handle_assert(
+        hpx::source_location const& loc, char const* expr,
+        std::string const& msg) noexcept;
     /// \endcond
 }    // namespace hpx::assertion::detail

@@ -21,12 +21,11 @@
 #include <hpx/components/client_base.hpp>
 #include <hpx/components/get_ptr.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/vector.hpp>
 
 #include <cstddef>
 #include <cstdint>

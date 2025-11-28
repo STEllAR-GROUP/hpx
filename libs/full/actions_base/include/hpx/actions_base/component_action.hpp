@@ -13,14 +13,11 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/actions_base/traits/is_client.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/naming_base/address.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
 
 #include <cstdlib>
 #include <string>

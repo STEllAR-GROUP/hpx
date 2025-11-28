@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,11 +31,11 @@ namespace hpx::util::cache::entries {
     ///                   default constructible, copy constructible and
     ///                   less_than_comparable.
     ///
-    template <typename Value>
-    class lfu_entry : public entry<Value, lfu_entry<Value>>
+    HPX_CXX_EXPORT template <typename Value>
+    class lfu_entry : public entry<Value>
     {
     private:
-        using base_type = entry<Value, lfu_entry<Value>>;
+        using base_type = entry<Value>;
 
     public:
         /// \brief Any cache entry has to be default constructible
@@ -65,7 +65,7 @@ namespace hpx::util::cache::entries {
         /// operator<().
         ///
         /// \returns  This function should return true if the cache needs to
-        ///           update it's internal heap. Usually this is needed if the
+        ///           update its internal heap. Usually this is needed if the
         ///           entry has been changed by touch() in a way influencing
         ///           the sort order as mandated by the cache's UpdatePolicy
         bool touch() noexcept
@@ -82,10 +82,29 @@ namespace hpx::util::cache::entries {
 
         /// \brief Compare the 'age' of two entries. An entry is 'older' than
         ///        another entry if it has been accessed less frequently (LFU).
-        friend bool operator<(
-            lfu_entry const& lhs, lfu_entry const& rhs) noexcept
+        friend auto operator<(lfu_entry const& lhs, lfu_entry const& rhs)
         {
             return lhs.get_access_count() < rhs.get_access_count();
+        }
+        friend auto operator>(lfu_entry const& lhs, lfu_entry const& rhs)
+        {
+            return rhs < lhs;
+        }
+        friend auto operator<=(lfu_entry const& lhs, lfu_entry const& rhs)
+        {
+            return !(rhs < lhs);
+        }
+        friend auto operator>=(lfu_entry const& lhs, lfu_entry const& rhs)
+        {
+            return !(lhs < rhs);
+        }
+        friend auto operator==(lfu_entry const& lhs, lfu_entry const& rhs)
+        {
+            return lhs.get_access_count() == rhs.get_access_count();
+        }
+        friend auto operator!=(lfu_entry const& lhs, lfu_entry const& rhs)
+        {
+            return !(lhs == rhs);
         }
 
     private:

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,11 +9,11 @@
 
 #ifdef HPX_HAVE_VERIFY_LOCKS
 #include <hpx/assert.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
-#include <hpx/debugging/backtrace.hpp>
+#include <hpx/modules/debugging.hpp>
 #endif
 
 #include <cstddef>

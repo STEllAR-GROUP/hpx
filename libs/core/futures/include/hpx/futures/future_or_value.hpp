@@ -7,12 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/variant.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/datastructures.hpp>
 
 namespace hpx {
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct future_or_value
     {
         constexpr future_or_value(T const& value)

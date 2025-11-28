@@ -9,13 +9,13 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/actions_base/plain_action.hpp>
-#include <hpx/async_combinators/wait_each.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/iostream.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 

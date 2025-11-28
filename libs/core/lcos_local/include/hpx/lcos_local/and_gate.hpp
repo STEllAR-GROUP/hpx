@@ -7,19 +7,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/allocator_support/thread_local_caching_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/stack.hpp>
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
-#include <hpx/datastructures/detail/intrusive_list.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/futures/promise.hpp>
 #include <hpx/lcos_local/conditional_cv.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/synchronization/no_mutex.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <mutex>
@@ -28,7 +25,7 @@
 namespace hpx::lcos::local {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Mutex = hpx::spinlock>
+    HPX_CXX_EXPORT template <typename Mutex = hpx::spinlock>
     struct base_and_gate
     {
     protected:
@@ -411,7 +408,7 @@ namespace hpx::lcos::local {
     // Note: This type is not thread-safe. It has to be protected from
     //       concurrent access by different threads by the code using instances
     //       of this type.
-    struct and_gate : base_and_gate<hpx::no_mutex>
+    HPX_CXX_EXPORT struct and_gate : base_and_gate<hpx::no_mutex>
     {
     private:
         using base_type = base_and_gate<hpx::no_mutex>;

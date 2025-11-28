@@ -9,7 +9,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/util/to_string.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <algorithm>
 
@@ -266,9 +266,9 @@ namespace boost { namespace inspect {
         {"(\\bhpx\\s*::\\s*intrusive_ptr\\b)", "hpx::intrusive_ptr",
             {"hpx/modules/memory.hpp"}},
         {"(\\bhpx\\s*::\\s*util\\s*::\\s*from_string\\b)",
-            "hpx::util::from_string", {"hpx/util/from_string.hpp"}},
+            "hpx::util::from_string", {"hpx/modules/format.hpp"}},
         {"(\\bhpx\\s*::\\s*util\\s*::\\s*to_string\\b)", "hpx::util::to_string",
-            {"hpx/util/to_string.hpp"}},
+            {"hpx/modules/format.hpp"}},
         // macros
         {"(\\bHPX_PP_CAT\\b)", "HPX_PP_CAT",
             {"hpx/modules/preprocessor.hpp", "hpx/preprocessor/cat.hpp"}},
@@ -284,6 +284,13 @@ namespace boost { namespace inspect {
         //
         {"(\\HPX_ASSERT\\b)", "HPX_ASSERT", {"hpx/assert.hpp"}},
         {"(\\HPX_ASSERT_MSG\\b)", "HPX_ASSERT_MSG", {"hpx/assert.hpp"}},
+        {"(\\HPX_THROW_EXCEPTION\\b)", "HPX_THROW_EXCEPTION",
+            {"hpx/modules/errors.hpp"}},
+        {"(\\HPX_THROWS_IF\\b)", "HPX_THROWS_IF", {"hpx/modules/errors.hpp"}},
+        {"(\\HPX_THROW_BAD_ALLOC\\b)", "HPX_THROW_BAD_ALLOC",
+            {"hpx/modules/errors.hpp"}},
+        {"(\\HPX_THROWS_BAD_ALLOC_IF\\b)", "HPX_THROWS_BAD_ALLOC_IF",
+            {"hpx/modules/errors.hpp"}},
         {nullptr, nullptr, {nullptr}}};
 
     //  include_check constructor  -------------------------------------------//
@@ -302,6 +309,7 @@ namespace boost { namespace inspect {
         register_signature(".inc");
         register_signature(".ipp");
         register_signature(".ixx");
+        register_signature(".cppm");
 
         for (names_includes const* names_it = &names[0];
             names_it->name_regex != nullptr; ++names_it)
@@ -357,6 +365,15 @@ namespace boost { namespace inspect {
         // if one of the includes is <hpx/hpx.hpp> assume all is well
         if (includes.find("hpx/hpx.hpp") != includes.end())
             return;
+
+        // if one of the includes starts with <hpx/include/...> assume all is
+        // well as well
+        constexpr char const* prefix = "hpx/include/";
+        if (auto it = includes.lower_bound(prefix);
+            it != includes.end() && it->find(prefix) == 0)
+        {
+            return;
+        }
 
         // for all given names, check whether corresponding include was found
         std::set<std::string> checked_includes;

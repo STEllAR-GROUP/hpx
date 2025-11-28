@@ -5,14 +5,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/async_local/async.hpp>
-#include <hpx/async_local/post.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/thread_pool_util/thread_pool_suspension_helpers.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <cstddef>
 #include <utility>
@@ -30,7 +29,7 @@ namespace hpx::threads {
                 "resume_processing_unit_cb instead");
         }
         if (!pool.get_scheduler()->has_scheduler_mode(
-                policies::scheduler_mode::enable_elasticity))
+                policies::scheduler_mode::enable_elasticity, virt_core))
         {
             return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
                 hpx::error::invalid_status, "resume_processing_unit",
@@ -47,7 +46,7 @@ namespace hpx::threads {
         hpx::function<void()> callback, std::size_t virt_core, error_code& ec)
     {
         if (!pool.get_scheduler()->has_scheduler_mode(
-                policies::scheduler_mode::enable_elasticity))
+                policies::scheduler_mode::enable_elasticity, virt_core))
         {
             HPX_THROWS_IF(ec, hpx::error::invalid_status,
                 "resume_processing_unit_cb",
@@ -83,7 +82,7 @@ namespace hpx::threads {
                 "suspend_processing_unit_cb instead");
         }
         if (!pool.get_scheduler()->has_scheduler_mode(
-                policies::scheduler_mode::enable_elasticity))
+                policies::scheduler_mode::enable_elasticity, virt_core))
         {
             return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
                 hpx::error::invalid_status, "suspend_processing_unit",
@@ -91,7 +90,7 @@ namespace hpx::threads {
                 "processing units"));
         }
         if (!pool.get_scheduler()->has_scheduler_mode(
-                policies::scheduler_mode::enable_stealing) &&
+                policies::scheduler_mode::enable_stealing, virt_core) &&
             hpx::this_thread::get_pool() == &pool)
         {
             return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
@@ -109,7 +108,7 @@ namespace hpx::threads {
         hpx::function<void()> callback, std::size_t virt_core, error_code& ec)
     {
         if (!pool.get_scheduler()->has_scheduler_mode(
-                policies::scheduler_mode::enable_elasticity))
+                policies::scheduler_mode::enable_elasticity, virt_core))
         {
             HPX_THROWS_IF(ec, hpx::error::invalid_status,
                 "suspend_processing_unit_cb",
@@ -127,7 +126,7 @@ namespace hpx::threads {
         if (threads::get_self_ptr())
         {
             if (!pool.get_scheduler()->has_scheduler_mode(
-                    policies::scheduler_mode::enable_stealing) &&
+                    policies::scheduler_mode::enable_stealing, virt_core) &&
                 hpx::this_thread::get_pool() == &pool)
             {
                 HPX_THROW_EXCEPTION(hpx::error::invalid_status,

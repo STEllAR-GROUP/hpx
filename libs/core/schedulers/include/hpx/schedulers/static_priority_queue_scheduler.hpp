@@ -23,10 +23,10 @@ namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    using default_static_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_EXPORT using default_static_priority_queue_scheduler_terminated_queue =
         lockfree_lifo;
 #else
-    using default_static_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_EXPORT using default_static_priority_queue_scheduler_terminated_queue =
         lockfree_fifo;
 #endif
 
@@ -40,7 +40,7 @@ namespace hpx::threads::policies {
     // other work is executed. Low priority threads are executed by the last OS
     // thread whenever no other work is available. This scheduler does not do
     // any work stealing.
-    template <typename Mutex = std::mutex,
+    HPX_CXX_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =
@@ -60,20 +60,17 @@ namespace hpx::threads::policies {
             bool deferred_initialization = true)
           : base_type(init, deferred_initialization)
         {
-            // disable thread stealing to begin with
-            this->remove_scheduler_mode(
-                policies::scheduler_mode::enable_stealing |
-                policies::scheduler_mode::enable_stealing_numa);
         }
 
-        void set_scheduler_mode(scheduler_mode mode) noexcept override
+        void set_scheduler_mode(scheduler_mode mode,
+            hpx::threads::mask_cref_type pu_mask) noexcept override
         {
             // this scheduler does not support stealing or numa stealing
             mode = static_cast<policies::scheduler_mode>(
                 mode & ~policies::scheduler_mode::enable_stealing);
             mode = static_cast<policies::scheduler_mode>(
                 mode & ~policies::scheduler_mode::enable_stealing_numa);
-            scheduler_base::set_scheduler_mode(mode);
+            scheduler_base::set_scheduler_mode(mode, pu_mask);
         }
 
         static std::string_view get_scheduler_name()

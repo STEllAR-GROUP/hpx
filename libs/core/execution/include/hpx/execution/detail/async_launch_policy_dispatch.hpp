@@ -8,29 +8,24 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/traits/is_action.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/futures_factory.hpp>
-#include <hpx/futures/traits/is_future.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/threading_base/detail/get_default_pool.hpp>
-#include <hpx/threading_base/scoped_annotation.hpp>
-#include <hpx/threading_base/thread_description.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <exception>
 #include <type_traits>
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // dispatch point used for launch_policy implementations
-    template <typename Action, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Action, typename Enable = void>
     struct async_launch_policy_dispatch;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -312,7 +307,7 @@ namespace hpx::detail {
         }
     };
 
-    template <typename Action>
+    HPX_CXX_EXPORT template <typename Action>
     struct async_launch_policy_dispatch<Action,
         std::enable_if_t<!traits::is_action_v<Action>>>
     {
@@ -378,3 +373,5 @@ namespace hpx::detail {
         }
     };
 }    // namespace hpx::detail
+
+#include <hpx/config/warnings_suffix.hpp>

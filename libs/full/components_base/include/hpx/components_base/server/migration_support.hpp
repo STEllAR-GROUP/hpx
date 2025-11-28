@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,15 +11,15 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
 
+#include <atomic>
 #include <cstdint>
 #include <mutex>
 #include <type_traits>
@@ -59,13 +59,19 @@ namespace hpx::components {
             friend void intrusive_ptr_add_ref(
                 migration_support_data* p) noexcept
             {
-                ++p->count_;
+                p->count_.increment();
             }
             friend void intrusive_ptr_release(
                 migration_support_data* p) noexcept
             {
-                if (0 == --p->count_)
+                if (0 == p->count_.decrement())
                 {
+                    // The thread that decrements the reference count to zero
+                    // must perform an acquire to ensure that it doesn't start
+                    // destructing the object until all previous writes have
+                    // drained.
+                    std::atomic_thread_fence(std::memory_order_acquire);
+
                     delete p;
                 }
             }

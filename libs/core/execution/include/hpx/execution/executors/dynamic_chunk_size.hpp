@@ -11,10 +11,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/detail/future_exec.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -30,7 +31,7 @@ namespace hpx::execution::experimental {
     /// \note This executor parameters type is equivalent to OpenMP's DYNAMIC
     ///       scheduling directive.
     ///
-    struct dynamic_chunk_size
+    HPX_CXX_EXPORT struct dynamic_chunk_size
     {
         /// Construct an \a dynamic_chunk_size executor parameters object
         ///
@@ -67,7 +68,7 @@ namespace hpx::execution::experimental {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int /* version */)
+        void serialize(Archive& ar, unsigned int const /* version */)
         {
             // clang-format off
             ar & chunk_size_;

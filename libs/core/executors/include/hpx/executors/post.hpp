@@ -7,11 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/post.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
-#include <hpx/functional/deferred_call.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -24,7 +24,7 @@ namespace hpx::detail {
     // dispatching trait for hpx::post
 
     // launch a plain function/function object
-    template <typename Func, typename Enable>
+    HPX_CXX_EXPORT template <typename Func, typename Enable>
     struct post_dispatch
     {
         template <typename F, typename... Ts>
@@ -41,7 +41,7 @@ namespace hpx::detail {
 
     // The overload for hpx::post taking an executor simply forwards to the
     // corresponding executor customization point.
-    template <typename Executor>
+    HPX_CXX_EXPORT template <typename Executor>
     struct post_dispatch<Executor,
         std::enable_if_t<traits::is_one_way_executor_v<Executor> ||
             traits::is_two_way_executor_v<Executor>>>

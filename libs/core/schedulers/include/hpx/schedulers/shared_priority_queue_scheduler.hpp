@@ -12,19 +12,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/debugging/print.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/queue_holder_numa.hpp>
 #include <hpx/schedulers/queue_holder_thread.hpp>
 #include <hpx/schedulers/thread_queue_mc.hpp>
-#include <hpx/threading_base/print.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <array>
 #include <atomic>
@@ -71,15 +67,15 @@ namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    using default_shared_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_EXPORT using default_shared_priority_queue_scheduler_terminated_queue =
         lockfree_lifo;
 #else
-    using default_shared_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_EXPORT using default_shared_priority_queue_scheduler_terminated_queue =
         lockfree_fifo;
 #endif
 
     // Holds core/queue ratios used by schedulers.
-    struct core_ratios
+    HPX_CXX_EXPORT struct core_ratios
     {
         constexpr core_ratios(std::size_t high_priority,
             std::size_t normal_priority, std::size_t low_priority) noexcept
@@ -104,7 +100,7 @@ namespace hpx::threads::policies {
     // scheduling hints into account when creating and scheduling work.
     //
     // Warning: PendingQueuing lifo causes lockup on termination
-    template <typename Mutex = std::mutex,
+    HPX_CXX_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = concurrentqueue_fifo,
         typename TerminatedQueuing =
             default_shared_priority_queue_scheduler_terminated_queue>
@@ -171,7 +167,6 @@ namespace hpx::threads::policies {
           , thread_init_counter_(0)
           , pool_index_(static_cast<std::size_t>(-1))
         {
-            scheduler_base::set_scheduler_mode(scheduler_mode::default_);
             HPX_ASSERT(num_workers_ != 0);
         }
 
@@ -192,10 +187,11 @@ namespace hpx::threads::policies {
         }
 
         // get/set scheduler mode
-        void set_scheduler_mode(scheduler_mode mode) noexcept override
+        void set_scheduler_mode(scheduler_mode mode,
+            hpx::threads::mask_cref_type pu_mask) noexcept override
         {
             // clang-format off
-            scheduler_base::set_scheduler_mode(mode);
+            scheduler_base::set_scheduler_mode(mode, pu_mask);
             round_robin_ = mode & policies::scheduler_mode::assign_work_round_robin;
             steal_hp_first_ =
                 mode & policies::scheduler_mode::steal_high_priority_first;

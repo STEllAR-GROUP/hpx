@@ -5,8 +5,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
 // make available M_PI
+#if !defined(_USE_MATH_DEFINES)
 #define _USE_MATH_DEFINES
+#endif
 
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
@@ -206,7 +210,7 @@ void init_resource_partitioner_handler(
     // a user supplied scheduler attached
     rp.create_thread_pool(CUSTOM_POOL_NAME,
         [](hpx::threads::thread_pool_init_parameters init,
-            hpx::threads::policies::thread_queue_init_parameters
+            hpx::threads::policies::thread_queue_init_parameters const&
                 thread_queue_init)
             -> std::unique_ptr<hpx::threads::thread_pool_base> {
             std::cout << "User defined scheduler creation callback "
@@ -214,14 +218,15 @@ void init_resource_partitioner_handler(
             high_priority_sched::init_parameter_type scheduler_init(
                 init.num_threads_, {1, 1, 64}, init.affinity_data_,
                 thread_queue_init, "shared-priority-scheduler");
-            std::unique_ptr<high_priority_sched> scheduler(
-                new high_priority_sched(scheduler_init));
 
-            init.mode_ = scheduler_mode(scheduler_mode::delay_exit);
+            auto scheduler =
+                std::make_unique<high_priority_sched>(scheduler_init);
 
-            std::unique_ptr<hpx::threads::thread_pool_base> pool(
-                new hpx::threads::detail::scheduled_thread_pool<
-                    high_priority_sched>(std::move(scheduler), init));
+            init.mode_ = scheduler_mode::delay_exit;
+
+            auto pool =
+                std::make_unique<hpx::threads::detail::scheduled_thread_pool<
+                    high_priority_sched>>(std::move(scheduler), init);
             return pool;
         });
 
@@ -269,7 +274,7 @@ int main(int argc, char* argv[])
 
     pool_threads = vm["pool-threads"].as<int>();
 
-    // Setup the init parameters
+    // Set up the init parameters
     hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_cmdline;
 

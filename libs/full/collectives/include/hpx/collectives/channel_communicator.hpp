@@ -103,12 +103,12 @@ namespace hpx { namespace collectives {
 #else
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/detail/channel_communicator.hpp>
 #include <hpx/components/client.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <cstddef>
 #include <memory>

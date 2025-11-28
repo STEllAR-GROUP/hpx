@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,9 +13,9 @@
 
 namespace hpx::traits {
 
-    // By default we return the address of the object which is used to invoke
+    // By default, we return the address of the object which is used to invoke
     // the trait.
-    template <typename F, typename Enable = void>
+    HPX_CXX_EXPORT template <typename F, typename Enable = void>
     struct get_function_address
     {
         static std::size_t call(F const& f) noexcept
@@ -25,7 +25,7 @@ namespace hpx::traits {
     };
 
     // For global (and static) functions we return the function address itself
-    template <typename R, typename... Ts>
+    HPX_CXX_EXPORT template <typename R, typename... Ts>
     struct get_function_address<R (*)(Ts...)>
     {
         static std::size_t call(R (*f)(Ts...)) noexcept
@@ -50,7 +50,7 @@ namespace hpx::traits {
     //         corresponding to the function.
     //
     // clang-format off
-    template <typename R, typename Obj, typename... Ts>
+    HPX_CXX_EXPORT template <typename R, typename Obj, typename... Ts>
     struct get_function_address<R (Obj::*)(Ts...)>
     {
         static std::size_t call(R (Obj::*f)(Ts...)) noexcept
@@ -83,7 +83,7 @@ namespace hpx::traits {
         }
     };
 
-    template <typename R, typename Obj, typename... Ts>
+    HPX_CXX_EXPORT template <typename R, typename Obj, typename... Ts>
     struct get_function_address<R (Obj::*)(Ts...) const>
     {
         static std::size_t call(R (Obj::*f)(Ts...) const) noexcept

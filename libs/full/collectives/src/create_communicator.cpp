@@ -9,26 +9,28 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
-#include <hpx/errors/throw_exception.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/lock_registration.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
-#include <hpx/synchronization/mutex.hpp>
-#include <hpx/type_support/extra_data.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
 #include <string>
 #include <utility>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::util {
 

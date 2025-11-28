@@ -14,11 +14,10 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
-#include <hpx/logging/format/destinations.hpp>
-
 #include <hpx/config.hpp>
+#include <hpx/logging/format/destinations.hpp>
 #include <hpx/logging/message.hpp>
-#include <hpx/thread_support/spinlock.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <fstream>
 #include <memory>

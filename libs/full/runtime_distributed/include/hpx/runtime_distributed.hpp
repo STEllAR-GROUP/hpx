@@ -10,7 +10,9 @@
 #include <hpx/config.hpp>
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/components_base/generate_unique_ids.hpp>
-#include <hpx/io_service/io_service_pool_fwd.hpp>
+#include <hpx/modules/io_service.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/parcelset_base/locality.hpp>
@@ -22,8 +24,6 @@
 #include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
 
 #include <condition_variable>
 #include <cstddef>

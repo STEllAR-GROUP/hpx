@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2024 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
@@ -13,9 +13,7 @@
 #include <hpx/coroutines/detail/coroutine_self.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/functional/detail/reset_function.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
-#include <hpx/functional/move_only_function.hpp>
+#include <hpx/modules/functional.hpp>
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
 #include <hpx/coroutines/detail/tss.hpp>
 #endif
@@ -27,7 +25,7 @@
 namespace hpx::threads::coroutines {
 
     ////////////////////////////////////////////////////////////////////////////
-    class stackless_coroutine
+    HPX_CXX_EXPORT class stackless_coroutine
     {
     private:
         friend struct detail::coroutine_accessor;
@@ -121,7 +119,7 @@ namespace hpx::threads::coroutines {
             return detail::set_tss_thread_data(thread_data_, data);
         }
 #else
-        std::size_t set_thread_data(std::size_t data) const noexcept
+        std::size_t set_thread_data(std::size_t const data) const noexcept
         {
             std::size_t const olddata = thread_data_;
             thread_data_ = data;
@@ -266,12 +264,11 @@ namespace hpx::threads::coroutines {
 namespace hpx::threads::coroutines {
 
     HPX_FORCEINLINE stackless_coroutine::result_type
-    stackless_coroutine::operator()(arg_type arg)
+    stackless_coroutine::operator()(arg_type const arg)
     {
         HPX_ASSERT(is_ready());
 
-        result_type result(
-            thread_schedule_state::terminated, invalid_thread_id);
+        result_type result;
 
         {
             detail::coroutine_stackless_self self(this);

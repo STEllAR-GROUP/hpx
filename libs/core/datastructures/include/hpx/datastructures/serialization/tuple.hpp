@@ -1,5 +1,5 @@
 //  Copyright (c) 2011-2013 Thomas Heller
-//  Copyright (c) 2011-2022 Hartmut Kaiser
+//  Copyright (c) 2011-2025 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //  Copyright (c)      2019 Mikael Simberg
 //
@@ -9,14 +9,9 @@
 
 #pragma once
 
-#include <hpx/serialization/config/defines.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/serialization/detail/non_default_constructible.hpp>
-#include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
-#include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -25,14 +20,14 @@
 
 namespace hpx::traits {
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     struct is_bitwise_serializable<::hpx::tuple<Ts...>>
       : ::hpx::util::all_of<
             hpx::traits::is_bitwise_serializable<std::remove_const_t<Ts>>...>
     {
     };
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     struct is_not_bitwise_serializable<::hpx::tuple<Ts...>>
       : std::integral_constant<bool,
             !is_bitwise_serializable_v<::hpx::tuple<Ts...>>>
@@ -42,16 +37,17 @@ namespace hpx::traits {
 
 namespace hpx::util::detail {
 
-    template <typename Archive, typename Is, typename... Ts>
+    HPX_CXX_EXPORT template <typename Archive, typename Is, typename... Ts>
     struct serialize_with_index_pack;
 
-    template <typename Archive, typename Is, typename... Ts>
+    HPX_CXX_EXPORT template <typename Archive, typename Is, typename... Ts>
     struct load_construct_data_with_index_pack;
 
-    template <typename Archive, typename Is, typename... Ts>
+    HPX_CXX_EXPORT template <typename Archive, typename Is, typename... Ts>
     struct save_construct_data_with_index_pack;
 
-    template <typename Archive, std::size_t... Is, typename... Ts>
+    HPX_CXX_EXPORT template <typename Archive, std::size_t... Is,
+        typename... Ts>
     struct serialize_with_index_pack<Archive, hpx::util::index_pack<Is...>,
         Ts...>
     {
@@ -69,14 +65,15 @@ namespace hpx::util::detail {
         }
     };
 
-    template <typename Archive, std::size_t... Is, typename... Ts>
+    HPX_CXX_EXPORT template <typename Archive, std::size_t... Is,
+        typename... Ts>
     struct load_construct_data_with_index_pack<Archive,
         hpx::util::index_pack<Is...>, Ts...>
     {
         template <typename T>
         static void load_element(Archive& ar, T& t)
         {
-            static constexpr bool is_polymorphic =
+            constexpr bool is_polymorphic =
                 hpx::traits::is_intrusive_polymorphic_v<T> ||
                 hpx::traits::is_nonintrusive_polymorphic_v<T>;
 
@@ -116,7 +113,8 @@ namespace hpx::util::detail {
         }
     };
 
-    template <typename Archive, std::size_t... Is, typename... Ts>
+    HPX_CXX_EXPORT template <typename Archive, std::size_t... Is,
+        typename... Ts>
     struct save_construct_data_with_index_pack<Archive,
         hpx::util::index_pack<Is...>, Ts...>
     {
@@ -140,7 +138,7 @@ namespace hpx::util::detail {
 
 namespace hpx::serialization {
 
-    template <typename Archive, typename... Ts>
+    HPX_CXX_EXPORT template <typename Archive, typename... Ts>
     void serialize(Archive& ar, hpx::tuple<Ts...>& t, unsigned int version)
     {
         using Is = hpx::util::make_index_pack_t<sizeof...(Ts)>;
@@ -148,12 +146,12 @@ namespace hpx::serialization {
             ar, t, version);
     }
 
-    template <typename Archive>
+    HPX_CXX_EXPORT template <typename Archive>
     void serialize(Archive&, hpx::tuple<>&, unsigned)
     {
     }
 
-    template <typename Archive, typename... Ts>
+    HPX_CXX_EXPORT template <typename Archive, typename... Ts>
     void load_construct_data(
         Archive& ar, hpx::tuple<Ts...>* t, unsigned int version)
     {
@@ -162,7 +160,7 @@ namespace hpx::serialization {
             Ts...>::call(ar, *t, version);
     }
 
-    template <typename Archive, typename... Ts>
+    HPX_CXX_EXPORT template <typename Archive, typename... Ts>
     void save_construct_data(
         Archive& ar, hpx::tuple<Ts...> const* t, unsigned int version)
     {

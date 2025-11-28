@@ -7,12 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/schedulers/thread_queue_mc.hpp>
-#include <hpx/threading_base/print.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-//
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/schedulers/queue_holder_thread.hpp>
-//
+#include <hpx/schedulers/thread_queue_mc.hpp>
+
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -37,7 +36,7 @@ namespace hpx::threads::policies {
     // ----------------------------------------------------------------
     // Helper class to hold a set of thread queue holders.
     // ----------------------------------------------------------------
-    template <typename QueueType>
+    HPX_CXX_EXPORT template <typename QueueType>
     struct queue_holder_numa
     {
         // ----------------------------------------------------------------

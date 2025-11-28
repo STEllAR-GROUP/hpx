@@ -11,7 +11,7 @@
 #include <hpx/modules/plugin.hpp>
 #include <hpx/modules/type_support.hpp>
 
-#include <hpx/runtime_configuration/plugin_registry_base.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::plugins {

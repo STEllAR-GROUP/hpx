@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors/exception.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/mpi_base/mpi.hpp>
 
 #include <cstddef>

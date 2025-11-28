@@ -10,15 +10,19 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 
 namespace hpx::threads {
 
-    class HPX_CORE_EXPORT thread_pool_base;
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT thread_pool_base;
 
     namespace detail {
-        using get_default_pool_type = hpx::function<thread_pool_base*()>;
-        HPX_CORE_EXPORT void set_get_default_pool(get_default_pool_type f);
-        HPX_CORE_EXPORT thread_pool_base* get_self_or_default_pool();
+
+        HPX_CXX_EXPORT using get_default_pool_type =
+            hpx::function<thread_pool_base*()>;
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void set_get_default_pool(
+            get_default_pool_type f);
+        HPX_CXX_EXPORT HPX_CORE_EXPORT thread_pool_base*
+        get_self_or_default_pool();
     }    // namespace detail
 }    // namespace hpx::threads

@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -17,9 +17,9 @@
 
 namespace hpx::execution_base {
 
-    struct agent_base;
+    HPX_CXX_EXPORT struct agent_base;
 
-    class HPX_CORE_EXPORT agent_ref
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT agent_ref
     {
     public:
         agent_ref() = default;
@@ -47,7 +47,7 @@ namespace hpx::execution_base {
 
         void yield(
             char const* desc = "hpx::execution_base::agent_ref::yield") const;
-        void yield_k(std::size_t k,
+        bool yield_k(std::size_t k,
             char const* desc = "hpx::execution_base::agent_ref::yield_k") const;
         void suspend(
             char const* desc = "hpx::execution_base::agent_ref::suspend") const;

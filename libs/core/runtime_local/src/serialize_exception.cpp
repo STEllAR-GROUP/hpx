@@ -6,9 +6,9 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_local/detail/serialize_exception.hpp>
-#include <hpx/serialization/serialize.hpp>
 
 #if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
 #include <boost/exception/diagnostic_information.hpp>
@@ -22,6 +22,8 @@
 #include <string>
 #include <system_error>
 #include <typeinfo>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::runtime_local::detail {
@@ -426,3 +428,5 @@ namespace hpx::runtime_local::detail {
         }
     }
 }    // namespace hpx::runtime_local::detail
+
+#include <hpx/config/warnings_suffix.hpp>

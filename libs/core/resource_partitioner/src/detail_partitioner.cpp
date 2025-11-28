@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Shoshana Jakobovits
-//  Copyright (c) 2017-2024 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,19 +7,17 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/ini.hpp>
+#include <hpx/modules/thread_pools.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/topology.hpp>
+#include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/thread_pools/scheduled_thread_pool.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/topology/topology.hpp>
-#include <hpx/type_support/static.hpp>
-#include <hpx/util/from_string.hpp>
-#include <hpx/util/get_entry_as.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -230,6 +228,20 @@ namespace hpx::resource::detail {
             threads::reset(assigned_pus_[i]);
             threads::set(assigned_pus_[i], pu_num);
         }
+    }
+
+    hpx::threads::mask_type init_pool_data::get_pu_mask() const
+    {
+        threads::mask_type pu_mask = threads::mask_type();
+        threads::resize(
+            pu_mask, static_cast<std::size_t>(threads::hardware_concurrency()));
+
+        for (std::size_t i = 0; i != num_threads_; ++i)
+        {
+            pu_mask |= assigned_pus_[i];
+        }
+
+        return pu_mask;
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -975,6 +987,13 @@ namespace hpx::resource::detail {
             static_cast<std::size_t>(hpx::threads::hardware_concurrency()));
         threads::set(mask, global_thread_num);
         return mask;
+    }
+
+    threads::mask_type partitioner::get_pool_pus_mask(
+        std::string const& pool_name) const
+    {
+        std::unique_lock<mutex_type> l(mtx_);
+        return get_pool_data(l, pool_name).get_pu_mask();
     }
 
     void partitioner::init(resource::partitioner_mode rpmode,

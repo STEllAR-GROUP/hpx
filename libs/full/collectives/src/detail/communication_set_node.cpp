@@ -12,8 +12,8 @@
 #include <hpx/collectives/detail/communication_set_node.hpp>
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/server/component.hpp>
-#include <hpx/functional/bind_back.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parallel/container_algorithms/count.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
@@ -23,6 +23,8 @@
 #include <cstddef>
 #include <string>
 #include <utility>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 using communication_set_node_component = hpx::components::component<

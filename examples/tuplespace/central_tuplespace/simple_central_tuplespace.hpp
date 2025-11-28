@@ -15,6 +15,7 @@
 #include "stubs/simple_central_tuplespace.hpp"
 
 namespace examples {
+
     ///////////////////////////////////////////////////////////////////////////
     /// Client for the \a server::simple_central_tuplespace component.
     //[simple_central_tuplespace_client_inherit
@@ -24,17 +25,17 @@ namespace examples {
     //]
     {
         //[simple_central_tuplespace_base_type
-        typedef hpx::components::client_base<simple_central_tuplespace,
-            stubs::simple_central_tuplespace>
-            base_type;
+        using base_type =
+            hpx::components::client_base<simple_central_tuplespace,
+                stubs::simple_central_tuplespace>;
         //]
 
-        typedef base_type::tuple_type tuple_type;
+        using tuple_type = base_type::tuple_type;
 
     public:
         /// Default construct an empty client side representation (not
         /// connected to any existing component).
-        simple_central_tuplespace() {}
+        simple_central_tuplespace() = default;
 
         /// Create a client side representation for the existing
         /// \a server::simple_central_tuplespace instance with the given GID.
@@ -75,7 +76,7 @@ namespace examples {
 
             // request gid;
             *this = hpx::components::new_<simple_central_tuplespace>(locality);
-            bool rc = hpx::agas::register_name(
+            bool const rc = hpx::agas::register_name(
                 hpx::launch::sync, symbol_name, this->get_id());
 
             if (rc)
@@ -106,9 +107,9 @@ namespace examples {
         ///
         /// \note This function has fire-and-forget semantics. It will not wait
         ///       for the action to be executed. Instead, it will return
-        ///       immediately after the action has has been dispatched.
+        ///       immediately after the action has been dispatched.
         //[simple_central_tuplespace_client_write_async
-        hpx::future<int> write_async(tuple_type const& tuple)
+        hpx::future<int> write_async(tuple_type const& tuple) const
         {
             HPX_ASSERT(this->get_id());
             return this->base_type::write_async(this->get_id(), tuple);
@@ -118,7 +119,7 @@ namespace examples {
         /// put \p tuple into tuplespace.
         ///
         /// \note This function is fully synchronous.
-        int write(hpx::launch::sync_policy, tuple_type const& tuple)
+        int write(hpx::launch::sync_policy, tuple_type const& tuple) const
         {
             HPX_ASSERT(this->get_id());
             return this->base_type::write(
@@ -130,9 +131,9 @@ namespace examples {
         ///
         /// \note This function has fire-and-forget semantics. It will not wait
         ///       for the action to be executed. Instead, it will return
-        ///       immediately after the action has has been dispatched.
+        ///       immediately after the action has been dispatched.
         hpx::future<tuple_type> read_async(
-            tuple_type const& tp, double const timeout)
+            tuple_type const& tp, double const timeout) const
         {
             HPX_ASSERT(this->get_id());
             return this->base_type::read_async(this->get_id(), tp, timeout);
@@ -143,7 +144,7 @@ namespace examples {
         /// \note This function is fully synchronous.
         //[simple_central_tuplespace_client_read_sync
         tuple_type read(hpx::launch::sync_policy, tuple_type const& tp,
-            double const timeout)
+            double const timeout) const
         {
             HPX_ASSERT(this->get_id());
             return this->base_type::read(
@@ -154,14 +155,14 @@ namespace examples {
         ///////////////////////////////////////////////////////////////////////
         /// take matching tuple from tuplespace within \p timeout.
         ///
-        /// \returns This function returns an \a hpx::future. When the
+        /// \returns This function returns a \a hpx::future. When the
         ///          value of this computation is needed, the get() method of
         ///          the future should be called. If the value is available,
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
         //[simple_central_tuplespace_client_take_async
         hpx::future<tuple_type> take_async(
-            tuple_type const& tp, double const timeout)
+            tuple_type const& tp, double const timeout) const
         {
             HPX_ASSERT(this->get_id());
             return this->base_type::take(

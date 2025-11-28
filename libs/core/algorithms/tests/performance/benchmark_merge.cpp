@@ -12,9 +12,9 @@
 #include <hpx/format.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/schedulers/local_priority_queue_scheduler.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -36,6 +36,10 @@ template <typename InIter1, typename InIter2, typename OutIter>
 double run_merge_benchmark_std(int const test_count, InIter1 first1,
     InIter1 last1, InIter2 first2, InIter2 last2, OutIter dest)
 {
+    // warmup
+    std::merge(first1, last1, first2, last2, dest);
+
+    // actual measurement
     std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)
@@ -55,11 +59,22 @@ double run_merge_benchmark_hpx(int const test_count, ExPolicy policy,
     FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
     FwdIter3 dest)
 {
+    // warmup
+    hpx::merge(policy, first1, last1, first2, last2, dest);
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+    auto local_policy = hpx::execution::experimental::with_annotation(
+        policy, "run_merge_benchmark_hpx (child)");
+#else
+    auto local_policy = policy;
+#endif
+
+    // actual measurement
     std::uint64_t time = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < test_count; ++i)
     {
-        hpx::merge(policy, first1, last1, first2, last2, dest);
+        hpx::merge(local_policy, first1, last1, first2, last2, dest);
     }
 
     time = hpx::chrono::high_resolution_clock::now() - time;
@@ -122,6 +137,51 @@ struct compute_chunk_size
 template <>
 struct hpx::execution::experimental::is_executor_parameters<compute_chunk_size>
   : std::true_type
+{
+};
+
+struct enable_fast_idle_mode
+{
+    template <typename Executor>
+    friend void tag_override_invoke(
+        hpx::execution::experimental::mark_begin_execution_t,
+        enable_fast_idle_mode, Executor&& exec)
+    {
+        auto const pu_mask =
+            hpx::execution::experimental::get_processing_units_mask(exec);
+        auto const full_pu_mask =
+            hpx::resource::get_partitioner().get_used_pus_mask();
+
+        // Enable fast-idle mode only for PU's that are not used by this
+        // algorithm invocation.
+        hpx::threads::add_remove_scheduler_mode(
+            hpx::threads::policies::scheduler_mode::fast_idle_mode,
+            hpx::threads::policies::scheduler_mode::enable_stealing |
+                hpx::threads::policies::scheduler_mode::enable_stealing_numa,
+            full_pu_mask & ~pu_mask);
+    }
+
+    template <typename Executor>
+    friend void tag_override_invoke(
+        hpx::execution::experimental::mark_end_execution_t,
+        enable_fast_idle_mode, Executor&& exec)
+    {
+        auto const pu_mask =
+            hpx::execution::experimental::get_processing_units_mask(exec);
+        auto const full_pu_mask =
+            hpx::resource::get_partitioner().get_used_pus_mask();
+
+        hpx::threads::add_remove_scheduler_mode(
+            hpx::threads::policies::scheduler_mode::enable_stealing |
+                hpx::threads::policies::scheduler_mode::enable_stealing_numa,
+            hpx::threads::policies::scheduler_mode::fast_idle_mode,
+            full_pu_mask & ~pu_mask);
+    }
+};
+
+template <>
+struct hpx::execution::experimental::is_executor_parameters<
+    enable_fast_idle_mode> : std::true_type
 {
 };
 
@@ -226,7 +286,7 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     double const time_seq = run_merge_benchmark_hpx(
         test_count, seq, first1, last1, first2, last2, dest);
 
-    hpx::this_thread::sleep_for(std::chrono::seconds(1));
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(200));
 
     std::cout << "--- run_merge_benchmark_par ---" << std::endl;
 
@@ -245,12 +305,49 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
 
     HPX_ITT_PAUSE();
 
+    std::cout << "--- run_merge_benchmark_par_stackless ---" << std::endl;
+
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    HPX_ITT_RESUME();
+
+    double time_par_stackless = 0;
+    {
+        auto const stackless_policy =
+            hpx::execution::experimental::with_stacksize(
+                policy, hpx::threads::thread_stacksize::nostack);
+        time_par_stackless = run_merge_benchmark_hpx(test_count,
+            stackless_policy.with(ccs), first1, last1, first2, last2, dest);
+    }
+
+    HPX_ITT_PAUSE();
+
+    std::cout << "--- run_merge_benchmark_par_stackless_fast_idle ---"
+              << std::endl;
+
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    HPX_ITT_RESUME();
+
+    double time_par_stackless_fast_idle = 0;
+    {
+        enable_fast_idle_mode efim;
+        auto const stackless_policy =
+            hpx::execution::experimental::with_stacksize(
+                policy, hpx::threads::thread_stacksize::nostack);
+        time_par_stackless_fast_idle = run_merge_benchmark_hpx(test_count,
+            stackless_policy.with(ccs, efim), first1, last1, first2, last2,
+            dest);
+    }
+
+    HPX_ITT_PAUSE();
+
     std::cout << "--- run_merge_benchmark_par_fork_join ---" << std::endl;
     double time_par_fork_join = 0;
     {
         hpx::execution::experimental::fork_join_executor exec;
-        time_par_fork_join = run_merge_benchmark_hpx(
-            test_count, par.on(exec), first1, last1, first2, last2, dest);
+        time_par_fork_join = run_merge_benchmark_hpx(test_count,
+            policy.on(exec).with(ccs), first1, last1, first2, last2, dest);
     }
 
     std::cout << "--- run_merge_benchmark_par_unseq ---" << std::endl;
@@ -263,6 +360,11 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     hpx::util::format_to(std::cout, fmt, "std", time_std) << std::endl;
     hpx::util::format_to(std::cout, fmt, "seq", time_seq) << std::endl;
     hpx::util::format_to(std::cout, fmt, "par", time_par) << std::endl;
+    hpx::util::format_to(std::cout, fmt, "par_stackless", time_par_stackless)
+        << std::endl;
+    hpx::util::format_to(
+        std::cout, fmt, "par_stackless_fast_idle", time_par_stackless_fast_idle)
+        << std::endl;
     hpx::util::format_to(std::cout, fmt, "par_fork_join", time_par_fork_join)
         << std::endl;
     hpx::util::format_to(std::cout, fmt, "par_unseq", time_par_unseq)

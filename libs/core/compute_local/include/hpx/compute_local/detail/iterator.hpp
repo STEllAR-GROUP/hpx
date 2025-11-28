@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/compute_local/detail/get_proxy_type.hpp>
 #include <hpx/compute_local/traits/allocator_traits.hpp>
-#include <hpx/iterator_support/iterator_adaptor.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <cstddef>
 #include <iterator>

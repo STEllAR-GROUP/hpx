@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Shoshana Jakobovits
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,28 +7,18 @@
 
 #pragma once
 
-#include <hpx/affinity/affinity_data.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/barrier.hpp>
-#include <hpx/execution_base/this_thread.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
+#include <hpx/modules/affinity.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/schedulers.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/thread_pools/scheduling_loop.hpp>
-#include <hpx/threading_base/create_thread.hpp>
-#include <hpx/threading_base/create_work.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
-#include <hpx/threading_base/scheduler_state.hpp>
-#include <hpx/threading_base/set_thread_state.hpp>
-#include <hpx/threading_base/set_thread_state_timed.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -442,7 +432,7 @@ namespace hpx::threads::detail {
     template <typename Scheduler>
     void hpx::threads::detail::scheduled_thread_pool<Scheduler>::thread_func(
         std::size_t thread_num, std::size_t global_thread_num,
-        std::shared_ptr<util::barrier> startup)
+        std::shared_ptr<util::barrier> const& startup)
     {
         topology const& topo = create_topology();
 
@@ -474,7 +464,7 @@ namespace hpx::threads::detail {
         // Setting priority of worker threads to a lower priority, this needs to
         // be done in order to give the parcel pool threads higher priority
         if (get_scheduler()->has_scheduler_mode(
-                policies::scheduler_mode::reduce_thread_priority))
+                policies::scheduler_mode::reduce_thread_priority, thread_num))
         {
             topo.reduce_thread_priority(ec);
             if (ec)
@@ -543,7 +533,8 @@ namespace hpx::threads::detail {
                     max_idle_loop_count_, max_busy_loop_count_);
 
                 if (get_scheduler()->has_scheduler_mode(
-                        policies::scheduler_mode::do_background_work) &&
+                        policies::scheduler_mode::do_background_work,
+                        thread_num) &&
                     network_background_callback_)
                 {
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \

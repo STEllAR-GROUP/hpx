@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -9,17 +9,17 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/io_service.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_local/debugging.hpp>
 #include <hpx/runtime_local/runtime_handlers.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
 #if defined(HPX_HAVE_VERIFY_LOCKS)
-#include <hpx/debugging/backtrace.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #endif
 
@@ -152,7 +152,7 @@ namespace hpx::detail {
         return &rt->get_thread_manager().default_pool();
     }
 
-    asio::io_context& get_default_timer_service()
+    ::asio::io_context& get_default_timer_service()
     {
         hpx::runtime const* rt = get_runtime_ptr();
         if (rt == nullptr)

@@ -8,13 +8,13 @@
 #include <hpx/init_runtime_local/init_runtime_local.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/program_options/option.hpp>
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/positional_options.hpp>
 #include <hpx/program_options/value_semantic.hpp>
 #include <hpx/program_options/variables_map.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <cstdlib>    // for putenv
@@ -308,7 +308,8 @@ void test_unregistered()
     HPX_TEST_EQ(a1[2].string_key, "");
     HPX_TEST_EQ(a1[2].unregistered, false);
 
-    vector<string> a2 = collect_unrecognized(a1, include_positional);
+    vector<string> a2 =
+        collect_unrecognized(a1, collect_unrecognized_mode::include_positional);
     HPX_TEST_EQ(a2[0], "--foo=12");
     HPX_TEST_EQ(a2[1], "--bar");
     HPX_TEST_EQ(a2[2], "1");

@@ -1,5 +1,5 @@
 //  Copyright (c) 2019 Mikael Simberg
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,9 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <cstddef>
 
@@ -30,7 +30,7 @@ namespace hpx::threads {
     ///
     /// \returns A `future<void>` which is ready when the given processing unit
     ///          has been resumed.
-    HPX_CORE_EXPORT hpx::future<void> resume_processing_unit(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT hpx::future<void> resume_processing_unit(
         thread_pool_base& pool, std::size_t virt_core);
 
     /// Resumes the given processing unit. Takes a callback as a parameter which
@@ -43,12 +43,12 @@ namespace hpx::threads {
     /// \param callback  [in] Callback which is called when the processing
     ///                  unit has been suspended.
     /// \param virt_core [in] The processing unit to resume.
-    /// \param ec        [in,out] this represents the error status on exit, if this
-    ///                  is pre-initialized to \a hpx#throws the function will throw
-    ///                  on error instead.
-    HPX_CORE_EXPORT void resume_processing_unit_cb(thread_pool_base& pool,
-        hpx::function<void()> callback, std::size_t virt_core,
-        error_code& ec = throws);
+    /// \param ec        [in,out] this represents the error status on exit, if
+    ///                  this is pre-initialized to \a hpx#throws the function
+    ///                  will throw on error instead.
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void resume_processing_unit_cb(
+        thread_pool_base& pool, hpx::function<void()> callback,
+        std::size_t virt_core, error_code& ec = throws);
 
     /// Suspends the given processing unit. When the processing unit has been
     /// suspended the returned future will be ready.
@@ -67,23 +67,23 @@ namespace hpx::threads {
     ///          has been suspended.
     ///
     /// \throws hpx::exception if called from outside the HPX runtime.
-    HPX_CORE_EXPORT hpx::future<void> suspend_processing_unit(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT hpx::future<void> suspend_processing_unit(
         thread_pool_base& pool, std::size_t virt_core);
 
     /// Suspends the given processing unit. Takes a callback as a parameter
     /// which will be called when the processing unit has been suspended.
     ///
-    /// \note Requires that the pool has
-    ///       threads::policies::enable_elasticity set.
+    /// \note Requires that the pool has threads::policies::enable_elasticity
+    ///       set.
     ///
     /// \param pool      [in] The thread pool to suspend a processing unit from.
     /// \param callback  [in] Callback which is called when the processing
     ///                  unit has been suspended.
     /// \param virt_core [in] The processing unit to suspend.
-    /// \param ec        [in,out] this represents the error status on exit, if this
-    ///                  is pre-initialized to \a hpx#throws the function will throw
-    ///                  on error instead.
-    HPX_CORE_EXPORT void suspend_processing_unit_cb(
+    /// \param ec        [in,out] this represents the error status on exit, if
+    ///                  this is pre-initialized to \a hpx#throws the function
+    ///                  will throw on error instead.
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void suspend_processing_unit_cb(
         hpx::function<void()> callback, thread_pool_base& pool,
         std::size_t virt_core, error_code& ec = throws);
 
@@ -99,17 +99,18 @@ namespace hpx::threads {
     ///          resumed.
     ///
     /// \throws hpx::exception if called from outside the HPX runtime.
-    HPX_CORE_EXPORT hpx::future<void> resume_pool(thread_pool_base& pool);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT hpx::future<void> resume_pool(
+        thread_pool_base& pool);
 
     /// Resumes the thread pool. Takes a callback as a parameter which will be
     /// called when all OS threads on the thread pool have been resumed.
     ///
     /// \param pool      [in] The thread pool to resume.
     /// \param callback [in] called when the thread pool has been resumed.
-    /// \param ec       [in,out] this represents the error status on exit, if this
-    ///                 is pre-initialized to \a hpx#throws the function will throw
-    ///                 on error instead.
-    HPX_CORE_EXPORT void resume_pool_cb(thread_pool_base& pool,
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void resume_pool_cb(thread_pool_base& pool,
         hpx::function<void()> callback, error_code& ec = throws);
 
     /// Suspends the thread pool. When the all OS threads on the thread pool
@@ -121,11 +122,12 @@ namespace hpx::threads {
     ///
     /// \param pool      [in] The thread pool to suspend.
     ///
-    /// \returns A `future<void>` which is ready when the thread pool has
-    ///          been suspended.
+    /// \returns A `future<void>` which is ready when the thread pool has been
+    ///          suspended.
     ///
     /// \throws hpx::exception if called from outside the HPX runtime.
-    HPX_CORE_EXPORT hpx::future<void> suspend_pool(thread_pool_base& pool);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT hpx::future<void> suspend_pool(
+        thread_pool_base& pool);
 
     /// Suspends the thread pool. Takes a callback as a parameter which will be
     /// called when all OS threads on the thread pool have been suspended.
@@ -135,12 +137,12 @@ namespace hpx::threads {
     ///
     /// \param pool      [in] The thread pool to suspend.
     /// \param callback [in] called when the thread pool has been suspended.
-    /// \param ec       [in,out] this represents the error status on exit, if this
-    ///                 is pre-initialized to \a hpx#throws the function will throw
-    ///                 on error instead.
+    /// \param ec       [in,out] this represents the error status on exit, if
+    ///                 this is pre-initialized to \a hpx#throws the function
+    ///                 will throw on error instead.
     ///
-    /// \throws hpx::exception if called from an HPX thread which is running
-    ///         on the pool itself.
-    HPX_CORE_EXPORT void suspend_pool_cb(thread_pool_base& pool,
+    /// \throws hpx::exception if called from an HPX thread which is running on
+    ///         the pool itself.
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void suspend_pool_cb(thread_pool_base& pool,
         hpx::function<void()> callback, error_code& ec = throws);
 }    // namespace hpx::threads

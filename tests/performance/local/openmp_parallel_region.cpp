@@ -8,10 +8,10 @@
 // parallel region. This is meant to be compared to resume_suspend and
 // start_stop.
 
-#include <hpx/execution_base/this_thread.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <omp.h>
 

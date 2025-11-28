@@ -14,9 +14,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/synchronization/detail/counting_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -410,11 +410,11 @@ namespace hpx {
         };
     }    // namespace detail
 
-    template <std::ptrdiff_t LeastMaxValue = PTRDIFF_MAX>
+    HPX_CXX_EXPORT template <std::ptrdiff_t LeastMaxValue = PTRDIFF_MAX>
     using counting_semaphore = detail::counting_semaphore<LeastMaxValue>;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Mutex = hpx::spinlock, int N = 0>
+    HPX_CXX_EXPORT template <typename Mutex = hpx::spinlock, int N = 0>
     class counting_semaphore_var
       : public detail::counting_semaphore<PTRDIFF_MAX, Mutex>
     {

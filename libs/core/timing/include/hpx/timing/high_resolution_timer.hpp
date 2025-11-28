@@ -11,7 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstdint>
 
@@ -19,7 +19,7 @@ namespace hpx::chrono {
 
     /// \brief high_resolution_timer is a timer object which measures
     ///        the elapsed time
-    class high_resolution_timer
+    HPX_CXX_EXPORT class high_resolution_timer
     {
     public:
         high_resolution_timer() noexcept

@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+//  Make HPX inspect tool happy: hpxinspect:noinclude:from_string
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -168,7 +170,7 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    template <typename T, typename Char>
+    HPX_CXX_EXPORT template <typename T, typename Char>
     [[nodiscard]] T from_string(std::basic_string<Char> const& v)
     {
         try
@@ -183,7 +185,7 @@ namespace hpx::util {
         }
     }
 
-    template <typename T, typename U, typename Char>
+    HPX_CXX_EXPORT template <typename T, typename U, typename Char>
     [[nodiscard]] T from_string(
         std::basic_string<Char> const& v, U&& default_value)
     {
@@ -199,7 +201,7 @@ namespace hpx::util {
         }
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     [[nodiscard]] T from_string(std::string const& v)
     {
         try
@@ -214,7 +216,7 @@ namespace hpx::util {
         }
     }
 
-    template <typename T, typename U>
+    HPX_CXX_EXPORT template <typename T, typename U>
     [[nodiscard]] T from_string(std::string const& v, U&& default_value)
     {
         try

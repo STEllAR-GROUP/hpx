@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,10 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/schedulers/local_queue_scheduler.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/thread_queue.hpp>
-#include <hpx/threading_base/thread_data.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -25,14 +26,16 @@ namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    using default_background_scheduler_terminated_queue = lockfree_lifo;
+    HPX_CXX_EXPORT using default_background_scheduler_terminated_queue =
+        lockfree_lifo;
 #else
-    using default_background_scheduler_terminated_queue = lockfree_fifo;
+    HPX_CXX_EXPORT using default_background_scheduler_terminated_queue =
+        lockfree_fifo;
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
     // The background_scheduler_scheduler runs only background work
-    template <typename Mutex = std::mutex,
+    HPX_CXX_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =
@@ -57,7 +60,8 @@ namespace hpx::threads::policies {
             return "background_scheduler";
         }
 
-        void set_scheduler_mode(scheduler_mode mode) noexcept override
+        void set_scheduler_mode(scheduler_mode mode,
+            hpx::threads::mask_cref_type mask) noexcept override
         {
             // this scheduler does not support stealing or numa stealing, but
             // needs to enable background work
@@ -67,7 +71,7 @@ namespace hpx::threads::policies {
                 mode & ~scheduler_mode::enable_stealing_numa);
             mode = mode | ~scheduler_mode::do_background_work;
             mode = mode | ~scheduler_mode::do_background_work_only;
-            scheduler_base::set_scheduler_mode(mode);
+            scheduler_base::set_scheduler_mode(mode, mask);
         }
 
         // Return the next thread to be executed, return false if none is

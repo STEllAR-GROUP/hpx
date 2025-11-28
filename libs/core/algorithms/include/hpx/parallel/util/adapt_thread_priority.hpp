@@ -7,10 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/scheduling_properties.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/executors/execution_policy_scheduling_property.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/executors.hpp>
 
 namespace hpx::execution::experimental {
 

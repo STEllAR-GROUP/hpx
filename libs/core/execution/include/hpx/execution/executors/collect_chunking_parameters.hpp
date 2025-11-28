@@ -11,9 +11,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/detail/future_exec.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -21,7 +22,7 @@
 namespace hpx::execution::experimental {
 
     /// Collected execution parameters
-    struct chunking_parameters
+    HPX_CXX_EXPORT struct chunking_parameters
     {
         std::size_t num_elements;
         std::size_t num_cores;
@@ -36,7 +37,7 @@ namespace hpx::execution::experimental {
     };
 
     /// Collect various parameters used for running a parallel algorithm
-    struct collect_chunking_parameters
+    HPX_CXX_EXPORT struct collect_chunking_parameters
     {
         explicit constexpr collect_chunking_parameters(
             chunking_parameters& exec_params) noexcept

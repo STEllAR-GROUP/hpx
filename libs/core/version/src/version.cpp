@@ -12,8 +12,8 @@
 #include <hpx/config/version.hpp>
 #include <hpx/modules/config_registry.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/prefix/find_prefix.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/prefix.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/version.hpp>
 
 #include <boost/config.hpp>
@@ -43,7 +43,7 @@
 
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)) ||      \
     defined(HPX_HAVE_MODULE_LCI_BASE)
-#include <lci.h>
+#include <lci.hpp>
 #endif
 
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \

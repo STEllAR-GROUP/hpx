@@ -19,14 +19,13 @@
 namespace hpx::parcelset::policies::lci {
     bool config_t::is_initialized = false;
     bool config_t::enable_send_immediate;
-    bool config_t::enable_lci_backlog_queue;
     config_t::protocol_t config_t::protocol;
     config_t::comp_type_t config_t::completion_type_header;
     config_t::comp_type_t config_t::completion_type_followup;
     config_t::progress_type_t config_t::progress_type;
+    config_t::progress_strategy_t config_t::progress_strategy;
     int config_t::progress_thread_num;
     int config_t::prepost_recv_num;
-    bool config_t::reg_mem;
     int config_t::ndevices;
     int config_t::ncomps;
     bool config_t::enable_in_buffer_assembly;
@@ -34,7 +33,6 @@ namespace hpx::parcelset::policies::lci {
     int config_t::mbuffer_alloc_max_retry;
     int config_t::bg_work_max_count;
     bool config_t::bg_work_when_send;
-    bool config_t::enable_sendmc;
 
     void config_t::init_config(util::runtime_configuration const& rtcfg)
     {
@@ -44,16 +42,10 @@ namespace hpx::parcelset::policies::lci {
         // The default value here does not matter here
         enable_send_immediate = util::get_entry_as<bool>(
             rtcfg, "hpx.parcel.lci.sendimm", false /* Does not matter*/);
-        enable_lci_backlog_queue = util::get_entry_as<bool>(
-            rtcfg, "hpx.parcel.lci.backlog_queue", false /* Does not matter*/);
         // set protocol to use
         std::string protocol_str = util::get_entry_as<std::string>(
             rtcfg, "hpx.parcel.lci.protocol", "");
-        if (protocol_str == "putva")
-        {
-            protocol = protocol_t::putva;
-        }
-        else if (protocol_str == "putsendrecv")
+        if (protocol_str == "putsendrecv")
         {
             protocol = protocol_t::putsendrecv;
         }
@@ -142,12 +134,30 @@ namespace hpx::parcelset::policies::lci {
             throw std::runtime_error(
                 "Unknown progress type " + progress_type_str);
         }
+        // set the progress strategy
+        std::string progress_strategy_str = util::get_entry_as<std::string>(
+            rtcfg, "hpx.parcel.lci.progress_strategy", "");
+        if (progress_strategy_str == "local")
+        {
+            progress_strategy = progress_strategy_t::local;
+        }
+        else if (progress_strategy_str == "global")
+        {
+            progress_strategy = progress_strategy_t::global;
+        }
+        else if (progress_strategy_str == "random")
+        {
+            progress_strategy = progress_strategy_t::random;
+        }
+        else
+        {
+            throw std::runtime_error(
+                "Unknown progress strategy " + progress_strategy_str);
+        }
         progress_thread_num = util::get_entry_as(
             rtcfg, "hpx.parcel.lci.prg_thread_num", -1 /* Does not matter*/);
         prepost_recv_num = util::get_entry_as(
             rtcfg, "hpx.parcel.lci.prepost_recv_num", 1 /* Does not matter*/);
-        reg_mem = util::get_entry_as(
-            rtcfg, "hpx.parcel.lci.reg_mem", 1 /* Does not matter*/);
         ndevices = util::get_entry_as(
             rtcfg, "hpx.parcel.lci.ndevices", 1 /* Does not matter*/);
         ncomps = util::get_entry_as(
@@ -162,15 +172,7 @@ namespace hpx::parcelset::policies::lci {
             rtcfg, "hpx.parcel.lci.bg_work_max_count", 0 /* Does not matter*/);
         bg_work_when_send = util::get_entry_as(
             rtcfg, "hpx.parcel.lci.bg_work_when_send", 0 /* Does not matter*/);
-        enable_sendmc = util::get_entry_as(
-            rtcfg, "hpx.parcel.lci.enable_sendmc", 0 /* Does not matter*/);
 
-        if (!enable_send_immediate && enable_lci_backlog_queue)
-        {
-            enable_lci_backlog_queue = false;
-            fprintf(
-                stderr, "WARNING: set enable_lci_backlog_queue to false!\n");
-        }
         std::size_t num_threads =
             util::get_entry_as<size_t>(rtcfg, "hpx.os_threads", 1);
         if (progress_type == progress_type_t::rp && num_threads <= 1)
@@ -178,15 +180,6 @@ namespace hpx::parcelset::policies::lci {
             progress_type = progress_type_t::pthread;
             fprintf(stderr, "WARNING: set progress_type to pthread!\n");
         }
-#ifndef LCI_ENABLE_MULTITHREAD_PROGRESS
-        if (progress_type == progress_type_t::worker ||
-            progress_thread_num > ndevices)
-        {
-            fprintf(stderr,
-                "WARNING: Thread-safe LCI_progress is needed "
-                "but not enabled during compilation!\n");
-        }
-#endif
         if (ncomps > ndevices)
         {
             int old_ncomps = ncomps;

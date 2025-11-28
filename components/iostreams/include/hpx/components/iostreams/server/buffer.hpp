@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/synchronization/recursive_mutex.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <hpx/components/iostreams/export_definitions.hpp>
 #include <hpx/components/iostreams/write_functions.hpp>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,16 +9,15 @@
 #include <hpx/config.hpp>
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
-#include <hpx/coroutines/coroutine.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/type_support.hpp>
 
+#include <atomic>
 #include <mutex>
 #include <type_traits>
 #include <utility>
@@ -32,13 +31,18 @@ namespace hpx::components {
         {
             friend void intrusive_ptr_add_ref(refcounted_mutex* p) noexcept
             {
-                ++p->reference_count;
+                p->reference_count.increment();
             }
 
             friend void intrusive_ptr_release(refcounted_mutex* p) noexcept
             {
-                if (--p->reference_count == 0)
+                if (p->reference_count.decrement() == 0)
                 {
+                    // The thread that decrements the reference count to zero must
+                    // perform an acquire to ensure that it doesn't start destructing
+                    // the object until all previous writes have drained.
+                    std::atomic_thread_fence(std::memory_order_acquire);
+
                     delete p;
                 }
             }

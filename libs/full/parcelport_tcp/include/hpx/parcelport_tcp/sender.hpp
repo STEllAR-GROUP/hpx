@@ -57,7 +57,7 @@ namespace hpx::parcelset::policies::tcp {
 
     public:
         // Construct a sending parcelport_connection with the given io_context.
-        sender(asio::io_context& io_service,
+        sender(::asio::io_context& io_service,
             parcelset::locality const& locality_id,
             [[maybe_unused]] parcelset::parcelport* pp)
           : socket_(io_service)
@@ -76,7 +76,7 @@ namespace hpx::parcelset::policies::tcp {
             {
                 // NOLINTBEGIN(bugprone-unused-return-value)
                 std::error_code ec;
-                socket_.shutdown(asio::ip::tcp::socket::shutdown_both, ec);
+                socket_.shutdown(::asio::ip::tcp::socket::shutdown_both, ec);
 
                 // close the socket to give it back to the OS
                 socket_.close(ec);
@@ -85,7 +85,7 @@ namespace hpx::parcelset::policies::tcp {
         }
 
         // Get the socket associated with the parcelport_connection.
-        asio::ip::tcp::socket& socket() noexcept
+        ::asio::ip::tcp::socket& socket() noexcept
         {
             return socket_;
         }
@@ -99,7 +99,7 @@ namespace hpx::parcelset::policies::tcp {
         {
 #if defined(HPX_DEBUG)
             std::error_code ec;
-            asio::ip::tcp::socket::endpoint_type const endpoint =
+            ::asio::ip::tcp::socket::endpoint_type const endpoint =
                 socket_.remote_endpoint(ec);
 
             locality const& impl = parcel_locality_id.get<locality>();
@@ -145,7 +145,7 @@ namespace hpx::parcelset::policies::tcp {
 #endif
             // Write the serialized data to the socket. We use "gather-write"
             // to send both the header and the data in a single write operation.
-            std::vector<asio::const_buffer> buffers;
+            std::vector<::asio::const_buffer> buffers;
             buffers.emplace_back(&buffer_.size_, sizeof(buffer_.size_));
             buffers.emplace_back(
                 &buffer_.data_size_, sizeof(buffer_.data_size_));
@@ -163,7 +163,7 @@ namespace hpx::parcelset::policies::tcp {
                         sizeof(parcel_buffer_type::transmission_chunk_type));
 
                 // add main buffer holding data which was serialized normally
-                buffers.emplace_back(asio::buffer(buffer_.data_));
+                buffers.emplace_back(::asio::buffer(buffer_.data_));
 
                 // now add chunks themselves, those hold zero-copy serialized chunks
                 for (serialization::serialization_chunk& c : buffer_.chunks_)
@@ -180,7 +180,7 @@ namespace hpx::parcelset::policies::tcp {
             else
             {
                 // add main buffer holding data which was serialized normally
-                buffers.emplace_back(asio::buffer(buffer_.data_));
+                buffers.emplace_back(::asio::buffer(buffer_.data_));
             }
 
             // this additional wrapping of the handler into a bind object is
@@ -189,7 +189,7 @@ namespace hpx::parcelset::policies::tcp {
             void (sender::*f)(std::error_code const&, std::size_t) =
                 &sender::handle_write;
 
-            asio::async_write(socket_, buffers,
+            ::asio::async_write(socket_, buffers,
                 hpx::bind(f, shared_from_this(), hpx::placeholders::_1,
                     hpx::placeholders::_2));
         }
@@ -217,8 +217,8 @@ namespace hpx::parcelset::policies::tcp {
                 // the handler needs to be reset on an HPX thread (it destroys
                 // the parcel, which in turn might invoke HPX functions)
                 threads::thread_init_data data(
-                    threads::make_thread_function_nullary(util::deferred_call(
-                        &sender::reset_handler, HPX_MOVE(handler))),
+                    threads::make_thread_function_nullary(
+                        &sender::reset_handler, HPX_MOVE(handler)),
                     "sender::reset_handler");
                 threads::register_thread(data);
             }
@@ -247,7 +247,7 @@ namespace hpx::parcelset::policies::tcp {
 
             // now handle the acknowledgment byte which is sent by the receiver
 #if defined(__linux) || defined(linux) || defined(__linux__)
-            asio::detail::socket_option::boolean<IPPROTO_TCP, TCP_QUICKACK>
+            ::asio::detail::socket_option::boolean<IPPROTO_TCP, TCP_QUICKACK>
                 quickack(true);
             socket_.set_option(quickack);
 #endif
@@ -255,7 +255,7 @@ namespace hpx::parcelset::policies::tcp {
             void (sender::*f)(std::error_code const&) =
                 &sender::handle_read_ack;
 
-            asio::async_read(socket_, asio::buffer(&ack_, sizeof(ack_)),
+            ::asio::async_read(socket_, asio::buffer(&ack_, sizeof(ack_)),
                 hpx::bind(f, shared_from_this(), placeholders::_1));
         }
 
@@ -277,7 +277,7 @@ namespace hpx::parcelset::policies::tcp {
         }
 
         // Socket for the parcelport_connection.
-        asio::ip::tcp::socket socket_;
+        ::asio::ip::tcp::socket socket_;
 
         bool ack_;
 

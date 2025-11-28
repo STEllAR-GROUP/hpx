@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(JENKINS_HASH_HAS_SERIALIZATION_SUPPORT)
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/modules/serialization.hpp>
 #endif
 
 #include <cstddef>
@@ -88,7 +88,7 @@ namespace hpx::util {
     /////////////////////////////////////////////////////////////////////////////
     /// The jenkins_hash class encapsulates a hash calculation function published
     /// by Bob Jenkins here: http://burtleburtle.net/bob/hash
-    class jenkins_hash
+    HPX_CXX_EXPORT class jenkins_hash
     {
     public:
         /// this is the type representing the result of this hash

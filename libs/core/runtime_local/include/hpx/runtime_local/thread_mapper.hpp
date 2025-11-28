@@ -8,10 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/runtime_local/os_thread_type.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -32,7 +32,7 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     // enumerates active OS threads and maintains their metadata
 
-    class thread_mapper;
+    HPX_CXX_EXPORT class thread_mapper;
 
     namespace detail {
 
@@ -78,10 +78,13 @@ namespace hpx::util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_CORE_EXPORT thread_mapper
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT thread_mapper
     {
     public:
-        HPX_NON_COPYABLE(thread_mapper);
+        thread_mapper(thread_mapper const&) = delete;
+        thread_mapper(thread_mapper&&) = delete;
+        thread_mapper& operator=(thread_mapper const&) = delete;
+        thread_mapper& operator=(thread_mapper&&) = delete;
 
         using callback_type = detail::thread_mapper_callback_type;
 

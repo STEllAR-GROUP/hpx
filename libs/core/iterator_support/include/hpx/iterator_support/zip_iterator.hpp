@@ -8,15 +8,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/detail/minimum_category.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/type_support/default_sentinel.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -364,7 +362,7 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     class zip_iterator
       : public detail::zip_iterator_base<hpx::tuple<Ts...>, zip_iterator<Ts...>>
     {
@@ -424,10 +422,10 @@ namespace hpx::util {
         }
     };
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     zip_iterator(Ts const&... vs) -> zip_iterator<Ts...>;
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     zip_iterator(hpx::tuple<Ts...>&& vs) -> zip_iterator<Ts...>;
 
     template <typename... Ts>
@@ -443,7 +441,7 @@ namespace hpx::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     class zip_iterator<hpx::tuple<Ts...>>
       : public detail::zip_iterator_base<hpx::tuple<Ts...>,
             zip_iterator<hpx::tuple<Ts...>>>
@@ -506,7 +504,7 @@ namespace hpx::util {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ZipIter>
+    HPX_CXX_EXPORT template <typename ZipIter>
     struct zip_iterator_category
       : detail::zip_iterator_category<typename ZipIter::iterator_tuple_type>
     {
@@ -518,15 +516,15 @@ namespace hpx::traits {
     namespace functional {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename T>
+        HPX_CXX_EXPORT template <typename F, typename T>
         struct element_result_of : util::invoke_result<F, T>
         {
         };
 
-        template <typename F, typename Iter>
+        HPX_CXX_EXPORT template <typename F, typename Iter>
         struct lift_zipped_iterators;
 
-        template <typename F, typename... Ts>
+        HPX_CXX_EXPORT template <typename F, typename... Ts>
         struct lift_zipped_iterators<F, util::zip_iterator<Ts...>>
         {
             using tuple_type =
@@ -553,7 +551,7 @@ namespace hpx::traits {
     }    // namespace functional
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename... Iter>
+    HPX_CXX_EXPORT template <typename... Iter>
     struct is_zip_iterator<hpx::util::zip_iterator<Iter...>> : std::true_type
     {
     };

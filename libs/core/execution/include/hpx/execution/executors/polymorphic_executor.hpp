@@ -11,14 +11,11 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution/detail/future_exec.hpp>
-#include <hpx/execution_base/execution.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/functional/move_only_function.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/thread_support.hpp>
-#include <hpx/type_support/aligned_storage.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -235,7 +232,7 @@ namespace hpx::parallel::execution {
             }
 
             template <typename T>
-            static void* allocate(void* storage, std::size_t storage_size)
+            static void* allocate(void* storage, std::size_t const storage_size)
             {
                 if (sizeof(T) > storage_size)
                 {
@@ -247,8 +244,8 @@ namespace hpx::parallel::execution {
             }
 
             template <typename T>
-            static void _deallocate(
-                void* obj, std::size_t storage_size, bool destroy) noexcept
+            static void _deallocate(void* obj, std::size_t const storage_size,
+                bool const destroy) noexcept
             {
                 if (destroy)
                 {
@@ -265,8 +262,8 @@ namespace hpx::parallel::execution {
             void (*deallocate)(void*, std::size_t storage_size, bool) noexcept;
 
             template <typename T>
-            static void* _copy(void* storage, std::size_t storage_size,
-                void const* src, bool destroy)
+            static void* _copy(void* storage, std::size_t const storage_size,
+                void const* src, bool const destroy)
             {
                 if (destroy)
                 {
@@ -674,10 +671,10 @@ namespace hpx::parallel::execution {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig>
+    HPX_CXX_EXPORT template <typename Sig>
     class polymorphic_executor;
 
-    template <typename R, typename... Ts>
+    HPX_CXX_EXPORT template <typename R, typename... Ts>
     class polymorphic_executor<R(Ts...)> : detail::polymorphic_executor_base
     {
         using base_type = detail::polymorphic_executor_base;
@@ -932,31 +929,31 @@ namespace hpx::parallel::execution {
 namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
-    template <typename Sig>
+    HPX_CXX_EXPORT template <typename Sig>
     struct is_never_blocking_one_way_executor<
         parallel::execution::polymorphic_executor<Sig>> : std::true_type
     {
     };
 
-    template <typename Sig>
+    HPX_CXX_EXPORT template <typename Sig>
     struct is_one_way_executor<parallel::execution::polymorphic_executor<Sig>>
       : std::true_type
     {
     };
 
-    template <typename Sig>
+    HPX_CXX_EXPORT template <typename Sig>
     struct is_two_way_executor<parallel::execution::polymorphic_executor<Sig>>
       : std::true_type
     {
     };
 
-    template <typename Sig>
+    HPX_CXX_EXPORT template <typename Sig>
     struct is_bulk_one_way_executor<
         parallel::execution::polymorphic_executor<Sig>> : std::true_type
     {
     };
 
-    template <typename Sig>
+    HPX_CXX_EXPORT template <typename Sig>
     struct is_bulk_two_way_executor<
         parallel::execution::polymorphic_executor<Sig>> : std::true_type
     {

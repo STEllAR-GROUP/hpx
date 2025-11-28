@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -123,11 +123,11 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/async_combinators/wait_some.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/preprocessor/strip_parens.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <array>
 #include <cstddef>
@@ -139,7 +139,7 @@ namespace hpx {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_any_nothrow_t final
+    HPX_CXX_EXPORT inline constexpr struct wait_any_nothrow_t final
       : hpx::functional::tag<wait_any_nothrow_t>
     {
     private:
@@ -211,7 +211,8 @@ namespace hpx {
     } wait_any_nothrow{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_any_t final : hpx::functional::tag<wait_any_t>
+    HPX_CXX_EXPORT inline constexpr struct wait_any_t final
+      : hpx::functional::tag<wait_any_t>
     {
     private:
         template <typename Future>
@@ -296,7 +297,7 @@ namespace hpx {
     } wait_any{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_any_n_nothrow_t final
+    HPX_CXX_EXPORT inline constexpr struct wait_any_n_nothrow_t final
       : hpx::functional::tag<wait_any_n_nothrow_t>
     {
     private:

@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/equality.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 
@@ -61,7 +61,7 @@ namespace hpx::parallel::detail {
             ++i;
     }
 
-    template <typename InputIterator, typename Distance>
+    HPX_CXX_EXPORT template <typename InputIterator, typename Distance>
     HPX_HOST_DEVICE constexpr void advance(
         InputIterator& i, Distance n) noexcept
     {
@@ -93,7 +93,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterable>
+    HPX_CXX_EXPORT template <typename Iterable>
     HPX_FORCEINLINE constexpr std::size_t distance(
         Iterable iter1, Iterable iter2)
     {
@@ -241,14 +241,14 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterable, typename Stride>
+    HPX_CXX_EXPORT template <typename Iterable, typename Stride>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iterable next(
         Iterable iter, Stride offset)
     {
         return calculate_next<std::decay_t<Iterable>>::call(iter, offset);
     }
 
-    template <typename Iterable, typename Stride>
+    HPX_CXX_EXPORT template <typename Iterable, typename Stride>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iterable next(
         Iterable iter, std::size_t max_count, Stride offset)
     {
@@ -257,7 +257,7 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct equal_to
+    HPX_CXX_EXPORT struct equal_to
     {
         template <typename T1, typename T2,
             typename Enable = std::enable_if_t<
@@ -270,7 +270,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    struct not_equal_to
+    HPX_CXX_EXPORT struct not_equal_to
     {
         template <typename T1, typename T2,
             typename Enable = std::enable_if_t<
@@ -283,7 +283,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Value>
+    HPX_CXX_EXPORT template <typename Value>
     struct compare_to
     {
         HPX_HOST_DEVICE HPX_FORCEINLINE explicit compare_to(
@@ -309,7 +309,7 @@ namespace hpx::parallel::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct less
+    HPX_CXX_EXPORT struct less
     {
         template <typename T1, typename T2>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
@@ -320,7 +320,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    struct greater
+    HPX_CXX_EXPORT struct greater
     {
         template <typename T1, typename T2>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
@@ -331,7 +331,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    struct greater_equal
+    HPX_CXX_EXPORT struct greater_equal
     {
         template <typename T1, typename T2>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
@@ -342,7 +342,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    struct less_equal
+    HPX_CXX_EXPORT struct less_equal
     {
         template <typename T1, typename T2>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
@@ -354,7 +354,7 @@ namespace hpx::parallel::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct min_of
     {
         constexpr T operator()(T const& t1, T const& t2) const
@@ -365,7 +365,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct max_of
     {
         constexpr T operator()(T const& t1, T const& t2) const
@@ -376,7 +376,7 @@ namespace hpx::parallel::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct plus
+    HPX_CXX_EXPORT struct plus
     {
         template <typename T1, typename T2>
         constexpr auto operator()(T1 const& t1, T2 const& t2) const
@@ -387,7 +387,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    struct minus
+    HPX_CXX_EXPORT struct minus
     {
         template <typename T1, typename T2>
         constexpr auto operator()(T1 const& t1, T2 const& t2) const
@@ -398,7 +398,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    struct multiplies
+    HPX_CXX_EXPORT struct multiplies
     {
         template <typename T1, typename T2>
         constexpr auto operator()(T1 const& t1, T2 const& t2) const
@@ -409,7 +409,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    struct divides
+    HPX_CXX_EXPORT struct divides
     {
         template <typename T1, typename T2>
         constexpr auto operator()(T1 const& t1, T2 const& t2) const
@@ -424,10 +424,10 @@ namespace hpx::parallel::detail {
 namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    using equal_to = hpx::parallel::detail::equal_to;
-    using not_equal_to = hpx::parallel::detail::not_equal_to;
-    using less = hpx::parallel::detail::less;
-    using greater = hpx::parallel::detail::greater;
-    using greater_equal = hpx::parallel::detail::greater_equal;
-    using less_equal = hpx::parallel::detail::less_equal;
+    HPX_CXX_EXPORT using equal_to = hpx::parallel::detail::equal_to;
+    HPX_CXX_EXPORT using not_equal_to = hpx::parallel::detail::not_equal_to;
+    HPX_CXX_EXPORT using less = hpx::parallel::detail::less;
+    HPX_CXX_EXPORT using greater = hpx::parallel::detail::greater;
+    HPX_CXX_EXPORT using greater_equal = hpx::parallel::detail::greater_equal;
+    HPX_CXX_EXPORT using less_equal = hpx::parallel::detail::less_equal;
 }    // namespace hpx::ranges

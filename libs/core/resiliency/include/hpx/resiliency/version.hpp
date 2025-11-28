@@ -13,7 +13,7 @@
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-//  The version of HPX_RESILILIENCY
+//  The version of HPX_RESILIENCY
 //
 //  HPX_RESILIENCY_VERSION_FULL & 0x0000FF is the sub-minor version
 //  HPX_RESILIENCY_VERSION_FULL & 0x00FF00 is the minor version
@@ -33,9 +33,9 @@
 namespace hpx::resiliency::experimental {
 
     // return version of this library
-    HPX_CORE_EXPORT unsigned int major_version();
-    HPX_CORE_EXPORT unsigned int minor_version();
-    HPX_CORE_EXPORT unsigned int subminor_version();
-    HPX_CORE_EXPORT unsigned long full_version();
-    HPX_CORE_EXPORT std::string full_version_str();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT unsigned int major_version();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT unsigned int minor_version();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT unsigned int subminor_version();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT unsigned long full_version();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::string full_version_str();
 }    // namespace hpx::resiliency::experimental

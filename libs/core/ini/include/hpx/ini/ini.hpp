@@ -1,5 +1,5 @@
 //  Copyright (c) 2005-2007 Andre Merzky
-//  Copyright (c) 2005-2023 Hartmut Kaiser
+//  Copyright (c) 2005-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,14 +9,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/spinlock.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/util/to_string.hpp>
+#include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/serialization.hpp>
 
+#include <iosfwd>
 #include <map>
 #include <mutex>
-#include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -35,7 +35,7 @@
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_CORE_EXPORT section
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT section
     {
     public:
         using entry_changed_func =
@@ -64,10 +64,10 @@ namespace hpx::util {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void save(Archive& ar, unsigned int const version) const;
+        void save(Archive& ar, unsigned int version) const;
 
         template <typename Archive>
-        void load(Archive& ar, unsigned int const version);
+        void load(Archive& ar, unsigned int version);
 
         HPX_SERIALIZATION_SPLIT_MEMBER()
 

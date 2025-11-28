@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,13 +6,13 @@
 
 /// \file jthread.hpp
 /// \page hpx::jthread
-/// \headerfile hpx/thread.hpp
+/// \headerfile hpx/jthread.hpp
 
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/detail/invoke.hpp>
-#include <hpx/synchronization/stop_token.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/threading/thread.hpp>
 
 #include <type_traits>
@@ -46,7 +46,7 @@ namespace hpx {
     /// represent the same thread of execution; \a hpx::jthread is not \a
     /// CopyConstructible or \a CopyAssignable, although it is \a
     /// MoveConstructible and \a MoveAssignable.
-    class jthread
+    HPX_CXX_EXPORT class jthread
     {
     private:
         template <typename F, typename... Ts>
@@ -127,9 +127,8 @@ namespace hpx {
         //          system-imposed limit on the number of threads in a process
         //          would be exceeded.
         //
-        template <typename F, typename... Ts,
-            typename Enable =
-                std::enable_if_t<!std::is_same_v<std::decay_t<F>, jthread>>>
+        template <typename F, typename... Ts>
+            requires(!std::is_same_v<std::decay_t<F>, jthread>)
         explicit jthread(F&& f, Ts&&... ts)
           : ssource_{}    // initialize stop_source
           , thread_{
@@ -219,7 +218,7 @@ namespace hpx {
         //
         // Error conditions:
         //      - resource_deadlock_would_occur - if deadlock is detected
-        //          or get_id() == thisthread_::get_id().
+        //          or get_id() == this_thread_::get_id().
         //      - no_such_process - if the thread is not valid.
         //      - invalid_argument - if the thread is not joinable.
         /// \brief waits for the thread to finish its execution
@@ -242,14 +241,14 @@ namespace hpx {
         // Error conditions:
         //      - no_such_process - if the thread is not valid.
         //      - invalid_argument - if the thread is not joinable.
-        /// \brief permits the thread to execute independently from the thread handle
+        /// \brief permits the thread to execute independently of  the thread handle
         void detach()
         {
             thread_.detach();
         }
 
         // Returns: A default constructed id object if *this does not
-        //      represent a thread, otherwise thisthread_::get_id() for
+        //      represent a thread, otherwise this_thread_::get_id() for
         //      the thread of execution represented by *this.
         /// \brief returns the id of the thread
         [[nodiscard]] id get_id() const noexcept
@@ -260,7 +259,7 @@ namespace hpx {
         // The presence of native_handle() and its semantic is
         //      implementation-defined.
         /// \brief returns the underlying implementation-defined thread handle
-        [[nodiscard]] native_handle_type native_handle()
+        [[nodiscard]] native_handle_type native_handle() const
         {
             return thread_.native_handle();
         }
@@ -285,7 +284,7 @@ namespace hpx {
 
         // Effects: Equivalent to: return ssource_.request_stop();
         /// \brief requests execution stop via the shared stop state of the thread
-        bool request_stop() noexcept
+        bool request_stop() const noexcept
         {
             return ssource_.request_stop();
         }
@@ -294,7 +293,7 @@ namespace hpx {
 
         // Returns: thread::hardware_concurrency().
         /// \brief returns the number of concurrent threads supported by the implementation
-        [[nodiscard]] static unsigned int hardware_concurrency()
+        [[nodiscard]] static unsigned int hardware_concurrency() noexcept
         {
             return hpx::threads::hardware_concurrency();
         }
@@ -307,7 +306,7 @@ namespace hpx {
     // 32.4.3.4, specialized algorithms
 
     // Effects: Equivalent to: x.swap(y).
-    inline void swap(jthread& lhs, jthread& rhs) noexcept
+    HPX_CXX_EXPORT inline void swap(jthread& lhs, jthread& rhs) noexcept
     {
         lhs.swap(rhs);
     }

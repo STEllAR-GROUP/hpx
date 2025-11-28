@@ -9,12 +9,12 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/collectives/spmd_block.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime_local/get_locality_id.hpp>
 
 #include <cstddef>
 #include <cstdint>

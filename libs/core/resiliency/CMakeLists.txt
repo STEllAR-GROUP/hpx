@@ -22,14 +22,28 @@ set(resiliency_headers
 )
 
 # Default location is $HPX_ROOT/libs/resiliency/src
-set(resiliency_sources resiliency.cpp)
+set(resiliency_sources resiliency.cpp util.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
   core resiliency
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${resiliency_sources}
   HEADERS ${resiliency_headers}
-  MODULE_DEPENDENCIES hpx_async_local hpx_execution hpx_futures
+  MODULE_DEPENDENCIES
+    hpx_async_base
+    hpx_async_local
+    hpx_concepts
+    hpx_datastructures
+    hpx_execution
+    hpx_execution_base
+    hpx_executors
+    hpx_functional
+    hpx_futures
+    hpx_iterator_support
+    hpx_synchronization
+    hpx_tag_invoke
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

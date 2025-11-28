@@ -11,6 +11,7 @@
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
@@ -23,7 +24,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx::lcos::local::detail {
 
-    class counting_semaphore
+    HPX_CXX_EXPORT class counting_semaphore
     {
     private:
         using mutex_type = hpx::spinlock;
@@ -72,14 +73,19 @@ namespace hpx::lcos::local::detail {
         friend void intrusive_ptr_add_ref(
             counting_semaphore_data<Mutex>* p) noexcept
         {
-            ++p->count_;
+            p->count_.increment();
         }
 
         friend void intrusive_ptr_release(
             counting_semaphore_data<Mutex>* p) noexcept
         {
-            if (0 == --p->count_)
+            if (0 == p->count_.decrement())
             {
+                // The thread that decrements the reference count to zero must
+                // perform an acquire to ensure that it doesn't start destructing
+                // the object until all previous writes have drained.
+                std::atomic_thread_fence(std::memory_order_acquire);
+
                 delete p;
             }
         }

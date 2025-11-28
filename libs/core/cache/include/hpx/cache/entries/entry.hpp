@@ -16,72 +16,18 @@
 namespace hpx::util::cache::entries {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Value, typename Derived = void>
-    class entry;
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
-
-        template <typename Value, typename Derived>
-        struct derived
-        {
-            using type = Derived;
-        };
-
-        template <typename Value>
-        struct derived<Value, void>
-        {
-            using type = entry<Value>;
-        };
-
-        template <typename Derived>
-        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
-        struct less_than_comparable
-        {
-            friend bool
-            operator>(Derived const& lhs, Derived const& rhs) noexcept(
-                noexcept(std::declval<Derived const&>() <
-                    std::declval<Derived const&>()))
-            {
-                return rhs < lhs;
-            }
-
-            friend bool
-            operator<=(Derived const& lhs, Derived const& rhs) noexcept(
-                noexcept(std::declval<Derived const&>() <
-                    std::declval<Derived const&>()))
-            {
-                return !(rhs < lhs);
-            }
-
-            friend bool
-            operator>=(Derived const& lhs, Derived const& rhs) noexcept(
-                noexcept(std::declval<Derived const&>() <
-                    std::declval<Derived const&>()))
-            {
-                return !(lhs < rhs);
-            }
-        };
-    }    // namespace detail
-
-    ///////////////////////////////////////////////////////////////////////////
     /// \class entry entry.hpp hpx/cache/entries/entry.hpp
     ///
     /// \tparam Value     The data type to be stored in a cache. It has to be
     ///                   default constructible, copy constructible and
     ///                   less_than_comparable.
-    /// \tparam Derived   The (optional) type for which this type is used as a
-    ///                   base class.
     ///
-    template <typename Value, typename Derived>
+    HPX_CXX_EXPORT template <typename Value>
     class entry
-      : detail::less_than_comparable<
-            typename detail::derived<Value, Derived>::type>
     {
     public:
         using value_type = Value;
 
-    public:
         // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
 
         /// \brief Any cache entry has to be default constructible
@@ -113,7 +59,7 @@ namespace hpx::util::cache::entries {
         /// \note     This function is part of the CacheEntry concept
         ///
         /// \return   This function should return true if the cache needs to
-        ///           update it's internal heap. Usually this is needed if the
+        ///           update its internal heap. Usually this is needed if the
         ///           entry has been changed by touch() in a way influencing
         ///           the sort order as mandated by the cache's UpdatePolicy
         static constexpr bool touch() noexcept
@@ -142,14 +88,14 @@ namespace hpx::util::cache::entries {
         ///
         /// \returns  The return value can be used to avoid removing this
         ///           instance from the cache. If the value is \a true it is
-        ///           ok to remove the entry, other wise it will stay in the
+        ///           ok to remove the entry, otherwise it will stay in the
         ///           cache.
         static constexpr bool remove() noexcept
         {
             return true;
         }
 
-        /// \brief    Return the 'size' of this entry. By default the size of
+        /// \brief    Return the 'size' of this entry. By default, the size of
         ///           each entry is just one (1), which is sensible if the
         ///           cache has a limit (capacity) measured in number of
         ///           entries.
@@ -158,14 +104,9 @@ namespace hpx::util::cache::entries {
             return 1;
         }
 
-        /// \brief    Forwarding operator< allowing to compare entries instead
+        /// \brief    Forwarding operator<=> allowing to compare entries instead
         ///           of the values.
-        friend bool operator<(entry const& lhs, entry const& rhs) noexcept(
-            noexcept(std::declval<value_type const&>() <
-                std::declval<value_type const&>()))
-        {
-            return lhs.value_ < rhs.value_;
-        }
+        friend auto operator<=>(entry const&, entry const&) = default;
 
         /// \brief Get a reference to the stored data value
         ///

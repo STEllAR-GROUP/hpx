@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/performance_counters/counters.hpp>
 

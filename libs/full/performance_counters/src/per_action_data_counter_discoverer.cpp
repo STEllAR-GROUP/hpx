@@ -11,11 +11,11 @@
     defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions_base/detail/invocation_count_registry.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/per_action_data_counter_discoverer.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/util/regex_from_pattern.hpp>
 
 #include <regex>
 #include <string>

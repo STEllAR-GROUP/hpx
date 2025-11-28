@@ -12,9 +12,9 @@
 #include <hpx/condition_variable.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/mutex.hpp>
 #include <hpx/thread.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <chrono>
 #include <cstddef>

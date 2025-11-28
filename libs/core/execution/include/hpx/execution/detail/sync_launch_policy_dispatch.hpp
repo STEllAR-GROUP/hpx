@@ -7,12 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/traits/is_action.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/futures_factory.hpp>
-#include <hpx/futures/traits/is_future.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <functional>
 #include <type_traits>
@@ -21,7 +19,7 @@
 namespace hpx::detail {
 
     // dispatch point used for launch_policy implementations
-    template <typename Action, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Action, typename Enable = void>
     struct sync_launch_policy_dispatch;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -69,7 +67,7 @@ namespace hpx::detail {
         }
     };
 
-    template <typename Action>
+    HPX_CXX_EXPORT template <typename Action>
     struct sync_launch_policy_dispatch<Action,
         std::enable_if_t<!traits::is_action_v<Action>>>
     {
@@ -96,7 +94,7 @@ namespace hpx::detail {
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
-            if (hpx::detail::has_async_policy(policy))
+            if (hpx::has_async_policy(policy))
             {
                 // if one of the arguments is a future we play it conservatively
                 if constexpr (hpx::traits::is_future_any_v<std::decay_t<Ts>...>)

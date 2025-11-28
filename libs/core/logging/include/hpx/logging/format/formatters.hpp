@@ -40,7 +40,7 @@ namespace hpx::util::logging::formatter {
     [2] my 2nd message
     @endcode
     */
-    struct idx : manipulator
+    HPX_CXX_EXPORT struct idx : manipulator
     {
         [[nodiscard]] HPX_CORE_EXPORT static std::unique_ptr<idx> make();
 
@@ -82,7 +82,7 @@ namespace hpx::util::logging::formatter {
     @param convert [optional] In case there needs to be a conversion between
     std::(w)string and the string that holds your logged message. See convert_format.
     */
-    struct high_precision_time : manipulator
+    HPX_CXX_EXPORT struct high_precision_time : manipulator
     {
         [[nodiscard]] HPX_CORE_EXPORT static std::unique_ptr<
             high_precision_time>
@@ -103,7 +103,7 @@ namespace hpx::util::logging::formatter {
     @param convert [optional] In case there needs to be a conversion between
     std::(w)string and the string that holds your logged message. See convert_format.
     */
-    struct thread_id : manipulator
+    HPX_CXX_EXPORT struct thread_id : manipulator
     {
         [[nodiscard]] HPX_CORE_EXPORT static std::unique_ptr<thread_id> make();
 

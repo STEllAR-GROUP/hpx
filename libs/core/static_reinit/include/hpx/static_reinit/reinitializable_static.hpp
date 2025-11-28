@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2006 Joao Abecasis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,10 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/static_reinit/static_reinit.hpp>
-#include <hpx/type_support/aligned_storage.hpp>
-#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <memory>    // for placement new
@@ -33,7 +32,8 @@ namespace hpx::util {
     //  Provides thread-safe initialization of a single static instance of T.
     //
     //  This instance is guaranteed to be constructed on static storage in a
-    //  thread-safe manner, on the first call to the constructor of static_.
+    //  thread-safe manner, on the first call to the constructor of
+    //  reinitializable_static.
     //
     //  Requirements:
     //      T is default constructible or has one argument
@@ -41,15 +41,19 @@ namespace hpx::util {
     //  In addition this type registers global construction and destruction
     //  functions used by the HPX runtime system to reinitialize the held data
     //  structures.
-    template <typename T, typename Tag = T, std::size_t N = 1>
+    HPX_CXX_EXPORT template <typename T, typename Tag = T, std::size_t N = 1>
     struct HPX_CORE_EXPORT_REINITIALIZABLE_STATIC reinitializable_static;
 
     //////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Tag, std::size_t N>
+    HPX_CXX_EXPORT template <typename T, typename Tag, std::size_t N>
     struct HPX_CORE_EXPORT_REINITIALIZABLE_STATIC reinitializable_static
     {
     public:
-        HPX_NON_COPYABLE(reinitializable_static);
+        reinitializable_static(reinitializable_static const&) = delete;
+        reinitializable_static(reinitializable_static&&) = delete;
+        reinitializable_static& operator=(
+            reinitializable_static const&) = delete;
+        reinitializable_static& operator=(reinitializable_static&&) = delete;
 
     public:
         using value_type = T;
@@ -106,6 +110,7 @@ namespace hpx::util {
         }
 
         template <typename U>
+            requires(!std::is_same_v<U, reinitializable_static>)
         reinitializable_static(U const& val)
         {
 #if !defined(__CUDACC__)
@@ -128,12 +133,12 @@ namespace hpx::util {
             return this->get();
         }
 
-        reference get(std::size_t item = 0) noexcept
+        reference get(std::size_t const item = 0) noexcept
         {
             return *this->get_address(item);
         }
 
-        const_reference get(std::size_t item = 0) const noexcept
+        const_reference get(std::size_t const item = 0) const noexcept
         {
             return *this->get_address(item);
         }

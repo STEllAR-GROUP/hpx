@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include <hpx/hardware/timestamp.hpp>
+#include <hpx/config.hpp>
+#include <hpx/modules/hardware.hpp>
 
 #include <cstdint>
 
@@ -18,7 +19,7 @@ namespace hpx::util {
     //  tick_counter - a timer
     //
     ///////////////////////////////////////////////////////////////////////////
-    class tick_counter
+    HPX_CXX_EXPORT class tick_counter
     {
     public:
         explicit tick_counter(std::uint64_t& output)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -146,18 +146,12 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/async_combinators/detail/throw_if_exceptional.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/futures/detail/future_data.hpp>
-#include <hpx/futures/traits/acquire_shared_state.hpp>
-#include <hpx/futures/traits/detail/future_traits.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/is_future.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/unwrap_ref.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <array>
@@ -438,7 +432,7 @@ namespace hpx::detail {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_all_nothrow_t final
+    HPX_CXX_EXPORT inline constexpr struct wait_all_nothrow_t final
       : hpx::functional::tag<wait_all_nothrow_t>
     {
     private:
@@ -572,7 +566,8 @@ namespace hpx {
     } wait_all_nothrow{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_all_t final : hpx::functional::tag<wait_all_t>
+    HPX_CXX_EXPORT inline constexpr struct wait_all_t final
+      : hpx::functional::tag<wait_all_t>
     {
     private:
         template <typename Future>
@@ -688,7 +683,7 @@ namespace hpx {
     } wait_all{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_all_n_nothrow_t final
+    HPX_CXX_EXPORT inline constexpr struct wait_all_n_nothrow_t final
       : hpx::functional::tag<wait_all_n_nothrow_t>
     {
     private:
@@ -710,7 +705,7 @@ namespace hpx {
     } wait_all_n_nothrow{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_all_n_t final
+    HPX_CXX_EXPORT inline constexpr struct wait_all_n_t final
       : hpx::functional::tag<wait_all_n_t>
     {
     private:

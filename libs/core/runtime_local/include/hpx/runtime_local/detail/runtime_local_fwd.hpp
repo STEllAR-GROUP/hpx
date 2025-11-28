@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,12 +12,12 @@
 
 namespace hpx {
 
-    class HPX_CORE_EXPORT runtime;
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT runtime;
 
     /// The function \a get_runtime returns a reference to the (thread
     /// specific) runtime instance.
-    HPX_CORE_EXPORT runtime& get_runtime();
-    HPX_CORE_EXPORT runtime*& get_runtime_ptr();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT runtime& get_runtime();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT runtime*& get_runtime_ptr();
 
     /// Return true if networking is enabled.
     ///
@@ -25,5 +25,5 @@ namespace hpx {
     ///       configuration time and more than one locality is used or the
     ///       command line option `--hpx:expect-connecting-localities` was
     ///       specified
-    HPX_CORE_EXPORT bool is_networking_enabled();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT bool is_networking_enabled();
 }    // namespace hpx

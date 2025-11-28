@@ -14,9 +14,9 @@
 #include <hpx/components/client_base.hpp>
 #include <hpx/components/iostreams/manipulators.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/async_distributed.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/lock_registration.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <boost/iostreams/stream.hpp>
 
@@ -395,7 +395,7 @@ namespace hpx { namespace iostreams {
             return os_.flush();
         }
     }    // namespace detail
-}}       // namespace hpx::iostreams
+}}    // namespace hpx::iostreams
 
 namespace hpx { namespace util {
     // TODO: This overload should not be needed. See #3175.

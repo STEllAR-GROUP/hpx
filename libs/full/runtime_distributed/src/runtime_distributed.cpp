@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,26 +9,29 @@
 
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/components_base/server/component_base.hpp>
-#include <hpx/coroutines/coroutine.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution_base/this_thread.hpp>
-#include <hpx/format.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/itt_notify/thread_name.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/io_service.hpp>
+#include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/static_reinit.hpp>
+#include <hpx/modules/thread_pools.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
@@ -41,7 +44,6 @@
 #include <hpx/runtime_components/console_error_sink.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_components/server/console_error_sink.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/big_boot_barrier.hpp>
@@ -50,22 +52,6 @@
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/runtime_support.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
-#include <hpx/runtime_local/debugging.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/runtime_local/shutdown_function.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/runtime_local/state.hpp>
-#include <hpx/runtime_local/thread_hooks.hpp>
-#include <hpx/runtime_local/thread_mapper.hpp>
-#include <hpx/thread_pools/detail/scoped_background_timer.hpp>
-#include <hpx/thread_support/set_thread_name.hpp>
-#include <hpx/threading_base/external_timer.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/type_support/unused.hpp>
-#include <hpx/util/from_string.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>
@@ -89,6 +75,8 @@
     !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 #include <io.h>
 #endif
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {

@@ -1,5 +1,3 @@
-#pragma once
-
 //
 //  Copyright 2002-2018 Peter Dimov
 //
@@ -12,11 +10,11 @@
 //
 //  Adapted to HPX naming scheme
 
-#include <hpx/config.hpp>
+#pragma once
 
 namespace hpx::assertion::detail {
 
-    constexpr inline void current_function_helper(){
+    constexpr void current_function_helper(){
 #if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) ||    \
     (defined(__ICC) && (__ICC >= 600)) || defined(__ghs__) ||                  \
     defined(__clang__)
@@ -54,5 +52,4 @@ namespace hpx::assertion::detail {
 
 #endif
     }
-
 }    // namespace hpx::assertion::detail

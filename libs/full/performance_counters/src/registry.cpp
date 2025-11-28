@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,10 +8,10 @@
 #include <hpx/config.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/create_component.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/performance_counters/server/arithmetics_counter.hpp>
@@ -22,7 +22,6 @@
 #include <hpx/performance_counters/server/statistics_counter.hpp>
 #include <hpx/statistics/rolling_max.hpp>
 #include <hpx/statistics/rolling_min.hpp>
-#include <hpx/util/regex_from_pattern.hpp>
 
 #include <boost/accumulators/statistics/rolling_variance.hpp>
 #include <boost/accumulators/statistics_fwd.hpp>
@@ -34,6 +33,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters {

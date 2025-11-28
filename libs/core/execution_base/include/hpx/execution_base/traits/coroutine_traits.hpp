@@ -10,9 +10,8 @@
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 
-#include <hpx/concepts/has_member_xxx.hpp>
-#include <hpx/type_support/coroutines_support.hpp>
-#include <hpx/type_support/meta.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -110,7 +109,7 @@ namespace hpx::execution::experimental {
     // is only awaitable within specific contexts and thus we don't consider it
     // to satisfy the Awaiter concept.
     //
-    template <typename Awaiter, typename Promise = void>
+    HPX_CXX_EXPORT template <typename Awaiter, typename Promise = void>
     struct is_awaiter
       : std::integral_constant<bool,
 #if defined(HPX_HAVE_STDEXEC)
@@ -123,7 +122,7 @@ namespace hpx::execution::experimental {
     {
     };
 
-    template <typename Awaiter, typename Promise = void>
+    HPX_CXX_EXPORT template <typename Awaiter, typename Promise = void>
     inline constexpr bool is_awaiter_v = is_awaiter<Awaiter, Promise>::value;
 
     namespace detail {
@@ -154,7 +153,7 @@ namespace hpx::execution::experimental {
     // Returns the result of applying operator co_await() to the function's
     // argument, if the operator is defined, otherwise returns a reference to
     // the input argument.
-    template <typename Awaitable>
+    HPX_CXX_EXPORT template <typename Awaitable>
     decltype(auto) get_awaiter(Awaitable&& await, void*)
     {
         if constexpr (detail::has_member_operator_co_await_v<Awaitable>)
@@ -171,7 +170,7 @@ namespace hpx::execution::experimental {
         }
     }
 
-    template <typename Awaitable, typename Promise,
+    HPX_CXX_EXPORT template <typename Awaitable, typename Promise,
         typename = std::enable_if_t<detail::has_await_transform_v<Promise>>>
     decltype(auto) get_awaiter(Awaitable&& await, Promise* promise)
     {
@@ -212,7 +211,7 @@ namespace hpx::execution::experimental {
     // satisfy the Awaiter concept. Otherwise, the Awaitable object must satisfy
     // the Awaiter concept itself.
     //
-    template <typename Awaitable, typename Promise = void>
+    HPX_CXX_EXPORT template <typename Awaitable, typename Promise = void>
     struct is_awaitable
       : is_awaiter<decltype(get_awaiter(std::declval<Awaitable>(),
                        static_cast<Promise*>(nullptr))),
@@ -220,13 +219,13 @@ namespace hpx::execution::experimental {
     {
     };
 
-    template <typename Awaitable, typename Promise = void>
+    HPX_CXX_EXPORT template <typename Awaitable, typename Promise = void>
     inline constexpr bool is_awaitable_v =
         is_awaitable<Awaitable, Promise>::value;
 
     // different versions of clang-format disagree
     // clang-format off
-    template <typename Awaitable, typename Promise = void,
+    HPX_CXX_EXPORT template <typename Awaitable, typename Promise = void,
         typename = std::enable_if_t<is_awaitable_v<Awaitable, Promise>>>
     using await_result_t = decltype((
         get_awaiter(std::declval<Awaitable>(), static_cast<Promise*>(nullptr))

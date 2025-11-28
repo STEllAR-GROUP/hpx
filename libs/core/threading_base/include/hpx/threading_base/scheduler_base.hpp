@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,10 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>
@@ -20,7 +20,7 @@
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
-#include <hpx/coroutines/detail/tss.hpp>
+#include <hpx/modules/coroutines.hpp>
 #endif
 
 #include <atomic>
@@ -50,12 +50,12 @@ namespace hpx::threads::policies {
             /// poll for
             busy = 1
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     /// The scheduler_base defines the interface to be implemented by all
     /// scheduler policies
-    struct scheduler_base
+    HPX_CXX_EXPORT struct scheduler_base
     {
         scheduler_base(scheduler_base const&) = delete;
         scheduler_base(scheduler_base&&) = delete;
@@ -99,7 +99,7 @@ namespace hpx::threads::policies {
             return description_;
         }
 
-        void idle_callback(std::size_t num_thread);
+        bool idle_callback(std::size_t num_thread);
 
         /// This function gets called by the thread-manager whenever new work
         /// has been added, allowing the scheduler to reactivate one or more of
@@ -125,15 +125,17 @@ namespace hpx::threads::policies {
 
         ///////////////////////////////////////////////////////////////////////
         // get/set scheduler mode
-        scheduler_mode get_scheduler_mode() const noexcept
+        scheduler_mode get_scheduler_mode(std::size_t thread_num) const noexcept
         {
-            return mode_.data_.load(std::memory_order_relaxed);
+            return modes_[thread_num].data_.load(std::memory_order_relaxed);
         }
 
         // get/set scheduler mode
-        bool has_scheduler_mode(scheduler_mode mode) const noexcept
+        bool has_scheduler_mode(
+            scheduler_mode mode, std::size_t thread_num) const noexcept
         {
-            return (mode_.data_.load(std::memory_order_relaxed) & mode) != 0;
+            return (modes_[thread_num].data_.load(std::memory_order_relaxed) &
+                       mode) != 0;
         }
 
         // set mode flags that control scheduler behaviour
@@ -141,20 +143,25 @@ namespace hpx::threads::policies {
         // by schedulers that do not support certain operations/modes.
         // All other mode set functions should call this one to ensure
         // that flags are always consistent
-        virtual void set_scheduler_mode(scheduler_mode mode) noexcept;
+        virtual void set_scheduler_mode(
+            scheduler_mode mode, hpx::threads::mask_cref_type pu_mask) noexcept;
 
         // add a flag to the scheduler mode flags
-        void add_scheduler_mode(scheduler_mode mode) noexcept;
+        void add_scheduler_mode(
+            scheduler_mode mode, hpx::threads::mask_cref_type pu_mask) noexcept;
 
         // remove flag from scheduler mode
-        void remove_scheduler_mode(scheduler_mode mode) noexcept;
+        void remove_scheduler_mode(
+            scheduler_mode mode, hpx::threads::mask_cref_type pu_mask) noexcept;
 
         // add flag to scheduler mode
-        void add_remove_scheduler_mode(
-            scheduler_mode to_add_mode, scheduler_mode to_remove_mode) noexcept;
+        void add_remove_scheduler_mode(scheduler_mode to_add_mode,
+            scheduler_mode to_remove_mode,
+            hpx::threads::mask_cref_type pu_mask) noexcept;
 
         // conditionally add or remove depending on set true/false
-        void update_scheduler_mode(scheduler_mode mode, bool set) noexcept;
+        void update_scheduler_mode(scheduler_mode mode, bool set,
+            hpx::threads::mask_cref_type pu_mask) noexcept;
 
         pu_mutex_type& get_pu_mutex(std::size_t num_thread) noexcept
         {
@@ -279,18 +286,18 @@ namespace hpx::threads::policies {
 
     protected:
         // the scheduler mode, protected from false sharing
-        util::cache_line_data<std::atomic<scheduler_mode>> mode_;
+        std::vector<util::cache_line_data<std::atomic<scheduler_mode>>> modes_;
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues
-        pu_mutex_type mtx_;
-        std::condition_variable cond_;
+        double max_idle_backoff_time_;
         struct idle_backoff_data
         {
-            std::uint32_t wait_count_;
-            double max_idle_backoff_time_;
+            pu_mutex_type wait_mtx;
+            std::condition_variable wait_cond;
+            std::uint32_t wait_count = 0;
         };
-        std::vector<util::cache_line_data<idle_backoff_data>> wait_counts_;
+        std::vector<util::cache_line_data<idle_backoff_data>> wait_count_data_;
 #endif
 
         // support for suspension of pus
@@ -339,7 +346,7 @@ namespace hpx::threads::policies {
 #endif
     };
 
-    HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, scheduler_base const& scheduler);
 }    // namespace hpx::threads::policies
 

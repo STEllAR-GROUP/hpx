@@ -13,14 +13,14 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/assert.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/async_local/dataflow.hpp>
+#include <hpx/modules/async_local.hpp>
 #endif
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/compute/detail/target_distribution_policy.hpp>
 #include <hpx/compute/host/distributed_target.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/runtime_components/create_component_helpers.hpp>
-#include <hpx/serialization/base_object.hpp>
 
 #include <algorithm>
 #include <cstddef>

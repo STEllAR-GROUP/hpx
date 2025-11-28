@@ -9,21 +9,19 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/plain_action.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/broadcast_direct.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/execution.hpp>
-#include <hpx/functional/first_argument.hpp>
-#include <hpx/functional/traits/is_action.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/hashing/jenkins_hash.hpp>
-#include <hpx/iterator_support/counting_shape.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/hashing.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <array>
 #include <atomic>
@@ -321,7 +319,13 @@ namespace hpx { namespace lcos {
                     static_cast<std::size_t>(agas::get_locality_id());
                 offset *= images_per_locality;
 
-                hpx::parallel::execution::bulk_sync_execute(exec,
+                auto hint = hpx::execution::experimental::get_hint(exec);
+                hint.sharing_mode(
+                    hpx::threads::thread_sharing_hint::do_not_share_function |
+                    hpx::threads::thread_sharing_hint::do_not_combine_tasks);
+
+                hpx::parallel::execution::bulk_sync_execute(
+                    hpx::execution::experimental::with_hint(exec, hint),
                     detail::spmd_block_helper<F>{
                         name, images_per_locality, num_images},
                     hpx::util::counting_shape(

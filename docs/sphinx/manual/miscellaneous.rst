@@ -35,7 +35,8 @@ is executed by invoking the plain action ``raise_exception_type``.
 
 .. literalinclude:: ../../examples/quickstart/error_handling.cpp
    :language: c++
-   :lines: 13-17
+   :start-after: //[error_handling_raise_exception
+   :end-before: //]
 
 The exception is thrown using the macro :c:macro:`HPX_THROW_EXCEPTION`. The type
 of the thrown exception is :cpp:class:`hpx::exception`. This associates
@@ -50,7 +51,8 @@ calling thread tries to wait for the result of the action by invoking either
 
 .. literalinclude:: ../../examples/quickstart/error_handling.cpp
    :language: c++
-   :lines: 27-42
+   :start-after: //exception_diagnostic_information
+   :end-before: //]
 
 .. note::
 
@@ -72,7 +74,8 @@ snippet:
 
 .. literalinclude:: ../../examples/quickstart/error_handling.cpp
    :language: c++
-   :lines: 47-72
+   :start-after: //exception_diagnostic_elements
+   :end-before: //]
 
 .. _error_code:
 
@@ -90,7 +93,8 @@ information without exception handling:
 
 .. literalinclude:: ../../examples/quickstart/error_handling.cpp
    :language: c++
-   :lines: 79-100
+   :start-after: //[error_handling_diagnostic_information
+   :end-before: //]
 
 .. note::
 
@@ -112,7 +116,8 @@ code snippet:
 
 .. literalinclude:: ../../examples/quickstart/error_handling.cpp
    :language: c++
-   :lines: 107-139
+   :start-after: //[error_handling_diagnostic_elements
+   :end-before: //]
 
 For more information please refer to the documentation of
 :cpp:func:`hpx::get_error_what`, :cpp:func:`hpx::get_error_locality_id`,
@@ -136,7 +141,8 @@ that will hold the error code only. The following snippet demonstrates its use:
 
 .. literalinclude:: ../../examples/quickstart/error_handling.cpp
    :language: c++
-   :lines: 146-166
+   :start-after: //[lightweight_error_handling_diagnostic_information
+   :end-before: //]
 
 All functions that retrieve other diagnostic elements from the
 :cpp:class:`hpx::error_code` will fail if called with a lightweight error_code
@@ -180,6 +186,8 @@ following 'Hello world' program:
 
 .. literalinclude:: ../../examples/quickstart/hello_world_1.cpp
    :language: c++
+   :start-after: //[hello_world_1_getting_started
+   :end-before: //]
 
 Additionally, those applications need to link with the iostreams component. When
 using CMake this can be achieved by using the ``COMPONENT_DEPENDENCIES``

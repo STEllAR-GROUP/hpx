@@ -18,7 +18,7 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename TD, typename Enable = void>
+        HPX_CXX_EXPORT template <typename TD, typename Enable = void>
         struct decay_unwrap_impl
         {
             using type = TD;
@@ -30,7 +30,7 @@ namespace hpx::util {
             }
         };
 
-        template <typename X>
+        HPX_CXX_EXPORT template <typename X>
         struct decay_unwrap_impl<::std::reference_wrapper<X>>
         {
             using type = X&;
@@ -43,11 +43,11 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct decay_unwrap : detail::decay_unwrap_impl<std::decay_t<T>>
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using decay_unwrap_t = typename decay_unwrap<T>::type;
 }    // namespace hpx::util

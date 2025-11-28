@@ -32,17 +32,25 @@ include(HPX_AddModule)
 add_hpx_module(
   core thread_pools
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${thread_pools_sources}
   HEADERS ${thread_pools_headers}
   COMPAT_HEADERS ${thread_pools_compat_headers}
   MODULE_DEPENDENCIES
+    hpx_affinity
     hpx_assertion
+    hpx_concurrency
     hpx_config
+    hpx_coroutines
     hpx_debugging
     hpx_errors
+    hpx_execution_base
+    hpx_functional
     hpx_itt_notify
     hpx_logging
     hpx_schedulers
+    hpx_tag_invoke
     hpx_threading_base
+    hpx_topology
   CMAKE_SUBDIRS examples tests
 )

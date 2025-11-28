@@ -10,8 +10,7 @@
 
 #include <cstdint>
 
-namespace hpx { namespace performance_counters { namespace io
-{
+namespace hpx { namespace performance_counters { namespace io {
     // returns number of bytes passed as an argument to read I/O operations
     std::uint64_t get_pio_riss(bool);
     // returns number of bytes passed as an argument to write I/O operations
@@ -27,5 +26,4 @@ namespace hpx { namespace performance_counters { namespace io
     // returns number of bytes transferred to storage that were later removed
     // due to truncation or deletion
     std::uint64_t get_pio_wcanc(bool);
-}}}
-
+}}}    // namespace hpx::performance_counters::io

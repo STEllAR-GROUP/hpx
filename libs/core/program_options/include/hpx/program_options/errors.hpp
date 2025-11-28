@@ -19,55 +19,43 @@
 namespace hpx::program_options {
 
     /** Base class for all errors in the library. */
-    class HPX_ALWAYS_EXPORT error : public std::logic_error
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT error : public std::logic_error
     {
     public:
-        explicit error(std::string const& xwhat)
-          : std::logic_error(xwhat)
-        {
-        }
+        explicit error(std::string const& xwhat);
     };
 
     /** Class thrown when there are too many positional options.
         This is a programming error.
     */
-    class HPX_ALWAYS_EXPORT too_many_positional_options_error : public error
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT too_many_positional_options_error
+      : public error
     {
     public:
-        too_many_positional_options_error()
-          : error("too many positional options have been specified on the "
-                  "command line")
-        {
-        }
+        too_many_positional_options_error();
     };
 
     /** Class thrown when there are programming error related to style */
-    class HPX_ALWAYS_EXPORT invalid_command_line_style : public error
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT invalid_command_line_style
+      : public error
     {
     public:
-        explicit invalid_command_line_style(std::string const& msg)
-          : error(msg)
-        {
-        }
+        explicit invalid_command_line_style(std::string const& msg);
     };
 
     /** Class thrown if config file can not be read */
-    class HPX_ALWAYS_EXPORT reading_file : public error
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT reading_file : public error
     {
     public:
-        explicit reading_file(char const* filename)
-          : error(std::string("can not read options configuration file '")
-                    .append(filename)
-                    .append("'"))
-        {
-        }
+        explicit reading_file(char const* filename);
     };
 
-    /** Base class for most exceptions in the library.
+    /**
+     * Base class for most exceptions in the library.
      *
      *  Substitutes the values for the parameter name
-     *      placeholders in the template to create the human
-     *      readable error message
+     *      placeholders in the template to create the human-readable error
+     *      message
      *
      *  Placeholders are surrounded by % signs: %example%
      *      Poor man's version of boost::format
@@ -76,17 +64,15 @@ namespace hpx::program_options {
      *      instead so ugly placeholders are never left in-place.
      *
      *  Options are displayed in "canonical" form
-     *      This is the most unambiguous form of the
-     *      *parsed* option name and would correspond to
-     *      option_description::format_name()
-     *      i.e. what is shown by print_usage()
+     *      This is the most unambiguous form of the *parsed* option name and
+     *      would correspond to option_description::format_name() i.e. what is
+     *      shown by print_usage()
      *
      *  The "canonical" form depends on whether the option is
-     *      specified in short or long form, using dashes or slashes
-     *      or without a prefix (from a configuration file)
-     *
-     *   */
-    class HPX_ALWAYS_EXPORT error_with_option_name : public error
+     *      specified in short or long form, using dashes or slashes or without
+     *      a prefix (from a configuration file)
+     */
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT error_with_option_name : public error
     {
     protected:
         /** can be
@@ -120,8 +106,10 @@ namespace hpx::program_options {
             m_substitutions[parameter_name] = value;
         }
 
-        /** If the parameter is missing, then make the
-         *      from->to substitution instead */
+        /**
+         * If the parameter is missing, then make the
+         *      from->to substitution instead
+         */
         void set_substitute_default(std::string const& parameter_name,
             std::string const& from, std::string const& to)
         {
@@ -175,47 +163,37 @@ namespace hpx::program_options {
             std::string const& from, std::string const& to) const;
 
         /** Construct option name in accordance with the appropriate
-         *  prefix style: i.e. long dash or short slash etc */
+         *  prefix style: i.e. long dash or short slash etc. */
         std::string get_canonical_option_name() const;
         std::string get_canonical_option_prefix() const;
     };
 
     /** Class thrown when there are several option values, but
         user called a method which cannot return them all. */
-    class HPX_ALWAYS_EXPORT multiple_values : public error_with_option_name
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT multiple_values
+      : public error_with_option_name
     {
     public:
-        multiple_values()
-          : error_with_option_name(
-                "option '%canonical_option%' only takes a single argument")
-        {
-        }
+        multiple_values();
     };
 
     /** Class thrown when there are several occurrences of an
         option, but user called a method which cannot return
         them all. */
-    class HPX_ALWAYS_EXPORT multiple_occurrences : public error_with_option_name
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT multiple_occurrences
+      : public error_with_option_name
     {
     public:
-        multiple_occurrences()
-          : error_with_option_name("option '%canonical_option%' cannot be "
-                                   "specified more than once")
-        {
-        }
+        multiple_occurrences();
     };
 
     /** Class thrown when a required/mandatory option is missing */
-    class HPX_ALWAYS_EXPORT required_option : public error_with_option_name
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT required_option
+      : public error_with_option_name
     {
     public:
         // option name is constructed by the option_descriptor and never on the fly
-        explicit required_option(std::string const& option_name)
-          : error_with_option_name(
-                "the option '%canonical_option%' is required but missing", "",
-                option_name)
-        {
-        }
+        explicit required_option(std::string const& option_name);
     };
 
     /** Base class of un-parsable options,
@@ -230,41 +208,31 @@ namespace hpx::program_options {
      *      conceptual dissonance!
      *
      *   */
-    class HPX_ALWAYS_EXPORT error_with_no_option_name
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT error_with_no_option_name
       : public error_with_option_name
     {
     public:
         explicit error_with_no_option_name(std::string const& template_,
-            std::string const& original_token = "")
-          : error_with_option_name(template_, "", original_token)
-        {
-        }
+            std::string const& original_token = "");
 
         /** Does NOT set option name, because no option name makes sense */
         void set_option_name(std::string const&) override {}
     };
 
     /** Class thrown when option name is not recognized. */
-    class HPX_ALWAYS_EXPORT unknown_option : public error_with_no_option_name
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT unknown_option
+      : public error_with_no_option_name
     {
     public:
-        explicit unknown_option(std::string const& original_token = "")
-          : error_with_no_option_name(
-                "unrecognized option '%canonical_option%'", original_token)
-        {
-        }
+        explicit unknown_option(std::string const& original_token = "");
     };
 
     /** Class thrown when there's ambiguity among several possible options. */
-    class HPX_ALWAYS_EXPORT ambiguous_option : public error_with_no_option_name
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT ambiguous_option
+      : public error_with_no_option_name
     {
     public:
-        explicit ambiguous_option(std::vector<std::string> xalternatives)
-          : error_with_no_option_name(
-                "option '%canonical_option%' is ambiguous")
-          , m_alternatives(HPX_MOVE(xalternatives))
-        {
-        }
+        explicit ambiguous_option(std::vector<std::string> xalternatives);
 
         std::vector<std::string> const& alternatives() const noexcept
         {
@@ -277,7 +245,6 @@ namespace hpx::program_options {
             std::string const& error_template) const override;
 
     private:
-        // TODO: copy ctor might throw
         std::vector<std::string> m_alternatives;
     };
 
@@ -285,7 +252,8 @@ namespace hpx::program_options {
      * Class thrown when there's syntax error either for command
      *  line or config file options. See derived children for concrete classes.
      */
-    class HPX_ALWAYS_EXPORT invalid_syntax : public error_with_option_name
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT invalid_syntax
+      : public error_with_option_name
     {
     public:
         enum kind_t
@@ -301,12 +269,7 @@ namespace hpx::program_options {
 
         explicit invalid_syntax(kind_t kind,
             std::string const& option_name = "",
-            std::string const& original_token = "", int option_style = 0)
-          : error_with_option_name(
-                get_template(kind), option_name, original_token, option_style)
-          , m_kind(kind)
-        {
-        }
+            std::string const& original_token = "", int option_style = 0);
 
         constexpr kind_t kind() const noexcept
         {
@@ -325,41 +288,30 @@ namespace hpx::program_options {
         kind_t m_kind;
     };
 
-    class HPX_ALWAYS_EXPORT invalid_config_file_syntax : public invalid_syntax
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT invalid_config_file_syntax
+      : public invalid_syntax
     {
     public:
-        invalid_config_file_syntax(std::string const& invalid_line, kind_t kind)
-          : invalid_syntax(kind)
-        {
-            m_substitutions["invalid_line"] = invalid_line;
-        }
+        invalid_config_file_syntax(
+            std::string const& invalid_line, kind_t kind);
 
         /** Convenience functions for backwards compatibility */
-        [[nodiscard]] std::string tokens() const override
-        {
-            if (auto const it = m_substitutions.find("invalid_line");
-                it != m_substitutions.end())
-            {
-                return it->second;
-            }
-            return "<unknown>";
-        }
+        [[nodiscard]] std::string tokens() const override;
     };
 
     /** Class thrown when there are syntax errors in given command line */
-    class HPX_ALWAYS_EXPORT invalid_command_line_syntax : public invalid_syntax
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT invalid_command_line_syntax
+      : public invalid_syntax
     {
     public:
         explicit invalid_command_line_syntax(kind_t kind,
             std::string const& option_name = "",
-            std::string const& original_token = "", int option_style = 0)
-          : invalid_syntax(kind, option_name, original_token, option_style)
-        {
-        }
+            std::string const& original_token = "", int option_style = 0);
     };
 
     /** Class thrown when value of option is incorrect. */
-    class HPX_ALWAYS_EXPORT validation_error : public error_with_option_name
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT validation_error
+      : public error_with_option_name
     {
     public:
         enum kind_t
@@ -374,12 +326,7 @@ namespace hpx::program_options {
     public:
         explicit validation_error(kind_t kind,
             std::string const& option_name = "",
-            std::string const& original_token = "", int option_style = 0)
-          : error_with_option_name(
-                get_template(kind), option_name, original_token, option_style)
-          , m_kind(kind)
-        {
-        }
+            std::string const& original_token = "", int option_style = 0);
 
         constexpr kind_t kind() const noexcept
         {
@@ -393,7 +340,8 @@ namespace hpx::program_options {
     };
 
     /** Class thrown if there is an invalid option value given */
-    class HPX_ALWAYS_EXPORT invalid_option_value : public validation_error
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT invalid_option_value
+      : public validation_error
     {
     public:
         explicit invalid_option_value(std::string const& value);
@@ -401,7 +349,8 @@ namespace hpx::program_options {
     };
 
     /** Class thrown if there is an invalid bool value given */
-    class HPX_ALWAYS_EXPORT invalid_bool_value : public validation_error
+    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT invalid_bool_value
+      : public validation_error
     {
     public:
         explicit invalid_bool_value(std::string const& value);

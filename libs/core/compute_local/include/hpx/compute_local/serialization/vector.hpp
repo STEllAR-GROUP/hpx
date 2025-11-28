@@ -10,16 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/config/endian.hpp>
 #include <hpx/assert.hpp>
-
-#if !defined(__CUDA_ARCH__)
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
-#include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
-#else
-#include <hpx/serialization/serialization_fwd.hpp>
-#endif
-
 #include <hpx/compute_local/vector.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <type_traits>
 

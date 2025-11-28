@@ -13,7 +13,7 @@
 
 namespace hpx::util {
 
-    class atomic_count
+    HPX_CXX_EXPORT class atomic_count
     {
     public:
         explicit constexpr atomic_count(long value) noexcept
@@ -21,7 +21,10 @@ namespace hpx::util {
         {
         }
 
-        HPX_NON_COPYABLE(atomic_count);
+        atomic_count(atomic_count const&) = delete;
+        atomic_count(atomic_count&&) = delete;
+        atomic_count& operator=(atomic_count const&) = delete;
+        atomic_count& operator=(atomic_count&&) = delete;
 
         ~atomic_count() = default;
 
@@ -31,9 +34,28 @@ namespace hpx::util {
             return *this;
         }
 
+        // Incrementing reference counts can be done with relaxed semantics,
+        // because the object is not at risk of being destroyed, and any memory
+        // operations that occur after the increment may as well have occurred
+        // before the increment.
+        long increment(
+            std::memory_order mo = std::memory_order_relaxed) noexcept
+        {
+            return value_.fetch_add(1, mo) + 1;
+        }
+
         long operator++() noexcept
         {
             return value_.fetch_add(1, std::memory_order_acq_rel) + 1;
+        }
+
+        // Any decrement of a reference count must be done with (at least)
+        // release semantics so that any straggling writes to memory are visible
+        // to the destructing thread before it frees the memory.
+        long decrement(
+            std::memory_order mo = std::memory_order_release) noexcept
+        {
+            return value_.fetch_sub(1, mo) - 1;
         }
 
         long operator--() noexcept

@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2024 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,11 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/errors/error_code.hpp>
-#include <hpx/functional/traits/get_action_name.hpp>
-#include <hpx/functional/traits/get_function_address.hpp>
-#include <hpx/functional/traits/get_function_annotation.hpp>
-#include <hpx/functional/traits/is_action.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
 #include <hpx/modules/itt_notify.hpp>
@@ -34,7 +31,7 @@ namespace hpx::threads {
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
-    struct thread_description
+    HPX_CXX_EXPORT struct thread_description
     {
     public:
         enum class data_type : std::uint8_t
@@ -217,7 +214,7 @@ namespace hpx::threads {
     };
 #else
     ///////////////////////////////////////////////////////////////////////////
-    struct thread_description
+    HPX_CXX_EXPORT struct thread_description
     {
     public:
         enum class data_type : std::uint8_t
@@ -310,9 +307,10 @@ namespace hpx::threads {
     };
 #endif
 
-    HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream&, thread_description const&);
-    HPX_CORE_EXPORT std::string as_string(thread_description const& desc);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::string as_string(
+        thread_description const& desc);
 }    // namespace hpx::threads
 
 namespace hpx::threads {
@@ -336,17 +334,18 @@ namespace hpx::threads {
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_CORE_EXPORT threads::thread_description get_thread_description(
-        thread_id_type const& id, error_code& ec = throws);
-    HPX_CORE_EXPORT threads::thread_description set_thread_description(
-        thread_id_type const& id,
+    HPX_CXX_EXPORT HPX_CORE_EXPORT threads::thread_description
+    get_thread_description(thread_id_type const& id, error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT threads::thread_description
+    set_thread_description(thread_id_type const& id,
         threads::thread_description const& desc = threads::thread_description(),
         error_code& ec = throws);
 
-    HPX_CORE_EXPORT threads::thread_description get_thread_lco_description(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT threads::thread_description
+    get_thread_lco_description(
         thread_id_type const& id, error_code& ec = throws);
-    HPX_CORE_EXPORT threads::thread_description set_thread_lco_description(
-        thread_id_type const& id,
+    HPX_CXX_EXPORT HPX_CORE_EXPORT threads::thread_description
+    set_thread_lco_description(thread_id_type const& id,
         threads::thread_description const& desc = threads::thread_description(),
         error_code& ec = throws);
 }    // namespace hpx::threads

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <array>
 #include <iterator>
 #include <string>
@@ -15,6 +17,7 @@
 #include <vector>
 
 namespace hpx::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     // Iterators are contiguous if they are pointers (without concepts we have
     // no generic way of determining whether an iterator is contiguous)
@@ -164,16 +167,16 @@ namespace hpx::traits {
         };
     }    // namespace detail
 
-    template <typename Iter>
+    HPX_CXX_EXPORT template <typename Iter>
     struct is_contiguous_iterator : detail::is_known_contiguous_iterator<Iter>
     {
     };
 
-    template <typename Iter>
+    HPX_CXX_EXPORT template <typename Iter>
     using is_contiguous_iterator_t =
         typename is_contiguous_iterator<Iter>::type;
 
-    template <typename Iter>
+    HPX_CXX_EXPORT template <typename Iter>
     inline constexpr bool is_contiguous_iterator_v =
         is_contiguous_iterator<Iter>::value;
 }    // namespace hpx::traits

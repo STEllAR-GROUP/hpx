@@ -11,13 +11,15 @@
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/async_distributed/post.hpp>
-#include <hpx/datastructures/serialization/tuple.hpp>
-#include <hpx/ini/ini.hpp>
-#include <hpx/serialization/vector.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/ini.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstdint>
 #include <string>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(std::int64_t, int64_t,
     hpx::actions::base_lco_with_value_int64_get,

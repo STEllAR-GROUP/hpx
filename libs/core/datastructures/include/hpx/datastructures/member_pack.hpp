@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>    // for size_t
 #include <type_traits>
@@ -19,6 +19,7 @@ namespace hpx::util {
     namespace detail {
 #if defined(HPX_HAVE_MSVC_NO_UNIQUE_ADDRESS_ATTRIBUTE) ||                      \
     defined(HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE)
+
         template <std::size_t I, typename T>
         struct member_leaf
         {
@@ -37,14 +38,13 @@ namespace hpx::util {
         T member_type(member_leaf<I, T> const& /*leaf*/) noexcept;
 
         template <std::size_t I, typename T>
-        static constexpr T& member_get(member_leaf<I, T>& leaf) noexcept
+        constexpr T& member_get(member_leaf<I, T>& leaf) noexcept
         {
             return leaf.member;
         }
 
         template <std::size_t I, typename T>
-        static constexpr T const& member_get(
-            member_leaf<I, T> const& leaf) noexcept
+        constexpr T const& member_get(member_leaf<I, T> const& leaf) noexcept
         {
             return leaf.member;
         }
@@ -80,26 +80,26 @@ namespace hpx::util {
         T member_type(member_leaf<I, T> const& /*leaf*/) noexcept;
 
         template <std::size_t I, typename T>
-        static constexpr T& member_get(member_leaf<I, T, false>& leaf) noexcept
+        constexpr T& member_get(member_leaf<I, T, false>& leaf) noexcept
         {
             return leaf.member;
         }
 
         template <std::size_t I, typename T>
-        static constexpr T& member_get(member_leaf<I, T, true>& leaf) noexcept
+        constexpr T& member_get(member_leaf<I, T, true>& leaf) noexcept
         {
             return leaf;
         }
 
         template <std::size_t I, typename T>
-        static constexpr T const& member_get(
+        constexpr T const& member_get(
             member_leaf<I, T, false> const& leaf) noexcept
         {
             return leaf.member;
         }
 
         template <std::size_t I, typename T>
-        static constexpr T const& member_get(
+        constexpr T const& member_get(
             member_leaf<I, T, true> const& leaf) noexcept
         {
             return leaf;
@@ -108,10 +108,10 @@ namespace hpx::util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Is, typename... Ts>
+    HPX_CXX_EXPORT template <typename Is, typename... Ts>
     struct HPX_EMPTY_BASES member_pack;
 
-    template <std::size_t... Is, typename... Ts>
+    HPX_CXX_EXPORT template <std::size_t... Is, typename... Ts>
     struct HPX_EMPTY_BASES member_pack<util::index_pack<Is...>, Ts...>
       : detail::member_leaf<Is, Ts>...
     {
@@ -151,7 +151,7 @@ namespace hpx::util {
         }
     };
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     using member_pack_for =
         member_pack<util::make_index_pack_t<sizeof...(Ts)>, Ts...>;
 }    // namespace hpx::util
@@ -160,7 +160,8 @@ namespace hpx::util {
 namespace hpx::serialization {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Archive, std::size_t... Is, typename... Ts>
+    HPX_CXX_EXPORT template <typename Archive, std::size_t... Is,
+        typename... Ts>
     HPX_FORCEINLINE void serialize(Archive& ar,
         ::hpx::util::member_pack<util::index_pack<Is...>, Ts...>& mp,
         unsigned int const /*version*/ = 0)

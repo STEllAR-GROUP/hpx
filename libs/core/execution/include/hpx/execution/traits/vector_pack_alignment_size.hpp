@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -19,43 +19,43 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_vector_pack : std::false_type
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_vector_pack_v = is_vector_pack<T>::value;
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using is_vector_pack_t = typename is_vector_pack<T>::type;
 
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_scalar_vector_pack;
 
-    template <typename T, typename Enable>
+    HPX_CXX_EXPORT template <typename T, typename Enable>
     struct is_scalar_vector_pack : std::false_type
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_scalar_vector_pack_v =
         is_scalar_vector_pack<T>::value;
 
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_non_scalar_vector_pack : std::false_type
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_non_scalar_vector_pack_v =
         is_non_scalar_vector_pack<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct vector_pack_alignment;
 
-    template <typename... Vector>
+    HPX_CXX_EXPORT template <typename... Vector>
     struct vector_pack_alignment<hpx::tuple<Vector...>,
         std::enable_if_t<hpx::util::all_of_v<is_vector_pack_t<Vector>...>>>
     {
@@ -66,15 +66,15 @@ namespace hpx::parallel::traits {
             vector_pack_alignment<pack_type>::value;
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr std::size_t vector_pack_alignment_v =
         vector_pack_alignment<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct vector_pack_size;
 
-    template <typename... Vector>
+    HPX_CXX_EXPORT template <typename... Vector>
     struct vector_pack_size<hpx::tuple<Vector...>,
         std::enable_if_t<hpx::util::all_of_v<is_vector_pack_t<Vector>...>>>
     {
@@ -85,15 +85,15 @@ namespace hpx::parallel::traits {
             vector_pack_size<pack_type>::value;
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr std::size_t vector_pack_size_v =
         vector_pack_size<T>::value;
 
     ////////////////////////////////////////////////////////////////////////////
-    template <typename Pack,
-        typename Enable = std::enable_if_t<is_vector_pack_v<Pack> ||
-            is_scalar_vector_pack_v<Pack>>>
-    constexpr std::size_t size(Pack) noexcept
+    HPX_CXX_EXPORT template <typename Pack,
+        typename Enable = std::enable_if_t < is_vector_pack_v<Pack> ||
+            is_scalar_vector_pack_v<Pack> >>
+                constexpr std::size_t size(Pack) noexcept
     {
         return vector_pack_size_v<Pack>;
     }

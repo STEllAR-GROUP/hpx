@@ -14,28 +14,29 @@
 #include <type_traits>
 
 namespace hpx::execution::experimental {
-    template <typename Receiver>
+
+    HPX_CXX_EXPORT template <typename Receiver>
     struct is_receiver : std::bool_constant<receiver<Receiver>>
     {
     };
 
-    template <typename Receiver>
+    HPX_CXX_EXPORT template <typename Receiver>
     inline constexpr bool is_receiver_v = is_receiver<Receiver>::value;
 
-    template <typename Receiver, typename Completions>
+    HPX_CXX_EXPORT template <typename Receiver, typename Completions>
     struct is_receiver_of
       : std::bool_constant<receiver_of<Receiver, Completions>>
     {
     };
 
-    template <typename Receiver, typename Completions>
+    HPX_CXX_EXPORT template <typename Receiver, typename Completions>
     inline constexpr bool is_receiver_of_v =
         is_receiver_of<Receiver, Completions>::value;
 
     namespace detail {
 
         // What about this implementation instead of using template specialization?
-        template <typename CPO>
+        HPX_CXX_EXPORT template <typename CPO>
         struct is_receiver_cpo
           : std::bool_constant<std::is_same_v<CPO, set_value_t> ||
                 std::is_same_v<CPO, set_error_t> ||
@@ -43,7 +44,7 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <typename CPO>
+        HPX_CXX_EXPORT template <typename CPO>
         inline constexpr bool is_receiver_cpo_v = is_receiver_cpo<CPO>::value;
     }    // namespace detail
 
@@ -52,10 +53,8 @@ namespace hpx::execution::experimental {
 #else
 
 #include <hpx/config/constexpr.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -135,7 +134,7 @@ namespace hpx::execution::experimental {
     /// completed.
     ///
     /// \see hpx::execution::experimental::is_receiver_of
-    template <typename T, typename E = std::exception_ptr>
+    HPX_CXX_EXPORT template <typename T, typename E = std::exception_ptr>
     struct is_receiver;
 
     /// The `receiver_of` concept is a refinement of the `Receiver` concept by
@@ -157,21 +156,22 @@ namespace hpx::execution::experimental {
     ///       `hpx::execution::set_stopped`
     ///
     /// \see hpx::execution::traits::is_receiver
-    template <typename Receiver, typename CS>
+    HPX_CXX_EXPORT template <typename Receiver, typename CS>
     struct is_receiver_of;
 
-    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
-    struct set_value_t : hpx::functional::tag<set_value_t>
+    HPX_CXX_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct set_value_t
+      : hpx::functional::tag<set_value_t>
     {
     } set_value{};
 
-    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
-    struct set_error_t : hpx::functional::tag_noexcept<set_error_t>
+    HPX_CXX_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct set_error_t
+      : hpx::functional::tag_noexcept<set_error_t>
     {
     } set_error{};
 
-    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
-    struct set_stopped_t : hpx::functional::tag_noexcept<set_stopped_t>
+    HPX_CXX_EXPORT
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct set_stopped_t
+      : hpx::functional::tag_noexcept<set_stopped_t>
     {
     } set_stopped{};
 
@@ -195,7 +195,7 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
-    template <typename T, typename E>
+    HPX_CXX_EXPORT template <typename T, typename E>
     struct is_receiver
       : detail::is_receiver_impl<
             std::is_move_constructible_v<std::decay_t<T>> &&
@@ -204,7 +204,7 @@ namespace hpx::execution::experimental {
     {
     };
 
-    template <typename T, typename E = std::exception_ptr>
+    HPX_CXX_EXPORT template <typename T, typename E = std::exception_ptr>
     inline constexpr bool is_receiver_v = is_receiver<T, E>::value;
 
     ///////////////////////////////////////////////////////////////////////
@@ -254,12 +254,12 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
-    template <typename T, typename CS>
+    HPX_CXX_EXPORT template <typename T, typename CS>
     struct is_receiver_of : detail::is_receiver_of_impl<is_receiver_v<T>, T, CS>
     {
     };
 
-    template <typename T, typename CS>
+    HPX_CXX_EXPORT template <typename T, typename CS>
     inline constexpr bool is_receiver_of_v = is_receiver_of<T, CS>::value;
 
     ///////////////////////////////////////////////////////////////////////
@@ -311,20 +311,20 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
-    template <typename T, typename CS>
+    HPX_CXX_EXPORT template <typename T, typename CS>
     struct is_nothrow_receiver_of
       : detail::is_nothrow_receiver_of_impl<
             is_receiver_v<T> && is_receiver_of_v<T, CS>, T, CS>
     {
     };
 
-    template <typename T, typename CS>
+    HPX_CXX_EXPORT template <typename T, typename CS>
     inline constexpr bool is_nothrow_receiver_of_v =
         is_nothrow_receiver_of<T, CS>::value;
 
     namespace detail {
 
-        template <typename CPO>
+        HPX_CXX_EXPORT template <typename CPO>
         struct is_receiver_cpo : std::false_type
         {
         };
@@ -344,7 +344,7 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <typename CPO>
+        HPX_CXX_EXPORT template <typename CPO>
         inline constexpr bool is_receiver_cpo_v = is_receiver_cpo<CPO>::value;
     }    // namespace detail
 }    // namespace hpx::execution::experimental

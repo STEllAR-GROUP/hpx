@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach & Katelyn Kufahl
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2015 Anton Bikineev
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -18,23 +18,22 @@
 #include <hpx/async_distributed/put_parcel.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/managed_component_base.hpp>
-#include <hpx/execution_base/this_thread.hpp>
-#include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/agas_base.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/static_reinit.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/parcelset/detail/parcel_await.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
 #include <hpx/parcelset_base/parcelport.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/big_boot_barrier.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
-#include <hpx/serialization/detail/polymorphic_id_factory.hpp>
-#include <hpx/serialization/vector.hpp>
-#include <hpx/static_reinit/reinitializable_static.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/topology/topology.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -48,10 +47,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx::detail {
-
-    std::string get_locality_base_name();
-}
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::parcelset {
 
@@ -63,8 +59,7 @@ namespace hpx::agas::detail {
 
     void register_unassigned_typenames()
     {
-        // supposed to be run on locality 0 before
-        // before locality communication
+        // supposed to be run on locality 0 locality communication
         hpx::serialization::detail::id_registry& serialization_registry =
             hpx::serialization::detail::id_registry::instance();
 

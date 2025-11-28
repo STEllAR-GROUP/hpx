@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,14 +7,13 @@
 #pragma once
 
 #include <hpx/datastructures/optional.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <utility>
 
 namespace hpx::serialization {
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     void save(output_archive& ar, hpx::optional<T> const& o, unsigned)
     {
         bool const valid = bool(o);
@@ -26,7 +25,7 @@ namespace hpx::serialization {
         }
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     void load(input_archive& ar, hpx::optional<T>& o, unsigned)
     {
         bool valid = false;

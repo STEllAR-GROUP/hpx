@@ -28,9 +28,10 @@
 
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <algorithm>
+#include <atomic>
 #include <functional>
 #include <utility>
 
@@ -67,13 +68,21 @@ namespace N {
 
         inline friend void intrusive_ptr_add_ref(base const* p) noexcept
         {
-            ++p->use_count_;
+            p->use_count_.increment();
         }
 
         inline friend void intrusive_ptr_release(base const* p) noexcept
         {
-            if (--p->use_count_ == 0)
+            if (p->use_count_.decrement() == 0)
+            {
+                // The thread that decrements the reference count to zero must
+                // perform an acquire to ensure that it doesn't start
+                // destructing the object until all previous writes have
+                // drained.
+                std::atomic_thread_fence(std::memory_order_acquire);
+
                 delete p;
+            }
         }
     };
 

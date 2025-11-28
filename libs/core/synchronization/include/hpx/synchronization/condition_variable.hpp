@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2022 Bhumit Attarde
 //  Copyright (c) 2013 Agustin Berge
 //
@@ -13,17 +13,17 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/synchronization/stop_token.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/timing/steady_clock.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <mutex>
 #include <utility>
@@ -38,8 +38,7 @@ namespace hpx {
     /// functions of \a hpx::condition_variable and
     /// \a hpx::condition_variable_any.
     ///
-    enum class cv_status
-    {
+    HPX_CXX_EXPORT enum class cv_status {
         /// The condition variable was awakened with \a notify_all,
         /// \a notify_one, or spuriously
         no_timeout,
@@ -101,7 +100,7 @@ namespace hpx {
     /// \namedrequirement{CopyAssignable}, or
     /// \namedrequirement{MoveAssignable}.
     ///
-    class condition_variable
+    HPX_CXX_EXPORT class condition_variable
     {
     private:
         using mutex_type =
@@ -520,7 +519,7 @@ namespace hpx {
     /// \namedrequirement{CopyAssignable}, or
     /// \namedrequirement{MoveAssignable}.
     ///
-    class condition_variable_any
+    HPX_CXX_EXPORT class condition_variable_any
     {
     private:
         using mutex_type =

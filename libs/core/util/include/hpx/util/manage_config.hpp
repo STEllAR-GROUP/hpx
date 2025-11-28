@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/util/from_string.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <map>
 #include <string>
@@ -17,7 +17,7 @@
 
 namespace hpx::util {
 
-    struct HPX_CORE_EXPORT manage_config
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT manage_config
     {
         using map_type = std::map<std::string, std::string>;
 

@@ -18,16 +18,13 @@
 #include <utility>
 #include <vector>
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////
     // Try to retrieve default values from a batch environment
-    struct HPX_CORE_EXPORT batch_environment
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT batch_environment
     {
         // the constructor tries to read initial values from a batch
         // environment, filling our map of nodes and thread counts
@@ -80,7 +77,7 @@ namespace hpx::util {
         bool debug_;
 
 #if defined(HPX_HAVE_PARCELPORT_TCP)
-        using node_map_type = std::map<asio::ip::tcp::endpoint,
+        using node_map_type = std::map<::asio::ip::tcp::endpoint,
             std::pair<std::string, std::size_t>>;
 
         node_map_type nodes_;
@@ -88,6 +85,4 @@ namespace hpx::util {
     };
 }    // namespace hpx::util
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
-#endif
+#include <hpx/config/warnings_suffix.hpp>

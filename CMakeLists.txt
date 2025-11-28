@@ -1,5 +1,5 @@
 # Copyright (c)      2020 Mikael Simberg
-# Copyright (c) 2007-2024 Hartmut Kaiser
+# Copyright (c) 2007-2025 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c)      2024 Isidoros Tsaousis-Seiras
 # Copyright (c) 2007-2008 Chirag Dekate
@@ -108,7 +108,6 @@ include(CMakeDependentOption)
 # include additional macro definitions
 include(HPX_AddConfigTest)
 include(HPX_AddDefinitions)
-include(HPX_CreateSymbolicLink)
 
 hpx_force_out_of_tree_build(
   "This project requires an out-of-source-tree build. See README.rst. Clean your CMake cache and CMakeFiles if this message persists."
@@ -310,6 +309,31 @@ hpx_option(
 )
 if(HPX_WITH_UNITY_BUILD)
   set(HPX_WITH_UNITY_BUILD_OPTION UNITY_BUILD)
+endif()
+
+# ##############################################################################
+# C++20 modules configuration
+# ##############################################################################
+
+hpx_option(
+  HPX_WITH_CXX_MODULES BOOL "Enable exposing C++20 modules (default: OFF)." OFF
+  ADVANCED
+)
+if(HPX_WITH_CXX_MODULES)
+  if(NOT (CMAKE_VERSION VERSION_GREATER_EQUAL "3.29"))
+    hpx_fatal(
+      "Please use a version of CMake newer than V3.28 in order to enable C++ module support for HPX"
+    )
+  endif()
+
+  hpx_info(
+    "HPX will build and install C++20 module interface units for downstream users."
+  )
+  hpx_add_config_define(HPX_HAVE_CXX_MODULES)
+
+  set(HPX_WITH_CXX_MODULES_OPTION SCAN_FOR_MODULES ON)
+else()
+  hpx_info("HPX will be built and used with traditional headers only.")
 endif()
 
 hpx_option(
@@ -581,6 +605,21 @@ if(HPX_WITH_CUDA AND HPX_WITH_HIP)
  Note: HPX_WITH_HIP is automatically enabled when compiling with hipcc."
   )
 endif()
+
+# HPX THRUST configuration
+set(HPX_WITH_THRUST_DEFAULT OFF)
+if(HPX_WITH_CUDA)
+  set(HPX_WITH_THRUST_DEFAULT ON)
+endif()
+
+hpx_option(
+  HPX_WITH_THRUST
+  BOOL
+  "Enable support for NVIDIA Thrust integration (default: ON when CUDA is enabled, OFF otherwise)"
+  ${HPX_WITH_THRUST_DEFAULT}
+  ADVANCED
+  CATEGORY "Build Targets"
+)
 
 # ## HPX STDEXEC configuration ##
 
@@ -1233,7 +1272,15 @@ if(HPX_WITH_NETWORKING)
     ADVANCED
   )
   hpx_option(
-    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch" "v1.7.9"
+    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch"
+    "2c4d2c59d2b781f54d6c4e64421adcca16502df9" # latest commit as of 2025-10-29
+    CATEGORY "Build Targets"
+    ADVANCED
+  )
+  hpx_option(
+    HPX_WITH_LCI_BOOTSTRAP_MPI BOOL
+    "Configure the autofetched LCI with mpi bootstrap support (default: OFF)"
+    OFF
     CATEGORY "Build Targets"
     ADVANCED
   )
@@ -1368,8 +1415,8 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
   hpx_option(
     HPX_WITH_PARCELPORT_LCI_ENV
     STRING
-    "List of environment variables checked to detect LCI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID)."
-    "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID"
+    "List of environment variables checked to detect LCI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID;LCT_PMI_FILE_NRANKS)."
+    "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID;LCT_PMI_FILE_NRANKS"
     CATEGORY "Parcelport"
     ADVANCED
   )
@@ -1668,6 +1715,12 @@ hpx_option(
 if(HPX_WITH_TUPLE_RVALUE_SWAP)
   hpx_add_config_define(HPX_HAVE_TUPLE_RVALUE_SWAP)
 endif()
+
+hpx_option(
+  HPX_WITH_MODULE_COMPATIBILITY_HEADERS BOOL
+  "Generate backwards-compatibility headers for HPX Modules (default: OFF)" OFF
+  ADVANCED
+)
 
 # ##############################################################################
 # Special diagnostic flags, do not enable by default, only if needed

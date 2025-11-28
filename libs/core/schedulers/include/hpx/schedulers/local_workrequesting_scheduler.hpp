@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,19 +8,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/modules/affinity.hpp>
 #include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/thread_queue.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -92,10 +89,10 @@ namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    using default_local_workrequesting_scheduler_terminated_queue =
+    HPX_CXX_EXPORT using default_local_workrequesting_scheduler_terminated_queue =
         lockfree_lifo;
 #else
-    using default_local_workrequesting_scheduler_terminated_queue =
+    HPX_CXX_EXPORT using default_local_workrequesting_scheduler_terminated_queue =
         lockfree_fifo;
 #endif
 
@@ -206,7 +203,7 @@ namespace hpx::threads::policies {
     // The local_workrequesting_scheduler maintains several queues of work
     // items (threads) per OS thread, where this OS thread pulls its next work
     // from.
-    template <typename Mutex = std::mutex,
+    HPX_CXX_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =
@@ -963,20 +960,25 @@ namespace hpx::threads::policies {
                 return true;
             }
 
-            if (allow_stealing &&
-                (get_thread(d.bound_queue_, thrd) ||
-                    get_thread(d.queue_, thrd)))
+            if (get_thread(d.bound_queue_, thrd) || get_thread(d.queue_, thrd))
             {
                 // We found a task to run, however before running it we handle
                 // steal requests (assuming that there is more work left that
                 // could be used to satisfy steal requests).
                 if (!d.requests_->is_empty())
                 {
-                    steal_request req;
-                    while (try_receiving_steal_request(d, req))
+                    if (allow_stealing)
                     {
-                        if (!handle_steal_request(d, req))
-                            break;
+                        steal_request req;
+                        while (try_receiving_steal_request(d, req))
+                        {
+                            if (!handle_steal_request(d, req))
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        decline_or_forward_one_steal_requests(d);
                     }
                 }
 
@@ -1068,7 +1070,8 @@ namespace hpx::threads::policies {
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "local_workrequesting_scheduler::schedule_thread",
-                    "unknown thread priority value (thread_priority::unknown)");
+                    "unknown thread priority value "
+                    "(thread_priority::unknown)");
             }
             }
         }
@@ -1138,8 +1141,10 @@ namespace hpx::threads::policies {
             case thread_priority::unknown:
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                    "local_workrequesting_scheduler::schedule_thread_last",
-                    "unknown thread priority value (thread_priority::unknown)");
+                    "local_workrequesting_scheduler::schedule_thread_"
+                    "last",
+                    "unknown thread priority value "
+                    "(thread_priority::unknown)");
             }
             }
         }
@@ -1861,13 +1866,15 @@ namespace hpx::threads::policies {
             curr_queue_.store(0, std::memory_order_release);
         }
 
-        void set_scheduler_mode(scheduler_mode mode) noexcept override
+        void set_scheduler_mode(scheduler_mode mode,
+            hpx::threads::mask_cref_type pu_mask) noexcept override
         {
             // we should not disable stealing for this scheduler, this would
             // possibly lead to deadlocks
             scheduler_base::set_scheduler_mode(mode |
-                policies::scheduler_mode::enable_stealing |
-                policies::scheduler_mode::enable_stealing_numa);
+                    policies::scheduler_mode::enable_stealing |
+                    policies::scheduler_mode::enable_stealing_numa,
+                pu_mask);
         }
 
     protected:

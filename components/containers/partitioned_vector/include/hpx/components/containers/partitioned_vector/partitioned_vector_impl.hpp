@@ -10,11 +10,11 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/components/get_ptr.hpp>
 #include <hpx/distribution_policies/container_distribution_policy.hpp>
 #include <hpx/distribution_policies/explicit_container_distribution_policy.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
@@ -372,7 +372,7 @@ namespace hpx {
             for (hpx::id_type const& id : r.second)
             {
                 std::size_t size =
-                    (std::min)(part_sizes[l], size_ - allocated_size);
+                    (std::min) (part_sizes[l], size_ - allocated_size);
                 partitions_[l] =
                     partition_data(id, allocated_size, size, locality);
 

@@ -7,13 +7,14 @@
 
 #include <hpx/config.hpp>
 
-// CLang V19.1.1 ICE's while compiling this file
-#if !defined(HPX_CLANG_VERSION) || HPX_CLANG_VERSION != 190101
+// Apple Clang and Clang V19.1.1 ICE's while compiling this file
+#if !defined(HPX_APPLE_CLANG_VERSION) &&                                       \
+    (!defined(HPX_CLANG_VERSION) || HPX_CLANG_VERSION != 190101)
 
 #include <hpx/algorithm.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/type_support/identity.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <iostream>

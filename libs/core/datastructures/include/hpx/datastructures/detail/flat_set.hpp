@@ -51,23 +51,19 @@ namespace hpx::detail {
     using namespace std::experimental;
 #endif
 
-    // TODO: Remove once we have this in C++20 mode ubiquitously.
-    template <typename T>
-    using remove_cvref_t = std::remove_cv_t<std::remove_reference_t<T>>;
-
-    struct sorted_unique_t
+    HPX_CXX_EXPORT struct sorted_unique_t
     {
         explicit sorted_unique_t() = default;
     };
-    inline constexpr sorted_unique_t sorted_unique{};
+    HPX_CXX_EXPORT inline constexpr sorted_unique_t sorted_unique{};
 
-    template <typename KeyRef, typename KeyIter>
+    HPX_CXX_EXPORT template <typename KeyRef, typename KeyIter>
     struct flat_set_iterator
     {
         static_assert(std::is_reference_v<KeyRef>);
 
         using iterator_category = std::random_access_iterator_tag;
-        using value_type = remove_cvref_t<KeyRef>;
+        using value_type = std::remove_cvref_t<KeyRef>;
         using difference_type =
             typename std::iterator_traits<KeyIter>::difference_type;
         using reference = KeyRef;
@@ -214,7 +210,7 @@ namespace hpx::detail {
         KeyIter key_it_;
     };
 
-    template <typename Key, typename Compare = std::less<Key>,
+    HPX_CXX_EXPORT template <typename Key, typename Compare = std::less<Key>,
         typename KeyContainer = std::vector<Key>>
     class flat_set
     {

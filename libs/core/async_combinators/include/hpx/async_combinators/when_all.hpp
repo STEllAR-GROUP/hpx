@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //  Copyright (c) 2017 Denis Blank
 //
@@ -32,7 +32,7 @@ namespace hpx {
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to \a when_all.
     ///           - future<Container<future<R>>>: If the input cardinality is
-    ///             unknown at compile time and the futures are all of the
+    ///             unknown at compile time and the futures are all have the
     ///             same type. The order of the futures in the output container
     ///             will be the same as given by the input iterator.
     ///
@@ -57,7 +57,7 @@ namespace hpx {
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to when_all.
     ///           - future<Container<future<R>>>: If the input cardinality is
-    ///             unknown at compile time and the futures are all of the
+    ///             unknown at compile time and the futures are all have the
     ///             same type.
     ///
     /// \note Calling this version of \a when_all where the input container is
@@ -104,7 +104,7 @@ namespace hpx {
     /// \return   Returns a future holding the same list of futures as has
     ///           been passed to \a when_all_n.
     ///           - future<Container<future<R>>>: If the input cardinality is
-    ///             unknown at compile time and the futures are all of the
+    ///             unknown at compile time and the futures are all have the
     ///             same type. The order of the futures in the output vector
     ///             will be the same as given by the input iterator.
     ///
@@ -116,7 +116,7 @@ namespace hpx {
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           parameter \a ec. Otherwise, it throws an instance of
     ///           hpx::exception.
     ///
     /// \note     None of the futures in the input sequence are invalidated.
@@ -129,21 +129,12 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/allocator_support/thread_local_caching_allocator.hpp>
-#include <hpx/concurrency/stack.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/futures/detail/future_data.hpp>
-#include <hpx/futures/detail/future_transforms.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/acquire_future.hpp>
-#include <hpx/futures/traits/acquire_shared_state.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/future_traits.hpp>
-#include <hpx/futures/traits/is_future.hpp>
-#include <hpx/futures/traits/is_future_range.hpp>
-#include <hpx/pack_traversal/pack_traversal_async.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/pack_traversal.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -244,7 +235,8 @@ namespace hpx::lcos::detail {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct when_all_t final : hpx::functional::tag<when_all_t>
+    HPX_CXX_EXPORT inline constexpr struct when_all_t final
+      : hpx::functional::tag<when_all_t>
     {
     private:
         // different versions of clang-format disagree
@@ -277,7 +269,7 @@ namespace hpx {
     } when_all{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct when_all_n_t final
+    HPX_CXX_EXPORT inline constexpr struct when_all_n_t final
       : hpx::functional::tag<when_all_n_t>
     {
     private:

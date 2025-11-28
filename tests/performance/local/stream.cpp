@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2015-2022 Hartmut Kaiser
+//  Copyright (c) 2015-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,14 +17,17 @@
 #define BOOST_NO_CXX11_ALLOCATOR
 #endif
 
+#include <hpx/config.hpp>
+
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/format.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/compute.hpp>
 #include <hpx/modules/compute_local.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/thread.hpp>
-#include <hpx/type_support/unused.hpp>
 #include <hpx/version.hpp>
 
 #include <cstddef>

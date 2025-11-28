@@ -12,9 +12,11 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)
 
+#include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
@@ -22,22 +24,19 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/util.hpp>
 
-#include <hpx/assert.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/parcelset/parcelport_connection.hpp>
 #include <hpx/parcelset/parcelport_impl.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/locality.hpp>
-#include <hpx/plugin/traits/plugin_config_data.hpp>
 #include <hpx/plugin_factories/parcelport_factory.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <hpx/parcelset/parcelport_connection.hpp>
 #include <hpx/parcelset_base/detail/gatherer.hpp>
 #include <hpx/parcelset_base/parcelport.hpp>
 
 #include <hpx/modules/lci_base.hpp>
-#include <hpx/parcelport_lci/backlog_queue.hpp>
 #include <hpx/parcelport_lci/header.hpp>
 #include <hpx/parcelport_lci/locality.hpp>
 #include <hpx/parcelport_lci/sender_base.hpp>

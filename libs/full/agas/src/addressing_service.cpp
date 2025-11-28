@@ -14,29 +14,25 @@
 #include <hpx/agas_base/detail/bootstrap_component_namespace.hpp>
 #include <hpx/agas_base/detail/bootstrap_locality_namespace.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/naming/split_gid.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/vector.hpp>
-#include <hpx/synchronization/shared_mutex.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
-#include <hpx/util/get_entry_as.hpp>
-#include <hpx/util/insert_checked.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -49,6 +45,8 @@
 #include <system_error>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::agas {
 
@@ -1312,8 +1310,8 @@ namespace hpx::agas {
                 threads::thread_priority) = &addressing_service::route;
 
             threads::thread_init_data data(
-                threads::make_thread_function_nullary(util::deferred_call(
-                    route_ptr, this, HPX_MOVE(p), HPX_MOVE(f), local_priority)),
+                threads::make_thread_function_nullary(
+                    route_ptr, this, HPX_MOVE(p), HPX_MOVE(f), local_priority),
                 "addressing_service::route", threads::thread_priority::normal,
                 threads::thread_schedule_hint(),
                 threads::thread_stacksize::default_,

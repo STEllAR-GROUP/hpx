@@ -11,10 +11,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy_mappings.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -23,7 +23,7 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // Return the matching non-simd (vectorpack) execution policy
-    inline constexpr struct to_non_simd_t final
+    HPX_CXX_EXPORT inline constexpr struct to_non_simd_t final
       : hpx::functional::detail::tag_fallback<to_non_simd_t>
     {
     private:
@@ -49,7 +49,7 @@ namespace hpx::execution::experimental {
     };
 
     // Return the matching simd (vectorpack) execution policy
-    inline constexpr struct to_simd_t final
+    HPX_CXX_EXPORT inline constexpr struct to_simd_t final
       : hpx::functional::detail::tag_fallback<to_simd_t>
     {
     private:

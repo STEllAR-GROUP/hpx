@@ -9,7 +9,7 @@
 #include <hpx/collectives/spmd_block.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_local_view.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
-#include <hpx/executors/execution_policy.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/partitioned_vector_predef.hpp>
 #include <hpx/include/partitioned_vector_view.hpp>
@@ -27,13 +27,9 @@
 HPX_REGISTER_PARTITIONED_VECTOR(double)
 #endif
 
-void bulk_test(hpx::lcos::spmd_block block,
-    std::size_t height,
-    std::size_t width,
-    std::size_t local_height,
-    std::size_t local_width,
-    std::size_t local_leading_dimension,
-    std::string in_name,
+void bulk_test(hpx::lcos::spmd_block block, std::size_t height,
+    std::size_t width, std::size_t local_height, std::size_t local_width,
+    std::size_t local_leading_dimension, std::string in_name,
     std::string out_name)
 {
     using const_iterator = typename std::vector<double>::const_iterator;
@@ -139,13 +135,9 @@ void bulk_test(hpx::lcos::spmd_block block,
 }
 HPX_PLAIN_ACTION(bulk_test, bulk_test_action)
 
-void async_bulk_test(hpx::lcos::spmd_block block,
-    std::size_t height,
-    std::size_t width,
-    std::size_t local_height,
-    std::size_t local_width,
-    std::size_t local_leading_dimension,
-    std::string in_name,
+void async_bulk_test(hpx::lcos::spmd_block block, std::size_t height,
+    std::size_t width, std::size_t local_height, std::size_t local_width,
+    std::size_t local_leading_dimension, std::string in_name,
     std::string out_name)
 {
     using const_iterator = typename std::vector<double>::const_iterator;
@@ -187,8 +179,7 @@ void async_bulk_test(hpx::lcos::spmd_block block,
     }
 
     block.sync_all(hpx::launch::async)
-        .then([&block, &in, &out, width, height](hpx::future<void> event)
-        {
+        .then([&block, &in, &out, width, height](hpx::future<void> event) {
             event.get();
 
             // Outer Transpose operation
@@ -202,8 +193,7 @@ void async_bulk_test(hpx::lcos::spmd_block block,
             return block.sync_all(hpx::launch::async);
         })
         .then([&block, &out, local_width, local_height,
-                  local_leading_dimension](hpx::future<void> event)
-        {
+                  local_leading_dimension](hpx::future<void> event) {
             event.get();
 
             // Inner Transpose operation
@@ -220,8 +210,7 @@ void async_bulk_test(hpx::lcos::spmd_block block,
             return block.sync_all(hpx::launch::async);
         })
         .then([&block, &out, width, height, local_width, local_height,
-                  local_leading_dimension](hpx::future<void> event)
-        {
+                  local_leading_dimension](hpx::future<void> event) {
             event.get();
 
             // Test the result of the computation
@@ -243,7 +232,7 @@ void async_bulk_test(hpx::lcos::spmd_block block,
                         // transpose the guess result
                         for (std::size_t jj = 0; jj < local_width - 1; jj++)
                             for (std::size_t ii = jj + 1; ii < local_height;
-                                 ii++)
+                                ii++)
                             {
                                 std::swap(
                                     result[jj + ii * local_leading_dimension],
@@ -275,8 +264,8 @@ int main()
 {
     using vector_type = hpx::partitioned_vector<double>;
 
-    const std::size_t height = 16;
-    const std::size_t width = 16;
+    std::size_t const height = 16;
+    std::size_t const width = 16;
 
     std::size_t local_height = 16;
     std::size_t local_width = 16;
@@ -308,11 +297,11 @@ int main()
     out2.register_as(hpx::launch::sync, out2_name);
 
     // Launch tests
-    hpx::future<void> join1 = hpx::lcos::define_spmd_block("block1", 4,
+    hpx::future<void> join1 = hpx::lcos::define_spmd_block("block1", 2,
         bulk_test_action(), height, width, local_height, local_width,
         local_leading_dimension, in1_name, out1_name);
 
-    hpx::future<void> join2 = hpx::lcos::define_spmd_block("block2", 4,
+    hpx::future<void> join2 = hpx::lcos::define_spmd_block("block2", 2,
         async_bulk_test_action(), height, width, local_height, local_width,
         local_leading_dimension, in2_name, out2_name);
 

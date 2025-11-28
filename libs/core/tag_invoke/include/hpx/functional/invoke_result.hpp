@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/invoke.hpp>
+#include <hpx/tag_invoke/macros.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -30,15 +31,14 @@ namespace hpx::util {
             using type =
                 decltype(HPX_INVOKE(std::declval<F>(), std::declval<Ts>()...));
         };
-
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     struct invoke_result : detail::invoke_result_impl<F && (Ts && ...)>
     {
     };
 
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     using invoke_result_t = typename invoke_result<F, Ts...>::type;
 }    // namespace hpx::util

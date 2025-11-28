@@ -34,6 +34,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::parcelset {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -237,8 +239,8 @@ namespace hpx::parcelset {
 
             // schedule all but the first parcel on a new thread.
             hpx::threads::thread_init_data init_data(
-                hpx::threads::make_thread_function_nullary(util::deferred_call(
-                    HPX_MOVE(f), HPX_MOVE(deferred_parcels[i]))),
+                hpx::threads::make_thread_function_nullary(
+                    HPX_MOVE(f), HPX_MOVE(deferred_parcels[i])),
                 "schedule_parcel", threads::thread_priority::boost,
                 threads::thread_schedule_hint(
                     static_cast<std::int16_t>(num_thread)),
@@ -504,5 +506,7 @@ namespace hpx::parcelset {
         return decode_message_zero_copy(parcelport, buffer, 0, num_thread);
     }
 }    // namespace hpx::parcelset
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

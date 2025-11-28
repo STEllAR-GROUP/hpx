@@ -17,7 +17,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>    // for std::min
@@ -1188,6 +1188,10 @@ struct bitset_test
         }
     }
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 140000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
     static void operator_shift_left(Bitset const& lhs, std::size_t pos)
     {
         Bitset x(lhs);
@@ -1199,6 +1203,9 @@ struct bitset_test
         Bitset x(lhs);
         HPX_TEST((lhs >> pos) == (x >>= pos));
     }
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 140000
+#pragma GCC diagnostic pop
+#endif
 
     // operator|
     static void operator_or(Bitset const& lhs, Bitset const& rhs)

@@ -10,8 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/concurrency/detail/contiguous_index_queue.hpp>
-#include <hpx/datastructures/optional.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 
 #include <atomic>
 #include <cstdint>
@@ -31,7 +30,7 @@ namespace hpx::concurrency::detail {
     ///
     /// The range of integers is non-contiguous in the sense that the returned
     /// integers are apart by a given step.
-    template <typename T = std::uint32_t>
+    HPX_CXX_EXPORT template <typename T = std::uint32_t>
     class non_contiguous_index_queue
     {
         static_assert(sizeof(T) <= 4,    //-V112
@@ -183,8 +182,6 @@ namespace hpx::concurrency::detail {
         hpx::optional<T> pop_right() noexcept
         {
             range desired_range{0, 0};
-            T index = 0;
-
             range expected_range =
                 current_range.data_.load(std::memory_order_relaxed);
 
@@ -199,12 +196,11 @@ namespace hpx::concurrency::detail {
                 HPX_SMT_PAUSE;
 
                 desired_range = expected_range.decrement_last(step);
-                index = desired_range.last;
 
             } while (!current_range.data_.compare_exchange_weak(
                 expected_range, desired_range));
 
-            return hpx::optional<T>(HPX_MOVE(index));
+            return hpx::optional<T>(HPX_MOVE(desired_range.last));
         }
 
         /// \brief Attempt to pop an item from the given end of the queue.

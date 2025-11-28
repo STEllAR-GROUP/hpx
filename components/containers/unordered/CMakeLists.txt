@@ -29,9 +29,10 @@ add_hpx_component(
   INSTALL_COMPONENT runtime
   HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
   HEADERS ${unordered_headers}
-  PREPEND_SOURCE_ROOT
+  PREPEND_SOURCE_ROOT ${HPX_WITH_UNITY_BUILD_OPTION}
+  ${HPX_WITH_CXX_MODULES_OPTION}
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
-  SOURCES ${unordered_sources} ${HPX_WITH_UNITY_BUILD_OPTION}
+  SOURCES ${unordered_sources}
 )
 
 add_hpx_pseudo_dependencies(components.containers.unordered unordered_component)

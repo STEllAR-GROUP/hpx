@@ -6,16 +6,17 @@
 
 #pragma once
 
-#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/config.hpp>
 #include <hpx/execution_base/context_base.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstddef>
 #include <string>
 
 namespace hpx::execution_base {
 
-    struct agent_base
+    HPX_CXX_EXPORT struct agent_base
     {
         virtual ~agent_base() = default;
 
@@ -24,7 +25,7 @@ namespace hpx::execution_base {
         [[nodiscard]] virtual context_base const& context() const noexcept = 0;
 
         virtual void yield(char const* desc) = 0;
-        virtual void yield_k(std::size_t k, char const* desc) = 0;
+        virtual bool yield_k(std::size_t k, char const* desc) = 0;
         virtual void suspend(char const* desc) = 0;
         virtual void resume(
             hpx::threads::thread_priority priority, char const* desc) = 0;

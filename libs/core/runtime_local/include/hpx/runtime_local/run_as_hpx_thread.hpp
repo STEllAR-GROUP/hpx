@@ -8,14 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_base/traits/is_launch_policy.hpp>
-#include <hpx/datastructures/optional.hpp>
-#include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/threading_base/threading_base_fwd.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <chrono>
 #include <condition_variable>
@@ -155,7 +152,7 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
     util::invoke_result_t<F, Ts...> run_as_hpx_thread(
         hpx::launch policy, F&& f, Ts&&... vs)
     {
@@ -166,7 +163,7 @@ namespace hpx {
             policy, HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
     }
 
-    template <typename F, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename... Ts>
         requires(!hpx::traits::is_launch_policy_v<std::decay_t<F>>)
     util::invoke_result_t<F, Ts...> run_as_hpx_thread(F&& f, Ts&&... vs)
     {

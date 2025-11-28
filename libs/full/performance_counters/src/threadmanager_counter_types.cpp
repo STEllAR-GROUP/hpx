@@ -10,17 +10,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/threadmanager_counter_types.hpp>
-#include <hpx/runtime_local/thread_pool_helpers.hpp>
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-#include <hpx/schedulers/maintain_queue_wait_times.hpp>
+#include <hpx/modules/schedulers.hpp>
 #endif
 
 #include <cstddef>

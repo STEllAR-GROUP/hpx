@@ -13,12 +13,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <atomic>
 #include <cstdint>
@@ -462,13 +462,18 @@ namespace hpx::detail {
     private:
         friend void intrusive_ptr_add_ref(shared_mutex_data* p) noexcept
         {
-            ++p->count_;
+            p->count_.increment();
         }
 
         friend void intrusive_ptr_release(shared_mutex_data* p) noexcept
         {
-            if (0 == --p->count_)
+            if (0 == p->count_.decrement())
             {
+                // The thread that decrements the reference count to zero must
+                // perform an acquire to ensure that it doesn't start destructing
+                // the object until all previous writes have drained.
+                std::atomic_thread_fence(std::memory_order_acquire);
+
                 delete p;
             }
         }
@@ -476,7 +481,7 @@ namespace hpx::detail {
         hpx::util::atomic_count count_;
     };
 
-    template <typename Mutex = hpx::spinlock>
+    HPX_CXX_EXPORT template <typename Mutex = hpx::spinlock>
     class shared_mutex
     {
     private:
@@ -603,5 +608,5 @@ namespace hpx {
     ///          no other thread is reading or writing at the same time. The \a
     ///          shared_mutex class satisfies all requirements of \a SharedMutex
     ///          and \a StandardLayoutType.
-    using shared_mutex = detail::shared_mutex<>;
+    HPX_CXX_EXPORT using shared_mutex = detail::shared_mutex<>;
 }    // namespace hpx

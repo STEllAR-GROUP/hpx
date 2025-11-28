@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 
 namespace hpx::util {
 
@@ -16,12 +16,13 @@ namespace hpx::util {
     // the runtime system is about to start and after the runtime system has
     // been terminated. This is used to initialize/reinitialize all
     // singleton instances.
-    HPX_CORE_EXPORT void reinit_register(hpx::function<void()> const& construct,
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void reinit_register(
+        hpx::function<void()> const& construct,
         hpx::function<void()> const& destruct);
 
     // Invoke all globally registered construction functions
-    HPX_CORE_EXPORT void reinit_construct();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void reinit_construct();
 
     // Invoke all globally registered destruction functions
-    HPX_CORE_EXPORT void reinit_destruct();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void reinit_destruct();
 }    // namespace hpx::util

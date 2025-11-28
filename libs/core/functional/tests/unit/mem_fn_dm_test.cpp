@@ -21,7 +21,7 @@
 #pragma warning(disable : 4514)    // unreferenced inline removed
 #endif
 
-#include <hpx/functional/mem_fn.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <iostream>
 

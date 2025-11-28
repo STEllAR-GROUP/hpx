@@ -9,23 +9,19 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/modules/execution_base.hpp>
 #else
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/queries/get_scheduler.hpp>
 #include <hpx/execution/queries/get_stop_token.hpp>
-#include <hpx/execution_base/completion_scheduler.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/execution.hpp>
-#include <hpx/execution_base/get_env.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/synchronization/detail/condition_variable.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/type_support/meta.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <exception>
 #include <mutex>
@@ -84,7 +80,7 @@ namespace hpx::execution::experimental {
     // operation states to hold the work units to make scheduling
     // allocation-free. -- end note]
     //
-    class run_loop
+    HPX_CXX_EXPORT class run_loop
     {
         struct run_loop_opstate_base
         {
@@ -399,7 +395,7 @@ namespace hpx::execution::experimental {
         }
     };
 
-    using run_loop_scheduler = run_loop::run_loop_scheduler;
+    HPX_CXX_EXPORT using run_loop_scheduler = run_loop::run_loop_scheduler;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ReceiverId>

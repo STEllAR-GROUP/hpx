@@ -14,8 +14,7 @@
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/lazy_conditional.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -112,9 +111,10 @@ namespace hpx::util {
     //   Difference - the difference_type of the resulting iterator. If not
     //      supplied, iterator_traits<Base>::difference_type is used.
     //
-    template <typename Derived, typename Base, typename Value = void,
-        typename Category = void, typename Reference = void,
-        typename Difference = void, typename Pointer = void>
+    HPX_CXX_EXPORT template <typename Derived, typename Base,
+        typename Value = void, typename Category = void,
+        typename Reference = void, typename Difference = void,
+        typename Pointer = void>
     class iterator_adaptor
       : public hpx::util::detail::iterator_adaptor_base<Derived, Base, Value,
             Category, Reference, Difference, Pointer>::type

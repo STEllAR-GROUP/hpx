@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,27 +6,24 @@
 
 #pragma once
 
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <cstdint>
 #include <string>
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // Try to map a given host name based on the list of mappings read from a
     // file
-    struct HPX_CORE_EXPORT map_hostnames
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT map_hostnames
     {
         using transform_function_type =
             hpx::function<std::string(std::string const&)>;
 
-        explicit map_hostnames(bool debug = false) noexcept
+        explicit map_hostnames(bool const debug = false) noexcept
           : ipv4_(false)
           , debug_(debug)
         {
@@ -47,7 +44,7 @@ namespace hpx::util {
             transform_ = f;
         }
 
-        void force_ipv4(bool f) noexcept
+        void force_ipv4(bool const f) noexcept
         {
             ipv4_ = f;
         }
@@ -64,6 +61,4 @@ namespace hpx::util {
     };
 }    // namespace hpx::util
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
-#endif
+#include <hpx/config/warnings_suffix.hpp>

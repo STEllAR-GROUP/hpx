@@ -10,8 +10,8 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <atomic>
 #include <cstdint>

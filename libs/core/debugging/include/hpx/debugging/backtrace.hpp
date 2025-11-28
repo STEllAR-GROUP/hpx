@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,14 +17,14 @@
 
 namespace hpx::util {
 
-    class backtrace
+    HPX_CXX_EXPORT class backtrace
     {
     };
 
-    inline std::string trace(
+    HPX_CXX_EXPORT std::string trace(
         std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)
     {
-        return "";
+        return {};
     }
 }    // namespace hpx::util
 

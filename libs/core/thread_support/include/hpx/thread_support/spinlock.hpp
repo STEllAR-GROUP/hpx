@@ -19,12 +19,12 @@
 namespace hpx::util::detail {
 
     /// Lockable spinlock class
-    struct spinlock
+    HPX_CXX_EXPORT struct spinlock
     {
     private:
         std::atomic<bool> m;
 
-        HPX_CORE_EXPORT void yield_k(unsigned) noexcept;
+        HPX_CORE_EXPORT static void yield_k(unsigned) noexcept;
 
     public:
         constexpr spinlock() noexcept
@@ -32,7 +32,10 @@ namespace hpx::util::detail {
         {
         }
 
-        HPX_NON_COPYABLE(spinlock);
+        spinlock(spinlock const&) = delete;
+        spinlock(spinlock&&) = delete;
+        spinlock& operator=(spinlock const&) = delete;
+        spinlock& operator=(spinlock&&) = delete;
 
         ~spinlock() = default;
 

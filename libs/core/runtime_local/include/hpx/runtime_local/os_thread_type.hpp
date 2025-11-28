@@ -16,9 +16,8 @@ namespace hpx::runtime_local {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Types of kernel threads registered with the runtime
-    enum class os_thread_type
-    {
-        unknown = -1,
+    HPX_CXX_EXPORT enum class os_thread_type : std::uint8_t {
+        unknown = static_cast<std::uint8_t>(-1),
         main_thread = 0,      ///< kernel thread represents main thread
         worker_thread = 1,    ///< kernel thread is used to schedule HPX threads
         io_thread = 2,        ///< kernel thread can be used for IO operations
@@ -28,27 +27,27 @@ namespace hpx::runtime_local {
     };
 
     /// Return a human-readable name representing one of the kernel thread types
-    HPX_CORE_EXPORT std::string get_os_thread_type_name(os_thread_type type);
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::string get_os_thread_type_name(
+        os_thread_type type);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Registration data for kernel threads that is maintained by the runtime
     /// internally
-    struct os_thread_data
+    HPX_CXX_EXPORT struct os_thread_data
     {
         std::string label_;     ///< name used for thread registration
         std::thread::id id_;    ///< thread id of corresponding kernel thread
         std::uint64_t native_handle_;    ///< the threads native handle
         os_thread_type type_;            ///< HPX thread type
     };
-
 }    // namespace hpx::runtime_local
 
 ///////////////////////////////////////////////////////////////////////////////
 // These functions are officially part of the API
 namespace hpx {
 
-    using runtime_local::os_thread_data;
-    using runtime_local::os_thread_type;
+    HPX_CXX_EXPORT using runtime_local::os_thread_data;
+    HPX_CXX_EXPORT using runtime_local::os_thread_type;
 
-    using runtime_local::get_os_thread_type_name;
+    HPX_CXX_EXPORT using runtime_local::get_os_thread_type_name;
 }    // namespace hpx

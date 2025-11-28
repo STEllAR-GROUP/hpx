@@ -41,11 +41,9 @@
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
+#include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/runtime_components/component_registry.hpp>
-#include <hpx/runtime_configuration/component_factory_base.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 

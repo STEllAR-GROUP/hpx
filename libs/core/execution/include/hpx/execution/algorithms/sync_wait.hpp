@@ -11,36 +11,31 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/modules/execution_base.hpp>
 
 namespace hpx::this_thread::experimental {
-    using hpx::execution::experimental::sync_wait;
-    using hpx::execution::experimental::sync_wait_t;
 
-    using hpx::execution::experimental::sync_wait_with_variant;
-    using hpx::execution::experimental::sync_wait_with_variant_t;
+    HPX_CXX_EXPORT using hpx::execution::experimental::sync_wait;
+    HPX_CXX_EXPORT using hpx::execution::experimental::sync_wait_t;
+
+    HPX_CXX_EXPORT using hpx::execution::experimental::sync_wait_with_variant;
+    HPX_CXX_EXPORT using hpx::execution::experimental::sync_wait_with_variant_t;
 }    // namespace hpx::this_thread::experimental
+
 #else
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/datastructures/optional.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/inject_scheduler.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution/algorithms/run_loop.hpp>
 #include <hpx/execution/queries/get_delegatee_scheduler.hpp>
 #include <hpx/execution/queries/get_scheduler.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/operation_state.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/detail/tag_priority_invoke.hpp>
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <atomic>
 #include <exception>
@@ -127,7 +122,7 @@ namespace hpx::execution::experimental::detail {
     using select_result_t = typename select_result<Type, T>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sender, sync_wait_type Type>
+    HPX_CXX_EXPORT template <typename Sender, sync_wait_type Type>
     struct sync_wait_receiver
     {
         struct type
@@ -296,14 +291,14 @@ namespace hpx::this_thread::experimental {
     // If the provided sender sends the "stopped" signal instead of values,
     // sync_wait returns an empty optional.
     //
-    // For an explanation of the requires clause, see 5.8 All senders are typed.
+    // For an explanation of the requires() clause, see 5.8 All senders are typed.
     // That clause also explains another sender consumer, built on top of
     // sync_wait: sync_wait_with_variant.
     //
     // Note: This function is specified inside hpx::this_thread::experimental,
     // and not inside hpx::execution::experimental. This is because sync_wait
     // has to block the current execution agent, but determining what the
-    // current execution agent is is not reliable. Since the standard does not
+    // current execution agent is not reliable. Since the standard does not
     // specify any functions on the current execution agent other than those in
     // std::this_thread, this is the flavor of this function that is being
     // proposed.
@@ -380,7 +375,7 @@ namespace hpx::this_thread::experimental {
     //          3. If execution::set_stopped(r) has been called, returns
     //             sync-wait-type<S, sync-wait-env>{}.
     //
-    inline constexpr struct sync_wait_t final
+    HPX_CXX_EXPORT inline constexpr struct sync_wait_t final
       : hpx::functional::detail::tag_priority<sync_wait_t>
     {
     private:
@@ -491,7 +486,7 @@ namespace hpx::this_thread::experimental {
     // thread of main until the work is completed, and returns an optional
     // of variant of tuples that were sent by the provided sender on its
     // completion of work.
-    inline constexpr struct sync_wait_with_variant_t final
+    HPX_CXX_EXPORT inline constexpr struct sync_wait_with_variant_t final
       : hpx::functional::detail::tag_priority<sync_wait_with_variant_t>
     {
     private:

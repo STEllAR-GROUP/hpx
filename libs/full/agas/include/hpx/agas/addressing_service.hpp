@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2023 Hartmut Kaiser
+//  Copyright (c) 2011-2025 Hartmut Kaiser
 //  Copyright (c) 2016 Parsa Amini
 //  Copyright (c) 2016 Thomas Heller
 //
@@ -11,20 +11,18 @@
 
 #include <hpx/config.hpp>
 #include <hpx/agas/agas_fwd.hpp>
-#include <hpx/cache/lru_cache.hpp>
-#include <hpx/cache/statistics/local_full_statistics.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/agas_base.hpp>
+#include <hpx/modules/cache.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/synchronization/shared_mutex.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>
 #include <cstddef>

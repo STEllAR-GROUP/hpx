@@ -7,11 +7,10 @@
 
 #include <hpx/program_options/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/string_util.hpp>
+#include <hpx/program_options/cmdline.hpp>
+#include <hpx/program_options/errors.hpp>
 #include <hpx/program_options/options_description.hpp>
-// FIXME: this is only to get multiple_occurrences class
-// should move that to a separate headers.
-#include <hpx/program_options/parsers.hpp>
-#include <hpx/string_util/tokenizer.hpp>
 
 #include <climits>
 #include <cstdarg>
@@ -90,7 +89,7 @@ namespace hpx::program_options {
                     result = full_match;
                     break;
                 }
-                else if (approx)
+                if (approx)
                 {
                     if (local_long_name.find(local_option) == 0)
                     {
@@ -636,7 +635,6 @@ namespace hpx::program_options {
 
         width = (std::min) (width, start_of_description_column - 1);
 
-        /* add an additional space to improve readability */
         ++width;
         return width;
     }

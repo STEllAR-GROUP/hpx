@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/debugging/macros.hpp>
 
 // The 'environ' should be declared in some cases. E.g. Linux man page says:
 // (This variable must be declared in the user program, but is declared in
@@ -15,29 +16,17 @@
 // To be safe, declare it here.
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
-#include <sys/mman.h>
-#include <unistd.h>
+// this case is handled in debugging/macros.hpp
 #elif defined(__APPLE__)
-// It appears that on Mac OS X the 'environ' variable is not available to
-// dynamically linked libraries. See:
-// http://article.gmane.org/gmane.comp.lib.boost.devel/103843 See:
-// http://lists.gnu.org/archive/html/bug-guile/2004-01/msg00013.html
-#include <unistd.h>
-// The proper include for this is crt_externs.h, however it's not available on
-// iOS. The right replacement is not known. See
-// https://svn.boost.org/trac/boost/ticket/5053
-extern "C" {
-extern char*** _NSGetEnviron(void);
-}
-#define environ (*_NSGetEnviron())
+// this case is handled in debugging/macros.hpp
 #elif defined(HPX_WINDOWS)
-#include <stdlib.h>
-#define environ _environ
+// this case is handled in debugging/macros.hpp
 #elif defined(__FreeBSD__)
 // On FreeBSD the environment is available for executables only, so needs to be
 // handled explicitly (e.g. see hpx_init_impl.hpp)
-// The variable is defined in .../runtime_local/src/custom_exception_info.cpp
-extern HPX_CORE_EXPORT char** freebsd_environ;
+// The variable is defined in debugging/src/print.cpp
+HPX_CXX_EXPORT HPX_CORE_EXPORT char** freebsd_environ;
 #else
+// this case is handled in debugging/macros.hpp
 extern char** environ;
 #endif

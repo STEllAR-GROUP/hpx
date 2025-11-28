@@ -1,4 +1,4 @@
-//  Copyright (c) 2018-2022 Hartmut Kaiser
+//  Copyright (c) 2018-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,8 +6,9 @@
 
 #include <hpx/exception.hpp>
 #include <hpx/manage_runtime.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/runtime_local/run_as_hpx_thread.hpp>
 
 void hpx_thread_func()
 {

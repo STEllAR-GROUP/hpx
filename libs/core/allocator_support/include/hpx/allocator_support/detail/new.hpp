@@ -7,13 +7,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <utility>
 
 namespace hpx::util::functional {
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct new_
     {
         template <typename... Ts>
@@ -23,7 +23,7 @@ namespace hpx::util::functional {
         }
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct placement_new
     {
         template <typename... Ts>
@@ -34,7 +34,7 @@ namespace hpx::util::functional {
         }
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct placement_new_one
     {
         explicit constexpr placement_new_one(void* p) noexcept

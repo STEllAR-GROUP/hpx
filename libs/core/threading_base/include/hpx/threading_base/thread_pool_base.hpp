@@ -8,18 +8,17 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/affinity/affinity_data.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/affinity.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/network_background_callback.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
-#include <hpx/timing/steady_clock.hpp>
-#include <hpx/topology/cpu_mask.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -36,7 +35,7 @@ namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
-    struct pool_id_type
+    HPX_CXX_EXPORT struct pool_id_type
     {
         pool_id_type(std::size_t index, std::string name) noexcept
           : index_(index)
@@ -60,7 +59,7 @@ namespace hpx::threads {
     };
     /// \endcond
 
-    struct thread_pool_init_parameters
+    HPX_CXX_EXPORT struct thread_pool_init_parameters
     {
         std::string const& name_;
         std::size_t index_;
@@ -108,7 +107,7 @@ namespace hpx::threads {
     // note: this data structure has to be protected from races from the outside
 
     /// \brief The base class used to manage a pool of OS threads.
-    class thread_pool_base
+    HPX_CXX_EXPORT class thread_pool_base
     {
     public:
         /// \cond NOINTERNAL
@@ -144,7 +143,7 @@ namespace hpx::threads {
         /// Suspends the given processing unit. Blocks until the processing unit
         /// has been suspended.
         ///
-        /// \param virt_core   [in] The processing unit on the the pool to be
+        /// \param virt_core   [in] The processing unit on the pool to be
         ///                    suspended. The processing units are indexed
         ///                    starting from 0.
         /// \param ec [in,out] this represents the error status on exit, if this
@@ -156,7 +155,7 @@ namespace hpx::threads {
         /// Resumes the given processing unit. Blocks until the processing unit
         /// has been resumed.
         ///
-        /// \param virt_core   [in] The processing unit on the the pool to be resumed.
+        /// \param virt_core   [in] The processing unit on the pool to be resumed.
         ///                    The processing units are indexed starting from 0.
         /// \param ec [in,out] this represents the error status on exit, if this
         ///           is pre-initialized to \a hpx#throws the function will
@@ -499,7 +498,7 @@ namespace hpx::threads {
         /// \endcond
     };
 
-    HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_pool_base const& thread_pool);
 }    // namespace hpx::threads
 

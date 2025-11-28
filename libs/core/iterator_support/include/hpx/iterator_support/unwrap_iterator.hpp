@@ -7,13 +7,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/is_contiguous_iterator.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <memory>
 
 namespace hpx::util {
 
-    template <typename Iter>
+    HPX_CXX_EXPORT template <typename Iter>
     HPX_FORCEINLINE auto get_unwrapped(Iter it)
     {
         // is_contiguous_iterator_v is true for pointers

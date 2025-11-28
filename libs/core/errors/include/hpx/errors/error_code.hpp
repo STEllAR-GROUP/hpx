@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -28,11 +28,12 @@ namespace hpx {
     /// \cond NODETAIL
     namespace detail {
 
-        [[nodiscard]] HPX_CORE_EXPORT std::exception_ptr access_exception(
-            error_code const&);
+        HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::exception_ptr
+        access_exception(error_code const&);
 
         ///////////////////////////////////////////////////////////////////////
-        struct HPX_ALWAYS_EXPORT command_line_error final : std::logic_error
+        HPX_CXX_EXPORT struct HPX_ALWAYS_EXPORT command_line_error final
+          : std::logic_error
         {
             explicit command_line_error(char const* msg)
               : std::logic_error(msg)
@@ -49,34 +50,37 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Returns generic HPX error category used for new errors.
-    [[nodiscard]] HPX_CORE_EXPORT std::error_category const&
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::error_category const&
     get_hpx_category() noexcept;
 
     /// \brief Returns generic HPX error category used for errors re-thrown
     ///        after the exception has been de-serialized.
-    [[nodiscard]] HPX_CORE_EXPORT std::error_category const&
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::error_category const&
     get_hpx_rethrow_category() noexcept;
 
     /// \cond NOINTERNAL
-    [[nodiscard]] HPX_CORE_EXPORT std::error_category const&
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::error_category const&
     get_lightweight_hpx_category() noexcept;
 
-    [[nodiscard]] HPX_CORE_EXPORT std::error_category const& get_hpx_category(
-        throwmode mode) noexcept;
+    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::error_category const&
+    get_hpx_category(throwmode mode) noexcept;
 
-    [[nodiscard]] inline std::error_code make_system_error_code(
+    HPX_CXX_EXPORT [[nodiscard]] inline std::error_code make_system_error_code(
         error e, throwmode mode = throwmode::plain)
     {
         return {static_cast<int>(e), get_hpx_category(mode)};
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    [[nodiscard]] inline std::error_condition make_error_condition(
-        error e, throwmode mode)
+    HPX_CXX_EXPORT [[nodiscard]] inline std::error_condition
+    make_error_condition(error e, throwmode mode)
     {
         return {static_cast<int>(e), get_hpx_category(mode)};
     }
     /// \endcond
+
+    HPX_CXX_EXPORT [[nodiscard]] inline error_code make_error_code(
+        std::exception_ptr const& e);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief A hpx::error_code represents an arbitrary error condition.
@@ -88,7 +92,8 @@ namespace hpx {
     /// \note Class hpx::error_code is an adjunct to error reporting by
     /// exception
     ///
-    class error_code : public std::error_code    //-V690
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT error_code
+      : public std::error_code    //-V690
     {
     public:
         /// Construct an object of type error_code.
@@ -116,8 +121,7 @@ namespace hpx {
         ///               (if mode is \a rethrow).
         ///
         /// \throws nothing
-        HPX_CORE_EXPORT explicit error_code(
-            error e, throwmode mode = throwmode::plain);
+        explicit error_code(error e, throwmode mode = throwmode::plain);
 
         /// Construct an object of type error_code.
         ///
@@ -134,8 +138,8 @@ namespace hpx {
         ///               (if mode is \a rethrow).
         ///
         /// \throws nothing
-        HPX_CORE_EXPORT error_code(error e, char const* func, char const* file,
-            long line, throwmode mode = throwmode::plain);
+        error_code(error e, char const* func, char const* file, long line,
+            throwmode mode = throwmode::plain);
 
         /// Construct an object of type error_code.
         ///
@@ -151,8 +155,7 @@ namespace hpx {
         ///
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
-        HPX_CORE_EXPORT error_code(
-            error e, char const* msg, throwmode mode = throwmode::plain);
+        error_code(error e, char const* msg, throwmode mode = throwmode::plain);
 
         /// Construct an object of type error_code.
         ///
@@ -172,8 +175,8 @@ namespace hpx {
         ///
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
-        HPX_CORE_EXPORT error_code(error e, char const* msg, char const* func,
-            char const* file, long line, throwmode mode = throwmode::plain);
+        error_code(error e, char const* msg, char const* func, char const* file,
+            long line, throwmode mode = throwmode::plain);
 
         /// Construct an object of type error_code.
         ///
@@ -189,7 +192,7 @@ namespace hpx {
         ///
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
-        HPX_CORE_EXPORT error_code(
+        error_code(
             error e, std::string const& msg, throwmode mode = throwmode::plain);
 
         /// Construct an object of type error_code.
@@ -210,14 +213,18 @@ namespace hpx {
         ///
         /// \throws std#bad_alloc (if allocation of a copy of
         ///         the passed string fails).
-        HPX_CORE_EXPORT error_code(error e, std::string const& msg,
-            char const* func, char const* file, long line,
-            throwmode mode = throwmode::plain);
+        error_code(error e, std::string const& msg, char const* func,
+            char const* file, long line, throwmode mode = throwmode::plain);
+
+        error_code(error_code&&) = default;
+        error_code& operator=(error_code&&) = default;
+
+        ~error_code() = default;
 
         /// Return a reference to the error message stored in the hpx::error_code.
         ///
         /// \throws nothing
-        [[nodiscard]] HPX_CORE_EXPORT std::string get_message() const;
+        [[nodiscard]] std::string get_message() const;
 
         /// \brief Clear this error_code object.
         /// The postconditions of invoking this method are
@@ -234,75 +241,77 @@ namespace hpx {
         ///
         /// \note This function maintains the error category of the left hand
         ///       side if the right hand side is a success code.
-        HPX_CORE_EXPORT error_code(error_code const& rhs);
+        error_code(error_code const& rhs);
 
         /// Assignment operator for error_code
         ///
         /// \note This function maintains the error category of the left hand
         ///       side if the right hand side is a success code.
-        HPX_CORE_EXPORT error_code& operator=(error_code const& rhs);
+        error_code& operator=(error_code const& rhs);
 
     private:
         friend std::exception_ptr detail::access_exception(error_code const&);
         friend class exception;
         friend error_code make_error_code(std::exception_ptr const&);
 
-        HPX_CORE_EXPORT error_code(int err, hpx::exception const& e);
-        HPX_CORE_EXPORT explicit error_code(std::exception_ptr const& e);
+        error_code(int err, hpx::exception const& e);
+        explicit error_code(std::exception_ptr const& e);
 
         std::exception_ptr exception_;
     };
 
     /// @{
     /// \brief Returns a new error_code constructed from the given parameters.
-    [[nodiscard]] inline error_code make_error_code(
+    HPX_CXX_EXPORT [[nodiscard]] inline error_code make_error_code(
         error e, throwmode mode = throwmode::plain)
     {
         return error_code(e, mode);
     }
 
-    [[nodiscard]] inline error_code make_error_code(error e, char const* func,
-        char const* file, long line, throwmode mode = throwmode::plain)
+    HPX_CXX_EXPORT [[nodiscard]] inline error_code make_error_code(error e,
+        char const* func, char const* file, long line,
+        throwmode mode = throwmode::plain)
     {
         return {e, func, file, line, mode};
     }
 
     /// \brief Returns error_code(e, msg, mode).
-    [[nodiscard]] inline error_code make_error_code(
+    HPX_CXX_EXPORT [[nodiscard]] inline error_code make_error_code(
         error e, char const* msg, throwmode mode = throwmode::plain)
     {
         return {e, msg, mode};
     }
 
-    [[nodiscard]] inline error_code make_error_code(error e, char const* msg,
-        char const* func, char const* file, long line,
+    HPX_CXX_EXPORT [[nodiscard]] inline error_code make_error_code(error e,
+        char const* msg, char const* func, char const* file, long line,
         throwmode mode = throwmode::plain)
     {
         return {e, msg, func, file, line, mode};
     }
 
     /// \brief Returns error_code(e, msg, mode).
-    [[nodiscard]] inline error_code make_error_code(
+    HPX_CXX_EXPORT [[nodiscard]] inline error_code make_error_code(
         error e, std::string const& msg, throwmode mode = throwmode::plain)
     {
         return {e, msg, mode};
     }
 
-    [[nodiscard]] inline error_code make_error_code(error e,
+    HPX_CXX_EXPORT [[nodiscard]] inline error_code make_error_code(error e,
         std::string const& msg, char const* func, char const* file, long line,
         throwmode mode = throwmode::plain)
     {
         return {e, msg, func, file, line, mode};
     }
 
-    [[nodiscard]] inline error_code make_error_code(std::exception_ptr const& e)
+    HPX_CXX_EXPORT [[nodiscard]] inline error_code make_error_code(
+        std::exception_ptr const& e)
     {
         return error_code(e);
     }
     ///@}
 
     /// \brief Returns error_code(hpx::error::success, "success", mode).
-    [[nodiscard]] inline error_code make_success_code(
+    HPX_CXX_EXPORT [[nodiscard]] inline error_code make_success_code(
         throwmode mode = throwmode::plain)
     {
         return error_code(mode);

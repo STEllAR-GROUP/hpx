@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -45,9 +45,17 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_CORE_EXPORTS)
-# define  HPX_CORE_EXPORT        HPX_SYMBOL_EXPORT
+# define  HPX_CORE_EXPORT       HPX_SYMBOL_EXPORT
 #else
-# define  HPX_CORE_EXPORT        HPX_SYMBOL_IMPORT
+# define  HPX_CORE_EXPORT       HPX_SYMBOL_IMPORT
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// C++20 module export definitions
+#if defined(HPX_COMPILE_BMI)
+# define HPX_CXX_EXPORT                  export
+#else
+# define HPX_CXX_EXPORT                  /* empty */
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,7 +74,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// define the export/import helper macros to be used for component modules
+// define the export/import helper macros to be used for library modules
 #if defined(HPX_LIBRARY_EXPORTS)
 # define  HPX_LIBRARY_EXPORT     HPX_SYMBOL_EXPORT
 #else
@@ -78,8 +86,7 @@
 // components
 #if defined(HPX_CORE_EXPORTS) || \
     defined(HPX_FULL_EXPORTS) || defined(HPX_EXPORTS) || \
-    defined(HPX_COMPONENT_EXPORTS) || defined(HPX_APPLICATION_EXPORTS) || \
-    defined(HPX_LIBRARY_EXPORTS)
+    defined(HPX_COMPONENT_EXPORTS) || defined(HPX_APPLICATION_EXPORTS)
 # define HPX_ALWAYS_EXPORT       HPX_SYMBOL_EXPORT
 # define HPX_ALWAYS_IMPORT       HPX_SYMBOL_IMPORT
 #else
@@ -87,4 +94,25 @@
 # define HPX_ALWAYS_IMPORT       HPX_SYMBOL_IMPORT
 #endif
 #endif
+
 // clang-format on
+
+// Simplify the condition whether HPX modules should be imported or not
+#if defined(HPX_HAVE_BUILD_USING_CXX_MODULES)
+
+#if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_BINARY_DOESNT_USE_CXX_MODULES)
+#undef HPX_COMPILE_WITH_MODULES
+#else
+#define HPX_COMPILE_WITH_MODULES
+#endif
+
+#else
+
+#if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_CORE_EXPORTS) ||             \
+    defined(HPX_BINARY_DOESNT_USE_CXX_MODULES)
+#undef HPX_COMPILE_WITH_MODULES
+#else
+#define HPX_COMPILE_WITH_MODULES
+#endif
+
+#endif

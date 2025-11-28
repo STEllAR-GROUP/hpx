@@ -14,11 +14,11 @@
 #include <hpx/assert.hpp>
 #include <hpx/components/client.hpp>
 #include <hpx/components_base/server/component_base.hpp>
-#include <hpx/datastructures/any.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/lcos_local/channel.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
-#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/lcos_local.hpp>
+#include <hpx/modules/lock_registration.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <cstddef>
 #include <map>

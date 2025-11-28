@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(preprocessor_headers
     hpx/preprocessor/cat.hpp
     hpx/preprocessor/config.hpp
+    hpx/preprocessor/empty.hpp
     hpx/preprocessor/expand.hpp
     hpx/preprocessor/identity.hpp
     hpx/preprocessor/nargs.hpp
@@ -24,13 +25,10 @@ set(preprocessor_compat_headers
 )
 # cmake-format: on
 
-# Default location is $HPX_ROOT/libs/preprocessor/src
-set(preprocessor_sources)
-
 include(HPX_AddModule)
 add_hpx_module(
   core preprocessor NO_CONFIG_IN_GENERATED_HEADERS
-  SOURCES ${preprocessor_sources}
+  GLOBAL_HEADER_GEN ON
   HEADERS ${preprocessor_headers}
   COMPAT_HEADERS ${preprocessor_compat_headers}
   CMAKE_SUBDIRS tests

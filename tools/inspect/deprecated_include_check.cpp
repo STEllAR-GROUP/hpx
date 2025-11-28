@@ -10,7 +10,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/util/to_string.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <algorithm>
 
@@ -27,8 +27,7 @@ namespace boost { namespace inspect {
         {"boost/unordered_map\\.hpp", "unordered_map"},
         {"boost/unordered_set\\.hpp", "unordered_set"},
         {"boost/utility/enable_if\\.hpp", "type_traits"},
-        {"boost/detail/atomic_count\\.hpp",
-            "hpx/thread_support/atomic_count.hpp"},
+        {"boost/detail/atomic_count\\.hpp", "hpx/modules/thread_support.hpp"},
         {"boost/function\\.hpp", "hpx/util/function.hpp"},
         {"boost/shared_ptr\\.hpp", "memory"},
         {"boost/intrusive_ptr\\.hpp", "hpx/modules/memory.hpp"},
@@ -73,9 +72,10 @@ namespace boost { namespace inspect {
         register_signature(".inc");
         register_signature(".ipp");
         register_signature(".ixx");
+        register_signature(".cppm");
 
         for (deprecated_includes const* includes_it = &names[0];
-             includes_it->include_regex != nullptr; ++includes_it)
+            includes_it->include_regex != nullptr; ++includes_it)
         {
             std::string rx = std::string(R"(^\s*#\s*include\s*<()") +
                 includes_it->include_regex + ")>\\s*$" + "|" +

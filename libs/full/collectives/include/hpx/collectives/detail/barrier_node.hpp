@@ -15,12 +15,12 @@
 #include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/components_base/traits/managed_component_policies.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/synchronization/barrier.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/type_support/unused.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -89,14 +89,20 @@ namespace hpx { namespace distributed { namespace detail {
         // intrusive reference counting
         friend void intrusive_ptr_add_ref(barrier_node* p) noexcept
         {
-            ++p->count_;
+            p->count_.increment();
         }
 
         // intrusive reference counting
         friend void intrusive_ptr_release(barrier_node* p) noexcept
         {
-            if (p && --p->count_ == 0)
+            if (p && p->count_.decrement() == 0)
             {
+                // The thread that decrements the reference count to zero must
+                // perform an acquire to ensure that it doesn't start
+                // destructing the object until all previous writes have
+                // drained.
+                std::atomic_thread_fence(std::memory_order_acquire);
+
                 delete p;
             }
         }

@@ -11,24 +11,18 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/modules/execution_base.hpp>
 #endif
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/datastructures/optional.hpp>
-#include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution/queries/get_stop_token.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/operation_state.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/synchronization/stop_token.hpp>
-#include <hpx/type_support/detail/with_result_of.hpp>
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -52,7 +46,7 @@ namespace hpx::when_all_vector_detail {
         }
     };
 
-    template <typename Sender>
+    HPX_CXX_EXPORT template <typename Sender>
     struct when_all_vector_sender_impl
     {
         struct when_all_vector_sender_type;
@@ -535,13 +529,13 @@ namespace hpx::execution::experimental {
     // execution::when_all_vector is an extension over P2300 (wg21.link/p2300)
     //
     // execution::when_all_vector is used to join an arbitrary number of sender
-    // chains and create a sender whose execution is dependent on all of the
+    // chains and create a sender whose execution is dependent on all the
     // input senders that only send a single set of values.
     // execution::when_all_vector_with_variant is used to join multiple sender
-    // chains and create a sender whose execution is dependent on all of the
+    // chains and create a sender whose execution is dependent on all the
     // input senders, each of which may have one or more sets of sent values.
     //
-    // when_all_vector returns a sender that completes once all of the input
+    // when_all_vector returns a sender that completes once all the input
     // senders have completed. It is constrained to only accept senders that can
     // complete with a single set of values (_i.e._, it only calls one overload
     // of set_value on its receiver). The values sent by this sender are the
@@ -552,7 +546,7 @@ namespace hpx::execution::experimental {
     // start.
     //
     // The returned sender has no completion schedulers.
-    inline constexpr struct when_all_vector_t final
+    HPX_CXX_EXPORT inline constexpr struct when_all_vector_t final
       : hpx::functional::detail::tag_fallback<when_all_vector_t>
     {
     private:

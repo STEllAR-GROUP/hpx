@@ -9,8 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <algorithm>
 #include <deque>

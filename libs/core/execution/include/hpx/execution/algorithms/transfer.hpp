@@ -9,17 +9,14 @@
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/modules/execution_base.hpp>
 #else
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/schedule_from.hpp>
-#include <hpx/execution_base/completion_scheduler.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/detail/tag_priority_invoke.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <utility>
 
@@ -40,7 +37,7 @@ namespace hpx::execution::experimental {
     // where the given sender is going to be started, but will ensure that the
     // completion signal of will be transferred to the given context.
     //
-    inline constexpr struct transfer_t final
+    HPX_CXX_EXPORT inline constexpr struct transfer_t final
       : hpx::functional::detail::tag_priority<transfer_t>
     {
     private:

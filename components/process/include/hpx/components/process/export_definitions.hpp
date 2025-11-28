@@ -9,10 +9,7 @@
 #include <hpx/config/export_definitions.hpp>
 
 #if defined(HPX_PROCESS_EXPORTS)
-# define HPX_PROCESS_EXPORT HPX_SYMBOL_EXPORT
+#define HPX_PROCESS_EXPORT HPX_SYMBOL_EXPORT
 #else
-# define HPX_PROCESS_EXPORT HPX_SYMBOL_IMPORT
+#define HPX_PROCESS_EXPORT HPX_SYMBOL_IMPORT
 #endif
-
-
-

@@ -8,11 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
-#include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/lazy_conditional.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -55,15 +54,14 @@ namespace hpx::traits {
 
             using type = hpx::future<result_type>;
         };
-
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future, typename F>
+    HPX_CXX_EXPORT template <typename Future, typename F>
     struct future_then_result : detail::future_then_result<Future, F>
     {
     };
 
-    template <typename Future, typename F>
+    HPX_CXX_EXPORT template <typename Future, typename F>
     using future_then_result_t = typename future_then_result<Future, F>::type;
 }    // namespace hpx::traits

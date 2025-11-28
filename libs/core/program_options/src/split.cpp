@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/program_options/parsers.hpp>
-#include <hpx/string_util/tokenizer.hpp>
 
 #include <string>
 #include <vector>

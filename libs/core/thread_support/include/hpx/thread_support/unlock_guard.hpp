@@ -1,4 +1,5 @@
-//  Copyright (c) 2007-2008 Chirag Dekate, Hartmut Kaiser
+//  Copyright (c) 2007-2008 Chirag Dekate
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -34,7 +35,7 @@ namespace hpx {
     ///          mutex is owned again. In this way, the mutex is unlocked in the
     ///          constructor and locked in the destructor, so that one can have
     ///          an unlocked section within a locked one.
-    template <typename Mutex>
+    HPX_CXX_EXPORT template <typename Mutex>
     class unlock_guard
     {
     public:

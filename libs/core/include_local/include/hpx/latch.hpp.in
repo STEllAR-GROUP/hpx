@@ -8,4 +8,4 @@
 
 #pragma once
 
-#include <hpx/synchronization/latch.hpp>
+#include <hpx/modules/synchronization.hpp>

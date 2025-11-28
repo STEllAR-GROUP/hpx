@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/bit_cast.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -54,7 +54,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // special struct to ensure cache line alignment of a data type
-    template <typename Data,
+    HPX_CXX_EXPORT template <typename Data,
         bool NeedsPadding = detail::needs_padding<Data>::value>
     struct cache_aligned_data
     {
@@ -84,7 +84,7 @@ namespace hpx::util {
             sizeof(Data))];
     };
 
-    template <typename Data>
+    HPX_CXX_EXPORT template <typename Data>
     struct cache_aligned_data<Data, false>
     {
         constexpr cache_aligned_data() noexcept(
@@ -107,7 +107,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // special struct to ensure cache line alignment of a data type
-    template <typename Data,
+    HPX_CXX_EXPORT template <typename Data,
         bool NeedsPadding = detail::needs_padding<Data>::value>
     struct cache_aligned_data_derived : Data
     {
@@ -133,7 +133,7 @@ namespace hpx::util {
             sizeof(Data))];
     };
 
-    template <typename Data>
+    HPX_CXX_EXPORT template <typename Data>
     struct cache_aligned_data_derived<Data, false> : Data
     {
         constexpr cache_aligned_data_derived() noexcept(
@@ -160,11 +160,11 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     // special struct to data type is cache line aligned and fully occupies a
     // cache line
-    template <typename Data>
+    HPX_CXX_EXPORT template <typename Data>
     using cache_line_data = cache_aligned_data<Data>;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     constexpr auto align_up(T value, std::size_t alignment) noexcept
     {
         return T(hpx::bit_cast<std::size_t>(value + (alignment - 1)) &

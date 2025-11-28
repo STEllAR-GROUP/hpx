@@ -11,14 +11,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_local/async.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/parallel/task_group.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 

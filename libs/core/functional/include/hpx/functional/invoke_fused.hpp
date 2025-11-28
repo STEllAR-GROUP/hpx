@@ -10,11 +10,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/void_guard.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -25,13 +24,13 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename Tuple>
+        HPX_CXX_EXPORT template <typename Tuple>
         struct fused_index_pack
           : util::make_index_pack<hpx::tuple_size<std::decay_t<Tuple>>::value>
         {
         };
 
-        template <typename Tuple>
+        HPX_CXX_EXPORT template <typename Tuple>
         using fused_index_pack_t = typename fused_index_pack<Tuple>::type;
 
         ///////////////////////////////////////////////////////////////////////
@@ -52,13 +51,13 @@ namespace hpx {
         {
         };
 
-        template <typename F, typename Tuple>
+        HPX_CXX_EXPORT template <typename F, typename Tuple>
         struct invoke_fused_result
           : invoke_fused_result_impl<F, Tuple&&, fused_index_pack_t<Tuple>>
         {
         };
 
-        template <typename F, typename Tuple>
+        HPX_CXX_EXPORT template <typename F, typename Tuple>
         using invoke_fused_result_t =
             typename invoke_fused_result<F, Tuple>::type;
 
@@ -106,7 +105,7 @@ namespace hpx {
     ///       unpacks the tuples while the former cannot. Turning a tuple into a
     ///       parameter pack is not a trivial operation which makes
     ///       \c hpx::invoke_fused rather useful.
-    template <typename F, typename Tuple>
+    HPX_CXX_EXPORT template <typename F, typename Tuple>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         detail::invoke_fused_result_t<F, Tuple>
         invoke_fused(F&& f, Tuple&& t) noexcept(noexcept(
@@ -125,7 +124,7 @@ namespace hpx {
     /// \note The difference between \c hpx::invoke_fused and
     ///       \c hpx::invoke_fused_r is that the later allows to
     ///       specify the return type as well.
-    template <typename R, typename F, typename Tuple>
+    HPX_CXX_EXPORT template <typename R, typename F, typename Tuple>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE R
     invoke_fused_r(F&& f, Tuple&& t) noexcept(
         noexcept(detail::invoke_fused_impl(detail::fused_index_pack_t<Tuple>{},
@@ -141,7 +140,7 @@ namespace hpx {
     /// \cond NOINTERNAL
     namespace functional {
 
-        struct invoke_fused
+        HPX_CXX_EXPORT struct invoke_fused
         {
             template <typename F, typename Tuple>
             constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -157,7 +156,7 @@ namespace hpx {
             }
         };
 
-        template <typename R>
+        HPX_CXX_EXPORT template <typename R>
         struct invoke_fused_r
         {
             template <typename F, typename Tuple>

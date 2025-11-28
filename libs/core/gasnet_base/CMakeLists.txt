@@ -33,7 +33,13 @@ add_hpx_module(
   SOURCES ${gasnet_base_sources}
   HEADERS ${gasnet_base_headers}
   DEPENDENCIES PkgConfig::GASNET ${gasnet_additional_dependencies}
-  MODULE_DEPENDENCIES hpx_logging hpx_runtime_configuration hpx_string_util
-                      hpx_threading_base hpx_util
+  MODULE_DEPENDENCIES
+    hpx_errors
+    hpx_logging
+    hpx_runtime_configuration
+    hpx_string_util
+    hpx_synchronization
+    hpx_threading_base
+    hpx_util
   CMAKE_SUBDIRS examples tests
 )

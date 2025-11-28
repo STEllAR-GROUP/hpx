@@ -14,7 +14,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>
-#include <hpx/threading_base/threading_base_fwd.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -212,7 +212,7 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Callback>
+    HPX_CXX_EXPORT template <typename Callback>
     class [[nodiscard]] stop_callback;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -240,7 +240,7 @@ namespace hpx {
     ///       but rather retrieved from a \a hpx::jthread or \a hpx::stop_source.
     ///       This makes it share the same associated stop-state as the \a
     ///       hpx::jthread or \a hpx::stop_source.
-    class stop_token
+    HPX_CXX_EXPORT class stop_token
     {
     private:
         template <typename Callback>
@@ -338,7 +338,7 @@ namespace hpx {
     /// Unit type intended for use as a placeholder in hpx::stop_source
     /// non-default constructor, that makes the constructed hpx::stop_source
     /// empty with no associated stop-state.
-    struct nostopstate_t
+    HPX_CXX_EXPORT struct nostopstate_t
     {
         explicit nostopstate_t() = default;
     };
@@ -346,7 +346,7 @@ namespace hpx {
     /// This is a constant object instance of hpx::nostopstate_t for use in
     /// constructing an empty hpx::stop_source, as a placeholder value in the
     /// non-default constructor.
-    inline constexpr nostopstate_t nostopstate{};
+    HPX_CXX_EXPORT inline constexpr nostopstate_t nostopstate{};
 
     /// The \a stop_source class provides the means to issue a stop request,
     /// such as for \a hpx::jthread cancellation. A stop request made for one
@@ -367,7 +367,7 @@ namespace hpx {
     ///       function being executed on its thread). For other uses, however, a
     ///       \a stop_source can be constructed separately using the default
     ///       constructor, which creates new stop-state.
-    class stop_source
+    HPX_CXX_EXPORT class stop_source
     {
     public:
         // 32.3.4.1 constructors, copy, and assignment
@@ -494,7 +494,7 @@ namespace hpx {
     //
     // 32.3.5, class stop_callback
     //
-    template <typename Callback>
+    HPX_CXX_EXPORT template <typename Callback>
     class [[nodiscard]] stop_callback : private detail::stop_callback_base
     {
     public:
@@ -584,8 +584,6 @@ namespace hpx {
     //      template parameter Callback that models both invocable and
     //      destructible.
 
-    // clang-format produces inconsistent result between different versions
-    // clang-format off
     /// The \a stop_callback class template provides an RAII object type that
     /// registers a callback function for an associated \a hpx::stop_token
     /// object, such that the callback function will be invoked when the \a
@@ -607,14 +605,13 @@ namespace hpx {
     /// MoveConstructible, nor \a MoveAssignable. The template param Callback
     /// type must be both \a invocable and \a destructible. Any return value is
     /// ignored.
-    template <typename Callback>
+    HPX_CXX_EXPORT template <typename Callback>
     stop_callback(stop_token, Callback) -> stop_callback<Callback>;
-    // clang-format on
 
     // 32.3.3.4 Specialized algorithms
 
     // Effects: Equivalent to: x.swap(y).
-    inline void swap(stop_token& lhs, stop_token& rhs) noexcept
+    HPX_CXX_EXPORT inline void swap(stop_token& lhs, stop_token& rhs) noexcept
     {
         lhs.swap(rhs);
     }
@@ -622,7 +619,7 @@ namespace hpx {
     // 32.3.4.4 Specialized algorithms
 
     // Effects: Equivalent to: x.swap(y).
-    inline void swap(stop_source& lhs, stop_source& rhs) noexcept
+    HPX_CXX_EXPORT inline void swap(stop_source& lhs, stop_source& rhs) noexcept
     {
         lhs.swap(rhs);
     }
@@ -633,13 +630,13 @@ namespace hpx {
 namespace hpx::p2300_stop_token {
 
     // [stoptoken.inplace], class in_place_stop_token
-    class in_place_stop_token;
+    HPX_CXX_EXPORT class in_place_stop_token;
 
     // [stopsource.inplace], class in_place_stop_source
-    class in_place_stop_source;
+    HPX_CXX_EXPORT class in_place_stop_source;
 
     // [stopcallback.inplace], class template in_place_stop_callback
-    template <typename Callback>
+    HPX_CXX_EXPORT template <typename Callback>
     class [[nodiscard]] in_place_stop_callback;
 
     // [stoptoken.never], class never_stop_token
@@ -649,7 +646,7 @@ namespace hpx::p2300_stop_token {
     // but also provides static information that a stop is never
     // possible nor requested.
     //
-    struct never_stop_token
+    HPX_CXX_EXPORT struct never_stop_token
     {
     private:
         struct callback_impl
@@ -698,7 +695,7 @@ namespace hpx::p2300_stop_token {
     // associated with a given in_place_stop_source object must happen before
     // the invocation of the destructor of that in_place_stop_token object.
     //
-    class in_place_stop_source
+    HPX_CXX_EXPORT class in_place_stop_source
     {
     public:
         in_place_stop_source() noexcept
@@ -788,7 +785,7 @@ namespace hpx::p2300_stop_token {
     // constructor to register a callback to be called when a stop
     // request has been made from an associated in_place_stop_source.
     //
-    class in_place_stop_token
+    HPX_CXX_EXPORT class in_place_stop_token
     {
     public:
         template <typename Callback>
@@ -900,7 +897,7 @@ namespace hpx::p2300_stop_token {
     // in_place_stop_callback objects to store the state necessary for their
     // association with an in_place_stop_source object.
     //
-    template <typename Callback>
+    HPX_CXX_EXPORT template <typename Callback>
     class [[nodiscard]] in_place_stop_callback
       : private hpx::detail::stop_callback_base
     {
@@ -995,7 +992,7 @@ namespace hpx::p2300_stop_token {
         in_place_stop_source* source_;
     };
 
-    template <typename Callback>
+    HPX_CXX_EXPORT template <typename Callback>
     in_place_stop_callback(in_place_stop_token, Callback)
         -> in_place_stop_callback<Callback>;
 
@@ -1004,5 +1001,5 @@ namespace hpx::p2300_stop_token {
 // For now, import all facilities as proposed by P2300 into hpx::experimental
 namespace hpx::experimental {
 
-    using namespace hpx::p2300_stop_token;
+    HPX_CXX_EXPORT using namespace hpx::p2300_stop_token;
 }    // namespace hpx::experimental

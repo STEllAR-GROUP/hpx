@@ -10,20 +10,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/fused_bulk_execute.hpp>
-#include <hpx/execution/executors/static_chunk_size.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution_base/execution.hpp>
 #include <hpx/executors/current_executor.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/io_service/io_service_pool_fwd.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/modules/io_service.hpp>
+#include <hpx/modules/pack_traversal.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <algorithm>
 #include <exception>
@@ -34,7 +29,7 @@
 
 namespace hpx::parallel::execution::detail {
 
-    class service_executor
+    HPX_CXX_EXPORT class service_executor
     {
     public:
         // Associate the parallel_execution_tag executor tag type as a default

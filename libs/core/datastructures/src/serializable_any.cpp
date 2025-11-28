@@ -5,7 +5,7 @@
     Copyright (c) Pablo Aguilar 2005
     Copyright (c) Kevlin Henney 2001
 
-//  SPDX-License-Identifier: BSL-1.0
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -14,8 +14,8 @@
 ==============================================================================*/
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/serialization/serializable_any.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <boost/functional/hash.hpp>
 
@@ -84,11 +84,11 @@ namespace hpx::util {
         return hasher.hash;
     }
 
-    template HPX_CORE_EXPORT std::size_t hash_any::operator()(
+    template std::size_t hash_any::operator()(
         basic_any<serialization::input_archive, serialization::output_archive,
             char, std::true_type> const& elem) const;
 
-    template HPX_CORE_EXPORT std::size_t hash_any::operator()(
+    template std::size_t hash_any::operator()(
         basic_any<serialization::input_archive, serialization::output_archive,
             wchar_t, std::true_type> const& elem) const;
 }    // namespace hpx::util

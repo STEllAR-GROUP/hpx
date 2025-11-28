@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -37,13 +37,19 @@ add_hpx_module(
   HEADERS ${async_mpi_headers}
   DEPENDENCIES Mpi::mpi
   MODULE_DEPENDENCIES
+    hpx_concepts
     hpx_concurrency
+    hpx_config
+    hpx_datastructures
     hpx_errors
     hpx_execution_base
+    hpx_functional
+    hpx_futures
     hpx_memory
-    hpx_threading_base
     hpx_mpi_base
+    hpx_threading_base
     hpx_runtime_local
-    hpx_config
+    hpx_synchronization
+    hpx_tag_invoke
   CMAKE_SUBDIRS examples tests
 )

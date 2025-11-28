@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2024 Hartmut Kaiser
+//  Copyright (c) 1998-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,9 +11,9 @@
 #include <hpx/components_base/server/wrapper_heap.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <cstddef>
 #include <cstdint>

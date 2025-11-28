@@ -10,7 +10,7 @@
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 
-#include <hpx/runtime_configuration/runtime_mode.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 
 namespace hpx { namespace detail {
 

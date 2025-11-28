@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compute/host/get_targets.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <cstddef>
 #include <mutex>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2016 Agustin Berge
 //  Copyright (c) 2017 Anton Bikineev
 //
@@ -9,10 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/has_member_xxx.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -23,17 +21,19 @@ namespace hpx::traits::detail {
     ///////////////////////////////////////////////////////////////////////
     // not every random access sequence is reservable
     // so we need an explicit trait to determine this
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF(reserve)
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CXX_EXPORT, reserve)
 
-    template <typename Range>
-    using is_reservable = std::integral_constant<bool,
-        is_range_v<std::decay_t<Range>> && has_reserve_v<std::decay_t<Range>>>;
+    HPX_CXX_EXPORT template <typename Range>
+    using is_reservable = std::integral_constant < bool,
+          is_range_v<std::decay_t<Range>>&& has_reserve_v < std::decay_t <
+        Range >>>
+        ;
 
-    template <typename Range>
+    HPX_CXX_EXPORT template <typename Range>
     inline constexpr bool is_reservable_v = is_reservable<Range>::value;
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Container>
+    HPX_CXX_EXPORT template <typename Container>
     HPX_FORCEINLINE void reserve_if_reservable(Container& v, std::size_t n)
     {
         if constexpr (is_reservable_v<Container>)
@@ -45,7 +45,7 @@ namespace hpx::traits::detail {
     ///////////////////////////////////////////////////////////////////////
     // Reserve sufficient space in the given vector if the underlying
     // iterator type of the given range allow calculating the size in O(1).
-    template <typename Container, typename Range>
+    HPX_CXX_EXPORT template <typename Container, typename Range>
     HPX_FORCEINLINE void reserve_if_random_access_by_range(
         Container& v, Range const& r)
     {
@@ -57,7 +57,7 @@ namespace hpx::traits::detail {
         }
     }
 
-    template <typename Container, typename Iterator>
+    HPX_CXX_EXPORT template <typename Container, typename Iterator>
     HPX_FORCEINLINE void reserve_if_random_access_by_range(
         Container& v, Iterator begin, Iterator end)
     {

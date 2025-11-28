@@ -180,20 +180,20 @@ foreach(sphinx_source_file ${sphinx_libs_source_files})
 endforeach()
 
 # Create links to source files so that they are visible to sphinx
-create_symbolic_link(
-  "${PROJECT_SOURCE_DIR}/src" "${CMAKE_CURRENT_BINARY_DIR}/src"
+file(CREATE_LINK "${PROJECT_SOURCE_DIR}/src" "${CMAKE_CURRENT_BINARY_DIR}/src"
+     SYMBOLIC
 )
-create_symbolic_link(
-  "${PROJECT_SOURCE_DIR}/hpx" "${CMAKE_CURRENT_BINARY_DIR}/hpx"
+file(CREATE_LINK "${PROJECT_SOURCE_DIR}/hpx" "${CMAKE_CURRENT_BINARY_DIR}/hpx"
+     SYMBOLIC
 )
-create_symbolic_link(
-  "${PROJECT_SOURCE_DIR}/examples" "${CMAKE_CURRENT_BINARY_DIR}/examples"
+file(CREATE_LINK "${PROJECT_SOURCE_DIR}/examples"
+     "${CMAKE_CURRENT_BINARY_DIR}/examples" SYMBOLIC
 )
-create_symbolic_link(
-  "${PROJECT_SOURCE_DIR}/tests" "${CMAKE_CURRENT_BINARY_DIR}/tests"
+file(CREATE_LINK "${PROJECT_SOURCE_DIR}/tests"
+     "${CMAKE_CURRENT_BINARY_DIR}/tests" SYMBOLIC
 )
-create_symbolic_link(
-  "${PROJECT_SOURCE_DIR}/libs" "${CMAKE_CURRENT_BINARY_DIR}/libs"
+file(CREATE_LINK "${PROJECT_SOURCE_DIR}/libs"
+     "${CMAKE_CURRENT_BINARY_DIR}/libs" SYMBOLIC
 )
 
 add_custom_target(docs)
@@ -258,7 +258,3 @@ add_custom_target(
     -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="${HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS}"
     -P "${PROJECT_SOURCE_DIR}/cmake/HPX_UpdateGitDocs.cmake"
 )
-
-set_target_properties(git_docs PROPERTIES FOLDER "Documentation/")
-
-add_dependencies(git_docs docs)

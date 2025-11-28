@@ -16,9 +16,8 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_components/derived_component_factory.hpp>
-#include <hpx/runtime_local/thread_mapper.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <boost/version.hpp>
 

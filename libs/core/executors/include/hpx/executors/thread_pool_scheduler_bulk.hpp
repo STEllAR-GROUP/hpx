@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,36 +9,25 @@
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/modules/execution_base.hpp>
 #endif
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/concurrency/detail/non_contiguous_index_queue.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/datastructures/variant.hpp>
-#include <hpx/errors/exception.hpp>
-#include <hpx/errors/exception_list.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution/algorithms/bulk.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution_base/completion_scheduler.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/iterator_support/counting_iterator.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/topology/cpu_mask.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/topology.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -116,10 +105,10 @@ namespace hpx::execution::experimental::detail {
         return mask;
     }
 
-    template <typename OperationState>
+    HPX_CXX_EXPORT template <typename OperationState>
     struct task_function;
 
-    template <typename OperationState>
+    HPX_CXX_EXPORT template <typename OperationState>
     struct set_value_loop_visitor
     {
         OperationState* const op_state;
@@ -150,7 +139,7 @@ namespace hpx::execution::experimental::detail {
                 (std::min) (i_begin + task_f->chunk_size, task_f->size);
 
             auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
-            for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
+            for (auto i = i_begin; i != i_end; (void) ++it, ++i)
             {
                 bulk_scheduler_invoke_helper(
                     index_pack_type{}, op_state->f, *it, ts);
@@ -176,7 +165,7 @@ namespace hpx::execution::experimental::detail {
                 static constexpr auto opposite_end =
                     hpx::concurrency::detail::opposite_end_v<Which>;
 
-                for (std::uint32_t offset = 1;
+                for (std::size_t offset = 1;
                     offset != op_state->num_worker_threads; ++offset)
                 {
                     std::size_t neighbor_thread =
@@ -218,7 +207,7 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    template <typename OperationState>
+    HPX_CXX_EXPORT template <typename OperationState>
     struct set_value_end_loop_visitor
     {
         OperationState* const op_state;
@@ -248,7 +237,7 @@ namespace hpx::execution::experimental::detail {
     };
 
     // This struct encapsulates the work done by one worker thread.
-    template <typename OperationState>
+    HPX_CXX_EXPORT template <typename OperationState>
     struct task_function
     {
         OperationState* const op_state;
@@ -336,7 +325,8 @@ namespace hpx::execution::experimental::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename OperationState, typename F, typename Shape>
+    HPX_CXX_EXPORT template <typename OperationState, typename F,
+        typename Shape>
     struct bulk_receiver
     {
 #if defined(HPX_HAVE_STDEXEC)
@@ -409,7 +399,8 @@ namespace hpx::execution::experimental::detail {
             {
                 // apply hint if none was given
                 hint.mode = hpx::threads::thread_schedule_hint_mode::thread;
-                hint.hint = worker_thread + op_state->first_thread;
+                hint.hint = static_cast<std::int16_t>(
+                    worker_thread + op_state->first_thread);
 
                 auto policy = hpx::execution::experimental::with_hint(
                     op_state->scheduler.policy(), hint);
@@ -462,7 +453,7 @@ namespace hpx::execution::experimental::detail {
 
             // Calculate chunk size and number of chunks
             std::uint32_t chunk_size = get_bulk_scheduler_chunk_size(
-                op_state->num_worker_threads, size);
+                static_cast<std::uint32_t>(op_state->num_worker_threads), size);
             std::uint32_t num_chunks = (size + chunk_size - 1) / chunk_size;
 
             // launch only as many tasks as we have chunks
@@ -498,13 +489,15 @@ namespace hpx::execution::experimental::detail {
                     hint.placement_mode() == placement::breadth_first_reverse)
                 {
                     init_queue_breadth_first(worker_thread, num_chunks,
-                        op_state->num_worker_threads);
+                        static_cast<std::uint32_t>(
+                            op_state->num_worker_threads));
                 }
                 else
                 {
                     // the default for this scheduler is depth-first placement
                     init_queue_depth_first(worker_thread, num_chunks,
-                        op_state->num_worker_threads);
+                        static_cast<std::uint32_t>(
+                            op_state->num_worker_threads));
                 }
             }
 
@@ -619,7 +612,8 @@ namespace hpx::execution::experimental::detail {
     // in this file is not chosen) it will be reused as one of the worker
     // threads.
     //
-    template <typename Policy, typename Sender, typename Shape, typename F>
+    HPX_CXX_EXPORT template <typename Policy, typename Sender, typename Shape,
+        typename F>
     class thread_pool_bulk_sender
     {
     private:
@@ -850,7 +844,8 @@ namespace hpx::execution::experimental::detail {
 namespace hpx::execution::experimental {
 
     // clang-format off
-    template <typename Policy, typename Sender, typename Shape, typename F,
+    HPX_CXX_EXPORT template <typename Policy, typename Sender, typename Shape,
+        typename F,
         HPX_CONCEPT_REQUIRES_(
             !std::is_integral_v<Shape>
         )>
@@ -874,7 +869,8 @@ namespace hpx::execution::experimental {
     }
 
     // clang-format off
-    template <typename Policy, typename Sender, typename Count, typename F,
+    HPX_CXX_EXPORT template <typename Policy, typename Sender, typename Count,
+        typename F,
         HPX_CONCEPT_REQUIRES_(
             std::is_integral_v<Count>
         )>

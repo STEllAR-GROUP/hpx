@@ -9,11 +9,11 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/post.hpp>
 #include <hpx/components/client_base.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/lcos_distributed/server/channel.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming.hpp>
 #include <hpx/runtime_components/new.hpp>
 

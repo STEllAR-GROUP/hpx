@@ -15,7 +15,7 @@
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <errno.h>
 #include <fcntl.h>

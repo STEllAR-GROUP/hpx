@@ -6,11 +6,11 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/execution/execution.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/modules/collectives.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -46,7 +46,12 @@ std::size_t bulk_test(
 
     local_count.store(0);
 
-    hpx::parallel::execution::bulk_sync_execute(hpx::execution::par.executor(),
+    auto hint = hpx::execution::experimental::get_hint(hpx::execution::par);
+    hint.sharing_mode(hpx::threads::thread_sharing_hint::do_not_share_function |
+        hpx::threads::thread_sharing_hint::do_not_combine_tasks);
+
+    hpx::parallel::execution::bulk_sync_execute(
+        hpx::execution::experimental::with_hint(hpx::execution::par, hint),
         spmd_block_helper{name, num_images},
         hpx::util::counting_shape(offset, offset + images_per_locality));
 

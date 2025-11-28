@@ -7,12 +7,10 @@
 
 #pragma once
 
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/datastructures/member_pack.hpp>
-#include <hpx/execution_base/completion_scheduler.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -20,10 +18,10 @@
 
 namespace hpx::execution::experimental::detail {
 
-    template <typename Tag, typename IsPack, typename... Ts>
+    HPX_CXX_EXPORT template <typename Tag, typename IsPack, typename... Ts>
     struct partial_algorithm_base;
 
-    template <typename Tag, std::size_t... Is, typename... Ts>
+    HPX_CXX_EXPORT template <typename Tag, std::size_t... Is, typename... Ts>
     struct partial_algorithm_base<Tag, hpx::util::index_pack<Is...>, Ts...>
     {
     private:
@@ -94,7 +92,7 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    template <typename Tag, typename... Ts>
+    HPX_CXX_EXPORT template <typename Tag, typename... Ts>
     using partial_algorithm = partial_algorithm_base<Tag,
         hpx::util::make_index_pack_t<sizeof...(Ts)>, Ts...>;
 }    // namespace hpx::execution::experimental::detail

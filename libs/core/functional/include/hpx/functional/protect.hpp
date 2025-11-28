@@ -57,19 +57,17 @@ namespace hpx::util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    HPX_HOST_DEVICE std::enable_if_t<hpx::is_bind_expression_v<std::decay_t<T>>,
-        detail::protected_bind<std::decay_t<T>>>
-    protect(T&& f)
+    HPX_CXX_EXPORT template <typename T>
+        requires(hpx::is_bind_expression_v<std::decay_t<T>>)
+    HPX_HOST_DEVICE detail::protected_bind<std::decay_t<T>> protect(T&& f)
     {
         return detail::protected_bind<std::decay_t<T>>(HPX_FORWARD(T, f));
     }
 
     // leave everything that is not a bind expression as is
-    template <typename T>
-    HPX_HOST_DEVICE
-        std::enable_if_t<!hpx::is_bind_expression_v<std::decay_t<T>>, T&&>
-        protect(T&& v)    //-V659
+    HPX_CXX_EXPORT template <typename T>
+        requires(!hpx::is_bind_expression_v<std::decay_t<T>>)
+    HPX_HOST_DEVICE T&& protect(T&& v)    //-V659
     {
         return HPX_FORWARD(T, v);
     }

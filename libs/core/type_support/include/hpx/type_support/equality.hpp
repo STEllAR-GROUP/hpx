@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <type_traits>
 #include <utility>
 
@@ -22,7 +24,7 @@ namespace hpx::traits {
 
         // different versions of clang-format disagree
         // clang-format off
-        template <typename T, typename U>
+         template <typename T, typename U>
         struct equality_result<T, U,
             std::void_t<decltype(
                 std::declval<T const&>() == std::declval<U const&>())>>
@@ -43,7 +45,7 @@ namespace hpx::traits {
 
         // different versions of clang-format disagree
         // clang-format off
-        template <typename T, typename U>
+         template <typename T, typename U>
         struct inequality_result<T, U,
             std::void_t<decltype(
                 std::declval<T const&>() != std::declval<U const&>())>>
@@ -72,37 +74,37 @@ namespace hpx::traits {
         };
     }    // namespace detail
 
-    template <typename T, typename U>
+    HPX_CXX_EXPORT template <typename T, typename U>
     struct is_weakly_equality_comparable_with
       : detail::is_weakly_equality_comparable_with<std::decay_t<T>,
             std::decay_t<U>>
     {
     };
 
-    template <typename T, typename U>
+    HPX_CXX_EXPORT template <typename T, typename U>
     inline constexpr bool is_weakly_equality_comparable_with_v =
         is_weakly_equality_comparable_with<T, U>::value;
 
     // for now is_equality_comparable is equivalent to its weak version
-    template <typename T, typename U>
+    HPX_CXX_EXPORT template <typename T, typename U>
     struct is_equality_comparable_with
       : detail::is_weakly_equality_comparable_with<std::decay_t<T>,
             std::decay_t<U>>
     {
     };
 
-    template <typename T, typename U>
+    HPX_CXX_EXPORT template <typename T, typename U>
     inline constexpr bool is_equality_comparable_with_v =
         is_equality_comparable_with<T, U>::value;
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct is_equality_comparable
       : detail::is_weakly_equality_comparable_with<std::decay_t<T>,
             std::decay_t<T>>
     {
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr bool is_equality_comparable_v =
         is_equality_comparable<T>::value;
 }    // namespace hpx::traits

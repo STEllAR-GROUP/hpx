@@ -197,10 +197,17 @@ void test_bulk_sync(Executor&& executor)
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
 
+    auto hint = hpx::execution::experimental::get_hint(executor);
+    hint.sharing_mode(hpx::threads::thread_sharing_hint::do_not_share_function |
+        hpx::threads::thread_sharing_hint::do_not_combine_tasks);
+    auto no_sharing_exec = hpx::experimental::prefer(
+        hpx::execution::experimental::with_hint, executor, hint);
+
     std::string desc("test_bulk_sync");
     {
         auto exec = hpx::experimental::prefer(
-            hpx::execution::experimental::with_annotation, executor, desc);
+            hpx::execution::experimental::with_annotation, no_sharing_exec,
+            desc);
 
         hpx::parallel::execution::bulk_sync_execute(
             exec, hpx::bind(&bulk_test, _1, _2), 107, 42);
@@ -218,8 +225,8 @@ void test_bulk_sync(Executor&& executor)
     }
 
     {
-        auto exec =
-            hpx::execution::experimental::with_annotation(executor, desc);
+        auto exec = hpx::execution::experimental::with_annotation(
+            no_sharing_exec, desc);
 
         annotation.clear();
         hpx::parallel::execution::bulk_sync_execute(

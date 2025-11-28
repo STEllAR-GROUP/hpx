@@ -5,17 +5,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/synchronization/mutex.hpp>
-
 #include <hpx/assert.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/lock_registration.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
+#include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <mutex>
 #include <utility>

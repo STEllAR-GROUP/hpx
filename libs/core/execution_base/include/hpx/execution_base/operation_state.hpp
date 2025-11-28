@@ -13,22 +13,23 @@
 #include <hpx/execution_base/stdexec_forward.hpp>
 
 namespace hpx::execution::experimental {
-    template <typename OperationState>
+
+    HPX_CXX_EXPORT template <typename OperationState>
     inline constexpr bool is_operation_state_v =
         operation_state<OperationState>;
 
-    template <typename OperationState>
+    HPX_CXX_EXPORT template <typename OperationState>
     struct is_operation_state
       : std::bool_constant<operation_state<OperationState>>
     {
     };
 }    // namespace hpx::execution::experimental
+
 #else
 
 #include <hpx/config/constexpr.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
-#include <hpx/type_support/meta.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -83,8 +84,7 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
-    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
-    struct start_t
+    HPX_CXX_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct start_t
       : hpx::functional::tag_noexcept<start_t, detail::enable_start>
     {
     } start{};
@@ -106,7 +106,7 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
-    template <typename O>
+    HPX_CXX_EXPORT template <typename O>
     struct is_operation_state
       : detail::is_operation_state_impl<std::is_destructible_v<O> &&
                 std::is_object_v<O> &&
@@ -115,8 +115,9 @@ namespace hpx::execution::experimental {
     {
     };
 
-    template <typename O>
+    HPX_CXX_EXPORT template <typename O>
     inline constexpr bool is_operation_state_v =
         meta::value<is_operation_state<O>>;
 }    // namespace hpx::execution::experimental
+
 #endif

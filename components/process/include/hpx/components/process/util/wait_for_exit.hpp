@@ -13,15 +13,12 @@
 
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/wait_for_exit.hpp>
-namespace hpx { namespace components { namespace process { namespace util
-{
+namespace hpx { namespace components { namespace process { namespace util {
     using windows::wait_for_exit;
-}}}}
+}}}}    // namespace hpx::components::process::util
 #else
 #include <hpx/components/process/util/posix/wait_for_exit.hpp>
-namespace hpx { namespace components { namespace process { namespace util
-{
+namespace hpx { namespace components { namespace process { namespace util {
     using posix::wait_for_exit;
-}}}}
+}}}}    // namespace hpx::components::process::util
 #endif
-

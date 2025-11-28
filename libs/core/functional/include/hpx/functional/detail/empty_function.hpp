@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013-2022 Hartmut Kaiser
+//  Copyright (c) 2013-2025 Hartmut Kaiser
 //  Copyright (c) 2014-2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -29,7 +29,7 @@ namespace hpx::util::detail {
     ///////////////////////////////////////////////////////////////////////////
     // make sure the empty table instance is initialized in time, even
     // during early startup
-    template <typename Sig, bool Copyable>
+    HPX_CXX_EXPORT template <typename Sig, bool Copyable>
     struct function_vtable;
 
     // NOTE: nvcc (at least CUDA 9.2 and 10.1) fails with an internal compiler

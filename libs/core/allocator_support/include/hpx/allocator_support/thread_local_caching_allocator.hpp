@@ -22,8 +22,8 @@ namespace hpx::util {
         defined(HPX_HAVE_HIP))
 
     ///////////////////////////////////////////////////////////////////////////
-    template <template <typename, typename> class Stack, typename T = char,
-        typename Allocator = std::allocator<T>>
+    HPX_CXX_EXPORT template <template <typename, typename> class Stack,
+        typename T = char, typename Allocator = std::allocator<T>>
     struct thread_local_caching_allocator
     {
         HPX_NO_UNIQUE_ADDRESS Allocator alloc;
@@ -199,8 +199,8 @@ namespace hpx::util {
         }
     };
 #else
-    template <template <typename, typename> class Stack, typename T = char,
-        typename Allocator = std::allocator<T>>
+    HPX_CXX_EXPORT template <template <typename, typename> class Stack,
+        typename T = char, typename Allocator = std::allocator<T>>
     using thread_local_caching_allocator = Allocator;
 #endif
 }    // namespace hpx::util

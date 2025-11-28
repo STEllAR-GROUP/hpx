@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2023-2024 Hartmut Kaiser
+//  Copyright (c) 2023-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,15 +8,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <type_traits>
 #include <utility>
 
 namespace hpx::experimental {
 
-    inline constexpr struct prefer_t
+    HPX_CXX_EXPORT inline constexpr struct prefer_t
       : hpx::functional::detail::tag_fallback<prefer_t>
     {
         // clang-format off

@@ -9,22 +9,24 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/collectives/channel_communicator.hpp>
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components/client.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
-#include <hpx/errors/exception.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/lock_registration.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/runtime_components/new.hpp>
-#include <hpx/synchronization/mutex.hpp>
 
 #include <cstddef>
 #include <memory>
 #include <mutex>
 #include <utility>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::collectives {

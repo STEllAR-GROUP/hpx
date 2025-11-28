@@ -9,11 +9,10 @@
 #include <hpx/config.hpp>
 #include <hpx/async_colocated/functional/colocated_helpers.hpp>
 #include <hpx/async_distributed/bind_action.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/move_only_function.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/type_support/pack.hpp>
 
 namespace hpx { namespace detail {
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2022 Hartmut Kaiser
+//  Copyright (c) 2015-2025 Hartmut Kaiser
 //  Copyright (c) 2015-2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -17,13 +17,10 @@ namespace hpx::serialization::detail {
 
     // This 'container' is used to gather the required archive size for a given
     // type before it is serialized.
-    class preprocess_container
+    HPX_CXX_EXPORT class preprocess_container
     {
     public:
-        constexpr preprocess_container() noexcept
-          : size_(0)
-        {
-        }
+        preprocess_container() = default;
 
         [[nodiscard]] constexpr std::size_t size() const noexcept
         {
@@ -45,41 +42,38 @@ namespace hpx::serialization::detail {
         }
 
     private:
-        std::size_t size_;
+        std::size_t size_ = 0;
     };
 }    // namespace hpx::serialization::detail
 
-namespace hpx::traits {
+template <>
+struct hpx::traits::serialization_access_data<
+    hpx::serialization::detail::preprocess_container>
+  : default_serialization_access_data<
+        hpx::serialization::detail::preprocess_container>
+{
+    using preprocessing_only = std::true_type;
 
-    template <>
-    struct serialization_access_data<
-        serialization::detail::preprocess_container>
-      : default_serialization_access_data<
-            serialization::detail::preprocess_container>
+    [[nodiscard]] static constexpr bool is_preprocessing() noexcept
     {
-        using preprocessing_only = std::true_type;
+        return true;
+    }
 
-        [[nodiscard]] static constexpr bool is_preprocessing() noexcept
-        {
-            return true;
-        }
+    [[nodiscard]] static constexpr std::size_t size(
+        hpx::serialization::detail::preprocess_container const& cont) noexcept
+    {
+        return cont.size();
+    }
 
-        [[nodiscard]] static constexpr std::size_t size(
-            serialization::detail::preprocess_container const& cont) noexcept
-        {
-            return cont.size();
-        }
+    static void resize(hpx::serialization::detail::preprocess_container& cont,
+        std::size_t count) noexcept
+    {
+        return cont.resize(cont.size() + count);
+    }
 
-        static void resize(serialization::detail::preprocess_container& cont,
-            std::size_t count) noexcept
-        {
-            return cont.resize(cont.size() + count);
-        }
-
-        static void reset(
-            serialization::detail::preprocess_container& cont) noexcept
-        {
-            cont.reset();
-        }
-    };
-}    // namespace hpx::traits
+    static void reset(
+        hpx::serialization::detail::preprocess_container& cont) noexcept
+    {
+        cont.reset();
+    }
+};

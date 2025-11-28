@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 Thomas Heller
-//  Copyright (c) 2023 Hartmut Kaiser
+//  Copyright (c) 2023-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -180,7 +180,8 @@ namespace hpx::util::detail {
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T = int, typename Allocator = std::allocator<T>>
+    HPX_CXX_EXPORT template <typename T = int,
+        typename Allocator = std::allocator<T>>
     struct aligned_allocator
     {
     private:
@@ -269,14 +270,14 @@ namespace hpx::util {
         }
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator==(
         aligned_allocator<T> const&, aligned_allocator<T> const&) noexcept
     {
         return true;
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator!=(
         aligned_allocator<T> const&, aligned_allocator<T> const&) noexcept
     {

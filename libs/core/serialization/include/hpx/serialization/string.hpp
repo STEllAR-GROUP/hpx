@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +16,8 @@
 namespace hpx::serialization {
 
     // load string
-    template <typename Char, typename CharTraits, typename Allocator>
+    HPX_CXX_EXPORT template <typename Char, typename CharTraits,
+        typename Allocator>
     void serialize(input_archive& ar,
         std::basic_string<Char, CharTraits, Allocator>& s, unsigned)
     {
@@ -30,7 +32,8 @@ namespace hpx::serialization {
     }
 
     // save string
-    template <typename Char, typename CharTraits, typename Allocator>
+    HPX_CXX_EXPORT template <typename Char, typename CharTraits,
+        typename Allocator>
     void serialize(output_archive& ar,
         std::basic_string<Char, CharTraits, Allocator> const& s, unsigned)
     {

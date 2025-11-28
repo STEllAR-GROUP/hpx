@@ -1,4 +1,4 @@
-//  Copyright (c) 2013-2015 Thomas Heller
+//  Copyright (c) 2025 Jiakun Yan
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,9 +11,8 @@
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)) ||      \
     defined(HPX_HAVE_MODULE_LCI_BASE)
 
-#include <hpx/lci_base/lci.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
-#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <atomic>
 #include <cstdlib>
@@ -23,17 +22,16 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+#include "lci.hpp"
+#include "lct.h"
+
 namespace hpx { namespace util {
     struct HPX_EXPORT lci_environment
     {
         static bool check_lci_environment(runtime_configuration& cfg);
 
-        static void init_config(runtime_configuration& cfg);
         static void init(int* argc, char*** argv, runtime_configuration& cfg);
         static void finalize();
-
-        static bool do_progress(LCI_device_t device);
-        static bool do_progress();
 
         static bool enabled();
 
@@ -41,6 +39,11 @@ namespace hpx { namespace util {
         static int size();
 
         static std::string get_processor_name();
+
+        static int get_max_tag();
+
+        // progress
+        static bool do_progress(::lci::device_t device);
 
         // log
         enum class log_level_t
@@ -55,6 +58,7 @@ namespace hpx { namespace util {
 #endif
         static void log(
             log_level_t level, const char* tag, const char* format, ...);
+
         // performance counter
         // clang-format off
 #define HPX_LCI_PCOUNTER_NONE_FOR_EACH(_macro)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,8 +18,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/iterator_support/detail/minimum_category.hpp>
-#include <hpx/iterator_support/iterator_facade.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/string_util/token_functions.hpp>
 
 #include <string>
@@ -28,7 +27,8 @@
 
 namespace hpx::string_util {
 
-    template <typename TokenizerFunc, typename Iterator, typename Type>
+    HPX_CXX_EXPORT template <typename TokenizerFunc, typename Iterator,
+        typename Type>
     class token_iterator
       : public util::iterator_facade<
             token_iterator<TokenizerFunc, Iterator, Type>, Type,
@@ -136,7 +136,7 @@ namespace hpx::string_util {
         }
     };
 
-    template <typename TokenizerFunc = char_separator<char>,
+    HPX_CXX_EXPORT template <typename TokenizerFunc = char_separator<char>,
         typename Iterator = std::string::const_iterator,
         typename Type = std::string>
     struct token_iterator_generator
@@ -146,7 +146,8 @@ namespace hpx::string_util {
 
     // Type has to be first because it needs to be explicitly specified as there
     // is no way the function can deduce it.
-    template <typename Type, typename Iterator, typename TokenizerFunc>
+    HPX_CXX_EXPORT template <typename Type, typename Iterator,
+        typename TokenizerFunc>
     typename token_iterator_generator<std::decay_t<TokenizerFunc>, Iterator,
         Type>::type
     make_token_iterator(Iterator begin, Iterator end, TokenizerFunc&& fun)

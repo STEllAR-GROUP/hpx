@@ -20,31 +20,31 @@
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
-namespace initializers {
+    namespace initializers {
 
-class bind_stderr : public initializer_base
-{
-public:
-    explicit bind_stderr(const boost::iostreams::file_descriptor_sink &sink)
-      : sink_(sink)
-    {}
+        class bind_stderr : public initializer_base
+        {
+        public:
+            explicit bind_stderr(
+                const boost::iostreams::file_descriptor_sink& sink)
+              : sink_(sink)
+            {
+            }
 
-    template <class WindowsExecutor>
-    void on_CreateProcess_setup(WindowsExecutor &e) const
-    {
-        ::SetHandleInformation(sink_.handle(), HANDLE_FLAG_INHERIT,
-            HANDLE_FLAG_INHERIT);
-        e.startup_info.hStdError = sink_.handle();
-        e.startup_info.dwFlags |= STARTF_USESTDHANDLES;
-        e.inherit_handles = true;
-    }
+            template <class WindowsExecutor>
+            void on_CreateProcess_setup(WindowsExecutor& e) const
+            {
+                ::SetHandleInformation(
+                    sink_.handle(), HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+                e.startup_info.hStdError = sink_.handle();
+                e.startup_info.dwFlags |= STARTF_USESTDHANDLES;
+                e.inherit_handles = true;
+            }
 
-private:
-    boost::iostreams::file_descriptor_sink sink_;
-};
+        private:
+            boost::iostreams::file_descriptor_sink sink_;
+        };
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::windows::initializers
 
 #endif

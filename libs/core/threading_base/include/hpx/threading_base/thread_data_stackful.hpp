@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -9,14 +9,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/coroutines/thread_id_type.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/threading_base/execution_agent.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
-#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -44,7 +44,8 @@ namespace hpx::threads {
     /// Generally, \a threads are not created or executed directly. All
     /// functionality related to the management of \a threads is implemented by
     /// the thread-manager.
-    class HPX_CORE_EXPORT thread_data_stackful : public thread_data
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT thread_data_stackful
+      : public thread_data
     {
     private:
         // Avoid warning about using 'this' in initializer list

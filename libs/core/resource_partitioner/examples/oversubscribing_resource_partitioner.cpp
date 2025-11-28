@@ -4,19 +4,24 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// make available M_PI
-#define _USE_MATH_DEFINES
-
 #include <hpx/config.hpp>
+
+// make available M_PI
+#if !defined(_USE_MATH_DEFINES)
+#define _USE_MATH_DEFINES
+#endif
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/thread.hpp>
 //
+
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -46,8 +51,6 @@ static int pool_threads = 1;
 static std::string const pool_name = "mpi";
 
 // this is our custom scheduler type
-using high_priority_sched =
-    hpx::threads::policies::shared_priority_queue_scheduler<>;
 using namespace hpx::threads::policies;
 using hpx::threads::policies::scheduler_mode;
 

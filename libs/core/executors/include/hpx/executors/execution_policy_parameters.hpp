@@ -9,11 +9,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution/executors/rebind_executor.hpp>
-#include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <cstddef>
 #include <string>
@@ -27,7 +25,7 @@ namespace hpx::execution::experimental {
     // the parameters type)
 
     // clang-format off
-    template <typename ExPolicy,
+    HPX_CXX_EXPORT template <typename ExPolicy,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::is_invocable_v<
@@ -45,7 +43,7 @@ namespace hpx::execution::experimental {
     }
 
     // clang-format off
-    template <typename ExPolicy, typename Params,
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Params,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_executor_parameters_v<Params> &&
@@ -76,7 +74,8 @@ namespace hpx::execution::experimental {
     // the underlying executor
 
     // clang-format off
-    template <typename ParametersProperty, typename ExPolicy, typename Params,
+    HPX_CXX_EXPORT template <typename ParametersProperty, typename ExPolicy,
+        typename Params,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_executor_parameters_v<Params>
@@ -89,7 +88,8 @@ namespace hpx::execution::experimental {
     }
 
     // clang-format off
-    template <typename ParametersProperty, typename ExPolicy, typename...Ts,
+    HPX_CXX_EXPORT template <typename ParametersProperty, typename ExPolicy,
+        typename...Ts,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy>
         )>

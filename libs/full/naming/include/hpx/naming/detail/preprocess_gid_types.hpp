@@ -12,10 +12,10 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/naming/credit_handling.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/extra_data.hpp>
 
 #include <cstddef>
 #include <map>

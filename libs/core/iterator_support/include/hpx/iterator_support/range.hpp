@@ -130,7 +130,7 @@ namespace hpx::util {
             fallback subrange(fallback, std::ptrdiff_t, std::size_t);
 
             // clang-format off
-            template <typename C,
+             template <typename C,
                 typename R = decltype(
                     subrange(std::declval<C&>(), std::declval<std::ptrdiff_t>(),
                         std::declval<std::size_t>()))>
@@ -173,16 +173,16 @@ namespace hpx::util {
             }
         }    // namespace range_impl
 
-        using range_impl::begin_impl;
-        using range_impl::end_impl;
-        using range_impl::iterate_impl;
-        using range_impl::subrange_impl;
+        HPX_CXX_EXPORT using range_impl::begin_impl;
+        HPX_CXX_EXPORT using range_impl::end_impl;
+        HPX_CXX_EXPORT using range_impl::iterate_impl;
+        HPX_CXX_EXPORT using range_impl::subrange_impl;
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename Enable = void>
+        HPX_CXX_EXPORT template <typename T, typename Enable = void>
         inline constexpr bool has_size_v = false;
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         inline constexpr bool has_size_v<T,
             std::void_t<decltype(size(std::declval<T const&>()))>> = true;
 
@@ -200,10 +200,10 @@ namespace hpx::util {
             }
         }
 
-        template <typename T, typename Enable = void>
+        HPX_CXX_EXPORT template <typename T, typename Enable = void>
         inline constexpr bool has_empty_v = false;
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         inline constexpr bool has_empty_v<T,
             std::void_t<decltype(empty(std::declval<T const&>()))>> = true;
 
@@ -222,43 +222,45 @@ namespace hpx::util {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct result_of_begin
         {
             using type = decltype(detail::begin_impl(std::declval<T&>(), 0L));
         };
 
-        template <typename T, typename Iter = typename result_of_begin<T>::type>
+        HPX_CXX_EXPORT template <typename T,
+            typename Iter = typename result_of_begin<T>::type>
         struct iterator
         {
             using type = Iter;
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct iterator<T, range_impl::fallback>
         {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct result_of_end
         {
             using type = decltype(detail::end_impl(std::declval<T&>(), 0L));
         };
 
-        template <typename T, typename Iter = typename result_of_end<T>::type>
+        HPX_CXX_EXPORT template <typename T,
+            typename Iter = typename result_of_end<T>::type>
         struct sentinel
         {
             using type = Iter;
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct sentinel<T, range_impl::fallback>
         {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct result_of_subrange
         {
             using type = decltype(detail::subrange_impl(std::declval<T&>(),
@@ -266,48 +268,50 @@ namespace hpx::util {
                 0L));
         };
 
-        template <typename T, typename R = typename result_of_subrange<T>::type>
+        HPX_CXX_EXPORT template <typename T,
+            typename R = typename result_of_subrange<T>::type>
         struct subrange
         {
             using type = R;
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct subrange<T, range_impl::fallback>
         {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct result_of_iterate
         {
             using type = decltype(detail::iterate_impl(std::declval<T&>(), 0L));
         };
 
-        template <typename T, typename R = typename result_of_iterate<T>::type>
+        HPX_CXX_EXPORT template <typename T,
+            typename R = typename result_of_iterate<T>::type>
         struct iterate
         {
             using type = R;
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct iterate<T, range_impl::fallback>
         {
         };
 
         ///////////////////////////////////////////////////////////////////////////
-        template <typename T, typename Enable = void>
+        HPX_CXX_EXPORT template <typename T, typename Enable = void>
         struct is_range : std::false_type
         {
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         inline constexpr bool is_range_v = is_range<T>::value;
 
         ///////////////////////////////////////////////////////////////////////////
         // return whether a given type is a range generator (i.e. exposes supports
         // an iterate function that returns a range
-        template <typename T, typename Enable = void>
+        HPX_CXX_EXPORT template <typename T, typename Enable = void>
         struct is_range_generator : std::false_type
         {
         };
@@ -320,7 +324,7 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace range_adl {
 
-        template <typename C,
+        HPX_CXX_EXPORT template <typename C,
             typename Iterator = typename detail::iterator<C>::type>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE Iterator begin(
             C& c) noexcept(noexcept(detail::begin_impl(c, 0L)))
@@ -328,7 +332,7 @@ namespace hpx::util {
             return detail::begin_impl(c, 0L);
         }
 
-        template <typename C,
+        HPX_CXX_EXPORT template <typename C,
             typename Iterator = typename detail::iterator<C const>::type>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE Iterator begin(
             C const& c) noexcept(noexcept(detail::begin_impl(c, 0L)))
@@ -336,7 +340,7 @@ namespace hpx::util {
             return detail::begin_impl(c, 0L);
         }
 
-        template <typename C,
+        HPX_CXX_EXPORT template <typename C,
             typename Sentinel = typename detail::sentinel<C>::type>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE Sentinel end(
             C& c) noexcept(noexcept(detail::end_impl(c, 0L)))
@@ -344,7 +348,7 @@ namespace hpx::util {
             return detail::end_impl(c, 0L);
         }
 
-        template <typename C,
+        HPX_CXX_EXPORT template <typename C,
             typename Sentinel = typename detail::sentinel<C const>::type>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE Sentinel end(
             C const& c) noexcept(noexcept(detail::end_impl(c, 0L)))
@@ -352,25 +356,28 @@ namespace hpx::util {
             return detail::end_impl(c, 0L);
         }
 
-        template <typename C,
-            typename Enable = std::enable_if_t<detail::is_range_v<C> ||
-                detail::is_range_generator_v<C>>>
-        [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE std::size_t
-        size(C const& c) noexcept(noexcept(detail::size_impl(c, 0L)))
+        HPX_CXX_EXPORT template <typename C,
+            typename Enable = std::enable_if_t < detail::is_range_v<C> ||
+                detail::is_range_generator_v<C> >>
+                    [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE
+                        std::size_t
+                        size(C const& c) noexcept(
+                            noexcept(detail::size_impl(c, 0L)))
         {
             return detail::size_impl(c, 0L);
         }
 
-        template <typename C,
-            typename Enable = std::enable_if_t<detail::is_range_v<C> ||
-                detail::is_range_generator_v<C>>>
-        [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE bool empty(
-            C const& c) noexcept(noexcept(detail::empty_impl(c, 0L)))
+        HPX_CXX_EXPORT template <typename C,
+            typename Enable = std::enable_if_t < detail::is_range_v<C> ||
+                detail::is_range_generator_v<C> >>
+                    [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE bool
+                    empty(C const& c) noexcept(
+                        noexcept(detail::empty_impl(c, 0L)))
         {
             return detail::empty_impl(c, 0L);
         }
 
-        template <typename C,
+        HPX_CXX_EXPORT template <typename C,
             typename Range = typename detail::subrange<C const>::type>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE Range subrange(
             C const& c, std::ptrdiff_t delta,
@@ -380,7 +387,7 @@ namespace hpx::util {
             return detail::subrange_impl(c, delta, size, 0L);
         }
 
-        template <typename C,
+        HPX_CXX_EXPORT template <typename C,
             typename R = typename detail::iterate<C const>::type>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R iterate(
             C const& c) noexcept(noexcept(detail::iterate_impl(c, 0L)))
@@ -389,11 +396,11 @@ namespace hpx::util {
         }
     }    // namespace range_adl
 
-    using namespace range_adl;
+    HPX_CXX_EXPORT using namespace range_adl;
 
     namespace detail {
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct is_range<T,
             std::enable_if_t<hpx::traits::is_sentinel_for_v<
                 typename util::detail::sentinel<T>::type,
@@ -401,7 +408,7 @@ namespace hpx::util {
         {
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct is_range_generator<T,
             std::enable_if_t<
                 is_range_v<decltype(hpx::util::iterate(std::declval<T&>()))>>>

@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/invoke_fused.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -24,9 +24,25 @@ namespace hpx::parallel::util::detail {
         std::decay_t<F> f_;
 
         template <typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE Result operator()(T&& t)
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(T&& t)
         {
             return hpx::invoke_fused_r<Result>(f_, HPX_FORWARD(T, t));
+        }
+
+        template <std::size_t... Is, typename... Ts>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(
+            hpx::util::index_pack<Is...>, hpx::tuple<Ts...>& t)
+        {
+            return HPX_INVOKE(f_, hpx::get<Is>(t)...);
+        }
+
+        template <std::size_t... Is, typename... Ts>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(
+            hpx::util::index_pack<Is...>, hpx::tuple<Ts...>&& t)
+        {
+            // NOLINTBEGIN(bugprone-use-after-move)
+            return HPX_INVOKE(f_, hpx::get<Is>(HPX_MOVE(t))...);
+            // NOLINTEND(bugprone-use-after-move)
         }
 
         template <typename Archive>
@@ -40,8 +56,7 @@ namespace hpx::parallel::util::detail {
 }    // namespace hpx::parallel::util::detail
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/functional/traits/get_function_address.hpp>
-#include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/modules/functional.hpp>
 
 namespace hpx::traits {
 

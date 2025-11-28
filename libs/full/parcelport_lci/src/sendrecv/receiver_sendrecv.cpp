@@ -44,33 +44,37 @@ namespace hpx::parcelset::policies::lci {
 
         auto poll_comp_start = util::lci_environment::pcounter_now();
         auto completion_manager_p = pp_->get_tls_device().completion_manager_p;
-        request_wrapper_t request;
-        request.request = completion_manager_p->recv_new->poll();
+        auto status = completion_manager_p->recv_new->poll();
         util::lci_environment::pcounter_add(util::lci_environment::poll_comp,
             util::lci_environment::pcounter_since(poll_comp_start));
 
-        if (request.request.flag == LCI_OK)
+        if (status.is_done())
         {
             auto useful_bg_start = util::lci_environment::pcounter_now();
             if (config_t::protocol == config_t::protocol_t::sendrecv)
             {
-                std::size_t device_idx =
-                    (std::size_t) request.request.user_context;
-                auto& device = pp_->devices[device_idx];
-                LCI_comp_t completion =
-                    completion_manager_p->recv_new->alloc_completion();
-                LCI_recvmn(device.endpoint_new, LCI_RANK_ANY, 0, completion,
-                    reinterpret_cast<void*>(device_idx));
-                completion_manager_p->recv_new->enqueue_completion(completion);
+                HPX_ASSERT(false);
+                // std::size_t device_idx =
+                //     (std::size_t) status.get_user_context();
+                // auto& device = pp_->devices[device_idx];
+                // ::lci::comp_t completion =
+                //     completion_manager_p->recv_new->alloc_completion();
+                // LCI_recvmn(device.endpoint_new, util::lci_environment::rank()_ANY,
+                //     0, completion, reinterpret_cast<void*>(device_idx));
+                // completion_manager_p->recv_new->enqueue_completion(completion);
             }
             util::lci_environment::log(
                 util::lci_environment::log_level_t::debug, "recv",
-                "accept_new (%d, %d, %d) length %lu\n", request.request.rank,
-                LCI_RANK, request.request.tag,
-                request.request.data.mbuffer.length);
+                "accept_new (%d, %d, %d) length %lu\n", status.get_rank(),
+                util::lci_environment::rank(), status.get_tag(),
+                status.get_size());
             connection_ptr connection =
-                create_connection(request.request.rank, pp_);
-            connection->load((char*) request.request.data.mbuffer.address);
+                create_connection(status.get_rank(), pp_);
+            connection->load((char*) status.get_buffer());
+            if (config_t::protocol == config_t::protocol_t::putsendrecv)
+            {
+                ::lci::put_upacket(status.get_buffer());
+            }
             receiver_connection_sendrecv::return_t ret = connection->receive();
             if (ret.isDone)
             {
@@ -96,30 +100,25 @@ namespace hpx::parcelset::policies::lci {
         // should be managed by the connections
         auto poll_comp_start = util::lci_environment::pcounter_now();
         auto completion_manager_p = pp_->get_tls_device().completion_manager_p;
-        LCI_request_t request = completion_manager_p->recv_followup->poll();
+        ::lci::status_t status = completion_manager_p->recv_followup->poll();
         util::lci_environment::pcounter_add(util::lci_environment::poll_comp,
             util::lci_environment::pcounter_since(poll_comp_start));
 
-        if (request.flag == LCI_OK)
+        if (status.is_done())
         {
             auto useful_bg_start = util::lci_environment::pcounter_now();
-            HPX_ASSERT(request.user_context);
-            auto* sharedPtr_p = (connection_ptr*) request.user_context;
-            size_t length;
-            if (request.type == LCI_MEDIUM)
-                length = request.data.mbuffer.length;
-            else
-                length = request.data.lbuffer.length;
+            HPX_ASSERT(status.get_user_context());
+            auto* sharedPtr_p = (connection_ptr*) status.get_user_context();
+            size_t length = status.get_size();
             util::lci_environment::log(
                 util::lci_environment::log_level_t::debug, "recv",
-                "followup (%d, %d, %d) length %lu\n", request.rank, LCI_RANK,
-                request.tag, length);
+                "followup (%d, %d, %d) length %lu\n", status.get_rank(),
+                util::lci_environment::rank(), status.get_tag(), length);
             receiver_connection_sendrecv::return_t ret =
                 (*sharedPtr_p)->receive();
             if (ret.isDone)
             {
                 (*sharedPtr_p)->done();
-                delete sharedPtr_p;
             }
             else
             {

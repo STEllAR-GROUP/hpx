@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/threading_base/thread_data.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 namespace hpx::threads::detail {
 

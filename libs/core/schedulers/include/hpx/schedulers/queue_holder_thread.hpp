@@ -8,14 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/debugging/print.hpp>
+#include <hpx/modules/debugging.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
-#include <hpx/threading_base/print.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_data_stackful.hpp>
-#include <hpx/threading_base/thread_data_stackless.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 
 #include <atomic>
 #include <cmath>
@@ -56,15 +52,15 @@ namespace hpx::threads::policies {
         return input >= ceil ? input % ceil : input;
     }
 
-    inline constexpr std::size_t max_thread_count = 1000;
-    inline constexpr std::size_t round_robin_rollover = 1;
-
     // ----------------------------------------------------------------
     // Helper class to hold a set of queues.
     // ----------------------------------------------------------------
-    template <typename QueueType>
+    HPX_CXX_EXPORT template <typename QueueType>
     struct queue_holder_thread
     {
+        static constexpr std::size_t max_thread_count = 1000;
+        static constexpr std::size_t round_robin_rollover = 1;
+
         using thread_holder_type = queue_holder_thread<QueueType>;
 
         // Queues that will store actual work for this thread

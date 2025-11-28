@@ -9,16 +9,17 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/executors/service_executors.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/executors.hpp>
 
 #include <cstdint>
 #include <type_traits>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::execution::experimental {
 
-    enum class service_executor_type : std::uint8_t
-    {
+    HPX_CXX_EXPORT enum class service_executor_type : std::uint8_t {
         io_thread_pool,        ///< Selects creating a service executor using
                                ///< the I/O pool of threads
         parcel_thread_pool,    ///< Selects creating a service executor using
@@ -35,29 +36,30 @@ namespace hpx::execution::experimental {
             service_executor_type t, char const* name_suffix = "");
     }    // namespace detail
 
-    struct HPX_CORE_EXPORT service_executor
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT service_executor
       : public parallel::execution::detail::service_executor
     {
         explicit service_executor(
             service_executor_type t, char const* name_suffix = "");
     };
 
-    struct HPX_CORE_EXPORT io_pool_executor : service_executor
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT io_pool_executor : service_executor
     {
         io_pool_executor();
     };
 
-    struct HPX_CORE_EXPORT parcel_pool_executor : service_executor
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT parcel_pool_executor
+      : service_executor
     {
         explicit parcel_pool_executor(char const* name_suffix = "-tcp");
     };
 
-    struct HPX_CORE_EXPORT timer_pool_executor : service_executor
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT timer_pool_executor : service_executor
     {
         timer_pool_executor();
     };
 
-    struct HPX_CORE_EXPORT main_pool_executor : service_executor
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT main_pool_executor : service_executor
     {
         main_pool_executor();
     };
@@ -157,3 +159,5 @@ namespace hpx::execution::experimental {
     };
     /// \endcond
 }    // namespace hpx::execution::experimental
+
+#include <hpx/config/warnings_suffix.hpp>

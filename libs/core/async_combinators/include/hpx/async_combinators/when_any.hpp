@@ -44,7 +44,7 @@ namespace hpx {
     ///           ready future.
     ///           - future<when_any_result<Container<future<R>>>>: If the input
     ///             cardinality is unknown at compile time and the futures
-    ///             are all of the same type. The order of the futures in the
+    ///             are all have the same type. The order of the futures in the
     ///             output container will be the same as given by the input
     ///             iterator.
     template <typename InputIter,
@@ -64,7 +64,7 @@ namespace hpx {
     ///           ready future.
     ///           - future<when_any_result<Container<future<R>>>>: If the input
     ///             cardinality is unknown at compile time and the futures
-    ///             are all of the same type. The order of the futures in the
+    ///             are all have the same type. The order of the futures in the
     ///             output container will be the same as given by the input
     ///             iterator.
     template <typename Range>
@@ -78,7 +78,7 @@ namespace hpx {
     ///
     /// \return   Returns a when_any_result holding the same list of futures
     ///           as has been passed to when_any and an index pointing to a
-    ///           ready future..
+    ///           ready future.
     ///           - future<when_any_result<tuple<future<T0>, future<T1>...>>>:
     ///             If inputs are fixed in number and are of heterogeneous
     ///             types. The inputs can be any arbitrary number of future
@@ -107,7 +107,7 @@ namespace hpx {
     ///           ready future.
     ///           - future<when_any_result<Container<future<R>>>>: If the input
     ///             cardinality is unknown at compile time and the futures
-    ///             are all of the same type. The order of the futures in the
+    ///             are all have the same type. The order of the futures in the
     ///             output container will be the same as given by the input
     ///             iterator.
     ///
@@ -124,19 +124,13 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/when_any.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution_base/this_thread.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/futures_factory.hpp>
-#include <hpx/futures/traits/acquire_future.hpp>
-#include <hpx/futures/traits/detail/future_traits.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/is_future.hpp>
-#include <hpx/futures/traits/is_future_range.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/util/detail/reserve.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -150,7 +144,7 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
 
-    template <typename Sequence>
+    HPX_CXX_EXPORT template <typename Sequence>
     struct when_any_result
     {
         static constexpr std::size_t index_error() noexcept
@@ -317,7 +311,7 @@ namespace hpx::lcos::detail {
                 when_any_result<Sequence>::index_error();
             if (index_.compare_exchange_strong(index_not_initialized, idx))
             {
-                // reactivate waiting thread only if it's not us
+                // reactivate waiting thread only if it's not the executing
                 if (ctx != hpx::execution_base::this_thread::agent())
                 {
                     ctx.resume();
@@ -378,7 +372,8 @@ namespace hpx::lcos::detail {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct when_any_t final : hpx::functional::tag<when_any_t>
+    HPX_CXX_EXPORT inline constexpr struct when_any_t final
+      : hpx::functional::tag<when_any_t>
     {
     private:
         template <typename Range,
@@ -454,7 +449,7 @@ namespace hpx {
     } when_any{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct when_any_n_t final
+    HPX_CXX_EXPORT inline constexpr struct when_any_n_t final
       : hpx::functional::tag<when_any_n_t>
     {
     private:

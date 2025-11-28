@@ -20,47 +20,49 @@
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
-template <class Process>
-inline int wait_for_exit(const Process &p)
-{
-    pid_t ret;
-    int status = 0;
-    do
+    template <class Process>
+    inline int wait_for_exit(const Process& p)
     {
-        ret = ::waitpid(p.pid, &status, 0);
-    } while ((ret == -1 && errno == EINTR) || (ret != -1 && !WIFEXITED(status)));
+        pid_t ret;
+        int status = 0;
+        do
+        {
+            ret = ::waitpid(p.pid, &status, 0);
+        } while (
+            (ret == -1 && errno == EINTR) || (ret != -1 && !WIFEXITED(status)));
 
-    if (ret == -1)
-    {
-        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-            "process::wait_for_exit", "waitpid(2) failed");
+        if (ret == -1)
+        {
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "process::wait_for_exit", "waitpid(2) failed");
+        }
+        return WEXITSTATUS(status);
     }
-    return WEXITSTATUS(status);
-}
 
-template <class Process>
-inline int wait_for_exit(const Process &p, hpx::error_code &ec)
-{
-    pid_t ret;
-    int status;
-    do
+    template <class Process>
+    inline int wait_for_exit(const Process& p, hpx::error_code& ec)
     {
-        ret = ::waitpid(p.pid, &status, 0);
-    } while ((ret == -1 && errno == EINTR) || (ret != -1 && !WIFEXITED(status)));
+        pid_t ret;
+        int status;
+        do
+        {
+            ret = ::waitpid(p.pid, &status, 0);
+        } while (
+            (ret == -1 && errno == EINTR) || (ret != -1 && !WIFEXITED(status)));
 
-    if (ret == -1)
-    {
-        HPX_THROWS_IF(ec, hpx::error::invalid_status,
-            "process::wait_for_exit", "waitpid(2) failed");
+        if (ret == -1)
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "process::wait_for_exit", "waitpid(2) failed");
+        }
+        else
+        {
+            ec = hpx::make_success_code();
+            return -1;
+        }
+        return WEXITSTATUS(status);
     }
-    else
-    {
-        ec = hpx::make_success_code();
-        return -1;
-    }
-    return WEXITSTATUS(status);
-}
 
-}}}}
+}}}}    // namespace hpx::components::process::posix
 
 #endif

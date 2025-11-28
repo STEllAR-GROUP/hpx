@@ -2,7 +2,7 @@
 //  troy d. straszheim <troy@resophonic.com>
 //  http://www.resophonic.com
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +13,7 @@
 #include <hpx/config.hpp>
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/serialization/macros.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstddef>
@@ -25,7 +26,7 @@ namespace hpx::serialization {
     namespace detail {
 
         ////////////////////////////////////////////////////////////////////////
-        struct std_variant_save_visitor
+        HPX_CXX_EXPORT struct std_variant_save_visitor
         {
             explicit constexpr std_variant_save_visitor(
                 output_archive& ar) noexcept
@@ -44,10 +45,10 @@ namespace hpx::serialization {
         };
 
         ////////////////////////////////////////////////////////////////////////
-        template <typename... Ts>
+        HPX_CXX_EXPORT template <typename... Ts>
         struct std_variant_impl;
 
-        template <typename T, typename... Ts>
+        HPX_CXX_EXPORT template <typename T, typename... Ts>
         struct std_variant_impl<T, Ts...>
         {
             template <typename V>
@@ -74,7 +75,7 @@ namespace hpx::serialization {
         };
     }    // namespace detail
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     void save(output_archive& ar, std::variant<Ts...> const& v, unsigned)
     {
         auto const which = static_cast<std::uint64_t>(v.index());
@@ -83,7 +84,7 @@ namespace hpx::serialization {
         std::visit(visitor, v);
     }
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     void load(input_archive& ar, std::variant<Ts...>& v, unsigned)
     {
         std::uint64_t which;
@@ -101,5 +102,5 @@ namespace hpx::serialization {
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        (template <typename... Ts>), (std::variant<Ts...>) )
+        HPX_CXX_EXPORT, (template <typename... Ts>), (std::variant<Ts...>) )
 }    // namespace hpx::serialization

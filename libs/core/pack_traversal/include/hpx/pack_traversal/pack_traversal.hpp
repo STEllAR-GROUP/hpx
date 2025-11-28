@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/pack_traversal/detail/pack_traversal_impl.hpp>
 
 #include <type_traits>
@@ -54,7 +54,7 @@ namespace hpx::util {
 
 namespace hpx::util {
 
-    template <typename Mapper, typename... T>
+    HPX_CXX_EXPORT template <typename Mapper, typename... T>
     auto map_pack(Mapper&& mapper, T&&... pack)
         -> decltype(detail::apply_pack_transform(detail::strategy_remap_tag{},
             HPX_FORWARD(Mapper, mapper), HPX_FORWARD(T, pack)...))
@@ -66,7 +66,7 @@ namespace hpx::util {
     // Indicate that the result shall be spread across the parent container if
     // possible. This can be used to create a mapper function used in map_pack
     // that maps one element to an arbitrary count (1:n).
-    template <typename... T>
+    HPX_CXX_EXPORT template <typename... T>
     constexpr detail::spreading::spread_box<typename std::decay<T>::type...>
     spread_this(T&&... args)
     {
@@ -80,7 +80,7 @@ namespace hpx::util {
     // the mapper isn't preserved.
     //
     // See `map_pack` for a detailed description.
-    template <typename Mapper, typename... T>
+    HPX_CXX_EXPORT template <typename Mapper, typename... T>
     void traverse_pack(Mapper&& mapper, T&&... pack)
     {
         detail::apply_pack_transform(detail::strategy_traverse_tag{},

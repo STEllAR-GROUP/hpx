@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,11 +32,11 @@ namespace hpx::util::cache::entries {
     ///                   default constructible, copy constructible and
     ///                   less_than_comparable.
     ///
-    template <typename Value>
-    class lru_entry : public entry<Value, lru_entry<Value>>
+    HPX_CXX_EXPORT template <typename Value>
+    class lru_entry : public entry<Value>
     {
     private:
-        using base_type = entry<Value, lru_entry<Value>>;
+        using base_type = entry<Value>;
         using time_point = std::chrono::steady_clock::time_point;
 
     public:
@@ -71,7 +71,7 @@ namespace hpx::util::cache::entries {
         /// invocation of the operator<().
         ///
         /// \returns  This function should return true if the cache needs to
-        ///           update it's internal heap. Usually this is needed if the
+        ///           update its internal heap. Usually this is needed if the
         ///           entry has been changed by touch() in a way influencing
         ///           the sort order as mandated by the cache's UpdatePolicy
         bool touch()
@@ -89,12 +89,29 @@ namespace hpx::util::cache::entries {
 
         /// \brief Compare the 'age' of two entries. An entry is 'older' than
         ///        another entry if it has been accessed less recently (LRU).
-        friend bool
-        operator<(lru_entry const& lhs, lru_entry const& rhs) noexcept(
-            noexcept(std::declval<time_point const&>() <
-                std::declval<time_point const&>()))
+        friend auto operator<(lru_entry const& lhs, lru_entry const& rhs)
         {
-            return lhs.get_access_time() > rhs.get_access_time();
+            return rhs.get_access_time() < lhs.get_access_time();
+        }
+        friend auto operator>(lru_entry const& lhs, lru_entry const& rhs)
+        {
+            return rhs < lhs;
+        }
+        friend auto operator<=(lru_entry const& lhs, lru_entry const& rhs)
+        {
+            return !(rhs < lhs);
+        }
+        friend auto operator>=(lru_entry const& lhs, lru_entry const& rhs)
+        {
+            return !(lhs < rhs);
+        }
+        friend auto operator==(lru_entry const& lhs, lru_entry const& rhs)
+        {
+            return lhs.get_access_time() == rhs.get_access_time();
+        }
+        friend auto operator!=(lru_entry const& lhs, lru_entry const& rhs)
+        {
+            return !(lhs == rhs);
         }
 
     private:

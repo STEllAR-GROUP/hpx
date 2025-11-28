@@ -7,19 +7,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/functional.hpp>
 
+#include <hpx/modules/io_service.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
-#include <hpx/serialization/vector.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 
 #include <hpx/components/iostreams/server/buffer.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
-
-#include <hpx/io_service/io_service_pool.hpp>
 
 #include <cstdint>
 #include <functional>
@@ -67,7 +63,7 @@ namespace hpx::iostreams::server {
         // enough.
         hpx::id_type this_id = this->get_id();
 #if ASIO_VERSION >= 103400
-        asio::post(hpx::get_thread_pool("io_pool")->get_io_service(),
+        ::asio::post(hpx::get_thread_pool("io_pool")->get_io_service(),
             hpx::bind_front(&output_stream::call_write_async, this, locality_id,
                 count, HPX_MOVE(in), HPX_MOVE(this_id)));
 #else
@@ -96,7 +92,7 @@ namespace hpx::iostreams::server {
         // Perform the IO in another OS thread.
         detail::buffer in(buf_in);
 #if ASIO_VERSION >= 103400
-        asio::post(hpx::get_thread_pool("io_pool")->get_io_service(),
+        ::asio::post(hpx::get_thread_pool("io_pool")->get_io_service(),
             hpx::bind_front(&output_stream::call_write_sync, this, locality_id,
                 count, std::ref(in),
                 threads::thread_id_ref_type(threads::get_outer_self_id())));
