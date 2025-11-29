@@ -12,3 +12,8 @@ module load gcc/12
 module load boost/1.79.0-debug
 module load hwloc
 module load openmpi
+
+export CCACHE_EXE=/work/pansysk75/ccache-4.12.2/bin/ccache
+export CCACHE_DIR=/work/pansysk75/ccache-4.12.2/cache
+export CCACHE_MAXSIZE=500G
+export CCACHE_NOHASHDIR=1
