@@ -161,7 +161,7 @@ namespace hpx::parallel {
         // https://github.com/danra/shift_proposal
 
         HPX_CXX_EXPORT template <typename FwdIter, typename Sent, typename Size>
-        static constexpr FwdIter sequential_shift_left(
+        constexpr FwdIter sequential_shift_left(
             FwdIter first, Sent last, Size n, std::size_t dist)
         {
             auto mid = std::next(first, n);

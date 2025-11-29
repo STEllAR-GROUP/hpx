@@ -7,4 +7,3 @@
 #pragma once
 
 #include <hpx/modules/algorithms.hpp>
-#include <hpx/parallel/container_algorithms/is_partitioned.hpp>

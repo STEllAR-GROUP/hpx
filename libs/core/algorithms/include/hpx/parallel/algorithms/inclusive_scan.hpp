@@ -456,7 +456,7 @@ namespace hpx::parallel {
         // Our own version of the sequential inclusive_scan.
         HPX_CXX_EXPORT template <typename InIter, typename Sent,
             typename OutIter, typename T, typename Op>
-        static constexpr util::in_out_result<InIter, OutIter>
+        constexpr util::in_out_result<InIter, OutIter>
         sequential_inclusive_scan(
             InIter first, Sent last, OutIter dest, T init, Op&& op)
         {
@@ -470,7 +470,7 @@ namespace hpx::parallel {
 
         HPX_CXX_EXPORT template <typename InIter, typename Sent,
             typename OutIter, typename Op>
-        static constexpr util::in_out_result<InIter, OutIter>
+        constexpr util::in_out_result<InIter, OutIter>
         sequential_inclusive_scan_noinit(
             InIter first, Sent last, OutIter dest, Op&& op)
         {
@@ -486,7 +486,7 @@ namespace hpx::parallel {
 
         HPX_CXX_EXPORT template <typename InIter, typename OutIter, typename T,
             typename Op>
-        static constexpr T sequential_inclusive_scan_n(
+        constexpr T sequential_inclusive_scan_n(
             InIter first, std::size_t count, OutIter dest, T init, Op&& op)
         {
             for (/* */; count-- != 0; (void) ++first, ++dest)

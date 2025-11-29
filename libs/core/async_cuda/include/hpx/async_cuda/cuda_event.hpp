@@ -10,21 +10,22 @@
 
 #pragma once
 
-#include <cstddef>
-#include <deque>
-
+#include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_cuda/cuda_exception.hpp>
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 #include <hpx/modules/concurrency.hpp>
 
-namespace hpx { namespace cuda { namespace experimental {
+#include <cstddef>
+#include <deque>
+
+namespace hpx::cuda::experimental {
 
     // a pool of cudaEvent_t objects.
     // Since allocation of a cuda event passes into the cuda runtime
     // it might be an expensive operation, so we pre-allocate a pool
     // of them at startup.
-    struct cuda_event_pool
+    HPX_CXX_EXPORT struct cuda_event_pool
     {
         static constexpr std::size_t initial_events_in_pool = 128;
 
@@ -37,6 +38,7 @@ namespace hpx { namespace cuda { namespace experimental {
                     static_cast<std::size_t>(max_number_devices_),
                 "Number of CUDA event pools does not match the number of "
                 "devices!");
+
             for (int device = 0; device < max_number_devices_; device++)
             {
                 check_cuda_error(cudaSetDevice(device));
@@ -51,7 +53,7 @@ namespace hpx { namespace cuda { namespace experimental {
             }
         }
 
-        inline bool pop(cudaEvent_t& event, int device = 0)
+        inline bool pop(cudaEvent_t& event, int const device = 0)
         {
             HPX_ASSERT_MSG(device >= 0 && device < max_number_devices_,
                 "Accessing CUDA event pool with invalid device ID!");
@@ -69,7 +71,7 @@ namespace hpx { namespace cuda { namespace experimental {
             return true;
         }
 
-        inline bool push(cudaEvent_t event, int device = 0)
+        inline bool push(cudaEvent_t event, int const device = 0)
         {
             HPX_ASSERT_MSG(device >= 0 && device < max_number_devices_,
                 "Accessing CUDA event pool with invalid device ID!");
@@ -107,7 +109,7 @@ namespace hpx { namespace cuda { namespace experimental {
             check_cuda_error(cudaSetDevice(original_device));
         }
 
-        void add_event_to_pool(int device)
+        void add_event_to_pool(int const device)
         {
             check_cuda_error(cudaSetDevice(device));
             cudaEvent_t event;
@@ -124,4 +126,4 @@ namespace hpx { namespace cuda { namespace experimental {
         // One pool per GPU - each pool is dynamically sized and can grow if needed
         std::deque<hpx::lockfree::stack<cudaEvent_t>> free_lists_;
     };
-}}}    // namespace hpx::cuda::experimental
+}    // namespace hpx::cuda::experimental

@@ -92,8 +92,33 @@
 // Include LCI headers if required
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)) ||      \
     defined(HPX_HAVE_MODULE_LCI_BASE)
-
 # include "lci.hpp"
 # include "lct.h"
+#endif
 
+#if defined(HPX_HAVE_MODULE_THRUST)
+# include <hpx/thrust/thrust_headers.hpp>
+#endif
+
+#if defined(HPX_HAVE_MM_PREFETCH)
+# if defined(HPX_MSVC)
+#  include <intrin.h>
+# endif
+# if defined(HPX_GCC_VERSION)
+#  include <emmintrin.h>
+# endif
+#endif
+
+#if defined(HPX_HAVE_DATAPAR)
+# if defined(HPX_HAVE_DATAPAR_EVE)
+#  include <eve/eve.hpp>
+#  include <eve/memory/aligned_ptr.hpp>
+# endif
+# if defined(HPX_HAVE_DATAPAR_STD_EXPERIMENTAL_SIMD)
+#  include <experimental/simd>
+# endif
+# if defined(HPX_HAVE_DATAPAR_VC)
+#  include <Vc/Vc>
+#  include <Vc/global.h>
+# endif
 #endif

@@ -9,6 +9,4 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/algorithms.hpp>
-#include <hpx/parallel/container_algorithms/generate.hpp>
-
 #include <hpx/parallel/segmented_algorithms/generate.hpp>

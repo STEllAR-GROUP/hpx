@@ -9,9 +9,11 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/modules/debugging.hpp>
 
-namespace hpx { namespace cuda { namespace experimental { namespace detail {
-    using print_on = debug::enable_print<false>;
-    static constexpr print_on cud_debug("CUDA");
-}}}}    // namespace hpx::cuda::experimental::detail
+namespace hpx::cuda::experimental::detail {
+
+    HPX_CXX_EXPORT using print_on = debug::enable_print<false>;
+    HPX_CXX_EXPORT inline constexpr print_on cud_debug("CUDA");
+}    // namespace hpx::cuda::experimental::detail

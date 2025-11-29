@@ -19,11 +19,13 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace cuda { namespace experimental {
+namespace hpx::cuda::experimental {
+
     namespace detail {
-        template <typename R, typename... Ts>
+
+        HPX_CXX_EXPORT template <typename R, typename... Ts>
         void set_value_event_callback_helper(
-            cudaError_t status, R&& r, Ts&&... ts)
+            cudaError_t const status, R&& r, Ts&&... ts)
         {
             static_assert(sizeof...(Ts) <= 1, "Expecting at most one value");
 
@@ -37,23 +39,22 @@ namespace hpx { namespace cuda { namespace experimental {
             else
             {
                 hpx::execution::experimental::set_error(HPX_FORWARD(R, r),
-                    std::make_exception_ptr(
-                        cuda_exception(std::string("Getting event after "
-                                                   "CUDA stream transform "
-                                                   "failed with status ") +
-                                cudaGetErrorString(status),
-                            status)));
+                    std::make_exception_ptr(cuda_exception(
+                        std::string("Getting event after CUDA stream transform "
+                                    "failed with status ") +
+                            cudaGetErrorString(status),
+                        status)));
             }
         }
 
-        template <typename... Ts>
+        HPX_CXX_EXPORT template <typename... Ts>
         void extend_argument_lifetimes(cudaStream_t stream, Ts&&... ts)
         {
             if constexpr (sizeof...(Ts) > 0)
             {
                 detail::add_event_callback(
                     [keep_alive = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
-                        cudaError_t status) {
+                        cudaError_t const status) {
                         HPX_ASSERT(status != cudaErrorNotReady);
                         HPX_UNUSED(status);
                     },
@@ -61,18 +62,18 @@ namespace hpx { namespace cuda { namespace experimental {
             }
         }
 
-        template <typename R, typename... Ts>
+        HPX_CXX_EXPORT template <typename R, typename... Ts>
         void set_value_immediate_void(cudaStream_t stream, R&& r, Ts&&... ts)
         {
             hpx::execution::experimental::set_value(HPX_FORWARD(R, r));
 
             // Even though we call set_value immediately, we still extend the
-            // life time of the arguments by capturing them in a callback that
+            // life-time of the arguments by capturing them in a callback that
             // is triggered when the event is ready.
             extend_argument_lifetimes(stream, HPX_FORWARD(Ts, ts)...);
         }
 
-        template <typename R, typename... Ts>
+        HPX_CXX_EXPORT template <typename R, typename... Ts>
         void set_value_event_callback_void(
             cudaStream_t stream, R&& r, Ts&&... ts)
         {
@@ -85,7 +86,7 @@ namespace hpx { namespace cuda { namespace experimental {
                 stream);
         }
 
-        template <typename R, typename T, typename... Ts>
+        HPX_CXX_EXPORT template <typename R, typename T, typename... Ts>
         void set_value_immediate_non_void(
             cudaStream_t stream, R&& r, T&& t, Ts&&... ts)
         {
@@ -93,12 +94,12 @@ namespace hpx { namespace cuda { namespace experimental {
                 HPX_FORWARD(R, r), HPX_FORWARD(T, t));
 
             // Even though we call set_value immediately, we still extend the
-            // life time of the arguments by capturing them in a callback that
+            // life-time of the arguments by capturing them in a callback that
             // is triggered when the event is ready.
             extend_argument_lifetimes(stream, HPX_FORWARD(Ts, ts)...);
         }
 
-        template <typename R, typename T, typename... Ts>
+        HPX_CXX_EXPORT template <typename R, typename T, typename... Ts>
         void set_value_event_callback_non_void(
             cudaStream_t stream, R&& r, T&& t, Ts&&... ts)
         {
@@ -112,21 +113,21 @@ namespace hpx { namespace cuda { namespace experimental {
                 stream);
         }
 
-        template <typename R, typename F>
+        HPX_CXX_EXPORT template <typename R, typename F>
         struct transform_stream_receiver;
 
-        template <typename R>
+        HPX_CXX_EXPORT template <typename R>
         struct is_transform_stream_receiver : std::false_type
         {
         };
 
-        template <typename R, typename F>
+        HPX_CXX_EXPORT template <typename R, typename F>
         struct is_transform_stream_receiver<transform_stream_receiver<R, F>>
           : std::true_type
         {
         };
 
-        template <typename R, typename F>
+        HPX_CXX_EXPORT template <typename R, typename F>
         struct transform_stream_receiver
         {
 #if defined(HPX_HAVE_STDEXEC)
@@ -137,7 +138,7 @@ namespace hpx { namespace cuda { namespace experimental {
             cudaStream_t stream;
 
             template <typename R_, typename F_>
-            transform_stream_receiver(R_&& r, F_&& f, cudaStream_t stream)
+            transform_stream_receiver(R_&& r, F_&& f, cudaStream_t const stream)
               : r(HPX_FORWARD(R_, r))
               , f(HPX_FORWARD(F_, f))
               , stream(stream)
@@ -177,10 +178,11 @@ namespace hpx { namespace cuda { namespace experimental {
                                 if (r.stream == stream)
                                 {
                                     // When the next receiver is also a
-                                    // transform_stream_receiver, we can immediately
-                                    // call set_value, with the knowledge that a
-                                    // later receiver will synchronize the stream
-                                    // when a non-transform_stream receiver is
+                                    // transform_stream_receiver, we can
+                                    // immediately call set_value, with the
+                                    // knowledge that a later receiver will
+                                    // synchronize the stream when a
+                                    // non-transform_stream receiver is
                                     // connected.
                                     set_value_immediate_void(stream,
                                         HPX_MOVE(r), HPX_FORWARD(Ts, ts)...);
@@ -205,8 +207,8 @@ namespace hpx { namespace cuda { namespace experimental {
                         }
                         else
                         {
-                            // When the return type is non-void, we have to forward
-                            // the value to the receiver
+                            // When the return type is non-void, we have to
+                            // forward the value to the receiver
                             auto t =
                                 HPX_INVOKE(f, HPX_FORWARD(Ts, ts)..., stream);
 
@@ -216,10 +218,11 @@ namespace hpx { namespace cuda { namespace experimental {
                                 if (r.stream == stream)
                                 {
                                     // When the next receiver is also a
-                                    // transform_stream_receiver, we can immediately
-                                    // call set_value, with the knowledge that a
-                                    // later receiver will synchronize the stream
-                                    // when a non-transform_stream receiver is
+                                    // transform_stream_receiver, we can
+                                    // immediately call set_value, with the
+                                    // knowledge that a later receiver will
+                                    // synchronize the stream when a
+                                    // non-transform_stream receiver is
                                     // connected.
                                     set_value_immediate_non_void(stream,
                                         HPX_MOVE(r), HPX_MOVE(t),
@@ -271,7 +274,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // nvcc does not know how to compile it with some argument types
         // ("error: no instance of overloaded function std::forward matches the
         // argument list").
-        template <typename R, typename F, typename... Ts>
+        HPX_CXX_EXPORT template <typename R, typename F, typename... Ts>
         void tag_invoke(hpx::execution::experimental::set_value_t,
             transform_stream_receiver<R, F>&& r, Ts&&... ts)
         {
@@ -279,7 +282,7 @@ namespace hpx { namespace cuda { namespace experimental {
         }
 #endif
 
-        template <typename S, typename F>
+        HPX_CXX_EXPORT template <typename S, typename F>
         struct transform_stream_sender
         {
             std::decay_t<S> s;
@@ -326,14 +329,14 @@ namespace hpx { namespace cuda { namespace experimental {
             friend auto tag_invoke(
                 hpx::execution::experimental::get_completion_signatures_t,
                 transform_stream_sender const&, Env const&)
-            -> hpx::execution::experimental::transform_completion_signatures_of<
-                S, Env,
-                hpx::execution::experimental::completion_signatures<
-                    hpx::execution::experimental::set_error_t(std::exception_ptr)
-                >,
-                invoke_function_transformation
-                // stop and error channel will be forwarded if they are present.
-            >;
+                -> hpx::execution::experimental::transform_completion_signatures_of<
+                    S, Env,
+                    hpx::execution::experimental::completion_signatures<
+                        hpx::execution::experimental::set_error_t(std::exception_ptr)
+                    >,
+                    invoke_function_transformation
+                    // stop and error channel will be forwarded if they are present.
+                >;
             // clang-format on
 
             friend constexpr auto tag_invoke(
@@ -400,18 +403,18 @@ namespace hpx { namespace cuda { namespace experimental {
         };
     }    // namespace detail
 
-    // NOTE: This is not a customization of
-    // hpx::execution::experimental::then. It has different semantics:
+    // NOTE: This is not a customization of hpx::execution::experimental::then.
+    // It has different semantics:
     // - a cudaStream_t is inserted as an additional argument into the call to f
     // - values from the predecessor sender are not forwarded, only passed by
     //   reference, to the call to f to keep them alive until the event is ready
-    inline constexpr struct transform_stream_t final
+    HPX_CXX_EXPORT inline constexpr struct transform_stream_t final
       : hpx::functional::detail::tag_fallback<transform_stream_t>
     {
     private:
         template <typename S, typename F,
             typename = std::enable_if_t<
-                !std::is_same<std::decay_t<F>, cudaStream_t>::value>>
+                !std::is_same_v<std::decay_t<F>, cudaStream_t>>>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             transform_stream_t, S&& s, F&& f, cudaStream_t stream = {})
         {
@@ -427,4 +430,4 @@ namespace hpx { namespace cuda { namespace experimental {
                 transform_stream_t, F, cudaStream_t>{HPX_FORWARD(F, f), stream};
         }
     } transform_stream{};
-}}}    // namespace hpx::cuda::experimental
+}    // namespace hpx::cuda::experimental

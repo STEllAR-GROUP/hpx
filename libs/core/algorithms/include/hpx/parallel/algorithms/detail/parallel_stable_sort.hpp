@@ -60,7 +60,7 @@ namespace hpx::parallel::detail {
     /// \param [in] first : range of elements to sort
     /// \param [in] last : range of elements to sort
     /// \param [in] comp : object for to compare two elements
-    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Compare>
+    template <typename Iter, typename Sent, typename Compare>
     parallel_stable_sort_helper<Iter, Sent,
         Compare>::parallel_stable_sort_helper(Iter first, Sent last,
         Compare comp)
@@ -72,7 +72,7 @@ namespace hpx::parallel::detail {
         HPX_ASSERT(range_initial.size() >= 0);
     }
 
-    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Compare>
+    template <typename Iter, typename Sent, typename Compare>
     template <typename Exec>
     Iter parallel_stable_sort_helper<Iter, Sent, Compare>::operator()(
         Exec&& exec, std::uint32_t nthreads, std::size_t chunk_size)
