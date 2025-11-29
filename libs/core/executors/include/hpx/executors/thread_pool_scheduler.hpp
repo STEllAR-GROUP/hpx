@@ -100,7 +100,8 @@ namespace hpx::execution::experimental {
         {
             static_assert(
                 hpx::execution::experimental::stdexec_internal::__completes_on<
-                    Sender, thread_pool_policy_scheduler<Policy>>,
+                    Sender, thread_pool_policy_scheduler<Policy>,
+                    hpx::execution::experimental::env<>>,
                 "No thread_pool_policy_scheduler instance can be found in the "
                 "sender's "
                 "attributes on which to schedule bulk work.");
@@ -458,6 +459,20 @@ namespace hpx::execution::experimental {
             struct env
             {
                 std::decay_t<Scheduler> const& sched;
+                
+                // query() member function for newer stdexec
+                auto query(stdexec::get_domain_t) const noexcept
+                {
+                    return stdexec::get_domain(sched);
+                }
+                
+                template <typename CPO>
+                    requires meta::value<meta::one_of<CPO, set_value_t, set_stopped_t>>
+                auto query(hpx::execution::experimental::get_completion_scheduler_t<CPO>) const noexcept
+                {
+                    return sched;
+                }
+                
                 // clang-format off
                 template <typename CPO,
                     HPX_CONCEPT_REQUIRES_(
@@ -512,7 +527,7 @@ namespace hpx::execution::experimental {
                 hpx::execution::experimental::get_forward_progress_guarantee_t,
                 thread_pool_policy_scheduler const& sched) noexcept
         {
-            if (hpx::detail::has_async_policy(sched.policy()))
+            if (hpx::has_async_policy(sched.policy()))
             {
                 return hpx::execution::experimental::
                     forward_progress_guarantee::parallel;
@@ -524,6 +539,12 @@ namespace hpx::execution::experimental {
             }
         }
 #endif
+
+        // Direct schedule() member function for newer stdexec
+        constexpr sender<thread_pool_policy_scheduler> schedule() const
+        {
+            return {*this};
+        }
 
         friend constexpr sender<thread_pool_policy_scheduler> tag_invoke(
             hpx::execution::experimental::schedule_t,
@@ -575,7 +596,7 @@ namespace hpx::execution::experimental {
             }
             else
             {
-                if (policy_.get_policy() == hpx::detail::launch_policy::sync)
+                if (policy_.get_policy() == hpx::launch_policy::sync)
                 {
                     return 1;
                 }
