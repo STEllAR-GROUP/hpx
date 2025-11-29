@@ -8,7 +8,4 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/algorithms.hpp>
-#if defined(HPX_HAVE_DATAPAR)
-#include <hpx/parallel/datapar.hpp>
-#endif
 #include <hpx/parallel/segmented_algorithm.hpp>

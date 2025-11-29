@@ -15,7 +15,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include #include < hpx / modules / algorithms.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/naming_base/id_type.hpp>

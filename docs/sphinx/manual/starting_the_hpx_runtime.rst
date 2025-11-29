@@ -59,6 +59,10 @@ you cannot or do not want to include ``hpx/hpx_main.hpp`` in ``main.cpp``, you
 can instead link against ``HPX::auto_wrap_main``. That target enables the same
 runtime startup path without needing the header-triggered opt-in.
 
+.. note::
+
+    The use of ``HPX::auto_wrap_main`` is not supported when using the
+    native Windows MSVC toolchain.
 
 .. note::
 

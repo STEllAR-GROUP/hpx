@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/parallel/task_block.hpp>
+#include <hpx/modules/algorithms.hpp>
 
 namespace hpx {
 

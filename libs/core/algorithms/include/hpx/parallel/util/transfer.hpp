@@ -157,7 +157,7 @@ namespace hpx::parallel::util {
             std::decay_t<OutIter>>;
     }    // namespace detail
 
-    template <typename InIter, typename Sent, typename OutIter>
+    HPX_CXX_EXPORT template <typename InIter, typename Sent, typename OutIter>
     HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter>
     copy(InIter first, Sent last, OutIter dest) noexcept(noexcept(
         detail::copy_helper<detail::pointer_category_t<InIter, OutIter>>::call(

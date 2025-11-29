@@ -31,12 +31,14 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace cuda { namespace experimental {
-    using event_mode = std::true_type;
-    using callback_mode = std::false_type;
+namespace hpx::cuda::experimental {
+
+    HPX_CXX_EXPORT using event_mode = std::true_type;
+    HPX_CXX_EXPORT using callback_mode = std::false_type;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         // -------------------------------------------------------------
         // cuda future data implementation
         // This version supports 2 modes of operation
@@ -44,15 +46,18 @@ namespace hpx { namespace cuda { namespace experimental {
         // by a cuda callback when the stream event occurs
         // 2) an event based callback that must be polled/queried by
         // the runtime to set the future ready state
-        template <typename Allocator, typename Mode>
+        HPX_CXX_EXPORT template <typename Allocator, typename Mode>
         struct future_data;
 
-        template <typename Allocator>
+        HPX_CXX_EXPORT template <typename Allocator>
         struct future_data<Allocator, event_mode>
           : lcos::detail::future_data_allocator<void, Allocator,
                 future_data<Allocator, event_mode>>
         {
-            HPX_NON_COPYABLE(future_data);
+            future_data(future_data const&) = delete;
+            future_data(future_data&&) = delete;
+            future_data& operator=(future_data const&) = delete;
+            future_data& operator=(future_data&&) = delete;
 
             using init_no_addref =
                 typename lcos::detail::future_data_allocator<void, Allocator,
@@ -70,7 +75,7 @@ namespace hpx { namespace cuda { namespace experimental {
             {
                 add_event_callback(
                     [fdp = hpx::intrusive_ptr<future_data>(this)](
-                        cudaError_t status) {
+                        cudaError_t const status) {
                         HPX_ASSERT(status != cudaErrorNotReady);
 
                         if (status == cudaSuccess)
@@ -91,7 +96,7 @@ namespace hpx { namespace cuda { namespace experimental {
             }
         };
 
-        template <typename Allocator>
+        HPX_CXX_EXPORT template <typename Allocator>
         struct future_data<Allocator, callback_mode>
           : lcos::detail::future_data_allocator<void, Allocator,
                 future_data<Allocator, callback_mode>>
@@ -111,14 +116,14 @@ namespace hpx { namespace cuda { namespace experimental {
             }
 
             future_data(init_no_addref no_addref, other_allocator const& alloc,
-                cudaStream_t stream)
+                cudaStream_t const stream)
               : lcos::detail::future_data_allocator<void, Allocator,
                     future_data>(no_addref, alloc)
               , rt_(hpx::get_runtime_ptr())
             {
                 // Hold on to the shared state on behalf of the cuda runtime
-                // right away as the callback could be called immediately
-                // and it happens on another thread which might cause a race
+                // right away as the callback could be called immediately, and it
+                // happens on another thread which might cause a race
                 lcos::detail::intrusive_ptr_add_ref(this);
 
                 cudaError_t error =
@@ -138,7 +143,7 @@ namespace hpx { namespace cuda { namespace experimental {
             // extreme care must be taken to not lock/block or take too long
             // in this callback
             static void CUDART_CB stream_callback(
-                cudaStream_t, cudaError_t error, void* user_data)
+                cudaStream_t, cudaError_t const error, void* user_data)
             {
                 future_data* this_ = static_cast<future_data*>(user_data);
 
@@ -166,7 +171,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // -------------------------------------------------------------
         // main API call to get a future from a stream using allocator, and the
         // specified mode
-        template <typename Allocator, typename Mode>
+        HPX_CXX_EXPORT template <typename Allocator, typename Mode>
         hpx::future<void> get_future(
             Allocator const& a, cudaStream_t stream, int device)
         {
@@ -188,6 +193,7 @@ namespace hpx { namespace cuda { namespace experimental {
             static_assert(std::is_same_v<Mode, event_mode> ||
                     std::is_same_v<Mode, callback_mode>,
                 "get_future mode not supported!");
+
             if constexpr (std::is_same_v<Mode, event_mode>)
             {
                 traits::construct(
@@ -205,9 +211,9 @@ namespace hpx { namespace cuda { namespace experimental {
 
         // -------------------------------------------------------------
         // main API call to get a future from a stream using allocator
-        template <typename Allocator>
+        HPX_CXX_EXPORT template <typename Allocator>
         hpx::future<void> get_future_with_callback(
-            Allocator const& a, cudaStream_t stream)
+            Allocator const& a, cudaStream_t const stream)
         {
             // device id 0 will be dropped in callback mode - can be
             // an arbitrary number here
@@ -216,9 +222,9 @@ namespace hpx { namespace cuda { namespace experimental {
 
         // -------------------------------------------------------------
         // main API call to get a future from a stream using allocator
-        template <typename Allocator>
+        HPX_CXX_EXPORT template <typename Allocator>
         hpx::future<void> get_future_with_event(
-            Allocator const& a, cudaStream_t stream, int device = -1)
+            Allocator const& a, cudaStream_t const stream, int device = -1)
         {
             if (device == -1)
                 check_cuda_error(cudaGetDevice(&device));
@@ -227,24 +233,21 @@ namespace hpx { namespace cuda { namespace experimental {
 
         // -------------------------------------------------------------
         // non allocator version of : get future with a callback set
-        HPX_CORE_EXPORT hpx::future<void> get_future_with_callback(
-            cudaStream_t);
+        HPX_CXX_EXPORT HPX_CORE_EXPORT hpx::future<void>
+            get_future_with_callback(cudaStream_t);
 
         // -------------------------------------------------------------
         // non allocator version of : get future with an event set
-        HPX_CORE_EXPORT hpx::future<void> get_future_with_event(
+        HPX_CXX_EXPORT HPX_CORE_EXPORT hpx::future<void> get_future_with_event(
             cudaStream_t stream, int device = -1);
     }    // namespace detail
-}}}    // namespace hpx::cuda::experimental
+}    // namespace hpx::cuda::experimental
 
-namespace hpx { namespace traits { namespace detail {
-
-    template <typename Allocator, typename Mode, typename NewAllocator>
-    struct shared_state_allocator<
-        hpx::cuda::experimental::detail::future_data<Allocator, Mode>,
-        NewAllocator>
-    {
-        using type =
-            hpx::cuda::experimental::detail::future_data<NewAllocator, Mode>;
-    };
-}}}    // namespace hpx::traits::detail
+HPX_CXX_EXPORT template <typename Allocator, typename Mode,
+    typename NewAllocator>
+struct hpx::traits::detail::shared_state_allocator<
+    hpx::cuda::experimental::detail::future_data<Allocator, Mode>, NewAllocator>
+{
+    using type =
+        hpx::cuda::experimental::detail::future_data<NewAllocator, Mode>;
+};

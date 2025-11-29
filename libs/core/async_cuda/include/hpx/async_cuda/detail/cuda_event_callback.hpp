@@ -21,14 +21,16 @@
 
 #include <string>
 
-namespace hpx { namespace cuda { namespace experimental { namespace detail {
-    using event_callback_function_type =
+namespace hpx::cuda::experimental::detail {
+
+    HPX_CXX_EXPORT using event_callback_function_type =
         hpx::move_only_function<void(cudaError_t)>;
 
-    HPX_CORE_EXPORT void add_event_callback(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void add_event_callback(
         event_callback_function_type&& f, cudaStream_t stream, int device = 0);
 
-    HPX_CORE_EXPORT void register_polling(hpx::threads::thread_pool_base& pool);
-    HPX_CORE_EXPORT void unregister_polling(
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void register_polling(
         hpx::threads::thread_pool_base& pool);
-}}}}    // namespace hpx::cuda::experimental::detail
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void unregister_polling(
+        hpx::threads::thread_pool_base& pool);
+}    // namespace hpx::cuda::experimental::detail

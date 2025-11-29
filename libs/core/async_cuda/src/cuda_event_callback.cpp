@@ -29,7 +29,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace cuda { namespace experimental { namespace detail {
+namespace hpx::cuda::experimental::detail {
+
     // this code runs on a std::thread, but we will use a spinlock
     // as we never suspend - only ever try_lock, or exit
     using mutex_type = hpx::spinlock;
@@ -135,7 +136,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         auto& event_callback_vector = detail::get_event_callback_vector();
 
         // Don't poll if another thread is already polling
-        std::unique_lock<hpx::cuda::experimental::detail::mutex_type> lk(
+        std::unique_lock<hpx::cuda::experimental::detail::mutex_type> const lk(
             detail::get_vector_mtx(), std::try_to_lock);
         if (!lk.owns_lock())
         {
@@ -169,7 +170,8 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
             std::remove_if(event_callback_vector.begin(),
                 event_callback_vector.end(),
                 [&](event_callback& continuation) {
-                    cudaError_t status = cudaEventQuery(continuation.event);
+                    cudaError_t const status =
+                        cudaEventQuery(continuation.event);
 
                     if (status == cudaErrorNotReady)
                     {
@@ -191,7 +193,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         detail::event_callback continuation;
         while (detail::get_event_callback_queue().try_dequeue(continuation))
         {
-            cudaError_t status = cudaEventQuery(continuation.event);
+            cudaError_t const status = cudaEventQuery(continuation.event);
 
             if (status == cudaErrorNotReady)
             {
@@ -218,7 +220,8 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
     {
         std::size_t work_count = 0;
         {
-            std::unique_lock<mutex_type> lk(get_vector_mtx(), std::try_to_lock);
+            std::unique_lock<mutex_type> const lk(
+                get_vector_mtx(), std::try_to_lock);
             if (lk.owns_lock())
             {
                 work_count += get_number_of_active_events();
@@ -249,9 +252,9 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         {
             std::unique_lock<hpx::cuda::experimental::detail::mutex_type> lk(
                 detail::get_vector_mtx());
-            bool event_queue_empty =
+            bool const event_queue_empty =
                 get_event_callback_queue().size_approx() == 0;
-            bool event_vector_empty = get_event_callback_vector().empty();
+            bool const event_vector_empty = get_event_callback_vector().empty();
             lk.unlock();
             HPX_ASSERT_MSG(event_queue_empty,
                 "CUDA event polling was disabled while there are unprocessed "
@@ -267,4 +270,4 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         auto* sched = pool.get_scheduler();
         sched->clear_cuda_polling_function();
     }
-}}}}    // namespace hpx::cuda::experimental::detail
+}    // namespace hpx::cuda::experimental::detail

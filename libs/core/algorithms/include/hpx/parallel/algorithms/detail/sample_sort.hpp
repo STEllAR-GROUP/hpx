@@ -30,7 +30,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::detail {
 
-    HPX_CXX_EXPORT static constexpr std::uint32_t sample_sort_limit_per_task = 1
+    HPX_CXX_EXPORT inline constexpr std::uint32_t sample_sort_limit_per_task = 1
         << 16;
 
     /// \struct sample_sort

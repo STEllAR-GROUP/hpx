@@ -265,7 +265,12 @@ implicitly using ``main()`` as the entry point. If you want the same wrapping
 behavior without including :hpx-header:`wrap/include,hpx/hpx_main.hpp`, link to
 the ``HPX::auto_wrap_main`` target instead. This enables the runtime
 initialization around ``main()`` unconditionally and is useful for codebases
-where adding the header to ``main.cpp`` is impractical.
+where adding the header to ``main.cpp`` is impractical
+
+.. note::
+
+    The use of ``HPX::auto_wrap_main`` is not supported when using the
+    native Windows MSVC toolchain.
 
 If you want to use the facilities exposed by ``hpx::runtime_manager`` in binaries
 that were not linked as executables (e.g., in shared libraries), you will need

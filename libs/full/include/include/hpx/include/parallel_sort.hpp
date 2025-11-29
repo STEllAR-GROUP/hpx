@@ -7,5 +7,3 @@
 #pragma once
 
 #include <hpx/modules/algorithms.hpp>
-#include <hpx/parallel/container_algorithms/sort.hpp>
-#include <hpx/parallel/container_algorithms/stable_sort.hpp>
