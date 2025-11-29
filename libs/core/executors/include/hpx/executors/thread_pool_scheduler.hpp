@@ -468,8 +468,8 @@ namespace hpx::execution::experimental {
                 }
 
                 template <typename CPO>
-                    requires meta::value<meta::one_of<CPO, set_value_t,
-                        set_stopped_t>>
+                    requires meta::value<
+                        meta::one_of<CPO, set_value_t, set_stopped_t>>
                 auto query(
                     hpx::execution::experimental::get_completion_scheduler_t<
                         CPO>) const noexcept
