@@ -32,6 +32,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core mpi_base
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${mpi_base_sources}
   HEADERS ${mpi_base_headers}
   COMPAT_HEADERS ${mpi_base_compat_headers}
