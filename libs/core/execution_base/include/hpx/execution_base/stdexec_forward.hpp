@@ -170,7 +170,6 @@ namespace hpx::execution::experimental {
 
     // Domain
     HPX_CXX_EXPORT using stdexec::default_domain;
-    HPX_CXX_EXPORT using stdexec::dependent_domain;
 
     // Execute
     HPX_CXX_EXPORT using stdexec::execute;
@@ -250,7 +249,6 @@ namespace hpx::execution::experimental {
     HPX_CXX_EXPORT using stdexec::transform_completion_signatures_of;
 
     // Transform sender
-    HPX_CXX_EXPORT using stdexec::transform_env;
     HPX_CXX_EXPORT using stdexec::transform_sender;
     HPX_CXX_EXPORT using stdexec::transform_sender_result_t;
     HPX_CXX_EXPORT using stdexec::transform_sender_t;

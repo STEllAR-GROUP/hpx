@@ -1,153 +1,167 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file exception_list.hpp
-
-#pragma once
-
 #include <hpx/config.hpp>
 #include <hpx/errors/exception.hpp>
+#include <hpx/errors/exception_list.hpp>
 #include <hpx/modules/thread_support.hpp>
 
-#include <cstddef>
 #include <exception>
-#include <list>
 #include <mutex>
+#include <set>
 #include <string>
 #include <system_error>
+#include <utility>
 
-#include <hpx/config/warnings_prefix.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+    namespace detail {
+        std::string indent_message(std::string const& msg_)
+        {
+            std::string result;
+            std::string const& msg(msg_);
+            std::string::size_type pos = msg.find_first_of('\n');
+            std::string::size_type first_non_ws = msg.find_first_not_of(" \n");
+            std::string::size_type pos1 = 0;
 
-    /// The class exception_list is a container of exception_ptr objects
-    /// parallel algorithms may use to communicate uncaught exceptions
-    /// encountered during parallel execution to the caller of the algorithm
-    ///
-    /// The type exception_list::const_iterator fulfills the requirements of
-    /// a forward iterator.
-    ///
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT exception_list : public hpx::exception
+            while (std::string::npos != pos)
+            {
+                if (pos > first_non_ws)
+                {    // skip leading newline
+                    result += msg.substr(pos1, pos - pos1 + 1);
+                    pos = msg.find_first_of('\n', pos1 = pos + 1);
+                    if (std::string::npos != pos)
+                    {
+                        result += "  ";
+                    }
+                }
+                else
+                {
+                    pos = msg.find_first_of('\n', pos1 = pos + 1);
+                }
+            }
+
+            result += msg.substr(pos1);
+            return result;
+        }
+    }    // namespace detail
+
+    error_code throws;    // "throw on error" special error_code;
+                          //
+                          // Note that it doesn't matter if this isn't
+                          // initialized before use since the only use is
+                          // to take its address for comparison purposes.
+
+    exception_list::exception_list()
+      : hpx::exception(hpx::error::success)
+      , mtx_()
     {
-    private:
-        /// \cond NOINTERNAL
+    }
 
-        // TODO: Does this need to be hpx::spinlock?
-        // typedef hpx::spinlock mutex_type;
-        // TODO: Add correct initialization of hpx::util::detail spinlock.
-        using mutex_type = hpx::util::detail::spinlock;
+    exception_list::exception_list(std::exception_ptr const& e)
+      : hpx::exception(hpx::get_error(e), hpx::get_error_what(e))
+      , mtx_()
+    {
+        add_no_lock(e);
+    }
 
-        using exception_list_type = std::list<std::exception_ptr>;
-        exception_list_type exceptions_;
-        mutable mutex_type mtx_;
+    exception_list::exception_list(exception_list_type&& l)
+      : hpx::exception(
+            !l.empty() ? hpx::get_error(l.front()) : hpx::error::success)
+      , exceptions_(HPX_MOVE(l))
+      , mtx_()
+    {
+    }
 
-        void add_no_lock(std::exception_ptr const& e)
+    exception_list::exception_list(exception_list const& l)
+      : hpx::exception(static_cast<hpx::exception const&>(l))
+      , exceptions_(l.exceptions_)
+      , mtx_()
+    {
+    }
+
+    exception_list::exception_list(exception_list&& l) noexcept
+      : hpx::exception(HPX_MOVE(static_cast<hpx::exception&>(l)))
+      , exceptions_(HPX_MOVE(l.exceptions_))
+      , mtx_()
+    {
+    }
+
+    exception_list& exception_list::operator=(exception_list const& l)
+    {
+        if (this != &l)
         {
-            exceptions_.push_back(e);
-        }
-        /// \endcond
-
-    public:
-        /// bidirectional iterator
-        using iterator = exception_list_type::const_iterator;
-
-        /// \cond NOINTERNAL
-        // \throws nothing
-        ~exception_list() noexcept override = default;
-
-        exception_list() = default;
-
-        explicit exception_list(std::exception_ptr const& e)
-        {
-            add(e);
-        }
-
-        explicit exception_list(exception_list_type&& l)
-        {
-            std::lock_guard<mutex_type> lock(mtx_);
-            exceptions_ = std::move(l);
-        }
-
-        exception_list(exception_list const& l) : hpx::exception(l)
-        {
-            std::lock_guard<mutex_type> lock(l.mtx_);
+            *static_cast<hpx::exception*>(this) =
+                static_cast<hpx::exception const&>(l);
             exceptions_ = l.exceptions_;
         }
+        return *this;
+    }
 
-        exception_list(exception_list&& l) noexcept : hpx::exception(std::move(l))
+    exception_list& exception_list::operator=(exception_list&& l) noexcept
+    {
+        if (this != &l)
         {
-            std::lock_guard<mutex_type> l_lock(l.mtx_);
-            exceptions_ = std::move(l.exceptions_);
+            static_cast<hpx::exception&>(*this) =
+                HPX_MOVE(static_cast<hpx::exception&>(l));
+            exceptions_ = HPX_MOVE(l.exceptions_);
         }
+        return *this;
+    }
 
-        exception_list& operator=(exception_list const& l)
+    ///////////////////////////////////////////////////////////////////////////
+    std::error_code exception_list::get_error_code() const
+    {
+        std::lock_guard<mutex_type> l(mtx_);
+        if (exceptions_.empty())
+            return hpx::error::no_success;
+        return hpx::get_error(exceptions_.front());
+    }
+
+    std::string exception_list::get_message() const
+    {
+        std::lock_guard<mutex_type> l(mtx_);
+        if (exceptions_.empty())
+            return "";
+
+        if (1 == exceptions_.size())
+            return hpx::get_error_what(exceptions_.front());
+
+        std::string result("\n");
+
+        exception_list_type::const_iterator end = exceptions_.end();
+        exception_list_type::const_iterator it = exceptions_.begin();
+        for (/**/; it != end; ++it)
         {
-            if (this != &l) {
-                std::lock_guard<mutex_type> this_lock(mtx_);
-                std::lock_guard<mutex_type> l_lock(l.mtx_);
-                exceptions_ = l.exceptions_;
+            result += "  ";
+            result += detail::indent_message(hpx::get_error_what(*it));
+            if (result.find_last_of('\n') < result.size() - 1)
+                result += "\n";
+        }
+        return result;
+    }
+
+    void exception_list::add(std::exception_ptr const& e)
+    {
+        std::unique_lock<mutex_type> l(mtx_);
+        if (exceptions_.empty())
+        {
+            hpx::exception ex;
+            {
+                unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                ex = hpx::exception(hpx::get_error(e), hpx::get_error_what(e));
             }
-            return *this;
-        }
 
-        exception_list& operator=(exception_list&& l) noexcept
-        {
-            if (this != &l) {
-                std::lock_guard<mutex_type> this_lock(mtx_);
-                std::lock_guard<mutex_type> l_lock(l.mtx_);
-                exceptions_ = std::move(l.exceptions_);
-            }
-            return *this;
+            // set the error code for our base class
+            static_cast<hpx::exception&>(*this) = ex;
         }
+        exceptions_.push_back(e);
+    }
 
-        void add(std::exception_ptr const& e)
-        {
-            std::lock_guard<mutex_type> l(mtx_);
-            add_no_lock(e);
-        }
-        /// \endcond
-
-        /// The number of exception_ptr objects contained within the
-        /// exception_list.
-        ///
-        /// \note Complexity: Constant time.
-        [[nodiscard]] std::size_t size() const noexcept
-        {
-            std::lock_guard<mutex_type> l(mtx_);
-            return exceptions_.size();
-        }
-
-        /// An iterator referring to the first exception_ptr object contained
-        /// within the exception_list.
-        [[nodiscard]] exception_list_type::const_iterator begin() const noexcept
-        {
-            std::lock_guard<mutex_type> l(mtx_);
-            return exceptions_.begin();
-        }
-
-        /// An iterator which is the past-the-end value for the exception_list.
-        [[nodiscard]] exception_list_type::const_iterator end() const noexcept
-        {
-            std::lock_guard<mutex_type> l(mtx_);
-            return exceptions_.end();
-        }
-
-        /// \cond NOINTERNAL
-        [[nodiscard]] std::error_code get_error_code() const
-        {
-            return std::error_code(); // placeholder implementation
-        }
-
-        [[nodiscard]] std::string get_message() const
-        {
-            return "Exception occurred"; // placeholder implementation
-        }
-        /// \endcond
-    };
+    void exception_list::add_no_lock(std::exception_ptr const& e)
+    {
+        exceptions_.push_back(e);
+    }
 }    // namespace hpx
-
-#include <hpx/config/warnings_suffix.hpp>
