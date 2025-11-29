@@ -460,6 +460,7 @@ namespace hpx::execution::experimental {
             {
                 std::decay_t<Scheduler> const& sched;
                 
+#if defined(HPX_HAVE_STDEXEC)
                 // query() member function for newer stdexec
                 auto query(stdexec::get_domain_t) const noexcept
                 {
@@ -472,6 +473,7 @@ namespace hpx::execution::experimental {
                 {
                     return sched;
                 }
+#endif
                 
                 // clang-format off
                 template <typename CPO,
