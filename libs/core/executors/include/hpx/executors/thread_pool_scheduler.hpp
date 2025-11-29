@@ -459,22 +459,25 @@ namespace hpx::execution::experimental {
             struct env
             {
                 std::decay_t<Scheduler> const& sched;
-                
+
 #if defined(HPX_HAVE_STDEXEC)
                 // query() member function for newer stdexec
                 auto query(stdexec::get_domain_t) const noexcept
                 {
                     return stdexec::get_domain(sched);
                 }
-                
+
                 template <typename CPO>
-                    requires meta::value<meta::one_of<CPO, set_value_t, set_stopped_t>>
-                auto query(hpx::execution::experimental::get_completion_scheduler_t<CPO>) const noexcept
+                    requires meta::value<meta::one_of<CPO, set_value_t,
+                        set_stopped_t>>
+                auto query(
+                    hpx::execution::experimental::get_completion_scheduler_t<
+                        CPO>) const noexcept
                 {
                     return sched;
                 }
 #endif
-                
+
                 // clang-format off
                 template <typename CPO,
                     HPX_CONCEPT_REQUIRES_(

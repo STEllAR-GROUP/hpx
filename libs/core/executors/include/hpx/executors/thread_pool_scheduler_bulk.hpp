@@ -179,8 +179,10 @@ namespace hpx::execution::experimental::detail {
                 // The regular bulk invocation will go through the is_chunked case.
                 auto it = std::ranges::next(
                     hpx::util::begin(op_state->shape), i_begin);
+                // Wrap the index in a tuple for partitioner_iteration compatibility
+                auto index_tuple = hpx::make_tuple(*it);
                 bulk_scheduler_invoke_helper(
-                    index_pack_type{}, op_state->f, *it, ts);
+                    index_pack_type{}, op_state->f, index_tuple, ts);
             }
         }
 
@@ -404,8 +406,8 @@ namespace hpx::execution::experimental::detail {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
             auto const part_begin = worker_thread;
-            auto part_end = (std::min) (size + num_threads - 1,
-                part_begin + num_steps * num_threads);
+            auto part_end = (std::min) (
+                size + num_threads - 1, part_begin + num_steps * num_threads);
             auto const remainder = (part_end - part_begin) % num_threads;
             if (remainder != 0)
             {
