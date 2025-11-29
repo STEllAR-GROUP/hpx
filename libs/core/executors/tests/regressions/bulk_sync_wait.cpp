@@ -17,6 +17,7 @@ namespace tt = hpx::this_thread::experimental;
 
 int hpx_main()
 {
+#if defined(HPX_HAVE_STDEXEC)
     std::atomic<bool> called = false;
 
     ex::thread_pool_scheduler sch{};
@@ -27,6 +28,7 @@ int hpx_main()
     tt::sync_wait(s);
 
     HPX_TEST(called.load());
+#endif
 
     return hpx::local::finalize();
 }
