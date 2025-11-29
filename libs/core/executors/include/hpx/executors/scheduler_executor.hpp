@@ -9,14 +9,31 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/execution/algorithms/bulk.hpp>
+#include <hpx/execution/algorithms/keep_future.hpp>
+#include <hpx/execution/algorithms/make_future.hpp>
+#include <hpx/execution/algorithms/schedule_from.hpp>
+#include <hpx/execution/algorithms/start_detached.hpp>
+#include <hpx/execution/algorithms/sync_wait.hpp>
+#include <hpx/execution/algorithms/then.hpp>
+#include <hpx/execution/algorithms/transfer.hpp>
+#include <hpx/execution/algorithms/transfer_just.hpp>
+#include <hpx/execution/executors/default_parameters.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/execution_base/execution.hpp>
+#include <hpx/execution_base/sender.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
+#include <hpx/functional/bind_back.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/invoke_fused.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/modules/concepts.hpp>
-#include <hpx/modules/datastructures.hpp>
-#include <hpx/modules/execution.hpp>
-#include <hpx/modules/execution_base.hpp>
-#include <hpx/modules/functional.hpp>
-#include <hpx/modules/tag_invoke.hpp>
-#include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -57,7 +74,7 @@ namespace hpx::execution::experimental {
     ///////////////////////////////////////////////////////////////////////////
     // A scheduler_executor wraps any P2300 scheduler and implements the
     // executor functionalities for those.
-    HPX_CXX_EXPORT template <typename BaseScheduler>
+    template <typename BaseScheduler>
     struct scheduler_executor
     {
         static_assert(hpx::execution::experimental::is_scheduler_v<
@@ -254,7 +271,7 @@ namespace hpx::execution::experimental {
             scheduler_executor const& exec, F&& f, S const& shape, Ts&&... ts)
         {
             hpx::this_thread::experimental::sync_wait(
-                bulk(schedule(exec.sched_), shape,
+                bulk(schedule(exec.sched_), hpx::util::size(shape),
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
@@ -280,7 +297,7 @@ namespace hpx::execution::experimental {
                     when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
                 auto loop = bulk(transfer(HPX_MOVE(pre_req), exec.sched_),
-                    shape,
+                    hpx::util::size(shape),
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
                 return make_future(HPX_MOVE(loop));
@@ -292,10 +309,10 @@ namespace hpx::execution::experimental {
                     when_all(keep_future(HPX_FORWARD(Future, predecessor)),
                         just(std::vector<result_type>(hpx::util::size(shape))));
 
-                auto loop =
-                    bulk(transfer(HPX_MOVE(pre_req), exec.sched_), shape,
-                        detail::captured_args_then(
-                            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+                auto loop = bulk(transfer(HPX_MOVE(pre_req), exec.sched_),
+                    hpx::util::size(shape),
+                    detail::captured_args_then(
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
                 return make_future(then(
                     HPX_MOVE(loop), [](auto&&, std::vector<result_type>&& v) {
@@ -309,14 +326,13 @@ namespace hpx::execution::experimental {
         /// \endcond
     };
 
-    HPX_CXX_EXPORT template <typename BaseScheduler>
+    template <typename BaseScheduler>
     explicit scheduler_executor(BaseScheduler&& sched)
         -> scheduler_executor<std::decay_t<BaseScheduler>>;
 
     // support all properties exposed by the wrapped scheduler
     // clang-format off
-    HPX_CXX_EXPORT template <typename Tag, typename BaseScheduler,
-        typename Property,
+    template <typename Tag, typename BaseScheduler, typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>
@@ -331,7 +347,7 @@ namespace hpx::execution::experimental {
     }
 
     // clang-format off
-    HPX_CXX_EXPORT template <typename Tag, typename BaseScheduler,
+    template <typename Tag, typename BaseScheduler,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>
@@ -343,35 +359,35 @@ namespace hpx::execution::experimental {
     }
 
     /// \cond NOINTERNAL
-    HPX_CXX_EXPORT template <typename BaseScheduler>
+    template <typename BaseScheduler>
     struct is_one_way_executor<
         hpx::execution::experimental::scheduler_executor<BaseScheduler>>
       : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename BaseScheduler>
+    template <typename BaseScheduler>
     struct is_never_blocking_one_way_executor<
         hpx::execution::experimental::scheduler_executor<BaseScheduler>>
       : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename BaseScheduler>
+    template <typename BaseScheduler>
     struct is_bulk_one_way_executor<
         hpx::execution::experimental::scheduler_executor<BaseScheduler>>
       : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename BaseScheduler>
+    template <typename BaseScheduler>
     struct is_two_way_executor<
         hpx::execution::experimental::scheduler_executor<BaseScheduler>>
       : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename BaseScheduler>
+    template <typename BaseScheduler>
     struct is_bulk_two_way_executor<
         hpx::execution::experimental::scheduler_executor<BaseScheduler>>
       : std::true_type
