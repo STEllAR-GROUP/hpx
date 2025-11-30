@@ -16,6 +16,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util::detail {
 
+    // Helper to detect if a type is tuple-like
+    template <typename T, typename = void>
+    struct is_tuple_like : std::false_type
+    {
+    };
+
+    template <typename T>
+    struct is_tuple_like<T,
+        std::void_t<decltype(hpx::tuple_size<std::decay_t<T>>::value)>>
+      : std::true_type
+    {
+    };
+
+    template <typename T>
+    inline constexpr bool is_tuple_like_v = is_tuple_like<T>::value;
+
     // Hand-crafted function object allowing to replace a more complex
     // bind(hpx::functional::invoke_fused(), f1, _1)
     template <typename Result, typename F>
@@ -23,10 +39,20 @@ namespace hpx::parallel::util::detail {
     {
         std::decay_t<F> f_;
 
-        template <typename T>
+        // Overload for tuple-like types
+        template <typename T,
+            typename = std::enable_if_t<is_tuple_like_v<T>>>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(T&& t)
         {
             return hpx::invoke_fused_r<Result>(f_, HPX_FORWARD(T, t));
+        }
+
+        // Overload for non-tuple types (std::size_t from stdexec bulk)
+        template <typename T,
+            typename = std::enable_if_t<!is_tuple_like_v<T>>, typename = void>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(T&& t)
+        {
+            return HPX_INVOKE_R(Result, f_, HPX_FORWARD(T, t));
         }
 
         template <std::size_t... Is, typename... Ts>

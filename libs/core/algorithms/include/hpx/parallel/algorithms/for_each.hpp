@@ -324,6 +324,14 @@ namespace hpx::parallel {
                 util::loop_n<execution_policy_type>(part_begin, part_size,
                     util::invoke_projected_ind<fun_type, proj_type>{f_, proj_});
             }
+
+            // Overload for stdexec bulk: receives single index
+            // called when using stdexec bulk with a single size_t index
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                std::size_t idx)
+            {
+                HPX_INVOKE(f_, HPX_INVOKE(proj_, idx));
+            }
         };
 
         template <typename ExPolicy, typename F>
@@ -389,6 +397,14 @@ namespace hpx::parallel {
                 Iter part_begin, std::size_t part_size, std::size_t)
             {
                 return (*this)(part_begin, part_size);
+            }
+
+            // Overload for stdexec bulk: receives single index
+            // called when using stdexec bulk with a single size_t index
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                std::size_t idx)
+            {
+                HPX_INVOKE(f_, idx);
             }
         };
 
