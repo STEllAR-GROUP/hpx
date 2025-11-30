@@ -363,6 +363,15 @@ namespace hpx::parallel {
                 util::copy_n<execution_policy_type>(
                     get<0>(iters), part_size, get<1>(iters));
             }
+
+            // Overload for stdexec bulk: receives single index
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                std::size_t) const
+            {
+                // ig this should not be called for copy operations
+                // Copy needs iterator pairs, not individual indices
+                HPX_ASSERT(false);
+            }
         };
 
         template <typename IterPair>

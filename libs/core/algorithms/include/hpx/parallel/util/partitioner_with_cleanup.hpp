@@ -149,7 +149,7 @@ namespace hpx::parallel::util {
                 namespace ex = hpx::execution::experimental;
                 if constexpr (ex::is_sender_v<std::decay_t<Items>>)
                 {
-                    return ex::let_value(workitems,
+                    return ex::let_value(HPX_FORWARD(Items, workitems),
                         [f = HPX_FORWARD(F, f),
                             cleanup = HPX_FORWARD(Cleanup, cleanup)](
                             auto&& all_parts) mutable {
