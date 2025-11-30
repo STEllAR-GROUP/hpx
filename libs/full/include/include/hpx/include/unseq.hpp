@@ -6,4 +6,4 @@
 
 #pragma once
 
-#include <hpx/parallel/unseq.hpp>
+#include <hpx/modules/algorithms.hpp>

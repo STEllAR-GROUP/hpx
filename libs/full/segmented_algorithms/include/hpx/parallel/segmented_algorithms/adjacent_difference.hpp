@@ -9,14 +9,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/modules/functional.hpp>
-
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/executors.hpp>
-#include <hpx/parallel/algorithms/adjacent_difference.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
 #include <cstddef>

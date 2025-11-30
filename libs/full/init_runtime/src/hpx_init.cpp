@@ -19,6 +19,7 @@
 #include <hpx/init_runtime/detail/init_logging.hpp>
 #include <hpx/init_runtime/detail/run_or_start.hpp>
 #include <hpx/init_runtime_local/init_runtime_local.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
@@ -40,7 +41,6 @@
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
 
 #ifdef HPX_HAVE_MODULE_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>

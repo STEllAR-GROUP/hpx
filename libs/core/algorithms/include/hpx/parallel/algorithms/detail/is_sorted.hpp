@@ -13,7 +13,7 @@
 
 namespace hpx::parallel::detail {
 
-    template <typename Iter, typename Sent, typename Compare,
+    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Compare,
         typename Proj = hpx::identity>
     constexpr bool is_sorted_sequential(
         Iter first, Sent last, Compare&& comp, Proj&& proj = Proj())
@@ -32,7 +32,7 @@ namespace hpx::parallel::detail {
         return sorted;
     }
 
-    template <typename Iter, typename Sent, typename Compare,
+    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Compare,
         typename Proj = hpx::identity>
     constexpr Iter is_sorted_until_sequential(
         Iter first, Sent last, Compare&& comp, Proj&& proj = Proj())

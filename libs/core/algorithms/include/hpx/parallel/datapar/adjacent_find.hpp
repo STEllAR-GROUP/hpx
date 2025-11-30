@@ -24,7 +24,7 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct datapar_adjacent_find
     {
         template <typename InIter, typename Sent_, typename PredProj>
@@ -68,13 +68,9 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename ExPolicy, typename InIter, typename Sent_,
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter, typename Sent_,
         typename PredProj>
-    // clang-format off
-        requires (
-            hpx::is_vectorpack_execution_policy_v<ExPolicy>
-        )
-    // clang-format on
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     constexpr InIter tag_invoke(sequential_adjacent_find_t<ExPolicy>,
         InIter first, Sent_ last, PredProj&& pred_projected)
     {
@@ -96,13 +92,9 @@ namespace hpx::parallel::detail {
         }
     }
 
-    template <typename ExPolicy, typename ZipIter, typename Token,
-        typename PredProj>
-    // clang-format off
-        requires (
-            hpx::is_vectorpack_execution_policy_v<ExPolicy>
-        )
-    // clang-format on
+    HPX_CXX_EXPORT template <typename ExPolicy, typename ZipIter,
+        typename Token, typename PredProj>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     constexpr void tag_invoke(sequential_adjacent_find_t<ExPolicy>,
         std::size_t base_idx, ZipIter part_begin, std::size_t part_count,
         Token& tok, PredProj&& pred_projected)

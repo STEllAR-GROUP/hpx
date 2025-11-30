@@ -184,21 +184,30 @@ add_library(hpx_interface_wrap_main INTERFACE)
 target_link_libraries(
   hpx_interface_wrap_main INTERFACE $<${_is_executable}:HPXInternal::hpx_wrap>
 )
-add_library(hpx_interface_auto_wrap_main INTERFACE)
-target_link_libraries(
-  hpx_interface_auto_wrap_main
-  INTERFACE $<${_is_executable}:HPXInternal::hpx_auto_wrap>
-)
 
 target_link_libraries(wrap_main INTERFACE hpx_interface_wrap_main)
-target_link_libraries(auto_wrap_main INTERFACE hpx_interface_auto_wrap_main)
 target_link_libraries(init INTERFACE HPXInternal::hpx_init)
 target_link_libraries(hpx INTERFACE hpx_interface)
 
-# HPX::component is to be linked privately to all HPX components NOTE: The
-# _is_library guard only prevents simple mistakes of linking HPX::component to
-# executables. It does not prevent linking it to libraries that are not
-# components.
+set(hpx_targets hpx wrap_main init plugin component)
+set(hpx_internal_targets hpx_full hpx_interface hpx_interface_wrap_main)
+
+if(NOT MSVC)
+  add_library(hpx_interface_auto_wrap_main INTERFACE)
+  target_link_libraries(
+    hpx_interface_auto_wrap_main
+    INTERFACE $<${_is_executable}:HPXInternal::hpx_auto_wrap>
+  )
+  target_link_libraries(auto_wrap_main INTERFACE hpx_interface_auto_wrap_main)
+  set(hpx_targets ${hpx_targets} auto_wrap_main)
+  set(hpx_internal_targets ${hpx_internal_targets} hpx_interface_auto_wrap_main)
+endif()
+
+# HPX::component is to be linked privately to all HPX components
+#
+# NOTE: The _is_library guard only prevents simple mistakes of linking
+# HPX::component to executables. It does not prevent linking it to libraries
+# that are not components.
 add_library(component INTERFACE)
 target_compile_definitions(
   component
@@ -217,11 +226,6 @@ target_compile_definitions(
   plugin
   INTERFACE
     "$<${_is_library}:HPX_PLUGIN_NAME_DEFAULT=hpx_$<TARGET_PROPERTY:NAME>>"
-)
-
-set(hpx_targets hpx wrap_main auto_wrap_main init plugin component)
-set(hpx_internal_targets hpx_full hpx_interface hpx_interface_wrap_main
-                         hpx_interface_auto_wrap_main
 )
 
 # cmake-format: off

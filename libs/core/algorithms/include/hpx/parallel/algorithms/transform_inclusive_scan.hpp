@@ -334,9 +334,9 @@ namespace hpx::parallel {
 
         ///////////////////////////////////////////////////////////////////////
         // Our own version of the sequential transform_inclusive_scan.
-        template <typename InIter, typename Sent, typename OutIter,
-            typename Conv, typename T, typename Op>
-        static constexpr util::in_out_result<InIter, OutIter>
+        HPX_CXX_EXPORT template <typename InIter, typename Sent,
+            typename OutIter, typename Conv, typename T, typename Op>
+        constexpr util::in_out_result<InIter, OutIter>
         sequential_transform_inclusive_scan(
             InIter first, Sent last, OutIter dest, Conv&& conv, T init, Op&& op)
         {
@@ -348,9 +348,9 @@ namespace hpx::parallel {
             return util::in_out_result<InIter, OutIter>{first, dest};
         }
 
-        template <typename InIter, typename Sent, typename OutIter,
-            typename Conv, typename Op>
-        static constexpr util::in_out_result<InIter, OutIter>
+        HPX_CXX_EXPORT template <typename InIter, typename Sent,
+            typename OutIter, typename Conv, typename Op>
+        constexpr util::in_out_result<InIter, OutIter>
         sequential_transform_inclusive_scan_noinit(
             InIter first, Sent last, OutIter dest, Conv&& conv, Op&& op)
         {
@@ -366,9 +366,9 @@ namespace hpx::parallel {
             return util::in_out_result<InIter, OutIter>{first, dest};
         }
 
-        template <typename InIter, typename OutIter, typename Conv, typename T,
-            typename Op>
-        static constexpr T sequential_transform_inclusive_scan_n(InIter first,
+        HPX_CXX_EXPORT template <typename InIter, typename OutIter,
+            typename Conv, typename T, typename Op>
+        constexpr T sequential_transform_inclusive_scan_n(InIter first,
             std::size_t count, OutIter dest, Conv&& conv, T init, Op&& op)
         {
             for (/**/; count-- != 0; (void) ++first, ++dest)
@@ -380,7 +380,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct transform_inclusive_scan
           : public algorithm<transform_inclusive_scan<IterPair>, IterPair>
         {
@@ -513,7 +513,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::transform_inclusive_scan
-    inline constexpr struct transform_inclusive_scan_t final
+    HPX_CXX_EXPORT inline constexpr struct transform_inclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<transform_inclusive_scan_t>
     {
         template <typename InIter, typename OutIter, typename BinOp,

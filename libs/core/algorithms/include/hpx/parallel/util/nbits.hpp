@@ -13,24 +13,24 @@
 
 namespace hpx::parallel::util {
 
-    inline constexpr std::uint32_t tmsb[256] = {0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4,
-        4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6,
-        6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-        6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+    HPX_CXX_EXPORT inline constexpr std::uint32_t tmsb[256] = {0, 1, 2, 2, 3, 3,
+        3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+        5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+        6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
         7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-        7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8,
+        7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+        7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
         8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
         8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
         8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
         8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-        8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-        8, 8, 8, 8, 8};
+        8, 8, 8, 8, 8, 8, 8, 8, 8, 8};
 
     // \brief Obtain the number of bits equal or greater than num
     // \param [in] num : Number to examine
     // \exception none
     // \return Number of bits
-    constexpr std::uint32_t nbits32(std::uint32_t num) noexcept
+    HPX_CXX_EXPORT constexpr std::uint32_t nbits32(std::uint32_t num) noexcept
     {
         int Pos = num & 0xffff0000U ? 16 : 0;
         if (num >> Pos & 0xff00U)
@@ -44,7 +44,7 @@ namespace hpx::parallel::util {
     // \param [in] num : Number to examine
     // \exception none
     // \return Number of bits
-    constexpr std::uint32_t nbits64(std::uint64_t num) noexcept
+    HPX_CXX_EXPORT constexpr std::uint32_t nbits64(std::uint64_t num) noexcept
     {
         uint32_t pos = num & 0xffffffff00000000ULL ? 32 : 0;
         if (num >> pos & 0xffff0000ULL)

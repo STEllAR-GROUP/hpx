@@ -12,10 +12,10 @@
 #include <hpx/collectives/detail/communication_set_node.hpp>
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/server/component.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/parallel/container_algorithms/count.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/get_num_localities.hpp>

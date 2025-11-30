@@ -8,7 +8,5 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/algorithms/minmax.hpp>
-#include <hpx/parallel/container_algorithms/minmax.hpp>
-
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/parallel/segmented_algorithms/minmax.hpp>

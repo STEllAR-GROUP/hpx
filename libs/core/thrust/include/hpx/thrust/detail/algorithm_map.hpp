@@ -3,54 +3,23 @@
 // SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
 
 #pragma once
 
 // HPX algorithm headers for tag types
-#include <hpx/parallel/algorithm.hpp>
-#include <hpx/parallel/memory.hpp>
-#include <hpx/parallel/numeric.hpp>
+#include <hpx/config.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/thrust/thrust_headers.hpp>
 
 // Centralized Thrust algorithm headers
-#include <thrust/adjacent_difference.h>
-#include <thrust/copy.h>
-#include <thrust/count.h>
-#include <thrust/equal.h>
-#include <thrust/extrema.h>
-#include <thrust/fill.h>
-#include <thrust/find.h>
-#include <thrust/for_each.h>
-#include <thrust/generate.h>
-#include <thrust/logical.h>
-#include <thrust/merge.h>
-#include <thrust/mismatch.h>
-#include <thrust/partition.h>
-#include <thrust/reduce.h>
-#include <thrust/remove.h>
-#include <thrust/replace.h>
-#include <thrust/reverse.h>
-#include <thrust/scan.h>
-#include <thrust/set_operations.h>
-#include <thrust/sort.h>
-#include <thrust/swap.h>
-#include <thrust/system/cuda/execution_policy.h>
-#include <thrust/transform.h>
-#include <thrust/transform_reduce.h>
-#include <thrust/transform_scan.h>
-#include <thrust/uninitialized_copy.h>
-#include <thrust/uninitialized_fill.h>
-#include <thrust/unique.h>
-
-#include <hpx/config/forward.hpp>    // HPX_FORWARD
 #include <type_traits>
 #include <utility>
 
 namespace hpx::thrust::detail {
 
-    template <typename HPXTag>
-    struct
-        algorithm_map;    // No definition = compilation error for unmapped algorithms
+    // No definition = compilation error for unmapped algorithms
+    HPX_CXX_EXPORT template <typename Tag>
+    struct algorithm_map;
 
     template <>
     struct algorithm_map<hpx::fill_t>
@@ -679,10 +648,9 @@ namespace hpx::thrust::detail {
     };
 
     // boolean predicate indicating whether a mapping exists
-    template <typename HPXTag, typename Policy, typename... Args>
+    HPX_CXX_EXPORT template <typename Tag, typename Policy, typename... Args>
     concept is_algorithm_mapped = requires {
-        algorithm_map<HPXTag>::invoke(
+        algorithm_map<Tag>::invoke(
             std::declval<Policy>(), std::declval<Args>()...);
     };
-
 }    // namespace hpx::thrust::detail

@@ -12,6 +12,6 @@
 
 namespace hpx {
 
-    using hpx::invoke_fused;
-    using hpx::mem_fn;
+    HPX_CXX_EXPORT using hpx::invoke_fused;
+    HPX_CXX_EXPORT using hpx::mem_fn;
 }    // namespace hpx

@@ -30,10 +30,10 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace cuda { namespace experimental {
+namespace hpx::cuda::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct target
+    HPX_CXX_EXPORT struct target
     {
     public:
         struct HPX_CORE_EXPORT native_handle_type
@@ -41,7 +41,6 @@ namespace hpx { namespace cuda { namespace experimental {
             typedef hpx::spinlock mutex_type;
 
             native_handle_type(int device = 0);
-
             ~native_handle_type();
 
             native_handle_type(native_handle_type const& rhs) noexcept;
@@ -73,7 +72,7 @@ namespace hpx { namespace cuda { namespace experimental {
                 return processor_name_;
             }
 
-            void reset() noexcept;
+            void reset() const noexcept;
 
         private:
             void init_processing_units();
@@ -170,8 +169,8 @@ namespace hpx { namespace cuda { namespace experimental {
         native_handle_type handle_;
     };
 
-    using detail::get_future_with_callback;
-    HPX_CORE_EXPORT target& get_default_target();
-}}}    // namespace hpx::cuda::experimental
+    HPX_CXX_EXPORT using detail::get_future_with_callback;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT target& get_default_target();
+}    // namespace hpx::cuda::experimental
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -20,12 +20,13 @@
 
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 
-namespace hpx { namespace cuda { namespace experimental {
+namespace hpx::cuda::experimental {
+
     void target::native_handle_type::init_processing_units()
     {
         cudaDeviceProp props;
-        cudaError_t error = cudaGetDeviceProperties(&props, device_);
-        if (error != cudaSuccess)
+        if (cudaError_t error = cudaGetDeviceProperties(&props, device_);
+            error != cudaSuccess)
         {
             // report error
             HPX_THROW_EXCEPTION(hpx::error::kernel_error,
@@ -66,7 +67,7 @@ namespace hpx { namespace cuda { namespace experimental {
 
     target::native_handle_type::native_handle_type(int device)
       : device_(device)
-      , stream_(0)
+      , stream_(nullptr)
     {
         init_processing_units();
     }
@@ -76,12 +77,12 @@ namespace hpx { namespace cuda { namespace experimental {
         reset();
     }
 
-    void target::native_handle_type::reset() noexcept
+    void target::native_handle_type::reset() const noexcept
     {
         if (stream_)
         {
-            cudaError_t err = cudaStreamDestroy(stream_);    // ignore error
-            HPX_UNUSED(err);
+            [[maybe_unused]] cudaError_t err =
+                cudaStreamDestroy(stream_);    // ignore error
         }
     }
 
@@ -91,7 +92,7 @@ namespace hpx { namespace cuda { namespace experimental {
       , processing_units_(rhs.processing_units_)
       , processor_family_(rhs.processor_family_)
       , processor_name_(rhs.processor_name_)
-      , stream_(0)
+      , stream_(nullptr)
     {
     }
 
@@ -103,7 +104,7 @@ namespace hpx { namespace cuda { namespace experimental {
       , processor_name_(rhs.processor_name_)
       , stream_(rhs.stream_)
     {
-        rhs.stream_ = 0;
+        rhs.stream_ = nullptr;
     }
 
     target::native_handle_type& target::native_handle_type::operator=(
@@ -132,7 +133,7 @@ namespace hpx { namespace cuda { namespace experimental {
         processor_family_ = rhs.processor_family_;
         processor_name_ = rhs.processor_name_;
         stream_ = rhs.stream_;
-        rhs.stream_ = 0;
+        rhs.stream_ = nullptr;
 
         return *this;
     }
@@ -141,7 +142,7 @@ namespace hpx { namespace cuda { namespace experimental {
     {
         std::lock_guard<mutex_type> l(mtx_);
 
-        if (stream_ == 0)
+        if (stream_ == nullptr)
         {
             cudaError_t error = cudaSetDevice(device_);
             if (error != cudaSuccess)
@@ -151,6 +152,7 @@ namespace hpx { namespace cuda { namespace experimental {
                     std::string("cudaSetDevice failed: ") +
                         cudaGetErrorString(error));
             }
+
             error = cudaStreamCreateWithFlags(&stream_, cudaStreamNonBlocking);
             if (error != cudaSuccess)
             {
@@ -166,17 +168,17 @@ namespace hpx { namespace cuda { namespace experimental {
     ///////////////////////////////////////////////////////////////////////////
     void target::synchronize() const
     {
-        cudaStream_t stream = handle_.get_stream();
+        cudaStream_t const stream = handle_.get_stream();
 
-        if (stream == 0)
+        if (stream == nullptr)
         {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "cuda::experimental::target::synchronize",
                 "no stream available");
         }
 
-        cudaError_t error = cudaStreamSynchronize(stream);
-        if (error != cudaSuccess)
+        if (cudaError_t const error = cudaStreamSynchronize(stream);
+            error != cudaSuccess)
         {
             HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "cuda::experimental::target::synchronize",
@@ -201,4 +203,4 @@ namespace hpx { namespace cuda { namespace experimental {
         static target target_;
         return target_;
     }
-}}}    // namespace hpx::cuda::experimental
+}    // namespace hpx::cuda::experimental

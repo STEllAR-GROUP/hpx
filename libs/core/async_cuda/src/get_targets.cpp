@@ -16,12 +16,13 @@
 
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 
-namespace hpx { namespace cuda { namespace experimental {
+namespace hpx::cuda::experimental {
+
     std::vector<target> get_local_targets()
     {
         int device_count = 0;
-        cudaError_t error = cudaGetDeviceCount(&device_count);
-        if (error != cudaSuccess)
+        if (cudaError_t const error = cudaGetDeviceCount(&device_count);
+            error != cudaSuccess)
         {
             HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "cuda::experimental::get_local_targets()",
@@ -49,8 +50,7 @@ namespace hpx { namespace cuda { namespace experimental {
 
     void print_local_targets(void)
     {
-        auto targets = get_local_targets();
-        for (auto target : targets)
+        for (auto const targets = get_local_targets(); auto target : targets)
         {
             std::cout << "GPU Device " << target.native_handle().get_device()
                       << ": \"" << target.native_handle().processor_name()
@@ -58,5 +58,4 @@ namespace hpx { namespace cuda { namespace experimental {
                       << target.native_handle().processor_family() << "\n";
         }
     }
-
-}}}    // namespace hpx::cuda::experimental
+}    // namespace hpx::cuda::experimental

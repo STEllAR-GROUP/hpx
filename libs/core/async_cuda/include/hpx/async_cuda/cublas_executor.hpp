@@ -14,6 +14,7 @@
 #include <hpx/async_cuda/cuda_exception.hpp>
 #include <hpx/async_cuda/cuda_executor.hpp>
 #include <hpx/async_cuda/cuda_future.hpp>
+#include <hpx/async_cuda/detail/cuda_debug.hpp>
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
@@ -23,7 +24,7 @@
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 // CuBLAS
 #include <hpx/async_cuda/custom_blas_api.hpp>
-//
+
 #include <cstddef>
 #include <exception>
 #include <memory>
@@ -31,68 +32,31 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace cuda { namespace experimental {
+namespace hpx::cuda::experimental {
 
     namespace detail {
-        using print_on = debug::enable_print<false>;
-        static constexpr print_on cub_debug("CUBLAS_");
+
+        HPX_CXX_EXPORT inline constexpr print_on cub_debug("CUBLAS_");
 
         // -------------------------------------------------------------------------
         // Error handling in cublas calls
         // not all of these are supported by all cuda/cublas versions
         // (comment them out if they cause compiler errors)
-        inline const char* _cublasGetErrorString(cublasStatus_t error)
-        {
-            switch (error)
-            {
-            case CUBLAS_STATUS_SUCCESS:
-                return "CUBLAS_STATUS_SUCCESS";
-            case CUBLAS_STATUS_NOT_INITIALIZED:
-                return "CUBLAS_STATUS_NOT_INITIALIZED";
-            case CUBLAS_STATUS_ALLOC_FAILED:
-                return "CUBLAS_STATUS_ALLOC_FAILED";
-            case CUBLAS_STATUS_INVALID_VALUE:
-                return "CUBLAS_STATUS_INVALID_VALUE";
-            case CUBLAS_STATUS_ARCH_MISMATCH:
-                return "CUBLAS_STATUS_ARCH_MISMATCH";
-            case CUBLAS_STATUS_MAPPING_ERROR:
-                return "CUBLAS_STATUS_MAPPING_ERROR";
-            case CUBLAS_STATUS_EXECUTION_FAILED:
-                return "CUBLAS_STATUS_EXECUTION_FAILED";
-            case CUBLAS_STATUS_INTERNAL_ERROR:
-                return "CUBLAS_STATUS_INTERNAL_ERROR";
-            case CUBLAS_STATUS_NOT_SUPPORTED:
-                return "CUBLAS_STATUS_NOT_SUPPORTED";
-#ifdef HPX_HAVE_HIP
-            case HIPBLAS_STATUS_HANDLE_IS_NULLPTR:
-                return "HIPBLAS_STATUS_HANDLE_IS_NULLPTR";
-#if HPX_HIP_VERSION >= 40300000
-            case HIPBLAS_STATUS_INVALID_ENUM:
-                return "HIPBLAS_STATUS_INVALID_ENUM";
-#endif
-            case HIPBLAS_STATUS_UNKNOWN:
-                return "HIPBLAS_STATUS_UNKNOWN";
-#else
-            case CUBLAS_STATUS_LICENSE_ERROR:
-                return "CUBLAS_STATUS_LICENSE_ERROR";
-#endif
-            default:
-                break;
-            }
-            return "<unknown>";
-        }
+        HPX_CXX_EXPORT HPX_CORE_EXPORT char const* _cublasGetErrorString(
+            cublasStatus_t error);
     }    // namespace detail
 
     // -------------------------------------------------------------------------
     // exception type for failed launch of cuda functions
-    struct HPX_CORE_EXPORT cublas_exception : hpx::exception
+    HPX_CXX_EXPORT struct HPX_ALWAYS_EXPORT cublas_exception : hpx::exception
     {
-        cublas_exception(const std::string& msg, cublasStatus_t err)
+        cublas_exception(std::string const& msg, cublasStatus_t err)
           : hpx::exception(hpx::error::bad_function_call, msg)
           , err_(err)
         {
         }
-        cublasStatus_t get_cublas_errorcode()
+
+        cublasStatus_t get_cublas_errorcode() const
         {
             return err_;
         }
@@ -101,20 +65,13 @@ namespace hpx { namespace cuda { namespace experimental {
         cublasStatus_t err_;
     };
 
-    inline cublasStatus_t check_cublas_error(cublasStatus_t err)
-    {
-        if (err != CUBLAS_STATUS_SUCCESS)
-        {
-            auto temp = std::string("cublas function returned error code :") +
-                detail::_cublasGetErrorString(err);
-            throw cublas_exception(temp, err);
-        }
-        return err;
-    }
+    HPX_CXX_EXPORT HPX_CORE_EXPORT cublasStatus_t check_cublas_error(
+        cublasStatus_t err);
 
     namespace detail {
+
         // specialization for return type of cublasStatus_t
-        template <typename... Args>
+        HPX_CXX_EXPORT template <typename... Args>
         struct dispatch_helper<cublasStatus_t, Args...>
         {
             inline cublasStatus_t operator()(
@@ -125,7 +82,7 @@ namespace hpx { namespace cuda { namespace experimental {
             }
         };
 
-        struct cublas_handle
+        HPX_CXX_EXPORT struct cublas_handle
         {
             static cublasHandle_t create()
             {
@@ -146,7 +103,7 @@ namespace hpx { namespace cuda { namespace experimental {
     // a simple cublas wrapper helper object that can be used to synchronize
     // cublas calls with an hpx future.
     // -------------------------------------------------------------------------
-    struct cublas_executor : cuda_executor
+    HPX_CXX_EXPORT struct cublas_executor : cuda_executor
     {
 #ifdef HPX_HAVE_HIP
         // hipblas handle is type : void*
@@ -274,8 +231,7 @@ namespace hpx { namespace cuda { namespace experimental {
         handle_ptr handle_;
         cublasPointerMode_t pointer_mode_;
     };
-
-}}}    // namespace hpx::cuda::experimental
+}    // namespace hpx::cuda::experimental
 
 namespace hpx::execution::experimental {
 
@@ -295,4 +251,5 @@ namespace hpx::execution::experimental {
     };
     /// \endcond
 }    // namespace hpx::execution::experimental
+
 #endif

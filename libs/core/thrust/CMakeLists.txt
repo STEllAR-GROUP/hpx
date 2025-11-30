@@ -10,8 +10,9 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(thrust_headers hpx/thrust/policy.hpp hpx/thrust/algorithms.hpp
-                   hpx/thrust/detail/algorithm_map.hpp
+set(thrust_headers
+    hpx/thrust/policy.hpp hpx/thrust/thrust_headers.hpp
+    hpx/thrust/algorithms.hpp hpx/thrust/detail/algorithm_map.hpp
 )
 
 # cmake-format: off
@@ -24,16 +25,21 @@ include(HPX_AddModule)
 add_hpx_module(
   core thrust
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${thrust_sources}
   HEADERS ${thrust_headers}
+  EXCLUDE_FROM_GLOBAL_HEADER "hpx/thrust/thrust_headers.hpp"
   COMPAT_HEADERS ${thrust_compat_headers}
   MODULE_DEPENDENCIES
     hpx_algorithms
+    hpx_async_cuda
     hpx_concepts
     hpx_execution
     hpx_execution_base
+    hpx_executors
     hpx_functional
     hpx_futures
-    hpx_async_cuda
+    hpx_tag_invoke
+    hpx_threading_base
   CMAKE_SUBDIRS examples tests
 )

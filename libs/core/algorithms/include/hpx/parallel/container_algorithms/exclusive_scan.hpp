@@ -343,10 +343,10 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     using exclusive_scan_result = parallel::util::in_out_result<I, O>;
 
-    inline constexpr struct exclusive_scan_t final
+    HPX_CXX_EXPORT inline constexpr struct exclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<exclusive_scan_t>
     {
     private:
@@ -354,14 +354,14 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<InIter>::value_type,
             typename Op = std::plus<>>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<Op,
                     typename std::iterator_traits<InIter>::value_type,
                     typename std::iterator_traits<InIter>::value_type>
-                )
+            )
         // clang-format on
         friend exclusive_scan_result<InIter, OutIter> tag_fallback_invoke(
             hpx::ranges::exclusive_scan_t, InIter first, Sent last,
@@ -384,7 +384,7 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<FwdIter1>::value_type,
             typename Op = std::plus<>>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
@@ -417,7 +417,7 @@ namespace hpx::ranges {
                 hpx::traits::range_iterator_t<Rng>>::value_type,
             typename Op = std::plus<>>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<Op,
                     typename hpx::traits::range_traits<Rng>::value_type,
@@ -446,7 +446,7 @@ namespace hpx::ranges {
                 hpx::traits::range_iterator_t<Rng>>::value_type,
             typename Op = std::plus<>>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<Op,

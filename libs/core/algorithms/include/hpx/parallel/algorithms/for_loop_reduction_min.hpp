@@ -63,7 +63,7 @@ namespace hpx::experimental {
     ///          views are combined by invoking the copy of combiner, passing it
     ///          the two views to be combined.
     ///
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         hpx::parallel::detail::min_of<T>>
     reduction_min(T& var)
@@ -71,7 +71,7 @@ namespace hpx::experimental {
         return reduction(var, var, hpx::parallel::detail::min_of<T>());
     }
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         hpx::parallel::detail::min_of<T>>
     reduction_min(T& var, T const& identity)
