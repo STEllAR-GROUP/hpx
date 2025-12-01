@@ -399,8 +399,6 @@ namespace hpx::parallel {
                 return (*this)(part_begin, part_size);
             }
 
-            // Overload for stdexec bulk: receives single index
-            // called when using stdexec bulk with a single size_t index
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
                 std::size_t idx)
             {
