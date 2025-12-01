@@ -687,6 +687,14 @@ function(hpx_check_for_cxx26_experimental_scope)
   )
 endfunction()
 
+function(hpx_check_for_cxx26_contracts)
+  add_hpx_config_test(
+    HPX_WITH_CXX26_CONTRACTS
+    SOURCE cmake/tests/cxx26_contracts.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
 # ##############################################################################
 function(hpx_check_for_cxx_lambda_capture_decltype)
   add_hpx_config_test(
