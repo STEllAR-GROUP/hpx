@@ -20,6 +20,8 @@ int multiply_positive(int const x) HPX_PRE(x > 0)
 
 int main()
 {
-    // This should trigger precondition violation when __cpp_contracts is available
-    return multiply_positive(-5);    // Violates x > 0
+    // This should trigger precondition violation when __cpp_contracts is
+    // available
+    [[maybe_unused]] int result = multiply_positive(-5);    // Violates x > 0
+    return 0;
 }

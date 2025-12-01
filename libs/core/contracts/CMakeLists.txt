@@ -24,7 +24,8 @@ if(HPX_WITH_CXX26_CONTRACTS)
 endif()
 
 # Default location is $HPX_ROOT/libs/contracts/include
-set(contracts_headers hpx/contracts.hpp hpx/modules/contracts.hpp)
+set(contracts_headers hpx/contracts.hpp hpx/contracts/macros.hpp)
+set(contracts_macro_headers hpx/contracts/macros.hpp)
 
 # Default location is $HPX_ROOT/libs/contracts/src
 set(contracts_sources)
@@ -32,9 +33,11 @@ set(contracts_sources)
 include(HPX_AddModule)
 add_hpx_module(
   core contracts
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${contracts_sources}
   HEADERS ${contracts_headers}
+  MACRO_HEADERS ${contracts_macro_headers}
   COMPAT_HEADERS ${contracts_compat_headers}
   MODULE_DEPENDENCIES hpx_config hpx_preprocessor hpx_assertion
   CMAKE_SUBDIRS examples tests

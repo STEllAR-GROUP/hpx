@@ -20,6 +20,8 @@ int get_positive_number(int) HPX_POST(r : r > 0)
 
 int main()
 {
-    // This should trigger postcondition violation when __cpp_contracts is available
-    return get_positive_number(5);
+    // This should trigger postcondition violation when __cpp_contracts is
+    // available
+    [[maybe_unused]] int result = get_positive_number(5);
+    return 0;
 }
