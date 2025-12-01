@@ -6,8 +6,8 @@
 
 #if defined(HPX_WINDOWS)
 #include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/program_options/parsers.hpp>
 
 #include <cctype>
 #include <cstdlib>

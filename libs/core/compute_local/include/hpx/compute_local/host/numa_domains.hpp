@@ -8,11 +8,12 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/compute_local/host/target.hpp>
 
 #include <vector>
 
 namespace hpx::compute::host {
 
-    HPX_CORE_EXPORT std::vector<target> numa_domains();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::vector<target> numa_domains();
 }    // namespace hpx::compute::host
