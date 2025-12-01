@@ -28,7 +28,7 @@ add_hpx_executable(
   SOURCES ${heartbeat_SOURCES}
   HEADERS ${heartbeat_HEADERS}
   FOLDER "Examples/HeartBeat"
-  DEPENDENCIES iostreams_component
+  DEPENDENCIES iostreams_component ${HPX_WITH_CXX_MODULES_OPTION}
 )
 
 # add pseudo-target dependencies
@@ -39,7 +39,7 @@ add_hpx_executable(
   heartbeat_console INTERNAL_FLAGS
   SOURCES heartbeat_console.cpp
   FOLDER "Examples/HeartBeat"
-  DEPENDENCIES iostreams_component
+  DEPENDENCIES iostreams_component ${HPX_WITH_CXX_MODULES_OPTION}
 )
 
 # add pseudo-target dependencies

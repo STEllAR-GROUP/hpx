@@ -9,5 +9,5 @@ add_hpx_component(
   INSTALL_COMPONENT examples
   HEADER_GLOB "cancelable_action.h*"
   SOURCE_GLOB "cancelable_action.c*"
-  FOLDER "Examples/CancelableAction"
+  FOLDER "Examples/CancelableAction" ${HPX_WITH_CXX_MODULES_OPTION}
 )
