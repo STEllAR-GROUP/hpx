@@ -21,7 +21,7 @@ namespace hpx::detail {
     // algorithm overloads, where one needs to bind an execution policy to an
     // algorithm for use in execution::then. Typically used together with
     // then_with_bound_algorithm.
-    template <typename Tag, typename ExPolicy>
+    HPX_CXX_EXPORT template <typename Tag, typename ExPolicy>
     struct bound_algorithm
     {
         std::decay_t<ExPolicy> policy;
@@ -36,17 +36,17 @@ namespace hpx::detail {
     };
 
     // Detects if the given type is a bound_algorithm.
-    template <typename Bound>
+    HPX_CXX_EXPORT template <typename Bound>
     struct is_bound_algorithm : std::false_type
     {
     };
 
-    template <typename Tag, typename ExPolicy>
+    HPX_CXX_EXPORT template <typename Tag, typename ExPolicy>
     struct is_bound_algorithm<bound_algorithm<Tag, ExPolicy>> : std::true_type
     {
     };
 
-    template <typename Bound>
+    HPX_CXX_EXPORT template <typename Bound>
     inline constexpr bool is_bound_algorithm_v =
         is_bound_algorithm<Bound>::value;
 
@@ -54,7 +54,8 @@ namespace hpx::detail {
     // take senders. Takes an execution policy, a predecessor sender, and an
     // "algorithm" (i.e. a tag) and applies then with the predecessor sender and
     // the execution policy bound to the algorithm.
-    template <typename Tag, typename ExPolicy, typename Predecessor>
+    HPX_CXX_EXPORT template <typename Tag, typename ExPolicy,
+        typename Predecessor>
     decltype(auto) then_with_bound_algorithm(
         Predecessor&& predecessor, ExPolicy&& policy)
     {
@@ -114,7 +115,7 @@ namespace hpx::detail {
     //      of the usual execution policy). These overloads use a scheduler
     //      based executor that is re-wrapped into an execution policy that is
     //      then passed on to the underlying algorithm APIs.
-    template <typename Tag>
+    HPX_CXX_EXPORT template <typename Tag>
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     struct tag_parallel_algorithm : hpx::functional::detail::tag_fallback<Tag>
     {

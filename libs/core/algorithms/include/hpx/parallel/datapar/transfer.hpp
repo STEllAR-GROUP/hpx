@@ -20,11 +20,12 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace util {
+namespace hpx::parallel::util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-        template <typename Iterator>
+
+        HPX_CXX_EXPORT template <typename Iterator>
         struct datapar_copy_n
         {
             template <typename InIter, typename OutIter>
@@ -57,7 +58,8 @@ namespace hpx { namespace parallel { namespace util {
         };
     }    // namespace detail
 
-    template <typename ExPolicy, typename InIter, typename OutIter>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter,
+        typename OutIter>
     HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<hpx::is_vectorpack_execution_policy_v<ExPolicy>,
             in_out_result<InIter, OutIter>>::type
@@ -66,5 +68,6 @@ namespace hpx { namespace parallel { namespace util {
     {
         return detail::datapar_copy_n<InIter>::call(first, count, dest);
     }
-}}}    // namespace hpx::parallel::util
+}    // namespace hpx::parallel::util
+
 #endif

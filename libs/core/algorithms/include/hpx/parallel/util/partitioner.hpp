@@ -35,7 +35,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util::detail {
 
-    template <typename Result, typename ExPolicy, typename IterOrR, typename F>
+    HPX_CXX_EXPORT template <typename Result, typename ExPolicy,
+        typename IterOrR, typename F>
     auto partition(ExPolicy policy, IterOrR it_or_r, std::size_t count, F&& f)
     {
         // estimate a chunk size based on number of cores used
@@ -85,8 +86,8 @@ namespace hpx::parallel::util::detail {
         }
     }
 
-    template <typename Result, typename ExPolicy, typename FwdIter,
-        typename Stride, typename F>
+    HPX_CXX_EXPORT template <typename Result, typename ExPolicy,
+        typename FwdIter, typename Stride, typename F>
     auto partition_with_index(
         ExPolicy policy, FwdIter first, std::size_t count, Stride stride, F&& f)
     {
@@ -137,8 +138,8 @@ namespace hpx::parallel::util::detail {
         }
     }
 
-    template <typename Result, typename ExPolicy, typename FwdIter,
-        typename Data, typename F>
+    HPX_CXX_EXPORT template <typename Result, typename ExPolicy,
+        typename FwdIter, typename Data, typename F>
     // requires is_container<Data>
     std::vector<hpx::future<Result>> partition_with_data(ExPolicy&& policy,
         FwdIter first, std::size_t count,
@@ -180,7 +181,7 @@ namespace hpx::parallel::util::detail {
     ///////////////////////////////////////////////////////////////////////
     // The static partitioner simply spawns one chunk of iterations for
     // each available core.
-    template <typename ExPolicy, typename R, typename Result>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename R, typename Result>
     struct static_partitioner
     {
         using parameters_type = typename ExPolicy::executor_parameters_type;
@@ -357,7 +358,7 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename R, typename Result>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename R, typename Result>
     struct task_static_partitioner
     {
         using parameters_type = typename ExPolicy::executor_parameters_type;
@@ -518,7 +519,8 @@ namespace hpx::parallel::util {
     // ExPolicy: execution policy
     // R:        overall result type
     // Result:   intermediate result type of first step
-    template <typename ExPolicy, typename R = void, typename Result = R>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename R = void,
+        typename Result = R>
     struct partitioner
       : detail::select_partitioner<std::decay_t<ExPolicy>,
             detail::static_partitioner,

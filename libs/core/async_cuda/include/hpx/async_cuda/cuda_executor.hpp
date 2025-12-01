@@ -18,24 +18,24 @@
 
 // CUDA runtime
 #include <hpx/async_cuda/custom_gpu_api.hpp>
-//
+
 #include <cstddef>
 #include <exception>
 #include <memory>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace cuda { namespace experimental {
+namespace hpx::cuda::experimental {
 
     namespace detail {
         // -------------------------------------------------------------------------
-        // A helper object to call a cudafunction returning a cudaError type
+        // A helper object to call a cuda function returning a cudaError type
         // or a plain kernel definition (or cublas function in cublas executor)
-        template <typename R, typename... Args>
+        HPX_CXX_EXPORT template <typename R, typename... Args>
         struct dispatch_helper;
 
         // default implementation - call the function
-        template <typename R, typename... Args>
+        HPX_CXX_EXPORT template <typename R, typename... Args>
         struct dispatch_helper
         {
             inline R operator()(R (*f)(Args...), Args... args) const
@@ -45,7 +45,7 @@ namespace hpx { namespace cuda { namespace experimental {
         };
 
         // specialization for return type void
-        template <typename... Args>
+        HPX_CXX_EXPORT template <typename... Args>
         struct dispatch_helper<void, Args...>
         {
             inline void operator()(void (*f)(Args...), Args... args) const
@@ -55,7 +55,7 @@ namespace hpx { namespace cuda { namespace experimental {
         };
 
         // specialization for return type of cudaError_t
-        template <typename... Args>
+        HPX_CXX_EXPORT template <typename... Args>
         struct dispatch_helper<cudaError_t, Args...>
         {
             inline void operator()(
@@ -64,14 +64,13 @@ namespace hpx { namespace cuda { namespace experimental {
                 check_cuda_error(f(args...));
             }
         };
-
     }    // namespace detail
 
     // -------------------------------------------------------------------------
     // Allows the launching of cuda functions and kernels on a stream with futures
     // returned that are set when the async functions/kernels are ready
     // -------------------------------------------------------------------------
-    struct cuda_executor_base
+    HPX_CXX_EXPORT struct cuda_executor_base
     {
         using future_type = hpx::future<void>;
 
@@ -79,11 +78,12 @@ namespace hpx { namespace cuda { namespace experimental {
         // constructors - create a cuda stream that all tasks invoked by
         // this helper will use
         // assume event mode is the default
-        cuda_executor_base(std::size_t device, bool event_mode)
-          : device_(device)
+        cuda_executor_base(std::size_t device, bool const event_mode)
+          : device_(static_cast<int>(device))
           , event_mode_(event_mode)
         {
-            target_ = std::make_shared<hpx::cuda::experimental::target>(device);
+            target_ =
+                std::make_shared<hpx::cuda::experimental::target>(device_);
             stream_ = target_->native_handle().get_stream();
         }
 
@@ -107,12 +107,13 @@ namespace hpx { namespace cuda { namespace experimental {
     // Allows you to launch kernels on a stream and get
     // futures back when they are ready
     // -------------------------------------------------------------------------
-    struct cuda_executor : cuda_executor_base
+    HPX_CXX_EXPORT struct cuda_executor : cuda_executor_base
     {
         // -------------------------------------------------------------------------
         // construct - create a cuda stream that all tasks invoked by
         // this helper will use
-        explicit cuda_executor(std::size_t device, bool event_mode = true)
+        explicit cuda_executor(
+            std::size_t const device, bool const event_mode = true)
           : cuda_executor_base(device, event_mode)
         {
         }
@@ -181,8 +182,7 @@ namespace hpx { namespace cuda { namespace experimental {
                 });
         }
     };
-
-}}}    // namespace hpx::cuda::experimental
+}    // namespace hpx::cuda::experimental
 
 namespace hpx::execution::experimental {
 

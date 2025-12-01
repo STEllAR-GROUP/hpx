@@ -6,4 +6,4 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/uninitialized_fill.hpp>
+#include <hpx/modules/algorithms.hpp>

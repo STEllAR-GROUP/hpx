@@ -8,13 +8,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/async_base.hpp>
-#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/executors.hpp>
 
 namespace hpx::execution::experimental {
 
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
         requires(hpx::is_execution_policy_v<ExPolicy>)
     decltype(auto) adapt_placement_mode(
         ExPolicy&& policy, hpx::threads::thread_placement_hint placement)
@@ -52,13 +51,11 @@ namespace hpx::parallel::util {
 
     template <typename ExPolicy>
         requires(hpx::is_execution_policy_v<ExPolicy>)
-    // clang-format off
     HPX_DEPRECATED_V(1, 11,
         "hpx::parallel::util::adapt_placement_mode is deprecated. Please use "
         "hpx::execution::experimental::adapt_placement_mode instead.")
-        // clang-format on
-        decltype(auto) adapt_placement_mode(
-            ExPolicy&& policy, hpx::threads::thread_placement_hint placement)
+    decltype(auto) adapt_placement_mode(
+        ExPolicy&& policy, hpx::threads::thread_placement_hint placement)
     {
         return hpx::execution::experimental::adapt_placement_mode(
             HPX_FORWARD(ExPolicy, policy), placement);

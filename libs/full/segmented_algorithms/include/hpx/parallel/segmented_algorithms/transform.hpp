@@ -8,16 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/datastructures.hpp>
-#include <hpx/parallel/util/result_types.hpp>
-
 #include <hpx/modules/executors.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/transform.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
 #include <cstddef>

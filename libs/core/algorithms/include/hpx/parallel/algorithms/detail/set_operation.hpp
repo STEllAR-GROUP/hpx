@@ -34,7 +34,7 @@ namespace hpx::parallel::detail {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename FwdIter>
+    HPX_CXX_EXPORT template <typename FwdIter>
     struct set_operations_buffer
     {
         template <typename T>
@@ -72,7 +72,7 @@ namespace hpx::parallel::detail {
             value_type, rewritable_ref<value_type>>;
     };
 
-    struct set_chunk_data
+    HPX_CXX_EXPORT struct set_chunk_data
     {
         static constexpr std::size_t uninit_start =
             static_cast<std::size_t>(-1);
@@ -92,9 +92,9 @@ namespace hpx::parallel::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename Iter3, typename F, typename Proj1,
-        typename Proj2, typename Combiner, typename SetOp>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter1, typename Sent1,
+        typename Iter2, typename Sent2, typename Iter3, typename F,
+        typename Proj1, typename Proj2, typename Combiner, typename SetOp>
     util::detail::algorithm_result_t<ExPolicy,
         util::in_in_out_result<Iter1, Iter2, Iter3>>
     set_operation(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
@@ -163,8 +163,8 @@ namespace hpx::parallel::detail {
                     return;
                 }
 
-                // move backwards to find earliest element which is equal to the
-                // last element of the current chunk
+                // move backwards to find the earliest element which is equal to
+                // the last element of the current chunk
                 if (end1 != 0)
                 {
                     auto end_value1 = HPX_INVOKE(proj1, first1[end1 - 1]);
@@ -177,7 +177,7 @@ namespace hpx::parallel::detail {
                 }
             }
 
-            // move backwards to find earliest element which is equal to the
+            // move backwards to find the earliest element which is equal to the
             // first element of the current chunk
             if (start1 != 0)
             {
@@ -281,6 +281,5 @@ namespace hpx::parallel::detail {
         return parallel::util::partitioner<ExPolicy, result_type, void>::call(
             policy, chunks.get(), cores, HPX_MOVE(f1), HPX_MOVE(f2));
     }
-
     /// \endcond
 }    // namespace hpx::parallel::detail

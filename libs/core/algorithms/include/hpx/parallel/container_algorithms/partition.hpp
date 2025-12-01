@@ -928,23 +928,23 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    template <typename I, typename O1, typename O2>
+    HPX_CXX_EXPORT template <typename I, typename O1, typename O2>
     using partition_copy_result = parallel::util::in_out_out_result<I, O1, O2>;
 
-    inline constexpr struct partition_t final
+    HPX_CXX_EXPORT inline constexpr struct partition_t final
       : hpx::detail::tag_parallel_algorithm<partition_t>
     {
     private:
         template <typename Rng, typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
                 parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
                     parallel::traits::projected_range<Proj, Rng>
                 >
-        )
+            )
         // clang-format on
         friend subrange_t<hpx::traits::range_iterator_t<Rng>>
         tag_fallback_invoke(
@@ -967,14 +967,14 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     parallel::traits::projected_range<Proj, Rng>
                 >
-        )
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             subrange_t<hpx::traits::range_iterator_t<Rng>>>
@@ -998,14 +998,14 @@ namespace hpx::ranges {
         template <typename FwdIter, typename Sent, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
                 parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
                     parallel::traits::projected<Proj, FwdIter>
                 >
-        )
+            )
         // clang-format on
         friend subrange_t<FwdIter> tag_fallback_invoke(hpx::ranges::partition_t,
             FwdIter first, Sent last, Pred pred, Proj proj = Proj())
@@ -1023,14 +1023,14 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     parallel::traits::projected<Proj, FwdIter>
                 >
-        )
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             subrange_t<FwdIter>>::type
@@ -1048,13 +1048,13 @@ namespace hpx::ranges {
         }
     } partition{};
 
-    inline constexpr struct stable_partition_t final
+    HPX_CXX_EXPORT inline constexpr struct stable_partition_t final
       : hpx::detail::tag_parallel_algorithm<stable_partition_t>
     {
     private:
         template <typename Rng, typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
                 parallel::traits::is_indirect_callable_v<
@@ -1085,14 +1085,14 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     parallel::traits::projected_range<Proj, Rng>
                 >
-        )
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             subrange_t<hpx::traits::range_iterator_t<Rng>>>
@@ -1121,14 +1121,14 @@ namespace hpx::ranges {
         template <typename BidirIter, typename Sent, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<BidirIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, BidirIter> &&
                 parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
                     parallel::traits::projected<Proj, BidirIter>
                 >
-        )
+            )
         // clang-format on
         friend subrange_t<BidirIter> tag_fallback_invoke(
             hpx::ranges::stable_partition_t, BidirIter first, Sent last,
@@ -1147,14 +1147,14 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename BidirIter, typename Sent,
             typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<BidirIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, BidirIter> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     parallel::traits::projected<Proj, BidirIter>
                 >
-        )
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             subrange_t<BidirIter>>
@@ -1175,14 +1175,14 @@ namespace hpx::ranges {
         }
     } stable_partition{};
 
-    inline constexpr struct partition_copy_t final
+    HPX_CXX_EXPORT inline constexpr struct partition_copy_t final
       : hpx::detail::tag_parallel_algorithm<partition_copy_t>
     {
     private:
         template <typename Rng, typename OutIter2, typename OutIter3,
             typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<OutIter2> &&
                 hpx::traits::is_iterator_v<OutIter3> &&
@@ -1215,7 +1215,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename FwdIter2,
             typename FwdIter3, typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -1249,7 +1249,7 @@ namespace hpx::ranges {
         template <typename InIter, typename Sent, typename OutIter2,
             typename OutIter3, typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, InIter> &&
                 hpx::traits::is_iterator_v<OutIter2> &&
@@ -1281,7 +1281,7 @@ namespace hpx::ranges {
             typename OutIter2, typename OutIter3, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&

@@ -33,7 +33,7 @@ namespace hpx::parallel::util {
 
     namespace prefetching {
 
-        template <typename Itr, typename... Ts>
+        HPX_CXX_EXPORT template <typename Itr, typename... Ts>
         class prefetching_iterator
         {
         public:
@@ -202,7 +202,7 @@ namespace hpx::parallel::util {
 
         ///////////////////////////////////////////////////////////////////////
         // Helper class to initialize prefetching_iterator
-        template <typename Itr, typename... Ts>
+        HPX_CXX_EXPORT template <typename Itr, typename... Ts>
         struct prefetcher_context
         {
         private:
@@ -244,7 +244,7 @@ namespace hpx::parallel::util {
 
         ///////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_MM_PREFETCH)
-        template <typename... T>
+        HPX_CXX_EXPORT template <typename... T>
         HPX_FORCEINLINE void prefetch_addresses(T const&... ts)
         {
             (_mm_prefetch(const_cast<char*>(reinterpret_cast<char const*>(&ts)),
@@ -252,14 +252,14 @@ namespace hpx::parallel::util {
                 ...);
         }
 
-        template <typename... Ts, std::size_t... Is>
+        HPX_CXX_EXPORT template <typename... Ts, std::size_t... Is>
         HPX_FORCEINLINE void prefetch_containers(hpx::tuple<Ts...> const& t,
             hpx::util::index_pack<Is...>, std::size_t idx)
         {
             prefetch_addresses(hpx::get<Is>(t).get()[idx]...);
         }
 #else
-        template <typename... Ts, std::size_t... Is>
+        HPX_CXX_EXPORT template <typename... Ts, std::size_t... Is>
         HPX_FORCEINLINE void prefetch_containers(hpx::tuple<Ts...> const& t,
             hpx::util::index_pack<Is...>, std::size_t idx)
         {
@@ -268,7 +268,7 @@ namespace hpx::parallel::util {
 #endif
 
         ///////////////////////////////////////////////////////////////////////
-        struct loop_n_helper
+        HPX_CXX_EXPORT struct loop_n_helper
         {
             template <typename Itr, typename... Ts, typename F, typename Pred>
             static constexpr prefetching_iterator<Itr, Ts...> call(
@@ -340,7 +340,8 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename Itr, typename... Ts, typename F>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename Itr,
+            typename... Ts, typename F>
         HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr prefetching_iterator<Itr, Ts...>
             tag_invoke(hpx::parallel::util::loop_n_t<ExPolicy>,
@@ -351,7 +352,7 @@ namespace hpx::parallel::util {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        struct loop_n_ind_helper
+        HPX_CXX_EXPORT struct loop_n_ind_helper
         {
             template <typename Itr, typename... Ts, typename F, typename Pred>
             static constexpr prefetching_iterator<Itr, Ts...> call(
@@ -423,7 +424,8 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename Itr, typename... Ts, typename F>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename Itr,
+            typename... Ts, typename F>
         HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr prefetching_iterator<Itr, Ts...>
             tag_invoke(hpx::parallel::util::loop_n_ind_t<ExPolicy>,
@@ -436,7 +438,7 @@ namespace hpx::parallel::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // function to create a prefetcher_context
-    template <typename Itr, typename... Ts>
+    HPX_CXX_EXPORT template <typename Itr, typename... Ts>
     prefetching::prefetcher_context<Itr, Ts const...> make_prefetcher_context(
         Itr base_begin, Itr base_end, std::size_t p_factor, Ts const&... rngs)
     {
@@ -453,8 +455,9 @@ namespace hpx::parallel::util {
     }
 
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
-        template <typename Itr, typename... Ts>
+        HPX_CXX_EXPORT template <typename Itr, typename... Ts>
         struct loop<prefetching::prefetching_iterator<Itr, Ts...>>
         {
             using iterator_type = prefetching::prefetching_iterator<Itr, Ts...>;
@@ -514,7 +517,7 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Itr, typename... Ts>
+        HPX_CXX_EXPORT template <typename Itr, typename... Ts>
         struct loop_ind<prefetching::prefetching_iterator<Itr, Ts...>>
         {
             using iterator_type = prefetching::prefetching_iterator<Itr, Ts...>;

@@ -269,13 +269,14 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    inline constexpr struct uninitialized_default_construct_t final
+    HPX_CXX_EXPORT inline constexpr struct uninitialized_default_construct_t
+        final
       : hpx::detail::tag_parallel_algorithm<uninitialized_default_construct_t>
     {
     private:
         template <typename FwdIter, typename Sent>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
             )
@@ -294,7 +295,7 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename FwdIter, typename Sent>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter>
@@ -313,11 +314,7 @@ namespace hpx::ranges {
         }
 
         template <typename Rng>
-        // clang-format off
-            requires (
-                hpx::traits::is_range_v<Rng>
-            )
-        // clang-format on
+            requires(hpx::traits::is_range_v<Rng>)
         friend typename hpx::traits::range_traits<Rng>::iterator_type
         tag_fallback_invoke(
             hpx::ranges::uninitialized_default_construct_t, Rng&& rng)
@@ -335,7 +332,7 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename Rng>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng>
             )
@@ -358,13 +355,14 @@ namespace hpx::ranges {
         }
     } uninitialized_default_construct{};
 
-    inline constexpr struct uninitialized_default_construct_n_t final
+    HPX_CXX_EXPORT inline constexpr struct uninitialized_default_construct_n_t
+        final
       : hpx::detail::tag_parallel_algorithm<uninitialized_default_construct_n_t>
     {
     private:
         template <typename FwdIter, typename Size>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
             )
@@ -383,7 +381,7 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename FwdIter, typename Size>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>

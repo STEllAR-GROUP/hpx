@@ -5,9 +5,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests manage_runtime auto_wrap_main)
+set(tests manage_runtime)
 
-set(auto_wrap_main_FLAGS NOLIBS DEPENDENCIES HPX::hpx HPX::auto_wrap_main)
+if(NOT MSVC)
+  set(tests ${tests} auto_wrap_main)
+  set(auto_wrap_main_FLAGS NOLIBS DEPENDENCIES HPX::hpx HPX::auto_wrap_main)
+endif()
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

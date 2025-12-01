@@ -830,17 +830,17 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    template <typename I, typename O>
+    HPX_CXX_EXPORT template <typename I, typename O>
     using transform_inclusive_scan_result = parallel::util::in_out_result<I, O>;
 
-    inline constexpr struct transform_inclusive_scan_t final
+    HPX_CXX_EXPORT inline constexpr struct transform_inclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<transform_inclusive_scan_t>
     {
     private:
         template <typename InIter, typename Sent, typename OutIter,
             typename BinOp, typename UnOp>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
@@ -876,7 +876,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter1, typename Sent,
             typename FwdIter2, typename BinOp, typename UnOp>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
@@ -913,7 +913,7 @@ namespace hpx::ranges {
 
         template <typename Rng, typename O, typename BinOp, typename UnOp>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<UnOp,
                     typename hpx::traits::range_traits<Rng>::value_type> &&
@@ -948,7 +948,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename O, typename BinOp,
             typename UnOp>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<UnOp,
@@ -988,7 +988,7 @@ namespace hpx::ranges {
             typename BinOp, typename UnOp,
             typename T = typename std::iterator_traits<InIter>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
@@ -1025,7 +1025,7 @@ namespace hpx::ranges {
             typename FwdIter2, typename BinOp, typename UnOp,
             typename T = typename std::iterator_traits<FwdIter1>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
@@ -1064,7 +1064,7 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<UnOp,
                     typename hpx::traits::range_traits<Rng>::value_type> &&
@@ -1101,7 +1101,7 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<UnOp,

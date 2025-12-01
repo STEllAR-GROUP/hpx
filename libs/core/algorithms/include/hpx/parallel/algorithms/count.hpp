@@ -231,7 +231,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename Op, typename Proj>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename Op, typename Proj>
         struct count_iteration
         {
             using execution_policy_type = std::decay_t<ExPolicy>;
@@ -291,7 +291,7 @@ namespace hpx::parallel {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Value>
+        HPX_CXX_EXPORT template <typename Value>
         struct count : public algorithm<count<Value>, Value>
         {
             typedef Value difference_type;
@@ -358,7 +358,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename Value>
+        HPX_CXX_EXPORT template <typename Value>
         struct count_if : public algorithm<count_if<Value>, Value>
         {
             using difference_type = Value;
@@ -423,7 +423,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::count
-    inline constexpr struct count_t final
+    HPX_CXX_EXPORT inline constexpr struct count_t final
       : hpx::detail::tag_parallel_algorithm<count_t>
     {
     private:
@@ -472,7 +472,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::count_if
-    inline constexpr struct count_if_t final
+    HPX_CXX_EXPORT inline constexpr struct count_if_t final
       : hpx::detail::tag_parallel_algorithm<count_if_t>
     {
     private:

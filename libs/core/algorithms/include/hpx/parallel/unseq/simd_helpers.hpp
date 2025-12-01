@@ -22,20 +22,18 @@
 
 // Please use static assert and enforce Iter to be Random Access Iterator
 namespace hpx::parallel::util {
-    /*
-        Compiler and Hardware should also support vector operations for IterDiff,
-        else we see slower performance when compared to sequential version
-    */
+
+    // Compiler and Hardware should also support vector operations for IterDiff,
+    // else we see slower performance when compared to sequential version
     template <typename Iter, typename IterDiff, typename F>
     Iter unseq_first_n(Iter const first, IterDiff const n, F&& f) noexcept
     {
-        /*
-            OMP loops can not have ++Iter, only integral types are allowed
-            Hence perform arthemetic on Iterators
-            which is O(1) only in case of random access iterators
-        */
+        // OMP loops can not have ++Iter, only integral types are allowed Hence
+        // perform arithmetic on Iterators which is O(1) only in case of random
+        // access iterators
         static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
             "algorithm is efficient only in case of Random Access Iterator");
+
 #if HPX_EARLYEXIT_PRESENT
         IterDiff i = 0;
         // clang-format off
@@ -51,11 +49,13 @@ namespace hpx::parallel::util {
 
         return first + i;
 #else
-        // std::int32_t has best support for vectorization from compilers and hardware
+        // std::int32_t has best support for vectorization from compilers and
+        // hardware
         IterDiff i = 0;
-        static constexpr std::int32_t num_blocks =
+        constexpr std::int32_t num_blocks =
             HPX_LANE_SIZE / sizeof(std::int32_t);
         alignas(HPX_LANE_SIZE) std::int32_t simd_lane[num_blocks] = {0};
+
         while (i <= n - num_blocks)
         {
             std::int32_t found_flag = 0;
@@ -85,7 +85,7 @@ namespace hpx::parallel::util {
             i += num_blocks;
         }
 
-        //Keep remainder scalar
+        // Keep remainder scalar
         while (i != n)
         {
             if (f(*(first + i)))
@@ -95,7 +95,7 @@ namespace hpx::parallel::util {
             ++i;
         }
         return first + i;
-#endif    //HPX_EARLYEXIT_PRESENT
+#endif    // HPX_EARLYEXIT_PRESENT
     }
 
     template <typename Iter1, typename Iter2, typename IterDiff, typename F>
@@ -105,17 +105,18 @@ namespace hpx::parallel::util {
 #if HPX_EARLYEXIT_PRESENT
         IterDiff i = 0;
 
-        // clang-format off
-        HPX_PRAGMA_VECTOR_UNALIGNED HPX_PRAGMA_SIMD_EARLYEXIT
-        for (; i < n; ++i)
+        // clang-format offs
+        HPX_PRAGMA_VECTOR_UNALIGNED HPX_PRAGMA_SIMD_EARLYEXIT for (; i < n; ++i)
+        {
             if (f(*(first1 + i), *(first2 + i)))
                 break;
+        }
         // clang-format on
 
         return std::make_pair(first1 + i, first2 + i);
 #else
 
-        static constexpr std::int32_t num_blocks =
+        constexpr std::int32_t num_blocks =
             HPX_LANE_SIZE / sizeof(std::int32_t);
         alignas(HPX_LANE_SIZE) std::int32_t simd_lane[num_blocks] = {0};
 
@@ -150,12 +151,14 @@ namespace hpx::parallel::util {
             outer_loop_ind += num_blocks;
         }
 
-        //Keep remainder scalar
+        // Keep remainder scalar
         for (; outer_loop_ind != n; ++outer_loop_ind)
+        {
             if (f(*(first1 + outer_loop_ind), *(first2 + outer_loop_ind)))
                 break;
+        }
 
         return std::make_pair(first1 + outer_loop_ind, first2 + outer_loop_ind);
-#endif    //HPX_EARLYEXIT_PRESENT
+#endif    // HPX_EARLYEXIT_PRESENT
     }
 }    // namespace hpx::parallel::util

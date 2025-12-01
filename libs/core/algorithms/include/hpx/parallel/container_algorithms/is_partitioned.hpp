@@ -257,14 +257,14 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    inline constexpr struct is_partitioned_t final
+    HPX_CXX_EXPORT inline constexpr struct is_partitioned_t final
       : hpx::detail::tag_parallel_algorithm<is_partitioned_t>
     {
     private:
         template <typename FwdIter, typename Sent, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
@@ -285,7 +285,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
@@ -307,7 +307,7 @@ namespace hpx::ranges {
 
         template <typename Rng, typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -331,7 +331,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&

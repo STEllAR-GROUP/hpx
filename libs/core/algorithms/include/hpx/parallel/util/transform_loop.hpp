@@ -23,7 +23,7 @@ namespace hpx::parallel::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename Iter>
+        HPX_CXX_EXPORT template <typename Iter>
         struct transform_loop
         {
             template <typename InIterB, typename InIterE, typename OutIter,
@@ -74,7 +74,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    struct transform_loop_t final
+    HPX_CXX_EXPORT struct transform_loop_t final
       : hpx::functional::detail::tag_fallback<transform_loop_t>
     {
     private:
@@ -91,9 +91,10 @@ namespace hpx::parallel::util {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    inline constexpr transform_loop_t transform_loop = transform_loop_t{};
+    HPX_CXX_EXPORT inline constexpr transform_loop_t transform_loop =
+        transform_loop_t{};
 #else
-    template <typename ExPolicy, typename IterB, typename IterE,
+    HPX_CXX_EXPORT template <typename ExPolicy, typename IterB, typename IterE,
         typename OutIter, typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
@@ -108,7 +109,7 @@ namespace hpx::parallel::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename Iter>
+        HPX_CXX_EXPORT template <typename Iter>
         struct transform_loop_ind
         {
             template <typename InIterB, typename InIterE, typename OutIter,
@@ -159,7 +160,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    struct transform_loop_ind_t final
+    HPX_CXX_EXPORT struct transform_loop_ind_t final
       : hpx::functional::detail::tag_fallback<transform_loop_ind_t>
     {
     private:
@@ -176,10 +177,10 @@ namespace hpx::parallel::util {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    inline constexpr transform_loop_ind_t transform_loop_ind =
+    HPX_CXX_EXPORT inline constexpr transform_loop_ind_t transform_loop_ind =
         transform_loop_ind_t{};
 #else
-    template <typename ExPolicy, typename IterB, typename IterE,
+    HPX_CXX_EXPORT template <typename ExPolicy, typename IterB, typename IterE,
         typename OutIter, typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
@@ -194,7 +195,7 @@ namespace hpx::parallel::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename Iter1, typename Iter2>
+        HPX_CXX_EXPORT template <typename Iter1, typename Iter2>
         struct transform_binary_loop
         {
             template <typename InIter1B, typename InIter1E, typename InIter2,
@@ -228,7 +229,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct transform_binary_loop_t final
       : hpx::functional::detail::tag_fallback<transform_binary_loop_t<ExPolicy>>
     {
@@ -261,12 +262,12 @@ namespace hpx::parallel::util {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr transform_binary_loop_t<ExPolicy> transform_binary_loop =
         transform_binary_loop_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename InIter1B, typename InIter1E,
-        typename InIter2, typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1B,
+        typename InIter1E, typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr util::in_in_out_result<InIter1B,
         InIter2, OutIter>
     transform_binary_loop(
@@ -276,8 +277,9 @@ namespace hpx::parallel::util {
             first1, last1, first2, dest, HPX_FORWARD(F, f));
     }
 
-    template <typename ExPolicy, typename InIter1B, typename InIter1E,
-        typename InIter2B, typename InIter2E, typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1B,
+        typename InIter1E, typename InIter2B, typename InIter2E,
+        typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr util::in_in_out_result<InIter1B,
         InIter2B, OutIter>
     transform_binary_loop(InIter1B first1, InIter1E last1, InIter2B first2,
@@ -291,7 +293,7 @@ namespace hpx::parallel::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename Iter1, typename Iter2>
+        HPX_CXX_EXPORT template <typename Iter1, typename Iter2>
         struct transform_binary_loop_ind
         {
             template <typename InIter1B, typename InIter1E, typename InIter2,
@@ -401,7 +403,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct transform_binary_loop_ind_t final
       : hpx::functional::detail::tag_fallback<
             transform_binary_loop_ind_t<ExPolicy>>
@@ -435,12 +437,12 @@ namespace hpx::parallel::util {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr transform_binary_loop_ind_t<ExPolicy>
         transform_binary_loop_ind = transform_binary_loop_ind_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename InIter1B, typename InIter1E,
-        typename InIter2, typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1B,
+        typename InIter1E, typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr util::in_in_out_result<InIter1B,
         InIter2, OutIter>
     transform_binary_loop_ind(
@@ -450,8 +452,9 @@ namespace hpx::parallel::util {
             first1, last1, first2, dest, HPX_FORWARD(F, f));
     }
 
-    template <typename ExPolicy, typename InIter1B, typename InIter1E,
-        typename InIter2B, typename InIter2E, typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1B,
+        typename InIter1E, typename InIter2B, typename InIter2E,
+        typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr util::in_in_out_result<InIter1B,
         InIter2B, OutIter>
     transform_binary_loop_ind(InIter1B first1, InIter1E last1, InIter2B first2,
@@ -464,7 +467,7 @@ namespace hpx::parallel::util {
 
     namespace detail {
 
-        template <typename Iter>
+        HPX_CXX_EXPORT template <typename Iter>
         struct transform_loop_n
         {
             template <typename InIter, typename OutIter, typename F>
@@ -539,7 +542,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct transform_loop_n_t final
       : hpx::functional::detail::tag_fallback<transform_loop_n_t<ExPolicy>>
     {
@@ -559,11 +562,12 @@ namespace hpx::parallel::util {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr transform_loop_n_t<ExPolicy> transform_loop_n =
         transform_loop_n_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename Iter, typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename OutIter,
+        typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::pair<Iter, OutIter>
     transform_loop_n(Iter it, std::size_t count, OutIter dest, F&& f)
     {
@@ -666,7 +670,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct transform_loop_n_ind_t final
       : hpx::functional::detail::tag_fallback<transform_loop_n_ind_t<ExPolicy>>
     {
@@ -686,11 +690,12 @@ namespace hpx::parallel::util {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr transform_loop_n_ind_t<ExPolicy> transform_loop_n_ind =
         transform_loop_n_ind_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename Iter, typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename OutIter,
+        typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::pair<Iter, OutIter>
     transform_loop_n_ind(Iter it, std::size_t count, OutIter dest, F&& f)
     {
@@ -702,7 +707,7 @@ namespace hpx::parallel::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename Iter1, typename Inter2>
+        HPX_CXX_EXPORT template <typename Iter1, typename Inter2>
         struct transform_binary_loop_n
         {
             template <typename InIter1, typename InIter2, typename OutIter,
@@ -735,7 +740,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct transform_binary_loop_n_t final
       : hpx::functional::detail::tag_fallback<
             transform_binary_loop_n_t<ExPolicy>>
@@ -756,12 +761,12 @@ namespace hpx::parallel::util {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr transform_binary_loop_n_t<ExPolicy>
         transform_binary_loop_n = transform_binary_loop_n_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+        typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr hpx::tuple<InIter1, InIter2, OutIter>
         transform_binary_loop_n(InIter1 first1, std::size_t count,
@@ -775,7 +780,7 @@ namespace hpx::parallel::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename Iter1, typename Inter2>
+        HPX_CXX_EXPORT template <typename Iter1, typename Inter2>
         struct transform_binary_loop_ind_n
         {
             template <typename InIter1, typename InIter2, typename OutIter,
@@ -849,7 +854,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     struct transform_binary_loop_ind_n_t final
       : hpx::functional::detail::tag_fallback<
             transform_binary_loop_ind_n_t<ExPolicy>>
@@ -870,12 +875,12 @@ namespace hpx::parallel::util {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_EXPORT template <typename ExPolicy>
     inline constexpr transform_binary_loop_ind_n_t<ExPolicy>
         transform_binary_loop_ind_n = transform_binary_loop_ind_n_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+        typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr hpx::tuple<InIter1, InIter2, OutIter>
         transform_binary_loop_ind_n(InIter1 first1, std::size_t count,
@@ -885,5 +890,4 @@ namespace hpx::parallel::util {
             first1, count, first2, dest, HPX_FORWARD(F, f));
     }
 #endif
-
 }    // namespace hpx::parallel::util

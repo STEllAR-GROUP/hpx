@@ -29,8 +29,8 @@ namespace hpx::parallel::util {
     // \param [in] v_output : vector of ranges obtained
     // \param [in] comp : comparison object
     // \return range with all the elements moved
-    template <typename Iter1, typename Sent1, typename Iter2, typename Sent2,
-        typename Compare>
+    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
+        typename Sent2, typename Compare>
     void merge_level4(util::range<Iter1, Sent1> dest,
         std::vector<util::range<Iter2, Sent2>>& v_input,
         std::vector<util::range<Iter1, Sent1>>& v_output, Compare comp)
@@ -75,7 +75,8 @@ namespace hpx::parallel::util {
     // \param [in] v_output : vector of ranges obtained
     // \param [in] comp : comparison object
     // \return range with all the elements moved
-    template <typename Value, typename Iter, typename Sent, typename Compare>
+    HPX_CXX_EXPORT template <typename Value, typename Iter, typename Sent,
+        typename Compare>
     void uninit_merge_level4(util::range<Value*> dest,
         std::vector<util::range<Iter, Sent>>& v_input,
         std::vector<util::range<Value*>>& v_output, Compare comp)
@@ -122,8 +123,8 @@ namespace hpx::parallel::util {
     // \param [in] v_output : vector of ranges obtained
     // \param [in] comp : comparison object
     // \return range with all the elements moved
-    template <typename Iter1, typename Sent1, typename Iter2, typename Sent2,
-        typename Compare>
+    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
+        typename Sent2, typename Compare>
     util::range<Iter2, Sent2> merge_vector4(
         util::range<Iter1, Sent1> range_input,
         util::range<Iter2, Sent2> range_output,

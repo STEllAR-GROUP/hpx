@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/naming_base/id_type.hpp>

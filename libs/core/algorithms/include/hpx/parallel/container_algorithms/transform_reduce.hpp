@@ -904,14 +904,14 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::transform_reduce
-    inline constexpr struct transform_reduce_t final
+    HPX_CXX_EXPORT inline constexpr struct transform_reduce_t final
       : hpx::detail::tag_parallel_algorithm<transform_reduce_t>
     {
     private:
         template <typename ExPolicy, typename Iter, typename Sent, typename T,
             typename Reduce, typename Convert>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::is_invocable_v<Convert,
@@ -942,7 +942,7 @@ namespace hpx::ranges {
         template <typename Iter, typename Sent, typename T, typename Reduce,
             typename Convert>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::is_invocable_v<Convert,
                    typename std::iterator_traits<Iter>::value_type
@@ -971,7 +971,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Iter2, typename T>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2>
@@ -994,7 +994,7 @@ namespace hpx::ranges {
 
         template <typename Iter, typename Sent, typename Iter2, typename T>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2>
             )
@@ -1016,7 +1016,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Iter2, typename T, typename Reduce, typename Convert>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2> &&
@@ -1053,7 +1053,7 @@ namespace hpx::ranges {
         template <typename Iter, typename Sent, typename Iter2, typename T,
             typename Reduce, typename Convert>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,
@@ -1090,7 +1090,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename T, typename Reduce,
             typename Convert>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<Convert,
@@ -1123,7 +1123,7 @@ namespace hpx::ranges {
 
         template <typename Rng, typename T, typename Reduce, typename Convert>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_traits<Rng>::value_type
@@ -1153,7 +1153,7 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename Rng, typename Iter2, typename T>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2>
@@ -1179,7 +1179,7 @@ namespace hpx::ranges {
 
         template <typename Rng, typename Iter2, typename T>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2>
             )
@@ -1203,7 +1203,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename Iter2, typename T,
             typename Reduce, typename Convert>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2> &&
@@ -1243,7 +1243,7 @@ namespace hpx::ranges {
         template <typename Rng, typename Iter2, typename T, typename Reduce,
             typename Convert>
         // clang-format off
-            requires (
+            requires(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,

@@ -28,7 +28,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         struct datapar_transform_loop_n
         {
             using iterator_type = std::decay_t<Iterator>;
@@ -84,7 +84,8 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    template <typename ExPolicy, typename Iter, typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename OutIter,
+        typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_vectorpack_execution_policy_v<ExPolicy>,
         std::pair<Iter, OutIter>>
@@ -98,7 +99,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         struct datapar_transform_loop_n_ind
         {
             using iterator_type = std::decay_t<Iterator>;
@@ -154,7 +155,8 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    template <typename ExPolicy, typename Iter, typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename OutIter,
+        typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_vectorpack_execution_policy_v<ExPolicy>,
         std::pair<Iter, OutIter>>
@@ -168,7 +170,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         struct datapar_transform_loop
         {
             using iterator_type = std::decay_t<Iterator>;
@@ -203,7 +205,8 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    template <typename IterB, typename IterE, typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename IterB, typename IterE, typename OutIter,
+        typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_invoke(hpx::parallel::util::transform_loop_t,
@@ -217,7 +220,8 @@ namespace hpx::parallel::util {
             HPX_MOVE(ret.first), HPX_MOVE(ret.second)};
     }
 
-    template <typename IterB, typename IterE, typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename IterB, typename IterE, typename OutIter,
+        typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_invoke(hpx::parallel::util::transform_loop_t,
@@ -234,7 +238,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iterator>
+        HPX_CXX_EXPORT template <typename Iterator>
         struct datapar_transform_loop_ind
         {
             using iterator_type = std::decay_t<Iterator>;
@@ -271,7 +275,8 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    template <typename IterB, typename IterE, typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename IterB, typename IterE, typename OutIter,
+        typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_invoke(hpx::parallel::util::transform_loop_ind_t,
@@ -285,7 +290,8 @@ namespace hpx::parallel::util {
             HPX_MOVE(ret.first), HPX_MOVE(ret.second)};
     }
 
-    template <typename IterB, typename IterE, typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename IterB, typename IterE, typename OutIter,
+        typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_invoke(hpx::parallel::util::transform_loop_ind_t,
@@ -302,7 +308,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iter1, typename Iter2>
+        HPX_CXX_EXPORT template <typename Iter1, typename Iter2>
         struct datapar_transform_binary_loop_n
         {
             using iterator1_type = std::decay_t<Iter1>;
@@ -369,8 +375,8 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+        typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_vectorpack_execution_policy_v<ExPolicy>,
         hpx::tuple<InIter1, InIter2, OutIter>>
@@ -384,7 +390,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iter1, typename Iter2>
+        HPX_CXX_EXPORT template <typename Iter1, typename Iter2>
         struct datapar_transform_binary_loop
         {
             using iterator1_type = std::decay_t<Iter1>;
@@ -475,8 +481,8 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+        typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_vectorpack_execution_policy_v<ExPolicy>,
         util::in_in_out_result<InIter1, InIter2, OutIter>>
@@ -487,8 +493,8 @@ namespace hpx::parallel::util {
             first1, last1, first2, dest, HPX_FORWARD(F, f));
     }
 
-    template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+        typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_vectorpack_execution_policy_v<ExPolicy>,
         util::in_in_out_result<InIter1, InIter2, OutIter>>
@@ -503,7 +509,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iter1, typename Iter2>
+        HPX_CXX_EXPORT template <typename Iter1, typename Iter2>
         struct datapar_transform_binary_loop_ind_n
         {
             using iterator1_type = std::decay_t<Iter1>;
@@ -570,8 +576,8 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+        typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_vectorpack_execution_policy_v<ExPolicy>,
         hpx::tuple<InIter1, InIter2, OutIter>>
@@ -585,7 +591,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iter1, typename Iter2>
+        HPX_CXX_EXPORT template <typename Iter1, typename Iter2>
         struct datapar_transform_binary_loop_ind
         {
             using iterator1_type = std::decay_t<Iter1>;
@@ -682,8 +688,8 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+        typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_vectorpack_execution_policy_v<ExPolicy>,
         util::in_in_out_result<InIter1, InIter2, OutIter>>
@@ -694,8 +700,8 @@ namespace hpx::parallel::util {
             InIter2>::call(first1, last1, first2, dest, HPX_FORWARD(F, f));
     }
 
-    template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename OutIter, typename F>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+        typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_vectorpack_execution_policy_v<ExPolicy>,
         util::in_in_out_result<InIter1, InIter2, OutIter>>

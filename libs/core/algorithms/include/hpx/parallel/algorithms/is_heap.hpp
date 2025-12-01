@@ -241,7 +241,8 @@ namespace hpx::parallel {
     namespace detail {
 
         // sequential is_heap with projection function
-        template <typename Iter, typename Sent, typename Comp, typename Proj>
+        HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Comp,
+            typename Proj>
         constexpr bool sequential_is_heap(
             Iter first, Sent last, Comp&& comp, Proj&& proj)
         {
@@ -259,7 +260,7 @@ namespace hpx::parallel {
             return true;
         }
 
-        struct is_heap_helper
+        HPX_CXX_EXPORT struct is_heap_helper
         {
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
@@ -344,7 +345,7 @@ namespace hpx::parallel {
             }
         };
 
-        template <typename RandIter>
+        HPX_CXX_EXPORT template <typename RandIter>
         struct is_heap : public algorithm<is_heap<RandIter>, bool>
         {
             constexpr is_heap() noexcept
@@ -377,7 +378,8 @@ namespace hpx::parallel {
     namespace detail {
 
         // sequential is_heap_until with projection function
-        template <typename Iter, typename Sent, typename Comp, typename Proj>
+        HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Comp,
+            typename Proj>
         constexpr Iter sequential_is_heap_until(
             Iter first, Sent last, Comp&& comp, Proj&& proj)
         {
@@ -395,7 +397,7 @@ namespace hpx::parallel {
             return last;
         }
 
-        struct is_heap_until_helper
+        HPX_CXX_EXPORT struct is_heap_until_helper
         {
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
@@ -482,7 +484,7 @@ namespace hpx::parallel {
             }
         };
 
-        template <typename RandIter>
+        HPX_CXX_EXPORT template <typename RandIter>
         struct is_heap_until
           : public algorithm<is_heap_until<RandIter>, RandIter>
         {
@@ -517,7 +519,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::is_heap
-    inline constexpr struct is_heap_t final
+    HPX_CXX_EXPORT inline constexpr struct is_heap_t final
       : hpx::detail::tag_parallel_algorithm<is_heap_t>
     {
     private:
@@ -569,7 +571,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::is_heap_until
-    inline constexpr struct is_heap_until_t final
+    HPX_CXX_EXPORT inline constexpr struct is_heap_until_t final
       : hpx::detail::tag_parallel_algorithm<is_heap_until_t>
     {
     private:

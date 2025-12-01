@@ -34,7 +34,7 @@ namespace hpx::parallel::util::detail {
 
     // Hand-crafted function object allowing to replace a more complex
     // bind(hpx::functional::invoke_fused(), f1, _1)
-    template <typename Result, typename F>
+    HPX_CXX_EXPORT template <typename Result, typename F>
     struct partitioner_iteration
     {
         std::decay_t<F> f_;
@@ -85,7 +85,7 @@ namespace hpx::parallel::util::detail {
 
 namespace hpx::traits {
 
-    template <typename Result, typename F>
+    HPX_CXX_EXPORT template <typename Result, typename F>
     struct get_function_address<
         parallel::util::detail::partitioner_iteration<Result, F>>
     {
@@ -97,7 +97,7 @@ namespace hpx::traits {
         }
     };
 
-    template <typename Result, typename F>
+    HPX_CXX_EXPORT template <typename Result, typename F>
     struct get_function_annotation<
         parallel::util::detail::partitioner_iteration<Result, F>>
     {
@@ -110,7 +110,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename Result, typename F>
+    HPX_CXX_EXPORT template <typename Result, typename F>
     struct get_function_annotation_itt<
         parallel::util::detail::partitioner_iteration<Result, F>>
     {
@@ -123,4 +123,5 @@ namespace hpx::traits {
     };
 #endif
 }    // namespace hpx::traits
+
 #endif

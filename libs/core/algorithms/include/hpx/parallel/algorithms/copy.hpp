@@ -349,7 +349,7 @@ namespace hpx::parallel {
     // copy
     namespace detail {
 
-        template <typename ExPolicy>
+        HPX_CXX_EXPORT template <typename ExPolicy>
         struct copy_iteration
         {
             using execution_policy_type = std::decay_t<ExPolicy>;
@@ -374,7 +374,7 @@ namespace hpx::parallel {
             }
         };
 
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct copy : public algorithm<copy<IterPair>, IterPair>
         {
             constexpr copy() noexcept
@@ -448,10 +448,11 @@ namespace hpx::parallel {
         };
 #else
         ///////////////////////////////////////////////////////////////////////
-        template <typename FwdIter1, typename FwdIter2, typename Enable = void>
+        HPX_CXX_EXPORT template <typename FwdIter1, typename FwdIter2,
+            typename Enable = void>
         struct copy_iter;
 
-        template <typename FwdIter1, typename FwdIter2>
+        HPX_CXX_EXPORT template <typename FwdIter1, typename FwdIter2>
         struct copy_iter<FwdIter1, FwdIter2,
             std::enable_if_t<
                 iterators_are_segmented<FwdIter1, FwdIter2>::value>>
@@ -463,7 +464,7 @@ namespace hpx::parallel {
         {
         };
 
-        template <typename FwdIter1, typename FwdIter2>
+        HPX_CXX_EXPORT template <typename FwdIter1, typename FwdIter2>
         struct copy_iter<FwdIter1, FwdIter2,
             std::enable_if_t<
                 iterators_are_not_segmented<FwdIter1, FwdIter2>::value>>
@@ -478,7 +479,7 @@ namespace hpx::parallel {
     namespace detail {
 
         // sequential copy_n
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct copy_n : public algorithm<copy_n<IterPair>, IterPair>
         {
             constexpr copy_n() noexcept
@@ -528,8 +529,8 @@ namespace hpx::parallel {
     namespace detail {
 
         // sequential copy_if with projection function
-        template <typename InIter1, typename InIter2, typename OutIter,
-            typename Pred, typename Proj>
+        HPX_CXX_EXPORT template <typename InIter1, typename InIter2,
+            typename OutIter, typename Pred, typename Proj>
         constexpr util::in_out_result<InIter1, OutIter> sequential_copy_if(
             InIter1 first, InIter2 last, OutIter dest, Pred&& pred, Proj&& proj)
         {
@@ -543,7 +544,7 @@ namespace hpx::parallel {
                 HPX_MOVE(first), HPX_MOVE(dest)};
         }
 
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct copy_if : public algorithm<copy_if<IterPair>, IterPair>
         {
             constexpr copy_if() noexcept
@@ -666,7 +667,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::copy
-    inline constexpr struct copy_t final
+    HPX_CXX_EXPORT inline constexpr struct copy_t final
       : hpx::detail::tag_parallel_algorithm<copy_t>
     {
     private:
@@ -706,7 +707,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::copy_n
-    inline constexpr struct copy_n_t final
+    HPX_CXX_EXPORT inline constexpr struct copy_n_t final
       : hpx::detail::tag_parallel_algorithm<copy_n_t>
     {
     private:
@@ -786,7 +787,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::copy_if
-    inline constexpr struct copy_if_t final
+    HPX_CXX_EXPORT inline constexpr struct copy_if_t final
       : hpx::detail::tag_parallel_algorithm<copy_if_t>
     {
     private:

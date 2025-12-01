@@ -309,7 +309,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename F, typename Proj>
+        HPX_CXX_EXPORT template <typename F, typename Proj>
         struct transform_projected
         {
             std::decay_t<F> f_;
@@ -331,7 +331,7 @@ namespace hpx::parallel {
             }
         };
 
-        template <typename F>
+        HPX_CXX_EXPORT template <typename F>
         struct transform_projected<F, hpx::identity>
         {
             std::decay_t<F> f_{};
@@ -351,7 +351,7 @@ namespace hpx::parallel {
             }
         };
 
-        template <typename ExPolicy, typename F, typename Proj>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename Proj>
         struct transform_iteration
         {
             using execution_policy_type = std::decay_t<ExPolicy>;
@@ -413,7 +413,7 @@ namespace hpx::parallel {
             }
         };
 
-        template <typename ExPolicy, typename F>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename F>
         struct transform_iteration<ExPolicy, F, hpx::identity>
         {
             using execution_policy_type = std::decay_t<ExPolicy>;
@@ -468,7 +468,7 @@ namespace hpx::parallel {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename IterPair>
+        HPX_CXX_EXPORT template <typename IterPair>
         struct transform : public algorithm<transform<IterPair>, IterPair>
         {
             constexpr transform() noexcept
@@ -542,7 +542,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename F, typename Proj1, typename Proj2>
+        HPX_CXX_EXPORT template <typename F, typename Proj1, typename Proj2>
         struct transform_binary_projected
         {
             std::decay_t<F> f_;
@@ -567,7 +567,8 @@ namespace hpx::parallel {
             }
         };
 
-        template <typename ExPolicy, typename F, typename Proj1, typename Proj2>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename Proj1,
+            typename Proj2>
         struct transform_binary_iteration
         {
             using execution_policy_type = std::decay_t<ExPolicy>;
@@ -641,7 +642,7 @@ namespace hpx::parallel {
             }
         };
 
-        template <typename ExPolicy, typename F>
+        HPX_CXX_EXPORT template <typename ExPolicy, typename F>
         struct transform_binary_iteration<ExPolicy, F, hpx::identity,
             hpx::identity>
         {
@@ -705,7 +706,7 @@ namespace hpx::parallel {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename IterTuple>
+        HPX_CXX_EXPORT template <typename IterTuple>
         struct transform_binary
           : public algorithm<transform_binary<IterTuple>, IterTuple>
         {
@@ -785,7 +786,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename IterTuple>
+        HPX_CXX_EXPORT template <typename IterTuple>
         struct transform_binary2
           : public algorithm<transform_binary2<IterTuple>, IterTuple>
         {
@@ -868,7 +869,7 @@ namespace hpx::parallel {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 namespace hpx::traits {
 
-    template <typename ExPolicy, typename F, typename Proj>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename Proj>
     struct get_function_address<
         parallel::detail::transform_iteration<ExPolicy, F, Proj>>
     {
@@ -880,7 +881,7 @@ namespace hpx::traits {
         }
     };
 
-    template <typename ExPolicy, typename F, typename Proj>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename Proj>
     struct get_function_annotation<
         parallel::detail::transform_iteration<ExPolicy, F, Proj>>
     {
@@ -892,7 +893,8 @@ namespace hpx::traits {
         }
     };
 
-    template <typename ExPolicy, typename F, typename Proj1, typename Proj2>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename Proj1,
+        typename Proj2>
     struct get_function_address<
         parallel::detail::transform_binary_iteration<ExPolicy, F, Proj1, Proj2>>
     {
@@ -904,7 +906,8 @@ namespace hpx::traits {
         }
     };
 
-    template <typename ExPolicy, typename F, typename Proj1, typename Proj2>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename Proj1,
+        typename Proj2>
     struct get_function_annotation<
         parallel::detail::transform_binary_iteration<ExPolicy, F, Proj1, Proj2>>
     {
@@ -917,7 +920,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename ExPolicy, typename F, typename Proj>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename Proj>
     struct get_function_annotation_itt<
         parallel::detail::transform_iteration<ExPolicy, F, Proj>>
     {
@@ -929,7 +932,8 @@ namespace hpx::traits {
         }
     };
 
-    template <typename ExPolicy, typename F, typename Proj1, typename Proj2>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename Proj1,
+        typename Proj2>
     struct get_function_annotation_itt<
         parallel::detail::transform_binary_iteration<ExPolicy, F, Proj1, Proj2>>
     {
@@ -949,7 +953,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::transform
-    inline constexpr struct transform_t final
+    HPX_CXX_EXPORT inline constexpr struct transform_t final
       : hpx::detail::tag_parallel_algorithm<transform_t>
     {
     private:

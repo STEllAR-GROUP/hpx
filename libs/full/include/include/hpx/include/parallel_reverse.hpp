@@ -7,5 +7,4 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/reverse.hpp>
-#include <hpx/parallel/container_algorithms/reverse.hpp>
+#include <hpx/modules/algorithms.hpp>
