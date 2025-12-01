@@ -38,6 +38,7 @@
 
 #if defined(HPX_CONTRACTS_HAVE_ASSERTS_AS_CONTRACT_ASSERTS)
 // Override HPX_ASSERT to use contract assertions
+#undef HPX_ASSERT
 #define HPX_ASSERT(x) contract_assert(x)
 #endif
 

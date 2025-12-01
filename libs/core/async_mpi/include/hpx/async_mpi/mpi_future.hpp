@@ -44,7 +44,7 @@ namespace hpx::mpi::experimental {
 
     // by convention the title is 7 chars (for alignment)
     HPX_CXX_EXPORT using print_on = debug::enable_print<false>;
-    HPX_CXX_EXPORT static constexpr print_on mpi_debug("MPI_FUT");
+    HPX_CXX_EXPORT inline constexpr print_on mpi_debug("MPI_FUT");
 
     namespace detail {
 
@@ -59,7 +59,10 @@ namespace hpx::mpi::experimental {
         // An implementation of future_data for MPI
         HPX_CXX_EXPORT struct future_data : hpx::lcos::detail::future_data<int>
         {
-            HPX_NON_COPYABLE(future_data);
+            future_data(future_data const&) = delete;
+            future_data(future_data&&) = delete;
+            future_data& operator=(future_data const&) = delete;
+            future_data& operator=(future_data&&) = delete;
 
             using init_no_addref =
                 typename hpx::lcos::detail::future_data<int>::init_no_addref;
@@ -112,7 +115,7 @@ namespace hpx::mpi::experimental {
 
         // -----------------------------------------------------------------
         // a convenience structure to hold state vars
-        // used extensivey with debug::print to display rank etc
+        // used extensively with debug::print to display rank etc
         HPX_CXX_EXPORT struct mpi_info
         {
             bool error_handler_initialized_ = false;
@@ -141,28 +144,20 @@ namespace hpx::mpi::experimental {
             MPI_Comm*, int* errorcode, ...);
 
         // -----------------------------------------------------------------
-        // we track requests and callbacks in two vectors even though
-        // we have the request stored in the request_callback vector already
-        // the reason for this is because we can use MPI_Testany
-        // with a vector of requests to save overheads compared
-        // to testing one by one every item (using a list)
+        // we track requests and callbacks in two vectors even though we have
+        // the request stored in the request_callback vector already the reason
+        // for this is we can use MPI_Testany with a vector of requests to save
+        // overheads compared to testing one by one every item (using a list)
         HPX_CXX_EXPORT HPX_CORE_EXPORT std::vector<MPI_Request>&
         get_requests_vector();
 
         // -----------------------------------------------------------------
         // define a lockfree queue type to place requests in prior to handling
         // this is done only to avoid taking a lock every time a request is
-        // returned from MPI. Instead the requests are placed into a queue
-        // and the polling code pops them prior to calling Testany
+        // returned from MPI. Instead, the requests are placed into a queue
+        // and the polling code pops them prior to calling Testany.
         HPX_CXX_EXPORT using queue_type =
             concurrency::ConcurrentQueue<future_data_ptr>;
-
-        // -----------------------------------------------------------------
-        // used internally to query how many requests are 'in flight'
-        // these are requests that are being polled for actively
-        // and not the same as the requests enqueued
-        HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t
-        get_number_of_active_requests();
     }    // namespace detail
 
     // -----------------------------------------------------------------

@@ -29,6 +29,13 @@ foreach(test ${contract_tests})
   add_hpx_unit_test("modules.contracts" ${test})
 endforeach()
 
+# Set failure expectation for fallback failure test Fallback only fails in Debug
+# mode (HPX_ASSERT or HPX_CONTRACT_ASSERT behavior)
+set_tests_properties(
+  tests.unit.modules.contracts.declaration_contracts_fail_contract_assert
+  PROPERTIES WILL_FAIL $<$<CONFIG:Debug>:ON>
+)
+
 if(HPX_HAVE_CXX26_CONTRACTS)
   # Set failure expectations for declaration contract failure tests Native
   # contracts should fail when violated
@@ -40,11 +47,6 @@ if(HPX_HAVE_CXX26_CONTRACTS)
     tests.unit.modules.contracts.declaration_contracts_fail_post
     PROPERTIES WILL_FAIL ON
   )
-  set_tests_properties(
-    tests.unit.modules.contracts.declaration_contracts_fail_contract_assert
-    PROPERTIES WILL_FAIL $<$<CONFIG:Debug>:ON>
-  )
-
 else()
   # Set failure expectation for fallback failure test Fallback only fails in
   # Debug mode (HPX_ASSERT behavior)
