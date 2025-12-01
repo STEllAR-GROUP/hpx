@@ -169,7 +169,7 @@ namespace hpx::program_options {
         v = hpx::any_nonser(hpx::optional<T>(hpx::any_cast<T>(a)));
     }
 
-    template <typename T, typename Char>
+    HPX_CXX_EXPORT template <typename T, typename Char>
     void typed_value<T, Char>::xparse(hpx::any_nonser& value_store,
         std::vector<std::basic_string<Char>> const& new_tokens) const
     {

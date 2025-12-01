@@ -52,7 +52,7 @@ namespace hpx::execution::experimental {
     /// This behaviour is similar to the plain \a fork_join_executor except that
     /// the block_fork_join_executor creates a hierarchy of fork_join_executors,
     /// one for each target used to initialize it.
-    class block_fork_join_executor
+    HPX_CXX_EXPORT class block_fork_join_executor
     {
         static hpx::threads::mask_type cores_for_targets(
             std::vector<compute::host::target> const& targets)

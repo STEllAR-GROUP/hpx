@@ -9,4 +9,3 @@
 #pragma once
 
 #include <hpx/modules/runtime_local.hpp>
-#include <hpx/modules/runtime_local.hpp>
