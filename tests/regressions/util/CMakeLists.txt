@@ -32,7 +32,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Util"
+    FOLDER "Tests/Regressions/Util" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   add_hpx_regression_test("util" ${test} ${${test}_PARAMETERS})

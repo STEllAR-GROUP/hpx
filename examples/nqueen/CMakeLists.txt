@@ -16,14 +16,14 @@ add_hpx_component(
   SOURCE_GLOB "nqueen.cp*"
   HEADER_GLOB "nqueen.hp*"
   FOLDER "Examples/Applications/NQueen"
-  AUTOGLOB
+  AUTOGLOB ${HPX_WITH_CXX_MODULES_OPTION}
 )
 
 add_hpx_executable(
   nqueen_client_example INTERNAL_FLAGS
   SOURCES nqueen_client.cpp
   DEPENDENCIES nqueen_component
-  FOLDER "Examples/Applications/NQueen"
+  FOLDER "Examples/Applications/NQueen" ${HPX_WITH_CXX_MODULES_OPTION}
 )
 
 # add dependencies to pseudo-target

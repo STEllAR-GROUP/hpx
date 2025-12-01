@@ -31,5 +31,5 @@ add_hpx_component(
   INSTALL_COMPONENT examples
   SOURCES ${client_sources} ${server_sources}
   HEADERS ${headers}
-  FOLDER "Examples/Throttle"
+  FOLDER "Examples/Throttle" ${HPX_WITH_CXX_MODULES_OPTION}
 )

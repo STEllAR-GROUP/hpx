@@ -28,4 +28,5 @@ add_hpx_component(
   SOURCES ${client_sources}
   HEADERS ${headers}
   FOLDER "Examples/RandomMemoryAccess/random_mem_access"
+         ${HPX_WITH_CXX_MODULES_OPTION}
 )

@@ -8,7 +8,7 @@ add_hpx_component(
   interpolate1d INTERNAL_FLAGS
   INSTALL_COMPONENT examples
   FOLDER "Examples/Interpolate1D"
-  AUTOGLOB
+  AUTOGLOB ${HPX_WITH_CXX_MODULES_OPTION}
 )
 
 target_include_directories(interpolate1d_component PRIVATE ${HDF5_INCLUDE_DIRS})
