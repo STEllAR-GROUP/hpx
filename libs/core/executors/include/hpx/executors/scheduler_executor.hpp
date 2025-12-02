@@ -270,9 +270,15 @@ namespace hpx::execution::experimental {
             hpx::parallel::execution::bulk_sync_execute_t,
             scheduler_executor const& exec, F&& f, S const& shape, Ts&&... ts)
         {
-            // For non-integral shapes (e.g., iterator ranges with tuples),
-            // we need to iterate over the shape elements and call the function
-            // with each element. stdexec's bulk() only accepts integral shapes.
+#if defined(HPX_HAVE_STDEXEC)
+            // stdexec's bulk() handles non-integral shapes correctly
+            hpx::this_thread::experimental::sync_wait(
+                bulk(schedule(exec.sched_), hpx::util::size(shape),
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
+#else
+            // HPX's bulk() converts integer to counting_shape which only
+            // provides indices. For non-integral shapes (e.g., iterator ranges
+            // with tuples), we need to iterate over shape elements manually.
             hpx::this_thread::experimental::sync_wait(then(schedule(exec.sched_),
                 [&f, &shape, &ts...]() {
                     for (auto const& elem : shape)
@@ -280,6 +286,7 @@ namespace hpx::execution::experimental {
                         HPX_INVOKE(f, elem, ts...);
                     }
                 }));
+#endif
         }
 
         // clang-format off
