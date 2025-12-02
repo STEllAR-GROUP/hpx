@@ -270,9 +270,16 @@ namespace hpx::execution::experimental {
             hpx::parallel::execution::bulk_sync_execute_t,
             scheduler_executor const& exec, F&& f, S const& shape, Ts&&... ts)
         {
-            hpx::this_thread::experimental::sync_wait(
-                bulk(schedule(exec.sched_), hpx::util::size(shape),
-                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
+            // For non-integral shapes (e.g., iterator ranges with tuples),
+            // we need to iterate over the shape elements and call the function
+            // with each element. stdexec's bulk() only accepts integral shapes.
+            hpx::this_thread::experimental::sync_wait(then(schedule(exec.sched_),
+                [&f, &shape, &ts...]() {
+                    for (auto const& elem : shape)
+                    {
+                        HPX_INVOKE(f, elem, ts...);
+                    }
+                }));
         }
 
         // clang-format off
@@ -293,31 +300,42 @@ namespace hpx::execution::experimental {
             if constexpr (std::is_void_v<result_type>)
             {
                 // the overall return value is future<void>
-                auto pre_req =
-                    when_all(keep_future(HPX_FORWARD(Future, predecessor)));
-
-                auto loop = bulk(transfer(HPX_MOVE(pre_req), exec.sched_),
-                    hpx::util::size(shape),
-                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+                // For non-integral shapes, iterate manually since stdexec's
+                // bulk() only accepts integral shapes
+                auto loop = then(
+                    transfer(keep_future(HPX_FORWARD(Future, predecessor)),
+                        exec.sched_),
+                    [f = HPX_FORWARD(F, f), &shape,
+                        ... ts = HPX_FORWARD(Ts, ts)](auto&&) mutable {
+                        for (auto const& elem : shape)
+                        {
+                            HPX_INVOKE(f, elem, ts...);
+                        }
+                    });
 
                 return make_future(HPX_MOVE(loop));
             }
             else
             {
                 // the overall return value is future<std::vector<result_type>>
-                auto pre_req =
-                    when_all(keep_future(HPX_FORWARD(Future, predecessor)),
-                        just(std::vector<result_type>(hpx::util::size(shape))));
+                // For non-integral shapes, iterate manually since stdexec's
+                // bulk() only accepts integral shapes
+                auto loop = then(
+                    transfer(when_all(keep_future(HPX_FORWARD(Future, predecessor)),
+                                 just(std::vector<result_type>(
+                                     hpx::util::size(shape)))),
+                        exec.sched_),
+                    [f = HPX_FORWARD(F, f), &shape, ... ts = HPX_FORWARD(Ts, ts)](
+                        auto&&, std::vector<result_type>&& results) mutable {
+                        std::size_t i = 0;
+                        for (auto const& elem : shape)
+                        {
+                            results[i++] = HPX_INVOKE(f, elem, ts...);
+                        }
+                        return HPX_MOVE(results);
+                    });
 
-                auto loop = bulk(transfer(HPX_MOVE(pre_req), exec.sched_),
-                    hpx::util::size(shape),
-                    detail::captured_args_then(
-                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
-
-                return make_future(then(
-                    HPX_MOVE(loop), [](auto&&, std::vector<result_type>&& v) {
-                        return HPX_MOVE(v);
-                    }));
+                return make_future(HPX_MOVE(loop));
             }
         }
 
