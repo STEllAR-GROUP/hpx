@@ -63,7 +63,7 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: "hpx_${env.BUILD_ID}/jenkins-hpx-*", fingerprint: true
-            archiveArtifacts artifacts: "hpx_${env.BUILD_ID}/build/*/Testing/**", fingerprint: true
+            archiveArtifacts artifacts: "hpx_${env.BUILD_ID}/Testing/**", fingerprint: true
         }
     }
 }
