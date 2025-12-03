@@ -14,6 +14,9 @@ if [ "${build_type}" = "Debug" ]; then
 #    configure_extra_options+=" -DHPX_WITH_VERIFY_LOCKS_BACKTRACE=ON"
 fi
 
+# These tests only make sense if hpx is being installed
+configure_extra_options+=" -DHPX_WITH_TESTS_EXTERNAL_BUILD=OFF"
+
 ctest_extra_args+=" --verbose "
 
 hostname

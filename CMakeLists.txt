@@ -17,13 +17,6 @@
 
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
-# Reassure CMake that <PACKAGENAME>_ROOT variables are meant to be used by
-# find_package Intentionally placed before project() statement, to precede
-# loading of package manager (vcpkg)
-if(POLICY CMP0144)
-  cmake_policy(SET CMP0144 NEW)
-endif()
-
 # Overrides must go before the project() statement, otherwise they are ignored.
 
 # ##############################################################################
@@ -102,6 +95,7 @@ hpx_set_cmake_policy(CMP0042 NEW)
 hpx_set_cmake_policy(CMP0060 NEW)
 hpx_set_cmake_policy(CMP0074 NEW)
 hpx_set_cmake_policy(CMP0167 OLD)
+hpx_set_cmake_policy(CMP0144 NEW)
 
 # We save the passed compiler flag to a special variable. This is needed for our
 # build system unit tests. Some flags might influence the created symbols
