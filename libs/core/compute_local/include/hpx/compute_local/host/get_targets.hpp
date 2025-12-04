@@ -12,7 +12,7 @@
 
 namespace hpx::compute::host {
 
-    struct HPX_CORE_EXPORT target;
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT target;
 
-    HPX_CORE_EXPORT std::vector<target> get_local_targets();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT std::vector<target> get_local_targets();
 }    // namespace hpx::compute::host

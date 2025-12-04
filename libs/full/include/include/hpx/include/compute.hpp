@@ -8,12 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compute/host.hpp>
-#include <hpx/compute_local/serialization/vector.hpp>
-#include <hpx/compute_local/vector.hpp>
+#include <hpx/modules/compute_local.hpp>
 
 #if defined(HPX_HAVE_CUDA) || defined(HPX_HAVE_HIP)
 #include <hpx/modules/async_cuda.hpp>
 #endif
-#if defined(HPX_WITH_SYCL)
+#if defined(HPX_HAVE_SYCL)
 #include <hpx/modules/async_sycl.hpp>
 #endif

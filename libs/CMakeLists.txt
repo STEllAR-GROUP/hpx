@@ -152,7 +152,9 @@ set(_is_library "$<IN_LIST:$<TARGET_PROPERTY:TYPE>,${_library_types}>")
 add_library(hpx INTERFACE)
 add_library(init INTERFACE)
 add_library(wrap_main INTERFACE)
-add_library(auto_wrap_main INTERFACE)
+if(NOT MSVC)
+  add_library(auto_wrap_main INTERFACE)
+endif()
 
 target_link_libraries(hpx INTERFACE hpx_full)
 

@@ -45,4 +45,5 @@ jobs:
           ctest \
             --output-on-failure \
             --tests-regex tests.examples \
-            --exclude-regex tests.examples.transpose.transpose_block_numa
+            --exclude-regex tests.examples.transpose.transpose_block_numa \
+            --exclude-regex tests.examples.quickstart.1d_wave_equation

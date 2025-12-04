@@ -5,16 +5,11 @@
 //  (See accompanying file LICENSE_1_0.txt
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/init_runtime_local/init_runtime_local.hpp>
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/init_runtime_local.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/program_options/option.hpp>
-#include <hpx/program_options/options_description.hpp>
-#include <hpx/program_options/parsers.hpp>
-#include <hpx/program_options/positional_options.hpp>
-#include <hpx/program_options/value_semantic.hpp>
-#include <hpx/program_options/variables_map.hpp>
 
 #include <cstddef>
 #include <cstdlib>    // for putenv

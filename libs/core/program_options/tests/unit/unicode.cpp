@@ -4,13 +4,8 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
-#include <hpx/program_options/option.hpp>
-#include <hpx/program_options/options_description.hpp>
-#include <hpx/program_options/parsers.hpp>
-#include <hpx/program_options/value_semantic.hpp>
-#include <hpx/program_options/variables_map.hpp>
 
 #include <cstddef>
 #include <locale>

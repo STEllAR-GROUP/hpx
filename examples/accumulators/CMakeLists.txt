@@ -30,6 +30,7 @@ foreach(example_program ${example_programs})
     SOURCES ${component_sources}
     HEADERS ${component_headers}
     FOLDER "Examples/Quickstart/Accumulators/${example_program}"
+           ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   # add example executable
@@ -38,6 +39,7 @@ foreach(example_program ${example_programs})
     SOURCES ${client_sources}
     DEPENDENCIES ${example_program}_component
     FOLDER "Examples/Quickstart/Accumulators/${example_program}"
+           ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   add_hpx_example_target_dependencies("accumulators" ${example_program})

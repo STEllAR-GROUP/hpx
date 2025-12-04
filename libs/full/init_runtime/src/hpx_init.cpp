@@ -16,9 +16,6 @@
 #include <hpx/hpx_main_winsocket.hpp>
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/hpx_user_main_config.hpp>
-#include <hpx/init_runtime/detail/init_logging.hpp>
-#include <hpx/init_runtime/detail/run_or_start.hpp>
-#include <hpx/init_runtime_local/init_runtime_local.hpp>
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
@@ -28,6 +25,7 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/init_runtime_local.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/prefix.hpp>
@@ -49,6 +47,7 @@
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/components_base/agas_interface.hpp>
+#include <hpx/init_runtime/detail/init_logging.hpp>
 #include <hpx/init_runtime/pre_main.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/naming.hpp>

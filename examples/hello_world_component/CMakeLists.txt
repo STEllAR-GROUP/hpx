@@ -48,11 +48,14 @@ if(EXISTS "${HPX_DIR}")
         hello_world_component
         COMPONENT_DEPENDENCIES iostreams
         DEPENDENCIES HPX::wrap_main
-        TYPE COMPONENT
+        TYPE COMPONENT ${HPX_WITH_CXX_MODULES_OPTION}
       )
-      hpx_setup_target(hello_world_client DEPENDENCIES hello_world_component)
+      hpx_setup_target(
+        hello_world_client DEPENDENCIES hello_world_component
+                                        ${HPX_WITH_CXX_MODULES_OPTION}
+      )
     else()
-      hpx_setup_target(hello_world_client)
+      hpx_setup_target(hello_world_client ${HPX_WITH_CXX_MODULES_OPTION})
     endif()
   else()
     message(FATAL_ERROR "Unknown SETUP_TYPE=\"${SETUP_TYPE}\"")

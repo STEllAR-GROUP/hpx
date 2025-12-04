@@ -20,7 +20,8 @@ namespace hpx::serialization {
 #if !defined(__CUDA_ARCH__)
     // load compute::vector<T>
     namespace detail {
-        template <typename T, typename Allocator>
+
+        HPX_CXX_EXPORT template <typename T, typename Allocator>
         void load_impl(input_archive& ar, compute::vector<T, Allocator>& vs,
             std::false_type)
         {
@@ -44,7 +45,7 @@ namespace hpx::serialization {
             }
         }
 
-        template <typename T, typename Allocator>
+        HPX_CXX_EXPORT template <typename T, typename Allocator>
         void load_impl(
             input_archive& ar, compute::vector<T, Allocator>& v, std::true_type)
         {
@@ -75,7 +76,7 @@ namespace hpx::serialization {
         }
     }    // namespace detail
 
-    template <typename T, typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Allocator>
     void serialize(
         input_archive& ar, compute::vector<T, Allocator>& v, unsigned)
     {
@@ -94,7 +95,7 @@ namespace hpx::serialization {
     // save compute::vector<T>
     namespace detail {
 
-        template <typename T, typename Allocator>
+        HPX_CXX_EXPORT template <typename T, typename Allocator>
         void save_impl(output_archive& ar,
             compute::vector<T, Allocator> const& vs, std::false_type)
         {
@@ -105,7 +106,7 @@ namespace hpx::serialization {
             }
         }
 
-        template <typename T, typename Allocator>
+        HPX_CXX_EXPORT template <typename T, typename Allocator>
         void save_impl(output_archive& ar,
             compute::vector<T, Allocator> const& v, std::true_type)
         {
@@ -126,7 +127,7 @@ namespace hpx::serialization {
         }
     }    // namespace detail
 
-    template <typename T, typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Allocator>
     void serialize(
         output_archive& ar, compute::vector<T, Allocator> const& v, unsigned)
     {
@@ -147,12 +148,12 @@ namespace hpx::serialization {
         detail::save_impl(ar, v, use_optimized());
     }
 #else
-    template <typename T, typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Allocator>
     void serialize(input_archive&, compute::vector<T, Allocator>&, unsigned)
     {
     }
 
-    template <typename T, typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Allocator>
     void serialize(
         output_archive&, compute::vector<T, Allocator> const&, unsigned)
     {

@@ -28,7 +28,7 @@ namespace hpx::execution_base {
 
     namespace detail {
 
-        HPX_CORE_EXPORT agent_base& get_default_agent();
+        HPX_CXX_EXPORT HPX_CORE_EXPORT agent_base& get_default_agent();
     }
 
     ///////////////////////////////////////////////////////////////////////////

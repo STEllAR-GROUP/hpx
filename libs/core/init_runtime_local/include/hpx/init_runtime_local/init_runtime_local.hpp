@@ -12,6 +12,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/init_runtime_local/detail/init_logging.hpp>
+#include <hpx/init_runtime_local/macros.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/prefix.hpp>
 #include <hpx/modules/preprocessor.hpp>
@@ -28,25 +30,9 @@
 #include <utility>
 #include <vector>
 
-#if !defined(HPX_PREFIX)
-#define HPX_PREFIX ""
-#endif
-
-#if defined(HPX_APPLICATION_NAME_DEFAULT) && !defined(HPX_APPLICATION_NAME)
-#define HPX_APPLICATION_NAME HPX_APPLICATION_NAME_DEFAULT
-#endif
-
-#if !defined(HPX_APPLICATION_STRING)
-#if defined(HPX_APPLICATION_NAME)
-#define HPX_APPLICATION_STRING HPX_PP_STRINGIZE(HPX_APPLICATION_NAME)
-#else
-#define HPX_APPLICATION_STRING "unknown HPX application"
-#endif
-#endif
-
 #if defined(__FreeBSD__)
-extern HPX_CORE_EXPORT char** freebsd_environ;
-extern char** environ;
+HPX_CXX_EXPORT extern HPX_CORE_EXPORT char** freebsd_environ;
+HPX_CXX_EXPORT extern char** environ;
 #endif
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -54,15 +40,17 @@ extern char** environ;
 namespace hpx {
 
     namespace detail {
-        HPX_CORE_EXPORT int init_helper(hpx::program_options::variables_map&,
+
+        HPX_CXX_EXPORT HPX_CORE_EXPORT int init_helper(
+            hpx::program_options::variables_map&,
             hpx::function<int(int, char**)> const&);
-    }
+    }    // namespace detail
 
     namespace local {
 
         namespace detail {
 
-            struct dump_config
+            HPX_CXX_EXPORT struct dump_config
             {
                 explicit dump_config(hpx::runtime const& rt)
                   : rt_(std::cref(rt))
@@ -81,23 +69,26 @@ namespace hpx {
             };
 
             // Default params to initialize the init_params struct
-            [[maybe_unused]] static int dummy_argc = 1;
-            [[maybe_unused]] static char app_name[256] = HPX_APPLICATION_STRING;
-            static char* default_argv[2] = {app_name, nullptr};
-            [[maybe_unused]] static char** dummy_argv = default_argv;
+            HPX_CXX_EXPORT [[maybe_unused]] inline int dummy_argc = 1;
+            HPX_CXX_EXPORT [[maybe_unused]] inline char app_name[256] =
+                HPX_APPLICATION_STRING;
+            inline char* default_argv[2] = {app_name, nullptr};
+            HPX_CXX_EXPORT [[maybe_unused]] inline char** dummy_argv =
+                default_argv;
 
             // HPX_APPLICATION_STRING is specific to an application and therefore
             // cannot be in the source file
-            HPX_CORE_EXPORT hpx::program_options::options_description const&
-            default_desc(char const*);
+            HPX_CXX_EXPORT HPX_CORE_EXPORT
+                hpx::program_options::options_description const&
+                default_desc(char const*);
 
             // Utilities to init the thread_pools of the resource partitioner
-            using rp_callback_type =
+            HPX_CXX_EXPORT using rp_callback_type =
                 hpx::function<void(hpx::resource::partitioner&,
                     hpx::program_options::variables_map const&)>;
         }    // namespace detail
 
-        struct init_params
+        HPX_CXX_EXPORT struct init_params
         {
             init_params()
             {
@@ -118,13 +109,13 @@ namespace hpx {
 
         namespace detail {
 
-            HPX_CORE_EXPORT int run_or_start(
+            HPX_CXX_EXPORT HPX_CORE_EXPORT int run_or_start(
                 hpx::function<int(
                     hpx::program_options::variables_map& vm)> const& f,
                 int argc, char** argv, init_params const& params,
                 bool blocking);
 
-            inline int init_start_impl(
+            HPX_CXX_EXPORT inline int init_start_impl(
                 hpx::function<int(hpx::program_options::variables_map&)> const&
                     f,
                 int argc, char** argv, init_params const& params, bool blocking)
@@ -155,7 +146,7 @@ namespace hpx {
             }
         }    // namespace detail
 
-        inline int init(
+        HPX_CXX_EXPORT inline int init(
             std::function<int(hpx::program_options::variables_map&)> f,
             int argc, char** argv, init_params const& params = init_params())
         {
@@ -163,8 +154,8 @@ namespace hpx {
                 HPX_MOVE(f), argc, argv, params, true);
         }
 
-        inline int init(std::function<int(int, char**)> f, int argc,
-            char** argv, init_params const& params = init_params())
+        HPX_CXX_EXPORT inline int init(std::function<int(int, char**)> f,
+            int argc, char** argv, init_params const& params = init_params())
         {
             hpx::function<int(hpx::program_options::variables_map&)> main_f =
                 hpx::bind_back(hpx::detail::init_helper, HPX_MOVE(f));
@@ -172,8 +163,8 @@ namespace hpx {
                 HPX_MOVE(main_f), argc, argv, params, true);
         }
 
-        inline int init(std::function<int()> f, int argc, char** argv,
-            init_params const& params = init_params())
+        HPX_CXX_EXPORT inline int init(std::function<int()> f, int argc,
+            char** argv, init_params const& params = init_params())
         {
             hpx::function<int(hpx::program_options::variables_map&)> main_f =
                 hpx::bind(HPX_MOVE(f));
@@ -181,7 +172,7 @@ namespace hpx {
                 HPX_MOVE(main_f), argc, argv, params, true);
         }
 
-        inline int init(std::nullptr_t, int argc, char** argv,
+        HPX_CXX_EXPORT inline int init(std::nullptr_t, int argc, char** argv,
             init_params const& params = init_params())
         {
             hpx::function<int(hpx::program_options::variables_map&)> main_f;
@@ -189,7 +180,7 @@ namespace hpx {
                 HPX_MOVE(main_f), argc, argv, params, true);
         }
 
-        inline bool start(
+        HPX_CXX_EXPORT inline bool start(
             std::function<int(hpx::program_options::variables_map&)> f,
             int argc, char** argv, init_params const& params = init_params())
         {
@@ -197,8 +188,8 @@ namespace hpx {
                 detail::init_start_impl(HPX_MOVE(f), argc, argv, params, false);
         }
 
-        inline bool start(std::function<int(int, char**)> f, int argc,
-            char** argv, init_params const& params = init_params())
+        HPX_CXX_EXPORT inline bool start(std::function<int(int, char**)> f,
+            int argc, char** argv, init_params const& params = init_params())
         {
             hpx::function<int(hpx::program_options::variables_map&)> main_f =
                 hpx::bind_back(hpx::detail::init_helper, HPX_MOVE(f));
@@ -207,8 +198,8 @@ namespace hpx {
                     HPX_MOVE(main_f), argc, argv, params, false);
         }
 
-        inline bool start(std::function<int()> f, int argc, char** argv,
-            init_params const& params = init_params())
+        HPX_CXX_EXPORT inline bool start(std::function<int()> f, int argc,
+            char** argv, init_params const& params = init_params())
         {
             hpx::function<int(hpx::program_options::variables_map&)> main_f =
                 hpx::bind(HPX_MOVE(f));
@@ -217,7 +208,7 @@ namespace hpx {
                     HPX_MOVE(main_f), argc, argv, params, false);
         }
 
-        inline bool start(std::nullptr_t, int argc, char** argv,
+        HPX_CXX_EXPORT inline bool start(std::nullptr_t, int argc, char** argv,
             init_params const& params = init_params())
         {
             hpx::function<int(hpx::program_options::variables_map&)> main_f;
@@ -226,14 +217,14 @@ namespace hpx {
                     HPX_MOVE(main_f), argc, argv, params, false);
         }
 
-        HPX_CORE_EXPORT int finalize(error_code& ec = throws);
-        HPX_CORE_EXPORT int stop(error_code& ec = throws);
-        HPX_CORE_EXPORT int suspend(error_code& ec = throws);
-        HPX_CORE_EXPORT int resume(error_code& ec = throws);
+        HPX_CXX_EXPORT HPX_CORE_EXPORT int finalize(error_code& ec = throws);
+        HPX_CXX_EXPORT HPX_CORE_EXPORT int stop(error_code& ec = throws);
+        HPX_CXX_EXPORT HPX_CORE_EXPORT int suspend(error_code& ec = throws);
+        HPX_CXX_EXPORT HPX_CORE_EXPORT int resume(error_code& ec = throws);
     }    // namespace local
 
     // Allow applications to add a finalizer if HPX_MAIN is set
-    HPX_CORE_EXPORT extern void (*on_finalize)();
+    HPX_CXX_EXPORT HPX_CORE_EXPORT extern void (*on_finalize)();
 }    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>

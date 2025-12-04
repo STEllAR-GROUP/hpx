@@ -81,9 +81,6 @@
 #include <cwchar>     // for mbstate_t
 #include <locale>
 
-// maximum length of a multibyte string
-#define MB_LENGTH_MAX 8
-
 //----------------------------------------------------------------------------//
 //                                                                            //
 //                          utf8_codecvt_facet                                //
@@ -93,7 +90,7 @@
 
 namespace hpx::program_options::detail {
 
-    struct HPX_CORE_EXPORT utf8_codecvt_facet
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT utf8_codecvt_facet
       : public std::codecvt<wchar_t, char, std::mbstate_t>
     {
     public:

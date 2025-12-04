@@ -21,7 +21,8 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // custom log destination: send generated strings to console
-    struct HPX_CORE_EXPORT console_local : logging::destination::manipulator
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT console_local
+      : logging::destination::manipulator
     {
         constexpr console_local(
             logging::level level, logging_destination dest) noexcept
@@ -45,24 +46,24 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        struct log_settings
+        HPX_CXX_EXPORT struct log_settings
         {
             std::string level_;
             std::string dest_;
             std::string format_;
         };
 
-        HPX_CORE_EXPORT void define_common_formatters(
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void define_common_formatters(
             logging::writer::named_write& writer);
 
-        HPX_CORE_EXPORT void define_formatters_local(
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void define_formatters_local(
             logging::writer::named_write& writer);
 
-        HPX_CORE_EXPORT log_settings get_log_settings(
+        HPX_CXX_EXPORT HPX_CORE_EXPORT log_settings get_log_settings(
             util::section const&, char const*);
 
-        HPX_CORE_EXPORT void init_logging(runtime_configuration& ini,
-            bool isconsole,
+        HPX_CXX_EXPORT HPX_CORE_EXPORT void init_logging(
+            runtime_configuration& ini, bool isconsole,
             void (*set_console_dest)(logging::writer::named_write&, char const*,
                 logging::level, logging_destination),
             void (*define_formatters)(logging::writer::named_write&));

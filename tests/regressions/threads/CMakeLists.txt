@@ -39,7 +39,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Threads"
+    FOLDER "Tests/Regressions/Threads" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   add_hpx_regression_test("threads" ${test} ${${test}_PARAMETERS})

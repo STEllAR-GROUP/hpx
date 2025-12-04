@@ -14,20 +14,20 @@
 
 namespace hpx::compute::detail {
 
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct get_proxy_type_impl
     {
         using type = T;
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct get_proxy_type_impl<T,
         std::void_t<typename std::decay_t<T>::proxy_type>>
     {
         using proxy_type = typename std::decay_t<T>::proxy_type;
     };
 
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct get_proxy_type : get_proxy_type_impl<T>
     {
     };

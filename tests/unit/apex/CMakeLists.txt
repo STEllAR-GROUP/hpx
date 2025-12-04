@@ -23,7 +23,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Unit/Apex"
+    FOLDER "Tests/Unit/Apex" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   add_hpx_unit_test("apex" ${test} ${${test}_PARAMETERS})

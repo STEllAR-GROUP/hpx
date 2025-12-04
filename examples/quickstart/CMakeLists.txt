@@ -154,7 +154,7 @@ foreach(example_program ${example_programs})
   add_hpx_executable(
     ${example_program} INTERNAL_FLAGS
     SOURCES ${sources} ${${example_program}_FLAGS}
-    FOLDER "Examples/Quickstart"
+    FOLDER "Examples/Quickstart" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   target_link_libraries(
