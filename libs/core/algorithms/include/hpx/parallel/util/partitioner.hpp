@@ -50,6 +50,7 @@ namespace hpx::parallel::util::detail {
             hpx::execution::experimental::extract_invokes_testing_function_v<
                 parameters_type>;
 
+        std::size_t cores = 1;
         if constexpr (has_variable_chunk_size)
         {
             static_assert(!invokes_testing_function,
@@ -57,7 +58,7 @@ namespace hpx::parallel::util::detail {
                 "has_variable_chunk_size and invokes_testing_function");
 
             auto&& shape = detail::get_bulk_iteration_shape_variable(
-                policy, it_or_r, count);
+                policy, it_or_r, count, cores);
 
             return execution::bulk_async_execute(policy.executor(),
                 partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
@@ -66,7 +67,7 @@ namespace hpx::parallel::util::detail {
         else if constexpr (!invokes_testing_function)
         {
             auto&& shape =
-                detail::get_bulk_iteration_shape(policy, it_or_r, count);
+                detail::get_bulk_iteration_shape(policy, it_or_r, count, cores);
 
             return execution::bulk_async_execute(policy.executor(),
                 partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
@@ -76,7 +77,7 @@ namespace hpx::parallel::util::detail {
         {
             std::vector<hpx::future<Result>> inititems;
             auto&& shape = detail::get_bulk_iteration_shape(
-                policy, inititems, f, it_or_r, count);
+                policy, inititems, f, it_or_r, count, cores);
 
             auto&& workitems = execution::bulk_async_execute(policy.executor(),
                 partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
@@ -102,6 +103,7 @@ namespace hpx::parallel::util::detail {
             hpx::execution::experimental::extract_invokes_testing_function_v<
                 parameters_type>;
 
+        std::size_t cores = 1;
         if constexpr (has_variable_chunk_size)
         {
             static_assert(!invokes_testing_function,
@@ -109,7 +111,7 @@ namespace hpx::parallel::util::detail {
                 "has_variable_chunk_size and invokes_testing_function");
 
             auto&& shape = detail::get_bulk_iteration_shape_idx_variable(
-                policy, first, count, stride);
+                policy, first, count, cores, stride);
 
             return execution::bulk_async_execute(policy.executor(),
                 partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
@@ -118,7 +120,7 @@ namespace hpx::parallel::util::detail {
         else if constexpr (!invokes_testing_function)
         {
             auto&& shape = detail::get_bulk_iteration_shape_idx(
-                policy, first, count, stride);
+                policy, first, count, cores, stride);
 
             return execution::bulk_async_execute(policy.executor(),
                 partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
@@ -128,7 +130,7 @@ namespace hpx::parallel::util::detail {
         {
             std::vector<hpx::future<Result>> inititems;
             auto&& shape = detail::get_bulk_iteration_shape_idx(
-                policy, inititems, f, first, count, stride);
+                policy, inititems, f, first, count, cores, stride);
 
             auto&& workitems = execution::bulk_async_execute(policy.executor(),
                 partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},

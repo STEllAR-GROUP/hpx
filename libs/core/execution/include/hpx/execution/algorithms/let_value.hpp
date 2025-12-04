@@ -47,15 +47,15 @@ namespace hpx::execution::experimental {
             template <typename Env = empty_env>
             struct generate_completion_signatures
             {
-                template <typename Pack, typename Enable = void>
+                template <typename Func, typename Pack, typename Enable = void>
                 struct successor_sender_types_helper;
 
-                template <typename... Ts>
-                struct successor_sender_types_helper<meta::pack<Ts...>,
-                    std::enable_if_t<hpx::is_invocable_v<F,
+                template <typename Func, typename... Ts>
+                struct successor_sender_types_helper<Func, meta::pack<Ts...>,
+                    std::enable_if_t<std::is_invocable_v<Func,
                         std::add_lvalue_reference_t<std::decay_t<Ts>>...>>>
                 {
-                    using type = hpx::util::invoke_result_t<F,
+                    using type = std::invoke_result_t<Func,
                         std::add_lvalue_reference_t<std::decay_t<Ts>>...>;
 
                     static_assert(is_sender_v<type>,
@@ -65,7 +65,7 @@ namespace hpx::execution::experimental {
 
                 template <typename... Ts>
                 using successor_sender_types = meta::type<
-                    successor_sender_types_helper<meta::pack<Ts...>>>;
+                    successor_sender_types_helper<F, meta::pack<Ts...>>>;
 
                 // Type of the potential values returned from the predecessor
                 // sender

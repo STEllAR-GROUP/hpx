@@ -46,7 +46,7 @@ namespace hpx::execution::experimental::detail {
     // Compute a chunk size given a number of worker threads and a total number
     // of items n. Returns a power-of-2 chunk size that produces at most 8 and
     // at least 4 chunks per worker thread.
-    static constexpr std::uint32_t get_bulk_scheduler_chunk_size(
+    constexpr std::uint32_t get_bulk_scheduler_chunk_size(
         std::uint32_t const num_threads, std::size_t const n) noexcept
     {
         std::uint64_t chunk_size = 1;

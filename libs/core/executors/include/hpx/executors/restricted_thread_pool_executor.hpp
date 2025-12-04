@@ -277,13 +277,6 @@ namespace hpx::execution::experimental {
     };
 
     HPX_CXX_EXPORT template <typename Policy>
-    struct is_bulk_one_way_executor<restricted_policy_executor<Policy>>
-      : is_bulk_one_way_executor<
-            hpx::execution::parallel_policy_executor<Policy>>
-    {
-    };
-
-    HPX_CXX_EXPORT template <typename Policy>
     struct is_two_way_executor<restricted_policy_executor<Policy>>
       : is_two_way_executor<hpx::execution::parallel_policy_executor<Policy>>
     {
