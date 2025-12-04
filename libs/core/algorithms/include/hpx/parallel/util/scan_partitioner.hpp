@@ -89,9 +89,10 @@ namespace hpx::parallel::util {
                         experimental::extract_has_variable_chunk_size<
                             parameters_type>::type;
 
+                    std::size_t cores = 1;
                     auto shape = detail::get_bulk_iteration_shape(
                         has_variable_chunk_size(), policy, workitems, f1, first,
-                        count, 1);
+                        count, cores, 1);
 
                     // schedule every chunk on a separate thread
                     std::size_t size = hpx::util::size(shape);

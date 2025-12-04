@@ -15,6 +15,7 @@
 #include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/partitioner_iteration.hpp>
@@ -48,6 +49,7 @@ namespace hpx::parallel::util::detail {
             hpx::execution::experimental::extract_invokes_testing_function_v<
                 parameters_type>;
 
+        std::size_t cores = 1;
         if constexpr (has_variable_chunk_size)
         {
             static_assert(!invokes_testing_function,
@@ -55,7 +57,7 @@ namespace hpx::parallel::util::detail {
                 "has_variable_chunk_size and invokes_testing_function");
 
             auto&& shape = detail::get_bulk_iteration_shape_idx_variable(
-                policy, first, count);
+                policy, first, count, cores);
 
             return execution::bulk_async_execute(policy.executor(),
                 partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
@@ -63,27 +65,62 @@ namespace hpx::parallel::util::detail {
         }
         else if constexpr (!invokes_testing_function)
         {
-            auto&& shape =
-                detail::get_bulk_iteration_shape_idx(policy, first, count);
+            auto&& shape = detail::get_bulk_iteration_shape_idx(
+                policy, first, count, cores);
 
-            if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
+            using executor_type = decltype(policy.executor());
+            auto&& reshaped = reshape(HPX_MOVE(shape), cores);
+
+            // We attempt to perform some optimizations in case of non-task
+            // execution.
+            if constexpr (!hpx::is_async_execution_policy_v<ExPolicy> &&
+                !hpx::execution_policy_has_scheduler_executor_v<ExPolicy>)
             {
-                return execution::bulk_async_execute(policy.executor(),
+                // Switch to sequential execution for one-core, one-chunk case
+                // if the executor supports it.
+                if constexpr (hpx::traits::is_one_way_executor_v<executor_type>)
+                {
+                    if (cores == 1 && std::size(reshaped) == 1)
+                    {
+                        return execution::sync_execute(policy.executor(),
+                            partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                            *std::begin(HPX_MOVE(reshaped)));
+                    }
+                }
+
+                if constexpr (hpx::traits::is_bulk_one_way_executor_v<
+                                  executor_type>)
+                {
+                    return execution::bulk_sync_execute(policy.executor(),
+                        partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                        HPX_MOVE(reshaped));
+                }
+
+                // Fall back if given executor doesn't support any of the above
+                // optimizations.
+                auto&& items = execution::bulk_async_execute(policy.executor(),
                     partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
-                    reshape(HPX_MOVE(shape)));
+                    HPX_MOVE(reshaped));
+                if (hpx::wait_all_nothrow(items))
+                {
+                    using handle_local_exceptions =
+                        detail::handle_local_exceptions<ExPolicy>;
+                    handle_local_exceptions::call(items);
+                }
+                return hpx::unwrap(items);
             }
             else
             {
-                return execution::bulk_sync_execute(policy.executor(),
+                return execution::bulk_async_execute(policy.executor(),
                     partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
-                    reshape(HPX_MOVE(shape)));
+                    HPX_MOVE(reshaped));
             }
         }
         else
         {
             std::vector<hpx::future<Result>> inititems;
             auto&& shape = detail::get_bulk_iteration_shape_idx(
-                policy, inititems, f, first, count);
+                policy, inititems, f, first, count, cores);
 
             auto&& workitems = execution::bulk_async_execute(policy.executor(),
                 partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
@@ -96,6 +133,17 @@ namespace hpx::parallel::util::detail {
     ///////////////////////////////////////////////////////////////////////
     // The static partitioner simply spawns one chunk of iterations for
     // each available core.
+    HPX_CXX_EXPORT struct default_reshape
+    {
+        using is_transparent = std::true_type;
+
+        template <typename T, typename... Ts>
+        HPX_HOST_DEVICE constexpr T&& operator()(T&& t, Ts&&...) const noexcept
+        {
+            return HPX_FORWARD(T, t);
+        }
+    };
+
     HPX_CXX_EXPORT template <typename ExPolicy, typename Result>
     struct foreach_static_partitioner
     {
@@ -106,7 +154,7 @@ namespace hpx::parallel::util::detail {
             detail::handle_local_exceptions<ExPolicy>;
 
         template <typename ExPolicy_, typename FwdIter, typename F1,
-            typename F2, typename ReShape = hpx::identity>
+            typename F2, typename ReShape = default_reshape>
         static auto call(ExPolicy_&& policy, FwdIter first, std::size_t count,
             F1&& f1, F2&& f2, ReShape&& reshape = ReShape{})
         {
@@ -213,7 +261,7 @@ namespace hpx::parallel::util::detail {
             detail::handle_local_exceptions<ExPolicy>;
 
         template <typename ExPolicy_, typename FwdIter, typename F1,
-            typename F2, typename ReShape = hpx::identity>
+            typename F2, typename ReShape = default_reshape>
         static decltype(auto) call(ExPolicy_&& policy, FwdIter first,
             std::size_t count, F1&& f1, F2&& f2, ReShape&& reshape = ReShape{})
         {
