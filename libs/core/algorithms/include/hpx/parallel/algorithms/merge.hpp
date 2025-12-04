@@ -657,13 +657,25 @@ namespace hpx::parallel {
                 hpx::tuple<Iter1, std::size_t, Iter2, std::size_t, std::size_t>;
 
             auto reshape = [len1, first2, last2, comp, proj1, proj2](
-                               auto&& shape) {
+                               auto&& shape, std::size_t cores) {
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
                 static hpx::util::itt::event notify_event("reshape");
                 hpx::util::itt::mark_event e(notify_event);
 #endif
+
+                auto shape_size = std::size(shape);
+                if (shape_size == 1 && cores == 1)
+                {
+                    // special case: one core, one chunk - the partitioner will
+                    // switch to sequential execution in this case
+                    auto [it1, size1, _] = *std::begin(shape);
+                    auto size2 = detail::distance(first2, last2);
+                    return std::vector<merge_region>(
+                        1, merge_region{it1, size1, first2, size2, 0});
+                }
+
                 std::vector<merge_region> reshaped;
-                reshaped.reserve(2 * std::size(shape));
+                reshaped.reserve(2 * shape_size);
 
                 Iter2 it2 = first2;
                 std::size_t dest_start = 0;
@@ -784,7 +796,7 @@ namespace hpx::parallel {
                 auto reshape = get_reshape_chunks<Iter1>(len1, first2, end2,
                     comp, proj1, proj2, lower_bound_helper{});
 
-                return util::foreach_partitioner<ExPolicy>::call(
+                return util::foreach_partitioner<std::decay_t<ExPolicy>>::call(
                     HPX_FORWARD(ExPolicy, policy), first1, len1, HPX_MOVE(f1),
                     HPX_MOVE(f2), HPX_MOVE(reshape));
             }
@@ -797,7 +809,7 @@ namespace hpx::parallel {
             auto reshape = get_reshape_chunks<Iter2>(
                 len2, first1, end1, comp, proj2, proj1, upper_bound_helper{});
 
-            return util::foreach_partitioner<ExPolicy>::call(
+            return util::foreach_partitioner<std::decay_t<ExPolicy>>::call(
                 HPX_FORWARD(ExPolicy, policy), first2, len2, HPX_MOVE(f1),
                 HPX_MOVE(f2), HPX_MOVE(reshape));
         }
