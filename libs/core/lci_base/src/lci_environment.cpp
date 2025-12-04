@@ -44,6 +44,9 @@ namespace hpx { namespace util {
                         get_entry_as(cfg, "hpx.parcel.lci.priority", 0))) ||
                 (get_entry_as(cfg, "hpx.parcel.mpi.enable", 1) &&
                     (get_entry_as(cfg, "hpx.parcel.mpi.priority", 1) >
+                        get_entry_as(cfg, "hpx.parcel.lci.priority", 0))) ||
+                (get_entry_as(cfg, "hpx.parcel.lcw.enable", 1) &&
+                    (get_entry_as(cfg, "hpx.parcel.lcw.priority", 1) >
                         get_entry_as(cfg, "hpx.parcel.lci.priority", 0))))
             {
                 LBT_(info)
