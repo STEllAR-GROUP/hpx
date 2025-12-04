@@ -14,4 +14,5 @@ int main() HPX_PRE(true)    //This precondition is ignored in fallback mode
     HPX_POST(true)          /// This postcondition is ignored in fallback mode
 {
     HPX_CONTRACT_ASSERT(true);
+    return 0;
 }
