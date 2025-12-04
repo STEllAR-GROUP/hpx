@@ -5,21 +5,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# compatibility with older CMake versions
-if(SNAPPY_ROOT AND NOT Snappy_ROOT)
-  set(Snappy_ROOT
-      ${SNAPPY_ROOT}
-      CACHE PATH "Snappy base directory"
-  )
-  unset(SNAPPY_ROOT CACHE)
-endif()
-
 find_package(PkgConfig QUIET)
 pkg_check_modules(PC_SNAPPY QUIET snappy)
 
 find_path(
   Snappy_INCLUDE_DIR snappy.h
-  HINTS ${Snappy_ROOT}
+  HINTS ${SNAPPY_ROOT}
         ENV
         SNAPPY_ROOT
         ${PC_Snappy_MINIMAL_INCLUDEDIR}
@@ -32,7 +23,7 @@ find_path(
 find_library(
   Snappy_LIBRARY
   NAMES snappy libsnappy
-  HINTS ${Snappy_ROOT}
+  HINTS ${SNAPPY_ROOT}
         ENV
         SNAPPY_ROOT
         ${PC_Snappy_MINIMAL_LIBDIR}

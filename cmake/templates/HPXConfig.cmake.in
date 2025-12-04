@@ -9,6 +9,11 @@
 set(HPX_FIND_PACKAGE ON)
 cmake_policy(VERSION 3.18)
 
+# Reassure CMake that <PACKAGENAME>_ROOT variables are meant to be used by find_package
+if(POLICY CMP0144)
+  cmake_policy(SET CMP0144 NEW)
+endif()
+
 include(CMakeFindDependencyMacro)
 
 # Forward HPX_* cache variables

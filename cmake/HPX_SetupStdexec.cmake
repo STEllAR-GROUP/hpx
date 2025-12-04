@@ -83,7 +83,7 @@ if(HPX_WITH_STDEXEC)
     endif()
 
   else()
-    find_package(Stdexec REQUIRED)
+    find_package(Stdexec)
 
     if(Stdexec_FOUND)
       hpx_add_config_define(HPX_HAVE_STDEXEC)
