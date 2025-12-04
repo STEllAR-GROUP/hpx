@@ -22,5 +22,6 @@ int process_data(int const x) HPX_PRE(x >= 0)
 int main()
 {
     // This should trigger CONTRACT_ASSERT failure
-    return process_data(5);
+    process_data(5);
+    return 0;
 }
