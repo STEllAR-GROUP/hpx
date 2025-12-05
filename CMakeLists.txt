@@ -95,6 +95,7 @@ hpx_set_cmake_policy(CMP0042 NEW)
 hpx_set_cmake_policy(CMP0060 NEW)
 hpx_set_cmake_policy(CMP0074 NEW)
 hpx_set_cmake_policy(CMP0167 OLD)
+hpx_set_cmake_policy(CMP0144 NEW)
 
 # We save the passed compiler flag to a special variable. This is needed for our
 # build system unit tests. Some flags might influence the created symbols
@@ -1504,6 +1505,24 @@ endif()
 
 # Debugging related build options
 hpx_option(
+  HPX_WITH_CONTRACTS BOOL "Enable C++ contracts support in HPX" OFF
+  CATEGORY "Debugging"
+)
+
+if(HPX_WITH_CONTRACTS)
+  hpx_add_config_define(HPX_HAVE_CONTRACTS)
+endif()
+
+hpx_option(
+  HPX_WITH_ASSERTS_AS_CONTRACT_ASSERTS BOOL
+  "Swap hpx_assert with hpx_contract_assert" OFF CATEGORY "Debugging"
+)
+
+if(HPX_WITH_ASSERTS_AS_CONTRACT_ASSERTS)
+  hpx_add_config_define(HPX_HAVE_ASSERTS_AS_CONTRACT_ASSERTS)
+endif()
+
+hpx_option(
   HPX_WITH_VALGRIND BOOL "Enable Valgrind instrumentation support." OFF
   CATEGORY "Debugging"
 )
@@ -2428,7 +2447,7 @@ endif()
 include(HPX_GitCommit)
 hpx_add_config_define(HPX_HAVE_GIT_COMMIT "\"${HPX_WITH_GIT_COMMIT}\"")
 
-hpx_include(SetOutputPaths)
+include(HPX_SetOutputPaths)
 
 # ##############################################################################
 # Fixing git tag, if necessary
@@ -2526,7 +2545,7 @@ add_subdirectory(wrap)
 # ##############################################################################
 # Documentation toolchain (Sphinx, Doxygen, Breathe)
 # ##############################################################################
-hpx_include(Documentation)
+include(HPX_Documentation)
 
 # ##############################################################################
 # Add core configuration
