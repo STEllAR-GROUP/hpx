@@ -24,12 +24,11 @@
 // their expectations.
 // Also. Routine can use either a lambda, or a function under control of USE_LAMBDA
 
-#define TEST_SUCCESS 1
-#define TEST_FAIL 0
-//
-#define FAILURE_RATE_PERCENT 5
-#define SAMPLES_PER_LOOP 10
-#define TEST_LOOPS 1000
+constexpr int TEST_SUCCESS = 1;
+constexpr int TEST_FAIL = 0;
+constexpr int FAILURE_RATE_PERCENT = 5;
+constexpr int SAMPLES_PER_LOOP = 10;
+constexpr int TEST_LOOPS = 1000;
 //
 std::random_device rseed;
 std::mt19937 gen(rseed());
@@ -84,11 +83,10 @@ hpx::future<int> test_reduce()
             std::vector<hpx::future<int>> vfs = futvec.get();
             // all futures in v are ready as fut is ready
             int res = TEST_SUCCESS;
-            for (hpx::future<int>& f : vfs)
-            {
+            hpx::wait_each([&res](hpx::future<int>& f) {
                 if (f.get() == TEST_FAIL)
-                    return TEST_FAIL;
-            }
+                    res = TEST_FAIL;
+            }, vfs);
             return res;
         });
 #else
