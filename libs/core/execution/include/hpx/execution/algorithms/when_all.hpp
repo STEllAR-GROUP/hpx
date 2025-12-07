@@ -68,7 +68,7 @@ namespace hpx::execution::experimental {
     namespace detail {
 
         // callback object to request cancellation
-        struct on_stop_requested
+        HPX_CXX_EXPORT struct on_stop_requested
         {
             hpx::experimental::in_place_stop_source& stop_source_;
             void operator()() noexcept

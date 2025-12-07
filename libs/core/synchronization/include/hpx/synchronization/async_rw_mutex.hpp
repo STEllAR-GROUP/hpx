@@ -24,13 +24,12 @@ namespace hpx::experimental {
 
     namespace detail {
 
-        enum class async_rw_mutex_access_type
-        {
+        HPX_CXX_EXPORT enum class async_rw_mutex_access_type {
             read,
             readwrite
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct async_rw_mutex_shared_state
         {
             using shared_state_ptr_type =
@@ -155,11 +154,11 @@ namespace hpx::experimental {
             }
         };
 
-        template <typename ReadWriteT, typename ReadT,
+        HPX_CXX_EXPORT template <typename ReadWriteT, typename ReadT,
             async_rw_mutex_access_type AccessType>
         struct async_rw_mutex_access_wrapper;
 
-        template <typename ReadWriteT, typename ReadT>
+        HPX_CXX_EXPORT template <typename ReadWriteT, typename ReadT>
         struct async_rw_mutex_access_wrapper<ReadWriteT, ReadT,
             async_rw_mutex_access_type::read>
         {
@@ -198,7 +197,7 @@ namespace hpx::experimental {
             }
         };
 
-        template <typename ReadWriteT, typename ReadT>
+        HPX_CXX_EXPORT template <typename ReadWriteT, typename ReadT>
         struct async_rw_mutex_access_wrapper<ReadWriteT, ReadT,
             async_rw_mutex_access_type::readwrite>
         {

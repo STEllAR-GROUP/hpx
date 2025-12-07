@@ -16,32 +16,32 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct is_one_way_executor : std::false_type
         {
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct is_never_blocking_one_way_executor : std::false_type
         {
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct is_bulk_one_way_executor : std::false_type
         {
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct is_two_way_executor : std::false_type
         {
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct is_bulk_two_way_executor : std::false_type
         {
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct is_scheduler_executor : std::false_type
         {
         };
