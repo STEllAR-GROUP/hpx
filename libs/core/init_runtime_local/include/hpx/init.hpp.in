@@ -6,4 +6,4 @@
 
 #pragma once
 
-#include <hpx/init_runtime_local/init_runtime_local.hpp>
+#include <hpx/modules/init_runtime_local.hpp>

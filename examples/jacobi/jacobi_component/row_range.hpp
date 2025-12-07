@@ -11,6 +11,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <atomic>
 #include <cstddef>

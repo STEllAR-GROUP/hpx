@@ -10,4 +10,4 @@
 
 #include <hpx/compute/host/distributed_target.hpp>
 #include <hpx/compute/host/target_distribution_policy.hpp>
-#include <hpx/compute_local/host.hpp>
+#include <hpx/modules/compute_local.hpp>

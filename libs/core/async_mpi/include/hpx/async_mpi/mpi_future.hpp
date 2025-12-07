@@ -52,7 +52,7 @@ namespace hpx::mpi::experimental {
 
         // mutex needed to protect mpi request vector, note that the
         // mpi poll function takes place inside the main scheduling loop
-        // of hpx and not on an hpx worker thread, so we must use std:mutex
+        // of hpx and not on a hpx worker thread, so we must use std:mutex
         HPX_CXX_EXPORT HPX_CORE_EXPORT mutex_type& get_vector_mtx();
 
         // -----------------------------------------------------------------
@@ -114,8 +114,8 @@ namespace hpx::mpi::experimental {
         HPX_CXX_EXPORT using future_data_ptr = hpx::intrusive_ptr<future_data>;
 
         // -----------------------------------------------------------------
-        // a convenience structure to hold state vars
-        // used extensively with debug::print to display rank etc
+        // a convenience structure to hold state vars used extensively with
+        // debug::print to display rank etc
         HPX_CXX_EXPORT struct mpi_info
         {
             bool error_handler_initialized_ = false;
@@ -135,8 +135,8 @@ namespace hpx::mpi::experimental {
             std::ostream& os, mpi_info const& i);
 
         // -----------------------------------------------------------------
-        // an MPI error handling type that we can use to intercept
-        // MPI errors is we enable the error handler
+        // an MPI error handling type that we can use to intercept MPI errors is
+        // we enable the error handler
         HPX_CXX_EXPORT HPX_CORE_EXPORT extern MPI_Errhandler hpx_mpi_errhandler;
 
         // function that converts an MPI error into an exception
@@ -161,8 +161,8 @@ namespace hpx::mpi::experimental {
     }    // namespace detail
 
     // -----------------------------------------------------------------
-    // set an error handler for communicators that will be called
-    // on any error instead of the default behavior of program termination
+    // set an error handler for communicators that will be called on any error
+    // instead of the default behavior of program termination
     HPX_CXX_EXPORT HPX_CORE_EXPORT void set_error_handler();
 
     // -----------------------------------------------------------------
@@ -195,9 +195,9 @@ namespace hpx::mpi::experimental {
     }    // namespace detail
 
     // -----------------------------------------------------------------
-    // Background progress function for MPI async operations
-    // Checks for completed MPI_Requests and sets mpi::experimental::future ready
-    // when found
+    // Background progress function for MPI async operations. Checks for
+    // completed MPI_Requests and sets mpi::experimental::future ready when
+    // found
     HPX_CXX_EXPORT HPX_CORE_EXPORT
         hpx::threads::policies::detail::polling_status
         poll();
@@ -233,9 +233,8 @@ namespace hpx::mpi::experimental {
         });
     }
 
-    // initialize the hpx::mpi background request handler
-    // All ranks should call this function,
-    // but only one thread per rank needs to do so
+    // initialize the hpx::mpi background request handler All ranks should call
+    // this function, but only one thread per rank needs to do so
     HPX_CXX_EXPORT HPX_CORE_EXPORT void init(bool init_mpi = false,
         std::string const& pool_name = "", bool init_errorhandler = false);
 

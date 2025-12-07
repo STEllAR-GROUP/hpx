@@ -21,7 +21,7 @@ add_hpx_executable(
   cancelable_action_client INTERNAL_FLAGS
   SOURCES ${sources}
   DEPENDENCIES cancelable_action_component
-  FOLDER "Examples/CancelableAction"
+  FOLDER "Examples/CancelableAction" ${HPX_WITH_CXX_MODULES_OPTION}
 )
 
 add_hpx_example_target_dependencies(

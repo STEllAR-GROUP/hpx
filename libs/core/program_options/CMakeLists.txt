@@ -59,6 +59,7 @@ add_hpx_module(
   MACRO_HEADERS ${program_options_macro_headers}
   COMPAT_HEADERS ${program_options_compat_headers}
   ADD_TO_GLOBAL_HEADER "hpx/program_options/detail/value_semantic.hpp"
+                       "hpx/program_options/detail/utf8_codecvt_facet.hpp"
   MODULE_DEPENDENCIES
     hpx_config
     hpx_datastructures

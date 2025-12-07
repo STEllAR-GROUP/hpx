@@ -44,7 +44,7 @@ foreach(jacobi_smp_application ${jacobi_smp_applications})
   add_hpx_executable(
     ${jacobi_smp_application} INTERNAL_FLAGS MODULE jacobi_smp
     SOURCES ${sources} ${${jacobi_smp_application}_FLAGS}
-    FOLDER "Examples/JacobiSMP"
+    FOLDER "Examples/JacobiSMP" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   # see #6579

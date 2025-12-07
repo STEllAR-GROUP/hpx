@@ -27,6 +27,7 @@ foreach(subdir ${subdirs})
     SOURCES ${sources}
     DEPENDENCIES ${subdir}_component
     FOLDER "Examples/RandomMemoryAccess/random_mem_access"
+           ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   add_hpx_example_target_dependencies("random_mem_access" ${subdir}_client)

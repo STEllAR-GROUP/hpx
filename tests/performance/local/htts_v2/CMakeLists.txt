@@ -34,7 +34,7 @@ foreach(benchmark ${benchmarks})
     DEPENDENCIES ${${benchmark}_LIBRARIES}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Benchmarks/HTTS v2/${benchmark}"
+    FOLDER "Benchmarks/HTTS v2/${benchmark}" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   target_include_directories(

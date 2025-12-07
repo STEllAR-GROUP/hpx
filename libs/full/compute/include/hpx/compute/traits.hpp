@@ -8,4 +8,4 @@
 
 #pragma once
 
-#include <hpx/compute_local/traits.hpp>
+#include <hpx/modules/compute_local.hpp>
