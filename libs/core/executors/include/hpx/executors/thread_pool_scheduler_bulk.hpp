@@ -46,7 +46,7 @@ namespace hpx::execution::experimental::detail {
     // Compute a chunk size given a number of worker threads and a total number
     // of items n. Returns a power-of-2 chunk size that produces at most 8 and
     // at least 4 chunks per worker thread.
-    constexpr std::uint32_t get_bulk_scheduler_chunk_size(
+    HPX_CXX_EXPORT constexpr std::uint32_t get_bulk_scheduler_chunk_size(
         std::uint32_t const num_threads, std::size_t const n) noexcept
     {
         std::uint64_t chunk_size = 1;
@@ -57,14 +57,15 @@ namespace hpx::execution::experimental::detail {
         return static_cast<std::uint32_t>(chunk_size);
     }
 
-    template <std::size_t... Is, typename F, typename T, typename Ts>
+    HPX_CXX_EXPORT template <std::size_t... Is, typename F, typename T,
+        typename Ts>
     constexpr void bulk_scheduler_invoke_helper(
         hpx::util::index_pack<Is...>, F&& f, T&& t, Ts& ts)
     {
         HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t), hpx::get<Is>(ts)...);
     }
 
-    inline hpx::threads::mask_type full_mask(
+    HPX_CXX_EXPORT inline hpx::threads::mask_type full_mask(
         std::size_t first_thread, std::size_t num_threads)
     {
         auto const& rp = hpx::resource::get_partitioner();
@@ -87,7 +88,7 @@ namespace hpx::execution::experimental::detail {
         return mask;
     }
 
-    inline hpx::threads::mask_type limit_mask(
+    HPX_CXX_EXPORT inline hpx::threads::mask_type limit_mask(
         hpx::threads::mask_cref_type orgmask, std::size_t num_threads)
     {
         std::size_t const num_cores = hpx::threads::hardware_concurrency();
@@ -268,7 +269,7 @@ namespace hpx::execution::experimental::detail {
         // Finish the work for one worker thread. If this is not the last worker
         // thread to finish, it will only decrement the counter. If it is the
         // last thread it will call set_error if there is an exception.
-        // Otherwise it will call set_value on the connected receiver.
+        // Otherwise, it will call set_value on the connected receiver.
         void finish() const
         {
             if (--(op_state->tasks_remaining.data_) == 0)
