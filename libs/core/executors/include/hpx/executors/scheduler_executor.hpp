@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2024 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
@@ -17,6 +16,7 @@
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -114,12 +114,8 @@ namespace hpx::execution::experimental {
         using future_type = hpx::future<T>;
 
     private:
-        // clang-format off
-        template <typename Parameters,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters>
-            )>
-        // clang-format on
+        template <typename Parameters>
+            requires(hpx::traits::is_executor_parameters_v<Parameters>)
         friend auto tag_invoke(
             hpx::execution::experimental::processing_units_count_t tag,
             Parameters&& params, scheduler_executor const& exec,
@@ -150,11 +146,15 @@ namespace hpx::execution::experimental {
         friend auto tag_invoke(hpx::parallel::execution::sync_execute_t,
             scheduler_executor const& exec, F&& f, Ts&&... ts)
         {
-            // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-            return *hpx::this_thread::experimental::sync_wait(
-                then(schedule(exec.sched_),
-                    hpx::util::deferred_call(
-                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
+            using result_type =
+                hpx::util::detail::invoke_deferred_result_t<F, Ts...>;
+
+            return hpx::util::void_guard<result_type>(),
+                   // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+                   *hpx::this_thread::experimental::sync_wait(
+                       then(schedule(exec.sched_),
+                           hpx::util::deferred_call(
+                               HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
         // TwoWayExecutor interface
@@ -182,12 +182,8 @@ namespace hpx::execution::experimental {
         }
 
         // BulkTwoWayExecutor interface
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend auto tag_invoke(hpx::parallel::execution::bulk_async_execute_t,
             scheduler_executor const& exec, F&& f, S const& shape, Ts&&... ts)
         {
@@ -243,27 +239,26 @@ namespace hpx::execution::experimental {
             }
         }
 
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
-        friend decltype(auto) tag_invoke(
-            hpx::parallel::execution::bulk_sync_execute_t,
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
+        friend auto tag_invoke(hpx::parallel::execution::bulk_sync_execute_t,
             scheduler_executor const& exec, F&& f, S const& shape, Ts&&... ts)
         {
-            hpx::this_thread::experimental::sync_wait(
-                bulk(schedule(exec.sched_), shape,
-                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
+            using shape_element =
+                typename hpx::traits::range_traits<S>::value_type;
+            using result_type = hpx::util::detail::invoke_deferred_result_t<F,
+                shape_element, Ts...>;
+
+            return hpx::util::void_guard<result_type>(),
+                   // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+                   *hpx::this_thread::experimental::sync_wait(
+                       bulk(schedule(exec.sched_), shape,
+                           hpx::bind_back(
+                               HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
-        // clang-format off
-        template <typename F, typename S, typename Future, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename Future, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_then_execute_t,
             scheduler_executor const& exec, F&& f, S const& shape,
@@ -314,13 +309,9 @@ namespace hpx::execution::experimental {
         -> scheduler_executor<std::decay_t<BaseScheduler>>;
 
     // support all properties exposed by the wrapped scheduler
-    // clang-format off
     HPX_CXX_EXPORT template <typename Tag, typename BaseScheduler,
-        typename Property,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
-    // clang-format on
+        typename Property>
+        requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(
         Tag tag, scheduler_executor<BaseScheduler> const& exec, Property&& prop)
         -> decltype(scheduler_executor<BaseScheduler>(std::declval<Tag>()(
@@ -330,12 +321,8 @@ namespace hpx::execution::experimental {
             tag(exec.sched(), HPX_FORWARD(Property, prop)));
     }
 
-    // clang-format off
-    HPX_CXX_EXPORT template <typename Tag, typename BaseScheduler,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
-    // clang-format on
+    HPX_CXX_EXPORT template <typename Tag, typename BaseScheduler>
+        requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(Tag tag, scheduler_executor<BaseScheduler> const& exec)
         -> decltype(std::declval<Tag>()(std::declval<BaseScheduler>()))
     {
