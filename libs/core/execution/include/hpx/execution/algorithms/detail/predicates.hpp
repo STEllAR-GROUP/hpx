@@ -22,14 +22,14 @@
 
 namespace hpx::parallel::detail {
 
-    template <typename InputIterator, typename Distance>
+    HPX_CXX_EXPORT template <typename InputIterator, typename Distance>
     HPX_HOST_DEVICE constexpr void advance_impl(
         InputIterator& i, Distance n, std::random_access_iterator_tag) noexcept
     {
         i += n;
     }
 
-    template <typename InputIterator, typename Distance>
+    HPX_CXX_EXPORT template <typename InputIterator, typename Distance>
     HPX_HOST_DEVICE constexpr void advance_impl(
         InputIterator& i, Distance n, std::bidirectional_iterator_tag) noexcept
     {
@@ -45,7 +45,7 @@ namespace hpx::parallel::detail {
         }
     }
 
-    template <typename InputIterator, typename Distance>
+    HPX_CXX_EXPORT template <typename InputIterator, typename Distance>
     HPX_HOST_DEVICE constexpr void advance_impl(
         InputIterator& i, Distance n, std::input_iterator_tag) noexcept
     {
@@ -70,7 +70,7 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterable, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Iterable, typename Enable = void>
     struct calculate_distance
     {
         template <typename T1, typename T2>
@@ -81,7 +81,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterable>
+    HPX_CXX_EXPORT template <typename Iterable>
     struct calculate_distance<Iterable,
         std::enable_if_t<hpx::traits::is_iterator_v<Iterable>>>
     {
@@ -101,7 +101,7 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterable, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Iterable, typename Enable = void>
     struct calculate_next
     {
         template <typename T, typename Stride>
@@ -141,7 +141,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterable>
+    HPX_CXX_EXPORT template <typename Iterable>
     struct calculate_next<Iterable,
         std::enable_if_t<hpx::traits::is_iterator_v<Iterable> &&
             !hpx::traits::is_bidirectional_iterator_v<Iterable>>>
@@ -178,7 +178,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterable>
+    HPX_CXX_EXPORT template <typename Iterable>
     struct calculate_next<Iterable,
         std::enable_if_t<hpx::traits::is_bidirectional_iterator_v<Iterable>>>
     {

@@ -25,7 +25,7 @@ namespace hpx::execution::experimental {
 
         ///////////////////////////////////////////////////////////////////////////
         // Operation state for sender compatibility
-        template <typename Receiver, typename Future>
+        HPX_CXX_EXPORT template <typename Receiver, typename Future>
         class as_sender_operation_state
         {
         private:
@@ -124,7 +124,7 @@ namespace hpx::execution::experimental {
             future_type future_;
         };
 
-        template <typename Future>
+        HPX_CXX_EXPORT template <typename Future>
         struct as_sender_sender_base
         {
             using result_type = typename std::decay_t<Future>::result_type;
@@ -180,10 +180,10 @@ namespace hpx::execution::experimental {
 #endif
         };
 
-        template <typename Future>
+        HPX_CXX_EXPORT template <typename Future>
         struct as_sender_sender;
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct as_sender_sender<hpx::future<T>>
           : public as_sender_sender_base<hpx::future<T>>
         {
@@ -213,7 +213,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct as_sender_sender<hpx::shared_future<T>>
           : as_sender_sender_base<hpx::shared_future<T>>
         {

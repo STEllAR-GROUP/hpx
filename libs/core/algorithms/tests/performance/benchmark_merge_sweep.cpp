@@ -209,6 +209,35 @@ struct hpx::execution::experimental::is_executor_parameters<
 {
 };
 
+struct force_sequential_execution
+{
+    force_sequential_execution() = default;
+
+    template <typename Executor>
+    friend constexpr std::size_t tag_override_invoke(
+        hpx::execution::experimental::maximal_number_of_chunks_t,
+        force_sequential_execution, Executor&&, std::size_t const,
+        std::size_t const) noexcept
+    {
+        return 1;
+    }
+
+    template <typename Executor>
+    friend constexpr std::size_t tag_override_invoke(
+        hpx::execution::experimental::processing_units_count_t,
+        force_sequential_execution, Executor&&,
+        hpx::chrono::steady_duration const&, std::size_t const) noexcept
+    {
+        return 1;
+    }
+};
+
+template <>
+struct hpx::execution::experimental::is_executor_parameters<
+    force_sequential_execution> : std::true_type
+{
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 struct random_to_item_t
@@ -244,7 +273,7 @@ template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
     typename FwdIter3>
 void run_merge_benchmark_sweep(std::string label, int const test_count,
     ExPolicy policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
-    FwdIter2 last2, FwdIter3 dest, double seq_time)
+    FwdIter2 last2, FwdIter3 dest)
 {
     std::size_t const all_cores = hpx::get_num_worker_threads();
 
@@ -257,8 +286,18 @@ void run_merge_benchmark_sweep(std::string label, int const test_count,
         num_cores.push_back(all_cores);
     }
 
+    // measure sequential execution when forcing one core and one chunk
+    hpx::execution::experimental::chunking_parameters force_sequential_params;
+    hpx::execution::experimental::collect_chunking_parameters
+        collect_single_core_params(force_sequential_params);
+
+    force_sequential_execution fse;
+    double const force_sequential_time = run_merge_benchmark_hpx(test_count,
+        policy.with(fse, collect_single_core_params), first1, last1, first2,
+        last2, dest);
+
     double overhead_time = 0.0;
-    double const time_per_iteration = seq_time /
+    double const time_per_iteration = force_sequential_time /
         static_cast<double>((std::max) (std::distance(first1, last1),
             std::distance(first2, last2)));
 
@@ -290,7 +329,7 @@ void run_merge_benchmark_sweep(std::string label, int const test_count,
         // and the parallel time with one core and one chunk
         if (cores == 1)
         {
-            overhead_time = (chunking_params[1].first - seq_time) /
+            overhead_time = (chunking_params[1].first - force_sequential_time) /
                 static_cast<double>(all_cores);
         }
 
@@ -447,8 +486,8 @@ void run_benchmark(Policy policy, std::size_t vector_size1,
     policy = hpx::execution::experimental::with_priority(
         policy, hpx::threads::thread_priority::initially_bound);
 
-    run_merge_benchmark_sweep("par", test_count, policy, first1, last1, first2,
-        last2, dest, time_seq);
+    run_merge_benchmark_sweep(
+        "par", test_count, policy, first1, last1, first2, last2, dest);
 
     hpx::this_thread::sleep_for(std::chrono::seconds(1));
 
@@ -456,7 +495,7 @@ void run_benchmark(Policy policy, std::size_t vector_size1,
     {
         hpx::execution::experimental::fork_join_executor exec;
         run_merge_benchmark_sweep("fj_par", test_count, par.on(exec), first1,
-            last1, first2, last2, dest, time_seq);
+            last1, first2, last2, dest);
     }
 
     std::cout << "----------------------------------------------\n";

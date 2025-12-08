@@ -19,25 +19,25 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename Scheduler, typename Enable = void>
+        HPX_CXX_EXPORT template <typename Scheduler, typename Enable = void>
         struct exposes_policy_aware_scheduler_types : std::false_type
         {
         };
 
-        template <typename Scheduler>
+        HPX_CXX_EXPORT template <typename Scheduler>
         struct exposes_policy_aware_scheduler_types<Scheduler,
             std::void_t<typename Scheduler::policy_type,
                 typename Scheduler::base_scheduler_type>> : std::true_type
         {
         };
 
-        template <typename Scheduler, typename Enable = void>
+        HPX_CXX_EXPORT template <typename Scheduler, typename Enable = void>
         struct exposes_get_policy : std::false_type
         {
         };
 
         // clang-format off
-        template <typename Scheduler>
+        HPX_CXX_EXPORT template <typename Scheduler>
         struct exposes_get_policy<Scheduler,
             std::enable_if_t<hpx::is_execution_policy_v<
                 decltype(std::declval<Scheduler>().get_policy())>>>

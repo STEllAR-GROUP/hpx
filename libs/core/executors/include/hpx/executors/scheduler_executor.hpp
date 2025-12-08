@@ -28,7 +28,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 #if defined(HPX_HAVE_CXX20_PERFECT_PACK_CAPTURE)
-        template <typename F, typename... Ts>
+        HPX_CXX_EXPORT template <typename F, typename... Ts>
         auto captured_args_then(F&& f, Ts&&... ts)
         {
             return [f = HPX_FORWARD(F, f), ... ts = HPX_FORWARD(Ts, ts)](
@@ -39,7 +39,7 @@ namespace hpx::execution::experimental {
             };
         }
 #else
-        template <typename F, typename... Ts>
+        HPX_CXX_EXPORT template <typename F, typename... Ts>
         auto captured_args_then(F&& f, Ts&&... ts)
         {
             return [f = HPX_FORWARD(F, f),

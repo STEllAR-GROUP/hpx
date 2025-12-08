@@ -114,7 +114,7 @@ namespace hpx::execution::experimental {
         //         to see if a sender knows its completion signatures
         //         independent of any particular execution environment.
         //  -- end note]
-        struct no_env
+        HPX_CXX_EXPORT struct no_env
         {
             using type = no_env;
             using id = no_env;
@@ -124,13 +124,14 @@ namespace hpx::execution::experimental {
                 tag_invoke(Tag, Env) = delete;
         };
 
-        struct empty_env
+        HPX_CXX_EXPORT struct empty_env
         {
             using type = empty_env;
             using id = empty_env;
         };
 
-        template <typename Tag, typename Value, typename BaseEnv = empty_env>
+        HPX_CXX_EXPORT template <typename Tag, typename Value,
+            typename BaseEnv = empty_env>
         struct env
         {
             struct type
@@ -165,10 +166,11 @@ namespace hpx::execution::experimental {
             };
         };
 
-        template <typename Tag, typename Value, typename BaseEnv = empty_env>
+        HPX_CXX_EXPORT template <typename Tag, typename Value,
+            typename BaseEnv = empty_env>
         using env_t = std::decay_t<hpx::meta::type<env<Tag, Value, BaseEnv>>>;
 
-        template <typename Tag>
+        HPX_CXX_EXPORT template <typename Tag>
         struct make_env_t
         {
             template <typename Value>
@@ -191,7 +193,7 @@ namespace hpx::execution::experimental {
 
         // For making an evaluation environment from a key/value pair, and
         // optionally another environment.
-        template <typename Tag>
+        HPX_CXX_EXPORT template <typename Tag>
         inline constexpr exec_envs::make_env_t<Tag> make_env{};
 
     }    // namespace exec_envs
@@ -244,7 +246,7 @@ namespace hpx::execution::experimental {
     // expression equivalent to:
     //
     // 1. tag_invoke(execution::forwarding_env_query, t), contextually converted
-    //    to bool, if the tag_invoke expression is well formed.
+    //    to bool, if the tag_invoke expression is well-formed.
     //
     //      - Mandates: The tag_invoke expression is indeed contextually
     //        convertible to bool, that expression and the contextual conversion
