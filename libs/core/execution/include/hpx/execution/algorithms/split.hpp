@@ -42,13 +42,9 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        enum class submission_type
-        {
-            eager,
-            lazy
-        };
+        HPX_CXX_EXPORT enum class submission_type { eager, lazy };
 
-        template <typename Receiver>
+        HPX_CXX_EXPORT template <typename Receiver>
         struct error_visitor
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver>& receiver;
@@ -62,7 +58,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        template <typename Receiver>
+        HPX_CXX_EXPORT template <typename Receiver>
         struct value_visitor
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver>& receiver;

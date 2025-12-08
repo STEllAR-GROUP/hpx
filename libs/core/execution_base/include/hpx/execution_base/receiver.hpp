@@ -178,15 +178,16 @@ namespace hpx::execution::experimental {
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <bool ConstructionRequirements, typename T, typename E>
+        HPX_CXX_EXPORT template <bool ConstructionRequirements, typename T,
+            typename E>
         struct is_receiver_impl;
 
-        template <typename T, typename E>
+        HPX_CXX_EXPORT template <typename T, typename E>
         struct is_receiver_impl<false, T, E> : std::false_type
         {
         };
 
-        template <typename T, typename E>
+        HPX_CXX_EXPORT template <typename T, typename E>
         struct is_receiver_impl<true, T, E>
           : std::integral_constant<bool,
                 hpx::is_invocable_v<set_stopped_t, std::decay_t<T>&&> &&
@@ -210,38 +211,38 @@ namespace hpx::execution::experimental {
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <bool IsReceiverOf, typename T, typename CS>
+        HPX_CXX_EXPORT template <bool IsReceiverOf, typename T, typename CS>
         struct is_receiver_of_impl;
 
-        template <typename T, typename CS>
+        HPX_CXX_EXPORT template <typename T, typename CS>
         struct is_receiver_of_impl<false, T, CS> : std::false_type
         {
         };
 
-        template <typename F, typename T, typename Variant>
+        HPX_CXX_EXPORT template <typename F, typename T, typename Variant>
         struct is_invocable_variant_of_tuples : std::false_type
         {
         };
 
-        template <typename F, typename T, typename... Ts>
+        HPX_CXX_EXPORT template <typename F, typename T, typename... Ts>
         struct is_invocable_variant_of_tuples<F, T,
             meta::pack<meta::pack<Ts...>>>
           : hpx::is_invocable<F, std::decay_t<T>&&, Ts...>
         {
         };
 
-        template <typename F, typename T, typename Variant>
+        HPX_CXX_EXPORT template <typename F, typename T, typename Variant>
         struct is_invocable_variant : std::false_type
         {
         };
 
-        template <typename F, typename T, typename... Ts>
+        HPX_CXX_EXPORT template <typename F, typename T, typename... Ts>
         struct is_invocable_variant<F, T, meta::pack<Ts...>>
           : hpx::is_invocable<F, std::decay_t<T>&&, Ts...>
         {
         };
 
-        template <typename T, typename CS>
+        HPX_CXX_EXPORT template <typename T, typename CS>
         struct is_receiver_of_impl<true, T, CS>
           : std::integral_constant<bool,
                 is_invocable_variant_of_tuples<set_value_t, T,
@@ -265,12 +266,12 @@ namespace hpx::execution::experimental {
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename F, typename T, typename Variant>
+        HPX_CXX_EXPORT template <typename F, typename T, typename Variant>
         struct is_nothrow_invocable_variant_of_tuples : std::false_type
         {
         };
 
-        template <typename F, typename T, typename... Ts>
+        HPX_CXX_EXPORT template <typename F, typename T, typename... Ts>
         struct is_nothrow_invocable_variant_of_tuples<F, T,
             meta::pack<meta::pack<Ts...>>>
           : hpx::functional::is_nothrow_tag_invocable<F, std::decay_t<T>&&,
@@ -278,27 +279,27 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <typename F, typename T, typename Variant>
+        HPX_CXX_EXPORT template <typename F, typename T, typename Variant>
         struct is_nothrow_invocable_variant : std::false_type
         {
         };
 
-        template <typename F, typename T, typename... Ts>
+        HPX_CXX_EXPORT template <typename F, typename T, typename... Ts>
         struct is_nothrow_invocable_variant<F, T, meta::pack<Ts...>>
           : hpx::functional::is_nothrow_tag_invocable<F, std::decay_t<T>&&,
                 Ts...>
         {
         };
 
-        template <bool IsReceiverOf, typename T, typename CS>
+        HPX_CXX_EXPORT template <bool IsReceiverOf, typename T, typename CS>
         struct is_nothrow_receiver_of_impl;
 
-        template <typename T, typename CS>
+        HPX_CXX_EXPORT template <typename T, typename CS>
         struct is_nothrow_receiver_of_impl<false, T, CS> : std::false_type
         {
         };
 
-        template <typename T, typename CS>
+        HPX_CXX_EXPORT template <typename T, typename CS>
         struct is_nothrow_receiver_of_impl<true, T, CS>
           : std::integral_constant<bool,
                 is_nothrow_invocable_variant_of_tuples<set_value_t, T,

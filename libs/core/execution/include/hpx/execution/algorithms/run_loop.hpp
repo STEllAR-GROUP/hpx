@@ -30,12 +30,12 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        struct run_loop_data;
+        HPX_CXX_EXPORT struct run_loop_data;
 
         HPX_CORE_EXPORT void intrusive_ptr_add_ref(run_loop_data* p) noexcept;
         HPX_CORE_EXPORT void intrusive_ptr_release(run_loop_data* p) noexcept;
 
-        struct run_loop_data
+        HPX_CXX_EXPORT struct run_loop_data
         {
             using mutex_type = hpx::spinlock;
 

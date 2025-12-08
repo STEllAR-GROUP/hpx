@@ -26,7 +26,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename Tag>
+        HPX_CXX_EXPORT template <typename Tag>
         struct read_sender
         {
             constexpr read_sender() = default;

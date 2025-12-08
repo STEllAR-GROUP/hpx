@@ -123,9 +123,9 @@ namespace hpx::functional::detail {
     namespace tag_override_invoke_t_ns {
 
         // poison pill
-        void tag_override_invoke();
+        HPX_CXX_EXPORT void tag_override_invoke();
 
-        struct tag_override_invoke_t
+        HPX_CXX_EXPORT struct tag_override_invoke_t
         {
             template <typename Tag, typename... Ts>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
@@ -196,7 +196,7 @@ namespace hpx::functional::detail {
     // noexcept(true) to not falsely exclude correct overloads. However, this
     // may lead to noexcept(false) overloads falsely being candidates.
 #if !defined(HPX_CUDA_VERSION) || (HPX_CUDA_VERSION >= 1102)
-    template <typename Tag, typename... Args>
+    HPX_CXX_EXPORT template <typename Tag, typename... Args>
     struct is_nothrow_tag_override_invocable
       : is_nothrow_tag_override_invocable_impl<
             decltype(tag_override_invoke_ns::tag_override_invoke)(Tag, Args...),
@@ -204,7 +204,7 @@ namespace hpx::functional::detail {
     {
     };
 #else
-    template <typename Tag, typename... Args>
+    HPX_CXX_EXPORT template <typename Tag, typename... Args>
     struct is_nothrow_tag_override_invocable : std::true_type
     {
     };

@@ -109,7 +109,7 @@ namespace hpx::execution::experimental {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename T>
+        HPX_CXX_EXPORT template <typename T>
         struct is_executor_parameters : std::false_type
         {
         };

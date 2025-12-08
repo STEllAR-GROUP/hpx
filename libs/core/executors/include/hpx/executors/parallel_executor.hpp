@@ -33,7 +33,7 @@
 
 namespace hpx::parallel::execution::detail {
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct get_default_policy
     {
         static constexpr Policy call() noexcept
@@ -52,14 +52,16 @@ namespace hpx::parallel::execution::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename F, typename Shape, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename Shape, typename... Ts>
     struct bulk_function_result;
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename F, typename Shape, typename Future, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename Shape, typename Future,
+        typename... Ts>
     struct bulk_then_execute_result;
 
-    template <typename F, typename Shape, typename Future, typename... Ts>
+    HPX_CXX_EXPORT template <typename F, typename Shape, typename Future,
+        typename... Ts>
     struct then_bulk_function_result;
 }    // namespace hpx::parallel::execution::detail
 

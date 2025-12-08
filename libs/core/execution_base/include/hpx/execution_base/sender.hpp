@@ -27,7 +27,7 @@ namespace hpx::execution::experimental {
     namespace detail {
 
         // Dummy type used in place of a scheduler if none is given
-        struct no_scheduler
+        HPX_CXX_EXPORT struct no_scheduler
         {
         };
     }    // namespace detail
@@ -118,7 +118,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename S, typename R, typename Enable = void>
+        HPX_CXX_EXPORT template <typename S, typename R, typename Enable = void>
         struct connect_result_helper
         {
             struct dummy_operation_state
@@ -128,7 +128,7 @@ namespace hpx::execution::experimental {
             using type = dummy_operation_state;
         };
 
-        template <typename S, typename R>
+        HPX_CXX_EXPORT template <typename S, typename R>
         struct connect_result_helper<S, R,
             std::enable_if_t<hpx::is_invocable<connect_t, S, R>::value>>
           : hpx::util::invoke_result<connect_t, S, R>
@@ -138,7 +138,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename F, typename E>
+        HPX_CXX_EXPORT template <typename F, typename E>
         struct as_receiver
         {
             F f;

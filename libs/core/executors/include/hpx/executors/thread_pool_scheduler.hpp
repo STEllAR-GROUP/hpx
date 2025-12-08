@@ -46,7 +46,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename Policy>
+        HPX_CXX_EXPORT template <typename Policy>
         struct get_default_scheduler_policy
         {
             static constexpr Policy call() noexcept
@@ -210,7 +210,7 @@ namespace hpx::execution::experimental {
     struct thread_pool_policy_scheduler
     {
         // Associate the parallel_execution_tag tag type as a default with this
-        // scheduler, except if the given launch policy is synch.
+        // scheduler, except if the given launch policy is sync.
         using execution_category =
             std::conditional_t<std::is_same_v<Policy, launch::sync_policy>,
                 sequenced_execution_tag, parallel_execution_tag>;

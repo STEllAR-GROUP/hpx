@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -61,7 +61,7 @@ namespace hpx::execution::experimental::detail {
     // If items < num_threads, returns a power-of-2 chunk
     // size that results in at most 8 and
     // at least 4 chunks per worker thread.
-    constexpr std::uint32_t get_bulk_scheduler_chunk_size(
+    HPX_CXX_EXPORT constexpr std::uint32_t get_bulk_scheduler_chunk_size(
         std::uint32_t const num_threads, std::size_t const n) noexcept
     {
         std::uint64_t chunk_size = 1;
@@ -113,7 +113,7 @@ namespace hpx::execution::experimental::detail {
         return mask;
     }
 
-    inline hpx::threads::mask_type limit_mask(
+    HPX_CXX_EXPORT inline hpx::threads::mask_type limit_mask(
         hpx::threads::mask_cref_type orgmask, std::size_t num_threads)
     {
         std::size_t const num_cores = hpx::threads::hardware_concurrency();
@@ -179,7 +179,6 @@ namespace hpx::execution::experimental::detail {
                 // The regular bulk invocation will go through the is_chunked case.
                 auto it = std::ranges::next(
                     hpx::util::begin(op_state->shape), i_begin);
-                // *it is already a tuple from chunk_size_idx_iterator
                 bulk_scheduler_invoke_helper(
                     index_pack_type{}, op_state->f, *it, ts);
             }
@@ -307,7 +306,7 @@ namespace hpx::execution::experimental::detail {
         // Finish the work for one worker thread. If this is not the last worker
         // thread to finish, it will only decrement the counter. If it is the
         // last thread it will call set_error if there is an exception.
-        // Otherwise it will call set_value on the connected receiver.
+        // Otherwise, it will call set_value on the connected receiver.
         void finish() const
         {
             if (--(op_state->tasks_remaining.data_) == 0)

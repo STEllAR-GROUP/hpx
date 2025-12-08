@@ -23,14 +23,14 @@ namespace hpx::traits {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Executor, typename Future, typename F,
+        HPX_CXX_EXPORT template <typename Executor, typename Future, typename F,
             typename Enable = void>
         struct future_then_executor_result
         {
             using type = typename continuation_not_callable<Future, F>::type;
         };
 
-        template <typename Executor, typename Future, typename F>
+        HPX_CXX_EXPORT template <typename Executor, typename Future, typename F>
         struct future_then_executor_result<Executor, Future, F,
             std::void_t<hpx::util::invoke_result_t<F&, Future>>>
         {

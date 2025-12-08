@@ -24,23 +24,24 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::detail {
-    template <typename T>
+
+    HPX_CXX_EXPORT template <typename T>
     struct empty_vtable_type
     {
         static_assert(
             sizeof(T) == 0, "No empty vtable type defined for given type T");
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     using empty_vtable_t = typename empty_vtable_type<T>::type;
 
 #if !defined(HPX_MSVC) &&                                                      \
     defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR) &&                      \
     !defined(__CUDACC__) && !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     inline constexpr empty_vtable_t<T> empty_vtable{};
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     T const* get_empty_vtable()
     {
         static_assert(std::is_base_of_v<T, empty_vtable_t<T>>,
@@ -49,7 +50,7 @@ namespace hpx::detail {
         return &empty_vtable<T>;
     }
 #else
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     T const* get_empty_vtable()
     {
         static_assert(std::is_base_of_v<T, empty_vtable_t<T>>,
@@ -60,7 +61,7 @@ namespace hpx::detail {
     }
 #endif
 
-    template <typename Base, std::size_t EmbeddedStorageSize,
+    HPX_CXX_EXPORT template <typename Base, std::size_t EmbeddedStorageSize,
         std::size_t AlignmentSize = sizeof(void*)>
     class movable_sbo_storage
     {
@@ -226,7 +227,7 @@ namespace hpx::detail {
         }
     };
 
-    template <typename Base, std::size_t EmbeddedStorageSize,
+    HPX_CXX_EXPORT template <typename Base, std::size_t EmbeddedStorageSize,
         std::size_t AlignmentSize = sizeof(void*)>
     class copyable_sbo_storage
       : public movable_sbo_storage<Base, EmbeddedStorageSize, AlignmentSize>
@@ -297,7 +298,7 @@ namespace hpx::detail {
 
 namespace hpx::execution::experimental::detail {
 
-    struct HPX_CORE_EXPORT any_operation_state_base
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT any_operation_state_base
     {
         virtual ~any_operation_state_base() = default;
 
@@ -308,7 +309,7 @@ namespace hpx::execution::experimental::detail {
         virtual void start() & noexcept = 0;
     };
 
-    struct HPX_CORE_EXPORT empty_any_operation_state final
+    HPX_CXX_EXPORT struct HPX_CORE_EXPORT empty_any_operation_state final
       : any_operation_state_base
     {
         [[nodiscard]] bool empty() const noexcept override;
@@ -326,7 +327,7 @@ struct hpx::detail::empty_vtable_type<
 
 namespace hpx::execution::experimental::detail {
 
-    template <typename Sender, typename Receiver>
+    HPX_CXX_EXPORT template <typename Sender, typename Receiver>
     struct any_operation_state_impl final : any_operation_state_base
     {
         std::decay_t<connect_result_t<Sender, Receiver>> operation_state;
@@ -344,15 +345,14 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    class immovable
+    HPX_CXX_EXPORT class immovable
     {
     public:
         immovable() = default;
         immovable(immovable&&) = delete;
     };
 
-    //    class HPX_CORE_EXPORT any_operation_state : immovable
-    class HPX_CORE_EXPORT any_operation_state : immovable
+    HPX_CXX_EXPORT class HPX_CORE_EXPORT any_operation_state : immovable
     {
         using base_type = detail::any_operation_state_base;
         template <typename Sender, typename Receiver>
@@ -382,7 +382,7 @@ namespace hpx::execution::experimental::detail {
             any_operation_state& os) noexcept;
     };
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     struct any_receiver_base
     {
         using is_receiver = void;
@@ -398,10 +398,10 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    [[noreturn]] HPX_CORE_EXPORT void throw_bad_any_call(
+    HPX_CXX_EXPORT [[noreturn]] HPX_CORE_EXPORT void throw_bad_any_call(
         char const* class_name, char const* function_name);
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     struct empty_any_receiver final : any_receiver_base<Ts...>
     {
         void move_into(void*) override
@@ -431,7 +431,7 @@ namespace hpx::execution::experimental::detail {
     };
 }    // namespace hpx::execution::experimental::detail
 
-template <typename... Ts>
+HPX_CXX_EXPORT template <typename... Ts>
 struct hpx::detail::empty_vtable_type<
     hpx::execution::experimental::detail::any_receiver_base<Ts...>>
 {
@@ -441,7 +441,7 @@ struct hpx::detail::empty_vtable_type<
 
 namespace hpx::execution::experimental::detail {
 
-    template <typename Receiver, typename... Ts>
+    HPX_CXX_EXPORT template <typename Receiver, typename... Ts>
     struct any_receiver_impl final : any_receiver_base<Ts...>
     {
         std::decay_t<Receiver> receiver;
@@ -478,7 +478,7 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     class any_receiver
     {
         using base_type = detail::any_receiver_base<Ts...>;
@@ -562,7 +562,7 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     struct unique_any_sender_base
     {
         virtual ~unique_any_sender_base() = default;
@@ -575,7 +575,7 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     struct any_sender_base : public unique_any_sender_base<Ts...>
     {
         virtual any_sender_base* clone() const = 0;
@@ -586,7 +586,7 @@ namespace hpx::execution::experimental::detail {
             any_receiver<Ts...>&& receiver) & = 0;
     };
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     struct empty_unique_any_sender final : unique_any_sender_base<Ts...>
     {
         void move_into(void*) override
@@ -606,7 +606,7 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     struct empty_any_sender final : any_sender_base<Ts...>
     {
         void move_into(void*) override
@@ -642,7 +642,7 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    template <typename Sender, typename... Ts>
+    HPX_CXX_EXPORT template <typename Sender, typename... Ts>
     struct unique_any_sender_impl final : unique_any_sender_base<Ts...>
     {
         std::decay_t<Sender> sender;
@@ -667,7 +667,7 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    template <typename Sender, typename... Ts>
+    HPX_CXX_EXPORT template <typename Sender, typename... Ts>
     struct any_sender_impl final : any_sender_base<Ts...>
     {
         std::decay_t<Sender> sender;
@@ -724,7 +724,7 @@ namespace hpx::execution::experimental {
         // any_(unique_)sender is destroyed. This would be problematic since the
         // any_(unique_)sender can hold previously created any_receivers and
         // any_operation_states indirectly.
-        template <typename... Ts>
+        HPX_CXX_EXPORT template <typename... Ts>
         struct any_sender_static_empty_vtable_helper
         {
             any_sender_static_empty_vtable_helper()
@@ -909,7 +909,7 @@ namespace hpx::execution::experimental {
 
 namespace hpx::detail {
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     struct empty_vtable_type<
         hpx::execution::experimental::detail::unique_any_sender_base<Ts...>>
     {
@@ -918,7 +918,7 @@ namespace hpx::detail {
                 Ts...>;
     };
 
-    template <typename... Ts>
+    HPX_CXX_EXPORT template <typename... Ts>
     struct empty_vtable_type<
         hpx::execution::experimental::detail::any_sender_base<Ts...>>
     {

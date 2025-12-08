@@ -33,7 +33,7 @@
 
 namespace hpx::lcos::detail {
 
-    template <typename Executor, typename Future, typename F>
+    HPX_CXX_EXPORT template <typename Executor, typename Future, typename F>
     inline hpx::traits::future_then_executor_result_t<Executor,
         std::decay_t<Future>, F>
     then_execute_helper(Executor&& exec, F&& f, Future&& predecessor)
@@ -149,7 +149,7 @@ namespace hpx::lcos::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct post_policy_spawner
+    HPX_CXX_EXPORT struct post_policy_spawner
     {
         template <typename F>
         void operator()(F&& f, hpx::threads::thread_description desc,
@@ -166,7 +166,7 @@ namespace hpx::lcos::detail {
         }
     };
 
-    template <typename Executor>
+    HPX_CXX_EXPORT template <typename Executor>
     struct executor_spawner
     {
         Executor exec;

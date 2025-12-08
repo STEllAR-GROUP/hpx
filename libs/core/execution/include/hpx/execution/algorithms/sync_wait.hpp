@@ -46,13 +46,9 @@ namespace hpx::this_thread::experimental {
 
 namespace hpx::execution::experimental::detail {
 
-    enum class sync_wait_type
-    {
-        single,
-        variant
-    };
+    HPX_CXX_EXPORT enum class sync_wait_type { single, variant };
 
-    struct sync_wait_error_visitor
+    HPX_CXX_EXPORT struct sync_wait_error_visitor
     {
         void operator()(std::exception_ptr ep) const
         {
@@ -66,7 +62,7 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    struct sync_wait_receiver_env
+    HPX_CXX_EXPORT struct sync_wait_receiver_env
     {
         using type = sync_wait_receiver_env;
         using id = sync_wait_receiver_env;
@@ -90,35 +86,36 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    template <typename Pack>
+    HPX_CXX_EXPORT template <typename Pack>
     struct make_decayed_pack;
 
-    template <template <typename...> typename Pack, typename... Ts>
+    HPX_CXX_EXPORT template <template <typename...> typename Pack,
+        typename... Ts>
     struct make_decayed_pack<Pack<Ts...>>
     {
         using type = Pack<std::decay_t<Ts>...>;
     };
 
-    template <typename Pack>
+    HPX_CXX_EXPORT template <typename Pack>
     using make_decayed_pack_t = typename make_decayed_pack<Pack>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <sync_wait_type Type, typename T>
+    HPX_CXX_EXPORT template <sync_wait_type Type, typename T>
     struct select_result;
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct select_result<sync_wait_type::single, T>
     {
         using type = hpx::variant<make_decayed_pack_t<single_variant_t<T>>>;
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     struct select_result<sync_wait_type::variant, T>
     {
         using type = T;
     };
 
-    template <sync_wait_type Type, typename T>
+    HPX_CXX_EXPORT template <sync_wait_type Type, typename T>
     using select_result_t = typename select_result<Type, T>::type;
 
     ///////////////////////////////////////////////////////////////////////////
