@@ -18,7 +18,7 @@ set(jacobi_FLAGS COMPONENT_DEPENDENCIES iostreams jacobi)
 add_hpx_executable(
   jacobi_simple INTERNAL_FLAGS MODULE jacobi
   SOURCES ${jacobi_sources} ${jacobi_FLAGS}
-  FOLDER "Examples/Jacobi"
+  FOLDER "Examples/Jacobi" ${HPX_WITH_CXX_MODULES_OPTION}
 )
 
 add_hpx_example_target_dependencies("jacobi" jacobi_simple)

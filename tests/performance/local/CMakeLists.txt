@@ -166,7 +166,7 @@ foreach(benchmark ${benchmarks})
     SOURCES ${sources} ${${benchmark}_FLAGS} ${${benchmark}_HEADERS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Benchmarks/Local"
+    FOLDER "Benchmarks/Local" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   target_include_directories(

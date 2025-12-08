@@ -73,9 +73,7 @@ namespace hpx::parallel::util::detail {
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
         {
-            // clang-format off
             ar & f_;
-            // clang-format on
         }
     };
 }    // namespace hpx::parallel::util::detail

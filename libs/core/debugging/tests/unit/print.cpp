@@ -9,11 +9,10 @@
 // are completely elided
 
 #include <hpx/modules/debugging.hpp>
+#include <hpx/modules/init_runtime_local.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/timing.hpp>
-
-#include <hpx/init_runtime_local/init_runtime_local.hpp>
 #include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <hpx/hpx_main.hpp>
 

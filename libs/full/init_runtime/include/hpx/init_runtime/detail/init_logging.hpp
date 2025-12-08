@@ -8,15 +8,15 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/init_runtime_local/detail/init_logging.hpp>
+#include <hpx/modules/init_runtime_local.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
 #include <hpx/modules/runtime_configuration.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
 
     HPX_EXPORT void init_logging_full(runtime_configuration&);
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail
 
 #endif

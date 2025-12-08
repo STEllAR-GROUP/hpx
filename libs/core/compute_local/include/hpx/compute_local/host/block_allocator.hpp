@@ -34,7 +34,7 @@ namespace hpx::compute::host {
 
         /// The policy_allocator allocates blocks of memory touched according to
         /// the distribution policy of the given executor.
-        template <typename T, typename Policy,
+        HPX_CXX_EXPORT template <typename T, typename Policy,
             typename Enable =
                 std::enable_if_t<hpx::is_execution_policy_v<Policy>>>
         struct policy_allocator
@@ -253,7 +253,7 @@ namespace hpx::compute::host {
     /// std::size_t N = 2048;
     /// vector_type v(N, allocator_type(numa_nodes));
     ///
-    template <typename T,
+    HPX_CXX_EXPORT template <typename T,
         typename Executor =
             hpx::execution::experimental::restricted_thread_pool_executor>
     struct block_allocator

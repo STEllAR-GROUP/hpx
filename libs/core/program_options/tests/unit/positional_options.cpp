@@ -6,12 +6,8 @@
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/program_options/errors.hpp>
-#include <hpx/program_options/options_description.hpp>
-#include <hpx/program_options/parsers.hpp>
-#include <hpx/program_options/positional_options.hpp>
-#include <hpx/program_options/value_semantic.hpp>
 
 #include <cstddef>
 #include <limits>

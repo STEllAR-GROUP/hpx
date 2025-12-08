@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/compute_local/host/get_targets.hpp>
+#include <hpx/modules/compute_local.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/modules/compute_local.hpp>

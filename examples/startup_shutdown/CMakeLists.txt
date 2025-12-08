@@ -12,7 +12,7 @@ add_hpx_component(
   startup_shutdown INTERNAL_FLAGS NOEXPORT
   INSTALL_COMPONENT examples
   FOLDER "Examples/StartupShutdown"
-  AUTOGLOB
+  AUTOGLOB ${HPX_WITH_CXX_MODULES_OPTION}
 )
 
 # make pseudo-targets depend on master pseudo-target

@@ -23,7 +23,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Unit/Init"
+    FOLDER "Tests/Unit/Init" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   add_hpx_unit_test("init" ${test} ${${test}_PARAMETERS})

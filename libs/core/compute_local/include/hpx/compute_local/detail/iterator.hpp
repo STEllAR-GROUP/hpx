@@ -18,7 +18,7 @@
 
 namespace hpx::compute::detail {
 
-    template <typename T, typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Allocator>
     struct iterator
       : hpx::util::iterator_adaptor<iterator<T, Allocator>,
             typename traits::allocator_traits<Allocator>::pointer,
@@ -78,12 +78,12 @@ namespace hpx::compute::detail {
         target_type const* target_;
     };
 
-    template <typename T, typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Allocator>
     struct reverse_iterator
     {
     };
 
-    template <typename T, typename Allocator>
+    HPX_CXX_EXPORT template <typename T, typename Allocator>
     struct const_reverse_iterator
     {
     };

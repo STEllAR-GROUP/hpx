@@ -25,6 +25,13 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE") AND NOT TARGET eve::eve)
         "HPX_WITH_FETCH_EVE=${HPX_WITH_FETCH_EVE}, EVE will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_Eve_TAG=${HPX_WITH_Eve_TAG})"
       )
     endif()
+
+    set(EVE_USE_PCH OFF)
+    set(EVE_BUILD_TEST OFF)
+    set(EVE_BUILD_RANDOM OFF)
+    set(EVE_BUILD_BENCHMARKS OFF)
+    set(EVE_BUILD_DOCUMENTATION OFF)
+
     include(FetchContent)
     fetchcontent_declare(
       eve
