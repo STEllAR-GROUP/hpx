@@ -70,7 +70,7 @@ namespace hpx::execution::experimental {
     namespace detail {
 
         // start should not be callable for operation states that are rvalues
-        struct enable_start
+        HPX_CXX_EXPORT struct enable_start
         {
             template <typename EnableTag, typename... Ts>
             struct apply : std::false_type
@@ -91,15 +91,15 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <bool IsOperationState, typename O>
+        HPX_CXX_EXPORT template <bool IsOperationState, typename O>
         struct is_operation_state_impl;
 
-        template <typename O>
+        HPX_CXX_EXPORT template <typename O>
         struct is_operation_state_impl<false, O> : std::false_type
         {
         };
 
-        template <typename O>
+        HPX_CXX_EXPORT template <typename O>
         struct is_operation_state_impl<true, O>
           : std::integral_constant<bool, noexcept(start(std::declval<O&>()))>
         {

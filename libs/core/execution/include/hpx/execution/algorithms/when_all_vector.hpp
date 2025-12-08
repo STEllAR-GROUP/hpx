@@ -37,7 +37,7 @@
 namespace hpx::when_all_vector_detail {
 
     // callback object to request cancellation
-    struct on_stop_requested
+    HPX_CXX_EXPORT struct on_stop_requested
     {
         hpx::experimental::in_place_stop_source& stop_source_;
         void operator()() noexcept
@@ -52,7 +52,7 @@ namespace hpx::when_all_vector_detail {
         struct when_all_vector_sender_type;
     };
 
-    template <typename Sender>
+    HPX_CXX_EXPORT template <typename Sender>
     using when_all_vector_sender = typename when_all_vector_sender_impl<
         Sender>::when_all_vector_sender_type;
 

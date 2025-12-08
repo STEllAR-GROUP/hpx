@@ -117,9 +117,9 @@ namespace hpx::functional {
     namespace tag_invoke_t_ns {
 
         // poison pill
-        void tag_invoke();
+        HPX_CXX_EXPORT void tag_invoke();
 
-        struct tag_invoke_t
+        HPX_CXX_EXPORT struct tag_invoke_t
         {
             // different versions of clang-format disagree
             // clang-format off
@@ -201,7 +201,7 @@ namespace hpx::functional {
     {
     };
 #else
-    template <typename Tag, typename... Args>
+    HPX_CXX_EXPORT template <typename Tag, typename... Args>
     struct is_nothrow_tag_invocable : std::true_type
     {
     };

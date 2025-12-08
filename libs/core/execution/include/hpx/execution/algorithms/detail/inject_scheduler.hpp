@@ -20,7 +20,7 @@ namespace hpx::execution::experimental::detail {
 
     // This is a partial s/r algorithm that injects a given scheduler as the
     // first argument while tag-invoking the bound algorithm.
-    template <typename Tag, typename Scheduler, typename... Ts>
+    HPX_CXX_EXPORT template <typename Tag, typename Scheduler, typename... Ts>
     struct inject_scheduler
       : partial_algorithm_base<Tag, hpx::util::make_index_pack_t<sizeof...(Ts)>,
             Ts...>
