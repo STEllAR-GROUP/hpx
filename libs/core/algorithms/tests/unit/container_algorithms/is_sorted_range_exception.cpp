@@ -32,7 +32,7 @@ void test_sorted_exception()
 void sorted_exception_test()
 {
     test_sorted_exception<std::random_access_iterator_tag>();
-    test_sorted_exception<std::forward_iterator_tag>();
+    test_sorted_exception_seq(std::forward_iterator_tag());
 
     using namespace hpx::execution;
 
@@ -66,7 +66,7 @@ void test_sorted_bad_alloc()
 void sorted_bad_alloc_test()
 {
     test_sorted_bad_alloc<std::random_access_iterator_tag>();
-    test_sorted_bad_alloc<std::forward_iterator_tag>();
+    test_sorted_bad_alloc_seq(std::forward_iterator_tag());
 
     using namespace hpx::execution;
 

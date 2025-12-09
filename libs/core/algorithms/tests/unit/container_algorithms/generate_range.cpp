@@ -54,7 +54,7 @@ void test_generate_sent(ExPolicy policy)
     auto gen = []() { return std::size_t(10); };
 
     hpx::ranges::generate(policy, std::begin(c),
-        sentinel<std::size_t>{*(std::begin(c) + 100)}, gen);
+        test::sentinel_from_iterator(std::begin(c) + 100), gen);
 
     // verify values
     std::size_t count = 0;
@@ -144,6 +144,13 @@ void test_generate()
     using namespace hpx::execution;
 
     test_generate(IteratorTag());
+    test_generate_sent();
+}
+
+template <typename IteratorTag>
+void test_generate_parallel()
+{
+    using namespace hpx::execution;
 
     test_generate(seq, IteratorTag());
     test_generate(par, IteratorTag());
@@ -152,7 +159,6 @@ void test_generate()
     test_generate_async(seq(task), IteratorTag());
     test_generate_async(par(task), IteratorTag());
 
-    test_generate_sent();
     test_generate_sent(seq);
     test_generate_sent(par);
     test_generate_sent(par_unseq);
@@ -162,6 +168,7 @@ void generate_test()
 {
     test_generate<std::random_access_iterator_tag>();
     test_generate<std::forward_iterator_tag>();
+    test_generate_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -283,6 +290,12 @@ void test_generate_exception()
     using namespace hpx::execution;
 
     test_generate_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_generate_exception_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -298,6 +311,7 @@ void generate_exception_test()
 {
     test_generate_exception<std::random_access_iterator_tag>();
     test_generate_exception<std::forward_iterator_tag>();
+    test_generate_exception_parallel<std::random_access_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -393,7 +407,6 @@ void test_generate_bad_alloc()
 void generate_bad_alloc_test()
 {
     test_generate_bad_alloc<std::random_access_iterator_tag>();
-    test_generate_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

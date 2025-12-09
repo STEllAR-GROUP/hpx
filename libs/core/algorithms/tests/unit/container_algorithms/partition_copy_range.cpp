@@ -139,8 +139,8 @@ void test_partition_copy_sent(ExPolicy policy)
     c[size - 1] = INT_MAX;
 
     auto result = hpx::ranges::partition_copy(policy, std::begin(c),
-        sentinel<int>{INT_MAX}, std::begin(d_true_res), std::begin(d_false_res),
-        pred);
+        test::sentinel_from_iterator(std::end(c) - 1), std::begin(d_true_res),
+        std::begin(d_false_res), pred);
     auto solution = std::partition_copy(std::begin(c), std::end(c) - 1,
         std::begin(d_true_sol), std::begin(d_false_sol), pred);
 

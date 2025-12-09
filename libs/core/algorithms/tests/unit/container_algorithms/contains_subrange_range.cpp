@@ -98,6 +98,12 @@ void test_contains_subrange()
     using namespace hpx::execution;
 
     test_contains_subrange(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_contains_subrange_parallel()
+{
+    using namespace hpx::execution;
 
     test_contains_subrange(seq, IteratorTag());
     test_contains_subrange(par, IteratorTag());
@@ -111,7 +117,7 @@ void test_contains_subrange()
 void contains_subrange_test()
 {
     test_contains_subrange<std::random_access_iterator_tag>();
-    test_contains_subrange<std::forward_iterator_tag>();
+    test_contains_subrange_parallel<std::random_access_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -259,6 +265,12 @@ void test_contains_subrange_exception()
     using namespace hpx::execution;
 
     test_contains_subrange_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_contains_subrange_exception_parallel()
+{
+    using namespace hpx::execution;
 
     test_contains_subrange_exception(seq, IteratorTag());
     test_contains_subrange_exception(par, IteratorTag());
@@ -270,7 +282,8 @@ void test_contains_subrange_exception()
 void contains_subrange_exception_test()
 {
     test_contains_subrange_exception<std::random_access_iterator_tag>();
-    test_contains_subrange_exception<std::forward_iterator_tag>();
+    test_contains_subrange_exception_parallel<
+        std::random_access_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -376,7 +389,6 @@ void test_contains_subrange_bad_alloc()
 void contains_subrange_bad_alloc_test()
 {
     test_contains_subrange_bad_alloc<std::random_access_iterator_tag>();
-    test_contains_subrange_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

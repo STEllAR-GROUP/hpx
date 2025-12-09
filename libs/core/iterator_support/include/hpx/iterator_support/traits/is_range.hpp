@@ -9,7 +9,9 @@
 
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -75,4 +77,115 @@ namespace hpx::traits {
         using iterator_type = typename util::detail::iterator<R>::type;
         using sentinel_type = typename util::detail::sentinel<R>::type;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_CXX_EXPORT template <typename R, typename Enable = void>
+    struct is_input_range : std::false_type
+    {
+    };
+
+    HPX_CXX_EXPORT template <typename R>
+    struct is_input_range<R, std::enable_if_t<is_range_v<R>>>
+      : std::integral_constant<bool,
+            hpx::traits::is_input_iterator_v<hpx::traits::range_iterator_t<R>>>
+    {
+    };
+
+    HPX_CXX_EXPORT template <typename R>
+    using is_input_range_t = typename is_input_range<R>::type;
+
+    HPX_CXX_EXPORT template <typename R>
+    inline constexpr bool is_input_range_v = is_input_range<R>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_CXX_EXPORT template <typename R, typename Enable = void>
+    struct is_forward_range : std::false_type
+    {
+    };
+
+    HPX_CXX_EXPORT template <typename R>
+    struct is_forward_range<R, std::enable_if_t<is_range_v<R>>>
+      : std::integral_constant<bool,
+            hpx::traits::is_forward_iterator_v<
+                hpx::traits::range_iterator_t<R>>>
+    {
+    };
+
+    HPX_CXX_EXPORT template <typename R>
+    using is_forward_range_t = typename is_forward_range<R>::type;
+
+    HPX_CXX_EXPORT template <typename R>
+    inline constexpr bool is_forward_range_v = is_forward_range<R>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_CXX_EXPORT template <typename R, typename Enable = void>
+    struct is_bidirectional_range : std::false_type
+    {
+    };
+
+    HPX_CXX_EXPORT template <typename R>
+    struct is_bidirectional_range<R, std::enable_if_t<is_range_v<R>>>
+      : std::integral_constant<bool,
+            hpx::traits::is_bidirectional_iterator_v<
+                hpx::traits::range_iterator_t<R>>>
+    {
+    };
+
+    HPX_CXX_EXPORT template <typename R>
+    using is_bidirectional_range_t = typename is_bidirectional_range<R>::type;
+
+    HPX_CXX_EXPORT template <typename R>
+    inline constexpr bool is_bidirectional_range_v =
+        is_bidirectional_range<R>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_CXX_EXPORT template <typename R, typename Enable = void>
+    struct is_random_access_range : std::false_type
+    {
+    };
+
+    HPX_CXX_EXPORT template <typename R>
+    struct is_random_access_range<R, std::enable_if_t<is_range_v<R>>>
+      : std::integral_constant<bool,
+            hpx::traits::is_random_access_iterator_v<
+                hpx::traits::range_iterator_t<R>>>
+    {
+    };
+
+    HPX_CXX_EXPORT template <typename R>
+    using is_random_access_range_t = typename is_random_access_range<R>::type;
+
+    HPX_CXX_EXPORT template <typename R>
+    inline constexpr bool is_random_access_range_v =
+        is_random_access_range<R>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_CXX20_STD_DISABLE_SIZED_RANGE)
+    HPX_CXX_EXPORT template <typename R>
+    inline constexpr bool disable_sized_range =
+        std::ranges::disable_sized_range<R>;
+#else
+    HPX_CXX_EXPORT template <typename R>
+    inline constexpr bool disable_sized_range = false;
+#endif
+
+    HPX_CXX_EXPORT template <typename R, typename Enable = void>
+    struct is_sized_range : std::false_type
+    {
+    };
+
+    HPX_CXX_EXPORT template <typename R>
+    struct is_sized_range<R,
+        std::enable_if_t<is_range_v<R> &&
+            !disable_sized_range<std::remove_cv_t<R>> &&
+            (util::detail::has_size_member_v<R> ||
+                util::detail::has_size_v<R> ||
+                std::is_array_v<std::remove_reference_t<R>> ||
+                is_sized_sentinel_for_v<range_sentinel_t<R>,
+                    range_iterator_t<R>>)>> : std::true_type
+    {
+    };
+
+    HPX_CXX_EXPORT template <typename R>
+    inline constexpr bool is_sized_range_v = is_sized_range<R>::value;
 }    // namespace hpx::traits

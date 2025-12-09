@@ -17,9 +17,13 @@
 template <typename IteratorTag, typename Proj>
 void test_for_each()
 {
-    using namespace hpx::execution;
-
     test_for_each_seq(IteratorTag(), Proj());
+}
+
+template <typename IteratorTag, typename Proj>
+void test_for_each_parallel()
+{
+    using namespace hpx::execution;
 
     test_for_each(seq, IteratorTag(), Proj());
     test_for_each(par, IteratorTag(), Proj());
@@ -34,19 +38,24 @@ void for_each_test()
 {
     test_for_each<std::random_access_iterator_tag, Proj>();
     test_for_each<std::forward_iterator_tag, Proj>();
+    test_for_each_parallel<std::random_access_iterator_tag, Proj>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag, typename Proj>
 void test_for_each_exception()
 {
+    test_for_each_exception_seq(IteratorTag(), Proj());
+}
+
+template <typename IteratorTag, typename Proj>
+void test_for_each_exception_parallel()
+{
     using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_for_each_exception_seq(IteratorTag(), Proj());
-
     test_for_each_exception(seq, IteratorTag(), Proj());
     test_for_each_exception(par, IteratorTag(), Proj());
 
@@ -59,18 +68,23 @@ void for_each_exception_test()
 {
     test_for_each_exception<std::random_access_iterator_tag, Proj>();
     test_for_each_exception<std::forward_iterator_tag, Proj>();
+    test_for_each_exception_parallel<std::random_access_iterator_tag, Proj>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag, typename Proj>
 void test_for_each_bad_alloc()
 {
-    using namespace hpx::execution;
-
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
     test_for_each_bad_alloc_seq(IteratorTag(), Proj());
+}
+
+template <typename IteratorTag, typename Proj>
+void test_for_each_bad_alloc_parallel()
+{
+    using namespace hpx::execution;
 
     test_for_each_bad_alloc(seq, IteratorTag(), Proj());
     test_for_each_bad_alloc(par, IteratorTag(), Proj());
@@ -84,6 +98,7 @@ void for_each_bad_alloc_test()
 {
     test_for_each_bad_alloc<std::random_access_iterator_tag, Proj>();
     test_for_each_bad_alloc<std::forward_iterator_tag, Proj>();
+    test_for_each_bad_alloc_parallel<std::random_access_iterator_tag, Proj>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

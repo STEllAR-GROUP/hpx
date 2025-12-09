@@ -424,14 +424,13 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter>
+                hpx::traits::is_random_access_iterator_v<Iter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, Iter>
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type
-        tag_fallback_invoke(
-            hpx::ranges::reverse_t, ExPolicy&& policy, Iter first, Sent sent)
+            Iter>::type tag_fallback_invoke(hpx::ranges::reverse_t,
+            ExPolicy&& policy, Iter first, Sent sent)
         {
             static_assert(hpx::traits::is_bidirectional_iterator<Iter>::value,
                 "Required at least bidirectional iterator.");
@@ -444,7 +443,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng>
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
@@ -521,9 +521,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-                hpx::traits::is_iterator_v<FwdIter>
+                hpx::traits::is_random_access_iterator_v<Iter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
@@ -546,8 +546,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
-                hpx::traits::is_iterator_v<OutIter>
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
+                hpx::traits::is_random_access_iterator_v<OutIter>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,

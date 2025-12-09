@@ -107,9 +107,14 @@ void test_transform_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_transform()
 {
+    test_transform(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_transform_parallel()
+{
     using namespace hpx::execution;
 
-    test_transform(IteratorTag());
     test_transform(seq, IteratorTag());
     test_transform(par, IteratorTag());
     test_transform(par_unseq, IteratorTag());
@@ -122,6 +127,8 @@ void transform_test()
 {
     test_transform<std::random_access_iterator_tag>();
     test_transform<std::forward_iterator_tag>();
+
+    test_transform_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -238,12 +245,17 @@ void test_transform_exception_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_transform_exception()
 {
+    test_transform_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_transform_exception_parallel()
+{
     using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_transform_exception(IteratorTag());
     test_transform_exception(seq, IteratorTag());
     test_transform_exception(par, IteratorTag());
 
@@ -255,6 +267,8 @@ void transform_exception_test()
 {
     test_transform_exception<std::random_access_iterator_tag>();
     test_transform_exception<std::forward_iterator_tag>();
+
+    test_transform_exception_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -349,7 +363,6 @@ void test_transform_bad_alloc()
 void transform_bad_alloc_test()
 {
     test_transform_bad_alloc<std::random_access_iterator_tag>();
-    test_transform_bad_alloc<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
