@@ -19,5 +19,13 @@ configure_extra_options+=" -DHPX_WITH_TESTS_EXTERNAL_BUILD=OFF"
 
 ctest_extra_args+=" --verbose "
 
+export CCACHE_EXE=/work/pansysk75/ccache-4.12.2/bin/ccache
+export CCACHE_DIR=/work/pansysk75/ccache-4.12.2/cache
+export CCACHE_MAXSIZE=500G
+export CCACHE_NOHASHDIR=1
+
+configure_extra_options+=" -DCMAKE_CXX_COMPILER_LAUNCHER=${CCACHE_EXE}"
+configure_extra_options+=" -DCMAKE_C_COMPILER_LAUNCHER=${CCACHE_EXE}"
+
 hostname
 module avail
