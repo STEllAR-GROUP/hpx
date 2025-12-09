@@ -18,6 +18,9 @@ namespace hpx::parallel::util::detail {
 
     // make sure iterators embedded in function object that is attached to
     // futures are invalidated
+    HPX_CXX_EXPORT
+    constexpr void clear_container() noexcept {}
+
     HPX_CXX_EXPORT template <typename Cont>
     constexpr void clear_container(Cont&&) noexcept
     {

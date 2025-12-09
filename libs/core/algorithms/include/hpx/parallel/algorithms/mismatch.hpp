@@ -639,12 +639,10 @@ namespace hpx::parallel {
                 auto f2 = [=](auto&&... data) mutable
                     -> util::in_in_result<Iter1, Iter2> {
                     static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        // make sure iterators embedded in function object that is
-                        // attached to futures are invalidated
-                        util::detail::clear_container(data...);
-                    }
+
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    util::detail::clear_container(data...);
 
                     auto mismatched = tok.get_data();
                     std::advance(first1, mismatched);
@@ -757,12 +755,10 @@ namespace hpx::parallel {
                 auto f2 = [=](auto&&... data) mutable
                     -> std::pair<FwdIter1, FwdIter2> {
                     static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        // make sure iterators embedded in function object that is
-                        // attached to futures are invalidated
-                        util::detail::clear_container(data...);
-                    }
+
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    util::detail::clear_container(data...);
 
                     difference_type mismatched =
                         static_cast<difference_type>(tok.get_data());

@@ -426,13 +426,11 @@ namespace hpx::parallel {
                 };
 
                 auto f2 = [first, tok](auto&&... data) mutable -> FwdIter {
+                    static_assert(sizeof...(data) < 2);
+
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        util::detail::clear_container(data...);
-                    }
+                    util::detail::clear_container(data...);
 
                     difference_type loc = tok.get_data();
                     std::advance(first, loc);

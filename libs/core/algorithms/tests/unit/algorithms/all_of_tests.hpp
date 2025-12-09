@@ -9,10 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/parallel/algorithms/all_any_none.hpp>
-#include <hpx/parallel/container_algorithms/all_any_none.hpp>
 
 #include <cstddef>
 #include <iostream>

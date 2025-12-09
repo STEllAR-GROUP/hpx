@@ -66,7 +66,7 @@ namespace hpx::parallel::util {
 
                 try
                 {
-                    bool const has_scheduler_executor =
+                    constexpr bool has_scheduler_executor =
                         hpx::execution_policy_has_scheduler_executor_v<
                             ExPolicy_>;
 
@@ -112,9 +112,10 @@ namespace hpx::parallel::util {
                                 std::monostate, Result>;
                         using variant_result_type =
                             std::variant<nonvoid_result, std::exception_ptr>;
-                        auto&& items = detail::partition<variant_result_type>(
-                            HPX_FORWARD(ExPolicy_, policy), first, count,
-                            wrapped_f1);
+                        auto&& items =
+                            detail::partition<variant_result_type, false>(
+                                HPX_FORWARD(ExPolicy_, policy), first, count,
+                                wrapped_f1);
 
                         scoped_params.mark_end_of_scheduling();
 
@@ -123,7 +124,7 @@ namespace hpx::parallel::util {
                     }
                     else
                     {
-                        auto&& items = detail::partition<Result>(
+                        auto&& items = detail::partition<Result, false>(
                             HPX_FORWARD(ExPolicy_, policy), first, count,
                             HPX_FORWARD(F1, f1));
 
@@ -146,8 +147,13 @@ namespace hpx::parallel::util {
             static decltype(auto) reduce(
                 Items&& workitems, F&& f, Cleanup&& cleanup)
             {
+                using decayed_items = std::decay_t<Items>;
+                constexpr bool is_future =
+                    hpx::traits::is_future_v<decayed_items> ||
+                    hpx::traits::is_future_range_v<decayed_items>;
+
                 namespace ex = hpx::execution::experimental;
-                if constexpr (ex::is_sender_v<std::decay_t<Items>>)
+                if constexpr (ex::is_sender_v<decayed_items> && !is_future)
                 {
                     return ex::let_value(workitems,
                         [f = HPX_FORWARD(F, f),
@@ -227,15 +233,18 @@ namespace hpx::parallel::util {
                 }
                 else
                 {
-                    // wait for all tasks to finish
-                    if (hpx::wait_all_nothrow(workitems))
+                    if constexpr (is_future)
                     {
-                        // always rethrow if 'errors' is not empty or workitems has
-                        // exceptional future
-                        handle_local_exceptions::call_with_cleanup(
-                            workitems, HPX_FORWARD(Cleanup, cleanup));
+                        // wait for all tasks to finish
+                        if (hpx::wait_all_nothrow(workitems))
+                        {
+                            // always rethrow if 'errors' is not empty or workitems has
+                            // exceptional future
+                            handle_local_exceptions::call_with_cleanup(
+                                workitems, HPX_FORWARD(Cleanup, cleanup));
+                        }
                     }
-                    return f(HPX_FORWARD(Items, workitems));
+                    return HPX_INVOKE(f, HPX_FORWARD(Items, workitems));
                 }
             }
 
@@ -292,7 +301,7 @@ namespace hpx::parallel::util {
 
                 try
                 {
-                    auto&& items = detail::partition<Result>(
+                    auto&& items = detail::partition<Result, false>(
                         HPX_FORWARD(ExPolicy_, policy), first, count,
                         HPX_FORWARD(F1, f1));
 

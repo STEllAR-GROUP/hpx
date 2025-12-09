@@ -343,7 +343,7 @@ namespace hpx::parallel {
                 return util::partitioner<ExPolicy, difference_type>::call(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
-                    hpx::unwrapping([](auto&& results) {
+                    hpx::unwrapping([](auto&& results, auto&&...) {
                         return util::accumulate_n(hpx::util::begin(results),
                             hpx::util::size(results), difference_type(0),
                             std::plus<difference_type>());
@@ -408,7 +408,7 @@ namespace hpx::parallel {
                 return util::partitioner<ExPolicy, difference_type>::call(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
-                    hpx::unwrapping([](auto&& results) {
+                    hpx::unwrapping([](auto&& results, auto&&...) {
                         return util::accumulate_n(hpx::util::begin(results),
                             hpx::util::size(results), difference_type(0),
                             std::plus<difference_type>());
