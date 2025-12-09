@@ -8,8 +8,7 @@
 
 #include <hpx/config/export_definitions.hpp>
 
-#if !defined(HPX_COMPILE_WITH_MODULES) ||                                      \
-    (defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_ITT_NOTIFY_WITH_MODULES))
+#if !defined(HPX_COMPILE_WITH_MODULES) || defined(HPX_COMPILE_BMI)
 #include <hpx/itt_notify/api.hpp>
 #endif
 
