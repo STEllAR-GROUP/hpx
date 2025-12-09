@@ -219,14 +219,14 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
-                hpx::traits::is_iterator_v<Iter2>
+                hpx::traits::is_random_access_iterator_v<Iter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, Iter1> &&
+                hpx::traits::is_random_access_iterator_v<Iter2>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            move_result<Iter1, Iter2>>
-        tag_fallback_invoke(
-            move_t, ExPolicy&& policy, Iter1 first, Sent1 last, Iter2 dest)
+            move_result<Iter1, Iter2>> tag_fallback_invoke(move_t,
+            ExPolicy&& policy, Iter1 first, Sent1 last, Iter2 dest)
         {
             return hpx::parallel::detail::transfer<
                 hpx::parallel::detail::move<Iter1, Iter2>>(
@@ -237,8 +237,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
-                hpx::traits::is_iterator_v<Iter2>
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
+                hpx::traits::is_random_access_iterator_v<Iter2>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,

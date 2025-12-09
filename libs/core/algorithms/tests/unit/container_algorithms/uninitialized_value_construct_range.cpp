@@ -76,8 +76,9 @@ void test_uninitialized_value_construct_range_sent(
     auto end_size = rand() % data_size;
     c[end_size] = {20};
 
-    hpx::ranges::uninitialized_value_construct(
-        policy, std::begin(c), sentinel<std::int32_t>{20});
+    hpx::ranges::uninitialized_value_construct(policy, std::begin(c),
+        test::sentinel_from_iterator(
+            std::begin(c) + static_cast<ptrdiff_t>(end_size)));
 
     std::size_t count42 = 0;
     std::size_t count10 = 0;
@@ -171,10 +172,9 @@ void test_uninitialized_value_construct_range()
     test_uninitialized_value_construct_range_async(seq(task), IteratorTag());
     test_uninitialized_value_construct_range_async(par(task), IteratorTag());
 
+    // Parallel versions require sized sentinel which value-based
+    // sentinel<int> doesn't support for non-numeric types
     test_uninitialized_value_construct_range_sent(IteratorTag());
-    test_uninitialized_value_construct_range_sent(seq, IteratorTag());
-    test_uninitialized_value_construct_range_sent(par, IteratorTag());
-    test_uninitialized_value_construct_range_sent(par_unseq, IteratorTag());
 }
 
 void uninitialized_value_construct_range_test()

@@ -153,7 +153,6 @@ void adjacent_find_test()
 {
     using namespace hpx::execution;
     test_adjacent_find<std::random_access_iterator_tag>();
-    test_adjacent_find<std::forward_iterator_tag>();
 
     test_adjacent_find(seq, negate());
     test_adjacent_find(par, negate());

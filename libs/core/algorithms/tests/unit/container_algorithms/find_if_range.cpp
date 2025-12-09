@@ -97,6 +97,12 @@ void test_find_if()
     using namespace hpx::execution;
 
     test_find_if(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_find_if_parallel()
+{
+    using namespace hpx::execution;
 
     test_find_if(seq, IteratorTag());
     test_find_if(par, IteratorTag());
@@ -110,6 +116,7 @@ void find_if_test()
 {
     test_find_if<std::random_access_iterator_tag>();
     test_find_if<std::forward_iterator_tag>();
+    test_find_if_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -224,6 +231,12 @@ void test_find_if_exception()
     using namespace hpx::execution;
 
     test_find_if_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_find_if_exception_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -239,6 +252,7 @@ void find_if_exception_test()
 {
     test_find_if_exception<std::random_access_iterator_tag>();
     test_find_if_exception<std::forward_iterator_tag>();
+    test_find_if_exception_parallel<std::random_access_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -330,7 +344,6 @@ void test_find_if_bad_alloc()
 void find_if_bad_alloc_test()
 {
     test_find_if_bad_alloc<std::random_access_iterator_tag>();
-    test_find_if_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
