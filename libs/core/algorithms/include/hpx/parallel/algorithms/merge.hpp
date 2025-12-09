@@ -288,8 +288,8 @@ namespace hpx {
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/properties.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/iterator_support/unwrap_iterator.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
@@ -302,12 +302,9 @@ namespace hpx {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/properties/property.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 #include <hpx/parallel/util/memoizing_range.hpp>
-#include <hpx/type_support/generator.hpp>
 #endif
 
 #include <algorithm>
@@ -686,6 +683,12 @@ namespace hpx::parallel {
                 std::vector<merge_region> reshaped;
                 reshaped.reserve(2 * shape_size);
 #endif
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+                static hpx::util::itt::event notify_event("reshape");
+                hpx::util::itt::mark_event e(notify_event);
+#endif
+
                 Iter2 it2 = first2;
                 std::size_t dest_start = 0;
                 for (auto [it1, size1, base] : shape)

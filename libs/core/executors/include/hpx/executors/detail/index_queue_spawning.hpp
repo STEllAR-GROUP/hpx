@@ -287,7 +287,7 @@ namespace hpx::parallel::execution::detail {
             std::uint32_t const n) const noexcept
         {
             std::uint32_t chunk_size = 1;
-            while (chunk_size * num_threads * 128 < n)
+            while (chunk_size * num_threads * 64 < n)
             {
                 chunk_size *= 2;
             }
