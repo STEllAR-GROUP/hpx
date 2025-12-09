@@ -150,6 +150,11 @@ function(add_hpx_module libname modulename)
     endforeach()
   endif()
 
+  # capitalize string
+  string(SUBSTRING ${libname} 0 1 first_letter)
+  string(TOUPPER ${first_letter} first_letter)
+  string(REGEX REPLACE "^.(.*)" "${first_letter}\\1" libname_cap "${libname}")
+
   # This header generation is disabled for config module specific generated
   # headers are included
   if(${modulename}_GLOBAL_HEADER_GEN)
@@ -205,28 +210,7 @@ function(add_hpx_module libname modulename)
             "${module_macro_headers}#include <${header_file}>\n"
         )
       endforeach()
-
-      if(HPX_WITH_BUILD_USING_CXX_MODULES)
-        # generate a list of imported dependent modules
-        set(template_file "global_module_header_modules_separate.hpp.in")
-        set(module_imports)
-        foreach(dep ${${modulename}_MODULE_DEPENDENCIES})
-          string(FIND ${dep} "hpx_" find_index)
-          if(${find_index} EQUAL 0)
-            string(SUBSTRING ${dep} 4 -1 dep) # cut off leading "hpx_"
-            set(module_imports
-                "${module_imports}#include <hpx/modules/${dep}.hpp>\n"
-            )
-          endif()
-        endforeach()
-        list(LENGTH ${modulename}_MODULE_DEPENDENCIES dep_count)
-        if(dep_count GREATER 0)
-          set(module_imports "${module_imports}\n")
-        endif()
-        set(module_imports "${module_imports}import HPX.Core.${modulename};")
-      else()
-        set(template_file "global_module_header_modules.hpp.in")
-      endif()
+      set(template_file "global_module_header_modules.hpp.in")
     else()
       set(template_file "global_module_header.hpp.in")
     endif()
@@ -258,24 +242,6 @@ function(add_hpx_module libname modulename)
           CACHE STRING "List of standard headers #included by HPX modules"
                 FORCE
       )
-
-      if(HPX_WITH_BUILD_USING_CXX_MODULES)
-        # generate module specific MIU: variables: cxx_module_part,
-        # cxx_module_headers
-        set(cxx_sub_module ".${modulename}")
-        set(cxx_module_headers
-            "${cxx_module_headers}#include <hpx/modules/${modulename}.hpp>\n"
-        )
-
-        set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib}/${modulename})
-        set(lib_module_file
-            "${lib_module_basedir}/hpx_${modulename}${HPX_MODULE_INTERFACE_EXTENSION}"
-        )
-        configure_file(
-          "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in" ${lib_module_file}
-          @ONLY
-        )
-      endif()
     endif()
   endif()
 
@@ -419,43 +385,6 @@ function(add_hpx_module libname modulename)
     ${compat_headers}
   )
 
-  set(module_installation)
-  if((${modulename}_GLOBAL_HEADER_MODULE_GEN OR ${modulename}_MODULE_SOURCE)
-     AND HPX_WITH_BUILD_USING_CXX_MODULES
-  )
-    if(${modulename}_MODULE_SOURCE)
-      set(lib_module_basedir ${SOURCE_ROOT})
-      set(lib_module_file ${SOURCE_ROOT}/${${modulename}_MODULE_SOURCE})
-      set(lib_module_class "Source Files")
-    else()
-      set(lib_module_class "Generated Files")
-    endif()
-
-    add_hpx_source_group(
-      NAME hpx_${modulename}
-      ROOT ${lib_module_basedir}
-      CLASS ${lib_module_class}
-      TARGETS ${lib_module_file}
-    )
-
-    # cmake-format: off
-    target_sources(
-      hpx_${modulename} PUBLIC
-          FILE_SET hpx_${modulename}_public_sources
-              TYPE CXX_MODULES
-                  BASE_DIRS ${lib_module_basedir}
-                  FILES ${lib_module_file}
-    )
-    set(module_installation
-        FILE_SET hpx_${modulename}_public_sources
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx/miu
-        CXX_MODULES_BMI
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx/bmi
-            COMPONENT ${modulename}
-    )
-    # cmake-format: on
-  endif()
-
   if(HPX_WITH_CHECK_MODULE_DEPENDENCIES)
     # verify that all dependencies are from the same module category
     foreach(dep ${${modulename}_MODULE_DEPENDENCIES})
@@ -563,11 +492,6 @@ function(add_hpx_module libname modulename)
     TARGETS ${config_header}
   )
 
-  # capitalize string
-  string(SUBSTRING ${libname} 0 1 first_letter)
-  string(TOUPPER ${first_letter} first_letter)
-  string(REGEX REPLACE "^.(.*)" "${first_letter}\\1" libname_cap "${libname}")
-
   set_target_properties(
     hpx_${modulename} PROPERTIES FOLDER "Core/Modules/${libname_cap}"
                                  POSITION_INDEPENDENT_CODE ON
@@ -589,15 +513,17 @@ function(add_hpx_module libname modulename)
     )
   endif()
 
+  # cmake-format: off
   install(
     TARGETS hpx_${modulename}
     EXPORT HPXInternalTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${modulename}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${modulename}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-            COMPONENT ${modulename}
-            ${module_installation}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${modulename}
+    ${header_fileset_installation}
   )
+  # cmake-format: on
+
   hpx_export_internal_targets(hpx_${modulename})
 
   # Install the headers from the source
@@ -682,7 +608,7 @@ function(add_hpx_module libname modulename)
   endif()
 
   set(_hpx_prev_scan "${CMAKE_CXX_SCAN_FOR_MODULES}")
-  if(HPX_WITH_CXX_MODULES AND ${modulename}_GLOBAL_HEADER_MODULE_GEN)
+  if(HPX_WITH_CXX_MODULES)
     set(CMAKE_CXX_SCAN_FOR_MODULES ON)
   endif()
 

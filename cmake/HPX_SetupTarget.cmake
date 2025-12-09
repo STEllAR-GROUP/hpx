@@ -244,9 +244,6 @@ function(hpx_setup_target target)
     endif()
 
     set_target_properties(${target} PROPERTIES CXX_SCAN_FOR_MODULES OFF)
-    target_compile_definitions(
-      ${target} PRIVATE HPX_BINARY_DOESNT_USE_CXX_MODULES
-    )
   endif()
 
   get_target_property(target_EXCLUDE_FROM_ALL ${target} EXCLUDE_FROM_ALL)

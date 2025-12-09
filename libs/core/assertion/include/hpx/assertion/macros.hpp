@@ -21,8 +21,7 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/preprocessor.hpp>
 
-#if !defined(HPX_COMPILE_WITH_MODULES) ||                                      \
-    (defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_ASSERTION_WITH_MODULES))
+#if !defined(HPX_COMPILE_WITH_MODULES) || defined(HPX_COMPILE_BMI)
 #include <hpx/config.hpp>
 #include <hpx/assertion/api.hpp>
 #include <hpx/assertion/evaluate_assert.hpp>
