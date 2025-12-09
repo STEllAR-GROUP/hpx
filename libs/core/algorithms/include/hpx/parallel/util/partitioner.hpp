@@ -17,6 +17,7 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
@@ -69,9 +70,52 @@ namespace hpx::parallel::util::detail {
             auto&& shape =
                 detail::get_bulk_iteration_shape(policy, it_or_r, count, cores);
 
-            return execution::bulk_async_execute(policy.executor(),
-                partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
-                HPX_MOVE(shape));
+            using executor_type = decltype(policy.executor());
+
+            // We attempt to perform some optimizations in case of non-task
+            // execution.
+            if constexpr (!hpx::is_async_execution_policy_v<ExPolicy> &&
+                !hpx::execution_policy_has_scheduler_executor_v<ExPolicy>)
+            {
+                // Switch to sequential execution for one-core, one-chunk case
+                // if the executor supports it.
+                if constexpr (hpx::traits::is_one_way_executor_v<executor_type>)
+                {
+                    if (cores == 1 && std::size(shape) == 1)
+                    {
+                        return execution::sync_execute(policy.executor(),
+                            partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                            *std::begin(HPX_MOVE(shape)));
+                    }
+                }
+
+                if constexpr (hpx::traits::is_bulk_one_way_executor_v<
+                                  executor_type>)
+                {
+                    return execution::bulk_sync_execute(policy.executor(),
+                        partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                        HPX_MOVE(shape));
+                }
+
+                // Fall back if given executor doesn't support any of the above
+                // optimizations.
+                auto&& items = execution::bulk_async_execute(policy.executor(),
+                    partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                    HPX_MOVE(shape));
+                if (hpx::wait_all_nothrow(items))
+                {
+                    using handle_local_exceptions =
+                        detail::handle_local_exceptions<ExPolicy>;
+                    handle_local_exceptions::call(items);
+                }
+                return hpx::unwrap(items);
+            }
+            else
+            {
+                return execution::bulk_async_execute(policy.executor(),
+                    partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                    HPX_MOVE(shape));
+            }
         }
         else
         {
@@ -122,9 +166,52 @@ namespace hpx::parallel::util::detail {
             auto&& shape = detail::get_bulk_iteration_shape_idx(
                 policy, first, count, cores, stride);
 
-            return execution::bulk_async_execute(policy.executor(),
-                partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
-                HPX_MOVE(shape));
+            using executor_type = decltype(policy.executor());
+
+            // We attempt to perform some optimizations in case of non-task
+            // execution.
+            if constexpr (!hpx::is_async_execution_policy_v<ExPolicy> &&
+                !hpx::execution_policy_has_scheduler_executor_v<ExPolicy>)
+            {
+                // Switch to sequential execution for one-core, one-chunk case
+                // if the executor supports it.
+                if constexpr (hpx::traits::is_one_way_executor_v<executor_type>)
+                {
+                    if (cores == 1 && std::size(shape) == 1)
+                    {
+                        return execution::sync_execute(policy.executor(),
+                            partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                            *std::begin(HPX_MOVE(shape)));
+                    }
+                }
+
+                if constexpr (hpx::traits::is_bulk_one_way_executor_v<
+                                  executor_type>)
+                {
+                    return execution::bulk_sync_execute(policy.executor(),
+                        partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                        HPX_MOVE(shape));
+                }
+
+                // Fall back if given executor doesn't support any of the above
+                // optimizations.
+                auto&& items = execution::bulk_async_execute(policy.executor(),
+                    partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                    HPX_MOVE(shape));
+                if (hpx::wait_all_nothrow(items))
+                {
+                    using handle_local_exceptions =
+                        detail::handle_local_exceptions<ExPolicy>;
+                    handle_local_exceptions::call(items);
+                }
+                return hpx::unwrap(items);
+            }
+            else
+            {
+                return execution::bulk_async_execute(policy.executor(),
+                    partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                    HPX_MOVE(shape));
+            }
         }
         else
         {
