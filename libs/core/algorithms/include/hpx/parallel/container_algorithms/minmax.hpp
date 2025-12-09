@@ -877,9 +877,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, F,
                     hpx::parallel::traits::projected<Proj, FwdIter>,
@@ -888,9 +888,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter>
-        tag_fallback_invoke(hpx::ranges::min_element_t, ExPolicy&& policy,
-            FwdIter first, Sent last, F f = F(), Proj proj = Proj())
+            FwdIter> tag_fallback_invoke(hpx::ranges::min_element_t,
+            ExPolicy&& policy, FwdIter first, Sent last, F f = F(),
+            Proj proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
@@ -906,7 +906,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, F,
@@ -995,9 +996,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, F,
                     hpx::parallel::traits::projected<Proj, FwdIter>,
@@ -1006,9 +1007,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter>
-        tag_fallback_invoke(hpx::ranges::max_element_t, ExPolicy&& policy,
-            FwdIter first, Sent last, F f = F(), Proj proj = Proj())
+            FwdIter> tag_fallback_invoke(hpx::ranges::max_element_t,
+            ExPolicy&& policy, FwdIter first, Sent last, F f = F(),
+            Proj proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
@@ -1024,7 +1025,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, F,
@@ -1114,9 +1116,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, F,
                     hpx::parallel::traits::projected<Proj, FwdIter>,
@@ -1143,7 +1145,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, F,

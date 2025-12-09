@@ -118,6 +118,12 @@ void test_find_end1()
     using namespace hpx::execution;
 
     test_find_end1_proj(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_find_end1_parallel()
+{
+    using namespace hpx::execution;
 
     test_find_end1_proj(seq, IteratorTag());
     test_find_end1_proj(par, IteratorTag());
@@ -131,6 +137,7 @@ void find_end_test1()
 {
     test_find_end1<std::random_access_iterator_tag>();
     test_find_end1<std::forward_iterator_tag>();
+    test_find_end1_parallel<std::random_access_iterator_tag>();
 }
 
 template <typename IteratorTag>
@@ -235,6 +242,12 @@ void test_find_end2()
     using namespace hpx::execution;
 
     test_find_end2_proj(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_find_end2_parallel()
+{
+    using namespace hpx::execution;
 
     test_find_end2_proj(seq, IteratorTag());
     test_find_end2_proj(par, IteratorTag());
@@ -248,6 +261,7 @@ void find_end_test2()
 {
     test_find_end2<std::random_access_iterator_tag>();
     test_find_end2<std::forward_iterator_tag>();
+    test_find_end2_parallel<std::random_access_iterator_tag>();
 }
 
 template <typename IteratorTag>
@@ -351,6 +365,12 @@ void test_find_end3()
     using namespace hpx::execution;
 
     test_find_end3_proj(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_find_end3_parallel()
+{
+    using namespace hpx::execution;
 
     test_find_end3_proj(seq, IteratorTag());
     test_find_end3_proj(par, IteratorTag());
@@ -364,6 +384,7 @@ void find_end_test3()
 {
     test_find_end3<std::random_access_iterator_tag>();
     test_find_end3<std::forward_iterator_tag>();
+    test_find_end3_parallel<std::random_access_iterator_tag>();
 }
 
 template <typename IteratorTag>
@@ -464,6 +485,12 @@ void test_find_end4()
     using namespace hpx::execution;
 
     test_find_end4_proj(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_find_end4_parallel()
+{
+    using namespace hpx::execution;
 
     test_find_end4_proj(seq, IteratorTag());
     test_find_end4_proj(par, IteratorTag());
@@ -477,6 +504,7 @@ void find_end_test4()
 {
     test_find_end4<std::random_access_iterator_tag>();
     test_find_end4<std::forward_iterator_tag>();
+    test_find_end4_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -611,6 +639,12 @@ void test_find_end_exception()
     using namespace hpx::execution;
 
     test_find_end_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_find_end_exception_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -626,6 +660,7 @@ void find_end_exception_test()
 {
     test_find_end_exception<std::random_access_iterator_tag>();
     test_find_end_exception<std::forward_iterator_tag>();
+    test_find_end_exception_parallel<std::random_access_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -723,7 +758,6 @@ void test_find_end_bad_alloc()
 void find_end_bad_alloc_test()
 {
     test_find_end_bad_alloc<std::random_access_iterator_tag>();
-    test_find_end_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

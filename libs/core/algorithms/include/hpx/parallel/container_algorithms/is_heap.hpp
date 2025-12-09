@@ -506,7 +506,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
@@ -535,7 +536,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_random_access_iterator_v<Iter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
                     hpx::parallel::traits::projected<Proj, Iter>,
                     hpx::parallel::traits::projected<Proj, Iter>
@@ -618,7 +620,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
@@ -649,7 +652,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_random_access_iterator_v<Iter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
                     hpx::parallel::traits::projected<Proj, Iter>,
                     hpx::parallel::traits::projected<Proj, Iter>

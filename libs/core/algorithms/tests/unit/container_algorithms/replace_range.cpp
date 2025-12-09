@@ -59,8 +59,8 @@ void test_replace_sent(ExPolicy policy)
     int new_value = 99;
 
     auto pre_result = std::count(std::begin(c), std::end(c), old_value);
-    hpx::ranges::replace(policy, std::begin(c), sentinel<std::int16_t>{50},
-        old_value, new_value);
+    hpx::ranges::replace(policy, std::begin(c),
+        test::sentinel_from_iterator(std::begin(c) + 50), old_value, new_value);
     auto post_result = std::count(std::begin(c), std::end(c), old_value);
 
     HPX_TEST(pre_result == 2 && post_result == 1);
@@ -157,6 +157,13 @@ void test_replace()
 {
     using namespace hpx::execution;
     test_replace(IteratorTag());
+    test_replace_sent();
+}
+
+template <typename IteratorTag>
+void test_replace_parallel()
+{
+    using namespace hpx::execution;
     test_replace(seq, IteratorTag());
     test_replace(par, IteratorTag());
     test_replace(par_unseq, IteratorTag());
@@ -164,7 +171,6 @@ void test_replace()
     test_replace_async(seq(task), IteratorTag());
     test_replace_async(par(task), IteratorTag());
 
-    test_replace_sent();
     test_replace_sent(seq);
     test_replace_sent(par);
     test_replace_sent(par_unseq);
@@ -174,6 +180,7 @@ void replace_test()
 {
     test_replace<std::random_access_iterator_tag>();
     test_replace<std::forward_iterator_tag>();
+    test_replace_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -293,10 +300,14 @@ void test_replace_exception()
 {
     using namespace hpx::execution;
 
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
     test_replace_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_replace_exception_parallel()
+{
+    using namespace hpx::execution;
+
     test_replace_exception(seq, IteratorTag());
     test_replace_exception(par, IteratorTag());
 
@@ -308,6 +319,7 @@ void replace_exception_test()
 {
     test_replace_exception<std::random_access_iterator_tag>();
     test_replace_exception<std::forward_iterator_tag>();
+    test_replace_exception_parallel<std::random_access_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -420,10 +432,17 @@ void test_replace_bad_alloc()
 {
     using namespace hpx::execution;
 
+    test_replace_bad_alloc(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_replace_bad_alloc_parallel()
+{
+    using namespace hpx::execution;
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_replace_bad_alloc(IteratorTag());
     test_replace_bad_alloc(seq, IteratorTag());
     test_replace_bad_alloc(par, IteratorTag());
 
@@ -435,6 +454,7 @@ void replace_bad_alloc_test()
 {
     test_replace_bad_alloc<std::random_access_iterator_tag>();
     test_replace_bad_alloc<std::forward_iterator_tag>();
+    test_replace_bad_alloc_parallel<std::random_access_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

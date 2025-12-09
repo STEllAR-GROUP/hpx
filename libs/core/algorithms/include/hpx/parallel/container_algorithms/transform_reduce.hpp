@@ -913,7 +913,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_random_access_iterator_v<Iter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
                 hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<Iter>::value_type
                 > &&
@@ -973,8 +974,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-                hpx::traits::is_iterator_v<Iter2>
+                hpx::traits::is_random_access_iterator_v<Iter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_random_access_iterator_v<Iter2>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
@@ -1018,8 +1020,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-                hpx::traits::is_iterator_v<Iter2> &&
+                hpx::traits::is_random_access_iterator_v<Iter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_random_access_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<Iter>::value_type,
                     typename std::iterator_traits<Iter2>::value_type
@@ -1092,7 +1095,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_traits<Rng>::value_type
                 > &&
@@ -1155,8 +1159,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
-                hpx::traits::is_iterator_v<Iter2>
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
+                hpx::traits::is_random_access_iterator_v<Iter2>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
@@ -1205,8 +1210,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
-                hpx::traits::is_iterator_v<Iter2> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
+                hpx::traits::is_random_access_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_traits<Rng>::value_type,
                     typename std::iterator_traits<Iter2>::value_type

@@ -400,7 +400,7 @@ void test_sorted_until_seq_exception()
 }
 
 template <typename IteratorTag>
-void test_sorted_until_exception()
+void test_sorted_until_exception_parallel()
 {
     using namespace hpx::execution;
     //If the execution policy object is of type vector_execution_policy,
@@ -417,8 +417,8 @@ void test_sorted_until_exception()
 
 void sorted_until_exception_test()
 {
-    test_sorted_until_exception<std::random_access_iterator_tag>();
-    test_sorted_until_exception<std::forward_iterator_tag>();
+    test_sorted_until_exception_parallel<std::random_access_iterator_tag>();
+    test_sorted_until_seq_exception(std::forward_iterator_tag());
 
     using namespace hpx::execution;
 
@@ -807,8 +807,7 @@ void test_sorted_until_bad_alloc()
 void sorted_until_bad_alloc_test()
 {
     test_sorted_until_bad_alloc<std::random_access_iterator_tag>();
-    test_sorted_until_bad_alloc<std::forward_iterator_tag>();
-
+    test_sorted_until_seq_bad_alloc(std::forward_iterator_tag());
     using namespace hpx::execution;
 
     test_sorted_until_bad_alloc(par);

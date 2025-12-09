@@ -104,8 +104,9 @@ void test_unique_copy_sent(ExPolicy policy)
     auto end_len = std::rand() % 10006 + 1;
     c[end_len] = 10;
 
-    auto result = hpx::ranges::unique_copy(
-        policy, std::begin(c), sentinel<std::size_t>{10}, std::begin(dest_res));
+    auto result = hpx::ranges::unique_copy(policy, std::begin(c),
+        test::sentinel_from_iterator(std::begin(c) + end_len),
+        std::begin(dest_res));
     auto solution = std::unique_copy(
         std::begin(c), std::begin(c) + end_len, std::begin(dest_sol));
 

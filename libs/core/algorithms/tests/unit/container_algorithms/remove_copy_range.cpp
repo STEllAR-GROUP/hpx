@@ -60,8 +60,8 @@ void test_remove_copy_sent(ExPolicy policy)
 
     auto pred = [](int const& n) -> bool { return n > 0; };
 
-    hpx::ranges::remove_copy(policy, std::begin(c), sentinel<std::int16_t>{50},
-        std::begin(d), value);
+    hpx::ranges::remove_copy(policy, std::begin(c),
+        test::sentinel_from_iterator(std::begin(c) + 49), std::begin(d), value);
     auto result = std::count_if(std::begin(d), std::end(d), pred);
 
     HPX_TEST(result == 48);
@@ -214,6 +214,13 @@ void test_remove_copy()
 {
     using namespace hpx::execution;
     test_remove_copy(IteratorTag());
+    test_remove_copy_sent();
+}
+
+template <typename IteratorTag>
+void test_remove_copy_parallel()
+{
+    using namespace hpx::execution;
     test_remove_copy(seq, IteratorTag());
     test_remove_copy(par, IteratorTag());
     test_remove_copy(par_unseq, IteratorTag());
@@ -221,7 +228,6 @@ void test_remove_copy()
     test_remove_copy_async(seq(task), IteratorTag());
     test_remove_copy_async(par(task), IteratorTag());
 
-    test_remove_copy_sent();
     test_remove_copy_sent(seq);
     test_remove_copy_sent(par);
     test_remove_copy_sent(par_unseq);
@@ -231,6 +237,7 @@ void remove_copy_test()
 {
     test_remove_copy<std::random_access_iterator_tag>();
     test_remove_copy<std::forward_iterator_tag>();
+    test_remove_copy_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -330,7 +337,6 @@ void test_remove_copy_exception()
 void remove_copy_exception_test()
 {
     test_remove_copy_exception<std::random_access_iterator_tag>();
-    test_remove_copy_exception<std::forward_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -426,7 +432,6 @@ void test_remove_copy_bad_alloc()
 void remove_copy_bad_alloc_test()
 {
     test_remove_copy_bad_alloc<std::random_access_iterator_tag>();
-    test_remove_copy_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

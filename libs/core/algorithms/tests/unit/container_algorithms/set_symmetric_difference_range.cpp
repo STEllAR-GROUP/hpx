@@ -100,6 +100,12 @@ void test_set_symmetric_difference1()
     using namespace hpx::execution;
 
     test_set_symmetric_difference1(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_set_symmetric_difference1_parallel()
+{
+    using namespace hpx::execution;
 
     test_set_symmetric_difference1(seq, IteratorTag());
     test_set_symmetric_difference1(par, IteratorTag());
@@ -113,6 +119,7 @@ void set_symmetric_difference_test1()
 {
     test_set_symmetric_difference1<std::random_access_iterator_tag>();
     test_set_symmetric_difference1<std::forward_iterator_tag>();
+    test_set_symmetric_difference1_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -210,6 +217,12 @@ void test_set_symmetric_difference2()
     using namespace hpx::execution;
 
     test_set_symmetric_difference2(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_set_symmetric_difference2_parallel()
+{
+    using namespace hpx::execution;
 
     test_set_symmetric_difference2(seq, IteratorTag());
     test_set_symmetric_difference2(par, IteratorTag());
@@ -223,6 +236,7 @@ void set_symmetric_difference_test2()
 {
     test_set_symmetric_difference2<std::random_access_iterator_tag>();
     test_set_symmetric_difference2<std::forward_iterator_tag>();
+    test_set_symmetric_difference2_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -361,6 +375,12 @@ void test_set_symmetric_difference_exception()
     using namespace hpx::execution;
 
     test_set_symmetric_difference_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_set_symmetric_difference_exception_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -376,6 +396,8 @@ void set_symmetric_difference_exception_test()
 {
     test_set_symmetric_difference_exception<std::random_access_iterator_tag>();
     test_set_symmetric_difference_exception<std::forward_iterator_tag>();
+    test_set_symmetric_difference_exception_parallel<
+        std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -524,7 +546,6 @@ void test_set_symmetric_difference_bad_alloc()
 void set_symmetric_difference_bad_alloc_test()
 {
     test_set_symmetric_difference_bad_alloc<std::random_access_iterator_tag>();
-    test_set_symmetric_difference_bad_alloc<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

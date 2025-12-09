@@ -160,6 +160,12 @@ void test_mismatch1()
     using namespace hpx::execution;
 
     test_mismatch1(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_mismatch1_parallel()
+{
+    using namespace hpx::execution;
 
     test_mismatch1(seq, IteratorTag());
     test_mismatch1(par, IteratorTag());
@@ -173,6 +179,7 @@ void mismatch_test1()
 {
     test_mismatch1<std::random_access_iterator_tag>();
     test_mismatch1<std::forward_iterator_tag>();
+    test_mismatch1_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -312,6 +319,14 @@ void test_mismatch2()
     using namespace hpx::execution;
 
     test_mismatch2(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_mismatch2_parallel()
+{
+    using namespace hpx::execution;
+
+    test_mismatch2(IteratorTag());
 
     test_mismatch2(seq, IteratorTag());
     test_mismatch2(par, IteratorTag());
@@ -325,6 +340,7 @@ void mismatch_test2()
 {
     test_mismatch2<std::random_access_iterator_tag>();
     test_mismatch2<std::forward_iterator_tag>();
+    test_mismatch2_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -464,7 +480,6 @@ void test_mismatch_exception()
 void mismatch_exception_test()
 {
     test_mismatch_exception<std::random_access_iterator_tag>();
-    test_mismatch_exception<std::forward_iterator_tag>();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -565,7 +580,6 @@ void test_mismatch_bad_alloc()
 void mismatch_bad_alloc_test()
 {
     test_mismatch_bad_alloc<std::random_access_iterator_tag>();
-    test_mismatch_bad_alloc<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

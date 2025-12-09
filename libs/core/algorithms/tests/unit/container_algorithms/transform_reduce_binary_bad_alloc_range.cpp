@@ -126,9 +126,13 @@ void test_transform_reduce_binary_bad_alloc_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_transform_reduce_binary_bad_alloc()
 {
-    using namespace hpx::execution;
-
     test_transform_reduce_binary_bad_alloc(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_transform_reduce_binary_bad_alloc_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -144,6 +148,8 @@ void transform_reduce_binary_bad_alloc_test()
 {
     test_transform_reduce_binary_bad_alloc<std::random_access_iterator_tag>();
     test_transform_reduce_binary_bad_alloc<std::forward_iterator_tag>();
+    test_transform_reduce_binary_bad_alloc_parallel<
+        std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

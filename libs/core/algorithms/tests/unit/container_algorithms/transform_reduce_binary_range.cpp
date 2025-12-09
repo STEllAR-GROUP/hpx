@@ -17,9 +17,13 @@
 template <typename IteratorTag>
 void test_transform_reduce_binary()
 {
-    using namespace hpx::execution;
-
     test_transform_reduce_binary(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_transform_reduce_binary_parallel()
+{
+    using namespace hpx::execution;
 
     test_transform_reduce_binary(seq, IteratorTag());
     test_transform_reduce_binary(par, IteratorTag());
@@ -33,6 +37,7 @@ void transform_reduce_binary_test()
 {
     test_transform_reduce_binary<std::random_access_iterator_tag>();
     test_transform_reduce_binary<std::forward_iterator_tag>();
+    test_transform_reduce_binary_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

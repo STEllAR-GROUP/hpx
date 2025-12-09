@@ -120,6 +120,10 @@ function(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR
     )
 
+    hpx_check_for_cxx20_std_disable_sized_range(
+      DEFINITIONS HPX_HAVE_CXX20_STD_DISABLE_SIZED_RANGE
+    )
+
     hpx_check_for_cxx20_std_endian(DEFINITIONS HPX_HAVE_CXX20_STD_ENDIAN)
 
     hpx_check_for_cxx20_std_execution_policies(

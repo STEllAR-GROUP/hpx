@@ -106,6 +106,12 @@ void test_move()
     using namespace hpx::execution;
 
     test_move(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_move_parallel()
+{
+    using namespace hpx::execution;
 
     test_move(seq, IteratorTag());
     test_move(par, IteratorTag());
@@ -119,6 +125,7 @@ void move_test()
 {
     test_move<std::random_access_iterator_tag>();
     test_move<std::forward_iterator_tag>();
+    test_move_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -218,7 +225,6 @@ void test_move_exception()
 void move_exception_test()
 {
     test_move_exception<std::random_access_iterator_tag>();
-    test_move_exception<std::forward_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -314,7 +320,6 @@ void test_move_bad_alloc()
 void move_bad_alloc_test()
 {
     test_move_bad_alloc<std::random_access_iterator_tag>();
-    test_move_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

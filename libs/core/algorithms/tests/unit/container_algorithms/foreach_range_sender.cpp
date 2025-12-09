@@ -167,13 +167,11 @@ void test_for_each_sender()
 void for_each_sender_test_direct()
 {
     test_for_each_sender_direct<std::random_access_iterator_tag>();
-    test_for_each_sender_direct<std::forward_iterator_tag>();
 }
 
 void for_each_sender_test()
 {
     test_for_each_sender<std::random_access_iterator_tag>();
-    test_for_each_sender<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

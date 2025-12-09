@@ -189,7 +189,6 @@ void test_partitioned1()
 void partitioned_test1()
 {
     test_partitioned1<std::random_access_iterator_tag>();
-    test_partitioned1<std::forward_iterator_tag>();
 
     using namespace hpx::execution;
     test_partitioned1(seq);
@@ -408,7 +407,6 @@ void test_partitioned2()
 void partitioned_test2()
 {
     test_partitioned2<std::random_access_iterator_tag>();
-    test_partitioned2<std::forward_iterator_tag>();
 
     using namespace hpx::execution;
     test_partitioned2(seq);
@@ -668,7 +666,6 @@ void test_partitioned3()
 void partitioned_test3()
 {
     test_partitioned3<std::random_access_iterator_tag>();
-    test_partitioned3<std::forward_iterator_tag>();
 
     using namespace hpx::execution;
     test_partitioned3(seq);

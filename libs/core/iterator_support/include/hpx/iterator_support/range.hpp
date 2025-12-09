@@ -319,6 +319,14 @@ namespace hpx::util {
         template <typename T>
         inline constexpr bool is_range_generator_v =
             is_range_generator<T>::value;
+
+        ///////////////////////////////////////////////////////////////////////
+        HPX_CXX_EXPORT template <typename T, typename Enable = void>
+        inline constexpr bool has_size_member_v = false;
+
+        HPX_CXX_EXPORT template <typename T>
+        inline constexpr bool has_size_member_v<T,
+            std::void_t<decltype(std::declval<T const&>().size())>> = true;
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////

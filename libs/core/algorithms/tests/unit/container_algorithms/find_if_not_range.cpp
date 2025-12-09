@@ -96,6 +96,12 @@ void test_find_if_not()
     using namespace hpx::execution;
 
     test_find_if_not(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_find_if_not_parallel()
+{
+    using namespace hpx::execution;
 
     test_find_if_not(seq, IteratorTag());
     test_find_if_not(par, IteratorTag());
@@ -109,6 +115,7 @@ void find_if_not_test()
 {
     test_find_if_not<std::random_access_iterator_tag>();
     test_find_if_not<std::forward_iterator_tag>();
+    test_find_if_not_parallel<std::random_access_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

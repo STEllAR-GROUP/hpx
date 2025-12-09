@@ -66,9 +66,7 @@ void test_stable_partition_sent(IteratorTag)
     int partition_at = std::rand();
 
     auto result = hpx::ranges::stable_partition(std::begin(c),
-        sentinel<int>{*std::next(
-            std::begin(c), static_cast<std::ptrdiff_t>(c.size() - 1))},
-        less_than(partition_at));
+        test::sentinel_from_iterator(std::end(c) - 1), less_than(partition_at));
 
     auto partition_pt = std::find_if(
         std::begin(c), std::end(c) - 1, great_equal_than(partition_at));
@@ -102,9 +100,7 @@ void test_stable_partition_sent(ExPolicy policy, IteratorTag)
     int partition_at = std::rand();
 
     auto result = hpx::ranges::stable_partition(policy, std::begin(c),
-        sentinel<int>{*std::next(
-            std::begin(c), static_cast<std::ptrdiff_t>(c.size() - 1))},
-        less_than(partition_at));
+        test::sentinel_from_iterator(std::end(c) - 1), less_than(partition_at));
 
     auto partition_pt = std::find_if(
         std::begin(c), std::end(c) - 1, great_equal_than(partition_at));

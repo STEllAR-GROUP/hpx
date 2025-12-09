@@ -68,7 +68,7 @@ struct iterator
 {
     using difference_type = std::ptrdiff_t;
     using value_type = Value;
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::random_access_iterator_tag;
     using pointer = Value const*;
     using reference = Value const&;
 
@@ -167,6 +167,12 @@ struct iterator
     bool operator>=(iterator const& that) const
     {
         return this->state >= that.state;
+    }
+
+    difference_type operator-(const iterator& that) const
+    {
+        return static_cast<difference_type>(this->state) -
+            static_cast<difference_type>(that.state);
     }
 
 protected:

@@ -701,13 +701,13 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter>
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
-        tag_fallback_invoke(hpx::ranges::reduce_t, ExPolicy&& policy,
-            FwdIter first, Sent last, T init, F f)
+            T>::type tag_fallback_invoke(hpx::ranges::reduce_t,
+            ExPolicy&& policy, FwdIter first, Sent last, T init, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
@@ -723,13 +723,13 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng>
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng>
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
-        tag_fallback_invoke(
-            hpx::ranges::reduce_t, ExPolicy&& policy, Rng&& rng, T init, F f)
+            T>::type tag_fallback_invoke(hpx::ranges::reduce_t,
+            ExPolicy&& policy, Rng&& rng, T init, F f)
         {
             static_assert(
                 hpx::traits::is_forward_iterator<typename hpx::traits::
@@ -746,13 +746,13 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter>
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
-        tag_fallback_invoke(hpx::ranges::reduce_t, ExPolicy&& policy,
-            FwdIter first, Sent last, T init)
+            T>::type tag_fallback_invoke(hpx::ranges::reduce_t,
+            ExPolicy&& policy, FwdIter first, Sent last, T init)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
@@ -768,13 +768,13 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng>
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng>
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
-        tag_fallback_invoke(
-            hpx::ranges::reduce_t, ExPolicy&& policy, Rng&& rng, T init)
+            T>::type tag_fallback_invoke(hpx::ranges::reduce_t,
+            ExPolicy&& policy, Rng&& rng, T init)
         {
             static_assert(
                 hpx::traits::is_forward_iterator<typename hpx::traits::
@@ -790,7 +790,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
@@ -813,7 +814,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng>
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
