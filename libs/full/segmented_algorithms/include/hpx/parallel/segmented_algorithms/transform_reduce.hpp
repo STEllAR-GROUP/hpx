@@ -402,9 +402,9 @@ namespace hpx { namespace segmented {
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        typename std::decay<T>::type>::type
-    tag_invoke(hpx::transform_reduce_t, ExPolicy&& policy, SegIter first,
-        SegIter last, T&& init, Reduce&& red_op, Convert&& conv_op)
+        typename std::decay<T>::type>::type tag_invoke(hpx::transform_reduce_t,
+        ExPolicy&& policy, SegIter first, SegIter last, T&& init,
+        Reduce&& red_op, Convert&& conv_op)
     {
         static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
             "Requires at least forward iterator.");

@@ -195,7 +195,7 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<Iterator> && 
+                hpx::traits::is_random_access_iterator_v<Iterator> &&
                 hpx::traits::is_sized_sentinel_for_v<Sentinel, Iterator> &&
                 hpx::is_invocable_v<Proj,
                 typename std::iterator_traits<Iterator>::value_type>

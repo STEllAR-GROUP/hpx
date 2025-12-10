@@ -191,9 +191,9 @@ namespace hpx::threads {
         hpx::error_code& ec = hpx::throws);
 #else
 #if !defined(DOXYGEN)
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT util::backtrace const*
-    get_thread_backtrace(
-        thread_id_type const& id, hpx::error_code& ec = hpx::throws);
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT
+        util::backtrace const* get_thread_backtrace(
+            thread_id_type const& id, hpx::error_code& ec = hpx::throws);
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT util::backtrace const*
     set_thread_backtrace(thread_id_type const& id,
         util::backtrace const* bt = nullptr, hpx::error_code& ec = hpx::throws);
@@ -431,8 +431,8 @@ namespace hpx::threads {
         std::size_t data, hpx::error_code& ec = hpx::throws);
 #endif
 
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::size_t&
-    get_continuation_recursion_count() noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT
+        std::size_t& get_continuation_recursion_count() noexcept;
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void
     reset_continuation_recursion_count() noexcept;
     /// \endcond

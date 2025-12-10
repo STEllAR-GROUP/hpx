@@ -590,8 +590,9 @@ namespace hpx::execution::experimental {
     // execution::transfer_when_all_with_variant is used to join multiple
     // sender chains and create a sender whose execution is dependent on all
     // the input senders, which may have one or more sets of sent values.
-    HPX_CXX_CORE_EXPORT inline constexpr struct transfer_when_all_with_variant_t
-        final : hpx::functional::tag<transfer_when_all_with_variant_t>
+    HPX_CXX_CORE_EXPORT inline constexpr struct
+        transfer_when_all_with_variant_t final
+      : hpx::functional::tag<transfer_when_all_with_variant_t>
     {
     } transfer_when_all_with_variant{};
 

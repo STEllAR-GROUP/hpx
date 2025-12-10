@@ -81,8 +81,9 @@ namespace hpx::resiliency::experimental {
     /// exactly \a n times concurrently. Verify the result of those invocations
     /// using the given predicate \a pred. Run all the valid results against a
     /// user provided voting function. Return the valid output.
-    HPX_CXX_CORE_EXPORT inline constexpr struct async_replicate_vote_validate_t
-        final : hpx::functional::tag<async_replicate_vote_validate_t>
+    HPX_CXX_CORE_EXPORT inline constexpr struct
+        async_replicate_vote_validate_t final
+      : hpx::functional::tag<async_replicate_vote_validate_t>
     {
     } async_replicate_vote_validate{};
 
@@ -144,8 +145,8 @@ namespace hpx::resiliency::experimental {
     ///
     /// Delay the invocation of \a f if any of the arguments to \a f are
     /// futures.
-    HPX_CXX_CORE_EXPORT inline constexpr struct dataflow_replicate_validate_t
-        final
+    HPX_CXX_CORE_EXPORT inline constexpr struct
+        dataflow_replicate_validate_t final
       : detail::tag_deferred<dataflow_replicate_validate_t,
             async_replicate_validate_t>
     {
