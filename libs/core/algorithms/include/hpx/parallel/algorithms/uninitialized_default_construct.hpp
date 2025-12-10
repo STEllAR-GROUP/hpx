@@ -344,8 +344,8 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_default_construct
-    HPX_CXX_EXPORT inline constexpr struct uninitialized_default_construct_t
-        final
+    HPX_CXX_EXPORT inline constexpr struct
+        uninitialized_default_construct_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_default_construct_t>
     {
         template <typename FwdIter, typename Sent>
@@ -393,8 +393,8 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_default_construct_n
-    HPX_CXX_EXPORT inline constexpr struct uninitialized_default_construct_n_t
-        final
+    HPX_CXX_EXPORT inline constexpr struct
+        uninitialized_default_construct_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_default_construct_n_t>
     {
         template <typename FwdIter, typename Size>

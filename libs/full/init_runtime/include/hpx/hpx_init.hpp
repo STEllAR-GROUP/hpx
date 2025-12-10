@@ -192,8 +192,7 @@ namespace hpx {
 #if !defined(HPX_HAVE_STATIC_LINKING)
     inline
 #endif
-        int
-        init(init_params const& params = init_params());
+        int init(init_params const& params = init_params());
 }    // namespace hpx
 
 #if !defined(DOXYGEN)

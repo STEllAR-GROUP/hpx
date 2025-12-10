@@ -1394,9 +1394,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend replace_copy_if_result<hpx::traits::range_iterator_t<Rng>,
-            OutIter>
-        tag_fallback_invoke(hpx::ranges::replace_copy_if_t, Rng&& rng,
-            OutIter dest, Pred pred, T const& new_value, Proj proj = Proj())
+            OutIter> tag_fallback_invoke(hpx::ranges::replace_copy_if_t,
+            Rng&& rng, OutIter dest, Pred pred, T const& new_value,
+            Proj proj = Proj())
         {
             static_assert(hpx::traits::is_input_iterator<
                               hpx::traits::range_iterator_t<Rng>>::value,

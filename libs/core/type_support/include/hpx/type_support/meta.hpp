@@ -471,9 +471,8 @@ namespace hpx::meta {
     };
 
     HPX_CXX_EXPORT template <typename... As>
-    using single_t = std::enable_if_t < sizeof...(As) == 1,
-          meta::type < front < As... >>>
-        ;
+    using single_t =
+        std::enable_if_t<sizeof...(As) == 1, meta::type<front<As...>>>;
 
     HPX_CXX_EXPORT template <typename Ty>
     struct single_or

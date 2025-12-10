@@ -1117,10 +1117,9 @@ namespace hpx {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            RandIter3>
-        tag_fallback_invoke(merge_t, ExPolicy&& policy, RandIter1 first1,
-            RandIter1 last1, RandIter2 first2, RandIter2 last2, RandIter3 dest,
-            Comp comp = Comp())
+            RandIter3> tag_fallback_invoke(merge_t, ExPolicy&& policy,
+            RandIter1 first1, RandIter1 last1, RandIter2 first2,
+            RandIter2 last2, RandIter3 dest, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter1>,
                 "Required at least random access iterator.");

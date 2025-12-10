@@ -528,9 +528,8 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename std::iterator_traits<typename hpx::traits::range_traits<
-            Rng>::iterator_type>::difference_type
-        tag_fallback_invoke(
-            count_t, Rng&& rng, T const& value, Proj proj = Proj())
+            Rng>::iterator_type>::difference_type tag_fallback_invoke(count_t,
+            Rng&& rng, T const& value, Proj proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
