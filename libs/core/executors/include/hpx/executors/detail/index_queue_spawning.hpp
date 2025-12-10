@@ -19,7 +19,6 @@
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/itt_notify.hpp>
-#include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/tag_invoke.hpp>

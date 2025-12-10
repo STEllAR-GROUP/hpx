@@ -8,35 +8,33 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/iterator_support/iterator_facade.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/memory.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <atomic>
 #include <cstddef>
 #include <iterator>
 #include <mutex>
 #include <type_traits>
+#include <vector>
 
 namespace hpx::parallel::util {
 
-    template <typename BaseRange>
+    HPX_CXX_EXPORT template <typename BaseRange>
     struct memoizing_range;
 
     namespace detail {
 
-        template <typename BaseRange>
+        HPX_CXX_EXPORT template <typename BaseRange>
         struct memoizing_range_data;
 
-        template <typename BaseRange>
+        HPX_CXX_EXPORT template <typename BaseRange>
         struct memoizing_iterator;
 
-        template <typename BaseRange>
+        HPX_CXX_EXPORT template <typename BaseRange>
         struct memoizing_iterator_base
         {
             using base_iterator = hpx::traits::range_iterator_t<BaseRange>;
@@ -46,7 +44,7 @@ namespace hpx::parallel::util {
                     value_type, std::random_access_iterator_tag>;
         };
 
-        template <typename BaseRange>
+        HPX_CXX_EXPORT template <typename BaseRange>
         struct memoizing_iterator : memoizing_iterator_base<BaseRange>::type
         {
             explicit memoizing_iterator(memoizing_range_data<BaseRange>& base,
@@ -55,14 +53,17 @@ namespace hpx::parallel::util {
               , current(index)
               , at_end(end)
             {
-                // fill in first element, if needed
-                fill_next();
+                // fill in first element, if needed (not at end)
+                if (current < static_cast<std::ptrdiff_t>(range->size()))
+                {
+                    fill_next(1);
+                }
             }
 
         private:
             friend class hpx::util::iterator_core_access;
 
-            using base_type = typename memoizing_iterator_base<BaseRange>::type;
+            using base_type = memoizing_iterator_base<BaseRange>::type;
 
             [[nodiscard]] constexpr bool equal(
                 memoizing_iterator const& rhs) const noexcept
@@ -70,37 +71,54 @@ namespace hpx::parallel::util {
                 return current == rhs.current || (at_end && rhs.at_end);
             }
 
-            void fill_next()
+            void fill_next(std::ptrdiff_t step)
             {
                 if (!at_end)
                 {
-                    if (current + 1 >= range->filled())
+                    if (current + step >= range->filled())
                     {
-                        std::scoped_lock<memoizing_range_data<BaseRange>> l(
+                        std::unique_lock<memoizing_range_data<BaseRange>> l(
                             *range);
-                        if (current + 1 >= range->filled())
+
+                        auto filled = range->filled(std::memory_order_acquire);
+                        if (current + step >= filled)
                         {
-                            if (range->is_at_end())
+                            HPX_ASSERT_LOCKED(l, current < filled);
+
+                            auto delta = filled - current - 1;
+                            step -= delta;
+                            current += delta;
+
+                            while (step > 0)
                             {
-                                at_end = true;
-                            }
-                            else
-                            {
-                                range->fill_next();
+                                --step;
+                                ++current;
+                                if (range->is_at_end())
+                                {
+                                    at_end = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    range->fill_next(l);
+                                }
                             }
                         }
                     }
-                    ++current;
                 }
+
+                current += step;
+                HPX_ASSERT(
+                    current <= static_cast<std::ptrdiff_t>(range->size()));
 
                 // if the iterator is at its end, the current index must be
                 // out of range
                 HPX_ASSERT(!at_end || current >= range->filled());
             }
 
-            void increment() noexcept
+            void increment()
             {
-                fill_next();
+                fill_next(1);
             }
 
             void decrement() noexcept
@@ -109,14 +127,11 @@ namespace hpx::parallel::util {
             }
 
             template <typename Distance>
-            void advance(Distance n) noexcept
+            void advance(Distance n)
             {
                 if (n > 0)
                 {
-                    while (n-- != 0 && !at_end)
-                    {
-                        fill_next();
-                    }
+                    fill_next(n);
                 }
                 else
                 {
@@ -124,12 +139,12 @@ namespace hpx::parallel::util {
                 }
             }
 
-            [[nodiscard]] constexpr typename base_type::reference dereference()
+            [[nodiscard]] constexpr base_type::reference dereference()
                 const noexcept
             {
                 HPX_ASSERT(current >= 0 &&
-                    current < static_cast<std::ptrdiff_t>(range->data.size()));
-                return range->data[current];
+                    current < static_cast<std::ptrdiff_t>(range->size()));
+                return range->data[current].data_;
             }
 
             [[nodiscard]] std::ptrdiff_t distance_to(
@@ -139,18 +154,18 @@ namespace hpx::parallel::util {
                     static_cast<std::ptrdiff_t>(current);
             }
 
-            hpx::intrusive_ptr<memoizing_range_data<BaseRange>> range;
+            memoizing_range_data<BaseRange>* range;
             std::ptrdiff_t current;
             bool at_end;
         };
 
         ////////////////////////////////////////////////////////////////////////
-        template <typename BaseRange>
+        HPX_CXX_EXPORT template <typename BaseRange>
         void intrusive_ptr_add_ref(memoizing_range_data<BaseRange>* p) noexcept;
-        template <typename BaseRange>
+        HPX_CXX_EXPORT template <typename BaseRange>
         void intrusive_ptr_release(memoizing_range_data<BaseRange>* p) noexcept;
 
-        template <typename BaseRange>
+        HPX_CXX_EXPORT template <typename BaseRange>
         struct memoizing_range_data
         {
             using value_type = hpx::traits::iter_value_t<
@@ -159,30 +174,35 @@ namespace hpx::parallel::util {
             explicit memoizing_range_data(BaseRange&& base, std::size_t size)
               : base_range(HPX_MOVE(base))
               , base_begin(hpx::util::begin(base_range))
-              , base_end(hpx::util::end(base_range))
               , data(size)    // fill with default constructed elements
               , num_valid(0)
               , count(1)
             {
             }
 
-            memoizing_iterator<BaseRange> begin()
+            memoizing_range_data(memoizing_range_data const&) = delete;
+            memoizing_range_data(memoizing_range_data&&) = delete;
+            memoizing_range_data& operator=(
+                memoizing_range_data const&) = delete;
+            memoizing_range_data& operator=(memoizing_range_data&&) = delete;
+
+            [[nodiscard]] memoizing_iterator<BaseRange> begin()
             {
                 return memoizing_iterator<BaseRange>(*this, -1);
             }
-            memoizing_iterator<BaseRange> end()
+            [[nodiscard]] memoizing_iterator<BaseRange> end()
             {
-                return memoizing_iterator<BaseRange>(
-                    *this, data.capacity(), true);
+                return memoizing_iterator<BaseRange>(*this, data.size(), true);
             }
 
-            std::size_t size() const
+            [[nodiscard]] std::size_t size() const noexcept
             {
                 return data.size();
             }
 
-            std::ptrdiff_t filled(
-                std::memory_order order = std::memory_order_relaxed) const
+            [[nodiscard]] std::ptrdiff_t filled(
+                std::memory_order const order =
+                    std::memory_order_relaxed) const noexcept
             {
                 return num_valid.load(order);
             }
@@ -191,7 +211,7 @@ namespace hpx::parallel::util {
             {
                 mtx.data_.lock();
             }
-            void unlock()
+            void unlock() noexcept(noexcept(mtx.data_.unlock()))
             {
                 mtx.data_.unlock();
             }
@@ -199,30 +219,33 @@ namespace hpx::parallel::util {
         private:
             friend struct memoizing_iterator<BaseRange>;
 
-            bool is_at_end() const
+            [[nodiscard]] bool is_at_end() const noexcept
             {
-                return base_begin == base_end;
+                return base_begin == hpx::util::end(base_range);
             }
 
-            void fill_next()
+            template <typename Lock>
+            void fill_next(Lock& l)
             {
-                HPX_ASSERT(data.size() > static_cast<std::size_t>(filled()));
-                HPX_ASSERT(!is_at_end());
+                HPX_ASSERT_OWNS_LOCK(l);
+                HPX_ASSERT_LOCKED(
+                    l, data.size() > static_cast<std::size_t>(filled()));
+                HPX_ASSERT_LOCKED(l, !is_at_end());
 
                 // overwrite the default constructed element
-                data[num_valid.load(std::memory_order_relaxed)] = *base_begin;
+                auto num = num_valid.load(std::memory_order_relaxed);
+                num_valid.store(num + 1, std::memory_order_release);
+
+                data[num].data_ = *base_begin;
                 ++base_begin;
-                ++num_valid;
             }
 
-            hpx::util::cache_aligned_data<hpx::spinlock> mtx;
+            hpx::util::cache_aligned_data<hpx::spinlock_no_backoff> mtx;
 
             BaseRange base_range;
-            typename hpx::util::detail::result_of_begin<BaseRange>::type
-                base_begin;
-            typename hpx::util::detail::result_of_end<BaseRange>::type base_end;
+            hpx::util::detail::result_of_begin<BaseRange>::type base_begin;
 
-            std::vector<value_type> data;
+            std::vector<hpx::util::cache_aligned_data<value_type>> data;
             std::atomic<std::ptrdiff_t> num_valid;
 
             template <typename Range>
@@ -236,25 +259,30 @@ namespace hpx::parallel::util {
             hpx::util::atomic_count count;
         };
 
-        template <typename BaseRange>
+        HPX_CXX_EXPORT template <typename BaseRange>
         void intrusive_ptr_add_ref(memoizing_range_data<BaseRange>* p) noexcept
         {
-            ++p->count;
+            p->count.increment();
         }
 
-        template <typename BaseRange>
+        HPX_CXX_EXPORT template <typename BaseRange>
         void intrusive_ptr_release(memoizing_range_data<BaseRange>* p) noexcept
         {
             HPX_ASSERT(p->count != 0);
-            if (--p->count == 0)
+            if (p->count.decrement() == 0)
             {
+                // The thread that decrements the reference count to zero must
+                // perform an acquire to ensure that it doesn't start
+                // destructing the object until all previous writes have
+                // drained.
+                std::atomic_thread_fence(std::memory_order_acquire);
                 delete p;
             }
         }
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
-    template <typename BaseRange>
+    HPX_CXX_EXPORT template <typename BaseRange>
     struct memoizing_range
     {
         explicit memoizing_range(BaseRange&& base, std::size_t size)
