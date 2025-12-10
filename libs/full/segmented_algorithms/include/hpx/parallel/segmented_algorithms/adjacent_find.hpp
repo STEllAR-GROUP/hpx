@@ -313,9 +313,8 @@ namespace hpx::segmented {
         )>
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        SegIter>::type
-    tag_invoke(hpx::adjacent_find_t, ExPolicy&& policy, SegIter first,
-        SegIter last, Pred&& pred)
+        SegIter>::type tag_invoke(hpx::adjacent_find_t, ExPolicy&& policy,
+        SegIter first, SegIter last, Pred&& pred)
     {
         static_assert((hpx::traits::is_forward_iterator<SegIter>::value),
             "Requires at least forward iterator.");

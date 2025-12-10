@@ -94,9 +94,8 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     static typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        SegIter>::type
-    tag_invoke(hpx::fill_t, ExPolicy&& policy, SegIter first, SegIter last,
-        T const& value)
+        SegIter>::type tag_invoke(hpx::fill_t, ExPolicy&& policy, SegIter first,
+        SegIter last, T const& value)
     {
         static_assert(hpx::traits::is_forward_iterator<SegIter>::value,
             "Requires at least forward iterator.");

@@ -952,8 +952,8 @@ namespace hpx::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_relocate_backward
-    HPX_CXX_EXPORT inline constexpr struct uninitialized_relocate_backward_t
-        final
+    HPX_CXX_EXPORT inline constexpr struct
+        uninitialized_relocate_backward_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_backward_t>
     {
         template <typename BiIter1, typename BiIter2>
