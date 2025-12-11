@@ -179,7 +179,9 @@ namespace hpx::traits {
         std::enable_if_t<is_range_v<R> &&
             !disable_sized_range<std::remove_cv_t<R>> &&
             (util::detail::has_size_member_v<R> ||
-                util::detail::has_size_v<R>)>> : std::true_type
+                util::detail::has_size_v<R> ||
+                is_sized_sentinel_for_v<range_sentinel_t<R>,
+                    range_iterator_t<R>>)>> : std::true_type
     {
     };
 
