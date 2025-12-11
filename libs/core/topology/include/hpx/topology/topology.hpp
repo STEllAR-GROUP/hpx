@@ -320,8 +320,8 @@ namespace hpx::threads {
         mask_type init_thread_affinity_mask(
             std::size_t num_core, std::size_t num_pu) const;
 
-        hwloc_bitmap_t mask_to_bitmap(
-            mask_cref_type mask, hwloc_obj_type_t htype) const;
+        hwloc_bitmap_t mask_to_bitmap(mask_cref_type mask,
+            hwloc_obj_type_t htype, unsigned* count = nullptr) const;
         mask_type bitmap_to_mask(
             hwloc_bitmap_t bitmap, hwloc_obj_type_t htype) const;
 

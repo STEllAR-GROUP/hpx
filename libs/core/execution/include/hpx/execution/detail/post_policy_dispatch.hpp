@@ -40,7 +40,6 @@ namespace hpx::detail {
             {
                 hint.runs_as_child_mode(
                     hpx::threads::thread_execution_hint::none);
-                policy.set_hint(hint);
             }
 
             threads::thread_init_data data(

@@ -288,6 +288,7 @@ namespace hpx {
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/properties.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
@@ -301,6 +302,10 @@ namespace hpx {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/result_types.hpp>
+
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+#include <hpx/parallel/util/memoizing_range.hpp>
+#endif
 
 #include <algorithm>
 #include <cstddef>
@@ -656,13 +661,30 @@ namespace hpx::parallel {
             using merge_region =
                 hpx::tuple<Iter1, std::size_t, Iter2, std::size_t, std::size_t>;
 
-            auto reshape = [len1, first2, last2, comp, proj1, proj2](
-                               auto&& shape, std::size_t cores) {
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-                static hpx::util::itt::event notify_event("reshape");
-                hpx::util::itt::mark_event e(notify_event);
+            static hpx::util::itt::event notify_event("reshape");
+            hpx::util::itt::mark_event e(notify_event);
 #endif
 
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+            auto reshape = [](auto&& shape, auto&& args,
+                               std::size_t const cores)
+                -> hpx::generator<merge_region&, merge_region> {
+                auto [len1, first2, last2, comp, proj1, proj2] = args;
+
+                if (std::size(shape) == 1 && cores == 1)
+                {
+                    // special case: one core, one chunk - the partitioner will
+                    // switch to sequential execution in this case
+                    auto [it1, size1, _] = *std::begin(shape);
+                    auto size2 = detail::distance(first2, last2);
+                    merge_region region(it1, size1, first2, size2, 0);
+                    co_yield region;
+                    co_return;
+                }
+#else
+            auto reshape = [len1, first2, last2, comp, proj1, proj2](
+                               auto&& shape, std::size_t const cores) {
                 auto shape_size = std::size(shape);
                 if (shape_size == 1 && cores == 1)
                 {
@@ -676,6 +698,7 @@ namespace hpx::parallel {
 
                 std::vector<merge_region> reshaped;
                 reshaped.reserve(2 * shape_size);
+#endif
 
                 Iter2 it2 = first2;
                 std::size_t dest_start = 0;
@@ -696,9 +719,14 @@ namespace hpx::parallel {
                     if (size2 <= static_cast<std::size_t>(
                                      1.2 * static_cast<double>(size1)))
                     {
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+                        merge_region region =
+                            hpx::make_tuple(it1, size1, it2, size2, dest_start);
+                        co_yield region;
+#else
                         reshaped.emplace_back(
                             it1, size1, it2, size2, dest_start);
-
+#endif
                         it2 = l2;
                         dest_start += size1 + size2;
                     }
@@ -736,9 +764,14 @@ namespace hpx::parallel {
                             auto chunk_size1 =
                                 detail::distance(begin1, end_chunk1);
 
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+                            merge_region region = hpx::make_tuple(begin1,
+                                chunk_size1, begin2, chunk_size2, dest_start);
+                            co_yield region;
+#else
                             reshaped.emplace_back(begin1, chunk_size1, begin2,
                                 chunk_size2, dest_start);
-
+#endif
                             dest_start += chunk_size1 + chunk_size2;
 
                             chunk_size2 = (std::min) (size1, remainder2);
@@ -754,10 +787,21 @@ namespace hpx::parallel {
                         it2 = l2;
                     }
                 }
+#if !defined(HPX_HAVE_CXX20_COROUTINES)
                 return reshaped;
+#endif
             };
 
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+            return [reshape = HPX_MOVE(reshape),
+                       data = hpx::make_tuple(len1, first2, last2, comp, proj1,
+                           proj2)](auto&& shape, std::size_t cores) {
+                return util::memoizing_range(
+                    reshape(shape, data, cores), 2 * std::size(shape));
+            };
+#else
             return reshape;
+#endif
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -851,6 +895,24 @@ namespace hpx::parallel {
 
                 try
                 {
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+                    // scheduling chunks breadth-first minimizes the
+                    // synchronization overhead in the memoizing iterator
+                    auto hint = hpx::execution::experimental::get_hint(policy);
+                    if (hint.placement_mode() ==
+                        hpx::threads::thread_placement_hint::none)
+                    {
+                        hint.placement_mode(
+                            hpx::threads::thread_placement_hint::breadth_first);
+                        auto p = hpx::experimental::prefer(
+                            hpx::execution::experimental::with_hint,
+                            HPX_FORWARD(ExPolicy, policy), hint);
+                        return algorithm_result::get(parallel_merge(HPX_MOVE(p),
+                            first1, last1, first2, last2, dest,
+                            HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj1, proj1),
+                            HPX_FORWARD(Proj2, proj2)));
+                    }
+#endif
                     return algorithm_result::get(parallel_merge(
                         HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
                         last2, dest, HPX_FORWARD(Comp, comp),
