@@ -212,6 +212,8 @@ struct random_to_item_t
     }
 };
 
+using data_type = int;
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag, typename Allocator>
 void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
@@ -231,7 +233,7 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     hpx::generate(par, std::begin(uniform_distribution),
         std::end(uniform_distribution), [&] { return dist(re); });
 
-    using test_container = test_container<IteratorTag, int, Allocator>;
+    using test_container = test_container<IteratorTag, data_type, Allocator>;
     using container = typename test_container::type;
     using T = typename container::value_type;
 
@@ -416,7 +418,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     {
         auto policy = hpx::execution::par;
         using allocator_type =
-            hpx::compute::host::detail::policy_allocator<int, decltype(policy)>;
+            hpx::compute::host::detail::policy_allocator<data_type,
+                decltype(policy)>;
         allocator_type alloc(policy);
 
         run_benchmark(vector_size1, vector_size2, test_count,
