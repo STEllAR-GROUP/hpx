@@ -1323,7 +1323,7 @@ if(HPX_WITH_NETWORKING)
   )
   hpx_option(
     HPX_WITH_LCW_TAG STRING "LCW repository tag or branch"
-    "9fde9302b312335759240f115a1dfa0aeab80def"
+    "f26fdd068110ec62a56ecb364254c3ce0b101174" # latest commit as of 2025-12-10
     CATEGORY "Build Targets"
     ADVANCED
   )
