@@ -128,8 +128,8 @@ int main()
         constexpr hpx::launch::async_policy policy(
             hpx::threads::thread_priority::bound);
 
-        hpx::execution::experimental::fork_join_executor exec;
         hpx::run_as_hpx_thread(policy, [&]() {
+            hpx::execution::experimental::fork_join_executor exec;
             invoked.store(0);
 
             hpx::for_each(hpx::execution::par.on(exec), vs.begin(), vs.end(),
