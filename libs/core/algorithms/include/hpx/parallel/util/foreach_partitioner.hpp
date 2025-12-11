@@ -170,7 +170,9 @@ namespace hpx::parallel::util::detail {
             try
             {
                 if constexpr (std::is_void_v<decltype(foreach_partition<Result>(
-                                  policy, first, count, f1, reshape))>)
+                                  HPX_FORWARD(ExPolicy_, policy), first, count,
+                                  HPX_FORWARD(F1, f1),
+                                  HPX_FORWARD(ReShape, reshape)))>)
                 {
                     detail::foreach_partition<Result>(
                         HPX_FORWARD(ExPolicy_, policy), first, count,
