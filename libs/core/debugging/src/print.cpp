@@ -61,6 +61,10 @@ namespace hpx::debug {
         template void print_dec(std::ostream&, std::uint32_t const&, int);
         template void print_dec(std::ostream&, std::int64_t const&, int);
         template void print_dec(std::ostream&, std::uint64_t const&, int);
+#if defined(__APPLE__)
+        template void print_dec(std::ostream&, long const&, int);
+        template void print_dec(std::ostream&, unsigned long const&, int);
+#endif
 
         template void print_dec(std::ostream&, std::atomic<int> const&, int);
         template void print_dec(
