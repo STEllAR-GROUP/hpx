@@ -1274,7 +1274,7 @@ if(HPX_WITH_NETWORKING)
   )
   hpx_option(
     HPX_WITH_LCI_TAG STRING "LCI repository tag or branch"
-    "2c4d2c59d2b781f54d6c4e64421adcca16502df9" # latest commit as of 2025-10-29
+    "f72956b4609c796b5faac1c24a782dd8ac824ad6" # latest commit as of 2025-12-10
     CATEGORY "Build Targets"
     ADVANCED
   )
