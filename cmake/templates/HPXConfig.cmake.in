@@ -68,6 +68,16 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
   endif()
 endif()
 
+# LCW
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCW)
+  if(HPX_WITH_FETCH_LCW)
+    include("${CMAKE_CURRENT_LIST_DIR}/HPXLCWTarget.cmake")
+  else()
+    include(HPX_SetupLCW)
+    hpx_setup_lcw()
+  endif()
+endif()
+
 if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_GASNET)
   include(HPX_SetupGasnet)
   hpx_setup_gasnet()

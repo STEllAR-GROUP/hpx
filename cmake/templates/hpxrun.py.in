@@ -260,6 +260,7 @@ def build_cmd(options, args):
         select_parcelport = (lambda pp:
             ['--hpx:ini=hpx.parcel.mpi.priority=1000', '--hpx:ini=hpx.parcel.mpi.enable=1', '--hpx:ini=hpx.parcel.bootstrap=mpi'] if pp == 'mpi'
             else ['--hpx:ini=hpx.parcel.lci.priority=1000', '--hpx:ini=hpx.parcel.lci.enable=1', '--hpx:ini=hpx.parcel.bootstrap=lci'] if pp == 'lci'
+            else ['--hpx:ini=hpx.parcel.lcw.priority=1000', '--hpx:ini=hpx.parcel.lcw.enable=1', '--hpx:ini=hpx.parcel.bootstrap=lcw'] if pp == 'lcw'
             else ['--hpx:ini=hpx.parcel.gasnet.priority=1000', '--hpx:ini=hpx.parcel.gasnet.enable=1', '--hpx:ini=hpx.parcel.bootstrap=gasnet'] if pp == 'gasnet'
             else ['--hpx:ini=hpx.parcel.tcp.priority=1000', '--hpx:ini=hpx.parcel.tcp.enable=1'] if pp == 'tcp'
             else [])
@@ -297,7 +298,7 @@ def check_options(parser, options, args):
         print('Can not start less than one thread per locality', sys.stderr)
         sys.exit(1)
 
-    check_valid_parcelport = (lambda x: x == 'mpi' or x == 'lci' or x == 'gasnet' or x == 'tcp' or x == 'none');
+    check_valid_parcelport = (lambda x: x == 'mpi' or x == 'lci' or x == 'lcw' or x == 'gasnet' or x == 'tcp' or x == 'none');
     if not check_valid_parcelport(options.parcelport):
         print('Error: Parcelport option not valid\n', sys.stderr)
         parser.print_help()
@@ -383,7 +384,7 @@ Used by the tcp parcelport only.
     parser.add_option('-p', '--parcelport'
       , action='store', type='string'
       , dest='parcelport', default=default_env('HPXRUN_PARCELPORT', 'tcp')
-      , help='Which parcelport to use (Options are: mpi, lci, gasnet, tcp) '
+      , help='Which parcelport to use (Options are: mpi, lci, lcw, gasnet, tcp) '
              '(environment variable HPXRUN_PARCELPORT')
 
     parser.add_option('-r', '--runwrapper'
