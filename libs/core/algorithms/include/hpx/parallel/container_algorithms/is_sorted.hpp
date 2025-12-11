@@ -657,9 +657,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter> tag_fallback_invoke(hpx::ranges::is_sorted_until_t,
-            ExPolicy&& policy, FwdIter first, Sent last, Pred pred = Pred(),
-            Proj proj = Proj())
+            FwdIter>
+        tag_fallback_invoke(hpx::ranges::is_sorted_until_t, ExPolicy&& policy,
+            FwdIter first, Sent last, Pred pred = Pred(), Proj proj = Proj())
         {
             return hpx::parallel::detail::is_sorted_until<FwdIter, Sent>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),

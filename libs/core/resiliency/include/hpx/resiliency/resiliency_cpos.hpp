@@ -120,8 +120,8 @@ namespace hpx::resiliency::experimental {
     ///
     /// Delay the invocation of \a f if any of the arguments to \a f are
     /// futures.
-    HPX_CXX_EXPORT inline constexpr struct
-        dataflow_replicate_vote_validate_t final
+    HPX_CXX_EXPORT inline constexpr struct dataflow_replicate_vote_validate_t
+        final
       : detail::tag_deferred<dataflow_replicate_vote_validate_t,
             async_replicate_vote_validate_t>
     {

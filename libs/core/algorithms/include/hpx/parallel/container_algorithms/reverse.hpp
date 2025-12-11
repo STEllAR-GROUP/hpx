@@ -429,8 +429,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type tag_fallback_invoke(hpx::ranges::reverse_t,
-            ExPolicy&& policy, Iter first, Sent sent)
+            Iter>::type
+        tag_fallback_invoke(
+            hpx::ranges::reverse_t, ExPolicy&& policy, Iter first, Sent sent)
         {
             static_assert(hpx::traits::is_bidirectional_iterator<Iter>::value,
                 "Required at least bidirectional iterator.");
