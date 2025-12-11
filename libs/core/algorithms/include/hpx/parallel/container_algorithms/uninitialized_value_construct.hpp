@@ -353,8 +353,8 @@ namespace hpx::ranges {
         }
     } uninitialized_value_construct{};
 
-    HPX_CXX_EXPORT inline constexpr struct
-        uninitialized_value_construct_n_t final
+    HPX_CXX_EXPORT inline constexpr struct uninitialized_value_construct_n_t
+        final
       : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_n_t>
     {
     private:

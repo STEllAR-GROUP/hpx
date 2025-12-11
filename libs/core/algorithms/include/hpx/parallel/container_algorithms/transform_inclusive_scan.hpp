@@ -964,7 +964,8 @@ namespace hpx::ranges {
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             transform_inclusive_scan_result<hpx::traits::range_iterator_t<Rng>,
-                O>> tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
+                O>>
+        tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
             ExPolicy&& policy, Rng&& rng, O dest, BinOp binary_op,
             UnOp unary_op)
         {
@@ -1117,7 +1118,8 @@ namespace hpx::ranges {
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             transform_inclusive_scan_result<hpx::traits::range_iterator_t<Rng>,
-                O>> tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
+                O>>
+        tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
             ExPolicy&& policy, Rng&& rng, O dest, BinOp binary_op,
             UnOp unary_op, T init)
         {

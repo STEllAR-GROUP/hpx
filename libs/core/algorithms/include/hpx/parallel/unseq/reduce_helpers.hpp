@@ -84,8 +84,8 @@ namespace hpx::parallel::util::detail {
 #if defined(HPX_HAVE_VECTOR_REDUCTION)
         template <typename Iter1, typename T, typename Convert, typename Reduce>
         HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
-            is_arithmetic_plus_reduction_v<T, Reduce>, T> reduce(Iter1 it,
-            std::size_t count, T init, Reduce /* */, Convert conv)
+            is_arithmetic_plus_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(+ : init)
             for (std::size_t i = 0; i != count; ++i)
@@ -196,8 +196,8 @@ namespace hpx::parallel::util::detail {
 #endif
         template <typename Iter1, typename T, typename Convert, typename Reduce>
         HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
-            is_not_omp_reduction_v<T, Reduce>, T> reduce(Iter1 it,
-            std::size_t count, T init, Reduce r, Convert conv)
+            is_not_omp_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it, std::size_t count, T init, Reduce r, Convert conv)
         {
             constexpr std::size_t block_size = HPX_LANE_SIZE / sizeof(T);
 
@@ -273,8 +273,9 @@ namespace hpx::parallel::util::detail {
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
         HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
-            is_arithmetic_plus_reduction_v<T, Reduce>, T> reduce(Iter1 it1,
-            Iter2 it2, std::size_t count, T init, Reduce /* */, Convert conv)
+            is_arithmetic_plus_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
+            Convert conv)
         {
             HPX_VECTOR_REDUCTION(+ : init)
             for (std::size_t i = 0; i != count; ++i)
@@ -400,8 +401,9 @@ namespace hpx::parallel::util::detail {
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
         HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
-            is_not_omp_reduction_v<T, Reduce>, T> reduce(Iter1 it1, Iter2 it2,
-            std::size_t count, T init, Reduce r, Convert conv)
+            is_not_omp_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce r,
+            Convert conv)
         {
             constexpr std::size_t block_size =
                 (std::max) (HPX_LANE_SIZE / (sizeof(T) * 8),

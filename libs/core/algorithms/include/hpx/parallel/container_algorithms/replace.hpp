@@ -1178,9 +1178,10 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type tag_fallback_invoke(hpx::ranges::replace_if_t,
-            ExPolicy&& policy, Iter first, Sent sent, Pred pred,
-            T const& new_value, Proj proj = Proj())
+            Iter>::type
+        tag_fallback_invoke(hpx::ranges::replace_if_t, ExPolicy&& policy,
+            Iter first, Sent sent, Pred pred, T const& new_value,
+            Proj proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator_v<Iter>,
                 "Required at least forward iterator.");
@@ -1294,9 +1295,10 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type tag_fallback_invoke(hpx::ranges::replace_t,
-            ExPolicy&& policy, Iter first, Sent sent, T1 const& old_value,
-            T2 const& new_value, Proj proj = Proj())
+            Iter>::type
+        tag_fallback_invoke(hpx::ranges::replace_t, ExPolicy&& policy,
+            Iter first, Sent sent, T1 const& old_value, T2 const& new_value,
+            Proj proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator_v<Iter>,
                 "Required at least forward iterator.");
@@ -1394,9 +1396,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend replace_copy_if_result<hpx::traits::range_iterator_t<Rng>,
-            OutIter> tag_fallback_invoke(hpx::ranges::replace_copy_if_t,
-            Rng&& rng, OutIter dest, Pred pred, T const& new_value,
-            Proj proj = Proj())
+            OutIter>
+        tag_fallback_invoke(hpx::ranges::replace_copy_if_t, Rng&& rng,
+            OutIter dest, Pred pred, T const& new_value, Proj proj = Proj())
         {
             static_assert(hpx::traits::is_input_iterator<
                               hpx::traits::range_iterator_t<Rng>>::value,

@@ -314,8 +314,8 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            hpx::traits::range_iterator_t<Rng>> tag_fallback_invoke(generate_t,
-            ExPolicy&& policy, Rng&& rng, F f)
+            hpx::traits::range_iterator_t<Rng>>
+        tag_fallback_invoke(generate_t, ExPolicy&& policy, Rng&& rng, F f)
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
@@ -389,8 +389,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter> tag_fallback_invoke(generate_n_t, ExPolicy&& policy,
-            FwdIter first, Size count, F f)
+            FwdIter>
+        tag_fallback_invoke(
+            generate_n_t, ExPolicy&& policy, FwdIter first, Size count, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
