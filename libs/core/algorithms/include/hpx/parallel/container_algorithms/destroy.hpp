@@ -232,7 +232,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng>
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
@@ -253,7 +254,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter>
+                hpx::traits::is_random_access_iterator_v<Iter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, Iter>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
@@ -303,7 +305,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on

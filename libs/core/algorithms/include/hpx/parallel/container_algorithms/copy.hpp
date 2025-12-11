@@ -546,9 +546,9 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter>
+                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, FwdIter1> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
@@ -567,8 +567,9 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
-                hpx::traits::is_iterator_v<FwdIter>
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
@@ -637,8 +638,8 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter2> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
@@ -707,10 +708,10 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, FwdIter1> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     hpx::parallel::traits::projected<Proj, FwdIter1>
                 >
@@ -741,9 +742,10 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >

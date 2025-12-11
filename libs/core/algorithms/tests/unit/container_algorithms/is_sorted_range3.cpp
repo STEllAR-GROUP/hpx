@@ -30,7 +30,7 @@ void test_sorted3()
 void sorted_test3()
 {
     test_sorted3<std::random_access_iterator_tag>();
-    test_sorted3<std::forward_iterator_tag>();
+    test_sorted3_seq(std::forward_iterator_tag());
 
     using namespace hpx::execution;
 

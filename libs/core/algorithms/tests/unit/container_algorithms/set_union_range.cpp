@@ -97,9 +97,13 @@ void test_set_union1_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_set_union1()
 {
-    using namespace hpx::execution;
-
     test_set_union1(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_set_union1_parallel()
+{
+    using namespace hpx::execution;
 
     test_set_union1(seq, IteratorTag());
     test_set_union1(par, IteratorTag());
@@ -113,6 +117,7 @@ void set_union_test1()
 {
     test_set_union1<std::random_access_iterator_tag>();
     test_set_union1<std::forward_iterator_tag>();
+    test_set_union1_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -206,9 +211,13 @@ void test_set_union2_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_set_union2()
 {
-    using namespace hpx::execution;
-
     test_set_union2(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_set_union2_parallel()
+{
+    using namespace hpx::execution;
 
     test_set_union2(seq, IteratorTag());
     test_set_union2(par, IteratorTag());
@@ -222,6 +231,7 @@ void set_union_test2()
 {
     test_set_union2<std::random_access_iterator_tag>();
     test_set_union2<std::forward_iterator_tag>();
+    test_set_union2_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -356,9 +366,13 @@ void test_set_union_exception_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_set_union_exception()
 {
-    using namespace hpx::execution;
-
     test_set_union_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_set_union_exception_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -374,6 +388,7 @@ void set_union_exception_test()
 {
     test_set_union_exception<std::random_access_iterator_tag>();
     test_set_union_exception<std::forward_iterator_tag>();
+    test_set_union_exception_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -504,9 +519,13 @@ void test_set_union_bad_alloc_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_set_union_bad_alloc()
 {
-    using namespace hpx::execution;
-
     test_set_union_bad_alloc(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_set_union_bad_alloc_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -522,6 +541,7 @@ void set_union_bad_alloc_test()
 {
     test_set_union_bad_alloc<std::random_access_iterator_tag>();
     test_set_union_bad_alloc<std::forward_iterator_tag>();
+    test_set_union_bad_alloc_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

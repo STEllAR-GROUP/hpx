@@ -72,7 +72,7 @@ void test_rotate_copy_sent(ExPolicy policy, IteratorTag)
     std::advance(mid, mid_pos);
 
     hpx::ranges::rotate_copy(policy, std::begin(c), mid,
-        sentinel<std::size_t>{*(std::end(c) - 1)}, std::begin(d1));
+        test::sentinel_from_iterator(std::end(c) - 1), std::begin(d1));
 
     auto mid_base = std::begin(c);
     std::advance(mid_base, mid_pos);
@@ -355,10 +355,17 @@ void test_rotate_copy_exception()
 {
     using namespace hpx::execution;
 
+    test_rotate_copy_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_rotate_copy_exception_parallel()
+{
+    using namespace hpx::execution;
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_rotate_copy_exception(IteratorTag());
     test_rotate_copy_exception(seq, IteratorTag());
     test_rotate_copy_exception(par, IteratorTag());
 
@@ -370,6 +377,7 @@ void rotate_copy_exception_test()
 {
     test_rotate_copy_exception<std::random_access_iterator_tag>();
     test_rotate_copy_exception<std::forward_iterator_tag>();
+    test_rotate_copy_exception_parallel<std::random_access_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -506,10 +514,17 @@ void test_rotate_copy_bad_alloc()
 {
     using namespace hpx::execution;
 
+    test_rotate_copy_bad_alloc(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_rotate_copy_bad_alloc_parallel()
+{
+    using namespace hpx::execution;
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_rotate_copy_bad_alloc(IteratorTag());
     test_rotate_copy_bad_alloc(seq, IteratorTag());
     test_rotate_copy_bad_alloc(par, IteratorTag());
 
@@ -521,6 +536,7 @@ void rotate_copy_bad_alloc_test()
 {
     test_rotate_copy_bad_alloc<std::random_access_iterator_tag>();
     test_rotate_copy_bad_alloc<std::forward_iterator_tag>();
+    test_rotate_copy_bad_alloc_parallel<std::random_access_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

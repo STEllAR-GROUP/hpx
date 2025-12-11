@@ -715,8 +715,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
             )
         // clang-format on
@@ -738,7 +738,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter>
             )
         // clang-format on
@@ -763,10 +764,10 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::traits::is_sentinel_for_v<Sent2, FwdIter2> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, FwdIter1> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent2, FwdIter2> &&
                 hpx::traits::is_iterator_v<FwdIter3>
             )
         // clang-format on
@@ -791,8 +792,10 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng1> &&
-                hpx::traits::is_range_v<Rng2> &&
+                hpx::traits::is_random_access_range_v<Rng1> &&
+                hpx::traits::is_sized_range_v<Rng1> &&
+                hpx::traits::is_random_access_range_v<Rng2> &&
+                hpx::traits::is_sized_range_v<Rng2> &&
                 hpx::traits::is_iterator_v<FwdIter>
             )
         // clang-format on

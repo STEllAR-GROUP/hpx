@@ -665,9 +665,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy>&&
-                hpx::traits::is_iterator_v<I> &&
-                hpx::traits::is_sentinel_for_v<Sent, I> &&
-                hpx::traits::is_iterator_v<O> &&
+                hpx::traits::is_random_access_iterator_v<I> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, I> &&
+                hpx::traits::is_random_access_iterator_v<O> &&
                 hpx::parallel::traits::is_projected_v<Proj, I> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<I>::value_type
@@ -696,7 +696,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<
@@ -787,9 +788,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy>&&
-                hpx::traits::is_iterator_v<I> &&
-                hpx::traits::is_sentinel_for_v<Sent, I> &&
-                hpx::traits::is_iterator_v<O> &&
+                hpx::traits::is_random_access_iterator_v<I> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, I> &&
+                hpx::traits::is_random_access_iterator_v<O> &&
                 hpx::parallel::traits::is_projected_v<Proj, I>
             )
         // clang-format on
@@ -816,7 +817,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
             )
         // clang-format on
