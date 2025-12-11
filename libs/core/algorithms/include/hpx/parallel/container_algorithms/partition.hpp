@@ -1231,9 +1231,10 @@ namespace hpx::ranges {
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             partition_copy_result<hpx::traits::range_iterator_t<Rng>, FwdIter2,
-                FwdIter3>> tag_fallback_invoke(hpx::ranges::partition_copy_t,
-            ExPolicy&& policy, Rng&& rng, FwdIter2 dest_true,
-            FwdIter3 dest_false, Pred pred, Proj proj = Proj())
+                FwdIter3>>
+        tag_fallback_invoke(hpx::ranges::partition_copy_t, ExPolicy&& policy,
+            Rng&& rng, FwdIter2 dest_true, FwdIter3 dest_false, Pred pred,
+            Proj proj = Proj())
         {
             using iterator = hpx::traits::range_iterator_t<Rng>;
             using result_type = hpx::tuple<iterator, FwdIter2, FwdIter3>;

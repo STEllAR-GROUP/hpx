@@ -575,8 +575,9 @@ namespace hpx::ranges {
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             ranges::copy_result<
                 typename hpx::traits::range_traits<Rng>::iterator_type,
-                FwdIter>> tag_fallback_invoke(hpx::ranges::copy_t,
-            ExPolicy&& policy, Rng&& rng, FwdIter dest)
+                FwdIter>>
+        tag_fallback_invoke(
+            hpx::ranges::copy_t, ExPolicy&& policy, Rng&& rng, FwdIter dest)
         {
             using copy_iter_t = hpx::parallel::detail::copy_iter<
                 typename hpx::traits::range_traits<Rng>::iterator_type,
@@ -753,9 +754,9 @@ namespace hpx::ranges {
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             ranges::copy_if_result<
                 typename hpx::traits::range_traits<Rng>::iterator_type,
-                FwdIter>> tag_fallback_invoke(hpx::ranges::copy_if_t,
-            ExPolicy&& policy, Rng&& rng, FwdIter dest, Pred pred,
-            Proj proj = Proj())
+                FwdIter>>
+        tag_fallback_invoke(hpx::ranges::copy_if_t, ExPolicy&& policy,
+            Rng&& rng, FwdIter dest, Pred pred, Proj proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&

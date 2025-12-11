@@ -875,10 +875,10 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter> tag_fallback_invoke(hpx::ranges::search_n_t,
-            ExPolicy&& policy, FwdIter first, std::size_t count,
-            FwdIter2 s_first, Sent2 s_last, Pred op = Pred(),
-            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
+            FwdIter>
+        tag_fallback_invoke(hpx::ranges::search_n_t, ExPolicy&& policy,
+            FwdIter first, std::size_t count, FwdIter2 s_first, Sent2 s_last,
+            Pred op = Pred(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             return hpx::parallel::detail::search_n<FwdIter, FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, count, s_first, s_last,

@@ -556,8 +556,9 @@ namespace hpx { namespace segmented {
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-        minmax_element_result<SegIter>> tag_invoke(hpx::minmax_element_t,
-        ExPolicy&& policy, SegIter first, SegIter last, F&& f)
+        minmax_element_result<SegIter>>
+    tag_invoke(hpx::minmax_element_t, ExPolicy&& policy, SegIter first,
+        SegIter last, F&& f)
     {
         static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
             "Requires at least forward iterator.");

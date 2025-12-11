@@ -702,8 +702,9 @@ namespace hpx::util {
     HPX_HOST_DEVICE constexpr std::enable_if_t<
         std::is_same_v<typename Derived::iterator_category,
             std::random_access_iterator_tag>,
-        Derived> operator+(iterator_facade<Derived, T, Category, Reference,
-                               Distance, Pointer> const& it,
+        Derived>
+    operator+(iterator_facade<Derived, T, Category, Reference, Distance,
+                  Pointer> const& it,
         typename Derived::difference_type
             n) noexcept(noexcept(std::declval<Derived>() +=
         std::declval<typename Derived::difference_type>()))
