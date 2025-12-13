@@ -28,6 +28,7 @@ set(example_programs
     pipeline1
     safe_object
     shared_mutex
+    simd_image_blur
     simple_future_continuation
     task_group_docs
     timed_futures
@@ -146,7 +147,11 @@ if(HPX_WITH_TUPLE_RVALUE_SWAP AND (NOT MSVC))
 endif()
 
 foreach(example_program ${example_programs})
-  set(sources ${example_program}.cpp)
+  if("${example_program}" STREQUAL "simd_image_blur")
+    set(sources ${example_program}.cpp include/EasyBMP.cpp)
+  else()
+    set(sources ${example_program}.cpp)
+  endif()
 
   source_group("Source Files" FILES ${sources})
 
