@@ -103,7 +103,7 @@ namespace hpx::parallel::execution {
     /// \returns f(ts...)'s result
     ///
     /// \note It will call tag_invoke(sync_execute_t, exec, f, ts...) if it
-    ///       exists. For two-way executors it will invoke asynch_execute_t
+    ///       exists. For two-way executors it will invoke async_execute_t
     ///       and wait for the task's completion before returning.
     ///
     HPX_CXX_EXPORT inline constexpr struct sync_execute_t final
@@ -148,7 +148,7 @@ namespace hpx::parallel::execution {
     ///
     /// \note This is valid for one way executors (calls
     ///       make_ready_future(exec.sync_execute(f, ts...) if it exists)
-    ///       and for two way executors (calls exec.async_execute(f, ts...)
+    ///       and for two-way executors (calls exec.async_execute(f, ts...)
     ///       if it exists).
     ///
     /// \returns f(ts...)'s result through a future
@@ -188,7 +188,7 @@ namespace hpx::parallel::execution {
     ///
     /// \returns f(ts...)'s result through a future
     ///
-    /// \note This is valid for two way executors (calls
+    /// \note This is valid for two-way executors (calls
     ///       exec.then_execute(f, predecessor, ts...) if it exists) and
     ///       for one way executors (calls predecessor.then(bind(f, ts...))).
     ///
@@ -227,10 +227,10 @@ namespace hpx::parallel::execution {
     ///             given executor.
     /// \param ts   [in] Additional arguments to use to invoke \a f.
     ///
-    /// \note This is valid for two way executors (calls
+    /// \note This is valid for two-way executors (calls
     ///       exec.post(f, ts...), if available, otherwise
     ///       it calls exec.async_execute(f, ts...) while discarding the
-    ///       returned future), and for non-blocking two way executors
+    ///       returned future), and for non-blocking two-way executors
     ///       (calls exec.post(f, ts...) if it exists).
     ///
     HPX_CXX_EXPORT inline constexpr struct post_t final
@@ -283,7 +283,7 @@ namespace hpx::parallel::execution {
     /// \param ts    [in] Additional arguments to use to invoke \a f.
     ///
     /// \returns The return type of \a executor_type::bulk_sync_execute
-    ///          if defined by \a executor_type. Otherwise a vector holding
+    ///          if defined by \a executor_type. Otherwise, a vector holding
     ///          the returned values of each invocation of \a f except when
     ///          \a f returns void, which case void is returned.
     ///
@@ -352,7 +352,7 @@ namespace hpx::parallel::execution {
     /// \param ts    [in] Additional arguments to use to invoke \a f.
     ///
     /// \returns The return type of \a executor_type::bulk_async_execute if
-    ///          defined by \a executor_type. Otherwise a vector
+    ///          defined by \a executor_type. Otherwise, a vector
     ///          of futures holding the returned values of each invocation
     ///          of \a f.
     ///
@@ -423,7 +423,7 @@ namespace hpx::parallel::execution {
     /// \param ts    [in] Additional arguments to use to invoke \a f.
     ///
     /// \returns The return type of \a executor_type::bulk_then_execute
-    ///          if defined by \a executor_type. Otherwise a vector holding
+    ///          if defined by \a executor_type. Otherwise, a vector holding
     ///          the returned values of each invocation of \a f.
     ///
     /// \note This calls exec.bulk_then_execute(f, shape, pred, ts...) if it
@@ -489,7 +489,7 @@ namespace hpx::parallel::execution {
     ///              given executor.
     ///
     /// \returns The return type of \a executor_type::async_invoke if defined by
-    ///          \a executor_type. Otherwise a future<void>
+    ///          \a executor_type. Otherwise, a future<void>
     ///          representing finishing the execution of all functions \a fs.
     ///
     /// \note This calls exec.async_invoke(fs...) if it exists; otherwise it

@@ -65,6 +65,11 @@ namespace hpx::parallel::execution::detail {
     struct then_bulk_function_result;
 }    // namespace hpx::parallel::execution::detail
 
+#if !defined(HPX_HAVE_MORE_THAN_64_THREADS) ||                                 \
+    (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT <= 64)
+#define HPX_MASK_TYPE_IS_CONSTEXPR_CONSTRUCTIBLE
+#endif
+
 namespace hpx::execution {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -223,6 +228,11 @@ namespace hpx::execution {
         {
             auto exec_with_num_cores = exec;
             exec_with_num_cores.num_cores_ = num_cores;
+
+#if defined(HPX_MASK_TYPE_IS_CONSTEXPR_CONSTRUCTIBLE)
+            // force recomputing cached pu mask
+            exec_with_num_cores.mask_ = hpx::threads::mask_type();
+#endif
             return exec_with_num_cores;
         }
 
@@ -594,6 +604,12 @@ namespace hpx::execution {
 
         hpx::threads::mask_type pu_mask() const noexcept
         {
+#if defined(HPX_MASK_TYPE_IS_CONSTEXPR_CONSTRUCTIBLE)
+            if (hpx::threads::any(mask_))
+            {
+                return mask_;
+            }
+#endif
             auto const num_threads = get_num_cores();
             auto const* pool =
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
@@ -621,6 +637,10 @@ namespace hpx::execution {
                     }
                 }
             }
+
+#if defined(HPX_MASK_TYPE_IS_CONSTEXPR_CONSTRUCTIBLE)
+            mask_ = mask;
+#endif
             return mask;
         }
 
@@ -644,6 +664,9 @@ namespace hpx::execution {
         std::size_t hierarchical_threshold_ = hierarchical_threshold_default_;
         std::size_t first_core_ = 0;
         std::size_t num_cores_ = 0;
+#if defined(HPX_MASK_TYPE_IS_CONSTEXPR_CONSTRUCTIBLE)
+        mutable hpx::threads::mask_type mask_ = hpx::threads::mask_type();
+#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
         char const* annotation_ = nullptr;
 #endif
@@ -684,6 +707,8 @@ namespace hpx::execution {
     HPX_CXX_EXPORT using parallel_executor =
         parallel_policy_executor<hpx::launch>;
 }    // namespace hpx::execution
+
+#undef HPX_MASK_TYPE_IS_CONSTEXPR_CONSTRUCTIBLE
 
 namespace hpx::execution::experimental {
 

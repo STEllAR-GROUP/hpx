@@ -490,7 +490,8 @@ namespace hpx::threads {
 
         int const pu_depth = hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
 
-        for (std::size_t i = 0; i != mask_size(mask); ++i)
+        auto const size = mask_size(mask);
+        for (std::size_t i = 0; i != size; ++i)
         {
             if (test(mask, i))
             {
@@ -1457,26 +1458,21 @@ namespace hpx::threads {
         return pu_obj;
     }
 
-    template <typename F>
-    static void iterate(hwloc_bitmap_t cpuset, F&& f)
-    {
-        for (auto id = hwloc_bitmap_first(cpuset);
-            static_cast<unsigned>(id) != static_cast<unsigned>(-1);
-            id = hwloc_bitmap_next(cpuset, id))
+    namespace {
+        template <typename F>
+        void iterate(hwloc_bitmap_t cpuset, F&& f)
         {
-            if (hwloc_bitmap_isset(cpuset, id))
+            for (auto id = hwloc_bitmap_first(cpuset);
+                static_cast<unsigned>(id) != static_cast<unsigned>(-1);
+                id = hwloc_bitmap_next(cpuset, id))
             {
-                f(id);
+                if (hwloc_bitmap_isset(cpuset, id))
+                {
+                    f(id);
+                }
             }
         }
-    }
-
-    static auto num_set_bits(hwloc_bitmap_t cpuset)
-    {
-        std::size_t count = 0;
-        iterate(cpuset, [&](auto) { ++count; });
-        return count;
-    }
+    }    // namespace
 
     // Return the size of the cache associated with the given cpuset.
     std::size_t topology::get_cache_size(mask_cref_type mask, int level) const
@@ -1488,7 +1484,9 @@ namespace hpx::threads {
 
         std::unique_lock<mutex_type> lk(topo_mtx);
 
-        hwloc_bitmap_t cpuset = mask_to_bitmap(mask, HWLOC_OBJ_PU);
+        unsigned cpuset_size = 0;
+        hwloc_bitmap_t cpuset =
+            mask_to_bitmap(mask, HWLOC_OBJ_PU, &cpuset_size);
         std::size_t cache_size = 0;
 
 #if HWLOC_API_VERSION >= 0x00020000
@@ -1531,7 +1529,7 @@ namespace hpx::threads {
 
             cache_size +=
                 static_cast<std::size_t>(cache_obj->attr->cache.size) /
-                num_set_bits(cache_obj->cpuset);
+                cpuset_size;
 #else
             // traverse up until found the requested cache level
             int levels = 0;
@@ -1542,7 +1540,7 @@ namespace hpx::threads {
                     continue;
 
                 cache_size += std::size_t(obj->attr->cache.size) /
-                    num_set_bits(obj->cpuset);
+                    cpuset_size;
             }
 #endif
         });
@@ -1553,14 +1551,16 @@ namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
     hwloc_bitmap_t topology::mask_to_bitmap(
-        mask_cref_type mask, hwloc_obj_type_t htype) const
+        mask_cref_type mask, hwloc_obj_type_t htype, unsigned* count) const
     {
         hwloc_bitmap_t const bitmap = hwloc_bitmap_alloc();
         hwloc_bitmap_zero(bitmap);
-        //
+
         int const depth = hwloc_get_type_or_below_depth(topo, htype);
 
-        for (std::size_t i = 0; i != mask_size(mask); ++i)
+        unsigned count_bits = 0;
+        auto const size = mask_size(mask);
+        for (std::size_t i = 0; i != size; ++i)
         {
             if (test(mask, i))
             {
@@ -1569,7 +1569,13 @@ namespace hpx::threads {
                 HPX_ASSERT(i == detail::get_index(hw_obj));
                 hwloc_bitmap_set(
                     bitmap, static_cast<unsigned int>(hw_obj->os_index));
+                ++count_bits;
             }
+        }
+
+        if (count != nullptr)
+        {
+            *count = count_bits;
         }
         return bitmap;
     }
