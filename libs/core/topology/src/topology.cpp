@@ -1416,8 +1416,8 @@ namespace hpx::threads {
             topo, addr, 1, ns, HWLOC_MEMBIND_BYNODESET);
         if (ret < 0)
         {
-#if defined(__FreeBSD__)
-            // on some platforms this API is not supported (e.g. FreeBSD)
+#if defined(__FreeBSD__) || defined(__APPLE__)
+            // on some platforms this API is not supported (e.g. FreeBSD, macOS)
             return 0;
 #else
             std::string msg(strerror(errno));
