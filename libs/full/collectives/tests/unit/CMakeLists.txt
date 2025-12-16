@@ -14,6 +14,7 @@ set(tests
     barrier
     broadcast
     broadcast_component
+    broadcast_hierarchical
     broadcast_post
     broadcast_sync
     channel_communicator
@@ -31,12 +32,15 @@ if(HPX_WITH_NETWORKING)
       exclusive_scan_
       exclusive_scan_sync
       gather
+      gather_hierarchical
       gather_sync
       inclusive_scan_
       inclusive_scan_sync
       reduce
+      reduce_hierarchical
       reduce_sync
       scatter
+      scatter_hierarchical
       scatter_sync
   )
 

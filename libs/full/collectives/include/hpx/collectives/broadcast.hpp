@@ -574,7 +574,7 @@ namespace hpx::collectives {
         this_site_arg this_site = this_site_arg(),
         generation_arg const generation = generation_arg())
     {
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = static_cast<std::size_t>(agas::get_locality_id());
         }
@@ -664,9 +664,9 @@ namespace hpx::collectives {
         this_site_arg this_site = this_site_arg(),
         generation_arg const generation = generation_arg())
     {
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
-            this_site = static_cast<std::size_t>(agas::get_locality_id());
+            this_site = agas::get_locality_id();
         }
 
         fid.wait();    // make sure communicator was created
@@ -683,77 +683,78 @@ namespace hpx::collectives {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////
     template <typename T>
-    hpx::future<std::decay_t<T>> broadcast_to_hierarchically(
-        std::vector<std::tuple<communicator,int>> communicators, 
-        T&& local_result,
+    hpx::future<std::decay_t<T>> broadcast_to(
+        hierarchical_communicator const& communicators, T&& local_result,
         this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg(),
-        int arity = 2)
-{
-        if (this_site == static_cast<std::size_t>(-1))
+        generation_arg const generation = generation_arg())
+    {
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
         }
-        if (generation == 0)
+
+        T result = HPX_FORWARD(T, local_result);
+        for (std::size_t i = 0; i < communicators.size() - 1; ++i)
         {
-            return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
-                hpx::error::bad_parameter, "hpx::collectives::scatter_to",
-                "the generation number shouldn't be zero"));
+            result = broadcast_to(hpx::launch::sync, communicators.get(i),
+                HPX_MOVE(result), this_site_arg(0), generation);
         }
-        
-        communicator current_communicator = std::get<0>(communicators[0]);
-        int current_site = std::get<1>(communicators[0]);
-        if (this_site == root_site)
-        {
-            T current_local_result = std::move(local_result);
-            for (int i = 0; i < communicators.size()-1;i++)
-            {
-                current_communicator = std::get<0>(communicators[i]);
-                current_local_result = broadcast_to(current_communicator, std::move(current_local_result), generation, this_site_arg(0)).get();
-            }
-            current_communicator = std::get<0>(communicators[communicators.size()-1]);
-            return broadcast_to(current_communicator, std::move(current_local_result), generation, this_site_arg(0));
-        } 
+
+        return broadcast_to(communicators.back(), HPX_MOVE(result),
+            this_site_arg(0), generation);
     }
 
     template <typename T>
-    hpx::future<T> broadcast_from_hierarchically(
-        std::vector<std::tuple<communicator,int>> communicators,
+    hpx::future<T> broadcast_from(
+        hierarchical_communicator const& communicators,
         this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg(),
-        int arity = 2)
-{
-        if (this_site == static_cast<std::size_t>(-1))
+        generation_arg const generation = generation_arg())
+    {
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
         }
-        if (generation == 0)
+
+        if (communicators.size() > 1)
         {
-            return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
-                hpx::error::bad_parameter, "hpx::collectives::scatter_to",
-                "the generation number shouldn't be zero"));
-        }
-        
-        communicator current_communicator = std::get<0>(communicators[0]);
-        int current_site = std::get<1>(communicators[0]);
-        if (this_site != root_site && communicators.size()>1)
-        {
-            T current_local_result = broadcast_from<T>(current_communicator, generation, this_site_arg(current_site)).get();
-            for (int i = 1; i < communicators.size()-1; i++)
+            T result = broadcast_from<T>(hpx::launch::sync,
+                communicators.get(0), generation, communicators.site(0));
+
+            for (std::size_t i = 1; i < communicators.size() - 1; ++i)
             {
-                current_communicator = std::get<0>(communicators[i]);
-                current_local_result = broadcast_to(current_communicator, std::move(current_local_result), generation, this_site_arg(0)).get();
+                result = broadcast_to(hpx::launch::sync, communicators.get(i),
+                    HPX_MOVE(result), this_site_arg(0), generation);
             }
-            current_communicator = std::get<0>(communicators[communicators.size()-1]);
-            return broadcast_to(current_communicator, std::move(current_local_result), generation, this_site_arg(0));
-        } 
-        else if (this_site != root_site )
-        {
-            return broadcast_from<T>(current_communicator, generation, this_site_arg(current_site));
+
+            return broadcast_to(communicators.back(), HPX_MOVE(result),
+                this_site_arg(0), generation);
         }
+
+        return broadcast_from<T>(communicators.get(communicators.size() - 1),
+            generation, communicators.site(communicators.size() - 1));
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    std::decay_t<T> broadcast_to(hpx::launch::sync_policy,
+        hierarchical_communicator const& communicators, T&& local_result,
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        return broadcast_to(
+            communicators, HPX_FORWARD(T, local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    hpx::future<T> broadcast_from(hpx::launch::sync_policy,
+        hierarchical_communicator const& communicators,
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        return broadcast_from<T>(communicators, this_site, generation).get();
     }
 }    // namespace hpx::collectives
 
