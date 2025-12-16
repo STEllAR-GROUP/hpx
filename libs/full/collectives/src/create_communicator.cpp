@@ -9,6 +9,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/assert.hpp>
+#include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/agas_interface.hpp>
@@ -367,6 +368,111 @@ namespace hpx::collectives {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace {
+
+        std::vector<hpx::tuple<communicator, this_site_arg>>
+        recursively_fill_communicators(
+            std::vector<hpx::tuple<communicator, this_site_arg>> communicators,
+            std::size_t left, std::size_t right, std::string basename,
+            arity_arg arity, int max_depth, this_site_arg this_site,
+            num_sites_arg num_sites, generation_arg generation)
+        {
+            std::string name(basename);
+            name += std::to_string(left) + "-" + std::to_string(right) + "/";
+
+            if (right - left < arity || max_depth == 0)
+            {
+                auto c = create_communicator(name.c_str(),
+                    num_sites_arg(right - left + 1),
+                    this_site_arg(this_site - left), generation_arg(generation),
+                    root_site_arg(0));
+
+                communicators.emplace_back(
+                    HPX_MOVE(c), this_site_arg(this_site - left));
+                return communicators;
+            }
+
+            float division_steps = (right - left + 1) / arity;
+            for (std::size_t i = 0; i != arity; ++i)
+            {
+                std::size_t current_left =
+                    left + static_cast<std::size_t>(division_steps * i);
+                if (this_site == current_left)
+                {
+                    auto c = create_communicator(name.c_str(),
+                        num_sites_arg(arity), this_site_arg(i),
+                        generation_arg(generation), root_site_arg(0));
+
+                    communicators.emplace_back(HPX_MOVE(c), this_site_arg(i));
+                }
+
+                std::size_t current_right = left +
+                    static_cast<std::size_t>(division_steps * (i + 1) - 1);
+                if (current_right > right)
+                {
+                    current_right = right;
+                }
+
+                if (this_site >= current_left && this_site < current_right + 1)
+                {
+                    return recursively_fill_communicators(
+                        HPX_MOVE(communicators), current_left, current_right,
+                        HPX_MOVE(basename), arity, max_depth - 1, this_site,
+                        num_sites, generation);
+                }
+            }
+            return communicators;
+        }
+
+        hierarchical_communicator fill_communicators(std::size_t left,
+            std::size_t right, std::string basename, arity_arg arity,
+            int max_depth, this_site_arg this_site, num_sites_arg num_sites,
+            generation_arg generation)
+        {
+            std::vector<hpx::tuple<communicator, this_site_arg>> communicators;
+            return {recursively_fill_communicators(HPX_MOVE(communicators),
+                        left, right, HPX_MOVE(basename), arity, max_depth,
+                        this_site, num_sites, generation),
+                arity};
+        }
+    }    // namespace
+
+    hierarchical_communicator create_hierarchical_communicator(
+        char const* basename, num_sites_arg num_sites, this_site_arg this_site,
+        arity_arg arity, generation_arg generation, root_site_arg root_site)
+    {
+        if (num_sites.is_default())
+        {
+            num_sites = agas::get_num_localities(hpx::launch::sync);
+        }
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
+            if (root_site == static_cast<std::size_t>(-1))    //-V1051
+            {
+                root_site = 0;
+            }
+        }
+        if (root_site != 0)
+        {
+            this_site = this_site - root_site % num_sites;
+        }
+
+        HPX_ASSERT(this_site < num_sites);
+        HPX_ASSERT(
+            root_site != static_cast<std::size_t>(-1) && root_site < num_sites);
+
+        std::string name(basename);
+        if (!generation.is_default())
+        {
+            name += std::to_string(generation) + "/";
+        }
+
+        return fill_communicators(0, num_sites - 1, HPX_MOVE(name), arity, -1,
+            this_site, num_sites, generation);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // Predefined global communicator
     namespace {
 
@@ -443,77 +549,6 @@ namespace hpx::collectives {
             }
         }
     }    // namespace detail
-
-     ///////////////////////////////////////////////////////////////////////////
-    std::vector<std::tuple<communicator,int>> create_hierarchical_communicator(char const* basename,
-        num_sites_arg num_sites, this_site_arg this_site,
-        generation_arg generation, root_site_arg root_site,
-        int arity)
-    {
-        if (num_sites == static_cast<std::size_t>(-1))
-        {
-            num_sites = agas::get_num_localities(hpx::launch::sync);
-        }
-        if (this_site == static_cast<std::size_t>(-1))
-        {
-            this_site = agas::get_locality_id();
-            if (root_site == static_cast<std::size_t>(-1))    //-V1051
-            {
-                root_site = 0;
-            }
-        }
-        if (root_site != 0)
-        {
-            this_site = this_site - root_site % num_sites;
-        }
-
-        HPX_ASSERT(this_site < num_sites);
-        HPX_ASSERT(
-            root_site != static_cast<std::size_t>(-1) && root_site < num_sites);
-        
-
-        std::string name(basename);
-        if (generation != static_cast<std::size_t>(-1))
-        {
-            name += std::to_string(generation) + "/";
-        }
-        std::vector<std::tuple<communicator,int>> communicators;
-        return recursively_fill_communicators(std::move(communicators), 0, num_sites - 1, name, arity, -1, this_site, num_sites, generation);
-    }
-    std::vector<std::tuple<communicator,int>> recursively_fill_communicators(std::vector<std::tuple<communicator,int>> communicators, int left, int right, std::string basename, int arity, int max_depth, int this_site, int num_sites, generation_arg generation)
-    {
-        std::string name(basename);
-        name += std::to_string(left) + "-" + std::to_string(right) + "/";
-        int pivot = left; // was ((right - left)/2)+left
-        //if (right-left + 1 == num_sites){pivot = 0;}
-        if (right-left < arity || max_depth == 0)
-        {
-
-            auto c = create_communicator(name.c_str(),num_sites_arg(right-left + 1), this_site_arg(this_site - left), generation_arg(generation), root_site_arg(0));
-            communicators.push_back(std::tuple(std::move(c), this_site - left)); // 0 originally pivot, but might've been wrong
-            //std::cout << "this_site: " << this_site << " (create_communicator )number of Communicators " << communicators.size() << "right, left:"<< left << "," << right <<"\n";
-            return communicators;
-        }
-        float division_steps = (right - left + 1)/arity;
-        for (int i = 0; i < arity; i++)
-        {
-            int current_left = left + (division_steps*i);
-            if (this_site == current_left) //was before left + (division_steps*i)-1 + (division_steps/2)
-            { 
-                auto c = create_communicator(name.c_str(),num_sites_arg(arity), this_site_arg(i), generation_arg(generation), root_site_arg(0));
-                communicators.push_back(std::tuple(c, i)); // Was pivot before
-            }
-            int current_right = left + (division_steps*(i+1)-1);
-            if (current_right > right) {current_right = right;}
-            if (this_site >= current_left && this_site < current_right+1)
-            {
-                return recursively_fill_communicators(std::move(communicators), current_left, current_right, basename, arity, max_depth-1, this_site, num_sites, generation);
-            }
-        }
-        return communicators;
-
-    }
-
 }    // namespace hpx::collectives
 
 #endif    // !HPX_COMPUTE_DEVICE_CODE
