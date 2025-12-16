@@ -15,8 +15,7 @@
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/preprocessor.hpp>
 
-#if !defined(HPX_COMPILE_WITH_MODULES) ||                                      \
-    (defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_PLUGIN_WITH_MODULES))
+#if !defined(HPX_COMPILE_WITH_MODULES) || defined(HPX_COMPILE_BMI)
 #include <hpx/plugin/abstract_factory.hpp>
 #include <hpx/plugin/concrete_factory.hpp>
 #endif
