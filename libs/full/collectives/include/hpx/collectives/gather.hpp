@@ -686,112 +686,107 @@ namespace hpx::collectives {
             .get();
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    namespace detail {
+
+        template <typename T>
+        std::vector<T> gather_data(std::vector<std::vector<T>>&& data)
+        {
+            std::size_t total_size = 0;
+            for (auto const& row : data)
+            {
+                total_size += row.size();
+            }
+
+            std::vector<T> result;
+            result.reserve(total_size);
+            for (auto&& row : data)
+            {
+                result.insert(result.end(),
+                    std::make_move_iterator(row.begin()),
+                    std::make_move_iterator(row.end()));
+            }
+            return result;
+        }
+
+        template <typename T>
+        hpx::future<std::vector<T>> gather_data(
+            hpx::future<std::vector<std::vector<T>>>&& f)
+        {
+            return hpx::make_future<std::vector<T>>(
+                HPX_MOVE(f), [](std::vector<std::vector<T>>&& data) {
+                    return gather_data(HPX_MOVE(data));
+                });
+        }
+    }    // namespace detail
+
     template <typename T>
-    std::vector<T> flatten_vector(communicator fid, std::vector<std::vector<T>>&& dimensional_vector)
+    hpx::future<std::vector<T>> gather_here(
+        hierarchical_communicator const& communicators, T&& local_result,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
-        std::vector<std::vector<T>> non_flat_vector = std::move(dimensional_vector);
-        std::vector<T> current_local_result;
-        size_t totalSize = 0;
-        for (const auto& row : non_flat_vector) {
-            totalSize += row.size();
-        }
-        current_local_result.reserve(totalSize);
-        for (auto& row : non_flat_vector) {
-            current_local_result.insert(current_local_result.end(), std::make_move_iterator(row.begin()), std::make_move_iterator(row.end()));
-        }
-        return std::move(current_local_result);
-    }
-
-
-    template <typename T>
-    std::vector<T> gather_here_hierarchically(
-        std::vector<std::tuple<communicator,int>> communicators, 
-        T&&  local_result,
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg(),
-        int arity = 2)
-{
         if (this_site == static_cast<std::size_t>(-1))
         {
             this_site = agas::get_locality_id();
         }
-        /* if (generation == 0)
+
+        std::vector<T> result(1, HPX_FORWARD(T, local_result));
+        for (std::size_t i = communicators.size() - 1; i != 0; --i)
         {
-            return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
-                hpx::error::bad_parameter, "hpx::collectives::scatter_to",
-                "the generation number shouldn't be zero"));
-        } */
-        
-        communicator current_communicator = std::get<0>(communicators[0]);
-        int current_site = std::get<1>(communicators[0]);
-        if (this_site == root_site)
-        {
-            std::vector<T> current_local_result;
-            current_local_result.push_back(std::move(local_result));
-            for (int i = communicators.size()-1; i > 0;i--)
-            {
-                current_communicator = std::get<0>(communicators[i]);
-                std::vector<std::vector<T>> in_between_result = gather_here(current_communicator, std::move(current_local_result), generation, this_site_arg(0)).get();
-                size_t totalSize = 0;
-                for (const auto& row : in_between_result) {
-                    totalSize += row.size();
-                }
-                current_local_result.reserve(totalSize);
-                for (auto& row : in_between_result) {
-                    current_local_result.insert(current_local_result.end(), std::make_move_iterator(row.begin()), std::make_move_iterator(row.end()));
-                }
-            }
-            current_communicator = std::get<0>(communicators[0]);
-            hpx::future<std::vector<std::vector<std::decay_t<T>>>> dimensional_vector = gather_here(current_communicator, std::move(current_local_result), generation, this_site_arg(0));
-            return flatten_vector<T>(current_communicator, std::move(dimensional_vector.get()));
-        } 
+            result = detail::gather_data(
+                gather_here(hpx::launch::sync, communicators.get(i),
+                    HPX_MOVE(result), this_site_arg(0), generation));
+        }
+
+        return detail::gather_data(gather_here(communicators.get(0),
+            HPX_MOVE(result), this_site_arg(0), generation));
     }
 
-    
-
     template <typename T>
-    hpx::future<void> gather_there_hierarchically(
-        std::vector<std::tuple<communicator,int>> communicators, 
-        T&&  local_result,
+    hpx::future<void> gather_there(
+        hierarchical_communicator const& communicators, T&& local_result,
         this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg(),
-        int arity = 2)
-{
-        if (this_site == static_cast<std::size_t>(-1))
+        generation_arg const generation = generation_arg())
+    {
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
         }
-        if (generation == 0)
+
+        std::vector<T> data(1, HPX_FORWARD(T, local_result));
+        for (std::size_t i = communicators.size() - 1; i != 0; --i)
         {
-            return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
-                hpx::error::bad_parameter, "hpx::collectives::scatter_to",
-                "the generation number shouldn't be zero"));
+            data = detail::gather_data(
+                gather_here(hpx::launch::sync, communicators.get(i),
+                    HPX_MOVE(data), this_site_arg(0), generation));
         }
-        
-        communicator current_communicator = std::get<0>(communicators[0]);
-        int current_site = std::get<1>(communicators[0]);
-        if (this_site != root_site)
-        {
-            std::vector<T> current_local_result;
-            current_local_result.push_back(std::move(local_result));
-            for (int i = communicators.size()-1; i > 0;i--)
-            {
-                current_communicator = std::get<0>(communicators[i]);
-                std::vector<std::vector<T>> in_between_result = gather_here(current_communicator, std::move(current_local_result), generation, this_site_arg(0)).get();
-                size_t totalSize = 0;
-                for (const auto& row : in_between_result) {
-                    totalSize += row.size();
-                }
-                current_local_result.reserve(totalSize);
-                for (auto& row : in_between_result) {
-                    current_local_result.insert(current_local_result.end(), std::make_move_iterator(row.begin()), std::make_move_iterator(row.end()));
-                }
-            }
-            current_communicator = std::get<0>(communicators[0]);
-            return gather_there(current_communicator, std::move(current_local_result), generation, this_site_arg(current_site));
-        } 
+
+        return gather_there(communicators.get(0), HPX_MOVE(data),
+            communicators.site(0), generation);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    std::vector<T> gather_here(hpx::launch::sync_policy,
+        hierarchical_communicator const& communicators, T&& local_result,
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        return gather_here(
+            communicators, HPX_FORWARD(T, local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename T>
+    void gather_there(hpx::launch::sync_policy,
+        hierarchical_communicator const& communicators, T&& local_result,
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        gather_there(
+            communicators, HPX_FORWARD(T, local_result), this_site, generation)
+            .get();
     }
 }    // namespace hpx::collectives
 

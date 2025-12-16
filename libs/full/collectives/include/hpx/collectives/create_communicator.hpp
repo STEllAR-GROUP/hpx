@@ -138,14 +138,16 @@ namespace hpx { namespace collectives {
 
 #else
 
+#include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/detail/communicator.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/type_support.hpp>
 
-#include <tuple>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -268,14 +270,53 @@ namespace hpx::collectives {
         generation_arg generation = generation_arg(),
         root_site_arg root_site = root_site_arg());
 
-    HPX_EXPORT std::vector<std::tuple<communicator,int>> create_hierarchical_communicator(char const* basename,
-        num_sites_arg num_sites = num_sites_arg(),
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg(),
-        int arity = 4);
-    std::vector<std::tuple<communicator,int>> recursively_fill_communicators(std::vector<std::tuple<communicator,int>> communicators, int left, int right, std::string basename, int arity, int max_depth, int this_site, int num_sites, generation_arg generation);
+    ///////////////////////////////////////////////////////////////////////////
+    struct hierarchical_communicator
+    {
+        hpx::tuple<communicator, this_site_arg>& operator[](std::size_t idx)
+        {
+            return communicators[idx];
+        }
+        hpx::tuple<communicator, this_site_arg> const& operator[](
+            std::size_t idx) const
+        {
+            return communicators[idx];
+        }
 
+        communicator& get(std::size_t idx)
+        {
+            return hpx::get<0>(communicators[idx]);
+        }
+        communicator const& get(std::size_t idx) const
+        {
+            return hpx::get<0>(communicators[idx]);
+        }
+
+        this_site_arg site(std::size_t idx) const
+        {
+            return hpx::get<1>(communicators[idx]);
+        }
+
+        std::size_t size() const
+        {
+            return communicators.size();
+        }
+
+        communicator const& back() const
+        {
+            return hpx::get<0>(communicators.back());
+        }
+
+        std::vector<hpx::tuple<communicator, this_site_arg>> communicators;
+        arity_arg arity;
+    };
+
+    HPX_EXPORT hierarchical_communicator create_hierarchical_communicator(
+        char const* basename, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        arity_arg arity = arity_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
 }    // namespace hpx::collectives
 
 #endif    // !HPX_COMPUTE_DEVICE_CODE

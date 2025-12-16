@@ -80,5 +80,5 @@ namespace hpx::collectives {
 
     /// The number of children each of the communication nodes is connected
     /// to (default: picked based on num_sites).
-    using arity_arg = detail::argument_type<detail::arity_tag>;
+    using arity_arg = detail::argument_type<detail::arity_tag, 2>;
 }    // namespace hpx::collectives

@@ -734,76 +734,72 @@ namespace hpx::collectives {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////
     template <typename T, typename F>
-    hpx::future<std::decay_t<T>> reduce_hierarchically_here(
-        std::vector<std::tuple<communicator,int>> communicators, 
-        T&& local_result,
-        F&& op,
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg(),
-        int arity = 2)
-{
-        if (this_site == static_cast<std::size_t>(-1))
+    hpx::future<std::decay_t<T>> reduce_here(
+        hierarchical_communicator const& communicators, T&& local_result,
+        F&& op, this_site_arg this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
         }
-        if (generation == 0)
+
+        T result = HPX_FORWARD(T, local_result);
+        for (std::size_t i = communicators.size() - 1; i != 0; --i)
         {
-            return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
-                hpx::error::bad_parameter, "hpx::collectives::scatter_to",
-                "the generation number shouldn't be zero"));
+            result = reduce_here(hpx::launch::sync, communicators.get(i),
+                HPX_MOVE(result), op, this_site_arg(0), generation);
         }
-        
-        communicator current_communicator = std::get<0>(communicators[0]);
-        int current_site = std::get<1>(communicators[0]);
-        if (this_site == root_site)
-        {
-            T current_local_result = std::move(local_result);
-            for (int i = communicators.size()-1; i > 0;i--)
-            {
-                current_communicator = std::get<0>(communicators[i]);
-                current_local_result = reduce_here(current_communicator, std::move(current_local_result), std::forward<F>(op), generation, this_site_arg(0)).get();
-            }
-            current_communicator = std::get<0>(communicators[0]);
-            return reduce_here(current_communicator, std::move(current_local_result), std::forward<F>(op), generation, this_site_arg(0));
-        } 
+
+        return reduce_here(communicators.get(0), HPX_MOVE(result),
+            HPX_FORWARD(F, op), this_site_arg(0), generation);
     }
 
     template <typename T, typename F>
-    hpx::future<void> reduce_hierarchically_there(
-        std::vector<std::tuple<communicator,int>> communicators, 
-        T&&  local_result,
-        F&& op,
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg(),
-        int arity = 2)
-{
-        if (this_site == static_cast<std::size_t>(-1))
+    hpx::future<void> reduce_there(
+        hierarchical_communicator const& communicators, T&& local_result,
+        F&& op, this_site_arg this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
         }
-        if (generation == 0)
+
+        T result = HPX_FORWARD(T, local_result);
+        for (std::size_t i = communicators.size() - 1; i != 0; --i)
         {
-            return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
-                hpx::error::bad_parameter, "hpx::collectives::scatter_to",
-                "the generation number shouldn't be zero"));
+            result = reduce_here(hpx::launch::sync, communicators.get(i),
+                HPX_MOVE(result), op, this_site_arg(0), generation);
         }
-        
-        communicator current_communicator = std::get<0>(communicators[0]);
-        int current_site = std::get<1>(communicators[0]);
-        if (this_site != root_site)
-        {
-            T current_local_result = std::move(local_result);
-            for (int i = communicators.size()-1; i > 0;i--)
-            {
-                current_communicator = std::get<0>(communicators[i]);
-                current_local_result = reduce_here(current_communicator, std::move(current_local_result), std::forward<F>(op), generation, this_site_arg(0)).get();
-            }
-            current_communicator = std::get<0>(communicators[0]);
-            return reduce_there(current_communicator, std::move(current_local_result), generation, this_site_arg(current_site));
-        } 
+
+        return reduce_there(communicators.get(0), HPX_MOVE(result),
+            communicators.site(0), generation);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename T, typename F>
+    std::decay_t<T> reduce_here(hpx::launch::sync_policy,
+        hierarchical_communicator const& communicators, T&& local_result,
+        F&& op, this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        return reduce_here(communicators, HPX_FORWARD(T, local_result),
+            HPX_FORWARD(F, op), this_site, generation)
+            .get();
+    }
+
+    template <typename T, typename F>
+    void reduce_there(hpx::launch::sync_policy,
+        hierarchical_communicator const& communicators, T&& local_result,
+        F&& op, this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        reduce_there(communicators, HPX_FORWARD(T, local_result),
+            HPX_FORWARD(F, op), this_site, generation)
+            .get();
     }
 }    // namespace hpx::collectives
 
