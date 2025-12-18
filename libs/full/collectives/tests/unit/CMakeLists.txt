@@ -49,9 +49,6 @@ if(HPX_WITH_NETWORKING)
   endforeach()
 endif()
 
-# communication_set should run on one locality
-set(tests ${tests} communication_set)
-
 foreach(test ${tests})
   set(sources ${test}.cpp)
 
