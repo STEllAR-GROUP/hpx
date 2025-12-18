@@ -1,4 +1,4 @@
-//  Copyright (c) 2025 Lukas Zell
+//  Copyright (c) 2025 Lukas Zeil
 //  Copyright (c) 2025 Alexander Strack
 //  Copyright (c) 2025 Hartmut Kaiser
 //
@@ -46,7 +46,7 @@ struct vector_adder
     }
 };
 
-std::vector<std::vector<int>> generateMatrix(
+std::vector<std::vector<int>> generate_matrix(
     int localities, int test_size, int start_val)
 {
     std::vector<std::vector<int>> result;
@@ -83,7 +83,7 @@ std::pair<double, double> compute_moments(std::vector<double> const& data)
     {
         sum += x;
     }
-    double mean = sum / data.size();
+    double mean = sum / static_cast<double>(data.size());
 
     // Compute variance (population variance)
     double varianceSum = 0.0;
@@ -91,19 +91,19 @@ std::pair<double, double> compute_moments(std::vector<double> const& data)
     {
         varianceSum += (x - mean) * (x - mean);
     }
-    double variance = varianceSum / data.size();
+    double variance = varianceSum / static_cast<double>(data.size());
 
     return std::make_pair(mean, variance);
 }
 
 void write_to_file(std::string const& collective, std::string const& type,
-    int arity, std::size_t num_l, int lpn, int size, int iterations,
+    int arity, std::size_t num_l, int lpn, int size, std::size_t iterations,
     std::vector<double> const& result)
 {
     // Compute mean and variance
     auto moments = compute_moments(result);
     // Compute nodes
-    int nodes = num_l / lpn;
+    std::size_t nodes = num_l / static_cast<std::size_t>(lpn);
     auto threads = hpx::get_os_thread_count();
     // Print info
     std::string msg = "\nCollective:        {1}\n"
@@ -159,7 +159,7 @@ void write_to_file(std::string const& collective, std::string const& type,
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // Hierarchical collectives
-void test_scatter_hierarchical(int arity, int lpn, int iterations,
+void test_scatter_hierarchical(int arity, int lpn, std::size_t iterations,
     int test_size, std::string const& operation)
 {
     // Get parameters
@@ -187,13 +187,15 @@ void test_scatter_hierarchical(int arity, int lpn, int iterations,
     {
         if (this_locality == 0)
         {
-            send_data = generateMatrix(num_localities, test_size, 42 + i);
+            send_data = generate_matrix(static_cast<int>(num_localities),
+                test_size, static_cast<int>(42 + i));
         }
 
         // Time collective
         hpx::chrono::high_resolution_timer const timer;
         if (this_locality == 0)
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             ft_data = scatter_to(communicators, std::move(send_data),
                 this_site_arg(this_locality), generation_arg(i + 1));
         }
@@ -209,7 +211,7 @@ void test_scatter_hierarchical(int arity, int lpn, int iterations,
         result[i] = timer.elapsed();
 
         // Check for correctness
-        for (int check : recv_data)
+        for (std::size_t check : recv_data)
         {
             HPX_TEST_EQ(42 + i + this_locality, check);
         }
@@ -222,8 +224,8 @@ void test_scatter_hierarchical(int arity, int lpn, int iterations,
     }
 }
 
-void test_reduce_hierarchical(int arity, int lpn, int iterations, int test_size,
-    std::string const& operation)
+void test_reduce_hierarchical(int arity, int lpn, std::size_t iterations,
+    int test_size, std::string const& operation)
 {
     // Get parameters
     std::size_t const num_localities =
@@ -248,13 +250,14 @@ void test_reduce_hierarchical(int arity, int lpn, int iterations, int test_size,
 
     for (std::size_t i = 0; i != iterations; ++i)
     {
-        send_data = std::vector<int>(test_size, i);
+        send_data = std::vector<int>(test_size, static_cast<int>(i));
 
         // Time collective
         hpx::chrono::high_resolution_timer const timer;
         if (this_locality == 0)
         {
             ft_data =
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 reduce_here(communicators, std::move(send_data), vector_adder{},
                     this_site_arg(this_locality), generation_arg(i + 1));
             recv_data = ft_data.get();
@@ -262,6 +265,7 @@ void test_reduce_hierarchical(int arity, int lpn, int iterations, int test_size,
         else
         {
             hpx::future<void> finished = reduce_there(communicators,
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 std::move(send_data), vector_adder{},
                 this_site_arg(this_locality), generation_arg(i + 1));
             finished.get();
@@ -274,7 +278,8 @@ void test_reduce_hierarchical(int arity, int lpn, int iterations, int test_size,
         // Check for correctness
         if (this_locality == 0)
         {
-            HPX_TEST_EQ(i * num_localities, recv_data[0]);
+            HPX_TEST_EQ(
+                i * num_localities, static_cast<std::size_t>(recv_data[0]));
         }
     }
 
@@ -285,7 +290,7 @@ void test_reduce_hierarchical(int arity, int lpn, int iterations, int test_size,
     }
 }
 
-void test_broadcast_hierarchical(int arity, int lpn, int iterations,
+void test_broadcast_hierarchical(int arity, int lpn, std::size_t iterations,
     int test_size, std::string const& operation)
 {
     // Get parameters
@@ -313,13 +318,14 @@ void test_broadcast_hierarchical(int arity, int lpn, int iterations,
     {
         if (this_locality == 0)
         {
-            send_data = std::vector<int>(test_size, i);
+            send_data = std::vector<int>(test_size, static_cast<int>(i));
         }
 
         // Time collective
         hpx::chrono::high_resolution_timer const timer;
         if (this_locality == 0)
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             ft_data = broadcast_to(communicators, std::move(send_data),
                 this_site_arg(this_locality), generation_arg(i + 1));
         }
@@ -337,7 +343,7 @@ void test_broadcast_hierarchical(int arity, int lpn, int iterations,
         // Check for correctness
         if (this_locality == 0)
         {
-            HPX_TEST_EQ(i, recv_data[0]);
+            HPX_TEST_EQ(i, static_cast<std::size_t>(recv_data[0]));
         }
     }
 
@@ -348,8 +354,8 @@ void test_broadcast_hierarchical(int arity, int lpn, int iterations,
     }
 }
 
-void test_gather_hierarchical(int arity, int lpn, int iterations, int test_size,
-    std::string const& operation)
+void test_gather_hierarchical(int arity, int lpn, std::size_t iterations,
+    int test_size, std::string const& operation)
 {
     // Get parameters
     std::size_t const num_localities =
@@ -374,12 +380,14 @@ void test_gather_hierarchical(int arity, int lpn, int iterations, int test_size,
 
     for (std::size_t i = 0; i != iterations; ++i)
     {
-        send_data = std::vector<int>(test_size, i + this_locality);
+        send_data =
+            std::vector<int>(test_size, static_cast<int>(i + this_locality));
 
         // Time collective
         hpx::chrono::high_resolution_timer const timer;
         if (this_locality == 0)
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             ft_data = gather_here(communicators, std::move(send_data),
                 this_site_arg(this_locality), generation_arg(i + 1));
             recv_data = ft_data.get();
@@ -387,6 +395,7 @@ void test_gather_hierarchical(int arity, int lpn, int iterations, int test_size,
         else
         {
             hpx::future<void> finished =
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 gather_there(communicators, std::move(send_data),
                     this_site_arg(this_locality), generation_arg(i + 1));
             finished.get();
@@ -399,9 +408,9 @@ void test_gather_hierarchical(int arity, int lpn, int iterations, int test_size,
         // Check for correctness
         if (this_locality == 0)
         {
-            for (int j = 0; j < num_localities; j++)
+            for (int j = 0; j < static_cast<int>(num_localities); ++j)
             {
-                HPX_TEST_EQ(i + j, recv_data[j][0]);
+                HPX_TEST_EQ(i + j, static_cast<std::size_t>(recv_data[j][0]));
             }
         }
     }
@@ -415,8 +424,8 @@ void test_gather_hierarchical(int arity, int lpn, int iterations, int test_size,
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // One shot collectives
-void test_one_shot_use_scatter(
-    int lpn, int iterations, int test_size, std::string const& operation)
+void test_one_shot_use_scatter(int lpn, std::size_t iterations, int test_size,
+    std::string const& operation)
 {
     // Get parameters
     std::size_t const num_localities =
@@ -438,13 +447,15 @@ void test_one_shot_use_scatter(
     {
         if (this_locality == 0)
         {
-            send_data = generateMatrix(num_localities, test_size, 42 + i);
+            send_data = generate_matrix(static_cast<int>(num_localities),
+                test_size, static_cast<int>(42 + i));
         }
 
         // Time collective
         hpx::chrono::high_resolution_timer const timer;
         if (this_locality == 0)
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             ft_data = scatter_to(scatter_direct_basename, std::move(send_data),
                 num_sites_arg(num_localities), this_site_arg(this_locality),
                 generation_arg(i + 1));
@@ -459,10 +470,9 @@ void test_one_shot_use_scatter(
         barrier.wait();
         // Write runtime into vector
         result[i] = timer.elapsed();
-        //std::cout << "locality = " << this_locality << ", runtime = " << timer.elapsed() <<std::endl;
 
         // Check for correctness
-        for (int check : recv_data)
+        for (std::size_t check : recv_data)
         {
             HPX_TEST_EQ(42 + i + this_locality, check);
         }
@@ -475,8 +485,8 @@ void test_one_shot_use_scatter(
     }
 }
 
-void test_one_shot_use_reduce(
-    int lpn, int iterations, int test_size, std::string const& operation)
+void test_one_shot_use_reduce(int lpn, std::size_t iterations, int test_size,
+    std::string const& operation)
 {
     // Get parameters
     std::size_t const num_localities =
@@ -496,12 +506,13 @@ void test_one_shot_use_reduce(
 
     for (std::size_t i = 0; i != iterations; ++i)
     {
-        send_data = std::vector<int>(test_size, i);
+        send_data = std::vector<int>(test_size, static_cast<int>(i));
 
         // Time collective
         hpx::chrono::high_resolution_timer const timer;
         if (this_locality == 0)
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             ft_data = reduce_here(reduce_direct_basename, std::move(send_data),
                 vector_adder{}, num_sites_arg(num_localities),
                 this_site_arg(this_locality), generation_arg(i + 1));
@@ -510,6 +521,7 @@ void test_one_shot_use_reduce(
         else
         {
             hpx::future<void> finished =
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 reduce_there(reduce_direct_basename, std::move(send_data),
                     this_site_arg(this_locality), generation_arg(i + 1));
             finished.get();
@@ -522,7 +534,8 @@ void test_one_shot_use_reduce(
         // Check for correctness
         if (this_locality == 0)
         {
-            HPX_TEST_EQ(i * num_localities, recv_data[0]);
+            HPX_TEST_EQ(
+                i * num_localities, static_cast<std::size_t>(recv_data[0]));
         }
     }
 
@@ -533,8 +546,8 @@ void test_one_shot_use_reduce(
     }
 }
 
-void test_one_shot_use_broadcast(
-    int lpn, int iterations, int test_size, std::string const& operation)
+void test_one_shot_use_broadcast(int lpn, std::size_t iterations, int test_size,
+    std::string const& operation)
 {
     // Get parameters
     std::size_t const num_localities =
@@ -556,7 +569,7 @@ void test_one_shot_use_broadcast(
     {
         if (this_locality == 0)
         {
-            send_data = std::vector<int>(test_size, i);
+            send_data = std::vector<int>(test_size, static_cast<int>(i));
         }
 
         // Time collective
@@ -564,6 +577,7 @@ void test_one_shot_use_broadcast(
         if (this_locality == 0)
         {
             ft_data = broadcast_to(broadcast_direct_basename,
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 std::move(send_data), num_sites_arg(num_localities),
                 this_site_arg(this_locality), generation_arg(i + 1));
         }
@@ -582,7 +596,7 @@ void test_one_shot_use_broadcast(
         // Check for correctness
         if (this_locality == 0)
         {
-            HPX_TEST_EQ(i, recv_data[0]);
+            HPX_TEST_EQ(i, static_cast<std::size_t>(recv_data[0]));
         }
     }
 
@@ -593,8 +607,8 @@ void test_one_shot_use_broadcast(
     }
 }
 
-void test_one_shot_use_gather(
-    int lpn, int iterations, int test_size, std::string const& operation)
+void test_one_shot_use_gather(int lpn, std::size_t iterations, int test_size,
+    std::string const& operation)
 {
     // Get parameters
     std::size_t const num_localities =
@@ -614,12 +628,14 @@ void test_one_shot_use_gather(
 
     for (std::size_t i = 0; i != iterations; ++i)
     {
-        send_data = std::vector<int>(test_size, i + this_locality);
+        send_data =
+            std::vector<int>(test_size, static_cast<int>(i + this_locality));
 
         // Time collective
         hpx::chrono::high_resolution_timer const timer;
         if (this_locality == 0)
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             ft_data = gather_here(gather_direct_basename, std::move(send_data),
                 num_sites_arg(num_localities), this_site_arg(this_locality),
                 generation_arg(i + 1));
@@ -628,6 +644,7 @@ void test_one_shot_use_gather(
         else
         {
             hpx::future<void> finished =
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 gather_there(gather_direct_basename, std::move(send_data),
                     this_site_arg(this_locality), generation_arg(i + 1));
             finished.get();
@@ -640,9 +657,9 @@ void test_one_shot_use_gather(
         // Check for correctness
         if (this_locality == 0)
         {
-            for (int j = 0; j < num_localities; j++)
+            for (int j = 0; j < static_cast<int>(num_localities); ++j)
             {
-                HPX_TEST_EQ(i + j, recv_data[j][0]);
+                HPX_TEST_EQ(i + j, static_cast<std::size_t>(recv_data[j][0]));
             }
         }
     }
@@ -656,8 +673,8 @@ void test_one_shot_use_gather(
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // Multi-use shot collectives
-void test_multiple_use_with_generation_scatter(
-    int lpn, int iterations, int test_size, std::string const& operation)
+void test_multiple_use_with_generation_scatter(int lpn, std::size_t iterations,
+    int test_size, std::string const& operation)
 {
     // Get parameters
     std::size_t const num_localities =
@@ -683,13 +700,15 @@ void test_multiple_use_with_generation_scatter(
     {
         if (this_locality == 0)
         {
-            send_data = generateMatrix(num_localities, test_size, 42 + i);
+            send_data = generate_matrix(static_cast<int>(num_localities),
+                test_size, static_cast<int>(42 + i));
         }
 
         // Time collective
         hpx::chrono::high_resolution_timer const timer;
         if (this_locality == 0)
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             ft_data = scatter_to(scatter_direct_client, std::move(send_data),
                 generation_arg(i + 1));
         }
@@ -705,7 +724,7 @@ void test_multiple_use_with_generation_scatter(
         result[i] = timer.elapsed();
 
         // Check for correctness
-        for (int check : recv_data)
+        for (std::size_t check : recv_data)
         {
             HPX_TEST_EQ(42 + i + this_locality, check);
         }
@@ -718,8 +737,8 @@ void test_multiple_use_with_generation_scatter(
     }
 }
 
-void test_multiple_use_with_generation_reduce(
-    int lpn, int iterations, int test_size, std::string const& operation)
+void test_multiple_use_with_generation_reduce(int lpn, std::size_t iterations,
+    int test_size, std::string const& operation)
 {
     // Get parameters
     std::size_t const num_localities =
@@ -743,12 +762,13 @@ void test_multiple_use_with_generation_reduce(
 
     for (std::size_t i = 0; i != iterations; ++i)
     {
-        send_data = std::vector<int>(test_size, i);
+        send_data = std::vector<int>(test_size, static_cast<int>(i));
 
         // Time collective
         hpx::chrono::high_resolution_timer const timer;
         if (this_locality == 0)
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             ft_data = reduce_here(reduce_direct_client, std::move(send_data),
                 vector_adder{}, generation_arg(i + 1));
             recv_data = ft_data.get();
@@ -756,6 +776,7 @@ void test_multiple_use_with_generation_reduce(
         else
         {
             hpx::future<void> finished = reduce_there(reduce_direct_client,
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 std::move(send_data), generation_arg(i + 1));
             finished.get();
         }
@@ -767,7 +788,8 @@ void test_multiple_use_with_generation_reduce(
         // Check for correctness
         if (this_locality == 0)
         {
-            HPX_TEST_EQ(i * num_localities, recv_data[0]);
+            HPX_TEST_EQ(
+                i * num_localities, static_cast<std::size_t>(recv_data[0]));
         }
     }
 
@@ -778,8 +800,8 @@ void test_multiple_use_with_generation_reduce(
     }
 }
 
-void test_multiple_use_with_generation_broadcast(
-    int lpn, int iterations, int test_size, std::string const& operation)
+void test_multiple_use_with_generation_broadcast(int lpn,
+    std::size_t iterations, int test_size, std::string const& operation)
 {
     // Get parameters
     std::size_t const num_localities =
@@ -805,7 +827,7 @@ void test_multiple_use_with_generation_broadcast(
     {
         if (this_locality == 0)
         {
-            send_data = std::vector<int>(test_size, i);
+            send_data = std::vector<int>(test_size, static_cast<int>(i));
         }
 
         // Time collective
@@ -813,6 +835,7 @@ void test_multiple_use_with_generation_broadcast(
         if (this_locality == 0)
         {
             ft_data = broadcast_to(broadcast_direct_client,
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 std::move(send_data), generation_arg(i + 1));
         }
         else
@@ -829,7 +852,7 @@ void test_multiple_use_with_generation_broadcast(
         // Check for correctness
         if (this_locality == 0)
         {
-            HPX_TEST_EQ(i, recv_data[0]);
+            HPX_TEST_EQ(i, static_cast<std::size_t>(recv_data[0]));
         }
     }
 
@@ -841,7 +864,7 @@ void test_multiple_use_with_generation_broadcast(
 }
 
 void test_multiple_use_with_generation_gather(
-    int lpn, int iterations, int test_size, std::string operation)
+    int lpn, std::size_t iterations, int test_size, std::string operation)
 {
     // Get parameters
     std::size_t const num_localities =
@@ -865,12 +888,14 @@ void test_multiple_use_with_generation_gather(
 
     for (std::size_t i = 0; i != iterations; ++i)
     {
-        send_data = std::vector<int>(test_size, i + this_locality);
+        send_data =
+            std::vector<int>(test_size, static_cast<int>(i + this_locality));
 
         // Time collective
         hpx::chrono::high_resolution_timer const timer;
         if (this_locality == 0)
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             ft_data = gather_here(gather_direct_client, std::move(send_data),
                 generation_arg(i + 1));
             recv_data = ft_data.get();
@@ -878,6 +903,7 @@ void test_multiple_use_with_generation_gather(
         else
         {
             hpx::future<void> finished = gather_there(gather_direct_client,
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 std::move(send_data), generation_arg(i + 1));
             finished.get();
         }
@@ -889,9 +915,9 @@ void test_multiple_use_with_generation_gather(
         // Check for correctness
         if (this_locality == 0)
         {
-            for (int j = 0; j < num_localities; j++)
+            for (int j = 0; j < static_cast<int>(num_localities); ++j)
             {
-                HPX_TEST_EQ(i + j, recv_data[j][0]);
+                HPX_TEST_EQ(i + j, static_cast<std::size_t>(recv_data[j][0]));
             }
         }
     }
@@ -985,7 +1011,7 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()
         ("arity", value<int>()->default_value(-1), "Arity of the operation")
         ("lpn", value<int>()->default_value(2),
-            "Number of localities per Node")     
+            "Number of localities per Node")
         ("test_size", value<int>()->default_value(2),
             "Number of Integers One Locality receives")
         ("iterations", value<int>()->default_value(10),

@@ -23,9 +23,9 @@ using namespace hpx::collectives;
 constexpr char const* broadcast_direct_basename =
     "/test/broadcast_hierarchical/";
 #if defined(HPX_DEBUG)
-constexpr int ITERATIONS = 100;
+constexpr int ITERATIONS = 50;
 #else
-constexpr int ITERATIONS = 1000;
+constexpr int ITERATIONS = 500;
 #endif
 
 void test_multiple_use(int arity = 2)
@@ -38,6 +38,8 @@ void test_multiple_use(int arity = 2)
     auto const broadcast_clients = create_hierarchical_communicator(
         broadcast_direct_basename, num_sites_arg(num_localities),
         this_site_arg(here), arity_arg(arity));
+
+    hpx::chrono::high_resolution_timer const t;
 
     // test functionality based on immediate local result value
     for (std::uint32_t i = 0; i != ITERATIONS; ++i)
@@ -57,6 +59,13 @@ void test_multiple_use(int arity = 2)
 
             HPX_TEST_EQ(i + 42, result.get());
         }
+    }
+
+    auto const elapsed = t.elapsed();
+    if (here == 0)
+    {
+        std::cout << "remote timing: " << elapsed / ITERATIONS << "[s]\n"
+                  << std::flush;
     }
 }
 
@@ -95,7 +104,9 @@ void test_multiple_use_with_generation(int arity = 2)
     auto const elapsed = t.elapsed();
     if (here == 0)
     {
-        std::cout << "remote timing: " << elapsed / ITERATIONS << "[s]\n";
+        std::cout << "remote timing (with generation): " << elapsed / ITERATIONS
+                  << "[s]\n"
+                  << std::flush;
     }
 }
 
@@ -139,8 +150,9 @@ void test_local_use(std::uint32_t num_sites, int arity)
             auto const elapsed = t.elapsed();
             if (site == 0)
             {
-                std::cout << "local timing: " << elapsed / (10 * ITERATIONS)
-                          << "[s]\n";
+                std::cout << "local timing (" << num_sites << "/" << arity
+                          << "): " << elapsed / (10 * ITERATIONS) << "[s]\n"
+                          << std::flush;
             }
         }));
     }
@@ -160,8 +172,22 @@ int hpx_main()
 
     if (hpx::get_locality_id() == 0)
     {
-        test_local_use(16, 2);
-        test_local_use(16, 4);
+        for (auto num_localities : {2, 4, 8, 16, 32, 64})
+        {
+            test_local_use(num_localities, 2);
+            if (num_localities >= 4)
+            {
+                test_local_use(num_localities, 4);
+                if (num_localities >= 8)
+                {
+                    test_local_use(num_localities, 8);
+                    if (num_localities >= 16)
+                    {
+                        test_local_use(num_localities, 16);
+                    }
+                }
+            }
+        }
     }
 
     return hpx::finalize();

@@ -1,4 +1,5 @@
 //  Copyright (c) 2020-2025 Hartmut Kaiser
+//  Copyright (c) 2025 Lukas Zeil
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,11 +26,13 @@
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -370,17 +373,16 @@ namespace hpx::collectives {
     ///////////////////////////////////////////////////////////////////////////
     namespace {
 
-        std::vector<hpx::tuple<communicator, this_site_arg>>
-        recursively_fill_communicators(
-            std::vector<hpx::tuple<communicator, this_site_arg>> communicators,
-            std::size_t left, std::size_t right, std::string basename,
-            arity_arg arity, int max_depth, this_site_arg this_site,
-            num_sites_arg num_sites, generation_arg generation)
+        void recursively_fill_communicators(
+            std::vector<hpx::tuple<communicator, this_site_arg>>& communicators,
+            std::size_t left, std::size_t right, std::string const& basename,
+            arity_arg arity, this_site_arg this_site, num_sites_arg num_sites,
+            generation_arg generation)
         {
             std::string name(basename);
             name += std::to_string(left) + "-" + std::to_string(right) + "/";
 
-            if (right - left < arity || max_depth == 0)
+            if (right - left < arity)
             {
                 auto c = create_communicator(name.c_str(),
                     num_sites_arg(right - left + 1),
@@ -389,14 +391,13 @@ namespace hpx::collectives {
 
                 communicators.emplace_back(
                     HPX_MOVE(c), this_site_arg(this_site - left));
-                return communicators;
+                return;
             }
 
-            float division_steps = (right - left + 1) / arity;
+            std::size_t division_steps = (right - left + 1) / arity;
             for (std::size_t i = 0; i != arity; ++i)
             {
-                std::size_t current_left =
-                    left + static_cast<std::size_t>(division_steps * i);
+                std::size_t current_left = left + division_steps * i;
                 if (this_site == current_left)
                 {
                     auto c = create_communicator(name.c_str(),
@@ -406,34 +407,16 @@ namespace hpx::collectives {
                     communicators.emplace_back(HPX_MOVE(c), this_site_arg(i));
                 }
 
-                std::size_t current_right = left +
-                    static_cast<std::size_t>(division_steps * (i + 1) - 1);
-                if (current_right > right)
-                {
-                    current_right = right;
-                }
-
+                std::size_t current_right =
+                    (std::min) (current_left + division_steps - 1, right);
                 if (this_site >= current_left && this_site < current_right + 1)
                 {
-                    return recursively_fill_communicators(
-                        HPX_MOVE(communicators), current_left, current_right,
-                        HPX_MOVE(basename), arity, max_depth - 1, this_site,
-                        num_sites, generation);
+                    recursively_fill_communicators(communicators, current_left,
+                        current_right, basename, arity, this_site, num_sites,
+                        generation);
+                    break;
                 }
             }
-            return communicators;
-        }
-
-        hierarchical_communicator fill_communicators(std::size_t left,
-            std::size_t right, std::string basename, arity_arg arity,
-            int max_depth, this_site_arg this_site, num_sites_arg num_sites,
-            generation_arg generation)
-        {
-            std::vector<hpx::tuple<communicator, this_site_arg>> communicators;
-            return {recursively_fill_communicators(HPX_MOVE(communicators),
-                        left, right, HPX_MOVE(basename), arity, max_depth,
-                        this_site, num_sites, generation),
-                arity};
         }
     }    // namespace
 
@@ -468,8 +451,23 @@ namespace hpx::collectives {
             name += std::to_string(generation) + "/";
         }
 
-        return fill_communicators(0, num_sites - 1, HPX_MOVE(name), arity, -1,
-            this_site, num_sites, generation);
+        std::vector<hpx::tuple<communicator, this_site_arg>> communicators;
+        recursively_fill_communicators(communicators, 0, num_sites - 1, name,
+            arity, this_site, num_sites, generation);
+        return hierarchical_communicator(
+            HPX_MOVE(communicators), arity, root_site, num_sites, this_site);
+    }
+
+    hpx::tuple<num_sites_arg, this_site_arg, root_site_arg>
+    hierarchical_communicator::get_info_ex() const noexcept
+    {
+        return hpx::make_tuple(num_sites, this_site, root_site);
+    }
+
+    hpx::tuple<num_sites_arg, this_site_arg>
+    hierarchical_communicator::get_info() const noexcept
+    {
+        return hpx::make_tuple(num_sites, this_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////

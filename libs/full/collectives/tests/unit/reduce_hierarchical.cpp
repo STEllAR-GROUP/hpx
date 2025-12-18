@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2024 Hartmut Kaiser
+//  Copyright (c) 2019-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,9 +22,9 @@ using namespace hpx::collectives;
 
 constexpr char const* reduce_direct_basename = "/test/reduce_hierarchical/";
 #if defined(HPX_DEBUG)
-constexpr int ITERATIONS = 100;
+constexpr int ITERATIONS = 50;
 #else
-constexpr int ITERATIONS = 1000;
+constexpr int ITERATIONS = 500;
 #endif
 
 void test_multiple_use(int arity = 2)
@@ -37,6 +37,8 @@ void test_multiple_use(int arity = 2)
     auto const reduce_clients = create_hierarchical_communicator(
         reduce_direct_basename, num_sites_arg(num_localities),
         this_site_arg(this_locality), arity_arg(arity));
+
+    hpx::chrono::high_resolution_timer const t;
 
     // test functionality based on immediate local result value
     for (int i = 0; i != ITERATIONS; ++i)
@@ -60,6 +62,13 @@ void test_multiple_use(int arity = 2)
                 reduce_clients, std::move(value), std::plus<std::uint32_t>{});
             overall_result.get();
         }
+    }
+
+    auto const elapsed = t.elapsed();
+    if (this_locality == 0)
+    {
+        std::cout << "remote timing: " << elapsed / ITERATIONS << "[s]\n"
+                  << std::flush;
     }
 }
 
@@ -104,7 +113,9 @@ void test_multiple_use_with_generation(int arity = 2)
     auto const elapsed = t.elapsed();
     if (this_locality == 0)
     {
-        std::cout << "remote timing: " << elapsed / ITERATIONS << "[s]\n";
+        std::cout << "remote timing (with generation): " << elapsed / ITERATIONS
+                  << "[s]\n"
+                  << std::flush;
     }
 }
 
@@ -152,8 +163,9 @@ void test_local_use(std::uint32_t num_sites, int arity = 2)
             auto const elapsed = t.elapsed();
             if (site == 0)
             {
-                std::cout << "local timing: " << elapsed / (10 * ITERATIONS)
-                          << "[s]\n";
+                std::cout << "local timing (" << num_sites << "/" << arity
+                          << "): " << elapsed / (10 * ITERATIONS) << "[s]\n"
+                          << std::flush;
             }
         }));
     }
@@ -173,8 +185,22 @@ int hpx_main()
 
     if (hpx::get_locality_id() == 0)
     {
-        test_local_use(16, 2);
-        test_local_use(16, 4);
+        for (auto num_localities : {2, 4, 8, 16, 32, 64})
+        {
+            test_local_use(num_localities, 2);
+            if (num_localities >= 4)
+            {
+                test_local_use(num_localities, 4);
+                if (num_localities >= 8)
+                {
+                    test_local_use(num_localities, 8);
+                    if (num_localities >= 16)
+                    {
+                        test_local_use(num_localities, 16);
+                    }
+                }
+            }
+        }
     }
 
     return hpx::finalize();
