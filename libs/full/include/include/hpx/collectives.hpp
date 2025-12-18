@@ -12,7 +12,6 @@
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/broadcast.hpp>
 #include <hpx/collectives/channel_communicator.hpp>
-#include <hpx/collectives/communication_set.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/collectives/exclusive_scan.hpp>
 #include <hpx/collectives/gather.hpp>
