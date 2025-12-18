@@ -45,7 +45,7 @@ struct mult_functor
 template <typename Pair>
 struct select1st_
 {
-    const typename Pair::first_type& operator()(const Pair& x) const
+    typename Pair::first_type const& operator()(Pair const& x) const
     {
         return x.first;
     }
@@ -109,7 +109,7 @@ public:
     }
 
     template <typename V2>
-    ptr_iterator(const ptr_iterator<V2>& x,
+    ptr_iterator(ptr_iterator<V2> const& x,
         typename std::enable_if<std::is_convertible<V2*, V*>::value>::type* =
             nullptr)
       : base_adaptor_type(x.base())
@@ -183,7 +183,7 @@ int main()
     tests::dummy_type array[] = {tests::dummy_type(0), tests::dummy_type(1),
         tests::dummy_type(2), tests::dummy_type(3), tests::dummy_type(4),
         tests::dummy_type(5)};
-    const int N = sizeof(array) / sizeof(tests::dummy_type);
+    int const N = sizeof(array) / sizeof(tests::dummy_type);
 
     // sanity check, if this doesn't pass the test is buggy
     tests::random_access_iterator_test(array, N, array);
@@ -193,7 +193,7 @@ int main()
         ptr_iterator<tests::dummy_type> i(array);
         tests::random_access_iterator_test(i, N, array);
 
-        ptr_iterator<const tests::dummy_type> j(array);
+        ptr_iterator<tests::dummy_type const> j(array);
         tests::random_access_iterator_test(j, N, array);
         tests::const_nonconst_iterator_test(i, ++j);
     }
@@ -217,7 +217,7 @@ int main()
         // Test computation of default when the Value is const
         typedef ptr_iterator<int const> Iter1;
         HPX_TEST((std::is_same<Iter1::value_type, int>::value));
-        HPX_TEST((std::is_same<Iter1::reference, const int&>::value));
+        HPX_TEST((std::is_same<Iter1::reference, int const&>::value));
 
         //HPX_TEST(boost::is_readable_iterator<Iter1>::value);
         //HPX_TEST(boost::is_lvalue_iterator<Iter1>::value);
@@ -253,7 +253,7 @@ int main()
         ptr_iterator<tests::dummy_type> i(array);
         tests::random_access_iterator_test(i, N, array);
 
-        ptr_iterator<const tests::dummy_type> j(array);
+        ptr_iterator<tests::dummy_type const> j(array);
         tests::random_access_iterator_test(j, N, array);
         tests::const_nonconst_iterator_test(i, ++j);
     }

@@ -13,7 +13,7 @@
 
 #include <cstddef>
 
-std::ostream& operator<<(std::ostream& os, const vector_t& x)
+std::ostream& operator<<(std::ostream& os, vector_t const& x)
 {
     os << "[";
     for (std::ptrdiff_t i = 0; i < x.N; ++i)
@@ -47,7 +47,7 @@ matrix_t::matrix_t(std::initializer_list<std::initializer_list<double>> a)
     }
 }
 
-std::ostream& operator<<(std::ostream& os, const matrix_t& a)
+std::ostream& operator<<(std::ostream& os, matrix_t const& a)
 {
     os << "[";
     for (std::ptrdiff_t i = 0; i < a.NI; ++i)

@@ -51,17 +51,17 @@ namespace hpx::parcelset {
         using send_immediate_parcels = std::false_type;
         using is_connectionless = std::false_type;
 
-        static constexpr const char* type() noexcept
+        static constexpr char const* type() noexcept
         {
             return "tcp";
         }
 
-        static constexpr const char* pool_name() noexcept
+        static constexpr char const* pool_name() noexcept
         {
             return "parcel-pool-tcp";
         }
 
-        static constexpr const char* pool_name_postfix() noexcept
+        static constexpr char const* pool_name_postfix() noexcept
         {
             return "-tcp";
         }

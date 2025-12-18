@@ -36,7 +36,7 @@ public slots:
 
     void run_clicked(bool);
 
-    void add_label(const QString& text);
+    void add_label(QString const& text);
 
 private:
     std::size_t no_threads;

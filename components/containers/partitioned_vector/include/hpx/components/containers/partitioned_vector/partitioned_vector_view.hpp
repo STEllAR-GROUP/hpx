@@ -206,6 +206,6 @@ namespace hpx {
         std::array<std::size_t, N + 1> sw_basis_, hw_basis_;
         segment_iterator begin_, end_;
         const_segment_iterator cbegin_, cend_;
-        std::reference_wrapper<const hpx::lcos::spmd_block> block_;
+        std::reference_wrapper<hpx::lcos::spmd_block const> block_;
     };
 }    // namespace hpx

@@ -139,32 +139,32 @@ struct iterator
         return copy -= n;
     }
 
-    bool operator==(const iterator& that) const
+    bool operator==(iterator const& that) const
     {
         return this->state == that.state;
     }
 
-    bool operator!=(const iterator& that) const
+    bool operator!=(iterator const& that) const
     {
         return this->state != that.state;
     }
 
-    bool operator<(const iterator& that) const
+    bool operator<(iterator const& that) const
     {
         return this->state < that.state;
     }
 
-    bool operator<=(const iterator& that) const
+    bool operator<=(iterator const& that) const
     {
         return this->state <= that.state;
     }
 
-    bool operator>(const iterator& that) const
+    bool operator>(iterator const& that) const
     {
         return this->state > that.state;
     }
 
-    bool operator>=(const iterator& that) const
+    bool operator>=(iterator const& that) const
     {
         return this->state >= that.state;
     }

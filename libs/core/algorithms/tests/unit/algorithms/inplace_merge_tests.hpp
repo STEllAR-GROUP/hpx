@@ -93,13 +93,13 @@ struct user_defined_type
         return t;
     }
 
-    static const std::vector<std::string> name_list;
+    static std::vector<std::string> const name_list;
 
     int val;
     std::string name;
 };
 
-const std::vector<std::string> user_defined_type::name_list{
+std::vector<std::string> const user_defined_type::name_list{
     "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"};
 
 struct random_fill
@@ -565,25 +565,25 @@ void test_inplace_merge()
     ////////// Test cases for 'int' type.
     test_inplace_merge(
         IteratorTag(), int(),
-        [](const unsigned int a, const unsigned int b) -> bool {
+        [](unsigned int const a, unsigned int const b) -> bool {
             return a < b;
         },
         rand_base);
     test_inplace_merge(
         seq, IteratorTag(), int(),
-        [](const unsigned int a, const unsigned int b) -> bool {
+        [](unsigned int const a, unsigned int const b) -> bool {
             return a < b;
         },
         rand_base);
     test_inplace_merge(
         par, IteratorTag(), int(),
-        [](const unsigned int a, const unsigned int b) -> bool {
+        [](unsigned int const a, unsigned int const b) -> bool {
             return a < b;
         },
         rand_base);
     test_inplace_merge(
         par_unseq, IteratorTag(), int(),
-        [](const unsigned int a, const unsigned int b) -> bool {
+        [](unsigned int const a, unsigned int const b) -> bool {
             return a > b;
         },
         rand_base);
@@ -617,13 +617,13 @@ void test_inplace_merge()
     ////////// Asynchronous test cases for 'int' type.
     test_inplace_merge_async(
         seq(task), IteratorTag(), int(),
-        [](const unsigned int a, const unsigned int b) -> bool {
+        [](unsigned int const a, unsigned int const b) -> bool {
             return a > b;
         },
         rand_base);
     test_inplace_merge_async(
         par(task), IteratorTag(), int(),
-        [](const unsigned int a, const unsigned int b) -> bool {
+        [](unsigned int const a, unsigned int const b) -> bool {
             return a > b;
         },
         rand_base);

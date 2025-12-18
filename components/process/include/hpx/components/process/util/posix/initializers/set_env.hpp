@@ -34,7 +34,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
                 env_[0] = nullptr;
             }
 
-            explicit set_env_(const Range& envs)
+            explicit set_env_(Range const& envs)
             {
                 string_env_.resize(envs.size());
                 env_.resize(envs.size() + 1);
@@ -81,7 +81,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
         };
 
         template <class Range>
-        set_env_<Range> set_env(const Range& envs)
+        set_env_<Range> set_env(Range const& envs)
         {
             return set_env_<Range>(envs);
         }

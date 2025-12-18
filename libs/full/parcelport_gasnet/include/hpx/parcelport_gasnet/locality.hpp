@@ -36,7 +36,7 @@ namespace hpx::parcelset::policies::gasnet {
             return static_cast<std::int32_t>(rank_);
         }
 
-        static constexpr const char* type() noexcept
+        static constexpr char const* type() noexcept
         {
             return "gasnet";
         }

@@ -192,7 +192,7 @@ void test5()
             N = -1;
         }
 
-        bool operator<(const forensic& f) const
+        bool operator<(forensic const& f) const
         {
             return (N < f.N);
         }

@@ -31,7 +31,7 @@ struct point_member_serialization
     // Second argument exists solely for compatibility with boost serialize
     // it is NOT processed by HPX in any way.
     template <typename Archive>
-    void serialize(Archive& ar, const unsigned int)
+    void serialize(Archive& ar, unsigned int const)
     {
         // clang-format off
         ar & x & y;
@@ -50,7 +50,7 @@ struct rectangle_member_serialization
     point_member_serialization lower_right;
 
     template <typename Archive>
-    void serialize(Archive& ar, const unsigned int)
+    void serialize(Archive& ar, unsigned int const)
     {
         // clang-format off
         ar & top_left & lower_right;
@@ -67,7 +67,7 @@ struct rectangle_free
 };
 
 template <typename Archive>
-void serialize(Archive& ar, rectangle_free& pt, const unsigned int)
+void serialize(Archive& ar, rectangle_free& pt, unsigned int const)
 {
     // clang-format off
     ar & pt.lower_right & pt.top_left;
@@ -103,7 +103,7 @@ private:
 };
 
 template <typename Archive>
-void load(Archive& ar, point_class& pt, const unsigned int)
+void load(Archive& ar, point_class& pt, unsigned int const)
 {
     int x, y;
     ar >> x >> y;
@@ -111,7 +111,7 @@ void load(Archive& ar, point_class& pt, const unsigned int)
 }
 
 template <typename Archive>
-void save(Archive& ar, point_class const& pt, const unsigned int)
+void save(Archive& ar, point_class const& pt, unsigned int const)
 {
     ar << pt.get_x() << pt.get_y();
 }
@@ -155,7 +155,7 @@ private:
     // Provides serialization access to HPX
     friend class hpx::serialization::access;
     template <class Archive>
-    void serialize(Archive&, const unsigned int)
+    void serialize(Archive&, unsigned int const)
     {
         // Serialization will be done in the save_construct_data
         // Still needs to be defined
@@ -168,14 +168,14 @@ private:
 //[save_construct_data
 template <class Archive>
 inline void save_construct_data(Archive& ar,
-    planet_weight_calculator const* weight_calc, const unsigned int)
+    planet_weight_calculator const* weight_calc, unsigned int const)
 {
     ar << weight_calc->g;    // Do all of your serialization here
 }
 
 template <class Archive>
 inline void load_construct_data(
-    Archive& ar, planet_weight_calculator* weight_calc, const unsigned int)
+    Archive& ar, planet_weight_calculator* weight_calc, unsigned int const)
 {
     double g;
     ar >> g;

@@ -64,9 +64,9 @@ struct user_defined_type
             return this->val < t.val;
     }
 
-    const user_defined_type& operator++()
+    user_defined_type const& operator++()
     {
-        static const std::vector<std::string> name_list = {
+        static std::vector<std::string> const name_list = {
             "ABB", "ABC", "ACB", "BCA", "CAA", "CAAA", "CAAB"};
         std::uniform_int_distribution<> dist(
             0, static_cast<int>(name_list.size() - 1));

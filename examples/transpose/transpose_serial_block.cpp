@@ -88,11 +88,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
         {
             for (std::uint64_t phase = 0; phase < num_blocks; ++phase)
             {
-                const std::uint64_t block_size = block_order * block_order;
-                const std::uint64_t from_block = phase;
-                const std::uint64_t from_phase = b;
-                const std::uint64_t A_offset = from_phase * block_size;
-                const std::uint64_t B_offset = phase * block_size;
+                std::uint64_t const block_size = block_order * block_order;
+                std::uint64_t const from_block = phase;
+                std::uint64_t const from_phase = b;
+                std::uint64_t const A_offset = from_phase * block_size;
+                std::uint64_t const B_offset = phase * block_size;
                 transpose(&A[from_block][A_offset], &B[b][B_offset],
                     block_order, tile_size);
             }

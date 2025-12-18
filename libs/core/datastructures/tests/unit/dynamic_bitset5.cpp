@@ -28,7 +28,7 @@ private:
     friend class hpx::serialization::access;
 
     template <class Archive>
-    void serialize(Archive& ar, unsigned const int)
+    void serialize(Archive& ar, unsigned int const)
     {
         // clang-format off
         ar & x;

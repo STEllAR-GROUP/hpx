@@ -1168,7 +1168,7 @@ namespace hpx { namespace agas {
             naming::address const& addr, std::uint64_t count = 0,
             std::uint64_t offset = 0, error_code& ec = throws)
         {
-            const gva g(
+            gva const g(
                 addr.locality_, addr.type_, count, addr.address_, offset);
             update_cache_entry(gid, g, ec);
         }

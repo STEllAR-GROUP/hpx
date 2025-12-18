@@ -66,7 +66,7 @@ void required_throw_test()
     }
 }
 
-void simple_required_test(const char* config_file)
+void simple_required_test(char const* config_file)
 {
     options_description opts;
     // clang-format off

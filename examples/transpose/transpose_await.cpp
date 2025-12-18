@@ -154,13 +154,13 @@ struct block : hpx::components::client_base<block, block_component>
     typedef hpx::components::client_base<block, block_component> base_type;
     block() {}
 
-    block(std::uint64_t id, const char* base_name)
+    block(std::uint64_t id, char const* base_name)
       : base_type(hpx::find_from_basename(base_name, id))
     {
         get_id();
     }
 
-    block(std::uint64_t id, std::uint64_t size, const char* base_name)
+    block(std::uint64_t id, std::uint64_t size, char const* base_name)
       : base_type(hpx::new_<block_component>(hpx::find_here(), size))
     {
         hpx::register_with_basename(base_name, get_id(), id);
@@ -202,14 +202,14 @@ hpx::future<sub_block> transpose_phase(std::vector<block> const& A,
     std::uint64_t num_blocks, std::uint64_t /* num_local_blocks */,
     std::uint64_t block_size, std::uint64_t tile_size)
 {
-    const std::uint64_t from_phase = b;
-    const std::uint64_t A_offset = from_phase * block_size;
+    std::uint64_t const from_phase = b;
+    std::uint64_t const A_offset = from_phase * block_size;
 
     auto phase_range = hpx::util::counting_shape(num_blocks);
     for (std::uint64_t phase : phase_range)
     {
-        const std::uint64_t from_block = phase;
-        const std::uint64_t B_offset = phase * block_size;
+        std::uint64_t const from_block = phase;
+        std::uint64_t const B_offset = phase * block_size;
 
         hpx::future<sub_block> from =
             A[from_block].get_sub_block(A_offset, block_size);
@@ -321,7 +321,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
             auto range = hpx::util::counting_shape(blocks_start, blocks_end);
 
-            const std::uint64_t block_size = block_order * block_order;
+            std::uint64_t const block_size = block_order * block_order;
             for_each(par, range, [&](std::uint64_t b) {
                 transpose_phase(A, B, block_order, b, num_blocks,
                     num_local_blocks, block_size, tile_size)

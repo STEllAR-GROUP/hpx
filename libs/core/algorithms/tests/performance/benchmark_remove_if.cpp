@@ -62,7 +62,7 @@ struct vector_type
     }
 
     std::vector<int> vec_;
-    static const std::size_t vec_size_{30};
+    static std::size_t const vec_size_{30};
 };
 
 struct array_type
@@ -79,7 +79,7 @@ struct array_type
         return arr_ == t.arr_;
     }
 
-    static const std::size_t arr_size_{30};
+    static std::size_t const arr_size_{30};
     std::array<int, arr_size_> arr_;
 };
 

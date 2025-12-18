@@ -126,38 +126,38 @@ namespace test {
             return *this;
         }
 
-        friend bool operator==(const movable_and_copyable_int& l,
-            const movable_and_copyable_int& r) noexcept
+        friend bool operator==(movable_and_copyable_int const& l,
+            movable_and_copyable_int const& r) noexcept
         {
             return l.int_ == r.int_;
         }
 
-        friend bool operator!=(const movable_and_copyable_int& l,
-            const movable_and_copyable_int& r) noexcept
+        friend bool operator!=(movable_and_copyable_int const& l,
+            movable_and_copyable_int const& r) noexcept
         {
             return l.int_ != r.int_;
         }
 
-        friend bool operator<(const movable_and_copyable_int& l,
-            const movable_and_copyable_int& r) noexcept
+        friend bool operator<(movable_and_copyable_int const& l,
+            movable_and_copyable_int const& r) noexcept
         {
             return l.int_ < r.int_;
         }
 
-        friend bool operator<=(const movable_and_copyable_int& l,
-            const movable_and_copyable_int& r) noexcept
+        friend bool operator<=(movable_and_copyable_int const& l,
+            movable_and_copyable_int const& r) noexcept
         {
             return l.int_ <= r.int_;
         }
 
-        friend bool operator>=(const movable_and_copyable_int& l,
-            const movable_and_copyable_int& r) noexcept
+        friend bool operator>=(movable_and_copyable_int const& l,
+            movable_and_copyable_int const& r) noexcept
         {
             return l.int_ >= r.int_;
         }
 
-        friend bool operator>(const movable_and_copyable_int& l,
-            const movable_and_copyable_int& r) noexcept
+        friend bool operator>(movable_and_copyable_int const& l,
+            movable_and_copyable_int const& r) noexcept
         {
             return l.int_ > r.int_;
         }
@@ -168,13 +168,13 @@ namespace test {
         }
 
         friend bool operator==(
-            const movable_and_copyable_int& l, int r) noexcept
+            movable_and_copyable_int const& l, int r) noexcept
         {
             return l.get_int() == r;
         }
 
         friend bool operator==(
-            int l, const movable_and_copyable_int& r) noexcept
+            int l, movable_and_copyable_int const& r) noexcept
         {
             return l == r.get_int();
         }

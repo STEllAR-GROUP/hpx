@@ -205,21 +205,21 @@ namespace hpx::execution::experimental {
             else
             {
                 using size_type = decltype(util::size(shape));
-                const size_type shape_size = util::size(shape);
+                size_type const shape_size = util::size(shape);
 
                 using result_vector_type = std::vector<result_type>;
                 result_vector_type result_vector(shape_size);
 
-                auto f_wrapper = [](const size_type i,
+                auto f_wrapper = [](size_type const i,
                                      result_vector_type& result_vector,
-                                     const S& shape, F& f, Ts&... ts) {
+                                     S const& shape, F& f, Ts&... ts) {
                     auto it = util::begin(shape);
                     std::advance(it, i);
                     result_vector[i] = HPX_INVOKE(f, *it, ts...);
                 };
 
                 auto get_result = [](result_vector_type&& result_vector,
-                                      const S&, F&&, Ts&&...) {
+                                      S const&, F&&, Ts&&...) {
                     return HPX_MOVE(result_vector);
                 };
 

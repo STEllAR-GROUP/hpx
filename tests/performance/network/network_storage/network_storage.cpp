@@ -230,9 +230,9 @@ class pointer_allocator
 public:
     typedef T value_type;
     typedef T* pointer;
-    typedef const T* const_pointer;
+    typedef T const* const_pointer;
     typedef T& reference;
-    typedef const T& const_reference;
+    typedef T const& const_reference;
     typedef std::size_t size_type;
     typedef std::ptrdiff_t difference_type;
 
@@ -316,7 +316,7 @@ alive_map keep_alive_buffers;
 
 //
 void async_callback(
-    const uint64_t index, std::error_code const&, hpx::parcelset::parcel const&)
+    uint64_t const index, std::error_code const&, hpx::parcelset::parcel const&)
 {
     scoped_lock lock(keep_alive_mutex);
     DEBUG_OUTPUT(7, "Async callback triggered for index " << index);

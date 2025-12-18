@@ -90,13 +90,13 @@ struct user_defined_type
         return this->val != rand_no;
     }
 
-    static const std::vector<std::string> name_list;
+    static std::vector<std::string> const name_list;
 
     int val;
     std::string name;
 };
 
-const std::vector<std::string> user_defined_type::name_list{
+std::vector<std::string> const user_defined_type::name_list{
     "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"};
 
 struct random_fill
@@ -406,19 +406,19 @@ void test_unique_copy()
     ////////// Test cases for 'int' type.
     test_unique_copy(
         IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a == b; }, rand_base);
+        [](int const a, int const b) -> bool { return a == b; }, rand_base);
     test_unique_copy(
         seq, IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a == b; }, rand_base);
+        [](int const a, int const b) -> bool { return a == b; }, rand_base);
     test_unique_copy(
         par, IteratorTag(), int(),
-        [rand_base](const int a, const int b) -> bool {
+        [rand_base](int const a, int const b) -> bool {
             return a == b && b == rand_base;
         },
         rand_base);
     test_unique_copy(
         par_unseq, IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a == b; }, rand_base);
+        [](int const a, int const b) -> bool { return a == b; }, rand_base);
 
     ////////// Test cases for user defined type.
     test_unique_copy(
@@ -448,13 +448,13 @@ void test_unique_copy()
     ////////// Asynchronous test cases for 'int' type.
     test_unique_copy_async(
         seq(task), IteratorTag(), int(),
-        [rand_base](const int a, const int b) -> bool {
+        [rand_base](int const a, int const b) -> bool {
             return a == b && b == rand_base;
         },
         rand_base);
     test_unique_copy_async(
         par(task), IteratorTag(), int(),
-        [](const int a, const int b) -> bool { return a == b; }, rand_base);
+        [](int const a, int const b) -> bool { return a == b; }, rand_base);
 
     ////////// Asynchronous test cases for user defined type.
     test_unique_copy_async(
@@ -472,7 +472,7 @@ void test_unique_copy()
     ////////// Corner test cases.
     test_unique_copy(
         par, IteratorTag(), int(),
-        [](const int, const int) -> bool { return true; }, rand_base);
+        [](int const, int const) -> bool { return true; }, rand_base);
     test_unique_copy(
         par_unseq, IteratorTag(), user_defined_type(),
         [](user_defined_type const&, user_defined_type const&) -> bool {

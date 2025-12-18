@@ -28,7 +28,7 @@ struct non_default_ctor
     }
 
     template <typename Archive>
-    void serialize(Archive& ar, const unsigned int)
+    void serialize(Archive& ar, unsigned int const)
     {
         // clang-format off
         ar & i;
@@ -37,7 +37,7 @@ struct non_default_ctor
 
     template <class Archive>
     void friend load_construct_data(
-        Archive&, non_default_ctor* p, const unsigned int)
+        Archive&, non_default_ctor* p, unsigned int const)
     {
         ::new (p) non_default_ctor(0);
     }

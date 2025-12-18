@@ -41,7 +41,7 @@ void cv_wait(hpx::stop_token stoken, int /* id */, bool& ready,
         HPX_TEST(!stoken.stop_requested());
         HPX_TEST(notify_called);
     }
-    catch (const char* e)
+    catch (char const* e)
     {
         HPX_TEST(!notify_called);
     }
@@ -110,7 +110,7 @@ void test_cv_pred(bool call_notify)
                     // should be no std::exception
                     HPX_TEST(false);
                 }
-                catch (const char*)
+                catch (char const*)
                 {
                     HPX_TEST(!call_notify);
                 }
@@ -427,7 +427,7 @@ void test_timed_wait(bool call_notify, bool call_interrupt, Duration duration)
                         ++times_done;
                     }
                 }
-                catch (const char*)
+                catch (char const*)
                 {
                     t1_feedback = state::interrupted;
                     HPX_TEST(!ready_);

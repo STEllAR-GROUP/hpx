@@ -28,7 +28,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
         public:
             start_in_dir() {}
 
-            explicit start_in_dir(const std::string& s)
+            explicit start_in_dir(std::string const& s)
               : s_(s)
             {
             }

@@ -62,7 +62,7 @@ namespace hpx::parcelset {
             ConnectionHandler>::connection_type;
 
     public:
-        static const char* connection_handler_type()
+        static char const* connection_handler_type()
         {
             return connection_handler_traits<ConnectionHandler>::type();
         }
@@ -77,12 +77,12 @@ namespace hpx::parcelset {
                 ini, key + ".io_pool_size", 2);
         }
 
-        static const char* pool_name()
+        static char const* pool_name()
         {
             return connection_handler_traits<ConnectionHandler>::pool_name();
         }
 
-        static const char* pool_name_postfix()
+        static char const* pool_name_postfix()
         {
             return connection_handler_traits<
                 ConnectionHandler>::pool_name_postfix();

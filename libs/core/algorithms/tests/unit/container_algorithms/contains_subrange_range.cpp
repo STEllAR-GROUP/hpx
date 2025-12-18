@@ -31,8 +31,8 @@ void test_contains_subrange(IteratorTag)
 
     std::vector<int> c1(10007), c2 = {1, 2, 3};
     std::fill(std::begin(c1), std::end(c1), dis(gen));
-    const std::size_t n = c1.size();
-    const std::size_t mid = n / 2;
+    std::size_t const n = c1.size();
+    std::size_t const mid = n / 2;
 
     c1.at(mid) = 1;
     c1.at(mid + 1) = 2;
@@ -54,8 +54,8 @@ void test_contains_subrange(ExPolicy&& policy, IteratorTag)
 
     std::vector<int> c1(10007), c2 = {1, 2, 3};
     std::fill(std::begin(c1), std::end(c1), dis(gen));
-    const std::size_t n = c1.size();
-    const std::size_t mid = n / 2;
+    std::size_t const n = c1.size();
+    std::size_t const mid = n / 2;
 
     c1.at(mid) = 1;
     c1.at(mid + 1) = 2;
@@ -78,8 +78,8 @@ void test_contains_subrange_async(ExPolicy&& policy, IteratorTag)
 
     std::vector<int> c1(10007), c2 = {1, 2, 3};
     std::fill(std::begin(c1), std::end(c1), dis(gen));
-    const std::size_t n = c1.size();
-    const std::size_t mid = n / 2;
+    std::size_t const n = c1.size();
+    std::size_t const mid = n / 2;
 
     c1.at(mid) = 1;
     c1.at(mid + 1) = 2;
@@ -124,8 +124,8 @@ void test_contains_subrange_exception(IteratorTag)
 
     std::vector<int> c1(10007), c2 = {1, 2, 3};
     std::iota(std::begin(c1), std::end(c1), gen() + 1);
-    const std::size_t n = c1.size();
-    const std::size_t mid = n / 2;
+    std::size_t const n = c1.size();
+    std::size_t const mid = n / 2;
 
     c1.at(mid) = 1;
     c1.at(mid + 1) = 2;
@@ -171,8 +171,8 @@ void test_contains_subrange_exception(ExPolicy&& policy, IteratorTag)
 
     std::vector<int> c1(10007), c2 = {1, 2, 3};
     std::iota(std::begin(c1), std::end(c1), gen() + 1);
-    const std::size_t n = c1.size();
-    const std::size_t mid = n / 2;
+    std::size_t const n = c1.size();
+    std::size_t const mid = n / 2;
 
     c1.at(mid) = 1;
     c1.at(mid + 1) = 2;
@@ -218,8 +218,8 @@ void test_contains_subrange_exception_async(ExPolicy&& policy, IteratorTag)
 
     std::vector<int> c1(10007), c2 = {1, 2, 3};
     std::iota(std::begin(c1), std::end(c1), gen() + 1);
-    const std::size_t n = c1.size();
-    const std::size_t mid = n / 2;
+    std::size_t const n = c1.size();
+    std::size_t const mid = n / 2;
 
     c1.at(mid) = 1;
     c1.at(mid + 1) = 2;
@@ -285,8 +285,8 @@ void test_contains_subrange_bad_alloc(ExPolicy&& policy, IteratorTag)
         decorated_iterator;
     std::vector<int> c1(10007), c2 = {1, 2, 3};
     std::iota(std::begin(c1), std::end(c1), gen() + 1);
-    const std::size_t n = c1.size();
-    const std::size_t mid = n / 2;
+    std::size_t const n = c1.size();
+    std::size_t const mid = n / 2;
 
     c1.at(mid) = 1;
     c1.at(mid + 1) = 2;
@@ -328,8 +328,8 @@ void test_contains_subrange_bad_alloc_async(ExPolicy&& policy, IteratorTag)
         decorated_iterator;
     std::vector<int> c1(10007), c2 = {1, 2, 3};
     std::iota(std::begin(c1), std::end(c1), gen() + 1);
-    const std::size_t n = c1.size();
-    const std::size_t mid = n / 2;
+    std::size_t const n = c1.size();
+    std::size_t const mid = n / 2;
 
     c1.at(mid) = 1;
     c1.at(mid + 1) = 2;

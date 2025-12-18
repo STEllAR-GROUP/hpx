@@ -92,7 +92,7 @@ int main()
     HPX_TEST_EQ(ivar.which(), ovar.which());
     HPX_TEST_EQ(ivar, ovar);
 
-    const boost::variant<std::string> sovar = std::string("string");
+    boost::variant<std::string> const sovar = std::string("string");
     boost::variant<std::string> sivar;
     oar << sovar;
     iar >> sivar;

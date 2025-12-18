@@ -29,7 +29,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
         {
         public:
             run_exe_() {}
-            explicit run_exe_(const String& s)
+            explicit run_exe_(String const& s)
               : s_(s)
             {
             }
@@ -58,12 +58,12 @@ namespace hpx { namespace components { namespace process { namespace windows {
             return run_exe_<std::wstring>(ws);
         }
 
-        inline run_exe_<std::wstring> run_exe(const std::wstring& ws)
+        inline run_exe_<std::wstring> run_exe(std::wstring const& ws)
         {
             return run_exe_<std::wstring>(ws);
         }
 
-        inline run_exe_<std::wstring> run_exe(const filesystem::path& p)
+        inline run_exe_<std::wstring> run_exe(filesystem::path const& p)
         {
             return run_exe_<std::wstring>(p.wstring());
         }
@@ -73,12 +73,12 @@ namespace hpx { namespace components { namespace process { namespace windows {
             return run_exe_<std::string>(s);
         }
 
-        inline run_exe_<std::string> run_exe(const std::string& s)
+        inline run_exe_<std::string> run_exe(std::string const& s)
         {
             return run_exe_<std::string>(s);
         }
 
-        inline run_exe_<std::string> run_exe(const filesystem::path& p)
+        inline run_exe_<std::string> run_exe(filesystem::path const& p)
         {
             return run_exe_<std::string>(p.string());
         }

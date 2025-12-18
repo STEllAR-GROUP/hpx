@@ -18,7 +18,7 @@ int hpx_main()
 {
     std::vector<int> v{1, 2, 3, 4, 5};
 
-    auto print = [](const int& n) { std::cout << n << ' '; };
+    auto print = [](int const& n) { std::cout << n << ' '; };
 
     std::cout << "Print sequential: ";
     hpx::for_each(v.begin(), v.end(), print);

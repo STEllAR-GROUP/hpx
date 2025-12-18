@@ -125,12 +125,12 @@ namespace hpx_test {
         Integers ids;
         Strings strings;
 
-        bool operator==(const Record& other) const
+        bool operator==(Record const& other) const
         {
             return (ids == other.ids && strings == other.strings);
         }
 
-        bool operator!=(const Record& other) const
+        bool operator!=(Record const& other) const
         {
             return !(*this == other);
         }
@@ -148,7 +148,7 @@ namespace hpx_test {
         }
     };
 
-    void to_string(const Record& record, std::string& data)
+    void to_string(Record const& record, std::string& data)
     {
         {
             hpx::serialization::detail::preprocess_container p;

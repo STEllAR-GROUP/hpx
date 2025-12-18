@@ -61,7 +61,7 @@ void dummy_task(std::size_t n)
 
 // --------------------------------------------------------------------------
 // string for a policy
-std::string policy_string(const hpx::launch& policy)
+std::string policy_string(hpx::launch const& policy)
 {
     if (policy == hpx::launch::async)
     {
@@ -91,7 +91,7 @@ std::string policy_string(const hpx::launch& policy)
 
 // string for an executor
 template <typename Executor>
-std::string exec_string(const Executor&)
+std::string exec_string(Executor const&)
 {
     return "Executor";
 }
@@ -100,7 +100,7 @@ std::string exec_string(const Executor&)
 template <typename Executor>
 typename std::enable_if<hpx::traits::is_executor_any<Executor>::value,
     std::string>::type
-execution_string(const Executor& exec)
+execution_string(Executor const& exec)
 {
     return exec_string(exec);
 }
@@ -108,7 +108,7 @@ execution_string(const Executor& exec)
 template <typename Policy>
 typename std::enable_if<hpx::traits::is_launch_policy<Policy>::value,
     std::string>::type
-execution_string(const Policy& policy)
+execution_string(Policy const& policy)
 {
     return policy_string(policy);
 }

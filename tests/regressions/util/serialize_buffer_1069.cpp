@@ -32,9 +32,9 @@ class test_allocator : public std::allocator<T>
 public:
     typedef T value_type;
     typedef T* pointer;
-    typedef const T* const_pointer;
+    typedef T const* const_pointer;
     typedef T& reference;
-    typedef const T& const_reference;
+    typedef T const& const_reference;
     typedef std::size_t size_type;
     typedef std::ptrdiff_t difference_type;
 
@@ -45,7 +45,7 @@ public:
         typedef std::allocator<U> other;
     };
 
-    pointer allocate(size_type n, const void* = nullptr)
+    pointer allocate(size_type n, void const* = nullptr)
     {
         HPX_TEST_EQ(n, static_cast<size_type>(MEMORY_BLOCK_SIZE));
         return std::allocator<T>::allocate(n);
@@ -61,7 +61,7 @@ public:
       : std::allocator<T>()
     {
     }
-    test_allocator(const test_allocator& a) noexcept
+    test_allocator(test_allocator const& a) noexcept
       : std::allocator<T>(a)
     {
     }

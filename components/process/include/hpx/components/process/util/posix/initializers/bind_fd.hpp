@@ -24,7 +24,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
         class bind_fd_ : public initializer_base
         {
         public:
-            bind_fd_(int id, const FileDescriptor& fd)
+            bind_fd_(int id, FileDescriptor const& fd)
               : id_(id)
               , fd_(fd)
             {
@@ -42,7 +42,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
         };
 
         template <class FileDescriptor>
-        bind_fd_<FileDescriptor> bind_fd(int id, const FileDescriptor& fd)
+        bind_fd_<FileDescriptor> bind_fd(int id, FileDescriptor const& fd)
         {
             return bind_fd_<FileDescriptor>(id, fd);
         }
