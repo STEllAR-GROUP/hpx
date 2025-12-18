@@ -34,9 +34,9 @@ struct vector_t_server : public hpx::components::component_base<vector_t_server>
       : data(std::make_shared<vector_t>(N))
     {
     }
-    vector_t_server& operator=(const vector_t_server&) = delete;
+    vector_t_server& operator=(vector_t_server const&) = delete;
     // Temporarily, to allow creating a remote object from local data
-    explicit vector_t_server(const vector_t& x)
+    explicit vector_t_server(vector_t const& x)
       : data(std::make_shared<vector_t>(x))
     {
     }
@@ -63,12 +63,12 @@ struct vector_t_server : public hpx::components::component_base<vector_t_server>
     }
     HPX_DEFINE_COMPONENT_ACTION(vector_t_server, set_elt)
 
-    void axpy(double alpha, const hpx::id_type& x);
+    void axpy(double alpha, hpx::id_type const& x);
     HPX_DEFINE_COMPONENT_ACTION(vector_t_server, axpy)
-    void copy(const hpx::id_type& x);
+    void copy(hpx::id_type const& x);
     HPX_DEFINE_COMPONENT_ACTION(vector_t_server, copy)
-    void gemv(bool trans, double alpha, const hpx::id_type& a,
-        const hpx::id_type& x, double beta);
+    void gemv(bool trans, double alpha, hpx::id_type const& a,
+        hpx::id_type const& x, double beta);
     HPX_DEFINE_COMPONENT_ACTION(vector_t_server, gemv)
     double nrm2_process() const;
     HPX_DEFINE_COMPONENT_ACTION(vector_t_server, nrm2_process)
@@ -110,17 +110,17 @@ struct vector_t_client
         return vector_t_server::set_elt_action()(get_id(), i, x);
     }
 
-    hpx::future<void> axpy(double alpha, const vector_t_client& x) const
+    hpx::future<void> axpy(double alpha, vector_t_client const& x) const
     {
         return hpx::async(
             vector_t_server::axpy_action(), get_id(), alpha, x.get_id());
     }
-    hpx::future<void> copy(const vector_t_client& x) const
+    hpx::future<void> copy(vector_t_client const& x) const
     {
         return hpx::async(vector_t_server::copy_action(), get_id(), x.get_id());
     }
-    hpx::future<void> gemv(bool trans, double alpha, const matrix_t_client& a,
-        const vector_t_client& x, double beta) const;
+    hpx::future<void> gemv(bool trans, double alpha, matrix_t_client const& a,
+        vector_t_client const& x, double beta) const;
     hpx::future<double> nrm2_process() const
     {
         return hpx::async(vector_t_server::nrm2_process_action(), get_id());
@@ -139,9 +139,9 @@ struct matrix_t_server : public hpx::components::component_base<matrix_t_server>
       : data(std::make_shared<matrix_t>(NI, NJ))
     {
     }
-    matrix_t_server& operator=(const matrix_t_server&) = delete;
+    matrix_t_server& operator=(matrix_t_server const&) = delete;
     // Temporarily, to allow creating a remote object from local data
-    explicit matrix_t_server(const matrix_t& a)
+    explicit matrix_t_server(matrix_t const& a)
       : data(std::make_shared<matrix_t>(a))
     {
     }
@@ -168,15 +168,15 @@ struct matrix_t_server : public hpx::components::component_base<matrix_t_server>
     }
     HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, set_elt)
 
-    void axpy(bool trans, double alpha, const hpx::id_type& a);
+    void axpy(bool trans, double alpha, hpx::id_type const& a);
     HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, axpy)
-    void copy(bool transa, const hpx::id_type& a);
+    void copy(bool transa, hpx::id_type const& a);
     HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, copy)
-    void gemm(bool transa, bool transb, double alpha, const hpx::id_type& a,
-        const hpx::id_type& b, double beta);
+    void gemm(bool transa, bool transb, double alpha, hpx::id_type const& a,
+        hpx::id_type const& b, double beta);
     HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, gemm)
     hpx::id_type gemv_process(
-        bool trans, double alpha, const hpx::id_type& x) const;
+        bool trans, double alpha, hpx::id_type const& x) const;
     HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, gemv_process)
     double nrm2_process() const;
     HPX_DEFINE_COMPONENT_ACTION(matrix_t_server, nrm2_process)
@@ -219,18 +219,18 @@ struct matrix_t_client
     }
 
     hpx::future<void> axpy(
-        bool trans, double alpha, const matrix_t_client& a) const
+        bool trans, double alpha, matrix_t_client const& a) const
     {
         return hpx::async(
             matrix_t_server::axpy_action(), get_id(), trans, alpha, a.get_id());
     }
-    hpx::future<void> copy(bool transa, const matrix_t_client& a) const
+    hpx::future<void> copy(bool transa, matrix_t_client const& a) const
     {
         return hpx::async(
             matrix_t_server::copy_action(), get_id(), transa, a.get_id());
     }
     hpx::future<void> gemm(bool transa, bool transb, double alpha,
-        const matrix_t_client& a, const matrix_t_client& b, double beta) const
+        matrix_t_client const& a, matrix_t_client const& b, double beta) const
     {
         return hpx::async(matrix_t_server::gemm_action(), get_id(), transa,
             transb, alpha, a.get_id(), b.get_id(), beta);

@@ -145,7 +145,7 @@ public:
             data_[i] = base_value + double(i);
     }
 
-    partition_data(std::size_t size, const double* other)
+    partition_data(std::size_t size, double const* other)
       : data_(new double[size])
       , size_(size)
     {

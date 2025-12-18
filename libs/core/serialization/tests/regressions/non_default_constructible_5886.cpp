@@ -22,20 +22,20 @@ class event
     friend class hpx::serialization::access;
 
     template <typename Archive>
-    constexpr void serialize(Archive&, const unsigned int) noexcept
+    constexpr void serialize(Archive&, unsigned int const) noexcept
     {
         // nothing else to do
     }
 
     template <typename Archive>
     friend void save_construct_data(
-        Archive& ar, event const* t, const unsigned int)
+        Archive& ar, event const* t, unsigned int const)
     {
         ar & t->name & t->data;
     }
 
     template <typename Archive>
-    friend void load_construct_data(Archive& ar, event* t, const unsigned int)
+    friend void load_construct_data(Archive& ar, event* t, unsigned int const)
     {
         std::string name;
         std::vector<int> data;

@@ -23,8 +23,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-const std::size_t vsize_default = 1'048'576;
-const std::size_t numiter_default = 5;
+std::size_t const vsize_default = 1'048'576;
+std::size_t const numiter_default = 5;
 
 ///////////////////////////////////////////////////////////////////////////////
 void on_recv(

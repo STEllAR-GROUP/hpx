@@ -26,12 +26,12 @@
 
 struct structure_t
 {
-    const std::ptrdiff_t N, B;
-    const std::vector<std::ptrdiff_t> begin, end;
-    const std::vector<hpx::id_type> locs;
+    std::ptrdiff_t const N, B;
+    std::vector<std::ptrdiff_t> const begin, end;
+    std::vector<hpx::id_type> const locs;
     bool invariant() const;
-    structure_t(std::ptrdiff_t N, std::ptrdiff_t B, const std::ptrdiff_t* begin,
-        const std::ptrdiff_t* end, const hpx::id_type* locs)
+    structure_t(std::ptrdiff_t N, std::ptrdiff_t B, std::ptrdiff_t const* begin,
+        std::ptrdiff_t const* end, hpx::id_type const* locs)
       : N(N)
       , B(B)
       , begin(begin, begin + B)
@@ -44,7 +44,7 @@ struct structure_t
     {
         return mkstr(*this);
     }
-    bool operator==(const structure_t& str) const
+    bool operator==(structure_t const& str) const
     {
         return this == &str;
     }
@@ -56,7 +56,7 @@ struct structure_t
     std::ptrdiff_t find(std::ptrdiff_t i) const;
 };
 
-std::ostream& operator<<(std::ostream& os, const structure_t& str);
+std::ostream& operator<<(std::ostream& os, structure_t const& str);
 
 struct block_vector_t
 {
@@ -72,7 +72,7 @@ struct block_vector_t
     {
         return mkstr(*this);
     }
-    const vector_t_client& block(std::ptrdiff_t b) const
+    vector_t_client const& block(std::ptrdiff_t b) const
     {
         HPX_ASSERT(b >= 0 && b < str->B);
         return elts[b];
@@ -81,7 +81,7 @@ struct block_vector_t
     {
         HPX_ASSERT(i >= 0 && i < str->N);
         auto b = str->find(i);
-        static const double zero = 0.0;
+        static double const zero = 0.0;
         if (b < 0)
             return zero;
         return block(b).get_elt(i - str->begin[b]);
@@ -95,7 +95,7 @@ struct block_vector_t
     }
 };
 
-std::ostream& operator<<(std::ostream& os, const block_vector_t& x);
+std::ostream& operator<<(std::ostream& os, block_vector_t const& x);
 
 struct block_matrix_t
 {
@@ -114,7 +114,7 @@ struct block_matrix_t
     {
         return mkstr(*this);
     }
-    const matrix_t_client& block(std::ptrdiff_t ib, std::ptrdiff_t jb) const
+    matrix_t_client const& block(std::ptrdiff_t ib, std::ptrdiff_t jb) const
     {
         HPX_ASSERT(ib >= 0 && ib < istr->B && jb >= 0 && jb <= jstr->B);
         return elts[ib + istr->B * jb];
@@ -124,7 +124,7 @@ struct block_matrix_t
         HPX_ASSERT(i >= 0 && i < istr->N && j >= 0 && j < jstr->N);
         auto ib = istr->find(i);
         auto jb = jstr->find(j);
-        static const double zero = 0.0;
+        static double const zero = 0.0;
         if (ib < 0 || jb < 0)
             return zero;
         return block(ib, jb).get_elt(i - istr->begin[ib], j - jstr->begin[jb]);
@@ -139,6 +139,6 @@ struct block_matrix_t
     }
 };
 
-std::ostream& operator<<(std::ostream& os, const block_matrix_t& a);
+std::ostream& operator<<(std::ostream& os, block_matrix_t const& a);
 
 #endif

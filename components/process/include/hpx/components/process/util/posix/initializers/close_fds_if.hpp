@@ -37,7 +37,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
             }
 
         public:
-            explicit close_fds_if_(const Predicate& pred)
+            explicit close_fds_if_(Predicate const& pred)
               : pred_(pred)
             {
             }
@@ -75,7 +75,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
         };
 
         template <class Predicate>
-        close_fds_if_<Predicate> close_fds_if(const Predicate& pred)
+        close_fds_if_<Predicate> close_fds_if(Predicate const& pred)
         {
             return close_fds_if_<Predicate>(pred);
         }

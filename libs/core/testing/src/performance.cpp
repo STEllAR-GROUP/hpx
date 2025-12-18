@@ -29,7 +29,7 @@ namespace hpx::util {
             "time taken for each epoch");
     }
 
-    void perftests_init(const hpx::program_options::variables_map& vm)
+    void perftests_init(hpx::program_options::variables_map const& vm)
     {
         if (vm.count("detailed_bench"))
         {

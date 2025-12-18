@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
         hpx::program_options::value<std::uint64_t>()->default_value(10),
         "n value for the Fibonacci function");
 
-    const apex_event_type when = APEX_START_EVENT;
+    apex_event_type const when = APEX_START_EVENT;
     policy_handle = apex::register_policy(when, [](apex_context const&) {
         std::cout << "Start event!" << std::endl;
         return APEX_NOERROR;

@@ -17,20 +17,20 @@ HPX_REGISTER_COMPONENT_MODULE()
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::component<vector_t_server>, vector_t_factory)
 
-void vector_t_server::axpy(double alpha, const hpx::id_type& x)
+void vector_t_server::axpy(double alpha, hpx::id_type const& x)
 {
     auto fx = hpx::async(vector_t_server::get_data_action(), x);
     auto fx_result = fx.get();
     ::axpy(alpha, *fx_result, *data);
 }
-void vector_t_server::copy(const hpx::id_type& x)
+void vector_t_server::copy(hpx::id_type const& x)
 {
     auto fx = hpx::async(vector_t_server::get_data_action(), x);
     auto fx_result = fx.get();
     ::copy(*fx_result, *data);
 }
-void vector_t_server::gemv(bool trans, double alpha, const hpx::id_type& a,
-    const hpx::id_type& x, double beta)
+void vector_t_server::gemv(bool trans, double alpha, hpx::id_type const& a,
+    hpx::id_type const& x, double beta)
 {
     ::scal(beta, *data);
     auto ytmp =
@@ -51,7 +51,7 @@ void vector_t_server::scal(double alpha)
 }
 
 hpx::future<void> vector_t_client::gemv(bool trans, double alpha,
-    const matrix_t_client& a, const vector_t_client& x, double beta) const
+    matrix_t_client const& a, vector_t_client const& x, double beta) const
 {
     return hpx::async(vector_t_server::gemv_action(), get_id(), trans, alpha,
         a.get_id(), x.get_id(), beta);
@@ -60,20 +60,20 @@ hpx::future<void> vector_t_client::gemv(bool trans, double alpha,
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(
     hpx::components::component<matrix_t_server>, matrix_t_factory)
 
-void matrix_t_server::axpy(bool trans, double alpha, const hpx::id_type& a)
+void matrix_t_server::axpy(bool trans, double alpha, hpx::id_type const& a)
 {
     auto fa = hpx::async(matrix_t_server::get_data_action(), a);
     auto fa_result = fa.get();
     ::axpy(trans, alpha, *fa_result, *data);
 }
-void matrix_t_server::copy(bool transa, const hpx::id_type& a)
+void matrix_t_server::copy(bool transa, hpx::id_type const& a)
 {
     auto fa = hpx::async(matrix_t_server::get_data_action(), a);
     auto fa_result = fa.get();
     ::copy(transa, *fa_result, *data);
 }
 void matrix_t_server::gemm(bool transa, bool transb, double alpha,
-    const hpx::id_type& a, const hpx::id_type& b, double beta)
+    hpx::id_type const& a, hpx::id_type const& b, double beta)
 {
     auto fa = hpx::async(matrix_t_server::get_data_action(), a);
     auto fb = hpx::async(matrix_t_server::get_data_action(), b);
@@ -82,7 +82,7 @@ void matrix_t_server::gemm(bool transa, bool transb, double alpha,
     ::gemm(transa, transb, alpha, *fa_result, *fb_result, beta, *data);
 }
 hpx::id_type matrix_t_server::gemv_process(
-    bool trans, double alpha, const hpx::id_type& x) const
+    bool trans, double alpha, hpx::id_type const& x) const
 {
     auto fx = hpx::async(vector_t_server::get_data_action(), x);
     auto fx_result = fx.get();

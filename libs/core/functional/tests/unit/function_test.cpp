@@ -83,11 +83,11 @@ static int generate_three()
 {
     return 3;
 }
-static string identity_str(const string& s)
+static string identity_str(string const& s)
 {
     return s;
 }
-static string string_cat(const string& s1, const string& s2)
+static string string_cat(string const& s1, string const& s2)
 {
     return s1 + s2;
 }
@@ -572,7 +572,7 @@ static void test_zero_args()
 
     // Const vs. non-const
     write_const_1_nonconst_2 one_or_two;
-    const hpx::function<void()> v7(one_or_two);
+    hpx::function<void()> const v7(one_or_two);
     hpx::function<void()> v8(one_or_two);
 
     global_int = 0;
@@ -636,20 +636,20 @@ static void test_one_arg()
     hpx::function<string(string)> id(&identity_str);
     HPX_TEST_EQ(id("str"), "str");
 
-    hpx::function<string(const char*)> id2(&identity_str);
+    hpx::function<string(char const*)> id2(&identity_str);
     HPX_TEST_EQ(id2("foo"), "foo");
 
     add_to_obj add_to(5);
     hpx::function<int(int)> f2(add_to);
     HPX_TEST_EQ(f2(3), 8);
 
-    const hpx::function<int(int)> cf2(add_to);
+    hpx::function<int(int)> const cf2(add_to);
     HPX_TEST_EQ(cf2(3), 8);
 }
 
 static void test_two_args()
 {
-    hpx::function<string(const string&, const string&)> cat(&string_cat);
+    hpx::function<string(string const&, string const&)> cat(&string_cat);
     HPX_TEST_EQ(cat("str", "ing"), "string");
 
     hpx::function<int(short, short)> sum(&sum_ints);
@@ -719,12 +719,12 @@ struct add_with_throw_on_copy
 
     add_with_throw_on_copy() {}
 
-    add_with_throw_on_copy(const add_with_throw_on_copy&)
+    add_with_throw_on_copy(add_with_throw_on_copy const&)
     {
         throw std::runtime_error("But this CAN'T throw");
     }
 
-    add_with_throw_on_copy& operator=(const add_with_throw_on_copy&)
+    add_with_throw_on_copy& operator=(add_with_throw_on_copy const&)
     {
         throw std::runtime_error("But this CAN'T throw");
     }
@@ -803,7 +803,7 @@ static void test_call_obj(hpx::function<int(int, int)> f)
     HPX_TEST(!f.empty());
 }
 
-static void test_call_cref(const hpx::function<int(int, int)>& f)
+static void test_call_cref(hpx::function<int(int, int)> const& f)
 {
     HPX_TEST(!f.empty());
 }
@@ -823,7 +823,7 @@ struct big_aggregating_structure
         ++global_int;
     }
 
-    big_aggregating_structure(const big_aggregating_structure&)
+    big_aggregating_structure(big_aggregating_structure const&)
     {
         ++global_int;
     }

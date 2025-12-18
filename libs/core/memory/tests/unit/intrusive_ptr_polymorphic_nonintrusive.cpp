@@ -26,7 +26,7 @@ struct D
     }
     virtual ~D() {}
 
-    virtual const char* foo() = 0;
+    virtual char const* foo() = 0;
 };
 HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(D)
 
@@ -36,7 +36,7 @@ void load(Archive& ar, D& d, unsigned)
     ar & d.a;
 }
 template <class Archive>
-void save(Archive& ar, const D& d, unsigned)
+void save(Archive& ar, D const& d, unsigned)
 {
     ar & d.a;
 }
@@ -64,7 +64,7 @@ struct E : D
     {
     }
 
-    const char* foo() override
+    char const* foo() override
     {
         return "E::foo";
     }
@@ -77,7 +77,7 @@ void load(Archive& ar, E& e, unsigned)
     ar & e.b;
 }
 template <class Archive>
-void save(Archive& ar, const E& e, unsigned)
+void save(Archive& ar, E const& e, unsigned)
 {
     ar& hpx::serialization::base_object<D>(e);
     ar & e.b;
@@ -94,7 +94,7 @@ struct F : public E
     {
     }
 
-    virtual const char* foo()
+    virtual char const* foo()
     {
         return "F::foo";
     }

@@ -66,7 +66,7 @@ namespace hpx::parallel::util {
 
                 try
                 {
-                    const bool has_scheduler_executor =
+                    bool const has_scheduler_executor =
                         hpx::execution_policy_has_scheduler_executor_v<
                             ExPolicy_>;
 

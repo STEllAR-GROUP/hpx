@@ -220,7 +220,7 @@ namespace hpx { namespace util {
     }
 
     void lci_environment::log([[maybe_unused]] log_level_t level,
-        [[maybe_unused]] const char* tag, [[maybe_unused]] const char* format,
+        [[maybe_unused]] char const* tag, [[maybe_unused]] char const* format,
         ...)
     {
 #ifdef HPX_HAVE_PARCELPORT_LCI_LOG

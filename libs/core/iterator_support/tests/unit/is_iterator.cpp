@@ -54,7 +54,7 @@ struct bidirectional_traversal_iterator
     using difference_type = int;
     using value_type = int;
     using iterator_category = std::input_iterator_tag;
-    using pointer = const int*;
+    using pointer = int const*;
     using reference = void;
 
     int state;
@@ -91,32 +91,32 @@ struct bidirectional_traversal_iterator
         return copy;
     }
 
-    bool operator==(const bidirectional_traversal_iterator& that) const
+    bool operator==(bidirectional_traversal_iterator const& that) const
     {
         return this->state == that.state;
     }
 
-    bool operator!=(const bidirectional_traversal_iterator& that) const
+    bool operator!=(bidirectional_traversal_iterator const& that) const
     {
         return this->state != that.state;
     }
 
-    bool operator<(const bidirectional_traversal_iterator& that) const
+    bool operator<(bidirectional_traversal_iterator const& that) const
     {
         return this->state < that.state;
     }
 
-    bool operator<=(const bidirectional_traversal_iterator& that) const
+    bool operator<=(bidirectional_traversal_iterator const& that) const
     {
         return this->state <= that.state;
     }
 
-    bool operator>(const bidirectional_traversal_iterator& that) const
+    bool operator>(bidirectional_traversal_iterator const& that) const
     {
         return this->state > that.state;
     }
 
-    bool operator>=(const bidirectional_traversal_iterator& that) const
+    bool operator>=(bidirectional_traversal_iterator const& that) const
     {
         return this->state >= that.state;
     }
@@ -127,7 +127,7 @@ struct random_access_traversal_iterator
     using difference_type = int;
     using value_type = int;
     using iterator_category = std::input_iterator_tag;
-    using pointer = const int*;
+    using pointer = int const*;
     using reference = void;
 
     int state;
@@ -194,37 +194,37 @@ struct random_access_traversal_iterator
     }
 
     difference_type operator-(
-        const random_access_traversal_iterator& that) const
+        random_access_traversal_iterator const& that) const
     {
         return this->state - that.state;
     }
 
-    bool operator==(const random_access_traversal_iterator& that) const
+    bool operator==(random_access_traversal_iterator const& that) const
     {
         return this->state == that.state;
     }
 
-    bool operator!=(const random_access_traversal_iterator& that) const
+    bool operator!=(random_access_traversal_iterator const& that) const
     {
         return this->state != that.state;
     }
 
-    bool operator<(const random_access_traversal_iterator& that) const
+    bool operator<(random_access_traversal_iterator const& that) const
     {
         return this->state < that.state;
     }
 
-    bool operator<=(const random_access_traversal_iterator& that) const
+    bool operator<=(random_access_traversal_iterator const& that) const
     {
         return this->state <= that.state;
     }
 
-    bool operator>(const random_access_traversal_iterator& that) const
+    bool operator>(random_access_traversal_iterator const& that) const
     {
         return this->state > that.state;
     }
 
-    bool operator>=(const random_access_traversal_iterator& that) const
+    bool operator>=(random_access_traversal_iterator const& that) const
     {
         return this->state >= that.state;
     }
@@ -243,7 +243,7 @@ void addition_result_test()
 
     struct C
     {
-        B operator+(const A&) const
+        B operator+(A const&) const
         {
             return B{};
         }
@@ -290,7 +290,7 @@ void equality_result_test()
 
     struct C
     {
-        B operator==(const A&) const
+        B operator==(A const&) const
         {
             return B{};
         }
@@ -315,7 +315,7 @@ void inequality_result_test()
 
     struct C
     {
-        B operator!=(const A&) const
+        B operator!=(A const&) const
         {
             return B{};
         }
@@ -341,7 +341,7 @@ void inplace_addition_result_test()
 
     struct C
     {
-        B operator+=(const A&) const
+        B operator+=(A const&) const
         {
             return B{};
         }
@@ -367,7 +367,7 @@ void inplace_subtraction_result_test()
 
     struct C
     {
-        B operator-=(const A&) const
+        B operator-=(A const&) const
         {
             return B{};
         }
@@ -487,7 +487,7 @@ void subscript_result_test()
 
     struct C
     {
-        B operator[](const A&) const
+        B operator[](A const&) const
         {
             return B{};
         }
@@ -512,7 +512,7 @@ void subtraction_result_test()
 
     struct C
     {
-        B operator-(const A&) const
+        B operator-(A const&) const
         {
             return B{};
         }

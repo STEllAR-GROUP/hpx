@@ -38,7 +38,7 @@ struct foo_t
 
     friend class hpx::serialization::access;
     template <typename Archive>
-    inline void serialize(Archive& ar, const unsigned int)
+    inline void serialize(Archive& ar, unsigned int const)
     {
         // clang-format off
         ar & a & b;

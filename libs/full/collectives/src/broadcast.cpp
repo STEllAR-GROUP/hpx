@@ -16,7 +16,7 @@ namespace hpx::traits::communication {
     // shared libraries.
     char const* communicator_data<broadcast_tag>::name() noexcept
     {
-        static const char* name = "broadcast";
+        static char const* name = "broadcast";
         return name;
     }
 }    // namespace hpx::traits::communication

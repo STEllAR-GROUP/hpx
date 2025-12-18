@@ -39,16 +39,16 @@ namespace hpx::parcelset::policies::lci {
         void* ptr;
         size_t length;
         buffer_wrapper() = default;
-        buffer_wrapper(const buffer_wrapper& wrapper) = default;
-        buffer_wrapper& operator=(const buffer_wrapper& wrapper) = default;
-        explicit buffer_wrapper(const allocator_type& alloc)
+        buffer_wrapper(buffer_wrapper const& wrapper) = default;
+        buffer_wrapper& operator=(buffer_wrapper const& wrapper) = default;
+        explicit buffer_wrapper(allocator_type const& alloc)
         {
             HPX_UNUSED(alloc);
             ptr = nullptr;
             length = 0;
         }
         buffer_wrapper(
-            const buffer_wrapper& wrapper, const allocator_type& alloc)
+            buffer_wrapper const& wrapper, allocator_type const& alloc)
         {
             HPX_UNUSED(alloc);
             ptr = wrapper.ptr;

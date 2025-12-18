@@ -71,8 +71,8 @@ namespace hpx::experimental {
             std::enable_if_t<relocate_using_memmove<T>, int> = 0>
         T* relocate_at_helper(T* src, T* dst) noexcept
         {
-            void* dst_void = const_cast<void*>(static_cast<const void*>(dst));
-            void* src_void = const_cast<void*>(static_cast<const void*>(src));
+            void* dst_void = const_cast<void*>(static_cast<void const*>(dst));
+            void* src_void = const_cast<void*>(static_cast<void const*>(src));
 
             std::memmove(dst_void, src_void, sizeof(T));
 

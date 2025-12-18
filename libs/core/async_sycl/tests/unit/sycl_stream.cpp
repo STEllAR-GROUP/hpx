@@ -62,8 +62,8 @@ int hpx_main(int, char*[])
     float aj = 1.0;
     float bj = 2.0;
     float cj = 0.0;
-    const float scalar = 3.0;
-    const auto reset_input_method = [=](sycl::id<1> i) {
+    float const scalar = 3.0;
+    auto const reset_input_method = [=](sycl::id<1> i) {
         a[i] = aj;
         b[i] = bj;
     };
@@ -74,10 +74,10 @@ int hpx_main(int, char*[])
     // the usual queue.submit pattern) require a reference to a kernel function
     // (hence we cannot pass a temporary. Instead we define our kernel lambdas
     // here...
-    const auto copy_step = [=](sycl::id<1> i) { c[i] = a[i]; };
-    const auto scale_step = [=](sycl::id<1> i) { b[i] = scalar * c[i]; };
-    const auto add_step = [=](sycl::id<1> i) { c[i] = a[i] + b[i]; };
-    const auto triad_step = [=](sycl::id<1> i) { a[i] = b[i] + scalar * c[i]; };
+    auto const copy_step = [=](sycl::id<1> i) { c[i] = a[i]; };
+    auto const scale_step = [=](sycl::id<1> i) { b[i] = scalar * c[i]; };
+    auto const add_step = [=](sycl::id<1> i) { c[i] = a[i] + b[i]; };
+    auto const triad_step = [=](sycl::id<1> i) { a[i] = b[i] + scalar * c[i]; };
 
     // ... and call them here
     hpx::apply(exec, &sycl::queue::parallel_for, sycl::range<1>{vectorsize},
@@ -92,12 +92,12 @@ int hpx_main(int, char*[])
     // Note: Parameter types needs to match exactly, otherwise the correct
     // function won't be found -- in this case we need to cast from float* to const float*
     // otherwise the correct copy overload won't be found
-    hpx::apply(exec, &sycl::queue::copy, static_cast<const float*>(c),
+    hpx::apply(exec, &sycl::queue::copy, static_cast<float const*>(c),
         static_cast<float*>(c_host), static_cast<size_t>(vectorsize));
-    hpx::apply(exec, &sycl::queue::copy, static_cast<const float*>(b),
+    hpx::apply(exec, &sycl::queue::copy, static_cast<float const*>(b),
         static_cast<float*>(b_host), static_cast<size_t>(vectorsize));
     auto fut =
-        hpx::async(exec, &sycl::queue::copy, static_cast<const float*>(a),
+        hpx::async(exec, &sycl::queue::copy, static_cast<float const*>(a),
             static_cast<float*>(a_host), static_cast<size_t>(vectorsize));
 
     fut.get();
@@ -116,9 +116,9 @@ int hpx_main(int, char*[])
         bSumErr += std::abs(b_host[j] - bj);
         cSumErr += std::abs(c_host[j] - cj);
     }
-    const float aAvgErr = aSumErr / static_cast<float>(vectorsize);
-    const float bAvgErr = bSumErr / static_cast<float>(vectorsize);
-    const float cAvgErr = cSumErr / static_cast<float>(vectorsize);
+    float const aAvgErr = aSumErr / static_cast<float>(vectorsize);
+    float const bAvgErr = bSumErr / static_cast<float>(vectorsize);
+    float const cAvgErr = cSumErr / static_cast<float>(vectorsize);
     float epsilon = 1.e-6;
     if (std::abs(aAvgErr / aj) > epsilon)
     {
@@ -138,13 +138,13 @@ int hpx_main(int, char*[])
     std::cerr << "Validation passed!" << std::endl;
 
     // Test running single_tasks with executor (to test single_task overloads are working)
-    const auto single_task_test1 = [=]() { a[42] = 137.0f; };
-    const auto single_task_test2 = [=]() { a[137] = 42.0f; };
+    auto const single_task_test1 = [=]() { a[42] = 137.0f; };
+    auto const single_task_test2 = [=]() { a[137] = 42.0f; };
     hpx::apply(exec, &sycl::queue::single_task, single_task_test1);
     hpx::apply(exec, &sycl::queue::single_task, single_task_test2);
 
     auto fut_single_task_test =
-        hpx::async(exec, &sycl::queue::copy, static_cast<const float*>(a),
+        hpx::async(exec, &sycl::queue::copy, static_cast<float const*>(a),
             static_cast<float*>(a_host), static_cast<size_t>(vectorsize));
     fut_single_task_test.get();
 

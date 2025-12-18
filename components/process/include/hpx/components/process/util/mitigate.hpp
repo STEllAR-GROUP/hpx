@@ -34,7 +34,7 @@ namespace hpx { namespace components { namespace process { namespace util {
 #endif
     }
 
-    inline const char* null_device()
+    inline char const* null_device()
     {
 #if defined(HPX_WINDOWS)
         return "NUL";

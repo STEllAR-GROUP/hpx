@@ -44,7 +44,7 @@ namespace hpx::parcelset::policies::tcp {
             return port_;
         }
 
-        static constexpr const char* type() noexcept
+        static constexpr char const* type() noexcept
         {
             return "tcp";
         }

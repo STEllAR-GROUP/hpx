@@ -21,7 +21,7 @@
 namespace hpx { namespace components { namespace process { namespace windows {
 
     template <class Process>
-    void terminate(const Process& p)
+    void terminate(Process const& p)
     {
         if (!::TerminateProcess(p.process_handle(), EXIT_FAILURE))
         {
@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
     }
 
     template <class Process>
-    void terminate(const Process& p, hpx::error_code& ec)
+    void terminate(Process const& p, hpx::error_code& ec)
     {
         if (!::TerminateProcess(p.process_handle(), EXIT_FAILURE))
         {

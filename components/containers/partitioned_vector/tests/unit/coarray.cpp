@@ -78,9 +78,9 @@ HPX_PLAIN_ACTION(bulk_test, bulk_test_action)
 
 int main()
 {
-    const std::size_t height = 32;
-    const std::size_t width = 4;
-    const std::size_t elt_size = 4;
+    std::size_t const height = 32;
+    std::size_t const width = 4;
+    std::size_t const elt_size = 4;
 
     std::string coarray_name("my_coarray");
 

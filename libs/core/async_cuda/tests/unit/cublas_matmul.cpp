@@ -62,7 +62,7 @@ struct sMatrixSize
 // @param wB         width of matrix B
 // -------------------------------------------------------------------------
 template <typename T>
-void matrixMulCPU(T* C, const T* A, const T* B, unsigned int hA,
+void matrixMulCPU(T* C, T const* A, T const* B, unsigned int hA,
     unsigned int wA, unsigned int wB)
 {
     hpx::experimental::for_loop(hpx::execution::par, 0, hA, [&](int i) {
@@ -82,8 +82,8 @@ void matrixMulCPU(T* C, const T* A, const T* B, unsigned int hA,
 
 // -------------------------------------------------------------------------
 // Compute the L2 norm difference between two arrays
-inline bool compare_L2_err(const float* reference, const float* data,
-    const unsigned int len, const float epsilon)
+inline bool compare_L2_err(float const* reference, float const* data,
+    unsigned int const len, float const epsilon)
 {
     HPX_ASSERT(epsilon >= 0);
 
@@ -163,8 +163,8 @@ void matrixMultiply(hpx::cuda::experimental::cublas_executor& cublas,
     });
 
     std::cout << "Computing result using CUBLAS...\n";
-    const T alpha = 1.0f;
-    const T beta = 0.0f;
+    T const alpha = 1.0f;
+    T const beta = 0.0f;
 
     // Perform warmup operation with cublas
     // note cublas is column major ordering : transpose the order

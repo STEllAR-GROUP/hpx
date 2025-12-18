@@ -52,7 +52,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     using hpx::experimental::for_loop_strided;
     using hpx::ranges::for_each;
 
-    const std::uint64_t start = 0;
+    std::uint64_t const start = 0;
 
     // Fill the original matrix, set transpose to known garbage value.
     auto range = hpx::util::counting_shape(order);
@@ -176,7 +176,7 @@ double test_results(std::uint64_t order, std::vector<double> const& trans)
     using hpx::transform_reduce;
     using hpx::execution::par;
 
-    const std::uint64_t start = 0;
+    std::uint64_t const start = 0;
 
     auto range = hpx::util::counting_shape(start, order);
     // parallel reduce

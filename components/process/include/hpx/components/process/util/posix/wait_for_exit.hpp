@@ -21,7 +21,7 @@
 namespace hpx { namespace components { namespace process { namespace posix {
 
     template <class Process>
-    inline int wait_for_exit(const Process& p)
+    inline int wait_for_exit(Process const& p)
     {
         pid_t ret;
         int status = 0;
@@ -40,7 +40,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
     }
 
     template <class Process>
-    inline int wait_for_exit(const Process& p, hpx::error_code& ec)
+    inline int wait_for_exit(Process const& p, hpx::error_code& ec)
     {
         pid_t ret;
         int status;

@@ -62,7 +62,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     using hpx::execution::task;
     using hpx::ranges::for_each;
 
-    const std::uint64_t start = 0;
+    std::uint64_t const start = 0;
 
     // Fill the original matrix, set transpose to known garbage value.
     auto range = hpx::util::counting_shape(start, num_blocks);
@@ -99,11 +99,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
         for_each(par, range, [&](std::uint64_t b) {
             transpose_futures[b] =
                 for_each(par(task), range, [&, b](std::uint64_t phase) {
-                    const std::uint64_t block_size = block_order * block_order;
-                    const std::uint64_t from_block = phase;
-                    const std::uint64_t from_phase = b;
-                    const std::uint64_t A_offset = from_phase * block_size;
-                    const std::uint64_t B_offset = phase * block_size;
+                    std::uint64_t const block_size = block_order * block_order;
+                    std::uint64_t const from_block = phase;
+                    std::uint64_t const from_phase = b;
+                    std::uint64_t const A_offset = from_phase * block_size;
+                    std::uint64_t const B_offset = phase * block_size;
 
                     transpose(&A[from_block][A_offset], &B[b][B_offset],
                         block_order, tile_size);
@@ -219,8 +219,8 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
     using hpx::transform_reduce;
     using hpx::execution::par;
 
-    const std::uint64_t start = 0;
-    const std::uint64_t end = trans.size();
+    std::uint64_t const start = 0;
+    std::uint64_t const end = trans.size();
 
     // Fill the original matrix, set transpose to known garbage value.
     auto range = hpx::util::counting_shape(start, end);
