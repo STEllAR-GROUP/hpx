@@ -36,7 +36,7 @@ namespace any_tests    // test suite
         void (*test_func)();
     };
 
-    const test_case test_cases[] = {{"default construction", test_default_ctor},
+    test_case const test_cases[] = {{"default construction", test_default_ctor},
         {"single argument construction", test_converting_ctor},
         {"copy construction", test_copy_ctor},
         {"copy assignment operator", test_copy_assign},
@@ -50,18 +50,18 @@ namespace any_tests    // test suite
     using test_case_iterator = test_case const*;
 
     test_case_iterator begin_tests = test_cases;
-    const test_case_iterator end_tests =
+    test_case_iterator const end_tests =
         test_cases + (sizeof test_cases / sizeof *test_cases);
 
     struct copy_counter
     {
     public:
         copy_counter() {}
-        copy_counter(const copy_counter&)
+        copy_counter(copy_counter const&)
         {
             ++count;
         }
-        copy_counter& operator=(const copy_counter&)
+        copy_counter& operator=(copy_counter const&)
         {
             ++count;
             return *this;
@@ -105,7 +105,7 @@ namespace any_tests    // test definitions
 {
     void test_default_ctor()
     {
-        const hpx::any value;
+        hpx::any const value;
 
         HPX_TEST_MSG(!value.has_value(), "empty");
         HPX_TEST_EQ_MSG(static_cast<void*>(nullptr), hpx::any_cast<int>(&value),
@@ -195,7 +195,7 @@ namespace any_tests    // test definitions
             bool caught_exception = false;
             try
             {
-                hpx::any_cast<const char*>(value);
+                hpx::any_cast<char const*>(value);
             }
             catch (hpx::bad_any_cast const&)
             {
@@ -273,7 +273,7 @@ namespace any_tests    // test definitions
 
     void test_null_copying()
     {
-        const hpx::any null;
+        hpx::any const null;
         hpx::any copied = null, assigned;
         assigned = null;
 
@@ -285,7 +285,7 @@ namespace any_tests    // test definitions
     void test_cast_to_reference()
     {
         hpx::any a(137);
-        const hpx::any b(a);
+        hpx::any const b(a);
 
         int& ra = hpx::any_cast<int&>(a);
         int const& ra_c = hpx::any_cast<int const&>(a);
@@ -327,7 +327,7 @@ namespace any_tests    // test definitions
             bool caught_exception = false;
             try
             {
-                hpx::any_cast<const char&>(b);
+                hpx::any_cast<char const&>(b);
             }
             catch (hpx::bad_any_cast const&)
             {

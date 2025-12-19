@@ -98,7 +98,7 @@ namespace hpx::plugins::compression {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        HPX_FORCEINLINE void serialize(Archive& ar, const unsigned int)
+        HPX_FORCEINLINE void serialize(Archive& ar, unsigned int const)
         {
         }
 

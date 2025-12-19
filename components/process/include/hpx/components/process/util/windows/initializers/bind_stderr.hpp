@@ -26,7 +26,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
         {
         public:
             explicit bind_stderr(
-                const boost::iostreams::file_descriptor_sink& sink)
+                boost::iostreams::file_descriptor_sink const& sink)
               : sink_(sink)
             {
             }

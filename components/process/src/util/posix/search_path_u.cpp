@@ -24,7 +24,7 @@
 #include <string>
 
 namespace hpx { namespace components { namespace process { namespace posix {
-    std::string search_path(const std::string& filename, std::string path)
+    std::string search_path(std::string const& filename, std::string path)
     {
         if (path.empty())
         {

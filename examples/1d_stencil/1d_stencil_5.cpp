@@ -106,7 +106,7 @@ private:
     friend class hpx::serialization::access;
 
     template <typename Archive>
-    void serialize(Archive&, const unsigned int) const
+    void serialize(Archive&, unsigned int const) const
     {
     }
 

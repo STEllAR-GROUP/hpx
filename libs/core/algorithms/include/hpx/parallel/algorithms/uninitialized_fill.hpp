@@ -230,7 +230,7 @@ namespace hpx::parallel {
         decltype(auto) parallel_uninitialized_fill_n(
             ExPolicy&& policy, Iter first, std::size_t count, T const& value)
         {
-            const bool has_scheduler_executor =
+            bool const has_scheduler_executor =
                 hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
             if constexpr (!has_scheduler_executor)
@@ -297,7 +297,7 @@ namespace hpx::parallel {
             static decltype(auto) parallel(
                 ExPolicy&& policy, Iter first, Sent last, T const& value)
             {
-                const bool has_scheduler_executor =
+                bool const has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
                 if constexpr (!has_scheduler_executor)

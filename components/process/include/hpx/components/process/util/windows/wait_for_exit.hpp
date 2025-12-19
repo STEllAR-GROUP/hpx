@@ -19,7 +19,7 @@
 namespace hpx { namespace components { namespace process { namespace windows {
 
     template <class Process>
-    inline int wait_for_exit(const Process& p)
+    inline int wait_for_exit(Process const& p)
     {
         if (::WaitForSingleObject(p.process_handle(), INFINITE) == WAIT_FAILED)
         {
@@ -37,7 +37,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
     }
 
     template <class Process>
-    inline int wait_for_exit(const Process& p, hpx::error_code& ec)
+    inline int wait_for_exit(Process const& p, hpx::error_code& ec)
     {
         DWORD exit_code = 1;
 

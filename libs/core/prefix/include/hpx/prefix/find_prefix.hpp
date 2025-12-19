@@ -17,7 +17,7 @@ namespace hpx::util {
 
     // set and query the prefix as configured at compile time
     HPX_CXX_EXPORT HPX_CORE_EXPORT void set_hpx_prefix(
-        const char* prefix) noexcept;
+        char const* prefix) noexcept;
     HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT char const*
     hpx_prefix() noexcept;
 

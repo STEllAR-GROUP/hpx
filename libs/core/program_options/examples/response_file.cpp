@@ -98,7 +98,7 @@ int main(int ac, char* av[])
 
         if (vm.count("include-path"))
         {
-            const vector<string>& s = vm["include-path"].as<vector<string>>();
+            vector<string> const& s = vm["include-path"].as<vector<string>>();
             cout << "Include paths: ";
             copy(s.begin(), s.end(), ostream_iterator<string>(cout, " "));
             cout << "\n";

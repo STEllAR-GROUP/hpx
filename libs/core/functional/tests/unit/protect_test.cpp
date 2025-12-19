@@ -27,7 +27,7 @@ int& g(int& x)
 }
 
 template <class T>
-const T& constify(const T& arg)
+T const& constify(T const& arg)
 {
     return arg;    // NOLINT(bugprone-return-const-ref-from-parameter)
 }

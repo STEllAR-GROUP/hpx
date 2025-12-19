@@ -64,7 +64,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
                 env_[0] = 0;
             }
 
-            explicit set_env_(const Range& envs)
+            explicit set_env_(Range const& envs)
             {
                 std::size_t s = std::accumulate(envs.begin(), envs.end(),
                     std::size_t(0), &set_env_::get_size);

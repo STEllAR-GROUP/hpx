@@ -24,9 +24,9 @@ typedef hpx::shared_future<double> future_type;
 template <typename Value>
 struct mul
 {
-    const Value a;
+    Value const a;
 
-    mul(const Value alpha)
+    mul(Value const alpha)
       : a(alpha)
     {
     }

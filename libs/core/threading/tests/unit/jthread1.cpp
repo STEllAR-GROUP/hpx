@@ -262,7 +262,7 @@ void test_hpx_thread()
             // "interrupted" not derived from std::exception
             HPX_TEST(false);
         }
-        catch (const char* e)
+        catch (char const* e)
         {
             caught_exception = true;
         }
@@ -366,7 +366,7 @@ void test_temporarily_disable_token()
                     throw "interrupted";
                 }
             }
-            catch (const char*)
+            catch (char const*)
             {
                 state.store(State::interrupted);
             }

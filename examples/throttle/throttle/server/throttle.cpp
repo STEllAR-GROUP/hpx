@@ -26,7 +26,7 @@
 namespace throttle { namespace server {
     throttle::throttle()
     {
-        const std::size_t num_threads = hpx::get_os_thread_count();
+        std::size_t const num_threads = hpx::get_os_thread_count();
         HPX_ASSERT(num_threads != std::size_t(-1));
         blocked_os_threads_.resize(num_threads);
 

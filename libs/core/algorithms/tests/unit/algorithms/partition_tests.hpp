@@ -76,13 +76,13 @@ struct user_defined_type
         return this->name == t.name && this->val == t.val;
     }
 
-    static const std::vector<std::string> name_list;
+    static std::vector<std::string> const name_list;
 
     unsigned int val;
     std::string name;
 };
 
-const std::vector<std::string> user_defined_type::name_list{
+std::vector<std::string> const user_defined_type::name_list{
     "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"};
 
 struct random_fill
@@ -349,8 +349,8 @@ void test_partition_bad_alloc_async(ExPolicy policy, IteratorTag)
 template <typename IteratorTag, typename DataType, typename Pred>
 void test_partition(IteratorTag, DataType, Pred pred, int rand_base)
 {
-    const std::size_t size = 30007;
-    const int half_range = size / 10;
+    std::size_t const size = 30007;
+    int const half_range = size / 10;
 
     test_partition(IteratorTag(), DataType(), pred, size,
         random_fill(rand_base, half_range));
@@ -361,8 +361,8 @@ template <typename ExPolicy, typename IteratorTag, typename DataType,
 void test_partition(
     ExPolicy policy, IteratorTag, DataType, Pred pred, int rand_base)
 {
-    const std::size_t size = 30007;
-    const int half_range = size / 10;
+    std::size_t const size = 30007;
+    int const half_range = size / 10;
 
     test_partition(policy, IteratorTag(), DataType(), pred, size,
         random_fill(rand_base, half_range));
@@ -373,8 +373,8 @@ template <typename ExPolicy, typename IteratorTag, typename DataType,
 void test_partition_async(
     ExPolicy policy, IteratorTag, DataType, Pred pred, int rand_base)
 {
-    const std::size_t size = 30007;
-    const int half_range = size / 10;
+    std::size_t const size = 30007;
+    int const half_range = size / 10;
 
     test_partition_async(policy, IteratorTag(), DataType(), pred, size,
         random_fill(rand_base, half_range));
@@ -417,19 +417,19 @@ void test_partition()
     ////////// Test cases for 'int' type.
     test_partition(
         IteratorTag(), int(),
-        [rand_base](const unsigned int n) -> bool { return n < rand_base; },
+        [rand_base](unsigned int const n) -> bool { return n < rand_base; },
         rand_base);
     test_partition(
         seq, IteratorTag(), int(),
-        [rand_base](const unsigned int n) -> bool { return n < rand_base; },
+        [rand_base](unsigned int const n) -> bool { return n < rand_base; },
         rand_base);
     test_partition(
         par, IteratorTag(), int(),
-        [rand_base](const unsigned int n) -> bool { return n <= rand_base; },
+        [rand_base](unsigned int const n) -> bool { return n <= rand_base; },
         rand_base);
     test_partition(
         par_unseq, IteratorTag(), int(),
-        [rand_base](const unsigned int n) -> bool { return n > rand_base; },
+        [rand_base](unsigned int const n) -> bool { return n > rand_base; },
         rand_base);
 
     ////////// Test cases for user defined type.
@@ -457,11 +457,11 @@ void test_partition()
     ////////// Asynchronous test cases for 'int' type.
     test_partition_async(
         seq(task), IteratorTag(), int(),
-        [rand_base](const unsigned int n) -> bool { return n >= rand_base; },
+        [rand_base](unsigned int const n) -> bool { return n >= rand_base; },
         rand_base);
     test_partition_async(
         par(task), IteratorTag(), int(),
-        [rand_base](const unsigned int n) -> bool { return n < rand_base; },
+        [rand_base](unsigned int const n) -> bool { return n < rand_base; },
         rand_base);
 
     ////////// Asynchronous test cases for user defined type.
@@ -479,7 +479,7 @@ void test_partition()
     ////////// Corner test cases.
     test_partition(
         par, IteratorTag(), int(),
-        [](const unsigned int) -> bool { return true; }, rand_base);
+        [](unsigned int const) -> bool { return true; }, rand_base);
     test_partition(
         par_unseq, IteratorTag(), user_defined_type(),
         [](user_defined_type const&) -> bool { return false; }, rand_base);

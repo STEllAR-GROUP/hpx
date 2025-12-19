@@ -37,9 +37,9 @@
 
 namespace hpx::util {
 
-    static const char* prefix_ = nullptr;
+    static char const* prefix_ = nullptr;
 
-    void set_hpx_prefix(const char* prefix) noexcept
+    void set_hpx_prefix(char const* prefix) noexcept
     {
         if (prefix_ == nullptr)
         {

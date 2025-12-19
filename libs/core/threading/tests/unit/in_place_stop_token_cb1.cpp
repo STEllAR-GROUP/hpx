@@ -409,7 +409,7 @@ void test_cancellation_single_thread_performance()
 
     auto time3 = end - start;
 
-    auto report = [](const char* label, auto time, std::uint64_t count) {
+    auto report = [](char const* label, auto time, std::uint64_t count) {
         auto ms = std::chrono::duration<double, std::milli>(time).count();
         auto ns = std::chrono::duration<double, std::nano>(time).count();
         std::cout << label << " took " << ms << "ms ("

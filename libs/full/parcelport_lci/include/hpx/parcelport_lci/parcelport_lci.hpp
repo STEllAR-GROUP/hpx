@@ -42,17 +42,17 @@ namespace hpx::parcelset {
         using send_immediate_parcels = std::true_type;
         using is_connectionless = std::true_type;
 
-        static constexpr const char* type() noexcept
+        static constexpr char const* type() noexcept
         {
             return "lci";
         }
 
-        static constexpr const char* pool_name() noexcept
+        static constexpr char const* pool_name() noexcept
         {
             return "parcel-pool-lci";
         }
 
-        static constexpr const char* pool_name_postfix() noexcept
+        static constexpr char const* pool_name_postfix() noexcept
         {
             return "-lci";
         }
@@ -152,7 +152,7 @@ namespace hpx::parcelset {
 
         private:
             static void progress_thread_fn(
-                const std::vector<device_t>& devices);
+                std::vector<device_t> const& devices);
 
             void setup(util::runtime_configuration const& rtcfg);
             void cleanup();
@@ -212,7 +212,7 @@ namespace hpx::traits {
 
                 size_t npus_to_add =
                     parcelset::policies::lci::config_t::progress_thread_num;
-                std::vector<const hpx::resource::pu*> pus;
+                std::vector<hpx::resource::pu const*> pus;
                 for (auto& numa_domain : rp.numa_domains())
                 {
                     for (auto& core : numa_domain.cores())

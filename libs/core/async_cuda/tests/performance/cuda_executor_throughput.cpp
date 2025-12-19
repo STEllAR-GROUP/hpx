@@ -107,11 +107,11 @@ void matrixMultiply(
         .get();
 
     std::cout << "Small matrix multiply tests using CUBLAS...\n\n";
-    const T alpha = 1.0f;
-    const T beta = 0.0f;
+    T const alpha = 1.0f;
+    T const beta = 0.0f;
 
     auto test_function = [&](hpx::cuda::experimental::cublas_executor& exec,
-                             const std::string& msg, std::size_t n_iters) {
+                             std::string const& msg, std::size_t n_iters) {
         // time many cuda kernels spawned one after each other when they complete
         hpx::future<void> f;
         hpx::chrono::high_resolution_timer t1;

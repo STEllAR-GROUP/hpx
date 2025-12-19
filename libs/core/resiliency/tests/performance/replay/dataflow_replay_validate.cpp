@@ -120,11 +120,11 @@ public:
         return std::abs(checksum_ - test_value_);
     }
 
-    friend std::vector<double>::const_iterator begin(const partition_data& v)
+    friend std::vector<double>::const_iterator begin(partition_data const& v)
     {
         return begin(v.data_);
     }
-    friend std::vector<double>::const_iterator end(const partition_data& v)
+    friend std::vector<double>::const_iterator end(partition_data const& v)
     {
         return end(v.data_);
     }
@@ -199,7 +199,7 @@ struct stepper
             ++counter;
         }
 
-        const std::size_t size = center_input.size() - 1;
+        std::size_t const size = center_input.size() - 1;
         partition_data workspace(3 * size + 1);
         std::copy(begin(left_input), end(left_input) - 1, &workspace[0]);
         std::copy(begin(center_input), end(center_input) - 1, &workspace[size]);

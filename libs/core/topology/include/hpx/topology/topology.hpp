@@ -290,7 +290,7 @@ namespace hpx::threads {
 
         /// allocate memory with binding to a numa node set as
         /// specified by the policy and flags (see hwloc docs)
-        void* allocate_membind(std::size_t len, const hwloc_bitmap_ptr& bitmap,
+        void* allocate_membind(std::size_t len, hwloc_bitmap_ptr const& bitmap,
             hpx_hwloc_membind_policy policy, int flags) const;
 
         threads::mask_type get_area_membind_nodeset(

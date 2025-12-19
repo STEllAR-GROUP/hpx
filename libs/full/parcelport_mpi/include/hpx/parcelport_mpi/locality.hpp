@@ -35,7 +35,7 @@ namespace hpx::parcelset::policies::mpi {
             return rank_;
         }
 
-        [[nodiscard]] static constexpr const char* type() noexcept
+        [[nodiscard]] static constexpr char const* type() noexcept
         {
             return "mpi";
         }

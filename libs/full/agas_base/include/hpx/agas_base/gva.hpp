@@ -121,10 +121,10 @@ namespace hpx::agas {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        HPX_EXPORT void save(Archive& ar, const unsigned int /*version*/) const;
+        HPX_EXPORT void save(Archive& ar, unsigned int const /*version*/) const;
 
         template <typename Archive>
-        HPX_EXPORT void load(Archive& ar, const unsigned int version);
+        HPX_EXPORT void load(Archive& ar, unsigned int const version);
 
         HPX_SERIALIZATION_SPLIT_MEMBER()
     };

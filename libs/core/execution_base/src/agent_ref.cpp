@@ -16,7 +16,7 @@
 
 namespace hpx::execution_base {
 
-    void agent_ref::yield(const char* desc) const
+    void agent_ref::yield(char const* desc) const
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
 
@@ -25,7 +25,7 @@ namespace hpx::execution_base {
         impl_->yield(desc);
     }
 
-    bool agent_ref::yield_k(std::size_t k, const char* desc) const
+    bool agent_ref::yield_k(std::size_t k, char const* desc) const
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
 
@@ -34,7 +34,7 @@ namespace hpx::execution_base {
         return impl_->yield_k(k, desc);
     }
 
-    void agent_ref::suspend(const char* desc) const
+    void agent_ref::suspend(char const* desc) const
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
 
@@ -44,13 +44,13 @@ namespace hpx::execution_base {
     }
 
     void agent_ref::resume(
-        hpx::threads::thread_priority priority, const char* desc) const
+        hpx::threads::thread_priority priority, char const* desc) const
     {
         HPX_ASSERT(*this != hpx::execution_base::this_thread::agent());
         impl_->resume(priority, desc);
     }
 
-    void agent_ref::abort(const char* desc) const
+    void agent_ref::abort(char const* desc) const
     {
         HPX_ASSERT(*this != hpx::execution_base::this_thread::agent());
         impl_->abort(desc);
@@ -58,7 +58,7 @@ namespace hpx::execution_base {
 
     void agent_ref::sleep_for(
         hpx::chrono::steady_duration const& sleep_duration,
-        const char* desc) const
+        char const* desc) const
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
         impl_->sleep_for(sleep_duration, desc);
@@ -66,7 +66,7 @@ namespace hpx::execution_base {
 
     void agent_ref::sleep_until(
         hpx::chrono::steady_time_point const& sleep_time,
-        const char* desc) const
+        char const* desc) const
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
         impl_->sleep_until(sleep_time, desc);

@@ -27,8 +27,8 @@ struct communicator
     // num: number of participating partners
     communicator(std::size_t rank, std::size_t num)
     {
-        static const char* left_name = "/stencil/left/";
-        static const char* right_name = "/stencil/right/";
+        static char const* left_name = "/stencil/left/";
+        static char const* right_name = "/stencil/right/";
 
         // Only set left channels if we have more than one partner
         if (num > 1)
