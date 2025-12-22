@@ -18,7 +18,7 @@
 #include <hpx/modules/string_util.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
+#include <hpx/modules/memory.hpp>
 #else
 #include <memory>
 #endif
@@ -85,7 +85,7 @@ namespace hpx::components::process::posix::initializers {
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<char*[]> cmd_line_;
 #else
-        boost::shared_array<char*> cmd_line_;
+        hpx::memory::shared_array<char*> cmd_line_;
 #endif
     };
 

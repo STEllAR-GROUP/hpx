@@ -22,7 +22,7 @@
 #include <hpx/hpx_init.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
+#include <hpx/modules/memory.hpp>
 #else
 #include <memory>
 #endif
@@ -61,7 +61,7 @@ private:
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
     typedef std::shared_ptr<double[]> buffer_type;
 #else
-    typedef boost::shared_array<double> buffer_type;
+    typedef hpx::memory::shared_array<double> buffer_type;
 #endif
 
 public:

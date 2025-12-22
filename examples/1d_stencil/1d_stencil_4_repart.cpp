@@ -24,7 +24,7 @@
 #include <hpx/modules/iterator_support.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
+#include <hpx/modules/memory.hpp>
 #else
 #include <memory>
 #endif
@@ -247,7 +247,7 @@ struct stepper
         std::shared_ptr<double[]> data)
 #else
     hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt,
-        boost::shared_array<double> data)
+        hpx::memory::shared_array<double> data)
 #endif
     {
         using hpx::dataflow;
@@ -358,7 +358,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // Set up APEX tuning
     // The tunable parameter -- how many partitions to divide data into
     long np_index = 1;
-    long* tune_params[1] = {0L};
+    long* tune_params[1] = {nullptr};
     long num_params = 1;
     long mins[1] = {0};
     long maxs[1] = {(long) divisors.size()};
@@ -373,7 +373,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
     std::shared_ptr<double[]> data;
 #else
-    boost::shared_array<double> data;
+    hpx::memory::shared_array<double> data;
 #endif
     for (std::uint64_t i = 0; i < nr; ++i)
     {

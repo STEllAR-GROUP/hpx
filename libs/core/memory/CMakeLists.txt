@@ -6,7 +6,9 @@
 
 # Default location is $HPX_ROOT/libs/memory/include
 set(memory_headers
-    hpx/memory/intrusive_ptr.hpp hpx/memory/detail/sp_convertible.hpp
+    hpx/memory/detail/sp_convertible.hpp
+    hpx/memory/intrusive_ptr.hpp
+    hpx/memory/shared_array.hpp
     hpx/memory/serialization/intrusive_ptr.hpp
 )
 

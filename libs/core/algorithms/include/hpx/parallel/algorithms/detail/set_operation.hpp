@@ -20,7 +20,7 @@
 #include <hpx/parallel/util/partitioner.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
+#include <hpx/modules/memory.hpp>
 #else
 #include <memory>
 #endif
@@ -126,9 +126,9 @@ namespace hpx::parallel::detail {
             new buffer_type[combiner(len1, len2)]);
         std::shared_ptr<set_chunk_data[]> chunks(new set_chunk_data[cores]);
 #else
-        boost::shared_array<buffer_type> buffer(
+        hpx::memory::shared_array<buffer_type> buffer(
             new buffer_type[combiner(len1, len2)]);
-        boost::shared_array<set_chunk_data> chunks(new set_chunk_data[cores]);
+        hpx::memory::shared_array<set_chunk_data> chunks(new set_chunk_data[cores]);
 #endif
 
         // first step, is applied to all partitions

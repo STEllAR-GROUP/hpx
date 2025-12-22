@@ -316,7 +316,7 @@ namespace hpx {
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
+#include <hpx/modules/memory.hpp>
 #endif
 
 #include <algorithm>
@@ -407,7 +407,7 @@ namespace hpx::parallel {
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count]);
 #else
-                boost::shared_array<bool> flags(new bool[count]);
+                hpx::memory::shared_array<bool> flags(new bool[count]);
 #endif
                 flags[0] = false;
 
@@ -611,7 +611,7 @@ namespace hpx::parallel {
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count - 1]);
 #else
-                boost::shared_array<bool> flags(new bool[count - 1]);
+                hpx::memory::shared_array<bool> flags(new bool[count - 1]);
 #endif
                 std::size_t init = 0;
 

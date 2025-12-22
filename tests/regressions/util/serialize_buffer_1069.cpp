@@ -14,7 +14,7 @@
 #include <hpx/modules/testing.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
+#include <hpx/modules/memory.hpp>
 #endif
 
 #include <algorithm>
@@ -109,7 +109,7 @@ int hpx_main()
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
     std::shared_ptr<char[]> send_buffer(new char[MEMORY_BLOCK_SIZE]);
 #else
-    boost::shared_array<char> send_buffer(new char[MEMORY_BLOCK_SIZE]);
+    hpx::memory::shared_array<char> send_buffer(new char[MEMORY_BLOCK_SIZE]);
 #endif
 
     for (hpx::id_type const& loc : hpx::find_all_localities())

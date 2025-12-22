@@ -16,7 +16,7 @@
 #include <hpx/serialization/serialize_buffer_fwd.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
+#include <hpx/modules/memory.hpp>
 #endif
 
 #include <cstddef>
@@ -78,7 +78,7 @@ namespace hpx::serialization {
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         using buffer_type = std::shared_ptr<T[]>;
 #else
-        using buffer_type = boost::shared_array<T>;
+        using buffer_type = hpx::memory::shared_array<T>;
 #endif
 
         static constexpr void no_deleter(T*) noexcept {}

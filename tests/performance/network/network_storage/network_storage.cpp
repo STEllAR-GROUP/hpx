@@ -15,7 +15,7 @@
 #include <hpx/modules/testing.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
+#include <hpx/modules/memory.hpp>
 #endif
 
 #include <algorithm>
@@ -355,7 +355,7 @@ namespace Storage {
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<char[]> src = srcbuffer.data_array();
 #else
-        boost::shared_array<char> src = srcbuffer.data_array();
+        hpx::memory::shared_array<char> src = srcbuffer.data_array();
 #endif
         return copy_to_local_storage(src.get(), address, length);
     }
@@ -378,7 +378,7 @@ namespace Storage {
         std::shared_ptr<char[]> local_buffer(local_allocator.allocate(length),
             [](char*) { DEBUG_OUTPUT(6, "Not deleting memory"); });
 #else
-        boost::shared_array<char> local_buffer(local_allocator.allocate(length),
+        hpx::memory::shared_array<char> local_buffer(local_allocator.allocate(length),
             [](char*) { DEBUG_OUTPUT(6, "Not deleting memory"); });
 #endif
 

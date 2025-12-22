@@ -12,6 +12,7 @@ set(tests
     ip_convertible
     ip_hash
     serialization_intrusive_ptr
+    shared_array
 )
 
 foreach(test ${tests})

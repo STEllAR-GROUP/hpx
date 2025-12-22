@@ -16,7 +16,7 @@
 #include <hpx/modules/execution.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
+#include <hpx/modules/memory.hpp>
 #else
 #include <memory>
 #endif
@@ -83,7 +83,7 @@ namespace hpx::parallel::detail {
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<hpx::util::cache_line_data<T>[]> data_;
 #else
-        boost::shared_array<hpx::util::cache_line_data<T>> data_;
+        hpx::memory::shared_array<hpx::util::cache_line_data<T>> data_;
 #endif
     };
 }    // namespace hpx::parallel::detail
