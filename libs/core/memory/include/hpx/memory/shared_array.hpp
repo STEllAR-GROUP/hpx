@@ -14,72 +14,72 @@
 #include <utility>
 
 namespace hpx::memory {
-namespace detail {
-    template <typename T>
-    struct shared_array_control_block_base
-    {
-        std::atomic<long> count;
-
-        explicit shared_array_control_block_base(long initial_count = 1)
-        : count{initial_count}
+    namespace detail {
+        template <typename T>
+        struct shared_array_control_block_base
         {
-        }
+            std::atomic<long> count;
 
-        virtual ~shared_array_control_block_base() = default;
+            explicit shared_array_control_block_base(long initial_count = 1)
+              : count{initial_count}
+            {
+            }
 
-        virtual void destroy(T* ptr) noexcept = 0;
+            virtual ~shared_array_control_block_base() = default;
 
-        void increment() noexcept
+            virtual void destroy(T* ptr) noexcept = 0;
+
+            void increment() noexcept
+            {
+                count.fetch_add(1, std::memory_order_relaxed);
+            }
+
+            long decrement() noexcept
+            {
+                return count.fetch_sub(1, std::memory_order_acq_rel) - 1;
+            }
+
+            long get_count() const noexcept
+            {
+                return count.load(std::memory_order_relaxed);
+            }
+        };
+
+        template <typename T>
+        struct shared_array_control_block_default
+          : shared_array_control_block_base<T>
         {
-            count.fetch_add(1, std::memory_order_relaxed);
-        }
+            shared_array_control_block_default()
+              : shared_array_control_block_base<T>(1)
+            {
+            }
 
-        long decrement() noexcept
+            void destroy(T* ptr) noexcept override
+            {
+                delete[] ptr;
+            }
+        };
+
+        template <typename T, typename Deleter>
+        struct shared_array_control_block_deleter
+          : shared_array_control_block_base<T>
         {
-            return count.fetch_sub(1, std::memory_order_acq_rel) - 1;
-        }
+            Deleter deleter;
 
-        long get_count() const noexcept
-        {
-            return count.load(std::memory_order_relaxed);
-        }
-    };
+            explicit shared_array_control_block_deleter(Deleter d)
+              : shared_array_control_block_base<T>(1)
+              , deleter(HPX_MOVE(d))
+            {
+            }
 
-    template <typename T>
-    struct shared_array_control_block_default
-    : shared_array_control_block_base<T>
-    {
-        shared_array_control_block_default()
-        : shared_array_control_block_base<T>(1)
-        {
-        }
+            void destroy(T* ptr) noexcept override
+            {
+                deleter(ptr);
+            }
+        };
+    }    // namespace detail
 
-        void destroy(T* ptr) noexcept override
-        {
-            delete[] ptr;
-        }
-    };
-
-    template <typename T, typename Deleter>
-    struct shared_array_control_block_deleter
-    : shared_array_control_block_base<T>
-    {
-        Deleter deleter;
-
-        explicit shared_array_control_block_deleter(Deleter d)
-        : shared_array_control_block_base<T>(1)
-        , deleter(HPX_MOVE(d))
-        {
-        }
-
-        void destroy(T* ptr) noexcept override
-        {
-            deleter(ptr);
-        }
-    };
-}    // namespace detail
-
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     class shared_array
     {
     public:
@@ -104,21 +104,22 @@ namespace detail {
 
         explicit shared_array(element_type* ptr)
           : ptr_{ptr}
-          , control_{ptr ? new detail::shared_array_control_block_default<T>()
-                         : nullptr}
+          , control_{ptr ? new detail::shared_array_control_block_default<T>() :
+                           nullptr}
         {
         }
 
         template <typename Deleter>
         shared_array(element_type* ptr, Deleter deleter)
           : ptr_{ptr}
-          , control_{ptr ? new detail::shared_array_control_block_deleter<T,
-                              Deleter>(HPX_MOVE(deleter))
-                         : nullptr}
+          , control_{ptr ?
+                    new detail::shared_array_control_block_deleter<T, Deleter>(
+                        HPX_MOVE(deleter)) :
+                    nullptr}
         {
         }
 
-        shared_array(const shared_array& other) noexcept
+        shared_array(shared_array const& other) noexcept
           : ptr_{other.ptr_}
           , control_{other.control_}
         {
@@ -141,7 +142,7 @@ namespace detail {
             release();
         }
 
-        shared_array& operator=(const shared_array& other) noexcept
+        shared_array& operator=(shared_array const& other) noexcept
         {
             if (this != &other)
             {
@@ -180,9 +181,9 @@ namespace detail {
         {
             release();
             ptr_ = ptr;
-            control_ =
-                ptr ? new detail::shared_array_control_block_default<T>()
-                    : nullptr;
+            control_ = ptr ?
+                new detail::shared_array_control_block_default<T>() :
+                nullptr;
         }
 
         template <typename Deleter>
@@ -190,9 +191,10 @@ namespace detail {
         {
             release();
             ptr_ = ptr;
-            control_ = ptr ? new detail::shared_array_control_block_deleter<T,
-                                Deleter>(HPX_MOVE(deleter))
-                           : nullptr;
+            control_ = ptr ?
+                new detail::shared_array_control_block_deleter<T, Deleter>(
+                    HPX_MOVE(deleter)) :
+                nullptr;
         }
 
         element_type& operator[](std::ptrdiff_t idx) const noexcept
@@ -229,39 +231,39 @@ namespace detail {
         }
 
         friend bool operator==(
-            const shared_array& lhs, const shared_array& rhs) noexcept
+            shared_array const& lhs, shared_array const& rhs) noexcept
         {
             return lhs.ptr_ == rhs.ptr_;
         }
 
         friend bool operator!=(
-            const shared_array& lhs, const shared_array& rhs) noexcept
+            shared_array const& lhs, shared_array const& rhs) noexcept
         {
             return lhs.ptr_ != rhs.ptr_;
         }
 
         friend bool operator<(
-            const shared_array& lhs, const shared_array& rhs) noexcept
+            shared_array const& lhs, shared_array const& rhs) noexcept
         {
             return lhs.ptr_ < rhs.ptr_;
         }
 
-        friend bool operator==(const shared_array& lhs, std::nullptr_t) noexcept
+        friend bool operator==(shared_array const& lhs, std::nullptr_t) noexcept
         {
             return lhs.ptr_ == nullptr;
         }
 
-        friend bool operator==(std::nullptr_t, const shared_array& rhs) noexcept
+        friend bool operator==(std::nullptr_t, shared_array const& rhs) noexcept
         {
             return rhs.ptr_ == nullptr;
         }
 
-        friend bool operator!=(const shared_array& lhs, std::nullptr_t) noexcept
+        friend bool operator!=(shared_array const& lhs, std::nullptr_t) noexcept
         {
             return lhs.ptr_ != nullptr;
         }
 
-        friend bool operator!=(std::nullptr_t, const shared_array& rhs) noexcept
+        friend bool operator!=(std::nullptr_t, shared_array const& rhs) noexcept
         {
             return rhs.ptr_ != nullptr;
         }

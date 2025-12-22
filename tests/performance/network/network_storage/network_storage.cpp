@@ -378,7 +378,8 @@ namespace Storage {
         std::shared_ptr<char[]> local_buffer(local_allocator.allocate(length),
             [](char*) { DEBUG_OUTPUT(6, "Not deleting memory"); });
 #else
-        hpx::memory::shared_array<char> local_buffer(local_allocator.allocate(length),
+        hpx::memory::shared_array<char> local_buffer(
+            local_allocator.allocate(length),
             [](char*) { DEBUG_OUTPUT(6, "Not deleting memory"); });
 #endif
 

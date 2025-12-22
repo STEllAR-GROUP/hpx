@@ -128,7 +128,8 @@ namespace hpx::parallel::detail {
 #else
         hpx::memory::shared_array<buffer_type> buffer(
             new buffer_type[combiner(len1, len2)]);
-        hpx::memory::shared_array<set_chunk_data> chunks(new set_chunk_data[cores]);
+        hpx::memory::shared_array<set_chunk_data> chunks(
+            new set_chunk_data[cores]);
 #endif
 
         // first step, is applied to all partitions

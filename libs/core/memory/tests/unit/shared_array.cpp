@@ -6,11 +6,11 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
+#include <utility>
 
 namespace n_element_type {
 
@@ -21,7 +21,7 @@ namespace n_element_type {
         HPX_TEST_EQ(value, 42);
     }
 
-}
+}    // namespace n_element_type
 
 namespace n_default_constructor {
 
@@ -32,7 +32,7 @@ namespace n_default_constructor {
         HPX_TEST_EQ(sa.use_count(), 0);
     }
 
-}
+}    // namespace n_default_constructor
 
 namespace n_pointer_constructor {
     void test()
@@ -53,7 +53,7 @@ namespace n_pointer_constructor {
             HPX_TEST_EQ(sa.use_count(), 1);
         }
     }
-}
+}    // namespace n_pointer_constructor
 
 namespace n_copy_constructor {
     void test()
@@ -89,7 +89,7 @@ namespace n_copy_constructor {
             HPX_TEST_EQ(sa3.get(), p);
         }
     }
-}
+}    // namespace n_copy_constructor
 
 namespace n_move_constructor {
     void test()
@@ -101,7 +101,8 @@ namespace n_move_constructor {
 
             hpx::memory::shared_array<int> sa2(std::move(sa1));
             HPX_TEST_EQ(sa2.get(), p);
-            HPX_TEST(sa1.get() == nullptr);
+            HPX_TEST(
+                sa1.get() == nullptr);    // NOLINT(bugprone-use-after-move)
         }
 
         {
@@ -112,11 +113,12 @@ namespace n_move_constructor {
 
             hpx::memory::shared_array<double> sa3(std::move(sa1));
             HPX_TEST_EQ(sa3.get(), p);
-            HPX_TEST(sa1.get() == nullptr);
+            HPX_TEST(
+                sa1.get() == nullptr);    // NOLINT(bugprone-use-after-move)
             HPX_TEST_EQ(sa2.get(), p);
         }
     }
-}
+}    // namespace n_move_constructor
 
 namespace n_swap {
     void test()
@@ -176,7 +178,7 @@ namespace n_swap {
             HPX_TEST_EQ(sa1_copy.use_count(), 2);
         }
     }
-}
+}    // namespace n_swap
 
 namespace n_use_count {
     void test()
@@ -210,7 +212,7 @@ namespace n_use_count {
             HPX_TEST_EQ(sa.use_count(), 1);
         }
     }
-}
+}    // namespace n_use_count
 
 namespace n_get {
     void test()
@@ -240,12 +242,12 @@ namespace n_get {
 
         {
             int* p = new int[2]{100, 200};
-            const hpx::memory::shared_array<int> sa(p);
+            hpx::memory::shared_array<int> const sa(p);
             HPX_TEST_EQ(sa.get(), p);
             HPX_TEST_EQ(sa.get()[0], 100);
         }
     }
-}
+}    // namespace n_get
 
 namespace n_reset {
     void test()
@@ -282,7 +284,7 @@ namespace n_reset {
             HPX_TEST_EQ(sa.use_count(), 1);
         }
     }
-}
+}    // namespace n_reset
 
 namespace n_destructor {
     void test()
@@ -309,7 +311,7 @@ namespace n_destructor {
             HPX_TEST_EQ(sa1.get(), p);
         }
     }
-}
+}    // namespace n_destructor
 
 namespace n_multiple_types {
     void test()
@@ -345,7 +347,7 @@ namespace n_multiple_types {
             HPX_TEST_EQ(sa.get()[1], std::size_t(2000));
         }
     }
-}
+}    // namespace n_multiple_types
 
 namespace n_custom_deleter {
     static int deleter_call_count = 0;
@@ -399,7 +401,7 @@ namespace n_custom_deleter {
 
         HPX_TEST_EQ(deleter_call_count, 1);
     }
-}
+}    // namespace n_custom_deleter
 
 namespace n_reset_with_deleter {
     static int deleter_call_count = 0;
@@ -428,7 +430,7 @@ namespace n_reset_with_deleter {
 
         HPX_TEST_EQ(deleter_call_count, 2);
     }
-}
+}    // namespace n_reset_with_deleter
 
 namespace n_no_delete {
     static int deleter_call_count = 0;
@@ -438,9 +440,8 @@ namespace n_no_delete {
         deleter_call_count = 0;
         int arr[3] = {10, 20, 30};
         {
-            hpx::memory::shared_array<int> sa(arr, [](int*) noexcept {
-                ++deleter_call_count;
-            });
+            hpx::memory::shared_array<int> sa(
+                arr, [](int*) noexcept { ++deleter_call_count; });
             HPX_TEST_EQ(sa.get(), arr);
             HPX_TEST_EQ(sa[0], 10);
             HPX_TEST_EQ(sa[2], 30);
@@ -449,7 +450,7 @@ namespace n_no_delete {
         HPX_TEST_EQ(deleter_call_count, 1);
         HPX_TEST_EQ(arr[0], 10);
     }
-}
+}    // namespace n_no_delete
 
 namespace n_nullptr_constructor {
     void test()
@@ -469,7 +470,7 @@ namespace n_nullptr_constructor {
             HPX_TEST(nullptr == sa2);
         }
     }
-}
+}    // namespace n_nullptr_constructor
 
 namespace n_comparison {
     void test()
@@ -506,7 +507,7 @@ namespace n_comparison {
             HPX_TEST(!(sa == nullptr));
         }
     }
-}
+}    // namespace n_comparison
 
 namespace n_unique {
     void test()
@@ -530,7 +531,7 @@ namespace n_unique {
             HPX_TEST(sa.unique());
         }
     }
-}
+}    // namespace n_unique
 
 int main()
 {
