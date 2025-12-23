@@ -417,22 +417,23 @@ namespace hpx::parallel {
                     }
                 }
 
-                auto f1 = [r](FwdIterB part_begin, std::size_t part_size) -> T {
-                    T val = *part_begin;
+                T init_val = HPX_FORWARD(T_, init);
+                Reduce reduce_op = HPX_FORWARD(Reduce, r);
+
+                auto f1 = [init_val, reduce_op](
+                              FwdIterB part_begin, std::size_t part_size) -> T {
                     return detail::sequential_reduce<ExPolicy>(
-                        ++part_begin, --part_size, HPX_MOVE(val), r);
+                        part_begin, part_size, init_val, reduce_op);
                 };
 
                 return util::partitioner<ExPolicy, T>::call(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
-                    hpx::unwrapping(
-                        [init = HPX_FORWARD(T_, init),
-                            r = HPX_FORWARD(Reduce, r)](auto&& results) -> T {
-                            return detail::sequential_reduce<ExPolicy>(
-                                hpx::util::begin(results),
-                                hpx::util::size(results), init, r);
-                        }));
+                    hpx::unwrapping([init_val, reduce_op](auto&& results) -> T {
+                        return detail::sequential_reduce<ExPolicy>(
+                            hpx::util::begin(results), hpx::util::size(results),
+                            init_val, reduce_op);
+                    }));
             }
         };
         /// \endcond
