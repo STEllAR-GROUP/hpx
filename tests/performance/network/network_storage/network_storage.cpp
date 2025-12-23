@@ -14,10 +14,6 @@
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <hpx/modules/memory.hpp>
-#endif
-
 #include <algorithm>
 #include <array>
 #include <atomic>
@@ -352,11 +348,8 @@ namespace Storage {
     async_mem_result_type CopyToStorage(
         general_buffer_type const& srcbuffer, uint32_t address, uint64_t length)
     {
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<char[]> src = srcbuffer.data_array();
-#else
-        hpx::memory::shared_array<char> src = srcbuffer.data_array();
-#endif
+
         return copy_to_local_storage(src.get(), address, length);
     }
 
@@ -374,14 +367,8 @@ namespace Storage {
         //
         // The memory must be freed after final use.
         std::allocator<char> local_allocator;
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<char[]> local_buffer(local_allocator.allocate(length),
             [](char*) { DEBUG_OUTPUT(6, "Not deleting memory"); });
-#else
-        hpx::memory::shared_array<char> local_buffer(
-            local_allocator.allocate(length),
-            [](char*) { DEBUG_OUTPUT(6, "Not deleting memory"); });
-#endif
 
         // allow the storage class to asynchronously copy the data into buffer
 #ifdef ASYNC_MEMORY

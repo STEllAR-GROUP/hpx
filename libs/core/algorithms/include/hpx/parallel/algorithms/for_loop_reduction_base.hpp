@@ -15,11 +15,7 @@
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/execution.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <hpx/modules/memory.hpp>
-#else
 #include <memory>
-#endif
 
 #include <cstddef>
 #include <type_traits>
@@ -80,11 +76,7 @@ namespace hpx::parallel::detail {
     private:
         T& var_;
         Op op_;
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<hpx::util::cache_line_data<T>[]> data_;
-#else
-        hpx::memory::shared_array<hpx::util::cache_line_data<T>> data_;
-#endif
     };
 }    // namespace hpx::parallel::detail
 /// \endcond

@@ -17,11 +17,8 @@
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/string_util.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <hpx/modules/memory.hpp>
-#else
+
 #include <memory>
-#endif
 
 #include <cstddef>
 #include <string>
@@ -82,11 +79,7 @@ namespace hpx::components::process::posix::initializers {
         HPX_SERIALIZATION_SPLIT_MEMBER()
 
         std::vector<std::string> args_;
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<char*[]> cmd_line_;
-#else
-        hpx::memory::shared_array<char*> cmd_line_;
-#endif
     };
 
 }    // namespace hpx::components::process::posix::initializers

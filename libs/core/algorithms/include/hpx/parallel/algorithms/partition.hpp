@@ -478,11 +478,7 @@ namespace hpx {
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <hpx/modules/memory.hpp>
-#else
 #include <memory>
-#endif
 
 #include <algorithm>
 #include <cstddef>
@@ -1508,11 +1504,8 @@ namespace hpx::parallel {
                 difference_type count =
                     detail::advance_and_get_distance(last_iter, last);
 
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count]);
-#else
-                hpx::memory::shared_array<bool> flags(new bool[count]);
-#endif
+
                 output_iterator_offset init = {0, 0};
 
                 using hpx::get;

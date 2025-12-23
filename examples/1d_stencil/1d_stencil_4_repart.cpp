@@ -23,11 +23,7 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/modules/iterator_support.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <hpx/modules/memory.hpp>
-#else
 #include <memory>
-#endif
 
 #include <algorithm>
 #include <cstddef>
@@ -242,13 +238,8 @@ struct stepper
 
     // do all the work on 'np' partitions, 'nx' data points each, for 'nt'
     // time steps
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
     hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt,
         std::shared_ptr<double[]> data)
-#else
-    hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt,
-        hpx::memory::shared_array<double> data)
-#endif
     {
         using hpx::dataflow;
         using hpx::unwrapping;
@@ -370,11 +361,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // Create the stepper object
     stepper step;
 
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
     std::shared_ptr<double[]> data;
-#else
-    hpx::memory::shared_array<double> data;
-#endif
     for (std::uint64_t i = 0; i < nr; ++i)
     {
         std::uint64_t parts = divisors[np_index];

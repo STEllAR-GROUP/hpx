@@ -19,11 +19,7 @@
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <hpx/modules/memory.hpp>
-#else
 #include <memory>
-#endif
 
 #include <algorithm>
 #include <cstddef>
@@ -121,16 +117,9 @@ namespace hpx::parallel::detail {
 
         std::size_t const step = (len1 + cores - 1) / cores;
 
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<buffer_type[]> buffer(
             new buffer_type[combiner(len1, len2)]);
         std::shared_ptr<set_chunk_data[]> chunks(new set_chunk_data[cores]);
-#else
-        hpx::memory::shared_array<buffer_type> buffer(
-            new buffer_type[combiner(len1, len2)]);
-        hpx::memory::shared_array<set_chunk_data> chunks(
-            new set_chunk_data[cores]);
-#endif
 
         // first step, is applied to all partitions
         auto f1 = [=](set_chunk_data* curr_chunk,

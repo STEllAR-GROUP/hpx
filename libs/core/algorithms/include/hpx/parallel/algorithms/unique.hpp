@@ -315,10 +315,6 @@ namespace hpx {
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <hpx/modules/memory.hpp>
-#endif
-
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
@@ -404,11 +400,8 @@ namespace hpx::parallel {
                     }
                 }
 
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count]);
-#else
-                hpx::memory::shared_array<bool> flags(new bool[count]);
-#endif
+
                 flags[0] = false;
 
                 using hpx::get;
@@ -608,11 +601,8 @@ namespace hpx::parallel {
                         HPX_MOVE(++first), HPX_MOVE(dest)});
                 }
 
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count - 1]);
-#else
-                hpx::memory::shared_array<bool> flags(new bool[count - 1]);
-#endif
+
                 std::size_t init = 0;
 
                 using hpx::get;
