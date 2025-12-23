@@ -370,15 +370,6 @@ function(hpx_check_for_cxx11_std_atomic_128bit)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx11_std_shared_ptr_lwg3018)
-  add_hpx_config_test(
-    HPX_WITH_CXX11_SHARED_PTR_LWG3018
-    SOURCE cmake/tests/cxx11_std_shared_ptr_lwg3018.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_cxx14_delete_operator_with_size)
   add_hpx_config_test(
     HPX_WITH_CXX14_DELETE_OPERATOR_WITH_SIZE
