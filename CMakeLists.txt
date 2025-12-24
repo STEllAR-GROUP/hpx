@@ -1240,22 +1240,9 @@ if(HPX_WITH_NETWORKING)
   endif()
 
   hpx_option(
-    HPX_WITH_PARCELPORT_MPI
-    STRING
-    "Enable the MPI based parcelport. Leave empty to auto-detect."
-    ""
+    HPX_WITH_PARCELPORT_MPI BOOL "Enable the MPI based parcelport." OFF
     CATEGORY "Parcelport"
   )
-  if("${HPX_WITH_PARCELPORT_MPI}" STREQUAL "")
-    find_package(MPI QUIET COMPONENTS CXX)
-    if(MPI_FOUND)
-      hpx_set_option(HPX_WITH_PARCELPORT_MPI VALUE ON FORCE)
-      hpx_info("MPI found. Enabling MPI parcelport (Auto-detected).")
-    else()
-      hpx_set_option(HPX_WITH_PARCELPORT_MPI VALUE OFF FORCE)
-      hpx_info("MPI not found. Disabling MPI parcelport (Auto-detected).")
-    endif()
-  endif()
   if(HPX_WITH_PARCELPORT_MPI)
     hpx_add_config_define(HPX_HAVE_PARCELPORT_MPI)
   endif()
