@@ -23,7 +23,7 @@ HPX_FORCEINLINE void worker_timed(std::uint64_t delay_ns) noexcept
 
     using clock = hpx::chrono::high_resolution_clock;
 
-    auto const end = clock::now() + delay_ns;
+    auto const end = clock::now() + std::chrono::nanoseconds(delay_ns);
 
     while (clock::now() < end)
     {
