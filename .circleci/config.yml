@@ -41,39 +41,9 @@ move_debug_log: &move_debug_log
         mkdir -p ${CIRCLE_JOB}
         cp debug-log.txt ${CIRCLE_JOB} || true
 
-gh_pages_filter: &gh_pages_filter
-    filters:
-      branches:
-        ignore:
-          - gh-pages
-          - trying
-          - staging
-      tags:
-        ignore: stable
-
-docs_push_filter: &docs_push_filter
-    filters:
-      branches:
-        only:
-          - master
-          - /release.*/
-      tags:
-        ignore: stable
-
 core_dependency: &core_dependency
     requires:
       - components
-    <<: *gh_pages_filter
-
-additional_docs_filter: &additional_docs_filter
-    filters:
-      branches:
-        only:
-          - master
-          - /release.*/
-      tags:
-        ignore: stable
-    <<: *gh_pages_filter
 
 add_github_to_known_hosts: &add_github_to_known_hosts
     run:
@@ -207,14 +177,6 @@ jobs:
           name: Running CMake
           command: |
             cmake --version
-            if [ -z "$CIRCLE_PR_NUMBER" ] && \
-                ( [ "$CIRCLE_BRANCH" == "master" ] || \
-                  [[ "$CIRCLE_BRANCH" =~ ^release.* ]] || \
-                  [ -n "$CIRCLE_TAG" ] ); then
-                DOCUMENTATION_OUTPUT_FORMATS="html;singlehtml;latexpdf"
-            else
-                DOCUMENTATION_OUTPUT_FORMATS="html"
-            fi
             # Disable Vc for now as otherwise we need to reconfigure during the
             # install step, which in turn forces everything to be rebuilt.
             # -DHPX_WITH_DATAPAR_VC=On
@@ -247,8 +209,6 @@ jobs:
                 -DHPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES=On \
                 -DHPX_WITH_FETCH_JSON=On \
                 -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
-                -DHPX_WITH_DOCUMENTATION=On \
-                -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="${DOCUMENTATION_OUTPUT_FORMATS}" \
                 -DHPX_WITH_TESTS_COMMAND_LINE=--hpx:queuing=local-workrequesting-fifo \
                 -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2
           no_output_timeout: 30m
@@ -382,23 +342,6 @@ jobs:
           path: /tmp/spelling_suggestions.txt
           destination: /hpx/artifacts/spelling_suggestions.txt
 
-  docs-html:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Sphinx Documentation (HTML)
-          command: |
-                ninja -j1 docs-html
-          no_output_timeout: 2h
-      - persist_to_workspace:
-          root: /hpx
-          paths:
-            - ./build
-      - store_artifacts:
-          path: /hpx/build/share/hpx/docs/html
-
   depreport:
     <<: *defaults
     steps:
@@ -419,53 +362,6 @@ jobs:
             - ./build/share/hpx/docs/report
       - store_artifacts:
           path: /hpx/build/share/hpx/docs/report
-
-  docs-singlehtml:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Sphinx Documentation (Single Page HTML)
-          command: |
-                ninja -j1 docs-singlehtml
-          no_output_timeout: 2h
-      - persist_to_workspace:
-          root: /hpx
-          paths:
-            - ./build/share/hpx/docs/singlehtml
-      - store_artifacts:
-          path: /hpx/build/share/hpx/docs/singlehtml
-
-  docs-latexpdf:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Building Sphinx Documentation (pdf)
-          command: |
-                ninja -j1 docs-latexpdf
-          no_output_timeout: 2h
-      - persist_to_workspace:
-          root: /hpx
-          paths:
-            - ./build/share/hpx/docs/latexpdf
-      - store_artifacts:
-          path: /hpx/build/share/hpx/docs/latexpdf/latex/HPX.pdf
-
-  docs_push:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - <<: *add_github_to_known_hosts
-      - <<: *configure_local_git
-      - run:
-          name: Pushing Sphinx Documentation
-          command: |
-              ninja -j1 git_docs
-          no_output_timeout: 1h
 
   core_local:
     <<: *defaults
@@ -1360,50 +1256,41 @@ workflows:
   version: 2
   build-and-test:
     jobs:
-      - checkout_code:
-          <<: *gh_pages_filter
+      - spellcheck
+      - checkout_code
       - check_circular_deps:
           requires:
             - checkout_code
-          <<: *gh_pages_filter
       - check_module_cmakelists:
           requires:
             - checkout_code
-          <<: *gh_pages_filter
       - clang_format:
           requires:
             - checkout_code
-          <<: *gh_pages_filter
       - cmake_format:
           requires:
             - checkout_code
-          <<: *gh_pages_filter
       - configure:
           requires:
             - checkout_code
-          <<: *gh_pages_filter
       - configure_test_combinations:
           requires:
             - checkout_code
-          <<: *gh_pages_filter
       - inspect:
           requires:
             - configure
-          <<: *gh_pages_filter
-      - spellcheck:
-          <<: *gh_pages_filter
+      - depreport:
+          requires:
+            - configure
       - core_local:
           requires:
             - configure
-          <<: *gh_pages_filter
       - core:
           requires:
             - core_local
-          <<: *gh_pages_filter
       - components:
           requires:
             - core
-          <<: *gh_pages_filter
       - tests.examples1:
           <<: *core_dependency
       - tests.examples2:
@@ -1458,47 +1345,6 @@ workflows:
           <<: *core_dependency
       - tests.headers4_2:
           <<: *core_dependency
-      - docs-html:
-          requires:
-            - configure
-            # Force docs to be built after examples so that workspace doesn't
-            # have conflicts.
-            #
-            # We make this depend on example2 only as this takes longer to run
-            # than example1. Making it depend on both causes workspace conflicts.
-            - tests.examples2
-          <<: *gh_pages_filter
-      - depreport:
-          requires:
-            - configure
-          <<: *gh_pages_filter
-      - docs-singlehtml:
-          requires:
-            - configure
-            # Force docs to be built after examples so that workspace doesn't
-            # have conflicts.
-            #
-            # We make this depend on example2 only as this takes longer to run
-            # than example1. Making it depend on both causes workspace conflicts.
-            - tests.examples2
-          <<: *additional_docs_filter
-      - docs-latexpdf:
-          requires:
-            - configure
-            # Force docs to be built after examples so that workspace doesn't
-            # have conflicts.
-            #
-            # We make this depend on example2 only as this takes longer to run
-            # than example1. Making it depend on both causes workspace conflicts.
-            - tests.examples2
-          <<: *additional_docs_filter
-      - docs_push:
-          requires:
-            - docs-html
-            - docs-singlehtml
-            - docs-latexpdf
-            - depreport
-          <<: *docs_push_filter
       - install:
           requires:
             - core
@@ -1528,15 +1374,8 @@ workflows:
             - tests.headers3_2
             - tests.headers4_1
             - tests.headers4_2
-            # prevent docs from being rebuilt
-            - docs-html
-            - docs-singlehtml
-            - docs-latexpdf
-            - depreport
             # prevent inspect from being rebuilt
             - inspect
-          <<: *gh_pages_filter
       - push_stable_tag:
           requires:
             - install
-          <<: *gh_pages_filter
