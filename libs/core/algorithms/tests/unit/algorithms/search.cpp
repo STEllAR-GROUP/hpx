@@ -569,6 +569,35 @@ void search_bad_alloc_test()
     test_search_bad_alloc<std::forward_iterator_tag>();
 }
 
+void search_searcher_test()
+{
+    std::string text = "abracadabra";
+    std::string pattern = "cada";
+
+    auto searcher = std::boyer_moore_searcher(pattern.begin(), pattern.end());
+
+    auto it_std = std::search(text.begin(), text.end(), searcher);
+
+    auto it_hpx = hpx::search(text.begin(), text.end(), searcher);
+
+    HPX_TEST(it_hpx == it_std);
+}
+
+void search_searcher_policy_test()
+{
+    std::string text = "abracadabra";
+    std::string pattern = "cada";
+
+    auto searcher = std::boyer_moore_searcher(pattern.begin(), pattern.end());
+
+    auto it_std = std::search(text.begin(), text.end(), searcher);
+
+    auto it_hpx =
+        hpx::search(hpx::execution::seq, text.begin(), text.end(), searcher);
+
+    HPX_TEST(it_hpx == it_std);
+}
+
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     unsigned int seed = (unsigned int) std::time(nullptr);
@@ -584,6 +613,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     search_test4();
     search_exception_test();
     search_bad_alloc_test();
+    search_searcher_test();
+    search_searcher_policy_test();
     return hpx::local::finalize();
 }
 

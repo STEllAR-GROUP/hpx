@@ -164,6 +164,44 @@ namespace hpx {
         ExPolicy&& policy, FwdIter first, FwdIter last, FwdIter2 s_first,
         FwdIter2 s_last, Pred&& op = Pred());
 
+    /// Searches the range [first, last) using a searcher object.
+    ///
+    /// \tparam FwdIter   The type of the source iterators (deduced).
+    ///                   This iterator type must meet the requirements of a
+    ///                   forward iterator.
+    /// \tparam Searcher  A callable searcher object meeting the C++ Searcher
+    ///                   requirements (e.g. std::boyer_moore_searcher).
+    ///
+    /// \param first      Refers to the beginning of the sequence to search.
+    /// \param last       Refers to the end of the sequence to search.
+    /// \param searcher   A callable object performing the search.
+    ///
+    /// \returns An iterator to the beginning of the found subsequence, or
+    ///          \a last if no subsequence is found.
+    ///
+    template <typename FwdIter, typename Searcher>
+    FwdIter search(FwdIter first, FwdIter last, Searcher&& searcher);
+
+    /// Searches the range [first, last) using a searcher object.
+    /// Executed according to the policy.
+    ///
+    /// \tparam ExPolicy  The type of the execution policy to use (deduced).
+    /// \tparam FwdIter   The type of the source iterators (deduced).
+    /// \tparam Searcher  A callable searcher object meeting the C++ Searcher
+    ///                   requirements.
+    ///
+    /// \param policy    The execution policy to use.
+    /// \param first     Refers to the beginning of the sequence to search.
+    /// \param last      Refers to the end of the sequence to search.
+    /// \param searcher  A callable object performing the search.
+    ///
+    /// \returns  The algorithm returns a \a hpx::future<FwdIter> if the
+    ///           execution policy is a task policy, or \a FwdIter otherwise.
+    ///
+    template <typename ExPolicy, typename FwdIter, typename Searcher>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter> search(
+        ExPolicy&& policy, FwdIter first, FwdIter last, Searcher&& searcher);
+
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
     /// Uses a provided predicate to compare elements.
     ///
@@ -349,6 +387,33 @@ namespace hpx {
                 HPX_FORWARD(ExPolicy, policy), first, last, s_first, s_last,
                 HPX_MOVE(op), hpx::identity_v, hpx::identity_v);
         }
+
+        template <typename FwdIter, typename Searcher>
+        // clang-format off
+        requires (
+            traits::is_forward_iterator<FwdIter>::value &&
+            std::is_invocable_v<Searcher&, FwdIter, FwdIter>)
+        // clang-format on
+        friend FwdIter tag_fallback_invoke(
+            hpx::search_t, FwdIter first, FwdIter last, Searcher&& searcher)
+        {
+            auto result = HPX_FORWARD(Searcher, searcher)(first, last);
+            return result.first;
+        }
+
+        template <typename ExPolicy, typename FwdIter, typename Searcher>
+        // clang-format off
+        requires (
+            is_execution_policy<ExPolicy>::value &&
+            traits::is_forward_iterator<FwdIter>::value &&
+            std::is_invocable_v<Searcher&, FwdIter, FwdIter>)
+        // clang-format on
+        friend FwdIter tag_fallback_invoke(hpx::search_t, ExPolicy&&,
+            FwdIter first, FwdIter last, Searcher&& searcher)
+        {
+            auto result = HPX_FORWARD(Searcher, searcher)(first, last);
+            return result.first;
+        }
     } search{};
 
     HPX_CXX_EXPORT inline constexpr struct search_n_t final
@@ -390,10 +455,9 @@ namespace hpx {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
-        tag_fallback_invoke(hpx::search_n_t, ExPolicy&& policy, FwdIter first,
-            std::size_t count, FwdIter2 s_first, FwdIter2 s_last,
-            Pred op = Pred())
+            FwdIter>::type tag_fallback_invoke(hpx::search_n_t,
+            ExPolicy&& policy, FwdIter first, std::size_t count,
+            FwdIter2 s_first, FwdIter2 s_last, Pred op = Pred())
         {
             return hpx::parallel::detail::search_n<FwdIter, FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, count, s_first, s_last,
