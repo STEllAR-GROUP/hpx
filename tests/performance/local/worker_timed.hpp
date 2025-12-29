@@ -12,10 +12,6 @@
 #include <hpx/modules/timing.hpp>
 #include <cstdint>
 
-#if defined(__x86_64__) || defined(_M_X64)
-#include <immintrin.h>
-#endif
-
 HPX_FORCEINLINE void worker_timed(std::uint64_t delay_ns) noexcept
 {
     if (delay_ns == 0)
@@ -27,8 +23,6 @@ HPX_FORCEINLINE void worker_timed(std::uint64_t delay_ns) noexcept
 
     while (clock::now() < end)
     {
-#if defined(__x86_64__) || defined(_M_X64)
-        _mm_pause();
-#endif
+        HPX_SMT_PAUSE;
     }
 }
