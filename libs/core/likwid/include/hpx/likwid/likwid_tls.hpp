@@ -28,7 +28,7 @@ namespace hpx::likwid {
         {
             if (surrounding_region != nullptr)
             {
-                stop_region(surrounding_region);
+                stop_region();
             }
         }
 

@@ -40,10 +40,9 @@ namespace hpx::execution::experimental {
 
     public:
         using execution_category =
-            hpx::parallel::execution::executor_execution_category_t<
-                BaseExecutor>;
+            hpx::traits::executor_execution_category_t<BaseExecutor>;
         using executor_parameters_type =
-            hpx::parallel::execution::executor_parameters_type_t<BaseExecutor>;
+            hpx::traits::executor_parameters_type_t<BaseExecutor>;
 
         explicit likwid_executor(BaseExecutor const& exec)
           : exec_(&exec)
@@ -187,7 +186,7 @@ namespace hpx::execution::experimental {
 
 ///////////////////////////////////////////////////////////////////////////////
 // simple forwarding implementations of executor traits
-namespace hpx::parallel::execution {
+namespace hpx::execution::experimental {
 
     HPX_CXX_EXPORT template <typename BaseExecutor>
     struct is_one_way_executor<
@@ -223,6 +222,6 @@ namespace hpx::parallel::execution {
       : is_bulk_two_way_executor<std::decay_t<BaseExecutor>>
     {
     };
-}    // namespace hpx::parallel::execution
+}    // namespace hpx::execution::experimental
 
 #endif
