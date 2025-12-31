@@ -31,7 +31,7 @@ namespace hpx::execution::experimental {
             decltype(auto) operator()(Ts&&... ts)
             {
                 hpx::likwid::region r(exec_.name_.c_str());
-                return hpx::util::invoke(f_, HPX_FORWARD(Ts, ts)...);
+                return hpx::invoke(f_, HPX_FORWARD(Ts, ts)...);
             }
 
             likwid_executor const& exec_;
