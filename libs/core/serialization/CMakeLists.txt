@@ -249,6 +249,7 @@ add_hpx_module(
     hpx_debugging
     hpx_errors
     hpx_format
+    hpx_memory
     hpx_preprocessor
     hpx_type_support
   DEPENDENCIES ${serialization_optional_dependencies}

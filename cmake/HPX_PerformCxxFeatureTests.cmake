@@ -68,10 +68,6 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx17_aligned_new(DEFINITIONS HPX_HAVE_CXX17_ALIGNED_NEW)
 
-  hpx_check_for_cxx17_shared_ptr_array(
-    DEFINITIONS HPX_HAVE_CXX17_SHARED_PTR_ARRAY
-  )
-
   hpx_check_for_cxx17_std_transform_scan(
     DEFINITIONS HPX_HAVE_CXX17_STD_TRANSFORM_SCAN_ALGORITHMS
   )

@@ -468,15 +468,6 @@ function(hpx_check_for_cxx17_std_scan)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx17_shared_ptr_array)
-  add_hpx_config_test(
-    HPX_WITH_CXX17_SHARED_PTR_ARRAY
-    SOURCE cmake/tests/cxx17_shared_ptr_array.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_cxx17_copy_elision)
   add_hpx_config_test(
     HPX_WITH_CXX17_COPY_ELISION
