@@ -16,7 +16,8 @@
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/modules/preprocessor.hpp>
 
-#if !defined(HPX_COMPILE_WITH_MODULES) || defined(HPX_COMPILE_BMI)
+#if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_CORE_EXPORTS) ||             \
+    (defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_CORE_WITH_MODULES))
 #include <hpx/errors/throw_exception.hpp>
 #endif
 
