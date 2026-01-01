@@ -185,11 +185,9 @@ namespace hpx::parallel::execution {
                 typename... Ts>
             struct result
             {
-                // clang-format off
                 using type = decltype(call(std::declval<OneWayExecutor>(),
                     std::declval<F>(), std::declval<Future>(),
                     std::declval<Ts>()...));
-                // clang-format on
             };
         };
 
@@ -345,8 +343,9 @@ namespace hpx::parallel::execution {
 
                 if constexpr (is_void)
                 {
-                    async_execute_dispatch(0, HPX_FORWARD(TwoWayExecutor, exec),
-                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)
+                    return async_execute_dispatch(0,
+                        HPX_FORWARD(TwoWayExecutor, exec), HPX_FORWARD(F, f),
+                        HPX_FORWARD(Ts, ts)...)
                         .get();
                 }
                 else
@@ -366,9 +365,9 @@ namespace hpx::parallel::execution {
                             })
                             .get();
                     }
-                    catch (std::bad_alloc const& ba)
+                    catch (std::bad_alloc const&)
                     {
-                        throw ba;
+                        throw;
                     }
                     catch (...)
                     {
@@ -505,11 +504,9 @@ namespace hpx::parallel::execution {
                 typename... Ts>
             struct result
             {
-                // clang-format off
                 using type = decltype(call(std::declval<TwoWayExecutor>(),
                     std::declval<F>(), std::declval<Future>(),
                     std::declval<Ts>()...));
-                // clang-format on
             };
         };
 
@@ -711,15 +708,14 @@ namespace hpx::parallel::execution {
         HPX_CXX_EXPORT template <typename F, typename Shape, typename... Ts>
         struct bulk_function_result
         {
-            using value_type =
-                typename hpx::traits::range_traits<Shape>::value_type;
+            using value_type = hpx::traits::range_traits<Shape>::value_type;
             using type = hpx::util::detail::invoke_deferred_result_t<F,
                 value_type, Ts...>;
         };
 
         HPX_CXX_EXPORT template <typename F, typename Shape, typename... Ts>
         using bulk_function_result_t =
-            typename bulk_function_result<F, Shape, Ts...>::type;
+            bulk_function_result<F, Shape, Ts...>::type;
 
         template <typename Executor>
         struct bulk_async_execute_fn_helper<Executor,
@@ -899,7 +895,7 @@ namespace hpx::parallel::execution {
 
         template <typename F, typename Shape, bool IsVoid, typename... Ts>
         using bulk_execute_result_impl_t =
-            typename bulk_execute_result_impl<F, Shape, IsVoid, Ts...>::type;
+            bulk_execute_result_impl<F, Shape, IsVoid, Ts...>::type;
 
         HPX_CXX_EXPORT template <typename F, typename Shape, typename... Ts>
         struct bulk_execute_result
@@ -910,7 +906,7 @@ namespace hpx::parallel::execution {
 
         HPX_CXX_EXPORT template <typename F, typename Shape, typename... Ts>
         using bulk_execute_result_t =
-            typename bulk_execute_result<F, Shape, Ts...>::type;
+            bulk_execute_result<F, Shape, Ts...>::type;
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor>
@@ -936,6 +932,7 @@ namespace hpx::parallel::execution {
                         {
                             execution::sync_execute(exec, f, elem, ts...);
                         }
+                        return;
                     }
                     else
                     {
@@ -951,9 +948,9 @@ namespace hpx::parallel::execution {
                         return results;
                     }
                 }
-                catch (std::bad_alloc const& ba)
+                catch (std::bad_alloc const&)
                 {
-                    throw ba;
+                    throw;
                 }
                 catch (...)
                 {
@@ -1009,11 +1006,9 @@ namespace hpx::parallel::execution {
                 typename... Ts>
             struct result
             {
-                // clang-format off
                 using type = decltype(call(std::declval<BulkExecutor>(),
                     std::declval<F>(), std::declval<Shape const&>(),
                     std::declval<Ts>()...));
-                // clang-format on
             };
         };
 
@@ -1059,9 +1054,9 @@ namespace hpx::parallel::execution {
                         return hpx::unwrap(HPX_MOVE(results));
                     }
                 }
-                catch (std::bad_alloc const& ba)
+                catch (std::bad_alloc const&)
                 {
-                    throw ba;
+                    throw;
                 }
                 catch (...)
                 {
@@ -1135,11 +1130,9 @@ namespace hpx::parallel::execution {
                 typename... Ts>
             struct result
             {
-                // clang-format off
                 using type = decltype(call(std::declval<BulkExecutor>(),
                     std::declval<F>(), std::declval<Shape const&>(),
                     std::declval<Ts>()...));
-                // clang-format on
             };
         };
 
@@ -1164,11 +1157,9 @@ namespace hpx::parallel::execution {
                 typename... Ts>
             struct result
             {
-                // clang-format off
                 using type = decltype(call(std::declval<BulkExecutor>(),
                     std::declval<F>(), std::declval<Shape const&>(),
                     std::declval<Ts>()...));
-                // clang-format on
             };
         };
     }    // namespace detail
@@ -1297,21 +1288,15 @@ namespace hpx::parallel::execution {
         {
             template <typename BulkExecutor, typename F, typename Shape,
                 typename Future, typename... Ts>
-            static auto call_impl(
-                hpx::traits::detail::wrap_int, BulkExecutor&& exec, F&& f,
-                Shape const& shape, Future&& predecessor,
-                Ts&&...
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-                ts
-#endif
-                ) -> hpx::traits::executor_future_t<Executor,
-                bulk_then_execute_result_t<F, Shape, Future, Ts...>>
+            static auto call_impl(hpx::traits::detail::wrap_int,
+                [[maybe_unused]] BulkExecutor&& exec, [[maybe_unused]] F&& f,
+                [[maybe_unused]] Shape const& shape,
+                [[maybe_unused]] Future&& predecessor,
+                [[maybe_unused]] Ts&&... ts)
+                -> hpx::traits::executor_future_t<Executor,
+                    bulk_then_execute_result_t<F, Shape, Future, Ts...>>
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-                HPX_UNUSED(exec);
-                HPX_UNUSED(f);
-                HPX_UNUSED(shape);
-                HPX_UNUSED(predecessor);
                 HPX_ASSERT(false);
                 return hpx::traits::executor_future_t<Executor,
                     bulk_then_execute_result_t<F, Shape, Future, Ts...>>{};
@@ -1438,10 +1423,8 @@ namespace hpx::parallel::execution {
             template <typename Executor_, typename... Fs>
             struct result
             {
-                // clang-format off
                 using type = decltype(call(
                     std::declval<Executor_>(), std::declval<Fs>()...));
-                // clang-format on
             };
         };
     }    // namespace detail
@@ -1472,10 +1455,8 @@ namespace hpx::parallel::execution {
             template <typename Executor_, typename... Fs>
             struct result
             {
-                // clang-format off
                 using type = decltype(call(
                     std::declval<Executor_>(), std::declval<Fs>()...));
-                // clang-format on
             };
         };
     }    // namespace detail
