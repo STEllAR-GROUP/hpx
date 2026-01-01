@@ -117,11 +117,14 @@ template <typename Executor>
 void test_then(Executor& exec)
 {
     hpx::future<void> f1 = hpx::make_ready_future();
-    HPX_TEST(hpx::parallel::execution::then_execute(exec, &then_test, f1, 42)
+    HPX_TEST(hpx::parallel::execution::then_execute(
+                 exec, &then_test, HPX_MOVE(f1), 42)
                  .get() == hpx::this_thread::get_id());
 
     hpx::future<void> f2 = hpx::make_ready_future();
-    hpx::parallel::execution::then_execute(exec, &then_test_void, f2, 42).get();
+    hpx::parallel::execution::then_execute(
+        exec, &then_test_void, HPX_MOVE(f2), 42)
+        .get();
 }
 
 template <typename Executor>

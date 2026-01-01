@@ -1,4 +1,4 @@
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,6 @@
 #include <hpx/config.hpp>
 #include <hpx/compute_local/host/numa_domains.hpp>
 #include <hpx/compute_local/host/target.hpp>
-#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
@@ -147,12 +146,14 @@ namespace hpx::execution::experimental {
         /// \note   This constructor will create one fork_join_executor for
         ///         each numa domain
         explicit block_fork_join_executor(
-            threads::thread_priority priority = threads::thread_priority::bound,
-            threads::thread_stacksize stacksize =
+            threads::thread_priority const priority =
+                threads::thread_priority::bound,
+            threads::thread_stacksize const stacksize =
                 threads::thread_stacksize::small_,
             fork_join_executor::loop_schedule const schedule =
                 fork_join_executor::loop_schedule::static_,
-            std::chrono::nanoseconds yield_delay = std::chrono::milliseconds(1))
+            std::chrono::nanoseconds const yield_delay =
+                std::chrono::milliseconds(1))
           : block_fork_join_executor(compute::host::numa_domains(), priority,
                 stacksize, schedule, yield_delay)
         {
@@ -172,12 +173,14 @@ namespace hpx::execution::experimental {
         ///         each given target
         explicit block_fork_join_executor(
             std::vector<compute::host::target> const& targets,
-            threads::thread_priority priority = threads::thread_priority::bound,
-            threads::thread_stacksize stacksize =
+            threads::thread_priority const priority =
+                threads::thread_priority::bound,
+            threads::thread_stacksize const stacksize =
                 threads::thread_stacksize::small_,
             fork_join_executor::loop_schedule const schedule =
                 fork_join_executor::loop_schedule::static_,
-            std::chrono::nanoseconds yield_delay = std::chrono::milliseconds(1))
+            std::chrono::nanoseconds const yield_delay =
+                std::chrono::milliseconds(1))
           : exec_(cores_for_targets(targets), priority, stacksize,
                 targets.size() == 1 ?
                     schedule :
@@ -195,7 +198,7 @@ namespace hpx::execution::experimental {
                         fork_join_executor::init_mode::no_init);
                 }
 
-                auto init_f = [&](std::size_t index) {
+                auto init_f = [&](std::size_t const index) {
                     // create the sub-executors
                     block_execs_[index] = fork_join_executor(
                         targets[index].native_handle().get_device(), priority,
@@ -220,7 +223,7 @@ namespace hpx::execution::experimental {
             }
 
             std::size_t const size = std::size(shape);
-            auto outer_func = [&](std::size_t index, auto&& func,
+            auto outer_func = [&](std::size_t const index, auto&& func,
                                   auto const& full_shape, auto&&... args) {
                 // calculate the inner inner_shape dimensions
                 auto const part_begin = (index * size) / num_targets;
@@ -242,12 +245,8 @@ namespace hpx::execution::experimental {
                 outer_shape, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend void tag_invoke(hpx::parallel::execution::bulk_sync_execute_t,
             block_fork_join_executor& exec, F&& f, S const& shape, Ts&&... ts)
         {
@@ -255,12 +254,8 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             block_fork_join_executor& exec, F&& f, S const& shape, Ts&&... ts)
@@ -297,7 +292,7 @@ namespace hpx::execution::experimental {
                     hpx::forward_as_tuple(HPX_FORWARD(Fs, fs)...);
 
                 constexpr std::size_t Size = sizeof...(Fs);
-                auto outer_func = [&](std::size_t index) {
+                auto outer_func = [&](std::size_t const index) {
                     auto const part_begin = (index * Size) / num_targets;
                     auto const part_end = ((index + 1) * Size) / num_targets;
 
@@ -313,12 +308,8 @@ namespace hpx::execution::experimental {
             }
         }
 
-        // clang-format off
-        template <typename F, typename... Fs,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...)
-            )>
-        // clang-format on
+        template <typename F, typename... Fs>
+            requires(std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...))
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::sync_invoke_t,
             block_fork_join_executor const& exec, F&& f, Fs&&... fs)
@@ -326,12 +317,8 @@ namespace hpx::execution::experimental {
             exec.sync_invoke_helper(HPX_FORWARD(F, f), HPX_FORWARD(Fs, fs)...);
         }
 
-        // clang-format off
-        template <typename F, typename... Fs,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...)
-            )>
-        // clang-format on
+        template <typename F, typename... Fs>
+            requires(std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...))
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::async_invoke_t,
             block_fork_join_executor const& exec, F&& f, Fs&&... fs)
@@ -351,14 +338,11 @@ namespace hpx::execution::experimental {
         }
 
         // support all properties that are exposed by the fork_join_executor
-        // clang-format off
-        template <typename Tag, typename Property,
-            HPX_CONCEPT_REQUIRES_(
+        template <typename Tag, typename Property>
+            requires(
                 hpx::execution::experimental::is_scheduling_property_v<Tag> &&
-                hpx::functional::is_tag_invocable_v<
-                    Tag, fork_join_executor, Property>
-            )>
-        // clang-format on
+                hpx::functional::is_tag_invocable_v<Tag, fork_join_executor,
+                    Property>)
         friend block_fork_join_executor tag_invoke(Tag tag,
             block_fork_join_executor const& exec, Property&& prop) noexcept
         {
@@ -368,13 +352,10 @@ namespace hpx::execution::experimental {
             return exec_with_prop;
         }
 
-        // clang-format off
-        template <typename Tag,
-            HPX_CONCEPT_REQUIRES_(
+        template <typename Tag>
+            requires(
                 hpx::execution::experimental::is_scheduling_property_v<Tag> &&
-                hpx::functional::is_tag_invocable_v<Tag, fork_join_executor>
-            )>
-        // clang-format on
+                hpx::functional::is_tag_invocable_v<Tag, fork_join_executor>)
         friend decltype(auto) tag_invoke(
             Tag tag, block_fork_join_executor const& exec) noexcept
         {

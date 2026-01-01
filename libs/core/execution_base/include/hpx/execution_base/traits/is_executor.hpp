@@ -175,6 +175,33 @@ namespace hpx::traits {
         is_scheduler_executor<T>::value;
 }    // namespace hpx::traits
 
+namespace hpx {
+
+    HPX_CXX_EXPORT template <typename Executor>
+    concept one_way_executor = hpx::traits::is_one_way_executor_v<Executor>;
+
+    HPX_CXX_EXPORT template <typename Executor>
+    concept never_blocking_one_way_executor =
+        hpx::traits::is_never_blocking_one_way_executor_v<Executor>;
+
+    HPX_CXX_EXPORT template <typename Executor>
+    concept bulk_one_way_executor =
+        hpx::traits::is_bulk_one_way_executor_v<Executor>;
+
+    HPX_CXX_EXPORT template <typename Executor>
+    concept two_way_executor = hpx::traits::is_two_way_executor_v<Executor>;
+
+    HPX_CXX_EXPORT template <typename Executor>
+    concept bulk_two_way_executor =
+        hpx::traits::is_bulk_two_way_executor_v<Executor>;
+
+    HPX_CXX_EXPORT template <typename Executor>
+    concept executor_any = hpx::traits::is_executor_any_v<Executor>;
+
+    HPX_CXX_EXPORT template <typename T>
+    concept scheduler_executor = hpx::traits::is_scheduler_executor_v<T>;
+}    // namespace hpx
+
 // backwards compatibility layer
 namespace hpx::parallel::execution {
 

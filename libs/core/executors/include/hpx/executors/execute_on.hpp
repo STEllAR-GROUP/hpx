@@ -96,6 +96,7 @@ namespace hpx::execution::experimental {
 
     ////////////////////////////////////////////////////////////////////////////
     // support all scheduling properties exposed by the embedded scheduler
+
     // clang-format off
     HPX_CXX_EXPORT template <typename Tag, typename Scheduler, typename ExPolicy,
         typename Property,
@@ -169,14 +170,9 @@ namespace hpx::execution::experimental {
           : hpx::functional::detail::tag_fallback<execute_on_t>
         {
         private:
-            // clang-format off
-            template <typename Scheduler, typename ExPolicy,
-                HPX_CONCEPT_REQUIRES_(
-                    hpx::execution::experimental::is_scheduler_v<
-                        std::decay_t<Scheduler>> &&
-                    hpx::is_execution_policy_v<ExPolicy>
-                )>
-            // clang-format on
+            template <typename Scheduler, execution_policy ExPolicy>
+                requires(hpx::execution::experimental::is_scheduler_v<
+                    std::decay_t<Scheduler>>)
             friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
                 execute_on_t, Scheduler&& scheduler, ExPolicy&& policy)
             {

@@ -1,4 +1,4 @@
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +13,7 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 
+#include <concepts>
 #include <cstddef>
 #include <string>
 #include <type_traits>
@@ -24,15 +25,9 @@ namespace hpx::execution::experimental {
     // policies that simply forwards to the embedded executor (if that supports
     // the parameters type)
 
-    // clang-format off
-    HPX_CXX_EXPORT template <typename ExPolicy,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::is_invocable_v<
-                with_processing_units_count_t,
-                typename std::decay_t<ExPolicy>::executor_type, std::size_t>
-        )>
-    // clang-format on
+    HPX_CXX_EXPORT template <execution_policy ExPolicy>
+        requires(std::invocable<with_processing_units_count_t,
+            typename std::decay_t<ExPolicy>::executor_type, std::size_t>)
     constexpr decltype(auto) tag_invoke(
         with_processing_units_count_t, ExPolicy&& policy, std::size_t num_cores)
     {
@@ -42,21 +37,14 @@ namespace hpx::execution::experimental {
             policy, HPX_MOVE(exec), policy.parameters());
     }
 
-    // clang-format off
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Params,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_executor_parameters_v<Params> &&
-            hpx::is_invocable_v<
-                with_processing_units_count_t,
+    HPX_CXX_EXPORT template <execution_policy ExPolicy,
+        executor_parameters Params>
+        requires(
+            std::invocable<with_processing_units_count_t,
                 typename std::decay_t<ExPolicy>::executor_type, std::size_t> &&
-            hpx::is_invocable_v<
-                processing_units_count_t,
-                std::decay_t<Params>,
+            std::invocable<processing_units_count_t, std::decay_t<Params>,
                 typename std::decay_t<ExPolicy>::executor_type,
-                hpx::chrono::steady_duration const&, std::size_t>
-        )>
-    // clang-format on
+                hpx::chrono::steady_duration const&, std::size_t>)
     constexpr decltype(auto) tag_invoke(
         with_processing_units_count_t, ExPolicy&& policy, Params&& params)
     {
@@ -72,28 +60,17 @@ namespace hpx::execution::experimental {
 
     // general fallback for parameters types that are not directly supported by
     // the underlying executor
-
-    // clang-format off
-    HPX_CXX_EXPORT template <typename ParametersProperty, typename ExPolicy,
-        typename Params,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_executor_parameters_v<Params>
-        )>
-    // clang-format on
+    HPX_CXX_EXPORT template <typename ParametersProperty,
+        execution_policy ExPolicy, executor_parameters Params>
     constexpr decltype(auto) tag_fallback_invoke(
         ParametersProperty, ExPolicy&& policy, Params&& params)
     {
         return policy.with(HPX_FORWARD(Params, params));
     }
 
-    // clang-format off
     HPX_CXX_EXPORT template <typename ParametersProperty, typename ExPolicy,
-        typename...Ts,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy>
-        )>
-    // clang-format on
+        typename... Ts,
+        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
     constexpr auto tag_fallback_invoke(
         ParametersProperty prop, ExPolicy&& policy, Ts&&... ts)
         -> decltype(std::declval<ParametersProperty>()(
