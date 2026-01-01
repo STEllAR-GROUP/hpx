@@ -327,26 +327,33 @@ namespace hpx::execution::experimental {
     };
 
     HPX_CXX_EXPORT template <typename Executor>
+    struct is_never_blocking_one_way_executor<
+        compute::host::block_executor<Executor>>
+      : is_never_blocking_one_way_executor<Executor>
+    {
+    };
+
+    HPX_CXX_EXPORT template <typename Executor>
     struct is_one_way_executor<compute::host::block_executor<Executor>>
-      : std::true_type
+      : is_one_way_executor<Executor>
     {
     };
 
     HPX_CXX_EXPORT template <typename Executor>
     struct is_two_way_executor<compute::host::block_executor<Executor>>
-      : std::true_type
+      : is_two_way_executor<Executor>
     {
     };
 
     HPX_CXX_EXPORT template <typename Executor>
     struct is_bulk_one_way_executor<compute::host::block_executor<Executor>>
-      : std::true_type
+      : is_bulk_one_way_executor<Executor>
     {
     };
 
     HPX_CXX_EXPORT template <typename Executor>
     struct is_bulk_two_way_executor<compute::host::block_executor<Executor>>
-      : std::true_type
+      : is_bulk_two_way_executor<Executor>
     {
     };
 }    // namespace hpx::execution::experimental

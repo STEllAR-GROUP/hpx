@@ -253,10 +253,12 @@ namespace hpx::parallel {
                                 HPX_FORWARD(ExPolicy, policy), it, part_size));
                     },
                     // finalize, called once if no error occurred
-                    [first, count](auto&& data) mutable -> FwdIter {
+                    [first, count](auto&&... data) mutable -> FwdIter {
+                        static_assert(sizeof...(data) < 2);
+
                         // make sure iterators embedded in function object that
                         // is attached to futures are invalidated
-                        util::detail::clear_container(data);
+                        util::detail::clear_container(data...);
 
                         std::advance(first, count);
                         return first;

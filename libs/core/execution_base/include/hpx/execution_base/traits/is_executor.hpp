@@ -50,6 +50,7 @@ namespace hpx::execution::experimental {
     // Executor type traits:
 
     // Condition: T meets the syntactic requirements for OneWayExecutor
+    //            (supports sync_execute)
     // Precondition: T is a complete type
     HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_one_way_executor : detail::is_one_way_executor<std::decay_t<T>>
@@ -57,6 +58,7 @@ namespace hpx::execution::experimental {
     };
 
     // Condition: T meets the syntactic requirements for NonBlockingOneWayExecutor
+    //            (supports post_execute)
     // Precondition: T is a complete type
     HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_never_blocking_one_way_executor
@@ -65,6 +67,7 @@ namespace hpx::execution::experimental {
     };
 
     // Condition: T meets the syntactic requirements for BulkOneWayExecutor
+    //            (supports bulk_sync_execute)
     // Precondition: T is a complete type
     HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_bulk_one_way_executor
@@ -73,6 +76,7 @@ namespace hpx::execution::experimental {
     };
 
     // Condition: T meets the syntactic requirements for TwoWayExecutor
+    //            (supports async_execute)
     // Precondition: T is a complete type
     HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_two_way_executor : detail::is_two_way_executor<std::decay_t<T>>
@@ -80,6 +84,7 @@ namespace hpx::execution::experimental {
     };
 
     // Condition: T meets the syntactic requirements for BulkTwoWayExecutor
+    //            (supports bulk_async_execute)
     // Precondition: T is a complete type
     HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_bulk_two_way_executor

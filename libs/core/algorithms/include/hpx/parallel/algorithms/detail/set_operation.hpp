@@ -212,14 +212,13 @@ namespace hpx::parallel::detail {
         // second step, is executed after all partitions are done running
 
         // different versions of clang-format produce different formatting
-        // clang-format off
         auto f2 = [buffer, chunks, cores, first1, first2, dest](
-                      auto&& data) -> result_type {
-            // clang-format on
+                      auto&&... data) -> result_type {
+            static_assert(sizeof...(data) < 2);
 
             // make sure iterators embedded in function object that is attached
             // to futures are invalidated
-            util::detail::clear_container(data);
+            util::detail::clear_container(data...);
 
             // accumulate real length and rightmost positions in input sequences
             std::size_t first1_pos = 0;

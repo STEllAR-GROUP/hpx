@@ -7,9 +7,9 @@
 
 #pragma once
 
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/sort.hpp>
 
 #include "test_utils.hpp"
 

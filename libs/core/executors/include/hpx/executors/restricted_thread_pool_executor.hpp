@@ -243,12 +243,6 @@ namespace hpx::execution::experimental {
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
     HPX_CXX_EXPORT template <typename Policy>
-    struct is_one_way_executor<restricted_policy_executor<Policy>>
-      : is_one_way_executor<hpx::execution::parallel_policy_executor<Policy>>
-    {
-    };
-
-    HPX_CXX_EXPORT template <typename Policy>
     struct is_never_blocking_one_way_executor<
         restricted_policy_executor<Policy>>
       : is_never_blocking_one_way_executor<
