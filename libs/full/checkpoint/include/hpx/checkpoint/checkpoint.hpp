@@ -17,10 +17,10 @@
 
 #include <hpx/actions_base/traits/is_client.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
-#include <hpx/checkpoint_base/checkpoint_data.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/components/get_ptr.hpp>
 #include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/checkpoint_base.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming.hpp>
 #include <hpx/modules/serialization.hpp>

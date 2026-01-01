@@ -14,6 +14,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full checkpoint_base
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${checkpoint_base_sources}
   HEADERS ${checkpoint_base_headers}
   DEPENDENCIES hpx_core

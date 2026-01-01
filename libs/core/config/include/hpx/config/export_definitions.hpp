@@ -97,10 +97,3 @@
 #endif
 
 // clang-format on
-
-// Simplify the condition whether HPX modules should be imported or not
-#if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_CORE_EXPORTS)
-#undef HPX_COMPILE_WITH_MODULES
-#else
-#define HPX_COMPILE_WITH_MODULES
-#endif
