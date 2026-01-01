@@ -109,10 +109,24 @@ namespace hpx::parallel::execution {
     HPX_CXX_EXPORT inline constexpr struct sync_execute_t final
       : hpx::functional::detail::tag_fallback<sync_execute_t>
     {
-    private:
+        using base_type = hpx::functional::detail::tag_fallback<sync_execute_t>;
+
         template <executor_any Executor, typename F, typename... Ts>
             requires(std::invocable<F &&, Ts && ...>)
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+        HPX_FORCEINLINE constexpr decltype(auto) operator()(
+            Executor&& exec, F&& f, Ts&&... ts) const
+            noexcept(noexcept(base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)))
+        {
+            return base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        }
+
+    private:
+        // default, unconstrained implementation chosen if no other overloads
+        // are found
+        template <typename Executor, typename F, typename... Ts>
+        friend HPX_FORCEINLINE constexpr decltype(auto) tag_fallback_invoke(
             sync_execute_t, Executor&& exec, F&& f, Ts&&... ts)
         {
             return detail::sync_execute_fn_helper<std::decay_t<Executor>>::call(
@@ -152,10 +166,25 @@ namespace hpx::parallel::execution {
     HPX_CXX_EXPORT inline constexpr struct async_execute_t final
       : hpx::functional::detail::tag_fallback<async_execute_t>
     {
-    private:
+        using base_type =
+            hpx::functional::detail::tag_fallback<async_execute_t>;
+
         template <executor_any Executor, typename F, typename... Ts>
             requires(std::invocable<F &&, Ts && ...>)
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+        HPX_FORCEINLINE constexpr decltype(auto) operator()(
+            Executor&& exec, F&& f, Ts&&... ts) const
+            noexcept(noexcept(base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)))
+        {
+            return base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        }
+
+    private:
+        // default, unconstrained implementation chosen if no other overloads
+        // are found
+        template <typename Executor, typename F, typename... Ts>
+        friend HPX_FORCEINLINE constexpr decltype(auto) tag_fallback_invoke(
             async_execute_t, Executor&& exec, F&& f, Ts&&... ts)
         {
             return detail::async_execute_fn_helper<
@@ -187,10 +216,27 @@ namespace hpx::parallel::execution {
     HPX_CXX_EXPORT inline constexpr struct then_execute_t final
       : hpx::functional::detail::tag_fallback<then_execute_t>
     {
-    private:
+        using base_type = hpx::functional::detail::tag_fallback<then_execute_t>;
+
         template <executor_any Executor, typename F, typename Future,
             typename... Ts>
             requires(std::invocable<F &&, Future &&, Ts && ...>)
+        HPX_FORCEINLINE constexpr decltype(auto) operator()(
+            Executor&& exec, F&& f, Future&& predecessor, Ts&&... ts) const
+            noexcept(noexcept(base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), HPX_FORWARD(Future, predecessor),
+                HPX_FORWARD(Ts, ts)...)))
+        {
+            return base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), HPX_FORWARD(Future, predecessor),
+                HPX_FORWARD(Ts, ts)...);
+        }
+
+    private:
+        // default, unconstrained implementation chosen if no other overloads
+        // are found
+        template <typename Executor, typename F, typename Future,
+            typename... Ts>
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             then_execute_t, Executor&& exec, F&& f, Future&& predecessor,
             Ts&&... ts)
@@ -225,9 +271,23 @@ namespace hpx::parallel::execution {
     HPX_CXX_EXPORT inline constexpr struct post_t final
       : hpx::functional::detail::tag_fallback<post_t>
     {
-    private:
+        using base_type = hpx::functional::detail::tag_fallback<post_t>;
+
         template <executor_any Executor, typename F, typename... Ts>
             requires(std::invocable<F &&, Ts && ...>)
+        HPX_FORCEINLINE constexpr decltype(auto) operator()(
+            Executor&& exec, F&& f, Ts&&... ts) const
+            noexcept(noexcept(base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)))
+        {
+            return base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        }
+
+    private:
+        // default, unconstrained implementation chosen if no other overloads are
+        // found
+        template <typename Executor, typename F, typename... Ts>
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             post_t, Executor&& exec, F&& f, Ts&&... ts)
         {
@@ -241,6 +301,27 @@ namespace hpx::parallel::execution {
     // BulkTwoWayExecutor customization points:
     // execution::bulk_async_execute, execution::bulk_sync_execute,
     // execution::bulk_then_execute
+
+    // Compute the type the bulk function is invoked with
+    namespace detail {
+
+        template <typename Shape, typename Enable = void>
+        struct shape_value_type
+        {
+            using type = Shape;
+        };
+
+        template <typename Shape>
+        struct shape_value_type<Shape,
+            std::enable_if_t<!std::is_integral_v<Shape>>>
+        {
+            using iterator = hpx::traits::range_iterator_t<Shape>;
+            using type = std::iterator_traits<iterator>::value_type;
+        };
+    }    // namespace detail
+
+    HPX_CXX_EXPORT template <typename Shape>
+    using shape_value_type_t = detail::shape_value_type<Shape>::type;
 
     /// Bulk form of synchronous execution agent creation.
     ///
@@ -279,9 +360,25 @@ namespace hpx::parallel::execution {
     HPX_CXX_EXPORT inline constexpr struct bulk_sync_execute_t final
       : hpx::functional::detail::tag_fallback<bulk_sync_execute_t>
     {
-    private:
+        using base_type =
+            hpx::functional::detail::tag_fallback<bulk_sync_execute_t>;
+
         template <executor_any Executor, typename F, typename Shape,
             typename... Ts>
+            requires(std::invocable<F &&, shape_value_type_t<Shape>, Ts && ...>)
+        HPX_FORCEINLINE constexpr decltype(auto) operator()(
+            Executor&& exec, F&& f, Shape const& shape, Ts&&... ts) const
+            noexcept(noexcept(base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...)))
+        {
+            return base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+        }
+
+    private:
+        // default, unconstrained implementations chosen if no other overloads
+        // are found
+        template <typename Executor, typename F, typename Shape, typename... Ts>
             requires(!std::integral<Shape>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_sync_execute_t, Executor&& exec, F&& f, Shape const& shape,
@@ -292,8 +389,7 @@ namespace hpx::parallel::execution {
                 HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
-        template <executor_any Executor, typename F, typename Shape,
-            typename... Ts>
+        template <typename Executor, typename F, typename Shape, typename... Ts>
             requires(std::integral<Shape>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_sync_execute_t tag, Executor&& exec, F&& f, Shape const& shape,
@@ -340,7 +436,24 @@ namespace hpx::parallel::execution {
     HPX_CXX_EXPORT inline constexpr struct bulk_async_execute_t final
       : hpx::functional::detail::tag_fallback<bulk_async_execute_t>
     {
+        using base_type =
+            hpx::functional::detail::tag_fallback<bulk_async_execute_t>;
+
+        template <executor_any Executor, typename F, typename Shape,
+            typename... Ts>
+            requires(std::invocable<F &&, shape_value_type_t<Shape>, Ts && ...>)
+        HPX_FORCEINLINE constexpr decltype(auto) operator()(
+            Executor&& exec, F&& f, Shape const& shape, Ts&&... ts) const
+            noexcept(noexcept(base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...)))
+        {
+            return base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+        }
+
     private:
+        // default, unconstrained implementations chosen if no other overloads
+        // are found
         template <executor_any Executor, typename F, typename Shape,
             typename... Ts>
             requires(!std::integral<Shape>)
@@ -405,8 +518,28 @@ namespace hpx::parallel::execution {
     HPX_CXX_EXPORT inline constexpr struct bulk_then_execute_t final
       : hpx::functional::detail::tag_fallback<bulk_then_execute_t>
     {
-    private:
+        using base_type =
+            hpx::functional::detail::tag_fallback<bulk_then_execute_t>;
+
         template <executor_any Executor, typename F, typename Shape,
+            typename Future, typename... Ts>
+            requires(std::invocable<F &&, shape_value_type_t<Shape>, Future &&,
+                Ts && ...>)
+        HPX_FORCEINLINE constexpr decltype(auto) operator()(Executor&& exec,
+            F&& f, Shape const& shape, Future&& predecessor, Ts&&... ts) const
+            noexcept(noexcept(base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Future, predecessor),
+                HPX_FORWARD(Ts, ts)...)))
+        {
+            return base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Future, predecessor),
+                HPX_FORWARD(Ts, ts)...);
+        }
+
+    private:
+        // default, unconstrained implementations chosen if no other overloads
+        // are found
+        template <typename Executor, typename F, typename Shape,
             typename Future, typename... Ts>
             requires(!std::integral<Shape>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -419,7 +552,7 @@ namespace hpx::parallel::execution {
                 HPX_FORWARD(Ts, ts)...);
         }
 
-        template <executor_any Executor, typename F, typename Shape,
+        template <typename Executor, typename F, typename Shape,
             typename Future, typename... Ts>
             requires(std::integral<Shape>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -457,9 +590,23 @@ namespace hpx::parallel::execution {
     HPX_CXX_EXPORT inline constexpr struct async_invoke_t final
       : hpx::functional::detail::tag_fallback<async_invoke_t>
     {
-    private:
+        using base_type = hpx::functional::detail::tag_fallback<async_invoke_t>;
+
         template <executor_any Executor, typename F, typename... Fs>
             requires(std::invocable<F> && (std::invocable<Fs> && ...))
+        HPX_FORCEINLINE constexpr decltype(auto) operator()(
+            Executor&& exec, F&& f, Fs&&... fs) const
+            noexcept(noexcept(base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), HPX_FORWARD(Fs, fs)...)))
+        {
+            return base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), HPX_FORWARD(Fs, fs)...);
+        }
+
+    private:
+        // default, unconstrained implementation chosen if no other overloads
+        // are found
+        template <typename Executor, typename F, typename... Fs>
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             async_invoke_t, Executor&& exec, F&& f, Fs&&... fs)
         {
@@ -493,7 +640,22 @@ namespace hpx::parallel::execution {
     HPX_CXX_EXPORT inline constexpr struct sync_invoke_t final
       : hpx::functional::detail::tag_fallback<sync_invoke_t>
     {
+        using base_type = hpx::functional::detail::tag_fallback<sync_invoke_t>;
+
+        template <executor_any Executor, typename F, typename... Fs>
+            requires(std::invocable<F> && (std::invocable<Fs> && ...))
+        HPX_FORCEINLINE constexpr decltype(auto) operator()(
+            Executor&& exec, F&& f, Fs&&... fs) const
+            noexcept(noexcept(base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), HPX_FORWARD(Fs, fs)...)))
+        {
+            return base_type::operator()(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), HPX_FORWARD(Fs, fs)...);
+        }
+
     private:
+        // default, unconstrained implementation chosen if no other overloads
+        // are found
         template <executor_any Executor, typename F, typename... Fs>
             requires(std::invocable<F> && (std::invocable<Fs> && ...))
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(

@@ -326,7 +326,7 @@ namespace hpx::functional::detail {
                     !is_nothrow_tag_invocable_v<Tag, Args&&...> &&
                     meta::value<meta::invoke<Enable,
                         enable_tag_fallback_invoke_t, Args&&...>>>>
-            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr decltype(auto) operator()(
                 Args&&... args) const noexcept
             {
                 if constexpr (is_nothrow_tag_fallback_invocable_v<Tag,
