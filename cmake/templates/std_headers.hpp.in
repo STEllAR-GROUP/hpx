@@ -67,6 +67,10 @@
 #include <asio.hpp>
 #include <hwloc.h>
 
+#if defined(HPX_HAVE_MODULE_LIKWID)
+# include <likwid.h>
+#endif
+
 // Include MPI headers if required
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
     defined(HPX_HAVE_MODULE_MPI_BASE)
