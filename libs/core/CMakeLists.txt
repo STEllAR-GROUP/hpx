@@ -24,6 +24,7 @@ set(_hpx_core_modules
     async_sycl
     batch_environments
     cache
+    checkpoint_base
     command_line_handling_local
     compute_local
     concepts
