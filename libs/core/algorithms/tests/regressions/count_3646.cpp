@@ -14,7 +14,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
-#include "../unit/algorithms/test_utils.hpp"
+#include "test_utils.hpp"
 
 struct bit_counting_iterator : public iterator<std::int64_t>
 {
