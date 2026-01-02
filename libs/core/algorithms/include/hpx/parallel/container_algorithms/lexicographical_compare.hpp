@@ -377,7 +377,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT inline constexpr struct lexicographical_compare_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct lexicographical_compare_t final
       : hpx::detail::tag_parallel_algorithm<lexicographical_compare_t>
     {
     private:

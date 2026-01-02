@@ -11,7 +11,7 @@
 
 namespace hpx::execution_base {
 
-    HPX_CXX_EXPORT struct context_base
+    HPX_CXX_CORE_EXPORT struct context_base
     {
         virtual ~context_base() = default;
 

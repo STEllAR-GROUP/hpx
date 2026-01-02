@@ -67,15 +67,15 @@ namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    HPX_CXX_EXPORT using default_shared_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_CORE_EXPORT using default_shared_priority_queue_scheduler_terminated_queue =
         lockfree_lifo;
 #else
-    HPX_CXX_EXPORT using default_shared_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_CORE_EXPORT using default_shared_priority_queue_scheduler_terminated_queue =
         lockfree_fifo;
 #endif
 
     // Holds core/queue ratios used by schedulers.
-    HPX_CXX_EXPORT struct core_ratios
+    HPX_CXX_CORE_EXPORT struct core_ratios
     {
         constexpr core_ratios(std::size_t high_priority,
             std::size_t normal_priority, std::size_t low_priority) noexcept
@@ -100,7 +100,7 @@ namespace hpx::threads::policies {
     // scheduling hints into account when creating and scheduling work.
     //
     // Warning: PendingQueuing lifo causes lockup on termination
-    HPX_CXX_EXPORT template <typename Mutex = std::mutex,
+    HPX_CXX_CORE_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = concurrentqueue_fifo,
         typename TerminatedQueuing =
             default_shared_priority_queue_scheduler_terminated_queue>

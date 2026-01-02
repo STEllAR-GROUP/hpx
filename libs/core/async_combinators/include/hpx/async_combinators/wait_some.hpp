@@ -372,7 +372,7 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct wait_some_nothrow_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct wait_some_nothrow_t final
       : hpx::functional::tag<wait_some_nothrow_t>
     {
     private:
@@ -547,7 +547,7 @@ namespace hpx {
     } wait_some_nothrow{};
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct wait_some_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct wait_some_t final
       : hpx::functional::tag<wait_some_t>
     {
     private:
@@ -669,7 +669,7 @@ namespace hpx {
     } wait_some{};
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct wait_some_n_nothrow_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct wait_some_n_nothrow_t final
       : hpx::functional::tag<wait_some_n_nothrow_t>
     {
     private:

@@ -477,7 +477,7 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct equal_binary
+        HPX_CXX_CORE_EXPORT struct equal_binary
           : public algorithm<equal_binary, bool>
         {
             constexpr equal_binary() noexcept
@@ -600,7 +600,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT struct equal : public algorithm<equal, bool>
+        HPX_CXX_CORE_EXPORT struct equal : public algorithm<equal, bool>
         {
             constexpr equal() noexcept
               : algorithm("equal")
@@ -675,7 +675,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::equal
-    HPX_CXX_EXPORT inline constexpr struct equal_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct equal_t final
       : hpx::detail::tag_parallel_algorithm<equal_t>
     {
     private:

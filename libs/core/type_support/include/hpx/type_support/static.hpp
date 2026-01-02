@@ -34,7 +34,7 @@ namespace hpx::util {
     // C++11 requires thread-safe initialization of function-scope statics.
     // For conforming compilers, we utilize this feature.
     //
-    HPX_CXX_EXPORT template <typename T, typename Tag = T>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Tag = T>
     struct HPX_EXPORT_STATIC_ static_
     {
     public:
@@ -93,7 +93,7 @@ namespace hpx::util {
     //      T::T() MUST not throw!
     //          this is a requirement of boost::call_once.
     //
-    HPX_CXX_EXPORT template <typename T, typename Tag = T>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Tag = T>
     struct HPX_EXPORT_STATIC_ static_
     {
     public:
@@ -166,10 +166,10 @@ namespace hpx::util {
         static std::once_flag constructed_;
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Tag>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Tag>
     typename static_<T, Tag>::storage_type static_<T, Tag>::data_;
 
-    HPX_CXX_EXPORT template <typename T, typename Tag>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Tag>
     std::once_flag static_<T, Tag>::constructed_;
 #endif
 }    // namespace hpx::util

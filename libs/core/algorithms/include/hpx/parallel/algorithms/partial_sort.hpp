@@ -148,7 +148,8 @@ namespace hpx::parallel {
         ///
         /// \return Position of the first bit set
         ///
-        HPX_CXX_EXPORT constexpr unsigned nbits64(std::uint64_t num) noexcept
+        HPX_CXX_CORE_EXPORT constexpr unsigned nbits64(
+            std::uint64_t num) noexcept
         {
             unsigned nb = 0;
             if (num >= 1ull << 32)
@@ -193,7 +194,7 @@ namespace hpx::parallel {
         /// \param last     iterator to the last element
         /// \param comp     object to Comp two elements
         ///
-        HPX_CXX_EXPORT template <typename Iter, typename Comp>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Comp>
         constexpr void pivot3(Iter first, Iter last, Comp&& comp) noexcept
         {
             auto n2 = (last - first) / 2;
@@ -217,7 +218,7 @@ namespace hpx::parallel {
         ///
         /// \return iterator where is the pivot used in the filtering
         ///
-        HPX_CXX_EXPORT template <typename Iter, typename Comp>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Comp>
         constexpr inline Iter filter(Iter first, Iter end, Comp&& comp)
         {
             std::int64_t const nelem = end - first;
@@ -275,7 +276,7 @@ namespace hpx::parallel {
         // end : iterator to the element after the end in the range
         // level : level of depth from the top level call
         // comp : object for to Comp elements
-        HPX_CXX_EXPORT template <typename Iter, typename Comp>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Comp>
         constexpr void recursive_partial_sort(
             Iter first, Iter middle, Iter end, std::uint32_t level, Comp&& comp)
         {
@@ -341,12 +342,12 @@ namespace hpx::parallel {
         // level : level of depth from the top level call
         // comp : object for to Comp elements
         //
-        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
             typename Comp>
         hpx::future<Iter> parallel_partial_sort(ExPolicy&& policy, Iter first,
             Iter middle, Iter last, std::uint32_t level, Comp&& comp = Comp());
 
-        HPX_CXX_EXPORT struct sort_thread_helper
+        HPX_CXX_CORE_EXPORT struct sort_thread_helper
         {
             template <typename... Ts>
             decltype(auto) operator()(Ts&&... ts) const
@@ -355,7 +356,7 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_EXPORT struct parallel_partial_sort_helper
+        HPX_CXX_CORE_EXPORT struct parallel_partial_sort_helper
         {
             template <typename... Ts>
             decltype(auto) operator()(Ts&&... ts) const
@@ -364,7 +365,7 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
             typename Comp>
         hpx::future<Iter> parallel_partial_sort(ExPolicy&& policy, Iter first,
             Iter middle, Iter last, std::uint32_t level, Comp&& comp)
@@ -450,7 +451,7 @@ namespace hpx::parallel {
     /// \param end : iterator to the element after the end in the range
     /// \param comp : object for to Comp elements
     ///
-    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Comp>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent, typename Comp>
     Iter sequential_partial_sort(Iter first, Iter middle, Sent end, Comp&& comp)
     {
         std::int64_t const nelem = parallel::detail::distance(first, end);
@@ -485,8 +486,8 @@ namespace hpx::parallel {
     /// \param end : iterator to the element after the end in the range
     /// \param comp : object for to Comp elements
     ///
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename Sent,
-        typename Comp>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
+        typename Sent, typename Comp>
     hpx::future<Iter> parallel_partial_sort(
         ExPolicy&& policy, Iter first, Iter middle, Sent end, Comp&& comp)
     {
@@ -511,7 +512,7 @@ namespace hpx::parallel {
 
     ///////////////////////////////////////////////////////////////////////
     // partial_sort
-    HPX_CXX_EXPORT template <typename RandIter>
+    HPX_CXX_CORE_EXPORT template <typename RandIter>
     struct partial_sort
       : public detail::algorithm<partial_sort<RandIter>, RandIter>
     {
@@ -558,7 +559,7 @@ namespace hpx::parallel {
 
 namespace hpx {
 
-    HPX_CXX_EXPORT inline constexpr struct partial_sort_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct partial_sort_t final
       : hpx::detail::tag_parallel_algorithm<partial_sort_t>
     {
     private:

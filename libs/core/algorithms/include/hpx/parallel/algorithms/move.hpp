@@ -127,7 +127,7 @@ namespace hpx::parallel {
     namespace detail {
         /// \cond NOINTERNAL
 
-        HPX_CXX_EXPORT template <typename IterPair>
+        HPX_CXX_CORE_EXPORT template <typename IterPair>
         struct move_pair : public algorithm<move_pair<IterPair>, IterPair>
         {
             move_pair()
@@ -180,11 +180,11 @@ namespace hpx::parallel {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename FwdIter1, typename FwdIter2,
+        HPX_CXX_CORE_EXPORT template <typename FwdIter1, typename FwdIter2,
             typename Enable = void>
         struct move;
 
-        HPX_CXX_EXPORT template <typename FwdIter1, typename FwdIter2>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter1, typename FwdIter2>
         struct move<FwdIter1, FwdIter2,
             std::enable_if_t<
                 iterators_are_segmented<FwdIter1, FwdIter2>::value>>
@@ -196,7 +196,7 @@ namespace hpx::parallel {
         {
         };
 
-        HPX_CXX_EXPORT template <typename FwdIter1, typename FwdIter2>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter1, typename FwdIter2>
         struct move<FwdIter1, FwdIter2,
             std::enable_if_t<
                 iterators_are_not_segmented<FwdIter1, FwdIter2>::value>>
@@ -211,7 +211,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::move
-    HPX_CXX_EXPORT inline constexpr struct move_t
+    HPX_CXX_CORE_EXPORT inline constexpr struct move_t
       : hpx::detail::tag_parallel_algorithm<move_t>
     {
     private:

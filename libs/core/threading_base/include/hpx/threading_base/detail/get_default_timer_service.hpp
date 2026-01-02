@@ -14,10 +14,10 @@
 
 namespace hpx::threads::detail {
 
-    HPX_CXX_EXPORT using get_default_timer_service_type =
+    HPX_CXX_CORE_EXPORT using get_default_timer_service_type =
         hpx::function<::asio::io_context&()>;
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_get_default_timer_service(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_get_default_timer_service(
         get_default_timer_service_type f);
-    HPX_CXX_EXPORT HPX_CORE_EXPORT ::asio::io_context&
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT ::asio::io_context&
     get_default_timer_service();
 }    // namespace hpx::threads::detail

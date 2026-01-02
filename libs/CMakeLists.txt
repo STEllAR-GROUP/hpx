@@ -413,8 +413,7 @@ foreach(lib ${HPX_LIBS})
     endforeach()
 
     configure_file(
-      "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in" ${lib_module_file}
-      @ONLY
+      "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in" ${lib_module_file} @ONLY
     )
 
     target_link_libraries(hpx INTERFACE hpx_${lib}_module_if)

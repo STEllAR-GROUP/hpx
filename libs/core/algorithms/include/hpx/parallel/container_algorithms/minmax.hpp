@@ -810,12 +810,12 @@ namespace hpx::ranges {
 
     /// `minmax_element_result` is equivalent to
     /// `hpx::parallel::util::min_max_result`
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     using minmax_element_result = hpx::parallel::util::min_max_result<T>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::min_element
-    HPX_CXX_EXPORT inline constexpr struct min_element_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct min_element_t final
       : hpx::detail::tag_parallel_algorithm<min_element_t>
     {
     private:
@@ -933,7 +933,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::max_element
-    HPX_CXX_EXPORT inline constexpr struct max_element_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct max_element_t final
       : hpx::detail::tag_parallel_algorithm<max_element_t>
     {
     private:
@@ -1051,7 +1051,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::minmax_element
-    HPX_CXX_EXPORT inline constexpr struct minmax_element_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct minmax_element_t final
       : hpx::detail::tag_parallel_algorithm<minmax_element_t>
     {
     private:

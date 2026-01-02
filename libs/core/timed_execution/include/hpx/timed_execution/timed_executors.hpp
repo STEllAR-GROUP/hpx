@@ -444,7 +444,7 @@ namespace hpx::parallel::execution {
 
     ///////////////////////////////////////////////////////////////////////////
     // Executor allowing to run things at a given point in time
-    HPX_CXX_EXPORT template <executor_any BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <executor_any BaseExecutor>
     struct timed_executor
     {
         using base_executor_type = std::decay_t<BaseExecutor>;
@@ -552,10 +552,10 @@ namespace hpx::parallel::execution {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT using sequenced_timed_executor =
+    HPX_CXX_CORE_EXPORT using sequenced_timed_executor =
         timed_executor<hpx::execution::sequenced_executor>;
 
-    HPX_CXX_EXPORT using parallel_timed_executor =
+    HPX_CXX_CORE_EXPORT using parallel_timed_executor =
         timed_executor<hpx::execution::parallel_executor>;
 }    // namespace hpx::parallel::execution
 
@@ -563,21 +563,21 @@ namespace hpx::execution::experimental {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_one_way_executor<
         parallel::execution::timed_executor<BaseExecutor>>
       : is_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_two_way_executor<
         parallel::execution::timed_executor<BaseExecutor>>
       : is_two_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_never_blocking_one_way_executor<
         parallel::execution::timed_executor<BaseExecutor>>
       : is_never_blocking_one_way_executor<std::decay_t<BaseExecutor>>

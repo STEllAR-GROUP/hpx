@@ -20,7 +20,7 @@ namespace hpx::traits {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct wildcard
+        HPX_CXX_CORE_EXPORT struct wildcard
         {
             // Excluded hpx::util::unused_type from wildcard conversions
             // due to ambiguity (unused_type has own conversion to every type).
@@ -37,12 +37,12 @@ namespace hpx::traits {
             operator T&() const;
         };
 
-        HPX_CXX_EXPORT template <std::size_t N = 0>
+        HPX_CXX_CORE_EXPORT template <std::size_t N = 0>
         inline constexpr wildcard _wildcard{};
 
         ///////////////////////////////////////////////////////////////////////
         // clang-format off
-        HPX_CXX_EXPORT template <typename T, std::size_t... I>
+        HPX_CXX_CORE_EXPORT template <typename T, std::size_t... I>
         constexpr auto is_brace_constructible(std::index_sequence<I...>, T*)
             // older versions of clang get confused by this
             // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
@@ -52,7 +52,7 @@ namespace hpx::traits {
         }
         // clang-format on
 
-        HPX_CXX_EXPORT template <std::size_t... I>
+        HPX_CXX_CORE_EXPORT template <std::size_t... I>
         constexpr std::false_type is_brace_constructible(
             std::index_sequence<I...>, ...) noexcept
         {
@@ -60,7 +60,7 @@ namespace hpx::traits {
         }
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N>
     constexpr auto is_brace_constructible() noexcept
         -> decltype(detail::is_brace_constructible(
             std::make_index_sequence<N>{}, static_cast<T*>(nullptr)))
@@ -72,7 +72,7 @@ namespace hpx::traits {
 #if defined(HPX_MSVC) && defined(HPX_HAVE_CXX_MODULES)
     // MSVC fails to properly implement the is_paren_constructible trait below
     // if C++ modules are enabled.
-    HPX_CXX_EXPORT template <typename T, std::size_t N>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N>
     constexpr auto is_paren_constructible() noexcept
     {
         // assume the struct is paren-constructible if it is brace-initializable
@@ -81,17 +81,17 @@ namespace hpx::traits {
 #else
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename T, typename U>
+        HPX_CXX_CORE_EXPORT template <typename T, typename U>
         struct is_paren_constructible;
 
-        HPX_CXX_EXPORT template <typename T, std::size_t... I>
+        HPX_CXX_CORE_EXPORT template <typename T, std::size_t... I>
         struct is_paren_constructible<T, std::index_sequence<I...>>
           : std::is_constructible<T, decltype(_wildcard<I>)...>
         {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N>
     constexpr auto is_paren_constructible() noexcept
         -> detail::is_paren_constructible<T, std::make_index_sequence<N>>
     {
@@ -102,10 +102,10 @@ namespace hpx::traits {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <std::size_t N>
+        HPX_CXX_CORE_EXPORT template <std::size_t N>
         using size = std::integral_constant<std::size_t, N>;
 
-        HPX_CXX_EXPORT template <typename T,
+        HPX_CXX_CORE_EXPORT template <typename T,
             typename Enable = std::enable_if_t < std::is_class_v<T> &&
                 std::is_empty_v<T> >> constexpr size<0> arity() noexcept
         {
@@ -114,7 +114,7 @@ namespace hpx::traits {
 
 #if !defined(HPX_HAVE_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES)
 #define MAKE_ARITY_FUNC(count)                                                 \
-    HPX_CXX_EXPORT template <typename T,                                       \
+    HPX_CXX_CORE_EXPORT template <typename T,                                  \
         typename Enable =                                                      \
             std::enable_if_t < traits::is_brace_constructible<T, count>() &&   \
             !traits::is_brace_constructible<T, count + 1>() &&                 \
@@ -125,7 +125,7 @@ namespace hpx::traits {
     }
 #else
 #define MAKE_ARITY_FUNC(count)                                                 \
-    HPX_CXX_EXPORT template <typename T,                                       \
+    HPX_CXX_CORE_EXPORT template <typename T,                                  \
         typename Enable =                                                      \
             std::enable_if_t < traits::is_brace_constructible<T, count>() &&   \
             !traits::is_brace_constructible<T, count + 1>() &&                 \

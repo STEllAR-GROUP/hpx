@@ -23,7 +23,7 @@ namespace hpx::cuda::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename R, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename R, typename... Ts>
         void set_value_event_callback_helper(
             cudaError_t const status, R&& r, Ts&&... ts)
         {
@@ -47,7 +47,7 @@ namespace hpx::cuda::experimental {
             }
         }
 
-        HPX_CXX_EXPORT template <typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename... Ts>
         void extend_argument_lifetimes(cudaStream_t stream, Ts&&... ts)
         {
             if constexpr (sizeof...(Ts) > 0)
@@ -62,7 +62,7 @@ namespace hpx::cuda::experimental {
             }
         }
 
-        HPX_CXX_EXPORT template <typename R, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename R, typename... Ts>
         void set_value_immediate_void(cudaStream_t stream, R&& r, Ts&&... ts)
         {
             hpx::execution::experimental::set_value(HPX_FORWARD(R, r));
@@ -73,7 +73,7 @@ namespace hpx::cuda::experimental {
             extend_argument_lifetimes(stream, HPX_FORWARD(Ts, ts)...);
         }
 
-        HPX_CXX_EXPORT template <typename R, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename R, typename... Ts>
         void set_value_event_callback_void(
             cudaStream_t stream, R&& r, Ts&&... ts)
         {
@@ -86,7 +86,7 @@ namespace hpx::cuda::experimental {
                 stream);
         }
 
-        HPX_CXX_EXPORT template <typename R, typename T, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename R, typename T, typename... Ts>
         void set_value_immediate_non_void(
             cudaStream_t stream, R&& r, T&& t, Ts&&... ts)
         {
@@ -99,7 +99,7 @@ namespace hpx::cuda::experimental {
             extend_argument_lifetimes(stream, HPX_FORWARD(Ts, ts)...);
         }
 
-        HPX_CXX_EXPORT template <typename R, typename T, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename R, typename T, typename... Ts>
         void set_value_event_callback_non_void(
             cudaStream_t stream, R&& r, T&& t, Ts&&... ts)
         {
@@ -113,21 +113,21 @@ namespace hpx::cuda::experimental {
                 stream);
         }
 
-        HPX_CXX_EXPORT template <typename R, typename F>
+        HPX_CXX_CORE_EXPORT template <typename R, typename F>
         struct transform_stream_receiver;
 
-        HPX_CXX_EXPORT template <typename R>
+        HPX_CXX_CORE_EXPORT template <typename R>
         struct is_transform_stream_receiver : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename R, typename F>
+        HPX_CXX_CORE_EXPORT template <typename R, typename F>
         struct is_transform_stream_receiver<transform_stream_receiver<R, F>>
           : std::true_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename R, typename F>
+        HPX_CXX_CORE_EXPORT template <typename R, typename F>
         struct transform_stream_receiver
         {
 #if defined(HPX_HAVE_STDEXEC)
@@ -274,7 +274,7 @@ namespace hpx::cuda::experimental {
         // nvcc does not know how to compile it with some argument types
         // ("error: no instance of overloaded function std::forward matches the
         // argument list").
-        HPX_CXX_EXPORT template <typename R, typename F, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename R, typename F, typename... Ts>
         void tag_invoke(hpx::execution::experimental::set_value_t,
             transform_stream_receiver<R, F>&& r, Ts&&... ts)
         {
@@ -282,7 +282,7 @@ namespace hpx::cuda::experimental {
         }
 #endif
 
-        HPX_CXX_EXPORT template <typename S, typename F>
+        HPX_CXX_CORE_EXPORT template <typename S, typename F>
         struct transform_stream_sender
         {
             std::decay_t<S> s;
@@ -408,7 +408,7 @@ namespace hpx::cuda::experimental {
     // - a cudaStream_t is inserted as an additional argument into the call to f
     // - values from the predecessor sender are not forwarded, only passed by
     //   reference, to the call to f to keep them alive until the event is ready
-    HPX_CXX_EXPORT inline constexpr struct transform_stream_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct transform_stream_t final
       : hpx::functional::detail::tag_fallback<transform_stream_t>
     {
     private:

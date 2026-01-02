@@ -16,10 +16,10 @@
 namespace hpx {
 
     /// The function report_error reports the given exception to the console
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void report_error(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void report_error(
         std::size_t num_thread, std::exception_ptr const& e);
 
     /// The function report_error reports the given exception to the console
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void report_error(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void report_error(
         std::exception_ptr const& e);
 }    // namespace hpx

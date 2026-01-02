@@ -24,7 +24,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
 
-    HPX_CXX_EXPORT template <typename Tag,
+    HPX_CXX_CORE_EXPORT template <typename Tag,
         std::size_t N = HPX_HAVE_SPINLOCK_POOL_NUM>
     class spinlock_pool
     {

@@ -30,7 +30,7 @@ namespace hpx::util::logging::destination {
     /**
     @brief Writes the string to console
     */
-    HPX_CXX_EXPORT struct cout : manipulator
+    HPX_CXX_CORE_EXPORT struct cout : manipulator
     {
         [[nodiscard]] HPX_CORE_EXPORT static std::unique_ptr<cout> make();
 
@@ -43,7 +43,7 @@ namespace hpx::util::logging::destination {
     /**
     @brief Writes the string to cerr
     */
-    HPX_CXX_EXPORT struct cerr : manipulator
+    HPX_CXX_CORE_EXPORT struct cerr : manipulator
     {
         [[nodiscard]] HPX_CORE_EXPORT static std::unique_ptr<cerr> make();
 
@@ -60,7 +60,7 @@ namespace hpx::util::logging::destination {
     The stream must outlive this object! Or, clear() the stream,
     before the stream is deleted.
     */
-    HPX_CXX_EXPORT struct stream : manipulator
+    HPX_CXX_CORE_EXPORT struct stream : manipulator
     {
         [[nodiscard]] HPX_CORE_EXPORT static std::unique_ptr<stream> make(
             std::ostream* stream_ptr);
@@ -98,7 +98,7 @@ namespace hpx::util::logging::destination {
 
     For non-Windows systems, this is the console.
      */
-    HPX_CXX_EXPORT struct dbg_window : manipulator
+    HPX_CXX_CORE_EXPORT struct dbg_window : manipulator
     {
         [[nodiscard]] HPX_CORE_EXPORT static std::unique_ptr<dbg_window> make();
 
@@ -111,7 +111,7 @@ namespace hpx::util::logging::destination {
     /**
     @brief Writes the string to a file
     */
-    HPX_CXX_EXPORT struct file : manipulator
+    HPX_CXX_CORE_EXPORT struct file : manipulator
     {
         /**
          @brief settings for when constructing a file class. To see how it's used,

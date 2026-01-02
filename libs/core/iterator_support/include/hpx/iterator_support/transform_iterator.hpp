@@ -18,7 +18,7 @@
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Iterator, typename Transformer,
+    HPX_CXX_CORE_EXPORT template <typename Iterator, typename Transformer,
         typename Reference = void, typename Value = void,
         typename Category = void, typename Difference = void>
     class transform_iterator;
@@ -62,7 +62,7 @@ namespace hpx::util {
     // The main difference to boost::transform_iterator is that the transformer
     // function will be invoked with the iterator, not with the result of
     // dereferencing the base iterator.
-    HPX_CXX_EXPORT template <typename Iterator, typename Transformer,
+    HPX_CXX_CORE_EXPORT template <typename Iterator, typename Transformer,
         typename Reference, typename Value, typename Category,
         typename Difference>
     class transform_iterator
@@ -118,7 +118,7 @@ namespace hpx::util {
         Transformer transformer_;
     };
 
-    HPX_CXX_EXPORT template <typename Iterator, typename Transformer>
+    HPX_CXX_CORE_EXPORT template <typename Iterator, typename Transformer>
     transform_iterator(Iterator const&, Transformer const&)
         -> transform_iterator<Iterator, Transformer>;
 
@@ -133,7 +133,7 @@ namespace hpx::util {
         return transform_iterator<Iterator, Transformer>(it, f);
     }
 
-    HPX_CXX_EXPORT template <typename Transformer, typename Iterator>
+    HPX_CXX_CORE_EXPORT template <typename Transformer, typename Iterator>
     transform_iterator<Iterator, Transformer> make_transform_iterator(
         Iterator const& it)
     {

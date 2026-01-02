@@ -28,7 +28,7 @@ namespace hpx::execution_base {
 
     namespace detail {
 
-        HPX_CXX_EXPORT HPX_CORE_EXPORT agent_base& get_default_agent();
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT agent_base& get_default_agent();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -36,11 +36,12 @@ namespace hpx::execution_base {
 
         namespace detail {
 
-            HPX_CXX_EXPORT struct agent_storage;
-            HPX_CXX_EXPORT HPX_CORE_EXPORT agent_storage* get_agent_storage();
+            HPX_CXX_CORE_EXPORT struct agent_storage;
+            HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT agent_storage*
+            get_agent_storage();
         }    // namespace detail
 
-        HPX_CXX_EXPORT struct HPX_CORE_EXPORT reset_agent
+        HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT reset_agent
         {
             explicit reset_agent(agent_base& impl);
             reset_agent(detail::agent_storage*, agent_base& impl);
@@ -56,23 +57,24 @@ namespace hpx::execution_base {
             agent_base* old_;
         };
 
-        HPX_CXX_EXPORT HPX_CORE_EXPORT hpx::execution_base::agent_ref agent();
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT hpx::execution_base::agent_ref
+        agent();
 
-        HPX_CXX_EXPORT HPX_CORE_EXPORT void yield(
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void yield(
             char const* desc = "hpx::execution_base::this_thread::yield");
-        HPX_CXX_EXPORT HPX_CORE_EXPORT bool yield_k(std::size_t k,
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool yield_k(std::size_t k,
             char const* desc = "hpx::execution_base::this_thread::yield_k");
-        HPX_CXX_EXPORT HPX_CORE_EXPORT void suspend(
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void suspend(
             char const* desc = "hpx::execution_base::this_thread::suspend");
 
-        HPX_CXX_EXPORT template <typename Rep, typename Period>
+        HPX_CXX_CORE_EXPORT template <typename Rep, typename Period>
         void sleep_for(std::chrono::duration<Rep, Period> const& sleep_duration,
             char const* desc = "hpx::execution_base::this_thread::sleep_for")
         {
             agent().sleep_for(sleep_duration, desc);
         }
 
-        HPX_CXX_EXPORT template <class Clock, class Duration>
+        HPX_CXX_CORE_EXPORT template <class Clock, class Duration>
         void sleep_until(
             std::chrono::time_point<Clock, Duration> const& sleep_time,
             char const* desc = "hpx::execution_base::this_thread::sleep_for")
@@ -89,8 +91,8 @@ namespace hpx::execution_base {
 namespace hpx::this_thread::experimental {
 
     using namespace std::this_thread;
-    HPX_CXX_EXPORT using stdexec::execute_may_block_caller;
-    HPX_CXX_EXPORT using stdexec::execute_may_block_caller_t;
+    HPX_CXX_CORE_EXPORT using stdexec::execute_may_block_caller;
+    HPX_CXX_CORE_EXPORT using stdexec::execute_may_block_caller_t;
 
     // this_thread::sync_wait is loaded in the sync_wait.hpp file.
 }    // namespace hpx::this_thread::experimental
@@ -132,7 +134,7 @@ namespace hpx::this_thread::experimental {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
+    HPX_CXX_CORE_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
         execute_may_block_caller_t final
       : hpx::functional::detail::tag_fallback_noexcept<
             execute_may_block_caller_t, detail::is_scheduler>
@@ -153,7 +155,7 @@ namespace hpx::util {
 
     namespace detail {
 
-        HPX_CXX_EXPORT inline bool yield_k(
+        HPX_CXX_CORE_EXPORT inline bool yield_k(
             std::size_t k, char const* thread_name)
         {
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
@@ -168,7 +170,7 @@ namespace hpx::util {
         }
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <bool AllowTimedSuspension, typename Predicate>
+    HPX_CXX_CORE_EXPORT template <bool AllowTimedSuspension, typename Predicate>
     void yield_while(Predicate&& predicate, char const* thread_name = nullptr)
     {
         for (std::size_t k = 0; predicate(); ++k)
@@ -184,7 +186,7 @@ namespace hpx::util {
         }
     }
 
-    HPX_CXX_EXPORT template <typename Predicate>
+    HPX_CXX_CORE_EXPORT template <typename Predicate>
     void yield_while(Predicate&& predicate, char const* thread_name = nullptr,
         bool allow_timed_suspension = true)
     {
@@ -208,7 +210,7 @@ namespace hpx::util {
         // Note: This is mostly a hack used to work around the raciness of
         // termination detection for thread pools and the runtime and can be
         // replaced if and when a better solution appears.
-        HPX_CXX_EXPORT template <typename Predicate>
+        HPX_CXX_CORE_EXPORT template <typename Predicate>
         void yield_while_count(Predicate&& predicate,
             std::size_t required_count, char const* thread_name = nullptr,
             bool allow_timed_suspension = true)
@@ -236,7 +238,7 @@ namespace hpx::util {
         // addition of a timeout parameter. If the timeout is exceeded, waiting
         // is stopped and the function returns false. If the predicate is
         // successfully waited for the function returns true.
-        HPX_CXX_EXPORT template <typename Predicate>
+        HPX_CXX_CORE_EXPORT template <typename Predicate>
         bool yield_while_count_timeout(Predicate&& predicate,
             std::size_t required_count,
             hpx::chrono::steady_duration const& rel_time,

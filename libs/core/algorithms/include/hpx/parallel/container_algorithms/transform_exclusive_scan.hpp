@@ -443,10 +443,10 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     using transform_exclusive_scan_result = parallel::util::in_out_result<I, O>;
 
-    HPX_CXX_EXPORT inline constexpr struct transform_exclusive_scan_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct transform_exclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<transform_exclusive_scan_t>
     {
     private:

@@ -25,7 +25,7 @@ namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // dispatch point used for launch_policy implementations
-    HPX_CXX_EXPORT template <typename Action, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Action, typename Enable = void>
     struct async_launch_policy_dispatch;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -307,7 +307,7 @@ namespace hpx::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Action>
+    HPX_CXX_CORE_EXPORT template <typename Action>
     struct async_launch_policy_dispatch<Action,
         std::enable_if_t<!traits::is_action_v<Action>>>
     {

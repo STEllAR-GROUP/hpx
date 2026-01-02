@@ -46,13 +46,14 @@
 
 namespace hpx {
 
-    HPX_CXX_EXPORT inline hpx::debug::enable_print<NUMA_BINDING_ALLOCATOR_DEBUG>
+    HPX_CXX_CORE_EXPORT inline hpx::debug::enable_print<
+        NUMA_BINDING_ALLOCATOR_DEBUG>
         nba_deb("NUM_B_A");
 }    // namespace hpx
 
 namespace hpx::execution::experimental {
 
-    HPX_CXX_EXPORT struct numa_binding_allocator_tag
+    HPX_CXX_CORE_EXPORT struct numa_binding_allocator_tag
     {
     };
 
@@ -72,7 +73,7 @@ namespace hpx::execution::experimental {
 
 namespace hpx::compute::host {
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct numa_binding_helper
     {
         // After memory has been allocated, this operator will be called for
@@ -146,14 +147,14 @@ namespace hpx::compute::host {
         std::string pool_name_ = "default";
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     using numa_binding_helper_ptr = std::shared_ptr<numa_binding_helper<T>>;
 
     /// The numa_binding_allocator allocates memory using a policy based on
     /// hwloc flags for memory binding. This allocator can be used to request
     /// data that is bound to one or more numa domains via the bitmap mask
     /// supplied
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct numa_binding_allocator
     {
         using value_type = T;

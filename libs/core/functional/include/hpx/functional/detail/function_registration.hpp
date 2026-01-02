@@ -17,7 +17,7 @@
 namespace hpx::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename VTable, typename T>
+    HPX_CXX_CORE_EXPORT template <typename VTable, typename T>
     struct get_function_name_declared : std::false_type
     {
     };
@@ -37,7 +37,7 @@ namespace hpx::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename VTable, typename F>
+    HPX_CXX_CORE_EXPORT template <typename VTable, typename F>
     [[nodiscard]] char const* get_function_name()
     {
         return get_function_name_impl<VTable, F>::call();

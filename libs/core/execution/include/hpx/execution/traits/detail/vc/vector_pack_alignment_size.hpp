@@ -20,74 +20,74 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     struct is_vector_pack<Vc::Vector<T, Abi>> : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename V,
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename V,
         std::size_t W>
     struct is_vector_pack<Vc::SimdArray<T, N, V, W>> : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_vector_pack<Vc::Scalar::Vector<T>> : std::true_type
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     struct is_scalar_vector_pack<Vc::Vector<T, Abi>> : std::false_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename V,
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename V,
         std::size_t W>
     struct is_scalar_vector_pack<Vc::SimdArray<T, N, V, W>>
       : std::integral_constant<bool, N == 1>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_scalar_vector_pack<Vc::Scalar::Vector<T>> : std::true_type
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     struct is_non_scalar_vector_pack<Vc::Vector<T, Abi>> : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename V,
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename V,
         std::size_t W>
     struct is_non_scalar_vector_pack<Vc::SimdArray<T, N, V, W>>
       : std::integral_constant<bool, N != 1>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_non_scalar_vector_pack<Vc::Scalar::Vector<T>> : std::false_type
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Enable>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable>
     struct vector_pack_alignment
     {
         static constexpr std::size_t const value =
             Vc::Vector<T>::MemoryAlignment;
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     struct vector_pack_alignment<Vc::Vector<T, Abi>>
     {
         static constexpr std::size_t const value =
             Vc::Vector<T, Abi>::MemoryAlignment;
     };
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename V,
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename V,
         std::size_t W>
     struct vector_pack_alignment<Vc::SimdArray<T, N, V, W>>
     {
@@ -95,7 +95,7 @@ namespace hpx::parallel::traits {
             Vc::SimdArray<T, N, V, W>::MemoryAlignment;
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct vector_pack_alignment<Vc::Scalar::Vector<T>>
     {
         static constexpr std::size_t const value =
@@ -103,26 +103,26 @@ namespace hpx::parallel::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Enable>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable>
     struct vector_pack_size
     {
         static std::size_t const value = Vc::Vector<T>::Size;
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     struct vector_pack_size<Vc::Vector<T, Abi>>
     {
         static std::size_t const value = Vc::Vector<T, Abi>::Size;
     };
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename V,
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename V,
         std::size_t W>
     struct vector_pack_size<Vc::SimdArray<T, N, V, W>>
     {
         static std::size_t const value = Vc::SimdArray<T, N, V, W>::Size;
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct vector_pack_size<Vc::Scalar::Vector<T>>
     {
         static std::size_t const value = Vc::Scalar::Vector<T>::Size;

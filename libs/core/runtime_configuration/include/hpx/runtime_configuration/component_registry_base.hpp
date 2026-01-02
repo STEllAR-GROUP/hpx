@@ -18,7 +18,7 @@ namespace hpx::components {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a component_registry_base has to be used as a base class for all
     /// component registries.
-    HPX_CXX_EXPORT struct HPX_CORE_EXPORT component_registry_base
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT component_registry_base
     {
         virtual ~component_registry_base() = default;
 

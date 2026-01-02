@@ -17,7 +17,7 @@
 namespace hpx::execution::experimental::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Variants>
+    HPX_CXX_CORE_EXPORT template <typename Variants>
     struct single_result
     {
         static_assert(sizeof(Variants) == 0,
@@ -36,13 +36,13 @@ namespace hpx::execution::experimental::detail {
         using type = void;
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct single_result<meta::pack<meta::pack<T>>>
     {
         using type = T;
     };
 
-    HPX_CXX_EXPORT template <typename T, typename U, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename T, typename U, typename... Ts>
     struct single_result<meta::pack<meta::pack<T, U, Ts...>>>
     {
         static_assert(sizeof(T) == 0,
@@ -50,7 +50,7 @@ namespace hpx::execution::experimental::detail {
             "(single variant with two or more types given)");
     };
 
-    HPX_CXX_EXPORT template <typename T, typename U, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename T, typename U, typename... Ts>
     struct single_result<meta::pack<T, U, Ts...>>
     {
         static_assert(sizeof(T) == 0,
@@ -58,11 +58,11 @@ namespace hpx::execution::experimental::detail {
             "(two or more variants)");
     };
 
-    HPX_CXX_EXPORT template <typename Variants>
+    HPX_CXX_CORE_EXPORT template <typename Variants>
     using single_result_t = meta::type<single_result<Variants>>;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Variants>
+    HPX_CXX_CORE_EXPORT template <typename Variants>
     struct single_result_non_void
     {
         using type = single_result_t<Variants>;
@@ -70,61 +70,61 @@ namespace hpx::execution::experimental::detail {
             !std::is_void_v<type>, "expected a non-void type in single_result");
     };
 
-    HPX_CXX_EXPORT template <typename Variants>
+    HPX_CXX_CORE_EXPORT template <typename Variants>
     using single_result_non_void_t =
         meta::type<single_result_non_void<Variants>>;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Variants>
+    HPX_CXX_CORE_EXPORT template <typename Variants>
     struct single_variant
     {
         static_assert(sizeof(Variants) == 0,
             "expected a single variant completion_signatures<>::value_types");
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct single_variant<util::pack<T>>
     {
         using type = T;
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct single_variant<meta::pack<T>>
     {
         using type = T;
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct single_variant<hpx::variant<T>>
     {
         using type = T;
     };
 
-    HPX_CXX_EXPORT template <typename Variants>
+    HPX_CXX_CORE_EXPORT template <typename Variants>
     using single_variant_t = meta::type<single_variant<Variants>>;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Variants>
+    HPX_CXX_CORE_EXPORT template <typename Variants>
     struct single_variant_tuple_size
     {
         static_assert(sizeof(Variants) == 0,
             "expected a single variant completion_signatures<>::value_types");
     };
 
-    HPX_CXX_EXPORT template <template <typename...> typename Variants>
+    HPX_CXX_CORE_EXPORT template <template <typename...> typename Variants>
     struct single_variant_tuple_size<Variants<>>
     {
         static constexpr std::size_t size = 0;
     };
 
-    HPX_CXX_EXPORT template <template <typename...> typename Variants,
+    HPX_CXX_CORE_EXPORT template <template <typename...> typename Variants,
         template <typename...> typename Tuple, typename... Ts>
     struct single_variant_tuple_size<Variants<Tuple<Ts...>>>
     {
         static constexpr std::size_t size = sizeof...(Ts);
     };
 
-    HPX_CXX_EXPORT template <typename Variants>
+    HPX_CXX_CORE_EXPORT template <typename Variants>
     inline constexpr std::size_t single_variant_tuple_size_v =
         single_variant_tuple_size<Variants>::size;
 }    // namespace hpx::execution::experimental::detail

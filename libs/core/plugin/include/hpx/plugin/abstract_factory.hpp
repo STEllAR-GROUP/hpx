@@ -15,7 +15,7 @@ namespace hpx::util::plugin {
 
     namespace detail {
 
-        HPX_CXX_EXPORT struct HPX_PLUGIN_EXPORT_API abstract_factory_item_base
+        HPX_CXX_CORE_EXPORT struct HPX_PLUGIN_EXPORT_API abstract_factory_item_base
         {
             virtual ~abstract_factory_item_base() = default;
             void create(int*******);    // dummy placeholder
@@ -24,11 +24,11 @@ namespace hpx::util::plugin {
         // A template class that is given the base type of plugin and a set of
         // constructor parameter types and defines the appropriate virtual
         // 'create' function.
-        HPX_CXX_EXPORT template <typename BasePlugin, typename Base,
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Base,
             typename Parameter>
         struct HPX_PLUGIN_EXPORT_API abstract_factory_item;
 
-        HPX_CXX_EXPORT template <typename BasePlugin, typename Base,
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Base,
             typename... Parameters>
         struct HPX_PLUGIN_EXPORT_API abstract_factory_item<BasePlugin, Base,
             hpx::util::pack<Parameters...>> : public Base
@@ -40,7 +40,7 @@ namespace hpx::util::plugin {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename BasePlugin>
+    HPX_CXX_CORE_EXPORT template <typename BasePlugin>
     struct HPX_PLUGIN_EXPORT_API abstract_factory
       : detail::abstract_factory_item<BasePlugin,
             detail::abstract_factory_item_base,

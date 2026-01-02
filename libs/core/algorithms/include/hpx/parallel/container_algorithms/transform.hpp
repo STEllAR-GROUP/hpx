@@ -698,15 +698,15 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     using unary_transform_result = parallel::util::in_out_result<I, O>;
 
-    HPX_CXX_EXPORT template <typename I1, typename I2, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I1, typename I2, typename O>
     using binary_transform_result = parallel::util::in_in_out_result<I1, I2, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // a for hpx::ranges::transform
-    HPX_CXX_EXPORT inline constexpr struct transform_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct transform_t final
       : hpx::detail::tag_parallel_algorithm<transform_t>
     {
     private:

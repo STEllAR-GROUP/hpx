@@ -20,8 +20,8 @@ namespace hpx::execution::experimental {
     // Scheduling property implementations for execution policies that simply
     // forwards to the embedded executor
 
-    HPX_CXX_EXPORT template <scheduling_property Tag, execution_policy ExPolicy,
-        typename Property>
+    HPX_CXX_CORE_EXPORT template <scheduling_property Tag,
+        execution_policy ExPolicy, typename Property>
         requires(hpx::functional::is_tag_invocable_v<Tag,
             typename std::decay_t<ExPolicy>::executor_type, Property>)
     constexpr decltype(auto) tag_invoke(
@@ -32,7 +32,8 @@ namespace hpx::execution::experimental {
             policy.parameters());
     }
 
-    HPX_CXX_EXPORT template <scheduling_property Tag, execution_policy ExPolicy>
+    HPX_CXX_CORE_EXPORT template <scheduling_property Tag,
+        execution_policy ExPolicy>
         requires(hpx::functional::is_tag_invocable_v<Tag,
             typename std::decay_t<ExPolicy>::executor_type>)
     constexpr decltype(auto) tag_invoke(Tag tag, ExPolicy&& policy)

@@ -14,10 +14,10 @@
 
 namespace hpx::execution::experimental {
 
-    HPX_CXX_EXPORT template <typename Scheduler>
+    HPX_CXX_CORE_EXPORT template <typename Scheduler>
     inline constexpr bool is_scheduler_v = scheduler<Scheduler>;
 
-    HPX_CXX_EXPORT template <typename Scheduler>
+    HPX_CXX_CORE_EXPORT template <typename Scheduler>
     struct is_scheduler : std::bool_constant<is_scheduler_v<Scheduler>>
     {
     };
@@ -27,7 +27,7 @@ namespace hpx::execution::experimental {
     namespace detail {
 
         // Dummy type used in place of a scheduler if none is given
-        HPX_CXX_EXPORT struct no_scheduler
+        HPX_CXX_CORE_EXPORT struct no_scheduler
         {
         };
     }    // namespace detail
@@ -114,11 +114,12 @@ namespace hpx::execution::experimental {
     //      // operation states are not movable, and therefore this operation
     //      // state object must be kept alive until the operation finishes
     //
-    HPX_CXX_EXPORT struct connect_t;
+    HPX_CXX_CORE_EXPORT struct connect_t;
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename S, typename R, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename S, typename R,
+            typename Enable = void>
         struct connect_result_helper
         {
             struct dummy_operation_state
@@ -128,7 +129,7 @@ namespace hpx::execution::experimental {
             using type = dummy_operation_state;
         };
 
-        HPX_CXX_EXPORT template <typename S, typename R>
+        HPX_CXX_CORE_EXPORT template <typename S, typename R>
         struct connect_result_helper<S, R,
             std::enable_if_t<hpx::is_invocable<connect_t, S, R>::value>>
           : hpx::util::invoke_result<connect_t, S, R>
@@ -138,7 +139,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename F, typename E>
+        HPX_CXX_CORE_EXPORT template <typename F, typename E>
         struct as_receiver
         {
             F f;
@@ -181,17 +182,18 @@ namespace hpx::execution::experimental {
     // context. It is not limited to scheduling purely using the
     // execution::schedule API.
     //
-    HPX_CXX_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct schedule_t
+    HPX_CXX_CORE_EXPORT
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct schedule_t
       : hpx::functional::tag<schedule_t>
     {
     } schedule{};
 
-    HPX_CXX_EXPORT template <typename Scheduler, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Scheduler, typename Enable = void>
     struct is_scheduler : std::false_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Scheduler>
+    HPX_CXX_CORE_EXPORT template <typename Scheduler>
     struct is_scheduler<Scheduler,
         std::enable_if_t<
             hpx::is_invocable_v<schedule_t, std::decay_t<Scheduler>> &&
@@ -201,16 +203,16 @@ namespace hpx::execution::experimental {
     {
     };
 
-    HPX_CXX_EXPORT template <typename Scheduler>
+    HPX_CXX_CORE_EXPORT template <typename Scheduler>
     inline constexpr bool is_scheduler_v = is_scheduler<Scheduler>::value;
 
-    HPX_CXX_EXPORT template <typename S>
+    HPX_CXX_CORE_EXPORT template <typename S>
     using schedule_result_t = hpx::util::invoke_result_t<schedule_t, S>;
 
     namespace detail {
 
         // Dummy type used in place of a scheduler if none is given
-        HPX_CXX_EXPORT struct no_scheduler
+        HPX_CXX_CORE_EXPORT struct no_scheduler
         {
         };
     }    // namespace detail

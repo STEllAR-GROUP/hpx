@@ -37,7 +37,7 @@
 namespace hpx::when_all_vector_detail {
 
     // callback object to request cancellation
-    HPX_CXX_EXPORT struct on_stop_requested
+    HPX_CXX_CORE_EXPORT struct on_stop_requested
     {
         hpx::experimental::in_place_stop_source& stop_source_;
         void operator()() noexcept
@@ -46,13 +46,13 @@ namespace hpx::when_all_vector_detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Sender>
+    HPX_CXX_CORE_EXPORT template <typename Sender>
     struct when_all_vector_sender_impl
     {
         struct when_all_vector_sender_type;
     };
 
-    HPX_CXX_EXPORT template <typename Sender>
+    HPX_CXX_CORE_EXPORT template <typename Sender>
     using when_all_vector_sender = typename when_all_vector_sender_impl<
         Sender>::when_all_vector_sender_type;
 
@@ -546,7 +546,7 @@ namespace hpx::execution::experimental {
     // start.
     //
     // The returned sender has no completion schedulers.
-    HPX_CXX_EXPORT inline constexpr struct when_all_vector_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct when_all_vector_t final
       : hpx::functional::detail::tag_fallback<when_all_vector_t>
     {
     private:

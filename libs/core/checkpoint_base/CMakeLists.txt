@@ -17,7 +17,6 @@ add_hpx_module(
   GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${checkpoint_base_sources}
   HEADERS ${checkpoint_base_headers}
-  MODULE_DEPENDENCIES
-    hpx_config hpx_serialization hpx_type_support
+  MODULE_DEPENDENCIES hpx_config hpx_serialization hpx_type_support
   CMAKE_SUBDIRS tests
 )

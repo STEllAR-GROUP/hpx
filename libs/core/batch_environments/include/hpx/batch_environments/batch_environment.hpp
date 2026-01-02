@@ -24,7 +24,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////
     // Try to retrieve default values from a batch environment
-    HPX_CXX_EXPORT struct HPX_CORE_EXPORT batch_environment
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT batch_environment
     {
         // the constructor tries to read initial values from a batch
         // environment, filling our map of nodes and thread counts

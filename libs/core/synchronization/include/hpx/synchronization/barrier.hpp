@@ -131,7 +131,8 @@ namespace hpx {
     /// Cpp17MoveConstructible (Table 28), Cpp17MoveAssignable (Table 30), and
     /// Cpp17Destructible (Table 32) requirements.
     ///
-    HPX_CXX_EXPORT template <typename OnCompletion = detail::empty_oncompletion>
+    HPX_CXX_CORE_EXPORT template <typename OnCompletion =
+                                      detail::empty_oncompletion>
     class barrier
     {
     public:

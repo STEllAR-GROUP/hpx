@@ -14,7 +14,7 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Mask>
+    HPX_CXX_CORE_EXPORT template <typename Mask>
     HPX_HOST_DEVICE HPX_FORCEINLINE int find_first_of(Mask const& msk) noexcept
     {
         auto tmp = eve::first_true(msk);

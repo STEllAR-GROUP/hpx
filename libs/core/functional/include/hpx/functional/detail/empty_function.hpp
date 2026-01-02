@@ -29,7 +29,7 @@ namespace hpx::util::detail {
     ///////////////////////////////////////////////////////////////////////////
     // make sure the empty table instance is initialized in time, even
     // during early startup
-    HPX_CXX_EXPORT template <typename Sig, bool Copyable>
+    HPX_CXX_CORE_EXPORT template <typename Sig, bool Copyable>
     struct function_vtable;
 
     // NOTE: nvcc (at least CUDA 9.2 and 10.1) fails with an internal compiler
