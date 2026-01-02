@@ -1,5 +1,5 @@
 // Copyright (c) 2018 Adrian Serio
-// Copyright (c) 2018-2025 Hartmut Kaiser
+// Copyright (c) 2018-2026 Hartmut Kaiser
 //
 // SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,7 +19,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // tag used to mark serialization archive during check-pointing
-    HPX_CXX_EXPORT struct checkpointing_tag
+    HPX_CXX_CORE_EXPORT struct checkpointing_tag
     {
     };
 
@@ -36,7 +36,7 @@ namespace hpx::util {
     ///
     /// Save_checkpoint_data takes any number of objects which a user may wish
     /// to store in the given container.
-    HPX_CXX_EXPORT template <typename Container, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename Container, typename... Ts>
     void save_checkpoint_data(Container& data, Ts&&... ts)
     {
         // Create serialization archive from checkpoint data member
@@ -62,7 +62,7 @@ namespace hpx::util {
     /// wish to store in a subsequent save_checkpoint_data operation. The
     /// function will return the number of bytes necessary to store the data
     /// that will be produced.
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     std::size_t prepare_checkpoint_data(Ts const&... ts)
     {
         // Create serialization archive from special container that collects
@@ -95,7 +95,7 @@ namespace hpx::util {
     /// wish to restore from the given container. The sequence of objects has to
     /// correspond to the sequence of objects for the corresponding call to
     /// save_checkpoint_data that had used the given container instance.
-    HPX_CXX_EXPORT template <typename Container, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename Container, typename... Ts>
     void restore_checkpoint_data(Container const& cont, Ts&... ts)
     {
         // Create serialization archive
@@ -106,7 +106,7 @@ namespace hpx::util {
     }
 
     /// \cond NOINTERNAL
-    HPX_CXX_EXPORT template <typename Container, typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename Container, typename F, typename... Ts>
     void restore_checkpoint_data_func(Container const& cont, F&& f, Ts&... ts)
     {
         // Create serialization archive
@@ -125,7 +125,7 @@ namespace hpx::util {
     template <>
     struct extra_data_helper<checkpointing_tag>
     {
-        HPX_EXPORT static extra_data_id_type id() noexcept;
+        HPX_CORE_EXPORT static extra_data_id_type id() noexcept;
         static constexpr void reset(checkpointing_tag*) noexcept {}
     };
 }    // namespace hpx::util
