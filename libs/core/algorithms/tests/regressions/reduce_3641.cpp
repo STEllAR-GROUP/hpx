@@ -15,7 +15,7 @@
 
 #include <cstdint>
 
-#include "../unit/container_algorithms/test_utils.hpp"
+#include "test_utils.hpp"
 
 int hpx_main()
 {
