@@ -12,7 +12,7 @@ on: [pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: stellargroup/build_env:18
+    container: stellargroup/build_env:19
 
     steps:
     - uses: actions/checkout@v6
@@ -23,6 +23,7 @@ jobs:
               . \
               -Bbuild \
               -GNinja \
+              -DHPX_WITH_CXX_STANDARD=23 \
               -DCMAKE_BUILD_TYPE=Debug \
               -DHPX_WITH_MALLOC=system \
               -DHPX_WITH_FETCH_ASIO=ON \
