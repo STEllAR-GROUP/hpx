@@ -32,7 +32,7 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     // enumerates active OS threads and maintains their metadata
 
-    HPX_CXX_EXPORT class thread_mapper;
+    HPX_CXX_CORE_EXPORT class thread_mapper;
 
     namespace detail {
 
@@ -78,7 +78,7 @@ namespace hpx::util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT thread_mapper
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT thread_mapper
     {
     public:
         thread_mapper(thread_mapper const&) = delete;

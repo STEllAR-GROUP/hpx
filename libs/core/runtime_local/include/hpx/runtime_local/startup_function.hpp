@@ -19,7 +19,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// The type of the function which is registered to be executed as a
     /// startup or pre-startup function.
-    HPX_CXX_EXPORT using startup_function_type =
+    HPX_CXX_CORE_EXPORT using startup_function_type =
         hpx::move_only_function<void()>;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ namespace hpx {
     ///       system during its initialization (if necessary).
     ///
     /// \see    \a hpx::register_startup_function()
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void register_pre_startup_function(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void register_pre_startup_function(
         startup_function_type f);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -70,6 +70,6 @@ namespace hpx {
     ///       system during its initialization (if necessary).
     ///
     /// \see    \a hpx::register_pre_startup_function()
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void register_startup_function(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void register_startup_function(
         startup_function_type f);
 }    // namespace hpx

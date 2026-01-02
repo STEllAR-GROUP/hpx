@@ -16,7 +16,7 @@
 
 namespace hpx::parallel::detail {
 
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct sequential_adjacent_find_t final
       : hpx::functional::detail::tag_fallback<
             sequential_adjacent_find_t<ExPolicy>>
@@ -47,12 +47,12 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     inline constexpr sequential_adjacent_find_t<ExPolicy>
         sequential_adjacent_find = sequential_adjacent_find_t<ExPolicy>{};
 #else
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter, typename Sent_,
-        typename PredProj>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
+        typename Sent_, typename PredProj>
     HPX_HOST_DEVICE HPX_FORCEINLINE InIter sequential_adjacent_find(
         InIter first, Sent_ last, PredProj&& pred_projected)
     {
@@ -60,7 +60,7 @@ namespace hpx::parallel::detail {
             first, last, HPX_FORWARD(PredProj, pred_projected));
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename ZipIter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename ZipIter,
         typename Token, typename PredProj>
     HPX_HOST_DEVICE HPX_FORCEINLINE void sequential_adjacent_find(
         std::size_t base_idx, ZipIter part_begin, std::size_t part_count,

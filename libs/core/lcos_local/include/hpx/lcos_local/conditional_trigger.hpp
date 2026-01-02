@@ -17,7 +17,7 @@
 namespace hpx::lcos::local {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct conditional_trigger
+    HPX_CXX_CORE_EXPORT struct conditional_trigger
     {
     public:
         conditional_trigger() = default;

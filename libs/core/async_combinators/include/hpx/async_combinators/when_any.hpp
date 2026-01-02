@@ -144,7 +144,7 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
 
-    HPX_CXX_EXPORT template <typename Sequence>
+    HPX_CXX_CORE_EXPORT template <typename Sequence>
     struct when_any_result
     {
         static constexpr std::size_t index_error() noexcept
@@ -372,7 +372,7 @@ namespace hpx::lcos::detail {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct when_any_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct when_any_t final
       : hpx::functional::tag<when_any_t>
     {
     private:
@@ -449,7 +449,7 @@ namespace hpx {
     } when_any{};
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct when_any_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct when_any_n_t final
       : hpx::functional::tag<when_any_n_t>
     {
     private:

@@ -1095,17 +1095,17 @@ namespace hpx::ranges {
 
     /// `replace_copy_if_result` is equivalent to
     /// `hpx::parallel::util::in_out_result`
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     using replace_copy_if_result = hpx::parallel::util::in_out_result<I, O>;
 
     /// `replace_copy_result` is equivalent to
     /// `hpx::parallel::util::in_out_result`
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     using replace_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::replace_if
-    HPX_CXX_EXPORT inline constexpr struct replace_if_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct replace_if_t final
       : hpx::detail::tag_parallel_algorithm<replace_if_t>
     {
     private:
@@ -1224,7 +1224,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::replace
-    HPX_CXX_EXPORT inline constexpr struct replace_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct replace_t final
       : hpx::detail::tag_parallel_algorithm<replace_t>
     {
     private:
@@ -1345,7 +1345,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::replace_copy_if
-    HPX_CXX_EXPORT inline constexpr struct replace_copy_if_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct replace_copy_if_t final
       : hpx::detail::tag_parallel_algorithm<replace_copy_if_t>
     {
     private:
@@ -1487,7 +1487,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::replace_copy
-    HPX_CXX_EXPORT inline constexpr struct replace_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct replace_copy_t final
       : hpx::detail::tag_parallel_algorithm<replace_copy_t>
     {
     private:

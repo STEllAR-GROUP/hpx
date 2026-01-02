@@ -29,7 +29,7 @@
 
 namespace hpx::parallel::detail {
 
-    HPX_CXX_EXPORT struct contains : public algorithm<contains, bool>
+    HPX_CXX_CORE_EXPORT struct contains : public algorithm<contains, bool>
     {
         constexpr contains() noexcept
           : algorithm("contains")
@@ -81,11 +81,11 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename T,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T,
         typename Enable = void>
     struct contains_subrange_helper;
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename T>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T>
     struct contains_subrange_helper<ExPolicy, T,
         std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy>>>
     {
@@ -95,7 +95,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename T>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T>
     struct contains_subrange_helper<ExPolicy, T,
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
     {
@@ -106,7 +106,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT struct contains_subrange
+    HPX_CXX_CORE_EXPORT struct contains_subrange
       : public algorithm<contains_subrange, bool>
     {
         constexpr contains_subrange() noexcept
@@ -148,7 +148,7 @@ namespace hpx::parallel::detail {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT inline constexpr struct contains_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct contains_t final
       : hpx::functional::detail::tag_fallback<contains_t>
     {
     private:
@@ -235,7 +235,7 @@ namespace hpx::ranges {
         }
     } contains{};
 
-    HPX_CXX_EXPORT inline constexpr struct contains_subrange_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct contains_subrange_t final
       : hpx::functional::detail::tag_fallback<contains_subrange_t>
     {
     private:

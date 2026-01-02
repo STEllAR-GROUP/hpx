@@ -18,11 +18,11 @@
 
 namespace hpx::program_options {
 
-    HPX_CXX_EXPORT template <typename Char>
+    HPX_CXX_CORE_EXPORT template <typename Char>
     class basic_parsed_options;
 
-    HPX_CXX_EXPORT class value_semantic;
-    HPX_CXX_EXPORT class variables_map;
+    HPX_CXX_CORE_EXPORT class value_semantic;
+    HPX_CXX_CORE_EXPORT class variables_map;
 
     // forward declaration
 
@@ -30,7 +30,7 @@ namespace hpx::program_options {
         If 'm' already has a non-defaulted value of an option, that value
         is not changed, even if 'options' specify some value.
     */
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void store(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void store(
         basic_parsed_options<char> const& options, variables_map& m,
         bool utf8 = false);
 
@@ -39,16 +39,16 @@ namespace hpx::program_options {
         is not changed, even if 'options' specify some value.
         This is wide character variant.
     */
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void store(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void store(
         basic_parsed_options<wchar_t> const& options, variables_map& m);
 
     /** Runs all 'notify' function for options in 'm'. */
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void notify(variables_map& m);
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void notify(variables_map& m);
 
     /** Class holding value of option. Contains details about how the
         value is set and allows to conveniently obtain the value.
     */
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT variable_value
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT variable_value
     {
     public:
         variable_value() = default;
@@ -101,7 +101,7 @@ namespace hpx::program_options {
 
     /** Implements string->string mapping with convenient value casting
         facilities. */
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT abstract_variables_map
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT abstract_variables_map
     {
     public:
         abstract_variables_map();
@@ -142,7 +142,7 @@ namespace hpx::program_options {
         This class is derived from std::map<std::string, variable_value>,
         so you can use all map operators to examine its content.
     */
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT variables_map
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT variables_map
       : public abstract_variables_map
       , public std::map<std::string, variable_value>
     {

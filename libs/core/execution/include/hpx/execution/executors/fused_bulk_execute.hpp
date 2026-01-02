@@ -21,7 +21,7 @@
 namespace hpx::parallel::execution::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename F, typename Shape, typename Future,
+    HPX_CXX_CORE_EXPORT template <typename F, typename Shape, typename Future,
         typename... Ts>
     struct then_bulk_function_result
     {
@@ -31,7 +31,7 @@ namespace hpx::parallel::execution::detail {
             Future, Ts...>;
     };
 
-    HPX_CXX_EXPORT template <typename F, typename Shape, typename Future,
+    HPX_CXX_CORE_EXPORT template <typename F, typename Shape, typename Future,
         typename... Ts>
     using then_bulk_function_result_t =
         typename then_bulk_function_result<F, Shape, Future, Ts...>::type;
@@ -54,7 +54,7 @@ namespace hpx::parallel::execution::detail {
         using type = void;
     };
 
-    HPX_CXX_EXPORT template <typename F, typename Shape, typename Future,
+    HPX_CXX_CORE_EXPORT template <typename F, typename Shape, typename Future,
         typename... Ts>
     struct bulk_then_execute_result
       : bulk_then_execute_result_impl<F, Shape, Future,
@@ -64,7 +64,7 @@ namespace hpx::parallel::execution::detail {
     {
     };
 
-    HPX_CXX_EXPORT template <typename F, typename Shape, typename Future,
+    HPX_CXX_CORE_EXPORT template <typename F, typename Shape, typename Future,
         typename... Ts>
     using bulk_then_execute_result_t =
         typename bulk_then_execute_result<F, Shape, Future, Ts...>::type;
@@ -104,7 +104,7 @@ namespace hpx::parallel::execution::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Executor, typename F, typename Shape,
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename F, typename Shape,
         typename Args>
     fused_bulk_sync_execute_helper<std::decay_t<Executor>, std::decay_t<F>,
         Shape, std::decay_t<Args>>
@@ -153,7 +153,7 @@ namespace hpx::parallel::execution::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Executor, typename F, typename Shape,
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename F, typename Shape,
         typename Args>
     fused_bulk_async_execute_helper<std::decay_t<Executor>, std::decay_t<F>,
         std::decay_t<Shape>, std::decay_t<Args>>

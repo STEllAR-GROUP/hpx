@@ -14,21 +14,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util::detail {
 
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CXX_EXPORT, owns_lock)
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CXX_CORE_EXPORT, owns_lock)
 
-    HPX_CXX_EXPORT template <typename Lock>
+    HPX_CXX_CORE_EXPORT template <typename Lock>
     constexpr void assert_owns_lock(Lock const&, int) noexcept
         requires(!has_owns_lock_v<Lock>)
     {
     }
 
-    HPX_CXX_EXPORT template <typename Lock>
+    HPX_CXX_CORE_EXPORT template <typename Lock>
     constexpr void assert_doesnt_own_lock(Lock const&, int) noexcept
         requires(!has_owns_lock_v<Lock>)
     {
     }
 
-    HPX_CXX_EXPORT template <typename Lock>
+    HPX_CXX_CORE_EXPORT template <typename Lock>
     void assert_owns_lock([[maybe_unused]] Lock& l, long) noexcept
         requires(has_owns_lock_v<Lock>)
     {
@@ -44,7 +44,7 @@ namespace hpx::util::detail {
 #endif
     }
 
-    HPX_CXX_EXPORT template <typename Lock>
+    HPX_CXX_CORE_EXPORT template <typename Lock>
     void assert_doesnt_own_lock([[maybe_unused]] Lock& l, long) noexcept
         requires(has_owns_lock_v<Lock>)
     {

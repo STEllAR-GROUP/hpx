@@ -181,7 +181,7 @@ namespace hpx::parallel {
 
         ///////////////////////////////////////////////////////////////////////
         // stable_sort
-        HPX_CXX_EXPORT template <typename RandomIt>
+        HPX_CXX_CORE_EXPORT template <typename RandomIt>
         struct stable_sort : public algorithm<stable_sort<RandomIt>, RandomIt>
         {
             constexpr stable_sort() noexcept
@@ -269,7 +269,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::stable_sort
-    HPX_CXX_EXPORT inline constexpr struct stable_sort_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct stable_sort_t final
       : hpx::detail::tag_parallel_algorithm<stable_sort_t>
     {
         template <typename RandomIt,

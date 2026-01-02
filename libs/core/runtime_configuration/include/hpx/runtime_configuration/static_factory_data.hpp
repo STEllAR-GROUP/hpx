@@ -18,31 +18,33 @@
 namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct static_factory_load_data_type
+    HPX_CXX_CORE_EXPORT struct static_factory_load_data_type
     {
         char const* name;    // component name
         hpx::util::plugin::get_plugins_list_type get_factory;
     };
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT bool& get_initial_static_loading() noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool&
+    get_initial_static_loading() noexcept;
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT std::vector<static_factory_load_data_type>&
-    get_static_module_data();
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void init_registry_module(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT
+        std::vector<static_factory_load_data_type>&
+        get_static_module_data();
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void init_registry_module(
         static_factory_load_data_type const&);
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT bool get_static_factory(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool get_static_factory(
         std::string const& instance, util::plugin::get_plugins_list_type& f);
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void init_registry_factory(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void init_registry_factory(
         static_factory_load_data_type const&);
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT bool get_static_commandline(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool get_static_commandline(
         std::string const& instance, util::plugin::get_plugins_list_type& f);
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void init_registry_commandline(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void init_registry_commandline(
         static_factory_load_data_type const&);
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT bool get_static_startup_shutdown(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool get_static_startup_shutdown(
         std::string const& instance, util::plugin::get_plugins_list_type& f);
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void init_registry_startup_shutdown(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void init_registry_startup_shutdown(
         static_factory_load_data_type const&);
 }    // namespace hpx::components

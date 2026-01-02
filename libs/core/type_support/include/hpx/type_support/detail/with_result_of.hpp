@@ -21,7 +21,7 @@ namespace hpx::util::detail {
     // until it is required for conversion, and guaranteed copy elision in C++17
     // ensures that a copy constructor is not called when returning from the
     // conversion operator.
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     class with_result_of_t
     {
         F&& f;
@@ -40,7 +40,7 @@ namespace hpx::util::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     with_result_of_t<F> with_result_of(F&& f) noexcept
     {
         return with_result_of_t<F>(HPX_FORWARD(F, f));

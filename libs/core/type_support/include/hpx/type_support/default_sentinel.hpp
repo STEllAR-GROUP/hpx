@@ -14,18 +14,18 @@
 
 namespace hpx {
 
-    HPX_CXX_EXPORT using std::default_sentinel;
-    HPX_CXX_EXPORT using std::default_sentinel_t;
+    HPX_CXX_CORE_EXPORT using std::default_sentinel;
+    HPX_CXX_CORE_EXPORT using std::default_sentinel_t;
 }    // namespace hpx
 
 #else
 
 namespace hpx {
 
-    HPX_CXX_EXPORT struct default_sentinel_t
+    HPX_CXX_CORE_EXPORT struct default_sentinel_t
     {
     };
-    HPX_CXX_EXPORT inline constexpr default_sentinel_t default_sentinel =
+    HPX_CXX_CORE_EXPORT inline constexpr default_sentinel_t default_sentinel =
         default_sentinel_t{};
 }    // namespace hpx
 

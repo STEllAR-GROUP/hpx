@@ -17,7 +17,7 @@
 namespace hpx::resiliency::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct HPX_ALWAYS_EXPORT abort_replicate_exception
+    HPX_CXX_CORE_EXPORT struct HPX_ALWAYS_EXPORT abort_replicate_exception
       : std::exception
     {
         abort_replicate_exception();
@@ -28,7 +28,7 @@ namespace hpx::resiliency::experimental {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct HPX_ALWAYS_EXPORT abort_replay_exception
+    HPX_CXX_CORE_EXPORT struct HPX_ALWAYS_EXPORT abort_replay_exception
       : std::exception
     {
         abort_replay_exception();
@@ -41,7 +41,7 @@ namespace hpx::resiliency::experimental {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct replicate_voter
+        HPX_CXX_CORE_EXPORT struct replicate_voter
         {
             template <typename T>
             constexpr T operator()(std::vector<T>&& vect) const
@@ -50,7 +50,7 @@ namespace hpx::resiliency::experimental {
             }
         };
 
-        HPX_CXX_EXPORT struct replicate_validator
+        HPX_CXX_CORE_EXPORT struct replicate_validator
         {
             template <typename T>
             constexpr bool operator()(T&&) const noexcept
@@ -60,7 +60,7 @@ namespace hpx::resiliency::experimental {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct replay_validator
+        HPX_CXX_CORE_EXPORT struct replay_validator
         {
             template <typename T>
             constexpr bool operator()(T&&) const noexcept
@@ -70,7 +70,7 @@ namespace hpx::resiliency::experimental {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Future>
         std::exception_ptr rethrow_on_abort_replicate(Future& f)
         {
             std::exception_ptr ex;
@@ -90,7 +90,7 @@ namespace hpx::resiliency::experimental {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Future>
         std::exception_ptr rethrow_on_abort_replay(Future& f)
         {
             std::exception_ptr ex;

@@ -20,7 +20,7 @@
 namespace hpx::util::cache::statistics {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT class local_full_statistics : public local_statistics
+    HPX_CXX_CORE_EXPORT class local_full_statistics : public local_statistics
     {
     private:
         [[nodiscard]] static std::int64_t get_and_reset_value(

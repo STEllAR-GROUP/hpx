@@ -16,7 +16,7 @@
 namespace hpx::util::batch_environments::detail {
 
     // export this for tests
-    HPX_CXX_EXPORT struct slurm_environment
+    HPX_CXX_CORE_EXPORT struct slurm_environment
     {
         HPX_CORE_EXPORT slurm_environment(
             std::vector<std::string>& nodelist, bool debug);

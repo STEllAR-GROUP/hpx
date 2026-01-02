@@ -14,7 +14,7 @@
 
 namespace hpx {
 
-    HPX_CXX_EXPORT enum class state : std::int8_t {
+    HPX_CXX_CORE_EXPORT enum class state : std::int8_t {
         invalid = -1,
         initialized = 0,
         pre_startup = 1,

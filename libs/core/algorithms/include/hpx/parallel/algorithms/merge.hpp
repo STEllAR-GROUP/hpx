@@ -320,9 +320,9 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct lower_bound_helper;
+        HPX_CXX_CORE_EXPORT struct lower_bound_helper;
 
-        HPX_CXX_EXPORT struct upper_bound_helper
+        HPX_CXX_CORE_EXPORT struct upper_bound_helper
         {
             template <typename Iter, typename Sent, typename T, typename Comp,
                 typename Proj>
@@ -345,7 +345,7 @@ namespace hpx::parallel {
             using another_type = lower_bound_helper;
         };
 
-        HPX_CXX_EXPORT struct lower_bound_helper
+        HPX_CXX_CORE_EXPORT struct lower_bound_helper
         {
             template <typename Iter, typename Sent, typename T, typename Comp,
                 typename Proj>
@@ -368,7 +368,7 @@ namespace hpx::parallel {
             using another_type = upper_bound_helper;
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         HPX_FORCEINLINE decltype(auto) init_value([[maybe_unused]] T&& val)
         {
             if constexpr (std::is_default_constructible_v<std::decay_t<T>>)
@@ -382,9 +382,9 @@ namespace hpx::parallel {
         }
 
         // sequential merge helper with projection function.
-        HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-            typename Sent2, typename OutIter, typename Comp, typename Proj1,
-            typename Proj2>
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+            typename Iter2, typename Sent2, typename OutIter, typename Comp,
+            typename Proj1, typename Proj2>
         constexpr util::in_in_out_result<Iter1, Iter2, OutIter>
         sequential_merge_helper(Iter1 first1, Sent1 last1, Iter2 first2,
             Sent2 last2, OutIter dest, Comp&& comp, Proj1&& proj1,
@@ -447,8 +447,8 @@ namespace hpx::parallel {
         }
 
         // sequential merge helper without projection function.
-        HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-            typename Sent2, typename OutIter, typename Comp>
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+            typename Iter2, typename Sent2, typename OutIter, typename Comp>
         constexpr util::in_in_out_result<Iter1, Iter2, OutIter>
         sequential_merge_helper(Iter1 first1, Sent1 last1, Iter2 first2,
             Sent2 last2, OutIter dest, Comp&& comp)
@@ -540,9 +540,9 @@ namespace hpx::parallel {
         }
 
         // sequential merge with projection function.
-        HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-            typename Sent2, typename OutIter, typename Comp, typename Proj1,
-            typename Proj2>
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+            typename Iter2, typename Sent2, typename OutIter, typename Comp,
+            typename Proj1, typename Proj2>
         constexpr util::in_in_out_result<Iter1, Iter2, OutIter>
         sequential_merge(Iter1 start1, Sent1 sent1, Iter2 start2, Sent2 sent2,
             OutIter out, Comp&& comp, Proj1&& proj1, Proj2&& proj2)
@@ -596,8 +596,8 @@ namespace hpx::parallel {
         }
 
         // sequential merge without projection function.
-        HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-            typename Sent2, typename OutIter, typename Comp>
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+            typename Iter2, typename Sent2, typename OutIter, typename Comp>
         constexpr util::in_in_out_result<Iter1, Iter2, OutIter>
         sequential_merge(Iter1 start1, Sent1 sent1, Iter2 start2, Sent2 sent2,
             OutIter out, Comp&& comp, hpx::identity, hpx::identity)
@@ -648,8 +648,9 @@ namespace hpx::parallel {
             }
         }
 
-        HPX_CXX_EXPORT template <typename Iter1, typename Iter2, typename Comp,
-            typename Proj1, typename Proj2, typename BinarySearchHelper>
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2,
+            typename Comp, typename Proj1, typename Proj2,
+            typename BinarySearchHelper>
         auto get_reshape_chunks(std::size_t len1, Iter2 first2, Iter2 last2,
             Comp&& comp, Proj1&& proj1, Proj2&& proj2, BinarySearchHelper)
         {
@@ -761,7 +762,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter1,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
             typename Sent1, typename Iter2, typename Sent2, typename Iter3,
             typename Comp, typename Proj1, typename Proj2>
         decltype(auto) parallel_merge(ExPolicy&& policy, Iter1 first1,
@@ -815,7 +816,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename IterTuple>
+        HPX_CXX_CORE_EXPORT template <typename IterTuple>
         struct merge : public algorithm<merge<IterTuple>, IterTuple>
         {
             constexpr merge() noexcept
@@ -872,8 +873,8 @@ namespace hpx::parallel {
     namespace detail {
 
         // sequential inplace_merge with projection function.
-        HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Comp,
-            typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
+            typename Comp, typename Proj>
         constexpr Iter sequential_inplace_merge(
             Iter first, Iter middle, Sent last, Comp&& comp, Proj&& proj)
         {
@@ -884,7 +885,7 @@ namespace hpx::parallel {
             return last;
         }
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
             typename Sent, typename Comp, typename Proj>
         void parallel_inplace_merge_helper(ExPolicy&& policy, Iter first,
             Iter middle, Sent last, Comp&& comp, Proj&& proj)
@@ -1016,7 +1017,7 @@ namespace hpx::parallel {
             }
         }
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
             typename Sent, typename Comp, typename Proj>
         hpx::future<Iter> parallel_inplace_merge(ExPolicy&& policy, Iter first,
             Iter middle, Sent last, Comp&& comp, Proj&& proj)
@@ -1040,7 +1041,7 @@ namespace hpx::parallel {
                 });
         }
 
-        HPX_CXX_EXPORT template <typename Result>
+        HPX_CXX_CORE_EXPORT template <typename Result>
         struct inplace_merge : public algorithm<inplace_merge<Result>, Result>
         {
             constexpr inplace_merge() noexcept
@@ -1081,12 +1082,12 @@ namespace hpx::parallel {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         constexpr void get_void_result(Iter) noexcept
         {
         }
 
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         hpx::future<void> get_void_result(hpx::future<Iter>&& f) noexcept
         {
             return hpx::future<void>(HPX_MOVE(f));
@@ -1098,7 +1099,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::merge
-    HPX_CXX_EXPORT inline constexpr struct merge_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct merge_t final
       : hpx::detail::tag_parallel_algorithm<merge_t>
     {
     private:
@@ -1174,7 +1175,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::inplace_merge
-    HPX_CXX_EXPORT inline constexpr struct inplace_merge_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct inplace_merge_t final
       : hpx::detail::tag_parallel_algorithm<inplace_merge_t>
     {
     private:

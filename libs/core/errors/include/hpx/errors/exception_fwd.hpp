@@ -20,18 +20,18 @@ namespace hpx {
 
     /// \cond NOINTERNAL
     // forward declaration
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT error_code;
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT error_code;
 
-    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT exception;
+    HPX_CXX_CORE_EXPORT class HPX_ALWAYS_EXPORT exception;
 
-    HPX_CXX_EXPORT struct HPX_ALWAYS_EXPORT thread_interrupted;
+    HPX_CXX_CORE_EXPORT struct HPX_ALWAYS_EXPORT thread_interrupted;
 
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT exception_list;
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT exception_list;
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Encode error category for new error_code.
-    HPX_CXX_EXPORT enum class throwmode : std::uint8_t {
+    HPX_CXX_CORE_EXPORT enum class throwmode : std::uint8_t {
         plain = 0,
         rethrow = 1,
 
@@ -49,7 +49,7 @@ namespace hpx {
 #pragma warning(push)
 #pragma warning(disable : 26827)
 #endif
-    HPX_CXX_EXPORT constexpr bool operator&(
+    HPX_CXX_CORE_EXPORT constexpr bool operator&(
         throwmode lhs, throwmode rhs) noexcept
     {
         return static_cast<int>(lhs) & static_cast<int>(rhs);
@@ -84,20 +84,20 @@ namespace hpx {
     // the compiler.
     extern HPX_DEVICE error_code throws;
 #else
-    HPX_CXX_EXPORT extern HPX_CORE_EXPORT error_code throws;
+    HPX_CXX_CORE_EXPORT extern HPX_CORE_EXPORT error_code throws;
 #endif
 
     /// \cond NOINTERNAL
     namespace detail {
 
         ////////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Exception>
+        HPX_CXX_CORE_EXPORT template <typename Exception>
         [[nodiscard]] HPX_CORE_EXPORT std::exception_ptr
         construct_lightweight_exception(Exception const& e);
 
-        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT std::exception_ptr
+        HPX_CXX_CORE_EXPORT extern template HPX_CORE_EXPORT std::exception_ptr
         construct_lightweight_exception(hpx::exception_list const&);
-        HPX_CXX_EXPORT extern template HPX_CORE_EXPORT std::exception_ptr
+        HPX_CXX_CORE_EXPORT extern template HPX_CORE_EXPORT std::exception_ptr
         construct_lightweight_exception(hpx::thread_interrupted const&);
     }    // namespace detail
     /// \endcond

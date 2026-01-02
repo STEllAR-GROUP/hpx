@@ -20,7 +20,7 @@ namespace hpx::program_options {
         The template parameter specifies the type of char used for storing the
         option's value.
     */
-    HPX_CXX_EXPORT template <typename Char>
+    HPX_CXX_CORE_EXPORT template <typename Char>
     class basic_option
     {
     public:
@@ -61,6 +61,6 @@ namespace hpx::program_options {
         bool case_insensitive = false;
     };
 
-    HPX_CXX_EXPORT using option = basic_option<char>;
-    HPX_CXX_EXPORT using woption = basic_option<wchar_t>;
+    HPX_CXX_CORE_EXPORT using option = basic_option<char>;
+    HPX_CXX_CORE_EXPORT using woption = basic_option<wchar_t>;
 }    // namespace hpx::program_options

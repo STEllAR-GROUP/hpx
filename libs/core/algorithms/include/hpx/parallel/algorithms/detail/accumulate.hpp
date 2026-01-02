@@ -14,7 +14,7 @@
 namespace hpx::parallel::detail {
 
     // provide implementation of std::accumulate supporting iterators/sentinels
-    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename T,
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent, typename T,
         typename F>
     constexpr T accumulate(Iter first, Sent last, T value, F&& reduce_op)
     {
@@ -25,7 +25,7 @@ namespace hpx::parallel::detail {
         return value;
     }
 
-    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename T>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent, typename T>
     constexpr T accumulate(Iter first, Sent last, T value)
     {
         return accumulate(first, last, HPX_MOVE(value), std::plus<T>());

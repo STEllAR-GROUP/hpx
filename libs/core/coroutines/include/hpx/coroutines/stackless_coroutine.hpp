@@ -25,7 +25,7 @@
 namespace hpx::threads::coroutines {
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT class stackless_coroutine
+    HPX_CXX_CORE_EXPORT class stackless_coroutine
     {
     private:
         friend struct detail::coroutine_accessor;
