@@ -12,7 +12,7 @@
 
 namespace hpx::traits {
 
-    HPX_CXX_EXPORT template <typename Result, typename RemoteResult,
+    HPX_CXX_CORE_EXPORT template <typename Result, typename RemoteResult,
         typename Enable = void>
     struct get_remote_result
     {
@@ -27,7 +27,7 @@ namespace hpx::traits {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Result>
+    HPX_CXX_CORE_EXPORT template <typename Result>
     struct get_remote_result<Result, Result>
     {
         static constexpr Result const& call(Result const& rhs) noexcept

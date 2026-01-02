@@ -39,7 +39,7 @@ namespace hpx {
 
         // std::mutex-compatible spinlock class (Backoff == true)
         // boost::mutex-compatible spinlock class (Backoff == false)
-        HPX_CXX_EXPORT template <bool Backoff = true>
+        HPX_CXX_CORE_EXPORT template <bool Backoff = true>
         struct spinlock
         {
         public:
@@ -211,6 +211,6 @@ namespace hpx {
     /// \brief \c spinlock is a type of lock that causes a thread attempting to
     ///        obtain it to check for its availability while waiting in a loop
     ///        continuously.
-    HPX_CXX_EXPORT using spinlock = detail::spinlock<true>;
-    HPX_CXX_EXPORT using spinlock_no_backoff = detail::spinlock<false>;
+    HPX_CXX_CORE_EXPORT using spinlock = detail::spinlock<true>;
+    HPX_CXX_CORE_EXPORT using spinlock_no_backoff = detail::spinlock<false>;
 }    // namespace hpx

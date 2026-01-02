@@ -301,7 +301,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::generate
-    HPX_CXX_EXPORT inline constexpr struct generate_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct generate_t final
       : hpx::detail::tag_parallel_algorithm<generate_t>
     {
     private:
@@ -373,7 +373,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::generate_n
-    HPX_CXX_EXPORT inline constexpr struct generate_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct generate_n_t final
       : hpx::detail::tag_parallel_algorithm<generate_n_t>
     {
     private:

@@ -15,8 +15,8 @@
 namespace hpx::threads {
 
     // return whether thread manager is in the state described by 'mask'
-    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT bool threadmanager_is(
+    HPX_CXX_CORE_EXPORT [[nodiscard]] HPX_CORE_EXPORT bool threadmanager_is(
         state st);
-    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT bool threadmanager_is_at_least(
-        state st);
+    HPX_CXX_CORE_EXPORT [[nodiscard]] HPX_CORE_EXPORT bool
+    threadmanager_is_at_least(state st);
 }    // namespace hpx::threads

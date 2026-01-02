@@ -134,6 +134,6 @@ namespace hpx::util::detail {
             invoke_mem_fun<T, C>, invoke_mem_obj<T, C>>;
     };
 
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     using invoke = typename dispatch_invoke<F>::type;
 }    // namespace hpx::util::detail

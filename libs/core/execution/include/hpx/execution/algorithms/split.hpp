@@ -42,9 +42,9 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT enum class submission_type { eager, lazy };
+        HPX_CXX_CORE_EXPORT enum class submission_type { eager, lazy };
 
-        HPX_CXX_EXPORT template <typename Receiver>
+        HPX_CXX_CORE_EXPORT template <typename Receiver>
         struct error_visitor
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver>& receiver;
@@ -58,7 +58,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Receiver>
+        HPX_CXX_CORE_EXPORT template <typename Receiver>
         struct value_visitor
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver>& receiver;
@@ -74,7 +74,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Sender, typename Allocator,
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Allocator,
             submission_type Type, typename Scheduler = no_scheduler>
         struct split_sender
         {
@@ -592,7 +592,7 @@ namespace hpx::execution::experimental {
     // Multi-shot senders should also define overloads of execution::connect
     // that accept rvalue-qualified senders to allow the sender to be also used
     // in places where only a single-shot sender is required.
-    HPX_CXX_EXPORT inline constexpr struct split_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct split_t final
       : hpx::functional::detail::tag_priority<split_t>
     {
     private:

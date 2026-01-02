@@ -568,20 +568,20 @@ namespace hpx::lcos::local {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T = void>
+    HPX_CXX_CORE_EXPORT template <typename T = void>
     class channel;
 
-    HPX_CXX_EXPORT template <typename T = void>
+    HPX_CXX_CORE_EXPORT template <typename T = void>
     class one_element_channel;
 
-    HPX_CXX_EXPORT template <typename T = void>
+    HPX_CXX_CORE_EXPORT template <typename T = void>
     class receive_channel;
 
-    HPX_CXX_EXPORT template <typename T = void>
+    HPX_CXX_CORE_EXPORT template <typename T = void>
     class send_channel;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     class channel_iterator
       : public hpx::util::iterator_facade<channel_iterator<T>, T const,
             std::input_iterator_tag>
@@ -638,7 +638,7 @@ namespace hpx::lcos::local {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     class channel_async_iterator
       : public hpx::util::iterator_facade<channel_async_iterator<T>,
             hpx::future<T>, std::input_iterator_tag, hpx::future<T>>
@@ -809,7 +809,7 @@ namespace hpx::lcos::local {
 
     ///////////////////////////////////////////////////////////////////////////
     // channel with unlimited buffer
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     class channel : protected detail::channel_base<T>
     {
         using base_type = detail::channel_base<T>;
@@ -836,7 +836,7 @@ namespace hpx::lcos::local {
     };
 
     // channel with a one-element buffer
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     class one_element_channel : protected detail::channel_base<T>
     {
         using base_type = detail::channel_base<T>;
@@ -863,7 +863,7 @@ namespace hpx::lcos::local {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     class receive_channel : protected detail::channel_base<T>
     {
         using base_type = detail::channel_base<T>;
@@ -889,7 +889,7 @@ namespace hpx::lcos::local {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     class send_channel : private detail::channel_base<T>
     {
         using base_type = detail::channel_base<T>;
@@ -1210,5 +1210,5 @@ namespace hpx::lcos::local {
 
 namespace hpx {
 
-    HPX_CXX_EXPORT using hpx::lcos::local::channel;
+    HPX_CXX_CORE_EXPORT using hpx::lcos::local::channel;
 }

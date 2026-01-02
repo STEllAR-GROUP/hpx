@@ -492,7 +492,7 @@ namespace hpx {
 
 namespace hpx::parallel {
 
-    HPX_CXX_EXPORT template <typename Tuple>
+    HPX_CXX_CORE_EXPORT template <typename Tuple>
     constexpr HPX_FORCEINLINE
         std::pair<typename hpx::tuple_element<1, Tuple>::type,
             typename hpx::tuple_element<2, Tuple>::type>
@@ -504,7 +504,7 @@ namespace hpx::parallel {
         // NOLINTEND(bugprone-use-after-move)
     }
 
-    HPX_CXX_EXPORT template <typename Tuple>
+    HPX_CXX_CORE_EXPORT template <typename Tuple>
     hpx::future<std::pair<typename hpx::tuple_element<1, Tuple>::type,
         typename hpx::tuple_element<2, Tuple>::type>>
     tuple_to_pair(hpx::future<Tuple>&& f)
@@ -524,7 +524,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT struct stable_partition_helper
+        HPX_CXX_CORE_EXPORT struct stable_partition_helper
         {
             template <typename ExPolicy, typename RandIter, typename F,
                 typename Proj>
@@ -594,8 +594,8 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_EXPORT template <typename BidirIter, typename Sent, typename F,
-            typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename BidirIter, typename Sent,
+            typename F, typename Proj>
         constexpr BidirIter stable_partition_seq(
             BidirIter first, Sent last, F&& f, Proj&& proj)
         {
@@ -623,7 +623,7 @@ namespace hpx::parallel {
             return next;
         }
 
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         struct stable_partition : public algorithm<stable_partition<Iter>, Iter>
         {
             constexpr stable_partition() noexcept
@@ -714,7 +714,7 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential partition with projection function for bidirectional iterator.
-        HPX_CXX_EXPORT template <typename BidirIter, typename Pred,
+        HPX_CXX_CORE_EXPORT template <typename BidirIter, typename Pred,
             typename Proj>
             requires(hpx::traits::is_bidirectional_iterator_v<BidirIter>)
         constexpr BidirIter sequential_partition(
@@ -748,7 +748,8 @@ namespace hpx::parallel {
         }
 
         // sequential partition with projection function for forward iterator.
-        HPX_CXX_EXPORT template <typename FwdIter, typename Pred, typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Pred,
+            typename Proj>
             requires(hpx::traits::is_forward_iterator_v<FwdIter> &&
                 !hpx::traits::is_bidirectional_iterator_v<FwdIter>)
         constexpr FwdIter sequential_partition(
@@ -775,7 +776,7 @@ namespace hpx::parallel {
             return first;
         }
 
-        HPX_CXX_EXPORT struct partition_helper
+        HPX_CXX_CORE_EXPORT struct partition_helper
         {
             template <typename FwdIter>
             struct block
@@ -1364,7 +1365,7 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
             typename Pred, typename Proj>
         hpx::future<FwdIter> parallel_partition(ExPolicy&& policy,
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
@@ -1386,7 +1387,7 @@ namespace hpx::parallel {
                 });
         }
 
-        HPX_CXX_EXPORT template <typename FwdIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter>
         struct partition : public algorithm<partition<FwdIter>, FwdIter>
         {
             constexpr partition() noexcept
@@ -1437,7 +1438,7 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential partition_copy with projection function
-        HPX_CXX_EXPORT template <typename InIter, typename OutIter1,
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename OutIter1,
             typename OutIter2, typename Pred, typename Proj>
         constexpr hpx::tuple<InIter, OutIter1, OutIter2>
         sequential_partition_copy(InIter first, InIter last, OutIter1 dest_true,
@@ -1459,7 +1460,7 @@ namespace hpx::parallel {
                 HPX_MOVE(last), HPX_MOVE(dest_true), HPX_MOVE(dest_false));
         }
 
-        HPX_CXX_EXPORT template <typename IterTuple>
+        HPX_CXX_CORE_EXPORT template <typename IterTuple>
         struct partition_copy
           : public algorithm<partition_copy<IterTuple>, IterTuple>
         {
@@ -1597,7 +1598,7 @@ namespace hpx::parallel {
         /// \endcond
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter1,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter1,
         typename FwdIter2, typename FwdIter3, typename Pred,
         typename Proj = hpx::identity>
     // clang-format off
@@ -1643,7 +1644,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::stable_partition
-    HPX_CXX_EXPORT inline constexpr struct stable_partition_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct stable_partition_t final
       : hpx::detail::tag_parallel_algorithm<stable_partition_t>
     {
         template <typename BidirIter, typename F>
@@ -1691,7 +1692,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::partition
-    HPX_CXX_EXPORT inline constexpr struct partition_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct partition_t final
       : hpx::detail::tag_parallel_algorithm<partition_t>
     {
         template <typename FwdIter, typename Pred>
@@ -1735,7 +1736,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::partition_copy
-    HPX_CXX_EXPORT inline constexpr struct partition_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct partition_copy_t final
       : hpx::detail::tag_parallel_algorithm<partition_copy_t>
     {
         template <typename FwdIter1, typename FwdIter2, typename FwdIter3,

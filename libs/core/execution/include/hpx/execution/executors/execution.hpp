@@ -708,7 +708,8 @@ namespace hpx::parallel::execution {
                 HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
-        HPX_CXX_EXPORT template <typename F, typename Shape, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename F, typename Shape,
+            typename... Ts>
         struct bulk_function_result
         {
             using value_type =
@@ -717,7 +718,8 @@ namespace hpx::parallel::execution {
                 value_type, Ts...>;
         };
 
-        HPX_CXX_EXPORT template <typename F, typename Shape, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename F, typename Shape,
+            typename... Ts>
         using bulk_function_result_t =
             typename bulk_function_result<F, Shape, Ts...>::type;
 
@@ -901,14 +903,16 @@ namespace hpx::parallel::execution {
         using bulk_execute_result_impl_t =
             typename bulk_execute_result_impl<F, Shape, IsVoid, Ts...>::type;
 
-        HPX_CXX_EXPORT template <typename F, typename Shape, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename F, typename Shape,
+            typename... Ts>
         struct bulk_execute_result
           : bulk_execute_result_impl<F, Shape,
                 std::is_void_v<bulk_function_result_t<F, Shape, Ts...>>, Ts...>
         {
         };
 
-        HPX_CXX_EXPORT template <typename F, typename Shape, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename F, typename Shape,
+            typename... Ts>
         using bulk_execute_result_t =
             typename bulk_execute_result<F, Shape, Ts...>::type;
 

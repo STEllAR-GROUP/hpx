@@ -15,7 +15,7 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi, typename Reduce>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi, typename Reduce>
     HPX_HOST_DEVICE HPX_FORCEINLINE T reduce(
         Reduce r, eve::wide<T, Abi> const& val) noexcept
     {

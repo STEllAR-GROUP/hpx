@@ -32,19 +32,19 @@ namespace hpx::execution::experimental {
     //      is true.
     //   4. Otherwise, e.
 #if !defined(HPX_HAVE_STDEXEC)
-    HPX_CXX_EXPORT struct as_awaitable_t;
+    HPX_CXX_CORE_EXPORT struct as_awaitable_t;
 
-    HPX_CXX_EXPORT struct connect_awaitable_t;
+    HPX_CXX_CORE_EXPORT struct connect_awaitable_t;
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Value>
+        HPX_CXX_CORE_EXPORT template <typename Value>
         struct receiver_base;
 
-        HPX_CXX_EXPORT template <typename PromiseId, typename Value>
+        HPX_CXX_CORE_EXPORT template <typename PromiseId, typename Value>
         struct sender_awaitable_base;
 
-        HPX_CXX_EXPORT template <typename PromiseId, typename SenderId>
+        HPX_CXX_CORE_EXPORT template <typename PromiseId, typename SenderId>
         struct sender_awaitable;
     }    // namespace detail
 
@@ -64,14 +64,14 @@ namespace hpx::execution::experimental {
     //    template <typename Promise>
     //    struct with_awaitable_senders;
 
-    HPX_CXX_EXPORT struct promise_base;
+    HPX_CXX_CORE_EXPORT struct promise_base;
 
-    HPX_CXX_EXPORT struct operation_base;
+    HPX_CXX_CORE_EXPORT struct operation_base;
 
-    HPX_CXX_EXPORT template <typename ReceiverId>
+    HPX_CXX_CORE_EXPORT template <typename ReceiverId>
     struct promise;
 
-    HPX_CXX_EXPORT template <typename ReceiverId>
+    HPX_CXX_CORE_EXPORT template <typename ReceiverId>
     struct operation;
 #endif
 }    // namespace hpx::execution::experimental

@@ -20,37 +20,37 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_vector_pack<datapar::experimental::native_simd<T>>
       : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_vector_pack<T> : std::false_type
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_scalar_vector_pack<datapar::experimental::native_simd<T>>
       : std::false_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_scalar_vector_pack<T> : std::true_type
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Enable>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable>
     struct vector_pack_alignment
     {
         static constexpr std::size_t const value = sizeof(T);
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     struct vector_pack_alignment<datapar::experimental::simd<T, Abi>>
     {
         static constexpr std::size_t const value =
@@ -59,13 +59,13 @@ namespace hpx::parallel::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Enable>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable>
     struct vector_pack_size
     {
         static constexpr std::size_t const value = 1;
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     struct vector_pack_size<datapar::experimental::simd<T, Abi>>
     {
         static constexpr std::size_t const value =

@@ -593,15 +593,15 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     using remove_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     using remove_copy_if_result = hpx::parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::remove_copy_if
-    HPX_CXX_EXPORT inline constexpr struct remove_copy_if_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct remove_copy_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_copy_if_t>
     {
         template <typename I, typename Sent, typename O, typename Pred,
@@ -723,7 +723,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::remove_copy
-    HPX_CXX_EXPORT inline constexpr struct remove_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct remove_copy_t final
       : hpx::detail::tag_parallel_algorithm<remove_copy_t>
     {
     private:

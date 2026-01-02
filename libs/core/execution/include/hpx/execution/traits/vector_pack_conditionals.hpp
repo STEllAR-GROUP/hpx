@@ -13,7 +13,7 @@
 namespace hpx::parallel::traits {
 
     ////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T choose(
         bool msk, T v_true, T v_false) noexcept
     {
@@ -21,7 +21,7 @@ namespace hpx::parallel::traits {
     }
 
     ////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void mask_assign(
         bool msk, T& v, T val) noexcept
     {

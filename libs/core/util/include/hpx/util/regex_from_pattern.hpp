@@ -13,6 +13,6 @@
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT std::string regex_from_pattern(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::string regex_from_pattern(
         std::string const& pattern, error_code& ec = throws);
 }    // namespace hpx::util

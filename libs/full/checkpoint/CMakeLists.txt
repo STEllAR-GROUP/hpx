@@ -34,7 +34,6 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_async_distributed
     hpx_actions_base
-    hpx_checkpoint_base
     hpx_components_base
     hpx_naming
     hpx_runtime_components

@@ -11,27 +11,27 @@
 namespace hpx::execution::detail {
 
     // forward declarations, see execution_policy.hpp
-    HPX_CXX_EXPORT template <typename Executor, typename Parameters>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Parameters>
     struct sequenced_policy_shim;
 
-    HPX_CXX_EXPORT template <typename Executor, typename Parameters>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Parameters>
     struct sequenced_task_policy_shim;
 
-    HPX_CXX_EXPORT template <typename Executor, typename Parameters>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Parameters>
     struct parallel_policy_shim;
 
-    HPX_CXX_EXPORT template <typename Executor, typename Parameters>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Parameters>
     struct parallel_task_policy_shim;
 
-    HPX_CXX_EXPORT template <typename Executor, typename Parameters>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Parameters>
     struct unsequenced_task_policy_shim;
 
-    HPX_CXX_EXPORT template <typename Executor, typename Parameters>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Parameters>
     struct unsequenced_policy_shim;
 
-    HPX_CXX_EXPORT template <typename Executor, typename Parameters>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Parameters>
     struct parallel_unsequenced_task_policy_shim;
 
-    HPX_CXX_EXPORT template <typename Executor, typename Parameters>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Parameters>
     struct parallel_unsequenced_policy_shim;
 }    // namespace hpx::execution::detail

@@ -36,7 +36,7 @@ namespace hpx::execution::experimental {
 
     // empty_variant will be returned by execution::value_types_of_t and
     // execution::error_types_of_t if no signatures are provided.
-    HPX_CXX_EXPORT struct empty_variant
+    HPX_CXX_CORE_EXPORT struct empty_variant
     {
         empty_variant() = delete;
     };
@@ -45,13 +45,13 @@ namespace hpx::execution::experimental {
 
         // use this remove_cv_ref instead of std::decay to avoid
         // decaying function types, e.g. set_value_t() -> set_value_t(*)()
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct remove_cv_ref
         {
             using type = std::remove_cv_t<std::remove_reference_t<T>>;
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         using remove_cv_ref_t = meta::type<remove_cv_ref<T>>;
 
         // clang-format off
@@ -59,7 +59,7 @@ namespace hpx::execution::experimental {
         // If sizeof...(Ts) is greater than zero, variant-or-empty<Ts...> names
         // the type variant<Us...> where Us... is the pack decay_t<Ts>... with
         // duplicate types removed.
-        HPX_CXX_EXPORT template <template <typename...> typename Variant>
+        HPX_CXX_CORE_EXPORT template <template <typename...> typename Variant>
         struct decay_variant_or_empty
         {
             template <typename... Ts>
@@ -72,7 +72,7 @@ namespace hpx::execution::experimental {
                 Ts...>;
         };
 
-        HPX_CXX_EXPORT template <template <typename...> typename Variant>
+        HPX_CXX_CORE_EXPORT template <template <typename...> typename Variant>
         struct decay_variant
         {
             template <typename... Ts>
@@ -83,7 +83,7 @@ namespace hpx::execution::experimental {
                 Ts...>;
         };
 
-        HPX_CXX_EXPORT template <template <typename...> typename Variant>
+        HPX_CXX_CORE_EXPORT template <template <typename...> typename Variant>
         struct unique_variant
         {
             template <typename... Ts>
@@ -92,30 +92,30 @@ namespace hpx::execution::experimental {
         };
         // clang-format on
 
-        HPX_CXX_EXPORT template <typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename... Ts>
         using decayed_variant =
             meta::invoke<decay_variant_or_empty<hpx::variant>, Ts...>;
 
-        HPX_CXX_EXPORT template <template <typename...> typename Tuple>
+        HPX_CXX_CORE_EXPORT template <template <typename...> typename Tuple>
         struct decay_tuple
         {
             template <typename... Ts>
             using apply = Tuple<remove_cv_ref_t<Ts>...>;
         };
 
-        HPX_CXX_EXPORT template <typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename... Ts>
         using decayed_tuple = meta::invoke<decay_tuple<hpx::tuple>, Ts...>;
 
 #if !defined(HPX_HAVE_STDEXEC)
         // test, if set_value_t(Ts...), set_error_t(Error, Ts...), or
         // set_stopped_t() are available, return meta::pack<Ts...>
-        HPX_CXX_EXPORT template <typename Tag,
+        HPX_CXX_CORE_EXPORT template <typename Tag,
             typename MetaF = meta::func<meta::pack>, typename... Ts>
         std::enable_if_t<std::is_same_v<Tag, set_value_t>,
             meta::pack<meta::invoke<MetaF, Ts...>>>
             test_signature(Tag (*)(Ts...));
 
-        HPX_CXX_EXPORT template <typename Tag,
+        HPX_CXX_CORE_EXPORT template <typename Tag,
             typename MetaF = meta::func<meta::pack>, typename Error,
             typename... Ts>
         std::enable_if_t<std::is_same_v<Tag, set_error_t>,
@@ -123,36 +123,37 @@ namespace hpx::execution::experimental {
                 meta::invoke1<MetaF, Ts>...>>
             test_signature(Tag (*)(Error, Ts...));
 
-        HPX_CXX_EXPORT template <typename Tag,
+        HPX_CXX_CORE_EXPORT template <typename Tag,
             typename MetaF = meta::func<meta::pack>>
         std::enable_if_t<std::is_same_v<Tag, set_stopped_t>,
             meta::pack<meta::invoke<MetaF>>>
             test_signature(Tag (*)());
 
         // fallback, returns an empty pack<>
-        HPX_CXX_EXPORT template <typename, typename = void>
+        HPX_CXX_CORE_EXPORT template <typename, typename = void>
         meta::pack<> test_signature(...);
 
         // clang-format off
-        HPX_CXX_EXPORT template <typename Signature, typename Tag,
+        HPX_CXX_CORE_EXPORT template <typename Signature, typename Tag,
             typename MetaF = meta::func<meta::pack>>
         using signature_arg_apply = decltype(
             test_signature<Tag, MetaF>(static_cast<Signature*>(nullptr)));
         // clang-format on
 
-        HPX_CXX_EXPORT template <typename Signature, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Signature,
+            typename Enable = void>
         struct is_completion_signature : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Signature>
+        HPX_CXX_CORE_EXPORT template <typename Signature>
         struct is_completion_signature<Signature,
             std::void_t<decltype(test_signature(
                 static_cast<Signature*>(nullptr)))>> : std::true_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename... Signatures>
+        HPX_CXX_CORE_EXPORT template <typename... Signatures>
         struct compose_signatures
         {
             struct type
@@ -200,12 +201,12 @@ namespace hpx::execution::experimental {
             };
         };
 
-        HPX_CXX_EXPORT template <typename Pack, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Pack, typename Enable = void>
         struct generate_completion_signatures
         {
         };
 
-        HPX_CXX_EXPORT template <typename... Signatures>
+        HPX_CXX_CORE_EXPORT template <typename... Signatures>
         struct generate_completion_signatures<meta::pack<Signatures...>,
             std::enable_if_t<
                 util::all_of_v<is_completion_signature<Signatures>...>>>
@@ -247,17 +248,17 @@ namespace hpx::execution::experimental {
     // completion_signatures<Fns...>::sends_stopped is true if at least one of
     // the types in Fns is execution::set_stopped_t(); otherwise, false.
     //
-    HPX_CXX_EXPORT template <typename... Signatures>
+    HPX_CXX_CORE_EXPORT template <typename... Signatures>
     using completion_signatures = meta::type<
         detail::generate_completion_signatures<meta::pack<Signatures...>>>;
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
-    HPX_CXX_EXPORT struct as_awaitable_t;
+    HPX_CXX_CORE_EXPORT struct as_awaitable_t;
 #endif
 
     namespace detail {
 
-        HPX_CXX_EXPORT struct
+        HPX_CXX_CORE_EXPORT struct
             completion_signals_of_sender_depend_on_execution_environment
         {
         };
@@ -278,11 +279,11 @@ namespace hpx::execution::experimental {
         // -- Eric Niebler
         //
         // To be kept in sync with the promise type used in connect_awaitable
-        HPX_CXX_EXPORT template <typename Env>
+        HPX_CXX_CORE_EXPORT template <typename Env>
         struct env_promise;
 #endif
 
-        HPX_CXX_EXPORT template <typename Env>
+        HPX_CXX_CORE_EXPORT template <typename Env>
         struct dependent_completion_signatures
         {
             template <template <typename...> typename,
@@ -319,19 +320,19 @@ namespace hpx::execution::experimental {
     // descriptor that can be used to report that a type might be a sender
     // within a particular execution environment, but it isn't a sender in an
     // arbitrary execution environment.
-    HPX_CXX_EXPORT template <typename Env>
+    HPX_CXX_CORE_EXPORT template <typename Env>
     using dependent_completion_signatures =
         detail::dependent_completion_signatures<Env>;
 #endif    // NOT HPX_HAVE_STDEXEC
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Sender, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Enable = void>
         struct has_completion_signatures : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Sender>
+        HPX_CXX_CORE_EXPORT template <typename Sender>
         struct has_completion_signatures<Sender,
             std::void_t<
                 typename remove_cv_ref_t<Sender>::completion_signatures>>
@@ -341,7 +342,7 @@ namespace hpx::execution::experimental {
 #if defined(HPX_HAVE_STDEXEC)
     }
 #else
-        HPX_CXX_EXPORT struct no_completion_signatures
+        HPX_CXX_CORE_EXPORT struct no_completion_signatures
         {
         };
 
@@ -352,13 +353,13 @@ namespace hpx::execution::experimental {
         // std::execution::as_awaitable. So you have two options for opting into
         // the sender concept if you type is not generally awaitable: (1)
         // specialize enable_sender, or (2) customize as_awaitable for T.
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CXX_EXPORT, is_sender)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CXX_CORE_EXPORT, is_sender)
 
 #ifdef HPX_HAVE_CXX20_COROUTINES
-        HPX_CXX_EXPORT template <typename Sender, typename = void>
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename = void>
         inline constexpr bool is_enable_sender_v = has_is_sender_v<Sender>;
 
-        HPX_CXX_EXPORT template <typename Sender>
+        HPX_CXX_CORE_EXPORT template <typename Sender>
         inline constexpr bool is_enable_sender_v<Sender,
             std::enable_if_t<
                 std::is_move_constructible_v<std::decay_t<Sender>> &&
@@ -368,7 +369,7 @@ namespace hpx::execution::experimental {
             is_awaitable_v<Sender, env_promise<no_env>> ||
             has_is_sender_v<Sender>;
 #else
-        HPX_CXX_EXPORT template <typename Sender>
+        HPX_CXX_CORE_EXPORT template <typename Sender>
         inline constexpr bool is_enable_sender_v = has_is_sender_v<Sender>;
 #endif    // HPX_HAVE_CXX20_COROUTINES
     }    // namespace detail
@@ -408,7 +409,8 @@ namespace hpx::execution::experimental {
     //
     //  Otherwise, no-completion-signatures{}.
     //
-    HPX_CXX_EXPORT inline constexpr struct get_completion_signatures_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct get_completion_signatures_t
+        final
       : hpx::functional::detail::tag_fallback<get_completion_signatures_t>
     {
     private:
@@ -476,40 +478,40 @@ namespace hpx::execution::experimental {
     // A sender's destructor shall not block pending completion of submitted
     // operations.
 #if defined(HPX_HAVE_STDEXEC)
-    HPX_CXX_EXPORT template <typename Sender, typename... Env>
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename... Env>
     struct is_sender_in
       : std::bool_constant<
             hpx::execution::experimental::sender_in<Sender, Env...>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Sender, typename... Env>
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename... Env>
     inline constexpr bool is_sender_in_v = is_sender_in<Sender, Env...>::value;
 
-    HPX_CXX_EXPORT template <typename Sender>
+    HPX_CXX_CORE_EXPORT template <typename Sender>
     struct is_sender
       : std::bool_constant<hpx::execution::experimental::sender<Sender>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Sender>
+    HPX_CXX_CORE_EXPORT template <typename Sender>
     inline constexpr bool is_sender_v = is_sender<Sender>::value;
 
     // \see is_sender
-    HPX_CXX_EXPORT template <typename Sender, typename Receiver>
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Receiver>
     struct is_sender_to
       : std::bool_constant<
             hpx::execution::experimental::sender_to<Sender, Receiver>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Sender, typename Receiver>
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Receiver>
     inline constexpr bool is_sender_to_v =
         is_sender_to<Sender, Receiver>::value;
 
     // The sender_of concept defines the requirements for a sender type that on
     // successful completion sends the specified set of value types.
-    HPX_CXX_EXPORT template <typename Sender, typename Signal,
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Signal,
         typename Env = hpx::execution::experimental::empty_env>
     struct is_sender_of
       : std::bool_constant<
@@ -517,7 +519,7 @@ namespace hpx::execution::experimental {
     {
     };
 
-    HPX_CXX_EXPORT template <typename Sender, typename Signal,
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Signal,
         typename Env = hpx::execution::experimental::empty_env>
     inline constexpr bool is_sender_of_v =
         is_sender_of<Sender, Signal, Env>::value;
@@ -534,13 +536,13 @@ namespace hpx::execution::experimental {
     // single-sender-value-type<S, E> is an alias for type void.
     // 3. Otherwise, single-sender-value-type<S, E> is ill-formed.
     //
-    HPX_CXX_EXPORT template <typename Sender,
+    HPX_CXX_CORE_EXPORT template <typename Sender,
         typename Env = hpx::execution::experimental::empty_env>
     using single_sender_value_t =
         hpx::execution::experimental::stdexec_internal::__single_sender_value_t<
             Sender, Env>;
 
-    HPX_CXX_EXPORT template <typename A, typename B>
+    HPX_CXX_CORE_EXPORT template <typename A, typename B>
     inline constexpr bool is_derived_from_v = std::derived_from<A, B>;
 
     // Does not exist in P2300
@@ -548,80 +550,81 @@ namespace hpx::execution::experimental {
     //    using with_awaitable_senders =
     //    hpx::execution::experimental::with_awaitable_senders<Promise>;
 
-    HPX_CXX_EXPORT template <typename ReceiverID>
+    HPX_CXX_CORE_EXPORT template <typename ReceiverID>
     using operation = hpx::execution::experimental::stdexec_internal::
         __connect_awaitable_::__operation<ReceiverID>;
 
-    HPX_CXX_EXPORT template <typename ReceiverID>
+    HPX_CXX_CORE_EXPORT template <typename ReceiverID>
     using promise = hpx::execution::experimental::stdexec_internal::
         __connect_awaitable_::__promise<ReceiverID>;
 
-    HPX_CXX_EXPORT template <typename Rec>
+    HPX_CXX_CORE_EXPORT template <typename Rec>
     using promise_t = hpx::execution::experimental::stdexec_internal::
         __connect_awaitable_::__promise_t<Rec>;
 
-    HPX_CXX_EXPORT template <typename Rec>
+    HPX_CXX_CORE_EXPORT template <typename Rec>
     using operation_t = hpx::execution::experimental::stdexec_internal::
         __connect_awaitable_::__operation_t<Rec>;
 
-    HPX_CXX_EXPORT using connect_awaitable_t =
+    HPX_CXX_CORE_EXPORT using connect_awaitable_t =
         hpx::execution::experimental::stdexec_internal::__connect_awaitable_t;
     inline constexpr connect_awaitable_t connect_awaitable{};
 #else
-    HPX_CXX_EXPORT template <typename Sender, typename Env = no_env>
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Env = no_env>
     struct is_sender;
 
     // \see is_sender
-    HPX_CXX_EXPORT template <typename Sender, typename Receiver>
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Receiver>
     struct is_sender_to;
 
     // The sender_of concept defines the requirements for a sender type that on
     // successful completion sends the specified set of value types.
-    HPX_CXX_EXPORT template <typename S, typename E = no_env, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename S, typename E = no_env,
+        typename... Ts>
     struct is_sender_of;
 
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         constexpr bool has_value_types(
             typename T::template value_types<meta::pack, meta::pack>*) noexcept
         {
             return true;
         }
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         constexpr bool has_value_types(...) noexcept
         {
             return false;
         }
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         constexpr bool has_error_types(
             typename T::template error_types<meta::pack>*) noexcept
         {
             return true;
         }
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         constexpr bool has_error_types(...) noexcept
         {
             return false;
         }
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         constexpr bool has_sends_stopped(decltype(T::sends_stopped)*) noexcept
         {
             return true;
         }
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         constexpr bool has_sends_stopped(...) noexcept
         {
             return false;
         }
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct has_sender_types
           : std::integral_constant<bool,
                 has_value_types<T>(nullptr) && has_error_types<T>(nullptr) &&
@@ -629,11 +632,11 @@ namespace hpx::execution::experimental {
         {
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         inline constexpr bool has_sender_types_v = has_sender_types<T>::value;
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Traits>
+        HPX_CXX_CORE_EXPORT template <typename Traits>
         struct valid_completion_signatures
         {
             using type = Traits;
@@ -643,30 +646,30 @@ namespace hpx::execution::experimental {
         template <>
         struct valid_completion_signatures<no_completion_signatures>;
 
-        HPX_CXX_EXPORT template <typename Sender, typename Env = no_env>
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Env = no_env>
         using completion_signatures_of = meta::type<valid_completion_signatures<
             util::invoke_result_t<get_completion_signatures_t, Sender, Env>>>;
 
-        HPX_CXX_EXPORT template <typename Sender, typename Env, bool IsClass,
-            typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Env,
+            bool IsClass, typename Enable = void>
         struct provides_completion_signatures_impl : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Sender, typename Env,
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Env,
             typename Enable = void>
         struct completion_signatures_of_is_valid : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Sender, typename Env>
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Env>
         struct completion_signatures_of_is_valid<Sender, Env,
             std::void_t<decltype(get_completion_signatures(
                 std::declval<Sender>(), std::declval<Env>()))>> : std::true_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Sender, typename Env>
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Env>
         struct provides_completion_signatures_impl<Sender, Env, true,
             std::enable_if_t<
                 meta::value<completion_signatures_of_is_valid<Sender, Env>> &&
@@ -675,7 +678,7 @@ namespace hpx::execution::experimental {
         {
         };
 
-        HPX_CXX_EXPORT template <typename Sender, typename Env = no_env>
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Env = no_env>
         struct provides_completion_signatures
           : provides_completion_signatures_impl<Sender, Env,
                 std::is_class_v<Sender>>
@@ -769,24 +772,24 @@ namespace hpx::execution::experimental {
     //
     // completion_signatures_of_t<S, E>::sends_stopped shall have the same value
     // as completion_signatures_of_t<S, no_env>::sends_stopped.
-    HPX_CXX_EXPORT template <typename Sender, typename Env = no_env>
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Env = no_env>
     using completion_signatures_of_t =
         detail::completion_signatures_of<Sender, Env>;
 
-    HPX_CXX_EXPORT struct connect_t;
+    HPX_CXX_CORE_EXPORT struct connect_t;
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <bool IsSenderReceiver, typename Sender,
+        HPX_CXX_CORE_EXPORT template <bool IsSenderReceiver, typename Sender,
             typename Receiver>
         struct is_sender_to_impl;
 
-        HPX_CXX_EXPORT template <typename Sender, typename Receiver>
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Receiver>
         struct is_sender_to_impl<false, Sender, Receiver> : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Sender, typename Receiver>
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Receiver>
         struct is_sender_to_impl<true, Sender, Receiver>
           : std::integral_constant<bool,
                 hpx::is_invocable_v<connect_t, Sender&&, Receiver&&> ||
@@ -804,14 +807,14 @@ namespace hpx::execution::experimental {
 
         // This concept has been introduced to increase atomicity of concepts
         // clang-format off
-        HPX_CXX_EXPORT template <typename Sender, typename Env>
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Env>
         inline constexpr bool is_sender_plain_v =
             std::is_move_constructible_v<std::decay_t<Sender>> &&
             std::is_class_v<std::decay_t<Sender>>;
         // clang-format on
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename Sender, typename Env>
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Env>
     struct is_sender
       : std::integral_constant<bool,
             !!(detail::is_sender_plain_v<Sender, Env> &&
@@ -821,26 +824,26 @@ namespace hpx::execution::experimental {
     {
     };
 
-    HPX_CXX_EXPORT template <typename Sender, typename Env = no_env>
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Env = no_env>
     inline constexpr bool is_sender_v = is_sender<Sender, Env>::value;
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <bool IsSenderOf, typename S, typename E,
+        HPX_CXX_CORE_EXPORT template <bool IsSenderOf, typename S, typename E,
             typename... Ts>
         struct is_sender_of_impl;
 
-        HPX_CXX_EXPORT template <typename S, typename E, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename S, typename E, typename... Ts>
         struct is_sender_of_impl<false, S, E, Ts...> : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename CS, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename CS, typename... Ts>
         inline bool constexpr is_same_types = std::is_same_v<
             typename CS::template value_types<meta::pack, meta::pack>,
             meta::pack<meta::pack<Ts...>>>;
 
-        HPX_CXX_EXPORT template <class S, class E, class... Ts>
+        HPX_CXX_CORE_EXPORT template <class S, class E, class... Ts>
         struct is_sender_of_impl<true, S, E, Ts...>
           : std::integral_constant<bool,
                 is_same_types<completion_signatures_of_t<S, E>, Ts...>>
@@ -859,16 +862,17 @@ namespace hpx::execution::experimental {
     //              value_types_of_t<S, E, type-list, type_identity_t>
     //          >;
     //
-    HPX_CXX_EXPORT template <typename S, typename E, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename S, typename E, typename... Ts>
     struct is_sender_of
       : detail::is_sender_of_impl<is_sender_v<S, E>, S, E, Ts...>
     {
     };
 
-    HPX_CXX_EXPORT template <typename S, typename E = no_env, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename S, typename E = no_env,
+        typename... Ts>
     inline constexpr bool is_sender_of_v = is_sender_of<S, E, Ts...>::value;
 
-    HPX_CXX_EXPORT template <typename Sender, typename Receiver>
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Receiver>
     struct is_sender_to
       : detail::is_sender_to_impl<is_sender_v<Sender, env_of_t<Receiver>> &&
                 is_receiver_v<Receiver>,
@@ -876,24 +880,24 @@ namespace hpx::execution::experimental {
     {
     };
 
-    HPX_CXX_EXPORT template <typename Sender, typename Receiver>
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Receiver>
     inline constexpr bool is_sender_to_v =
         is_sender_to<Sender, Receiver>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Signatures, typename Tuple,
+        HPX_CXX_CORE_EXPORT template <typename Signatures, typename Tuple,
             typename Variant>
         using value_types_from =
             typename Signatures::template value_types<Tuple::template apply,
                 Variant::template apply>;
 
-        HPX_CXX_EXPORT template <typename Signatures, typename Variant>
+        HPX_CXX_CORE_EXPORT template <typename Signatures, typename Variant>
         using error_types_from =
             typename Signatures::template error_types<Variant::template apply>;
 
-        HPX_CXX_EXPORT template <typename Signatures>
+        HPX_CXX_CORE_EXPORT template <typename Signatures>
         using sends_stopped_from = meta::bool_<Signatures::sends_stopped>;
     }    // namespace detail
 
@@ -909,7 +913,7 @@ namespace hpx::execution::experimental {
     // ill-formed with no diagnostic required.
     //
     // clang-format off
-    HPX_CXX_EXPORT template <typename Sender, typename Env = no_env,
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Env = no_env,
         template <typename...> typename Tuple = detail::decayed_tuple,
         template <typename...> typename Variant = detail::decayed_variant,
         typename = std::enable_if_t<is_sender_v<Sender, Env>>>
@@ -920,7 +924,7 @@ namespace hpx::execution::experimental {
 
     /// Start definitions from coroutine_utils and sender
 
-    HPX_CXX_EXPORT template <typename Receiver, typename Sender>
+    HPX_CXX_CORE_EXPORT template <typename Receiver, typename Sender>
     inline constexpr bool is_receiver_from_v = is_receiver_of_v<Receiver,
         completion_signatures_of_t<Sender, env_of_t<Receiver>>>;
 
@@ -934,14 +938,15 @@ namespace hpx::execution::experimental {
     // single-sender-value-type<S, E> is an alias for type void.
     // 3. Otherwise, single-sender-value-type<S, E> is ill-formed.
     //
-    HPX_CXX_EXPORT template <typename Sender, typename Env = no_env>
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Env = no_env>
     using single_sender_value_t =
         detail::value_types_from<detail::completion_signatures_of<Sender, Env>,
             meta::single_or<void>, meta::compose_template_func<meta::single_t>>;
 
-    HPX_CXX_EXPORT struct connect_awaitable_t;
+    HPX_CXX_CORE_EXPORT struct connect_awaitable_t;
 
-    HPX_CXX_EXPORT struct is_debug_env_t : hpx::functional::tag<is_debug_env_t>
+    HPX_CXX_CORE_EXPORT struct is_debug_env_t
+      : hpx::functional::tag<is_debug_env_t>
     {
         template <typename Env,
             typename = std::enable_if_t<
@@ -949,12 +954,12 @@ namespace hpx::execution::experimental {
         void tag_invoke(Env&&) const noexcept;
     };
 
-    HPX_CXX_EXPORT struct connect_t;
+    HPX_CXX_CORE_EXPORT struct connect_t;
 
-    HPX_CXX_EXPORT template <typename S, typename R>
+    HPX_CXX_CORE_EXPORT template <typename S, typename R>
     using connect_result_t = hpx::util::invoke_result_t<connect_t, S, R>;
 
-    HPX_CXX_EXPORT template <typename Sender, typename Receiver>
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Receiver>
     struct has_nothrow_connect;
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
@@ -976,18 +981,18 @@ namespace hpx::execution::experimental {
     // types ought to implement unhandled_stopped. The author of Add lazy
     // coroutine (coroutine task) type, which proposes a standard coroutine task
     // type, is in agreement.
-    HPX_CXX_EXPORT template <typename Promise, typename = void>
+    HPX_CXX_CORE_EXPORT template <typename Promise, typename = void>
     inline constexpr bool has_unhandled_stopped = false;
 
-    HPX_CXX_EXPORT template <typename Promise>
+    HPX_CXX_CORE_EXPORT template <typename Promise>
     inline constexpr bool has_unhandled_stopped<Promise,
         std::void_t<decltype(std::declval<Promise>().unhandled_stopped())>> =
         true;
 
-    HPX_CXX_EXPORT template <typename Promise, typename = void>
+    HPX_CXX_CORE_EXPORT template <typename Promise, typename = void>
     inline constexpr bool has_convertible_unhandled_stopped = false;
 
-    HPX_CXX_EXPORT template <typename Promise>
+    HPX_CXX_CORE_EXPORT template <typename Promise>
     inline constexpr bool has_convertible_unhandled_stopped<Promise,
         std::enable_if_t<std::is_convertible_v<
             decltype(std::declval<Promise>().unhandled_stopped()),
@@ -996,28 +1001,28 @@ namespace hpx::execution::experimental {
     namespace detail {
 
         // clang-format off
-        HPX_CXX_EXPORT template <typename T, typename U>
+        HPX_CXX_CORE_EXPORT template <typename T, typename U>
         inline constexpr bool decays_to = std::is_same_v<std::decay_t<T>, U>&&
             std::is_same_v<std::decay_t<U>, T>;
         // clang-format on
 
-        HPX_CXX_EXPORT struct void_type
+        HPX_CXX_CORE_EXPORT struct void_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Value>
+        HPX_CXX_CORE_EXPORT template <typename Value>
         using value_or_void_t =
             hpx::meta::if_<std::is_same<Value, void>, void_type, Value>;
 
-        HPX_CXX_EXPORT template <typename Value>
+        HPX_CXX_CORE_EXPORT template <typename Value>
         using coroutine_expected_result_t = hpx::variant<hpx::monostate,
             value_or_void_t<Value>, std::exception_ptr>;
 
-        HPX_CXX_EXPORT template <typename Promise>
+        HPX_CXX_CORE_EXPORT template <typename Promise>
         using coroutine_env_t = hpx::util::detected_or<exec_envs::empty_env,
             hpx::functional::tag_invoke_result_t, get_env_t, Promise>;
 
-        HPX_CXX_EXPORT template <typename Value>
+        HPX_CXX_CORE_EXPORT template <typename Value>
         struct receiver_base
         {
             template <typename... Us,
@@ -1061,7 +1066,7 @@ namespace hpx::execution::experimental {
             hpx::coroutine_handle<> continuation;
         };
 
-        HPX_CXX_EXPORT template <typename PromiseId, typename Value>
+        HPX_CXX_CORE_EXPORT template <typename PromiseId, typename Value>
         struct receiver
         {
             using Promise = hpx::meta::type<PromiseId>;
@@ -1096,12 +1101,12 @@ namespace hpx::execution::experimental {
             };
         };
 
-        HPX_CXX_EXPORT template <typename Sender, typename Promise>
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Promise>
         using receiver_t =
             hpx::meta::type<receiver<hpx::meta::get_id_t<Promise>,
                 single_sender_value_t<Sender, coroutine_env_t<Promise>>>>;
 
-        HPX_CXX_EXPORT template <typename PromiseId, typename Value>
+        HPX_CXX_CORE_EXPORT template <typename PromiseId, typename Value>
         struct sender_awaitable_base
         {
             static constexpr bool await_ready() noexcept
@@ -1162,7 +1167,7 @@ namespace hpx::execution::experimental {
         // clang-format on
     }    // namespace detail
 
-    HPX_CXX_EXPORT inline constexpr struct as_awaitable_t
+    HPX_CXX_CORE_EXPORT inline constexpr struct as_awaitable_t
       : hpx::functional::detail::tag_fallback<as_awaitable_t>
     {
         template <typename T, typename Promise>
@@ -1227,7 +1232,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Env>
+        HPX_CXX_CORE_EXPORT template <typename Env>
         struct env_promise
         {
             template <typename Ty,
@@ -1257,7 +1262,7 @@ namespace hpx::execution::experimental {
             // clang-format on
         };
 
-        HPX_CXX_EXPORT struct with_awaitable_senders_base
+        HPX_CXX_CORE_EXPORT struct with_awaitable_senders_base
         {
             with_awaitable_senders_base() = default;
 
@@ -1307,11 +1312,11 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename A, typename B>
+    HPX_CXX_CORE_EXPORT template <typename A, typename B>
     inline constexpr bool is_derived_from_v = std::is_base_of_v<B, A> &&
         std::is_convertible_v<A const volatile*, B const volatile*>;
 
-    HPX_CXX_EXPORT template <typename Promise>
+    HPX_CXX_CORE_EXPORT template <typename Promise>
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     struct with_awaitable_senders : detail::with_awaitable_senders_base
     {
@@ -1325,7 +1330,7 @@ namespace hpx::execution::experimental {
         }
     };
 
-    HPX_CXX_EXPORT struct promise_base
+    HPX_CXX_CORE_EXPORT struct promise_base
     {
         static constexpr hpx::suspend_always initial_suspend() noexcept
         {
@@ -1379,7 +1384,7 @@ namespace hpx::execution::experimental {
         }
     };
 
-    HPX_CXX_EXPORT struct operation_base
+    HPX_CXX_CORE_EXPORT struct operation_base
     {
         hpx::coroutine_handle<> coro_handle;
 
@@ -1413,10 +1418,10 @@ namespace hpx::execution::experimental {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ReceiverId>
+    HPX_CXX_CORE_EXPORT template <typename ReceiverId>
     struct promise;
 
-    HPX_CXX_EXPORT template <typename ReceiverId>
+    HPX_CXX_CORE_EXPORT template <typename ReceiverId>
     struct operation
     {
         struct type : operation_base
@@ -1426,7 +1431,7 @@ namespace hpx::execution::experimental {
         };
     };
 
-    HPX_CXX_EXPORT template <typename ReceiverId>
+    HPX_CXX_CORE_EXPORT template <typename ReceiverId>
     struct promise
     {
         using Receiver = hpx::meta::type<ReceiverId>;
@@ -1485,16 +1490,16 @@ namespace hpx::execution::experimental {
         };
     };
 
-    HPX_CXX_EXPORT template <typename Receiver,
+    HPX_CXX_CORE_EXPORT template <typename Receiver,
         typename = std::enable_if_t<is_receiver_v<Receiver>>>
     using promise_t = hpx::meta::type<promise<hpx::meta::get_id_t<Receiver>>>;
 
-    HPX_CXX_EXPORT template <typename Receiver,
+    HPX_CXX_CORE_EXPORT template <typename Receiver,
         typename = std::enable_if_t<is_receiver_v<Receiver>>>
     using operation_t =
         hpx::meta::type<operation<hpx::meta::get_id_t<Receiver>>>;
 
-    HPX_CXX_EXPORT inline constexpr struct connect_awaitable_t
+    HPX_CXX_CORE_EXPORT inline constexpr struct connect_awaitable_t
     {
     private:
         template <typename Fun, typename... Ts>
@@ -1579,7 +1584,8 @@ namespace hpx::execution::experimental {
     } connect_awaitable{};
 #endif    // HPX_HAVE_CXX20_COROUTINES
 
-    HPX_CXX_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct connect_t
+    HPX_CXX_CORE_EXPORT
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct connect_t
       : hpx::functional::detail::tag_fallback<connect_t>
     {
 #if defined(HPX_HAVE_CXX20_COROUTINES)
@@ -1606,7 +1612,7 @@ namespace hpx::execution::experimental {
     } connect{};
 #endif    // NOT HPX_HAVE_STDEXEC
 
-    HPX_CXX_EXPORT template <typename Sender, typename Receiver>
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Receiver>
     struct has_nothrow_connect
       : std::integral_constant<bool,
             noexcept(hpx::execution::experimental::connect(
@@ -1618,7 +1624,7 @@ namespace hpx::execution::experimental {
 #if defined(HPX_HAVE_CXX20_COROUTINES)
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename PromiseId, typename SenderId>
+        HPX_CXX_CORE_EXPORT template <typename PromiseId, typename SenderId>
         struct sender_awaitable
         {
             using promise_type = hpx::meta::type<PromiseId>;
@@ -1661,14 +1667,14 @@ namespace hpx::execution::experimental {
     // through EN (ignoring differences in rvalue-reference qualification), the
     // program is ill-formed with no diagnostic required.
     //
-    HPX_CXX_EXPORT template <typename Sender, typename Env = no_env,
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Env = no_env,
         template <typename...> typename Variant = detail::decayed_variant,
         typename = std::enable_if_t<is_sender_v<Sender, Env>>>
     using error_types_of_t =
         detail::error_types_from<detail::completion_signatures_of<Sender, Env>,
             meta::func<Variant>>;
 
-    HPX_CXX_EXPORT template <typename Sender, typename Env = no_env,
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Env = no_env,
         typename = std::enable_if_t<is_sender_v<Sender, Env>>>
     inline constexpr bool sends_stopped_of_v =
         meta::value<detail::sends_stopped_from<
@@ -1684,7 +1690,7 @@ namespace hpx::execution::experimental {
         //       corresponding functions execution::value_types_of_t and
         //       execution::error_types_of_t).
 
-        HPX_CXX_EXPORT template <typename Sender, typename Env,
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Env,
             typename Tuple = meta::func<meta::pack>,
             typename Variant = meta::func<meta::pack>,
             typename = std::enable_if_t<is_sender_v<Sender, Env>>>
@@ -1693,26 +1699,26 @@ namespace hpx::execution::experimental {
                 decay_tuple<Tuple::template apply>,
                 decay_variant<Variant::template apply>>;
 
-        HPX_CXX_EXPORT template <typename Sender, typename Env,
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Env,
             typename Variant = meta::func<meta::pack>,
             typename = std::enable_if_t<is_sender_v<Sender, Env>>>
         using error_types_of =
             error_types_from<completion_signatures_of_t<Sender, Env>,
                 decay_variant<Variant::template apply>>;
 
-        HPX_CXX_EXPORT template <typename Sender, typename Env = no_env,
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Env = no_env,
             typename = std::enable_if_t<is_sender_v<Sender, Env>>>
         using sends_stopped_of =
             meta::bool_<completion_signatures_of_t<Sender, Env>::sends_stopped>;
 
         // helpers for make_completion_signatures
-        HPX_CXX_EXPORT template <typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename... Ts>
         using set_value_signature = set_value_t(Ts...);
 
-        HPX_CXX_EXPORT template <typename Error>
+        HPX_CXX_CORE_EXPORT template <typename Error>
         using set_error_signature = set_error_t(Error);
 
-        HPX_CXX_EXPORT template <typename Sender, typename Env,
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Env,
             typename Signatures, typename SetValue, typename SetError,
             typename SendsStopped>
         using completion_signatures_t = meta::apply<
@@ -1723,7 +1729,7 @@ namespace hpx::execution::experimental {
                 meta::transform<SetError, meta::func<meta::pack>>>,
             meta::if_<SendsStopped, meta::pack<set_stopped_t()>, meta::pack<>>>;
 
-        HPX_CXX_EXPORT template <typename Sender, typename Env,
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Env,
             typename Signatures, typename SetValue, typename SetError,
             bool SendsStopped>
         struct make_helper
@@ -1732,7 +1738,7 @@ namespace hpx::execution::experimental {
                 SetValue, SetError, meta::bool_<SendsStopped>>;
         };
 
-        HPX_CXX_EXPORT template <typename Sender, typename Signatures,
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Signatures,
             typename SetValue, typename SetError, bool SendsStopped>
         struct make_helper<Sender, no_env, Signatures, SetValue, SetError,
             SendsStopped>
@@ -1796,7 +1802,7 @@ namespace hpx::execution::experimental {
     // where Sigs... is the unique set of types in [Vs..., Es..., Ss...,
     // MoreSigs...].
     //
-    HPX_CXX_EXPORT template <typename Sender, typename Env = no_env,
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Env = no_env,
         typename AddlSignatures = completion_signatures<>,
         template <typename...> typename SetValue = detail::set_value_signature,
         template <typename> typename SetError = detail::set_error_signature,

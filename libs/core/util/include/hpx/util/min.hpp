@@ -10,7 +10,7 @@
 
 namespace hpx::detail {
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     HPX_HOST_DEVICE constexpr T const&(min) (T const& a, T const& b) noexcept(
         noexcept(a < b))
     {

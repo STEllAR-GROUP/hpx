@@ -928,10 +928,10 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT template <typename I, typename O1, typename O2>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O1, typename O2>
     using partition_copy_result = parallel::util::in_out_out_result<I, O1, O2>;
 
-    HPX_CXX_EXPORT inline constexpr struct partition_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct partition_t final
       : hpx::detail::tag_parallel_algorithm<partition_t>
     {
     private:
@@ -1048,7 +1048,7 @@ namespace hpx::ranges {
         }
     } partition{};
 
-    HPX_CXX_EXPORT inline constexpr struct stable_partition_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct stable_partition_t final
       : hpx::detail::tag_parallel_algorithm<stable_partition_t>
     {
     private:
@@ -1175,7 +1175,7 @@ namespace hpx::ranges {
         }
     } stable_partition{};
 
-    HPX_CXX_EXPORT inline constexpr struct partition_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct partition_copy_t final
       : hpx::detail::tag_parallel_algorithm<partition_copy_t>
     {
     private:

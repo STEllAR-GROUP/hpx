@@ -19,7 +19,7 @@ namespace hpx::components {
     ////////////////////////////////////////////////////////////////////////////
     /// The \a component_commandline_base has to be used as a base class for all
     /// component command-line line handling registries.
-    HPX_CXX_EXPORT struct HPX_CORE_EXPORT component_commandline_base
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT component_commandline_base
     {
         virtual ~component_commandline_base() = default;
 

@@ -181,7 +181,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct fill_iteration
         {
             std::decay_t<T> val_;
@@ -193,7 +193,7 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         struct fill : public algorithm<fill<Iter>, Iter>
         {
             constexpr fill() noexcept
@@ -240,7 +240,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT template <typename FwdIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter>
         struct fill_n : public algorithm<fill_n<FwdIter>, FwdIter>
         {
             constexpr fill_n() noexcept
@@ -273,7 +273,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::fill
-    HPX_CXX_EXPORT inline constexpr struct fill_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct fill_t final
       : hpx::detail::tag_parallel_algorithm<fill_t>
     {
     private:
@@ -318,7 +318,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::fill_n
-    HPX_CXX_EXPORT inline constexpr struct fill_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct fill_n_t final
       : hpx::detail::tag_parallel_algorithm<fill_n_t>
     {
     private:

@@ -13,7 +13,7 @@
 namespace hpx::execution_base {
 
     /// TODO: implement, this is currently just a dummy
-    HPX_CXX_EXPORT struct resource_base
+    HPX_CXX_CORE_EXPORT struct resource_base
     {
         virtual ~resource_base() = default;
     };

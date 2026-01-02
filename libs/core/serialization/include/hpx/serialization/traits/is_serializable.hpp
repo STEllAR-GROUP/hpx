@@ -17,7 +17,7 @@
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     class has_serialize_adl
     {
         template <typename T1>
@@ -35,11 +35,11 @@ namespace hpx::traits {
         static constexpr bool value = decltype(test<T>(0))::value;
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool has_serialize_adl_v = has_serialize_adl<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     class has_struct_serialization
     {
         template <typename T1>
@@ -56,7 +56,7 @@ namespace hpx::traits {
         static constexpr bool value = decltype(test<T>(0))::value;
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool has_struct_serialization_v =
         has_struct_serialization<T>::value;
 

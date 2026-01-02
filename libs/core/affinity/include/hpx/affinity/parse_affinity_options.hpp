@@ -22,15 +22,16 @@
 
 namespace hpx::threads {
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void parse_affinity_options(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void parse_affinity_options(
         std::string const& spec, std::vector<mask_type>& affinities,
         std::size_t used_cores, std::size_t max_cores, std::size_t num_threads,
         std::vector<std::size_t>& num_pus, bool use_process_mask,
         error_code& ec = throws);
 
     // backwards compatibility helper
-    HPX_CXX_EXPORT inline void parse_affinity_options(std::string const& spec,
-        std::vector<mask_type>& affinities, error_code& ec = throws)
+    HPX_CXX_CORE_EXPORT inline void parse_affinity_options(
+        std::string const& spec, std::vector<mask_type>& affinities,
+        error_code& ec = throws)
     {
         std::vector<std::size_t> num_pus;
         parse_affinity_options(

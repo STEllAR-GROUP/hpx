@@ -106,7 +106,8 @@ namespace hpx::util {
     }
 
     /// \cond NOINTERNAL
-    HPX_CXX_CORE_EXPORT template <typename Container, typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename Container, typename F,
+        typename... Ts>
     void restore_checkpoint_data_func(Container const& cont, F&& f, Ts&... ts)
     {
         // Create serialization archive

@@ -22,7 +22,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Receiver, typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Receiver, typename Future>
         struct operation_state
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
@@ -58,7 +58,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Future>
         struct keep_future_sender_base
         {
             std::decay_t<Future> future;
@@ -84,10 +84,10 @@ namespace hpx::execution::experimental {
 #endif
         };
 
-        HPX_CXX_EXPORT template <typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Future>
         struct keep_future_sender;
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct keep_future_sender<hpx::future<T>>
           : public keep_future_sender_base<hpx::future<T>>
         {
@@ -117,7 +117,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct keep_future_sender<hpx::shared_future<T>>
           : keep_future_sender_base<hpx::shared_future<T>>
         {
@@ -155,7 +155,7 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT inline constexpr struct keep_future_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct keep_future_t final
     {
         // clang-format off
         template <typename Future,

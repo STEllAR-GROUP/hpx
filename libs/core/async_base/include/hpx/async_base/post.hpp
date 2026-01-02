@@ -47,13 +47,13 @@ namespace hpx {
 namespace hpx::detail {
 
     // dispatch point used for post implementations
-    HPX_CXX_EXPORT template <typename Func, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Func, typename Enable = void>
     struct post_dispatch;
 }    // namespace hpx::detail
 
 namespace hpx {
 
-    HPX_CXX_EXPORT template <typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
     HPX_FORCEINLINE bool post(F&& f, Ts&&... ts)
     {
         return detail::post_dispatch<std::decay_t<F>>::call(
