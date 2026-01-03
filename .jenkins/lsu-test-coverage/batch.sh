@@ -9,7 +9,7 @@
 set -eux
 
 src_dir="$(pwd)"
-build_dir="${src_dir}/build/"
+build_dir="/tmp/jenkins-cov/build/${configuration_name_with_build_type}"
 
 rm -rf "${build_dir}"
 
@@ -33,7 +33,7 @@ cmake \
     -DHPX_WITH_FETCH_LCI=ON \
     -DHPX_WITH_LCI_BOOTSTRAP_MPI=ON \
     -DCMAKE_CXX_FLAGS="-O0 --coverage" \
-    -DCMAKE_EXE_LINKER_FLAGS=--coverage 
+    -DCMAKE_EXE_LINKER_FLAGS=--coverage
 
 
 # Build
@@ -45,7 +45,10 @@ ctest_status=$?
 
 
 # Tests are finished; Collect coverage data
-./grcov . -s ${src_dir} -o lcov.info -t lcov --log "grcov-log.txt" --ignore-not-existing --ignore "/*"
+./grcov ${build_dir} -s ${src_dir} -o lcov.info -t lcov --log "grcov-log.txt" --ignore-not-existing --ignore "/*"
+
+# Copy to src_dir for artifacting
+cp lcov.info ${src_dir}/lcov.info
 
 # Upload to Codacy
 bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r lcov.info --language CPP -t ${CODACY_TOKEN} --commit-uuid ${GIT_COMMIT}
