@@ -114,7 +114,6 @@ void test_adjacent_find_exception()
 void adjacent_find_exception_test()
 {
     test_adjacent_find_exception<std::random_access_iterator_tag>();
-    test_adjacent_find_exception<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

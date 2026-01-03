@@ -969,7 +969,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     parallel::traits::projected_range<Proj, Rng>
@@ -1025,8 +1026,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     parallel::traits::projected<Proj, FwdIter>
                 >
@@ -1087,7 +1088,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     parallel::traits::projected_range<Proj, Rng>
@@ -1149,8 +1151,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<BidirIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, BidirIter> &&
+                hpx::traits::is_random_access_iterator_v<BidirIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, BidirIter> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     parallel::traits::projected<Proj, BidirIter>
                 >
@@ -1217,9 +1219,10 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::traits::is_iterator_v<FwdIter3> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter2> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter3> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     parallel::traits::projected_range<Proj, Rng>
@@ -1283,10 +1286,10 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
-                hpx::traits::is_iterator_v<OutIter2> &&
-                hpx::traits::is_iterator_v<OutIter3> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<OutIter2> &&
+                hpx::traits::is_random_access_iterator_v<OutIter3> &&
                 parallel::traits::is_projected_v<Proj, FwdIter> &&
                 parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,

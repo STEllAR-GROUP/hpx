@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <iterator>
 
 // Apple Clang and Clang V19.1.1 ICE's while compiling this file
 #if !defined(HPX_APPLE_CLANG_VERSION) &&                                       \
@@ -36,6 +37,21 @@ void test_any_of()
 
     test_any_of(IteratorTag());
     test_any_of_ranges_seq(IteratorTag(), proj());
+}
+
+template <typename IteratorTag>
+void test_any_of_parallel()
+{
+    struct proj
+    {
+        //This projection should cause tests to fail if it is not applied
+        //because it causes predicate to evaluate the opposite
+        constexpr std::size_t operator()(std::size_t x) const
+        {
+            return !static_cast<bool>(x);
+        }
+    };
+    using namespace hpx::execution;
 
     test_any_of(seq, IteratorTag());
     test_any_of(par, IteratorTag());
@@ -81,6 +97,7 @@ void any_of_test()
 {
     test_any_of<std::random_access_iterator_tag>();
     test_any_of<std::forward_iterator_tag>();
+    test_any_of_parallel<std::random_access_iterator_tag>();
 }
 
 template <typename IteratorTag>

@@ -562,6 +562,15 @@ function(hpx_check_for_cxx20_std_disable_sized_sentinel_for)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_cxx20_std_disable_sized_range)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_STD_DISABLE_SIZED_RANGE
+    SOURCE cmake/tests/cxx20_std_disable_sized_range.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_cxx20_std_endian)
   add_hpx_config_test(
     HPX_WITH_CXX20_STD_ENDIAN

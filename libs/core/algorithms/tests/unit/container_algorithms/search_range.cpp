@@ -365,6 +365,12 @@ void test_search4()
 {
     using namespace hpx::execution;
     test_search4_sentinel(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_search4_parallel()
+{
+    using namespace hpx::execution;
 
     test_search4_sentinel(seq, IteratorTag());
     test_search4_sentinel(par, IteratorTag());
@@ -382,6 +388,7 @@ void search_test4()
 {
     test_search4<std::random_access_iterator_tag>();
     test_search4<std::forward_iterator_tag>();
+    test_search4_parallel<std::random_access_iterator_tag>();
 }
 
 template <typename ExPolicy, typename IteratorTag>

@@ -878,8 +878,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<UnOp,
                     typename std::iterator_traits<FwdIter1>::value_type> &&
@@ -950,7 +950,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::is_invocable_v<UnOp,
                     typename hpx::traits::range_traits<Rng>::value_type> &&
                 hpx::is_invocable_v<BinOp,
@@ -1027,8 +1028,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<UnOp,
                     typename std::iterator_traits<FwdIter1>::value_type> &&
@@ -1103,7 +1104,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::is_invocable_v<UnOp,
                     typename hpx::traits::range_traits<Rng>::value_type> &&
                 hpx::is_invocable_v<BinOp,

@@ -69,8 +69,8 @@ void test_rotate_sent(ExPolicy policy, IteratorTag)
     auto mid = std::begin(c);
     std::advance(mid, mid_pos);
 
-    hpx::ranges::rotate(
-        policy, std::begin(c), mid, sentinel<std::size_t>{*(std::end(c) - 1)});
+    hpx::ranges::rotate(policy, std::begin(c), mid,
+        test::sentinel_from_iterator(std::end(c) - 1));
 
     auto mid1 = std::begin(d1);
     std::advance(mid1, mid_pos);
@@ -344,6 +344,13 @@ void test_rotate_exception()
     using namespace hpx::execution;
 
     test_rotate_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_rotate_exception_parallel()
+{
+    using namespace hpx::execution;
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
@@ -358,6 +365,7 @@ void rotate_exception_test()
 {
     test_rotate_exception<std::random_access_iterator_tag>();
     test_rotate_exception<std::forward_iterator_tag>();
+    test_rotate_exception_parallel<std::random_access_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -504,7 +512,6 @@ void test_rotate_bad_alloc()
 void rotate_bad_alloc_test()
 {
     test_rotate_bad_alloc<std::random_access_iterator_tag>();
-    test_rotate_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

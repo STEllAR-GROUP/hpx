@@ -6,43 +6,63 @@
 
 #include <hpx/algorithm.hpp>
 #include <hpx/init.hpp>
-#include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstdint>
+#include <iterator>
+#include <numeric>
+#include <vector>
+
+#include "test_utils.hpp"
 
 void myfunction(std::int64_t) {}
 
-void test_invoke_projected()
+template <typename IteratorTag>
+void test_invoke_projected(IteratorTag)
 {
-    iterator<std::int64_t> iter = hpx::ranges::for_each(hpx::execution::seq,
-        iterator<std::int64_t>{0}, sentinel<std::int64_t>{100}, myfunction);
+    using base_iterator = std::vector<std::int64_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+    using sentinel = test::sentinel_from_iterator<iterator>;
 
-    HPX_TEST_EQ(*iter, std::int64_t(100));
+    std::vector<std::int64_t> c(100);
+    std::iota(std::begin(c), std::end(c), 0);
 
-    iter = hpx::ranges::for_each(hpx::execution::par, iterator<std::int64_t>{0},
-        sentinel<std::int64_t>{100}, myfunction);
+    iterator iter = hpx::ranges::for_each(hpx::execution::seq,
+        iterator(std::begin(c)), sentinel(iterator(std::end(c))), myfunction);
 
-    HPX_TEST_EQ(*iter, std::int64_t(100));
+    HPX_TEST(iter == iterator(std::end(c)));
+
+    iter = hpx::ranges::for_each(hpx::execution::par, iterator(std::begin(c)),
+        sentinel(iterator(std::end(c))), myfunction);
+
+    HPX_TEST(iter == iterator(std::end(c)));
 }
 
-void test_begin_end_iterator()
+template <typename IteratorTag>
+void test_begin_end_iterator(IteratorTag)
 {
-    iterator<std::int64_t> iter = hpx::ranges::for_each(hpx::execution::seq,
-        iterator<std::int64_t>{0}, sentinel<std::int64_t>{100}, &myfunction);
+    using base_iterator = std::vector<std::int64_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+    using sentinel = test::sentinel_from_iterator<iterator>;
 
-    HPX_TEST_EQ(*iter, std::int64_t(100));
+    std::vector<std::int64_t> c(100);
+    std::iota(std::begin(c), std::end(c), 0);
 
-    iter = hpx::ranges::for_each(hpx::execution::par, iterator<std::int64_t>{0},
-        sentinel<std::int64_t>{100}, &myfunction);
+    iterator iter = hpx::ranges::for_each(hpx::execution::seq,
+        iterator(std::begin(c)), sentinel(iterator(std::end(c))), &myfunction);
 
-    HPX_TEST_EQ(*iter, std::int64_t(100));
+    HPX_TEST(iter == iterator(std::end(c)));
+
+    iter = hpx::ranges::for_each(hpx::execution::par, iterator(std::begin(c)),
+        sentinel(iterator(std::end(c))), &myfunction);
+
+    HPX_TEST(iter == iterator(std::end(c)));
 }
 
 int hpx_main()
 {
-    test_begin_end_iterator();
-    test_invoke_projected();
+    test_begin_end_iterator(std::random_access_iterator_tag());
+    test_invoke_projected(std::random_access_iterator_tag());
 
     return hpx::local::finalize();
 }
