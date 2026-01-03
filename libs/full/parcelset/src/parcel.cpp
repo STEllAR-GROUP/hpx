@@ -22,10 +22,10 @@
 #include <hpx/actions_base/detail/action_factory.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/naming/detail/preprocess_gid_types.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
-#include <hpx/parcelset_base/parcel_interface.hpp>
 
 #include <cstddef>
 #include <cstdint>

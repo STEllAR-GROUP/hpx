@@ -14,10 +14,10 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <atomic>
 #include <cstdint>

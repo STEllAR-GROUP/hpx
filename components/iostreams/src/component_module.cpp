@@ -6,6 +6,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#include <hpx/components/iostreams/ostream.hpp>
+#include <hpx/components/iostreams/server/output_stream.hpp>
+#include <hpx/components/iostreams/standard_streams.hpp>
+
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/component_startup_shutdown.hpp>
@@ -14,10 +19,6 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
-
-#include <hpx/components/iostreams/ostream.hpp>
-#include <hpx/components/iostreams/server/output_stream.hpp>
-#include <hpx/components/iostreams/standard_streams.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_COMPONENT_MODULE()

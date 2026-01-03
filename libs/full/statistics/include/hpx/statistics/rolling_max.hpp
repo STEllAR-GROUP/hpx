@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -104,9 +104,9 @@ namespace hpx::util {
 
     namespace tag {
 
-        using boost::accumulators::tag::rolling_max;
+        HPX_CXX_EXPORT using boost::accumulators::tag::rolling_max;
     }
 
-    using boost::accumulators::extract::rolling_max;
+    HPX_CXX_EXPORT using boost::accumulators::extract::rolling_max;
 }    // namespace hpx::util
 // namespace hpx::util

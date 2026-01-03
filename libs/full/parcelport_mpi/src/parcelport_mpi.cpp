@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c)      2020 Google
 //
@@ -9,23 +9,22 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
+#include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/mpi_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/util.hpp>
-
-#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/parcelport_mpi/locality.hpp>
 #include <hpx/parcelport_mpi/receiver.hpp>
 #include <hpx/parcelport_mpi/sender.hpp>
 #include <hpx/parcelset/parcelport_impl.hpp>
-#include <hpx/parcelset_base/locality.hpp>
 #include <hpx/plugin_factories/parcelport_factory.hpp>
 
 #include <atomic>

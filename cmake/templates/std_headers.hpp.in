@@ -135,3 +135,7 @@
 #  include <Vc/global.h>
 # endif
 #endif
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+# include <boost/accumulators/accumulators.hpp>
+#endif

@@ -9,6 +9,8 @@
 
 #include <hpx/config.hpp>
 
+#include <boost/iostreams/stream.hpp>
+
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/post.hpp>
 #include <hpx/components/client_base.hpp>
@@ -17,8 +19,6 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/type_support.hpp>
-
-#include <boost/iostreams/stream.hpp>
 
 #include <atomic>
 #include <cstdint>
