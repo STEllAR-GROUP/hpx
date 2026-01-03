@@ -644,7 +644,8 @@ namespace hpx::execution {
     // support all properties exposed by the embedded policy
     HPX_CXX_EXPORT template <typename Tag, typename Policy, typename Property,
         HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>)>
+            hpx::execution::experimental::is_scheduling_property_v<Tag>&&
+                hpx::functional::is_tag_invocable_v<Tag, Policy, Property&&>)>
     auto tag_invoke(
         Tag tag, parallel_policy_executor<Policy> const& exec, Property&& prop)
         -> decltype(std::declval<parallel_policy_executor<Policy>>().policy(
@@ -659,7 +660,8 @@ namespace hpx::execution {
 
     HPX_CXX_EXPORT template <typename Tag, typename Policy,
         HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>)>
+            hpx::execution::experimental::is_scheduling_property_v<Tag>&&
+                hpx::functional::is_tag_invocable_v<Tag, Policy>)>
     auto tag_invoke(Tag tag, parallel_policy_executor<Policy> const& exec)
         -> decltype(std::declval<Tag>()(std::declval<Policy>()))
     {
