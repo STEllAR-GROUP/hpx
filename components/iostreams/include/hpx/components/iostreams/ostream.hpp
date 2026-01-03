@@ -8,6 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <boost/iostreams/stream.hpp>
+
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/post.hpp>
 #include <hpx/components/client_base.hpp>

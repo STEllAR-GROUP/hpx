@@ -11,7 +11,7 @@
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/iterator_support.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/parallel/segmented_algorithms/functional/segmented_iterator_helpers.hpp>
 
 #include <cstddef>

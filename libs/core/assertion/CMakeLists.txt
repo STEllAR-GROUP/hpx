@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2025 The STE||AR-Group
+# Copyright (c) 2019-2026 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,14 +8,11 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/assertion/include
 set(assertion_headers
-    hpx/assert.hpp hpx/assertion/api.hpp hpx/assertion/current_function.hpp
-    hpx/assertion/evaluate_assert.hpp hpx/assertion/macros.hpp
-    hpx/assertion/source_location.hpp
+    hpx/assert.hpp hpx/assertion/api.hpp hpx/assertion/evaluate_assert.hpp
+    hpx/assertion/macros.hpp hpx/assertion/source_location.hpp
 )
 set(assertion_exclude_global_header hpx/assert.hpp)
-set(assertion_macro_headers hpx/assertion/current_function.hpp
-                            hpx/assertion/macros.hpp
-)
+set(assertion_macro_headers hpx/assertion/macros.hpp)
 
 # Default location is $HPX_ROOT/libs/assertion/include_compatibility
 # cmake-format: off

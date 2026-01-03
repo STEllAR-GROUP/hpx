@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2021 Hartmut Kaiser
+//  Copyright (c) 2015-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +14,8 @@
 namespace hpx {
 
     /// \cond NOINTERN
-    using parcel_write_handler_type = parcelset::parcel_write_handler_type;
+    HPX_CXX_EXPORT using parcel_write_handler_type =
+        parcelset::parcel_write_handler_type;
     /// \endcond
 
     /// Set the default parcel write handler which is invoked once a parcel has
@@ -31,8 +32,8 @@ namespace hpx {
     ///       terminate the application in case of any errors detected during
     ///       preparing or sending the parcel.
     ///
-    HPX_EXPORT parcel_write_handler_type set_parcel_write_handler(
-        parcel_write_handler_type const& f);
+    HPX_CXX_EXPORT HPX_EXPORT parcel_write_handler_type
+    set_parcel_write_handler(parcel_write_handler_type const& f);
 }    // namespace hpx
 
 #endif

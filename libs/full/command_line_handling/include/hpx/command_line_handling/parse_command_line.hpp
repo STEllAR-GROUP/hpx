@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,7 +22,8 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // parse the command line
-    HPX_EXPORT bool parse_commandline(hpx::util::section const& rtcfg,
+    HPX_CXX_EXPORT HPX_EXPORT bool parse_commandline(
+        hpx::util::section const& rtcfg,
         hpx::program_options::options_description const& app_options,
         std::string const& cmdline, hpx::program_options::variables_map& vm,
         std::size_t node,
@@ -32,7 +33,8 @@ namespace hpx::util {
         hpx::program_options::options_description* visible = nullptr,
         std::vector<std::string>* unregistered_options = nullptr);
 
-    HPX_EXPORT bool parse_commandline(hpx::util::section const& rtcfg,
+    HPX_CXX_EXPORT HPX_EXPORT bool parse_commandline(
+        hpx::util::section const& rtcfg,
         hpx::program_options::options_description const& app_options,
         std::string const& arg0, std::vector<std::string> const& args,
         hpx::program_options::variables_map& vm, std::size_t node,

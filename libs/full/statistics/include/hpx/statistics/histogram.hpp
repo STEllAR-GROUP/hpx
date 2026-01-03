@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -46,7 +46,7 @@ namespace hpx::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////////
-        // The histogram histogram estimator returns a histogram of the sample
+        // The histogram estimator returns a histogram of the sample
         // distribution. The positions and sizes of the bins are determined
         // using a specifiable number of cached samples (cache_size). The range
         // between the minimum and the maximum of the cached samples is
@@ -195,8 +195,8 @@ namespace hpx::util {
 
     namespace tag {
 
-        using boost::accumulators::tag::histogram;
+        HPX_CXX_EXPORT using boost::accumulators::tag::histogram;
     }
 
-    using boost::accumulators::extract::histogram;
+    HPX_CXX_EXPORT using boost::accumulators::extract::histogram;
 }    // namespace hpx::util

@@ -2158,6 +2158,16 @@ if(HPX_WITH_COMPILER_WARNINGS)
       hpx_add_compile_flag(-wd4244)
     endif()
 
+    # when compiling with modules enabled, the following warning can't be
+    # disabled inline
+    if(HPX_WITH_CXX_MODULES)
+      # 'symbol' needs to have dll-interface to be used by clients of 'symbol'
+      hpx_add_compile_flag(-wd4251)
+      # non dll-interface struct 'symbol' used as base for dll-interface class
+      # 'symbol'
+      hpx_add_compile_flag(-wd4275)
+    endif()
+
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall)
     hpx_add_compile_flag_if_available(-Wno-strict-aliasing)
@@ -2192,6 +2202,10 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # sadly
     hpx_add_compile_flag_if_available(-Wformat=2)
     hpx_add_compile_flag_if_available(-Wno-format-nonliteral)
+
+    # inside a lambda, '__func__' expands to the name of the function call
+    # operator
+    hpx_add_compile_flag_if_available(-Wno-bugprone-lambda-function-name)
 
     # Self initialization is dangerous
     hpx_add_compile_flag_if_available(-Winit-self)
