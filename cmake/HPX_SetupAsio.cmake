@@ -89,7 +89,7 @@ if(NOT HPX_FIND_PACKAGE)
   hpx_add_config_cond_define(ASIO_HAS_STD_INVOKE_RESULT 1)
 
   # Asio should not use Boost exceptions
-  hpx_add_config_cond_define(ASIO_HAS_BOOST_THROW_EXCEPTION 0)
+  #hpx_add_config_cond_define(ASIO_HAS_BOOST_THROW_EXCEPTION 0)
 
   # Disable concepts support in Asio as a workaround to
   # https://github.com/boostorg/asio/issues/312

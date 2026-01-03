@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2015-2016 Thomas Heller
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2007 Alexandre (aka Alex) TABBAL
@@ -17,9 +17,7 @@
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/threading_base.hpp>
 
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/gid_type.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/parcelset_base/policies/message_handler.hpp>
 
@@ -35,7 +33,7 @@
 namespace hpx::parcelset::detail {
 
     // abstract base class for parcels
-    struct parcel_base
+    HPX_CXX_EXPORT struct parcel_base
     {
         using split_gids_type =
             std::map<naming::gid_type const*, naming::gid_type>;
@@ -115,7 +113,7 @@ namespace hpx::parcelset::detail {
 
 namespace hpx::parcelset {
 
-    class HPX_EXPORT parcel
+    HPX_CXX_EXPORT class HPX_EXPORT parcel
     {
         using split_gids_type = detail::parcel_base::split_gids_type;
 
@@ -203,8 +201,9 @@ namespace hpx::parcelset {
         std::shared_ptr<detail::parcel_base> data_;
     };
 
-    HPX_EXPORT std::ostream& operator<<(std::ostream& os, parcel const& p);
-    HPX_EXPORT std::string dump_parcel(parcel const& p);
+    HPX_CXX_EXPORT HPX_EXPORT std::ostream& operator<<(
+        std::ostream& os, parcel const& p);
+    HPX_CXX_EXPORT HPX_EXPORT std::string dump_parcel(parcel const& p);
 }    // namespace hpx::parcelset
 
 #include <hpx/config/warnings_suffix.hpp>

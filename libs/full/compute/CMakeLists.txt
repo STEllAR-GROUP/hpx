@@ -44,6 +44,6 @@ add_hpx_module(
   HEADERS ${compute_headers}
   COMPAT_HEADERS ${compute_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES ${compute_optional_module_dependencies}
+  MODULE_DEPENDENCIES ${compute_optional_module_dependencies} hpx_naming_base
   CMAKE_SUBDIRS examples tests
 )

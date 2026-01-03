@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,7 +24,7 @@
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_EXPORT command_line_handling
+    HPX_CXX_EXPORT struct HPX_EXPORT command_line_handling
       : hpx::local::detail::command_line_handling
     {
         using base_type = hpx::local::detail::command_line_handling;

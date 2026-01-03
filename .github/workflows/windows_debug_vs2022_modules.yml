@@ -48,8 +48,8 @@ jobs:
       shell: bash
       run: |
           cmake --build build --config Debug \
-          --target ALL_BUILD \
-          -- -maxcpucount:2 -verbosity:minimal -nologo
+            --target ALL_BUILD \
+            -- -maxcpucount:2 -verbosity:minimal -nologo
     - name: Install
       shell: bash
       run: |
