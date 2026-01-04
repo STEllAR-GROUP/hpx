@@ -15,7 +15,7 @@
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT template <typename DestType, typename Config,
+    HPX_CXX_CORE_EXPORT template <typename DestType, typename Config,
         std::enable_if_t<!std::is_same_v<DestType, std::string>, bool> = false>
     DestType get_entry_as(
         Config const& config, std::string const& key, DestType const& dflt)
@@ -26,7 +26,7 @@ namespace hpx::util {
         return from_string<DestType>(entry, dflt);
     }
 
-    HPX_CXX_EXPORT template <typename DestType, typename Config,
+    HPX_CXX_CORE_EXPORT template <typename DestType, typename Config,
         std::enable_if_t<std::is_same_v<DestType, std::string>, bool> = false>
     DestType get_entry_as(
         Config const& config, std::string const& key, DestType const& dflt)

@@ -26,7 +26,7 @@ namespace hpx::execution::experimental {
     /// that are assigned to threads. If \a num_chunks is not specified, the
     /// number of chunks is determined based on the number of available cores.
     ///
-    HPX_CXX_EXPORT struct max_num_chunks
+    HPX_CXX_CORE_EXPORT struct max_num_chunks
     {
         /// Construct a \a max_num_chunks executor parameters object
         ///

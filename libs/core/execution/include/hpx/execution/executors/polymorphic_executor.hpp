@@ -671,10 +671,10 @@ namespace hpx::parallel::execution {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     class polymorphic_executor;
 
-    HPX_CXX_EXPORT template <typename R, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename R, typename... Ts>
     class polymorphic_executor<R(Ts...)> : detail::polymorphic_executor_base
     {
         using base_type = detail::polymorphic_executor_base;
@@ -929,31 +929,31 @@ namespace hpx::parallel::execution {
 namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
-    HPX_CXX_EXPORT template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct is_never_blocking_one_way_executor<
         parallel::execution::polymorphic_executor<Sig>> : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct is_one_way_executor<parallel::execution::polymorphic_executor<Sig>>
       : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct is_two_way_executor<parallel::execution::polymorphic_executor<Sig>>
       : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct is_bulk_one_way_executor<
         parallel::execution::polymorphic_executor<Sig>> : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct is_bulk_two_way_executor<
         parallel::execution::polymorphic_executor<Sig>> : std::true_type
     {

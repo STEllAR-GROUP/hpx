@@ -65,7 +65,7 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // define customization points
-    HPX_CXX_EXPORT inline constexpr struct null_parameters_t
+    HPX_CXX_CORE_EXPORT inline constexpr struct null_parameters_t
     {
     } null_parameters{};
 
@@ -94,7 +94,7 @@ namespace hpx::execution::experimental {
     /// \return         The size of the chunks (number of iterations per chunk)
     ///                 that should be used for parallel execution.
     ///
-    HPX_CXX_EXPORT inline constexpr struct get_chunk_size_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct get_chunk_size_t final
       : hpx::functional::detail::tag_priority<get_chunk_size_t>
     {
     private:
@@ -146,7 +146,7 @@ namespace hpx::execution::experimental {
     ///
     /// \return The execution time for one of the tasks.
     ///
-    HPX_CXX_EXPORT inline constexpr struct measure_iteration_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct measure_iteration_t final
       : hpx::functional::detail::tag_priority<measure_iteration_t>
     {
     private:
@@ -177,7 +177,7 @@ namespace hpx::execution::experimental {
     /// \param num_tasks [in] The number of tasks the chunk size should be
     ///                 determined for
     ///
-    HPX_CXX_EXPORT inline constexpr struct maximal_number_of_chunks_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct maximal_number_of_chunks_t final
       : hpx::functional::detail::tag_priority<maximal_number_of_chunks_t>
     {
     private:
@@ -205,7 +205,8 @@ namespace hpx::execution::experimental {
     /// \note This calls params.reset_thread_distribution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_CXX_EXPORT inline constexpr struct reset_thread_distribution_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct reset_thread_distribution_t
+        final
       : hpx::functional::detail::tag_priority<reset_thread_distribution_t>
     {
     private:
@@ -239,7 +240,7 @@ namespace hpx::execution::experimental {
     ///
     /// \return The number of cores to use
     ///
-    HPX_CXX_EXPORT inline constexpr struct processing_units_count_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct processing_units_count_t final
       : hpx::functional::detail::tag_priority<processing_units_count_t>
     {
     private:
@@ -294,7 +295,8 @@ namespace hpx::execution::experimental {
 
     /// Generate a policy that supports setting the number of cores for
     /// execution.
-    HPX_CXX_EXPORT inline constexpr struct with_processing_units_count_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct with_processing_units_count_t
+        final
       : hpx::functional::detail::tag_priority<with_processing_units_count_t>
     {
     } with_processing_units_count{};
@@ -309,7 +311,7 @@ namespace hpx::execution::experimental {
     /// \note This calls params.mark_begin_execution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_CXX_EXPORT inline constexpr struct mark_begin_execution_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct mark_begin_execution_t final
       : hpx::functional::detail::tag_priority<mark_begin_execution_t>
     {
     private:
@@ -336,7 +338,7 @@ namespace hpx::execution::experimental {
     /// \note This calls params.mark_begin_execution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_CXX_EXPORT inline constexpr struct mark_end_of_scheduling_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct mark_end_of_scheduling_t final
       : hpx::functional::detail::tag_priority<mark_end_of_scheduling_t>
     {
     private:
@@ -363,7 +365,7 @@ namespace hpx::execution::experimental {
     /// \note This calls params.mark_end_execution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_CXX_EXPORT inline constexpr struct mark_end_execution_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct mark_end_execution_t final
       : hpx::functional::detail::tag_priority<mark_end_execution_t>
     {
     private:
@@ -399,7 +401,8 @@ namespace hpx::execution::experimental {
     /// \note This calls params.mark_begin_execution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_CXX_EXPORT inline constexpr struct collect_execution_parameters_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct collect_execution_parameters_t
+        final
       : hpx::functional::detail::tag_priority<collect_execution_parameters_t>
     {
     private:

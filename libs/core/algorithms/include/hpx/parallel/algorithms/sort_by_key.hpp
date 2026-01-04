@@ -108,7 +108,7 @@ namespace hpx { namespace experimental {
 
 namespace hpx::parallel {
 
-    HPX_CXX_EXPORT template <typename KeyIter, typename ValueIter>
+    HPX_CXX_CORE_EXPORT template <typename KeyIter, typename ValueIter>
     using sort_by_key_result = std::pair<KeyIter, ValueIter>;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT struct extract_key
+        HPX_CXX_CORE_EXPORT struct extract_key
         {
             template <typename Tuple>
             auto operator()(Tuple&& t) const
@@ -131,10 +131,10 @@ namespace hpx::parallel {
 
 namespace hpx::experimental {
 
-    HPX_CXX_EXPORT template <typename KeyIter, typename ValueIter>
+    HPX_CXX_CORE_EXPORT template <typename KeyIter, typename ValueIter>
     using sort_by_key_result = std::pair<KeyIter, ValueIter>;
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename KeyIter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename KeyIter,
         typename ValueIter, typename Compare = hpx::parallel::detail::less>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
         sort_by_key_result<KeyIter, ValueIter>>

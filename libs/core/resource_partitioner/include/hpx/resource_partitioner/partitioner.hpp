@@ -23,7 +23,7 @@
 namespace hpx::resource {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT class pu
+    HPX_CXX_CORE_EXPORT class pu
     {
         static constexpr std::size_t const invalid_pu_id =
             static_cast<std::size_t>(-1);
@@ -65,7 +65,7 @@ namespace hpx::resource {
         mutable std::size_t thread_occupancy_count_;
     };
 
-    HPX_CXX_EXPORT class core
+    HPX_CXX_CORE_EXPORT class core
     {
         static constexpr std::size_t const invalid_core_id =
             static_cast<std::size_t>(-1);
@@ -99,7 +99,7 @@ namespace hpx::resource {
         std::vector<pu> pus_;
     };
 
-    HPX_CXX_EXPORT class numa_domain
+    HPX_CXX_CORE_EXPORT class numa_domain
     {
         static constexpr std::size_t const invalid_numa_domain_id =
             static_cast<std::size_t>(-1);
@@ -137,7 +137,7 @@ namespace hpx::resource {
             hpx::threads::policies::detail::affinity_data const& affinity_data);
     }
 
-    HPX_CXX_EXPORT class partitioner
+    HPX_CXX_CORE_EXPORT class partitioner
     {
     private:
         friend ::hpx::resource::partitioner detail::make_partitioner(

@@ -297,7 +297,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::copy
-    HPX_CXX_EXPORT inline constexpr struct starts_with_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct starts_with_t final
       : hpx::functional::detail::tag_fallback<starts_with_t>
     {
     private:

@@ -33,7 +33,8 @@
 
 namespace hpx::lcos::detail {
 
-    HPX_CXX_EXPORT template <typename Executor, typename Future, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Future,
+        typename F>
     inline hpx::traits::future_then_executor_result_t<Executor,
         std::decay_t<Future>, F>
     then_execute_helper(Executor&& exec, F&& f, Future&& predecessor)
@@ -45,7 +46,7 @@ namespace hpx::lcos::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // launch
-    HPX_CXX_EXPORT template <typename Future, typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Future, typename Policy>
     struct future_then_dispatch<Future, Policy,
         std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
@@ -96,7 +97,7 @@ namespace hpx::lcos::detail {
     //
     // parallel executors v2
     // threads::executor
-    HPX_CXX_EXPORT template <typename Future, typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Future, typename Executor>
     struct future_then_dispatch<Future, Executor,
         std::enable_if_t<traits::is_one_way_executor_v<Executor> ||
             traits::is_two_way_executor_v<Executor>>>
@@ -122,7 +123,7 @@ namespace hpx::lcos::detail {
     };
 
     // plain function, or function object
-    HPX_CXX_EXPORT template <typename Future, typename FD>
+    HPX_CXX_CORE_EXPORT template <typename Future, typename FD>
     struct future_then_dispatch<Future, FD,
         std::enable_if_t<!traits::is_launch_policy_v<FD> &&
             !(traits::is_one_way_executor_v<FD> ||
@@ -149,7 +150,7 @@ namespace hpx::lcos::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct post_policy_spawner
+    HPX_CXX_CORE_EXPORT struct post_policy_spawner
     {
         template <typename F>
         void operator()(F&& f, hpx::threads::thread_description desc,
@@ -166,7 +167,7 @@ namespace hpx::lcos::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     struct executor_spawner
     {
         Executor exec;
@@ -181,7 +182,7 @@ namespace hpx::lcos::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ContResult, typename Future,
+    HPX_CXX_CORE_EXPORT template <typename ContResult, typename Future,
         typename Policy, typename F>
     inline traits::detail::shared_state_ptr_t<continuation_result_t<ContResult>>
     make_continuation(Future&& future, Policy&& policy, F&& f)
@@ -203,7 +204,7 @@ namespace hpx::lcos::detail {
     }
 
     // same as above, except with allocator
-    HPX_CXX_EXPORT template <typename ContResult, typename Allocator,
+    HPX_CXX_CORE_EXPORT template <typename ContResult, typename Allocator,
         typename Future, typename Policy, typename F>
     inline traits::detail::shared_state_ptr_t<continuation_result_t<ContResult>>
     make_continuation_alloc(
@@ -245,7 +246,7 @@ namespace hpx::lcos::detail {
 
     // same as above, except with allocator and without unwrapping returned
     // futures
-    HPX_CXX_EXPORT template <typename ContResult, typename Allocator,
+    HPX_CXX_CORE_EXPORT template <typename ContResult, typename Allocator,
         typename Future, typename Policy, typename F>
     inline traits::detail::shared_state_ptr_t<ContResult>
     make_continuation_alloc_nounwrap(
@@ -285,7 +286,7 @@ namespace hpx::lcos::detail {
         return r;
     }
 
-    HPX_CXX_EXPORT template <typename ContResult, typename Future,
+    HPX_CXX_CORE_EXPORT template <typename ContResult, typename Future,
         typename Executor, typename Policy, typename F>
     inline traits::detail::shared_state_ptr_t<ContResult>
     make_continuation_exec_policy(
@@ -307,7 +308,7 @@ namespace hpx::lcos::detail {
         return p;
     }
 
-    HPX_CXX_EXPORT template <typename ContResult, typename Future,
+    HPX_CXX_CORE_EXPORT template <typename ContResult, typename Future,
         typename Executor, typename F>
     inline traits::detail::shared_state_ptr_t<ContResult>
     make_continuation_exec(Future&& future, Executor&& exec, F&& f)

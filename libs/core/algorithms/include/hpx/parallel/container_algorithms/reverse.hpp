@@ -379,12 +379,12 @@ namespace hpx::ranges {
 
     /// `reverse_copy_result` is equivalent to
     /// `hpx::parallel::util::in_out_result`
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     using reverse_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::reverse
-    HPX_CXX_EXPORT inline constexpr struct reverse_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct reverse_t final
       : hpx::detail::tag_parallel_algorithm<reverse_t>
     {
     private:
@@ -465,7 +465,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::reverse_copy
-    HPX_CXX_EXPORT inline constexpr struct reverse_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct reverse_copy_t final
       : hpx::detail::tag_parallel_algorithm<reverse_copy_t>
     {
     private:

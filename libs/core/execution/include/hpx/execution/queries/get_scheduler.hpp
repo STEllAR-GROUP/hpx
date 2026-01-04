@@ -44,7 +44,7 @@ namespace hpx::execution::experimental {
     //
     //     2. Otherwise, false.
     //
-    HPX_CXX_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
+    HPX_CXX_CORE_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
         forwarding_scheduler_query_t final
       : hpx::functional::detail::tag_fallback_noexcept<
             forwarding_scheduler_query_t,
@@ -60,7 +60,7 @@ namespace hpx::execution::experimental {
         }
     } forwarding_scheduler_query{};
 
-    HPX_CXX_EXPORT enum class forward_progress_guarantee : std::uint8_t {
+    HPX_CXX_CORE_EXPORT enum class forward_progress_guarantee : std::uint8_t {
         concurrent,
         parallel,
         weakly_parallel
@@ -94,7 +94,7 @@ namespace hpx::execution::experimental {
     //    agents created by that scheduler shall provide at least the parallel
     //    forward progress guarantee.
     //
-    HPX_CXX_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
+    HPX_CXX_CORE_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
         get_forward_progress_guarantee_t final
       : hpx::functional::detail::tag_fallback_noexcept<
             get_forward_progress_guarantee_t>
@@ -128,7 +128,7 @@ namespace hpx::execution::experimental {
     // 3. execution::get_scheduler() (with no arguments) is expression-equivalent
     //    to execution::read(execution::get_scheduler).
     //
-    HPX_CXX_EXPORT inline constexpr struct get_scheduler_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct get_scheduler_t final
       : hpx::functional::detail::tag_fallback<get_scheduler_t>
     {
     private:
@@ -137,7 +137,8 @@ namespace hpx::execution::experimental {
 
     } get_scheduler{};
 
-    HPX_CXX_EXPORT constexpr auto tag_fallback_invoke(get_scheduler_t) noexcept
+    HPX_CXX_CORE_EXPORT constexpr auto tag_fallback_invoke(
+        get_scheduler_t) noexcept
     {
         return hpx::execution::experimental::read(get_scheduler);
     }

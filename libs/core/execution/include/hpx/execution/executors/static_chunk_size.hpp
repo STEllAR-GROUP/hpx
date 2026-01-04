@@ -31,7 +31,7 @@ namespace hpx::execution::experimental {
     /// \note This executor parameters type is equivalent to OpenMP's STATIC
     ///       scheduling directive.
     ///
-    HPX_CXX_EXPORT struct static_chunk_size
+    HPX_CXX_CORE_EXPORT struct static_chunk_size
     {
         /// Construct a \a static_chunk_size executor parameters object
         ///

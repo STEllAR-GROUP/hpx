@@ -30,7 +30,7 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     // Helper class to gain access to the implementation functions in the
     // derived (user-defined) iterator classes.
-    HPX_CXX_EXPORT class iterator_core_access
+    HPX_CXX_CORE_EXPORT class iterator_core_access
     {
     public:
         template <typename Iterator1, typename Iterator2>
@@ -380,9 +380,9 @@ namespace hpx::util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Derived, typename T, typename Category,
-        typename Reference = T&, typename Distance = std::ptrdiff_t,
-        typename Pointer = void>
+    HPX_CXX_CORE_EXPORT template <typename Derived, typename T,
+        typename Category, typename Reference = T&,
+        typename Distance = std::ptrdiff_t, typename Pointer = void>
     struct iterator_facade
       : detail::iterator_facade_base<Derived, T,
             // clang-format off
@@ -562,8 +562,9 @@ namespace hpx::util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Derived, typename T, typename Category,
-        typename Reference, typename Distance, typename Pointer>
+    HPX_CXX_CORE_EXPORT template <typename Derived, typename T,
+        typename Category, typename Reference, typename Distance,
+        typename Pointer>
     HPX_HOST_DEVICE inline util::detail::postfix_increment_result_t<Derived,
         typename Derived::value_type, typename Derived::reference>
     operator++(
@@ -600,7 +601,7 @@ namespace hpx::util {
     }    // namespace detail
 
 #define HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD(prefix, op, result_type)         \
-    HPX_CXX_EXPORT template <typename Derived1, typename T1,                   \
+    HPX_CXX_CORE_EXPORT template <typename Derived1, typename T1,              \
         typename Category1, typename Reference1, typename Distance1,           \
         typename Pointer1, typename Derived2, typename T2, typename Category2, \
         typename Reference2, typename Distance2, typename Pointer2>            \
@@ -614,7 +615,7 @@ namespace hpx::util {
 
 #define HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX(                              \
     prefix, op, result_type, cond)                                             \
-    HPX_CXX_EXPORT template <typename Derived1, typename T1,                   \
+    HPX_CXX_CORE_EXPORT template <typename Derived1, typename T1,              \
         typename Category1, typename Reference1, typename Distance1,           \
         typename Pointer1, typename Derived2, typename T2, typename Category2, \
         typename Reference2, typename Distance2, typename Pointer2>            \
@@ -695,8 +696,9 @@ namespace hpx::util {
 #undef HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX
 #undef HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD
 
-    HPX_CXX_EXPORT template <typename Derived, typename T, typename Category,
-        typename Reference, typename Distance, typename Pointer>
+    HPX_CXX_CORE_EXPORT template <typename Derived, typename T,
+        typename Category, typename Reference, typename Distance,
+        typename Pointer>
     HPX_HOST_DEVICE constexpr std::enable_if_t<
         std::is_same_v<typename Derived::iterator_category,
             std::random_access_iterator_tag>,
@@ -711,8 +713,9 @@ namespace hpx::util {
         return tmp += n;
     }
 
-    HPX_CXX_EXPORT template <typename Derived, typename T, typename Category,
-        typename Reference, typename Distance, typename Pointer>
+    HPX_CXX_CORE_EXPORT template <typename Derived, typename T,
+        typename Category, typename Reference, typename Distance,
+        typename Pointer>
     HPX_HOST_DEVICE constexpr std::enable_if_t<
         std::is_same_v<typename Derived::iterator_category,
             std::random_access_iterator_tag>,

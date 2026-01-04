@@ -15,7 +15,7 @@
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/get_num_localities.hpp>

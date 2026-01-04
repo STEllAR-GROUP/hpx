@@ -35,7 +35,7 @@ namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
-    HPX_CXX_EXPORT struct pool_id_type
+    HPX_CXX_CORE_EXPORT struct pool_id_type
     {
         pool_id_type(std::size_t index, std::string name) noexcept
           : index_(index)
@@ -59,7 +59,7 @@ namespace hpx::threads {
     };
     /// \endcond
 
-    HPX_CXX_EXPORT struct thread_pool_init_parameters
+    HPX_CXX_CORE_EXPORT struct thread_pool_init_parameters
     {
         std::string const& name_;
         std::size_t index_;
@@ -107,7 +107,7 @@ namespace hpx::threads {
     // note: this data structure has to be protected from races from the outside
 
     /// \brief The base class used to manage a pool of OS threads.
-    HPX_CXX_EXPORT class thread_pool_base
+    HPX_CXX_CORE_EXPORT class thread_pool_base
     {
     public:
         /// \cond NOINTERNAL
@@ -498,7 +498,7 @@ namespace hpx::threads {
         /// \endcond
     };
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_pool_base const& thread_pool);
 }    // namespace hpx::threads
 

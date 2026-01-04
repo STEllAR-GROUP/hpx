@@ -19,13 +19,13 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <int N, typename R, typename ZipIter>
+    HPX_CXX_CORE_EXPORT template <int N, typename R, typename ZipIter>
     constexpr R get_iter(ZipIter&& zipiter)
     {
         return hpx::get<N>(zipiter.get_iterator_tuple());
     }
 
-    HPX_CXX_EXPORT template <int N, typename R, typename ZipIter>
+    HPX_CXX_CORE_EXPORT template <int N, typename R, typename ZipIter>
     R get_iter(hpx::future<ZipIter>&& zipiter)
     {
         using result_type = typename hpx::tuple_element<N,
@@ -38,14 +38,14 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ZipIter>
+    HPX_CXX_CORE_EXPORT template <typename ZipIter>
     constexpr typename ZipIter::iterator_tuple_type get_iter_tuple(
         ZipIter&& zipiter)
     {
         return zipiter.get_iterator_tuple();
     }
 
-    HPX_CXX_EXPORT template <typename ZipIter>
+    HPX_CXX_CORE_EXPORT template <typename ZipIter>
     hpx::future<typename ZipIter::iterator_tuple_type> get_iter_tuple(
         hpx::future<ZipIter>&& zipiter)
     {
@@ -55,7 +55,7 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ZipIter>
+    HPX_CXX_CORE_EXPORT template <typename ZipIter>
     constexpr std::pair<typename hpx::tuple_element<0,
                             typename ZipIter::iterator_tuple_type>::type,
         typename hpx::tuple_element<1,
@@ -68,7 +68,7 @@ namespace hpx::parallel::detail {
         return std::make_pair(hpx::get<0>(t), hpx::get<1>(t));
     }
 
-    HPX_CXX_EXPORT template <typename ZipIter>
+    HPX_CXX_CORE_EXPORT template <typename ZipIter>
     hpx::future<std::pair<typename hpx::tuple_element<0,
                               typename ZipIter::iterator_tuple_type>::type,
         typename hpx::tuple_element<1,
@@ -86,7 +86,7 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ZipIter>
+    HPX_CXX_CORE_EXPORT template <typename ZipIter>
     constexpr util::in_in_result<
         typename hpx::tuple_element<0,
             typename ZipIter::iterator_tuple_type>::type,
@@ -104,7 +104,7 @@ namespace hpx::parallel::detail {
         return result_type{hpx::get<0>(t), hpx::get<1>(t)};
     }
 
-    HPX_CXX_EXPORT template <typename ZipIterSender>
+    HPX_CXX_CORE_EXPORT template <typename ZipIterSender>
         requires(hpx::execution::experimental::is_sender_v<ZipIterSender>)
     constexpr decltype(auto) get_iter_in_in_result(
         ZipIterSender&& zipiter_sender)
@@ -116,7 +116,7 @@ namespace hpx::parallel::detail {
             });
     }
 
-    HPX_CXX_EXPORT template <typename ZipIter>
+    HPX_CXX_CORE_EXPORT template <typename ZipIter>
     hpx::future<
         util::in_in_result<typename hpx::tuple_element<0,
                                typename ZipIter::iterator_tuple_type>::type,

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,7 @@
 
 namespace hpx::parcelset::policies {
 
-    struct message_handler
+    HPX_CXX_EXPORT struct message_handler
     {
         enum flush_mode
         {
