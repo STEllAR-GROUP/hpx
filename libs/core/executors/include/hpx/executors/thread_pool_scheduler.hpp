@@ -298,6 +298,20 @@ namespace hpx::execution::experimental {
                 {
                     return e.sched;
                 }
+
+                // clang-format off
+                template <typename CPO,
+                    HPX_CONCEPT_REQUIRES_(
+                        meta::value<meta::one_of<
+                            CPO, set_value_t, set_stopped_t>>
+                    )>
+                // clang-format on
+                constexpr auto query(
+                    hpx::execution::experimental::get_completion_scheduler_t<
+                        CPO>) const noexcept
+                {
+                    return sched;
+                }
             };
 
             friend constexpr env tag_invoke(
@@ -353,6 +367,11 @@ namespace hpx::execution::experimental {
             thread_pool_policy_scheduler const& sched)
         {
             return {sched};
+        }
+
+        constexpr sender<thread_pool_policy_scheduler> schedule() const
+        {
+            return {*this};
         }
 
         void policy(Policy policy) noexcept
