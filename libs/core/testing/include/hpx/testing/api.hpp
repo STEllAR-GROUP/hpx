@@ -53,6 +53,13 @@ namespace hpx::util {
 
             template <typename T>
             bool check_(char const* file, int line, char const* function,
+                counter_type c, T const& t, std::string const& msg)
+            {
+                return check_(file, line, function, c, t, msg.c_str());
+            }
+
+            template <typename T>
+            bool check_(char const* file, int line, char const* function,
                 counter_type c, T const& t, char const* msg)
             {
                 if (!t)
@@ -66,6 +73,13 @@ namespace hpx::util {
                     return false;
                 }
                 return true;
+            }
+
+            template <typename T, typename U>
+            bool check_equal(char const* file, int line, char const* function,
+                counter_type c, T const& t, U const& u, std::string const& msg)
+            {
+                return check_equal(file, line, function, c, u, t, msg.c_str());
             }
 
             template <typename T, typename U>
@@ -88,6 +102,15 @@ namespace hpx::util {
             template <typename T, typename U>
             bool check_not_equal(char const* file, int line,
                 char const* function, counter_type c, T const& t, U const& u,
+                std::string const& msg)
+            {
+                return check_not_equal(
+                    file, line, function, c, u, t, msg.c_str());
+            }
+
+            template <typename T, typename U>
+            bool check_not_equal(char const* file, int line,
+                char const* function, counter_type c, T const& t, U const& u,
                 char const* msg)
             {
                 if (!(t != u))
@@ -101,6 +124,13 @@ namespace hpx::util {
                     return false;
                 }
                 return true;
+            }
+
+            template <typename T, typename U>
+            bool check_less(char const* file, int line, char const* function,
+                counter_type c, T const& t, U const& u, std::string const& msg)
+            {
+                return check_less(file, line, function, c, u, t, msg.c_str());
             }
 
             template <typename T, typename U>
@@ -123,6 +153,15 @@ namespace hpx::util {
             template <typename T, typename U>
             bool check_less_equal(char const* file, int line,
                 char const* function, counter_type c, T const& t, U const& u,
+                std::string const& msg)
+            {
+                return check_less_equal(
+                    file, line, function, c, u, t, msg.c_str());
+            }
+
+            template <typename T, typename U>
+            bool check_less_equal(char const* file, int line,
+                char const* function, counter_type c, T const& t, U const& u,
                 char const* msg)
             {
                 if (!(t <= u))
@@ -136,6 +175,15 @@ namespace hpx::util {
                     return false;
                 }
                 return true;
+            }
+
+            template <typename T, typename U, typename V>
+            bool check_range(char const* file, int line, char const* function,
+                counter_type c, T const& t, U const& u, V const& v,
+                std::string const& msg)
+            {
+                return check_range(
+                    file, line, function, c, u, v, t, msg.c_str());
             }
 
             template <typename T, typename U, typename V>

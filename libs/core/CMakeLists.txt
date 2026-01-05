@@ -49,6 +49,7 @@ set(_hpx_core_modules
     ini
     init_runtime_local
     io_service
+    iostreams
     iterator_support
     itt_notify
     lci_base
