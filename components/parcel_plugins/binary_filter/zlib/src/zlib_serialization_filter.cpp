@@ -9,6 +9,7 @@
 #if defined(HPX_HAVE_COMPRESSION_ZLIB)
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/iostream.hpp>
 
 #include <hpx/binary_filter/zlib_serialization_filter.hpp>
 #include <hpx/modules/actions.hpp>
@@ -31,7 +32,7 @@ namespace hpx::plugins::compression {
     namespace detail {
 
         zlib_compdecomp::zlib_compdecomp(
-            bool compress, boost::iostreams::zlib_params const& params)
+            bool compress, hpx::iostreams::zlib_params const& params)
           : compress_(compress)
           , eof_(false)
         {
@@ -46,8 +47,8 @@ namespace hpx::plugins::compression {
         bool zlib_compdecomp::save(char const*& src_begin, char const* src_end,
             char*& dest_begin, char* dest_end, bool flush)
         {
-            using namespace boost::iostreams;
-            using namespace boost::iostreams::zlib;
+            using namespace hpx::iostreams;
+            using namespace hpx::iostreams::zlib;
 
             before(src_begin, src_end, dest_begin, dest_end);
             int result = this->xdeflate(flush ? finish : no_flush);
@@ -59,8 +60,8 @@ namespace hpx::plugins::compression {
         bool zlib_compdecomp::load(char const*& src_begin, char const* src_end,
             char*& dest_begin, char* dest_end)
         {
-            using namespace boost::iostreams;
-            using namespace boost::iostreams::zlib;
+            using namespace hpx::iostreams;
+            using namespace hpx::iostreams::zlib;
 
             before(src_begin, src_end, dest_begin, dest_end);
             int result = this->xinflate(sync_flush);

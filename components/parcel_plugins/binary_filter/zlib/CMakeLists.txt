@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2022 Hartmut Kaiser
+# Copyright (c) 2007-2026 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -35,9 +35,7 @@ add_hpx_library(
 )
 
 target_include_directories(compression_zlib SYSTEM PRIVATE ${ZLIB_INCLUDE_DIRS})
-target_link_libraries(
-  compression_zlib PUBLIC Boost::iostreams ${ZLIB_LIBRARIES}
-)
+target_link_libraries(compression_zlib PUBLIC ${ZLIB_LIBRARIES})
 
 add_hpx_pseudo_dependencies(
   components.parcel_plugins.binary_filter.zlib compression_zlib

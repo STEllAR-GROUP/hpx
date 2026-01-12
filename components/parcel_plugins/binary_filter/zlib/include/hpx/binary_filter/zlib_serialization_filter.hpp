@@ -10,6 +10,7 @@
 #include <hpx/binary_filter/zlib_serialization_filter_registration.hpp>
 
 #if defined(HPX_HAVE_COMPRESSION_ZLIB)
+#include <hpx/modules/iostream.hpp>
 #include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
@@ -18,25 +19,23 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#include <boost/iostreams/filter/zlib.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::plugins::compression {
 
     namespace detail {
 
         class zlib_compdecomp
-          : public boost::iostreams::detail::zlib_base
-          , public boost::iostreams::detail::zlib_allocator<
-                std::allocator<char>>
+          : public hpx::iostreams::detail::zlib_base
+          , public hpx::iostreams::detail::zlib_allocator<std::allocator<char>>
         {
             using allocator_type =
-                boost::iostreams::detail::zlib_allocator<std::allocator<char>>;
+                hpx::iostreams::detail::zlib_allocator<std::allocator<char>>;
 
         public:
-            zlib_compdecomp(bool compress = false,
-                boost::iostreams::zlib_params const& params =
-                    boost::iostreams::zlib::default_compression);
+            explicit zlib_compdecomp(bool compress = false,
+                hpx::iostreams::zlib_params const& params =
+                    hpx::iostreams::zlib_params(
+                        hpx::iostreams::zlib::default_compression));
             ~zlib_compdecomp();
 
             bool save(char const*& src_begin, char const* src_end,

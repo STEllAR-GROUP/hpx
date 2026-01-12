@@ -14,18 +14,25 @@
 
 namespace hpx::iostreams {
 
+    // hpx::flush
     struct flush_type
     {
-    };    // hpx::flush
+    };
+
+    // hpx::endl
     struct endl_type
     {
-    };    // hpx::endl
+    };
+
+    // hpx::async_flush
     struct async_flush_type
     {
-    };    // hpx::async_flush
+    };
+
+    // hpx::async_endl
     struct async_endl_type
     {
-    };    // hpx::async_endl
+    };
 
     inline std::ostream& operator<<(std::ostream& os, flush_type const&)
     {
