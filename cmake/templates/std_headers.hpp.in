@@ -102,7 +102,6 @@
 
 #if defined(HPX_HAVE_MODULE_ASYNC_CUDA)
 # if defined(HPX_HAVE_CUDA) && defined(HPX_HAVE_GPUBLAS)
-#  include <cublas_api.h>
 #  include <cublas_v2.h>
 # elif defined(HPX_HAVE_HIP) && defined(HPX_HAVE_GPUBLAS)
 #  include <hipblas.h>

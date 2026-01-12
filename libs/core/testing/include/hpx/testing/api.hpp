@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <mutex>
 #include <ostream>
+#include <string>
 
 namespace hpx::util {
 
