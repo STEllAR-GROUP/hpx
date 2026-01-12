@@ -38,7 +38,7 @@ namespace hpx::execution::experimental {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename Sender, typename Shape, typename F>
+        HPX_CXX_EXPORT template <typename Sender, typename Shape, typename F>
         struct bulk_sender
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
@@ -196,7 +196,7 @@ namespace hpx::execution::experimental {
     // additional operations such as let_value to deliver dynamic shape
     // information to the bulk operation.
     //
-    inline constexpr struct bulk_t final
+    HPX_CXX_EXPORT inline constexpr struct bulk_t final
       : hpx::functional::detail::tag_priority<bulk_t>
     {
     private:

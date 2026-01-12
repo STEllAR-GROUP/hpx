@@ -62,7 +62,7 @@ namespace hpx::execution::experimental::detail {
     // If items < num_threads, returns a power-of-2 chunk
     // size that results in at most 8 and
     // at least 4 chunks per worker thread.
-    HPX_CXX_EXPORT constexpr std::uint32_t get_bulk_scheduler_chunk_size(
+    constexpr std::uint32_t get_bulk_scheduler_chunk_size(
         std::uint32_t const num_threads, std::size_t const n) noexcept
     {
         std::uint64_t chunk_size = 1;
@@ -74,7 +74,7 @@ namespace hpx::execution::experimental::detail {
     }
 
     // For bulk_unchunked: f(index, ...)
-    template <std::size_t... Is, typename F, typename T, typename Ts>
+    HPX_CXX_EXPORT template <std::size_t... Is, typename F, typename T, typename Ts>
     constexpr void bulk_scheduler_invoke_helper(
         hpx::util::index_pack<Is...>, F&& f, T&& t, Ts& ts)
     {
@@ -91,7 +91,7 @@ namespace hpx::execution::experimental::detail {
             HPX_FORWARD(End, end), hpx::get<Is>(ts)...);
     }
 
-    inline hpx::threads::mask_type full_mask(
+    HPX_CXX_EXPORT inline hpx::threads::mask_type full_mask(
         std::size_t first_thread, std::size_t num_threads)
     {
         auto const& rp = hpx::resource::get_partitioner();
@@ -132,10 +132,10 @@ namespace hpx::execution::experimental::detail {
         return mask;
     }
 
-    template <typename OperationState>
+    HPX_CXX_EXPORT template <typename OperationState>
     struct task_function;
 
-    template <typename OperationState>
+    HPX_CXX_EXPORT template <typename OperationState>
     struct set_value_loop_visitor
     {
         OperationState* const op_state;
@@ -242,7 +242,7 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    template <typename OperationState>
+    HPX_CXX_EXPORT template <typename OperationState>
     struct set_value_end_loop_visitor
     {
         OperationState* const op_state;
@@ -268,7 +268,7 @@ namespace hpx::execution::experimental::detail {
     };
 
     // This struct encapsulates the work done by one worker thread.
-    template <typename OperationState>
+    HPX_CXX_EXPORT template <typename OperationState>
     struct task_function
     {
         OperationState* const op_state;
@@ -356,7 +356,7 @@ namespace hpx::execution::experimental::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename OperationState, typename F, typename Shape>
+    HPX_CXX_EXPORT template <typename OperationState, typename F, typename Shape>
     struct bulk_receiver
     {
 #if defined(HPX_HAVE_STDEXEC)
@@ -643,7 +643,7 @@ namespace hpx::execution::experimental::detail {
     // in this file is not chosen) it will be reused as one of the worker
     // threads.
     //
-    template <typename Policy, typename Sender, typename Shape, typename F,
+    HPX_CXX_EXPORT template <typename Policy, typename Sender, typename Shape, typename F,
         bool IsChunked = false>
     class thread_pool_bulk_sender
     {
@@ -871,7 +871,7 @@ namespace hpx::execution::experimental::detail {
 #if !defined(HPX_HAVE_STDEXEC)
 namespace hpx::execution::experimental {
 
-    template <typename Policy, typename Sender, typename Shape, typename F>
+    HPX_CXX_EXPORT template <typename Policy, typename Sender, typename Shape, typename F>
         requires(!std::integral<Shape>)
     constexpr auto tag_invoke(bulk_t,
         thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
@@ -891,7 +891,7 @@ namespace hpx::execution::experimental {
         }
     }
 
-    template <typename Policy, typename Sender, typename Count, typename F>
+    HPX_CXX_EXPORT template <typename Policy, typename Sender, typename Count, typename F>
         requires(std::integral<Count>)
     constexpr decltype(auto) tag_invoke(bulk_t,
         thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,

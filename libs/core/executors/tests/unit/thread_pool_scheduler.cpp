@@ -2337,7 +2337,7 @@ void test_stdexec_thread_distribution()
     HPX_TEST(!worker_threads.empty());
 
     // Verify tasks didn't run on main thread (they use HPX thread pool)
-    for (const auto& thread_id : worker_threads)
+    for (auto const& thread_id : worker_threads)
     {
         HPX_TEST_NEQ(thread_id, main_thread_id);
     }
@@ -2483,7 +2483,7 @@ void test_scheduler_copy_avoidance()
     {
         copy_tracking_scheduler() = default;
 
-        copy_tracking_scheduler(const copy_tracking_scheduler& other)
+        copy_tracking_scheduler(copy_tracking_scheduler const& other)
           : ex::thread_pool_scheduler(other)
         {
             copy_count.fetch_add(1, std::memory_order_relaxed);
@@ -2495,7 +2495,7 @@ void test_scheduler_copy_avoidance()
             move_count.fetch_add(1, std::memory_order_relaxed);
         }
 
-        copy_tracking_scheduler& operator=(const copy_tracking_scheduler& other)
+        copy_tracking_scheduler& operator=(copy_tracking_scheduler const& other)
         {
             ex::thread_pool_scheduler::operator=(other);
             copy_count.fetch_add(1, std::memory_order_relaxed);

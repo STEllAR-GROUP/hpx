@@ -46,7 +46,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Policy>
+        template <typename Policy>
         struct get_default_scheduler_policy
         {
             static constexpr Policy call() noexcept
@@ -154,7 +154,7 @@ namespace hpx::execution::experimental {
         // Unified transform_sender for all bulk operations with environment
         // (starts_on pattern)
         template <bulk_chunked_or_unchunked_sender Sender, typename Env>
-        auto transform_sender(Sender&& sndr, const Env& env) const noexcept
+        auto transform_sender(Sender&& sndr, Env const& env) const noexcept
         {
             static_assert(
                 hpx::execution::experimental::stdexec_internal::__starts_on<
@@ -206,7 +206,7 @@ namespace hpx::execution::experimental {
 
 #endif
 
-    template <typename Policy>
+    HPX_CXX_EXPORT template <typename Policy>
     struct thread_pool_policy_scheduler
     {
         // Associate the parallel_execution_tag tag type as a default with this
@@ -597,7 +597,7 @@ namespace hpx::execution::experimental {
     };
 
     // support all properties exposed by the embedded policy
-    template <typename Tag, typename Policy, typename Property>
+    HPX_CXX_EXPORT template <typename Tag, typename Policy, typename Property>
         requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(Tag tag,
         thread_pool_policy_scheduler<Policy> const& scheduler, Property&& prop)
@@ -612,7 +612,7 @@ namespace hpx::execution::experimental {
         return scheduler_with_prop;
     }
 
-    template <typename Tag, typename Policy>
+    HPX_CXX_EXPORT template <typename Tag, typename Policy>
         requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(
         Tag tag, thread_pool_policy_scheduler<Policy> const& scheduler)
@@ -621,13 +621,13 @@ namespace hpx::execution::experimental {
         return tag(scheduler.policy());
     }
 
-    using thread_pool_scheduler = thread_pool_policy_scheduler<hpx::launch>;
+    HPX_CXX_EXPORT using thread_pool_scheduler = thread_pool_policy_scheduler<hpx::launch>;
 
 #if defined(HPX_HAVE_STDEXEC)
     // Add get_domain query to the scheduler (following system_context.hpp pattern)
     template <typename Policy>
     constexpr auto tag_invoke(stdexec::get_domain_t,
-        const thread_pool_policy_scheduler<Policy>& sched) noexcept
+        thread_pool_policy_scheduler<Policy> const& sched) noexcept
     {
         return thread_pool_domain<Policy>{};
     }

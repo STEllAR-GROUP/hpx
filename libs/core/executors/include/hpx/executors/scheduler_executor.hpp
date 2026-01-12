@@ -57,7 +57,7 @@ namespace hpx::execution::experimental {
     ///////////////////////////////////////////////////////////////////////////
     // A scheduler_executor wraps any P2300 scheduler and implements the
     // executor functionalities for those.
-    template <typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename BaseScheduler>
     struct scheduler_executor
     {
         static_assert(hpx::execution::experimental::is_scheduler_v<
@@ -303,7 +303,7 @@ namespace hpx::execution::experimental {
         /// \endcond
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename BaseScheduler>
     explicit scheduler_executor(BaseScheduler&& sched)
         -> scheduler_executor<std::decay_t<BaseScheduler>>;
 
@@ -330,35 +330,35 @@ namespace hpx::execution::experimental {
     }
 
     /// \cond NOINTERNAL
-    template <typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename BaseScheduler>
     struct is_one_way_executor<
         hpx::execution::experimental::scheduler_executor<BaseScheduler>>
       : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename BaseScheduler>
     struct is_never_blocking_one_way_executor<
         hpx::execution::experimental::scheduler_executor<BaseScheduler>>
       : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename BaseScheduler>
     struct is_bulk_one_way_executor<
         hpx::execution::experimental::scheduler_executor<BaseScheduler>>
       : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename BaseScheduler>
     struct is_two_way_executor<
         hpx::execution::experimental::scheduler_executor<BaseScheduler>>
       : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename BaseScheduler>
     struct is_bulk_two_way_executor<
         hpx::execution::experimental::scheduler_executor<BaseScheduler>>
       : std::true_type

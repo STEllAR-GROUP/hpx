@@ -162,6 +162,8 @@ namespace hpx::execution::experimental {
     HPX_CXX_EXPORT using stdexec::transfer;
     HPX_CXX_EXPORT using stdexec::transfer_t;
 
+    HPX_CXX_EXPORT using stdexec::dependent_domain;
+
     // Tags
     namespace tags {
 
@@ -244,6 +246,8 @@ namespace hpx::execution::experimental {
     HPX_CXX_EXPORT using stdexec::sends_stopped;
     HPX_CXX_EXPORT using stdexec::value_types_of_t;
 
+    HPX_CXX_EXPORT using stdexec::transform_env;
+
     HPX_CXX_EXPORT using stdexec::make_completion_signatures;
     HPX_CXX_EXPORT using stdexec::transform_completion_signatures;
     HPX_CXX_EXPORT using stdexec::transform_completion_signatures_of;
@@ -315,7 +319,7 @@ namespace hpx::execution::experimental {
             HPX_CXX_EXPORT using namespace stdexec::__connect_awaitable_;
         }
 
-        using stdexec::__connect_awaitable_t;
+        HPX_CXX_EXPORT using stdexec::__connect_awaitable_t;
 
         // Additional stdexec concepts and utilities needed for domain customization
         using stdexec::__completes_on;

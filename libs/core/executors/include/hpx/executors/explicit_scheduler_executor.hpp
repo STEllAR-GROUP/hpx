@@ -42,7 +42,7 @@ namespace hpx::execution::experimental {
     // A explicit_scheduler_executor wraps any P2300 scheduler and implements
     // the executor functionalities for those. All scheduling functions return
     // senders.
-    template <typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename BaseScheduler>
     struct explicit_scheduler_executor
     {
         static_assert(hpx::execution::experimental::is_scheduler_v<
@@ -210,21 +210,21 @@ namespace hpx::execution::experimental {
             else
             {
                 using size_type = decltype(util::size(shape));
-                const size_type shape_size = util::size(shape);
+                size_type const shape_size = util::size(shape);
 
                 using result_vector_type = std::vector<result_type>;
                 result_vector_type result_vector(shape_size);
 
-                auto f_wrapper = [](const size_type i,
+                auto f_wrapper = [](size_type const i,
                                      result_vector_type& result_vector,
-                                     const S& shape, F& f, Ts&... ts) {
+                                     S const& shape, F& f, Ts&... ts) {
                     auto it = util::begin(shape);
                     std::advance(it, i);
                     result_vector[i] = HPX_INVOKE(f, *it, ts...);
                 };
 
                 auto get_result = [](result_vector_type&& result_vector,
-                                      const S&, F&&, Ts&&...) {
+                                      S const&, F&&, Ts&&...) {
                     return HPX_MOVE(result_vector);
                 };
 
@@ -287,14 +287,14 @@ namespace hpx::execution::experimental {
         /// \endcond
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename BaseScheduler>
     explicit explicit_scheduler_executor(BaseScheduler&& sched)
         -> explicit_scheduler_executor<std::decay_t<BaseScheduler>>;
 
     // support all properties exposed by the wrapped scheduler
     template <typename Tag, typename BaseScheduler, typename Property>
         requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
-    auto tag_invoke(Tag tag,
+    HPX_CXX_EXPORT auto tag_invoke(Tag tag,
         explicit_scheduler_executor<BaseScheduler> const& exec, Property&& prop)
         -> decltype(explicit_scheduler_executor<BaseScheduler>(
             std::declval<Tag>()(
@@ -306,7 +306,7 @@ namespace hpx::execution::experimental {
 
     template <typename Tag, typename BaseScheduler>
         requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
-    auto tag_invoke(
+    HPX_CXX_EXPORT auto tag_invoke(
         Tag tag, explicit_scheduler_executor<BaseScheduler> const& exec)
         -> decltype(std::declval<Tag>()(std::declval<BaseScheduler>()))
     {
@@ -317,37 +317,37 @@ namespace hpx::execution::experimental {
 namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
-    template <typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename BaseScheduler>
     struct is_one_way_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename BaseScheduler>
     struct is_never_blocking_one_way_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename BaseScheduler>
     struct is_bulk_one_way_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename BaseScheduler>
     struct is_two_way_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename BaseScheduler>
     struct is_bulk_two_way_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename BaseScheduler>
     struct is_scheduler_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
