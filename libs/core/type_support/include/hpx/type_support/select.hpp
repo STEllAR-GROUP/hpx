@@ -30,6 +30,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/type_support/identity.hpp>
+#include <hpx/type_support/lazy_conditional.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -59,7 +60,7 @@ namespace hpx::util {
         typename Case12 = std::true_type, typename Type12 = void_t>
     struct select
     {
-        using type = 
+        using type =
             lazy_conditional<Case1::value, type_identity<Type1>,
              lazy_conditional<Case2::value, type_identity<Type2>,
               lazy_conditional<Case3::value, type_identity<Type3>,

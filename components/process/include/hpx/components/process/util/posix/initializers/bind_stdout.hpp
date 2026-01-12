@@ -14,32 +14,28 @@
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
-#include <boost/iostreams/device/file_descriptor.hpp>
+#include <hpx/modules/iostream.hpp>
 #include <unistd.h>
 
-namespace hpx { namespace components { namespace process { namespace posix {
+namespace hpx::components::process::posix::initializers {
 
-    namespace initializers {
-
-        class bind_stdout : public initializer_base
+    class bind_stdout : public initializer_base
+    {
+    public:
+        explicit bind_stdout(hpx::iostream::file_descriptor_sink const& sink)
+          : sink_(sink)
         {
-        public:
-            explicit bind_stdout(
-                boost::iostreams::file_descriptor_sink const& sink)
-              : sink_(sink)
-            {
-            }
+        }
 
-            template <class PosixExecutor>
-            void on_exec_setup(PosixExecutor&) const
-            {
-                ::dup2(sink_.handle(), STDOUT_FILENO);
-            }
+        template <class PosixExecutor>
+        void on_exec_setup(PosixExecutor&) const
+        {
+            ::dup2(sink_.handle(), STDOUT_FILENO);
+        }
 
-        private:
-            boost::iostreams::file_descriptor_sink sink_;
-        };
-
-}}}}}    // namespace hpx::components::process::posix::initializers
+    private:
+        hpx::iostream::file_descriptor_sink sink_;
+    };
+}    // namespace hpx::components::process::posix::initializers
 
 #endif

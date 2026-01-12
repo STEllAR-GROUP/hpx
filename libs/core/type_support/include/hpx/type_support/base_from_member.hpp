@@ -25,7 +25,7 @@ namespace hpx::util {
         // Type-trait to check if two type expressions have the same raw type.
 
         // Contributed by Daryle Walker, based on a work-around by Luc Danton
-        template <typename T, typename U>
+        HPX_CXX_EXPORT template <typename T, typename U>
         struct is_related : std::is_same<std::decay_t<T>, std::decay_t<U>>
         {
         };
@@ -37,12 +37,12 @@ namespace hpx::util {
 
         // Contributed by Daryle Walker, based on a work-around by Luc Danton
 
-        template <typename... T>
+        HPX_CXX_EXPORT template <typename... T>
         struct is_unrelated : std::true_type
         {
         };
 
-        template <typename T, typename U, typename... U2>
+        HPX_CXX_EXPORT template <typename T, typename U, typename... U2>
         struct is_unrelated<T, U, U2...> : std::negation<is_related<T, U>>
         {
         };
@@ -57,7 +57,7 @@ namespace hpx::util {
 
     // Contributed by Daryle Walker
 
-    template <typename MemberType, int UniqueId = 0>
+    HPX_CXX_EXPORT template <typename MemberType, int UniqueId = 0>
     class base_from_member
     {
     protected:
@@ -73,7 +73,7 @@ namespace hpx::util {
         }
     };
 
-    template <typename MemberType, int UniqueId>
+    HPX_CXX_EXPORT template <typename MemberType, int UniqueId>
     class base_from_member<MemberType&, UniqueId>
     {
     protected:
