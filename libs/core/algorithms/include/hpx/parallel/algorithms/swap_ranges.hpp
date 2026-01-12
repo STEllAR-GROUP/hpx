@@ -222,7 +222,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::swap_ranges
-    inline constexpr struct swap_ranges_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct swap_ranges_t final
       : hpx::detail::tag_parallel_algorithm<swap_ranges_t>
     {
         template <typename FwdIter1, typename FwdIter2>
