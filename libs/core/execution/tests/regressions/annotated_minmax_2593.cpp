@@ -11,7 +11,7 @@
 
 #include <vector>
 
-double compute_minmax(const std::vector<double> v)
+double compute_minmax(std::vector<double> const v)
 {
     hpx::execution::experimental::static_chunk_size param;
     hpx::execution::parallel_task_policy par_policy;

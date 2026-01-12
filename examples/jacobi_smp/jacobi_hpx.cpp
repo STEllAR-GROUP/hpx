@@ -25,7 +25,7 @@ namespace jacobi_smp {
         for (std::size_t y = y_range.begin(); y < y_range.end(); ++y)
         {
             double* dst_ptr = &dst[y * n];
-            const double* src_ptr = &src[y * n];
+            double const* src_ptr = &src[y * n];
             jacobi_kernel(dst_ptr, src_ptr, n);
         }
     }

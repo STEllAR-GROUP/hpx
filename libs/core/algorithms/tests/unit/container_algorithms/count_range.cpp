@@ -28,7 +28,7 @@ struct user_defined_struct
 
     ~user_defined_struct() = default;
 
-    bool operator==(const user_defined_struct& rhs) const
+    bool operator==(user_defined_struct const& rhs) const
     {
         return val == rhs.val;
     }
@@ -59,7 +59,7 @@ void test_count(IteratorTag, DataType)
     std::vector<DataType> c{10007};
     std::generate(std::begin(c), std::end(c), random_fill(0, 20));
 
-    const auto search_val = DataType(10);
+    auto const search_val = DataType(10);
 
     auto result = hpx::ranges::count(c, search_val);
     auto expected = std::count(std::begin(c), std::end(c), search_val);
@@ -76,7 +76,7 @@ void test_count(ExPolicy&& policy, IteratorTag, DataType)
     std::vector<DataType> c{10007};
     std::generate(std::begin(c), std::end(c), random_fill(0, 20));
 
-    const auto search_val = DataType(10);
+    auto const search_val = DataType(10);
 
     auto result = hpx::ranges::count(policy, c, search_val);
     auto expected = std::count(std::begin(c), std::end(c), search_val);
@@ -93,7 +93,7 @@ void test_count_async(ExPolicy&& policy, IteratorTag, DataType)
     std::vector<DataType> c{10007};
     std::generate(std::begin(c), std::end(c), random_fill(0, 20));
 
-    const auto search_val = DataType(10);
+    auto const search_val = DataType(10);
 
     auto f = hpx::ranges::count(policy, c, search_val);
     auto result = f.get();

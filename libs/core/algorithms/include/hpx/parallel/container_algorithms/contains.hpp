@@ -10,6 +10,7 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/contains.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -38,7 +39,7 @@ namespace hpx::parallel::detail {
         template <typename ExPolicy, typename Iterator, typename Sentinel,
             typename T, typename Proj>
         static constexpr bool sequential(
-            ExPolicy, Iterator first, Sentinel last, const T& val, Proj&& proj)
+            ExPolicy, Iterator first, Sentinel last, T const& val, Proj&& proj)
         {
             return sequential_contains<std::decay<ExPolicy>>(
                 first, last, val, HPX_FORWARD(Proj, proj));
@@ -47,7 +48,7 @@ namespace hpx::parallel::detail {
         template <typename ExPolicy, typename Iterator, typename Sentinel,
             typename T, typename Proj>
         static util::detail::algorithm_result_t<ExPolicy, bool> parallel(
-            ExPolicy&& orgpolicy, Iterator first, Sentinel last, const T& val,
+            ExPolicy&& orgpolicy, Iterator first, Sentinel last, T const& val,
             Proj&& proj)
         {
             using difference_type =
@@ -71,8 +72,7 @@ namespace hpx::parallel::detail {
 
             auto f2 = [](auto&& results) {
                 return std::any_of(hpx::util::begin(results),
-                    hpx::util::end(results),
-                    [](hpx::future<bool>& val) { return val.get(); });
+                    hpx::util::end(results), hpx::functional::unwrap{});
             };
 
             return util::partitioner<policy_type, bool>::call(
@@ -162,7 +162,7 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::contains_t, Iterator first,
-            Sentinel last, const T& val, Proj&& proj = Proj())
+            Sentinel last, T const& val, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_input_iterator_v<Iterator>,
                 "Required at least input iterator.");
@@ -182,7 +182,7 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend bool tag_fallback_invoke(
-            hpx::ranges::contains_t, Rng&& rng, const T& t, Proj proj = Proj())
+            hpx::ranges::contains_t, Rng&& rng, T const& t, Proj proj = Proj())
         {
             return parallel::detail::contains().call(hpx::execution::seq,
                 hpx::util::begin(rng), hpx::util::end(rng), t, HPX_MOVE(proj));
@@ -227,7 +227,7 @@ namespace hpx::ranges {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
         tag_fallback_invoke(hpx::ranges::contains_t, ExPolicy&& policy,
-            Rng&& rng, const T& t, Proj proj = Proj())
+            Rng&& rng, T const& t, Proj proj = Proj())
         {
             return parallel::detail::contains().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),

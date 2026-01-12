@@ -57,7 +57,7 @@ static std::uint64_t num_threads = 1;
 static std::string info_string = "";
 
 ///////////////////////////////////////////////////////////////////////////////
-void print_stats(const char* title, const char* wait, const char* exec,
+void print_stats(char const* title, char const* wait, char const* exec,
     std::int64_t count, double duration, bool csv, bool libcds)
 {
     std::ostringstream temp;
@@ -84,7 +84,7 @@ void print_stats(const char* title, const char* wait, const char* exec,
     //hpx::util::print_cdash_timing(title, duration);
 }
 
-const char* exec_name(hpx::execution::parallel_executor const& exec)
+char const* exec_name(hpx::execution::parallel_executor const& exec)
 {
     return "parallel_executor";
 }
@@ -118,7 +118,7 @@ double null_function(bool uselibcds) noexcept
 
     if (num_iterations > 0)
     {
-        const int array_size = 4096;
+        int const array_size = 4096;
         std::array<double, array_size> dummy;
         for (std::uint64_t i = 0; i < num_iterations; ++i)
         {
@@ -205,7 +205,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
     l.wait();
 
     // stop the clock
-    const double duration = walltime.elapsed();
+    double const duration = walltime.elapsed();
     print_stats("create_thread_hierarchical", "latch", "none", count, duration,
         csv, uselibcds);
 }
@@ -240,7 +240,7 @@ int hpx_main(variables_map& vm)
         else
             numa_sensitive = 0;
 
-        const int repetitions = vm["repetitions"].as<int>();
+        int const repetitions = vm["repetitions"].as<int>();
 
         if (vm.count("info"))
             info_string = vm["info"].as<std::string>();
@@ -249,7 +249,7 @@ int hpx_main(variables_map& vm)
 
         num_iterations = vm["delay-iterations"].as<std::uint64_t>();
 
-        const std::uint64_t count = vm["futures"].as<std::uint64_t>();
+        std::uint64_t const count = vm["futures"].as<std::uint64_t>();
         bool csv = vm.count("csv") != 0;
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");

@@ -43,8 +43,8 @@ namespace jacobi_smp {
     {
         double result = b[row];
         double div = 1.0;
-        const std::size_t begin = A.row_begin(row);
-        const std::size_t end = A.row_end(row);
+        std::size_t const begin = A.row_begin(row);
+        std::size_t const end = A.row_end(row);
 
         for (std::size_t j = begin; j < end; ++j)
         {
@@ -158,8 +158,8 @@ int hpx_main(variables_map& vm)
             double mean_per_row = 0.0;
             for (std::size_t r = 0; r < b.size(); ++r)
             {
-                const std::size_t begin = A.row_begin(r);
-                const std::size_t end = A.row_end(r);
+                std::size_t const begin = A.row_begin(r);
+                std::size_t const end = A.row_end(r);
                 std::size_t n_row = end - begin;
                 mean_per_row += double(n_row);
                 if (n_row > max_per_row)

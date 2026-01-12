@@ -6,8 +6,8 @@
 
 #pragma once
 
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/partition.hpp>
 
 #include <cstddef>
 #include <iostream>

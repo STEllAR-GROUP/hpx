@@ -98,7 +98,7 @@ void print_results(std::uint64_t cores, double walltime, double warmup_estimate,
         header = false;
         cout << "Delay,Tasks,STasks,OS_Threads,Execution_Time_sec,Warmup_sec";
 
-        for (const auto& counter_shortname : counter_shortnames)
+        for (auto const& counter_shortname : counter_shortnames)
         {
             cout << "," << counter_shortname;
         }

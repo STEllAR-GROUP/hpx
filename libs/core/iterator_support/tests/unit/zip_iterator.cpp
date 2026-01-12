@@ -77,7 +77,7 @@ int main(void)
 
     hpx::tuple<int, double> val_tuple(*zip_it_mixed);
 
-    hpx::tuple<const int&, double&> ref_tuple(*zip_it_mixed);
+    hpx::tuple<int const&, double&> ref_tuple(*zip_it_mixed);
 
     double dblOldVal = hpx::get<1>(ref_tuple);
     hpx::get<1>(ref_tuple) -= 41.;
@@ -140,12 +140,12 @@ int main(void)
 
     // typedefs for cons lists for dereferencing the zip iterator
     // made from the cons list above.
-    typedef tuple_cat_result_of_t<hpx::tuple<const int&>,
-        hpx::tuple<int&, int&, const int&, int&, int&, const int&, int&, int&,
-            const int&, const int&>>
+    typedef tuple_cat_result_of_t<hpx::tuple<int const&>,
+        hpx::tuple<int&, int&, int const&, int&, int&, int const&, int&, int&,
+            int const&, int const&>>
         cons_11_refs_type;
     //
-    typedef tuple_cat_result_of_t<hpx::tuple<const int&>, cons_11_refs_type>
+    typedef tuple_cat_result_of_t<hpx::tuple<int const&>, cons_11_refs_type>
         cons_12_refs_type;
 
     // typedef for zip iterator with 12 elements

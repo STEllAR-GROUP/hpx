@@ -11,7 +11,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_mpi/mpi_future.hpp>
-#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
@@ -195,15 +194,15 @@ namespace hpx::mpi::experimental {
             friend auto tag_invoke(
                 hpx::execution::experimental::get_completion_signatures_t,
                 transform_mpi_sender const&, Env const&)
-            -> hpx::execution::experimental::transform_completion_signatures_of<
-                Sender, Env,
-                hpx::execution::experimental::completion_signatures<
-                    hpx::execution::experimental::set_error_t(std::exception_ptr)
-                >,
-                invoke_function_transformation,
-                default_set_error,
-                no_set_stopped_signature
-            >;
+            ->  hpx::execution::experimental::transform_completion_signatures_of<
+                    Sender, Env,
+                    hpx::execution::experimental::completion_signatures<
+                        hpx::execution::experimental::set_error_t(std::exception_ptr)
+                    >,
+                    invoke_function_transformation,
+                    default_set_error,
+                    no_set_stopped_signature
+                >;
             // clang-format on
 #else
             template <typename Env>
@@ -242,13 +241,11 @@ namespace hpx::mpi::experimental {
                 static constexpr bool sends_stopped = false;
             };
 
-            // clang-format off
             template <typename Env>
             friend auto tag_invoke(
                 hpx::execution::experimental::get_completion_signatures_t,
                 transform_mpi_sender const&, Env)
-            -> generate_completion_signatures<Env>;
-            // clang-format on
+                -> generate_completion_signatures<Env>;
 #endif
 
             template <typename R>
@@ -276,9 +273,8 @@ namespace hpx::mpi::experimental {
       : hpx::functional::detail::tag_fallback<transform_mpi_t>
     {
     private:
-        template <typename Sender, typename F,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_sender_v<Sender>)>
+        template <typename Sender, typename F>
+            requires(hpx::execution::experimental::is_sender_v<Sender>)
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             transform_mpi_t, Sender&& s, F&& f)
         {

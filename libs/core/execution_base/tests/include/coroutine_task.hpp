@@ -95,7 +95,7 @@ struct default_task_context_impl
     friend struct default_awaiter_context;
 
     friend auto tag_invoke(hpx::execution::experimental::get_stop_token_t,
-        const default_task_context_impl& self) noexcept
+        default_task_context_impl const& self) noexcept
         -> hpx::experimental::in_place_stop_token
     {
         return self.stop_token_;
@@ -341,7 +341,7 @@ private:
         using context_t =
             typename Context::template promise_context_t<_promise>;
         friend context_t tag_invoke(hpx::execution::experimental::get_env_t,
-            const _promise& self) noexcept
+            _promise const& self) noexcept
         {
             return self.context_;
         }

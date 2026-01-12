@@ -22,7 +22,7 @@
 struct pred
 {
     template <typename T>
-    bool operator()(const T& prev, const T& curr) const
+    bool operator()(T const& prev, T const& curr) const
     {
         return curr < prev;
     }

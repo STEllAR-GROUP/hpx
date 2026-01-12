@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2022 The STE||AR-Group
+# Copyright (c) 2020-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -27,6 +27,10 @@ set(tests
 
 if(HPX_WITH_CXX17_STD_EXECUTION_POLICES)
   set(tests ${tests} std_execution_policies)
+endif()
+
+if(HPX_LIKWID_WITH_LIKWID)
+  set(tests ${tests} likwid_executor)
 endif()
 
 foreach(test ${tests})

@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2024 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -96,12 +96,8 @@ namespace hpx::execution::experimental {
             return sched_;
         }
 
-        // clang-format off
-        template <typename Parameters,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters>
-            )>
-        // clang-format on
+        template <typename Parameters>
+            requires(hpx::traits::is_executor_parameters_v<Parameters>)
         friend auto tag_invoke(
             hpx::execution::experimental::processing_units_count_t tag,
             Parameters&& params, explicit_scheduler_executor const& exec,
@@ -178,12 +174,8 @@ namespace hpx::execution::experimental {
         }
 
         // BulkTwoWayExecutor interface
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-               !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
@@ -254,12 +246,8 @@ namespace hpx::execution::experimental {
         }
 
 #if !defined(HPX_HAVE_STDEXEC)
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-               !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
@@ -272,12 +260,8 @@ namespace hpx::execution::experimental {
 #endif
 
 #if !defined(HPX_HAVE_STDEXEC)
-        // clang-format off
-        template <typename F, typename S, typename Future, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-               !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename Future, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend auto tag_invoke(hpx::parallel::execution::bulk_then_execute_t,
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
             Future&& predecessor, Ts&&... ts)
@@ -308,11 +292,8 @@ namespace hpx::execution::experimental {
         -> explicit_scheduler_executor<std::decay_t<BaseScheduler>>;
 
     // support all properties exposed by the wrapped scheduler
-    // clang-format off
-    template <typename Tag, typename BaseScheduler, typename Property,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
+    template <typename Tag, typename BaseScheduler, typename Property>
+        requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(Tag tag,
         explicit_scheduler_executor<BaseScheduler> const& exec, Property&& prop)
         -> decltype(explicit_scheduler_executor<BaseScheduler>(
@@ -322,14 +303,9 @@ namespace hpx::execution::experimental {
         return explicit_scheduler_executor<BaseScheduler>(
             tag(exec.sched(), HPX_FORWARD(Property, prop)));
     }
-    // clang-format on
 
-    // clang-format off
-    template <typename Tag, typename BaseScheduler,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
-    // clang-format on
+    template <typename Tag, typename BaseScheduler>
+        requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(
         Tag tag, explicit_scheduler_executor<BaseScheduler> const& exec)
         -> decltype(std::declval<Tag>()(std::declval<BaseScheduler>()))

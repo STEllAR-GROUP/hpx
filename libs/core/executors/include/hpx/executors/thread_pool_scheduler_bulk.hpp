@@ -43,6 +43,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -225,12 +226,8 @@ namespace hpx::execution::experimental::detail {
         // first tries to handle all chunks in the queue owned by worker_thread.
         // It then tries to steal chunks from neighboring threads.
         //
-        // clang-format off
-        template <typename Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_same_v<std::decay_t<Ts>, hpx::monostate>
-            )>
-        // clang-format on
+        template <typename Ts>
+            requires(!std::same_as<std::decay_t<Ts>, hpx::monostate>)
         void operator()(Ts& ts) const
         {
             // schedule chunks from the end, if needed
@@ -259,12 +256,8 @@ namespace hpx::execution::experimental::detail {
         // called once all worker threads have processed their chunks and the
         // connected receiver should be signaled.
         //
-        // clang-format off
-        template <typename Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_same_v<std::decay_t<Ts>, hpx::monostate>
-            )>
-        // clang-format on
+        template <typename Ts>
+            requires(!std::same_as<std::decay_t<Ts>, hpx::monostate>)
         void operator()(Ts&& ts) const
         {
             hpx::invoke_fused(
@@ -619,9 +612,9 @@ namespace hpx::execution::experimental::detail {
             }
         }
 
-        // clang-format off
         template <typename... Ts>
-        // clang-format on
+            requires(std::invocable<F, range_value_type,
+                std::add_lvalue_reference_t<Ts>...>)
         friend void tag_invoke(hpx::execution::experimental::set_value_t,
             bulk_receiver&& r, Ts&&... ts) noexcept
         {
@@ -713,16 +706,12 @@ namespace hpx::execution::experimental::detail {
             std::decay_t<Sender> const& pred_snd;
             thread_pool_policy_scheduler<Policy> const& sch;
 
-            // clang-format off
-            template <typename CPO,
-                HPX_CONCEPT_REQUIRES_(
-                    meta::value<meta::one_of<CPO,
-                        hpx::execution::experimental::set_error_t,
-                        hpx::execution::experimental::set_stopped_t>> &&
-                    hpx::execution::experimental::detail::has_completion_scheduler_v<
-                        CPO, std::decay_t<Sender>>
-                )>
-            // clang-format on
+            template <typename CPO>
+                requires(meta::value<meta::one_of<CPO,
+                             hpx::execution::experimental::set_error_t,
+                             hpx::execution::experimental::set_stopped_t>> &&
+                    hpx::execution::experimental::detail::
+                        has_completion_scheduler_v<CPO, std::decay_t<Sender>>)
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>
                     tag,
@@ -765,22 +754,19 @@ namespace hpx::execution::experimental::detail {
                 sends_stopped_of_v<Sender, Env>;
         };
 
-        // clang-format off
         template <typename Env>
         friend auto tag_invoke(
             hpx::execution::experimental::get_completion_signatures_t,
-            thread_pool_bulk_sender const&,
-            Env) -> generate_completion_signatures<Env>;
+            thread_pool_bulk_sender const&, Env)
+            -> generate_completion_signatures<Env>;
 
-        template <typename CPO,
-            HPX_CONCEPT_REQUIRES_(
-                meta::value<meta::one_of<CPO,
-                    hpx::execution::experimental::set_error_t,
-                    hpx::execution::experimental::set_stopped_t>> &&
-                hpx::execution::experimental::detail::has_completion_scheduler_v<
-                    CPO, std::decay_t<Sender>>
-            )>
-        // clang-format on
+        template <typename CPO>
+            requires(
+                meta::value<
+                    meta::one_of<CPO, hpx::execution::experimental::set_error_t,
+                        hpx::execution::experimental::set_stopped_t>> &&
+                hpx::execution::experimental::detail::
+                    has_completion_scheduler_v<CPO, std::decay_t<Sender>>)
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::get_completion_scheduler_t<CPO> tag,
             thread_pool_bulk_sender const& s)
@@ -884,12 +870,9 @@ namespace hpx::execution::experimental::detail {
 
 #if !defined(HPX_HAVE_STDEXEC)
 namespace hpx::execution::experimental {
-    // clang-format off
-    template <typename Policy, typename Sender, typename Shape, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            !std::is_integral_v<Shape>
-        )>
-    // clang-format on
+
+    template <typename Policy, typename Sender, typename Shape, typename F>
+        requires(!std::integral<Shape>)
     constexpr auto tag_invoke(bulk_t,
         thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
         Shape const& shape, F&& f)
@@ -908,12 +891,8 @@ namespace hpx::execution::experimental {
         }
     }
 
-    // clang-format off
-    template <typename Policy, typename Sender, typename Count, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            std::is_integral_v<Count>
-        )>
-    // clang-format on
+    template <typename Policy, typename Sender, typename Count, typename F>
+        requires(std::integral<Count>)
     constexpr decltype(auto) tag_invoke(bulk_t,
         thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
         Count const& count, F&& f)

@@ -1,0 +1,229 @@
+{
+    "version": 4,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 19,
+        "patch": 0
+    },
+    "vendor": {
+        "hpx/project": {
+            "description": "HPX-specific presets for common build configurations"
+        }
+    },
+    "configurePresets": [
+        {
+            "name": "default",
+            "displayName": "Default Configuration",
+            "description": "Default HPX configuration suitable for most users. Release build with common features enabled.",
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build/default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "HPX_WITH_TESTS": "ON",
+                "HPX_WITH_EXAMPLES": "ON"
+            }
+        },
+        {
+            "name": "minimal",
+            "displayName": "Minimal Configuration",
+            "description": "Minimal HPX build with only core features. Useful for quick builds or when dependencies are limited.",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/minimal",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "HPX_WITH_TESTS": "OFF",
+                "HPX_WITH_EXAMPLES": "OFF",
+                "HPX_WITH_DOCUMENTATION": "OFF",
+                "HPX_WITH_TOOLS": "OFF"
+            }
+        },
+        {
+            "name": "full",
+            "displayName": "Full Configuration",
+            "description": "Full HPX build with all standard features enabled. Includes tests, examples, and tools.",
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build/full",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "HPX_WITH_TESTS": "ON",
+                "HPX_WITH_EXAMPLES": "ON",
+                "HPX_WITH_TOOLS": "ON",
+                "HPX_WITH_DOCUMENTATION": "OFF"
+            }
+        },
+        {
+            "name": "debug",
+            "displayName": "Debug Build",
+            "description": "Debug build configuration with debug symbols and debug-optimized settings.",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "HPX_WITH_TESTS": "ON",
+                "HPX_WITH_EXAMPLES": "ON"
+            }
+        },
+        {
+            "name": "performance",
+            "displayName": "Performance Instrumentation",
+            "description": "Build optimized for performance analysis with APEX profiling enabled.",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/performance",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "HPX_WITH_APEX": "ON",
+                "HPX_WITH_FETCH_APEX": "ON",
+                "HPX_WITH_TESTS": "ON"
+            }
+        },
+        {
+            "name": "sanitizer-address",
+            "displayName": "Address Sanitizer",
+            "description": "Build with AddressSanitizer for detecting memory errors. Requires compatible compiler.",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/sanitizer-address",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "HPX_WITH_SANITIZERS": "ON",
+                "HPX_WITH_TESTS": "ON",
+                "HPX_WITH_EXAMPLES": "OFF"
+            }
+        },
+        {
+            "name": "documentation",
+            "displayName": "Documentation Build",
+            "description": "Build configuration for generating HPX documentation. Requires Sphinx and Doxygen.",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/documentation",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "HPX_WITH_DOCUMENTATION": "ON",
+                "HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS": "html",
+                "HPX_WITH_TESTS": "OFF",
+                "HPX_WITH_EXAMPLES": "OFF"
+            }
+        },
+        {
+            "name": "mpi",
+            "displayName": "MPI Parcelport",
+            "description": "Build with MPI parcelport enabled for multi-node distributed execution.",
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build/mpi",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "HPX_WITH_PARCELPORT_MPI": "ON",
+                "HPX_WITH_TESTS": "ON",
+                "HPX_WITH_EXAMPLES": "ON"
+            }
+        },
+        {
+            "name": "fetch-dependencies",
+            "displayName": "Fetch Dependencies",
+            "description": "Build configuration that automatically fetches dependencies using FetchContent. Useful for development or when dependencies are not installed.",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/fetch-dependencies",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "HPX_WITH_FETCH_BOOST": "ON",
+                "HPX_WITH_FETCH_ASIO": "ON",
+                "HPX_WITH_FETCH_HWLOC": "ON",
+                "HPX_WITH_TESTS": "ON",
+                "HPX_WITH_EXAMPLES": "ON"
+            }
+        },
+        {
+            "name": "static-linking",
+            "displayName": "Static Linking",
+            "description": "Build with static linking enabled. All HPX libraries will be statically linked.",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/static",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "HPX_WITH_STATIC_LINKING": "ON",
+                "HPX_WITH_TESTS": "ON"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "default",
+            "displayName": "Default Build",
+            "configurePreset": "default",
+            "jobs": 0
+        },
+        {
+            "name": "minimal",
+            "displayName": "Minimal Build",
+            "configurePreset": "minimal",
+            "jobs": 0
+        },
+        {
+            "name": "full",
+            "displayName": "Full Build",
+            "configurePreset": "full",
+            "jobs": 0
+        },
+        {
+            "name": "debug",
+            "displayName": "Debug Build",
+            "configurePreset": "debug",
+            "jobs": 0
+        },
+        {
+            "name": "performance",
+            "displayName": "Performance Build",
+            "configurePreset": "performance",
+            "jobs": 0
+        },
+        {
+            "name": "sanitizer-address",
+            "displayName": "Address Sanitizer Build",
+            "configurePreset": "sanitizer-address",
+            "jobs": 0
+        },
+        {
+            "name": "documentation",
+            "displayName": "Documentation Build",
+            "configurePreset": "documentation",
+            "targets": [
+                "docs"
+            ]
+        },
+        {
+            "name": "mpi",
+            "displayName": "MPI Build",
+            "configurePreset": "mpi",
+            "jobs": 0
+        },
+        {
+            "name": "fetch-dependencies",
+            "displayName": "Fetch Dependencies Build",
+            "configurePreset": "fetch-dependencies",
+            "jobs": 0
+        },
+        {
+            "name": "static-linking",
+            "displayName": "Static Linking Build",
+            "configurePreset": "static-linking",
+            "jobs": 0
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "default",
+            "displayName": "Default Tests",
+            "configurePreset": "default",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "debug",
+            "displayName": "Debug Tests",
+            "configurePreset": "debug",
+            "output": {
+                "outputOnFailure": true
+            }
+        }
+    ]
+}

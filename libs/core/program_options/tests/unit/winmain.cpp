@@ -19,7 +19,7 @@ using namespace hpx::program_options;
 using namespace std;
 
 void check_equal(
-    const std::vector<string>& actual, char const** expected, int n)
+    std::vector<string> const& actual, char const** expected, int n)
 {
     if (actual.size() != n)
     {

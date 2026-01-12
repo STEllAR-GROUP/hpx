@@ -16,8 +16,6 @@
 #include <hpx/modules/type_support.hpp>
 #include <hpx/serialization.hpp>
 
-#include <boost/shared_array.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
@@ -122,7 +120,7 @@ private:
     friend class hpx::serialization::access;
 
     template <typename Archive>
-    void serialize(Archive& ar, const unsigned int)
+    void serialize(Archive& ar, unsigned int const)
     {
         // clang-format off
         ar & data_ & size_ & min_index_;

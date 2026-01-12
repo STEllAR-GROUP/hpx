@@ -230,7 +230,7 @@ namespace hpx::parallel {
         decltype(auto) parallel_uninitialized_fill_n(
             ExPolicy&& policy, Iter first, std::size_t count, T const& value)
         {
-            const bool has_scheduler_executor =
+            bool const has_scheduler_executor =
                 hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
             if constexpr (!has_scheduler_executor)
@@ -256,10 +256,12 @@ namespace hpx::parallel {
                                 value));
                     },
                     // finalize, called once if no error occurred
-                    [first, count](auto&& data) mutable -> Iter {
+                    [first, count](auto&&... data) mutable -> Iter {
+                        static_assert(sizeof...(data) < 2);
+
                         // make sure iterators embedded in function object that
                         // is attached to futures are invalidated
-                        util::detail::clear_container(data);
+                        util::detail::clear_container(data...);
 
                         std::advance(first, count);
                         return first;
@@ -297,7 +299,7 @@ namespace hpx::parallel {
             static decltype(auto) parallel(
                 ExPolicy&& policy, Iter first, Sent last, T const& value)
             {
-                const bool has_scheduler_executor =
+                bool const has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
                 if constexpr (!has_scheduler_executor)

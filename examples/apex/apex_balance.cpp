@@ -40,15 +40,15 @@ double do_work(std::uint64_t n)
     return result;
 }
 
-size_t next_locality(const std::vector<double>& probs)
+size_t next_locality(std::vector<double> const& probs)
 {
     static std::default_random_engine generator;
     static std::uniform_real_distribution<double> distribution(0.0, 1.0);
-    const double eps = 1e-9;
+    double const eps = 1e-9;
     double r = distribution(generator);
 
     size_t i = 0;
-    for (const double p : probs)
+    for (double const p : probs)
     {
         r -= p;
         if (r < eps)

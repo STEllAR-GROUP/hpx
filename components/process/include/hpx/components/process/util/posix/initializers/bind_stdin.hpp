@@ -25,7 +25,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
         {
         public:
             explicit bind_stdin(
-                const boost::iostreams::file_descriptor_source& source)
+                boost::iostreams::file_descriptor_source const& source)
               : source_(source)
             {
             }

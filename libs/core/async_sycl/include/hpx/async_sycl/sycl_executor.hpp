@@ -33,7 +33,7 @@ namespace hpx::sycl::experimental {
           : std::integral_constant<bool,
                 std::is_scalar<T>::value ||
                     std::is_same<T, ::sycl::event>::value ||
-                    std::is_same<T, const std::vector<::sycl::event>&>::value>
+                    std::is_same<T, std::vector<::sycl::event> const&>::value>
         {
         };
     }    // namespace detail
@@ -45,7 +45,7 @@ namespace hpx::sycl::experimental {
         // --------------------------------------------------------------------
         /// Create a SYCL executor (based on a sycl queue)
         template <typename sycl_device_selector>
-        explicit sycl_executor(const sycl_device_selector& selector)
+        explicit sycl_executor(sycl_device_selector const& selector)
           : command_queue(selector, ::sycl::property::queue::in_order{})
         {
         }

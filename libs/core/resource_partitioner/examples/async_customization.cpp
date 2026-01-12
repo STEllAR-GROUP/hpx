@@ -64,7 +64,7 @@ struct test_async_executor
     struct future_extract_value
     {
         template <typename T, template <typename> class Future>
-        const T& operator()(const Future<T>& el) const
+        T const& operator()(Future<T> const& el) const
         {
             using shared_state_ptr =
                 traits::detail::shared_state_ptr_for_t<Future<T>>;
@@ -175,7 +175,7 @@ private:
         // that we can access them
         std::cout << "when_all(fut) : tuple       : ";
         hpx::invoke_fused(
-            [](const auto&... ts) {
+            [](auto const&... ts) {
                 std::cout << print_type<decltype(ts)...>(" | ") << "\n";
             },
             unwrapped_futures_tuple);
@@ -220,7 +220,7 @@ private:
         // that we can access them
         std::cout << "dataflow      : tuple       : ";
         hpx::invoke_fused(
-            [](const auto&... ts) {
+            [](auto const&... ts) {
                 std::cout << print_type<decltype(ts)...>(" | ") << "\n";
             },
             unwrapped_futures_tuple);
@@ -257,7 +257,7 @@ T dummy_task(T val)
 // test various execution modes
 // --------------------------------------------------------------------
 template <typename Executor>
-int test(const std::string& message, Executor& exec)
+int test(std::string const& message, Executor& exec)
 {
     // test 1
     std::cout << "============================" << std::endl;
@@ -266,7 +266,7 @@ int test(const std::string& message, Executor& exec)
     std::cout << "Test 1 : async()" << std::endl;
     hpx::future<char const*> fa = async(
         exec,
-        [](int a, double b, const char* c) {
+        [](int a, double b, char const* c) {
             std::cout << "Inside async " << c << std::endl;
             HPX_TEST_EQ(a == 1 && b == 2.2 && std::string(c) == "Hello", true);
             return "async";
@@ -440,34 +440,34 @@ namespace hpx::execution::experimental {
             std::cout << "Hint 0 \n";
             return 0;
         }
-        int operator()(const int, const double, const char*) const
+        int operator()(int const, double const, char const*) const
         {
             std::cout << "Hint 1 \n";
             return 1;
         }
-        int operator()(const int) const
+        int operator()(int const) const
         {
             std::cout << "Hint 2 \n";
             return 2;
         }
-        int operator()(const hpx::tuple<future<int>, future<double>>&) const
+        int operator()(hpx::tuple<future<int>, future<double>> const&) const
         {
             std::cout << "Hint 3(a) \n";
             return 3;
         }
         int operator()(
-            const hpx::tuple<future<std::uint64_t>, shared_future<float>>&)
+            hpx::tuple<future<std::uint64_t>, shared_future<float>> const&)
             const
         {
             std::cout << "Hint 3(b) \n";
             return 3;
         }
-        int operator()(const std::uint16_t, const double) const
+        int operator()(std::uint16_t const, double const) const
         {
             std::cout << "Hint 4(a) \n";
             return 4;
         }
-        int operator()(const std::uint32_t, const double&) const
+        int operator()(std::uint32_t const, double const&) const
         {
             std::cout << "Hint 4(b) \n";
             return 4;

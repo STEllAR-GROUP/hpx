@@ -35,9 +35,9 @@ T get_rand(T LO = (std::numeric_limits<T>::min)(),
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename PolicyT, typename IteratorT, typename InitVal, typename Op>
-void bench_reduce_deterministic(const PolicyT& policy,
-    const IteratorT& deterministic_shuffled, const InitVal& val_det,
-    const Op& op)
+void bench_reduce_deterministic(PolicyT const& policy,
+    IteratorT const& deterministic_shuffled, InitVal const& val_det,
+    Op const& op)
 {
     // check if different type for deterministic and nondeeterministic
     // and same result
@@ -48,9 +48,9 @@ void bench_reduce_deterministic(const PolicyT& policy,
 }
 
 template <typename PolicyT, typename IteratorT, typename InitVal, typename Op>
-void bench_reduce(const PolicyT& policy,
-    const IteratorT& non_deterministic_shuffled, const InitVal& val_det,
-    const Op& op)
+void bench_reduce(PolicyT const& policy,
+    IteratorT const& non_deterministic_shuffled, InitVal const& val_det,
+    Op const& op)
 {
     [[maybe_unused]] auto r =
         hpx::reduce(policy, (std::begin(non_deterministic_shuffled)),

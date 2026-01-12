@@ -42,10 +42,6 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx11_std_quick_exit(DEFINITIONS HPX_HAVE_CXX11_STD_QUICK_EXIT)
 
-  hpx_check_for_cxx11_std_shared_ptr_lwg3018(
-    DEFINITIONS HPX_HAVE_CXX11_STD_SHARED_PTR_LWG3018
-  )
-
   hpx_check_for_c11_aligned_alloc(DEFINITIONS HPX_HAVE_C11_ALIGNED_ALLOC)
 
   hpx_check_for_cxx14_delete_operator_with_size(
@@ -67,10 +63,6 @@ function(hpx_perform_cxx_feature_tests)
   )
 
   hpx_check_for_cxx17_aligned_new(DEFINITIONS HPX_HAVE_CXX17_ALIGNED_NEW)
-
-  hpx_check_for_cxx17_shared_ptr_array(
-    DEFINITIONS HPX_HAVE_CXX17_SHARED_PTR_ARRAY
-  )
 
   hpx_check_for_cxx17_std_transform_scan(
     DEFINITIONS HPX_HAVE_CXX17_STD_TRANSFORM_SCAN_ALGORITHMS

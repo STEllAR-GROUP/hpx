@@ -113,7 +113,7 @@ typedef struct
 {
     std::atomic<std::uint32_t> count;
     std::uint32_t target;
-    volatile int flag;
+    int volatile flag;
 } done_t;
 
 static void AM_signal([[maybe_unused]] gasnet_token_t token,
@@ -295,8 +295,8 @@ namespace hpx::util {
     gasnet_seginfo_t* gasnet_environment::segments = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    int gasnet_environment::init(int* argc, char*** argv, const int minimal,
-        [[maybe_unused]] const int required, int& provided)
+    int gasnet_environment::init(int* argc, char*** argv, int const minimal,
+        [[maybe_unused]] int const required, int& provided)
     {
         if (!has_called_init_)
         {
@@ -429,8 +429,8 @@ namespace hpx::util {
     std::string gasnet_environment::get_processor_name()
     {
         char name[1024 + 1] = {'\0'};
-        const std::string rnkstr = std::to_string(rank());
-        const int len = rnkstr.size();
+        std::string const rnkstr = std::to_string(rank());
+        int const len = rnkstr.size();
         if (1025 < len)
         {
             HPX_THROW_EXCEPTION(error::invalid_status,
@@ -442,26 +442,26 @@ namespace hpx::util {
     }
 
     bool gasnet_environment::gettable(
-        const int node, void* start, const size_t len)
+        int const node, void* start, size_t const len)
     {
-        const uintptr_t segstart =
+        uintptr_t const segstart =
             (uintptr_t) gasnet_environment::segments[node].addr;
-        const uintptr_t segend =
+        uintptr_t const segend =
             segstart + gasnet_environment::segments[node].size;
-        const uintptr_t reqstart = (uintptr_t) start;
-        const uintptr_t reqend = reqstart + len;
+        uintptr_t const reqstart = (uintptr_t) start;
+        uintptr_t const reqend = reqstart + len;
 
         return (segstart <= reqstart && reqstart <= segend &&
             segstart <= reqend && reqend <= segend);
     }
 
-    void gasnet_environment::put(std::uint8_t* addr, const int node,
-        std::uint8_t* raddr, const std::size_t size)
+    void gasnet_environment::put(std::uint8_t* addr, int const node,
+        std::uint8_t* raddr, std::size_t const size)
     {
-        const bool in_remote_seg = gettable(node, raddr, size);
+        bool const in_remote_seg = gettable(node, raddr, size);
         if (in_remote_seg)
         {
-            const std::lock_guard<hpx::mutex> lk(segment_mutex[node]);
+            std::lock_guard<hpx::mutex> const lk(segment_mutex[node]);
             gasnet_put(node, static_cast<void*>(raddr),
                 static_cast<void*>(addr), size);
         }
@@ -503,8 +503,8 @@ namespace hpx::util {
         }
     }
 
-    void gasnet_environment::get(std::uint8_t* addr, const int node,
-        std::uint8_t* raddr, const std::size_t size)
+    void gasnet_environment::get(std::uint8_t* addr, int const node,
+        std::uint8_t* raddr, std::size_t const size)
     {
         if (rank() == node)
         {

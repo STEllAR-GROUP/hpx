@@ -283,11 +283,13 @@ namespace hpx::parallel {
                                     get<0>(iters), part_size, dst)));
                     },
                     // finalize, called once if no error occurred
-                    [first, dest, count](auto&& data) mutable
+                    [first, dest, count](auto&&... data) mutable
                         -> util::in_out_result<Iter, FwdIter2> {
+                        static_assert(sizeof...(data) < 2);
+
                         // make sure iterators embedded in function object that
                         // is attached to futures are invalidated
-                        util::detail::clear_container(data);
+                        util::detail::clear_container(data...);
 
                         std::advance(first, count);
                         std::advance(dest, count);

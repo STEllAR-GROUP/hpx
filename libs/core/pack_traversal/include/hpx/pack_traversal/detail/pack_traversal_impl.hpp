@@ -51,7 +51,7 @@ namespace hpx::util::detail {
             explicit constexpr spread_box() noexcept = default;
             explicit constexpr spread_box(hpx::tuple<> const&) noexcept {}
 
-            constexpr hpx::tuple<> unbox() const noexcept
+            static constexpr hpx::tuple<> unbox() noexcept
             {
                 return hpx::tuple<>{};
             }
@@ -100,8 +100,8 @@ namespace hpx::util::detail {
             return type.unbox();
         }
 
-        /// Deduces to the type unpack is returning when called with the the
-        /// given type T.
+        /// Deduces to the type unpack is returning when called with the given
+        /// type T.
         template <typename T>
         using unpacked_of_t = decltype(unpack(std::declval<T>()));
 
@@ -117,8 +117,8 @@ namespace hpx::util::detail {
 
         constexpr inline void unpack_or_void(spread_box<>) noexcept {}
 
-        /// Converts types to the a tuple carrying the single type and
-        /// spread_box objects to its underlying tuple.
+        /// Converts types to the tuple carrying the single type and spread_box
+        /// objects to its underlying tuple.
         template <typename T>
         constexpr hpx::tuple<T> undecorate(T&& type)
         {
@@ -195,8 +195,8 @@ namespace hpx::util::detail {
             }
         };
 
-        /// Use the recursive instantiation for a variadic pack which
-        /// may contain spread types
+        /// Use the recursive instantiation for a variadic pack which may
+        /// contain spread types
         template <typename C, typename... T>
         constexpr auto apply_spread_impl(std::true_type, C&& callable,
             T&&... args) -> decltype(hpx::invoke_fused(HPX_FORWARD(C, callable),
@@ -206,8 +206,8 @@ namespace hpx::util::detail {
                 hpx::tuple_cat(undecorate(HPX_FORWARD(T, args))...));
         }
 
-        /// Use the linear instantiation for variadic packs which don't
-        /// contain spread types.
+        /// Use the linear instantiation for variadic packs which don't contain
+        /// spread types.
         template <typename C, typename... T>
         constexpr auto apply_spread_impl(std::false_type, C&& callable,
             T&&... args) -> hpx::util::invoke_result_t<C, T...>
@@ -216,8 +216,8 @@ namespace hpx::util::detail {
                 HPX_FORWARD(C, callable), HPX_FORWARD(T, args)...);
         }
 
-        /// Deduces to a true_type if any of the given types marks
-        /// the underlying type to be spread into the current context.
+        /// Deduces to a true_type if any of the given types marks the
+        /// underlying type to be spread into the current context.
         template <typename... T>
         using is_any_spread_t = util::any_of<is_spread<T>...>;
 
@@ -233,8 +233,8 @@ namespace hpx::util::detail {
                 HPX_FORWARD(C, callable), HPX_FORWARD(T, args)...);
         }
 
-        /// Converts the given variadic arguments into a tuple in a way
-        /// that spread return values are inserted into the current pack.
+        /// Converts the given variadic arguments into a tuple in a way that
+        /// spread return values are inserted into the current pack.
         template <typename... T>
         constexpr auto tupelize(T&&... args)
             -> decltype(map_spread(tupelizer_of_t<>{}, HPX_FORWARD(T, args)...))
@@ -244,10 +244,10 @@ namespace hpx::util::detail {
 
         // clang-format off
 
-        /// Converts the given variadic arguments into a tuple in a way
-        /// that spread return values are inserted into the current pack.
-        /// If the arguments were mapped to zero arguments, the empty
-        /// mapping is propagated backwards to the caller.
+        /// Converts the given variadic arguments into a tuple in a way that
+        /// spread return values are inserted into the current pack. If the
+        /// arguments were mapped to zero arguments, the empty mapping is
+        /// propagated backwards to the caller.
         template <template <typename...> class Type, typename... T>
         constexpr auto flat_tupelize_to(T&&... args) -> decltype(
             map_spread(flat_tupelizer_of_t<Type>{}, HPX_FORWARD(T, args)...))
@@ -256,11 +256,11 @@ namespace hpx::util::detail {
                 flat_tupelizer_of_t<Type>{}, HPX_FORWARD(T, args)...);
         }
 
-        /// Converts the given variadic arguments into an array in a way
-        /// that spread return values are inserted into the current pack.
-        /// Through this the size of the array like type might change.
-        /// If the arguments were mapped to zero arguments, the empty
-        /// mapping is propagated backwards to the caller.
+        /// Converts the given variadic arguments into an array in a way that
+        /// spread return values are inserted into the current pack. Through
+        /// this the size of the array like type might change. If the arguments
+        /// were mapped to zero arguments, the empty mapping is propagated
+        /// backwards to the caller.
         template <template <typename, std::size_t> class Type, typename... T>
         constexpr auto flat_arraylize_to(T&&... args) -> decltype(
             map_spread(flat_arraylizer<Type>{}, HPX_FORWARD(T, args)...))
@@ -278,8 +278,8 @@ namespace hpx::util::detail {
         }
         inline void voidify_empty_tuple(hpx::tuple<> const&) noexcept {}
 
-        /// Converts the given variadic arguments into a tuple in a way
-        /// that spread return values are inserted into the current pack.
+        /// Converts the given variadic arguments into a tuple in a way that
+        /// spread return values are inserted into the current pack.
         ///
         /// If the returned tuple is empty, void is returned instead.
         template <typename... T>
@@ -290,8 +290,8 @@ namespace hpx::util::detail {
         }
     }    // end namespace spreading
 
-    /// Just traverses the pack with the given callable object,
-    /// no result is returned or preserved.
+    /// Just traverses the pack with the given callable object, no result is
+    /// returned or preserved.
     struct strategy_traverse_tag
     {
     };
@@ -300,8 +300,8 @@ namespace hpx::util::detail {
     {
     };
 
-    /// Deduces to a true type if the type leads to at least one effective
-    /// call to the mapper.
+    /// Deduces to a true type if the type leads to at least one effective call
+    /// to the mapper.
     template <typename Mapper, typename T>
     using is_effective_t = is_invocable<typename Mapper::traversor_type, T>;
 
@@ -333,8 +333,8 @@ namespace hpx::util::detail {
     /// type to the same container holding different types.
     namespace container_remapping {
 
-        /// Deduces to a true type if the given parameter T
-        /// has a push_back method that accepts a type of E.
+        /// Deduces to a true type if the given parameter T has a push_back
+        /// method that accepts a type of E.
         template <typename T, typename E, typename = void>
         struct has_push_back : std::false_type
         {
@@ -364,7 +364,7 @@ namespace hpx::util::detail {
         // clang-format on
 
         /// Returns the default iterators of the container in case the container
-        /// was passed as an l-value reference. Otherwise move iterators of the
+        /// was passed as an l-value reference. Otherwise, move iterators of the
         /// container are returned.
         template <typename C, typename = void>
         class container_accessor
@@ -475,7 +475,7 @@ namespace hpx::util::detail {
 
         /// Categorizes a mapping of a homogeneous container
         ///
-        /// \tparam IsEmptyMapped Identifies whether the mapping maps to to zero
+        /// \tparam IsEmptyMapped Identifies whether the mapping maps to zero
         ///         arguments.
         /// \tparam CanReuse Identifies whether the container can be re-used
         ///         through the mapping.
@@ -618,6 +618,7 @@ namespace hpx::util::detail {
                     mapper_(HPX_FORWARD(Args, args))...);
             }
         };
+
         template <typename M, template <typename...> typename Base,
             typename... OldArgs>
         struct tuple_like_remapper<strategy_traverse_tag, M, Base<OldArgs...>,

@@ -330,10 +330,6 @@ namespace hpx {
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#endif
-
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
@@ -584,11 +580,8 @@ namespace hpx::parallel {
 
                 difference_type count = detail::distance(first, last);
 
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count]);
-#else
-                boost::shared_array<bool> flags(new bool[count]);
-#endif
+
                 std::size_t init = 0;
 
                 using hpx::get;

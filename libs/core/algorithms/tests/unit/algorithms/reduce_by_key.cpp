@@ -27,7 +27,7 @@
 //
 namespace debug {
     template <typename T>
-    void output(const std::string& name, const std::vector<T>& v)
+    void output(std::string const& name, std::vector<T> const& v)
     {
 #ifdef EXTRA_DEBUG
         std::cout << name.c_str() << "\t : {" << v.size() << "} : ";
@@ -38,7 +38,7 @@ namespace debug {
     }
 
     template <typename Iter>
-    void output(const std::string& name, Iter begin, Iter end)
+    void output(std::string const& name, Iter begin, Iter end)
     {
 #ifdef EXTRA_DEBUG
         std::cout << name.c_str() << "\t : {" << std::distance(begin, end)
@@ -106,7 +106,7 @@ std::mt19937 gen(seed);
 template <typename ExPolicy, typename Tkey, typename Tval, typename Op,
     typename HelperOp>
 void test_reduce_by_key1(ExPolicy&& policy, Tkey, Tval, bool benchmark,
-    const Op& op, const HelperOp& ho)
+    Op const& op, HelperOp const& ho)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -204,7 +204,7 @@ void test_reduce_by_key1(ExPolicy&& policy, Tkey, Tval, bool benchmark,
 template <typename ExPolicy, typename Tkey, typename Tval, typename Op,
     typename HelperOp>
 void test_reduce_by_key_const(ExPolicy&& policy, Tkey, Tval, bool benchmark,
-    const Op& op, const HelperOp& ho)
+    Op const& op, HelperOp const& ho)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -259,8 +259,8 @@ void test_reduce_by_key_const(ExPolicy&& policy, Tkey, Tval, bool benchmark,
     o_values = values;
     o_keys = keys;
 
-    const std::vector<Tkey> const_keys(keys.begin(), keys.end());
-    const std::vector<Tval> const_values(values.begin(), values.end());
+    std::vector<Tkey> const const_keys(keys.begin(), keys.end());
+    std::vector<Tval> const const_values(values.begin(), values.end());
 
     hpx::chrono::high_resolution_timer t;
     // reduce_by_key, blocking when seq, par, par_vec
@@ -305,7 +305,7 @@ void test_reduce_by_key_const(ExPolicy&& policy, Tkey, Tval, bool benchmark,
 template <typename ExPolicy, typename Tkey, typename Tval, typename Op,
     typename HelperOp>
 void test_reduce_by_key_async(
-    ExPolicy&& policy, Tkey, Tval, const Op& op, const HelperOp& ho)
+    ExPolicy&& policy, Tkey, Tval, Op const& op, HelperOp const& ho)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");

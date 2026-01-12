@@ -26,7 +26,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
         {
         public:
             explicit bind_stdin(
-                const boost::iostreams::file_descriptor_source& source)
+                boost::iostreams::file_descriptor_source const& source)
               : source_(source)
             {
             }

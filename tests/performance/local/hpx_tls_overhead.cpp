@@ -95,7 +95,7 @@ int main(int argc, char** argv)
             thread.join();
     }
 
-    const double duration = t.elapsed();
+    double const duration = t.elapsed();
 
     ///////////////////////////////////////////////////////////////////////////
     // output results

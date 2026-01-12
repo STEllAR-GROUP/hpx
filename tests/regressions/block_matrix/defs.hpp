@@ -31,7 +31,7 @@ std::ostream& operator<<(std::ostream& os, std::vector<T> const& v)
 }
 
 template <typename T>
-std::string mkstr(const T& x)
+std::string mkstr(T const& x)
 {
     std::ostringstream os;
     os << x;

@@ -34,7 +34,7 @@ namespace jacobi_smp {
             for (std::int64_t y = 1; y < std::int64_t(n - 1); ++y)
             {
                 double* dst = &(*grid_new)[y * n];
-                const double* src = &(*grid_new)[y * n];
+                double const* src = &(*grid_new)[y * n];
                 jacobi_kernel(dst, src, n);
             }
             std::swap(grid_new, grid_old);

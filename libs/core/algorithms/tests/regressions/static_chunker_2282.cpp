@@ -10,7 +10,7 @@
 
 int main()
 {
-    const int size = 1000000;
+    int const size = 1000000;
     float* a = new float[size];
 
     bool caught_exception = false;

@@ -26,12 +26,12 @@ void test_ambiguous()
         ("output,o", value<string>(), "the output file");
     // clang-format on
 
-    const char* cmdline[] = {"program", "-c", "file", "-o", "anotherfile"};
+    char const* cmdline[] = {"program", "-c", "file", "-o", "anotherfile"};
 
     variables_map vm;
     try
     {
-        store(parse_command_line(sizeof(cmdline) / sizeof(const char*),
+        store(parse_command_line(sizeof(cmdline) / sizeof(char const*),
                   const_cast<char**>(cmdline), desc),
             vm);
     }
@@ -53,13 +53,13 @@ void test_ambiguous_long()
         ("output,o", value<string>(), "the output file");
     // clang-format on
 
-    const char* cmdline[] = {
+    char const* cmdline[] = {
         "program", "--cfgfile", "file", "--output", "anotherfile"};
 
     variables_map vm;
     try
     {
-        store(parse_command_line(sizeof(cmdline) / sizeof(const char*),
+        store(parse_command_line(sizeof(cmdline) / sizeof(char const*),
                   const_cast<char**>(cmdline), desc),
             vm);
     }
@@ -82,12 +82,12 @@ void test_ambiguous_multiple_long_names()
         ("output,foo,o", value<string>(), "the output file");
     // clang-format on
 
-    const char* cmdline[] = {"program", "--foo", "file"};
+    char const* cmdline[] = {"program", "--foo", "file"};
 
     variables_map vm;
     try
     {
-        store(parse_command_line(sizeof(cmdline) / sizeof(const char*),
+        store(parse_command_line(sizeof(cmdline) / sizeof(char const*),
                   const_cast<char**>(cmdline), desc),
             vm);
     }
@@ -105,12 +105,12 @@ void test_unknown_option()
     options_description desc;
     desc.add_options()("cfgfile,c", value<string>(), "the configfile");
 
-    const char* cmdline[] = {"program", "-c", "file", "-f", "anotherfile"};
+    char const* cmdline[] = {"program", "-c", "file", "-f", "anotherfile"};
 
     variables_map vm;
     try
     {
-        store(parse_command_line(sizeof(cmdline) / sizeof(const char*),
+        store(parse_command_line(sizeof(cmdline) / sizeof(char const*),
                   const_cast<char**>(cmdline), desc),
             vm);
     }
@@ -127,13 +127,13 @@ void test_multiple_values()
     desc.add_options()("cfgfile,c", value<string>()->multitoken(),
         "the config file")("output,o", value<string>(), "the output file");
 
-    const char* cmdline[] = {"program", "-o", "fritz", "hugo", "--cfgfile",
+    char const* cmdline[] = {"program", "-o", "fritz", "hugo", "--cfgfile",
         "file", "c", "-o", "text.out"};
 
     variables_map vm;
     try
     {
-        store(parse_command_line(sizeof(cmdline) / sizeof(const char*),
+        store(parse_command_line(sizeof(cmdline) / sizeof(char const*),
                   const_cast<char**>(cmdline), desc),
             vm);
         notify(vm);
@@ -159,13 +159,13 @@ void test_multiple_occurrences()
     options_description desc;
     desc.add_options()("cfgfile,c", value<string>(), "the configfile");
 
-    const char* cmdline[] = {
+    char const* cmdline[] = {
         "program", "--cfgfile", "file", "-c", "anotherfile"};
 
     variables_map vm;
     try
     {
-        store(parse_command_line(sizeof(cmdline) / sizeof(const char*),
+        store(parse_command_line(sizeof(cmdline) / sizeof(char const*),
                   const_cast<char**>(cmdline), desc),
             vm);
         notify(vm);
@@ -184,13 +184,13 @@ void test_multiple_occurrences_with_different_names()
     desc.add_options()(
         "cfgfile,config-file,c", value<string>(), "the configfile");
 
-    const char* cmdline[] = {
+    char const* cmdline[] = {
         "program", "--config-file", "file", "--cfgfile", "anotherfile"};
 
     variables_map vm;
     try
     {
-        store(parse_command_line(sizeof(cmdline) / sizeof(const char*),
+        store(parse_command_line(sizeof(cmdline) / sizeof(char const*),
                   const_cast<char**>(cmdline), desc),
             vm);
         notify(vm);
@@ -212,13 +212,13 @@ void test_multiple_occurrences_with_non_key_names()
     desc.add_options()(
         "cfgfile,config-file,c", value<string>(), "the configfile");
 
-    const char* cmdline[] = {
+    char const* cmdline[] = {
         "program", "--config-file", "file", "-c", "anotherfile"};
 
     variables_map vm;
     try
     {
-        store(parse_command_line(sizeof(cmdline) / sizeof(const char*),
+        store(parse_command_line(sizeof(cmdline) / sizeof(char const*),
                   const_cast<char**>(cmdline), desc),
             vm);
         notify(vm);
@@ -237,13 +237,13 @@ void test_missing_value()
     desc.add_options()("cfgfile,c", value<string>()->multitoken(),
         "the config file")("output,o", value<string>(), "the output file");
     // missing value for option '-c'
-    const char* cmdline[] = {"program", "-c", "-c", "output.txt"};
+    char const* cmdline[] = {"program", "-c", "-c", "output.txt"};
 
     variables_map vm;
 
     try
     {
-        store(parse_command_line(sizeof(cmdline) / sizeof(const char*),
+        store(parse_command_line(sizeof(cmdline) / sizeof(char const*),
                   const_cast<char**>(cmdline), desc),
             vm);
         notify(vm);

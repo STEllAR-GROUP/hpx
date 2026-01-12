@@ -29,10 +29,10 @@ void test_dense()
     hpx::id_type here = hpx::find_here();
     std::cout << "test_dense: running on " << here << std::endl;
 
-    const double alpha = 2.0, beta = 3.0;
+    double const alpha = 2.0, beta = 3.0;
     std::cout << "alpha=" << alpha << ", beta=" << beta << std::endl;
 
-    const ptrdiff_t NI = 4, NJ = 3, NK = 2;
+    ptrdiff_t const NI = 4, NJ = 3, NK = 2;
     std::cout << "NI=" << NI << ", NJ=" << NJ << ", NK=" << NK << std::endl;
 
     vector_t x(NJ);
@@ -103,33 +103,33 @@ void test_blocked()
     hpx::id_type here = hpx::find_here();
     std::cout << "test_blocked: running on " << here << std::endl;
 
-    const double alpha = 2.0, beta = 3.0;
+    double const alpha = 2.0, beta = 3.0;
     std::cout << "alpha=" << alpha << ", beta=" << beta << std::endl;
 
-    const ptrdiff_t NI = 10, NJ = 6, NK = 6;
+    ptrdiff_t const NI = 10, NJ = 6, NK = 6;
     std::cout << "NI=" << NI << ", NJ=" << NJ << ", NK=" << NK << std::endl;
 
-    const ptrdiff_t BI = 3;
-    const ptrdiff_t istr0[BI] = {1, 4, 9};
-    const ptrdiff_t istr1[BI] = {2, 6, 10};
+    ptrdiff_t const BI = 3;
+    ptrdiff_t const istr0[BI] = {1, 4, 9};
+    ptrdiff_t const istr1[BI] = {2, 6, 10};
     hpx::id_type ilocs[BI];
     for (std::ptrdiff_t i = 0; i < BI; ++i)
         ilocs[i] = locs[i % nlocs];
     auto istr = std::make_shared<structure_t>(NI, BI, istr0, istr1, ilocs);
     std::cout << "istr=" << *istr << std::endl;
 
-    const ptrdiff_t BJ = 2;
-    const ptrdiff_t jstr0[BJ] = {0, 4};
-    const ptrdiff_t jstr1[BJ] = {2, 5};
+    ptrdiff_t const BJ = 2;
+    ptrdiff_t const jstr0[BJ] = {0, 4};
+    ptrdiff_t const jstr1[BJ] = {2, 5};
     hpx::id_type jlocs[BJ];
     for (std::ptrdiff_t j = 0; j < BJ; ++j)
         jlocs[j] = locs[(j + 1) % nlocs];
     auto jstr = std::make_shared<structure_t>(NJ, BJ, jstr0, jstr1, jlocs);
     std::cout << "jstr=" << *jstr << std::endl;
 
-    const ptrdiff_t BK = 1;
-    const ptrdiff_t kstr0[BK] = {1};
-    const ptrdiff_t kstr1[BK] = {3};
+    ptrdiff_t const BK = 1;
+    ptrdiff_t const kstr0[BK] = {1};
+    ptrdiff_t const kstr1[BK] = {3};
     hpx::id_type klocs[BK];
     for (std::ptrdiff_t k = 0; k < BK; ++k)
         klocs[k] = locs[(k + 2) % nlocs];

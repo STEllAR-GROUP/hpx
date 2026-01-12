@@ -15,14 +15,14 @@
 using namespace hpx::program_options;
 using namespace std;
 
-void check_value(const string& option, const string& value)
+void check_value(string const& option, string const& value)
 {
     HPX_TEST_EQ(option, value);
 }
 
-void split_whitespace(const options_description& description)
+void split_whitespace(options_description const& description)
 {
-    const char* cmdline =
+    char const* cmdline =
         "prg --input input.txt \r --optimization 4  \t  --opt \n  option";
 
     vector<string> tokens = split_unix(cmdline, " \t\n\r");
@@ -42,9 +42,9 @@ void split_whitespace(const options_description& description)
     notify(vm);
 }
 
-void split_equalsign(const options_description& description)
+void split_equalsign(options_description const& description)
 {
-    const char* cmdline =
+    char const* cmdline =
         "prg --input=input.txt  --optimization=4 --opt=option";
 
     vector<string> tokens = split_unix(cmdline, "= ");
@@ -63,9 +63,9 @@ void split_equalsign(const options_description& description)
     notify(vm);
 }
 
-void split_semi(const options_description& description)
+void split_semi(options_description const& description)
 {
-    const char* cmdline = "prg;--input input.txt;--optimization 4;--opt option";
+    char const* cmdline = "prg;--input input.txt;--optimization 4;--opt option";
 
     vector<string> tokens = split_unix(cmdline, "; ");
 
@@ -83,9 +83,9 @@ void split_semi(const options_description& description)
     notify(vm);
 }
 
-void split_quotes(const options_description& description)
+void split_quotes(options_description const& description)
 {
-    const char* cmdline =
+    char const* cmdline =
         R"(prg --input "input.txt input.txt" --optimization 4 --opt "option1 option2")";
 
     vector<string> tokens = split_unix(cmdline, " ");
@@ -104,9 +104,9 @@ void split_quotes(const options_description& description)
     notify(vm);
 }
 
-void split_escape(const options_description& description)
+void split_escape(options_description const& description)
 {
-    const char* cmdline =
+    char const* cmdline =
         R"(prg --input \"input.txt\" --optimization 4 --opt \"option1\ option2\")";
 
     vector<string> tokens = split_unix(cmdline, " ");
@@ -125,9 +125,9 @@ void split_escape(const options_description& description)
     notify(vm);
 }
 
-void split_single_quote(const options_description& description)
+void split_single_quote(options_description const& description)
 {
-    const char* cmdline = "prg --input 'input.txt input.txt' --optimization 4 "
+    char const* cmdline = "prg --input 'input.txt input.txt' --optimization 4 "
                           "--opt 'option1 option2'";
 
     vector<string> tokens = split_unix(cmdline, " ", "'");
@@ -146,9 +146,9 @@ void split_single_quote(const options_description& description)
     notify(vm);
 }
 
-void split_defaults(const options_description& description)
+void split_defaults(options_description const& description)
 {
-    const char* cmdline = "prg --input \t \'input file.txt\' \t   "
+    char const* cmdline = "prg --input \t \'input file.txt\' \t   "
                           "--optimization 4 --opt \\\"option1\\ option2\\\"";
 
     vector<string> tokens = split_unix(cmdline);

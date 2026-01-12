@@ -168,12 +168,12 @@ struct int_array
             M[i] = number;
     }
 
-    bool operator<(const int_array<NN>& A) const
+    bool operator<(int_array<NN> const& A) const
     {
         return M[0] < A.M[0];
     }
 
-    bool operator==(const int_array<NN>& A) const
+    bool operator==(int_array<NN> const& A) const
     {
         bool sw = true;
         for (std::uint32_t i = 0; i < NN; ++i)

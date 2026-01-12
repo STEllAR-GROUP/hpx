@@ -38,7 +38,7 @@ struct A
 // non-default constructible
 struct B
 {
-    const int a;
+    int const a;
     short b;
 
 public:
@@ -71,7 +71,7 @@ public:
 };
 
 template <class Archive>
-void save_construct_data(Archive& ar, const B* b, unsigned)
+void save_construct_data(Archive& ar, B const* b, unsigned)
 {
     ar << b->get_a();
 }

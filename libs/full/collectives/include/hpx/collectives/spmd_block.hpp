@@ -15,6 +15,7 @@
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/hashing.hpp>
@@ -335,8 +336,8 @@ namespace hpx { namespace lcos {
         };
     }    // namespace detail
 
-    template <typename F, typename... Args,
-        HPX_CONCEPT_REQUIRES_(hpx::traits::is_action<F>::value)>
+    template <typename F, typename... Args>
+        requires(hpx::traits::is_action_v<F>)
     hpx::future<void> define_spmd_block(std::string&& name,
         std::size_t images_per_locality, F&& /* f */, Args&&... args)
     {
@@ -369,4 +370,5 @@ namespace hpx { namespace lcos {
             HPX_FORWARD(Args, args)...);
     }
 }}    // namespace hpx::lcos
+
 #endif

@@ -290,7 +290,7 @@ namespace hpx::threads {
 
         /// allocate memory with binding to a numa node set as
         /// specified by the policy and flags (see hwloc docs)
-        void* allocate_membind(std::size_t len, const hwloc_bitmap_ptr& bitmap,
+        void* allocate_membind(std::size_t len, hwloc_bitmap_ptr const& bitmap,
             hpx_hwloc_membind_policy policy, int flags) const;
 
         threads::mask_type get_area_membind_nodeset(
@@ -320,8 +320,8 @@ namespace hpx::threads {
         mask_type init_thread_affinity_mask(
             std::size_t num_core, std::size_t num_pu) const;
 
-        hwloc_bitmap_t mask_to_bitmap(
-            mask_cref_type mask, hwloc_obj_type_t htype) const;
+        hwloc_bitmap_t mask_to_bitmap(mask_cref_type mask,
+            hwloc_obj_type_t htype, unsigned* count = nullptr) const;
         mask_type bitmap_to_mask(
             hwloc_bitmap_t bitmap, hwloc_obj_type_t htype) const;
 
