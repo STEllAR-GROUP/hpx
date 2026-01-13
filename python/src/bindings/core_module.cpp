@@ -14,6 +14,10 @@ void bind_array(py::module_& m);
 void bind_algorithms(py::module_& m);
 void bind_execution(py::module_& m);
 
+namespace hpxpy {
+void register_collective_bindings(py::module_& m);
+}
+
 PYBIND11_MODULE(_core, m) {
     m.doc() = R"pbdoc(
         HPXPy Core Extension Module
@@ -36,6 +40,7 @@ PYBIND11_MODULE(_core, m) {
     bind_array(m);
     bind_algorithms(m);
     bind_execution(m);
+    hpxpy::register_collective_bindings(m);
 
     // GPU availability flags
 #ifdef HPXPY_HAVE_CUDA

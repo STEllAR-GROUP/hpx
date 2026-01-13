@@ -71,6 +71,7 @@ pybind11_add_module(_core MODULE
   src/bindings/runtime_bindings.cpp
   src/bindings/array_bindings.cpp
   src/bindings/algorithm_bindings.cpp
+  src/bindings/collective_bindings.cpp
 )
 
 target_include_directories(_core PRIVATE

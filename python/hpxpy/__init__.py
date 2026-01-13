@@ -107,6 +107,13 @@ __all__ = [
     "execution",
     # Distribution (Phase 3)
     "distribution",
+    # Collective operations (Phase 4)
+    "collectives",
+    "all_reduce",
+    "broadcast",
+    "gather",
+    "scatter",
+    "barrier",
 ]
 
 # Import the compiled extension module
@@ -171,6 +178,13 @@ try:
         execution,
         # Distribution module (Phase 3)
         distribution,
+        # Collectives module (Phase 4)
+        collectives,
+        all_reduce as _all_reduce,
+        broadcast as _broadcast,
+        gather as _gather,
+        scatter as _scatter,
+        barrier as _barrier,
     )
 
     _HPX_AVAILABLE = True
@@ -1144,3 +1158,144 @@ class random:
         if len(shape) == 0:
             shape = (1,)
         return _random_module._rand(list(shape))
+
+
+# -----------------------------------------------------------------------------
+# Collective Operations (Phase 4)
+# -----------------------------------------------------------------------------
+
+
+def all_reduce(arr, op: str = 'sum'):
+    """Combine values from all localities using a reduction operation.
+
+    Each locality contributes its local array, and all localities receive
+    the combined result. In single-locality mode, returns the input unchanged.
+
+    Parameters
+    ----------
+    arr : ndarray
+        Local array to contribute.
+    op : str, optional
+        Reduction operation: 'sum', 'prod', 'min', 'max'. Default: 'sum'.
+
+    Returns
+    -------
+    ndarray
+        Combined result (same on all localities).
+
+    Examples
+    --------
+    >>> local_sum = hpx.from_numpy(np.array([1.0, 2.0, 3.0]))
+    >>> global_sum = hpx.all_reduce(local_sum, op='sum')
+    """
+    _check_available()
+    from hpxpy._core import ReduceOp
+    op_map = {
+        'sum': ReduceOp.sum,
+        'prod': ReduceOp.prod,
+        'min': ReduceOp.min,
+        'max': ReduceOp.max,
+    }
+    if op not in op_map:
+        raise ValueError(f"Unknown reduction operation: {op}. Use one of: {list(op_map.keys())}")
+    return _all_reduce(arr, op_map[op])
+
+
+def broadcast(arr, root: int = 0):
+    """Broadcast array from root locality to all localities.
+
+    In single-locality mode, returns a copy of the input.
+
+    Parameters
+    ----------
+    arr : ndarray
+        Array to broadcast (only used on root locality).
+    root : int, optional
+        Locality ID to broadcast from. Default: 0.
+
+    Returns
+    -------
+    ndarray
+        Broadcasted array (same on all localities).
+
+    Examples
+    --------
+    >>> data = hpx.from_numpy(np.array([1.0, 2.0, 3.0]))
+    >>> shared = hpx.broadcast(data, root=0)
+    """
+    _check_available()
+    return _broadcast(arr, root)
+
+
+def gather(arr, root: int = 0):
+    """Gather arrays from all localities to root.
+
+    In single-locality mode, returns a list containing just the input.
+
+    Parameters
+    ----------
+    arr : ndarray
+        Local array to contribute.
+    root : int, optional
+        Locality ID to gather to. Default: 0.
+
+    Returns
+    -------
+    list
+        List of numpy arrays from all localities (only valid on root).
+
+    Examples
+    --------
+    >>> local_data = hpx.from_numpy(np.array([1.0, 2.0, 3.0]))
+    >>> all_data = hpx.gather(local_data, root=0)
+    >>> print(len(all_data))  # Number of localities
+    """
+    _check_available()
+    return _gather(arr, root)
+
+
+def scatter(arr, root: int = 0):
+    """Scatter array from root to all localities.
+
+    The array on root is divided evenly among all localities.
+    In single-locality mode, returns a copy of the input.
+
+    Parameters
+    ----------
+    arr : ndarray
+        Array to scatter (only used on root).
+    root : int, optional
+        Locality ID to scatter from. Default: 0.
+
+    Returns
+    -------
+    ndarray
+        This locality's portion of the scattered array.
+
+    Examples
+    --------
+    >>> full_data = hpx.arange(1000)
+    >>> local_chunk = hpx.scatter(full_data, root=0)
+    """
+    _check_available()
+    return _scatter(arr, root)
+
+
+def barrier(name: str = "hpxpy_barrier"):
+    """Synchronize all localities.
+
+    All localities wait until everyone reaches the barrier.
+    In single-locality mode, this is a no-op.
+
+    Parameters
+    ----------
+    name : str, optional
+        Name for the barrier. Default: "hpxpy_barrier".
+
+    Examples
+    --------
+    >>> # Ensure all localities have finished computation
+    >>> hpx.barrier()
+    """
+    _check_available()
+    _barrier(name)
