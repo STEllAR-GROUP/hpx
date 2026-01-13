@@ -16,34 +16,44 @@ Welcome to HPXPy! This section will help you get up and running quickly.
 pip install hpxpy
 ```
 
-### Building from Source
+### Building from Source (Development)
+
+For development, you can build HPXPy against an HPX build directory without installing HPX system-wide:
 
 ```bash
-# Clone HPX repository
+# Clone and build HPX
 git clone https://github.com/STEllAR-GROUP/hpx.git
 cd hpx
-
-# Build HPX (see HPX documentation for full options)
 mkdir build && cd build
-cmake .. -DHPX_WITH_PYTHON=ON
-make -j$(nproc)
-make install
+cmake .. -DCMAKE_BUILD_TYPE=Release -DHPX_WITH_FETCH_ASIO=ON
+make -j8
 
-# Install HPXPy
+# Build HPXPy
 cd ../python
-pip install -e .
+mkdir build && cd build
+cmake .. -DHPX_DIR=../../build/lib/cmake/HPX
+make -j8
+
+# Set up environment and test
+source setup_env.sh
+python3 -c "import hpxpy as hpx; hpx.init(); print('HPXPy works!'); hpx.finalize()"
 ```
+
+See **[Building from Source](building)** for detailed instructions including:
+- Environment setup scripts
+- GPU support (CUDA/SYCL)
+- Troubleshooting
 
 ### GPU Support
 
-For CUDA support:
+For CUDA support (requires HPX built with `HPX_WITH_CUDA=ON`):
 ```bash
-cmake .. -DHPXPY_WITH_CUDA=ON
+cmake .. -DHPXPY_WITH_CUDA=ON -DHPX_DIR=../../build/lib/cmake/HPX
 ```
 
-For SYCL support (Intel/AMD/Apple):
+For SYCL support (requires HPX built with `HPX_WITH_SYCL=ON`):
 ```bash
-cmake .. -DHPXPY_WITH_SYCL=ON
+cmake .. -DHPXPY_WITH_SYCL=ON -DHPX_DIR=../../build/lib/cmake/HPX
 ```
 
 ## Quickstart
