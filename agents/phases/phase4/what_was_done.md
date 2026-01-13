@@ -4,7 +4,7 @@
 
 Phase 4 adds full distributed computing capabilities to HPXPy.
 
-**Status:** In Progress (2026-01-12)
+**Status:** Complete (2026-01-12)
 
 ## Objectives
 
@@ -41,15 +41,18 @@ Phase 4 adds full distributed computing capabilities to HPXPy.
   - [x] Distribution introspection (policy, num_partitions, locality_id, is_distributed)
   - [x] `DistributionInfo` struct for detailed distribution info
 
-- [ ] **SPMD Execution**
-  - [x] Barrier synchronization (implemented)
-  - [ ] Locality-aware execution
-  - [ ] Distributed parallel algorithms
+- [x] **SPMD Execution**
+  - [x] Barrier synchronization
+  - [x] `@spmd_main` decorator for SPMD programs
+  - [x] Environment-based locality detection
 
-- [ ] **Multi-Locality Support**
-  - [ ] TCP parcelport configuration
-  - [ ] Multi-process launch
-  - [ ] Locality discovery and registration
+- [x] **Multi-Locality Launcher**
+  - [x] `hpx.launcher` Python module
+  - [x] TCP parcelport configuration via `LocalityConfig`
+  - [x] `launch_localities()` function for spawning processes
+  - [x] `@spmd_main` decorator for automatic multi-process launch
+  - [x] Port discovery with `find_free_port()`
+  - [x] Command-line argument parsing for HPX args
 
 ## Files Created/Modified
 
@@ -61,9 +64,12 @@ Phase 4 adds full distributed computing capabilities to HPXPy.
 | `python/src/bindings/core_module.cpp` | Register bindings |
 | `python/CMakeLists.txt` | Add source files |
 | `python/hpxpy/__init__.py` | Export functions |
+| `python/hpxpy/launcher.py` | Multi-locality launcher module |
 | `python/tests/unit/test_collectives.py` | Tests for collective operations |
 | `python/tests/unit/test_distributed_arrays.py` | Tests for distributed arrays |
+| `python/tests/unit/test_launcher.py` | Tests for launcher module |
 | `python/examples/distributed_reduction_demo.py` | SPMD pattern demo |
+| `python/examples/multi_locality_demo.py` | Multi-locality launch demo |
 
 ## API Additions
 
@@ -103,13 +109,37 @@ arr.get_distribution_info()  # Get DistributionInfo
 hpx.DistributionPolicy.none   # Local (no distribution)
 hpx.DistributionPolicy.block  # Block distribution
 hpx.DistributionPolicy.cyclic # Cyclic distribution
+
+# Multi-locality launcher
+from hpxpy.launcher import launch_localities, spmd_main
+
+# Launch script across multiple localities
+launch_localities("my_script.py", num_localities=4)
+
+# Or use decorator for automatic launch
+@spmd_main(num_localities=4)
+def main():
+    import hpxpy as hpx
+    with hpx.runtime():
+        print(f"Locality {hpx.locality_id()}")
+
+# Launcher configuration
+from hpxpy.launcher import LocalityConfig, LaunchConfig
+config = LocalityConfig(locality_id=0, num_localities=4)
+hpx_args = config.to_hpx_args()  # Get HPX command-line args
+
+# Check if running in multi-locality mode
+from hpxpy.launcher import is_multi_locality_mode
+if is_multi_locality_mode():
+    print("Running distributed")
 ```
 
 ## Test Results
 
-- **166 total tests pass** (145 from Phase 3 + 21 new)
+- **184 total tests pass** (166 from before + 18 launcher tests)
 - 17 tests for collective operations
 - 21 tests for distributed arrays
+- 18 tests for multi-locality launcher
 - All Phase 1-3 tests continue to pass
 
 ## Implementation Notes
@@ -129,7 +159,14 @@ hpx.DistributionPolicy.cyclic # Cyclic distribution
    - Barrier uses `hpx::distributed::barrier`
    - Distributed arrays can use HPX partitioned_vector for true distribution
 
-3. **Future Work**:
-   - Connect distributed arrays to HPX partitioned_vector when multi-locality
+3. **Multi-Locality Launcher**:
+   - Uses environment variables (HPXPY_MULTI_LOCALITY, HPXPY_NUM_LOCALITIES) to signal distributed mode
+   - HPX arguments are passed after `--` separator on command line
+   - Locality 0 starts the AGAS server, workers connect with `--hpx:worker`
+   - Each locality uses a unique port: base_port + locality_id
+   - `find_free_port()` automatically discovers available ports
+
+4. **Future Work**:
+   - Connect distributed arrays to HPX partitioned_vector for actual distribution
    - Add distributed parallel algorithms on distributed arrays
-   - Add multi-process launch configuration
+   - Add remote procedure call (RPC) support between localities

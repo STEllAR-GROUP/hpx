@@ -120,6 +120,8 @@ __all__ = [
     "distributed_ones",
     "distributed_full",
     "distributed_from_numpy",
+    # Multi-locality launcher (Phase 4)
+    "launcher",
 ]
 
 # Import the compiled extension module
@@ -1312,3 +1314,11 @@ def barrier(name: str = "hpxpy_barrier"):
     """
     _check_available()
     _barrier(name)
+
+
+# -----------------------------------------------------------------------------
+# Multi-Locality Launcher (Phase 4)
+# -----------------------------------------------------------------------------
+
+# Import the launcher module for multi-locality support
+from hpxpy import launcher
