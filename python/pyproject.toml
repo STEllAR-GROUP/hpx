@@ -1,0 +1,186 @@
+# HPXPy - High Performance Python Arrays powered by HPX
+#
+# SPDX-License-Identifier: BSL-1.0
+
+[build-system]
+requires = [
+    "scikit-build-core>=0.5",
+    "pybind11>=2.11",
+    "numpy>=1.20",
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "hpxpy"
+version = "0.1.0"
+description = "High-performance distributed NumPy-like arrays powered by HPX"
+readme = "README.md"
+license = {text = "BSL-1.0"}
+requires-python = ">=3.9"
+authors = [
+    {name = "LSU CCT", email = "hpx@cct.lsu.edu"},
+]
+keywords = [
+    "hpx",
+    "parallel",
+    "distributed",
+    "numpy",
+    "high-performance",
+    "hpc",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Boost Software License 1.0 (BSL-1.0)",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "numpy>=1.20",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "pytest-benchmark>=4.0",
+    "hypothesis>=6.0",
+]
+dev = [
+    "hpxpy[test]",
+    "black",
+    "isort",
+    "mypy",
+    "ruff",
+]
+docs = [
+    "sphinx>=6.0",
+    "sphinx-rtd-theme",
+    "numpydoc",
+]
+
+[project.urls]
+Homepage = "https://github.com/STEllAR-GROUP/hpx"
+Documentation = "https://hpx-docs.stellar-group.org/"
+Repository = "https://github.com/STEllAR-GROUP/hpx"
+Issues = "https://github.com/STEllAR-GROUP/hpx/issues"
+
+# ------------------------------------------------------------------------------
+# scikit-build-core configuration
+# ------------------------------------------------------------------------------
+[tool.scikit-build]
+cmake.minimum-version = "3.18"
+cmake.build-type = "Release"
+wheel.packages = ["hpxpy"]
+wheel.install-dir = "hpxpy"
+build-dir = "build/{wheel_tag}"
+
+# Pass HPX_DIR if set in environment
+[tool.scikit-build.cmake.define]
+# HPX_DIR can be set via environment or command line:
+# pip install . -C cmake.define.HPX_DIR=/path/to/hpx
+
+# ------------------------------------------------------------------------------
+# pytest configuration
+# ------------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+]
+markers = [
+    "slow: marks tests as slow",
+    "distributed: marks tests requiring multiple localities",
+    "gpu: marks tests requiring GPU",
+    "benchmark: marks benchmark tests",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+
+# ------------------------------------------------------------------------------
+# coverage configuration
+# ------------------------------------------------------------------------------
+[tool.coverage.run]
+source = ["hpxpy"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/benchmarks/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
+
+# ------------------------------------------------------------------------------
+# black configuration
+# ------------------------------------------------------------------------------
+[tool.black]
+line-length = 88
+target-version = ["py39", "py310", "py311", "py312"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+    | \.venv
+    | build
+    | dist
+)/
+'''
+
+# ------------------------------------------------------------------------------
+# isort configuration
+# ------------------------------------------------------------------------------
+[tool.isort]
+profile = "black"
+line_length = 88
+known_first_party = ["hpxpy"]
+
+# ------------------------------------------------------------------------------
+# mypy configuration
+# ------------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+# ------------------------------------------------------------------------------
+# ruff configuration
+# ------------------------------------------------------------------------------
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+]
