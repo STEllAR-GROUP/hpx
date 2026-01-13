@@ -66,6 +66,36 @@ Topics covered:
 - Async operations with futures
 :::
 
+:::{grid-item-card} 5. Array Operations
+:link: 06_array_operations
+:link-type: doc
+
+**Level:** Beginner | **Time:** 15 min
+
+Master array slicing and reshape operations.
+
+Topics covered:
+- Basic slicing (start:stop)
+- Step slicing (::2)
+- Negative indices
+- NumPy compatibility
+:::
+
+:::{grid-item-card} 6. Benchmarks
+:link: 07_benchmarks
+:link-type: doc
+
+**Level:** Intermediate | **Time:** 20 min
+
+Measure and compare HPXPy performance.
+
+Topics covered:
+- Benchmarking methodology
+- NumPy comparison
+- Scaling with array size
+- Performance analysis
+:::
+
 ::::
 
 ## Running the Tutorials
@@ -111,4 +141,6 @@ pip install jupyterlab numpy matplotlib
 02_parallel_algorithms
 03_distributed_computing
 05_gpu_acceleration
+06_array_operations
+07_benchmarks
 ```

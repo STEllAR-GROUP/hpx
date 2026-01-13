@@ -128,6 +128,7 @@ auto_arr = hpx.zeros(1000, device='auto') # Best available
 - **[Tutorials](../tutorials/index)** - Step-by-step notebooks
 - **[User Guide](../user_guide/index)** - Detailed feature documentation
 - **[API Reference](../api/index)** - Complete API documentation
+- **[Cloud Deployment](deployment)** - Docker, AWS, GCP deployment guides
 
 ## Related Documentation
 
@@ -139,4 +140,5 @@ auto_arr = hpx.zeros(1000, device='auto') # Best available
 :hidden:
 
 building
+deployment
 ```

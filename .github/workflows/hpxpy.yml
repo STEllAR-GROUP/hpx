@@ -1,0 +1,125 @@
+# Copyright (c) 2026 The STE||AR Group
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+name: HPXPy CI
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'python/**'
+      - '.github/workflows/hpxpy.yml'
+  pull_request:
+    paths:
+      - 'python/**'
+      - '.github/workflows/hpxpy.yml'
+  workflow_dispatch:
+
+jobs:
+  # ==========================================================================
+  # Build and test HPXPy
+  # ==========================================================================
+  build-and-test:
+    name: Build & Test (Ubuntu)
+    runs-on: ubuntu-latest
+    container: stellargroup/build_env:17
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install numpy pybind11 pytest pytest-cov
+
+      - name: Configure HPX
+        run: |
+          cmake . -Bbuild-hpx -GNinja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DHPX_WITH_MALLOC=system \
+            -DHPX_WITH_FETCH_ASIO=ON \
+            -DHPX_WITH_ASIO_TAG=asio-1-34-2 \
+            -DHPX_WITH_EXAMPLES=OFF \
+            -DHPX_WITH_TESTS=OFF
+
+      - name: Build HPX
+        run: cmake --build build-hpx --target all -j2
+
+      - name: Install HPX
+        run: cmake --install build-hpx --prefix /opt/hpx
+
+      - name: Configure HPXPy
+        run: |
+          cd python
+          cmake . -Bbuild -GNinja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DHPX_DIR=/opt/hpx/lib/cmake/HPX
+
+      - name: Build HPXPy
+        run: cmake --build python/build --target all
+
+      - name: Run Unit Tests
+        run: |
+          cd python
+          PYTHONPATH=build:. LD_LIBRARY_PATH=/opt/hpx/lib:$LD_LIBRARY_PATH \
+            python3 -m pytest tests/unit/ -v --tb=short
+
+      - name: Run Benchmarks
+        run: |
+          cd python
+          PYTHONPATH=build:. LD_LIBRARY_PATH=/opt/hpx/lib:$LD_LIBRARY_PATH \
+            python3 benchmarks/benchmark_arrays.py
+
+  # ==========================================================================
+  # Docker image build test
+  # ==========================================================================
+  docker-build:
+    name: Docker Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./python
+          file: ./python/Dockerfile
+          push: false
+          tags: hpxpy:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ==========================================================================
+  # Code quality checks
+  # ==========================================================================
+  lint:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install linters
+        run: |
+          pip install ruff black
+
+      - name: Check formatting (black)
+        run: black --check python/hpxpy python/tests python/benchmarks || true
+
+      - name: Lint (ruff)
+        run: ruff check python/hpxpy python/tests python/benchmarks || true
