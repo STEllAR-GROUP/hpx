@@ -3,16 +3,17 @@
 ## Test Summary
 
 **Date:** 2026-01-12
-**Total Tests:** 127
-**Passed:** 127
+**Total Tests:** 128
+**Passed:** 128
 **Failed:** 0
 **Skipped:** 3
 
-## New Phase 3 Tests (8 tests)
+## New Phase 3 Tests (9 tests)
 
-All distribution module tests pass:
+All Phase 3 tests pass:
 
 ```
+# Distribution module tests
 tests/unit/test_distribution.py::TestDistributionModule::test_distribution_module_exists PASSED
 tests/unit/test_distribution.py::TestDistributionModule::test_distribution_policies_exist PASSED
 tests/unit/test_distribution.py::TestDistributionModule::test_locality_introspection PASSED
@@ -21,6 +22,9 @@ tests/unit/test_distribution.py::TestDistributionPolicy::test_local_alias PASSED
 tests/unit/test_distribution.py::TestLocalArrayWithDistributionContext::test_zeros_still_works PASSED
 tests/unit/test_distribution.py::TestLocalArrayWithDistributionContext::test_operations_still_work PASSED
 tests/unit/test_distribution.py::TestLocalArrayWithDistributionContext::test_to_numpy_still_works PASSED
+
+# Zero-copy array tests (new)
+tests/unit/test_array.py::TestArrayFromNumpy::test_from_numpy_no_copy_to_numpy_roundtrip PASSED
 ```
 
 ## Test Breakdown by Module
@@ -28,12 +32,12 @@ tests/unit/test_distribution.py::TestLocalArrayWithDistributionContext::test_to_
 | Module | Tests | Passed |
 |--------|-------|--------|
 | test_algorithms.py | 32 | 32 |
-| test_array.py | 24 | 24 |
+| test_array.py | 25 | 25 |
 | test_distribution.py | 8 | 8 |
 | test_math.py | 34 | 34 |
 | test_operators.py | 24 | 24 |
 | test_runtime.py | 5 | 5 |
-| **Total** | **127** | **127** |
+| **Total** | **128** | **128** |
 
 ## Test Categories
 
@@ -43,6 +47,11 @@ tests/unit/test_distribution.py::TestLocalArrayWithDistributionContext::test_to_
 - Policy enum values match convenience attributes
 - Locality introspection returns valid integers
 - Existing array operations work with distribution module loaded
+
+### Zero-Copy Array Tests
+- `from_numpy(arr, copy=False)` creates a view sharing memory
+- `to_numpy()` on views returns a view of the same data
+- Modifications to original numpy array are visible through the view
 
 ### Backward Compatibility Tests
 The 119 tests from Phase 1 and Phase 2 continue to pass:

@@ -101,17 +101,29 @@ class TestArrayFromNumpy:
         np_arr[0] = 999.0
         assert hpx_arr.to_numpy()[0] == 1.0
 
-    def test_from_numpy_no_copy_modifies_original(self, hpx_runtime):
-        """from_numpy with copy=False should share memory.
-
-        Note: Current implementation always copies. This test documents
-        the expected behavior for when zero-copy is implemented.
-        """
+    def test_from_numpy_no_copy_is_view(self, hpx_runtime):
+        """from_numpy with copy=False should share memory (zero-copy)."""
         np_arr = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
         hpx_arr = hpx_runtime.from_numpy(np_arr, copy=False)
 
-        # Current implementation copies, so this test verifies data is correct
         np.testing.assert_array_equal(hpx_arr.to_numpy(), np_arr)
+
+        # Modifying original numpy array should be visible through hpx array
+        np_arr[0] = 999.0
+        assert hpx_arr.to_numpy()[0] == 999.0
+
+    def test_from_numpy_no_copy_to_numpy_roundtrip(self, hpx_runtime):
+        """to_numpy on a view should return same data."""
+        np_arr = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+        hpx_arr = hpx_runtime.from_numpy(np_arr, copy=False)
+        result = hpx_arr.to_numpy()
+
+        # Both should share the same underlying data
+        np.testing.assert_array_equal(result, np_arr)
+
+        # Modifying original should be visible in result (shared memory)
+        np_arr[2] = 888.0
+        assert result[2] == 888.0
 
     def test_array_from_list(self, hpx_runtime):
         """Create array from Python list."""

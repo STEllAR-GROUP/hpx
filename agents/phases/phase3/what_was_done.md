@@ -38,10 +38,16 @@ Phase 3 adds distribution policy infrastructure to HPXPy and significantly impro
   - [x] Added `-funroll-loops` for better vectorization
   - [x] Sequential reductions for deterministic results (compiler auto-vectorizes)
 
+- [x] **Zero-Copy Array Views**
+  - [x] `from_numpy(arr, copy=False)` creates a view sharing memory with numpy
+  - [x] `to_numpy()` on views returns a view of the same data
+  - [x] Proper lifetime management via `np_base_` reference keeping
+  - [x] `is_view()` method to check if array is a view
+
 - [x] **Backward Compatibility**
   - [x] All existing array operations work unchanged
   - [x] 119 Phase 1+2 tests still pass
-  - [x] 8 new Phase 3 tests pass
+  - [x] 9 new Phase 3 tests pass
 
 ## Files Created/Modified
 
@@ -55,6 +61,10 @@ Phase 3 adds distribution policy infrastructure to HPXPy and significantly impro
 | `python/tests/unit/test_distribution.py` | Distribution module tests |
 | `python/examples/distribution_demo.py` | Distribution API demo |
 | `python/examples/distributed_analytics_demo.py` | Performance benchmark demo |
+| `python/examples/heat_diffusion_demo.py` | 1D heat equation scalability demo |
+| `python/examples/parallel_integration_demo.py` | Numerical integration scaling demo |
+| `python/src/bindings/ndarray.hpp` | Zero-copy array view support |
+| `python/tests/unit/test_array.py` | Added zero-copy tests |
 
 ## API Additions
 
@@ -77,8 +87,8 @@ hpx.distribution.get_num_localities()   # Returns int (1 in single-locality mode
 
 ## Test Results
 
-- **127 total tests pass** (up from 119 in Phase 2)
-- **8 new Phase 3 tests** covering distribution module
+- **128 total tests pass** (up from 119 in Phase 2)
+- **9 new Phase 3 tests** covering distribution module and zero-copy
 - All Phase 1 and Phase 2 tests continue to pass
 
 ## Performance Results (vs NumPy)

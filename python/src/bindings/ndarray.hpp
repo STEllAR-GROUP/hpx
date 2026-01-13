@@ -34,25 +34,35 @@ public:
     }
 
     // Construct from NumPy array (with optional copy)
-    ndarray(py::array np_array, bool /*copy*/)
+    ndarray(py::array np_array, bool copy)
         : dtype_(np_array.dtype())
+        , np_base_(copy ? py::none() : py::reinterpret_borrow<py::object>(np_array))
     {
         // Get shape
         for (py::ssize_t i = 0; i < np_array.ndim(); ++i) {
             shape_.push_back(np_array.shape(i));
         }
         size_ = compute_size(shape_);
-        strides_ = compute_strides(shape_, dtype_.itemsize());
-
-        // Allocate and copy data
-        size_t nbytes = size_ * dtype_.itemsize();
-        data_.resize(nbytes);
 
         // Make array contiguous if needed
         py::array contiguous = py::array::ensure(np_array,
             py::array::c_style | py::array::forcecast);
 
-        std::memcpy(data_.data(), contiguous.data(), nbytes);
+        if (copy || contiguous.ptr() != np_array.ptr()) {
+            // Need to copy: either requested or array wasn't contiguous
+            strides_ = compute_strides(shape_, dtype_.itemsize());
+            size_t nbytes = size_ * dtype_.itemsize();
+            data_.resize(nbytes);
+            std::memcpy(data_.data(), contiguous.data(), nbytes);
+            external_data_ = nullptr;
+            np_base_ = py::none();
+        } else {
+            // Zero-copy: use numpy's buffer directly
+            // Keep reference to numpy array to ensure lifetime
+            strides_ = compute_strides(shape_, dtype_.itemsize());
+            external_data_ = const_cast<void*>(np_array.data());
+            np_base_ = py::reinterpret_borrow<py::object>(np_array);
+        }
     }
 
     // Properties
@@ -63,14 +73,29 @@ public:
     std::vector<py::ssize_t> const& strides() const { return strides_; }
 
     // Get raw data pointer
-    void* data() { return data_.data(); }
-    void const* data() const { return data_.data(); }
-    size_t nbytes() const { return data_.size(); }
+    void* data() {
+        return external_data_ ? external_data_ : data_.data();
+    }
+    void const* data() const {
+        return external_data_ ? external_data_ : data_.data();
+    }
+    size_t nbytes() const {
+        return external_data_ ? size_ * dtype_.itemsize() : data_.size();
+    }
 
-    // Convert to NumPy array
+    // Check if this is a view (references external data)
+    bool is_view() const { return external_data_ != nullptr; }
+
+    // Convert to NumPy array (zero-copy view when possible)
     py::array to_numpy() const {
-        // Create NumPy array that copies our data
-        return py::array(dtype_, shape_, strides_, data_.data());
+        if (external_data_) {
+            // Return a view of the external data, keeping the original numpy array alive
+            return py::array(dtype_, shape_, strides_, external_data_, np_base_);
+        } else {
+            // We own the data - create a copy for safety
+            // (the ndarray could be destroyed while numpy array is still in use)
+            return py::array(dtype_, shape_, strides_, data_.data());
+        }
     }
 
     // Get typed data pointer (for algorithm implementations)
@@ -109,7 +134,9 @@ private:
     py::dtype dtype_;
     std::vector<py::ssize_t> strides_;
     py::ssize_t size_;
-    std::vector<char> data_;  // Raw byte storage
+    std::vector<char> data_;      // Raw byte storage (when we own data)
+    void* external_data_ = nullptr;  // Pointer to external data (zero-copy view)
+    py::object np_base_;          // Keep numpy array alive for zero-copy views
 };
 
 }  // namespace hpxpy

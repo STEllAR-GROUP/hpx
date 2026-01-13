@@ -68,7 +68,14 @@ local_arr = arr.to_numpy()  # Gathers all data to calling locality
 
 4. **Tests**
    - 8 new tests for distribution module
-   - All 127 tests pass (119 from Phase 1+2 + 8 new)
+   - 1 new test for zero-copy array views
+   - All 128 tests pass (119 from Phase 1+2 + 9 new)
+
+5. **Zero-Copy Array Views**
+   - `from_numpy(arr, copy=False)` creates a view sharing memory with numpy
+   - `to_numpy()` on views returns a view of the same data (no copying)
+   - Proper lifetime management using pybind11 base object references
+   - `is_view()` method to check if array references external data
 
 ### Future Work
 
