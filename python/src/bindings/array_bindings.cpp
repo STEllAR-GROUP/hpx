@@ -220,7 +220,12 @@ void bind_array(py::module_& m) {
         })
         .def("__ge__", [](hpxpy::ndarray const& a, py::object const& b) {
             return hpxpy::ops::dispatch_compare(a, b, hpxpy::ops::Ge{});
-        });
+        })
+        // Slicing support (Phase 6)
+        .def("__getitem__", [](hpxpy::ndarray const& self, py::slice slice) {
+            return self.getitem_slice(slice);
+        }, py::arg("slice"),
+            "Get a slice view of the array.");
 
     // Array creation functions
     m.def("_zeros", &hpxpy::zeros,

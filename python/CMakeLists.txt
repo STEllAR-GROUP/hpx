@@ -101,6 +101,14 @@ set_target_properties(_core PROPERTIES
   VISIBILITY_INLINES_HIDDEN ON
 )
 
+# Copy built module to hpxpy package directory for development
+add_custom_command(TARGET _core POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    $<TARGET_FILE:_core>
+    ${CMAKE_SOURCE_DIR}/hpxpy/$<TARGET_FILE_NAME:_core>
+  COMMENT "Copying _core module to hpxpy/ for development"
+)
+
 # Compiler warnings and optimizations
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(_core PRIVATE -Wall -Wextra -Wpedantic)
