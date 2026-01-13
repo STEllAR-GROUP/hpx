@@ -54,12 +54,22 @@ make -j$(sysctl -n hw.ncpu)  # macOS
 
 **Important:** Do NOT run `make install`. We'll use HPX directly from the build directory.
 
-### Step 3: Build HPXPy
+### Step 3: Set Up Python Environment
 
-From the repository root, build the Python extension:
+Create a virtual environment with required dependencies. This is required for CMake to find Python development headers and NumPy:
 
 ```bash
 cd ../python
+python3 -m venv .venv
+source .venv/bin/activate
+pip install numpy pybind11
+```
+
+### Step 4: Build HPXPy
+
+Build the Python extension:
+
+```bash
 mkdir build && cd build
 
 # Point to the HPX build directory
@@ -67,12 +77,13 @@ cmake .. \
     -DCMAKE_BUILD_TYPE=Release \
     -DHPX_DIR=../../build/lib/cmake/HPX
 
-make -j$(nproc)
+make -j$(nproc)  # Linux
+make -j$(sysctl -n hw.ncpu)  # macOS
 ```
 
 This creates `_core.cpython-*.so` in the build directory.
 
-### Step 4: Set Up the Environment
+### Step 5: Set Up the Environment
 
 Create a setup script to configure the environment:
 
@@ -84,6 +95,11 @@ cat > setup_env.sh << 'EOF'
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HPX_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+# Activate virtual environment if it exists
+if [[ -f "$HPX_ROOT/python/.venv/bin/activate" ]]; then
+    source "$HPX_ROOT/python/.venv/bin/activate"
+fi
 
 # HPX build directory
 export HPX_BUILD="$HPX_ROOT/build"
@@ -106,7 +122,7 @@ EOF
 chmod +x setup_env.sh
 ```
 
-### Step 5: Use HPXPy
+### Step 6: Use HPXPy
 
 Source the environment and run Python:
 
@@ -119,7 +135,7 @@ python3
 >>> import hpxpy as hpx
 >>> hpx.init()
 >>> arr = hpx.arange(100)
->>> print(hpx.reduce(arr))
+>>> print(hpx.sum(arr))
 4950
 >>> hpx.finalize()
 ```
@@ -135,8 +151,13 @@ mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release -DHPX_WITH_FETCH_ASIO=ON -DHPX_WITH_EXAMPLES=OFF -DHPX_WITH_TESTS=OFF
 make -j8
 
-# Build HPXPy
+# Set up Python environment
 cd ../python
+python3 -m venv .venv
+source .venv/bin/activate
+pip install numpy pybind11
+
+# Build HPXPy
 mkdir build && cd build
 cmake .. -DHPX_DIR=../../build/lib/cmake/HPX
 make -j8
@@ -145,7 +166,7 @@ make -j8
 source setup_env.sh  # (create this script first - see above)
 
 # Test
-python3 -c "import hpxpy as hpx; hpx.init(); print(hpx.reduce(hpx.arange(100))); hpx.finalize()"
+python3 -c "import hpxpy as hpx; hpx.init(); print(hpx.sum(hpx.arange(100))); hpx.finalize()"
 ```
 
 ## Directory Structure After Build

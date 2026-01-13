@@ -28,8 +28,13 @@ mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release -DHPX_WITH_FETCH_ASIO=ON
 make -j8
 
-# Build HPXPy
+# Set up Python environment (required for CMake to find Python/NumPy)
 cd ../python
+python3 -m venv .venv
+source .venv/bin/activate
+pip install numpy pybind11
+
+# Build HPXPy
 mkdir build && cd build
 cmake .. -DHPX_DIR=../../build/lib/cmake/HPX
 make -j8
@@ -70,8 +75,8 @@ zeros = hpx.zeros((10, 10))
 ones = hpx.ones(100)
 
 # Parallel algorithms
-total = hpx.reduce(arr)
-doubled = hpx.transform(arr, lambda x: x * 2)
+total = hpx.sum(arr)
+doubled = arr * 2  # Element-wise operations
 
 # Convert to/from NumPy
 import numpy as np

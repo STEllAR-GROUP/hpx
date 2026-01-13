@@ -28,8 +28,8 @@ zeros = hpx.zeros((10, 10))
 ones = hpx.ones(100)
 
 # Parallel algorithms
-total = hpx.reduce(arr)
-doubled = hpx.transform(arr, lambda x: x * 2)
+total = hpx.sum(arr)
+doubled = arr * 2  # Element-wise operations
 
 # Convert to/from NumPy
 import numpy as np
@@ -72,8 +72,13 @@ mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release -DHPX_WITH_FETCH_ASIO=ON -DHPX_WITH_EXAMPLES=OFF -DHPX_WITH_TESTS=OFF
 make -j8
 
-# Build HPXPy (from hpx/build directory)
+# Set up Python virtual environment (required for CMake to find Python/NumPy)
 cd ../python
+python3 -m venv .venv
+source .venv/bin/activate
+pip install numpy pybind11
+
+# Build HPXPy
 mkdir build && cd build
 cmake .. -DHPX_DIR=../../build/lib/cmake/HPX
 make -j8
@@ -83,6 +88,12 @@ cat > setup_env.sh << 'EOF'
 #!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HPX_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+# Activate virtual environment if it exists
+if [[ -f "$HPX_ROOT/python/.venv/bin/activate" ]]; then
+    source "$HPX_ROOT/python/.venv/bin/activate"
+fi
+
 export HPX_BUILD="$HPX_ROOT/build"
 if [[ "$OSTYPE" == "darwin"* ]]; then
     export DYLD_LIBRARY_PATH="$HPX_BUILD/lib:$DYLD_LIBRARY_PATH"
@@ -96,7 +107,7 @@ chmod +x setup_env.sh
 
 # Test
 source setup_env.sh
-python3 -c "import hpxpy as hpx; hpx.init(); print(hpx.reduce(hpx.arange(100))); hpx.finalize()"
+python3 -c "import hpxpy as hpx; hpx.init(); print(hpx.sum(hpx.arange(100))); hpx.finalize()"
 ```
 
 ### GPU Support (Optional)
