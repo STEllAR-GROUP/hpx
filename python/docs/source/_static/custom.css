@@ -1,0 +1,45 @@
+/* HPXPy Custom Styles */
+
+/* Accent color matching HPX branding */
+:root {
+    --pst-color-primary: #1a73e8;
+}
+
+/* Code block styling */
+.highlight {
+    border-radius: 4px;
+}
+
+/* Feature cards */
+.sd-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.sd-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Tutorial badges */
+.badge-beginner {
+    background-color: #28a745;
+}
+
+.badge-intermediate {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-advanced {
+    background-color: #dc3545;
+}
+
+/* API reference styling */
+.sig-name {
+    font-weight: 600;
+}
+
+/* Notebook cells */
+.nbinput .prompt,
+.nboutput .prompt {
+    min-width: 80px;
+}

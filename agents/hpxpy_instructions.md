@@ -47,6 +47,7 @@ Each implementation phase gets its own branch:
 | 3 | `hpxpy/phase3-distributed` | Multi-locality, collectives, partitioned vectors |
 | 4 | `hpxpy/phase4-numpy-compat` | Full NumPy API compatibility |
 | 5 | `hpxpy/phase5-gpu` | CUDA/SYCL GPU support |
+| 5.5 | `hpxpy/phase5.5-docs` | Sphinx documentation site |
 | 6 | `hpxpy/phase6-advanced` | Optimizations, ecosystem integration |
 
 ### Branch Workflow
@@ -229,6 +230,15 @@ List of test files/functions added in this phase.
 - Async GPU operations with HPX futures
 - Transparent device selection (`device='auto'`, `'gpu'`, `'sycl'`, `'cpu'`)
 - Cross-platform GPU support (NVIDIA, Intel, AMD, Apple Silicon)
+
+### Phase 5.5: Documentation
+- Sphinx documentation with PyData theme
+- API reference auto-generated from docstrings
+- Tutorial notebooks rendered inline
+- User guide with deep-dive content
+- Getting started and installation guides
+- Read the Docs hosting configuration
+- See [docs_spec.md](phases/phase5.5/docs_spec.md) and [docs_instructions.md](phases/phase5.5/docs_instructions.md)
 
 ### Phase 6: Advanced Features
 - Performance optimizations

@@ -1,0 +1,21 @@
+# HPXPy Documentation Dependencies
+
+# Core Sphinx
+sphinx>=7.0
+sphinx-autobuild>=2024.0
+
+# Theme
+sphinx-rtd-theme>=2.0
+
+# Markdown support
+myst-parser>=2.0
+myst-nb>=1.0
+
+# Extensions
+sphinx-copybutton>=0.5
+sphinx-design>=0.5
+numpydoc>=1.6
+
+# For notebook rendering
+nbsphinx>=0.9
+ipykernel>=6.0
