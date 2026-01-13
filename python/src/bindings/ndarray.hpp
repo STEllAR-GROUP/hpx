@@ -101,12 +101,12 @@ public:
     // Get typed data pointer (for algorithm implementations)
     template<typename T>
     T* typed_data() {
-        return reinterpret_cast<T*>(data_.data());
+        return reinterpret_cast<T*>(data());
     }
 
     template<typename T>
     T const* typed_data() const {
-        return reinterpret_cast<T const*>(data_.data());
+        return reinterpret_cast<T const*>(data());
     }
 
 private:
