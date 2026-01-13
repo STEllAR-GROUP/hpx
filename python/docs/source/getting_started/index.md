@@ -128,3 +128,10 @@ auto_arr = hpx.zeros(1000, device='auto') # Best available
 
 - **[HPX Documentation](https://hpx-docs.stellar-group.org/)** - Full HPX C++ documentation
 - **[HPX Tutorials](https://hpx-docs.stellar-group.org/latest/html/manual/getting_started.html)** - HPX getting started guide
+
+```{toctree}
+:maxdepth: 1
+:hidden:
+
+building
+```
