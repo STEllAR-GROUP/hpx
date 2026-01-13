@@ -14,16 +14,197 @@
 #include <hpx/async_cuda/target.hpp>
 #include <hpx/async_cuda/get_targets.hpp>
 #include <hpx/async_cuda/cuda_exception.hpp>
+#include <hpx/async_cuda/cuda_polling_helper.hpp>
+#include <hpx/future.hpp>
 
 #include <cuda_runtime.h>
 
 #include <vector>
 #include <string>
 #include <memory>
+#include <mutex>
+#include <unordered_map>
 
 namespace py = pybind11;
 
 namespace hpxpy {
+
+// --------------------------------------------------------------------------
+// GPU Polling Manager - Required for HPX CUDA futures to resolve
+// --------------------------------------------------------------------------
+// The polling manager registers a polling handler with HPX's thread pool.
+// This is necessary for CUDA events/callbacks to be detected and futures
+// to be resolved. Without polling enabled, async GPU operations will hang.
+
+class GPUPollingManager {
+public:
+    static GPUPollingManager& instance() {
+        static GPUPollingManager inst;
+        return inst;
+    }
+
+    void enable(std::string const& pool_name = "") {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (!polling_) {
+            if (pool_name.empty()) {
+                polling_ = std::make_unique<
+                    hpx::cuda::experimental::enable_user_polling>();
+            } else {
+                polling_ = std::make_unique<
+                    hpx::cuda::experimental::enable_user_polling>(pool_name);
+            }
+        }
+    }
+
+    void disable() {
+        std::lock_guard<std::mutex> lock(mutex_);
+        polling_.reset();
+    }
+
+    bool is_enabled() const {
+        std::lock_guard<std::mutex> lock(mutex_);
+        return polling_ != nullptr;
+    }
+
+private:
+    GPUPollingManager() = default;
+    GPUPollingManager(const GPUPollingManager&) = delete;
+    GPUPollingManager& operator=(const GPUPollingManager&) = delete;
+
+    std::unique_ptr<hpx::cuda::experimental::enable_user_polling> polling_;
+    mutable std::mutex mutex_;
+};
+
+// --------------------------------------------------------------------------
+// GPU Executor Manager - Per-device CUDA executors for async operations
+// --------------------------------------------------------------------------
+
+class GPUExecutorManager {
+public:
+    static GPUExecutorManager& instance() {
+        static GPUExecutorManager inst;
+        return inst;
+    }
+
+    hpx::cuda::experimental::cuda_executor& get_executor(int device_id) {
+        std::lock_guard<std::mutex> lock(mutex_);
+
+        auto it = executors_.find(device_id);
+        if (it == executors_.end()) {
+            // Create new executor for this device (event mode = true for polling)
+            auto [iter, inserted] = executors_.emplace(
+                device_id,
+                hpx::cuda::experimental::cuda_executor(device_id, true));
+            return iter->second;
+        }
+        return it->second;
+    }
+
+    void reset() {
+        std::lock_guard<std::mutex> lock(mutex_);
+        executors_.clear();
+    }
+
+private:
+    GPUExecutorManager() = default;
+    GPUExecutorManager(const GPUExecutorManager&) = delete;
+    GPUExecutorManager& operator=(const GPUExecutorManager&) = delete;
+
+    std::unordered_map<int, hpx::cuda::experimental::cuda_executor> executors_;
+    std::mutex mutex_;
+};
+
+// --------------------------------------------------------------------------
+// PyFuture - Wrapper to expose hpx::future<T> to Python
+// --------------------------------------------------------------------------
+// This class wraps an HPX future and exposes it to Python with proper
+// GIL handling. When waiting for completion, the GIL is released to allow
+// other Python threads to run.
+
+template<typename T>
+class PyFuture {
+public:
+    explicit PyFuture(hpx::future<T> fut)
+        : future_(std::move(fut))
+    {}
+
+    PyFuture(PyFuture&& other) noexcept
+        : future_(std::move(other.future_))
+    {}
+
+    PyFuture& operator=(PyFuture&& other) noexcept {
+        future_ = std::move(other.future_);
+        return *this;
+    }
+
+    // Non-copyable
+    PyFuture(const PyFuture&) = delete;
+    PyFuture& operator=(const PyFuture&) = delete;
+
+    T get() {
+        // Release GIL while waiting for GPU operation
+        py::gil_scoped_release release;
+        return future_.get();
+    }
+
+    void wait() {
+        py::gil_scoped_release release;
+        future_.wait();
+    }
+
+    bool is_ready() const {
+        return future_.is_ready();
+    }
+
+    bool valid() const {
+        return future_.valid();
+    }
+
+private:
+    hpx::future<T> future_;
+};
+
+// Specialization for void futures
+template<>
+class PyFuture<void> {
+public:
+    explicit PyFuture(hpx::future<void> fut)
+        : future_(std::move(fut))
+    {}
+
+    PyFuture(PyFuture&& other) noexcept
+        : future_(std::move(other.future_))
+    {}
+
+    PyFuture& operator=(PyFuture&& other) noexcept {
+        future_ = std::move(other.future_);
+        return *this;
+    }
+
+    PyFuture(const PyFuture&) = delete;
+    PyFuture& operator=(const PyFuture&) = delete;
+
+    void get() {
+        py::gil_scoped_release release;
+        future_.get();
+    }
+
+    void wait() {
+        py::gil_scoped_release release;
+        future_.wait();
+    }
+
+    bool is_ready() const {
+        return future_.is_ready();
+    }
+
+    bool valid() const {
+        return future_.valid();
+    }
+
+private:
+    hpx::future<void> future_;
+};
 
 // GPU device information struct
 struct GPUDevice {
@@ -213,6 +394,47 @@ public:
         return result;
     }
 
+    // --------------------------------------------------------------------------
+    // Async operations using HPX CUDA executor
+    // --------------------------------------------------------------------------
+    // These methods use HPX's CUDA integration for async operations.
+    // They return PyFuture objects that can be waited on.
+    // NOTE: enable_async() must be called before using these methods!
+
+    PyFuture<void> async_from_numpy(py::array_t<T> arr) {
+        if (static_cast<std::size_t>(arr.size()) != size_) {
+            throw std::runtime_error("Array size mismatch");
+        }
+
+        if (!GPUPollingManager::instance().is_enabled()) {
+            throw std::runtime_error(
+                "Async operations require polling to be enabled. "
+                "Call hpx.gpu.enable_async() first.");
+        }
+
+        auto& exec = GPUExecutorManager::instance().get_executor(device_id_);
+
+        // Need to keep numpy array alive until copy completes
+        // Make a shared copy of the data pointer
+        T* dst = data_;
+        const T* src = arr.data();
+        std::size_t bytes = size_ * sizeof(T);
+        cudaStream_t stream = exec.get_stream();
+
+        // Launch async copy using HPX executor
+        hpx::future<void> fut = hpx::async(exec, [dst, src, bytes, stream]() {
+            cudaError_t err = cudaMemcpyAsync(dst, src, bytes,
+                                               cudaMemcpyHostToDevice, stream);
+            if (err != cudaSuccess) {
+                throw std::runtime_error(
+                    std::string("Async copy H2D failed: ") +
+                    cudaGetErrorString(err));
+            }
+        });
+
+        return PyFuture<void>(std::move(fut));
+    }
+
     // Accessors
     std::vector<py::ssize_t> const& shape() const { return shape_; }
     py::ssize_t size() const { return size_; }
@@ -314,6 +536,31 @@ void bind_gpu_array_type(py::module_& m, const char* name) {
         .def("from_numpy", &GA::from_numpy, py::arg("arr"), "Copy data from numpy array")
         .def("to_numpy", &GA::to_numpy, "Copy data to numpy array")
 
+        // Async operations - require enable_async() to be called first
+        .def("async_from_numpy", &GA::async_from_numpy, py::arg("arr"),
+             R"doc(Async copy data from numpy array.
+
+Returns a Future that completes when the copy is done.
+Requires hpx.gpu.enable_async() to be called first.
+
+Parameters
+----------
+arr : numpy.ndarray
+    Source numpy array.
+
+Returns
+-------
+Future
+    Future that completes when the copy is done.
+
+Example
+-------
+>>> hpx.gpu.enable_async()
+>>> future = gpu_arr.async_from_numpy(np_data)
+>>> # Do other work while copy is in progress
+>>> future.get()  # Wait for completion
+)doc")
+
         .def("__repr__", [name](GA const& arr) {
             std::ostringstream oss;
             oss << name << "(shape=[";
@@ -334,6 +581,39 @@ void bind_gpu(py::module_& m) {
 
     // Create GPU submodule
     auto gpu = m.def_submodule("gpu", "GPU/CUDA support for HPXPy");
+
+    // --------------------------------------------------------------------------
+    // Future types - wrap HPX futures for Python
+    // --------------------------------------------------------------------------
+
+    py::class_<PyFuture<void>>(gpu, "Future",
+        R"doc(Future for async GPU operations.
+
+A Future represents the result of an async GPU operation. Use get() or wait()
+to block until the operation completes. Use is_ready() to check completion
+without blocking.
+
+Note: You must call hpx.gpu.enable_async() before using async operations.
+)doc")
+        .def("get", &PyFuture<void>::get,
+             "Wait for completion and get the result (releases Python GIL)")
+        .def("wait", &PyFuture<void>::wait,
+             "Wait for completion (releases Python GIL)")
+        .def("is_ready", &PyFuture<void>::is_ready,
+             "Check if the operation has completed (non-blocking)")
+        .def("valid", &PyFuture<void>::valid,
+             "Check if this future is associated with a shared state");
+
+    py::class_<PyFuture<double>>(gpu, "FutureFloat64",
+        "Future for async GPU operations returning a float64")
+        .def("get", &PyFuture<double>::get,
+             "Wait for completion and get the result (releases Python GIL)")
+        .def("wait", &PyFuture<double>::wait,
+             "Wait for completion (releases Python GIL)")
+        .def("is_ready", &PyFuture<double>::is_ready,
+             "Check if the operation has completed (non-blocking)")
+        .def("valid", &PyFuture<double>::valid,
+             "Check if this future is associated with a shared state");
 
     // GPU device info class
     py::class_<GPUDevice>(gpu, "Device", "GPU device information")
@@ -442,6 +722,48 @@ void bind_gpu(py::module_& m) {
     gpu.def("is_available", []() {
         return get_device_count() > 0;
     }, "Check if CUDA is available");
+
+    // --------------------------------------------------------------------------
+    // Async operations support (HPX CUDA integration)
+    // --------------------------------------------------------------------------
+
+    gpu.def("enable_async", [](std::string const& pool_name) {
+        GPUPollingManager::instance().enable(pool_name);
+    }, py::arg("pool_name") = "",
+       R"doc(Enable async GPU operations.
+
+This enables HPX's CUDA polling mechanism which is required for
+async GPU operations to complete. Without this, async operations
+will hang waiting for completion signals.
+
+Parameters
+----------
+pool_name : str, optional
+    HPX thread pool to use for polling. Default is the first pool.
+
+Example
+-------
+>>> hpx.gpu.enable_async()
+>>> future = arr.async_from_numpy(data)
+>>> future.get()  # Will complete correctly
+>>> hpx.gpu.disable_async()
+)doc");
+
+    gpu.def("disable_async", []() {
+        GPUPollingManager::instance().disable();
+    }, "Disable async GPU operations (stops polling)");
+
+    gpu.def("is_async_enabled", []() {
+        return GPUPollingManager::instance().is_enabled();
+    }, "Check if async GPU operations are enabled");
+
+    // Get HPX CUDA executor for a device (for advanced users)
+    gpu.def("_get_executor_stream", [](int device_id) {
+        auto& exec = GPUExecutorManager::instance().get_executor(device_id);
+        // Return the stream as an integer (pointer value)
+        return reinterpret_cast<std::uintptr_t>(exec.get_stream());
+    }, py::arg("device") = 0,
+       "Get the CUDA stream handle for a device (internal use)");
 }
 
 #else  // No CUDA support
@@ -462,6 +784,20 @@ void bind_gpu(py::module_& m) {
     gpu.def("get_devices", []() {
         return py::list();
     }, "Get list of all available CUDA devices");
+
+    // Async operation stubs
+    gpu.def("enable_async", [](std::string const&) {
+        // No-op when CUDA not available
+    }, py::arg("pool_name") = "",
+       "Enable async GPU operations (no-op without CUDA)");
+
+    gpu.def("disable_async", []() {
+        // No-op when CUDA not available
+    }, "Disable async GPU operations (no-op without CUDA)");
+
+    gpu.def("is_async_enabled", []() {
+        return false;
+    }, "Check if async GPU operations are enabled");
 }
 
 #endif  // HPXPY_HAVE_CUDA

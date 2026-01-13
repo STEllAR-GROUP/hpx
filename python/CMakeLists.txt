@@ -74,6 +74,7 @@ pybind11_add_module(_core MODULE
   src/bindings/collective_bindings.cpp
   src/bindings/distributed_array_bindings.cpp
   src/bindings/gpu_bindings.cpp
+  src/bindings/sycl_bindings.cpp
 )
 
 target_include_directories(_core PRIVATE
@@ -120,25 +121,38 @@ endif()
 # GPU Support (Optional)
 # ------------------------------------------------------------------------------
 if(HPXPY_WITH_CUDA)
+  # Require HPX built with CUDA support for async_cuda module
+  # This provides: hpx::cuda::experimental::cuda_executor, target, etc.
   find_package(HPX REQUIRED COMPONENTS cuda)
   find_package(CUDAToolkit REQUIRED)
 
   target_compile_definitions(_core PRIVATE HPXPY_HAVE_CUDA)
+
+  # Link CUDA runtime for memory allocation and device management
+  # HPX async_cuda is already part of HPX::hpx when HPX_WITH_CUDA is enabled
   target_link_libraries(_core PRIVATE CUDA::cudart)
 
-  message(STATUS "CUDA support enabled")
+  # Add cuBLAS for GPU BLAS operations (optional but recommended)
+  if(TARGET CUDA::cublas)
+    target_link_libraries(_core PRIVATE CUDA::cublas)
+    target_compile_definitions(_core PRIVATE HPXPY_HAVE_CUBLAS)
+    message(STATUS "CUDA cuBLAS support enabled")
+  endif()
+
+  message(STATUS "CUDA support enabled (HPX async_cuda integration)")
 endif()
 
 if(HPXPY_WITH_SYCL)
+  # Require HPX built with SYCL support for async_sycl module
+  # This provides: hpx::sycl::experimental::sycl_executor, etc.
   find_package(HPX REQUIRED COMPONENTS sycl)
-
-  target_sources(_core PRIVATE
-    src/bindings/sycl_bindings.cpp
-  )
 
   target_compile_definitions(_core PRIVATE HPXPY_HAVE_SYCL)
 
-  message(STATUS "SYCL support enabled")
+  # Note: sycl_bindings.cpp is always compiled (provides stubs when SYCL unavailable)
+  # SYCL compile flags should be set by HPX SYCL component
+
+  message(STATUS "SYCL support enabled (HPX async_sycl integration)")
 endif()
 
 # ------------------------------------------------------------------------------

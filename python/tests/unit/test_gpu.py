@@ -181,3 +181,99 @@ class TestGPUStubsWhenUnavailable:
         """get_devices should return empty list if no CUDA."""
         if not hpx_runtime.gpu.is_available():
             assert hpx_runtime.gpu.get_devices() == []
+
+
+class TestGPUAsyncOperations:
+    """Test GPU async operation infrastructure."""
+
+    def test_enable_async_no_error(self, hpx_runtime):
+        """enable_async should not raise even without CUDA."""
+        # Should work (no-op without CUDA)
+        hpx_runtime.gpu.enable_async()
+        hpx_runtime.gpu.disable_async()
+
+    def test_disable_async_no_error(self, hpx_runtime):
+        """disable_async should not raise even without CUDA."""
+        hpx_runtime.gpu.disable_async()
+
+    def test_is_async_enabled_returns_bool(self, hpx_runtime):
+        """is_async_enabled should return a boolean."""
+        result = hpx_runtime.gpu.is_async_enabled()
+        assert isinstance(result, bool)
+
+    def test_is_async_enabled_without_cuda(self, hpx_runtime):
+        """is_async_enabled should return False without CUDA."""
+        if not hpx_runtime.gpu.is_available():
+            hpx_runtime.gpu.enable_async()
+            # Without CUDA, should be False even after enable
+            assert hpx_runtime.gpu.is_async_enabled() == False
+
+    def test_async_context_manager(self, hpx_runtime):
+        """AsyncContext should enable/disable async operations."""
+        with hpx_runtime.gpu.AsyncContext():
+            # Inside context
+            pass
+        # After context, async should be disabled
+
+
+@pytest.mark.skipif(
+    not pytest.importorskip("hpxpy").gpu.is_available(),
+    reason="CUDA not available"
+)
+class TestGPUAsyncArrayOperations:
+    """Test GPU async array operations (requires CUDA)."""
+
+    def test_async_enabled_state(self, hpx_runtime):
+        """enable_async should change the enabled state."""
+        hpx_runtime.gpu.enable_async()
+        assert hpx_runtime.gpu.is_async_enabled() == True
+        hpx_runtime.gpu.disable_async()
+        assert hpx_runtime.gpu.is_async_enabled() == False
+
+    def test_async_from_numpy_requires_polling(self, hpx_runtime):
+        """async_from_numpy should require enable_async first."""
+        arr = hpx_runtime.gpu.zeros([100])
+        np_data = np.ones(100)
+
+        # Ensure async is disabled
+        hpx_runtime.gpu.disable_async()
+
+        # Should raise because polling is not enabled
+        with pytest.raises(RuntimeError, match="enable_async"):
+            arr.async_from_numpy(np_data)
+
+    def test_async_from_numpy_basic(self, hpx_runtime):
+        """async_from_numpy should copy data asynchronously."""
+        hpx_runtime.gpu.enable_async()
+        try:
+            arr = hpx_runtime.gpu.zeros([1000])
+            np_data = np.arange(1000, dtype=np.float64)
+
+            # Start async copy
+            future = arr.async_from_numpy(np_data)
+
+            # Future should have standard methods
+            assert hasattr(future, 'get')
+            assert hasattr(future, 'wait')
+            assert hasattr(future, 'is_ready')
+
+            # Wait for completion
+            future.get()
+
+            # Verify data was copied
+            result = arr.to_numpy()
+            np.testing.assert_array_equal(result, np_data)
+        finally:
+            hpx_runtime.gpu.disable_async()
+
+    def test_async_context_with_operations(self, hpx_runtime):
+        """AsyncContext should enable async operations."""
+        arr = hpx_runtime.gpu.zeros([100])
+        np_data = np.ones(100)
+
+        with hpx_runtime.gpu.AsyncContext():
+            future = arr.async_from_numpy(np_data)
+            future.get()
+
+        # Verify data
+        np.testing.assert_array_equal(arr.to_numpy(), np_data)

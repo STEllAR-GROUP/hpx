@@ -267,6 +267,90 @@ def sum(arr):
     return _gpu.sum(arr)
 
 
+# --------------------------------------------------------------------------
+# Async GPU Operations (HPX CUDA Integration)
+# --------------------------------------------------------------------------
+
+def enable_async(pool_name: str = "") -> None:
+    """Enable async GPU operations.
+
+    This enables HPX's CUDA polling mechanism which is required for
+    async GPU operations to complete. Without this, async operations
+    will hang waiting for completion signals.
+
+    Parameters
+    ----------
+    pool_name : str, optional
+        HPX thread pool to use for polling. Default uses the first pool.
+
+    Example
+    -------
+    >>> import hpxpy as hpx
+    >>> hpx.init()
+    >>> hpx.gpu.enable_async()
+    >>> # Now async GPU operations will work
+    >>> arr = hpx.gpu.zeros([1000000])
+    >>> future = arr.async_from_numpy(data)  # Returns immediately
+    >>> future.get()  # Blocks until complete
+    >>> hpx.gpu.disable_async()
+    """
+    if not _GPU_AVAILABLE:
+        return  # No-op without CUDA
+    _gpu.enable_async(pool_name)
+
+
+def disable_async() -> None:
+    """Disable async GPU operations.
+
+    This stops HPX's CUDA polling mechanism. Call this when you're done
+    with async GPU operations to free up resources.
+    """
+    if not _GPU_AVAILABLE:
+        return  # No-op without CUDA
+    _gpu.disable_async()
+
+
+def is_async_enabled() -> bool:
+    """Check if async GPU operations are enabled.
+
+    Returns
+    -------
+    bool
+        True if async GPU operations are enabled.
+    """
+    if not _GPU_AVAILABLE:
+        return False
+    return _gpu.is_async_enabled()
+
+
+class AsyncContext:
+    """Context manager for async GPU operations.
+
+    Enables async GPU operations within a context and automatically
+    disables them when exiting.
+
+    Example
+    -------
+    >>> with hpx.gpu.AsyncContext():
+    ...     future1 = arr1.async_from_numpy(data1)
+    ...     future2 = arr2.async_from_numpy(data2)
+    ...     future1.get()
+    ...     future2.get()
+    >>> # Async automatically disabled here
+    """
+
+    def __init__(self, pool_name: str = ""):
+        self.pool_name = pool_name
+
+    def __enter__(self):
+        enable_async(self.pool_name)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        disable_async()
+        return False
+
+
 # Export GPU array types if available
 if _GPU_AVAILABLE and hasattr(_gpu, 'ArrayF64'):
     ArrayF64 = _gpu.ArrayF64
@@ -289,4 +373,9 @@ __all__ = [
     "full",
     "from_numpy",
     "sum",
+    # Async operations (HPX CUDA integration)
+    "enable_async",
+    "disable_async",
+    "is_async_enabled",
+    "AsyncContext",
 ]

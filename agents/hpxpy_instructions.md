@@ -223,17 +223,19 @@ List of test files/functions added in this phase.
 - Type promotion rules
 
 ### Phase 5: GPU Support
-- CUDA executor bindings
+- CUDA executor bindings via `hpx::cuda::experimental::cuda_executor`
+- SYCL executor bindings via `hpx::sycl::experimental::sycl_executor`
 - GPU array creation and transfers
-- GPU-accelerated algorithms
-- Multi-GPU support
-- Hybrid CPU+GPU execution
+- Async GPU operations with HPX futures
+- Transparent device selection (`device='auto'`, `'gpu'`, `'sycl'`, `'cpu'`)
+- Cross-platform GPU support (NVIDIA, Intel, AMD, Apple Silicon)
 
 ### Phase 6: Advanced Features
 - Performance optimizations
-- SYCL backend
+- GPU-native reductions (thrust, SYCL parallel STL)
 - Linear algebra (cuBLAS integration)
 - Ecosystem interoperability (Dask, CuPy)
+- Multi-GPU distribution
 
 ## Development Guidelines
 

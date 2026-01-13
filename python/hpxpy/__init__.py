@@ -53,6 +53,7 @@ __all__ = [
     "zeros",
     "ones",
     "empty",
+    "full",
     "arange",
     "linspace",
     "from_numpy",
@@ -124,6 +125,8 @@ __all__ = [
     "launcher",
     # GPU support (Phase 5)
     "gpu",
+    # SYCL support (Phase 5) - HPX-native backend for Intel/AMD/Apple GPUs
+    "sycl",
 ]
 
 # Import the compiled extension module
@@ -304,11 +307,88 @@ def finalize() -> None:
 
 
 # -----------------------------------------------------------------------------
+# Device Selection
+# -----------------------------------------------------------------------------
+
+
+def _resolve_device(device) -> tuple:
+    """Resolve device specification to (backend, device_id).
+
+    Parameters
+    ----------
+    device : str or int or None
+        Device specification:
+        - None or 'cpu': Use CPU backend
+        - 'gpu' or 'cuda': Use CUDA GPU if available, else raise error
+        - 'sycl': Use SYCL GPU if available, else raise error
+        - 'auto': Use best available (CUDA > SYCL > CPU)
+        - int: Use specific GPU device ID (CUDA preferred, then SYCL)
+
+    Returns
+    -------
+    tuple
+        (backend, device_id) where backend is 'cpu', 'gpu', or 'sycl'
+    """
+    # Lazy imports to avoid circular dependency
+    from hpxpy import gpu as _gpu_mod
+    from hpxpy import sycl as _sycl_mod
+
+    if device is None or device == 'cpu':
+        return ('cpu', None)
+
+    if device == 'auto':
+        # Auto-select: prefer CUDA > SYCL > CPU
+        # Both use HPX executors for proper integration
+        if _gpu_mod.is_available():
+            return ('gpu', 0)
+        if _sycl_mod.is_available():
+            return ('sycl', 0)
+        return ('cpu', None)
+
+    if device == 'gpu' or device == 'cuda':
+        # Explicit CUDA GPU request
+        if not _gpu_mod.is_available():
+            raise RuntimeError(
+                "CUDA GPU requested but CUDA is not available. "
+                "Use device='auto' for automatic fallback, device='sycl' for SYCL GPUs, "
+                "or device='cpu' for CPU."
+            )
+        return ('gpu', 0)
+
+    if device == 'sycl':
+        # Explicit SYCL GPU request (works on Intel, AMD, Apple Silicon via AdaptiveCpp)
+        if not _sycl_mod.is_available():
+            raise RuntimeError(
+                "SYCL requested but not available. "
+                "SYCL requires HPX built with HPX_WITH_SYCL=ON and a SYCL compiler. "
+                "Use device='auto' for automatic fallback or device='cpu' for CPU."
+            )
+        return ('sycl', 0)
+
+    if isinstance(device, int):
+        # Specific GPU device ID - try CUDA first, then SYCL
+        if _gpu_mod.is_available():
+            if device >= _gpu_mod.device_count():
+                raise ValueError(f"Invalid CUDA device ID {device}. Available: 0-{_gpu_mod.device_count()-1}")
+            return ('gpu', device)
+        if _sycl_mod.is_available():
+            if device >= _sycl_mod.device_count():
+                raise ValueError(f"Invalid SYCL device ID {device}. Available: 0-{_sycl_mod.device_count()-1}")
+            return ('sycl', device)
+        raise RuntimeError(f"GPU device {device} requested but no GPU backend is available.")
+
+    raise ValueError(
+        f"Invalid device specification: {device!r}. "
+        "Use 'cpu', 'gpu', 'cuda', 'sycl', 'auto', or an integer GPU device ID."
+    )
+
+
+# -----------------------------------------------------------------------------
 # Array Creation Functions
 # -----------------------------------------------------------------------------
 
 
-def array(data, dtype=None, copy: bool = True) -> ndarray:
+def array(data, dtype=None, copy: bool = True, device=None):
     """Create an HPXPy array from existing data.
 
     Parameters
@@ -320,26 +400,41 @@ def array(data, dtype=None, copy: bool = True) -> ndarray:
     copy : bool, default True
         If True, always copy the data. If False, try to share memory
         when possible (only works with contiguous NumPy arrays).
+    device : str or int, optional
+        Device to create array on:
+        - None or 'cpu': CPU (default)
+        - 'gpu': GPU (error if unavailable)
+        - 'auto': GPU if available, else CPU
+        - int: Specific GPU device ID
 
     Returns
     -------
-    ndarray
-        A new HPXPy array.
+    ndarray or GPUArray
+        A new HPXPy array on the specified device.
 
     Examples
     --------
     >>> import hpxpy as hpx
     >>> a = hpx.array([1, 2, 3, 4, 5])
     >>> a = hpx.array(numpy_array, copy=False)  # Zero-copy if possible
+    >>> a = hpx.array([1, 2, 3], device='auto')  # GPU if available
     """
     _check_available()
     import numpy as np
 
     np_array = np.asarray(data, dtype=dtype)
+    backend, device_id = _resolve_device(device)
+
+    if backend == 'gpu':
+        from hpxpy import gpu as _gpu_mod
+        return _gpu_mod.from_numpy(np_array, device=device_id)
+    if backend == 'sycl':
+        from hpxpy import sycl as _sycl_mod
+        return _sycl_mod.from_numpy(np_array, device=device_id)
     return _array_from_numpy(np_array, copy=copy)
 
 
-def from_numpy(arr, copy: bool = False) -> ndarray:
+def from_numpy(arr, copy: bool = False, device=None):
     """Create an HPXPy array from a NumPy array.
 
     Parameters
@@ -348,24 +443,37 @@ def from_numpy(arr, copy: bool = False) -> ndarray:
         Input NumPy array.
     copy : bool, default False
         If False, try to share memory with the input array (zero-copy).
-        If True, always make a copy.
+        If True, always make a copy. Only applies to CPU arrays.
+    device : str or int, optional
+        Device to create array on:
+        - None or 'cpu': CPU (default)
+        - 'gpu': GPU (error if unavailable)
+        - 'auto': GPU if available, else CPU
+        - int: Specific GPU device ID
 
     Returns
     -------
-    ndarray
-        A new HPXPy array.
+    ndarray or GPUArray
+        A new HPXPy array on the specified device.
 
     Notes
     -----
-    Zero-copy is only possible when the input array is C-contiguous.
-    If zero-copy is used, modifying the original NumPy array will
-    also modify the HPXPy array.
+    Zero-copy is only possible for CPU arrays when the input is C-contiguous.
+    GPU arrays always copy data.
     """
     _check_available()
+    backend, device_id = _resolve_device(device)
+
+    if backend == 'gpu':
+        from hpxpy import gpu as _gpu_mod
+        return _gpu_mod.from_numpy(arr, device=device_id)
+    if backend == 'sycl':
+        from hpxpy import sycl as _sycl_mod
+        return _sycl_mod.from_numpy(arr, device=device_id)
     return _array_from_numpy(arr, copy=copy)
 
 
-def zeros(shape, dtype=None) -> ndarray:
+def zeros(shape, dtype=None, device=None):
     """Create an array filled with zeros.
 
     Parameters
@@ -374,29 +482,45 @@ def zeros(shape, dtype=None) -> ndarray:
         Shape of the new array.
     dtype : numpy.dtype, optional
         Data type. Default is float64.
+    device : str or int, optional
+        Device to create array on:
+        - None or 'cpu': CPU (default)
+        - 'gpu': GPU (error if unavailable)
+        - 'auto': GPU if available, else CPU
+        - int: Specific GPU device ID
 
     Returns
     -------
-    ndarray
+    ndarray or GPUArray
         Array of zeros with the given shape and dtype.
 
     Examples
     --------
     >>> a = hpx.zeros((10, 10))
     >>> b = hpx.zeros(1000, dtype=np.int32)
+    >>> c = hpx.zeros(1000000, device='auto')  # GPU if available
     """
     _check_available()
     import numpy as np
 
     if dtype is None:
         dtype = np.float64
-    dtype = np.dtype(dtype)  # Ensure it's a dtype instance
+    dtype = np.dtype(dtype)
     if isinstance(shape, int):
         shape = (shape,)
+
+    backend, device_id = _resolve_device(device)
+
+    if backend == 'gpu':
+        from hpxpy import gpu as _gpu_mod
+        return _gpu_mod.zeros(list(shape), device=device_id)
+    if backend == 'sycl':
+        from hpxpy import sycl as _sycl_mod
+        return _sycl_mod.zeros(list(shape), device=device_id)
     return _zeros(shape, dtype)
 
 
-def ones(shape, dtype=None) -> ndarray:
+def ones(shape, dtype=None, device=None):
     """Create an array filled with ones.
 
     Parameters
@@ -405,10 +529,16 @@ def ones(shape, dtype=None) -> ndarray:
         Shape of the new array.
     dtype : numpy.dtype, optional
         Data type. Default is float64.
+    device : str or int, optional
+        Device to create array on:
+        - None or 'cpu': CPU (default)
+        - 'gpu': GPU (error if unavailable)
+        - 'auto': GPU if available, else CPU
+        - int: Specific GPU device ID
 
     Returns
     -------
-    ndarray
+    ndarray or GPUArray
         Array of ones with the given shape and dtype.
     """
     _check_available()
@@ -416,13 +546,22 @@ def ones(shape, dtype=None) -> ndarray:
 
     if dtype is None:
         dtype = np.float64
-    dtype = np.dtype(dtype)  # Ensure it's a dtype instance
+    dtype = np.dtype(dtype)
     if isinstance(shape, int):
         shape = (shape,)
+
+    backend, device_id = _resolve_device(device)
+
+    if backend == 'gpu':
+        from hpxpy import gpu as _gpu_mod
+        return _gpu_mod.ones(list(shape), device=device_id)
+    if backend == 'sycl':
+        from hpxpy import sycl as _sycl_mod
+        return _sycl_mod.ones(list(shape), device=device_id)
     return _ones(shape, dtype)
 
 
-def empty(shape, dtype=None) -> ndarray:
+def empty(shape, dtype=None, device=None):
     """Create an uninitialized array.
 
     Parameters
@@ -431,29 +570,47 @@ def empty(shape, dtype=None) -> ndarray:
         Shape of the new array.
     dtype : numpy.dtype, optional
         Data type. Default is float64.
+    device : str or int, optional
+        Device to create array on:
+        - None or 'cpu': CPU (default)
+        - 'gpu': GPU (error if unavailable)
+        - 'auto': GPU if available, else CPU
+        - int: Specific GPU device ID
 
     Returns
     -------
-    ndarray
+    ndarray or GPUArray
         Uninitialized array with the given shape and dtype.
 
     Notes
     -----
     The values in the array are not initialized and may contain
     arbitrary data. Use ``zeros`` or ``ones`` if you need initialized values.
+    Note: GPU 'empty' currently returns zero-filled array.
     """
     _check_available()
     import numpy as np
 
     if dtype is None:
         dtype = np.float64
-    dtype = np.dtype(dtype)  # Ensure it's a dtype instance
+    dtype = np.dtype(dtype)
     if isinstance(shape, int):
         shape = (shape,)
+
+    backend, device_id = _resolve_device(device)
+
+    if backend == 'gpu':
+        # GPU arrays don't have true 'empty' - use zeros for safety
+        from hpxpy import gpu as _gpu_mod
+        return _gpu_mod.zeros(list(shape), device=device_id)
+    if backend == 'sycl':
+        # SYCL arrays don't have true 'empty' - use zeros for safety
+        from hpxpy import sycl as _sycl_mod
+        return _sycl_mod.zeros(list(shape), device=device_id)
     return _empty(shape, dtype)
 
 
-def arange(start, stop=None, step=1, dtype=None) -> ndarray:
+def arange(start, stop=None, step=1, dtype=None, device=None):
     """Create an array with evenly spaced values.
 
     Parameters
@@ -466,10 +623,16 @@ def arange(start, stop=None, step=1, dtype=None) -> ndarray:
         Spacing between values.
     dtype : numpy.dtype, optional
         Data type. Inferred from arguments if not specified.
+    device : str or int, optional
+        Device to create array on:
+        - None or 'cpu': CPU (default)
+        - 'gpu': GPU (error if unavailable)
+        - 'auto': GPU if available, else CPU
+        - int: Specific GPU device ID
 
     Returns
     -------
-    ndarray
+    ndarray or GPUArray
         Array of evenly spaced values.
 
     Examples
@@ -477,15 +640,31 @@ def arange(start, stop=None, step=1, dtype=None) -> ndarray:
     >>> hpx.arange(5)           # [0, 1, 2, 3, 4]
     >>> hpx.arange(1, 5)        # [1, 2, 3, 4]
     >>> hpx.arange(0, 10, 2)    # [0, 2, 4, 6, 8]
+    >>> hpx.arange(1000000, device='auto')  # GPU if available
     """
     _check_available()
+    import numpy as np
+
     if stop is None:
         stop = start
         start = 0
+
+    backend, device_id = _resolve_device(device)
+
+    if backend == 'gpu':
+        # Create on CPU first, then transfer
+        from hpxpy import gpu as _gpu_mod
+        np_arr = np.arange(start, stop, step, dtype=dtype)
+        return _gpu_mod.from_numpy(np_arr, device=device_id)
+    if backend == 'sycl':
+        # Create on CPU first, then transfer
+        from hpxpy import sycl as _sycl_mod
+        np_arr = np.arange(start, stop, step, dtype=dtype)
+        return _sycl_mod.from_numpy(np_arr, device=device_id)
     return _arange(start, stop, step, dtype)
 
 
-def linspace(start, stop, num: int = 50, dtype=None) -> ndarray:
+def linspace(start, stop, num: int = 50, dtype=None, device=None):
     """Create an array with evenly spaced values over an interval.
 
     Parameters
@@ -498,17 +677,73 @@ def linspace(start, stop, num: int = 50, dtype=None) -> ndarray:
         Number of values to generate.
     dtype : numpy.dtype, optional
         Data type. Default is float64.
+    device : str or int, optional
+        Device to create array on:
+        - None or 'cpu': CPU (default)
+        - 'gpu': GPU (error if unavailable)
+        - 'auto': GPU if available, else CPU
+        - int: Specific GPU device ID
 
     Returns
     -------
-    ndarray
+    ndarray or GPUArray
         Array of evenly spaced values.
     """
     _check_available()
     import numpy as np
 
-    # For Phase 1, delegate to NumPy and convert
     np_arr = np.linspace(start, stop, num, dtype=dtype)
+    return from_numpy(np_arr, copy=True, device=device)
+
+
+def full(shape, fill_value, dtype=None, device=None):
+    """Create an array filled with a specified value.
+
+    Parameters
+    ----------
+    shape : int or tuple of ints
+        Shape of the new array.
+    fill_value : scalar
+        Fill value.
+    dtype : numpy.dtype, optional
+        Data type. Default is float64.
+    device : str or int, optional
+        Device to create array on:
+        - None or 'cpu': CPU (default)
+        - 'gpu': GPU (error if unavailable)
+        - 'auto': GPU if available, else CPU
+        - int: Specific GPU device ID
+
+    Returns
+    -------
+    ndarray or GPUArray
+        Array filled with the specified value.
+
+    Examples
+    --------
+    >>> a = hpx.full((10, 10), 3.14)
+    >>> b = hpx.full(1000, 42, device='auto')
+    """
+    _check_available()
+    import numpy as np
+
+    if dtype is None:
+        dtype = np.float64
+    dtype = np.dtype(dtype)
+    if isinstance(shape, int):
+        shape = (shape,)
+
+    backend, device_id = _resolve_device(device)
+
+    if backend == 'gpu':
+        from hpxpy import gpu as _gpu_mod
+        return _gpu_mod.full(list(shape), float(fill_value), device=device_id)
+    if backend == 'sycl':
+        from hpxpy import sycl as _sycl_mod
+        return _sycl_mod.full(list(shape), float(fill_value), device=device_id)
+
+    # CPU: create with numpy and convert
+    np_arr = np.full(shape, fill_value, dtype=dtype)
     return from_numpy(np_arr, copy=True)
 
 
@@ -1330,5 +1565,9 @@ from hpxpy import launcher
 # GPU Support (Phase 5)
 # -----------------------------------------------------------------------------
 
-# Import the GPU module for CUDA/GPU support
+# Import the GPU module for CUDA/GPU support (via HPX cuda_executor)
 from hpxpy import gpu
+
+# Import the SYCL module for cross-platform GPU support (via HPX sycl_executor)
+# Supports: Intel GPUs (oneAPI), AMD GPUs (HIP), Apple Silicon (AdaptiveCpp Metal)
+from hpxpy import sycl
