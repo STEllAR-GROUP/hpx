@@ -14,12 +14,7 @@ Deferred features and enhancements for future phases.
 - `arr[1:4] = 7` - Slice assignment with scalar broadcast
 - `arr[1:4] = other_arr` - Slice assignment with array
 
-## Phase 8: Reshape & Views
-
-### reshape/flatten/ravel
-- `reshape()` - Returns view with new shape (same data)
-- `flatten()` - Return flattened copy
-- `ravel()` - Return flattened view when possible
+## Phase 8: Multi-dimensional Slicing
 
 ### Multi-dimensional Slicing
 - `arr[1:3, 2:5]` - Multi-axis slicing

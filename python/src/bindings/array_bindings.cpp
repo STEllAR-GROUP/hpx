@@ -225,7 +225,46 @@ void bind_array(py::module_& m) {
         .def("__getitem__", [](hpxpy::ndarray const& self, py::slice slice) {
             return self.getitem_slice(slice);
         }, py::arg("slice"),
-            "Get a slice view of the array.");
+            "Get a slice view of the array.")
+        // Reshape operations (Phase 8)
+        .def("reshape", &hpxpy::ndarray::reshape,
+            py::arg("shape"),
+            R"pbdoc(
+                Return array with new shape.
+
+                Returns a view if array is contiguous, otherwise returns a copy.
+                Use -1 for one dimension to infer size automatically.
+
+                Args:
+                    shape: Tuple of new dimensions.
+
+                Returns:
+                    Reshaped array (view or copy).
+
+                Example:
+                    >>> arr = hpx.arange(12)
+                    >>> arr.reshape((3, 4))
+                    >>> arr.reshape((2, -1))  # Infer second dim
+            )pbdoc")
+        .def("flatten", &hpxpy::ndarray::flatten,
+            R"pbdoc(
+                Return a flattened copy of the array.
+
+                Always returns a copy, regardless of whether the array is contiguous.
+
+                Returns:
+                    1D array copy with all elements.
+            )pbdoc")
+        .def("ravel", &hpxpy::ndarray::ravel,
+            R"pbdoc(
+                Return a flattened array.
+
+                Returns a view if the array is contiguous, otherwise returns a copy.
+                Use flatten() if you always need a copy.
+
+                Returns:
+                    1D array (view or copy).
+            )pbdoc");
 
     // Array creation functions
     m.def("_zeros", &hpxpy::zeros,

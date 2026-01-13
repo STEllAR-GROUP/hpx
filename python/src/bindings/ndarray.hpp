@@ -206,6 +206,119 @@ public:
         , external_data_(data_ptr)
         , data_owner_(std::move(owner))
     {}
+    // Check if array data is contiguous (C-order)
+    bool is_contiguous() const {
+        if (shape_.empty()) return true;
+
+        py::ssize_t expected_stride = dtype_.itemsize();
+        for (int i = static_cast<int>(shape_.size()) - 1; i >= 0; --i) {
+            if (strides_[i] != expected_stride) {
+                return false;
+            }
+            expected_stride *= shape_[i];
+        }
+        return true;
+    }
+
+    // Reshape array to new shape (returns view if contiguous, copy otherwise)
+    std::shared_ptr<ndarray> reshape(std::vector<py::ssize_t> new_shape) const {
+        // Compute new size and handle -1 dimension
+        py::ssize_t new_size = 1;
+        int infer_dim = -1;
+        for (size_t i = 0; i < new_shape.size(); ++i) {
+            if (new_shape[i] == -1) {
+                if (infer_dim >= 0) {
+                    throw std::runtime_error("Can only specify one unknown dimension (-1)");
+                }
+                infer_dim = static_cast<int>(i);
+            } else if (new_shape[i] < 0) {
+                throw std::runtime_error("Invalid shape dimension: negative value");
+            } else {
+                new_size *= new_shape[i];
+            }
+        }
+
+        // Infer the -1 dimension if present
+        if (infer_dim >= 0) {
+            if (new_size == 0) {
+                throw std::runtime_error("Cannot infer dimension with zero-sized dimensions");
+            }
+            if (size_ % new_size != 0) {
+                throw std::runtime_error("Cannot reshape array: size mismatch");
+            }
+            new_shape[infer_dim] = size_ / new_size;
+            new_size = size_;
+        }
+
+        // Verify size matches
+        if (new_size != size_) {
+            std::ostringstream ss;
+            ss << "Cannot reshape array of size " << size_ << " into shape (";
+            for (size_t i = 0; i < new_shape.size(); ++i) {
+                if (i > 0) ss << ", ";
+                ss << new_shape[i];
+            }
+            ss << ")";
+            throw std::runtime_error(ss.str());
+        }
+
+        // Compute new strides for C-contiguous layout
+        std::vector<py::ssize_t> new_strides = compute_strides(new_shape, dtype_.itemsize());
+
+        if (is_contiguous()) {
+            // Return a view with new shape
+            return std::make_shared<ndarray>(
+                slice_view_tag{},
+                std::move(new_shape),
+                std::move(new_strides),
+                dtype_,
+                const_cast<void*>(data()),
+                shared_from_this()
+            );
+        } else {
+            // Non-contiguous: must copy to new contiguous array
+            auto result = std::make_shared<ndarray>(new_shape, dtype_);
+            copy_to_contiguous(result->data(), shape_, strides_, data(), dtype_.itemsize());
+            return result;
+        }
+    }
+
+    // Flatten array to 1D (always returns a copy)
+    std::shared_ptr<ndarray> flatten() const {
+        std::vector<py::ssize_t> flat_shape = {size_};
+        auto result = std::make_shared<ndarray>(flat_shape, dtype_);
+
+        if (is_contiguous()) {
+            // Simple copy for contiguous arrays
+            std::memcpy(result->data(), data(), size_ * dtype_.itemsize());
+        } else {
+            // Copy with stride handling for non-contiguous
+            copy_to_contiguous(result->data(), shape_, strides_, data(), dtype_.itemsize());
+        }
+        return result;
+    }
+
+    // Ravel array to 1D (returns view if contiguous, copy otherwise)
+    std::shared_ptr<ndarray> ravel() const {
+        std::vector<py::ssize_t> flat_shape = {size_};
+
+        if (is_contiguous()) {
+            // Return a view
+            std::vector<py::ssize_t> flat_strides = {dtype_.itemsize()};
+            return std::make_shared<ndarray>(
+                slice_view_tag{},
+                std::move(flat_shape),
+                std::move(flat_strides),
+                dtype_,
+                const_cast<void*>(data()),
+                shared_from_this()
+            );
+        } else {
+            // Non-contiguous: must copy (same as flatten)
+            return flatten();
+        }
+    }
+
     // Slice a 1D array: arr[start:stop:step]
     std::shared_ptr<ndarray> getitem_slice(py::slice slice) const {
         if (shape_.empty()) {
