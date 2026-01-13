@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: BSL-1.0
 
 #include "ndarray.hpp"
+#include "operators.hpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
@@ -152,6 +153,72 @@ void bind_array(py::module_& m) {
             }
             ss << "), dtype=" << py::str(arr.dtype()).cast<std::string>() << ")";
             return ss.str();
+        })
+        // Arithmetic operators
+        .def("__add__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_binary_py(a, b, hpxpy::ops::Add{});
+        })
+        .def("__radd__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_binary_py(a, b, hpxpy::ops::Add{});
+        })
+        .def("__sub__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_binary_py(a, b, hpxpy::ops::Sub{});
+        })
+        .def("__rsub__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_rbinary_py(a, b, hpxpy::ops::Sub{});
+        })
+        .def("__mul__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_binary_py(a, b, hpxpy::ops::Mul{});
+        })
+        .def("__rmul__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_binary_py(a, b, hpxpy::ops::Mul{});
+        })
+        .def("__truediv__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_binary_py(a, b, hpxpy::ops::Div{});
+        })
+        .def("__rtruediv__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_rbinary_py(a, b, hpxpy::ops::Div{});
+        })
+        .def("__floordiv__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_binary_py(a, b, hpxpy::ops::FloorDiv{});
+        })
+        .def("__rfloordiv__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_rbinary_py(a, b, hpxpy::ops::FloorDiv{});
+        })
+        .def("__mod__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_binary_py(a, b, hpxpy::ops::Mod{});
+        })
+        .def("__pow__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_binary_py(a, b, hpxpy::ops::Pow{});
+        })
+        // Unary operators
+        .def("__neg__", [](hpxpy::ndarray const& a) {
+            return hpxpy::ops::dispatch_unary(a, hpxpy::ops::Neg{});
+        })
+        .def("__pos__", [](hpxpy::ndarray const& a) {
+            return hpxpy::ops::dispatch_unary(a, hpxpy::ops::Pos{});
+        })
+        .def("__abs__", [](hpxpy::ndarray const& a) {
+            return hpxpy::ops::dispatch_unary(a, hpxpy::ops::Abs{});
+        })
+        // Comparison operators
+        .def("__eq__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_compare(a, b, hpxpy::ops::Eq{});
+        })
+        .def("__ne__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_compare(a, b, hpxpy::ops::Ne{});
+        })
+        .def("__lt__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_compare(a, b, hpxpy::ops::Lt{});
+        })
+        .def("__le__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_compare(a, b, hpxpy::ops::Le{});
+        })
+        .def("__gt__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_compare(a, b, hpxpy::ops::Gt{});
+        })
+        .def("__ge__", [](hpxpy::ndarray const& a, py::object const& b) {
+            return hpxpy::ops::dispatch_compare(a, b, hpxpy::ops::Ge{});
         });
 
     // Array creation functions

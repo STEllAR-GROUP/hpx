@@ -58,7 +58,7 @@ __all__ = [
     "from_numpy",
     # Array class
     "ndarray",
-    # Algorithms
+    # Reduction algorithms
     "sum",
     "prod",
     "min",
@@ -66,9 +66,43 @@ __all__ = [
     "mean",
     "std",
     "var",
+    # Sorting
     "sort",
     "argsort",
     "count",
+    # Math functions
+    "sqrt",
+    "square",
+    "exp",
+    "exp2",
+    "log",
+    "log2",
+    "log10",
+    "sin",
+    "cos",
+    "tan",
+    "arcsin",
+    "arccos",
+    "arctan",
+    "sinh",
+    "cosh",
+    "tanh",
+    "floor",
+    "ceil",
+    "trunc",
+    "abs",
+    "sign",
+    # Scan operations
+    "cumsum",
+    "cumprod",
+    # Element-wise functions
+    "maximum",
+    "minimum",
+    "clip",
+    "power",
+    "where",
+    # Random submodule
+    "random",
     # Execution policies
     "execution",
 ]
@@ -98,6 +132,39 @@ try:
         _max,
         _sort,
         _count,
+        # Math functions
+        _sqrt,
+        _square,
+        _exp,
+        _exp2,
+        _log,
+        _log2,
+        _log10,
+        _sin,
+        _cos,
+        _tan,
+        _arcsin,
+        _arccos,
+        _arctan,
+        _sinh,
+        _cosh,
+        _tanh,
+        _floor,
+        _ceil,
+        _trunc,
+        _abs,
+        _sign,
+        # Scan operations
+        _cumsum,
+        _cumprod,
+        # Element-wise functions
+        _maximum,
+        _minimum,
+        _clip,
+        _power,
+        _where,
+        # Random submodule
+        random as _random_module,
         # Execution module
         execution,
     )
@@ -666,3 +733,410 @@ def count(arr, value) -> int:
     """
     _check_available()
     return _count(arr, value)
+
+
+# -----------------------------------------------------------------------------
+# Math Functions (Phase 2)
+# -----------------------------------------------------------------------------
+
+
+def sqrt(arr) -> ndarray:
+    """Element-wise square root."""
+    _check_available()
+    return _sqrt(arr)
+
+
+def square(arr) -> ndarray:
+    """Element-wise square."""
+    _check_available()
+    return _square(arr)
+
+
+def exp(arr) -> ndarray:
+    """Element-wise exponential."""
+    _check_available()
+    return _exp(arr)
+
+
+def exp2(arr) -> ndarray:
+    """Element-wise 2**x."""
+    _check_available()
+    return _exp2(arr)
+
+
+def log(arr) -> ndarray:
+    """Element-wise natural logarithm."""
+    _check_available()
+    return _log(arr)
+
+
+def log2(arr) -> ndarray:
+    """Element-wise base-2 logarithm."""
+    _check_available()
+    return _log2(arr)
+
+
+def log10(arr) -> ndarray:
+    """Element-wise base-10 logarithm."""
+    _check_available()
+    return _log10(arr)
+
+
+def sin(arr) -> ndarray:
+    """Element-wise sine."""
+    _check_available()
+    return _sin(arr)
+
+
+def cos(arr) -> ndarray:
+    """Element-wise cosine."""
+    _check_available()
+    return _cos(arr)
+
+
+def tan(arr) -> ndarray:
+    """Element-wise tangent."""
+    _check_available()
+    return _tan(arr)
+
+
+def arcsin(arr) -> ndarray:
+    """Element-wise inverse sine."""
+    _check_available()
+    return _arcsin(arr)
+
+
+def arccos(arr) -> ndarray:
+    """Element-wise inverse cosine."""
+    _check_available()
+    return _arccos(arr)
+
+
+def arctan(arr) -> ndarray:
+    """Element-wise inverse tangent."""
+    _check_available()
+    return _arctan(arr)
+
+
+def sinh(arr) -> ndarray:
+    """Element-wise hyperbolic sine."""
+    _check_available()
+    return _sinh(arr)
+
+
+def cosh(arr) -> ndarray:
+    """Element-wise hyperbolic cosine."""
+    _check_available()
+    return _cosh(arr)
+
+
+def tanh(arr) -> ndarray:
+    """Element-wise hyperbolic tangent."""
+    _check_available()
+    return _tanh(arr)
+
+
+def floor(arr) -> ndarray:
+    """Element-wise floor."""
+    _check_available()
+    return _floor(arr)
+
+
+def ceil(arr) -> ndarray:
+    """Element-wise ceiling."""
+    _check_available()
+    return _ceil(arr)
+
+
+def trunc(arr) -> ndarray:
+    """Element-wise truncation toward zero."""
+    _check_available()
+    return _trunc(arr)
+
+
+def abs(arr) -> ndarray:
+    """Element-wise absolute value."""
+    _check_available()
+    return _abs(arr)
+
+
+def sign(arr) -> ndarray:
+    """Element-wise sign indicator (-1, 0, or 1)."""
+    _check_available()
+    return _sign(arr)
+
+
+# -----------------------------------------------------------------------------
+# Scan Operations (Phase 2)
+# -----------------------------------------------------------------------------
+
+
+def cumsum(arr, axis=None) -> ndarray:
+    """Cumulative sum of array elements.
+
+    Parameters
+    ----------
+    arr : ndarray
+        Input array.
+    axis : int, optional
+        Axis along which to compute cumulative sum.
+        If None, compute over flattened array.
+
+    Returns
+    -------
+    ndarray
+        Cumulative sum.
+    """
+    _check_available()
+    if axis is not None:
+        raise NotImplementedError("axis parameter not yet supported")
+    return _cumsum(arr)
+
+
+def cumprod(arr, axis=None) -> ndarray:
+    """Cumulative product of array elements.
+
+    Parameters
+    ----------
+    arr : ndarray
+        Input array.
+    axis : int, optional
+        Axis along which to compute cumulative product.
+        If None, compute over flattened array.
+
+    Returns
+    -------
+    ndarray
+        Cumulative product.
+    """
+    _check_available()
+    if axis is not None:
+        raise NotImplementedError("axis parameter not yet supported")
+    return _cumprod(arr)
+
+
+# -----------------------------------------------------------------------------
+# Element-wise Functions (Phase 2)
+# -----------------------------------------------------------------------------
+
+
+def maximum(a, b) -> ndarray:
+    """Element-wise maximum of two arrays.
+
+    Parameters
+    ----------
+    a : ndarray
+        First input array.
+    b : ndarray or scalar
+        Second input array or scalar.
+
+    Returns
+    -------
+    ndarray
+        Element-wise maximum.
+    """
+    _check_available()
+    return _maximum(a, b)
+
+
+def minimum(a, b) -> ndarray:
+    """Element-wise minimum of two arrays.
+
+    Parameters
+    ----------
+    a : ndarray
+        First input array.
+    b : ndarray or scalar
+        Second input array or scalar.
+
+    Returns
+    -------
+    ndarray
+        Element-wise minimum.
+    """
+    _check_available()
+    return _minimum(a, b)
+
+
+def clip(arr, a_min, a_max) -> ndarray:
+    """Clip (limit) the values in an array.
+
+    Parameters
+    ----------
+    arr : ndarray
+        Input array.
+    a_min : scalar
+        Minimum value.
+    a_max : scalar
+        Maximum value.
+
+    Returns
+    -------
+    ndarray
+        Clipped array.
+    """
+    _check_available()
+    return _clip(arr, a_min, a_max)
+
+
+def power(arr, exponent) -> ndarray:
+    """Element-wise power.
+
+    Parameters
+    ----------
+    arr : ndarray
+        Base array.
+    exponent : ndarray or scalar
+        Exponent array or scalar.
+
+    Returns
+    -------
+    ndarray
+        arr ** exponent element-wise.
+    """
+    _check_available()
+    return _power(arr, exponent)
+
+
+def where(condition, x, y) -> ndarray:
+    """Return elements chosen from x or y depending on condition.
+
+    Parameters
+    ----------
+    condition : ndarray of bool
+        Where True, yield x, otherwise yield y.
+    x : ndarray
+        Values to use where condition is True.
+    y : ndarray
+        Values to use where condition is False.
+
+    Returns
+    -------
+    ndarray
+        Array with elements from x where condition is True, else from y.
+    """
+    _check_available()
+    return _where(condition, x, y)
+
+
+# -----------------------------------------------------------------------------
+# Random Number Generation (Phase 2)
+# -----------------------------------------------------------------------------
+
+
+class random:
+    """Random number generation module.
+
+    Provides NumPy-like random number generation functions.
+    """
+
+    @staticmethod
+    def seed(s: int) -> None:
+        """Seed the random number generator.
+
+        Parameters
+        ----------
+        s : int
+            Seed value.
+        """
+        _check_available()
+        _random_module.seed(s)
+
+    @staticmethod
+    def uniform(low: float = 0.0, high: float = 1.0, size=None) -> ndarray:
+        """Draw samples from a uniform distribution.
+
+        Parameters
+        ----------
+        low : float, default 0.0
+            Lower boundary.
+        high : float, default 1.0
+            Upper boundary.
+        size : int or tuple of ints, optional
+            Output shape. Default is a single value.
+
+        Returns
+        -------
+        ndarray
+            Samples from uniform distribution.
+        """
+        _check_available()
+        if size is None:
+            size = (1,)
+        elif isinstance(size, int):
+            size = (size,)
+        return _random_module._uniform(low, high, size)
+
+    @staticmethod
+    def randn(*shape) -> ndarray:
+        """Return samples from the standard normal distribution.
+
+        Parameters
+        ----------
+        *shape : ints
+            Shape of the output array.
+
+        Returns
+        -------
+        ndarray
+            Samples from standard normal distribution.
+
+        Examples
+        --------
+        >>> hpx.random.randn(3, 4)  # 3x4 array of standard normal samples
+        """
+        _check_available()
+        if len(shape) == 0:
+            shape = (1,)
+        return _random_module._randn(list(shape))
+
+    @staticmethod
+    def randint(low: int, high: int = None, size=None) -> ndarray:
+        """Return random integers from low (inclusive) to high (exclusive).
+
+        Parameters
+        ----------
+        low : int
+            Lowest integer (or highest if high is None).
+        high : int, optional
+            One above the highest integer.
+        size : int or tuple of ints, optional
+            Output shape.
+
+        Returns
+        -------
+        ndarray
+            Random integers.
+        """
+        _check_available()
+        if high is None:
+            high = low
+            low = 0
+        if size is None:
+            size = (1,)
+        elif isinstance(size, int):
+            size = (size,)
+        return _random_module._randint(low, high, size)
+
+    @staticmethod
+    def rand(*shape) -> ndarray:
+        """Random values in a given shape from uniform [0, 1).
+
+        Parameters
+        ----------
+        *shape : ints
+            Shape of the output array.
+
+        Returns
+        -------
+        ndarray
+            Random values.
+
+        Examples
+        --------
+        >>> hpx.random.rand(3, 4)  # 3x4 array of uniform random values
+        """
+        _check_available()
+        if len(shape) == 0:
+            shape = (1,)
+        return _random_module._rand(list(shape))
