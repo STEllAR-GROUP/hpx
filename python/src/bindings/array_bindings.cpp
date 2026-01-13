@@ -4,6 +4,7 @@
 
 #include "ndarray.hpp"
 #include "operators.hpp"
+#include "../types/distributed_array.hpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
@@ -241,4 +242,28 @@ void bind_array(py::module_& m) {
     m.def("_array_from_numpy", &hpxpy::array_from_numpy,
         py::arg("arr"), py::arg("copy"),
         "Create an array from a NumPy array.");
+
+    // Distribution submodule (Phase 3)
+    auto dist = m.def_submodule("distribution",
+        "Distribution policies for distributed arrays.");
+
+    // Distribution policy enum
+    py::enum_<hpxpy::DistributionPolicy>(dist, "DistributionPolicy",
+        "Distribution policy for partitioning arrays across localities.")
+        .value("none", hpxpy::DistributionPolicy::None,
+            "No distribution (local array)")
+        .value("block", hpxpy::DistributionPolicy::Block,
+            "Block distribution (contiguous chunks)")
+        .value("cyclic", hpxpy::DistributionPolicy::Cyclic,
+            "Cyclic distribution (round-robin)")
+        .export_values();
+
+    // Convenience aliases
+    dist.attr("local") = hpxpy::DistributionPolicy::None;
+
+    // Locality introspection
+    dist.def("get_locality_id", &hpxpy::get_current_locality,
+        "Get the current locality ID.");
+    dist.def("get_num_localities", &hpxpy::get_num_localities,
+        "Get the number of localities.");
 }

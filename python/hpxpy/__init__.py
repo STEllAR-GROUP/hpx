@@ -105,6 +105,8 @@ __all__ = [
     "random",
     # Execution policies
     "execution",
+    # Distribution (Phase 3)
+    "distribution",
 ]
 
 # Import the compiled extension module
@@ -167,6 +169,8 @@ try:
         random as _random_module,
         # Execution module
         execution,
+        # Distribution module (Phase 3)
+        distribution,
     )
 
     _HPX_AVAILABLE = True

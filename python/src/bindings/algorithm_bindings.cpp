@@ -66,8 +66,8 @@ py::object sum(std::shared_ptr<ndarray> arr) {
     return dispatch_dtype(*arr, [](auto const* data, py::ssize_t size) -> py::object {
         using T = std::remove_const_t<std::remove_pointer_t<decltype(data)>>;
 
-        // Phase 1: Use sequential execution
-        // Phase 2 will add parallel execution policies
+        // Sequential reduction for deterministic floating-point results
+        // Compiler SIMD vectorization provides performance
         T result = hpx::reduce(
             hpx::execution::seq,
             data, data + size,
@@ -90,6 +90,7 @@ py::object prod(std::shared_ptr<ndarray> arr) {
     return dispatch_dtype(*arr, [](auto const* data, py::ssize_t size) -> py::object {
         using T = std::remove_const_t<std::remove_pointer_t<decltype(data)>>;
 
+        // Sequential for deterministic results
         T result = hpx::reduce(
             hpx::execution::seq,
             data, data + size,
@@ -113,6 +114,7 @@ py::object min(std::shared_ptr<ndarray> arr) {
     return dispatch_dtype(*arr, [](auto const* data, py::ssize_t size) -> py::object {
         using T = std::remove_const_t<std::remove_pointer_t<decltype(data)>>;
 
+        // min_element is deterministic, but seq avoids parallel overhead
         auto result = hpx::min_element(
             hpx::execution::seq,
             data, data + size
@@ -134,6 +136,7 @@ py::object max(std::shared_ptr<ndarray> arr) {
     return dispatch_dtype(*arr, [](auto const* data, py::ssize_t size) -> py::object {
         using T = std::remove_const_t<std::remove_pointer_t<decltype(data)>>;
 
+        // max_element is deterministic, but seq avoids parallel overhead
         auto result = hpx::max_element(
             hpx::execution::seq,
             data, data + size

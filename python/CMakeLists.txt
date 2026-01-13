@@ -97,9 +97,20 @@ set_target_properties(_core PROPERTIES
   VISIBILITY_INLINES_HIDDEN ON
 )
 
-# Compiler warnings
+# Compiler warnings and optimizations
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(_core PRIVATE -Wall -Wextra -Wpedantic)
+
+  # Enable SIMD vectorization for Release builds
+  if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_compile_options(_core PRIVATE
+      -march=native          # Enable native CPU instruction set (AVX, AVX2, etc.)
+      -mtune=native          # Tune for native CPU
+      -ffast-math            # Allow aggressive floating-point optimizations
+      -funroll-loops         # Unroll loops for better vectorization
+    )
+    message(STATUS "SIMD optimizations enabled: -march=native -ffast-math")
+  endif()
 endif()
 
 # ------------------------------------------------------------------------------
