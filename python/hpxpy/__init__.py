@@ -122,6 +122,8 @@ __all__ = [
     "distributed_from_numpy",
     # Multi-locality launcher (Phase 4)
     "launcher",
+    # GPU support (Phase 5)
+    "gpu",
 ]
 
 # Import the compiled extension module
@@ -1322,3 +1324,11 @@ def barrier(name: str = "hpxpy_barrier"):
 
 # Import the launcher module for multi-locality support
 from hpxpy import launcher
+
+
+# -----------------------------------------------------------------------------
+# GPU Support (Phase 5)
+# -----------------------------------------------------------------------------
+
+# Import the GPU module for CUDA/GPU support
+from hpxpy import gpu

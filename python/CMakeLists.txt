@@ -73,6 +73,7 @@ pybind11_add_module(_core MODULE
   src/bindings/algorithm_bindings.cpp
   src/bindings/collective_bindings.cpp
   src/bindings/distributed_array_bindings.cpp
+  src/bindings/gpu_bindings.cpp
 )
 
 target_include_directories(_core PRIVATE
@@ -121,10 +122,6 @@ endif()
 if(HPXPY_WITH_CUDA)
   find_package(HPX REQUIRED COMPONENTS cuda)
   find_package(CUDAToolkit REQUIRED)
-
-  target_sources(_core PRIVATE
-    src/bindings/gpu_bindings.cpp
-  )
 
   target_compile_definitions(_core PRIVATE HPXPY_HAVE_CUDA)
   target_link_libraries(_core PRIVATE CUDA::cudart)
