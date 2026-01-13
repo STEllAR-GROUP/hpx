@@ -65,6 +65,7 @@ Phase 3 adds distribution policy infrastructure to HPXPy and significantly impro
 | `python/examples/parallel_integration_demo.py` | Numerical integration scaling demo |
 | `python/src/bindings/ndarray.hpp` | Zero-copy array view support |
 | `python/tests/unit/test_array.py` | Added zero-copy tests |
+| `python/examples/kmeans_clustering_demo.py` | K-Means clustering MapReduce demo |
 
 ## API Additions
 
@@ -123,3 +124,15 @@ With SIMD optimizations enabled:
    - Multi-locality distributed arrays via HPX's partitioned_vector
    - Distributed operations that partition work across localities
    - Serialization for data transfer between localities
+
+## Demo Applications
+
+Phase 3 includes several demos showcasing distribution concepts:
+
+| Demo | Pattern | What it Shows |
+|------|---------|---------------|
+| `distribution_demo.py` | API overview | Distribution policies, locality introspection |
+| `distributed_analytics_demo.py` | Data science | HPXPy vs NumPy performance comparison |
+| `heat_diffusion_demo.py` | Stencil/PDE | Strong/weak scaling, ghost cell exchange pattern |
+| `parallel_integration_demo.py` | Embarrassingly parallel | Perfect scaling for independent work |
+| `kmeans_clustering_demo.py` | MapReduce | Iterative ML algorithm, minimal O(K) communication |
