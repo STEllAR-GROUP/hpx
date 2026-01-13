@@ -114,6 +114,12 @@ __all__ = [
     "gather",
     "scatter",
     "barrier",
+    # Distributed arrays (Phase 4)
+    "DistributionPolicy",
+    "distributed_zeros",
+    "distributed_ones",
+    "distributed_full",
+    "distributed_from_numpy",
 ]
 
 # Import the compiled extension module
@@ -185,7 +191,14 @@ try:
         gather as _gather,
         scatter as _scatter,
         barrier as _barrier,
+        # Distributed arrays (Phase 4)
+        distributed_zeros,
+        distributed_ones,
+        distributed_full,
+        distributed_from_numpy,
     )
+    # DistributionPolicy is in the distribution submodule
+    from hpxpy._core.distribution import DistributionPolicy
 
     _HPX_AVAILABLE = True
 except ImportError as e:

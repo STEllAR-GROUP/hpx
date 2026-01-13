@@ -3,14 +3,14 @@
 ## Test Summary
 
 **Date:** 2026-01-12
-**Total Tests:** 145
-**Passed:** 145
+**Total Tests:** 166
+**Passed:** 166
 **Failed:** 0
 **Skipped:** 3
 
-## New Phase 4 Tests (17 tests)
+## New Phase 4 Tests (38 tests)
 
-All collective operation tests pass:
+### Collective Operation Tests (17 tests)
 
 ```
 # Collectives Module Tests
@@ -43,6 +43,41 @@ tests/unit/test_collectives.py::TestBarrier::test_barrier_no_args PASSED
 tests/unit/test_collectives.py::TestBarrier::test_barrier_with_name PASSED
 ```
 
+### Distributed Array Tests (21 tests)
+
+```
+# Array Creation Tests
+tests/unit/test_distributed_arrays.py::TestDistributedArrayCreation::test_distributed_zeros PASSED
+tests/unit/test_distributed_arrays.py::TestDistributedArrayCreation::test_distributed_zeros_with_shape_tuple PASSED
+tests/unit/test_distributed_arrays.py::TestDistributedArrayCreation::test_distributed_ones PASSED
+tests/unit/test_distributed_arrays.py::TestDistributedArrayCreation::test_distributed_full PASSED
+tests/unit/test_distributed_arrays.py::TestDistributedArrayCreation::test_distributed_from_numpy PASSED
+
+# Distribution Policy Tests
+tests/unit/test_distributed_arrays.py::TestDistributionPolicy::test_default_policy_is_none PASSED
+tests/unit/test_distributed_arrays.py::TestDistributionPolicy::test_block_distribution PASSED
+tests/unit/test_distributed_arrays.py::TestDistributionPolicy::test_cyclic_distribution PASSED
+tests/unit/test_distributed_arrays.py::TestDistributionPolicy::test_none_distribution_string PASSED
+
+# Property Tests
+tests/unit/test_distributed_arrays.py::TestDistributedArrayProperties::test_shape_property PASSED
+tests/unit/test_distributed_arrays.py::TestDistributedArrayProperties::test_size_property PASSED
+tests/unit/test_distributed_arrays.py::TestDistributedArrayProperties::test_ndim_property PASSED
+tests/unit/test_distributed_arrays.py::TestDistributedArrayProperties::test_num_partitions_property PASSED
+tests/unit/test_distributed_arrays.py::TestDistributedArrayProperties::test_locality_id_property PASSED
+
+# Method Tests
+tests/unit/test_distributed_arrays.py::TestDistributedArrayMethods::test_fill PASSED
+tests/unit/test_distributed_arrays.py::TestDistributedArrayMethods::test_to_numpy PASSED
+tests/unit/test_distributed_arrays.py::TestDistributedArrayMethods::test_is_distributed_single_locality PASSED
+tests/unit/test_distributed_arrays.py::TestDistributedArrayMethods::test_get_distribution_info PASSED
+
+# Repr Tests
+tests/unit/test_distributed_arrays.py::TestDistributedArrayRepr::test_repr_contains_shape PASSED
+tests/unit/test_distributed_arrays.py::TestDistributedArrayRepr::test_repr_contains_distribution PASSED
+tests/unit/test_distributed_arrays.py::TestDistributedArrayRepr::test_repr_contains_partitions PASSED
+```
+
 ## Test Breakdown by Module
 
 | Module | Tests | Passed |
@@ -50,11 +85,12 @@ tests/unit/test_collectives.py::TestBarrier::test_barrier_with_name PASSED
 | test_algorithms.py | 32 | 32 |
 | test_array.py | 25 | 25 |
 | test_collectives.py | 17 | 17 |
+| test_distributed_arrays.py | 21 | 21 |
 | test_distribution.py | 8 | 8 |
 | test_math.py | 34 | 34 |
 | test_operators.py | 24 | 24 |
 | test_runtime.py | 5 | 5 |
-| **Total** | **145** | **145** |
+| **Total** | **166** | **166** |
 
 ## Test Categories
 
@@ -65,12 +101,12 @@ tests/unit/test_collectives.py::TestBarrier::test_barrier_with_name PASSED
 - scatter returns ndarray
 - barrier synchronization
 
-### Distributed Array Tests (Planned)
-- Creating distributed arrays with block distribution
-- Creating distributed arrays with cyclic distribution
-- Accessing local partitions
-- Converting distributed array to numpy (gather)
-- Operations on distributed arrays
+### Distributed Array Tests (Implemented)
+- Creating distributed arrays with zeros, ones, full, from_numpy
+- Block and cyclic distribution policies
+- Array properties (shape, size, ndim, policy, num_partitions, locality_id)
+- Methods (to_numpy, fill, is_distributed, get_distribution_info)
+- String representation
 
 ### Multi-Locality Tests (Planned)
 - Running with multiple localities

@@ -9,7 +9,7 @@ Phase 4 adds full distributed computing capabilities to HPXPy.
 ## Objectives
 
 1. Collective operations (all_reduce, broadcast, gather, scatter)
-2. Distributed algorithms on partitioned_vector
+2. Distributed arrays with distribution policies
 3. SPMD execution model support
 4. Multi-locality deployment support
 
@@ -29,11 +29,17 @@ Phase 4 adds full distributed computing capabilities to HPXPy.
   - [x] `hpx.collectives.get_locality_id()` - get current locality ID
   - [x] Top-level exports for all collective functions
 
-- [ ] **Distributed Arrays**
-  - [ ] partitioned_vector bindings
-  - [ ] Block distribution across localities
-  - [ ] Cyclic distribution across localities
-  - [ ] Local partition access
+- [x] **Distributed Arrays**
+  - [x] `distributed_array<T>` template class in C++
+  - [x] `DistributedArrayF64`, `F32`, `I64`, `I32` types in Python
+  - [x] Block distribution policy support
+  - [x] Cyclic distribution policy support
+  - [x] `distributed_zeros()`, `distributed_ones()`, `distributed_full()` creation functions
+  - [x] `distributed_from_numpy()` for creating from numpy arrays
+  - [x] `to_numpy()` for converting back to numpy
+  - [x] `fill()` method for setting all elements
+  - [x] Distribution introspection (policy, num_partitions, locality_id, is_distributed)
+  - [x] `DistributionInfo` struct for detailed distribution info
 
 - [ ] **SPMD Execution**
   - [x] Barrier synchronization (implemented)
@@ -50,11 +56,14 @@ Phase 4 adds full distributed computing capabilities to HPXPy.
 | File | Description |
 |------|-------------|
 | `python/src/bindings/collective_bindings.cpp` | Collective operation C++ bindings |
-| `python/src/bindings/core_module.cpp` | Register collective bindings |
-| `python/CMakeLists.txt` | Add collective_bindings.cpp |
-| `python/hpxpy/__init__.py` | Export collective operations |
+| `python/src/bindings/distributed_array_bindings.cpp` | Distributed array C++ bindings |
+| `python/src/types/distributed_array.hpp` | distributed_array template class |
+| `python/src/bindings/core_module.cpp` | Register bindings |
+| `python/CMakeLists.txt` | Add source files |
+| `python/hpxpy/__init__.py` | Export functions |
 | `python/tests/unit/test_collectives.py` | Tests for collective operations |
-| `python/examples/distributed_reduction_demo.py` | SPMD pattern demo with collectives |
+| `python/tests/unit/test_distributed_arrays.py` | Tests for distributed arrays |
+| `python/examples/distributed_reduction_demo.py` | SPMD pattern demo |
 
 ## API Additions
 
@@ -70,14 +79,37 @@ hpx.barrier()
 hpx.collectives.get_num_localities()
 hpx.collectives.get_locality_id()
 
-# Distributed array creation (planned)
-arr = hpx.zeros((N,), distribution='block')
+# Distributed array creation
+arr = hpx.distributed_zeros([N], distribution='block')
+arr = hpx.distributed_ones([N], distribution='cyclic')
+arr = hpx.distributed_full([N], value, distribution='block')
+arr = hpx.distributed_from_numpy(np_arr, distribution='block')
+
+# Distributed array properties
+arr.shape            # Array shape
+arr.size             # Total elements
+arr.ndim             # Number of dimensions
+arr.policy           # Distribution policy
+arr.num_partitions   # Number of partitions
+arr.locality_id      # Creating locality ID
+arr.is_distributed() # True if actually distributed
+
+# Distributed array methods
+arr.to_numpy()       # Convert to numpy array
+arr.fill(value)      # Fill with value
+arr.get_distribution_info()  # Get DistributionInfo
+
+# Distribution policies
+hpx.DistributionPolicy.none   # Local (no distribution)
+hpx.DistributionPolicy.block  # Block distribution
+hpx.DistributionPolicy.cyclic # Cyclic distribution
 ```
 
 ## Test Results
 
-- **145 total tests pass** (128 from Phase 3 + 17 new)
-- 17 new tests for collective operations
+- **166 total tests pass** (145 from Phase 3 + 21 new)
+- 17 tests for collective operations
+- 21 tests for distributed arrays
 - All Phase 1-3 tests continue to pass
 
 ## Implementation Notes
@@ -88,13 +120,16 @@ arr = hpx.zeros((N,), distribution='block')
    - `gather` returns a list with one element
    - `scatter` returns a copy of the input
    - `barrier` is a no-op
+   - Distributed arrays store data locally with distribution metadata
+   - `is_distributed()` returns False
 
 2. **Multi-Locality Ready**: The API is designed for multi-locality:
    - When `get_num_localities() > 1`, actual distributed operations will be performed
    - Uses HPX's built-in collective operations (all_reduce, broadcast, etc.)
    - Barrier uses `hpx::distributed::barrier`
+   - Distributed arrays can use HPX partitioned_vector for true distribution
 
 3. **Future Work**:
-   - Implement actual distributed operations using HPX parcels
-   - Add partitioned_vector bindings for distributed arrays
+   - Connect distributed arrays to HPX partitioned_vector when multi-locality
+   - Add distributed parallel algorithms on distributed arrays
    - Add multi-process launch configuration
