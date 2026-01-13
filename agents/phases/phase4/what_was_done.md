@@ -54,6 +54,7 @@ Phase 4 adds full distributed computing capabilities to HPXPy.
 | `python/CMakeLists.txt` | Add collective_bindings.cpp |
 | `python/hpxpy/__init__.py` | Export collective operations |
 | `python/tests/unit/test_collectives.py` | Tests for collective operations |
+| `python/examples/distributed_reduction_demo.py` | SPMD pattern demo with collectives |
 
 ## API Additions
 
