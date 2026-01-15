@@ -22,7 +22,7 @@
 #include <type_traits>
 #include <utility>
 
-#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 #include <experimental/meta>
 #endif
 
@@ -121,11 +121,15 @@ namespace hpx::serialization {
                     // the archive functions
                     ar.invoke(t);
                 }
-                else if constexpr (std::is_class_v<dT>) {
+                else if constexpr (
+                    std::is_class_v<dT> && // TODO: I think this is too wide a filter
+                    !hpx::traits::has_serialize_adl_v<dT> && 
+                    !has_serialize_v<dT>
+                ) {
                     // If we have cpp 26 reflection, then codegen can be used
                     // to generate serialization functions for types that
                     // don't have them already.
-                    #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+                    #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
                         detail::refl_serialize(ar, t, 0);
                     #endif
                 }
@@ -181,7 +185,7 @@ namespace hpx::traits {
 }    // namespace hpx::traits
 #endif
 
-#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 // We need to include refl_serialize_impl.hpp here to avoid circular
 // dependencies as refl_serialize_impl.hpp depends on base_object.hpp
 #include <hpx/serialization/detail/refl_serialize_impl.hpp>

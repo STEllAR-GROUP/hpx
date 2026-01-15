@@ -28,6 +28,10 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#include <experimental/meta>
+#endif
+
 namespace hpx::serialization::detail {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -37,6 +41,21 @@ namespace hpx::serialization::detail {
         ;
 #else
     {
+
+        #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+        [[nodiscard]] char const* operator()() const noexcept
+        {
+            // Unless the user specifically creates a specialization of this
+            // we should be able to auto generate a full string description
+            // for the type T using reflection and display_string_of()
+        
+            // Todo, write a homegrown qualified_name_of() later
+            // display_string_of is not portable yet
+            // return std::meta::display_string_of(^^T).c_str();
+            return "TODO: I have implemented refl_qualified_name_of but "
+                   "not yet integrated it here";
+        }
+        #else
         [[nodiscard]] char const* operator()() const noexcept
         {
             // If you encounter this assert while compiling code, that means
@@ -47,6 +66,7 @@ namespace hpx::serialization::detail {
                 "HPX_REGISTER_ACTION_DECLARATION missing");
             return util::debug::type_id<T>();
         }
+        #endif
     };
 #endif
 
@@ -164,7 +184,7 @@ namespace hpx::serialization::detail {
     {
         static void save(output_archive& ar, void const* base)
         {
-            #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+            #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
                 if constexpr (std::is_class_v<Derived>) {
                     // member serialization
                     // Todo, check if this is the right dispatch
@@ -184,7 +204,7 @@ namespace hpx::serialization::detail {
 
         static void load(input_archive& ar, void* base)
         {
-            #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+            #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
                 if constexpr (std::is_class_v<Derived>) {
                     // member serialization
                     // Todo, check if this is the right dispatch

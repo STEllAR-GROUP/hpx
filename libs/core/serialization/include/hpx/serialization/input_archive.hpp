@@ -118,7 +118,7 @@ namespace hpx::serialization {
                     access::has_serialize_v<T> || std::is_empty_v<T> ||
                     hpx::traits::has_serialize_adl_v<T>;
 
-                #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+                #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
                     constexpr bool has_refl_serialize = true;
                 #else
                     constexpr bool has_refl_serialize = false;
@@ -133,11 +133,6 @@ namespace hpx::serialization {
                     // non-bitwise polymorphic serialization
                     detail::polymorphic_nonintrusive_factory::instance().load(
                         *this, t);
-                }
-                else if constexpr (has_serialize || has_refl_serialize)
-                {
-                    // non-bitwise normal serialization
-                    access::serialize(*this, t, 0);
                 }
                 else if constexpr (optimized)
                 {
@@ -162,13 +157,18 @@ namespace hpx::serialization {
                     // struct serialization
                     access::serialize(*this, t, 0);
                 }
+                else if constexpr (has_serialize || has_refl_serialize)
+                {
+                    // non-bitwise normal serialization
+                    access::serialize(*this, t, 0);
+                }
                 else
                 {
                     static_assert(traits::is_nonintrusive_polymorphic_v<T> ||
-                            has_serialize || optimized ||
+                            has_serialize || optimized || has_refl_serialize ||
                             hpx::traits::has_struct_serialization_v<T>,
                         "traits::is_nonintrusive_polymorphic_v<T> || "
-                        "has_serialize || optimized || "
+                        "has_serialize || optimized || has_refl_serialize || "
                         "hpx::traits::has_struct_serialization_v<T>");
                 }
             }

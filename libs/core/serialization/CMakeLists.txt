@@ -105,16 +105,16 @@ endif()
 # functions using C++26 reflection capabilities. It is ON by default if
 # HPX is built with C++26 reflection support.
 hpx_option(
-  HPX_SERIALIZATION_ALLOW_AUTO_GENERATE BOOL
+  HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE BOOL
   "Enable automatic generation of serialization functions using C++26 \
   reflection capabilities. (default: OFF)" OFF ADVANCED
   CATEGORY "Modules"
   MODULE SERIALIZATION
 )
 
-if(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+if(HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE)
   hpx_add_config_define_namespace(
-    DEFINE HPX_SERIALIZATION_ALLOW_AUTO_GENERATE
+    DEFINE HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE
     NAMESPACE SERIALIZATION
   )
 endif()

@@ -12,8 +12,8 @@
 #define HPX_HAVE_CXX26_EXPERIMENTAL_META
 
     // By default allow auto generation of serialization functions using C++26 reflection
-    #if !defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
-    #define HPX_SERIALIZATION_ALLOW_AUTO_GENERATE
+    #if !defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+    #define HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE
     #endif
 
 #endif
