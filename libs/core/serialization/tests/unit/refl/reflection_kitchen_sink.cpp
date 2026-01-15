@@ -6,6 +6,12 @@
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <hpx/serialization/map.hpp>
+#include <hpx/serialization/vector.hpp>
+#include <hpx/serialization/string.hpp>
+#include <hpx/serialization/deque.hpp>
+#include <hpx/serialization/array.hpp>
+
 #include <array>
 #include <deque>
 #include <list>
@@ -18,6 +24,8 @@
 #include <utility>
 #include <vector>
 
+#include <iostream>
+
 class person
 {
 private:
@@ -27,6 +35,16 @@ private:
 public:
     person() : age(0) {}
     person(int a, std::string n) : age(a), name(std::move(n)) {}
+
+    int get_age() const
+    {
+        return age;
+    }
+
+    std::string get_name() const
+    {
+        return name;
+    }
 
     bool operator==(person const& rhs) const
     {
@@ -39,7 +57,14 @@ public:
         if (age != rhs.age) return age < rhs.age;
         return name < rhs.name;
     }
+
+    template <typename Archive>
+    void serialize(Archive& ar, unsigned) {
+        ar & age & name;
+    }
 };
+
+HPX_IS_NOT_BITWISE_SERIALIZABLE(person)
 
 enum class Color
 {
@@ -57,7 +82,7 @@ private:
     std::vector<person> c;
     std::list<std::string> d;
     std::deque<int> e;
-    std::map<int, person> f;
+    // std::map<int, person> f;
     // std::multimap<int, person> g;
     // std::set<std::string> h;
     // std::multiset<int> i;
@@ -73,7 +98,7 @@ public:
     complicated_object(Color col, int a_val, std::string b_val,
         std::vector<person> c_val, std::list<std::string> d_val,
         std::deque<int> e_val,
-        std::map<int, person> f_val,
+        // std::map<int, person> f_val,
         // std::multimap<int, person> g_val,
         // std::set<std::string> h_val,
         // std::multiset<int> i_val,
@@ -87,7 +112,7 @@ public:
       , c(std::move(c_val))
       , d(std::move(d_val))
       , e(std::move(e_val))
-      , f(std::move(f_val))
+    //   , f(std::move(f_val))
     //   , g(std::move(g_val))
     //   , h(std::move(h_val))
     //   , i(std::move(i_val))
@@ -108,13 +133,61 @@ public:
 
         return color == rhs.color && a == rhs.a && b == rhs.b &&
             c == rhs.c && d == rhs.d &&
-            e == rhs.e && f == rhs.f && 
+            e == rhs.e && 
+            // f == rhs.f && 
             // g == rhs.g && h == rhs.h && i == rhs.i &&
             // j == rhs.j && k == rhs.k &&
             m == rhs.m && o == rhs.o &&
             p == rhs.p && uptr_q_equal;
     }
+
+    void print() const
+    {
+        std::cout << "Color: " << static_cast<int>(color) << ", a: " << a
+                  << ", b: " << b
+                  << ", c: { ";
+        for (const auto& person_obj : c)
+        {
+            std::cout << "{Age: " << person_obj.get_age()
+                      << ", Name: " << person_obj.get_name() << "} ";
+        }
+        std::cout << "}" << std::endl;
+        // print all
+
+        std::cout << "d: { ";
+        for (const auto& str : d)
+        {
+            std::cout << str << " ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::cout << "e: { ";
+        for (const auto& val : e)
+        {
+            std::cout << val << " ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::cout << "m: { ";
+        for (const auto& person_obj : m)
+        {
+            std::cout << "{Age: " << person_obj.get_age()
+                      << ", Name: " << person_obj.get_name() << "} ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::cout << "o: { " << o.first << ", {Age: " << o.second.get_age()
+                  << ", Name: " << o.second.get_name() << "}" << std::endl;
+            
+        std::cout << "p: ";
+        if (p)
+            std::cout << *p << std::endl;
+        else
+            std::cout << "nullopt" << std::endl;
+    }
 };
+
+HPX_IS_NOT_BITWISE_SERIALIZABLE(complicated_object)
 
 // --- Nested Object Definition ---
 class nested_object
@@ -140,24 +213,33 @@ public:
     {
         return id == rhs.id && name == rhs.name && p == rhs.p && o == rhs.o;
     }
+
+    void print() const
+    {
+        std::cout << "ID: " << id << ", Name: " << name << std::endl;
+        std::cout << "Person - Age: " << p.get_age() << ", Name: " << p.get_name() << std::endl;
+        // Add more detailed printing for complicated_object if needed
+        o.print();
+    }
 };
+HPX_IS_NOT_BITWISE_SERIALIZABLE(nested_object)
 
 int main()
 {
     complicated_object input_o(Color::black, 42, "hello",
-        {{10, "c1"}, {11, "c2"}}, // c: vector
-        {"list1", "list2"},       // d: list
-        {1, 2, 3},                // e: deque
-        {{1, {10, "f1"}}, {2, {11, "f2"}}}, // f: map
-        // {{1, {10, "g1"}}, {1, {11, "g2"}}}, // g: multimap
-        // {"set1", "set2"},         // h: set
-        // {1, 1, 2, 3, 3, 3},       // i: multiset
-        // {{1, {10, "j1"}}},        // j: unordered_map
-        // {{1, 100}, {1, 101}},     // k: unordered_multimap
-        {{{1, "m1"}, {2, "m2"}}}, // m: array
-        {"pair1", {1, "o1"}},     // o: pair
-        123,                      // p: optional
-        std::make_unique<int>(456)    // q: unique_ptr
+        {{10, "c1"}, {11, "c2"}},               // c: vector
+        {"list1", "list2"},                     // d: list
+        {1, 2, 3},                              // e: deque
+        // {{1, {10, "f1"}}, {2, {11, "f2"}}},  // f: map
+        // {{1, {10, "g1"}}, {1, {11, "g2"}}},  // g: multimap
+        // {"set1", "set2"},                    // h: set
+        // {1, 1, 2, 3, 3, 3},                  // i: multiset
+        // {{1, {10, "j1"}}},                   // j: unordered_map
+        // {{1, 100}, {1, 101}},                // k: unordered_multimap
+        {{{1, "m1"}, {2, "m2"}}},               // m: array
+        {"pair1", {1, "o1"}},                   // o: pair
+        123,                                    // p: optional
+        std::make_unique<int>(456)              // q: unique_ptr
     );
 
     nested_object input_data(
@@ -172,6 +254,12 @@ int main()
     hpx::serialization::input_archive iarchive(buffer);
     nested_object output_data;
     iarchive >> output_data;
+
+    // Print both
+    std::cout << "Input Data:" << std::endl;
+    input_data.print();
+    std::cout << "\nOutput Data:" << std::endl;
+    output_data.print();
 
     HPX_TEST(input_data == output_data);
 

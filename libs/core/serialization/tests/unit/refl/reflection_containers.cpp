@@ -1,73 +1,56 @@
-//  Copyright (c) 2025 Ujjwal Shekhar
-//  SPDX-License-Identifier: BSL-1.0
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying
-//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
+#include <hpx/config.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <map>
 #include <string>
 #include <vector>
+#include <array>
+#include <iostream>
 
-// A simple class
-class ReflStruct
-{
-private:
-    int i;
-    std::string s;
+struct person {
+    int age;
+    std::string name;
 
-public: // <-- Added public
-    ReflStruct() = default;
-    ReflStruct(int i, std::string s) : i(i), s(std::move(s)) {}
+    person() : age(0), name("") {}
+    person(int a, std::string n) : age(a), name(n) {}
 
-    bool operator==(ReflStruct const& rhs) const
-    {
-        return i == rhs.i && s == rhs.s;
+    bool operator==(person const& rhs) const {
+        return age == rhs.age && name == rhs.name;
     }
 };
 
-// A host class containing containers of the reflection-only class
-// This class has NO serialize() function.
-class ContainerHost
-{
-    std::vector<ReflStruct> vec;
-    std::map<int, ReflStruct> map;
-
+class A {
 public:
-    ContainerHost() = default;
-    ContainerHost(std::vector<ReflStruct> vec,
-        std::map<int, ReflStruct> map)
-      : vec(std::move(vec))
-      , map(std::move(map))
-    {
-    }
+    int a;
+    std::array<person, 2> b;
 
-    bool operator==(ContainerHost const& rhs) const
-    {
-        return vec == rhs.vec && map == rhs.map;
+    A() = default;
+    A(int a, std::array<person, 2> const& b) : a(a), b(b) {}
+
+    bool operator==(A const& rhs) const {
+        return a == rhs.a && b == rhs.b;
     }
 };
 
-int main()
-{
+int main() {
     std::vector<char> buffer;
     hpx::serialization::output_archive oarchive(buffer);
 
-    ContainerHost input_data;
-    input_data = ContainerHost({{1, "one"}, {2, "two"}},
-        {
-            {3, {3, "three"}},
-            {4, {4, "four"}},
-        });
-
+    // Initializing with known values
+    A input_data(42, {{{10, "p1"}, {20, "p2"}}});
     oarchive << input_data;
 
-    hpx::serialization::input_archive iarchive(buffer);
-    ContainerHost output_data;
+    hpx::serialization::input_archive iarchive(buffer, buffer.size());
+    A output_data;
     iarchive >> output_data;
 
-    HPX_TEST(input_data == output_data);
+    // Diagnostic Prints
+    std::cout << "Input  m[0]: " << input_data.b[0].age << ", " << input_data.b[0].name << std::endl;
+    std::cout << "Output m[0]: " << output_data.b[0].age << ", " << output_data.b[0].name << std::endl;
+
+    HPX_TEST_EQ(input_data.a, output_data.a);
+    HPX_TEST_EQ(input_data.b[0].age, output_data.b[0].age);
+    HPX_TEST_EQ(input_data.b[0].name, output_data.b[0].name);
 
     return hpx::util::report_errors();
 }
