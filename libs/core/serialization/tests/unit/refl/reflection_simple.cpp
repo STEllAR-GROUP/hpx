@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 // A simple class that is NOT bitwise serializable.
 // We will NOT provide a serialize() function for this.
@@ -17,12 +18,12 @@ class A
 private:
     int a;
     std::string b;
-    std::vector<int> c;
+    std::vector<std::string> c;
 
 public:
     A() = default;
 
-    A(int a, std::string const& b, std::vector<int> const& c)
+    A(int a, std::string const& b, std::vector<std::string> const& c)
       : a(a)
       , b(b)
       , c(c)
@@ -38,7 +39,7 @@ public:
     {
         return b;
     }
-    std::vector<int> get_c() const
+    std::vector<std::string> get_c() const
     {
         return c;
     }
@@ -57,7 +58,7 @@ int main()
     std::vector<char> buffer;
     hpx::serialization::output_archive oarchive(buffer);
 
-    simple_test_struct input_data(42, "hello reflection", {1, 2, 3, 4, 5});
+    simple_test_struct input_data(42, "hello reflection", {"6", "7", "6", "7"});
 
     // Serialize
     // This will fail to compile if reflection is not working,
@@ -73,6 +74,7 @@ int main()
     HPX_TEST_EQ(input_data.get_a(), output_data.get_a());
     HPX_TEST_EQ(input_data.get_b(), output_data.get_b());
     HPX_TEST_EQ(input_data.get_c().size(), output_data.get_c().size());
+
     HPX_TEST(input_data == output_data);
 
     return hpx::util::report_errors();

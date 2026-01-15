@@ -6,7 +6,6 @@
 
 #pragma once
 
-// These need to be included before base_object.hpp
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 
@@ -14,7 +13,7 @@
 
 // This file is only ever included by access.hpp
 // but we will still guard against direct inclusion
-#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_ALLOW_AUTO_GENERATE)
+#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 #include <experimental/meta>
 
 namespace hpx::serialization::detail {
@@ -28,8 +27,10 @@ namespace hpx::serialization::detail {
             constexpr auto base_info :
                 std::define_static_array(std::meta::bases_of(^^T, ctx)))
         {
-            using BaseType = typename[:std::meta::type_of(base_info):];
-            ar & hpx::serialization::base_object<BaseType>(t);
+            if constexpr (std::meta::is_public(base_info)) {
+                using BaseType = typename[:std::meta::type_of(base_info):];
+                ar & hpx::serialization::base_object<BaseType>(t);
+            }
         }
 
         // Serialize all members
@@ -41,9 +42,13 @@ namespace hpx::serialization::detail {
             // be a private/protected member, we will have to do manual
             // pointer arithmetic to get the member and codegen the
             // archive handling logic
-            // TODO: If intrusion given, we can directly access the member
+
+            // TODO: If intrusion provided, we can directly access the member
+            // so we should try figuring out the access context that we have
+            // and optimize for that case
             if constexpr (std::meta::is_public(member)) {
-                ar & t.[:member:];
+                using MemberType = typename[:std::meta::type_of(member):];
+                ar & const_cast<MemberType&>(t.[:member:]);
             } else {
                 constexpr auto offset_info = std::meta::offset_of(member);
                 static_assert(
@@ -53,18 +58,18 @@ namespace hpx::serialization::detail {
                 using MemberType = typename[:std::meta::type_of(member):];
                 constexpr size_t offset = offset_info.bytes;
                 
-                if constexpr (std::is_const_v<T>)
-                {
-                    // This is the 'save' path (T is 'const A')
-                    auto* member_ptr = reinterpret_cast<const MemberType*>(
-                        reinterpret_cast<const std::byte*>(&t) + offset);
+                if constexpr (std::is_const_v<T>) { // save path
+                    auto* member_ptr =
+                        reinterpret_cast<const MemberType*>(
+                            reinterpret_cast<const std::byte*>(
+                                std::addressof(t)) + offset);
                     ar & *member_ptr;
                 }
-                else
-                {
-                    // This is the 'load' path (T is 'A')
-                    auto* member_ptr = reinterpret_cast<MemberType*>(
-                        reinterpret_cast<std::byte*>(&t) + offset);
+                else { // load path
+                    auto* member_ptr =
+                        reinterpret_cast<MemberType*>(
+                            reinterpret_cast<std::byte*>(
+                                std::addressof(t)) + offset);
                     ar & *member_ptr;
                 }
             }
