@@ -10,6 +10,7 @@
 #include <hpx/binary_filter/zlib_serialization_filter_registration.hpp>
 
 #if defined(HPX_HAVE_COMPRESSION_ZLIB)
+#include <hpx/modules/iostream.hpp>
 #include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
@@ -23,7 +24,36 @@ namespace hpx::plugins::compression {
 
     namespace detail {
 
-        class zlib_compdecomp;
+        class zlib_compdecomp
+          : public hpx::iostreams::detail::zlib_base
+          , public hpx::iostreams::detail::zlib_allocator<std::allocator<char>>
+        {
+            using allocator_type =
+                hpx::iostreams::detail::zlib_allocator<std::allocator<char>>;
+
+        public:
+            explicit zlib_compdecomp(bool compress = false,
+                hpx::iostreams::zlib_params const& params =
+                    hpx::iostreams::zlib_params(
+                        hpx::iostreams::zlib::default_compression));
+            ~zlib_compdecomp();
+
+            bool save(char const*& src_begin, char const* src_end,
+                char*& dest_begin, char* dest_end, bool flush = false);
+            bool load(char const*& begin_in, char const* end_in,
+                char*& begin_out, char* end_out);
+
+            void close();
+
+            bool eof() const noexcept
+            {
+                return eof_;
+            }
+
+        private:
+            bool compress_;
+            bool eof_;
+        };
     }    // namespace detail
 
     struct HPX_LIBRARY_EXPORT zlib_serialization_filter

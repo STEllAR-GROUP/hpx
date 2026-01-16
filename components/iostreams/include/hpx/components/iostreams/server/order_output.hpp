@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2025 Hartmut Kaiser
+//  Copyright (c) 2011-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,25 +10,26 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/thread_support.hpp>
 
-#include <hpx/components/iostreams/server/buffer.hpp>
+#include <hpx/components/iostreams/server/data_buffer.hpp>
 
 #include <cstdint>
 #include <map>
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace iostreams { namespace detail {
+namespace hpx::iostreams::detail {
+
     struct order_output
     {
-        typedef std::map<std::uint64_t, buffer> output_data_type;
+        typedef std::map<std::uint64_t, data_buffer> output_data_type;
         typedef std::pair<std::uint64_t, output_data_type> data_type;
         typedef std::map<std::uint32_t, data_type> output_data_map_type;
 
         template <typename F, typename Mutex>
         void output(std::uint32_t locality_id, std::uint64_t count,
-            detail::buffer const& buf_in, F const& write_f, Mutex& mtx)
+            detail::data_buffer const& buf_in, F const& write_f, Mutex& mtx)
         {
-            detail::buffer in(buf_in);
+            detail::data_buffer in(buf_in);
             std::unique_lock<Mutex> l(mtx);
             data_type& data = output_data_map_[locality_id];    //-V108
 
@@ -46,7 +47,7 @@ namespace hpx { namespace iostreams { namespace detail {
                 output_data_type::iterator next = data.second.find(++count);
                 while (next != data.second.end())
                 {
-                    buffer next_in = (*next).second;
+                    data_buffer next_in = HPX_MOVE((*next).second);
                     {
                         // output the next line
                         unlock_guard<std::unique_lock<Mutex>> ul(l);
@@ -69,4 +70,4 @@ namespace hpx { namespace iostreams { namespace detail {
     private:
         output_data_map_type output_data_map_;
     };
-}}}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostreams::detail

@@ -434,3 +434,31 @@
         HPX_TEST_IMPL(fixture, caught_exception);                              \
     }                                                                          \
     /**/
+
+////////////////////////////////////////////////////////////////////////////////
+#define HPX_TEST_NO_THROW(...)                                                 \
+    HPX_TEST_NO_THROW_(__VA_ARGS__)                                            \
+    /**/
+
+#define HPX_TEST_NO_THROW_(...)                                                \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_TEST_NO_THROW_, HPX_PP_NARGS(__VA_ARGS__))(   \
+        __VA_ARGS__))                                                          \
+    /**/
+#define HPX_TEST_NO_THROW_1(expression)                                        \
+    HPX_TEST_NO_THROW_IMPL(::hpx::util::detail::global_fixture(), expression)
+
+#define HPX_TEST_NO_THROW_IMPL(fixture, expression)                            \
+    {                                                                          \
+        bool caught_exception = false;                                         \
+        try                                                                    \
+        {                                                                      \
+            expression;                                                        \
+        }                                                                      \
+        catch (...)                                                            \
+        {                                                                      \
+            caught_exception = true;                                           \
+        }                                                                      \
+        HPX_TEST_MSG_IMPL(                                                     \
+            fixture, !caught_exception, "unexpected exception caught");        \
+    }                                                                          \
+    /**/

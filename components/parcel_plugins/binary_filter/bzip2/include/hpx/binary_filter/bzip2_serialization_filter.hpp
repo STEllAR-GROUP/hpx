@@ -10,6 +10,7 @@
 #include <hpx/binary_filter/bzip2_serialization_filter_registration.hpp>
 
 #if defined(HPX_HAVE_COMPRESSION_BZIP2)
+#include <hpx/modules/iostream.hpp>
 #include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
@@ -23,8 +24,44 @@ namespace hpx::plugins::compression {
 
     namespace detail {
 
-        class bzip2_compdecomp;
-    }
+        class bzip2_compdecomp
+          : public hpx::iostreams::detail::bzip2_base
+          , public hpx::iostreams::detail::bzip2_allocator<std::allocator<char>>
+        {
+            using allocator_type =
+                hpx::iostreams::detail::bzip2_allocator<std::allocator<char>>;
+
+        public:
+            bzip2_compdecomp();    // used for decompression
+            bzip2_compdecomp(bool compress,
+                hpx::iostreams::bzip2_params const& params =
+                    hpx::iostreams::bzip2_params());
+            ~bzip2_compdecomp();
+
+            bool save(char const*& src_begin, char const* src_end,
+                char*& dest_begin, char* dest_end, bool flush = false);
+            bool load(char const*& begin_in, char const* end_in,
+                char*& begin_out, char* end_out);
+
+            void close();
+
+            bool eof() const noexcept
+            {
+                return eof_;
+            }
+
+        protected:
+            void init()
+            {
+                hpx::iostreams::detail::bzip2_base::init(
+                    compress_, static_cast<allocator_type&>(*this));
+            }
+
+        private:
+            bool compress_;
+            bool eof_;
+        };
+    }    // namespace detail
 
     struct HPX_LIBRARY_EXPORT bzip2_serialization_filter
       : public serialization::binary_filter

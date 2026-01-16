@@ -30,7 +30,8 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace iostreams { namespace detail {
+namespace hpx::iostreams::detail {
+
     std::ostream& get_coutstream() noexcept
     {
         return std::cout;
@@ -90,9 +91,9 @@ namespace hpx { namespace iostreams { namespace detail {
             agas::unregister_name(launch::sync, name);
         }
     }
-}}}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostreams::detail
 
-namespace hpx { namespace iostreams {
+namespace hpx::iostreams {
     // force the creation of the singleton stream objects
     void create_cout()
     {
@@ -137,7 +138,7 @@ namespace hpx { namespace iostreams {
         }
         return detail::get_consolestream();
     }
-}}    // namespace hpx::iostreams
+}    // namespace hpx::iostreams
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_PLAIN_ACTION(hpx::iostreams::create_cout, create_cout_action)
@@ -147,6 +148,7 @@ HPX_PLAIN_ACTION(
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     // global standard ostream objects
     iostreams::ostream<> cout;
     iostreams::ostream<> cerr;

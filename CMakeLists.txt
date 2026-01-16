@@ -2358,7 +2358,6 @@ include(HPX_SetupThreads)
 # Setup our required Boost libraries.
 include(HPX_SetupBoost)
 include(HPX_SetupBoostFilesystem)
-include(HPX_SetupBoostIostreams)
 
 # Set up standalone Asio
 include(HPX_SetupAsio)

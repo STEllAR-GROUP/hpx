@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 #include <hpx/modules/actions.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/iostream.hpp>
 
 #include <hpx/binary_filter/bzip2_serialization_filter.hpp>
 #include <hpx/plugin_factories/binary_filter_factory.hpp>
@@ -73,16 +74,16 @@ namespace hpx::plugins::compression {
         };
 
         bzip2_compdecomp::bzip2_compdecomp()
-          : boost::iostreams::detail::bzip2_base(boost::iostreams::bzip2_params(
-                boost::iostreams::bzip2::default_small))
+          : hpx::iostreams::detail::bzip2_base(hpx::iostreams::bzip2_params(
+                hpx::iostreams::bzip2::default_small))
           , compress_(false)
           , eof_(false)
         {
         }
 
         bzip2_compdecomp::bzip2_compdecomp(
-            bool compress, boost::iostreams::bzip2_params const& params)
-          : boost::iostreams::detail::bzip2_base(params)
+            bool compress, hpx::iostreams::bzip2_params const& params)
+          : hpx::iostreams::detail::bzip2_base(params)
           , compress_(compress)
           , eof_(false)
         {
@@ -96,8 +97,8 @@ namespace hpx::plugins::compression {
         bool bzip2_compdecomp::save(char const*& src_begin, char const* src_end,
             char*& dest_begin, char* dest_end, bool flush)
         {
-            using namespace boost::iostreams;
-            using namespace boost::iostreams::bzip2;
+            using namespace hpx::iostreams;
+            using namespace hpx::iostreams::bzip2;
 
             if (!ready())
                 init();
@@ -114,8 +115,8 @@ namespace hpx::plugins::compression {
         bool bzip2_compdecomp::load(char const*& src_begin, char const* src_end,
             char*& dest_begin, char* dest_end)
         {
-            using namespace boost::iostreams;
-            using namespace boost::iostreams::bzip2;
+            using namespace hpx::iostreams;
+            using namespace hpx::iostreams::bzip2;
 
             if (eof_)
             {

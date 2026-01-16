@@ -24,6 +24,7 @@ function(add_hpx_module libname modulename)
       GENERATED_HEADERS
       OBJECTS
       DEPENDENCIES
+      INCLUDE_DIRECTORIES
       MODULE_DEPENDENCIES
       CMAKE_SUBDIRS
       EXCLUDE_FROM_GLOBAL_HEADER
@@ -407,6 +408,9 @@ function(add_hpx_module libname modulename)
     hpx_${modulename} PUBLIC ${${modulename}_MODULE_DEPENDENCIES}
   )
   target_link_libraries(hpx_${modulename} PUBLIC ${${modulename}_DEPENDENCIES})
+  target_include_directories(
+    hpx_${modulename} PUBLIC ${${modulename}_INCLUDE_DIRECTORIES}
+  )
   target_include_directories(
     hpx_${modulename}
     PUBLIC $<BUILD_INTERFACE:${HEADER_ROOT}>
