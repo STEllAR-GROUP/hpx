@@ -66,7 +66,6 @@
 #if !defined(HPX_CXX_EXPORT)
 # define HPX_CXX_EXPORT                         /* empty */
 #endif
-# define HPX_CXX_CORE_EXPORT HPX_CXX_EXPORT
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_EXPORTS) || defined(HPX_FULL_EXPORTS)
