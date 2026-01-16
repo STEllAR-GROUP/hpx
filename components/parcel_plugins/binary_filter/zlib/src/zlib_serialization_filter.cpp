@@ -34,17 +34,17 @@ namespace hpx::plugins::compression {
     namespace detail {
 
         class zlib_compdecomp
-          : public boost::iostreams::detail::zlib_base
-          , public boost::iostreams::detail::zlib_allocator<
-                std::allocator<char>>
+          : public hpx::iostreams::detail::zlib_base
+          , public hpx::iostreams::detail::zlib_allocator<std::allocator<char>>
         {
             using allocator_type =
-                boost::iostreams::detail::zlib_allocator<std::allocator<char>>;
+                hpx::iostreams::detail::zlib_allocator<std::allocator<char>>;
 
         public:
             explicit zlib_compdecomp(bool compress = false,
-                boost::iostreams::zlib_params const& params =
-                    boost::iostreams::zlib::default_compression);
+                hpx::iostreams::zlib_params const& params =
+                    hpx::iostreams::zlib_params{
+                        hpx::iostreams::zlib::default_compression});
             ~zlib_compdecomp();
 
             bool save(char const*& src_begin, char const* src_end,
@@ -111,8 +111,8 @@ namespace hpx::plugins::compression {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    zlib_serialization_filter::zlib_serialization_filter(bool compress,
-        serialization::binary_filter* next_filter) noexcept
+    zlib_serialization_filter::zlib_serialization_filter(
+        bool compress, serialization::binary_filter* next_filter) noexcept
       : compdecomp_(std::make_unique<detail::zlib_compdecomp>(compress))
       , current_(0)
     {

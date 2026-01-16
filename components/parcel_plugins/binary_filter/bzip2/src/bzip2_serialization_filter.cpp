@@ -35,18 +35,17 @@ namespace hpx::plugins::compression {
     namespace detail {
 
         class bzip2_compdecomp
-          : public boost::iostreams::detail::bzip2_base
-          , public boost::iostreams::detail::bzip2_allocator<
-                std::allocator<char>>
+          : public hpx::iostreams::detail::bzip2_base
+          , public hpx::iostreams::detail::bzip2_allocator<std::allocator<char>>
         {
             using allocator_type =
-                boost::iostreams::detail::bzip2_allocator<std::allocator<char>>;
+                hpx::iostreams::detail::bzip2_allocator<std::allocator<char>>;
 
         public:
             bzip2_compdecomp();    // used for decompression
             explicit bzip2_compdecomp(bool compress,
-                boost::iostreams::bzip2_params const& params =
-                    boost::iostreams::bzip2_params());
+                hpx::iostreams::bzip2_params const& params =
+                    hpx::iostreams::bzip2_params());
             ~bzip2_compdecomp();
 
             bool save(char const*& src_begin, char const* src_end,
@@ -64,7 +63,7 @@ namespace hpx::plugins::compression {
         protected:
             void init()
             {
-                boost::iostreams::detail::bzip2_base::init(
+                hpx::iostreams::detail::bzip2_base::init(
                     compress_, static_cast<allocator_type&>(*this));
             }
 

@@ -35,7 +35,6 @@
 
 #elif defined(HPX_HAVE_CUDA) && defined(HPX_HAVE_GPUBLAS)
 
-#include <cublas.h>
 #include <cublas_v2.h>
 
 #endif

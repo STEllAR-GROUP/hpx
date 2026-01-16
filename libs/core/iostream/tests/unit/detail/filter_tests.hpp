@@ -110,6 +110,7 @@ namespace hpx::iostreams {
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
+#pragma GCC diagnostic ignored "-Wrestrict"
 #endif
             dest_.insert(dest_.end(), s, s + amt);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
