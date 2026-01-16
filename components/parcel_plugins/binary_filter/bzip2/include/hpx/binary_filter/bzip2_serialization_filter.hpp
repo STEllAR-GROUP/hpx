@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 #include <hpx/binary_filter/bzip2_serialization_filter_registration.hpp>
 
 #if defined(HPX_HAVE_COMPRESSION_BZIP2)
+#include <hpx/modules/iostream.hpp>
 #include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
@@ -18,67 +19,20 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#include <boost/iostreams/filter/bzip2.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::plugins::compression {
 
     namespace detail {
 
-        class bzip2_compdecomp
-          : public boost::iostreams::detail::bzip2_base
-          , public boost::iostreams::detail::bzip2_allocator<
-                std::allocator<char>>
-        {
-            using allocator_type =
-                boost::iostreams::detail::bzip2_allocator<std::allocator<char>>;
-
-        public:
-            bzip2_compdecomp();    // used for decompression
-            bzip2_compdecomp(bool compress,
-                boost::iostreams::bzip2_params const& params =
-                    boost::iostreams::bzip2_params());
-            ~bzip2_compdecomp();
-
-            bool save(char const*& src_begin, char const* src_end,
-                char*& dest_begin, char* dest_end, bool flush = false);
-            bool load(char const*& begin_in, char const* end_in,
-                char*& begin_out, char* end_out);
-
-            void close();
-
-            bool eof() const noexcept
-            {
-                return eof_;
-            }
-
-        protected:
-            void init()
-            {
-                boost::iostreams::detail::bzip2_base::init(
-                    compress_, static_cast<allocator_type&>(*this));
-            }
-
-        private:
-            bool compress_;
-            bool eof_;
-        };
+        class bzip2_compdecomp;
     }    // namespace detail
 
     struct HPX_LIBRARY_EXPORT bzip2_serialization_filter
       : public serialization::binary_filter
     {
-        bzip2_serialization_filter() noexcept
-          : current_(0)
-        {
-        }
-
-        bzip2_serialization_filter(bool compress,
-            serialization::binary_filter* next_filter = nullptr) noexcept
-          : compdecomp_(compress)
-          , current_(0)
-        {
-        }
+        bzip2_serialization_filter() noexcept;
+        explicit bzip2_serialization_filter(bool compress,
+            serialization::binary_filter* next_filter = nullptr) noexcept;
 
         void load(void* dst, std::size_t dst_count) override;
         void save(void const* src, std::size_t src_count) override;
@@ -98,13 +52,14 @@ namespace hpx::plugins::compression {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        HPX_FORCEINLINE void serialize(Archive& ar, unsigned int const)
+        HPX_FORCEINLINE static constexpr void serialize(
+            Archive& ar, unsigned int const)
         {
         }
 
         HPX_SERIALIZATION_POLYMORPHIC(bzip2_serialization_filter, override);
 
-        detail::bzip2_compdecomp compdecomp_;
+        std::unique_ptr<detail::bzip2_compdecomp> compdecomp_;
         std::vector<char> buffer_;
         std::size_t current_;
     };
