@@ -23,7 +23,7 @@
 #include "detail/temp_file.hpp"
 #include "detail/verification.hpp"
 
-namespace io = hpx::iostreams;
+namespace io = hpx::iostream;
 
 inline bool compare_type_ids(
     std::type_info const& ti1, std::type_info const& ti2)
@@ -85,7 +85,7 @@ void component_type_test()
 {
     using namespace std;
     using namespace io;
-    using namespace hpx::iostreams::test;
+    using namespace hpx::iostream::test;
 
     temp_file dest;
     lowercase_file lower;

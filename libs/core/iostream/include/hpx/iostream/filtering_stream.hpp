@@ -26,7 +26,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     //--------------Definition of filtered_istream--------------------------------//
     namespace detail {
@@ -217,6 +217,6 @@ namespace hpx::iostreams {
     HPX_CXX_CORE_EXPORT using filtering_wistream = wfiltering_stream<input>;
     HPX_CXX_CORE_EXPORT using filtering_wostream = wfiltering_stream<output>;
 #endif
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

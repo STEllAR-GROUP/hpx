@@ -29,7 +29,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     namespace detail {
 
@@ -102,8 +102,8 @@ namespace hpx::iostreams {
             template <typename Locale>    // Avoid dependency on <locale>
             void imbue(Locale const& loc)
             {
-                iostreams::imbue(filter_, loc);
-                iostreams::imbue(device_, loc);
+                iostream::imbue(filter_, loc);
+                iostream::imbue(device_, loc);
             }
 
             Filter& first()
@@ -173,7 +173,7 @@ namespace hpx::iostreams {
             {
                 composite_device<filter_ref, Source> cmp(
                     std::ref(filter2_), src);
-                return iostreams::read(filter1_, cmp, s, n);
+                return iostream::read(filter1_, cmp, s, n);
             }
 
             template <typename Sink>
@@ -181,7 +181,7 @@ namespace hpx::iostreams {
                 Sink& snk, char_type const* s, std::streamsize n)
             {
                 composite_device<filter_ref, Sink> cmp(std::ref(filter2_), snk);
-                return iostreams::write(filter1_, cmp, s, n);
+                return iostream::write(filter1_, cmp, s, n);
             }
 
             template <typename Device>
@@ -192,7 +192,7 @@ namespace hpx::iostreams {
             {
                 composite_device<filter_ref, Device> cmp(
                     std::ref(filter2_), dev);
-                return iostreams::seek(filter1_, cmp, off, way, which);
+                return iostream::seek(filter1_, cmp, off, way, which);
             }
 
             template <typename Device>
@@ -271,23 +271,23 @@ namespace hpx::iostreams {
             bool flush(Device& dev)
             {
                 composite_device<Filter2, Device> cmp(filter2_, dev);
-                return iostreams::flush(filter1_, cmp);
+                return iostream::flush(filter1_, cmp);
             }
 
             [[nodiscard]] std::streamsize optimal_buffer_size() const
             {
                 std::streamsize const first =
-                    iostreams::optimal_buffer_size(filter1_);
+                    iostream::optimal_buffer_size(filter1_);
                 std::streamsize const second =
-                    iostreams::optimal_buffer_size(filter2_);
+                    iostream::optimal_buffer_size(filter2_);
                 return first < second ? second : first;
             }
 
             template <typename Locale>    // Avoid dependency on <locale>
             void imbue(Locale const& loc)
             {
-                iostreams::imbue(filter1_, loc);
-                iostreams::imbue(filter2_, loc);
+                iostream::imbue(filter1_, loc);
+                iostream::imbue(filter2_, loc);
             }
 
             Filter1& first()
@@ -384,14 +384,14 @@ namespace hpx::iostreams {
         std::streamsize composite_device<Filter, Device, Mode>::read(
             char_type* s, std::streamsize n)
         {
-            return iostreams::read(filter_, device_, s, n);
+            return iostream::read(filter_, device_, s, n);
         }
 
         template <typename Filter, typename Device, typename Mode>
         std::streamsize composite_device<Filter, Device, Mode>::write(
             char_type const* s, std::streamsize n)
         {
-            return iostreams::write(filter_, device_, s, n);
+            return iostream::write(filter_, device_, s, n);
         }
 
         template <typename Filter, typename Device, typename Mode>
@@ -399,7 +399,7 @@ namespace hpx::iostreams {
             stream_offset off, std::ios_base::seekdir way,
             std::ios_base::openmode which)
         {
-            return iostreams::seek(filter_, device_, off, way, which);
+            return iostream::seek(filter_, device_, off, way, which);
         }
 
         template <typename Filter, typename Device, typename Mode>
@@ -461,8 +461,8 @@ namespace hpx::iostreams {
         template <typename Filter, typename Device, typename Mode>
         bool composite_device<Filter, Device, Mode>::flush()
         {
-            bool const r1 = iostreams::flush(filter_, device_);
-            bool const r2 = iostreams::flush(device_);
+            bool const r1 = iostream::flush(filter_, device_);
+            bool const r2 = iostream::flush(device_);
             return r1 && r2;
         }
 
@@ -470,9 +470,9 @@ namespace hpx::iostreams {
         std::streamsize
         composite_device<Filter, Device, Mode>::optimal_buffer_size() const
         {
-            return iostreams::optimal_buffer_size(device_);
+            return iostream::optimal_buffer_size(device_);
         }
     }    // End namespace detail.
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

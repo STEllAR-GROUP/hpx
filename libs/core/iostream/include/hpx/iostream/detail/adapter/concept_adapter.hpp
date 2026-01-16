@@ -27,7 +27,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     HPX_CXX_CORE_EXPORT template <typename Category>
     struct device_wrapper_impl;
@@ -152,14 +152,14 @@ namespace hpx::iostreams::detail {
         {
             if constexpr (std::is_convertible_v<category, localizable_tag>)
             {
-                iostreams::imbue(t_, loc);
+                iostream::imbue(t_, loc);
             }
         }
 
         [[nodiscard]] constexpr std::streamsize optimal_buffer_size()
             const noexcept
         {
-            return iostreams::optimal_buffer_size(t_);
+            return iostream::optimal_buffer_size(t_);
         }
 
     private:
@@ -190,19 +190,19 @@ namespace hpx::iostreams::detail {
             std::ios_base::seekdir way, std::ios_base::openmode which,
             random_access)
         {
-            return iostreams::seek(dev, off, way, which);
+            return iostream::seek(dev, off, way, which);
         }
 
         template <typename Device, typename Dummy>
         static void close(Device& dev, Dummy*, std::ios_base::openmode which)
         {
-            iostreams::close(dev, which);
+            iostream::close(dev, which);
         }
 
         template <typename Device, typename Dummy>
         static bool flush(Device& dev, Dummy*)
         {
-            return iostreams::flush(dev);
+            return iostream::flush(dev);
         }
     };
 
@@ -213,7 +213,7 @@ namespace hpx::iostreams::detail {
         static std::streamsize read(
             Device& dev, Dummy*, char_type_of_t<Device>* s, std::streamsize n)
         {
-            return iostreams::read(dev, s, n);
+            return iostream::read(dev, s, n);
         }
 
         template <typename Device, typename Dummy>
@@ -238,7 +238,7 @@ namespace hpx::iostreams::detail {
         static std::streamsize write(Device& dev, Dummy*,
             char_type_of_t<Device> const* s, std::streamsize n)
         {
-            return iostreams::write(dev, s, n);
+            return iostream::write(dev, s, n);
         }
     };
 
@@ -289,13 +289,13 @@ namespace hpx::iostreams::detail {
         template <typename Filter, typename Device>
         static void close(Filter& f, Device* dev, std::ios_base::openmode which)
         {
-            iostreams::close(f, *dev, which);
+            iostream::close(f, *dev, which);
         }
 
         template <typename Filter, typename Device>
         static bool flush(Filter& f, Device* dev)
         {
-            return iostreams::flush(f, *dev);
+            return iostream::flush(f, *dev);
         }
     };
 
@@ -306,7 +306,7 @@ namespace hpx::iostreams::detail {
         static std::streamsize read(Filter& f, Source* src,
             char_type_of_t<Filter>* s, std::streamsize n)
         {
-            return iostreams::read(f, *src, s, n);
+            return iostream::read(f, *src, s, n);
         }
 
         template <typename Filter, typename Sink>
@@ -331,9 +331,9 @@ namespace hpx::iostreams::detail {
         static std::streamsize write(Filter& f, Sink* snk,
             char_type_of_t<Filter> const* s, std::streamsize n)
         {
-            return iostreams::write(f, *snk, s, n);
+            return iostream::write(f, *snk, s, n);
         }
     };
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail
 
 #include <hpx/config/warnings_suffix.hpp>

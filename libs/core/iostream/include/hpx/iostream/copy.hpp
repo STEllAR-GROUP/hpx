@@ -36,7 +36,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     namespace detail {
 
@@ -56,8 +56,8 @@ namespace hpx::iostreams {
             if constexpr (is_direct_v<source_t> && is_direct_v<sink_t>)
             {
                 // Copy from a direct source to a direct sink
-                auto p1 = iostreams::input_sequence(HPX_FORWARD(Source, src));
-                auto p2 = iostreams::output_sequence(HPX_FORWARD(Sink, snk));
+                auto p1 = iostream::input_sequence(HPX_FORWARD(Source, src));
+                auto p2 = iostream::output_sequence(HPX_FORWARD(Sink, snk));
                 total = static_cast<std::streamsize>(
                     (std::min) (p1.size(), p2.size()));
                 std::copy(p1.data(), p1.data() + total, p2.data());
@@ -65,14 +65,14 @@ namespace hpx::iostreams {
             else if constexpr (is_direct_v<source_t> && !is_direct_v<sink_t>)
             {
                 // Copy from a direct source to an indirect sink
-                auto p = iostreams::input_sequence(HPX_FORWARD(Source, src));
+                auto p = iostream::input_sequence(HPX_FORWARD(Source, src));
                 for (std::streamsize const size =
                          static_cast<std::streamsize>(p.size());
                     total < size;
                     /**/)
                 {
                     std::streamsize const amt =
-                        iostreams::write(snk, p.data() + total, size - total);
+                        iostream::write(snk, p.data() + total, size - total);
                     total += amt;
                 }
             }
@@ -86,7 +86,7 @@ namespace hpx::iostreams {
                 std::ptrdiff_t const capacity = p.size();
                 while (true)
                 {
-                    std::streamsize const amt = iostreams::read(src, buf.data(),
+                    std::streamsize const amt = iostream::read(src, buf.data(),
                         buffer_size < capacity - total ? buffer_size :
                                                          capacity - total);
                     if (amt == -1)
@@ -107,12 +107,12 @@ namespace hpx::iostreams {
                 non_blocking_adapter<sink_t> nb(snk);
                 while (true)
                 {
-                    std::streamsize const amt = iostreams::read(
+                    std::streamsize const amt = iostream::read(
                         HPX_FORWARD(Source, src), buf.data(), buffer_size);
                     if (amt == -1)
                         break;
 
-                    iostreams::write(nb, buf.data(), amt);
+                    iostream::write(nb, buf.data(), amt);
                     total += amt;
                 }
             }
@@ -183,4 +183,4 @@ namespace hpx::iostreams {
                 detail::wrap(HPX_FORWARD(Sink, snk)), buffer_size);
         }
     }
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

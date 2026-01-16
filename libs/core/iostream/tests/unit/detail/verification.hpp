@@ -24,7 +24,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams::test {
+namespace hpx::iostream::test {
 
     template <typename Ch, typename Tr>
     bool compare_streams_in_chars(
@@ -364,6 +364,6 @@ namespace hpx::iostreams::test {
         }
         return true;
     }
-}    // namespace hpx::iostreams::test
+}    // namespace hpx::iostream::test
 
 #include <hpx/config/warnings_suffix.hpp>

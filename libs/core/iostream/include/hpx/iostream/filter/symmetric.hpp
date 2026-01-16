@@ -57,7 +57,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     HPX_CXX_CORE_EXPORT template <typename SymmetricFilter,
         typename Alloc = std::allocator<char_type_of_t<SymmetricFilter>>>
@@ -65,7 +65,7 @@ namespace hpx::iostreams {
     {
     public:
         using char_type = char_type_of_t<SymmetricFilter>;
-        using traits_type = iostreams::char_traits<char_type>;
+        using traits_type = iostream::char_traits<char_type>;
         using string_type = std::basic_string<char_type, traits_type, Alloc>;
 
         struct category
@@ -223,7 +223,7 @@ namespace hpx::iostreams {
         int fill(Source& src)
         {
             std::streamsize amt =
-                iostreams::read(src, buf().data(), buf().size());
+                iostream::read(src, buf().data(), buf().size());
             if (amt == -1)
             {
                 state() = state() | flags::eof;
@@ -244,7 +244,7 @@ namespace hpx::iostreams {
                 std::streamsize amt =
                     static_cast<std::streamsize>(buf().ptr() - buf().data());
                 std::streamsize result =
-                    hpx::iostreams::write(snk, buf().data(), amt);
+                    hpx::iostream::write(snk, buf().data(), amt);
                 if (result < amt && result > 0)
                     traits_type::move(
                         buf().data(), buf().data() + result, amt - result);
@@ -336,6 +336,6 @@ namespace hpx::iostreams {
     {
         return string_type(buf().ptr(), buf().eptr());
     }
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -16,8 +16,8 @@
 #include "detail/temp_file.hpp"
 #include "detail/verification.hpp"
 
-using namespace hpx::iostreams;
-using namespace hpx::iostreams::test;
+using namespace hpx::iostream;
+using namespace hpx::iostream::test;
 
 void file_test()
 {

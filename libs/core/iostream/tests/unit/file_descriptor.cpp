@@ -21,8 +21,8 @@
 #include "detail/temp_file.hpp"
 #include "detail/verification.hpp"
 
-using namespace hpx::iostreams;
-using namespace hpx::iostreams::test;
+using namespace hpx::iostream;
+using namespace hpx::iostream::test;
 using std::ifstream;
 
 void file_descriptor_test()
@@ -431,7 +431,7 @@ void file_handle_test_impl(FileDescriptor*)
     test_file test2;
 
     {
-        hpx::iostreams::file_handle handle = open_file_handle(test1.name());
+        hpx::iostream::file_handle handle = open_file_handle(test1.name());
         {
             FileDescriptor device1(
                 handle, file_descriptor::flags::never_close_handle);
@@ -442,7 +442,7 @@ void file_handle_test_impl(FileDescriptor*)
     }
 
     {
-        hpx::iostreams::file_handle handle = open_file_handle(test1.name());
+        hpx::iostream::file_handle handle = open_file_handle(test1.name());
         {
             FileDescriptor device1(
                 handle, file_descriptor::flags::close_handle);
@@ -452,7 +452,7 @@ void file_handle_test_impl(FileDescriptor*)
     }
 
     {
-        hpx::iostreams::file_handle handle = open_file_handle(test1.name());
+        hpx::iostream::file_handle handle = open_file_handle(test1.name());
         FileDescriptor device1(
             handle, file_descriptor::flags::never_close_handle);
         HPX_TEST(device1.handle() == handle);
@@ -463,7 +463,7 @@ void file_handle_test_impl(FileDescriptor*)
     }
 
     {
-        hpx::iostreams::file_handle handle = open_file_handle(test1.name());
+        hpx::iostream::file_handle handle = open_file_handle(test1.name());
         FileDescriptor device1(handle, file_descriptor::flags::close_handle);
         HPX_TEST(device1.handle() == handle);
         device1.close();
@@ -472,8 +472,8 @@ void file_handle_test_impl(FileDescriptor*)
     }
 
     {
-        hpx::iostreams::file_handle handle1 = open_file_handle(test1.name());
-        hpx::iostreams::file_handle handle2 = open_file_handle(test2.name());
+        hpx::iostream::file_handle handle1 = open_file_handle(test1.name());
+        hpx::iostream::file_handle handle2 = open_file_handle(test2.name());
         {
             FileDescriptor device1(
                 handle1, file_descriptor::flags::never_close_handle);
@@ -488,8 +488,8 @@ void file_handle_test_impl(FileDescriptor*)
     }
 
     {
-        hpx::iostreams::file_handle handle1 = open_file_handle(test1.name());
-        hpx::iostreams::file_handle handle2 = open_file_handle(test2.name());
+        hpx::iostream::file_handle handle1 = open_file_handle(test1.name());
+        hpx::iostream::file_handle handle2 = open_file_handle(test2.name());
         {
             FileDescriptor device1(
                 handle1, file_descriptor::flags::close_handle);
@@ -504,8 +504,8 @@ void file_handle_test_impl(FileDescriptor*)
     }
 
     {
-        hpx::iostreams::file_handle handle1 = open_file_handle(test1.name());
-        hpx::iostreams::file_handle handle2 = open_file_handle(test2.name());
+        hpx::iostream::file_handle handle1 = open_file_handle(test1.name());
+        hpx::iostream::file_handle handle2 = open_file_handle(test2.name());
         {
             FileDescriptor device1(
                 handle1, file_descriptor::flags::close_handle);
@@ -521,7 +521,7 @@ void file_handle_test_impl(FileDescriptor*)
     }
 
     {
-        hpx::iostreams::file_handle handle = open_file_handle(test1.name());
+        hpx::iostream::file_handle handle = open_file_handle(test1.name());
         {
             FileDescriptor device1;
             HPX_TEST(!device1.is_open());
@@ -534,7 +534,7 @@ void file_handle_test_impl(FileDescriptor*)
     }
 
     {
-        hpx::iostreams::file_handle handle = open_file_handle(test1.name());
+        hpx::iostream::file_handle handle = open_file_handle(test1.name());
         {
             FileDescriptor device1;
             HPX_TEST(!device1.is_open());

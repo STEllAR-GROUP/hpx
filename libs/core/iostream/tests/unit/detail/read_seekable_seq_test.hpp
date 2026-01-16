@@ -25,8 +25,8 @@ void read_seekable_sequence_test()
 {
     using namespace std;
     using namespace hpx;
-    using namespace hpx::iostreams;
-    using namespace hpx::iostreams::test;
+    using namespace hpx::iostream;
+    using namespace hpx::iostream::test;
 
     test_file file;
     test_sequence<> seq;

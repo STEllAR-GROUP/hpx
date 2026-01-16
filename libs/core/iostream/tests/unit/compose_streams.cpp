@@ -24,9 +24,9 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 using namespace std;
-using namespace hpx::iostreams;
-using namespace hpx::iostreams::test;
-namespace io = hpx::iostreams;
+using namespace hpx::iostream;
+using namespace hpx::iostream::test;
+namespace io = hpx::iostream;
 
 void read_composite()
 {

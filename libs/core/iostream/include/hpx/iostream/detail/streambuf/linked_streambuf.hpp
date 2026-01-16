@@ -21,7 +21,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     HPX_CXX_CORE_EXPORT template <typename Self, typename Ch, typename Tr,
         typename Alloc, typename Mode>
@@ -139,6 +139,6 @@ namespace hpx::iostreams::detail {
 
         int flags_ = 0;
     };
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail
 
 #include <hpx/config/warnings_prefix.hpp>

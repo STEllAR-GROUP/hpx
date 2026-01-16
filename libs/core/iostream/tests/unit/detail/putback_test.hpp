@@ -19,7 +19,7 @@
 #include "constants.hpp"
 #include "temp_file.hpp"
 
-using hpx::iostreams::test::chunk_size;
+using hpx::iostream::test::chunk_size;
 
 bool putback_test_one(std::istream& is)
 {
@@ -79,10 +79,10 @@ bool putback_test_three(Source& src)
         while (true)
         {
             char buf[chunk_size];
-            if (hpx::iostreams::read(src, buf, chunk_size) < chunk_size)
+            if (hpx::iostream::read(src, buf, chunk_size) < chunk_size)
                 break;
-            hpx::iostreams::putback(src, 'a');
-            if (hpx::iostreams::get(src) != 'a')
+            hpx::iostream::putback(src, 'a');
+            if (hpx::iostream::get(src) != 'a')
                 return false;
         }
         return true;
@@ -101,17 +101,17 @@ bool putback_test_four(Source& src)
         while (true)
         {
             char buf[chunk_size];
-            if (hpx::iostreams::read(src, buf, chunk_size) < chunk_size)
+            if (hpx::iostream::read(src, buf, chunk_size) < chunk_size)
                 break;
 
-            hpx::iostreams::putback(src, 'a');
-            hpx::iostreams::putback(src, 'b');
-            hpx::iostreams::putback(src, 'c');
-            hpx::iostreams::putback(src, 'd');
-            if (hpx::iostreams::get(src) != 'd' ||
-                hpx::iostreams::get(src) != 'c' ||
-                hpx::iostreams::get(src) != 'b' ||
-                hpx::iostreams::get(src) != 'a')
+            hpx::iostream::putback(src, 'a');
+            hpx::iostream::putback(src, 'b');
+            hpx::iostream::putback(src, 'c');
+            hpx::iostream::putback(src, 'd');
+            if (hpx::iostream::get(src) != 'd' ||
+                hpx::iostream::get(src) != 'c' ||
+                hpx::iostream::get(src) != 'b' ||
+                hpx::iostream::get(src) != 'a')
             {
                 return false;
             }
@@ -127,9 +127,8 @@ bool putback_test_four(Source& src)
 void putback_test()
 {
     using namespace std;
-    using namespace boost;
-    using namespace hpx::iostreams;
-    using namespace hpx::iostreams::test;
+    using namespace hpx::iostream;
+    using namespace hpx::iostream::test;
 
     test_file test;
 

@@ -23,9 +23,9 @@
 
 #include <iosfwd>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
-    // Function objects and object generators for invoking hpx::iostreams::close
+    // Function objects and object generators for invoking hpx::iostream::close
     HPX_CXX_CORE_EXPORT template <typename T>
     class device_close_operation
     {
@@ -41,7 +41,7 @@ namespace hpx::iostreams::detail {
 
         void operator()() const
         {
-            iostreams::close(t_, which_);
+            iostream::close(t_, which_);
         }
 
         device_close_operation(device_close_operation const&) = delete;
@@ -77,7 +77,7 @@ namespace hpx::iostreams::detail {
 
         void operator()() const
         {
-            iostreams::close(t_, snk_, which_);
+            iostream::close(t_, snk_, which_);
         }
 
     private:
@@ -101,7 +101,7 @@ namespace hpx::iostreams::detail {
     }
 
     // Function objects and object generators for invoking
-    // hpx::iostreams::detail::close_all
+    // hpx::iostream::detail::close_all
     HPX_CXX_CORE_EXPORT template <typename T>
     class device_close_all_operation
     {
@@ -314,4 +314,4 @@ namespace hpx::iostreams::detail {
     {
         return flush_buffer_operation<Buffer, Device>(buf, dev, flush);
     }
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail

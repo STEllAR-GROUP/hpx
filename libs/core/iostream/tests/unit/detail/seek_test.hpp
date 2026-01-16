@@ -23,8 +23,8 @@
 void seek_test()
 {
     using namespace std;
-    using namespace hpx::iostreams;
-    using namespace hpx::iostreams::test;
+    using namespace hpx::iostream;
+    using namespace hpx::iostream::test;
 
     {
         string test(data_reps * data_length(), '\0');

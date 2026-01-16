@@ -22,7 +22,7 @@
 #include <cwchar>
 #endif
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     HPX_CXX_CORE_EXPORT inline constexpr int WOULD_BLOCK = EOF - 1;
 
@@ -113,4 +113,4 @@ namespace hpx::iostreams {
             }
         }
     }    // namespace detail
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

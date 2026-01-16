@@ -30,7 +30,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     HPX_CXX_CORE_EXPORT template <typename T,
         typename Tr = std::char_traits<char_type_of_t<T>>>
@@ -246,7 +246,7 @@ namespace hpx::iostreams::detail {
             setp(nullptr, nullptr);
             obeg_ = oend_ = nullptr;
         }
-        iostreams::close(*storage_, which);
+        iostream::close(*storage_, which);
     }
 
     template <typename T, typename Tr>
@@ -365,6 +365,6 @@ namespace hpx::iostreams::detail {
     {
         return ibeg_ && obeg_ && ibeg_ != obeg_;
     }
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail
 
 #include <hpx/config/warnings_suffix.hpp>

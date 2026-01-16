@@ -43,7 +43,7 @@
 #include <unistd.h>       // low-level file i/o.
 #endif
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     namespace detail {
 
@@ -705,4 +705,4 @@ namespace hpx::iostreams {
             throw std::ios_base::failure("invalid mode");
         file_descriptor::open(path, mode, std::ios_base::out);
     }
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

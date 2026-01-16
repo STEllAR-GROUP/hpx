@@ -24,7 +24,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     HPX_CXX_CORE_EXPORT template <typename T>
     void close(T& t);
@@ -42,13 +42,13 @@ namespace hpx::iostreams {
         {
             try
             {
-                iostreams::close(t, std::ios_base::in);
+                iostream::close(t, std::ios_base::in);
             }
             catch (...)
             {
                 try
                 {
-                    iostreams::close(t, std::ios_base::out);
+                    iostream::close(t, std::ios_base::out);
                 }
                 // NOLINTNEXTLINE(bugprone-empty-catch)
                 catch (...)
@@ -56,7 +56,7 @@ namespace hpx::iostreams {
                 }
                 throw;
             }
-            iostreams::close(t, std::ios_base::out);
+            iostream::close(t, std::ios_base::out);
         }
 
         HPX_CXX_CORE_EXPORT template <typename T, typename Sink>
@@ -64,13 +64,13 @@ namespace hpx::iostreams {
         {
             try
             {
-                iostreams::close(t, snk, std::ios_base::in);
+                iostream::close(t, snk, std::ios_base::in);
             }
             catch (...)
             {
                 try
                 {
-                    iostreams::close(t, snk, std::ios_base::out);
+                    iostream::close(t, snk, std::ios_base::out);
                 }
                 // NOLINTNEXTLINE(bugprone-empty-catch)
                 catch (...)
@@ -78,7 +78,7 @@ namespace hpx::iostreams {
                 }
                 throw;
             }
-            iostreams::close(t, snk, std::ios_base::out);
+            iostream::close(t, snk, std::ios_base::out);
         }
     }    // namespace detail.
 
@@ -165,7 +165,7 @@ namespace hpx::iostreams {
             static void close(T& t, std::ios_base::openmode const which)
             {
                 if (which == std::ios_base::out)
-                    iostreams::flush(t);
+                    iostream::flush(t);
             }
 
             template <typename T, typename Sink>
@@ -175,7 +175,7 @@ namespace hpx::iostreams {
                 if (which == std::ios_base::out)
                 {
                     non_blocking_adapter<Sink> nb(snk);
-                    iostreams::flush(t, nb);
+                    iostream::flush(t, nb);
                 }
             }
         };
@@ -259,6 +259,6 @@ namespace hpx::iostreams {
             }
         };
     }    // namespace detail
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -19,7 +19,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams::test {
+namespace hpx::iostream::test {
 
     //
     // Model of Source which reads from an STL-compatible sequence
@@ -162,6 +162,7 @@ namespace hpx::iostreams::test {
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
+#pragma GCC diagnostic ignored "-Wrestrict"
 #endif
                 std::copy(s, s + result, container_->begin() + pos_);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
@@ -220,6 +221,6 @@ namespace hpx::iostreams::test {
         Container* container_;
         size_type pos_;
     };
-}    // namespace hpx::iostreams::test
+}    // namespace hpx::iostream::test
 
 #include <hpx/config/warnings_suffix.hpp>

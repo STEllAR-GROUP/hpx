@@ -46,7 +46,7 @@ namespace hpx::plugins::compression {
 
         template <typename Archive>
         HPX_FORCEINLINE static constexpr void serialize(
-            Archive& ar, unsigned int const)
+            Archive& ar, unsigned int const) noexcept
         {
         }
 

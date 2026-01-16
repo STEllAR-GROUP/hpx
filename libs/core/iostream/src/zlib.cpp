@@ -20,7 +20,7 @@
 // http://boost.org/libs/iostreams/doc/index.html?path=7
 #include "zlib.h"
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     namespace zlib {
 
@@ -172,4 +172,4 @@ namespace hpx::iostreams {
                     inflateInit2(s, window_bits));
         }
     }    // End namespace detail.
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

@@ -14,6 +14,7 @@ Checks: >
     -bugprone-branch-clone,
     -bugprone-easily-swappable-parameters,
     -bugprone-reserved-identifier,
+    -bugprone-lambda-function-name,
     modernize-use-nullptr,
     misc-assert-side-effect
     misc-dangling-handle

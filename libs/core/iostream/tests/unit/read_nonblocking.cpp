@@ -25,7 +25,7 @@ class read_one_source
 {
 public:
     using char_type = char;
-    using category = hpx::iostreams::source_tag;
+    using category = hpx::iostream::source_tag;
 
     template <std::size_t N>
     explicit read_one_source(char const (&data)[N])
@@ -63,10 +63,10 @@ void nonblocking_read_test()
         hpx::util::counting_iterator<char>(data_size_k), data);
 
     read_one_source src(data);
-    hpx::iostreams::non_blocking_adapter<read_one_source> nb(src);
+    hpx::iostream::non_blocking_adapter<read_one_source> nb(src);
 
     char read_data[data_size_k];
-    std::streamsize amt = hpx::iostreams::read(nb, read_data, data_size_k);
+    std::streamsize amt = hpx::iostream::read(nb, read_data, data_size_k);
 
     HPX_TEST_EQ(amt, data_size_k);
 

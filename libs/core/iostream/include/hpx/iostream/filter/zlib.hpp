@@ -23,7 +23,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     namespace zlib {
 
@@ -467,6 +467,6 @@ namespace hpx::iostreams {
       : base_type(buffer_size, p)
     {
     }
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

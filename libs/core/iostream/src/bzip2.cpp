@@ -20,7 +20,7 @@
 
 #include <iosfwd>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     namespace bzip2 {
 
@@ -158,4 +158,4 @@ namespace hpx::iostreams {
             ready_ = true;
         }
     }    // namespace detail
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

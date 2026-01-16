@@ -26,7 +26,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     //
     // Template name: range_adapter
@@ -142,6 +142,6 @@ namespace hpx::iostreams::detail {
     private:
         iterator first_, cur_, last_;
     };
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail
 
 #include <hpx/config/warnings_suffix.hpp>

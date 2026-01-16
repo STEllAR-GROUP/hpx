@@ -23,7 +23,7 @@ namespace hpx::components::process::posix::initializers {
     class bind_stdout : public initializer_base
     {
     public:
-        explicit bind_stdout(hpx::iostreams::file_descriptor_sink const& sink)
+        explicit bind_stdout(hpx::iostream::file_descriptor_sink const& sink)
           : sink_(sink)
         {
         }
@@ -39,7 +39,7 @@ namespace hpx::components::process::posix::initializers {
         }
 
     private:
-        hpx::iostreams::file_descriptor_sink sink_;
+        hpx::iostream::file_descriptor_sink sink_;
     };
 }    // namespace hpx::components::process::posix::initializers
 

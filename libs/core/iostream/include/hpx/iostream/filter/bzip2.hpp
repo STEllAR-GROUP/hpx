@@ -22,7 +22,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     namespace bzip2 {
 
@@ -438,6 +438,6 @@ namespace hpx::iostreams {
       : base_type(buffer_size, small_)
     {
     }
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

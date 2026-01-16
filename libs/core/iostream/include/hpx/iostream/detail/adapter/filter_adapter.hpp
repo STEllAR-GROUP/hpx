@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-// Defines the class template hpx::iostreams::detail::filter_adapter,
+// Defines the class template hpx::iostream::detail::filter_adapter,
 // a convenience base class for filter adapters.
 //
 // File:        hpx/iostream/detail/adapter/filter_adapter.hpp
@@ -26,7 +26,7 @@
 #include <iosfwd>
 #include <type_traits>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     HPX_CXX_CORE_EXPORT template <typename T>
     class filter_adapter
@@ -55,26 +55,26 @@ namespace hpx::iostreams::detail {
         template <typename Device>
         void close(Device& dev, std::ios_base::openmode which)
         {
-            iostreams::close(t_, dev, which);
+            iostream::close(t_, dev, which);
         }
 
         template <typename Device>
         void flush(Device& dev)
         {
-            return iostreams::flush(t_, dev);
+            return iostream::flush(t_, dev);
         }
 
         template <typename Locale>
         void imbue(Locale const& loc)
         {
-            iostreams::imbue(t_, loc);
+            iostream::imbue(t_, loc);
         }
 
         [[nodiscard]] std::streamsize optimal_buffer_size() const
         {
-            return iostreams::optimal_buffer_size(t_);
+            return iostream::optimal_buffer_size(t_);
         }
 
         value_type t_;
     };
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail

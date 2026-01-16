@@ -10,7 +10,7 @@
 // See http://www.boost.org/libs/iostreams for documentation.
 
 // Contains the definition of the class template
-// hpx::iostreams::detail::double_object, which is similar to compressed pair
+// hpx::iostream::detail::double_object, which is similar to compressed pair
 // except that both members of the pair have the same type, and compression
 // occurs only if requested using a boolean template parameter.
 
@@ -22,7 +22,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     HPX_CXX_CORE_EXPORT template <typename T>
     class single_object_holder
@@ -134,4 +134,4 @@ namespace hpx::iostreams::detail {
             return IsDouble::value;
         }
     };
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail

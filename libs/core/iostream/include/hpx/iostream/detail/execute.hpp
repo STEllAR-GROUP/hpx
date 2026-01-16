@@ -13,8 +13,8 @@
 // Contact:     turkanis at coderage dot com
 
 // Defines the overloaded function template
-// hpx::iostreams::detail::execute_all() and the function template
-// hpx::iostreams::detail::execute_foreach().
+// hpx::iostream::detail::execute_all() and the function template
+// hpx::iostream::detail::execute_foreach().
 //
 // execute_all() invokes a primary operation and performs a sequence of cleanup
 // operations, returning the result of the primary operation if no exceptions
@@ -34,7 +34,7 @@
 
 #include <type_traits>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // Implementation with one or more cleanup operations
@@ -104,4 +104,4 @@ namespace hpx::iostreams::detail {
         ++first;
         return execute_foreach(first, last, HPX_FORWARD(Op, op));
     }
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail

@@ -22,7 +22,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     //----------------Buffers-----------------------------------------------------//
 
@@ -104,7 +104,7 @@ namespace hpx::iostreams::detail {
         using base = basic_buffer<Ch, Alloc>;
 
     public:
-        using traits_type = iostreams::char_traits<Ch>;
+        using traits_type = iostream::char_traits<Ch>;
         using const_pointer = Ch* const;
 
         using base::data;
@@ -150,7 +150,7 @@ namespace hpx::iostreams::detail {
             set(0, keep);
 
             std::streamsize const result =
-                iostreams::read(src, this->data() + keep, this->size() - keep);
+                iostream::read(src, this->data() + keep, this->size() - keep);
             if (result != -1)
                 this->set(nullptr, keep + result);
             if (result == -1)
@@ -166,7 +166,7 @@ namespace hpx::iostreams::detail {
         {
             using namespace std;
             std::streamsize amt = static_cast<std::streamsize>(eptr_ - ptr_);
-            std::streamsize const result = iostreams::write_if(dest, ptr_, amt);
+            std::streamsize const result = iostream::write_if(dest, ptr_, amt);
             if (result < amt)
             {
                 traits_type::move(this->data(),
@@ -261,4 +261,4 @@ namespace hpx::iostreams::detail {
         swap(ptr_, rhs.ptr_);
         swap(eptr_, rhs.eptr_);
     }
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail

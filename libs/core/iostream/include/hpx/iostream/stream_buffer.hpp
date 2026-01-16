@@ -25,7 +25,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
     namespace detail {
 
         HPX_CXX_CORE_EXPORT template <typename T, typename Tr, typename Alloc,
@@ -154,6 +154,6 @@ namespace hpx::iostreams {
             base_type::open(HPX_FORWARD(Dev, dev), buffer_size, pback_size);
         }
     };
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

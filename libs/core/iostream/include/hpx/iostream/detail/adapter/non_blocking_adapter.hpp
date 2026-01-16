@@ -18,7 +18,7 @@
 
 #include <iosfwd>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     HPX_CXX_CORE_EXPORT template <typename Device>
     class non_blocking_adapter
@@ -43,7 +43,7 @@ namespace hpx::iostreams {
             while (result < n)
             {
                 std::streamsize const amt =
-                    iostreams::read(device_, s + result, n - result);
+                    iostream::read(device_, s + result, n - result);
                 if (amt == -1)
                     break;
                 result += amt;
@@ -57,7 +57,7 @@ namespace hpx::iostreams {
             while (result < n)
             {
                 std::streamsize const amt =
-                    iostreams::write(device_, s + result, n - result);
+                    iostream::write(device_, s + result, n - result);
 
                 // write errors, like EOF on read, need to be handled.
                 if (amt == -1)
@@ -71,10 +71,10 @@ namespace hpx::iostreams {
             std::ios_base::openmode which = std::ios_base::in |
                 std::ios_base::out)
         {
-            return iostreams::seek(device_, off, way, which);
+            return iostream::seek(device_, off, way, which);
         }
 
     public:
         Device& device_;
     };
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

@@ -25,7 +25,7 @@
 #include <string>
 #include <type_traits>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
     namespace detail {
 
         HPX_CXX_CORE_EXPORT template <typename Device, typename Tr>
@@ -203,4 +203,4 @@ namespace hpx::iostreams {
             this->member.open(HPX_FORWARD(Dev, dev), buffer_size, pback_size);
         }
     };
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

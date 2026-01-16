@@ -43,11 +43,13 @@
 #ifdef HPX_HAVE_MODULE_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
 #endif
+#if defined(HPX_HAVE_LOGGING)
+#include <hpx/init_runtime/detail/init_logging.hpp>
+#endif
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/init_runtime/detail/init_logging.hpp>
 #include <hpx/init_runtime/pre_main.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/naming.hpp>

@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/functional.hpp>
+
 #include <hpx/modules/io_service.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/threading_base.hpp>
@@ -45,9 +46,11 @@ namespace hpx::iostreams::detail {
 }    // namespace hpx::iostreams::detail
 
 namespace hpx::iostreams::server {
+
     ///////////////////////////////////////////////////////////////////////////
     void output_stream::call_write_async(std::uint32_t locality_id,
-        std::uint64_t count, detail::data_buffer const& in, hpx::id_type /*this_id*/)
+        std::uint64_t count, detail::data_buffer const& in,
+        hpx::id_type /*this_id*/)
     {
         // Perform the IO operation.
         pending_output_.output(locality_id, count, in, write_f, mtx_);

@@ -6,10 +6,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-
-#include <hpx/components/iostreams/ostream.hpp>
-#include <hpx/components/iostreams/standard_streams.hpp>
-
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/components_base/agas_interface.hpp>
@@ -20,6 +16,9 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
+
+#include <hpx/components/iostreams/ostream.hpp>
+#include <hpx/components/iostreams/standard_streams.hpp>
 
 #include <functional>
 #include <iostream>
@@ -94,13 +93,14 @@ namespace hpx::iostreams::detail {
 }    // namespace hpx::iostreams::detail
 
 namespace hpx::iostreams {
+
     // force the creation of the singleton stream objects
     void create_cout()
     {
         if (!agas::is_console())
         {
             HPX_THROW_EXCEPTION(hpx::error::service_unavailable,
-                "hpx::iostreams::create_cout",
+                "hpx::iostream::create_cout",
                 "this function should be called on the console only");
         }
         detail::create_ostream(detail::cout_tag());
@@ -111,7 +111,7 @@ namespace hpx::iostreams {
         if (!agas::is_console())
         {
             HPX_THROW_EXCEPTION(hpx::error::service_unavailable,
-                "hpx::iostreams::create_cerr",
+                "hpx::iostream::create_cerr",
                 "this function should be called on the console only");
         }
         detail::create_ostream(detail::cerr_tag());
@@ -122,7 +122,7 @@ namespace hpx::iostreams {
         if (!agas::is_console())
         {
             HPX_THROW_EXCEPTION(hpx::error::service_unavailable,
-                "hpx::iostreams::create_consolestream",
+                "hpx::iostream::create_consolestream",
                 "this function should be called on the console only");
         }
         detail::create_ostream(detail::consolestream_tag());
@@ -133,7 +133,7 @@ namespace hpx::iostreams {
         if (get_runtime_ptr() != nullptr && !agas::is_console())
         {
             HPX_THROW_EXCEPTION(hpx::error::service_unavailable,
-                "hpx::iostreams::get_consolestream",
+                "hpx::iostream::get_consolestream",
                 "this function should be called on the console only");
         }
         return detail::get_consolestream();

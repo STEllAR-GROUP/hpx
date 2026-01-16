@@ -10,6 +10,13 @@
 #include <hpx/modules/preprocessor.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
+// The __func__ macro below causes the bugprone-lambda-function-name warning to
+// be generated, we just ignore it.
+#if defined(HPX_CLANG_VERSION) && HPX_CLANG_VERSION >= 150000
+#pragma clang diagnostic ignored "-Wbugprone-lambda-function-name"
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
 #define HPX_TEST(...)                                                          \
     HPX_TEST_(__VA_ARGS__)                                                     \
     /**/

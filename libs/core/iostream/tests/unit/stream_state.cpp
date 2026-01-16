@@ -15,17 +15,17 @@
 #include <hpx/modules/iostream.hpp>
 #include <hpx/modules/testing.hpp>
 
-using hpx::iostreams::seekable_device_tag;
-using hpx::iostreams::stream;
-using hpx::iostreams::stream_offset;
-using hpx::iostreams::detail::bad_read;
-using hpx::iostreams::detail::bad_seek;
-using hpx::iostreams::detail::bad_write;
+using hpx::iostream::seekable_device_tag;
+using hpx::iostream::stream;
+using hpx::iostream::stream_offset;
+using hpx::iostream::detail::bad_read;
+using hpx::iostream::detail::bad_seek;
+using hpx::iostream::detail::bad_write;
 
 // This test unit uses a custom device to trigger errors. The device supports
 // input, output, and seek according to the SeekableDevice concept. And each
 // of the required functions throw a special detail::bad_xxx exception. This
-// should trigger the iostreams::stream to set the badbit status flag.
+// should trigger the iostream::stream to set the badbit status flag.
 // Additionally the exception can be propagated to the caller if the exception
 // mask of the stream allows exceptions.
 //

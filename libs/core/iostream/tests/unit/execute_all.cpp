@@ -7,8 +7,8 @@
 
 // See http://www.boost.org/libs/iostreams for documentation.
 //
-// Tests the function templates hpx::iostreams::detail::execute_all and
-// hpx::iostreams::detail::execute_foreach
+// Tests the function templates hpx::iostream::detail::execute_all and
+// hpx::iostream::detail::execute_foreach
 //
 // File:        libs/iostreams/test/execute_test.cpp
 // Date:        Thu Dec 06 13:21:54 MST 2007
@@ -22,8 +22,8 @@
 #include <hpx/modules/testing.hpp>
 
 using namespace std;
-using namespace hpx::iostreams;
-using namespace hpx::iostreams::detail;
+using namespace hpx::iostream;
+using namespace hpx::iostream::detail;
 
 // Function object that sets a boolean flag and returns a value
 // specified at construction

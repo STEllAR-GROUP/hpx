@@ -23,8 +23,8 @@
 #include <iostream>
 #include <sstream>
 
-using namespace hpx::iostreams;
-namespace io = hpx::iostreams;
+using namespace hpx::iostream;
+namespace io = hpx::iostream;
 
 typedef stream<array_source<char>> array_istream;
 typedef stream<array_sink<char>> array_ostream;

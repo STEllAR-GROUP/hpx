@@ -24,8 +24,8 @@
 void write_output_filter_test()
 {
     using namespace std;
-    using namespace hpx::iostreams;
-    using namespace hpx::iostreams::test;
+    using namespace hpx::iostream;
+    using namespace hpx::iostream::test;
 
     lowercase_file lower;
 

@@ -21,8 +21,8 @@
 #include "detail/verification.hpp"
 
 using namespace std;
-using namespace hpx::iostreams;
-using namespace hpx::iostreams::test;
+using namespace hpx::iostream;
+using namespace hpx::iostream::test;
 
 void verification_function_seekable_test()
 {

@@ -30,7 +30,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     //------------------Definitions of char_type_of-------------------------------//
     namespace detail {
@@ -483,6 +483,6 @@ namespace hpx::iostreams {
     {
         using type = std::conditional_t<is_std_io_v<T>, T&, T>;
     };
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -23,7 +23,7 @@ namespace hpx::components::process::posix::initializers {
     {
     public:
         explicit bind_stdin(
-            hpx::iostreams::file_descriptor_source const& source)
+            hpx::iostream::file_descriptor_source const& source)
           : source_(source)
         {
         }
@@ -35,7 +35,7 @@ namespace hpx::components::process::posix::initializers {
         }
 
     private:
-        hpx::iostreams::file_descriptor_source source_;
+        hpx::iostream::file_descriptor_source source_;
     };
 }    // namespace hpx::components::process::posix::initializers
 

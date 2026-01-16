@@ -10,13 +10,15 @@
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <winsock2.h>
 #endif
-#include <asio/ip/tcp.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <asio/ip/tcp.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

@@ -21,8 +21,8 @@
 #include "detail/verification.hpp"
 
 using namespace std;
-using namespace hpx::iostreams;
-using namespace hpx::iostreams::test;
+using namespace hpx::iostream;
+using namespace hpx::iostream::test;
 
 void flush_test()
 {
@@ -30,7 +30,7 @@ void flush_test()
         stream_buffer<null_sink> null;
         null.open(null_sink());
         HPX_TEST_MSG(
-            hpx::iostreams::flush(null), "failed flushing stream_buffer");
+            hpx::iostream::flush(null), "failed flushing stream_buffer");
         HPX_TEST_MSG(null.strict_sync(),
             "failed strict-syncing stream_buffer with "
             "non-flushable resource");
@@ -39,7 +39,7 @@ void flush_test()
     {
         stream<null_sink> null;
         null.open(null_sink());
-        HPX_TEST_MSG(hpx::iostreams::flush(null), "failed flushing stream");
+        HPX_TEST_MSG(hpx::iostream::flush(null), "failed flushing stream");
         HPX_TEST_MSG(null.strict_sync(),
             "failed strict-syncing stream with "
             "non-flushable resource");
@@ -49,7 +49,7 @@ void flush_test()
         filtering_ostream null;
         null.push(null_sink());
         HPX_TEST_MSG(
-            hpx::iostreams::flush(null), "failed flushing filtering_ostream");
+            hpx::iostream::flush(null), "failed flushing filtering_ostream");
         HPX_TEST_MSG(null.strict_sync(),
             "failed strict-syncing filtering_ostream with "
             "non-flushable resource");
@@ -59,7 +59,7 @@ void flush_test()
         filtering_ostream null;
         null.push(tolower_filter<output>());
         null.push(null_sink());
-        HPX_TEST_MSG(hpx::iostreams::flush(null),
+        HPX_TEST_MSG(hpx::iostream::flush(null),
             "failed flushing filtering_ostream with non-flushable filter");
         HPX_TEST_MSG(!null.strict_sync(),
             "strict-syncing filtering_ostream with "
@@ -74,13 +74,13 @@ void flush_test()
         out.push(flushable_output_filter());
 
         // Write to dest1.
-        out.push(hpx::iostreams::back_inserter(dest1));
+        out.push(hpx::iostream::back_inserter(dest1));
         write_data_in_chunks(out);
         out.flush();
 
         // Write to dest2.
         out.pop();
-        out.push(hpx::iostreams::back_inserter(dest2));
+        out.push(hpx::iostream::back_inserter(dest2));
         write_data_in_chunks(out);
         out.flush();
 
@@ -98,13 +98,13 @@ void flush_test()
         out.push(flushable_output_filter());
 
         // Write to dest1.
-        out.push(hpx::iostreams::back_inserter(dest1));
+        out.push(hpx::iostream::back_inserter(dest1));
         write_data_in_chunks(out);
         out.flush();
 
         // Write to dest2.
         out.pop();
-        out.push(hpx::iostreams::back_inserter(dest2));
+        out.push(hpx::iostream::back_inserter(dest2));
         write_data_in_chunks(out);
         out.flush();
 

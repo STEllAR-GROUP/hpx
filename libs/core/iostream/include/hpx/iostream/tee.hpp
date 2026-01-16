@@ -23,7 +23,7 @@
 #include <concepts>
 #include <type_traits>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     //
     // Template name: tee_filter.
@@ -59,11 +59,11 @@ namespace hpx::iostreams {
         template <typename Source>
         std::streamsize read(Source& src, char_type* s, std::streamsize n)
         {
-            std::streamsize result = iostreams::read(src, s, n);
+            std::streamsize result = iostream::read(src, s, n);
             if (result != -1)
             {
                 [[maybe_unused]] std::streamsize const result2 =
-                    iostreams::write(this->component(), s, result);
+                    iostream::write(this->component(), s, result);
                 HPX_ASSERT(result == result2);
             }
             return result;
@@ -72,9 +72,9 @@ namespace hpx::iostreams {
         template <typename Sink>
         std::streamsize write(Sink& snk, char_type const* s, std::streamsize n)
         {
-            std::streamsize result = iostreams::write(snk, s, n);
+            std::streamsize result = iostream::write(snk, s, n);
             [[maybe_unused]] std::streamsize const result2 =
-                iostreams::write(this->component(), s, result);
+                iostream::write(this->component(), s, result);
             HPX_ASSERT(result == result2);
             return result;
         }
@@ -88,8 +88,8 @@ namespace hpx::iostreams {
         template <typename Sink>
         bool flush(Sink& snk)
         {
-            bool const r1 = iostreams::flush(snk);
-            bool const r2 = iostreams::flush(this->component());
+            bool const r1 = iostream::flush(snk);
+            bool const r2 = iostream::flush(this->component());
             return r1 && r2;
         }
     };
@@ -140,11 +140,11 @@ namespace hpx::iostreams {
             static_assert(std::is_convertible_v<category_of_t<Device>, input>);
 
             [[maybe_unused]] std::streamsize result1 =
-                iostreams::read(dev_, s, n);
+                iostream::read(dev_, s, n);
             if (result1 != -1)
             {
                 [[maybe_unused]] std::streamsize const result2 =
-                    iostreams::write(sink_, s, result1);
+                    iostream::write(sink_, s, result1);
                 HPX_ASSERT(result1 == result2);
             }
             return result1;
@@ -155,9 +155,9 @@ namespace hpx::iostreams {
             static_assert(std::is_convertible_v<category_of_t<Device>, output>);
 
             [[maybe_unused]] std::streamsize const result1 =
-                iostreams::write(dev_, s, n);
+                iostream::write(dev_, s, n);
             [[maybe_unused]] std::streamsize const result2 =
-                iostreams::write(sink_, s, n);
+                iostream::write(sink_, s, n);
             HPX_ASSERT(result1 == n && result2 == n);
             return n;
         }
@@ -170,22 +170,22 @@ namespace hpx::iostreams {
 
         bool flush()
         {
-            bool const r1 = iostreams::flush(dev_);
-            bool const r2 = iostreams::flush(sink_);
+            bool const r1 = iostream::flush(dev_);
+            bool const r2 = iostream::flush(sink_);
             return r1 && r2;
         }
 
         template <typename Locale>
         void imbue(Locale const& loc)
         {
-            iostreams::imbue(dev_, loc);
-            iostreams::imbue(sink_, loc);
+            iostream::imbue(dev_, loc);
+            iostream::imbue(sink_, loc);
         }
 
         [[nodiscard]] std::streamsize optimal_buffer_size() const
         {
-            return (std::max) (iostreams::optimal_buffer_size(dev_),
-                iostreams::optimal_buffer_size(sink_));
+            return (std::max) (iostream::optimal_buffer_size(dev_),
+                iostream::optimal_buffer_size(sink_));
         }
 
     private:
@@ -206,4 +206,4 @@ namespace hpx::iostreams {
         return tee_device<std::decay_t<Device>, std::decay_t<Sink>>(
             HPX_FORWARD(Device, dev), HPX_FORWARD(Sink, sink));
     }
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

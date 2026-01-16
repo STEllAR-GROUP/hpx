@@ -16,7 +16,7 @@
 
 #include <iosfwd>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     HPX_CXX_CORE_EXPORT template <typename Container>
     class back_insert_device
@@ -46,4 +46,4 @@ namespace hpx::iostreams {
     {
         return back_insert_device<Container>(cnt);
     }
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

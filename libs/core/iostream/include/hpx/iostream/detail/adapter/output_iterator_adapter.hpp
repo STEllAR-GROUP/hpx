@@ -17,7 +17,7 @@
 #include <iosfwd>
 #include <type_traits>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     HPX_CXX_CORE_EXPORT template <typename Mode, typename Ch, typename OutIt>
     class output_iterator_adapter
@@ -42,4 +42,4 @@ namespace hpx::iostreams::detail {
     private:
         OutIt out_;
     };
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail

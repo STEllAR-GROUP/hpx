@@ -17,7 +17,7 @@
 
 #include <iosfwd>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     HPX_CXX_CORE_EXPORT inline constexpr std::streamsize
         default_device_buffer_size = 4096;
@@ -25,4 +25,4 @@ namespace hpx::iostreams {
         default_filter_buffer_size = 128;
     HPX_CXX_CORE_EXPORT inline constexpr std::streamsize
         default_pback_buffer_size = 4;
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

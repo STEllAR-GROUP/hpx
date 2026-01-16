@@ -41,7 +41,8 @@ HPX_REGISTER_ACTION_ID(ostream_type::write_sync_action,
 ///////////////////////////////////////////////////////////////////////////////
 // Register a startup function which will be called as a HPX-thread during
 // runtime startup.
-namespace hpx { namespace iostreams { namespace detail {
+namespace hpx::iostreams::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     void register_ostreams()
     {
@@ -74,7 +75,7 @@ namespace hpx { namespace iostreams { namespace detail {
         pre_shutdown = false;       // run as pre-startup function
         return true;
     }
-}}}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostreams::detail
 
 // Note that this macro can be used not more than once in one module.
 HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(

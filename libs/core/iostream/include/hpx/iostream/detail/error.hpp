@@ -15,7 +15,7 @@
 
 #include <ios>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     HPX_CXX_CORE_EXPORT inline std::ios_base::failure cant_read()
     {
@@ -56,4 +56,4 @@ namespace hpx::iostreams::detail {
     {
         return std::ios_base::failure("bad seek");
     }
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail

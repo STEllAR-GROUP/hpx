@@ -14,7 +14,7 @@
 #include <hpx/config.hpp>
 #include <hpx/iostream/traits.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     HPX_CXX_CORE_EXPORT template <typename Pipeline, typename Component>
     struct pipeline;
@@ -111,4 +111,4 @@ namespace hpx::iostreams {
         using segment = detail::pipeline_segment<Filter<Ts...>>;
         return pipeline<segment, Component>(segment(f), c);
     }
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

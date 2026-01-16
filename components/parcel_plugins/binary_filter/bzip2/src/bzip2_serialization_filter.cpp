@@ -7,14 +7,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_COMPRESSION_BZIP2)
-#include <boost/iostreams/filter/bzip2.hpp>
-
-#include <hpx/modules/actions.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/iostream.hpp>
 
 #include <hpx/binary_filter/bzip2_serialization_filter.hpp>
+#include <hpx/modules/actions.hpp>
 #include <hpx/plugin_factories/binary_filter_factory.hpp>
 #include <hpx/plugin_factories/plugin_registry.hpp>
 
@@ -35,17 +33,17 @@ namespace hpx::plugins::compression {
     namespace detail {
 
         class bzip2_compdecomp
-          : public hpx::iostreams::detail::bzip2_base
-          , public hpx::iostreams::detail::bzip2_allocator<std::allocator<char>>
+          : public hpx::iostream::detail::bzip2_base
+          , public hpx::iostream::detail::bzip2_allocator<std::allocator<char>>
         {
             using allocator_type =
-                hpx::iostreams::detail::bzip2_allocator<std::allocator<char>>;
+                hpx::iostream::detail::bzip2_allocator<std::allocator<char>>;
 
         public:
             bzip2_compdecomp();    // used for decompression
             explicit bzip2_compdecomp(bool compress,
-                hpx::iostreams::bzip2_params const& params =
-                    hpx::iostreams::bzip2_params());
+                hpx::iostream::bzip2_params const& params =
+                    hpx::iostream::bzip2_params());
             ~bzip2_compdecomp();
 
             bool save(char const*& src_begin, char const* src_end,
@@ -63,7 +61,7 @@ namespace hpx::plugins::compression {
         protected:
             void init()
             {
-                hpx::iostreams::detail::bzip2_base::init(
+                hpx::iostream::detail::bzip2_base::init(
                     compress_, static_cast<allocator_type&>(*this));
             }
 
@@ -73,16 +71,16 @@ namespace hpx::plugins::compression {
         };
 
         bzip2_compdecomp::bzip2_compdecomp()
-          : hpx::iostreams::detail::bzip2_base(hpx::iostreams::bzip2_params(
-                hpx::iostreams::bzip2::default_small))
+          : hpx::iostream::detail::bzip2_base(hpx::iostream::bzip2_params(
+                hpx::iostream::bzip2::default_small))
           , compress_(false)
           , eof_(false)
         {
         }
 
         bzip2_compdecomp::bzip2_compdecomp(
-            bool compress, hpx::iostreams::bzip2_params const& params)
-          : hpx::iostreams::detail::bzip2_base(params)
+            bool compress, hpx::iostream::bzip2_params const& params)
+          : hpx::iostream::detail::bzip2_base(params)
           , compress_(compress)
           , eof_(false)
         {
@@ -96,8 +94,8 @@ namespace hpx::plugins::compression {
         bool bzip2_compdecomp::save(char const*& src_begin, char const* src_end,
             char*& dest_begin, char* dest_end, bool flush)
         {
-            using namespace hpx::iostreams;
-            using namespace hpx::iostreams::bzip2;
+            using namespace hpx::iostream;
+            using namespace hpx::iostream::bzip2;
 
             if (!ready())
                 init();
@@ -114,8 +112,8 @@ namespace hpx::plugins::compression {
         bool bzip2_compdecomp::load(char const*& src_begin, char const* src_end,
             char*& dest_begin, char* dest_end)
         {
-            using namespace hpx::iostreams;
-            using namespace hpx::iostreams::bzip2;
+            using namespace hpx::iostream;
+            using namespace hpx::iostream::bzip2;
 
             if (eof_)
             {

@@ -26,7 +26,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
 #if defined(HPX_WINDOWS)
     HPX_CXX_CORE_EXPORT using file_handle = void*;    // A.k.a. HANDLE
@@ -280,6 +280,6 @@ namespace hpx::iostreams {
         void open(
             std::filesystem::path const& path, std::ios_base::openmode) const;
     };
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -17,8 +17,8 @@
 #include "detail/filters.hpp"    // Must come before operations.hpp for VC6.
 
 using namespace std;
-using namespace hpx::iostreams;
-using namespace hpx::iostreams::test;
+using namespace hpx::iostream;
+using namespace hpx::iostream::test;
 
 struct optimally_buffered_filter
 {

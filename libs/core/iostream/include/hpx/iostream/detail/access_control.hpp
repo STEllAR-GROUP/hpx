@@ -22,7 +22,7 @@
 
 #include <type_traits>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     // Represents protected inheritance.
     HPX_CXX_CORE_EXPORT struct protected_t
@@ -82,4 +82,4 @@ namespace hpx::iostreams {
         using base_type = detail::access_control_base<T, Access>::type;
         using base_type::base_type;
     };
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

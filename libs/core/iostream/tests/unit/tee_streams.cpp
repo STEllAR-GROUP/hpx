@@ -21,8 +21,8 @@
 #include "detail/verification.hpp"
 
 using namespace std;
-using namespace hpx::iostreams;
-using namespace hpx::iostreams::test;
+using namespace hpx::iostream;
+using namespace hpx::iostream::test;
 
 void read_write_test()
 {
@@ -138,7 +138,7 @@ void close_test()
         operation_sequence seq;
         chain<output> ch;
         ch.push(
-            hpx::iostreams::tee(closable_device<output>(seq.new_operation(1)),
+            hpx::iostream::tee(closable_device<output>(seq.new_operation(1)),
                 closable_device<output>(seq.new_operation(2))));
         HPX_TEST_NO_THROW(ch.reset());
         HPX_TEST_MSG(seq.is_success(), seq.message());
@@ -149,8 +149,8 @@ void close_test()
         operation_sequence seq;
         chain<output> ch;
         ch.push(
-            hpx::iostreams::tee(closable_device<bidirectional>(
-                                    seq.new_operation(1), seq.new_operation(2)),
+            hpx::iostream::tee(closable_device<bidirectional>(
+                                   seq.new_operation(1), seq.new_operation(2)),
                 closable_device<bidirectional>(
                     seq.new_operation(3), seq.new_operation(4))));
         HPX_TEST_NO_THROW(ch.reset());
@@ -162,7 +162,7 @@ void close_test()
         operation_sequence seq;
         chain<output> ch;
         ch.push(
-            hpx::iostreams::tee(closable_device<seekable>(seq.new_operation(1)),
+            hpx::iostream::tee(closable_device<seekable>(seq.new_operation(1)),
                 closable_device<seekable>(seq.new_operation(2))));
         HPX_TEST_NO_THROW(ch.reset());
         HPX_TEST_MSG(seq.is_success(), seq.message());
@@ -173,7 +173,7 @@ void close_test()
         operation_sequence seq;
         chain<output> ch;
         ch.push(
-            hpx::iostreams::tee(closable_device<output>(seq.new_operation(1))));
+            hpx::iostream::tee(closable_device<output>(seq.new_operation(1))));
         ch.push(closable_device<output>(seq.new_operation(2)));
         HPX_TEST_NO_THROW(ch.reset());
         HPX_TEST_MSG(seq.is_success(), seq.message());
@@ -183,7 +183,7 @@ void close_test()
     {
         operation_sequence seq;
         chain<output> ch;
-        ch.push(hpx::iostreams::tee(closable_device<bidirectional>(
+        ch.push(hpx::iostream::tee(closable_device<bidirectional>(
             seq.new_operation(1), seq.new_operation(2))));
         ch.push(closable_device<output>(seq.new_operation(3)));
         HPX_TEST_NO_THROW(ch.reset());
@@ -194,7 +194,7 @@ void close_test()
     {
         operation_sequence seq;
         chain<output> ch;
-        ch.push(hpx::iostreams::tee(
+        ch.push(hpx::iostream::tee(
             closable_device<seekable>(seq.new_operation(1))));
         ch.push(closable_device<seekable>(seq.new_operation(2)));
         HPX_TEST_NO_THROW(ch.reset());
@@ -257,8 +257,8 @@ void tee_composite_test()
     {
         operation_sequence seq;
         chain<output> ch;
-        ch.push(hpx::iostreams::tee(
-            hpx::iostreams::compose(
+        ch.push(hpx::iostream::tee(
+            hpx::iostream::compose(
                 closable_filter<output>(seq.new_operation(1)),
                 closable_device<output>(seq.new_operation(2))),
             closable_device<output>(seq.new_operation(3))));
@@ -270,8 +270,8 @@ void tee_composite_test()
     {
         operation_sequence seq;
         chain<output> ch;
-        ch.push(hpx::iostreams::tee(
-            hpx::iostreams::compose(
+        ch.push(hpx::iostream::tee(
+            hpx::iostream::compose(
                 closable_filter<bidirectional>(
                     seq.new_operation(2), seq.new_operation(3)),
                 closable_device<bidirectional>(
@@ -285,8 +285,8 @@ void tee_composite_test()
     {
         operation_sequence seq;
         chain<output> ch;
-        ch.push(hpx::iostreams::tee(
-            hpx::iostreams::compose(
+        ch.push(hpx::iostream::tee(
+            hpx::iostream::compose(
                 closable_filter<seekable>(seq.new_operation(1)),
                 closable_device<seekable>(seq.new_operation(2))),
             closable_device<output>(seq.new_operation(3))));
@@ -298,7 +298,7 @@ void tee_composite_test()
     {
         operation_sequence seq;
         chain<output> ch;
-        ch.push(hpx::iostreams::tee(hpx::iostreams::compose(
+        ch.push(hpx::iostream::tee(hpx::iostream::compose(
             closable_filter<output>(seq.new_operation(1)),
             closable_device<output>(seq.new_operation(2)))));
         ch.push(closable_device<output>(seq.new_operation(3)));
@@ -310,7 +310,7 @@ void tee_composite_test()
     {
         operation_sequence seq;
         chain<output> ch;
-        ch.push(hpx::iostreams::tee(hpx::iostreams::compose(
+        ch.push(hpx::iostream::tee(hpx::iostream::compose(
             closable_filter<bidirectional>(
                 seq.new_operation(2), seq.new_operation(3)),
             closable_device<bidirectional>(
@@ -324,7 +324,7 @@ void tee_composite_test()
     {
         operation_sequence seq;
         chain<output> ch;
-        ch.push(hpx::iostreams::tee(hpx::iostreams::compose(
+        ch.push(hpx::iostream::tee(hpx::iostream::compose(
             closable_filter<seekable>(seq.new_operation(1)),
             closable_device<seekable>(seq.new_operation(2)))));
         ch.push(closable_device<output>(seq.new_operation(3)));

@@ -21,16 +21,16 @@
 #include "detail/verification.hpp"
 
 using namespace std;
-using namespace hpx::iostreams;
-using namespace hpx::iostreams::test;
+using namespace hpx::iostream;
+using namespace hpx::iostream::test;
 
 void direct_adapter_test()
 {
-    typedef hpx::iostreams::detail::direct_adapter<array_source<char>>
+    typedef hpx::iostream::detail::direct_adapter<array_source<char>>
         indirect_array_source;
-    typedef hpx::iostreams::detail::direct_adapter<array_sink<char>>
+    typedef hpx::iostream::detail::direct_adapter<array_sink<char>>
         indirect_array_sink;
-    typedef hpx::iostreams::detail::direct_adapter<hpx::iostreams::array<char>>
+    typedef hpx::iostream::detail::direct_adapter<hpx::iostream::array<char>>
         indirect_array;
     typedef stream<indirect_array_source> indirect_array_istream;
     typedef stream<indirect_array_sink> indirect_array_ostream;

@@ -20,7 +20,7 @@
 
 #include <streambuf>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     //--------------Definition of chainbuf----------------------------------------//
 
@@ -172,4 +172,4 @@ namespace hpx::iostreams::detail {
         friend struct sentry;
         Chain chain_;
     };
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail

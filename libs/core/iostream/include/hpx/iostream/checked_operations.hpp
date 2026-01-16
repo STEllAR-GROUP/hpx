@@ -25,7 +25,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     namespace detail {
 
@@ -82,14 +82,14 @@ namespace hpx::iostreams {
             template <typename T>
             static int_type_of_t<T> get(T& t)
             {
-                return iostreams::get(t);
+                return iostream::get(t);
             }
 
             template <typename T>
             static std::streamsize read(
                 T& t, char_type_of_t<T>* s, std::streamsize n)
             {
-                return iostreams::read(t, s, n);
+                return iostream::read(t, s, n);
             }
 
             template <typename T>
@@ -124,14 +124,14 @@ namespace hpx::iostreams {
             template <typename T>
             static bool put(T& t, char_type_of_t<T> c)
             {
-                return iostreams::put(t, c);
+                return iostream::put(t, c);
             }
 
             template <typename T>
             static std::streamsize write(
                 T& t, char_type_of_t<T> const* s, std::streamsize n)
             {
-                return iostreams::write(t, s, n);
+                return iostream::write(t, s, n);
             }
         };
 
@@ -143,7 +143,7 @@ namespace hpx::iostreams {
             static std::streampos seek(T& t, stream_offset off,
                 std::ios_base::seekdir way, std::ios_base::openmode which)
             {
-                return iostreams::seek(t, off, way, which);
+                return iostream::seek(t, off, way, which);
             }
         };
 
@@ -158,6 +158,6 @@ namespace hpx::iostreams {
             }
         };
     }    // namespace detail
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

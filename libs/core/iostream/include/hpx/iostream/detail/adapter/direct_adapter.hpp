@@ -26,7 +26,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     //------------------Definition of direct_adapter_base-------------------------//
 
@@ -160,7 +160,7 @@ namespace hpx::iostreams::detail {
     template <typename Direct>
     void direct_adapter_base<Direct>::init_input(std::true_type)
     {
-        auto seq = iostreams::input_sequence(d_);
+        auto seq = iostream::input_sequence(d_);
         ptrs_.first().beg = seq.data();
         ptrs_.first().ptr = seq.data();
         ptrs_.first().end = seq.data() + seq.size();
@@ -169,7 +169,7 @@ namespace hpx::iostreams::detail {
     template <typename Direct>
     void direct_adapter_base<Direct>::init_output(std::true_type)
     {
-        auto seq = iostreams::output_sequence(d_);
+        auto seq = iostream::output_sequence(d_);
         ptrs_.first().beg = seq.data();
         ptrs_.first().ptr = seq.data();
         ptrs_.first().end = seq.data() + seq.size();
@@ -256,14 +256,14 @@ namespace hpx::iostreams::detail {
     void direct_adapter<Direct>::close(std::ios_base::openmode which)
     {
         static_assert(std::is_convertible_v<category, two_sequence>);
-        iostreams::close(d_, which);
+        iostream::close(d_, which);
     }
 
     template <typename Direct>
     void direct_adapter<Direct>::imbue(std::locale const& loc)
     {
-        iostreams::imbue(d_, loc);
+        iostream::imbue(d_, loc);
     }
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail
 
 #include <hpx/config/warnings_suffix.hpp>

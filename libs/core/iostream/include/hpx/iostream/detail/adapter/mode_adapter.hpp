@@ -25,7 +25,7 @@
 #include <ios>
 #include <type_traits>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     HPX_CXX_CORE_EXPORT template <typename Mode, typename T>
     class mode_adapter
@@ -65,12 +65,12 @@ namespace hpx::iostreams::detail {
         // Device member functions.
         std::streamsize read(char_type* s, std::streamsize const n)
         {
-            return iostreams::read(t_, s, n);
+            return iostream::read(t_, s, n);
         }
 
         std::streamsize write(char_type const* s, std::streamsize const n)
         {
-            return iostreams::write(t_, s, n);
+            return iostream::write(t_, s, n);
         }
 
         std::streampos seek(stream_offset const off,
@@ -78,7 +78,7 @@ namespace hpx::iostreams::detail {
             std::ios_base::openmode const which = std::ios_base::in |
                 std::ios_base::out)
         {
-            return iostreams::seek(t_, off, way, which);
+            return iostream::seek(t_, off, way, which);
         }
 
         void close()
@@ -88,28 +88,28 @@ namespace hpx::iostreams::detail {
 
         void close(std::ios_base::openmode const which)
         {
-            iostreams::close(t_, which);
+            iostream::close(t_, which);
         }
 
         // Filter member functions.
         template <typename Source>
         std::streamsize read(Source& src, char_type* s, std::streamsize const n)
         {
-            return iostreams::read(t_, src, s, n);
+            return iostream::read(t_, src, s, n);
         }
 
         template <typename Sink>
         std::streamsize write(
             Sink& snk, char_type const* s, std::streamsize const n)
         {
-            return iostreams::write(t_, snk, s, n);
+            return iostream::write(t_, snk, s, n);
         }
 
         template <typename Device>
         std::streampos seek(Device& dev, stream_offset const off,
             std::ios_base::seekdir const way)
         {
-            return iostreams::seek(t_, dev, off, way);
+            return iostream::seek(t_, dev, off, way);
         }
 
         template <typename Device>
@@ -117,7 +117,7 @@ namespace hpx::iostreams::detail {
             std::ios_base::seekdir const way,
             std::ios_base::openmode const which)
         {
-            return iostreams::seek(t_, dev, off, way, which);
+            return iostream::seek(t_, dev, off, way, which);
         }
 
         template <typename Device>
@@ -129,16 +129,16 @@ namespace hpx::iostreams::detail {
         template <typename Device>
         void close(Device& dev, std::ios_base::openmode const which)
         {
-            iostreams::close(t_, dev, which);
+            iostream::close(t_, dev, which);
         }
 
         template <typename Locale>
         void imbue(Locale const& loc)
         {
-            iostreams::imbue(t_, loc);
+            iostream::imbue(t_, loc);
         }
 
     private:
         component_type t_;
     };
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail

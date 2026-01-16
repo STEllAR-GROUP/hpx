@@ -26,7 +26,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     //------------------Definition of resolve-------------------------------------//
     HPX_CXX_CORE_EXPORT template <typename Mode, typename Ch, typename T>
@@ -37,7 +37,7 @@ namespace hpx::iostreams::detail {
     };
 
     HPX_CXX_CORE_EXPORT template <typename Mode, typename Ch, typename T>
-        requires(!iostreams::is_std_io_v<T> && !traits::is_range_v<T>)
+        requires(!iostream::is_std_io_v<T> && !traits::is_range_v<T>)
     constexpr resolve_traits<Mode, Ch, T>::type resolve(T const& t) noexcept
     {
         using return_type = resolve_traits<Mode, Ch, T>::type;
@@ -84,6 +84,6 @@ namespace hpx::iostreams::detail {
     {
         return range_adapter<Mode, util::iterator_range<Iter>>(rng);
     }
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail
 
 #include <hpx/config/warnings_suffix.hpp>

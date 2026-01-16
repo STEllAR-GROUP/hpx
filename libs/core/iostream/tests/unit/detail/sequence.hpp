@@ -18,7 +18,7 @@
 
 #include "constants.hpp"
 
-namespace hpx::iostreams::test {
+namespace hpx::iostream::test {
 
     template <typename Ch = char>
     struct test_sequence : public std::vector<Ch>
@@ -156,4 +156,4 @@ namespace hpx::iostreams::test {
             this->insert(this->end(), text, text + len);
         }
     };
-}    // namespace hpx::iostreams::test
+}    // namespace hpx::iostream::test

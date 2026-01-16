@@ -20,7 +20,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     //------------------Definition of stream_offset-------------------------------//
     HPX_CXX_CORE_EXPORT using stream_offset = std::intmax_t;
@@ -47,6 +47,6 @@ namespace hpx::iostreams {
     {
         return static_cast<stream_offset>(pos);
     }
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

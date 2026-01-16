@@ -2119,10 +2119,6 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Wformat=2)
     hpx_add_compile_flag_if_available(-Wno-format-nonliteral)
 
-    # inside a lambda, '__func__' expands to the name of the function call
-    # operator
-    hpx_add_compile_flag_if_available(-Wno-bugprone-lambda-function-name)
-
     # Self initialization is dangerous
     hpx_add_compile_flag_if_available(-Winit-self)
 

@@ -24,7 +24,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     HPX_CXX_CORE_EXPORT template <typename T>
     struct is_string
@@ -137,8 +137,8 @@ namespace hpx::iostreams {
             {
                 non_blocking_source src(input, inc);
                 std::string dest;
-                iostreams::copy(
-                    compose(filter, src), iostreams::back_inserter(dest));
+                iostream::copy(
+                    compose(filter, src), iostream::back_inserter(dest));
                 if (dest != output)
                     return false;
             }
@@ -148,8 +148,8 @@ namespace hpx::iostreams {
         {
             std::string in;
             std::string out;
-            iostreams::copy(input, iostreams::back_inserter(in));
-            iostreams::copy(output, iostreams::back_inserter(out));
+            iostream::copy(input, iostream::back_inserter(in));
+            iostream::copy(output, iostream::back_inserter(out));
             return test_input_filter(filter, in, out);
         }
     }
@@ -167,7 +167,7 @@ namespace hpx::iostreams {
                 array_source<char> src(
                     input.data(), input.data() + input.size());
                 std::string dest;
-                iostreams::copy(
+                iostream::copy(
                     src, compose(filter, non_blocking_sink(dest, inc)));
                 if (dest != output)
                     return false;
@@ -178,8 +178,8 @@ namespace hpx::iostreams {
         {
             std::string in;
             std::string out;
-            iostreams::copy(input, iostreams::back_inserter(in));
-            iostreams::copy(output, iostreams::back_inserter(out));
+            iostream::copy(input, iostream::back_inserter(in));
+            iostream::copy(output, iostream::back_inserter(out));
             return test_output_filter(filter, in, out);
         }
     }
@@ -198,10 +198,10 @@ namespace hpx::iostreams {
                         data.data(), data.data() + data.size());
                     std::string temp;
                     std::string dest;
-                    iostreams::copy(
+                    iostream::copy(
                         src, compose(out, non_blocking_sink(temp, inc)));
-                    iostreams::copy(compose(in, non_blocking_source(temp, inc)),
-                        iostreams::back_inserter(dest));
+                    iostream::copy(compose(in, non_blocking_source(temp, inc)),
+                        iostream::back_inserter(dest));
                     if (dest != data)
                         return false;
                 }
@@ -210,7 +210,7 @@ namespace hpx::iostreams {
                         data.data(), data.data() + data.size());
                     std::string temp;
                     std::string dest;
-                    iostreams::copy(
+                    iostream::copy(
                         src, compose(out, non_blocking_sink(temp, inc)));
 
                     // truncate the file, this should not loop, it may throw
@@ -218,9 +218,9 @@ namespace hpx::iostreams {
                     try
                     {
                         temp.resize(temp.size() / 2);
-                        iostreams::copy(
+                        iostream::copy(
                             compose(in, non_blocking_source(temp, inc)),
-                            iostreams::back_inserter(dest));
+                            iostream::back_inserter(dest));
                     }
                     catch (std::ios_base::failure&)
                     {
@@ -235,10 +235,10 @@ namespace hpx::iostreams {
                             data.data(), data.data() + data.size());
                         std::string temp;
                         std::string dest;
-                        iostreams::copy(
+                        iostream::copy(
                             compose(out, src), non_blocking_sink(temp, inc));
-                        iostreams::copy(non_blocking_source(temp, inc),
-                            compose(in, iostreams::back_inserter(dest)));
+                        iostream::copy(non_blocking_source(temp, inc),
+                            compose(in, iostream::back_inserter(dest)));
                         if (dest != data)
                             return false;
                     }
@@ -247,7 +247,7 @@ namespace hpx::iostreams {
                             data.data(), data.data() + data.size());
                         std::string temp;
                         std::string dest;
-                        iostreams::copy(
+                        iostream::copy(
                             compose(out, src), non_blocking_sink(temp, inc));
 
                         // truncate the file, this should not loop, it may throw
@@ -255,8 +255,8 @@ namespace hpx::iostreams {
                         try
                         {
                             temp.resize(temp.size() / 2);
-                            iostreams::copy(non_blocking_source(temp, inc),
-                                compose(in, iostreams::back_inserter(dest)));
+                            iostream::copy(non_blocking_source(temp, inc),
+                                compose(in, iostream::back_inserter(dest)));
                         }
                         catch (std::ios_base::failure&)
                         {
@@ -269,8 +269,8 @@ namespace hpx::iostreams {
         else
         {
             std::string str;
-            iostreams::copy(data, iostreams::back_inserter(str));
+            iostream::copy(data, iostream::back_inserter(str));
             return test_filter_pair(out, in, str);
         }
     }
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

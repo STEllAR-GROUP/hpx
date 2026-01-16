@@ -20,7 +20,7 @@
 
 #include <iosfwd>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     HPX_CXX_CORE_EXPORT template <typename Ch, typename Mode>
     class basic_null_device
@@ -88,4 +88,4 @@ namespace hpx::iostreams {
 #if defined(HPX_IOSTREAM_HAVE_WIDE_STREAMS)
     HPX_CXX_CORE_EXPORT using wnull_sink = basic_null_sink<wchar_t>;
 #endif
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

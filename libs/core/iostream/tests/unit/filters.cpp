@@ -19,8 +19,8 @@
 #include "detail/filter_tests.hpp"
 #include "detail/filters.hpp"
 
-using namespace hpx::iostreams;
-using namespace hpx::iostreams::test;
+using namespace hpx::iostream;
+using namespace hpx::iostream::test;
 
 std::string const lower =
     "in addition to providing an abstract framework the "
@@ -51,7 +51,7 @@ struct toupper_dual_use_filter : public dual_use_filter
     template <typename Source>
     int get(Source& s)
     {
-        int c = hpx::iostreams::get(s);
+        int c = hpx::iostream::get(s);
         return c != EOF && c != WOULD_BLOCK ? std::toupper((unsigned char) c) :
                                               c;
     }
@@ -59,7 +59,7 @@ struct toupper_dual_use_filter : public dual_use_filter
     template <typename Sink>
     bool put(Sink& s, char c)
     {
-        return hpx::iostreams::put(s, (char) std::toupper((unsigned char) c));
+        return hpx::iostream::put(s, (char) std::toupper((unsigned char) c));
     }
 };
 
@@ -68,7 +68,7 @@ struct tolower_dual_use_filter : public dual_use_filter
     template <typename Source>
     int get(Source& s)
     {
-        int c = hpx::iostreams::get(s);
+        int c = hpx::iostream::get(s);
         return c != EOF && c != WOULD_BLOCK ? std::tolower((unsigned char) c) :
                                               c;
     }
@@ -76,7 +76,7 @@ struct tolower_dual_use_filter : public dual_use_filter
     template <typename Sink>
     bool put(Sink& s, char c)
     {
-        return hpx::iostreams::put(s, (char) std::tolower((unsigned char) c));
+        return hpx::iostream::put(s, (char) std::tolower((unsigned char) c));
     }
 };
 

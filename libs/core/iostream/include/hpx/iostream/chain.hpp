@@ -34,7 +34,7 @@
 #include <typeinfo>
 #include <utility>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     //--------------Definition of chain and wchain--------------------------------//
     namespace detail {
@@ -265,7 +265,7 @@ namespace hpx::iostreams {
             }
 
             template <typename T>
-                requires(!hpx::iostreams::is_std_io_v<T>)
+                requires(!hpx::iostream::is_std_io_v<T>)
             void push(T const& t, std::streamsize const buffer_size = -1,
                 std::streamsize const pback_size = -1)
             {
@@ -782,7 +782,7 @@ namespace hpx::iostreams {
         std::streamsize chain_base<Self, Ch, Tr, Alloc, Mode>::read(
             char_type* s, std::streamsize n)
         {
-            return iostreams::read(*list().front(), s, n);
+            return iostream::read(*list().front(), s, n);
         }
 
         template <typename Self, typename Ch, typename Tr, typename Alloc,
@@ -790,7 +790,7 @@ namespace hpx::iostreams {
         std::streamsize chain_base<Self, Ch, Tr, Alloc, Mode>::write(
             char_type const* s, std::streamsize n)
         {
-            return iostreams::write(*list().front(), s, n);
+            return iostream::write(*list().front(), s, n);
         }
 
         template <typename Self, typename Ch, typename Tr, typename Alloc,
@@ -798,7 +798,7 @@ namespace hpx::iostreams {
         std::streampos chain_base<Self, Ch, Tr, Alloc, Mode>::seek(
             stream_offset off, std::ios_base::seekdir way)
         {
-            return iostreams::seek(*list().front(), off, way);
+            return iostream::seek(*list().front(), off, way);
         }
 
         template <typename Self, typename Ch, typename Tr, typename Alloc,
@@ -865,4 +865,4 @@ namespace hpx::iostreams {
                 pimpl_->flags_ &= ~flags::open;
         }
     }    // namespace detail
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

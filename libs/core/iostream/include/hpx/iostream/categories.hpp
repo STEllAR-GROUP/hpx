@@ -16,7 +16,7 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     //------------------Tags for dispatch according to i/o mode-------------------//
     HPX_CXX_CORE_EXPORT struct any_tag
@@ -330,4 +330,4 @@ namespace hpx::iostreams {
       , streambuf_tag
     {
     };
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

@@ -11,7 +11,7 @@
 // See http://www.boost.org/libs/iostreams for documentation.
 //
 // Defines the classes operation_sequence and operation, in the namespace
-// hpx::iostreams::test, for verifying that all elements of a sequence of
+// hpx::iostream::test, for verifying that all elements of a sequence of
 // operations are executed, and that they are executed in the correct order.
 //
 // File:        libs/iostreams/test/detail/operation_sequence.hpp
@@ -31,7 +31,7 @@
 #include <utility>    // pair
 #include <vector>
 
-namespace hpx::iostreams::test {
+namespace hpx::iostream::test {
 
     // Simple exception class with error code built in to type
     template <int Code>
@@ -290,4 +290,4 @@ namespace hpx::iostreams::test {
         }
         operations_.erase(it);
     }
-}    // namespace hpx::iostreams::test
+}    // namespace hpx::iostream::test

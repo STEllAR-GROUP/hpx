@@ -17,7 +17,7 @@
 
 #include <type_traits>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     HPX_CXX_CORE_EXPORT template <typename T, typename Tag1, typename Tag2,
         typename Tag3 = util::void_t, typename Tag4 = util::void_t,
@@ -39,4 +39,4 @@ namespace hpx::iostreams::detail {
         typename Category = category_of_t<T>>
     using dispatch_t =
         dispatch<T, Tag1, Tag2, Tag3, Tag4, Tag5, Tag6, Category>::type;
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail

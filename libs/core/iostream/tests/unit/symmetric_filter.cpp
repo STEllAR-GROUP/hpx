@@ -24,9 +24,9 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-using namespace hpx::iostreams;
-using namespace hpx::iostreams::test;
-namespace io = hpx::iostreams;
+using namespace hpx::iostream;
+using namespace hpx::iostream::test;
+namespace io = hpx::iostream;
 
 // Note: The filter is given an internal buffer -- unnecessary in this simple
 // case -- to stress test symmetric_filter.
@@ -89,7 +89,7 @@ struct toupper_symmetric_filter_impl
         return dest_begin != dest_end && buf_.ptr() != buf_.eptr();
     }
 
-    hpx::iostreams::detail::buffer<char> buf_;
+    hpx::iostream::detail::buffer<char> buf_;
 };
 
 using toupper_symmetric_filter =

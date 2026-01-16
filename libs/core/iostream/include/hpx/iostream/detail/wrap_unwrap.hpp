@@ -18,7 +18,7 @@
 #include <functional>
 #include <type_traits>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     //------------------Definition of wrap/unwrap traits--------------------------//
     HPX_CXX_CORE_EXPORT template <typename T>
@@ -53,4 +53,4 @@ namespace hpx::iostreams::detail {
             return HPX_FORWARD(T, t);
         }
     }
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail

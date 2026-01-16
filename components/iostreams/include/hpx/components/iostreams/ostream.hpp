@@ -8,8 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <boost/iostreams/stream.hpp>
-
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/post.hpp>
 #include <hpx/components/client_base.hpp>
@@ -69,8 +67,8 @@ namespace hpx::iostreams {
             typedef Char char_type;
 
             struct category
-              : hpx::iostreams::sink_tag
-              , hpx::iostreams::flushable_tag
+              : hpx::iostream::sink_tag
+              , hpx::iostream::flushable_tag
             {
             };
 
@@ -96,7 +94,7 @@ namespace hpx::iostreams {
         {
             typedef std::back_insert_iterator<std::vector<Char>> iterator_type;
             typedef Sink device_type;
-            typedef hpx::iostreams::stream<device_type> stream_type;
+            typedef hpx::iostream::stream<device_type> stream_type;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -305,6 +303,7 @@ namespace hpx::iostreams {
         friend void detail::register_ostreams();
         friend void detail::unregister_ostreams();
 
+    public:
         // late initialization during runtime system startup
         template <typename Tag>
         void initialize(Tag tag)

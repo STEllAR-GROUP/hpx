@@ -21,7 +21,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     namespace detail {
 
@@ -123,6 +123,6 @@ namespace hpx::iostreams {
             }
         };
     }    // End namespace detail.
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

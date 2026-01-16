@@ -21,8 +21,8 @@
 
 using namespace std;
 using namespace hpx;
-using namespace hpx::iostreams;
-using namespace hpx::iostreams::test;
+using namespace hpx::iostream;
+using namespace hpx::iostream::test;
 
 //------------------Definition of stream types--------------------------------//
 using vector_source = container_source<vector<char>>;
@@ -41,7 +41,7 @@ void copy_test()
         vector_ostream second;
         first.open(vector_source(src));
         second.open(vector_sink(dest));
-        HPX_TEST_MSG(hpx::iostreams::copy(first, second) ==
+        HPX_TEST_MSG(hpx::iostream::copy(first, second) ==
                     static_cast<streamsize>(src.size()) &&
                 src == dest,
             "failed copying from stream to stream");
@@ -54,7 +54,7 @@ void copy_test()
         vector_istream in;
         vector_sink out(dest);
         in.open(vector_source(src));
-        HPX_TEST_MSG(hpx::iostreams::copy(in, out) ==
+        HPX_TEST_MSG(hpx::iostream::copy(in, out) ==
                     static_cast<streamsize>(src.size()) &&
                 src == dest,
             "failed copying from stream to indirect sink");
@@ -67,7 +67,7 @@ void copy_test()
         vector_source in(src);
         vector_ostream out;
         out.open(vector_sink(dest));
-        HPX_TEST_MSG(hpx::iostreams::copy(in, out) ==
+        HPX_TEST_MSG(hpx::iostream::copy(in, out) ==
                     static_cast<streamsize>(src.size()) &&
                 src == dest,
             "failed copying from indirect source to stream");
@@ -79,7 +79,7 @@ void copy_test()
         vector<char> dest;
         vector_source in(src);
         vector_sink out(dest);
-        HPX_TEST_MSG(hpx::iostreams::copy(in, out) ==
+        HPX_TEST_MSG(hpx::iostream::copy(in, out) ==
                     static_cast<streamsize>(src.size()) &&
                 src == dest,
             "failed copying from indirect source to indirect sink");
@@ -91,7 +91,7 @@ void copy_test()
         vector<char> dest(src.size(), '?');
         array_source<char> in(&src[0], &src[0] + src.size());
         array_sink<char> out(&dest[0], &dest[0] + dest.size());
-        HPX_TEST_MSG(hpx::iostreams::copy(in, out) ==
+        HPX_TEST_MSG(hpx::iostream::copy(in, out) ==
                     static_cast<streamsize>(src.size()) &&
                 src == dest,
             "failed copying from direct source to direct sink");
@@ -103,7 +103,7 @@ void copy_test()
         vector<char> dest;
         array_source<char> in(&src[0], &src[0] + src.size());
         vector_ostream out(dest);
-        HPX_TEST_MSG(hpx::iostreams::copy(in, out) ==
+        HPX_TEST_MSG(hpx::iostream::copy(in, out) ==
                     static_cast<streamsize>(src.size()) &&
                 src == dest,
             "failed copying from direct source to indirect sink");
@@ -116,7 +116,7 @@ void copy_test()
         vector_istream in;
         array_sink<char> out(&dest[0], &dest[0] + dest.size());
         in.open(vector_source(src));
-        HPX_TEST_MSG(hpx::iostreams::copy(in, out) ==
+        HPX_TEST_MSG(hpx::iostream::copy(in, out) ==
                     static_cast<streamsize>(src.size()) &&
                 src == dest,
             "failed copying from indirect source to direct sink");

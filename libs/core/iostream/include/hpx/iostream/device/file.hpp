@@ -24,7 +24,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     HPX_CXX_CORE_EXPORT template <typename Ch>
     class basic_file
@@ -207,7 +207,7 @@ namespace hpx::iostreams {
     std::streampos basic_file<Ch>::seek(
         stream_offset off, std::ios_base::seekdir way, std::ios_base::openmode)
     {
-        return iostreams::seek(pimpl_->file_, off, way);
+        return iostream::seek(pimpl_->file_, off, way);
     }
 
     template <typename Ch>
@@ -235,6 +235,6 @@ namespace hpx::iostreams {
     {
         return pimpl_->file_.pubsync() == 0;
     }
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

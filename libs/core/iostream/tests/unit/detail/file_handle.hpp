@@ -25,12 +25,12 @@
 #include <sys/stat.h>
 #endif
 
-namespace hpx::iostreams::test {
+namespace hpx::iostream::test {
 
 #if defined(HPX_WINDOWS)
 
     // Windows implementation
-    hpx::iostreams::file_handle open_file_handle(std::string const& name)
+    hpx::iostream::file_handle open_file_handle(std::string const& name)
     {
         HANDLE handle = ::CreateFileA(name.c_str(),
             GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -40,17 +40,17 @@ namespace hpx::iostreams::test {
         return handle;
     }
 
-    void close_file_handle(hpx::iostreams::file_handle handle)
+    void close_file_handle(hpx::iostream::file_handle handle)
     {
         HPX_TEST(::CloseHandle(handle) == 1);
     }
 
-    constexpr void check_handle_open(hpx::iostreams::file_handle) noexcept {}
-    constexpr void check_handle_closed(hpx::iostreams::file_handle) noexcept {}
+    constexpr void check_handle_open(hpx::iostream::file_handle) noexcept {}
+    constexpr void check_handle_closed(hpx::iostream::file_handle) noexcept {}
 #else
 
     // Non-windows implementation
-    hpx::iostreams::file_handle open_file_handle(std::string const& name)
+    hpx::iostream::file_handle open_file_handle(std::string const& name)
     {
         int oflag = O_RDWR;
 
@@ -69,7 +69,7 @@ namespace hpx::iostreams::test {
         return fd;
     }
 
-    void close_file_handle(hpx::iostreams::file_handle handle)
+    void close_file_handle(hpx::iostream::file_handle handle)
     {
         HPX_TEST(::close(handle) != -1);
     }
@@ -81,19 +81,19 @@ namespace hpx::iostreams::test {
     // fcntl will know that the descriptor is closed but this seems
     // to work okay, and I can't see any other convenient way to check
     // that a descripter has been closed.
-    bool is_handle_open(hpx::iostreams::file_handle handle)
+    bool is_handle_open(hpx::iostream::file_handle handle)
     {
         return ::fcntl(handle, F_GETFD) != -1;
     }
 
-    inline void check_handle_open(hpx::iostreams::file_handle handle)
+    inline void check_handle_open(hpx::iostream::file_handle handle)
     {
-        HPX_TEST(::hpx::iostreams::test::is_handle_open(handle));
+        HPX_TEST(::hpx::iostream::test::is_handle_open(handle));
     }
 
-    inline void check_handle_closed(hpx::iostreams::file_handle handle)
+    inline void check_handle_closed(hpx::iostream::file_handle handle)
     {
-        HPX_TEST(!::hpx::iostreams::test::is_handle_open(handle));
+        HPX_TEST(!::hpx::iostream::test::is_handle_open(handle));
     }
 #endif
-}    // namespace hpx::iostreams::test
+}    // namespace hpx::iostream::test

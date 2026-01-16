@@ -21,7 +21,7 @@ if(EXISTS "${HPX_DIR}")
   if("${SETUP_TYPE}" STREQUAL "TARGETS")
     if(HPX_WITH_DISTRIBUTED_RUNTIME)
       target_link_libraries(
-        hello_world_component PUBLIC HPX::hpx HPX::iostreams_component
+        hello_world_component PUBLIC HPX::hpx hpx::iostreams_component
       )
       target_link_libraries(hello_world_component PRIVATE HPX::component)
       target_link_libraries(hello_world_client PRIVATE hello_world_component)

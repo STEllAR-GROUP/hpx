@@ -24,7 +24,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     namespace detail {
 
@@ -111,14 +111,14 @@ namespace hpx::iostreams {
             template <typename Source>
             std::streamsize read(Source& src, char_type* s, std::streamsize n)
             {
-                return iostreams::read(in_, src, s, n);
+                return iostream::read(in_, src, s, n);
             }
 
             template <typename Sink>
             std::streamsize write(
                 Sink& snk, char_type const* s, std::streamsize n)
             {
-                return iostreams::write(out_, snk, s, n);
+                return iostream::write(out_, snk, s, n);
             }
 
             template <typename Sink>
@@ -128,7 +128,7 @@ namespace hpx::iostreams {
                 {
                     if constexpr (std::is_convertible_v<in_category, dual_use>)
                     {
-                        iostreams::close(in_, snk, std::ios_base::in);
+                        iostream::close(in_, snk, std::ios_base::in);
                     }
                     else
                     {
@@ -139,7 +139,7 @@ namespace hpx::iostreams {
                 {
                     if constexpr (std::is_convertible_v<out_category, dual_use>)
                     {
-                        iostreams::close(out_, snk, std::ios_base::out);
+                        iostream::close(out_, snk, std::ios_base::out);
                     }
                     else
                     {
@@ -210,14 +210,14 @@ namespace hpx::iostreams {
         std::streamsize combined_device<Source, Sink>::read(
             char_type* s, std::streamsize n)
         {
-            return iostreams::read(src_, s, n);
+            return iostream::read(src_, s, n);
         }
 
         template <typename Source, typename Sink>
         std::streamsize combined_device<Source, Sink>::write(
             char_type const* s, std::streamsize n)
         {
-            return iostreams::write(sink_, s, n);
+            return iostream::write(sink_, s, n);
         }
 
         template <typename Source, typename Sink>
@@ -233,8 +233,8 @@ namespace hpx::iostreams {
         template <typename Source, typename Sink>
         void combined_device<Source, Sink>::imbue(std::locale const& loc)
         {
-            iostreams::imbue(src_, loc);
-            iostreams::imbue(sink_, loc);
+            iostream::imbue(src_, loc);
+            iostream::imbue(sink_, loc);
         }
 
         //--------------Implementation of filter_pair---------------------------------//
@@ -250,10 +250,10 @@ namespace hpx::iostreams {
         void combined_filter<InputFilter, OutputFilter>::imbue(
             std::locale const& loc)
         {
-            iostreams::imbue(in_, loc);
-            iostreams::imbue(out_, loc);
+            iostream::imbue(in_, loc);
+            iostream::imbue(out_, loc);
         }
     }    // namespace detail
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

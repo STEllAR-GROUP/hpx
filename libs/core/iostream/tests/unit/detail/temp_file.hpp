@@ -21,7 +21,7 @@
 
 #include "constants.hpp"
 
-namespace hpx::iostreams::test {
+namespace hpx::iostream::test {
 
     // Represents a temp file, deleted upon destruction.
     class temp_file
@@ -102,4 +102,4 @@ namespace hpx::iostreams::test {
                     f.put((char) std::tolower(buf[w]));
         }
     };
-}    // namespace hpx::iostreams::test
+}    // namespace hpx::iostream::test

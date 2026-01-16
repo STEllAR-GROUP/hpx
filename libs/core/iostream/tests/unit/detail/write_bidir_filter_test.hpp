@@ -24,8 +24,8 @@
 void write_bidirectional_filter_test()
 {
     using namespace std;
-    using namespace hpx::iostreams;
-    using namespace hpx::iostreams::test;
+    using namespace hpx::iostream;
+    using namespace hpx::iostream::test;
 
     lowercase_file lower;
     std::ios_base::openmode mode = out_mode | std::ios_base::trunc;

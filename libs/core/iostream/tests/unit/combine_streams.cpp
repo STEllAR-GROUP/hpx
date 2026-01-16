@@ -23,9 +23,9 @@
 #include "detail/closable.hpp"
 #include "detail/operation_sequence.hpp"
 
-using namespace hpx::iostreams;
-using namespace hpx::iostreams::test;
-namespace io = hpx::iostreams;
+using namespace hpx::iostream;
+using namespace hpx::iostream::test;
+namespace io = hpx::iostream;
 
 void combine_test()
 {

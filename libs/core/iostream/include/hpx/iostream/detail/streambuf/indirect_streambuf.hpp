@@ -43,7 +43,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams::detail {
+namespace hpx::iostream::detail {
 
     //
     // Description: The implementation of basic_streambuf used by chains.
@@ -232,7 +232,7 @@ namespace hpx::iostreams::detail {
 
         // Normalize buffer sizes.
         buffer_size = (buffer_size != -1) ? buffer_size :
-                                            iostreams::optimal_buffer_size(t);
+                                            iostream::optimal_buffer_size(t);
         pback_size =
             (pback_size != -1) ? pback_size : default_pback_buffer_size;
 
@@ -563,6 +563,6 @@ namespace hpx::iostreams::detail {
         else
             setp(nullptr, nullptr);
     }
-}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostream::detail
 
 #include <hpx/config/warnings_suffix.hpp>

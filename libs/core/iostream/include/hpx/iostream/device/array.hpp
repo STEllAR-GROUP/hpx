@@ -18,7 +18,7 @@
 #include <span>
 #include <type_traits>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     namespace detail {
 
@@ -90,4 +90,4 @@ namespace hpx::iostreams {
 
     HPX_CXX_CORE_EXPORT template <typename Ch>
     using array = detail::array_adapter<seekable, Ch>;
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

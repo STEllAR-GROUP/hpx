@@ -16,7 +16,7 @@
 #include <cstring>
 #include <iosfwd>
 
-namespace hpx::iostreams::test {
+namespace hpx::iostream::test {
 
     inline constexpr std::ios_base::openmode in_mode =
         std::ios_base::in | std::ios_base::binary;
@@ -73,4 +73,4 @@ namespace hpx::iostreams::test {
         static int len = (int) std::strlen(narrow_data());
         return len;
     }
-}    // namespace hpx::iostreams::test
+}    // namespace hpx::iostream::test

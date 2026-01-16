@@ -23,7 +23,7 @@
 #include <streambuf>
 #include <string>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     HPX_CXX_CORE_EXPORT template <typename Mode, typename Ch = char,
         typename Tr = std::char_traits<Ch>, typename Alloc = std::allocator<Ch>,
@@ -149,4 +149,4 @@ namespace hpx::iostreams {
     HPX_CXX_CORE_EXPORT using filtering_wostreambuf =
         filtering_wstreambuf<output>;
 #endif
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

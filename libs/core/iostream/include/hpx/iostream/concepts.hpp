@@ -19,7 +19,7 @@
 #include <iosfwd>
 #include <type_traits>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     //--------------Definitions of helper templates for device concepts-----------//
     HPX_CXX_CORE_EXPORT template <typename Mode, typename Ch = char>
@@ -145,4 +145,4 @@ namespace hpx::iostreams {
     HPX_CXX_CORE_EXPORT using multichar_dual_use_wfilter =
         multichar_wfilter<dual_use>;
 #endif
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

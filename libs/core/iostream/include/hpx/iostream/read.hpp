@@ -24,7 +24,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     namespace detail {
 
@@ -127,7 +127,7 @@ namespace hpx::iostreams {
             static int_type_of_t<T> get(T& t)
             {
                 using char_type = char_type_of_t<T>;
-                using traits_type = iostreams::char_traits<char_type>;
+                using traits_type = iostream::char_traits<char_type>;
 
                 int_type_of_t<T> c = t.sbumpc();
                 if (!traits_type::is_eof(c) || detail::true_eof(t))
@@ -150,7 +150,7 @@ namespace hpx::iostreams {
             static bool putback(T& t, char_type_of_t<T> c)
             {
                 using char_type = char_type_of_t<T>;
-                using traits_type = iostreams::char_traits<char_type>;
+                using traits_type = iostream::char_traits<char_type>;
 
                 return !traits_type::is_eof(t.sputbackc(c));
             }
@@ -163,7 +163,7 @@ namespace hpx::iostreams {
             static int_type_of<T>::type get(T& t)
             {
                 using char_type = char_type_of_t<T>;
-                using traits_type = iostreams::char_traits<char_type>;
+                using traits_type = iostream::char_traits<char_type>;
 
                 char_type c;
                 std::streamsize const amt = t.read(&c, 1);
@@ -215,7 +215,7 @@ namespace hpx::iostreams {
                 T& t, Source& src, char_type_of_t<T>* s, std::streamsize n)
             {
                 using char_type = char_type_of_t<T>;
-                using traits_type = iostreams::char_traits<char_type>;
+                using traits_type = iostream::char_traits<char_type>;
 
                 for (std::streamsize off = 0; off < n; ++off)
                 {
@@ -230,6 +230,6 @@ namespace hpx::iostreams {
             }
         };
     }    // namespace detail
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

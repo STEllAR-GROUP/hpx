@@ -15,7 +15,7 @@
 
 #include <type_traits>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     HPX_CXX_CORE_EXPORT template <typename T>
     struct operations;
@@ -40,4 +40,4 @@ namespace hpx::iostreams {
     struct operations : detail::custom_tag
     {
     };
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream

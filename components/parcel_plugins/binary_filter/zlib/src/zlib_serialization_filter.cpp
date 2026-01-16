@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2026 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,14 +7,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_COMPRESSION_ZLIB)
-#include <boost/iostreams/filter/zlib.hpp>
-
-#include <hpx/modules/actions.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/iostream.hpp>
 
 #include <hpx/binary_filter/zlib_serialization_filter.hpp>
+#include <hpx/modules/actions.hpp>
 #include <hpx/plugin_factories/binary_filter_factory.hpp>
 #include <hpx/plugin_factories/plugin_registry.hpp>
 
@@ -34,17 +32,17 @@ namespace hpx::plugins::compression {
     namespace detail {
 
         class zlib_compdecomp
-          : public hpx::iostreams::detail::zlib_base
-          , public hpx::iostreams::detail::zlib_allocator<std::allocator<char>>
+          : public hpx::iostream::detail::zlib_base
+          , public hpx::iostream::detail::zlib_allocator<std::allocator<char>>
         {
             using allocator_type =
-                hpx::iostreams::detail::zlib_allocator<std::allocator<char>>;
+                hpx::iostream::detail::zlib_allocator<std::allocator<char>>;
 
         public:
             explicit zlib_compdecomp(bool compress = false,
-                hpx::iostreams::zlib_params const& params =
-                    hpx::iostreams::zlib_params{
-                        hpx::iostreams::zlib::default_compression});
+                hpx::iostream::zlib_params const& params =
+                    hpx::iostream::zlib_params{
+                        hpx::iostream::zlib::default_compression});
             ~zlib_compdecomp();
 
             bool save(char const*& src_begin, char const* src_end,
@@ -65,7 +63,7 @@ namespace hpx::plugins::compression {
         };
 
         zlib_compdecomp::zlib_compdecomp(
-            bool compress, hpx::iostreams::zlib_params const& params)
+            bool compress, hpx::iostream::zlib_params const& params)
           : compress_(compress)
           , eof_(false)
         {
@@ -80,8 +78,8 @@ namespace hpx::plugins::compression {
         bool zlib_compdecomp::save(char const*& src_begin, char const* src_end,
             char*& dest_begin, char* dest_end, bool flush)
         {
-            using namespace hpx::iostreams;
-            using namespace hpx::iostreams::zlib;
+            using namespace hpx::iostream;
+            using namespace hpx::iostream::zlib;
 
             before(src_begin, src_end, dest_begin, dest_end);
             int result = this->xdeflate(flush ? finish : no_flush);
@@ -93,8 +91,8 @@ namespace hpx::plugins::compression {
         bool zlib_compdecomp::load(char const*& src_begin, char const* src_end,
             char*& dest_begin, char* dest_end)
         {
-            using namespace hpx::iostreams;
-            using namespace hpx::iostreams::zlib;
+            using namespace hpx::iostream;
+            using namespace hpx::iostream::zlib;
 
             before(src_begin, src_end, dest_begin, dest_end);
             int result = this->xinflate(sync_flush);

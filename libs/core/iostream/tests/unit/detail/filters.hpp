@@ -26,7 +26,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx::iostreams::test {
+namespace hpx::iostream::test {
 
     template <typename Mode>
     struct toupper_filter;
@@ -37,7 +37,7 @@ namespace hpx::iostreams::test {
         template <typename Source>
         int get(Source& s)
         {
-            int c = hpx::iostreams::get(s);
+            int c = hpx::iostream::get(s);
             return c != EOF && c != WOULD_BLOCK ?
                 std::toupper((unsigned char) c) :
                 c;
@@ -50,7 +50,7 @@ namespace hpx::iostreams::test {
         template <typename Sink>
         bool put(Sink& s, char c)
         {
-            return hpx::iostreams::put(
+            return hpx::iostream::put(
                 s, (char) std::toupper((unsigned char) c));
         }
     };
@@ -64,7 +64,7 @@ namespace hpx::iostreams::test {
         template <typename Source>
         int get(Source& s)
         {
-            int c = hpx::iostreams::get(s);
+            int c = hpx::iostream::get(s);
             return c != EOF && c != WOULD_BLOCK ?
                 std::toupper((unsigned char) c) :
                 c;
@@ -77,7 +77,7 @@ namespace hpx::iostreams::test {
         template <typename Sink>
         bool put(Sink& s, char c)
         {
-            return hpx::iostreams::put(
+            return hpx::iostream::put(
                 s, (char) std::tolower((unsigned char) c));
         }
     };
@@ -91,7 +91,7 @@ namespace hpx::iostreams::test {
         template <typename Source>
         std::streamsize read(Source& s, char* buf, std::streamsize n)
         {
-            std::streamsize result = hpx::iostreams::read(s, buf, n);
+            std::streamsize result = hpx::iostream::read(s, buf, n);
             if (result == -1)
                 return -1;
             for (int z = 0; z < result; ++z)
@@ -110,7 +110,7 @@ namespace hpx::iostreams::test {
             for (result = 0; result < n; ++result)
             {
                 char c = (char) std::toupper((unsigned char) buf[result]);
-                if (!hpx::iostreams::put(s, c))
+                if (!hpx::iostream::put(s, c))
                     break;
             }
             return result;
@@ -126,7 +126,7 @@ namespace hpx::iostreams::test {
         template <typename Source>
         std::streamsize read(Source& s, char* buf, std::streamsize n)
         {
-            std::streamsize result = hpx::iostreams::read(s, buf, n);
+            std::streamsize result = hpx::iostream::read(s, buf, n);
             if (result == -1)
                 return -1;
             for (int z = 0; z < result; ++z)
@@ -145,7 +145,7 @@ namespace hpx::iostreams::test {
             for (result = 0; result < n; ++result)
             {
                 char c = (char) std::tolower((unsigned char) buf[result]);
-                if (!hpx::iostreams::put(s, c))
+                if (!hpx::iostream::put(s, c))
                     break;
             }
             return result;
@@ -172,7 +172,7 @@ namespace hpx::iostreams::test {
             }
             else
             {
-                result = hpx::iostreams::get(src);
+                result = hpx::iostream::get(src);
                 if (result != EOF && result != WOULD_BLOCK)
                     use_pad_char_ = true;
                 eof_ = result == EOF;
@@ -185,13 +185,13 @@ namespace hpx::iostreams::test {
         {
             if (use_pad_char_)
             {
-                if (!hpx::iostreams::put(s, pad_char_))
+                if (!hpx::iostream::put(s, pad_char_))
                     return false;
                 use_pad_char_ = false;
             }
-            if (!hpx::iostreams::put(s, c))
+            if (!hpx::iostream::put(s, c))
                 return false;
-            if (!hpx::iostreams::put(s, pad_char_))
+            if (!hpx::iostream::put(s, pad_char_))
                 use_pad_char_ = true;
             return true;
         }
@@ -223,7 +223,7 @@ namespace hpx::iostreams::test {
         {
             if (!buf_.empty())
             {
-                hpx::iostreams::write(
+                hpx::iostream::write(
                     s, &buf_[0], (std::streamsize) buf_.size());
                 buf_.clear();
             }
@@ -238,20 +238,20 @@ namespace hpx::iostreams::test {
         template <typename Source>
         int get(Source& s)
         {
-            return hpx::iostreams::get(s);
+            return hpx::iostream::get(s);
         }
 
         template <typename Sink>
         bool put(Sink& s, char c)
         {
-            return hpx::iostreams::put(s, c);
+            return hpx::iostream::put(s, c);
         }
 
         template <typename Device>
         std::streampos seek(
             Device& d, stream_offset off, std::ios_base::seekdir way)
         {
-            return hpx::iostreams::seek(d, off, way);
+            return hpx::iostream::seek(d, off, way);
         }
     };
 
@@ -260,20 +260,20 @@ namespace hpx::iostreams::test {
         template <typename Source>
         std::streamsize read(Source& s, char* buf, std::streamsize n)
         {
-            return hpx::iostreams::read(s, buf, n);
+            return hpx::iostream::read(s, buf, n);
         }
         template <typename Sink>
         std::streamsize write(Sink& s, char const* buf, std::streamsize n)
         {
-            return hpx::iostreams::write(s, buf, n);
+            return hpx::iostream::write(s, buf, n);
         }
         template <typename Device>
         std::streampos seek(
             Device& d, stream_offset off, std::ios_base::seekdir way)
         {
-            return hpx::iostreams::seek(d, off, way);
+            return hpx::iostream::seek(d, off, way);
         }
     };
-}    // namespace hpx::iostreams::test
+}    // namespace hpx::iostream::test
 
 #include <hpx/config/warnings_suffix.hpp>

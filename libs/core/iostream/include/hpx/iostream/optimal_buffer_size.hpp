@@ -21,7 +21,7 @@
 
 #include <type_traits>
 
-namespace hpx::iostreams {
+namespace hpx::iostream {
 
     namespace detail {
 
@@ -76,6 +76,6 @@ namespace hpx::iostreams {
         return detail::optimal_buffer_size_impl<T>::optimal_buffer_size(
             util::unwrap_ref(t));
     }
-}    // namespace hpx::iostreams
+}    // namespace hpx::iostream
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -20,8 +20,8 @@
 void array_test()
 {
     using namespace std;
-    using namespace hpx::iostreams;
-    using namespace hpx::iostreams::test;
+    using namespace hpx::iostream;
+    using namespace hpx::iostream::test;
 
     test_file test;
 
@@ -68,7 +68,7 @@ void array_test()
     //--------------random access---------------------------------------------//
     {
         vector<char> first(data_reps * data_length(), '?');
-        stream<hpx::iostreams::array<char>> io(
+        stream<hpx::iostream::array<char>> io(
             &first[0], &first[0] + first.size());
         HPX_TEST_MSG(test_seekable_in_chars(io),
             "failed seeking within stream<array>, in chars");
@@ -76,7 +76,7 @@ void array_test()
 
     {
         vector<char> first(data_reps * data_length(), '?');
-        stream<hpx::iostreams::array<char>> io(
+        stream<hpx::iostream::array<char>> io(
             &first[0], &first[0] + first.size());
         HPX_TEST_MSG(test_seekable_in_chars(io),
             "failed seeking within stream<array>, in chunks");
