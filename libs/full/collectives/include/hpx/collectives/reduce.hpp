@@ -1,4 +1,5 @@
 //  Copyright (c) 2019-2025 Hartmut Kaiser
+//  Copyright (c) 2025 Lukas Zeil
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -556,18 +557,44 @@ namespace hpx::collectives {
         return fid.then(hpx::launch::sync, HPX_MOVE(reduction_data));
     }
 
+    ////////////////////////////////////////////////////////////////////////////
     template <typename T, typename F>
-    hpx::future<std::decay_t<T>> reduce_here(communicator fid, T&& local_result,
-        F&& op, generation_arg const generation,
+    hpx::future<std::decay_t<T>> reduce_here(
+        hierarchical_communicator const& communicators, T&& local_result,
+        F&& op, this_site_arg this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
+        }
+
+        std::decay_t<T> result = HPX_FORWARD(T, local_result);
+        for (std::size_t i = communicators.size() - 1; i != 0; --i)
+        {
+            result = reduce_here(hpx::launch::sync, communicators.get(i),
+                HPX_MOVE(result), op, this_site_arg(0), generation);
+        }
+
+        return reduce_here(communicators.get(0), HPX_MOVE(result),
+            HPX_FORWARD(F, op), this_site_arg(0), generation);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename Communicator, typename T, typename F>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    decltype(auto) reduce_here(Communicator&& comm, T&& local_result, F&& op,
+        generation_arg const generation,
         this_site_arg const this_site = this_site_arg())
     {
-        return reduce_here(HPX_MOVE(fid), HPX_FORWARD(T, local_result),
-            HPX_FORWARD(F, op), this_site, generation);
+        return reduce_here(HPX_FORWARD(Communicator, comm),
+            HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site,
+            generation);
     }
 
     template <typename T, typename F>
-    hpx::future<std::decay_t<T>> reduce_here(char const* basename, T&& result,
-        F&& op, num_sites_arg const num_sites = num_sites_arg(),
+    decltype(auto) reduce_here(char const* basename, T&& result, F&& op,
+        num_sites_arg const num_sites = num_sites_arg(),
         this_site_arg const this_site = this_site_arg(),
         generation_arg const generation = generation_arg())
     {
@@ -577,24 +604,28 @@ namespace hpx::collectives {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename F>
-    decltype(auto) reduce_here(hpx::launch::sync_policy, communicator fid,
+    template <typename Communicator, typename T, typename F>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    decltype(auto) reduce_here(hpx::launch::sync_policy, Communicator&& comm,
         T&& local_result, F&& op,
         this_site_arg const this_site = this_site_arg(),
         generation_arg const generation = generation_arg())
     {
-        return reduce_here(HPX_MOVE(fid), HPX_FORWARD(T, local_result),
-            HPX_FORWARD(F, op), this_site, generation)
+        return reduce_here(HPX_FORWARD(Communicator, comm),
+            HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site,
+            generation)
             .get();
     }
 
-    template <typename T, typename F>
-    decltype(auto) reduce_here(hpx::launch::sync_policy, communicator fid,
+    template <typename Communicator, typename T, typename F>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    decltype(auto) reduce_here(hpx::launch::sync_policy, Communicator&& comm,
         T&& local_result, F&& op, generation_arg const generation,
         this_site_arg const this_site = this_site_arg())
     {
-        return reduce_here(HPX_MOVE(fid), HPX_FORWARD(T, local_result),
-            HPX_FORWARD(F, op), this_site, generation)
+        return reduce_here(HPX_FORWARD(Communicator, comm),
+            HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site,
+            generation)
             .get();
     }
 
@@ -653,17 +684,42 @@ namespace hpx::collectives {
         return fid.then(hpx::launch::sync, HPX_MOVE(reduction_data));
     }
 
-    template <typename T>
-    hpx::future<void> reduce_there(communicator fid, T&& local_result,
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename T, typename F>
+    hpx::future<void> reduce_there(
+        hierarchical_communicator const& communicators, T&& local_result,
+        F&& op, this_site_arg this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
+        }
+
+        std::decay_t<T> result = HPX_FORWARD(T, local_result);
+        for (std::size_t i = communicators.size() - 1; i != 0; --i)
+        {
+            result = reduce_here(hpx::launch::sync, communicators.get(i),
+                HPX_MOVE(result), op, this_site_arg(0), generation);
+        }
+
+        return reduce_there(communicators.get(0), HPX_MOVE(result),
+            communicators.site(0), generation);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename Communicator, typename T>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    decltype(auto) reduce_there(Communicator&& comm, T&& local_result,
         generation_arg const generation,
         this_site_arg const this_site = this_site_arg())
     {
-        return reduce_there(
-            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation);
+        return reduce_there(HPX_FORWARD(Communicator, comm),
+            HPX_FORWARD(T, local_result), this_site, generation);
     }
 
     template <typename T>
-    hpx::future<void> reduce_there(char const* basename, T&& local_result,
+    decltype(auto) reduce_there(char const* basename, T&& local_result,
         this_site_arg const this_site = this_site_arg(),
         generation_arg const generation = generation_arg(),
         root_site_arg const root_site = root_site_arg())
@@ -675,23 +731,25 @@ namespace hpx::collectives {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    void reduce_there(hpx::launch::sync_policy, communicator fid,
+    template <typename Communicator, typename T>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    void reduce_there(hpx::launch::sync_policy, Communicator&& comm,
         T&& local_result, this_site_arg const this_site = this_site_arg(),
         generation_arg const generation = generation_arg())
     {
-        reduce_there(
-            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+        reduce_there(HPX_FORWARD(Communicator, comm),
+            HPX_FORWARD(T, local_result), this_site, generation)
             .get();
     }
 
-    template <typename T>
-    void reduce_there(hpx::launch::sync_policy, communicator fid,
+    template <typename Communicator, typename T>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    void reduce_there(hpx::launch::sync_policy, Communicator&& comm,
         T&& local_result, generation_arg const generation,
         this_site_arg const this_site = this_site_arg())
     {
-        reduce_there(
-            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+        reduce_there(HPX_FORWARD(Communicator, comm),
+            HPX_FORWARD(T, local_result), this_site, generation)
             .get();
     }
 
@@ -710,7 +768,7 @@ namespace hpx::collectives {
 
     ////////////////////////////////////////////////////////////////////////////
     template <typename T, typename F>
-    void reduce(communicator fid, T&& local_result, F&& op,
+    void reduce(communicator comm, T&& local_result, F&& op,
         this_site_arg this_site = this_site_arg(),
         generation_arg const generation = generation_arg())
     {
@@ -719,17 +777,17 @@ namespace hpx::collectives {
             this_site = static_cast<std::size_t>(agas::get_locality_id());
         }
 
-        fid.wait();    // make sure communicator was created
+        comm.wait();    // make sure communicator was created
 
-        if (this_site == std::get<2>(fid.get_info_ex()))
+        if (this_site == std::get<2>(comm.get_info_ex()))
         {
-            local_result = reduce_here(hpx::launch::sync, HPX_MOVE(fid),
+            local_result = reduce_here(hpx::launch::sync, HPX_MOVE(comm),
                 HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site,
                 generation);
         }
         else
         {
-            reduce_there(hpx::launch::sync, HPX_MOVE(fid),
+            reduce_there(hpx::launch::sync, HPX_MOVE(comm),
                 HPX_FORWARD(T, local_result), this_site, generation);
         }
     }
