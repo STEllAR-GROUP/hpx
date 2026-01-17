@@ -13,7 +13,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 
-#include <hpx/parcelset_base/parcelport.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 
 #include <cstddef>
 #include <system_error>

@@ -25,7 +25,7 @@ namespace hpx::execution::experimental {
     // policies that simply forwards to the embedded executor (if that supports
     // the parameters type)
 
-    HPX_CXX_EXPORT template <execution_policy ExPolicy>
+    HPX_CXX_CORE_EXPORT template <execution_policy ExPolicy>
         requires(std::invocable<with_processing_units_count_t,
             typename std::decay_t<ExPolicy>::executor_type, std::size_t>)
     constexpr decltype(auto) tag_invoke(
@@ -37,7 +37,7 @@ namespace hpx::execution::experimental {
             policy, HPX_MOVE(exec), policy.parameters());
     }
 
-    HPX_CXX_EXPORT template <execution_policy ExPolicy,
+    HPX_CXX_CORE_EXPORT template <execution_policy ExPolicy,
         executor_parameters Params>
         requires(
             std::invocable<with_processing_units_count_t,
@@ -60,7 +60,7 @@ namespace hpx::execution::experimental {
 
     // general fallback for parameters types that are not directly supported by
     // the underlying executor
-    HPX_CXX_EXPORT template <typename ParametersProperty,
+    HPX_CXX_CORE_EXPORT template <typename ParametersProperty,
         execution_policy ExPolicy, executor_parameters Params>
     constexpr decltype(auto) tag_fallback_invoke(
         ParametersProperty, ExPolicy&& policy, Params&& params)
@@ -68,8 +68,8 @@ namespace hpx::execution::experimental {
         return policy.with(HPX_FORWARD(Params, params));
     }
 
-    HPX_CXX_EXPORT template <typename ParametersProperty, typename ExPolicy,
-        typename... Ts,
+    HPX_CXX_CORE_EXPORT template <typename ParametersProperty,
+        typename ExPolicy, typename... Ts,
         HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
     constexpr auto tag_fallback_invoke(
         ParametersProperty prop, ExPolicy&& policy, Ts&&... ts)

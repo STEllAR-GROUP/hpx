@@ -16,9 +16,9 @@
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/server/fixed_component_base.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/parcelset_base/locality.hpp>
 
 #include <atomic>
 #include <cstdint>

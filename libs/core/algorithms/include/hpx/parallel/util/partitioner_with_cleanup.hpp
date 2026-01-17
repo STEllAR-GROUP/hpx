@@ -42,7 +42,8 @@ namespace hpx::parallel::util {
         // iterations for each available core. The number of iterations is
         // determined automatically based on the measured runtime of the
         // iterations.
-        HPX_CXX_EXPORT template <typename ExPolicy, typename R, typename Result>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename R,
+            typename Result>
         struct static_partitioner_with_cleanup
         {
             using parameters_type = typename ExPolicy::executor_parameters_type;
@@ -276,7 +277,8 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename ExPolicy, typename R, typename Result>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename R,
+            typename Result>
         struct task_static_partitioner_with_cleanup
         {
             using parameters_type = typename ExPolicy::executor_parameters_type;
@@ -381,7 +383,7 @@ namespace hpx::parallel::util {
     // ExPolicy: execution policy
     // R:        overall result type
     // Result:   intermediate result type of first step
-    HPX_CXX_EXPORT template <typename ExPolicy, typename R = void,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename R = void,
         typename Result = R>
     struct partitioner_with_cleanup
       : detail::select_partitioner<std::decay_t<ExPolicy>,

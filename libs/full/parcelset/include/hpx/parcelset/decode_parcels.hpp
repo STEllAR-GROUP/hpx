@@ -19,9 +19,7 @@
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/parcelset_base/detail/data_point.hpp>
-#include <hpx/parcelset_base/detail/parcel_route_handler.hpp>
-#include <hpx/parcelset_base/parcel_interface.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 
 #if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
 #include <boost/exception/exception.hpp>

@@ -22,47 +22,47 @@ namespace hpx::parallel::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_VECTOR_REDUCTION)
-    HPX_CXX_EXPORT template <typename T, typename Operation,
+    HPX_CXX_CORE_EXPORT template <typename T, typename Operation,
         template <typename = void> typename Op>
     inline constexpr bool is_operation_v =
         std::is_same_v<Operation, Op<T>> || std::is_same_v<Operation, Op<>>;
 
-    HPX_CXX_EXPORT template <typename T, typename Operation>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Operation>
     inline constexpr bool is_arithmetic_plus_reduction_v =
         std::is_arithmetic_v<T> && is_operation_v<T, Operation, std::plus>;
 
-    HPX_CXX_EXPORT template <typename T, typename Operation>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Operation>
     inline constexpr bool is_arithmetic_minus_reduction_v =
         std::is_arithmetic_v<T> && is_operation_v<T, Operation, std::minus>;
 
-    HPX_CXX_EXPORT template <typename T, typename Operation>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Operation>
     inline constexpr bool is_arithmetic_multiplies_reduction_v =
         std::is_arithmetic_v<T> &&
         is_operation_v<T, Operation, std::multiplies>;
 
-    HPX_CXX_EXPORT template <typename T, typename Operation>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Operation>
     inline constexpr bool is_arithmetic_bit_and_reduction_v =
         std::is_arithmetic_v<T> && is_operation_v<T, Operation, std::bit_and>;
 
-    HPX_CXX_EXPORT template <typename T, typename Operation>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Operation>
     inline constexpr bool is_arithmetic_bit_or_reduction_v =
         std::is_arithmetic_v<T> && is_operation_v<T, Operation, std::bit_or>;
 
-    HPX_CXX_EXPORT template <typename T, typename Operation>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Operation>
     inline constexpr bool is_arithmetic_bit_xor_reduction_v =
         std::is_arithmetic_v<T> && is_operation_v<T, Operation, std::bit_xor>;
 
-    HPX_CXX_EXPORT template <typename T, typename Operation>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Operation>
     inline constexpr bool is_arithmetic_logical_and_reduction_v =
         std::is_arithmetic_v<T> &&
         is_operation_v<T, Operation, std::logical_and>;
 
-    HPX_CXX_EXPORT template <typename T, typename Operation>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Operation>
     inline constexpr bool is_arithmetic_logical_or_reduction_v =
         std::is_arithmetic_v<T> &&
         is_operation_v<T, Operation, std::logical_or>;
 
-    HPX_CXX_EXPORT template <typename T, typename Operation>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Operation>
     inline constexpr bool is_not_omp_reduction_v =
         !is_arithmetic_plus_reduction_v<T, Operation> &&
         !is_arithmetic_minus_reduction_v<T, Operation> &&
@@ -73,13 +73,13 @@ namespace hpx::parallel::util::detail {
         !is_arithmetic_logical_and_reduction_v<T, Operation> &&
         !is_arithmetic_logical_or_reduction_v<T, Operation>;
 #else
-    HPX_CXX_EXPORT template <typename T, typename Operation>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Operation>
     inline constexpr bool is_not_omp_reduction_v = true;
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
     // Will only be called when the iterators are all random access
-    HPX_CXX_EXPORT struct unseq_reduce_n
+    HPX_CXX_CORE_EXPORT struct unseq_reduce_n
     {
 #if defined(HPX_HAVE_VECTOR_REDUCTION)
         template <typename Iter1, typename T, typename Convert, typename Reduce>
@@ -267,7 +267,7 @@ namespace hpx::parallel::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // Will only be called when the iterators are all random access
-    HPX_CXX_EXPORT struct unseq_binary_reduce_n
+    HPX_CXX_CORE_EXPORT struct unseq_binary_reduce_n
     {
 #if defined(HPX_HAVE_VECTOR_REDUCTION)
         template <typename Iter1, typename Iter2, typename T, typename Convert,

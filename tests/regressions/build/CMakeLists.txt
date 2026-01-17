@@ -8,6 +8,8 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   return()
 endif()
 
+include(HPX_CXXModules)
+
 if(NOT HPX_WITH_STATIC_LINKING)
   set(_libraries hpx iostreams_component)
 
@@ -29,6 +31,15 @@ if(NOT HPX_WITH_STATIC_LINKING)
   set_target_properties(
     test_client_1950_test PROPERTIES FOLDER "Tests/Regressions/Build/"
   )
+
+  if(HPX_WITH_CXX_MODULES)
+    hpx_configure_module_consumer(test_server_1950 hpx_core_module_if)
+    hpx_configure_module_consumer(test_client_1950_test hpx_core_module_if)
+    if(TARGET hpx_full_module_if)
+      hpx_configure_module_consumer(test_server_1950 hpx_full_module_if)
+      hpx_configure_module_consumer(test_client_1950_test hpx_full_module_if)
+    endif()
+  endif()
 
   add_hpx_regression_test(
     "build" test_client_1950

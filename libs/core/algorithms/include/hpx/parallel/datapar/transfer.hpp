@@ -25,7 +25,7 @@ namespace hpx::parallel::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Iterator>
+        HPX_CXX_CORE_EXPORT template <typename Iterator>
         struct datapar_copy_n
         {
             template <typename InIter, typename OutIter>
@@ -58,7 +58,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
         typename OutIter>
     HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<hpx::is_vectorpack_execution_policy_v<ExPolicy>,

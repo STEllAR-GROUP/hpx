@@ -10,13 +10,15 @@
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <winsock2.h>
 #endif
-#include <asio/ip/tcp.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <asio/ip/tcp.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -24,7 +26,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////
     // Try to retrieve default values from a batch environment
-    HPX_CXX_EXPORT struct HPX_CORE_EXPORT batch_environment
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT batch_environment
     {
         // the constructor tries to read initial values from a batch
         // environment, filling our map of nodes and thread counts

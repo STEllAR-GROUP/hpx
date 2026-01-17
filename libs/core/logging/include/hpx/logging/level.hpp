@@ -43,7 +43,7 @@ namespace hpx::util::logging {
     error, fatal will be logged.
 
     */
-    HPX_CXX_EXPORT enum class level : unsigned int {
+    HPX_CXX_CORE_EXPORT enum class level : unsigned int {
         disable_all = static_cast<unsigned int>(-1),
         enable_all = 0,
         debug = 1000,
@@ -55,6 +55,6 @@ namespace hpx::util::logging {
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void format_value(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void format_value(
         std::ostream& os, std::string_view spec, level value);
 }    // namespace hpx::util::logging

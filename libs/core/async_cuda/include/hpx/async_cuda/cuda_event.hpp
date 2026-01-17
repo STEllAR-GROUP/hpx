@@ -25,7 +25,7 @@ namespace hpx::cuda::experimental {
     // Since allocation of a cuda event passes into the cuda runtime
     // it might be an expensive operation, so we pre-allocate a pool
     // of them at startup.
-    HPX_CXX_EXPORT struct cuda_event_pool
+    HPX_CXX_CORE_EXPORT struct cuda_event_pool
     {
         static constexpr std::size_t initial_events_in_pool = 128;
 

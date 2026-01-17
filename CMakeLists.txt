@@ -1,5 +1,5 @@
 # Copyright (c)      2020 Mikael Simberg
-# Copyright (c) 2007-2025 Hartmut Kaiser
+# Copyright (c) 2007-2026 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c)      2024 Isidoros Tsaousis-Seiras
 # Copyright (c) 2007-2008 Chirag Dekate
@@ -2074,6 +2074,16 @@ if(HPX_WITH_COMPILER_WARNINGS)
       hpx_add_compile_flag(-wd4244)
     endif()
 
+    # when compiling with modules enabled, the following warning can't be
+    # disabled inline
+    if(HPX_WITH_CXX_MODULES)
+      # 'symbol' needs to have dll-interface to be used by clients of 'symbol'
+      hpx_add_compile_flag(-wd4251)
+      # non dll-interface struct 'symbol' used as base for dll-interface class
+      # 'symbol'
+      hpx_add_compile_flag(-wd4275)
+    endif()
+
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall)
     hpx_add_compile_flag_if_available(-Wno-strict-aliasing)
@@ -2344,7 +2354,6 @@ include(HPX_SetupThreads)
 # Setup our required Boost libraries.
 include(HPX_SetupBoost)
 include(HPX_SetupBoostFilesystem)
-include(HPX_SetupBoostIostreams)
 
 # Set up standalone Asio
 include(HPX_SetupAsio)

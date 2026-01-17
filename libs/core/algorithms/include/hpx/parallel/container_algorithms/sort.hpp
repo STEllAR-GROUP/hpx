@@ -293,7 +293,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::sort
-    HPX_CXX_EXPORT inline constexpr struct sort_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct sort_t final
       : hpx::detail::tag_parallel_algorithm<sort_t>
     {
     private:

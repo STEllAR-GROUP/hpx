@@ -173,7 +173,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-pr:`3178` - Fix #3124
 * :hpx-pr:`3177` - Removed allgather
 * :hpx-pr:`3176` - Fixed Documentation for "using_hpx_pkgconfig"
-* :hpx-pr:`3174` - Add hpx::iostreams::ostream overload to format_to
+* :hpx-pr:`3174` - Add hpx::iostream::ostream overload to format_to
 * :hpx-pr:`3172` - Fix lifo queue backend
 * :hpx-pr:`3171` - adding the missing unset() function to cpu_mask() for case of
   more than 64 threads
@@ -333,7 +333,7 @@ Here is a list of the important tickets we closed for this release.
 * :hpx-issue:`3027` - Implement all scheduling APIs in terms of executors
 * :hpx-pr:`3026` - implement executor then interface with && forwarding
   reference
-* :hpx-pr:`3025` - Fix typo unitialized to uninitialized
+* :hpx-pr:`3025` - Fix typo uninitialized to uninitialized
 * :hpx-pr:`3024` - Inspect fixes
 * :hpx-pr:`3023` - P0356 Simplified partial function application
 * :hpx-pr:`3022` - Master fixes

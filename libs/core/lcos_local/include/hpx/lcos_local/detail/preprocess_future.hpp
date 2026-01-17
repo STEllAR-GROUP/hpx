@@ -22,7 +22,7 @@ namespace hpx::serialization::detail {
 
     // This class allows to register futures during serialization preprocessing
     // to ensure each future is ready before serializing it.
-    HPX_CXX_EXPORT class preprocess_futures
+    HPX_CXX_CORE_EXPORT class preprocess_futures
     {
         using mutex_type = hpx::spinlock;
 

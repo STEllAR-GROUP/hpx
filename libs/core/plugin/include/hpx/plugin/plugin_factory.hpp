@@ -30,7 +30,7 @@ namespace hpx::util::plugin {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename BasePlugin, typename DeleterType>
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename DeleterType>
         std::pair<abstract_factory<BasePlugin>*, dll_handle>
         get_abstract_factory_static(get_plugins_list_type f, DeleterType d,
             std::string const& class_name, std::string const& libname = "",
@@ -104,7 +104,7 @@ namespace hpx::util::plugin {
             }
         }
 
-        HPX_CXX_EXPORT template <typename BasePlugin>
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin>
         std::pair<abstract_factory<BasePlugin>*, dll_handle>
         get_abstract_factory(dll const& d, std::string const& class_name,
             std::string const& base_name, error_code& ec = throws)
@@ -126,7 +126,7 @@ namespace hpx::util::plugin {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT inline void get_abstract_factory_names_static(
+        HPX_CXX_CORE_EXPORT inline void get_abstract_factory_names_static(
             get_plugins_list_type f, std::vector<std::string>& names,
             error_code& /*ec*/ = throws)
         {
@@ -139,7 +139,7 @@ namespace hpx::util::plugin {
             }
         }
 
-        HPX_CXX_EXPORT inline void get_abstract_factory_names(dll const& d,
+        HPX_CXX_CORE_EXPORT inline void get_abstract_factory_names(dll const& d,
             std::string const& base_name, std::vector<std::string>& names,
             error_code& ec = throws)
         {
@@ -159,7 +159,7 @@ namespace hpx::util::plugin {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct plugin_factory_item_base
+        HPX_CXX_CORE_EXPORT struct plugin_factory_item_base
         {
             plugin_factory_item_base(dll& d, std::string basename)
               : m_dll(d)
@@ -181,11 +181,11 @@ namespace hpx::util::plugin {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename BasePlugin, typename Base,
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Base,
             typename Parameters>
         struct plugin_factory_item;
 
-        HPX_CXX_EXPORT template <typename BasePlugin, typename Base,
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Base,
             typename... Parameters>
         struct plugin_factory_item<BasePlugin, Base,
             hpx::util::pack<Parameters...>> : public Base
@@ -221,13 +221,13 @@ namespace hpx::util::plugin {
         ///////////////////////////////////////////////////////////////////////
         // empty deleter for the smart pointer to be used for static
         // plugin_factories
-        HPX_CXX_EXPORT constexpr inline void empty_deleter(
+        HPX_CXX_CORE_EXPORT constexpr inline void empty_deleter(
             get_plugins_list_type) noexcept
         {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct static_plugin_factory_item_base
+        HPX_CXX_CORE_EXPORT struct static_plugin_factory_item_base
         {
             explicit static_plugin_factory_item_base(
                 get_plugins_list_type const& f_) noexcept    //-V835
@@ -248,11 +248,11 @@ namespace hpx::util::plugin {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename BasePlugin, typename Base,
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Base,
             typename Parameters>
         struct static_plugin_factory_item;
 
-        HPX_CXX_EXPORT template <typename BasePlugin, typename Base,
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Base,
             typename... Parameters>
         struct static_plugin_factory_item<BasePlugin, Base,
             hpx::util::pack<Parameters...>> : public Base
@@ -288,7 +288,7 @@ namespace hpx::util::plugin {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename BasePlugin>
+    HPX_CXX_CORE_EXPORT template <typename BasePlugin>
     struct plugin_factory
       : detail::plugin_factory_item<BasePlugin,
             detail::plugin_factory_item_base, virtual_constructor_t<BasePlugin>>
@@ -306,7 +306,7 @@ namespace hpx::util::plugin {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename BasePlugin>
+    HPX_CXX_CORE_EXPORT template <typename BasePlugin>
     struct static_plugin_factory
       : detail::static_plugin_factory_item<BasePlugin,
             detail::static_plugin_factory_item_base,

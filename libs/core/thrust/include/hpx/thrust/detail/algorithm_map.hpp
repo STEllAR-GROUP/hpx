@@ -18,7 +18,7 @@
 namespace hpx::thrust::detail {
 
     // No definition = compilation error for unmapped algorithms
-    HPX_CXX_EXPORT template <typename Tag>
+    HPX_CXX_CORE_EXPORT template <typename Tag>
     struct algorithm_map;
 
     template <>
@@ -648,7 +648,8 @@ namespace hpx::thrust::detail {
     };
 
     // boolean predicate indicating whether a mapping exists
-    HPX_CXX_EXPORT template <typename Tag, typename Policy, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename Policy,
+        typename... Args>
     concept is_algorithm_mapped = requires {
         algorithm_map<Tag>::invoke(
             std::declval<Policy>(), std::declval<Args>()...);

@@ -55,7 +55,7 @@ namespace hpx::threads::policies {
     // ----------------------------------------------------------------
     // Helper class to hold a set of queues.
     // ----------------------------------------------------------------
-    HPX_CXX_EXPORT template <typename QueueType>
+    HPX_CXX_CORE_EXPORT template <typename QueueType>
     struct queue_holder_thread
     {
         static constexpr std::size_t max_thread_count = 1000;

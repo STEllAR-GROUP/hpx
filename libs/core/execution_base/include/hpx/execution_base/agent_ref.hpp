@@ -17,9 +17,9 @@
 
 namespace hpx::execution_base {
 
-    HPX_CXX_EXPORT struct agent_base;
+    HPX_CXX_CORE_EXPORT struct agent_base;
 
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT agent_ref
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT agent_ref
     {
     public:
         agent_ref() = default;

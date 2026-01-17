@@ -27,7 +27,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Policy>
+        HPX_CXX_CORE_EXPORT template <typename Policy>
         struct get_default_scheduler_policy
         {
             static constexpr Policy call() noexcept
@@ -46,7 +46,7 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct thread_pool_policy_scheduler
     {
         // Associate the parallel_execution_tag tag type as a default with this
@@ -412,7 +412,8 @@ namespace hpx::execution::experimental {
     };
 
     // support all properties exposed by the embedded policy
-    HPX_CXX_EXPORT template <typename Tag, typename Policy, typename Property,
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename Policy,
+        typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>)>
     auto tag_invoke(Tag tag,
@@ -428,7 +429,7 @@ namespace hpx::execution::experimental {
         return scheduler_with_prop;
     }
 
-    HPX_CXX_EXPORT template <typename Tag, typename Policy,
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename Policy,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>)>
     auto tag_invoke(
@@ -438,6 +439,6 @@ namespace hpx::execution::experimental {
         return tag(scheduler.policy());
     }
 
-    HPX_CXX_EXPORT using thread_pool_scheduler =
+    HPX_CXX_CORE_EXPORT using thread_pool_scheduler =
         thread_pool_policy_scheduler<hpx::launch>;
 }    // namespace hpx::execution::experimental

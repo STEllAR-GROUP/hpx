@@ -570,7 +570,7 @@ namespace hpx::parallel {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename IterPair>
+        HPX_CXX_CORE_EXPORT template <typename IterPair>
         struct mismatch_binary
           : public algorithm<mismatch_binary<IterPair>, IterPair>
         {
@@ -662,14 +662,14 @@ namespace hpx::parallel {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename I1, typename I2>
+        HPX_CXX_CORE_EXPORT template <typename I1, typename I2>
         constexpr std::pair<I1, I2> get_pair(
             util::in_in_result<I1, I2>&& p) noexcept
         {
             return {HPX_MOVE(p.in1), HPX_MOVE(p.in2)};
         }
 
-        HPX_CXX_EXPORT template <typename InInSender>
+        HPX_CXX_CORE_EXPORT template <typename InInSender>
             requires(hpx::execution::experimental::is_sender_v<InInSender>)
         decltype(auto) get_pair(InInSender&& in_in_sender) noexcept
         {
@@ -680,7 +680,7 @@ namespace hpx::parallel {
                 });
         }
 
-        HPX_CXX_EXPORT template <typename I1, typename I2>
+        HPX_CXX_CORE_EXPORT template <typename I1, typename I2>
         hpx::future<std::pair<I1, I2>> get_pair(
             hpx::future<util::in_in_result<I1, I2>>&& f) noexcept
         {
@@ -695,7 +695,7 @@ namespace hpx::parallel {
     // mismatch
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename IterPair>
+        HPX_CXX_CORE_EXPORT template <typename IterPair>
         struct mismatch : public algorithm<mismatch<IterPair>, IterPair>
         {
             constexpr mismatch() noexcept
@@ -786,7 +786,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::mismatch
-    HPX_CXX_EXPORT inline constexpr struct mismatch_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct mismatch_t final
       : hpx::detail::tag_parallel_algorithm<mismatch_t>
     {
     private:

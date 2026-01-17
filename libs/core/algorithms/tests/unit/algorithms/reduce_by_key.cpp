@@ -7,7 +7,6 @@
 #include <hpx/algorithm.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/reduce_by_key.hpp>
 
 #include <iomanip>
 #include <random>

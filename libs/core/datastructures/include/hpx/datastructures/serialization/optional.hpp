@@ -13,7 +13,7 @@
 
 namespace hpx::serialization {
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     void save(output_archive& ar, hpx::optional<T> const& o, unsigned)
     {
         bool const valid = bool(o);
@@ -25,7 +25,7 @@ namespace hpx::serialization {
         }
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     void load(input_archive& ar, hpx::optional<T>& o, unsigned)
     {
         bool valid = false;

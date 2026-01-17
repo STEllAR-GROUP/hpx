@@ -23,7 +23,7 @@ namespace hpx::util {
         class pool_timer;
     }    // namespace detail
 
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT pool_timer
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT pool_timer
     {
     public:
         pool_timer();

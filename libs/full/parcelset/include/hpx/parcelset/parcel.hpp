@@ -14,10 +14,8 @@
 #include <hpx/modules/threading_base.hpp>
 
 #include <hpx/actions/base_action.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/gid_type.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/parcelset_base/parcel_interface.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 
 #include <cstddef>
 #include <cstdint>

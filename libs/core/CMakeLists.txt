@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 The STE||AR-Group
+# Copyright (c) 2020-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,6 +24,7 @@ set(_hpx_core_modules
     async_sycl
     batch_environments
     cache
+    checkpoint_base
     command_line_handling_local
     compute_local
     concepts
@@ -49,6 +50,7 @@ set(_hpx_core_modules
     ini
     init_runtime_local
     io_service
+    iostream
     iterator_support
     itt_notify
     lci_base
