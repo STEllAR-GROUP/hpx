@@ -126,9 +126,9 @@ namespace hpx::util::plugin {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT inline void get_abstract_factory_names_static(
-            get_plugins_list_type f, std::vector<std::string>& names,
-            error_code& /*ec*/ = throws)
+        HPX_CXX_EXPORT inline HPX_CORE_EXPORT void
+        get_abstract_factory_names_static(get_plugins_list_type f,
+            std::vector<std::string>& names, error_code& /*ec*/ = throws)
         {
             exported_plugins_type& e = *f();
 
@@ -139,9 +139,9 @@ namespace hpx::util::plugin {
             }
         }
 
-        HPX_CXX_EXPORT inline void get_abstract_factory_names(dll const& d,
-            std::string const& base_name, std::vector<std::string>& names,
-            error_code& ec = throws)
+        HPX_CXX_EXPORT inline HPX_CORE_EXPORT void get_abstract_factory_names(
+            dll const& d, std::string const& base_name,
+            std::vector<std::string>& names, error_code& ec = throws)
         {
             using deleter_type = hpx::function<void(get_plugins_list_type)>;
 
@@ -159,7 +159,7 @@ namespace hpx::util::plugin {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct plugin_factory_item_base
+        HPX_CXX_EXPORT struct HPX_CORE_EXPORT plugin_factory_item_base
         {
             plugin_factory_item_base(dll& d, std::string basename)
               : m_dll(d)
@@ -183,11 +183,11 @@ namespace hpx::util::plugin {
         ///////////////////////////////////////////////////////////////////////
         HPX_CXX_EXPORT template <typename BasePlugin, typename Base,
             typename Parameters>
-        struct plugin_factory_item;
+        struct HPX_CORE_EXPORT plugin_factory_item;
 
         HPX_CXX_EXPORT template <typename BasePlugin, typename Base,
             typename... Parameters>
-        struct plugin_factory_item<BasePlugin, Base,
+        struct HPX_CORE_EXPORT plugin_factory_item<BasePlugin, Base,
             hpx::util::pack<Parameters...>> : public Base
         {
             plugin_factory_item(dll& d, std::string basename)
@@ -227,7 +227,7 @@ namespace hpx::util::plugin {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct static_plugin_factory_item_base
+        HPX_CXX_EXPORT struct HPX_CORE_EXPORT static_plugin_factory_item_base
         {
             explicit static_plugin_factory_item_base(
                 get_plugins_list_type const& f_) noexcept    //-V835
@@ -250,11 +250,11 @@ namespace hpx::util::plugin {
         ///////////////////////////////////////////////////////////////////////
         HPX_CXX_EXPORT template <typename BasePlugin, typename Base,
             typename Parameters>
-        struct static_plugin_factory_item;
+        struct HPX_CORE_EXPORT static_plugin_factory_item;
 
         HPX_CXX_EXPORT template <typename BasePlugin, typename Base,
             typename... Parameters>
-        struct static_plugin_factory_item<BasePlugin, Base,
+        struct HPX_CORE_EXPORT static_plugin_factory_item<BasePlugin, Base,
             hpx::util::pack<Parameters...>> : public Base
         {
             explicit static_plugin_factory_item(
@@ -289,7 +289,7 @@ namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_EXPORT template <typename BasePlugin>
-    struct plugin_factory
+    struct HPX_CORE_EXPORT plugin_factory
       : detail::plugin_factory_item<BasePlugin,
             detail::plugin_factory_item_base, virtual_constructor_t<BasePlugin>>
     {
@@ -307,7 +307,7 @@ namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_EXPORT template <typename BasePlugin>
-    struct static_plugin_factory
+    struct HPX_CORE_EXPORT static_plugin_factory
       : detail::static_plugin_factory_item<BasePlugin,
             detail::static_plugin_factory_item_base,
             virtual_constructor_t<BasePlugin>>
