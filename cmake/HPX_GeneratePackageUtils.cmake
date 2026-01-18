@@ -400,7 +400,7 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
 
   get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
   if(is_multi_config)
-    # For multi-config generators, we generate a single template and use 
+    # For multi-config generators, we generate a single template and use
     # configuration-specific file generation.
     configure_file(
       ${_hpx_generate_package_utils_dir}/templates/${template}.pc.in
@@ -423,8 +423,8 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
         CONDITION "$<CONFIG:${config_type}>"
       )
 
-      # We track a default configuration (preferring Release) to generate the legacy 
-      # .pc file for backward compatibility.
+      # We track a default configuration (preferring Release) to generate the
+      # legacy .pc file for backward compatibility.
       if(NOT default_config OR "${config_lower}" STREQUAL "release")
         if(NOT default_config OR NOT "${default_config}" STREQUAL "release")
           if("${config_lower}" MATCHES "rel")

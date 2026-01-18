@@ -218,11 +218,11 @@ function(create_pkgconfig_generation_test name test_dir)
   add_custom_target(
     ${name}
     COMMAND
-      "${CMAKE_CTEST_COMMAND}" --build-and-test "${PROJECT_SOURCE_DIR}/${test_dir}"
-      "${build_dir}" --build-generator "${CMAKE_GENERATOR}" --build-noclean
-      --build-options -DHPX_SOURCE_DIR=${PROJECT_SOURCE_DIR}
-      -DCMAKE_BUILD_TYPE=$<CONFIGURATION> --test-command
-      "${CMAKE_CTEST_COMMAND}" --output-on-failure
+      "${CMAKE_CTEST_COMMAND}" --build-and-test
+      "${PROJECT_SOURCE_DIR}/${test_dir}" "${build_dir}" --build-generator
+      "${CMAKE_GENERATOR}" --build-noclean --build-options
+      -DHPX_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DCMAKE_BUILD_TYPE=$<CONFIGURATION>
+      --test-command "${CMAKE_CTEST_COMMAND}" --output-on-failure
     VERBATIM
   )
 
@@ -233,7 +233,10 @@ endfunction()
 
 if(HPX_WITH_PKGCONFIG)
   create_pkgconfig_generation_test(
-    tests.unit.build.pkgconfig_generation "tests/unit/build/pkgconfig_generation"
+    tests.unit.build.pkgconfig_generation
+    "tests/unit/build/pkgconfig_generation"
   )
-  add_hpx_pseudo_dependencies(tests.unit.build tests.unit.build.pkgconfig_generation)
+  add_hpx_pseudo_dependencies(
+    tests.unit.build tests.unit.build.pkgconfig_generation
+  )
 endif()

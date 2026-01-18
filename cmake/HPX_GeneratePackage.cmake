@@ -87,7 +87,8 @@ configure_file(
 set(HPX_CONF_PREFIX ${PROJECT_BINARY_DIR})
 if(HPX_WITH_PKGCONFIG)
   configure_file(
-    ${CMAKE_CURRENT_LIST_DIR}/templates/hpxcxx.in "${CMAKE_CURRENT_BINARY_DIR}/bin/hpxcxx" @ONLY
+    ${CMAKE_CURRENT_LIST_DIR}/templates/hpxcxx.in
+    "${CMAKE_CURRENT_BINARY_DIR}/bin/hpxcxx" @ONLY
   )
 endif()
 unset(HPX_CONFIG_IS_INSTALL)
