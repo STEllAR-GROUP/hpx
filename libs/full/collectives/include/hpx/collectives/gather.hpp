@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2025 Hartmut Kaiser
+//  Copyright (c) 2025 Lukas Zeil
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -535,18 +536,77 @@ namespace hpx::collectives {
         return fid.then(hpx::launch::sync, HPX_MOVE(gather_here_data));
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    namespace detail {
+
+        template <typename T>
+        std::vector<T> gather_data(std::vector<std::vector<T>>&& data)
+        {
+            std::size_t total_size = 0;
+            for (auto const& row : data)
+            {
+                total_size += row.size();
+            }
+
+            std::vector<T> result;
+            result.reserve(total_size);
+            for (auto&& row : data)
+            {
+                result.insert(result.end(),
+                    std::make_move_iterator(row.begin()),
+                    std::make_move_iterator(row.end()));
+            }
+            return result;
+        }
+
+        template <typename T>
+        hpx::future<std::vector<T>> gather_data(
+            hpx::future<std::vector<std::vector<T>>>&& f)
+        {
+            return hpx::make_future<std::vector<T>>(
+                HPX_MOVE(f), [](std::vector<std::vector<T>>&& data) {
+                    return gather_data(HPX_MOVE(data));
+                });
+        }
+    }    // namespace detail
+
     template <typename T>
-    hpx::future<std::vector<std::decay_t<T>>> gather_here(communicator fid,
-        T&& local_result, generation_arg generation,
-        this_site_arg this_site = this_site_arg())
+    hpx::future<std::vector<std::decay_t<T>>> gather_here(
+        hierarchical_communicator const& communicators, T&& local_result,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
-        return gather_here(
-            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation);
+        if (this_site == static_cast<std::size_t>(-1))
+        {
+            this_site = agas::get_locality_id();
+        }
+
+        std::vector<std::decay_t<T>> result(1, HPX_FORWARD(T, local_result));
+        for (std::size_t i = communicators.size() - 1; i != 0; --i)
+        {
+            result = detail::gather_data(
+                gather_here(hpx::launch::sync, communicators.get(i),
+                    HPX_MOVE(result), this_site_arg(0), generation));
+        }
+
+        return detail::gather_data(gather_here(communicators.get(0),
+            HPX_MOVE(result), this_site_arg(0), generation));
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename Communicator, typename T>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    decltype(auto) gather_here(Communicator&& comm, T&& local_result,
+        generation_arg const generation,
+        this_site_arg const this_site = this_site_arg())
+    {
+        return gather_here(HPX_FORWARD(Communicator, comm),
+            HPX_FORWARD(T, local_result), this_site, generation);
     }
 
     template <typename T>
-    hpx::future<std::vector<std::decay_t<T>>> gather_here(char const* basename,
-        T&& result, num_sites_arg const num_sites = num_sites_arg(),
+    decltype(auto) gather_here(char const* basename, T&& result,
+        num_sites_arg const num_sites = num_sites_arg(),
         this_site_arg const this_site = this_site_arg(),
         generation_arg const generation = generation_arg())
     {
@@ -556,23 +616,25 @@ namespace hpx::collectives {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    decltype(auto) gather_here(hpx::launch::sync_policy, communicator fid,
+    template <typename Communicator, typename T>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    decltype(auto) gather_here(hpx::launch::sync_policy, Communicator&& comm,
         T&& local_result, this_site_arg const this_site = this_site_arg(),
         generation_arg const generation = generation_arg())
     {
-        return gather_here(
-            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+        return gather_here(HPX_FORWARD(Communicator, comm),
+            HPX_FORWARD(T, local_result), this_site, generation)
             .get();
     }
 
-    template <typename T>
-    decltype(auto) gather_here(hpx::launch::sync_policy, communicator fid,
+    template <typename Communicator, typename T>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    decltype(auto) gather_here(hpx::launch::sync_policy, Communicator&& comm,
         T&& local_result, generation_arg const generation,
         this_site_arg const this_site = this_site_arg())
     {
-        return gather_here(
-            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+        return gather_here(HPX_FORWARD(Communicator, comm),
+            HPX_FORWARD(T, local_result), this_site, generation)
             .get();
     }
 
@@ -631,17 +693,43 @@ namespace hpx::collectives {
         return fid.then(hpx::launch::sync, HPX_MOVE(gather_there_data));
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    hpx::future<void> gather_there(communicator fid, T&& local_result,
+    hpx::future<void> gather_there(
+        hierarchical_communicator const& communicators, T&& local_result,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
+        }
+
+        std::vector<std::decay_t<T>> data(1, HPX_FORWARD(T, local_result));
+        for (std::size_t i = communicators.size() - 1; i != 0; --i)
+        {
+            data = detail::gather_data(
+                gather_here(hpx::launch::sync, communicators.get(i),
+                    HPX_MOVE(data), this_site_arg(0), generation));
+        }
+
+        return gather_there(communicators.get(0), HPX_MOVE(data),
+            communicators.site(0), generation);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Communicator, typename T>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    decltype(auto) gather_there(Communicator&& comm, T&& local_result,
         generation_arg const generation,
         this_site_arg const this_site = this_site_arg())
     {
-        return gather_there(
-            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation);
+        return gather_there(HPX_FORWARD(Communicator, comm),
+            HPX_FORWARD(T, local_result), this_site, generation);
     }
 
     template <typename T>
-    hpx::future<void> gather_there(char const* basename, T&& local_result,
+    decltype(auto) gather_there(char const* basename, T&& local_result,
         this_site_arg const this_site = this_site_arg(),
         generation_arg const generation = generation_arg(),
         root_site_arg const root_site = root_site_arg())
@@ -653,23 +741,25 @@ namespace hpx::collectives {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    void gather_there(hpx::launch::sync_policy, communicator fid,
-        T&& local_result, this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+    template <typename Communicator, typename T>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    void gather_there(hpx::launch::sync_policy, Communicator&& comm,
+        T&& local_result, this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
-        gather_there(
-            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+        gather_there(HPX_FORWARD(Communicator, comm),
+            HPX_FORWARD(T, local_result), this_site, generation)
             .get();
     }
 
-    template <typename T>
-    void gather_there(hpx::launch::sync_policy, communicator fid,
+    template <typename Communicator, typename T>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    void gather_there(hpx::launch::sync_policy, Communicator&& comm,
         T&& local_result, generation_arg const generation,
         this_site_arg const this_site = this_site_arg())
     {
-        gather_there(
-            HPX_MOVE(fid), HPX_FORWARD(T, local_result), this_site, generation)
+        gather_there(HPX_FORWARD(Communicator, comm),
+            HPX_FORWARD(T, local_result), this_site, generation)
             .get();
     }
 
