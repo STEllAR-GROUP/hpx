@@ -170,13 +170,49 @@ if(HPX_WITH_PKGCONFIG)
     hpx_pkgconfig_component hpx_component FALSE EXCLUDE ${exclude_targets}
   )
 
-  string(TOLOWER ${CMAKE_BUILD_TYPE} build_type)
-  install(
-    FILES ${OUTPUT_DIR_PC}/hpx_application_${build_type}.pc
-          ${OUTPUT_DIR_PC}/hpx_component_${build_type}.pc
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-    COMPONENT pkgconfig
-  )
+  get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+  if(is_multi_config)
+    # For multi-config generators, install all configuration files
+    if(CMAKE_CONFIGURATION_TYPES)
+      foreach(config_type ${CMAKE_CONFIGURATION_TYPES})
+        string(TOLOWER ${config_type} config_lower)
+        install(
+          FILES ${OUTPUT_DIR_PC}/hpx_application_${config_lower}.pc
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+          COMPONENT pkgconfig
+        )
+        install(
+          FILES ${OUTPUT_DIR_PC}/hpx_component_${config_lower}.pc
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+          COMPONENT pkgconfig
+        )
+      endforeach()
+    else()
+      # Fallback: install for common configurations
+      foreach(config_type Debug Release RelWithDebInfo MinSizeRel)
+        string(TOLOWER ${config_type} config_lower)
+        install(
+          FILES ${OUTPUT_DIR_PC}/hpx_application_${config_lower}.pc
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+          COMPONENT pkgconfig
+        )
+        install(
+          FILES ${OUTPUT_DIR_PC}/hpx_component_${config_lower}.pc
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+          COMPONENT pkgconfig
+        )
+      endforeach()
+    endif()
+  else()
+    # Original logic for single-config generators
+    string(TOLOWER ${CMAKE_BUILD_TYPE} build_type)
+    install(
+      FILES ${OUTPUT_DIR_PC}/hpx_application_${build_type}.pc
+            ${OUTPUT_DIR_PC}/hpx_component_${build_type}.pc
+      DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+      COMPONENT pkgconfig
+    )
+  endif()
   # Temporary (to deprecate gradually)
   install(
     FILES ${OUTPUT_DIR_PC}/hpx_application.pc ${OUTPUT_DIR_PC}/hpx_component.pc
