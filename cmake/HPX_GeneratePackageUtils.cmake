@@ -399,7 +399,8 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
   get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
   if(is_multi_config)
     # For multi-config generators, we need to handle configurations differently
-    # We'll generate a single template file and let the generator expression handle the rest
+    # We'll generate a single template file and let the generator expression
+    # handle the rest
     configure_file(
       cmake/templates/${template}.pc.in
       ${OUTPUT_DIR}${template}_configurable.pc.in @ONLY ESCAPE_QUOTES
@@ -408,14 +409,16 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
     if(CMAKE_CONFIGURATION_TYPES)
       foreach(config_type ${CMAKE_CONFIGURATION_TYPES})
         string(TOLOWER ${config_type} config_lower)
-        file(GENERATE
+        file(
+          GENERATE
           OUTPUT ${OUTPUT_DIR}/${template}_${config_lower}.pc
           INPUT ${OUTPUT_DIR}${template}_configurable.pc.in
           CONDITION "$<CONFIG:${config_type}>"
         )
         # Temporary (to deprecate gradually) - only for release-like configs
         if("${config_lower}" MATCHES "rel")
-          file(GENERATE
+          file(
+            GENERATE
             OUTPUT ${OUTPUT_DIR}/${template}.pc
             INPUT ${OUTPUT_DIR}${template}_configurable.pc.in
             CONDITION "$<CONFIG:${config_type}>"
@@ -423,17 +426,20 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
         endif()
       endforeach()
     else()
-      # Fallback: generate for the most common configurations if CMAKE_CONFIGURATION_TYPES is not set
+      # Fallback: generate for the most common configurations if
+      # CMAKE_CONFIGURATION_TYPES is not set
       foreach(config_type Debug Release RelWithDebInfo MinSizeRel)
         string(TOLOWER ${config_type} config_lower)
-        file(GENERATE
+        file(
+          GENERATE
           OUTPUT ${OUTPUT_DIR}/${template}_${config_lower}.pc
           INPUT ${OUTPUT_DIR}${template}_configurable.pc.in
           CONDITION "$<CONFIG:${config_type}>"
         )
         # Temporary (to deprecate gradually) - only for release-like configs
         if("${config_lower}" MATCHES "rel")
-          file(GENERATE
+          file(
+            GENERATE
             OUTPUT ${OUTPUT_DIR}/${template}.pc
             INPUT ${OUTPUT_DIR}${template}_configurable.pc.in
             CONDITION "$<CONFIG:${config_type}>"
@@ -444,7 +450,7 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
   else()
     # Original logic for single-config generators
     string(TOLOWER ${CMAKE_BUILD_TYPE} build_type)
-    
+
     configure_file(
       cmake/templates/${template}.pc.in
       ${OUTPUT_DIR}${template}_${build_type}.pc.in @ONLY ESCAPE_QUOTES
