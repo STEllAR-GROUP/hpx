@@ -63,7 +63,7 @@ install(
 # Install dir
 set(HPX_CONFIG_IS_INSTALL ON)
 configure_file(
-  cmake/templates/${HPX_PACKAGE_NAME}Config.cmake.in
+  ${CMAKE_CURRENT_LIST_DIR}/templates/${HPX_PACKAGE_NAME}Config.cmake.in
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${HPX_PACKAGE_NAME}Config.cmake"
   ESCAPE_QUOTES
   @ONLY
@@ -71,7 +71,7 @@ configure_file(
 set(HPX_CONF_PREFIX ${CMAKE_INSTALL_PREFIX})
 if(HPX_WITH_PKGCONFIG)
   configure_file(
-    cmake/templates/hpxcxx.in
+    ${CMAKE_CURRENT_LIST_DIR}/templates/hpxcxx.in
     "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpxcxx" @ONLY
   )
 endif()
@@ -79,7 +79,7 @@ endif()
 # Build dir
 set(HPX_CONFIG_IS_INSTALL OFF)
 configure_file(
-  cmake/templates/${HPX_PACKAGE_NAME}Config.cmake.in
+  ${CMAKE_CURRENT_LIST_DIR}/templates/${HPX_PACKAGE_NAME}Config.cmake.in
   "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/${HPX_PACKAGE_NAME}Config.cmake"
   ESCAPE_QUOTES
   @ONLY
@@ -87,7 +87,7 @@ configure_file(
 set(HPX_CONF_PREFIX ${PROJECT_BINARY_DIR})
 if(HPX_WITH_PKGCONFIG)
   configure_file(
-    cmake/templates/hpxcxx.in "${CMAKE_CURRENT_BINARY_DIR}/bin/hpxcxx" @ONLY
+    ${CMAKE_CURRENT_LIST_DIR}/templates/hpxcxx.in "${CMAKE_CURRENT_BINARY_DIR}/bin/hpxcxx" @ONLY
   )
 endif()
 unset(HPX_CONFIG_IS_INSTALL)
@@ -95,7 +95,7 @@ unset(HPX_CONFIG_IS_INSTALL)
 # Configure macros for the install dir ...
 set(HPX_CMAKE_MODULE_PATH "\${CMAKE_CURRENT_LIST_DIR}")
 configure_file(
-  cmake/templates/HPXMacros.cmake.in
+  ${CMAKE_CURRENT_LIST_DIR}/templates/HPXMacros.cmake.in
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/HPXMacros.cmake" ESCAPE_QUOTES
   @ONLY
 )
@@ -104,7 +104,7 @@ set(HPX_CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake"
                           "${HPX_CMAKE_ADDITIONAL_MODULE_PATH_BUILD}"
 )
 configure_file(
-  cmake/templates/HPXMacros.cmake.in
+  ${CMAKE_CURRENT_LIST_DIR}/templates/HPXMacros.cmake.in
   "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXMacros.cmake"
   ESCAPE_QUOTES @ONLY
 )
@@ -172,39 +172,21 @@ if(HPX_WITH_PKGCONFIG)
 
   get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
   if(is_multi_config)
-    # For multi-config generators, install all configuration files
-    if(CMAKE_CONFIGURATION_TYPES)
-      foreach(config_type ${CMAKE_CONFIGURATION_TYPES})
-        string(TOLOWER ${config_type} config_lower)
-        install(
-          FILES ${OUTPUT_DIR_PC}/hpx_application_${config_lower}.pc
-          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-          COMPONENT pkgconfig
-        )
-        install(
-          FILES ${OUTPUT_DIR_PC}/hpx_component_${config_lower}.pc
-          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-          COMPONENT pkgconfig
-        )
-      endforeach()
-    else()
-      # Fallback: install for common configurations
-      foreach(config_type Debug Release RelWithDebInfo MinSizeRel)
-        string(TOLOWER ${config_type} config_lower)
-        install(
-          FILES ${OUTPUT_DIR_PC}/hpx_application_${config_lower}.pc
-          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-          COMPONENT pkgconfig
-        )
-        install(
-          FILES ${OUTPUT_DIR_PC}/hpx_component_${config_lower}.pc
-          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-          COMPONENT pkgconfig
-        )
-      endforeach()
+    set(config_types ${CMAKE_CONFIGURATION_TYPES})
+    if(NOT config_types)
+      set(config_types Debug Release RelWithDebInfo MinSizeRel)
     endif()
+
+    foreach(config_type ${config_types})
+      string(TOLOWER ${config_type} config_lower)
+      install(
+        FILES ${OUTPUT_DIR_PC}/hpx_application_${config_lower}.pc
+              ${OUTPUT_DIR_PC}/hpx_component_${config_lower}.pc
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+        COMPONENT pkgconfig
+      )
+    endforeach()
   else()
-    # Original logic for single-config generators
     string(TOLOWER ${CMAKE_BUILD_TYPE} build_type)
     install(
       FILES ${OUTPUT_DIR_PC}/hpx_application_${build_type}.pc

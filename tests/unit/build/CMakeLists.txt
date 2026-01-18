@@ -212,3 +212,28 @@ if(HPX_WITH_PKGCONFIG AND HPX_WITH_DISTRIBUTED_RUNTIME)
     add_hpx_pseudo_dependencies(tests.unit.build tests.unit.build.pkgconfig)
   endif()
 endif()
+
+function(create_pkgconfig_generation_test name test_dir)
+  set(build_dir "${CMAKE_CURRENT_BINARY_DIR}/${name}")
+  add_custom_target(
+    ${name}
+    COMMAND
+      "${CMAKE_CTEST_COMMAND}" --build-and-test "${PROJECT_SOURCE_DIR}/${test_dir}"
+      "${build_dir}" --build-generator "${CMAKE_GENERATOR}" --build-noclean
+      --build-options -DHPX_SOURCE_DIR=${PROJECT_SOURCE_DIR}
+      -DCMAKE_BUILD_TYPE=$<CONFIGURATION> --test-command
+      "${CMAKE_CTEST_COMMAND}" --output-on-failure
+    VERBATIM
+  )
+
+  if(MSVC)
+    set_target_properties(${name} PROPERTIES FOLDER "Tests/Unit/Build")
+  endif()
+endfunction()
+
+if(HPX_WITH_PKGCONFIG)
+  create_pkgconfig_generation_test(
+    tests.unit.build.pkgconfig_generation "tests/unit/build/pkgconfig_generation"
+  )
+  add_hpx_pseudo_dependencies(tests.unit.build tests.unit.build.pkgconfig_generation)
+endif()
