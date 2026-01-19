@@ -17,16 +17,26 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
+
     - name: Clang Format
       shell: bash
       run: |
         cd libs && shopt -s globstar # to activate the ** globbing
+        
         clang-format-20 --version
+        
         clang-format-20 -i **/*.{cpp,hpp}
+        
         cd ../examples
+        
         clang-format-20 -i **/*.{cpp,hpp}
+        
         cd ../tests
+        
         clang-format-20 -i **/*.{cpp,hpp}
+        
+        pwd
+        ls -a
         if ! git diff --exit-code > /tmp/modified_clang_format_files.txt; then
           echo "The following files are not properly clang-formatted:"
           cat /tmp/modified_clang_format_files.txt
@@ -46,12 +56,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
+    
     - name: CMake Format
       shell: bash
       run: |
         cd ../ && shopt -s globstar # to activate the ** globbing
+        
         cmake-format --version
+        
         cmake-format -i **/*.cmake **/CMakeLists.txt
+        
+        pwd
+        ls -a
         if ! git diff --exit-code > /tmp/modified_cmake_format_files.txt; then
           echo "The following files are not properly cmake-formatted:"
           cat /tmp/modified_cmake_format_files.txt
@@ -72,12 +88,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
+    
     - name: Spell Check
       shell: bash
       run: |
         cd ../ && \
+    
         codespell --version && \
+    
         codespell --ignore-words tools/.codespell_whitelist --skip='*.h5,*.png' $(git diff --name-only origin/master...) > /tmp/spelling_suggestions.txt
+    
         if [ -s /tmp/spelling_suggestions.txt ]; then
             echo "The following spelling suggestions were found:"
             cat /tmp/spelling_suggestions.txt
