@@ -20,23 +20,22 @@ jobs:
 
     - name: Clang Format
       shell: bash
+      working-directory: ${{ github.workspace }}
       run: |
-        REPO_ROOT=$(git rev-parse --show-toplevel)
-        cd "$REPO_ROOT" && shopt -s globstar # to activate the ** globbing
+        cd libs && shopt -s globstar # to activate the ** globbing
         
         clang-format-20 --version
+        clang-format-20 -i **/*.{cpp,hpp}
+        
+        cd "$GITHUB_WORKSPACE/examples"
         
         clang-format-20 -i **/*.{cpp,hpp}
         
-        cd "$REPO_ROOT/examples"
-        
-        clang-format-20 -i **/*.{cpp,hpp}
-        
-        cd "$REPO_ROOT/tests"
+        cd "$GITHUB_WORKSPACE/tests"
         
         clang-format-20 -i **/*.{cpp,hpp}
 
-        cd "$REPO_ROOT"
+        cd "$GITHUB_WORKSPACE"
 
         if ! git diff --exit-code > /tmp/modified_clang_format_files.txt; then
           echo "The following files are not properly clang-formatted:"
@@ -60,10 +59,9 @@ jobs:
     
     - name: CMake Format
       shell: bash
+      working-directory: ${{ github.workspace }}
       run: |
-      
-        REPO_ROOT=$(git rev-parse --show-toplevel)
-        cd "$REPO_ROOT" && shopt -s globstar # to activate the ** globbing
+        cd "$GITHUB_WORKSPACE" && shopt -s globstar # to activate the ** globbing
         
         cmake-format --version
         
@@ -92,9 +90,9 @@ jobs:
     
     - name: Spell Check
       shell: bash
+      working-directory: ${{ github.workspace }}
       run: |
-        REPO_ROOT=$(git rev-parse --show-toplevel)
-        cd "$REPO_ROOT"
+        cd "$GITHUB_WORKSPACE" && \
     
         codespell --version && \
         codespell --ignore-words tools/.codespell_whitelist --skip='*.h5,*.png' $(git diff --name-only origin/master...) > /tmp/spelling_suggestions.txt
