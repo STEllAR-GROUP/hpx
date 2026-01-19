@@ -21,19 +21,17 @@ jobs:
     - name: Clang Format
       shell: bash
       run: |
+        git config --global --add safe.directory /__w/hpx/hpx
         REPO_ROOT=$(git rev-parse --show-toplevel)
         cd "$REPO_ROOT" && shopt -s globstar # to activate the ** globbing
         
         clang-format-20 --version
-        
         clang-format-20 -i **/*.{cpp,hpp}
         
         cd "$REPO_ROOT/examples"
-        
         clang-format-20 -i **/*.{cpp,hpp}
         
         cd "$REPO_ROOT/tests"
-        
         clang-format-20 -i **/*.{cpp,hpp}
 
         cd "$REPO_ROOT"
@@ -68,10 +66,6 @@ jobs:
         cmake-format --version
         
         cmake-format -i **/*.cmake **/CMakeLists.txt
-
-        echo "Working directory: $(pwd)"
-        echo "Files changed:"
-        git status --short
         
         if ! git diff --exit-code > /tmp/modified_cmake_format_files.txt; then
           echo "The following files are not properly cmake-formatted:"
@@ -97,6 +91,7 @@ jobs:
     - name: Spell Check
       shell: bash
       run: |
+        git config --global --add safe.directory /__w/hpx/hpx
         REPO_ROOT=$(git rev-parse --show-toplevel)
         cd "$REPO_ROOT"
     
