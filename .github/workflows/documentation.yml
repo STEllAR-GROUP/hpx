@@ -1,4 +1,4 @@
-# Copyright (c) 2025 The STE||AR Group
+# Copyright (c) 2026 The STE||AR Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,11 +6,8 @@
 
 name: Documentation Build
 
-on: [push, pull_request]
-#   push:
-#     branches:
-#       - master
-#       - 'release/*'
+on:
+  push
 
 jobs:
   build-documentation:
@@ -54,9 +51,14 @@ jobs:
           build/share/hpx/docs/singlehtml
           build/share/hpx/docs/latexpdf/latex/HPX.pdf
 
+    - name: Configure Local Git
+      shell: bash
+      run: |
+          git config --global user.name "StellarBot"
+          git config --global user.email "contact@stellar-group.org"
 
-    # - name: Push Documentation
-    #   if: github.ref == 'refs/heads/master'
-    #   shell: bash
-    #   run: |
-    #     cmake --build build --target git_docs
+    - name: Push Documentation
+      if: github.ref == 'refs/heads/master'
+      shell: bash
+      run: |
+        cmake --build build --target git_docs

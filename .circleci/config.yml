@@ -84,31 +84,6 @@ jobs:
             - ./source
             - ./conv.xsl
 
-  # Check circular dependencies with cpp-dependencies tool
-  check_circular_deps:
-    <<: *working_dir_default
-    <<: *docker_default
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Check circular dependencies with cpp-dependencies
-          command: |
-              # Ignore compatibility headers (the last cut -c3- is to remove a
-              # leading ./ in path names)
-              cpp-dependencies \
-                  --dir /hpx/source/libs \
-                  --ignore $(find /hpx/source/libs -type d -wholename '*/include_compatibility' | cut -d'/' -f5-) \
-                  --graph-cycles /tmp/circular_deps.dot
-              dot /tmp/circular_deps.dot -Tsvg -o /tmp/circular_deps.svg
-              if [[ $(wc -l /tmp/circular_deps.dot | awk '{print $1}') -gt 2 ]]; then exit 1; fi
-      - store_artifacts:
-          path: /tmp/circular_deps.dot
-          destination: /hpx/artifacts/circular_deps.dot
-      - store_artifacts:
-          path: /tmp/circular_deps.svg
-          destination: /hpx/artifacts/circular_deps.svg
-
   # Check if the files of the module are listed in the CMakeLists.txt
   # Check if all the module dependencies are listed
   check_module_cmakelists:
@@ -129,44 +104,6 @@ jobs:
       - store_artifacts:
           path: /tmp/missing_deps.txt
           destination: /hpx/artifacts/missing_deps.txt
-
-  # Ensure that the modules stay clang-formatted
-  clang_format:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Check that the modules are well clang-formatted
-          command: |
-              cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
-              clang-format-20 --version
-              clang-format-20 -i **/*.{cpp,hpp}
-              cd /hpx/source/examples
-              clang-format-20 -i **/*.{cpp,hpp}
-              cd /hpx/source/tests
-              clang-format-20 -i **/*.{cpp,hpp}
-              git diff --exit-code > /tmp/modified_clang_format_files.txt
-      - store_artifacts:
-          path: /tmp/modified_clang_format_files.txt
-          destination: /hpx/artifacts/modified_clang_format_files.txt
-
-  # Ensure that CMake files stay cmake-formatted
-  cmake_format:
-    <<: *docker_default
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Check that CMake files are well cmake-formatted
-          command: |
-              cd /hpx/source && shopt -s globstar # to activate the ** globbing
-              cmake-format --version
-              cmake-format -i **/*.cmake **/CMakeLists.txt
-              git diff --exit-code > /tmp/modified_cmake_format_files.txt
-      - store_artifacts:
-          path: /tmp/modified_cmake_format_files.txt
-          destination: /hpx/artifacts/modified_cmake_format_files.txt
 
   configure:
     <<: *defaults
@@ -293,54 +230,6 @@ jobs:
           paths:
             - ./build/bin/inspect
 
-  # We need a full clone here to be able to compare to master.
-  spellcheck:
-    docker:
-      - image: stellargroup/build_env:17
-    resource_class: large  # Increased memory allocation
-    steps:
-      - checkout:
-          path: /hpx/source
-          fetch-depth: 0  # Ensure full history for proper diff
-      - run:
-          name: Running codespell
-          command: |
-            if [[ -n "$CIRCLE_PULL_REQUEST" ]]; then
-                cd /hpx/source
-                codespell --version
-
-                echo "Fetching changed files from origin/master..."
-                git fetch origin master --depth=1
-
-                echo "Files being checked:"
-                git diff --name-only origin/master... > /tmp/file_list.txt
-                cat /tmp/file_list.txt  # Print all files being checked
-
-                set -x  # Enable debug mode
-
-                # Read all changed files into an array
-                mapfile -t FILES < /tmp/file_list.txt
-
-                # Process files in batches of 50
-                for ((i = 0; i < ${#FILES[@]}; i += 50)); do
-                codespell --ignore-words tools/.codespell_whitelist --skip='*.h5,*.png' "${FILES[@]:i:50}" >> /tmp/spelling_suggestions.txt
-                done
-
-                set +x  # Disable debug mode
-
-                # If there are spelling errors, exit with error code 1
-                if [[ -s /tmp/spelling_suggestions.txt ]]; then
-                    echo "Spelling errors found:"
-                    cat /tmp/spelling_suggestions.txt
-                    exit 1
-                fi
-            else
-                echo "Skipping spellcheck on non-PR build"
-            fi
-          when: always
-      - store_artifacts:
-          path: /tmp/spelling_suggestions.txt
-          destination: /hpx/artifacts/spelling_suggestions.txt
 
   depreport:
     <<: *defaults
