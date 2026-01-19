@@ -35,8 +35,14 @@ jobs:
         
         clang-format-20 -i **/*.{cpp,hpp}
         
+        echo "=== DEBUG DIRECTORY STRUCTURE ==="
         pwd
-        ls -a
+        echo "Workspace: $GITHUB_WORKSPACE"
+        ls -la
+        ls -la ..
+        find .. -maxdepth 3 -type d
+        echo "================================"
+
         if ! git diff --exit-code > /tmp/modified_clang_format_files.txt; then
           echo "The following files are not properly clang-formatted:"
           cat /tmp/modified_clang_format_files.txt
@@ -65,10 +71,6 @@ jobs:
         cmake-format --version
         
         cmake-format -i **/*.cmake **/CMakeLists.txt
-        
-        pwd
-        ls -a
-        which git || echo "git is not installed"
 
         if ! git diff --exit-code > /tmp/modified_cmake_format_files.txt; then
           echo "The following files are not properly cmake-formatted:"
