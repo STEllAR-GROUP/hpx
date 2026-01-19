@@ -16,7 +16,7 @@ jobs:
     container: stellargroup/build_env:17
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Clang Format
       shell: bash
@@ -55,7 +55,7 @@ jobs:
     container: stellargroup/build_env:17
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     
     - name: CMake Format
       shell: bash
@@ -68,6 +68,8 @@ jobs:
         
         pwd
         ls -a
+        which git || echo "git is not installed"
+
         if ! git diff --exit-code > /tmp/modified_cmake_format_files.txt; then
           echo "The following files are not properly cmake-formatted:"
           cat /tmp/modified_cmake_format_files.txt
@@ -87,7 +89,7 @@ jobs:
     if: github.event_name == 'pull_request'
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     
     - name: Spell Check
       shell: bash
