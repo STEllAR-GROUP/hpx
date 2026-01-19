@@ -16,7 +16,7 @@ jobs:
     container: stellargroup/build_env:17
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v4
 
     - name: Clang Format
       shell: bash
@@ -55,7 +55,7 @@ jobs:
     container: stellargroup/build_env:17
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v4
     
     - name: CMake Format
       shell: bash
@@ -87,7 +87,7 @@ jobs:
     if: github.event_name == 'pull_request'
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v4
     
     - name: Spell Check
       shell: bash
