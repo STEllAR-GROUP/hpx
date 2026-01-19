@@ -61,10 +61,9 @@ jobs:
     - name: CMake Format
       shell: bash
       run: |
-      
+        git config --global --add safe.directory /__w/hpx/hpx
         REPO_ROOT=$(git rev-parse --show-toplevel)
         cd "$REPO_ROOT" && shopt -s globstar # to activate the ** globbing
-        git config --global --add safe.directory "$REPO_ROOT"
         
         cmake-format --version
         
