@@ -1,5 +1,5 @@
 # Copyright (c)      2020 Mikael Simberg
-# Copyright (c) 2007-2025 Hartmut Kaiser
+# Copyright (c) 2007-2026 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c)      2024 Isidoros Tsaousis-Seiras
 # Copyright (c) 2007-2008 Chirag Dekate
@@ -2346,7 +2346,6 @@ include(HPX_SetupThreads)
 # Setup our required Boost libraries.
 include(HPX_SetupBoost)
 include(HPX_SetupBoostFilesystem)
-include(HPX_SetupBoostIostreams)
 
 # Set up standalone Asio
 include(HPX_SetupAsio)

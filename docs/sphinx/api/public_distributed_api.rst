@@ -108,9 +108,9 @@ Functions
    +-----------------------------------------------------------+
    | :cpp:func:`hpx::collectives::get`                         |
    +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::create_communication_set`    |
-   +-----------------------------------------------------------+
    | :cpp:func:`hpx::collectives::create_communicator`         |
+   +-----------------------------------------------------------+
+   | :cpp:func:`hpx::collectives::create_hierarchical_communicator` |
    +-----------------------------------------------------------+
    | :cpp:func:`hpx::collectives::create_local_communicator`   |
    +-----------------------------------------------------------+

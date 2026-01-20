@@ -24,14 +24,14 @@ one the options found in `Support for deploying and using HPX <hpx_github_suppor
 
 .. _troubleshooting_iostreams:
 
-``HPX::iostreams_component" target not found``
+``hpx::iostreams_component" target not found``
 ----------------------------------------------
 
 You may see a |cmake|_ error message that looks a bit like this:
 
 .. code-block:: text
 
-   error: `HPX::iostreams_component`` target not found
+   error: `hpx::iostreams_component`` target not found
 
 Simply ensure that |hpx| is installed with ``HPX_WITH_DISTRIBUTED_RUNTIME=ON``
 to prevent encountering such error(s). This is required if you want to use

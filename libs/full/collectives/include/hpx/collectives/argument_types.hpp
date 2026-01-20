@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2023 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -80,5 +80,5 @@ namespace hpx::collectives {
 
     /// The number of children each of the communication nodes is connected
     /// to (default: picked based on num_sites).
-    using arity_arg = detail::argument_type<detail::arity_tag>;
+    using arity_arg = detail::argument_type<detail::arity_tag, 2>;
 }    // namespace hpx::collectives
