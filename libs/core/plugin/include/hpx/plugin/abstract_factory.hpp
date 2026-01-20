@@ -26,11 +26,11 @@ namespace hpx::util::plugin {
         // 'create' function.
         HPX_CXX_EXPORT template <typename BasePlugin, typename Base,
             typename Parameter>
-        struct HPX_CORE_EXPORT abstract_factory_item;
+        struct HPX_PLUGIN_EXPORT_API abstract_factory_item;
 
         HPX_CXX_EXPORT template <typename BasePlugin, typename Base,
             typename... Parameters>
-        struct HPX_CORE_EXPORT abstract_factory_item<BasePlugin, Base,
+        struct HPX_PLUGIN_EXPORT_API abstract_factory_item<BasePlugin, Base,
             hpx::util::pack<Parameters...>> : public Base
         {
             using Base::create;
@@ -41,7 +41,7 @@ namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_EXPORT template <typename BasePlugin>
-    struct HPX_CORE_EXPORT abstract_factory
+    struct HPX_PLUGIN_EXPORT_API abstract_factory
       : detail::abstract_factory_item<BasePlugin,
             detail::abstract_factory_item_base,
             virtual_constructor_t<BasePlugin>>

@@ -31,7 +31,7 @@ namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_EXPORT template <typename Wrapped, typename... Parameters>
-    struct HPX_CORE_EXPORT plugin_wrapper
+    struct HPX_PLUGIN_EXPORT_API plugin_wrapper
       : public detail::dll_handle_holder
       , public Wrapped
     {

@@ -19,4 +19,8 @@ namespace hpx::util {
 
     HPX_CXX_EXPORT template <bool Enable, typename C1, typename C2>
     using lazy_conditional_t = typename lazy_conditional<Enable, C1, C2>::type;
+
+    HPX_CXX_EXPORT template <bool Enable, typename C1, typename C2>
+    inline constexpr bool lazy_conditional_v =
+        lazy_conditional<Enable, C1, C2>::value;
 }    // namespace hpx::util
