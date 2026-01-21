@@ -19,10 +19,7 @@ jobs:
         - name: Check if the headers of the modules are listed in their CMakeLists.txt
           shell: bash
           run: |
-            pwd
-            ls -la
-            
-            /hpx/source/tools/check_module_cmakelists.sh
+            /tools/check_module_cmakelists.sh
             if [[ $(wc -l /tmp/missing_files.txt | awk '{print $1}') -gt 1 ]] \
                 || [[ $(wc -l /tmp/missing_deps.txt | awk '{print $1}') -gt 1 ]]; \
                 then exit 1; fi
