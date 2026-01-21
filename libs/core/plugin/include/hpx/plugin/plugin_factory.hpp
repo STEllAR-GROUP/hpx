@@ -227,7 +227,8 @@ namespace hpx::util::plugin {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct HPX_PLUGIN_EXPORT_API static_plugin_factory_item_base
+        HPX_CXX_EXPORT struct HPX_PLUGIN_EXPORT_API
+            static_plugin_factory_item_base
         {
             explicit static_plugin_factory_item_base(
                 get_plugins_list_type const& f_) noexcept    //-V835
@@ -254,8 +255,8 @@ namespace hpx::util::plugin {
 
         HPX_CXX_EXPORT template <typename BasePlugin, typename Base,
             typename... Parameters>
-        struct HPX_PLUGIN_EXPORT_API static_plugin_factory_item<BasePlugin, Base,
-            hpx::util::pack<Parameters...>> : public Base
+        struct HPX_PLUGIN_EXPORT_API static_plugin_factory_item<BasePlugin,
+            Base, hpx::util::pack<Parameters...>> : public Base
         {
             explicit static_plugin_factory_item(
                 get_plugins_list_type const& f) noexcept    //-V835

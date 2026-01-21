@@ -15,7 +15,7 @@ namespace hpx::util::plugin {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT struct HPX_CORE_EXPORT dll_handle_holder
+        HPX_CXX_EXPORT struct HPX_PLUGIN_EXPORT_API dll_handle_holder
         {
             explicit dll_handle_holder(dll_handle dll) noexcept
               : m_dll(HPX_MOVE(dll))
