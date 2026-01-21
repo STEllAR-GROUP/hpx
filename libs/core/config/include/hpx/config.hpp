@@ -401,6 +401,17 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Number of spin iterations before entering idle backoff sleep (used only if
+// HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF is defined). Higher values reduce wake-up
+// latency but increase CPU usage during idle periods. For local parallelism
+// workloads (parallel_for, parallel_reduce), higher values like 4000 are
+// recommended. For distributed workloads with network I/O, lower values are
+// better.
+#if !defined(HPX_IDLE_SPIN_COUNT)
+#  define HPX_IDLE_SPIN_COUNT 4000
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_WRAPPER_HEAP_STEP)
 #  define HPX_WRAPPER_HEAP_STEP 0xFFFFU
 #endif

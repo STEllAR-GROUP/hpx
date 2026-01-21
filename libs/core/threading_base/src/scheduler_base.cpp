@@ -44,6 +44,7 @@ namespace hpx::threads::policies {
       : modes_(num_threads)
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
       , max_idle_backoff_time_(thread_queue_init.max_idle_backoff_time_)
+      , idle_spin_count_(thread_queue_init.idle_spin_count_)
       , wait_count_data_(num_threads)
 #endif
       , suspend_mtxs_(num_threads)
@@ -79,10 +80,26 @@ namespace hpx::threads::policies {
             static hpx::util::itt::event notify_event("idle_callback");
             hpx::util::itt::mark_event e(notify_event);
 #endif
+            auto& data = wait_count_data_[num_thread].data_;
+
+            // Phase 1: Spin phase - fast polling without sleeping
+            // This provides low-latency response for local parallelism workloads
+            if (data.spin_count < static_cast<std::uint32_t>(idle_spin_count_))
+            {
+                ++data.spin_count;
+                // Use CPU pause instruction to reduce power consumption and
+                // avoid memory bus contention during spinning
+#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
+                __builtin_ia32_pause();
+#elif defined(__aarch64__) || defined(_M_ARM64)
+                __asm__ __volatile__("yield" ::: "memory");
+#endif
+                return false;  // Don't count as idle, keep polling
+            }
+
+            // Phase 2: Sleep phase - exponential backoff with condition variable
             // Put this thread to sleep for some time, additionally it gets
             // woken up on new work.
-
-            auto& data = wait_count_data_[num_thread].data_;
 
             std::unique_lock<pu_mutex_type> l(data.wait_mtx, std::try_to_lock);
             if (!l)
@@ -104,8 +121,9 @@ namespace hpx::threads::policies {
             if (data.wait_cond.wait_for(l, period) ==    //-V1089
                 std::cv_status::no_timeout)
             {
-                // reset counter if thread was woken up
+                // reset counters if thread was woken up
                 data.wait_count = 0;
+                data.spin_count = 0;
             }
             return true;
         }
@@ -133,6 +151,7 @@ namespace hpx::threads::policies {
                     policies::scheduler_mode::enable_idle_backoff)
                 {
                     wait_count_data_[i].data_.wait_count = 0;
+                    wait_count_data_[i].data_.spin_count = 0;
                     wait_count_data_[i].data_.wait_cond.notify_one();
                 }
             }
@@ -144,6 +163,7 @@ namespace hpx::threads::policies {
             for (std::size_t i = 0; i != size; ++i)
             {
                 wait_count_data_[i].data_.wait_count = 0;
+                wait_count_data_[i].data_.spin_count = 0;
                 wait_count_data_[i].data_.wait_cond.notify_one();
             }
         }
