@@ -98,7 +98,10 @@ done
 # Construct a list for each of the module groups
 
 # Find non module headers under the main hpx/ dir to exclude them later
-non_module_files_list=($(ls ../hpx | grep .hpp))
+non_module_files_list=()
+if [ -d ../init/include/hpx ]; then
+    non_module_files_list=($(ls ../init/include/hpx/*.hpp 2>/dev/null | xargs -n1 basename))
+fi
 
 echo "" > $output_dir/missing_files.txt
 echo "" > $output_dir/missing_deps.txt
