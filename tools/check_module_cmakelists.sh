@@ -74,7 +74,9 @@ function check_cmakelists_files() {
 shopt -s globstar
 
 # HPX source directory
-source_dir=/hpx/source
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source_dir="$(cd "$script_dir/.." && pwd)"
+
 # Where to write the dependencies output files
 output_dir=/tmp
 # Helper to filter out the dependencies from other groups
