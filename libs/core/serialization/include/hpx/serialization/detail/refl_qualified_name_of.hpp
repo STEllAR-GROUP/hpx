@@ -71,8 +71,8 @@ public:
                 // Todo: Should I use ranges? Should we filter global namespace?
                 const auto scoped_name =
                     scopes 
-                    | std::views::reverse 
-                    | std::views::transform(std::meta::identifier_of) 
+                    | std::views::reverse
+                    | std::views::transform(std::meta::identifier_of)
                     | std::views::join_with(std::string_view("::"))
                     | std::ranges::to<std::string>();
                 // constexpr auto scoped_name = []() {
