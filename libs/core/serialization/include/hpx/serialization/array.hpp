@@ -21,6 +21,9 @@
 #include <cstddef>
 #include <type_traits>
 
+#include <iostream>
+#include <experimental/meta>
+
 namespace hpx::serialization {
 
     HPX_CXX_CORE_EXPORT template <typename T>
@@ -48,6 +51,9 @@ namespace hpx::serialization {
         template <typename Archive>
         void serialize(Archive& ar, unsigned int)
         {
+            std::cout << "INSIDE ARRAY SERIALIZE FOR TYPE "
+                      << std::meta::display_string_of(^^T)
+                      << "\n";
 #if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
             if (ar.disable_array_optimization() || ar.endianess_differs())
             {
@@ -71,6 +77,10 @@ namespace hpx::serialization {
                 (hpx::traits::is_bitwise_serializable_v<element_type> ||
                     !hpx::traits::is_not_bitwise_serializable_v<element_type>);
 
+            std::cout << "DEBUG7: Processing array of type "
+                      << std::meta::display_string_of(^^T)
+                      << ", use_optimized=" << use_optimized << "\n";
+
             if constexpr (use_optimized)
             {
                 // try using chunking
@@ -83,8 +93,7 @@ namespace hpx::serialization {
                     ar.load_binary_chunk(m_t, m_element_count * sizeof(T),
                         allow_zero_copy_receive);
                 }
-                else
-                {
+                else {                
                     ar.save_binary_chunk(m_t, m_element_count * sizeof(T));
                 }
             }
@@ -118,6 +127,12 @@ namespace hpx::serialization {
     void serialize(
         Archive& ar, std::array<T, N>& a, unsigned int const /* version */)
     {
+
+        std::cout << "INSIDE BAD STD::ARRAY SERIALIZE FOR TYPE "
+                  << std::meta::display_string_of(^^T)
+                  << "DATA payload:"
+                  << std::string_view(reinterpret_cast<const char*>(a.data()), a.size() * sizeof(T))
+                  << "\n";
         // clang-format off
         ar & hpx::serialization::make_array(a.data(), a.size());
         // clang-format on

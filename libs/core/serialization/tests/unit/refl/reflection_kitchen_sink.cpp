@@ -6,11 +6,11 @@
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <hpx/serialization/map.hpp>
-#include <hpx/serialization/vector.hpp>
-#include <hpx/serialization/string.hpp>
-#include <hpx/serialization/deque.hpp>
-#include <hpx/serialization/array.hpp>
+// #include <hpx/serialization/map.hpp>
+// #include <hpx/serialization/vector.hpp>
+// #include <hpx/serialization/string.hpp>
+// #include <hpx/serialization/deque.hpp>
+// #include <hpx/serialization/array.hpp>
 
 #include <array>
 #include <deque>
@@ -57,14 +57,12 @@ public:
         if (age != rhs.age) return age < rhs.age;
         return name < rhs.name;
     }
-
-    template <typename Archive>
-    void serialize(Archive& ar, unsigned) {
-        ar & age & name;
-    }
 };
 
-HPX_IS_NOT_BITWISE_SERIALIZABLE(person)
+static_assert(hpx::traits::is_not_bitwise_serializable_v<person>, 
+              "Person must be marked as NOT bitwise serializable!");
+
+// HPX_IS_NOT_BITWISE_SERIALIZABLE(person)
 
 enum class Color
 {
@@ -175,6 +173,9 @@ public:
                       << ", Name: " << person_obj.get_name() << "} ";
         }
         std::cout << "}" << std::endl;
+        std::cout << "RAW BUFFER DATA OF m: "
+                  << std::string_view(reinterpret_cast<const char*>(m.data()), m.size() * sizeof(person))
+                  << "\n";
 
         std::cout << "o: { " << o.first << ", {Age: " << o.second.get_age()
                   << ", Name: " << o.second.get_name() << "}" << std::endl;
@@ -187,7 +188,7 @@ public:
     }
 };
 
-HPX_IS_NOT_BITWISE_SERIALIZABLE(complicated_object)
+// HPX_IS_NOT_BITWISE_SERIALIZABLE(complicated_object)
 
 // --- Nested Object Definition ---
 class nested_object
@@ -222,7 +223,7 @@ public:
         o.print();
     }
 };
-HPX_IS_NOT_BITWISE_SERIALIZABLE(nested_object)
+// HPX_IS_NOT_BITWISE_SERIALIZABLE(nested_object)
 
 int main()
 {
