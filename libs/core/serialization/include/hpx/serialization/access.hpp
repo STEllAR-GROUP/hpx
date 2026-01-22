@@ -22,6 +22,8 @@
 #include <type_traits>
 #include <utility>
 
+#include <iostream>
+
 #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 #include <experimental/meta>
 #endif
@@ -80,6 +82,7 @@ namespace hpx::serialization {
         template <typename Archive, typename T>
         static void serialize(Archive& ar, T& t, unsigned)
         {
+
             using dT = std::decay_t<T>;
             if constexpr (hpx::traits::is_intrusive_polymorphic_v<dT>)
             {
@@ -87,10 +90,16 @@ namespace hpx::serialization {
                 // viable to call the right overloaded function according to T
                 // constness and to prevent calling templated version of
                 // serialize function
+                std::cout << "6DEBUG: Processing Member "
+                      << std::meta::display_string_of(^^T)
+                      << "\n";
                 t.serialize(ar, 0);
             }
             else if constexpr (has_serialize_v<dT>)
             {
+                std::cout << "4DEBUG: Processing Member "
+                      << std::meta::display_string_of(^^T)
+                      << "\n";
                 // intrusive_usual: cast it to let it be run for templated
                 // member functions
                 const_cast<dT&>(t).serialize(ar, 0);
@@ -100,6 +109,9 @@ namespace hpx::serialization {
                 // non_intrusive
                 if constexpr (hpx::traits::has_serialize_adl_v<dT>)
                 {
+                    std::cout << "5DEBUG: Processing Member "
+                      << std::meta::display_string_of(^^T)
+                      << "\n";
                     // this additional indirection level is needed to force ADL
                     // on the second phase of template lookup. call of serialize
                     // function directly from base_object finds only
@@ -109,6 +121,9 @@ namespace hpx::serialization {
                 else if constexpr (std::is_aggregate_v<dT> &&
                     hpx::traits::has_struct_serialization_v<dT>)
                 {
+                    std::cout << "1DEBUG: Processing Member "
+                      << std::meta::display_string_of(^^T)
+                      << "\n";
                     // This is automatic serialization for types that are simple
                     // (brace-initializable) structs, that means every struct's
                     // field has to be serializable and public.
@@ -117,6 +132,9 @@ namespace hpx::serialization {
                 else if constexpr (hpx::traits::is_bitwise_serializable_v<dT> ||
                     !hpx::traits::is_not_bitwise_serializable_v<dT>)
                 {
+                    std::cout << "2DEBUG: Processing Member "
+                      << std::meta::display_string_of(^^T)
+                      << "\n";
                     // bitwise serializable types can be directly dispatched to
                     // the archive functions
                     ar.invoke(t);
@@ -129,6 +147,9 @@ namespace hpx::serialization {
                     // If we have cpp 26 reflection, then codegen can be used
                     // to generate serialization functions for types that
                     // don't have them already.
+                    std::cout << "3DEBUG: Processing Member "
+                      << std::meta::display_string_of(^^T)
+                      << "\n";
                     #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
                         detail::refl_serialize(ar, t, 0);
                     #endif
