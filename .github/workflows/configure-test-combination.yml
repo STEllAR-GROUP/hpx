@@ -14,15 +14,15 @@ jobs:
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
         steps:
-        - uses: actions/checkout@v6
-          with:
-            path: source
+        - name: Checkout code
+          uses: actions/checkout@v6
 
         - name: Running CMake with tests on and examples off
+          working-directory: build
           shell: bash
           run: |
             cmake \
-                ../source \
+                .. \
                 -G "Ninja" \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_FETCH_ASIO=Off \
@@ -31,10 +31,11 @@ jobs:
             rm -rf *
         
         - name: Running CMake with tests off and examples on
+          working-directory: build
           shell: bash
           run: |
             cmake \
-                ../source \
+                .. \
                 -G "Ninja" \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_FETCH_ASIO=Off \
@@ -43,10 +44,11 @@ jobs:
             rm -rf *
         
         - name: Running CMake with APEX on
+          working-directory: build
           shell: bash
           run: |
             cmake \
-                ../source \
+                .. \
                 -G "Ninja" \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_FETCH_ASIO=Off \
