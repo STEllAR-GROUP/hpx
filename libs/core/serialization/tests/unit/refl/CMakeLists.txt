@@ -11,7 +11,7 @@ set(tests
     reflection_compound
     reflection_pointers
     reflection_bitwise_regression
-    reflection_kitchen_sink
+    reflection_nested_object
 )
 
 foreach(test ${tests})
