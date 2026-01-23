@@ -41,4 +41,9 @@ namespace hpx::traits {
     inline constexpr bool is_bitwise_serializable_v =
         is_bitwise_serializable<T>::value;
 
+    HPX_CXX_EXPORT template <typename T>
+    struct is_bitwise_serializable<hpx::serialization::array<T>>
+      : is_bitwise_serializable<T> 
+    {}; // Fixes arrays of non-bitwise-serializable types
+
 }    // namespace hpx::traits
