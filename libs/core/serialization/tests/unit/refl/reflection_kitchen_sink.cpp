@@ -173,9 +173,6 @@ public:
                       << ", Name: " << person_obj.get_name() << "} ";
         }
         std::cout << "}" << std::endl;
-        std::cout << "RAW BUFFER DATA OF m: "
-                  << std::string_view(reinterpret_cast<const char*>(m.data()), m.size() * sizeof(person))
-                  << "\n";
 
         std::cout << "o: { " << o.first << ", {Age: " << o.second.get_age()
                   << ", Name: " << o.second.get_name() << "}" << std::endl;
@@ -225,6 +222,7 @@ public:
 };
 // HPX_IS_NOT_BITWISE_SERIALIZABLE(nested_object)
 
+
 int main()
 {
     complicated_object input_o(Color::black, 42, "hello",
@@ -255,6 +253,11 @@ int main()
     hpx::serialization::input_archive iarchive(buffer);
     nested_object output_data;
     iarchive >> output_data;
+
+    // std::cout << std::is_trivially_copy_assignable_v<hpx::serialization::array<person>> <<
+    //             std::is_copy_assignable_v<hpx::serialization::array<person>> <<
+    //                 std::is_trivially_copy_constructible_v<hpx::serialization::array<person>> << "\n";
+    // they all evaluate to true
 
     // Print both
     std::cout << "Input Data:" << std::endl;
