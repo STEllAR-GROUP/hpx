@@ -469,15 +469,6 @@ namespace hpx::ranges {
             Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest,
             Pred op = Pred(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter3> ||
-                    (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        hpx::traits::is_output_iterator_v<Iter3>),
-                "Requires at least forward iterator or sequential execution.");
-
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
                     !hpx::traits::is_random_access_iterator_v<Iter1> ||
@@ -518,15 +509,6 @@ namespace hpx::ranges {
         {
             using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
             using iterator_type2 = hpx::traits::range_iterator_t<Rng2>;
-
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type2>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter3> ||
-                    (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        hpx::traits::is_output_iterator_v<Iter3>),
-                "Requires at least forward iterator or sequential execution.");
 
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||

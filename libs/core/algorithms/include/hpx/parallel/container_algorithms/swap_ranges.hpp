@@ -275,11 +275,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::swap_ranges_t, ExPolicy&& policy,
             FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::swap_ranges<
                 swap_ranges_result<FwdIter1, FwdIter2>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,

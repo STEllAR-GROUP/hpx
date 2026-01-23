@@ -770,9 +770,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(none_of_t, ExPolicy&& policy, Iter first, Sent last,
             F f, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::none_of().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 HPX_MOVE(proj));
@@ -876,9 +873,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(any_of_t, ExPolicy&& policy, Iter first, Sent last,
             F f, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::any_of().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 HPX_MOVE(proj));
@@ -982,9 +976,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(all_of_t, ExPolicy&& policy, Iter first, Sent last,
             F f, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::all_of().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 HPX_MOVE(proj));

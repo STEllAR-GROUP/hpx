@@ -370,11 +370,6 @@ namespace hpx::ranges {
             ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
             Sent2 last2)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::uninitialized_copy_sent<
                 parallel::util::in_out_result<FwdIter1, FwdIter2>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
@@ -493,11 +488,6 @@ namespace hpx::ranges {
             ExPolicy&& policy, FwdIter1 first1, Size count, FwdIter2 first2,
             Sent2 last2)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
             std::size_t d = parallel::detail::distance(first2, last2);
             return hpx::parallel::detail::uninitialized_copy_n<
                 parallel::util::in_out_result<FwdIter1, FwdIter2>>()

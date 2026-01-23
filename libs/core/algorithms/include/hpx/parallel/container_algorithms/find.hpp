@@ -1430,9 +1430,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(find_t, ExPolicy&& policy, Iter first, Sent last,
             T const& val, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::find<Iter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, val,
                 HPX_MOVE(proj));
@@ -1531,9 +1528,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(find_if_t, ExPolicy&& policy, Iter first, Sent last,
             Pred&& pred, Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::find_if<Iter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last,
                 HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
@@ -1639,9 +1633,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(find_if_not_t, ExPolicy&& policy, Iter first,
             Sent last, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::find_if_not<Iter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
                 HPX_MOVE(proj));
@@ -1791,11 +1782,6 @@ namespace hpx::ranges {
             Sent1 last1, Iter2 first2, Sent2 last2, Pred op = Pred(),
             Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::find_end<Iter1>().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
                 HPX_MOVE(op), HPX_MOVE(proj1), HPX_MOVE(proj2));
@@ -1928,11 +1914,6 @@ namespace hpx::ranges {
             Sent1 last1, Iter2 first2, Sent2 last2, Pred op = Pred(),
             Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
-                "Subsequence requires at least forward iterator.");
-
             return hpx::parallel::detail::find_first_of<Iter1>().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
                 HPX_MOVE(op), HPX_MOVE(proj1), HPX_MOVE(proj2));

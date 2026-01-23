@@ -1038,9 +1038,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::partition_t, ExPolicy&& policy,
             FwdIter first, Sent last, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::util::make_subrange<FwdIter, FwdIter>(
                 hpx::parallel::detail::partition<FwdIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
@@ -1163,9 +1160,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::stable_partition_t, ExPolicy&& policy,
             BidirIter first, Sent last, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
-                "Requires at least bidirectional iterator.");
-
             using is_seq = std::integral_constant<bool,
                 !hpx::traits::is_random_access_iterator_v<BidirIter>>;
 
@@ -1239,9 +1233,6 @@ namespace hpx::ranges {
             using iterator = hpx::traits::range_iterator_t<Rng>;
             using result_type = hpx::tuple<iterator, FwdIter2, FwdIter3>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator>,
-                "Requires at least forward iterator.");
-
             return parallel::util::make_in_out_out_result(
                 parallel::detail::partition_copy<result_type>().call(
                     HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
@@ -1304,9 +1295,6 @@ namespace hpx::ranges {
             Pred pred, Proj proj = Proj())
         {
             using result_type = hpx::tuple<FwdIter, OutIter2, OutIter3>;
-
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
 
             return parallel::util::make_in_out_out_result(
                 parallel::detail::partition_copy<result_type>().call(

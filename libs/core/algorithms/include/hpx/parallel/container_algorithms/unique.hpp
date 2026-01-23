@@ -669,9 +669,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::unique_t, ExPolicy&& policy,
             FwdIter first, Sent last, Pred pred = Pred(), Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::util::make_subrange<FwdIter, Sent>(
                 hpx::parallel::detail::unique<FwdIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
@@ -808,9 +805,6 @@ namespace hpx::ranges {
             FwdIter first, Sent last, O dest, Pred pred = Pred(),
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
-
             using result_type = unique_copy_result<FwdIter, O>;
 
             return hpx::parallel::detail::unique_copy<result_type>().call(

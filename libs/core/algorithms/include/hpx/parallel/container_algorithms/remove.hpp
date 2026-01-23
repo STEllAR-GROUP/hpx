@@ -567,9 +567,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::remove_if_t, ExPolicy&& policy,
             FwdIter first, Sent sent, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::util::make_subrange<FwdIter, Sent>(
                 hpx::parallel::detail::remove_if<FwdIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first, sent, HPX_MOVE(pred),
@@ -683,9 +680,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::remove_t, ExPolicy&& policy,
             FwdIter first, Sent last, T const& value, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Required at least forward iterator.");
-
             using type = typename std::iterator_traits<FwdIter>::value_type;
 
             return hpx::ranges::remove_if(

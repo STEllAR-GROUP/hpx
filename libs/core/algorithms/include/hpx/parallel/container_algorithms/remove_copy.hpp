@@ -679,12 +679,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::remove_copy_if_t, ExPolicy&& policy,
             I first, Sent last, O dest, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<I>,
-                "Required at least forward iterator.");
-
-            static_assert(hpx::traits::is_forward_iterator_v<O>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::remove_copy_if<
                 hpx::parallel::util::in_out_result<I, O>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
@@ -799,9 +793,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::remove_copy_t, ExPolicy&& policy,
             I first, Sent last, O dest, T const& value, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<I>,
-                "Required at least forward iterator.");
-
             using type = typename std::iterator_traits<I>::value_type;
 
             return hpx::ranges::remove_copy_if(
