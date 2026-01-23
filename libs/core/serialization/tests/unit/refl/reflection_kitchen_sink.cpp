@@ -6,12 +6,6 @@
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
-// #include <hpx/serialization/map.hpp>
-// #include <hpx/serialization/vector.hpp>
-// #include <hpx/serialization/string.hpp>
-// #include <hpx/serialization/deque.hpp>
-// #include <hpx/serialization/array.hpp>
-
 #include <array>
 #include <deque>
 #include <list>
@@ -59,11 +53,6 @@ public:
     }
 };
 
-static_assert(hpx::traits::is_not_bitwise_serializable_v<person>, 
-              "Person must be marked as NOT bitwise serializable!");
-
-// HPX_IS_NOT_BITWISE_SERIALIZABLE(person)
-
 enum class Color
 {
     red,
@@ -80,11 +69,11 @@ private:
     std::vector<person> c;
     std::list<std::string> d;
     std::deque<int> e;
-    // std::map<int, person> f;
+    std::map<int, person> f;
     // std::multimap<int, person> g;
-    // std::set<std::string> h;
+    std::set<std::string> h;
     // std::multiset<int> i;
-    // std::unordered_map<int, person> j;
+    std::unordered_map<int, person> j;
     // std::unordered_multimap<int, int> k;
     std::array<person, 2> m;
     std::pair<std::string, person> o;
@@ -92,15 +81,15 @@ private:
     std::unique_ptr<int> q;
 
 public:
-    complicated_object() : color(Color::red), a(0) {} // For deserialization
+    complicated_object() : color(Color::red), a(0) {}
     complicated_object(Color col, int a_val, std::string b_val,
         std::vector<person> c_val, std::list<std::string> d_val,
         std::deque<int> e_val,
-        // std::map<int, person> f_val,
+        std::map<int, person> f_val,
         // std::multimap<int, person> g_val,
-        // std::set<std::string> h_val,
+        std::set<std::string> h_val,
         // std::multiset<int> i_val,
-        // std::unordered_map<int, person> j_val,
+        std::unordered_map<int, person> j_val,
         // std::unordered_multimap<int, int> k_val,
         std::array<person, 2> m_val, std::pair<std::string, person> o_val,
         std::optional<int> p_val, std::unique_ptr<int> q_val)
@@ -110,11 +99,11 @@ public:
       , c(std::move(c_val))
       , d(std::move(d_val))
       , e(std::move(e_val))
-    //   , f(std::move(f_val))
+      , f(std::move(f_val))
     //   , g(std::move(g_val))
-    //   , h(std::move(h_val))
+      , h(std::move(h_val))
     //   , i(std::move(i_val))
-    //   , j(std::move(j_val))
+      , j(std::move(j_val))
     //   , k(std::move(k_val))
       , m(std::move(m_val))
       , o(std::move(o_val))
@@ -129,12 +118,13 @@ public:
         bool uptr_q_equal =
             ((!q && !rhs.q) || (q && rhs.q && *q == *rhs.q));
 
-        return color == rhs.color && a == rhs.a && b == rhs.b &&
-            c == rhs.c && d == rhs.d &&
-            e == rhs.e && 
-            // f == rhs.f && 
-            // g == rhs.g && h == rhs.h && i == rhs.i &&
-            // j == rhs.j && k == rhs.k &&
+        return
+            color == rhs.color && a == rhs.a &&
+            b == rhs.b && c == rhs.c &&
+            d == rhs.d && e == rhs.e && 
+            f == rhs.f && // g == rhs.g &&
+            h == rhs.h && // i == rhs.i &&
+            j == rhs.j && // k == rhs.k &&
             m == rhs.m && o == rhs.o &&
             p == rhs.p && uptr_q_equal;
     }
@@ -166,6 +156,40 @@ public:
         }
         std::cout << "}" << std::endl;
 
+        std::cout << "f: { ";
+        for (const auto& [key, person_obj] : f)
+        {
+            std::cout << "{Key: " << key
+                      << ", Age: " << person_obj.get_age()
+                      << ", Name: " << person_obj.get_name() << "} ";
+        }
+        std::cout << "}" << std::endl;
+
+        // std::cout << "g: { ";
+        // for (const auto& [key, person_obj] : g)
+        // {
+        //     std::cout << "{Key: " << key
+        //               << ", Age: " << person_obj.get_age()
+        //               << ", Name: " << person_obj.get_name() << "} ";
+        // }
+        // std::cout << "}" << std::endl;
+
+        std::cout << "h: { ";
+        for (const auto& str : h)
+        {
+            std::cout << str << " ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::cout << "j: { ";
+        for (const auto& [key, person_obj] : j)
+        {
+            std::cout << "{Key: " << key
+                      << ", Age: " << person_obj.get_age()
+                      << ", Name: " << person_obj.get_name() << "} ";
+        }
+        std::cout << "}" << std::endl;
+
         std::cout << "m: { ";
         for (const auto& person_obj : m)
         {
@@ -185,9 +209,6 @@ public:
     }
 };
 
-// HPX_IS_NOT_BITWISE_SERIALIZABLE(complicated_object)
-
-// --- Nested Object Definition ---
 class nested_object
 {
 private:
@@ -216,12 +237,9 @@ public:
     {
         std::cout << "ID: " << id << ", Name: " << name << std::endl;
         std::cout << "Person - Age: " << p.get_age() << ", Name: " << p.get_name() << std::endl;
-        // Add more detailed printing for complicated_object if needed
         o.print();
     }
 };
-// HPX_IS_NOT_BITWISE_SERIALIZABLE(nested_object)
-
 
 int main()
 {
@@ -229,11 +247,11 @@ int main()
         {{10, "c1"}, {11, "c2"}},               // c: vector
         {"list1", "list2"},                     // d: list
         {1, 2, 3},                              // e: deque
-        // {{1, {10, "f1"}}, {2, {11, "f2"}}},  // f: map
+        {{1, {10, "f1"}}, {2, {11, "f2"}}},     // f: map
         // {{1, {10, "g1"}}, {1, {11, "g2"}}},  // g: multimap
-        // {"set1", "set2"},                    // h: set
+        {"set1", "set2"},                       // h: set
         // {1, 1, 2, 3, 3, 3},                  // i: multiset
-        // {{1, {10, "j1"}}},                   // j: unordered_map
+        {{1, {10, "j1"}}},                      // j: unordered_map
         // {{1, 100}, {1, 101}},                // k: unordered_multimap
         {{{1, "m1"}, {2, "m2"}}},               // m: array
         {"pair1", {1, "o1"}},                   // o: pair
