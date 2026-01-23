@@ -4,30 +4,30 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# enable likwid module only if HPX_LIKWID_WITH_LIKWID is set
-if(NOT ${HPX_LIKWID_WITH_LIKWID})
+# Enable Tracy module only if HPX_TRACY_WITH_TRACY is set
+if(NOT ${HPX_TRACY_WITH_TRACY})
   return()
 endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# Setup likwid
-if(HPX_LIKWID_WITH_LIKWID)
-  include(HPX_SetupLikwid)
-endif()
+# Setup Tracy
+include(HPX_SetupTracy)
 
-set(likwid_headers hpx/likwid/likwid_tls.hpp)
+set(tracy_headers hpx/tracy/tracy.hpp hpx/tracy/tracy_lock.hpp
+                  hpx/tracy/tracy_tls.hpp
+)
 
-set(likwid_sources likwid_tls.cpp)
+set(tracy_sources tracy.cpp tracy_init.cpp tracy_lock.cpp tracy_tls.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
-  core likwid
+  core tracy
   GLOBAL_HEADER_GEN ON
   GLOBAL_HEADER_MODULE_GEN ON
-  SOURCES ${likwid_sources}
-  HEADERS ${likwid_headers}
+  SOURCES ${tracy_sources}
+  HEADERS ${tracy_headers}
   MODULE_DEPENDENCIES hpx_config
-  DEPENDENCIES LIKWID::likwid
-  CMAKE_SUBDIRS examples tests
+  PRIVATE_DEPENDENCIES tracy::tracy
+  CMAKE_SUBDIRS
 )

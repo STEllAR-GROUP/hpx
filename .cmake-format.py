@@ -357,6 +357,7 @@ with section("parse"):
                                     'COMPAT_HEADERS': '+',
                                     'GENERATED_HEADERS': '+',
                                     'DEPENDENCIES': '+',
+                                    'PRIVATE_DEPENDENCIES': '+',
                                     'INCLUDE_DIRECTORIES': '+',
                                     'EXCLUDE_FROM_GLOBAL_HEADER': '+',
                                     'ADD_TO_GLOBAL_HEADER': '+',

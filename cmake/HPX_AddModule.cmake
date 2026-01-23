@@ -24,6 +24,7 @@ function(add_hpx_module libname modulename)
       GENERATED_HEADERS
       OBJECTS
       DEPENDENCIES
+      PRIVATE_DEPENDENCIES
       INCLUDE_DIRECTORIES
       MODULE_DEPENDENCIES
       CMAKE_SUBDIRS
@@ -408,6 +409,9 @@ function(add_hpx_module libname modulename)
     hpx_${modulename} PUBLIC ${${modulename}_MODULE_DEPENDENCIES}
   )
   target_link_libraries(hpx_${modulename} PUBLIC ${${modulename}_DEPENDENCIES})
+  target_link_libraries(
+    hpx_${modulename} PRIVATE ${${modulename}_PRIVATE_DEPENDENCIES}
+  )
   target_include_directories(
     hpx_${modulename} PUBLIC ${${modulename}_INCLUDE_DIRECTORIES}
   )

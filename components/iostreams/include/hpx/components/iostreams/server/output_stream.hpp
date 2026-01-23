@@ -33,7 +33,7 @@ namespace hpx::iostreams::server {
         typedef hpx::spinlock mutex_type;
 
     private:
-        mutable mutex_type mtx_;
+        mutable mutex_type mtx_ = mutex_type("iostreams::output_stream");
         write_function_type write_f;
         detail::order_output pending_output_;
 
