@@ -153,4 +153,42 @@ namespace hpx::serialization {
 
         detail::save_collection(ar, t);
     }
+
+    HPX_CXX_EXPORT template <typename Key, typename Value, typename Comp,
+        typename Alloc>
+    void serialize(input_archive& ar,
+        std::multimap<Key, Value, Comp, Alloc>& t, unsigned)
+    {
+        using value_type =
+            typename std::multimap<Key, Value, Comp, Alloc>::value_type;
+
+        std::uint64_t size;
+        ar >> size;
+
+        t.clear();
+        for (std::size_t i = 0; i < size; ++i) {
+            value_type v;
+            ar >> v;
+            t.insert(t.end(), HPX_MOVE(v));
+        }
+    }
+
+    HPX_CXX_EXPORT template <typename Key, typename Value, typename Comp,
+        typename Alloc>
+    void serialize(output_archive& ar,
+        std::multimap<Key, Value, Comp, Alloc> const& t, unsigned)
+    {
+        using value_type =
+            typename std::multimap<Key, Value, Comp, Alloc>::value_type;
+
+        std::uint64_t const size = t.size();
+        ar << size;
+        if (size == 0)
+            return;
+
+        for (value_type const& val : t)
+        {
+            ar << val;
+        }
+    }
 }    // namespace hpx::serialization

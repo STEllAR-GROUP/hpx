@@ -45,7 +45,7 @@ public:
         return age == rhs.age && name == rhs.name;
     }
 
-    // operator< is required for std::map, std::set, etc.
+    // for std::map, std::set, etc.
     bool operator<(person const& rhs) const
     {
         if (age != rhs.age) return age < rhs.age;
@@ -70,11 +70,11 @@ private:
     std::list<std::string> d;
     std::deque<int> e;
     std::map<int, person> f;
-    // std::multimap<int, person> g;
+    std::multimap<int, person> g;
     std::set<std::string> h;
-    // std::multiset<int> i;
+    std::multiset<int> i;
     std::unordered_map<int, person> j;
-    // std::unordered_multimap<int, int> k;
+    std::unordered_multimap<int, int> k;
     std::array<person, 2> m;
     std::pair<std::string, person> o;
     std::optional<int> p;
@@ -86,11 +86,11 @@ public:
         std::vector<person> c_val, std::list<std::string> d_val,
         std::deque<int> e_val,
         std::map<int, person> f_val,
-        // std::multimap<int, person> g_val,
+        std::multimap<int, person> g_val,
         std::set<std::string> h_val,
-        // std::multiset<int> i_val,
+        std::multiset<int> i_val,
         std::unordered_map<int, person> j_val,
-        // std::unordered_multimap<int, int> k_val,
+        std::unordered_multimap<int, int> k_val,
         std::array<person, 2> m_val, std::pair<std::string, person> o_val,
         std::optional<int> p_val, std::unique_ptr<int> q_val)
       : color(col)
@@ -100,11 +100,11 @@ public:
       , d(std::move(d_val))
       , e(std::move(e_val))
       , f(std::move(f_val))
-    //   , g(std::move(g_val))
+      , g(std::move(g_val))
       , h(std::move(h_val))
-    //   , i(std::move(i_val))
+      , i(std::move(i_val))
       , j(std::move(j_val))
-    //   , k(std::move(k_val))
+      , k(std::move(k_val))
       , m(std::move(m_val))
       , o(std::move(o_val))
       , p(std::move(p_val))
@@ -122,9 +122,9 @@ public:
             color == rhs.color && a == rhs.a &&
             b == rhs.b && c == rhs.c &&
             d == rhs.d && e == rhs.e && 
-            f == rhs.f && // g == rhs.g &&
-            h == rhs.h && // i == rhs.i &&
-            j == rhs.j && // k == rhs.k &&
+            f == rhs.f && g == rhs.g &&
+            h == rhs.h && i == rhs.i &&
+            j == rhs.j && k == rhs.k &&
             m == rhs.m && o == rhs.o &&
             p == rhs.p && uptr_q_equal;
     }
@@ -165,19 +165,26 @@ public:
         }
         std::cout << "}" << std::endl;
 
-        // std::cout << "g: { ";
-        // for (const auto& [key, person_obj] : g)
-        // {
-        //     std::cout << "{Key: " << key
-        //               << ", Age: " << person_obj.get_age()
-        //               << ", Name: " << person_obj.get_name() << "} ";
-        // }
-        // std::cout << "}" << std::endl;
+        std::cout << "g: { ";
+        for (const auto& [key, person_obj] : g)
+        {
+            std::cout << "{Key: " << key
+                      << ", Age: " << person_obj.get_age()
+                      << ", Name: " << person_obj.get_name() << "} ";
+        }
+        std::cout << "}" << std::endl;
 
         std::cout << "h: { ";
         for (const auto& str : h)
         {
             std::cout << str << " ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::cout << "i: { ";
+        for (const auto& val : i)
+        {
+            std::cout << val << " ";
         }
         std::cout << "}" << std::endl;
 
@@ -187,6 +194,14 @@ public:
             std::cout << "{Key: " << key
                       << ", Age: " << person_obj.get_age()
                       << ", Name: " << person_obj.get_name() << "} ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::cout << "k: { ";
+        for (const auto& [key, val] : k)
+        {
+            std::cout << "{Key: " << key
+                      << ", Value: " << val << "} ";
         }
         std::cout << "}" << std::endl;
 
@@ -248,11 +263,11 @@ int main()
         {"list1", "list2"},                     // d: list
         {1, 2, 3},                              // e: deque
         {{1, {10, "f1"}}, {2, {11, "f2"}}},     // f: map
-        // {{1, {10, "g1"}}, {1, {11, "g2"}}},  // g: multimap
+        {{1, {10, "g1"}}, {1, {11, "g2"}}},     // g: multimap
         {"set1", "set2"},                       // h: set
-        // {1, 1, 2, 3, 3, 3},                  // i: multiset
+        {1, 1, 2, 3, 3, 3},                     // i: multiset
         {{1, {10, "j1"}}},                      // j: unordered_map
-        // {{1, 100}, {1, 101}},                // k: unordered_multimap
+        {{1, 100}, {1, 101}},                   // k: unordered_multimap
         {{{1, "m1"}, {2, "m2"}}},               // m: array
         {"pair1", {1, "o1"}},                   // o: pair
         123,                                    // p: optional
