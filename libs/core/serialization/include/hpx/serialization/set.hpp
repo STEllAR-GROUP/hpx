@@ -47,4 +47,35 @@ namespace hpx::serialization {
             ar << i;
         }
     }
+
+    HPX_CXX_EXPORT template <typename T, typename Compare, typename Allocator>
+    void serialize(
+        input_archive& ar, std::multiset<T, Compare, Allocator>& set, unsigned)
+    {
+        std::uint64_t size;
+        ar >> size;
+
+        set.clear();
+        for (std::size_t i = 0; i < size; ++i)
+        {
+            T t;
+            ar >> t;
+            set.insert(set.end(), HPX_MOVE(t));
+        }
+    }
+
+    HPX_CXX_EXPORT template <typename T, typename Compare, typename Allocator>
+    void serialize(output_archive& ar,
+        std::multiset<T, Compare, Allocator> const& set, unsigned)
+    {
+        std::uint64_t const size = set.size();
+        ar << size;
+        if (size == 0)
+            return;
+
+        for (T const& i : set)
+        {
+            ar << i;
+        }
+    }
 }    // namespace hpx::serialization
