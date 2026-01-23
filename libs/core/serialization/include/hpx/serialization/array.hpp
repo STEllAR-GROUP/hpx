@@ -51,9 +51,6 @@ namespace hpx::serialization {
         template <typename Archive>
         void serialize(Archive& ar, unsigned int)
         {
-            std::cout << "INSIDE ARRAY SERIALIZE FOR TYPE "
-                      << std::meta::display_string_of(^^T)
-                      << "\n";
 #if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
             if (ar.disable_array_optimization() || ar.endianess_differs())
             {
@@ -76,10 +73,6 @@ namespace hpx::serialization {
                 std::is_default_constructible_v<element_type> &&
                 (hpx::traits::is_bitwise_serializable_v<element_type> ||
                     !hpx::traits::is_not_bitwise_serializable_v<element_type>);
-
-            std::cout << "DEBUG7: Processing array of type "
-                      << std::meta::display_string_of(^^T)
-                      << ", use_optimized=" << use_optimized << "\n";
 
             if constexpr (use_optimized)
             {
@@ -127,12 +120,6 @@ namespace hpx::serialization {
     void serialize(
         Archive& ar, std::array<T, N>& a, unsigned int const /* version */)
     {
-
-        std::cout << "INSIDE BAD STD::ARRAY SERIALIZE FOR TYPE "
-                  << std::meta::display_string_of(^^T)
-                  << "DATA payload:"
-                  << std::string_view(reinterpret_cast<const char*>(a.data()), a.size() * sizeof(T))
-                  << "\n";
         // clang-format off
         ar & hpx::serialization::make_array(a.data(), a.size());
         // clang-format on
