@@ -507,9 +507,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(count_t, ExPolicy&& policy, Iter first, Sent last,
             T const& value, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Required at least forward iterator.");
-
             using difference_type =
                 typename std::iterator_traits<Iter>::difference_type;
 
@@ -626,9 +623,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(count_if_t, ExPolicy&& policy, Iter first,
             Sent last, F f, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Required at least forward iterator.");
-
             using difference_type =
                 typename std::iterator_traits<Iter>::difference_type;
 

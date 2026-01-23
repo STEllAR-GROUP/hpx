@@ -345,9 +345,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(
             fill_t, ExPolicy&& policy, Iter first, Sent last, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::fill<Iter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, value);
         }
@@ -438,9 +435,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(fill_n_t, ExPolicy&& policy, FwdIter first,
             Size count, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
-
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::detail::is_negative(count))
             {

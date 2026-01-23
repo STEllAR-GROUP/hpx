@@ -206,12 +206,6 @@ namespace hpx::ranges {
             ExPolicy&& policy, Iterator first, Sentinel last, T const& val,
             Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_iterator_v<Iterator>,
-                "Required at least iterator.");
-
-            static_assert(hpx::traits::is_iterator_v<Sentinel>,
-                "Required at least iterator.");
-
             return hpx::parallel::detail::contains().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, val,
                 HPX_FORWARD(Proj, proj));
@@ -325,12 +319,6 @@ namespace hpx::ranges {
             Sent2 last2, Pred pred = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Required at least forward iterator.");
-
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::contains_subrange().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
                 HPX_MOVE(pred), HPX_FORWARD(Proj1, proj1),

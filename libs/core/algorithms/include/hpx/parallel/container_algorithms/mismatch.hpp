@@ -412,11 +412,6 @@ namespace hpx::ranges {
             Sent1 last1, Iter2 first2, Sent2 last2, Pred op = Pred(),
             Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::mismatch_binary<
                 mismatch_result<Iter1, Iter2>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,

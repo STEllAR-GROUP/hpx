@@ -414,9 +414,6 @@ namespace hpx::ranges {
             FwdIter first, Sent1 last, RandIter r_first, Sent2 r_last,
             Comp comp = Comp(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires a forward iterator.");
-
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires a random access iterator.");
 
@@ -497,9 +494,6 @@ namespace hpx::ranges {
             using iterator_type2 = hpx::traits::range_iterator_t<Rng2>;
             using result_type =
                 partial_sort_copy_result<iterator_type1, iterator_type2>;
-
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type1>,
-                "Requires a forward iterator.");
 
             static_assert(
                 hpx::traits::is_random_access_iterator_v<iterator_type2>,

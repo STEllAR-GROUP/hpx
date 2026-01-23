@@ -1183,9 +1183,6 @@ namespace hpx::ranges {
             Iter first, Sent sent, Pred pred, T const& new_value,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::replace_if<Iter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, sent, HPX_MOVE(pred),
                 new_value, HPX_MOVE(proj));
@@ -1300,9 +1297,6 @@ namespace hpx::ranges {
             Iter first, Sent sent, T1 const& old_value, T2 const& new_value,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Required at least forward iterator.");
-
             using type = typename std::iterator_traits<Iter>::value_type;
 
             return hpx::ranges::replace_if(
@@ -1437,12 +1431,6 @@ namespace hpx::ranges {
             FwdIter1 first, Sent sent, FwdIter2 dest, Pred pred,
             T const& new_value, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Required at least forward iterator.");
-
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::replace_copy_if<
                 hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, sent, dest,
@@ -1471,13 +1459,6 @@ namespace hpx::ranges {
             Rng&& rng, FwdIter dest, Pred pred, T const& new_value,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator<
-                              hpx::traits::range_iterator_t<Rng>>::value,
-                "Required at least forward iterator.");
-
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::replace_copy_if<
                 hpx::parallel::util::in_out_result<
                     hpx::traits::range_iterator_t<Rng>, FwdIter>>()
@@ -1574,12 +1555,6 @@ namespace hpx::ranges {
             FwdIter1 first, Sent sent, FwdIter2 dest, T1 const& old_value,
             T2 const& new_value, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Required at least forward iterator.");
-
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Required at least forward iterator.");
-
             using type = typename std::iterator_traits<FwdIter1>::value_type;
 
             return hpx::ranges::replace_copy_if(
@@ -1608,13 +1583,6 @@ namespace hpx::ranges {
             Rng&& rng, FwdIter dest, T1 const& old_value, T2 const& new_value,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator<
-                              hpx::traits::range_iterator_t<Rng>>::value,
-                "Required at least forward iterator.");
-
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Required at least forward iterator.");
-
             using type = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type;
 

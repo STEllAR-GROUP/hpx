@@ -400,11 +400,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::exclusive_scan_t, ExPolicy&& policy,
             FwdIter1 first, Sent last, FwdIter2 dest, T init, Op op = Op())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
             using result_type = exclusive_scan_result<FwdIter1, FwdIter2>;
 
             return hpx::parallel::detail::exclusive_scan<result_type>().call(

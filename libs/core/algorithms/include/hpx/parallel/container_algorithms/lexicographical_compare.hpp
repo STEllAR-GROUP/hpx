@@ -440,11 +440,6 @@ namespace hpx::ranges {
             Sent2 last2, Pred pred = Pred(), Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::lexicographical_compare().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
                 HPX_MOVE(pred), HPX_MOVE(proj1), HPX_MOVE(proj2));

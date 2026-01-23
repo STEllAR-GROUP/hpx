@@ -892,9 +892,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::min_element_t, ExPolicy&& policy,
             FwdIter first, Sent last, F f = F(), Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::min_element<FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 HPX_MOVE(proj));
@@ -1011,9 +1008,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::max_element_t, ExPolicy&& policy,
             FwdIter first, Sent last, F f = F(), Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::max_element<FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 HPX_MOVE(proj));
@@ -1131,9 +1125,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::minmax_element_t, ExPolicy&& policy,
             FwdIter first, Sent last, F f = F(), Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::minmax_element<FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 HPX_MOVE(proj));

@@ -710,9 +710,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::reduce_t, ExPolicy&& policy,
             FwdIter first, Sent last, T init, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
                 HPX_MOVE(f));
@@ -757,9 +754,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::reduce_t, ExPolicy&& policy,
             FwdIter first, Sent last, T init)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
                 std::plus<T>{});
@@ -803,9 +797,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(
             hpx::ranges::reduce_t, ExPolicy&& policy, FwdIter first, Sent last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
-
             using value_type =
                 typename std::iterator_traits<FwdIter>::value_type;
 

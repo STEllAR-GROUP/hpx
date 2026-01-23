@@ -716,11 +716,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::inclusive_scan_t, ExPolicy&& policy,
             FwdIter1 first, Sent last, FwdIter2 dest, Op op = Op())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
             using result_type = inclusive_scan_result<FwdIter1, FwdIter2>;
 
             return hpx::parallel::detail::inclusive_scan<result_type>().call(
@@ -836,11 +831,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::inclusive_scan_t, ExPolicy&& policy,
             FwdIter1 first, Sent last, FwdIter2 dest, Op op, T init)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
             using result_type = inclusive_scan_result<FwdIter1, FwdIter2>;
 
             return hpx::parallel::detail::inclusive_scan<result_type>().call(

@@ -897,8 +897,6 @@ namespace hpx::ranges {
             ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest,
             BinOp binary_op, UnOp unary_op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
@@ -1047,8 +1045,6 @@ namespace hpx::ranges {
             ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest,
             BinOp binary_op, UnOp unary_op, T init)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 

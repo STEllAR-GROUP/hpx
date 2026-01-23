@@ -495,7 +495,7 @@ namespace hpx::ranges {
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_random_access_iterator_v<FwdIter1> &&
                 hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
+                hpx::traits::is_forward_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<UnOp,
                     typename std::iterator_traits<FwdIter1>::value_type> &&
                 hpx::is_invocable_v<BinOp,
@@ -512,11 +512,6 @@ namespace hpx::ranges {
             ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest, T init,
             BinOp binary_op, UnOp unary_op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
             using result_type =
                 transform_exclusive_scan_result<FwdIter1, FwdIter2>;
 

@@ -724,9 +724,6 @@ namespace hpx::ranges {
             ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest, F f,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-
             return parallel::detail::transform<
                 unary_transform_result<FwdIter1, FwdIter2>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
@@ -776,10 +773,6 @@ namespace hpx::ranges {
             Sent2 last2, FwdIter3 dest, F f, Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1> &&
-                    hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
             return parallel::detail::transform_binary2<
                 binary_transform_result<FwdIter1, FwdIter2, FwdIter3>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
