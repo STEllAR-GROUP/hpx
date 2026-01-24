@@ -1,4 +1,4 @@
-//  Copyright (c) 2025 Ujjwal Shekhar
+//  Copyright (c) 2026 Ujjwal Shekhar
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,7 +29,6 @@ private:
 
         consteval fixed_string() = default;
 
-        // Construct from string_view
         consteval fixed_string(std::string_view str) {
             std::copy_n(str.data(), std::min(N - 1, str.size()), data);
             data[N - 1] = '\0'; // Ensure null termination
@@ -68,6 +67,7 @@ public:
                     scopes.push_back(scope);
                 }
                 
+                // Add all enclosing namespaces in reverse
                 // Todo: Should I use ranges? Should we filter global namespace?
                 const auto scoped_name =
                     scopes 
@@ -75,18 +75,7 @@ public:
                     | std::views::transform(std::meta::identifier_of)
                     | std::views::join_with(std::string_view("::"))
                     | std::ranges::to<std::string>();
-                // constexpr auto scoped_name = []() {
-                //     std::string result;
-                //     for (auto it = scopes.rbegin(); it != scopes.rend(); ++it) {
-                //         if (!result.empty()) {
-                //             result += "::";
-                //         }
-                //         result += std::meta::identifier_of(*it);
-                //     }
-                //     return result;
-                // }();
-    
-                
+
                 // Put all the template arguments into a string view
                 const auto template_args =
                     std::define_static_array(std::meta::template_arguments_of(dT))
