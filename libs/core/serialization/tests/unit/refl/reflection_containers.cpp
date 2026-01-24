@@ -7,37 +7,54 @@
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <string>
-#include <vector>
 #include <array>
 #include <iostream>
+#include <string>
+#include <vector>
 
-struct person {
+struct person
+{
     int age;
     std::string name;
 
-    person() : age(0), name("") {}
-    person(int a, std::string n) : age(a), name(n) {}
+    person()
+      : age(0)
+      , name("")
+    {
+    }
+    person(int a, std::string n)
+      : age(a)
+      , name(n)
+    {
+    }
 
-    bool operator==(person const& rhs) const {
+    bool operator==(person const& rhs) const
+    {
         return age == rhs.age && name == rhs.name;
     }
 };
 
-class A {
+class A
+{
 public:
     int a;
     std::array<person, 2> b;
 
     A() = default;
-    A(int a, std::array<person, 2> const& b) : a(a), b(b) {}
+    A(int a, std::array<person, 2> const& b)
+      : a(a)
+      , b(b)
+    {
+    }
 
-    bool operator==(A const& rhs) const {
+    bool operator==(A const& rhs) const
+    {
         return a == rhs.a && b == rhs.b;
     }
 };
 
-int main() {
+int main()
+{
     std::vector<char> buffer;
     hpx::serialization::output_archive oarchive(buffer);
 
@@ -50,8 +67,10 @@ int main() {
     iarchive >> output_data;
 
     // Diagnostic Prints
-    std::cout << "Input  m[0]: " << input_data.b[0].age << ", " << input_data.b[0].name << std::endl;
-    std::cout << "Output m[0]: " << output_data.b[0].age << ", " << output_data.b[0].name << std::endl;
+    std::cout << "Input  m[0]: " << input_data.b[0].age << ", "
+              << input_data.b[0].name << std::endl;
+    std::cout << "Output m[0]: " << output_data.b[0].age << ", "
+              << output_data.b[0].name << std::endl;
 
     HPX_TEST_EQ(input_data.a, output_data.a);
     HPX_TEST_EQ(input_data.b[0].age, output_data.b[0].age);
