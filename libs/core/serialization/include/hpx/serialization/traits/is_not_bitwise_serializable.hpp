@@ -38,10 +38,11 @@ namespace hpx::traits {
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
-    struct is_not_bitwise_serializable<hpx::serialization::array<T>>
-      : is_not_bitwise_serializable<T>
-    {}; // Fixes arrays of non-bitwise-serializable types
+    /* Will be addressed in a separate PR, to allow serializing AoV and VoA*/
+    // HPX_CXX_EXPORT template <typename T>
+    // struct is_not_bitwise_serializable<hpx::serialization::array<T>>
+    //   : is_not_bitwise_serializable<T>
+    // {}; // Fixes arrays of non-bitwise-serializable types
 
     HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_not_bitwise_serializable_v = true;

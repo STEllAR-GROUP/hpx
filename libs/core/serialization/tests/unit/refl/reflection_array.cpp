@@ -11,6 +11,14 @@
 #include <string>
 #include <vector>
 
+/*
+This is a failing test case for serialization of arrays
+We will work on fixing this issue
+(Primary suspect: array.hpp and is_bitwise_serializable.hpp)
+The traits specializations for hpx::serialization::array<T> need to be
+carefully designed to avoid incorrect assumptions about the bitwise
+serializability of arrays containing non-bitwise-serializable
+*/
 
 struct person_pod {
     int age;
@@ -33,9 +41,10 @@ struct final_array_boss {
     std::vector<std::array<int, 3>> vector_of_arrays;
 
     bool operator==(final_array_boss const& rhs) const {
-        return pod_array == rhs.pod_array &&
+        return pod_array == rhs.pod_array && 
                array_of_vectors == rhs.array_of_vectors &&
-               vector_of_arrays == rhs.vector_of_arrays;
+               vector_of_arrays == rhs.vector_of_arrays
+            ;
     }
 
     void print() const {
