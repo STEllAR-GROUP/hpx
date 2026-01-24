@@ -47,7 +47,7 @@ int main()
 {
     // Serialize
     std::vector<char> buffer;
-    
+
     // Create a Derived object but store it in a Base pointer
     std::unique_ptr<Base> input_data = std::make_unique<Derived>();
     static_cast<Derived*>(input_data.get())->a = 123;
@@ -62,7 +62,7 @@ int main()
 
     // Deserialize
     std::unique_ptr<Base> output_data;
-    
+
     {
         hpx::serialization::input_archive iarchive(buffer);
         // Deserialize into the base pointer. HPX should
@@ -71,11 +71,10 @@ int main()
     }
 
     HPX_TEST(nullptr != output_data.get());
-    
+
     // Check if it's the correct dynamic type
     auto* d = dynamic_cast<Derived*>(output_data.get());
     HPX_TEST(nullptr != d);
-
 
     // Check values
     HPX_TEST(input_data->equals(*output_data));

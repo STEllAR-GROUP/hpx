@@ -18,7 +18,11 @@ private:
 
 public:
     ReflStruct() = default;
-    ReflStruct(int i, std::string s) : i(i), s(std::move(s)) {}
+    ReflStruct(int i, std::string s)
+      : i(i)
+      , s(std::move(s))
+    {
+    }
 
     bool operator==(ReflStruct const& rhs) const
     {
