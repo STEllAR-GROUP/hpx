@@ -83,7 +83,8 @@ namespace hpx::serialization {
                     ar.load_binary_chunk(m_t, m_element_count * sizeof(T),
                         allow_zero_copy_receive);
                 }
-                else {                
+                else
+                {
                     ar.save_binary_chunk(m_t, m_element_count * sizeof(T));
                 }
             }

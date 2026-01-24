@@ -7,9 +7,9 @@
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 // A simple class that is NOT bitwise serializable.
 // We will NOT provide a serialize() function for this.
