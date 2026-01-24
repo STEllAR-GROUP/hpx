@@ -77,7 +77,7 @@ private:
     std::multiset<int> i;
     std::unordered_map<int, person> j;
     std::unordered_multimap<int, int> k;
-    std::array<person, 2> m;
+    std::array<int, 2> m;
     std::pair<std::string, person> o;
     hpx::optional<int> p;
     std::unique_ptr<int> q;
@@ -93,7 +93,7 @@ public:
         std::multiset<int> i_val,
         std::unordered_map<int, person> j_val,
         std::unordered_multimap<int, int> k_val,
-        std::array<person, 2> m_val, std::pair<std::string, person> o_val,
+        std::array<int, 2> m_val, std::pair<std::string, person> o_val,
         hpx::optional<int> p_val, std::unique_ptr<int> q_val)
       : color(col)
       , a(a_val)
@@ -208,10 +208,9 @@ public:
         std::cout << "}" << std::endl;
 
         std::cout << "m: { ";
-        for (const auto& person_obj : m)
+        for (const auto& val : m)
         {
-            std::cout << "{Age: " << person_obj.get_age()
-                      << ", Name: " << person_obj.get_name() << "} ";
+            std::cout << val << " ";
         }
         std::cout << "}" << std::endl;
 
@@ -270,7 +269,8 @@ int main()
         {1, 1, 2, 3, 3, 3},                     // i: multiset
         {{1, {10, "j1"}}},                      // j: unordered_map
         {{1, 100}, {1, 101}},                   // k: unordered_multimap
-        {{{1, "m1"}, {2, "m2"}}},               // m: array
+        // {{{1, "m1"}, {2, "m2"}}},               // m: array
+        {1, 2},                                 // m: array
         {"pair1", {1, "o1"}},                   // o: pair
         123,                                    // p: optional
         std::make_unique<int>(456)              // q: unique_ptr
