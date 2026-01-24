@@ -22,52 +22,74 @@
 #include <vector>
 
 // POD struct for bitwise-safe array testing
-struct Coordinate {
+struct Coordinate
+{
     double x, y, z;
 
-    bool operator==(Coordinate const& rhs) const {
+    bool operator==(Coordinate const& rhs) const
+    {
         return x == rhs.x && y == rhs.y && z == rhs.z;
     }
 };
 
-class person {
+class person
+{
 private:
     int age;
     std::string name;
 
 public:
-    person() : age(0) {}
-    person(int a, std::string n) : age(a), name(std::move(n)) {}
+    person()
+      : age(0)
+    {
+    }
+    person(int a, std::string n)
+      : age(a)
+      , name(std::move(n))
+    {
+    }
 
-    int get_age() const { return age; }
-    std::string get_name() const { return name; }
+    int get_age() const
+    {
+        return age;
+    }
+    std::string get_name() const
+    {
+        return name;
+    }
 
-    bool operator==(person const& rhs) const {
+    bool operator==(person const& rhs) const
+    {
         return age == rhs.age && name == rhs.name;
     }
 
-    bool operator<(person const& rhs) const {
-        if (age != rhs.age) return age < rhs.age;
+    bool operator<(person const& rhs) const
+    {
+        if (age != rhs.age)
+            return age < rhs.age;
         return name < rhs.name;
     }
 };
 
-class deeply_nested_object {
+class deeply_nested_object
+{
 private:
     // Level 2: Array of PODs (Bitwise-safe)
     std::array<Coordinate, 4> fixed_points;
-    
+
     // Level 3: Template-of-template-of-template (Non-bitwise)
     std::vector<std::map<int, std::vector<person>>> registry_history;
-    
+
     // Level 2: Mixed types with optionals
     hpx::optional<std::list<std::pair<std::string, person>>> metadata;
 
-    struct internal_stats {
+    struct internal_stats
+    {
         double score;
         std::vector<std::string> tags;
 
-        bool operator==(internal_stats const& rhs) const {
+        bool operator==(internal_stats const& rhs) const
+        {
             return score == rhs.score && tags == rhs.tags;
         }
     };
@@ -76,65 +98,72 @@ private:
 public:
     deeply_nested_object() = default;
 
-    deeply_nested_object(
-        std::array<Coordinate, 4> pts,
+    deeply_nested_object(std::array<Coordinate, 4> pts,
         std::vector<std::map<int, std::vector<person>>> history,
         hpx::optional<std::list<std::pair<std::string, person>>> meta,
-        double sc,
-        std::vector<std::string> tgs)
+        double sc, std::vector<std::string> tgs)
       : fixed_points(pts)
       , registry_history(std::move(history))
       , metadata(std::move(meta))
       , stats{sc, std::move(tgs)}
-    {}
-
-    bool operator==(deeply_nested_object const& rhs) const {
-        return fixed_points == rhs.fixed_points &&
-               registry_history == rhs.registry_history &&
-               metadata == rhs.metadata &&
-               stats == rhs.stats;
+    {
     }
 
-    void print() const {
+    bool operator==(deeply_nested_object const& rhs) const
+    {
+        return fixed_points == rhs.fixed_points &&
+            registry_history == rhs.registry_history &&
+            metadata == rhs.metadata && stats == rhs.stats;
+    }
+
+    void print() const
+    {
         std::cout << "--- Deeply Nested Object (POD Array) ---" << std::endl;
         std::cout << "Fixed Points: " << std::endl;
-        for (std::size_t i = 0; i < fixed_points.size(); ++i) {
-            std::cout << "Point " << i << ": (" 
-                      << fixed_points[i].x << ", " 
-                      << fixed_points[i].y << ", " 
-                      << fixed_points[i].z << ")" << std::endl;
+        for (std::size_t i = 0; i < fixed_points.size(); ++i)
+        {
+            std::cout << "Point " << i << ": (" << fixed_points[i].x << ", "
+                      << fixed_points[i].y << ", " << fixed_points[i].z << ")"
+                      << std::endl;
         }
         std::cout << "History Groups: " << registry_history.size() << std::endl;
-        for (const auto& group : registry_history) {
-            for (const auto& [id, persons] : group) {
+        for (auto const& group : registry_history)
+        {
+            for (auto const& [id, persons] : group)
+            {
                 std::cout << "ID: " << id << " -> Persons: ";
-                for (const auto& p : persons) {
-                    std::cout << "{" << p.get_age() << ", " << p.get_name() << "} ";
+                for (auto const& p : persons)
+                {
+                    std::cout << "{" << p.get_age() << ", " << p.get_name()
+                              << "} ";
                 }
                 std::cout << std::endl;
             }
         }
-        if (metadata != hpx::nullopt) {
+        if (metadata != hpx::nullopt)
+        {
             std::cout << "Metadata entries: " << metadata->size() << std::endl;
-            for (const auto& [key, p] : *metadata) {
-                std::cout << "Key: " << key << " -> Person: {"
-                          << p.get_age() << ", " << p.get_name() << "}" << std::endl;
+            for (auto const& [key, p] : *metadata)
+            {
+                std::cout << "Key: " << key << " -> Person: {" << p.get_age()
+                          << ", " << p.get_name() << "}" << std::endl;
             }
         }
         std::cout << "Stats Score: " << stats.score << std::endl;
         std::cout << "Stats Tags: ";
-        for (const auto& tag : stats.tags) {
+        for (auto const& tag : stats.tags)
+        {
             std::cout << tag << " ";
         }
         std::cout << std::endl;
     }
 };
 
-int main() {
+int main()
+{
     // Setup
-    std::array<Coordinate, 4> pts = {{
-        {1.1, 2.2, 3.3}, {4.4, 5.5, 6.6}, {0.0, 0.0, 0.0}, {-1.0, 2.0, 5.0}
-    }};
+    std::array<Coordinate, 4> pts = {
+        {{1.1, 2.2, 3.3}, {4.4, 5.5, 6.6}, {0.0, 0.0, 0.0}, {-1.0, 2.0, 5.0}}};
 
     std::vector<person> group_a = {{20, "Alice"}, {25, "Bob"}};
     std::map<int, std::vector<person>> map_1;
@@ -144,16 +173,10 @@ int main() {
     history.push_back(map_1);
 
     std::list<std::pair<std::string, person>> meta_list = {
-        {"Admin", {50, "Root"}}
-    };
+        {"Admin", {50, "Root"}}};
 
-    deeply_nested_object input_data(
-        pts,
-        std::move(history),
-        meta_list,
-        99.5,
-        {"reflection", "test", "pod_array"}
-    );
+    deeply_nested_object input_data(pts, std::move(history), meta_list, 99.5,
+        {"reflection", "test", "pod_array"});
 
     // Serialize
     std::vector<char> buffer;
