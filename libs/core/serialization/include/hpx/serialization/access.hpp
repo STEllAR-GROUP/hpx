@@ -22,8 +22,6 @@
 #include <type_traits>
 #include <utility>
 
-#include <iostream>
-
 #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 #include <experimental/meta>
 #endif
@@ -109,6 +107,8 @@ namespace hpx::serialization {
                     // serialize-member function and doesn't perform ADL
                     detail::serialize_force_adl(ar, t, 0);
                 }
+
+#if !defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) || !defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
                 else if constexpr (std::is_aggregate_v<dT> &&
                     hpx::traits::has_struct_serialization_v<dT>)
                 {
@@ -117,6 +117,7 @@ namespace hpx::serialization {
                     // field has to be serializable and public.
                     serialize_struct(ar, t, 0);
                 }
+#endif
                 else if constexpr (hpx::traits::is_bitwise_serializable_v<dT> ||
                     !hpx::traits::is_not_bitwise_serializable_v<dT>)
                 {
@@ -124,16 +125,14 @@ namespace hpx::serialization {
                     // the archive functions
                     ar.invoke(t);
                 }
+
+#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
                 else if constexpr ( // TODO: I think this is too wide a filter
                     std::is_class_v<dT>
                 ) {
-                    // If we have cpp 26 reflection, then codegen can be used
-                    // to generate serialization functions for types that
-                    // don't have them already.
-                    #if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
                         detail::refl_serialize(ar, t, 0);
-                    #endif
                 }
+#endif
                 else
                 {
                     static_assert(hpx::traits::has_serialize_adl_v<dT> ||
