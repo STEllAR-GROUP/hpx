@@ -20,17 +20,19 @@ carefully designed to avoid incorrect assumptions about the bitwise
 serializability of arrays containing non-bitwise-serializable
 */
 
-struct person_pod {
+struct person_pod
+{
     int age;
     std::string name;
 
-    bool operator==(person_pod const& rhs) const {
+    bool operator==(person_pod const& rhs) const
+    {
         return age == rhs.age && name == rhs.name;
     }
 };
 
-
-struct final_array_boss {
+struct final_array_boss
+{
     // Array of PODs: Works!
     std::array<person_pod, 2> pod_array;
 
@@ -40,32 +42,38 @@ struct final_array_boss {
     // Vector of Arrays: zeroed out after deserialization
     std::vector<std::array<int, 3>> vector_of_arrays;
 
-    bool operator==(final_array_boss const& rhs) const {
-        return pod_array == rhs.pod_array && 
-               array_of_vectors == rhs.array_of_vectors &&
-               vector_of_arrays == rhs.vector_of_arrays
-            ;
+    bool operator==(final_array_boss const& rhs) const
+    {
+        return pod_array == rhs.pod_array &&
+            array_of_vectors == rhs.array_of_vectors &&
+            vector_of_arrays == rhs.vector_of_arrays;
     }
 
-    void print() const {
+    void print() const
+    {
         std::cout << "POD Array:" << std::endl;
-        for (const auto& p : pod_array) {
+        for (auto const& p : pod_array)
+        {
             std::cout << "Age: " << p.age << ", Name: " << p.name << std::endl;
         }
 
         std::cout << "Array of Vectors:" << std::endl;
-        for (const auto& vec : array_of_vectors) {
+        for (auto const& vec : array_of_vectors)
+        {
             std::cout << "Vector: ";
-            for (const auto& val : vec) {
+            for (auto const& val : vec)
+            {
                 std::cout << val << " ";
             }
             std::cout << std::endl;
         }
 
         std::cout << "Vector of Arrays:" << std::endl;
-        for (const auto& arr : vector_of_arrays) {
+        for (auto const& arr : vector_of_arrays)
+        {
             std::cout << "Array: ";
-            for (const auto& val : arr) {
+            for (auto const& val : arr)
+            {
                 std::cout << val << " ";
             }
             std::cout << std::endl;
@@ -73,7 +81,8 @@ struct final_array_boss {
     }
 };
 
-int main() {
+int main()
+{
     final_array_boss input;
     input.pod_array = {{{25, "Alice"}, {30, "Bob"}}};
     input.array_of_vectors = {{{1, 2, 3}, {4, 5, 6}}};
@@ -91,14 +100,19 @@ int main() {
 
     // Reporting
     std::cout << "--- Array Test ---" << std::endl;
-    std::cout << "POD Array Match: " << (input.pod_array == output.pod_array) << std::endl;
-    std::cout << "Array of Vectors Match: " << (input.array_of_vectors == output.array_of_vectors) << std::endl;
-    std::cout << "Vector of Arrays Match: " << (input.vector_of_arrays == output.vector_of_arrays) << std::endl;
+    std::cout << "POD Array Match: " << (input.pod_array == output.pod_array)
+              << std::endl;
+    std::cout << "Array of Vectors Match: "
+              << (input.array_of_vectors == output.array_of_vectors)
+              << std::endl;
+    std::cout << "Vector of Arrays Match: "
+              << (input.vector_of_arrays == output.vector_of_arrays)
+              << std::endl;
 
     // Print
     input.print();
     output.print();
-    
+
     HPX_TEST(input == output);
 
     return hpx::util::report_errors();

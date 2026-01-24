@@ -29,8 +29,15 @@ private:
     std::string name;
 
 public:
-    person() : age(0) {}
-    person(int a, std::string n) : age(a), name(std::move(n)) {}
+    person()
+      : age(0)
+    {
+    }
+    person(int a, std::string n)
+      : age(a)
+      , name(std::move(n))
+    {
+    }
 
     int get_age() const
     {
@@ -50,7 +57,8 @@ public:
     // for std::map, std::set, etc.
     bool operator<(person const& rhs) const
     {
-        if (age != rhs.age) return age < rhs.age;
+        if (age != rhs.age)
+            return age < rhs.age;
         return name < rhs.name;
     }
 };
@@ -83,18 +91,19 @@ private:
     std::unique_ptr<int> q;
 
 public:
-    complicated_object() : color(Color::red), a(0) {}
+    complicated_object()
+      : color(Color::red)
+      , a(0)
+    {
+    }
     complicated_object(Color col, int a_val, std::string b_val,
         std::vector<person> c_val, std::list<std::string> d_val,
-        std::deque<int> e_val,
-        std::map<int, person> f_val,
-        std::multimap<int, person> g_val,
-        std::set<std::string> h_val,
-        std::multiset<int> i_val,
-        std::unordered_map<int, person> j_val,
-        std::unordered_multimap<int, int> k_val,
-        std::array<int, 2> m_val, std::pair<std::string, person> o_val,
-        hpx::optional<int> p_val, std::unique_ptr<int> q_val)
+        std::deque<int> e_val, std::map<int, person> f_val,
+        std::multimap<int, person> g_val, std::set<std::string> h_val,
+        std::multiset<int> i_val, std::unordered_map<int, person> j_val,
+        std::unordered_multimap<int, int> k_val, std::array<int, 2> m_val,
+        std::pair<std::string, person> o_val, hpx::optional<int> p_val,
+        std::unique_ptr<int> q_val)
       : color(col)
       , a(a_val)
       , b(std::move(b_val))
@@ -117,26 +126,19 @@ public:
     bool operator==(complicated_object const& rhs) const
     {
         // unique_ptr must be compared manually
-        bool uptr_q_equal =
-            ((!q && !rhs.q) || (q && rhs.q && *q == *rhs.q));
+        bool uptr_q_equal = ((!q && !rhs.q) || (q && rhs.q && *q == *rhs.q));
 
-        return
-            color == rhs.color && a == rhs.a &&
-            b == rhs.b && c == rhs.c &&
-            d == rhs.d && e == rhs.e && 
-            f == rhs.f && g == rhs.g &&
-            h == rhs.h && i == rhs.i &&
-            j == rhs.j && k == rhs.k &&
-            m == rhs.m && o == rhs.o &&
-            p == rhs.p && uptr_q_equal;
+        return color == rhs.color && a == rhs.a && b == rhs.b && c == rhs.c &&
+            d == rhs.d && e == rhs.e && f == rhs.f && g == rhs.g &&
+            h == rhs.h && i == rhs.i && j == rhs.j && k == rhs.k &&
+            m == rhs.m && o == rhs.o && p == rhs.p && uptr_q_equal;
     }
 
     void print() const
     {
         std::cout << "Color: " << static_cast<int>(color) << ", a: " << a
-                  << ", b: " << b
-                  << ", c: { ";
-        for (const auto& person_obj : c)
+                  << ", b: " << b << ", c: { ";
+        for (auto const& person_obj : c)
         {
             std::cout << "{Age: " << person_obj.get_age()
                       << ", Name: " << person_obj.get_name() << "} ";
@@ -145,70 +147,66 @@ public:
         // print all
 
         std::cout << "d: { ";
-        for (const auto& str : d)
+        for (auto const& str : d)
         {
             std::cout << str << " ";
         }
         std::cout << "}" << std::endl;
 
         std::cout << "e: { ";
-        for (const auto& val : e)
+        for (auto const& val : e)
         {
             std::cout << val << " ";
         }
         std::cout << "}" << std::endl;
 
         std::cout << "f: { ";
-        for (const auto& [key, person_obj] : f)
+        for (auto const& [key, person_obj] : f)
         {
-            std::cout << "{Key: " << key
-                      << ", Age: " << person_obj.get_age()
+            std::cout << "{Key: " << key << ", Age: " << person_obj.get_age()
                       << ", Name: " << person_obj.get_name() << "} ";
         }
         std::cout << "}" << std::endl;
 
         std::cout << "g: { ";
-        for (const auto& [key, person_obj] : g)
+        for (auto const& [key, person_obj] : g)
         {
-            std::cout << "{Key: " << key
-                      << ", Age: " << person_obj.get_age()
+            std::cout << "{Key: " << key << ", Age: " << person_obj.get_age()
                       << ", Name: " << person_obj.get_name() << "} ";
         }
         std::cout << "}" << std::endl;
 
         std::cout << "h: { ";
-        for (const auto& str : h)
+        for (auto const& str : h)
         {
             std::cout << str << " ";
         }
         std::cout << "}" << std::endl;
 
         std::cout << "i: { ";
-        for (const auto& val : i)
+        for (auto const& val : i)
         {
             std::cout << val << " ";
         }
         std::cout << "}" << std::endl;
 
         std::cout << "j: { ";
-        for (const auto& [key, person_obj] : j)
+        for (auto const& [key, person_obj] : j)
         {
-            std::cout << "{Key: " << key
-                      << ", Age: " << person_obj.get_age()
+            std::cout << "{Key: " << key << ", Age: " << person_obj.get_age()
                       << ", Name: " << person_obj.get_name() << "} ";
         }
         std::cout << "}" << std::endl;
 
         std::cout << "k: { ";
-        for (const auto& [key, val] : k)
+        for (auto const& [key, val] : k)
         {
-            std::cout << "{Key: " << key
-                      << ", Value: " << val << "} ";
+            std::cout << "{Key: " << key << ", Value: " << val << "} ";
         }
         std::cout << "}" << std::endl;
 
         std::cout << "m: { ";
-        for (const auto& val : m)
+        for (auto const& val : m)
         {
             std::cout << val << " ";
         }
@@ -216,7 +214,7 @@ public:
 
         std::cout << "o: { " << o.first << ", {Age: " << o.second.get_age()
                   << ", Name: " << o.second.get_name() << "}" << std::endl;
-            
+
         std::cout << "p: ";
         if (p != hpx::nullopt)
             std::cout << *p << std::endl;
@@ -234,7 +232,10 @@ private:
     complicated_object o;
 
 public:
-    nested_object() : id(0) {} // For deserialization
+    nested_object()
+      : id(0)
+    {
+    }    // For deserialization
     nested_object(int id_val, std::string name_val, person p_val,
         complicated_object o_val)
       : id(id_val)
@@ -252,32 +253,32 @@ public:
     void print() const
     {
         std::cout << "ID: " << id << ", Name: " << name << std::endl;
-        std::cout << "Person - Age: " << p.get_age() << ", Name: " << p.get_name() << std::endl;
+        std::cout << "Person - Age: " << p.get_age()
+                  << ", Name: " << p.get_name() << std::endl;
         o.print();
     }
 };
 
 int main()
 {
-    complicated_object input_o(Color::black, 42, "hello",
-        {{10, "c1"}, {11, "c2"}},               // c: vector
-        {"list1", "list2"},                     // d: list
-        {1, 2, 3},                              // e: deque
-        {{1, {10, "f1"}}, {2, {11, "f2"}}},     // f: map
-        {{1, {10, "g1"}}, {1, {11, "g2"}}},     // g: multimap
-        {"set1", "set2"},                       // h: set
-        {1, 1, 2, 3, 3, 3},                     // i: multiset
-        {{1, {10, "j1"}}},                      // j: unordered_map
-        {{1, 100}, {1, 101}},                   // k: unordered_multimap
+    complicated_object input_o(
+        Color::black, 42, "hello", {{10, "c1"}, {11, "c2"}},    // c: vector
+        {"list1", "list2"},                                     // d: list
+        {1, 2, 3},                                              // e: deque
+        {{1, {10, "f1"}}, {2, {11, "f2"}}},                     // f: map
+        {{1, {10, "g1"}}, {1, {11, "g2"}}},                     // g: multimap
+        {"set1", "set2"},                                       // h: set
+        {1, 1, 2, 3, 3, 3},                                     // i: multiset
+        {{1, {10, "j1"}}},       // j: unordered_map
+        {{1, 100}, {1, 101}},    // k: unordered_multimap
         // {{{1, "m1"}, {2, "m2"}}},               // m: array
-        {1, 2},                                 // m: array
-        {"pair1", {1, "o1"}},                   // o: pair
-        123,                                    // p: optional
-        std::make_unique<int>(456)              // q: unique_ptr
+        {1, 2},                       // m: array
+        {"pair1", {1, "o1"}},         // o: pair
+        123,                          // p: optional
+        std::make_unique<int>(456)    // q: unique_ptr
     );
 
-    nested_object input_data(
-        2, "tom", {20, "tom"}, std::move(input_o));
+    nested_object input_data(2, "tom", {20, "tom"}, std::move(input_o));
 
     // Serialize
     std::vector<char> buffer;

@@ -22,7 +22,8 @@
 #include <type_traits>
 #include <utility>
 
-#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) &&                               \
+    defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 #include <experimental/meta>
 #endif
 
@@ -80,7 +81,6 @@ namespace hpx::serialization {
         template <typename Archive, typename T>
         static void serialize(Archive& ar, T& t, unsigned)
         {
-
             using dT = std::decay_t<T>;
             if constexpr (hpx::traits::is_intrusive_polymorphic_v<dT>)
             {
@@ -108,7 +108,8 @@ namespace hpx::serialization {
                     detail::serialize_force_adl(ar, t, 0);
                 }
 
-#if !defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) || !defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if !defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) ||                              \
+    !defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
                 else if constexpr (std::is_aggregate_v<dT> &&
                     hpx::traits::has_struct_serialization_v<dT>)
                 {
@@ -126,11 +127,12 @@ namespace hpx::serialization {
                     ar.invoke(t);
                 }
 
-#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
-                else if constexpr ( // TODO: I think this is too wide a filter
-                    std::is_class_v<dT>
-                ) {
-                        detail::refl_serialize(ar, t, 0);
+#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) &&                               \
+    defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+                else if constexpr (    // TODO: I think this is too wide a filter
+                    std::is_class_v<dT>)
+                {
+                    detail::refl_serialize(ar, t, 0);
                 }
 #endif
                 else
@@ -185,7 +187,8 @@ namespace hpx::traits {
 }    // namespace hpx::traits
 #endif
 
-#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) && defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) &&                               \
+    defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 // We need to include refl_serialize_impl.hpp here to avoid circular
 // dependencies as refl_serialize_impl.hpp depends on base_object.hpp
 #include <hpx/serialization/detail/refl_serialize_impl.hpp>
