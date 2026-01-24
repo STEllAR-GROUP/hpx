@@ -251,11 +251,13 @@ namespace hpx::serialization {
 #endif
                     save_binary(&t, sizeof(t));
                 }
-                else if constexpr (hpx::traits::has_struct_serialization_v<T>)
+#if !defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) || !defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+                else if constexpr (!hpx::traits::has_struct_serialization_v<T>)
                 {
                     // struct serialization
                     access::serialize(*this, t, 0);
                 }
+#endif
                 else if constexpr (has_serialize || has_refl_serialize)
                 {
                     // non-bitwise normal serialization

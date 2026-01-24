@@ -1,4 +1,4 @@
-//  Copyright (c) 2025 Ujjwal Shekhar
+//  Copyright (c) 2026 Ujjwal Shekhar
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -42,9 +42,6 @@ struct Derived : Base
 };
 
 HPX_SERIALIZATION_REGISTER_CLASS(Derived)
-
-// (You might not even need HPX_IS_NOT_BITWISE_SERIALIZABLE
-// since they have virtual functions, but it can't hurt)
 
 int main()
 {

@@ -1,17 +1,17 @@
-# Copyright (c) 2025 Ujjwal Shekhar
+# Copyright (c) 2026 Ujjwal Shekhar
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    reflection_simple
-    reflection_polymorphic
+    reflection_array
     reflection_containers
-    reflection_compound
     reflection_pointers
-    reflection_bitwise_regression
+    reflection_polymorphic
+    reflection_simple
     reflection_nested_object
+    reflection_nested_templ_object
 )
 
 foreach(test ${tests})
