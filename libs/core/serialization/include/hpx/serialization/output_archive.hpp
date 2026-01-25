@@ -233,6 +233,11 @@ namespace hpx::serialization {
                     detail::polymorphic_nonintrusive_factory::instance().save(
                         *this, t);
                 }
+                else if constexpr (has_serialize)
+                {
+                    // non-bitwise normal serialization
+                    access::serialize(*this, t, 0);
+                }
                 else if constexpr (optimized)
                 {
                     // bitwise serialization
@@ -255,11 +260,6 @@ namespace hpx::serialization {
                     hpx::traits::has_struct_serialization_v<T>)
                 {
                     // struct serialization
-                    access::serialize(*this, t, 0);
-                }
-                else if constexpr (has_serialize)
-                {
-                    // non-bitwise normal serialization
                     access::serialize(*this, t, 0);
                 }
                 else
