@@ -10,7 +10,7 @@ on:
   push
 
 env:
-  FETCHCONTENT_UPDATES_DISCONNECTED: On
+  FETCHCONTENT_UPDATES_DISCONNECTED: ON
   
 jobs:
   checkout-code:
