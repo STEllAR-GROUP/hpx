@@ -115,8 +115,7 @@ namespace hpx::serialization {
                 }
 
 #if !defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
-                else if constexpr (std::is_aggregate_v<dT> &&
-                    hpx::traits::has_struct_serialization_v<dT>)
+                else if constexpr (hpx::traits::has_struct_serialization_v<dT>)
                 {
                     // This is automatic serialization for types that are simple
                     // (brace-initializable) structs, that means every struct's
