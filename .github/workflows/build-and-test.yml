@@ -44,13 +44,9 @@ jobs:
     - name: Running CMake
       shell: bash
       run: |
-        ls -la /hpx/
-        ls -la /hpx/source/
-        
-        # Create and enter build directory
         mkdir -p /hpx/build
         cd /hpx/build
-        
+
         cmake --version
         if [ "${{ github.event_name }}" != "pull_request" ] && \
           ( [ "${{ github.ref_name }}" == "master" ] || \
@@ -102,3 +98,4 @@ jobs:
       with:
         name: hpx-workspace
         path: /hpx/
+        overwrite: true
