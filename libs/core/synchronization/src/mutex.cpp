@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -80,6 +80,8 @@ namespace hpx {
                     return;
                 }
             }
+
+            util::register_lock(this);
             owner_id_ = self_id;
         }
 
@@ -88,7 +90,6 @@ namespace hpx {
         if (run_after)
             hpx::tracy::lock_acquired(context_);
 #endif
-        util::register_lock(this);
     }
 
     bool mutex::try_lock(char const* /* description */, error_code& /* ec */)
@@ -112,10 +113,11 @@ namespace hpx {
 #endif
                 return false;
             }
+
+            util::register_lock(this);
             owner_id_ = threads::get_self_id();
         }
 
-        util::register_lock(this);
         HPX_ITT_SYNC_ACQUIRED(this);
 #if defined(HPX_HAVE_MODULE_TRACY)
         if (run_after)
