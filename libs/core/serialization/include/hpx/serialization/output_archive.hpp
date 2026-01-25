@@ -217,8 +217,7 @@ namespace hpx::serialization {
                     access::has_serialize_v<T> || std::is_empty_v<T> ||
                     hpx::traits::has_serialize_adl_v<T>;
 
-#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) &&                               \
-    defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
                 constexpr bool has_refl_serialize = true;
 #else
                 constexpr bool has_refl_serialize = false;
@@ -252,15 +251,13 @@ namespace hpx::serialization {
 #endif
                     save_binary(&t, sizeof(t));
                 }
-#if !defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) ||                              \
-    !defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
-                else if constexpr (!hpx::traits::has_struct_serialization_v<T>)
+                else if constexpr (has_refl_serialize ||
+                    hpx::traits::has_struct_serialization_v<T>)
                 {
                     // struct serialization
                     access::serialize(*this, t, 0);
                 }
-#endif
-                else if constexpr (has_serialize || has_refl_serialize)
+                else if constexpr (has_serialize)
                 {
                     // non-bitwise normal serialization
                     access::serialize(*this, t, 0);

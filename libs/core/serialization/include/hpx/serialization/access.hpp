@@ -22,11 +22,6 @@
 #include <type_traits>
 #include <utility>
 
-#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) &&                               \
-    defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
-#include <experimental/meta>
-#endif
-
 namespace hpx::serialization {
 
     namespace detail {
@@ -44,6 +39,10 @@ namespace hpx::serialization {
         {
             serialize(ar, t, 0);
         }
+
+        // Forward declare
+        HPX_CXX_EXPORT template <typename Archive, typename T>
+        void refl_serialize(Archive& ar, T& t, unsigned /*version*/);
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -107,9 +106,15 @@ namespace hpx::serialization {
                     // serialize-member function and doesn't perform ADL
                     detail::serialize_force_adl(ar, t, 0);
                 }
+                else if constexpr (hpx::traits::is_bitwise_serializable_v<dT> ||
+                    !hpx::traits::is_not_bitwise_serializable_v<dT>)
+                {
+                    // bitwise serializable types can be directly dispatched to
+                    // the archive functions
+                    ar.invoke(t);
+                }
 
-#if !defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) ||                              \
-    !defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if !defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
                 else if constexpr (std::is_aggregate_v<dT> &&
                     hpx::traits::has_struct_serialization_v<dT>)
                 {
@@ -119,16 +124,7 @@ namespace hpx::serialization {
                     serialize_struct(ar, t, 0);
                 }
 #endif
-                else if constexpr (hpx::traits::is_bitwise_serializable_v<dT> ||
-                    !hpx::traits::is_not_bitwise_serializable_v<dT>)
-                {
-                    // bitwise serializable types can be directly dispatched to
-                    // the archive functions
-                    ar.invoke(t);
-                }
-
-#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) &&                               \
-    defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
                 else if constexpr (    // TODO: I think this is too wide a filter
                     std::is_class_v<dT>)
                 {
@@ -187,8 +183,7 @@ namespace hpx::traits {
 }    // namespace hpx::traits
 #endif
 
-#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) &&                               \
-    defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 // We need to include refl_serialize_impl.hpp here to avoid circular
 // dependencies as refl_serialize_impl.hpp depends on base_object.hpp
 #include <hpx/serialization/detail/refl_serialize_impl.hpp>

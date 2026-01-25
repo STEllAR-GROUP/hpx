@@ -9,7 +9,8 @@
 #include <experimental/meta>
 
 #if !defined(__cpp_lib_experimental_meta)
-#  error "__cpp_lib_experimental_meta not defined, assume meta programming features are not supported"
+#error                                                                         \
+    "__cpp_lib_experimental_meta not defined, assume meta programming features are not supported"
 #endif
 
 int main()

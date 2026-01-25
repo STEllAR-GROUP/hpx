@@ -11,12 +11,9 @@
 
 #include <hpx/serialization/base_object.hpp>
 
-#include <iostream>
-
 // This file is only ever included by access.hpp
 // but we will still guard against direct inclusion
-#if defined(HPX_HAVE_CXX26_EXPERIMENTAL_META) &&                               \
-    defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 #include <experimental/meta>
 
 namespace hpx::serialization::detail {

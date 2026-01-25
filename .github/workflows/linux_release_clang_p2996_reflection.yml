@@ -12,7 +12,7 @@ on: [pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: stellargroup/build_env:17
+    container: ujjwalshekhar2503/hpx-clang-ci:latest
 
     steps:
     - uses: actions/checkout@v5
