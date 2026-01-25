@@ -70,7 +70,7 @@ namespace hpx::serialization::detail {
                 // find each enclosing namespace
                 std::vector<std::meta::info> scopes;
                 for (auto scope = dT; has_parent(scope);
-                     scope = std::meta::parent_of(scope))
+                    scope = std::meta::parent_of(scope))
                 {
                     scopes.push_back(scope);
                 }
