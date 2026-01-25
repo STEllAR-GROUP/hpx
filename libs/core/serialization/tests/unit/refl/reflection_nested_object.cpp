@@ -290,11 +290,6 @@ int main()
     nested_object output_data;
     iarchive >> output_data;
 
-    // std::cout << std::is_trivially_copy_assignable_v<hpx::serialization::array<person>> <<
-    //             std::is_copy_assignable_v<hpx::serialization::array<person>> <<
-    //                 std::is_trivially_copy_constructible_v<hpx::serialization::array<person>> << "\n";
-    // they all evaluate to true
-
     // Print both
     std::cout << "Input Data:" << std::endl;
     input_data.print();

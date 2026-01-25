@@ -9,6 +9,7 @@
 #include <hpx/modules/testing.hpp>
 
 #include <array>
+#include <cstddef>
 #include <deque>
 #include <iostream>
 #include <list>

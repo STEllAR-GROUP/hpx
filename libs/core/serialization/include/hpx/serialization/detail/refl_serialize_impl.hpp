@@ -15,6 +15,7 @@
 // but we will still guard against direct inclusion
 #if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 #include <experimental/meta>
+#include <memory>
 
 namespace hpx::serialization::detail {
     HPX_CXX_EXPORT template <typename Archive, typename T>
