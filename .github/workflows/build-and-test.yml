@@ -16,9 +16,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
-      with:
-        path: /hpx/source
     
+    - name: Setup HPX workspace
+      shell: bash
+      run: |
+        mkdir -p /hpx/source /hpx/build
+        # Copy instead of checkout directly to /hpx
+        cp -r ${{ github.workspace }}/* /hpx/source/ || true
+        cp -r ${{ github.workspace }}/.[!.]* /hpx/source/ || true
+        
     - uses: actions/upload-artifact@v6
       with:
         name: hpx-workspace
