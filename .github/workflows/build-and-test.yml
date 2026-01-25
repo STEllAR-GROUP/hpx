@@ -45,6 +45,8 @@ jobs:
       shell: bash
       working-directory: /hpx/build
       run: |
+        pwd
+        ls -la
         cmake --version
         if [ "${{ github.event_name }}" != "pull_request" ] && \
           ( [ "${{ github.ref_name }}" == "master" ] || \
