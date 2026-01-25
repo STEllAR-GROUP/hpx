@@ -4,16 +4,13 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-name: Build and Test
+name: Build all
 
 on:
   push
-
-env:
-  FETCHCONTENT_UPDATES_DISCONNECTED: ON
   
 jobs:
-  checkout-code:
+  build-all:
     runs-on: ubuntu-latest
     container: stellargroup/build_env:17
 
@@ -24,28 +21,11 @@ jobs:
       shell: bash
       run: |
         mkdir -p /hpx/source /hpx/build
-        # Use environment variable for workspace
         cp -r $GITHUB_WORKSPACE/. /hpx/source/
-
-    - uses: actions/upload-artifact@v6
-      with:
-        name: hpx-workspace
-        path: /hpx/
     
-  configure:
-    runs-on: ubuntu-latest
-    needs: checkout-code
-    container: stellargroup/build_env:17
-    timeout-minutes: 30
-
-    steps:
-    - uses: actions/download-artifact@v6
-      with:
-        name: hpx-workspace
-        path: /hpx/
-
-    - name: Running CMake
+    - name: Configure (Running CMake)
       shell: bash
+      timeout-minutes: 30
       run: |
         mkdir -p /hpx/build
         cd /hpx/build
@@ -97,54 +77,25 @@ jobs:
           -DHPX_WITH_TESTS_COMMAND_LINE=--hpx:queuing=local-workrequesting-fifo \
           -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2
     
-    - uses: actions/upload-artifact@v6
-      with:
-        name: hpx-workspace
-        path: /hpx/
-        overwrite: true
-
-  core_local:
-    runs-on: ubuntu-latest
-    needs: configure
-    container: stellargroup/build_env:17
-
-    steps:
-    - uses: actions/download-artifact@v6
-      with:
-        name: hpx-workspace
-        path: /hpx/
-
-    - name: Building Core Local
+    - name: core_local (Building Core Local)
       shell: bash
       working-directory: /hpx/build
       run: |
         ninja -j2 -k 0 hpx_core
   
-    - uses: actions/upload-artifact@v6
-      with:
-        name: hpx-workspace
-        path: /hpx/
-        overwrite: true
-      
-  core:
-    runs-on: ubuntu-latest
-    needs: core_local
-    container: stellargroup/build_env:17
-
-    steps:
-    - uses: actions/download-artifact@v6
-      with:
-        name: hpx-workspace
-        path: /hpx/
-
-    - name: Building Core
+    - name: core (Building Core)
       shell: bash
       working-directory: /hpx/build
       run: |
         ninja -j2 -k 0 core
-  
+
+    - name: Components (Building Components)
+      shell: bash
+      working-directory: /hpx/build
+      run: |
+        ninja -j2 -k 0 components
+      
     - uses: actions/upload-artifact@v6
       with:
         name: hpx-workspace
         path: /hpx/
-        overwrite: true
