@@ -16,6 +16,8 @@
 #if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 
 #include <algorithm>
+#include <cstddef>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -47,9 +49,9 @@ namespace hpx::serialization::detail {
     {
         static char const* get() noexcept
         {
-            return NULL;
+            return nullptr;
         }
-    }
+    };
 
     HPX_CXX_EXPORT template <template <typename...> typename T,
         typename... Args>
