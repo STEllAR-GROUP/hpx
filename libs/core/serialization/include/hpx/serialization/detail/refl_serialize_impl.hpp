@@ -44,7 +44,7 @@ namespace hpx::serialization::detail {
 
             // TODO: If intrusion provided, we can directly access the member
             // so we should try figuring out the access context that we have
-            // and optimize for that case
+            // and optimize for that case 
             if constexpr (std::meta::is_public(member))
             {
                 using MemberType = typename[:std::meta::type_of(member):];
