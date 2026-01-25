@@ -1,0 +1,93 @@
+# Copyright (c) 2026 The STE||AR Group
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+name: Build and Test
+
+on:
+  push
+  
+jobs:
+  checkout-code:
+    runs-on: ubuntu-latest
+    container: stellargroup/build_env:17
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        path: /hpx/source
+    
+    - uses: actions/upload-artifact@v6
+      with:
+        name: hpx-workspace
+        path: /hpx/
+    
+  configure:
+    runs-on: ubuntu-latest
+    needs: checkout-code
+    container: stellargroup/build_env:17
+    timeout-minutes: 30
+
+    steps:
+    - uses: actions/download-artifact@v6
+      with:
+        name: hpx-workspace
+        path: /hpx/
+
+    - name: Running CMake
+      shell: bash
+      working-directory: /hpx/build
+      run: |
+        cmake --version
+        if [ "${{ github.event_name }}" != "pull_request" ] && \
+          ( [ "${{ github.ref_name }}" == "master" ] || \
+            [[ "${{ github.ref_name }}" =~ ^release.* ]] || \
+            [ "${{ github.ref_type }}" == "tag" ] ); then
+          DOCUMENTATION_OUTPUT_FORMATS="html;singlehtml;latexpdf"
+        else
+          DOCUMENTATION_OUTPUT_FORMATS="html"  # ← FIX INDENTATION
+        fi
+
+        # Disable Vc for now as otherwise we need to reconfigure during the
+        # install step, which in turn forces everything to be rebuilt.
+        # -DHPX_WITH_DATAPAR_VC=On
+        cmake \
+          /hpx/source \
+          -G "Ninja" \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DHPX_WITH_MALLOC=system \
+          -DHPX_WITH_FETCH_ASIO=Off \
+          -DHPX_WITH_DATAPAR_BACKEND=VC \
+          -DHPX_WITH_GIT_COMMIT=${{ github.sha }} \
+          -DHPX_WITH_GIT_BRANCH="${{ github.ref_name }}" \
+          -DHPX_WITH_GIT_TAG="${{ github.ref_type == 'tag' && github.ref_name || '' }}" \
+          -DHPX_WITH_TOOLS=On \
+          -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" \
+          -DHPX_WITH_TESTS_HEADERS=On \
+          -DHPX_WITH_COMPILER_WARNINGS=On \
+          -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=On \
+          -DHPX_WITH_DEPRECATION_WARNINGS=On \
+          -DCMAKE_CXX_CLANG_TIDY=clang-tidy-20 \
+          -DHPX_WITH_THREAD_LOCAL_STORAGE=On \
+          -DHPX_WITH_STACKTRACES_STATIC_SYMBOLS=On \
+          -DHPX_WITH_STACKTRACES_DEMANGLE_SYMBOLS=Off \
+          -DHPX_WITH_TESTS_DEBUG_LOG=On \
+          -DHPX_WITH_TESTS_DEBUG_LOG_DESTINATION=/hpx/build/debug-log.txt \
+          -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=On \
+          -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On \
+          -DHPX_LOGGING_WITH_SEPARATE_DESTINATIONS=Off \
+          -DHPX_WITH_THREAD_DEBUG_INFO=On \
+          -DHPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES=On \
+          -DHPX_WITH_FETCH_JSON=On \
+          -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
+          -DHPX_WITH_DOCUMENTATION=On \
+          -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="${DOCUMENTATION_OUTPUT_FORMATS}" \
+          -DHPX_WITH_TESTS_COMMAND_LINE=--hpx:queuing=local-workrequesting-fifo \
+          -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2
+    
+    - uses: actions/upload-artifact@v6
+      with:
+        name: hpx-workspace
+        path: /hpx/
