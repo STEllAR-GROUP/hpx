@@ -21,10 +21,9 @@ jobs:
       shell: bash
       run: |
         mkdir -p /hpx/source /hpx/build
-        # Copy instead of checkout directly to /hpx
-        cp -r ${{ github.workspace }}/* /hpx/source/ || true
-        cp -r ${{ github.workspace }}/.[!.]* /hpx/source/ || true
-        
+        # Use environment variable for workspace
+        cp -r $GITHUB_WORKSPACE/. /hpx/source/
+
     - uses: actions/upload-artifact@v6
       with:
         name: hpx-workspace
