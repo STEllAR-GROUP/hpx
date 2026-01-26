@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/init.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/uninitialized_relocate.hpp>
 
 #include <atomic>
 #include <random>
