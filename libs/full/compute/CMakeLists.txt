@@ -29,6 +29,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       hpx_actions
       hpx_actions_base
       hpx_naming
+      hpx_naming_base
       hpx_performance_counters
       hpx_async_distributed
       hpx_runtime_components
@@ -44,6 +45,6 @@ add_hpx_module(
   HEADERS ${compute_headers}
   COMPAT_HEADERS ${compute_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES ${compute_optional_module_dependencies} hpx_naming_base
+  MODULE_DEPENDENCIES ${compute_optional_module_dependencies}
   CMAKE_SUBDIRS examples tests
 )

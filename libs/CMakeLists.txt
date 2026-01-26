@@ -427,10 +427,10 @@ foreach(lib ${HPX_LIBS})
               FILES ${lib_module_file}
     )
 
-      target_include_directories(hpx_${lib}_module PUBLIC
-          $<BUILD_INTERFACE:${lib_module_basedir}>
-          $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/cxx>
-      )
+    target_include_directories(hpx_${lib}_module PUBLIC
+        $<BUILD_INTERFACE:${lib_module_basedir}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/cxx>
+    )
 
     # Clang emits DWARF-5 records while compiling the TracyClient library
     if(HPX_TRACY_WITH_TRACY
