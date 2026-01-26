@@ -7,7 +7,10 @@ on:
         description: 'Run ID from successful build (leave empty for latest)'
         required: false
         type: string
-
+  push:
+    paths:
+      - '.github/workflows/test-only.yml'
+      
 jobs:
   tests-example1:
     runs-on: ubuntu-latest
@@ -35,7 +38,7 @@ jobs:
         run: |
           pwd
           ls -la
-          
+
           ulimit -c unlimited
           ctest \
             --timeout 180 \
