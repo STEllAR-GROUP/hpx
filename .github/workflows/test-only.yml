@@ -33,6 +33,9 @@ jobs:
         shell: bash
         working-directory: /hpx/build
         run: |
+          pwd
+          ls -la
+          
           ulimit -c unlimited
           ctest \
             --timeout 180 \
