@@ -6,7 +6,8 @@
 
 name: Build and Test
 
-on: push
+on:
+  push
 
 jobs:
     build-all:
