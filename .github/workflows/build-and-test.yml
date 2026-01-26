@@ -30,6 +30,11 @@ jobs:
                   mkdir -p /hpx/build
                   cd /hpx/build
 
+                  # Log the CPU for debugging
+                  echo "=== CPU Information ==="
+                  grep "model name" /proc/cpuinfo | head -1
+                  echo "======================="
+
                   cmake --version
                   if [ "${{ github.event_name }}" != "pull_request" ] && \
                     ( [ "${{ github.ref_name }}" == "master" ] || \
