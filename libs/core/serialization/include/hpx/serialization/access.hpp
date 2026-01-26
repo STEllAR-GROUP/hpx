@@ -40,9 +40,11 @@ namespace hpx::serialization {
             serialize(ar, t, 0);
         }
 
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
         // Forward declare
         HPX_CXX_EXPORT template <typename Archive, typename T>
         void refl_serialize(Archive& ar, T& t, unsigned /*version*/);
+#endif
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
