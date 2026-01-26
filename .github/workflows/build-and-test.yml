@@ -7,7 +7,9 @@
 name: Build and Test
 
 on:
-  push
+  push:
+    paths-ignore:
+      - '.github/workflows/test-only.yml'
 
 jobs:
     build-all:
