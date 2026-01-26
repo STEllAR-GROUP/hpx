@@ -9,9 +9,15 @@ if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
   if(NOT TARGET Boost::filesystem)
 
     find_package(
-      Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE MODULE
+      Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE CONFIG QUIET
       COMPONENTS filesystem
     )
+    if(NOT Boost_FOUND)
+      find_package(
+        Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE MODULE
+        COMPONENTS filesystem
+      )
+    endif()
 
     if(NOT Boost_FILESYSTEM_FOUND)
       hpx_error(
