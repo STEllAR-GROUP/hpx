@@ -1,5 +1,5 @@
 //  Copyright Vladimir Prus 2004.
-//  Copyright (c) 2005-2022 Hartmut Kaiser
+//  Copyright (c) 2005-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -37,7 +37,7 @@ namespace hpx::util::plugin {
     {
         explicit plugin_wrapper(dll_handle dll, Parameters... parameters)
           : detail::dll_handle_holder(HPX_MOVE(dll))
-          , Wrapped(parameters...)
+          , Wrapped(HPX_MOVE(parameters)...)
         {
         }
     };
