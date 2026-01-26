@@ -20,15 +20,15 @@ namespace hpx::util {
 
         // Computes the padding required to fill up a full cache line after
         // data_size bytes.
-        constexpr std::size_t get_cache_line_padding_size(
-            std::size_t data_size) noexcept
+        HPX_CXX_CORE_EXPORT constexpr std::size_t get_cache_line_padding_size(
+            std::size_t const data_size) noexcept
         {
             return (threads::get_cache_line_size() -
                        (data_size % threads::get_cache_line_size())) %
                 threads::get_cache_line_size();
         }
 
-        template <typename Data>
+        HPX_CXX_CORE_EXPORT template <typename Data>
         struct needs_padding
           : std::integral_constant<bool,
                 // NOLINTNEXTLINE(bugprone-sizeof-expression)

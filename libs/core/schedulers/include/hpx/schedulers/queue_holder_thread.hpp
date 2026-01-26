@@ -12,6 +12,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
+#include <hpx/schedulers/macros.hpp>
 
 #include <atomic>
 #include <cmath>
@@ -28,19 +29,12 @@
 #include <utility>
 #include <vector>
 
-#if !defined(QUEUE_HOLDER_THREAD_DEBUG)
-#if defined(HPX_DEBUG)
-#define QUEUE_HOLDER_THREAD_DEBUG false
-#else
-#define QUEUE_HOLDER_THREAD_DEBUG false
-#endif
-#endif
-
 namespace hpx {
 
-    inline constexpr hpx::debug::enable_print<QUEUE_HOLDER_THREAD_DEBUG> tq_deb(
-        "QH_THRD");
-}
+    HPX_CXX_CORE_EXPORT inline constexpr hpx::debug::enable_print<
+        QUEUE_HOLDER_THREAD_DEBUG>
+        tq_deb("QH_THRD");
+}    // namespace hpx
 
 namespace hpx::threads::policies {
 

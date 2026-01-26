@@ -35,6 +35,5 @@ namespace hpx::util::plugin {
     };
 
     HPX_CXX_CORE_EXPORT template <typename BasePlugin>
-    using virtual_constructor_t =
-        typename virtual_constructor<BasePlugin>::type;
+    using virtual_constructor_t = virtual_constructor<BasePlugin>::type;
 }    // namespace hpx::util::plugin

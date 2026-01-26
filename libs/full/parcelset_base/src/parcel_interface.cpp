@@ -14,8 +14,6 @@
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threading_base.hpp>
 
-#include <hpx/naming_base/gid_type.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/parcelset_base/locality_interface.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>

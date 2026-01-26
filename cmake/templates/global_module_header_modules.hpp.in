@@ -11,8 +11,17 @@
 
 #include <hpx/config/defines.hpp>
 
+// The compilation will fall back to using the HPX headers (instead of the
+// generated C++ module interface files) if any of the following is true:
+//
+// - C++ modules are not enabled
+// - Otherwise:
+//   - The HPX @libname@ library is being compiled
+//   - The module interface file is being compiled
+//   - The current translation unit is not forcing to disable using C++ modules
+//
 #if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_@libname_upper@_EXPORTS) ||             \
-    defined(HPX_COMPILE_BMI)
+    defined(HPX_COMPILE_BMI) || defined(HPX_HAVE_FORCE_NO_CXX_MODULES)
 @module_headers@
 #else
 

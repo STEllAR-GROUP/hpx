@@ -15,6 +15,16 @@
 #include <type_traits>
 #include <utility>
 
+// clang-format off
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#elif defined (__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
+// clang-format on
+
 namespace hpx::traits {
 
     namespace detail {
@@ -155,3 +165,11 @@ namespace hpx::traits {
 #undef MAKE_ARITY_FUNC
     }    // namespace detail
 }    // namespace hpx::traits
+
+// clang-format off
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined (__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
+// clang-format on

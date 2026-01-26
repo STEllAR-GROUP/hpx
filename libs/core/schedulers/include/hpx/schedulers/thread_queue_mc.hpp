@@ -14,6 +14,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
+#include <hpx/schedulers/macros.hpp>
 #include <hpx/schedulers/queue_holder_thread.hpp>
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
@@ -31,21 +32,14 @@
 #include <string>
 #include <utility>
 
-#if !defined(THREAD_QUEUE_MC_DEBUG)
-#if defined(HPX_DEBUG)
-#define THREAD_QUEUE_MC_DEBUG false
-#else
-#define THREAD_QUEUE_MC_DEBUG false
-#endif
-#endif
-
 //#define DEBUG_QUEUE_EXTRA 1
 
 namespace hpx {
 
-    inline constexpr hpx::debug::enable_print<THREAD_QUEUE_MC_DEBUG> tqmc_deb(
-        "_TQ_MC_");
-}
+    HPX_CXX_CORE_EXPORT inline constexpr hpx::debug::enable_print<
+        THREAD_QUEUE_MC_DEBUG>
+        tqmc_deb("_TQ_MC_");
+}    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {

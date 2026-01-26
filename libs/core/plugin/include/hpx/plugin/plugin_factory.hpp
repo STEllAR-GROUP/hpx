@@ -25,6 +25,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -135,7 +137,7 @@ namespace hpx::util::plugin {
             auto const end = e.end();
             for (auto it = e.begin(); it != end; ++it)
             {
-                names.push_back((*it).first);
+                names.push_back(it->first);
             }
         }
 
@@ -159,7 +161,8 @@ namespace hpx::util::plugin {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT struct HPX_PLUGIN_EXPORT_API plugin_factory_item_base
+        HPX_CXX_CORE_EXPORT struct HPX_PLUGIN_EXPORT_API
+            plugin_factory_item_base
         {
             plugin_factory_item_base(dll& d, std::string basename)
               : m_dll(d)
@@ -326,3 +329,5 @@ namespace hpx::util::plugin {
         }
     };
 }    // namespace hpx::util::plugin
+
+#include <hpx/config/warnings_suffix.hpp>

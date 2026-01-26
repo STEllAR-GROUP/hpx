@@ -26,7 +26,7 @@ add_hpx_module(
   SOURCES ${lcw_base_sources}
   HEADERS ${lcw_base_headers}
   MODULE_DEPENDENCIES hpx_logging hpx_runtime_configuration hpx_string_util
-                      hpx_util
+                      hpx_synchronization hpx_util
   DEPENDENCIES LCW::LCW LCI::LCT
   CMAKE_SUBDIRS examples tests
 )

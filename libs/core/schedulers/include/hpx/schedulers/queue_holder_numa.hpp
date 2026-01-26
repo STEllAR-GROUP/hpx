@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/threading_base.hpp>
+#include <hpx/schedulers/macros.hpp>
 #include <hpx/schedulers/queue_holder_thread.hpp>
 #include <hpx/schedulers/thread_queue_mc.hpp>
 
@@ -17,19 +18,12 @@
 #include <exception>
 #include <vector>
 
-#if !defined(QUEUE_HOLDER_NUMA_DEBUG)
-#if defined(HPX_DEBUG)
-#define QUEUE_HOLDER_NUMA_DEBUG false
-#else
-#define QUEUE_HOLDER_NUMA_DEBUG false
-#endif
-#endif
-
 namespace hpx {
 
-    inline constexpr hpx::debug::enable_print<QUEUE_HOLDER_NUMA_DEBUG> nq_deb(
-        "QH_NUMA");
-}
+    HPX_CXX_CORE_EXPORT inline constexpr hpx::debug::enable_print<
+        QUEUE_HOLDER_NUMA_DEBUG>
+        nq_deb("QH_NUMA");
+}    // namespace hpx
 
 namespace hpx::threads::policies {
 

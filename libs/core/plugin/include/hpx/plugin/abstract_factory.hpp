@@ -15,7 +15,8 @@ namespace hpx::util::plugin {
 
     namespace detail {
 
-        HPX_CXX_CORE_EXPORT struct HPX_PLUGIN_EXPORT_API abstract_factory_item_base
+        HPX_CXX_CORE_EXPORT struct HPX_PLUGIN_EXPORT_API
+            abstract_factory_item_base
         {
             virtual ~abstract_factory_item_base() = default;
             void create(int*******);    // dummy placeholder

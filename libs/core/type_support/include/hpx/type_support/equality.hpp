@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2019 Austin McCartney
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -17,14 +17,15 @@ namespace hpx::traits {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename U, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename T, typename U,
+            typename Enable = void>
         struct equality_result
         {
         };
 
         // different versions of clang-format disagree
         // clang-format off
-         template <typename T, typename U>
+        HPX_CXX_CORE_EXPORT template <typename T, typename U>
         struct equality_result<T, U,
             std::void_t<decltype(
                 std::declval<T const&>() == std::declval<U const&>())>>
@@ -34,18 +35,19 @@ namespace hpx::traits {
         };
         // clang-format on
 
-        template <typename T, typename U>
+        HPX_CXX_CORE_EXPORT template <typename T, typename U>
         using equality_result_t = typename equality_result<T, U>::type;
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename U, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename T, typename U,
+            typename Enable = void>
         struct inequality_result
         {
         };
 
         // different versions of clang-format disagree
         // clang-format off
-         template <typename T, typename U>
+        HPX_CXX_CORE_EXPORT template <typename T, typename U>
         struct inequality_result<T, U,
             std::void_t<decltype(
                 std::declval<T const&>() != std::declval<U const&>())>>
@@ -55,16 +57,17 @@ namespace hpx::traits {
         };
         // clang-format on
 
-        template <typename T, typename U>
+        HPX_CXX_CORE_EXPORT template <typename T, typename U>
         using inequality_result_t = typename inequality_result<T, U>::type;
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename U, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename T, typename U,
+            typename Enable = void>
         struct is_weakly_equality_comparable_with : std::false_type
         {
         };
 
-        template <typename T, typename U>
+        HPX_CXX_CORE_EXPORT template <typename T, typename U>
         struct is_weakly_equality_comparable_with<T, U,
             std::void_t<detail::equality_result_t<T, U>,
                 detail::equality_result_t<U, T>,

@@ -37,8 +37,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
 
-    enum class future_status
-    {
+    HPX_CXX_CORE_EXPORT enum class future_status {
         ready,
         timeout,
         deferred,

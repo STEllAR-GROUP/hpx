@@ -81,11 +81,12 @@ namespace hpx {
 namespace hpx::util::detail::any {
 
     ////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct get_table;
 
     // function pointer table
-    template <typename IArch, typename OArch, typename Char, typename Copyable>
+    HPX_CXX_CORE_EXPORT template <typename IArch, typename OArch, typename Char,
+        typename Copyable>
     struct fxn_ptr_table;
 
     template <>
@@ -129,7 +130,7 @@ namespace hpx::util::detail::any {
     };
 
     ////////////////////////////////////////////////////////////////////////
-    template <typename Char, typename Copyable>
+    HPX_CXX_CORE_EXPORT template <typename Char, typename Copyable>
     struct fxn_ptr_table<void, void, Char, Copyable>
       : fxn_ptr_table<void, void, void, Copyable>
     {
@@ -150,33 +151,34 @@ namespace hpx::util::detail::any {
             std::basic_ostream<Char>&, void* const*) = nullptr;
     };
 
-    ////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Small, typename Char,
-        typename Enable = typename traits::supports_streaming_with_any<T>::type>
-    struct streaming_base;
+    HPX_CXX_CORE_EXPORT    ////////////////////////////////////////////////////////////////////////
+        template <typename T, typename Small, typename Char,
+            typename Enable =
+                typename traits::supports_streaming_with_any<T>::type>
+        struct streaming_base;
 
     // no streaming support
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct streaming_base<T, std::true_type, void, std::true_type>
     {
     };
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct streaming_base<T, std::true_type, void, std::false_type>
     {
     };
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct streaming_base<T, std::false_type, void, std::true_type>
     {
     };
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct streaming_base<T, std::false_type, void, std::false_type>
     {
     };
 
     // streaming support is enabled
-    template <typename T, typename Char>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Char>
     struct streaming_base<T, std::true_type, Char, std::true_type>
     {
         template <typename Char_>
@@ -196,7 +198,7 @@ namespace hpx::util::detail::any {
         }
     };
 
-    template <typename T, typename Char>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Char>
     struct streaming_base<T, std::false_type, Char, std::true_type>
     {
         template <typename Char_>
@@ -216,7 +218,7 @@ namespace hpx::util::detail::any {
         }
     };
 
-    template <typename T, typename Small, typename Char>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Small, typename Char>
     struct streaming_base<T, Small, Char, std::false_type>
     {
         template <typename Char_>
@@ -236,7 +238,7 @@ namespace hpx::util::detail::any {
 
     ////////////////////////////////////////////////////////////////////////
     // static functions for small value-types
-    template <typename Small, typename Copyable>
+    HPX_CXX_CORE_EXPORT template <typename Small, typename Copyable>
     struct fxns;
 
     template <>
@@ -453,11 +455,11 @@ namespace hpx::util::detail::any {
     };
 
     ////////////////////////////////////////////////////////////////////////
-    template <typename IArch, typename OArch, typename Vtable, typename Char,
-        typename Copyable>
+    HPX_CXX_CORE_EXPORT template <typename IArch, typename OArch,
+        typename Vtable, typename Char, typename Copyable>
     struct fxn_ptr;
 
-    template <typename Vtable>
+    HPX_CXX_CORE_EXPORT template <typename Vtable>
     struct fxn_ptr<void, void, Vtable, void, std::true_type>
       : fxn_ptr_table<void, void, void, std::true_type>
     {
@@ -480,7 +482,7 @@ namespace hpx::util::detail::any {
         }
     };
 
-    template <typename Vtable, typename Char>
+    HPX_CXX_CORE_EXPORT template <typename Vtable, typename Char>
     struct fxn_ptr<void, void, Vtable, Char, std::true_type>
       : fxn_ptr_table<void, void, Char, std::true_type>
     {
@@ -505,7 +507,7 @@ namespace hpx::util::detail::any {
         }
     };
 
-    template <typename Vtable>
+    HPX_CXX_CORE_EXPORT template <typename Vtable>
     struct fxn_ptr<void, void, Vtable, void, std::false_type>
       : fxn_ptr_table<void, void, void, std::false_type>
     {
@@ -526,7 +528,7 @@ namespace hpx::util::detail::any {
         }
     };
 
-    template <typename Vtable, typename Char>
+    HPX_CXX_CORE_EXPORT template <typename Vtable, typename Char>
     struct fxn_ptr<void, void, Vtable, Char, std::false_type>
       : fxn_ptr_table<void, void, Char, std::false_type>
     {
@@ -550,7 +552,7 @@ namespace hpx::util::detail::any {
     };
 
     ////////////////////////////////////////////////////////////////////////
-    template <typename Vtable, typename T>
+    HPX_CXX_CORE_EXPORT template <typename Vtable, typename T>
     struct any_vtable
     {
         static_assert(
@@ -568,7 +570,7 @@ namespace hpx::util::detail::any {
         }
     };
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct get_table
     {
         using is_small =
@@ -591,7 +593,7 @@ namespace hpx::util::detail::any {
     };
 
     ////////////////////////////////////////////////////////////////////////
-    struct empty
+    HPX_CXX_CORE_EXPORT struct empty
     {
         [[nodiscard]] constexpr bool operator==(empty) const noexcept
         {
@@ -603,7 +605,7 @@ namespace hpx::util::detail::any {
         }
     };
 
-    template <typename Char>
+    HPX_CXX_CORE_EXPORT template <typename Char>
     std::basic_istream<Char>& operator>>(std::basic_istream<Char>& i, empty&)
     {
         // If this assertion fires you tried to insert from a std istream
@@ -620,7 +622,7 @@ namespace hpx::util::detail::any {
         return i;
     }
 
-    template <typename Char>
+    HPX_CXX_CORE_EXPORT template <typename Char>
     std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& o, empty)
     {
         return o;

@@ -8,6 +8,7 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/executors/dataflow.hpp>
+#include <hpx/executors/macros.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
@@ -22,10 +23,6 @@
 //#define GUIDED_POOL_EXECUTOR_FAKE_NOOP
 
 #include <hpx/config/warnings_prefix.hpp>
-
-#if !defined(GUIDED_POOL_EXECUTOR_DEBUG)
-#define GUIDED_POOL_EXECUTOR_DEBUG false
-#endif
 
 namespace hpx {
 

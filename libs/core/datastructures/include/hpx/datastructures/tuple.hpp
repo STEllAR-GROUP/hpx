@@ -189,25 +189,25 @@ namespace hpx {
             get(hpx::tuple<Ts...> const&& t) noexcept;
     }    // namespace std_adl_barrier
 
-    using hpx::adl_barrier::get;
-    using hpx::std_adl_barrier::get;
+    HPX_CXX_CORE_EXPORT using hpx::adl_barrier::get;
+    HPX_CXX_CORE_EXPORT using hpx::std_adl_barrier::get;
 }    // namespace hpx
 
 // Adapt hpx::tuple to be usable with structured binding contexts
 namespace std {
 
-    template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     struct tuple_size<hpx::tuple<Ts...>> : hpx::tuple_size<hpx::tuple<Ts...>>
     {
     };
 
-    template <std::size_t I, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
     struct tuple_element<I, hpx::tuple<Ts...>>
       : hpx::tuple_element<I, hpx::tuple<Ts...>>
     {
     };
 
-    using hpx::std_adl_barrier::get;
+    HPX_CXX_CORE_EXPORT using hpx::std_adl_barrier::get;
 }    // namespace std
 
 namespace hpx {

@@ -28,7 +28,7 @@ namespace hpx::threads {
 
         HPX_CORE_EXPORT threads::thread_result_type cleanup_thread();
 
-        template <typename F>
+        HPX_CXX_CORE_EXPORT template <typename F>
         struct thread_function
         {
             HPX_NO_UNIQUE_ADDRESS F f;
@@ -48,10 +48,12 @@ namespace hpx::threads {
             }
         };
 
-        template <typename F, typename Is = util::index_pack<>, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename F,
+            typename Is = util::index_pack<>, typename... Ts>
         struct thread_function_nullary;
 
-        template <typename F, std::size_t... Is, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename F, std::size_t... Is,
+            typename... Ts>
         struct thread_function_nullary<F, util::index_pack<Is...>, Ts...>
         {
             HPX_NO_UNIQUE_ADDRESS F f;

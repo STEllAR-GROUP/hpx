@@ -10,12 +10,12 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
 #include <hpx/modules/functional.hpp>
-#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/statistics.hpp>
 #include <hpx/modules/synchronization.hpp>
 
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcel_coalescing/message_buffer.hpp>
 
 #include <cstddef>

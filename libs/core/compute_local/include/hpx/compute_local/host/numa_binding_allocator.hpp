@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assert.hpp>
+#include <hpx/compute_local/macros.hpp>
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/executors.hpp>
@@ -18,6 +19,7 @@
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/type_support.hpp>
 
+#include <concepts>
 #include <cstddef>
 #include <memory>
 #include <sstream>
@@ -27,22 +29,13 @@
 #include <vector>
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
+#include <iostream>
 #include <linux/unistd.h>
 #include <sys/mman.h>
-#define NUMA_ALLOCATOR_LINUX
-#include <iostream>
 #endif
 
 // Can be used to enable debugging of the allocator page mapping
 //#define NUMA_BINDING_ALLOCATOR_INIT_MEMORY
-
-#if !defined(NUMA_BINDING_ALLOCATOR_DEBUG)
-#if defined(HPX_DEBUG)
-#define NUMA_BINDING_ALLOCATOR_DEBUG false
-#else
-#define NUMA_BINDING_ALLOCATOR_DEBUG false
-#endif
-#endif
 
 namespace hpx {
 
@@ -210,6 +203,7 @@ namespace hpx::compute::host {
 
         // copy constructor using rebind type
         template <typename U>
+            requires(!std::same_as<T, U>)
         numa_binding_allocator(numa_binding_allocator<U> const& rhs)
           : binding_helper_(rhs.binding_helper_)
           , policy_(rhs.policy_)

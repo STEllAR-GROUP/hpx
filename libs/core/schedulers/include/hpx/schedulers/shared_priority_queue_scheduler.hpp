@@ -18,6 +18,7 @@
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
+#include <hpx/schedulers/macros.hpp>
 #include <hpx/schedulers/queue_holder_numa.hpp>
 #include <hpx/schedulers/queue_holder_thread.hpp>
 #include <hpx/schedulers/thread_queue_mc.hpp>
@@ -36,31 +37,21 @@
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
-
-#if !defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
-#if defined(HPX_DEBUG)
-#define SHARED_PRIORITY_SCHEDULER_DEBUG false
-#else
-#define SHARED_PRIORITY_SCHEDULER_DEBUG false
-#endif
-#endif
-
 #if defined(__linux) || defined(linux) || defined(__linux__)
 #include <linux/unistd.h>
 #include <sys/mman.h>
-#define SHARED_PRIORITY_SCHEDULER_LINUX
 #endif
 
 // #define SHARED_PRIORITY_SCHEDULER_DEBUG_NUMA
 
 namespace hpx {
 
-    using print_onoff =
+    HPX_CXX_CORE_EXPORT using print_onoff =
         hpx::debug::enable_print<SHARED_PRIORITY_SCHEDULER_DEBUG>;
-    using print_on = hpx::debug::enable_print<false>;
+    HPX_CXX_CORE_EXPORT using print_on = hpx::debug::enable_print<false>;
 
-    inline constexpr print_onoff spq_deb("SPQUEUE");
-    inline constexpr print_on spq_arr("SPQUEUE");
+    HPX_CXX_CORE_EXPORT inline constexpr print_onoff spq_deb("SPQUEUE");
+    HPX_CXX_CORE_EXPORT inline constexpr print_on spq_arr("SPQUEUE");
 }    // namespace hpx
 
 namespace hpx::threads::policies {

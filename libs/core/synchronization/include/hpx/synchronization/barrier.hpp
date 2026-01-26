@@ -34,7 +34,7 @@ namespace hpx {
     /// \cond NOINTERN
     namespace detail {
 
-        struct empty_oncompletion
+        HPX_CXX_CORE_EXPORT struct empty_oncompletion
         {
             constexpr void operator()() const noexcept {}
         };
@@ -44,7 +44,7 @@ namespace hpx {
         HPX_CORE_EXPORT void intrusive_ptr_add_ref(barrier_data* p) noexcept;
         HPX_CORE_EXPORT void intrusive_ptr_release(barrier_data* p) noexcept;
 
-        struct barrier_data
+        HPX_CXX_CORE_EXPORT struct barrier_data
         {
             using mutex_type = hpx::spinlock;
 
@@ -319,7 +319,7 @@ namespace hpx {
         //         id, and it can't be triggered using the action (parcel)
         //         mechanism. It is just a low level synchronization primitive
         //         allowing to synchronize a given number of \a threads.
-        class HPX_CORE_EXPORT barrier
+        HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT barrier
         {
             using mutex_type = hpx::spinlock;
 

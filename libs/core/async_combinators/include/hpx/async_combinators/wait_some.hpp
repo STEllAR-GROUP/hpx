@@ -688,7 +688,7 @@ namespace hpx {
     } wait_some_n_nothrow{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct wait_some_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct wait_some_n_t final
       : hpx::functional::tag<wait_some_n_t>
     {
     private:

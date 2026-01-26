@@ -391,7 +391,7 @@ namespace hpx {
         return detail::split_future_helper_array<N, T>(HPX_MOVE(f));
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     HPX_FORCEINLINE std::array<hpx::future<void>, 1> split_future(
         hpx::future<std::array<T, 0>>&& f)
     {
