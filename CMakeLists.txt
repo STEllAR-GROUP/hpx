@@ -1156,6 +1156,16 @@ hpx_option(
   CATEGORY "Profiling"
 )
 
+hpx_option(
+  HPX_LIKWID_WITH_LIKWID BOOL "Enable Likwid instrumentation support." OFF
+  CATEGORY "Profiling"
+)
+
+hpx_option(
+  HPX_TRACY_WITH_TRACY BOOL "Enable Tracy instrumentation support." OFF
+  CATEGORY "Profiling"
+)
+
 # Experimental settings
 hpx_option(
   HPX_WITH_IO_POOL

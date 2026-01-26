@@ -21,6 +21,9 @@
     !defined(HPX_HAVE_APEX)
 #include <hpx/modules/itt_notify.hpp>
 #endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+#include <hpx/modules/tracy.hpp>
+#endif
 
 #include <atomic>
 #include <cstddef>
@@ -228,6 +231,13 @@ namespace hpx::threads::detail {
                                 task.add_metadata(
                                     task_phase, thrdptr->get_thread_phase());
 #endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+                                char const* name = thrdptr->get_description()
+                                                       .get_description();
+                                tracy::region rctx(name, num_thread,
+                                    thrdptr->get_thread_phase());
+#endif
+
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.

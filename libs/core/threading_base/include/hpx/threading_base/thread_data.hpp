@@ -276,35 +276,13 @@ namespace hpx::threads {
             return {"<unknown>"};
         }
 #else
-        threads::thread_description get_description() const
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            return description_;
-        }
+        threads::thread_description get_description() const;
         threads::thread_description set_description(
-            threads::thread_description value)
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            std::swap(description_, value);
-            return value;
-        }
+            threads::thread_description value);
 
-        threads::thread_description get_lco_description() const
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            return lco_description_;
-        }
+        threads::thread_description get_lco_description() const;
         threads::thread_description set_lco_description(
-            threads::thread_description value)
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            std::swap(lco_description_, value);
-            return value;
-        }
+            threads::thread_description value);
 #endif
 
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
@@ -446,41 +424,11 @@ namespace hpx::threads {
         }
 
         // handle thread interruption
-        bool interruption_requested() const noexcept
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            return requested_interrupt_;
-        }
+        bool interruption_requested() const noexcept;
+        bool interruption_enabled() const noexcept;
+        bool set_interruption_enabled(bool enable) noexcept;
 
-        bool interruption_enabled() const noexcept
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            return enabled_interrupt_;
-        }
-
-        bool set_interruption_enabled(bool enable) noexcept
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            std::swap(enabled_interrupt_, enable);
-            return enable;
-        }
-
-        void interrupt(bool flag = true)
-        {
-            std::unique_lock<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            if (flag && !enabled_interrupt_)
-            {
-                l.unlock();
-                HPX_THROW_EXCEPTION(hpx::error::thread_not_interruptable,
-                    "thread_data::interrupt",
-                    "interrupts are disabled for this thread");
-            }
-            requested_interrupt_ = flag;
-        }
+        void interrupt(bool flag = true);
 
         bool interruption_point(bool throw_on_interrupt = true);
 
