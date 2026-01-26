@@ -14,21 +14,23 @@ set(tests
     reflection_nested_templ_object
 )
 
-foreach(test ${tests})
-  set(sources ${test}.cpp)
+if(HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE)
+  foreach(test ${tests})
+    set(sources ${test}.cpp)
 
-  source_group("Source Files" FILES ${sources})
+    source_group("Source Files" FILES ${sources})
 
-  # add example executable
-  add_hpx_executable(
-    ${test}_test INTERNAL_FLAGS
-    SOURCES ${sources} ${${test}_FLAGS}
-    EXCLUDE_FROM_ALL NOLIBS
-    DEPENDENCIES hpx_core
-    FOLDER "Tests/Unit/Modules/Core/Serialization/Refl"
-  )
+    # add example executable
+    add_hpx_executable(
+      ${test}_test INTERNAL_FLAGS
+      SOURCES ${sources} ${${test}_FLAGS}
+      EXCLUDE_FROM_ALL NOLIBS
+      DEPENDENCIES hpx_core
+      FOLDER "Tests/Unit/Modules/Core/Serialization/Refl"
+    )
 
-  add_hpx_unit_test("modules.serialization" ${test} ${${test}_PARAMETERS})
-  target_compile_definitions(${test}_test PRIVATE -DHPX_MODULE_STATIC_LINKING)
+    add_hpx_unit_test("modules.serialization" ${test} ${${test}_PARAMETERS})
+    target_compile_definitions(${test}_test PRIVATE -DHPX_MODULE_STATIC_LINKING)
 
-endforeach()
+  endforeach()
+endif()
