@@ -54,7 +54,6 @@ jobs:
                     -DCMAKE_BUILD_TYPE=Debug \
                     -DHPX_WITH_MALLOC=system \
                     -DHPX_WITH_FETCH_ASIO=Off \
-                    # -DHPX_WITH_DATAPAR_BACKEND=VC \
                     -DHPX_WITH_GIT_COMMIT=${{ github.sha }} \
                     -DHPX_WITH_GIT_BRANCH="${{ github.ref_name }}" \
                     -DHPX_WITH_GIT_TAG="${{ github.ref_type == 'tag' && github.ref_name || '' }}" \
