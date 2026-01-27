@@ -95,7 +95,14 @@ jobs:
               working-directory: /hpx/build
               run: |
                   ninja -j2 -k 0 components
-
+            
+            - name: Building Examples (1)
+              shell: bash
+              working-directory: /hpx/build
+              run: |
+                ninja -j2 -k 0 \
+                  `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.examples1.targets`
+                  
             - uses: actions/upload-artifact@v6
               with:
                   name: hpx-workspace
