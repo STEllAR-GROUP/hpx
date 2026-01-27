@@ -26,9 +26,17 @@ jobs:
           run_id: ${{ inputs.run_id || '' }}
           # If run_id is empty, downloads from latest successful run
       
-      - name: Restore Executable Permissions
+      - uses: actions/checkout@v6
+        with:
+          path: /tmp/repo
+          sparse-checkout: |
+            .github
+          sparse-checkout-cone-mode: false
+
+      - name: Restore Executable Permissions 
         shell: bash
         run: |
+          cp -r /tmp/repo/.github /hpx/source
           chmod -R +x /hpx/build/bin/ || true
           chmod -R +x /hpx/build/lib*/ || true
 
@@ -36,13 +44,6 @@ jobs:
         shell: bash
         working-directory: /hpx/build
         run: |
-          echo "=== Contents of /hpx ==="
-          ls -la /hpx/
-          echo "=== Checking for source directory ==="
-          ls -la /hpx/source/ || echo "Source directory missing!"
-          echo "=== Checking for targets file ==="
-          ls -la /hpx/source/.circleci/ || echo "CircleCI directory missing!"
-
           ulimit -c unlimited
           ctest \
             --timeout 180 \
@@ -50,18 +51,11 @@ jobs:
             --no-compress-output \
             --output-on-failure \
             --tests-regex \
-              `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.examples1.targets | sed ':b;N;$!bb;s/\n/|/g'`
-      
-      - name: Checkout for composite action
-        uses: actions/checkout@v6
-        with:
-          sparse-checkout: |
-            .github/actions
-          sparse-checkout-cone-mode: false
+              `grep -v -e ^# -e ^$ /hpx/source/.github/test/targets/tests.examples1.targets | sed ':b;N;$!bb;s/\n/|/g'`
       
       - name: Collect test artifacts
         if: always()
-        uses: ./.github/actions/collect-artifacts
+        uses: /hpx/source/.github/actions/collect-artifacts
         with:
           job-name: tests-example1
       
