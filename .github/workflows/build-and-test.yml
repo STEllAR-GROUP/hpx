@@ -7,9 +7,9 @@
 name: Build and Test
 
 on:
-  push:
-    paths-ignore:
-      - '.github/workflows/test-only.yml'
+    push:
+        paths-ignore:
+            - ".github/workflows/test-only.yml"
 
 jobs:
     build-all:
@@ -95,15 +95,66 @@ jobs:
               working-directory: /hpx/build
               run: |
                   ninja -j2 -k 0 components
-            
+
             - name: Building Examples (1)
               shell: bash
               working-directory: /hpx/build
               run: |
-                ninja -j2 -k 0 \
-                  `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.examples1.targets`
-                  
+                  ninja -j2 -k 0 \
+                    `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.examples1.targets`
+
             - uses: actions/upload-artifact@v6
               with:
                   name: hpx-workspace
                   path: /hpx/
+
+    tests-example1:
+        needs: build-all
+        runs-on: ubuntu-latest
+        container: stellargroup/build_env:17
+
+        steps:
+            - uses: actions/checkout@v6
+              with:
+                  sparse-checkout: |
+                      .github
+                  sparse-checkout-cone-mode: false
+
+            - name: Download build artifacts
+              uses: actions/download-artifact@v6
+              with:
+                  name: hpx-workspace
+                  path: /hpx/
+
+            - name: Copy .github and restore permissions
+              shell: bash
+              run: |
+                  cp -r .github /hpx/source
+                  chmod -R +x /hpx/build/bin/ || true
+                  chmod -R +x /hpx/build/lib*/ || true
+
+            - name: Running Example Tests
+              shell: bash
+              working-directory: /hpx/build
+              run: |
+                  ulimit -c unlimited
+                  ctest \
+                    --timeout 180 \
+                    -T test \
+                    --no-compress-output \
+                    --output-on-failure \
+                    --tests-regex \
+                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.examples1.targets | sed ':b;N;$!bb;s/\n/|/g'`
+
+            - name: Collect test artifacts
+              if: always()
+              uses: ./.github/actions/collect-artifacts
+              with:
+                  job-name: tests-example1
+
+            - name: Upload test artifacts
+              if: always()
+              uses: actions/upload-artifact@v6
+              with:
+                  name: tests-example1-artifacts
+                  path: /hpx/build/tests-example1/
