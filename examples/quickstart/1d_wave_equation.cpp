@@ -76,7 +76,9 @@ struct data
     // Default constructor: data d1;
     data()
       : mtx()
-      , f()
+      , u_value(0.0)
+      , computed(false)
+      , started(false)
     {
     }
 
@@ -84,18 +86,24 @@ struct data
     // We can't copy the mutex, because mutexes are noncopyable.
     data(data const& other)
       : mtx()
-      , f(other.f)
+      , u_value(other.u_value)
+      , computed(other.computed)
+      , started(other.started)
     {
     }
 
     data& operator=(data const& other)
     {
-        f = other.f;
+        u_value = other.u_value;
+        computed = other.computed;
+        started = other.started;
         return *this;
     }
 
     hpx::mutex mtx;
-    hpx::shared_future<double> f;
+    double u_value;
+    bool computed;
+    bool started;
 };
 
 std::vector<std::vector<data>> u;
@@ -128,58 +136,78 @@ double calculate_u_tplus_x_1st(
 double wave(std::uint64_t t, std::uint64_t x)
 {
     {
-        std::lock_guard<hpx::mutex> l(u[t][x].mtx);
-        if (u[t][x].f.valid())
+        std::unique_lock<hpx::mutex> l(u[t][x].mtx);
+        if (u[t][x].computed)
         {
-            return u[t][x].f.get();
+            return u[t][x].u_value;
         }
 
-        hpx::promise<double> p;
-        u[t][x].f = p.get_future();
-
-        if (t == 0)
+        if (u[t][x].started)
         {
-            double val = std::sin(2. * pi * static_cast<double>(x) * dx);
-            p.set_value(val);
-            return val;
+            // Another thread is already computing this cell.
+            // Wait for it to finish.
+            while (!u[t][x].computed)
+            {
+                // We use a simple retry/yield here as adding a condition variable
+                // to every cell's data struct might be too much for this example.
+                // However, since it's an HPX thread, we should yield.
+                l.unlock();
+                hpx::this_thread::yield();
+                l.lock();
+            }
+            return u[t][x].u_value;
         }
 
-        hpx::async([t, x, p = std::move(p)]() mutable {
-            future<double> n1;
-            if (x == 0)
-                n1 = async(&wave, t - 1, nx - 1);
-            else
-                n1 = async(&wave, t - 1, x - 1);
-
-            future<double> n2 = async(&wave, t - 1, x);
-
-            future<double> n3;
-            if (x == (nx - 1))
-                n3 = async(&wave, t - 1, 0);
-            else
-                n3 = async(&wave, t - 1, x + 1);
-
-            double u_t_xminus = n1.get();
-            double u_t_x = n2.get();
-            double u_t_xplus = n3.get();
-
-            double result = 0.0;
-            if (t == 1)
-            {
-                double u_dot = 0;
-                result = calculate_u_tplus_x_1st(
-                    u_t_xplus, u_t_x, u_t_xminus, u_dot);
-            }
-            else
-            {
-                double u_tminus_x = async(&wave, t - 2, x).get();
-                result = calculate_u_tplus_x(
-                    u_t_xplus, u_t_x, u_t_xminus, u_tminus_x);
-            }
-            p.set_value(result);
-        });
+        u[t][x].started = true;
     }
-    return u[t][x].f.get();
+
+    double result = 0;
+    if (t == 0)    //first timestep are initial values
+    {
+        result = std::sin(2. * pi * static_cast<double>(x) * dx);
+    }
+    else
+    {
+        // NOT using ghost zones here... just letting the stencil cross the periodic
+        // boundary.
+        future<double> n1;
+        if (x == 0)
+            n1 = async<wave_action>(here, t - 1, nx - 1);
+        else
+            n1 = async<wave_action>(here, t - 1, x - 1);
+
+        future<double> n2 = async<wave_action>(here, t - 1, x);
+
+        future<double> n3;
+        if (x == (nx - 1))
+            n3 = async<wave_action>(here, t - 1, 0);
+        else
+            n3 = async<wave_action>(here, t - 1, x + 1);
+
+        double u_t_xminus = n1.get();    //get the futures
+        double u_t_x = n2.get();
+        double u_t_xplus = n3.get();
+
+        if (t == 1)    //second time coordinate handled differently
+        {
+            double u_dot = 0;    // initial du/dt(x)
+            result =
+                calculate_u_tplus_x_1st(u_t_xplus, u_t_x, u_t_xminus, u_dot);
+        }
+        else
+        {
+            double u_tminus_x = async<wave_action>(here, t - 2, x).get();
+            result =
+                calculate_u_tplus_x(u_t_xplus, u_t_x, u_t_xminus, u_tminus_x);
+        }
+    }
+
+    {
+        std::lock_guard<hpx::mutex> l(u[t][x].mtx);
+        u[t][x].u_value = result;
+        u[t][x].computed = true;
+    }
+    return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -200,81 +228,39 @@ int hpx_main(variables_map& vm)
     dx = 1.0 / static_cast<double>(nx - 1);
     alpha_squared = (c * dt / dx) * (c * dt / dx);
 
-    // check that alpha_squared satisfies the stability condition
-    if (0.25 < alpha_squared)
+    u.resize(nt);
+    for (std::uint64_t i = 0; i < nt; ++i)
     {
-        cout << (("alpha^2 = (c*dt/dx)^2 should be less than 0.25 for "
-                  "stability!\n"))
-             << std::flush;
+        u[i].resize(nx);
     }
 
-    u = std::vector<std::vector<data>>(nt, std::vector<data>(nx));
+    high_resolution_timer t;
 
-    hpx::util::format_to(cout, "dt = {1}\n", dt) << std::flush;
-    hpx::util::format_to(cout, "dx = {1}\n", dx) << std::flush;
-    hpx::util::format_to(cout, "alpha^2 = {1}\n", alpha_squared) << std::flush;
+    // The last point in the grid.
+    double result = 0;
+    result = wave(nt - 1, nx - 1);
 
-    {
-        // Keep track of the time required to execute.
-        high_resolution_timer t;
+    char const* fmt = "Elapsed time: {1} [s]\n";
+    std::cout << hpx::util::format(fmt, t.elapsed());
 
-        std::vector<future<double>> futures;
-        for (std::uint64_t i = 0; i < nx; i++)
-            futures.push_back(async(&wave, nt - 1, i));
+    cout << "U(t,x) = " << result << "\n";
 
-        // open file for output
-        std::ofstream outfile;
-        outfile.open("output.dat");
-
-        auto f = [&](std::size_t i, hpx::future<double>&& f) {
-            double x_here = static_cast<double>(i) * dx;
-            hpx::util::format_to(outfile, "{1} {2}\n", x_here, f.get())
-                << std::flush;
-        };
-        hpx::wait_each(f, futures);
-
-        outfile.close();
-
-        char const* fmt = "elapsed time: {1} [s]\n";
-        hpx::util::format_to(std::cout, fmt, t.elapsed());
-    }
-
-    hpx::finalize();
-    return 0;
+    return hpx::finalize();
 }
 
-///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    // Configure application-specific options.
-    options_description desc_commandline(
-        "Usage: " HPX_APPLICATION_STRING " [options]");
+    options_description desc_commandline;
 
-    // clang-format off
-    desc_commandline.add_options()
-        ("dt-value",
-           value<double>()->default_value(0.05),
-           "dt parameter of the wave equation")
+    desc_commandline.add_options()("nx-value",
+        value<std::uint64_t>()->default_value(100),
+        "Nx value")("nt-value", value<std::uint64_t>()->default_value(100),
+        "Nt value")("c-value", value<double>()->default_value(1.0), "c value")(
+        "dt-value", value<double>()->default_value(1.0),
+        "dt value")("dx-value", value<double>()->default_value(1.0),
+        "dx value");
 
-        ("dx-value",
-           value<double>()->default_value(0.1),
-           "dx parameter of the wave equation")
-
-        ("c-value",
-           value<double>()->default_value(1.0),
-           "c parameter of the wave equation")
-
-        ("nx-value",
-           value<std::uint64_t>()->default_value(100),
-           "nx parameter of the wave equation")
-
-        ("nt-value",
-           value<std::uint64_t>()->default_value(100),
-           "nt parameter of the wave equation")
-    ;
-    // clang-format on
-
-    // Initialize and run HPX.
+    // Initialize and run HPX
     hpx::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
