@@ -216,17 +216,32 @@ int hpx_main(variables_map& vm)
     here = find_here();
     pi = 3.141592653589793238462643383279;
 
-    //    dt = vm["dt-value"].as<double>();
-    //    dx = vm["dx-value"].as<double>();
-    //    c = vm["c-value"].as<double>();
     nx = vm["nx-value"].as<std::uint64_t>();
     nt = vm["nt-value"].as<std::uint64_t>();
 
-    c = 1.0;
+    if (vm.count("c-value"))
+        c = vm["c-value"].as<double>();
+    else
+        c = 1.0;
 
-    dt = 1.0 / static_cast<double>(nt - 1);
-    dx = 1.0 / static_cast<double>(nx - 1);
+    if (vm.count("dt-value"))
+        dt = vm["dt-value"].as<double>();
+    else
+        dt = 1.0 / static_cast<double>(nt - 1);
+
+    if (vm.count("dx-value"))
+        dx = vm["dx-value"].as<double>();
+    else
+        dx = 1.0 / static_cast<double>(nx - 1);
     alpha_squared = (c * dt / dx) * (c * dt / dx);
+
+    // check that alpha_squared satisfies the stability condition
+    if (0.25 < alpha_squared)
+    {
+        cout << (("alpha^2 = (c*dt/dx)^2 should be less than 0.25 for "
+                  "stability!\n"))
+             << std::flush;
+    }
 
     u.resize(nt);
     for (std::uint64_t i = 0; i < nt; ++i)
@@ -234,33 +249,68 @@ int hpx_main(variables_map& vm)
         u[i].resize(nx);
     }
 
-    high_resolution_timer t;
+    hpx::util::format_to(cout, "dt = {1}\n", dt) << std::flush;
+    hpx::util::format_to(cout, "dx = {1}\n", dx) << std::flush;
+    hpx::util::format_to(cout, "alpha^2 = {1}\n", alpha_squared) << std::flush;
 
-    // The last point in the grid.
-    double result = 0;
-    result = wave(nt - 1, nx - 1);
+    {
+        // Keep track of the time required to execute.
+        high_resolution_timer t;
 
-    char const* fmt = "Elapsed time: {1} [s]\n";
-    std::cout << hpx::util::format(fmt, t.elapsed());
+        std::vector<hpx::shared_future<double>> futures;
+        for (std::uint64_t i = 0; i < nx; i++)
+            futures.push_back(hpx::async<wave_action>(here, nt - 1, i));
 
-    cout << "U(t,x) = " << result << "\n";
+        // open file for output
+        std::ofstream outfile;
+        outfile.open("output.dat");
 
-    return hpx::finalize();
+        auto f = [&](std::size_t i, hpx::shared_future<double> f) {
+            double x_here = static_cast<double>(i) * dx;
+            hpx::util::format_to(outfile, "{1} {2}\n", x_here, f.get())
+                << std::flush;
+        };
+        hpx::wait_each(f, futures);
+
+        outfile.close();
+
+        char const* fmt = "elapsed time: {1} [s]\n";
+        hpx::util::format_to(std::cout, fmt, t.elapsed());
+    }
+
+    hpx::finalize();
+    return 0;
 }
 
 int main(int argc, char* argv[])
 {
     options_description desc_commandline;
 
-    desc_commandline.add_options()("nx-value",
-        value<std::uint64_t>()->default_value(100),
-        "Nx value")("nt-value", value<std::uint64_t>()->default_value(100),
-        "Nt value")("c-value", value<double>()->default_value(1.0), "c value")(
-        "dt-value", value<double>()->default_value(1.0),
-        "dt value")("dx-value", value<double>()->default_value(1.0),
-        "dx value");
+    // clang-format off
+    desc_commandline.add_options()
+        ("dt-value",
+           value<double>()->default_value(0.05),
+           "dt parameter of the wave equation")
 
-    // Initialize and run HPX
+        ("dx-value",
+           value<double>()->default_value(0.1),
+           "dx parameter of the wave equation")
+
+        ("c-value",
+           value<double>()->default_value(1.0),
+           "c parameter of the wave equation")
+
+        ("nx-value",
+            value<std::uint64_t>()->default_value(20),
+            "nx parameter of the wave equation")
+
+        ("nt-value",
+            value<std::uint64_t>()->default_value(20),
+            "nt parameter of the wave equation")
+    ;
+    // clang-format on
+
+    // Initialize and run HPX.
     hpx::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 

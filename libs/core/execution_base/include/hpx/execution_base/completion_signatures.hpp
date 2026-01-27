@@ -326,18 +326,6 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Sender, typename Enable = void>
-        struct has_completion_signatures : std::false_type
-        {
-        };
-
-        HPX_CXX_EXPORT template <typename Sender>
-        struct has_completion_signatures<Sender,
-            std::void_t<
-                typename remove_cv_ref_t<Sender>::completion_signatures>>
-          : std::true_type
-        {
-        };
 #if defined(HPX_HAVE_STDEXEC)
     }
 #else
@@ -352,6 +340,7 @@ namespace hpx::execution::experimental {
         // std::execution::as_awaitable. So you have two options for opting into
         // the sender concept if you type is not generally awaitable: (1)
         // specialize enable_sender, or (2) customize as_awaitable for T.
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CXX_EXPORT, completion_signatures)
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CXX_EXPORT, is_sender)
 
 #ifdef HPX_HAVE_CXX20_COROUTINES
@@ -421,8 +410,7 @@ namespace hpx::execution::experimental {
             static_assert(sizeof(Env),
                 "Incomplete type used with get_completion_signatures");
 
-            if constexpr (meta::value<
-                              detail::has_completion_signatures<Sender>>)
+            if constexpr (detail::has_completion_signatures_v<Sender>)
             {
                 return typename detail::remove_cv_ref_t<
                     Sender>::completion_signatures{};

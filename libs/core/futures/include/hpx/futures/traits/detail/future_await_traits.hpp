@@ -129,9 +129,17 @@ namespace hpx::lcos::detail {
     }
 
     template <typename T>
-    HPX_FORCEINLINE T await_resume(hpx::shared_future<T>& f)
+    HPX_FORCEINLINE std::enable_if_t<!std::is_void_v<T>, T const&> await_resume(
+        hpx::shared_future<T>& f)
     {
         return f.get();
+    }
+
+    template <typename T>
+    HPX_FORCEINLINE std::enable_if_t<std::is_void_v<T>> await_resume(
+        hpx::shared_future<T>& f)
+    {
+        f.get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
