@@ -44,8 +44,8 @@ jobs:
         working-directory: /hpx/build
         run: |
           ninja -j2 -k 0 \
-            `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.examples1.targets | sed ':b;N;$!bb;s/\n/|/g'`
-
+            `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.examples1.targets`
+            
       - name: Running Example Tests
         shell: bash
         working-directory: /hpx/build
