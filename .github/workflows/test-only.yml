@@ -17,6 +17,12 @@ jobs:
     container: stellargroup/build_env:17
 
     steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            .github
+          sparse-checkout-cone-mode: false
+
       - name: Download build artifacts
         uses: dawidd6/action-download-artifact@v3
         with:
@@ -25,18 +31,11 @@ jobs:
           path: /hpx/
           run_id: ${{ inputs.run_id || '' }}
           # If run_id is empty, downloads from latest successful run
-      
-      - uses: actions/checkout@v6
-        with:
-          path: /tmp/repo
-          sparse-checkout: |
-            .github
-          sparse-checkout-cone-mode: false
 
-      - name: Restore Executable Permissions 
+      - name: Copy .github and restore permissions 
         shell: bash
         run: |
-          cp -r /tmp/repo/.github /hpx/source
+          cp -r .github /hpx/source
           chmod -R +x /hpx/build/bin/ || true
           chmod -R +x /hpx/build/lib*/ || true
 
@@ -55,7 +54,7 @@ jobs:
       
       - name: Collect test artifacts
         if: always()
-        uses: /hpx/source/.github/actions/collect-artifacts
+        uses: ./.github/actions/collect-artifacts
         with:
           job-name: tests-example1
       
