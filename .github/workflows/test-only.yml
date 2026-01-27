@@ -50,7 +50,7 @@ jobs:
             --no-compress-output \
             --output-on-failure \
             --tests-regex \
-              `grep -v -e ^# -e ^$ /hpx/source/.github/test/targets/tests.examples1.targets | sed ':b;N;$!bb;s/\n/|/g'`
+              `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.examples1.targets | sed ':b;N;$!bb;s/\n/|/g'`
       
       - name: Collect test artifacts
         if: always()
