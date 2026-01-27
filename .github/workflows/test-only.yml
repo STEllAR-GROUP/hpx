@@ -10,7 +10,7 @@ on:
   push:
     paths:
       - '.github/workflows/test-only.yml'
-      
+
 jobs:
   tests-example1:
     runs-on: ubuntu-latest
@@ -36,8 +36,12 @@ jobs:
         shell: bash
         working-directory: /hpx/build
         run: |
-          pwd
-          ls -la
+          echo "=== Contents of /hpx ==="
+          ls -la /hpx/
+          echo "=== Checking for source directory ==="
+          ls -la /hpx/source/ || echo "Source directory missing!"
+          echo "=== Checking for targets file ==="
+          ls -la /hpx/source/.circleci/ || echo "CircleCI directory missing!"
 
           ulimit -c unlimited
           ctest \
