@@ -11,15 +11,6 @@
 #include <string>
 #include <vector>
 
-/*
-This is a failing test case for serialization of arrays
-We will work on fixing this issue
-(Primary suspect: array.hpp and is_bitwise_serializable.hpp)
-The traits specializations for hpx::serialization::array<T> need to be
-carefully designed to avoid incorrect assumptions about the bitwise
-serializability of arrays containing non-bitwise-serializable
-*/
-
 struct person_pod
 {
     int age;
@@ -33,13 +24,8 @@ struct person_pod
 
 struct final_array_boss
 {
-    // Array of PODs: Works!
     std::array<person_pod, 2> pod_array;
-
-    // Array of Vectors: triggers bad_alloc
     std::array<std::vector<int>, 2> array_of_vectors;
-
-    // Vector of Arrays: zeroed out after deserialization
     std::vector<std::array<int, 3>> vector_of_arrays;
 
     bool operator==(final_array_boss const& rhs) const
@@ -84,7 +70,7 @@ struct final_array_boss
 int main()
 {
     final_array_boss input;
-    input.pod_array = {{{25, "Alice"}, {30, "Bob"}}};
+    input.pod_array = {{{25, std::string(1000, 'a')}, {30, "Bob"}}};
     input.array_of_vectors = {{{1, 2, 3}, {4, 5, 6}}};
     input.vector_of_arrays = {{{10, 20, 30}, {40, 50, 60}}};
 
