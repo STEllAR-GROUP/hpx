@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,11 +16,16 @@
 
 #include <cstddef>
 #include <cstdint>
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-#include <map>
-#endif
 #include <string>
 #include <vector>
+#if !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0
+#include <map>
+#endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+#include <set>
+#endif
+#endif
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -119,8 +124,13 @@ namespace hpx::util {
 
         interval_timer timer_;
 
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#if !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0
         std::map<std::string, util::itt::counter> itt_counters_;
+#endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+        std::set<std::string> tracy_counters_;
+#endif
 #endif
     };
 }    // namespace hpx::util

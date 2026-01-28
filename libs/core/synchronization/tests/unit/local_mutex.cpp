@@ -127,7 +127,9 @@ struct test_lock_times_out_if_other_thread_has_lock
         [[maybe_unused]] bool retval =
             lock.try_lock_for(std::chrono::milliseconds(50));
 
-        std::lock_guard<hpx::mutex> lk(done_mutex);
+        std::unique_lock<hpx::mutex> lk(done_mutex);
+        [[maybe_unused]] hpx::util::ignore_while_checking<decltype(lk)> il(&lk);
+
         locked = lock.owns_lock();
         done = true;
         done_cond.notify_one();
@@ -137,7 +139,9 @@ struct test_lock_times_out_if_other_thread_has_lock
     {
         Lock lock(m, std::chrono::milliseconds(50));
 
-        std::lock_guard<hpx::mutex> lk(done_mutex);
+        std::unique_lock<hpx::mutex> lk(done_mutex);
+        [[maybe_unused]] hpx::util::ignore_while_checking<decltype(lk)> il(&lk);
+
         locked = lock.owns_lock();
         done = true;
         done_cond.notify_one();

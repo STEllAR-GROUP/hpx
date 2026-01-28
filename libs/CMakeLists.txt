@@ -432,6 +432,15 @@ foreach(lib ${HPX_LIBS})
 
     set_target_properties(hpx_${lib} PROPERTIES FOLDER "Core")
 
+    # Clang emits DWARF-5 records while compiling the TracyClient library
+    if(HPX_TRACY_WITH_TRACY
+       AND (NOT MSVC)
+       AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID
+                                                     MATCHES "AppleClang")
+    )
+      target_link_options(hpx_${lib} PRIVATE "-fuse-ld=lld")
+    endif()
+
     install(
       TARGETS hpx_${lib} ${module_install_targets}
       EXPORT HPXInternalTargets

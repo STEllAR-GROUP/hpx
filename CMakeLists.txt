@@ -1156,6 +1156,16 @@ hpx_option(
   CATEGORY "Profiling"
 )
 
+hpx_option(
+  HPX_LIKWID_WITH_LIKWID BOOL "Enable Likwid instrumentation support." OFF
+  CATEGORY "Profiling"
+)
+
+hpx_option(
+  HPX_TRACY_WITH_TRACY BOOL "Enable Tracy instrumentation support." OFF
+  CATEGORY "Profiling"
+)
+
 # Experimental settings
 hpx_option(
   HPX_WITH_IO_POOL
@@ -1908,8 +1918,15 @@ endif()
 if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   set(__use_generic_coroutine_context ON)
 endif()
-# If compiling for riscv64 or arm64, automatically bake in Boost.Context
-if(${__target_arch} STREQUAL "riscv64" OR ${__target_arch} STREQUAL "arm64")
+# If compiling for riscv64, arm or arm64 (including armv5, armv6, armv7),
+# automatically bake in Boost.Context
+if(${__target_arch} STREQUAL "riscv64"
+   OR ${__target_arch} STREQUAL "arm64"
+   OR ${__target_arch} STREQUAL "arm"
+   OR ${__target_arch} STREQUAL "armv5"
+   OR ${__target_arch} STREQUAL "armv6"
+   OR ${__target_arch} STREQUAL "armv7"
+)
   set(__use_generic_coroutine_context ON)
 endif()
 

@@ -902,7 +902,8 @@ namespace hpx::parallel {
                 std::size_t left_, right_;
                 std::size_t block_size_;
                 std::int64_t left_block_no_{-1}, right_block_no_{1};
-                hpx::spinlock mutex_;
+                hpx::spinlock mutex_ =
+                    hpx::spinlock("partition_helper::block_manager");
             };
 
             // block manager for forward access iterator.
@@ -988,7 +989,8 @@ namespace hpx::parallel {
                 std::vector<block<FwdIter>> blocks_;
                 std::size_t left_, right_;
                 std::int64_t left_block_no_{-1}, right_block_no_{1};
-                hpx::spinlock mutex_;
+                hpx::spinlock mutex_ =
+                    hpx::spinlock("partition_helper::block_manager");
             };
 
             // std::swap_ranges doesn't support overlapped ranges in standard.

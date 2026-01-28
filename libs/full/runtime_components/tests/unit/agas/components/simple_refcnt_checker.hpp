@@ -104,7 +104,6 @@ namespace hpx { namespace test {
 #ifdef HPX_HAVE_MODULE_LIKWID
             hpx::likwid::suspend_region region;
 #endif
-
             // Suspend this thread.
             threads::get_self().yield(threads::thread_result_type(
                 threads::thread_schedule_state::suspended,

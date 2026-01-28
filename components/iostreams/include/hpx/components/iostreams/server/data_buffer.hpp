@@ -29,7 +29,7 @@ namespace hpx::iostreams::detail {
     public:
         data_buffer()
           : data_(new std::vector<char>)
-          , mtx_(new mutex_type)
+          , mtx_(new mutex_type("iostreams::data_buffer"))
         {
         }
 

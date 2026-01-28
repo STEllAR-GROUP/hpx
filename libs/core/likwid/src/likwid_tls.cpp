@@ -31,13 +31,13 @@ namespace hpx::likwid {
         return current;
     }
 
-    char const* stop_region() noexcept
+    char const* stop_region(char const* curr_region) noexcept
     {
         char const* current = current_region();
 
+        current_region() = curr_region;
         if (current != nullptr)
         {
-            current_region() = nullptr;
             likwid_markerStopRegion(current);
         }
 
