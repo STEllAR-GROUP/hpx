@@ -111,8 +111,8 @@ int main()
 {
     using vector_type = hpx::partitioned_vector<double>;
 
-    std::size_t N = 40;
-    std::size_t tile = 10;
+    std::size_t N = 20;
+    std::size_t tile = 5;
     std::size_t elt_size = 8;
 
     // (N+1) replaces N for padding purpose

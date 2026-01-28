@@ -264,11 +264,11 @@ int main()
 {
     using vector_type = hpx::partitioned_vector<double>;
 
-    std::size_t const height = 16;
-    std::size_t const width = 16;
+    std::size_t const height = 8;
+    std::size_t const width = 8;
 
-    std::size_t local_height = 16;
-    std::size_t local_width = 16;
+    std::size_t local_height = 8;
+    std::size_t local_width = 8;
     std::size_t local_leading_dimension = local_height;
 
     std::size_t raw_size = (height * width) * (local_height * local_width);
