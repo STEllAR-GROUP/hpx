@@ -61,8 +61,8 @@ void test_uninitialized_move_n_sent(ExPolicy&& policy, IteratorTag)
     std::size_t sent_len = (std::rand() % 10007) + 1;
     hpx::ranges::uninitialized_move_n(policy, std::begin(c), sent_len,
         std::begin(d),
-        sentinel<std::size_t>{
-            *(std::begin(d) + static_cast<std::ptrdiff_t>(sent_len))});
+        test::sentinel_from_iterator(
+            std::begin(d) + static_cast<std::ptrdiff_t>(sent_len)));
 
     std::size_t count = 0;
     // loop till for sent_len since either the sentinel for the input or output iterator
@@ -88,8 +88,8 @@ void test_uninitialized_move_n_sent_async(ExPolicy&& p, IteratorTag)
     std::size_t sent_len = (std::rand() % 10007) + 1;
     auto f = hpx::ranges::uninitialized_move_n(p, std::begin(c), sent_len,
         std::begin(d),
-        sentinel<std::size_t>{
-            *(std::begin(d) + static_cast<std::ptrdiff_t>(sent_len))});
+        test::sentinel_from_iterator(
+            std::begin(d) + static_cast<std::ptrdiff_t>(sent_len)));
     f.wait();
 
     std::size_t count = 0;

@@ -50,7 +50,8 @@ void test_reverse_sent(ExPolicy policy)
     auto first = c.begin();
     HPX_TEST(*first == 0);
 
-    hpx::ranges::reverse(policy, std::begin(c), sentinel<std::int16_t>{50});
+    hpx::ranges::reverse(policy, std::begin(c),
+        test::sentinel_from_iterator(std::begin(c) + 50));
     auto first_reversed = c.begin();
 
     HPX_TEST(*first_reversed == 49);
@@ -144,6 +145,12 @@ void test_reverse()
 {
     using namespace hpx::execution;
     test_reverse(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_reverse_parallel()
+{
+    using namespace hpx::execution;
     test_reverse(seq, IteratorTag());
     test_reverse(par, IteratorTag());
     test_reverse(par_unseq, IteratorTag());
@@ -161,6 +168,7 @@ void reverse_test()
 {
     test_reverse<std::random_access_iterator_tag>();
     test_reverse<std::bidirectional_iterator_tag>();
+    test_reverse_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -274,10 +282,17 @@ void test_reverse_exception()
 {
     using namespace hpx::execution;
 
+    test_reverse_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_reverse_exception_parallel()
+{
+    using namespace hpx::execution;
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_reverse_exception(IteratorTag());
     test_reverse_exception(seq, IteratorTag());
     test_reverse_exception(par, IteratorTag());
 
@@ -289,6 +304,7 @@ void reverse_exception_test()
 {
     test_reverse_exception<std::random_access_iterator_tag>();
     test_reverse_exception<std::bidirectional_iterator_tag>();
+    test_reverse_exception_parallel<std::random_access_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -397,10 +413,17 @@ void test_reverse_bad_alloc()
 {
     using namespace hpx::execution;
 
+    test_reverse_bad_alloc(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_reverse_bad_alloc_parallel()
+{
+    using namespace hpx::execution;
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_reverse_bad_alloc(IteratorTag());
     test_reverse_bad_alloc(seq, IteratorTag());
     test_reverse_bad_alloc(par, IteratorTag());
 
@@ -412,6 +435,7 @@ void reverse_bad_alloc_test()
 {
     test_reverse_bad_alloc<std::random_access_iterator_tag>();
     test_reverse_bad_alloc<std::bidirectional_iterator_tag>();
+    test_reverse_bad_alloc_parallel<std::random_access_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

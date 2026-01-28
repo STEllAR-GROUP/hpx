@@ -421,10 +421,10 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
-                hpx::traits::is_forward_iterator_v<FwdIter2> &&
-                hpx::traits::is_sentinel_for_v<Sent2, FwdIter2> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, FwdIter1> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent2, FwdIter2> &&
                 hpx::parallel::traits::is_projected_v<Proj1, FwdIter1> &&
                 hpx::parallel::traits::is_projected_v<Proj2, FwdIter2> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -440,11 +440,6 @@ namespace hpx::ranges {
             Sent2 last2, Pred pred = Pred(), Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::lexicographical_compare().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
                 HPX_MOVE(pred), HPX_MOVE(proj1), HPX_MOVE(proj2));
@@ -493,8 +488,10 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng1> &&
-                hpx::traits::is_range_v<Rng2> &&
+                hpx::traits::is_random_access_range_v<Rng1> &&
+                hpx::traits::is_sized_range_v<Rng1> &&
+                hpx::traits::is_random_access_range_v<Rng2> &&
+                hpx::traits::is_sized_range_v<Rng2> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 hpx::parallel::traits::is_indirect_callable_v<

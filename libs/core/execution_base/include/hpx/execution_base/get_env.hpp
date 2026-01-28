@@ -217,8 +217,9 @@ namespace hpx::execution::experimental {
     // 1. tag_invoke(execution::get_env, r) if that expression is well-formed.
     // 2. Otherwise, empty_env{}.
     //
-    HPX_CXX_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct get_env_t
-        final : hpx::functional::detail::tag_fallback<get_env_t>
+    HPX_CXX_EXPORT
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct get_env_t final
+      : hpx::functional::detail::tag_fallback<get_env_t>
     {
     private:
         template <typename EnvProvider>

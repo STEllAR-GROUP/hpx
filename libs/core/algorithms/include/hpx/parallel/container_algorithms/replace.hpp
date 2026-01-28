@@ -1170,9 +1170,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<Iter> &&
+                hpx::traits::is_random_access_iterator_v<Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy,
                     Pred, hpx::parallel::traits::projected<Proj, Iter>>::value
             )
@@ -1183,9 +1183,6 @@ namespace hpx::ranges {
             Iter first, Sent sent, Pred pred, T const& new_value,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::replace_if<Iter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, sent, HPX_MOVE(pred),
                 new_value, HPX_MOVE(proj));
@@ -1289,8 +1286,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_random_access_iterator_v<Iter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter>
             )
         // clang-format on
@@ -1300,9 +1297,6 @@ namespace hpx::ranges {
             Iter first, Sent sent, T1 const& old_value, T2 const& new_value,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Required at least forward iterator.");
-
             using type = typename std::iterator_traits<Iter>::value_type;
 
             return hpx::ranges::replace_if(
@@ -1319,7 +1313,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
             )
         // clang-format on
@@ -1421,10 +1416,10 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter2> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter1> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy,
                     Pred, hpx::parallel::traits::projected<Proj, FwdIter1>
                 >
@@ -1436,12 +1431,6 @@ namespace hpx::ranges {
             FwdIter1 first, Sent sent, FwdIter2 dest, Pred pred,
             T const& new_value, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Required at least forward iterator.");
-
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::replace_copy_if<
                 hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, sent, dest,
@@ -1455,8 +1444,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy,
                     Pred, hpx::parallel::traits::projected_range<Proj, Rng>
@@ -1469,13 +1459,6 @@ namespace hpx::ranges {
             Rng&& rng, FwdIter dest, Pred pred, T const& new_value,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator<
-                              hpx::traits::range_iterator_t<Rng>>::value,
-                "Required at least forward iterator.");
-
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::replace_copy_if<
                 hpx::parallel::util::in_out_result<
                     hpx::traits::range_iterator_t<Rng>, FwdIter>>()
@@ -1516,7 +1499,7 @@ namespace hpx::ranges {
             using type = typename std::iterator_traits<InIter>::value_type;
 
             return hpx::ranges::replace_copy_if(
-                hpx::execution::seq, first, sent, dest,
+                first, sent, dest,
                 [old_value](type const& a) -> bool { return old_value == a; },
                 new_value, HPX_MOVE(proj));
         }
@@ -1547,8 +1530,7 @@ namespace hpx::ranges {
                 hpx::traits::range_iterator_t<Rng>>::value_type;
 
             return hpx::ranges::replace_copy_if(
-                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                dest,
+                HPX_FORWARD(Rng, rng), dest,
                 [old_value](type const& a) -> bool { return old_value == a; },
                 new_value, HPX_MOVE(proj));
         }
@@ -1561,9 +1543,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter1> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter1>
             )
         // clang-format on
@@ -1573,12 +1555,6 @@ namespace hpx::ranges {
             FwdIter1 first, Sent sent, FwdIter2 dest, T1 const& old_value,
             T2 const& new_value, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Required at least forward iterator.");
-
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Required at least forward iterator.");
-
             using type = typename std::iterator_traits<FwdIter1>::value_type;
 
             return hpx::ranges::replace_copy_if(
@@ -1595,7 +1571,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
             )
         // clang-format on
@@ -1605,13 +1583,6 @@ namespace hpx::ranges {
             Rng&& rng, FwdIter dest, T1 const& old_value, T2 const& new_value,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator<
-                              hpx::traits::range_iterator_t<Rng>>::value,
-                "Required at least forward iterator.");
-
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Required at least forward iterator.");
-
             using type = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type;
 

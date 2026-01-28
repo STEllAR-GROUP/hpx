@@ -160,6 +160,12 @@ void test_equal_binary1()
     using namespace hpx::execution;
 
     test_equal_binary1(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_equal_binary1_parallel()
+{
+    using namespace hpx::execution;
 
     test_equal_binary1(seq, IteratorTag());
     test_equal_binary1(par, IteratorTag());
@@ -173,6 +179,7 @@ void equal_binary_test1()
 {
     test_equal_binary1<std::random_access_iterator_tag>();
     test_equal_binary1<std::forward_iterator_tag>();
+    test_equal_binary1_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -320,6 +327,12 @@ void test_equal_binary2()
     using namespace hpx::execution;
 
     test_equal_binary2(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_equal_binary2_parallel()
+{
+    using namespace hpx::execution;
 
     test_equal_binary2(seq, IteratorTag());
     test_equal_binary2(par, IteratorTag());
@@ -333,6 +346,7 @@ void equal_binary_test2()
 {
     test_equal_binary2<std::random_access_iterator_tag>();
     test_equal_binary2<std::forward_iterator_tag>();
+    test_equal_binary2_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -470,6 +484,12 @@ void test_equal_binary_exception()
     using namespace hpx::execution;
 
     test_equal_binary_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_equal_binary_exception_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -480,11 +500,11 @@ void test_equal_binary_exception()
     test_equal_binary_exception_async(seq(task), IteratorTag());
     test_equal_binary_exception_async(par(task), IteratorTag());
 }
-
 void equal_binary_exception_test()
 {
     test_equal_binary_exception<std::random_access_iterator_tag>();
     test_equal_binary_exception<std::forward_iterator_tag>();
+    test_equal_binary_exception_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -591,7 +611,6 @@ void test_equal_binary_bad_alloc()
 void equal_binary_bad_alloc_test()
 {
     test_equal_binary_bad_alloc<std::random_access_iterator_tag>();
-    test_equal_binary_bad_alloc<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

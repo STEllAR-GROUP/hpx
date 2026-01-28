@@ -36,6 +36,21 @@ void test_all_of()
 
     test_all_of(IteratorTag());
     test_all_of_ranges_seq(IteratorTag(), proj());
+}
+
+template <typename IteratorTag>
+void test_all_of_parallel()
+{
+    struct proj
+    {
+        //This projection should cause tests to fail if it is not applied
+        //because it causes predicate to evaluate the opposite
+        constexpr std::size_t operator()(std::size_t x) const
+        {
+            return !static_cast<bool>(x);
+        }
+    };
+    using namespace hpx::execution;
 
     test_all_of(seq, IteratorTag());
     test_all_of(par, IteratorTag());
@@ -80,6 +95,7 @@ void all_of_test()
 {
     test_all_of<std::random_access_iterator_tag>();
     test_all_of<std::forward_iterator_tag>();
+    test_all_of_parallel<std::random_access_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////

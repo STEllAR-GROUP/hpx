@@ -298,8 +298,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter>
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
@@ -307,9 +307,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::uninitialized_fill_t,
             ExPolicy&& policy, FwdIter first, Sent last, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::uninitialized_fill<FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, value);
         }
@@ -335,7 +332,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng>
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
@@ -381,7 +379,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
@@ -389,9 +387,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::uninitialized_fill_n_t,
             ExPolicy&& policy, FwdIter first, Size count, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::uninitialized_fill_n<FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, count, value);
         }

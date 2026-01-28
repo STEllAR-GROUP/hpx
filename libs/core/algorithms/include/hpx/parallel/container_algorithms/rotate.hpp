@@ -443,8 +443,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
+                hpx::traits::is_random_access_iterator_v<FwdIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter>
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
@@ -452,9 +452,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::rotate_t, ExPolicy&& policy,
             FwdIter first, FwdIter middle, Sent last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
-
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
                     !hpx::traits::is_bidirectional_iterator_v<FwdIter>>;
@@ -487,7 +484,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng>
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
@@ -547,10 +545,10 @@ namespace hpx::ranges {
             typename FwdIter2>
         // clang-format off
             requires(
-                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2>
+                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter1> &&
+                hpx::traits::is_random_access_iterator_v<FwdIter2>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
@@ -558,11 +556,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::rotate_copy_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 middle, Sent last, FwdIter2 dest_first)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
                     !hpx::traits::is_bidirectional_iterator_v<FwdIter1>>;
@@ -594,8 +587,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
-                hpx::traits::is_iterator_v<OutIter>
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
+                hpx::traits::is_random_access_iterator_v<OutIter>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
