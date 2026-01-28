@@ -24,3 +24,5 @@ add_hpx_pseudo_dependencies(
   tests.regressions.modules.async_distributed.action_move_semantics
   action_move_semantics_component
 )
+
+hpx_set_lib_name(action_move_semantics_component action_move_semantics_test)

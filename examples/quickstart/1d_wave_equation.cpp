@@ -73,33 +73,29 @@ std::uint64_t nx = 0;
 
 struct data
 {
-    // Default constructor: data d1;
     data()
       : mtx()
-      , u_value(0.0)
-      , computed(false)
+      , f()
     {
     }
 
-    // Copy constructor: data d1; data d2(d1);
-    // We can't copy the mutex, because mutexes are noncopyable.
     data(data const& other)
       : mtx()
-      , u_value(other.u_value)
-      , computed(other.computed)
+      , f(other.f)
     {
     }
 
     data& operator=(data const& other)
     {
-        u_value = other.u_value;
-        computed = other.computed;
+        if (this != &other)
+        {
+            f = other.f;
+        }
         return *this;
     }
 
     hpx::mutex mtx;
-    double u_value;
-    bool computed;
+    hpx::shared_future<double> f;
 };
 
 std::vector<std::vector<data>> u;
@@ -112,6 +108,16 @@ double wave(std::uint64_t t, std::uint64_t x);
 // invoked as a HPX-thread.
 // This generates the required boilerplate we need for remote invocation.
 HPX_PLAIN_ACTION(wave)
+
+hpx::shared_future<double> get_wave_future(std::uint64_t t, std::uint64_t x)
+{
+    std::lock_guard<hpx::mutex> l(u[t][x].mtx);
+    if (!u[t][x].f.valid())
+    {
+        u[t][x].f = hpx::async<wave_action>(here, t, x);
+    }
+    return u[t][x].f;
+}
 
 double calculate_u_tplus_x(
     double u_t_xplus, double u_t_x, double u_t_xminus, double u_tminus_x)
@@ -131,61 +137,35 @@ double calculate_u_tplus_x_1st(
 
 double wave(std::uint64_t t, std::uint64_t x)
 {
+    if (t == 0)    //first timestep are initial values
     {
-        std::lock_guard<hpx::mutex> l(u[t][x].mtx);
-        //  hpx::util::format_to(cout, "calling wave... t={1} x={2}\n", t, x);
-        if (u[t][x].computed)
-        {
-            //cout << ("already computed!\n");
-            return u[t][x].u_value;
-        }
-        u[t][x].computed = true;
-
-        if (t == 0)    //first timestep are initial values
-        {
-            //        hpx::util::format_to(cout, "first timestep\n");
-            u[t][x].u_value = std::sin(
-                2. * pi * static_cast<double>(x) * dx);    // initial u(x) value
-            return u[t][x].u_value;
-        }
+        return std::sin(2. * pi * static_cast<double>(x) * dx);
     }
 
-    // NOT using ghost zones here... just letting the stencil cross the periodic
-    // boundary.
-    future<double> n1;
-    if (x == 0)
-        n1 = async<wave_action>(here, t - 1, nx - 1);
-    else
-        n1 = async<wave_action>(here, t - 1, x - 1);
+    std::uint64_t x_minus = (x == 0) ? nx - 1 : x - 1;
+    std::uint64_t x_plus = (x == nx - 1) ? 0 : x + 1;
 
-    future<double> n2 = async<wave_action>(here, t - 1, x);
+    auto n1 = get_wave_future(t - 1, x_minus);
+    auto n2 = get_wave_future(t - 1, x);
+    auto n3 = get_wave_future(t - 1, x_plus);
 
-    future<double> n3;
-    if (x == (nx - 1))
-        n3 = async<wave_action>(here, t - 1, 0);
-    else
-        n3 = async<wave_action>(here, t - 1, x + 1);
-
-    double u_t_xminus = n1.get();    //get the futures
+    double u_t_xminus = n1.get();
     double u_t_x = n2.get();
     double u_t_xplus = n3.get();
 
+    double result = 0;
     if (t == 1)    //second time coordinate handled differently
     {
-        std::lock_guard<hpx::mutex> l(u[t][x].mtx);
         double u_dot = 0;    // initial du/dt(x)
-        u[t][x].u_value =
-            calculate_u_tplus_x_1st(u_t_xplus, u_t_x, u_t_xminus, u_dot);
-        return u[t][x].u_value;
+        result = calculate_u_tplus_x_1st(u_t_xplus, u_t_x, u_t_xminus, u_dot);
     }
     else
     {
-        double u_tminus_x = async<wave_action>(here, t - 2, x).get();
-        std::lock_guard<hpx::mutex> l(u[t][x].mtx);
-        u[t][x].u_value =
-            calculate_u_tplus_x(u_t_xplus, u_t_x, u_t_xminus, u_tminus_x);
-        return u[t][x].u_value;
+        double u_tminus_x = get_wave_future(t - 2, x).get();
+        result = calculate_u_tplus_x(u_t_xplus, u_t_x, u_t_xminus, u_tminus_x);
     }
+
+    return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -194,16 +174,23 @@ int hpx_main(variables_map& vm)
     here = find_here();
     pi = 3.141592653589793238462643383279;
 
-    //    dt = vm["dt-value"].as<double>();
-    //    dx = vm["dx-value"].as<double>();
-    //    c = vm["c-value"].as<double>();
     nx = vm["nx-value"].as<std::uint64_t>();
     nt = vm["nt-value"].as<std::uint64_t>();
 
-    c = 1.0;
+    if (vm.count("c-value"))
+        c = vm["c-value"].as<double>();
+    else
+        c = 1.0;
 
-    dt = 1.0 / static_cast<double>(nt - 1);
-    dx = 1.0 / static_cast<double>(nx - 1);
+    if (vm.count("dt-value"))
+        dt = vm["dt-value"].as<double>();
+    else
+        dt = 1.0 / static_cast<double>(nt - 1);
+
+    if (vm.count("dx-value"))
+        dx = vm["dx-value"].as<double>();
+    else
+        dx = 1.0 / static_cast<double>(nx - 1);
     alpha_squared = (c * dt / dx) * (c * dt / dx);
 
     // check that alpha_squared satisfies the stability condition
@@ -224,15 +211,15 @@ int hpx_main(variables_map& vm)
         // Keep track of the time required to execute.
         high_resolution_timer t;
 
-        std::vector<future<double>> futures;
+        std::vector<hpx::shared_future<double>> futures;
         for (std::uint64_t i = 0; i < nx; i++)
-            futures.push_back(async<wave_action>(here, nt - 1, i));
+            futures.push_back(get_wave_future(nt - 1, i));
 
         // open file for output
         std::ofstream outfile;
         outfile.open("output.dat");
 
-        auto f = [&](std::size_t i, hpx::future<double>&& f) {
+        auto f = [&](std::size_t i, hpx::shared_future<double> f) {
             double x_here = static_cast<double>(i) * dx;
             hpx::util::format_to(outfile, "{1} {2}\n", x_here, f.get())
                 << std::flush;
@@ -271,12 +258,12 @@ int main(int argc, char* argv[])
            "c parameter of the wave equation")
 
         ("nx-value",
-           value<std::uint64_t>()->default_value(100),
-           "nx parameter of the wave equation")
+            value<std::uint64_t>()->default_value(20),
+            "nx parameter of the wave equation")
 
         ("nt-value",
-           value<std::uint64_t>()->default_value(100),
-           "nt parameter of the wave equation")
+            value<std::uint64_t>()->default_value(20),
+            "nt parameter of the wave equation")
     ;
     // clang-format on
 
