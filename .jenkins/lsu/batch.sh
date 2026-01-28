@@ -9,7 +9,7 @@
 set -eux
 
 src_dir="$(pwd)"
-build_dir="${src_dir}/build/${configuration_name_with_build_type}"
+build_dir="/tmp/jenkins/build/${configuration_name_with_build_type}"
 
 rm -rf "${build_dir}"
 mkdir -p "${build_dir}"
@@ -18,6 +18,11 @@ source ${src_dir}/.jenkins/lsu/env-common.sh
 source ${src_dir}/.jenkins/lsu/env-${configuration_name}.sh
 
 ulimit -l unlimited
+
+# On exit, copy build artifacts to shared storage
+mkdir -p "${src_dir}/Testing/${configuration_name_with_build_type}"
+trap "cp -r ${build_dir}/Testing ${src_dir}/Testing/${configuration_name_with_build_type}" EXIT
+
 
 set +e
 ctest \
