@@ -345,14 +345,8 @@ namespace hpx::execution::experimental {
                 // Make sure the main thread runs with the required priority
                 // as well. Yield with the intent to be resumed with the
                 // required settings.
-                threads::detail::set_thread_state(threads::get_self_id(),
-                    threads::thread_schedule_state::pending,
-                    threads::thread_restart_state::signaled, priority,
-                    threads::thread_schedule_hint(
-                        static_cast<std::int16_t>(main_thread_)),
-                    true);
-                hpx::this_thread::suspend(
-                    threads::thread_schedule_state::suspended);
+                hpx::this_thread::set_affinity(
+                    static_cast<std::int16_t>(main_thread_), priority);
             }
 
             void init_threads()

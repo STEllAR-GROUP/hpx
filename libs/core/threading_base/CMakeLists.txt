@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2023 The STE||AR-Group
+# Copyright (c) 2019-2026 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,6 +25,7 @@ set(threading_base_headers
     hpx/threading_base/scheduler_mode.hpp
     hpx/threading_base/scheduler_state.hpp
     hpx/threading_base/scoped_annotation.hpp
+    hpx/threading_base/set_thread_affinity.hpp
     hpx/threading_base/set_thread_state.hpp
     hpx/threading_base/set_thread_state_timed.hpp
     hpx/threading_base/thread_data.hpp
@@ -81,6 +82,7 @@ set(threading_base_sources
     print.cpp
     register_thread.cpp
     scheduler_base.cpp
+    set_thread_affinity.cpp
     set_thread_state.cpp
     set_thread_state_timed.cpp
     thread_data.cpp
