@@ -410,10 +410,12 @@ namespace hpx::execution::experimental {
             static_assert(sizeof(Env),
                 "Incomplete type used with get_completion_signatures");
 
-            if constexpr (detail::has_completion_signatures_v<Sender>)
+            if constexpr (requires {
+                              typename std::decay_t<
+                                  Sender>::completion_signatures;
+                          })
             {
-                return typename detail::remove_cv_ref_t<
-                    Sender>::completion_signatures{};
+                return typename std::decay_t<Sender>::completion_signatures{};
             }
 #if defined(HPX_HAVE_CXX20_COROUTINES)
             else if constexpr (is_awaitable_v<Sender, detail::env_promise<Env>>)
