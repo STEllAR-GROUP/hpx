@@ -58,7 +58,7 @@ namespace hpx { namespace agas { namespace server {
     private:
         // REVIEW: Separate mutexes might reduce contention here. This has to be
         // investigated carefully.
-        mutex_type mutex_;
+        mutex_type mutex_ = mutex_type("locality_namespace");
         std::string instance_name_;
 
         partition_table_type partitions_;

@@ -46,6 +46,7 @@ if(HPX_WITH_PARCELPORT_LCI)
   )
   set(migrate_polymorphic_component_PARAMETERS
       ${migrate_polymorphic_component_PARAMETERS} NO_PARCELPORT_LCI
+      NO_PARCELPORT_LCW
   )
 endif()
 

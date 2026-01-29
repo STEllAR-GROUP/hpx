@@ -301,6 +301,9 @@ namespace hpx {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/result_types.hpp>
+#if defined(HPX_HAVE_MODULE_TRACY)
+#include <hpx/modules/tracy.hpp>
+#endif
 
 #include <algorithm>
 #include <cstddef>
@@ -661,6 +664,9 @@ namespace hpx::parallel {
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
                 static hpx::util::itt::event notify_event("reshape");
                 hpx::util::itt::mark_event e(notify_event);
+#endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+                hpx::tracy::mark_event evt("reshape");
 #endif
 
                 auto shape_size = std::size(shape);
@@ -1115,12 +1121,12 @@ namespace hpx {
                     typename std::iterator_traits<RandIter2>::value_type
                 >
             )
-        // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             RandIter3>
-        tag_fallback_invoke(merge_t, ExPolicy&& policy, RandIter1 first1,
-            RandIter1 last1, RandIter2 first2, RandIter2 last2, RandIter3 dest,
-            Comp comp = Comp())
+        tag_fallback_invoke(merge_t, ExPolicy&& policy,
+            RandIter1 first1, RandIter1 last1, RandIter2 first2,
+            RandIter2 last2, RandIter3 dest, Comp comp = Comp())
+        // clang-format on
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter1>,
                 "Required at least random access iterator.");

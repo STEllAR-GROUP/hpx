@@ -14,6 +14,7 @@
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
+#include <concepts>
 #include <type_traits>
 #include <utility>
 

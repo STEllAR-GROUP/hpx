@@ -86,6 +86,12 @@ set(runtime_local_sources
     thread_stacktrace.cpp
 )
 
+set(additional_dependencies)
+if(HPX_LIKWID_WITH_LIKWID)
+  set(additional_dependencies ${additional_dependencies} hpx_likwid)
+  set(runtime_local_sources ${runtime_local_sources} likwid_init.cpp)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   core runtime_local
@@ -129,5 +135,6 @@ add_hpx_module(
     hpx_topology
     hpx_type_support
     hpx_util
+    ${additional_dependencies}
   CMAKE_SUBDIRS examples tests
 )

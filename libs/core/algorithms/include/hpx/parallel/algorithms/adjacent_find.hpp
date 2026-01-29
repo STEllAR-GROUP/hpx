@@ -218,12 +218,10 @@ namespace hpx::parallel {
                 auto f2 = [tok, count, first, last](
                               auto&&... data) mutable -> FwdIter {
                     static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        // make sure iterators embedded in function object that
-                        // is attached to futures are invalidated
-                        util::detail::clear_container(data...);
-                    }
+
+                    // make sure iterators embedded in function object that
+                    // is attached to futures are invalidated
+                    util::detail::clear_container(data...);
 
                     difference_type adj_find_res = tok.get_data();
                     if (adj_find_res != count)

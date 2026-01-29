@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2024 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -165,11 +165,11 @@ namespace hpx::execution::experimental {
         }
 
         // BulkTwoWayExecutor interface
+        template <typename F, typename S, typename... Ts>
         // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                !std::is_integral_v<S>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
@@ -238,12 +238,8 @@ namespace hpx::execution::experimental {
             }
         }
 
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-               !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
@@ -254,12 +250,8 @@ namespace hpx::execution::experimental {
                     exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
         }
 
-        // clang-format off
-        template <typename F, typename S, typename Future, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-               !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename Future, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend auto tag_invoke(hpx::parallel::execution::bulk_then_execute_t,
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
             Future&& predecessor, Ts&&... ts)

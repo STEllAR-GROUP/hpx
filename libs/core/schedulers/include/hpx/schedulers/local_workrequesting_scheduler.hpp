@@ -1331,22 +1331,17 @@ namespace hpx::threads::policies {
         // Queries whether a given core is idle
         bool is_core_idle(std::size_t num_thread) const override
         {
+            auto& data = data_[num_thread].data_;
             if (num_thread < num_queues_)
             {
-                for (thread_queue_type* this_queue :
-                    {data_[num_thread].data_.bound_queue_,
-                        data_[num_thread].data_.queue_})
-                {
-                    if (this_queue->get_queue_length() != 0)
-                    {
-                        return false;
-                    }
-                }
+                if (data.bound_queue_->get_queue_length() != 0)
+                    return false;
+                if (data.queue_->get_queue_length() != 0)
+                    return false;
             }
 
             if (num_thread < num_high_priority_queues_ &&
-                data_[num_thread]
-                        .data_.high_priority_queue_->get_queue_length() != 0)
+                data.high_priority_queue_->get_queue_length() != 0)
             {
                 return false;
             }

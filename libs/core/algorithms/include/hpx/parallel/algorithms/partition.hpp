@@ -478,11 +478,7 @@ namespace hpx {
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#else
 #include <memory>
-#endif
 
 #include <algorithm>
 #include <cstddef>
@@ -906,7 +902,8 @@ namespace hpx::parallel {
                 std::size_t left_, right_;
                 std::size_t block_size_;
                 std::int64_t left_block_no_{-1}, right_block_no_{1};
-                hpx::spinlock mutex_;
+                hpx::spinlock mutex_ =
+                    hpx::spinlock("partition_helper::block_manager");
             };
 
             // block manager for forward access iterator.
@@ -992,7 +989,8 @@ namespace hpx::parallel {
                 std::vector<block<FwdIter>> blocks_;
                 std::size_t left_, right_;
                 std::int64_t left_block_no_{-1}, right_block_no_{1};
-                hpx::spinlock mutex_;
+                hpx::spinlock mutex_ =
+                    hpx::spinlock("partition_helper::block_manager");
             };
 
             // std::swap_ranges doesn't support overlapped ranges in standard.
@@ -1508,11 +1506,8 @@ namespace hpx::parallel {
                 difference_type count =
                     detail::advance_and_get_distance(last_iter, last);
 
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count]);
-#else
-                boost::shared_array<bool> flags(new bool[count]);
-#endif
+
                 output_iterator_offset init = {0, 0};
 
                 using hpx::get;

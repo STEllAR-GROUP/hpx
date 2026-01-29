@@ -258,7 +258,7 @@ namespace hpx::parallel {
                 return util::partitioner<ExPolicy, Iter>::call(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
-                    [first, last](auto&&) {
+                    [first, last](auto&&...) {
                         return detail::advance_to_sentinel(first, last);
                     });
             }

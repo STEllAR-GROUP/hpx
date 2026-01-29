@@ -979,7 +979,7 @@ jobs:
           name: Building Header Tests (part 3/2)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R "tests.headers.modules.[e-g].*"
+                -R "tests.headers.modules.[e-h].*"
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -996,7 +996,7 @@ jobs:
           name: Building Header Tests (part 4/1)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R "tests.headers.modules.[h-l].*"
+                -R "tests.headers.modules.[i-l].*"
       - run:
           <<: *convert_xml
       - store_test_results:

@@ -13,6 +13,9 @@
 #include <hpx/threading_base/detail/get_default_timer_service.hpp>
 #include <hpx/threading_base/set_thread_state_timed.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
+#ifdef HPX_HAVE_MODULE_LIKWID
+#include <hpx/modules/likwid.hpp>
+#endif
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <winsock2.h>
@@ -128,8 +131,15 @@ namespace hpx::threads::detail {
         // this waits for the thread to be reactivated when the timer fired
         // if it returns signaled the timer has been canceled, otherwise
         // the timer fired and the wake_timer_thread above has been executed
-        thread_restart_state const statex = get_self().yield(thread_result_type(
-            thread_schedule_state::suspended, invalid_thread_id));
+        thread_restart_state statex;
+
+        {
+#ifdef HPX_HAVE_MODULE_LIKWID
+            hpx::likwid::suspend_region region;
+#endif
+            statex = get_self().yield(thread_result_type(
+                thread_schedule_state::suspended, invalid_thread_id));
+        }
 
         HPX_ASSERT(statex == thread_restart_state::abort ||
             statex == thread_restart_state::timeout);

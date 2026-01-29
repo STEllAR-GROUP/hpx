@@ -20,11 +20,7 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/iterator_support.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#else
 #include <memory>
-#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -78,11 +74,7 @@ struct partition_data
     }
 
 private:
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
     std::shared_ptr<double[]> data_;
-#else
-    boost::shared_array<double> data_;
-#endif
     std::size_t size_;
 };
 

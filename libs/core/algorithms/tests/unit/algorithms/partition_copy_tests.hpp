@@ -6,9 +6,9 @@
 
 #pragma once
 
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/parallel/algorithms/partition.hpp>
 
 #include <algorithm>
 #include <cstddef>

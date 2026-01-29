@@ -1253,7 +1253,7 @@ namespace hpx::parallel {
                             hinted_policy, iter_or_r, size, 1,
                             part_iterations<policy_type, F, void, args_type>{
                                 HPX_FORWARD(F, f), args},
-                            [=](auto&&) mutable {
+                            [=](auto&&...) mutable {
                                 auto pack =
                                     hpx::util::make_index_pack_t<sizeof...(
                                         Ts)>();
@@ -1406,7 +1406,9 @@ namespace hpx::parallel {
                                     HPX_FORWARD(ExPolicy, policy), first, size,
                                     part_iterations<ExPolicy, F, S>{
                                         HPX_FORWARD(F, f)},
-                                    [](auto&&) { return hpx::util::unused; }));
+                                    [](auto&&...) {
+                                        return hpx::util::unused;
+                                    }));
                         }
                     }
 
@@ -1419,7 +1421,7 @@ namespace hpx::parallel {
                                 stride,
                                 part_iterations<ExPolicy, F, S>{
                                     HPX_FORWARD(F, f), stride},
-                                [](auto&&) { return hpx::util::unused; }));
+                                [](auto&&...) { return hpx::util::unused; }));
                     }
                     else
                     {
@@ -1427,7 +1429,7 @@ namespace hpx::parallel {
                             HPX_FORWARD(ExPolicy, policy), first, size, stride,
                             part_iterations<ExPolicy, F, S>{
                                 HPX_FORWARD(F, f), stride},
-                            [](auto&&) { return hpx::util::unused; });
+                            [](auto&&...) { return hpx::util::unused; });
                         return util::detail::algorithm_result<ExPolicy>::get();
                     }
                 }
@@ -1455,7 +1457,7 @@ namespace hpx::parallel {
                             hinted_policy, first, size, stride,
                             part_iterations<policy_type, F, S, args_type>{
                                 HPX_FORWARD(F, f), stride, args},
-                            [=](auto&&) mutable {
+                            [=](auto&&...) mutable {
                                 auto pack =
                                     hpx::util::make_index_pack_t<sizeof...(
                                         Ts)>();

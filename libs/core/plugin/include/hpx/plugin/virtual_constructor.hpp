@@ -29,7 +29,7 @@ namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_EXPORT template <typename BasePlugin>
-    struct virtual_constructor
+    struct HPX_PLUGIN_EXPORT_API virtual_constructor
     {
         using type = hpx::util::pack<>;
     };
