@@ -191,7 +191,7 @@ jobs:
                     --no-compress-output \
                     --output-on-failure \
                     --tests-regex \
-                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.examples2.targets | sed ':b;N;$!bb;s/\n/|/g'`
+                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.examples2.targets | sed ':b;N;$!bb;s/\n/|/g'` \
                     --exclude-regex \
                       "tests.examples.transpose.transpose_block_numa"
 
@@ -245,7 +245,7 @@ jobs:
                     --no-compress-output \
                     --output-on-failure \
                     --tests-regex \
-                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit1.algorithms.targets | sed ':b;N;$!bb;s/\n/|/g'`
+                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit1.algorithms | sed ':b;N;$!bb;s/\n/|/g'`
 
             - name: Collect test artifacts
               if: always()
@@ -297,7 +297,7 @@ jobs:
                     --no-compress-output \
                     --output-on-failure \
                     --tests-regex \
-                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit2.algorithms.targets | sed ':b;N;$!bb;s/\n/|/g'`
+                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit2.algorithms | sed ':b;N;$!bb;s/\n/|/g'`
 
             - name: Collect test artifacts
               if: always()
@@ -349,7 +349,7 @@ jobs:
                     --no-compress-output \
                     --output-on-failure \
                     --tests-regex \
-                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit3.algorithms.targets | sed ':b;N;$!bb;s/\n/|/g'`
+                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit3.algorithms | sed ':b;N;$!bb;s/\n/|/g'`
                     --exclude-regex \
                       "tests.unit.modules.algorithms.algorithms.foreach_std_policies"
 
@@ -403,7 +403,7 @@ jobs:
                     --no-compress-output \
                     --output-on-failure \
                     --tests-regex \
-                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit4.algorithms.targets | sed ':b;N;$!bb;s/\n/|/g'`
+                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit4.algorithms | sed ':b;N;$!bb;s/\n/|/g'`
 
             - name: Collect test artifacts
               if: always()
@@ -823,7 +823,7 @@ jobs:
                     --no-compress-output \
                     --output-on-failure \
                     --tests-regex \
-                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit4.targets | sed ':b;N;$!bb;s/\n/|/g'`
+                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit4.targets | sed ':b;N;$!bb;s/\n/|/g'` \
                     --exclude-regex \
                       "tests.unit.modules.resource_partitioner.scheduler_binding_check"
 
@@ -929,7 +929,7 @@ jobs:
                     --no-compress-output \
                     --output-on-failure \
                     --tests-regex \
-                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.regressions1.targets | sed ':b;N;$!bb;s/\n/|/g'`
+                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.regressions1.targets | sed ':b;N;$!bb;s/\n/|/g'` \
                     --exclude-regex \
                       "tests.regressions.modules.threading_base.thread_stacksize_current"
 
@@ -983,7 +983,7 @@ jobs:
                     --no-compress-output \
                     --output-on-failure \
                     --tests-regex \
-                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.regressions2.targets | sed ':b;N;$!bb;s/\n/|/g'`
+                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.regressions2.targets | sed ':b;N;$!bb;s/\n/|/g'` \
                     --exclude-regex \
                       "tests.regressions.modules.command_line_handling_local|\
                       tests.regressions.modules.parcelset.distributed.tcp.nested_vectors_6623|\
