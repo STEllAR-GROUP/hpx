@@ -175,10 +175,13 @@ function(hpx_setup_target target)
       set(_wrap_main_deps HPX::wrap_main)
     endif()
     target_link_libraries(${target} ${__tll_public} HPX::hpx ${_wrap_main_deps})
-    hpx_handle_component_dependencies(target_COMPONENT_DEPENDENCIES)
-    target_link_libraries(
-      ${target} ${__tll_public} ${target_COMPONENT_DEPENDENCIES}
-    )
+
+    if(HPX_WITH_DISTRIBUTED_RUNTIME)
+      hpx_handle_component_dependencies(target_COMPONENT_DEPENDENCIES)
+      target_link_libraries(
+        ${target} ${__tll_public} ${target_COMPONENT_DEPENDENCIES}
+      )
+    endif()
 
     if(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL)
       if("${_type}" STREQUAL "EXECUTABLE")
@@ -229,6 +232,9 @@ function(hpx_setup_target target)
   if(HPX_WITH_CXX_MODULES AND target_SCAN_FOR_MODULES)
     hpx_debug("setup_target.${target} SCAN_FOR_MODULES: ON")
     hpx_configure_module_consumer(${target} hpx_core_module_if)
+    if(TARGET hpx_full_module_if)
+      hpx_configure_module_consumer(${target} hpx_full_module_if)
+    endif()
   else()
     hpx_debug("setup_target.${target} SCAN_FOR_MODULES: OFF")
 

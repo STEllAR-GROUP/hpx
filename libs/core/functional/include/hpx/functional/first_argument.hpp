@@ -66,20 +66,20 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename F, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename F, typename Enable = void>
     struct first_argument
     {
     };
 
     // Specialization for actions
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     struct first_argument<F, std::enable_if_t<hpx::traits::is_action_v<F>>>
       : detail::tuple_first_argument<typename F::arguments_type>
     {
     };
 
     // Specialization for functions
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     struct first_argument<F,
         std::enable_if_t<!hpx::traits::is_action_v<F> &&
             std::is_function_v<std::remove_pointer_t<F>>>>
@@ -88,7 +88,7 @@ namespace hpx::util {
     };
 
     // Specialization for lambdas
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     struct first_argument<F,
         std::enable_if_t<!hpx::traits::is_action_v<F> &&
             !std::is_function_v<std::remove_pointer_t<F>>>>
@@ -96,6 +96,6 @@ namespace hpx::util {
     {
     };
 
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     using first_argument_t = typename first_argument<F>::type;
 }    // namespace hpx::util

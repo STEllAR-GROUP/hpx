@@ -20,9 +20,9 @@
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/hashing.hpp>
 #include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <array>
 #include <atomic>

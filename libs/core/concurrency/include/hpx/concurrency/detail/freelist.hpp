@@ -14,7 +14,8 @@
 namespace hpx::lockfree {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Alloc = std::allocator<T>>
+    HPX_CXX_CORE_EXPORT template <typename T,
+        typename Alloc = std::allocator<T>>
     class caching_freelist : public lockfree::detail::freelist_stack<T, Alloc>
     {
         using base_type = lockfree::detail::freelist_stack<T, Alloc>;
@@ -36,7 +37,8 @@ namespace hpx::lockfree {
         }
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Alloc = std::allocator<T>>
+    HPX_CXX_CORE_EXPORT template <typename T,
+        typename Alloc = std::allocator<T>>
     class static_freelist : public lockfree::detail::freelist_stack<T, Alloc>
     {
         using base_type = lockfree::detail::freelist_stack<T, Alloc>;
@@ -58,11 +60,11 @@ namespace hpx::lockfree {
         }
     };
 
-    HPX_CXX_EXPORT struct caching_freelist_t
+    HPX_CXX_CORE_EXPORT struct caching_freelist_t
     {
     };
 
-    HPX_CXX_EXPORT struct static_freelist_t
+    HPX_CXX_CORE_EXPORT struct static_freelist_t
     {
     };
 }    // namespace hpx::lockfree

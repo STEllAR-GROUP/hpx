@@ -36,7 +36,7 @@ namespace hpx::execution::experimental {
     //      auto work = execution::then(snd, fn);
     //      execution::start_detached(work);
     //
-    HPX_CXX_EXPORT inline constexpr struct execute_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct execute_t final
       : hpx::functional::detail::tag_fallback<execute_t>
     {
     private:

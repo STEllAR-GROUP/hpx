@@ -15,7 +15,8 @@
 
 namespace hpx::execution::experimental {
 
-    HPX_CXX_EXPORT template <typename F, typename Sender, typename... Senders>
+    HPX_CXX_CORE_EXPORT template <typename F, typename Sender,
+        typename... Senders>
     constexpr HPX_FORCEINLINE auto tag_invoke(
         hpx::detail::dataflow_t, F&& f, Sender&& sender, Senders&&... senders)
         -> decltype(hpx::execution::experimental::then(
@@ -29,7 +30,8 @@ namespace hpx::execution::experimental {
             HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename F, typename Sender, typename... Senders>
+    HPX_CXX_CORE_EXPORT template <typename F, typename Sender,
+        typename... Senders>
     constexpr HPX_FORCEINLINE auto tag_invoke(hpx::detail::dataflow_t,
         hpx::launch, F&& f, Sender&& sender, Senders&&... senders)
         -> decltype(hpx::execution::experimental::then(
@@ -68,7 +70,7 @@ namespace hpx::execution::experimental {
     namespace detail {
 
         // callback object to request cancellation
-        HPX_CXX_EXPORT struct on_stop_requested
+        HPX_CXX_CORE_EXPORT struct on_stop_requested
         {
             hpx::experimental::in_place_stop_source& stop_source_;
             void operator()() noexcept
@@ -81,7 +83,7 @@ namespace hpx::execution::experimental {
         // passed to when_all. When set_value is called, it will emplace the
         // values sent into the appropriate position in the pack used to store
         // values from all predecessor senders.
-        HPX_CXX_EXPORT template <typename OperationState>
+        HPX_CXX_CORE_EXPORT template <typename OperationState>
         struct when_all_receiver
         {
             std::decay_t<OperationState>& op_state;
@@ -200,7 +202,7 @@ namespace hpx::execution::experimental {
         // set_value would give an error about accessing an incomplete type, if
         // the member set_value were a hidden friend tag_invoke overload
         // instead.
-        HPX_CXX_EXPORT template <typename OperationState, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename OperationState, typename... Ts>
         auto tag_invoke(set_value_t, when_all_receiver<OperationState>&& r,
             Ts&&... ts) noexcept
             -> decltype(r.set_value(HPX_FORWARD(Ts, ts)...), void())
@@ -208,7 +210,7 @@ namespace hpx::execution::experimental {
             r.set_value(HPX_FORWARD(Ts, ts)...);
         }
 
-        HPX_CXX_EXPORT template <typename... Senders>
+        HPX_CXX_CORE_EXPORT template <typename... Senders>
         struct when_all_sender
         {
             using is_sender = void;
@@ -532,7 +534,7 @@ namespace hpx::execution::experimental {
     // is started, in which case it completes inline within the call to start.
     //
     // The returned sender has no completion schedulers.
-    HPX_CXX_EXPORT inline constexpr struct when_all_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct when_all_t final
       : hpx::functional::detail::tag_fallback<when_all_t>
     {
     private:
@@ -554,7 +556,7 @@ namespace hpx::execution::experimental {
     // execution::when_all_with_variant is used to join multiple sender chains
     // and create a sender whose execution is dependent on all the input
     // senders, each of which may have one or more sets of sent values.
-    HPX_CXX_EXPORT inline constexpr struct when_all_with_variant_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct when_all_with_variant_t final
       : hpx::functional::tag<when_all_with_variant_t>
     {
     } when_all_with_variant{};
@@ -563,7 +565,7 @@ namespace hpx::execution::experimental {
     // and create a sender whose execution is dependent on all the input
     // senders that only send a single set of values each, while also making
     // sure that they complete on the specified scheduler.
-    HPX_CXX_EXPORT inline constexpr struct transfer_when_all_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct transfer_when_all_t final
       : hpx::functional::detail::tag_fallback<transfer_when_all_t>
     {
     private:
@@ -588,14 +590,15 @@ namespace hpx::execution::experimental {
     // execution::transfer_when_all_with_variant is used to join multiple
     // sender chains and create a sender whose execution is dependent on all
     // the input senders, which may have one or more sets of sent values.
-    HPX_CXX_EXPORT inline constexpr struct transfer_when_all_with_variant_t
+    HPX_CXX_CORE_EXPORT inline constexpr struct transfer_when_all_with_variant_t
         final : hpx::functional::tag<transfer_when_all_with_variant_t>
     {
     } transfer_when_all_with_variant{};
 
     // the following enables directly using dataflow() with senders
 
-    HPX_CXX_EXPORT template <typename F, typename Sender, typename... Senders>
+    HPX_CXX_CORE_EXPORT template <typename F, typename Sender,
+        typename... Senders>
     constexpr HPX_FORCEINLINE auto tag_invoke(
         hpx::detail::dataflow_t, F&& f, Sender&& sender, Senders&&... senders)
         -> decltype(then(when_all(HPX_FORWARD(Sender, sender),
@@ -607,7 +610,8 @@ namespace hpx::execution::experimental {
             HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename F, typename Sender, typename... Senders>
+    HPX_CXX_CORE_EXPORT template <typename F, typename Sender,
+        typename... Senders>
     constexpr HPX_FORCEINLINE auto tag_invoke(hpx::detail::dataflow_t,
         hpx::launch, F&& f, Sender&& sender, Senders&&... senders)
         -> decltype(then(when_all(HPX_FORWARD(Sender, sender),

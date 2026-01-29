@@ -26,22 +26,22 @@
 
 namespace hpx::filesystem {
 
-    HPX_CXX_EXPORT using namespace std::filesystem;
+    HPX_CXX_CORE_EXPORT using namespace std::filesystem;
 
-    HPX_CXX_EXPORT using std::filesystem::canonical;
+    HPX_CXX_CORE_EXPORT using std::filesystem::canonical;
 
-    HPX_CXX_EXPORT [[nodiscard]] inline path initial_path()
+    HPX_CXX_CORE_EXPORT [[nodiscard]] inline path initial_path()
     {
         static path ip = current_path();
         return ip;
     }
 
-    HPX_CXX_EXPORT [[nodiscard]] inline std::string basename(path const& p)
+    HPX_CXX_CORE_EXPORT [[nodiscard]] inline std::string basename(path const& p)
     {
         return p.stem().string();
     }
 
-    HPX_CXX_EXPORT [[nodiscard]] inline path canonical(
+    HPX_CXX_CORE_EXPORT [[nodiscard]] inline path canonical(
         path const& p, path const& base)
     {
         if (p.is_relative())
@@ -54,7 +54,7 @@ namespace hpx::filesystem {
         }
     }
 
-    HPX_CXX_EXPORT [[nodiscard]] inline path canonical(
+    HPX_CXX_CORE_EXPORT [[nodiscard]] inline path canonical(
         path const& p, path const& base, std::error_code& ec)
     {
         if (p.is_relative())
@@ -82,27 +82,27 @@ static_assert(BOOST_FILESYSTEM_VERSION == 3,
 
 namespace hpx::filesystem {
 
-    HPX_CXX_EXPORT using namespace boost::filesystem;
+    HPX_CXX_CORE_EXPORT using namespace boost::filesystem;
 
-    HPX_CXX_EXPORT using boost::filesystem::canonical;
+    HPX_CXX_CORE_EXPORT using boost::filesystem::canonical;
 
-    HPX_CXX_EXPORT [[nodiscard]] inline path canonical(
+    HPX_CXX_CORE_EXPORT [[nodiscard]] inline path canonical(
         path const& p, path const& base, std::error_code& ec)
     {
         return canonical(p, base, compat_error_code(ec));
     }
 
-    HPX_CXX_EXPORT using boost::filesystem::exists;
+    HPX_CXX_CORE_EXPORT using boost::filesystem::exists;
 
-    HPX_CXX_EXPORT [[nodiscard]] inline bool exists(
+    HPX_CXX_CORE_EXPORT [[nodiscard]] inline bool exists(
         path const& p, std::error_code& ec) noexcept
     {
         return exists(p, compat_error_code(ec));
     }
 
-    HPX_CXX_EXPORT using boost::filesystem::is_regular_file;
+    HPX_CXX_CORE_EXPORT using boost::filesystem::is_regular_file;
 
-    HPX_CXX_EXPORT [[nodiscard]] inline bool is_regular_file(
+    HPX_CXX_CORE_EXPORT [[nodiscard]] inline bool is_regular_file(
         path const& p, std::error_code& ec) noexcept
     {
         return is_regular_file(p, compat_error_code(ec));

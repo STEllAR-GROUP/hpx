@@ -40,7 +40,7 @@ namespace hpx {
 #else
 
 #if defined(HPX_FUNCTIONAL_HAVE_BOOST_PLACEHOLDERS)
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_placeholder
       : std::integral_constant<int,
             std::is_placeholder_v<T> != 0 ? std::is_placeholder_v<T> :
@@ -48,18 +48,18 @@ namespace hpx {
     {
     };
 #else
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_placeholder : std::is_placeholder<T>
     {
     };
 #endif
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_placeholder<T const> : is_placeholder<T>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr int is_placeholder_v = is_placeholder<T>::value;
 #endif
 }    // namespace hpx

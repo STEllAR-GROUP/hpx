@@ -13,11 +13,9 @@
 #include <hpx/components_base/components_base_fwd.hpp>
 #include <hpx/components_base/traits/component_type_database.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/thread_support.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/gid_type.hpp>
-#include <hpx/naming_base/naming_base.hpp>
 
 #include <cstdint>
 #include <string>

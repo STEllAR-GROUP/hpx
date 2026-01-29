@@ -14,7 +14,7 @@
 
 namespace hpx {
 
-    HPX_CXX_EXPORT using std::bit_cast;
+    HPX_CXX_CORE_EXPORT using std::bit_cast;
 }    // namespace hpx
 
 #else
@@ -26,7 +26,7 @@ namespace hpx {
 
 namespace hpx {
 
-    HPX_CXX_EXPORT template <typename To, typename From>
+    HPX_CXX_CORE_EXPORT template <typename To, typename From>
     // NOLINTNEXTLINE(bugprone-sizeof-expression)
     std::enable_if_t<sizeof(To) == sizeof(From) &&
             std::is_trivially_copyable_v<From> &&

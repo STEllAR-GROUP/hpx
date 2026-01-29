@@ -30,7 +30,7 @@ namespace hpx::parallel::detail {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename FwdIter>
+    HPX_CXX_CORE_EXPORT template <typename FwdIter>
     struct set_operations_buffer
     {
         template <typename T>
@@ -68,7 +68,7 @@ namespace hpx::parallel::detail {
             value_type, rewritable_ref<value_type>>;
     };
 
-    HPX_CXX_EXPORT struct set_chunk_data
+    HPX_CXX_CORE_EXPORT struct set_chunk_data
     {
         static constexpr std::size_t uninit_start =
             static_cast<std::size_t>(-1);
@@ -88,9 +88,10 @@ namespace hpx::parallel::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter1, typename Sent1,
-        typename Iter2, typename Sent2, typename Iter3, typename F,
-        typename Proj1, typename Proj2, typename Combiner, typename SetOp>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
+        typename Sent1, typename Iter2, typename Sent2, typename Iter3,
+        typename F, typename Proj1, typename Proj2, typename Combiner,
+        typename SetOp>
     util::detail::algorithm_result_t<ExPolicy,
         util::in_in_out_result<Iter1, Iter2, Iter3>>
     set_operation(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,

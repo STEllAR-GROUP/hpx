@@ -272,7 +272,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT inline constexpr struct uninitialized_fill_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct uninitialized_fill_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_fill_t>
     {
     private:
@@ -355,7 +355,7 @@ namespace hpx::ranges {
         }
     } uninitialized_fill{};
 
-    HPX_CXX_EXPORT inline constexpr struct uninitialized_fill_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct uninitialized_fill_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_fill_n_t>
     {
     private:

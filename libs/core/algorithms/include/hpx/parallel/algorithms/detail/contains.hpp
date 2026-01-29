@@ -17,7 +17,7 @@
 
 namespace hpx::parallel::detail {
 
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct sequential_contains_t final
       : hpx::functional::detail::tag_fallback<sequential_contains_t<ExPolicy>>
     {
@@ -58,7 +58,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     inline constexpr sequential_contains_t<ExPolicy> sequential_contains =
         sequential_contains_t<ExPolicy>{};
 }    //namespace hpx::parallel::detail

@@ -19,7 +19,7 @@
 
 namespace hpx::serialization {
 
-    HPX_CXX_EXPORT template <typename Derived, typename Base,
+    HPX_CXX_CORE_EXPORT template <typename Derived, typename Base,
         typename Enable = void>
     struct base_object_type
     {
@@ -39,7 +39,7 @@ namespace hpx::serialization {
 
     // we need another specialization to explicitly specify non-virtual calls of
     // virtual functions in intrusively serialized base classes.
-    HPX_CXX_EXPORT template <typename Derived, typename Base>
+    HPX_CXX_CORE_EXPORT template <typename Derived, typename Base>
     struct base_object_type<Derived, Base,
         std::enable_if_t<hpx::traits::is_intrusive_polymorphic_v<Derived>>>
     {
@@ -64,7 +64,7 @@ namespace hpx::serialization {
         HPX_SERIALIZATION_SPLIT_MEMBER();
     };
 
-    HPX_CXX_EXPORT template <typename Base, typename Derived>
+    HPX_CXX_CORE_EXPORT template <typename Base, typename Derived>
     constexpr base_object_type<Derived, Base> base_object(Derived& d) noexcept
     {
         return base_object_type<Derived, Base>(d);
@@ -73,7 +73,7 @@ namespace hpx::serialization {
     // allow our base_object_type to be serialized as prvalue compiler should
     // support good ADL implementation, but it is rather for all hpx
     // serialization library
-    HPX_CXX_EXPORT template <typename D, typename B>
+    HPX_CXX_CORE_EXPORT template <typename D, typename B>
     HPX_FORCEINLINE output_archive& operator<<(
         output_archive& ar, base_object_type<D, B> t)
     {
@@ -81,7 +81,7 @@ namespace hpx::serialization {
         return ar;
     }
 
-    HPX_CXX_EXPORT template <typename D, typename B>
+    HPX_CXX_CORE_EXPORT template <typename D, typename B>
     HPX_FORCEINLINE input_archive& operator>>(
         input_archive& ar, base_object_type<D, B> t)
     {
@@ -89,7 +89,7 @@ namespace hpx::serialization {
         return ar;
     }
 
-    HPX_CXX_EXPORT template <typename D, typename B>
+    HPX_CXX_CORE_EXPORT template <typename D, typename B>
     HPX_FORCEINLINE output_archive& operator&(    //-V524
         output_archive& ar, base_object_type<D, B> t)
     {
@@ -97,7 +97,7 @@ namespace hpx::serialization {
         return ar;
     }
 
-    HPX_CXX_EXPORT template <typename D, typename B>
+    HPX_CXX_CORE_EXPORT template <typename D, typename B>
     HPX_FORCEINLINE input_archive& operator&(    //-V524
         input_archive& ar, base_object_type<D, B> t)
     {

@@ -14,7 +14,7 @@
 
 namespace hpx::util::plugin {
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     using shared_ptr = std::shared_ptr<T>;
 }    // namespace hpx::util::plugin
 

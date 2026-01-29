@@ -14,7 +14,7 @@
 
 namespace hpx::string_util {
 
-    HPX_CXX_EXPORT template <typename CharT, class Traits, class Alloc>
+    HPX_CXX_CORE_EXPORT template <typename CharT, class Traits, class Alloc>
     void to_lower(std::basic_string<CharT, Traits, Alloc>& s)
     {
         std::transform(std::begin(s), std::end(s), std::begin(s),

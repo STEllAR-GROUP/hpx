@@ -16,20 +16,16 @@ namespace hpx::naming {
     template <typename Archive>
     void address::save(Archive& ar, unsigned int /* version */) const
     {
-        // clang-format off
         std::size_t address = reinterpret_cast<std::size_t>(address_);
         ar & locality_ & type_ & address;
-        // clang-format on
     }
 
     template <typename Archive>
     void address::load(Archive& ar, unsigned int /* version */)
     {
-        // clang-format off
         std::size_t address;
         ar & locality_ & type_ & address;
         address_ = reinterpret_cast<address_type>(address);
-        // clang-format on
     }
 
     template HPX_EXPORT void address::save(

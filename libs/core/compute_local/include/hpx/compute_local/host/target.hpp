@@ -22,7 +22,7 @@
 
 namespace hpx::compute::host {
 
-    HPX_CXX_EXPORT struct HPX_CORE_EXPORT target
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT target
     {
         struct native_handle_type
         {

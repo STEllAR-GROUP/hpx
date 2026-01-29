@@ -30,12 +30,12 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT struct run_loop_data;
+        HPX_CXX_CORE_EXPORT struct run_loop_data;
 
         HPX_CORE_EXPORT void intrusive_ptr_add_ref(run_loop_data* p) noexcept;
         HPX_CORE_EXPORT void intrusive_ptr_release(run_loop_data* p) noexcept;
 
-        HPX_CXX_EXPORT struct run_loop_data
+        HPX_CXX_CORE_EXPORT struct run_loop_data
         {
             using mutex_type = hpx::spinlock;
 
@@ -80,7 +80,7 @@ namespace hpx::execution::experimental {
     // operation states to hold the work units to make scheduling
     // allocation-free. -- end note]
     //
-    HPX_CXX_EXPORT class run_loop
+    HPX_CXX_CORE_EXPORT class run_loop
     {
         struct run_loop_opstate_base
         {
@@ -395,7 +395,7 @@ namespace hpx::execution::experimental {
         }
     };
 
-    HPX_CXX_EXPORT using run_loop_scheduler = run_loop::run_loop_scheduler;
+    HPX_CXX_CORE_EXPORT using run_loop_scheduler = run_loop::run_loop_scheduler;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ReceiverId>

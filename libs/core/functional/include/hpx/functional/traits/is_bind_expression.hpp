@@ -28,16 +28,16 @@ namespace hpx {
     ///          argument of this type will be invoked as a function object and
     ///          will be given all the unbound arguments passed to the
     ///          bind-generated object.
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_bind_expression : std::is_bind_expression<T>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_bind_expression<T const> : is_bind_expression<T>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_bind_expression_v = is_bind_expression<T>::value;
 }    // namespace hpx

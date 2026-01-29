@@ -23,7 +23,7 @@
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT struct HPX_CORE_EXPORT mpi_environment
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT mpi_environment
     {
         static bool check_mpi_environment(runtime_configuration const& cfg);
 
@@ -125,7 +125,7 @@ namespace hpx::util {
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT struct HPX_CORE_EXPORT mpi_environment
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT mpi_environment
     {
         static bool check_mpi_environment(runtime_configuration const& cfg);
     };

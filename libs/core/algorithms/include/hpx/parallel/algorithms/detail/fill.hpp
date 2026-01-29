@@ -16,7 +16,7 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename T>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent, typename T>
     constexpr Iter sequential_fill_helper(Iter first, Sent last, T const& value)
     {
         for (; first != last; ++first)
@@ -26,7 +26,7 @@ namespace hpx::parallel::detail {
         return first;
     }
 
-    HPX_CXX_EXPORT struct sequential_fill_t
+    HPX_CXX_CORE_EXPORT struct sequential_fill_t
       : hpx::functional::detail::tag_fallback<sequential_fill_t>
     {
     private:
@@ -39,11 +39,11 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_CXX_EXPORT inline constexpr sequential_fill_t sequential_fill =
+    HPX_CXX_CORE_EXPORT inline constexpr sequential_fill_t sequential_fill =
         sequential_fill_t{};
 #else
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename Sent,
-        typename T>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
+        typename Sent, typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter sequential_fill(
         ExPolicy&& policy, Iter first, Sent last, T const& value)
     {
@@ -53,14 +53,14 @@ namespace hpx::parallel::detail {
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Iter, typename T>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename T>
     constexpr Iter sequential_fill_n_helper(
         Iter first, std::size_t count, T const& value)
     {
         return std::fill_n(first, count, value);
     }
 
-    HPX_CXX_EXPORT struct sequential_fill_n_t
+    HPX_CXX_CORE_EXPORT struct sequential_fill_n_t
       : hpx::functional::detail::tag_fallback<sequential_fill_n_t>
     {
     private:
@@ -73,10 +73,10 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_CXX_EXPORT inline constexpr sequential_fill_n_t sequential_fill_n =
+    HPX_CXX_CORE_EXPORT inline constexpr sequential_fill_n_t sequential_fill_n =
         sequential_fill_n_t{};
 #else
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename T>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter, typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter sequential_fill_n(
         ExPolicy&& policy, Iter first, std::size_t count, T const& value)
     {

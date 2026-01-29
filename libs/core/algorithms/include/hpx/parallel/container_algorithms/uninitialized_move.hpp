@@ -336,7 +336,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT inline constexpr struct uninitialized_move_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct uninitialized_move_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_move_t>
     {
     private:
@@ -455,7 +455,7 @@ namespace hpx::ranges {
         }
     } uninitialized_move{};
 
-    HPX_CXX_EXPORT inline constexpr struct uninitialized_move_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct uninitialized_move_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_move_n_t>
     {
     private:

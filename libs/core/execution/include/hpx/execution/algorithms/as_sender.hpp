@@ -25,7 +25,7 @@ namespace hpx::execution::experimental {
 
         ///////////////////////////////////////////////////////////////////////////
         // Operation state for sender compatibility
-        HPX_CXX_EXPORT template <typename Receiver, typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Receiver, typename Future>
         class as_sender_operation_state
         {
         private:
@@ -124,7 +124,7 @@ namespace hpx::execution::experimental {
             future_type future_;
         };
 
-        HPX_CXX_EXPORT template <typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Future>
         struct as_sender_sender_base
         {
             using result_type = typename std::decay_t<Future>::result_type;
@@ -180,10 +180,10 @@ namespace hpx::execution::experimental {
 #endif
         };
 
-        HPX_CXX_EXPORT template <typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Future>
         struct as_sender_sender;
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct as_sender_sender<hpx::future<T>>
           : public as_sender_sender_base<hpx::future<T>>
         {
@@ -213,7 +213,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct as_sender_sender<hpx::shared_future<T>>
           : as_sender_sender_base<hpx::shared_future<T>>
         {
@@ -259,7 +259,7 @@ namespace hpx::execution::experimental {
     // The difference to keep_future is that as_future propagates the value
     // stored in the future while keep_future will propagate the future instance
     // itself.
-    HPX_CXX_EXPORT inline constexpr struct as_sender_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct as_sender_t final
     {
         // clang-format off
         template <typename Future,

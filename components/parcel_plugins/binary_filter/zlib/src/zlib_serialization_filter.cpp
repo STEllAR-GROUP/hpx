@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,12 +7,14 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_COMPRESSION_ZLIB)
+#include <boost/iostreams/filter/zlib.hpp>
+
+#include <hpx/modules/actions.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/iostream.hpp>
 
 #include <hpx/binary_filter/zlib_serialization_filter.hpp>
-#include <hpx/modules/actions.hpp>
 #include <hpx/plugin_factories/binary_filter_factory.hpp>
 #include <hpx/plugin_factories/plugin_registry.hpp>
 
