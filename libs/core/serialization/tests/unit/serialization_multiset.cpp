@@ -54,7 +54,8 @@ void test_int()
         HPX_TEST_EQ(os.size(), is.size());
 
         std::multiset<int>::iterator j = is.begin();
-        for (std::multiset<int>::iterator i = os.begin(); i != os.end(); ++i, ++j)
+        for (std::multiset<int>::iterator i = os.begin(); i != os.end();
+            ++i, ++j)
         {
             HPX_TEST_EQ(*i, *j);
         }
@@ -83,7 +84,8 @@ void test(T min, T max)
         HPX_TEST_EQ(os.size(), is.size());
 
         typename std::multiset<T>::iterator j = is.begin();
-        for (typename std::multiset<T>::iterator i = os.begin(); i != os.end(); ++i)
+        for (typename std::multiset<T>::iterator i = os.begin(); i != os.end();
+            ++i)
         {
             HPX_TEST_EQ(*i, *j);
             ++j;
@@ -139,7 +141,8 @@ void test_fp(T min, T max)
         HPX_TEST_EQ(os.size(), is.size());
 
         typename std::multiset<T>::iterator j = is.begin();
-        for (typename std::multiset<T>::iterator i = os.begin(); i != os.end(); ++i)
+        for (typename std::multiset<T>::iterator i = os.begin(); i != os.end();
+            ++i)
         {
             HPX_TEST_EQ(*i, *j);
             ++j;

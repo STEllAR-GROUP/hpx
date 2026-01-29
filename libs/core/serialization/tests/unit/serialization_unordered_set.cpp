@@ -74,17 +74,20 @@ void test(T min, T max)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
-        std::unordered_set<T, std::hash<T>, std::equal_to<T>, std::allocator<T>> os;
+        std::unordered_set<T, std::hash<T>, std::equal_to<T>, std::allocator<T>>
+            os;
         for (T c = min; c < max; ++c)
         {
             os.insert(c);
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
-        std::unordered_set<T, std::hash<T>, std::equal_to<T>, std::allocator<T>> is;
+        std::unordered_set<T, std::hash<T>, std::equal_to<T>, std::allocator<T>>
+            is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for (auto i = os.begin(), j = is.begin(); i != os.end() && j != is.end(); ++i, ++j)
+        for (auto i = os.begin(), j = is.begin();
+            i != os.end() && j != is.end(); ++i, ++j)
         {
             HPX_TEST_EQ(os.count(*i), is.count(*i));
             HPX_TEST_EQ(os.count(*j), is.count(*j));
@@ -93,17 +96,22 @@ void test(T min, T max)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
-        std::unordered_set<A<T>, std::hash<A<T>>, std::equal_to<A<T>>, std::allocator<A<T>>> os;
+        std::unordered_set<A<T>, std::hash<A<T>>, std::equal_to<A<T>>,
+            std::allocator<A<T>>>
+            os;
         for (T c = min; c < max; ++c)
         {
             os.insert(A<T>(c));
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
-        std::unordered_set<A<T>, std::hash<A<T>>, std::equal_to<A<T>>, std::allocator<A<T>>> is;
+        std::unordered_set<A<T>, std::hash<A<T>>, std::equal_to<A<T>>,
+            std::allocator<A<T>>>
+            is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for (auto i = os.begin(), j = is.begin(); i != os.end() && j != is.end(); ++i, ++j)
+        for (auto i = os.begin(), j = is.begin();
+            i != os.end() && j != is.end(); ++i, ++j)
         {
             HPX_TEST_EQ(os.count(*i), is.count(*i));
             HPX_TEST_EQ(os.count(*j), is.count(*j));
@@ -117,17 +125,20 @@ void test_fp(T min, T max)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
-        std::unordered_set<T, std::hash<T>, std::equal_to<T>, std::allocator<T>> os;
+        std::unordered_set<T, std::hash<T>, std::equal_to<T>, std::allocator<T>>
+            os;
         for (T c = min; c < max; c += static_cast<T>(0.5))
         {
             os.insert(c);
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
-        std::unordered_set<T, std::hash<T>, std::equal_to<T>, std::allocator<T>> is;
+        std::unordered_set<T, std::hash<T>, std::equal_to<T>, std::allocator<T>>
+            is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for (auto i = os.begin(), j = is.begin(); i != os.end() && j != is.end(); ++i, ++j)
+        for (auto i = os.begin(), j = is.begin();
+            i != os.end() && j != is.end(); ++i, ++j)
         {
             HPX_TEST_EQ(os.count(*i), is.count(*i));
             HPX_TEST_EQ(os.count(*j), is.count(*j));
@@ -136,17 +147,22 @@ void test_fp(T min, T max)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);
-        std::unordered_set<A<T>, std::hash<A<T>>, std::equal_to<A<T>>, std::allocator<A<T>>> os;
+        std::unordered_set<A<T>, std::hash<A<T>>, std::equal_to<A<T>>,
+            std::allocator<A<T>>>
+            os;
         for (T c = min; c < max; c += static_cast<T>(0.5))
         {
             os.insert(A<T>(c));
         }
         oarchive << os;
         hpx::serialization::input_archive iarchive(buffer);
-        std::unordered_set<A<T>, std::hash<A<T>>, std::equal_to<A<T>>, std::allocator<A<T>>> is;
+        std::unordered_set<A<T>, std::hash<A<T>>, std::equal_to<A<T>>,
+            std::allocator<A<T>>>
+            is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for (auto i = os.begin(), j = is.begin(); i != os.end() && j != is.end(); ++i, ++j)
+        for (auto i = os.begin(), j = is.begin();
+            i != os.end() && j != is.end(); ++i, ++j)
         {
             HPX_TEST_EQ(os.count(*i), is.count(*i));
             HPX_TEST_EQ(os.count(*j), is.count(*j));
@@ -167,7 +183,9 @@ void test_vector_as_value()
 {
     std::vector<char> buffer;
     hpx::serialization::output_archive oarchive(buffer);
-    std::unordered_set<std::vector<int>, std::hash<std::vector<int>>, std::equal_to<std::vector<int>>, std::allocator<std::vector<int>>> os;
+    std::unordered_set<std::vector<int>, std::hash<std::vector<int>>,
+        std::equal_to<std::vector<int>>, std::allocator<std::vector<int>>>
+        os;
     for (int k = 0; k < 10; ++k)
     {
         std::vector<int> vec(10);
@@ -176,10 +194,13 @@ void test_vector_as_value()
     }
     oarchive << os;
     hpx::serialization::input_archive iarchive(buffer);
-    std::unordered_set<std::vector<int>, std::hash<std::vector<int>>, std::equal_to<std::vector<int>>, std::allocator<std::vector<int>>> is;
+    std::unordered_set<std::vector<int>, std::hash<std::vector<int>>,
+        std::equal_to<std::vector<int>>, std::allocator<std::vector<int>>>
+        is;
     iarchive >> is;
     HPX_TEST_EQ(os.size(), is.size());
-    for (auto i = os.begin(), j = is.begin(); i != os.end() && j != is.end(); ++i, ++j)
+    for (auto i = os.begin(), j = is.begin(); i != os.end() && j != is.end();
+        ++i, ++j)
     {
         HPX_TEST_EQ(os.count(*i), is.count(*i));
         HPX_TEST_EQ(os.count(*j), is.count(*j));

@@ -58,7 +58,7 @@ void test(T min, T max)
         for (T c = min; c < max; ++c)
         {
             os.insert(std::make_pair(c, A<T>(c)));
-            
+
             // inserting duplicates to test multimap
             os.insert(std::make_pair(c, A<T>(c)));
             os.insert(std::make_pair(c, A<T>(c)));
@@ -71,9 +71,11 @@ void test(T min, T max)
         for (auto const& v : os)
         {
             HPX_TEST_EQ(os.count(v.first), is.count(v.first));
-            for (auto it1 = os.equal_range(v.first).first, it2 = is.equal_range(v.first).first;
-                 it1 != os.equal_range(v.first).second && it2 != is.equal_range(v.first).second;
-                 ++it1, ++it2)
+            for (auto it1 = os.equal_range(v.first).first,
+                      it2 = is.equal_range(v.first).first;
+                it1 != os.equal_range(v.first).second &&
+                it2 != is.equal_range(v.first).second;
+                ++it1, ++it2)
             {
                 HPX_TEST_EQ(it1->second, it2->second);
             }
@@ -104,9 +106,11 @@ void test_fp(T min, T max)
         for (auto const& v : os)
         {
             HPX_TEST_EQ(os.count(v.first), is.count(v.first));
-            for (auto it1 = os.equal_range(v.first).first, it2 = is.equal_range(v.first).first;
-                 it1 != os.equal_range(v.first).second && it2 != is.equal_range(v.first).second;
-                 ++it1, ++it2)
+            for (auto it1 = os.equal_range(v.first).first,
+                      it2 = is.equal_range(v.first).first;
+                it1 != os.equal_range(v.first).second &&
+                it2 != is.equal_range(v.first).second;
+                ++it1, ++it2)
             {
                 HPX_TEST_EQ(it1->second, it2->second);
             }
@@ -146,9 +150,11 @@ void test_vector_as_value()
     for (auto const& v : os)
     {
         HPX_TEST_EQ(os.count(v.first), is.count(v.first));
-        for (auto it1 = os.equal_range(v.first).first, it2 = is.equal_range(v.first).first;
-                it1 != os.equal_range(v.first).second && it2 != is.equal_range(v.first).second;
-                ++it1, ++it2)
+        for (auto it1 = os.equal_range(v.first).first,
+                  it2 = is.equal_range(v.first).first;
+            it1 != os.equal_range(v.first).second &&
+            it2 != is.equal_range(v.first).second;
+            ++it1, ++it2)
         {
             HPX_TEST_EQ(it1->second, it2->second);
         }

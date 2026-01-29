@@ -73,8 +73,10 @@ void test(T min, T max)
         for (auto const& v : os)
         {
             HPX_TEST_EQ(os.count(v.first), is.count(v.first));
-            for (auto it1 = os.equal_range(v.first).first, it2 = is.equal_range(v.first).first;
-                it1 != os.equal_range(v.first).second && it2 != is.equal_range(v.first).second;
+            for (auto it1 = os.equal_range(v.first).first,
+                      it2 = is.equal_range(v.first).first;
+                it1 != os.equal_range(v.first).second &&
+                it2 != is.equal_range(v.first).second;
                 ++it1, ++it2)
             {
                 HPX_TEST_EQ(os.count(it1->first), is.count(it1->first));
@@ -107,8 +109,10 @@ void test_fp(T min, T max)
         for (auto const& v : os)
         {
             HPX_TEST_EQ(os.count(v.first), is.count(v.first));
-            for (auto it1 = os.equal_range(v.first).first, it2 = is.equal_range(v.first).first;
-                it1 != os.equal_range(v.first).second && it2 != is.equal_range(v.first).second;
+            for (auto it1 = os.equal_range(v.first).first,
+                      it2 = is.equal_range(v.first).first;
+                it1 != os.equal_range(v.first).second &&
+                it2 != is.equal_range(v.first).second;
                 ++it1, ++it2)
             {
                 HPX_TEST_EQ(os.count(it1->first), is.count(it1->first));
@@ -150,9 +154,11 @@ void test_vector_as_value()
     for (auto const& v : os)
     {
         HPX_TEST_EQ(os.count(v.first), is.count(v.first));
-        for (auto it1 = os.equal_range(v.first).first, it2 = is.equal_range(v.first).first;
-                it1 != os.equal_range(v.first).second && it2 != is.equal_range(v.first).second;
-                ++it1, ++it2)
+        for (auto it1 = os.equal_range(v.first).first,
+                  it2 = is.equal_range(v.first).first;
+            it1 != os.equal_range(v.first).second &&
+            it2 != is.equal_range(v.first).second;
+            ++it1, ++it2)
         {
             HPX_TEST_EQ(os.count(it1->first), is.count(it1->first));
             HPX_TEST_EQ(os.count(it2->first), is.count(it2->first));
