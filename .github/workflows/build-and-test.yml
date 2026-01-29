@@ -12,7 +12,7 @@ on:
             - ".github/workflows/test-only.yml"
 
 jobs:
-    build-all:
+    configure-core-core_local-components:
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -103,7 +103,7 @@ jobs:
                   key: ${{ runner.os }}-hpx-build-${{ github.sha }}
 
     tests-example1:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -155,7 +155,7 @@ jobs:
                   path: /hpx/build/tests-example1/
 
     tests-example2:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -209,7 +209,7 @@ jobs:
                   path: /hpx/build/tests-example2/
 
     tests-unit1-algorithms:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -261,7 +261,7 @@ jobs:
                   path: /hpx/build/tests-unit1-algorithms/
 
     tests-unit2-algorithms:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -313,7 +313,7 @@ jobs:
                   path: /hpx/build/tests-unit2-algorithms/
 
     tests-unit3-algorithms:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -349,7 +349,7 @@ jobs:
                     --no-compress-output \
                     --output-on-failure \
                     --tests-regex \
-                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit3.algorithms | sed ':b;N;$!bb;s/\n/|/g'`
+                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit3.algorithms | sed ':b;N;$!bb;s/\n/|/g'` \
                     --exclude-regex \
                       "tests.unit.modules.algorithms.algorithms.foreach_std_policies"
 
@@ -367,7 +367,7 @@ jobs:
                   path: /hpx/build/tests-unit3-algorithms/
 
     tests-unit4-algorithms:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -419,7 +419,7 @@ jobs:
                   path: /hpx/build/tests-unit4-algorithms/
                 
     tests-unit1-container_algorithms:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -455,7 +455,7 @@ jobs:
                     --no-compress-output \
                     --output-on-failure \
                     --tests-regex \
-                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit1.container_algorithms | sed ':b;N;$!bb;s/\n/|/g'`
+                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit1.container_algorithms | sed ':b;N;$!bb;s/\n/|/g'` \
                     --exclude-regex \
                       "tests.unit.modules.algorithms.container_algorithms.for_loop_range_generator"
 
@@ -473,7 +473,7 @@ jobs:
                   path: /hpx/build/tests-unit1-container-algorithms/
 
     tests-unit2-container_algorithms:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -525,7 +525,7 @@ jobs:
                   path: /hpx/build/tests-unit2-container-algorithms/
 
     tests-unit1-segmented_algorithms:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -577,7 +577,7 @@ jobs:
                   path: /hpx/build/tests-unit1-segmented-algorithms/
 
     tests-unit2-segmented_algorithms:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -629,7 +629,7 @@ jobs:
                   path: /hpx/build/tests-unit2-segmented-algorithms/
 
     tests-unit1:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -681,7 +681,7 @@ jobs:
                   path: /hpx/build/tests-unit1/
 
     tests-unit2:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -717,7 +717,7 @@ jobs:
                     --no-compress-output \
                     --output-on-failure \
                     --tests-regex \
-                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit2.targets | sed ':b;N;$!bb;s/\n/|/g'`
+                      `grep -v -e ^# -e ^$ /hpx/source/.github/test-targets/tests.unit2.targets | sed ':b;N;$!bb;s/\n/|/g'` \
                     --exclude-regex \
                       "tests.unit.modules.compute_local.numa_allocator"
 
@@ -735,7 +735,7 @@ jobs:
                   path: /hpx/build/tests-unit2/
 
     tests-unit3:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -787,7 +787,7 @@ jobs:
                   path: /hpx/build/tests-unit3/
 
     tests-unit4:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -841,7 +841,7 @@ jobs:
                   path: /hpx/build/tests-unit4/
 
     tests-unit5:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -893,7 +893,7 @@ jobs:
                   path: /hpx/build/tests-unit5/
 
     tests-regression1:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -947,7 +947,7 @@ jobs:
                   path: /hpx/build/tests-regressions1/
 
     tests-regression2:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -1005,7 +1005,7 @@ jobs:
                   path: /hpx/build/tests-regressions2/
                
     tests-headers1_1:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -1044,7 +1044,7 @@ jobs:
                   path: /hpx/build/tests-headers1_1/
 
     tests-headers1_2:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -1083,7 +1083,7 @@ jobs:
                   path: /hpx/build/tests-headers1_2/
 
     tests-headers2_1:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -1122,7 +1122,7 @@ jobs:
                   path: /hpx/build/tests-headers2_1/
 
     tests-headers2_2:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -1161,7 +1161,7 @@ jobs:
                   path: /hpx/build/tests-headers2_2/
 
     tests-headers2_3:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -1200,7 +1200,7 @@ jobs:
                   path: /hpx/build/tests-headers2_3/
 
     tests-headers3_1:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -1239,7 +1239,7 @@ jobs:
                   path: /hpx/build/tests-headers3_1/
 
     tests-headers3_2:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -1278,7 +1278,7 @@ jobs:
                   path: /hpx/build/tests-headers3_2/
 
     tests-headers4_1:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -1317,7 +1317,7 @@ jobs:
                   path: /hpx/build/tests-headers4_1/
 
     tests-headers4_2:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -1356,7 +1356,7 @@ jobs:
                   path: /hpx/build/tests-headers4_2/
 
     tests-performance:
-        needs: build-all
+        needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
