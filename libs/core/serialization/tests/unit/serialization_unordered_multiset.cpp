@@ -42,7 +42,7 @@ struct A
     }
 };
 
-// Hash function fpr A
+// Hash function for A
 template <typename T>
 struct std::hash<A<T>>
 {
