@@ -103,12 +103,6 @@ jobs:
                 name: hpx-inspect-report
                 path: /hpx/build/hpx_inspect_report.html
 
-            - name: Publish test results
-              if: always()
-              uses: EnricoMi/publish-unit-test-result-action@v2
-              with:
-                files: /report/hpx_inspect.xml
-
             - name: Upload inspect binary
               uses: actions/upload-artifact@v4
               with:
