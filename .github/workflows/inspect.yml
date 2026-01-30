@@ -1,0 +1,116 @@
+# Copyright (c) 2026 The STE||AR Group
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+name: Inspect
+
+on:
+    push
+
+jobs:
+    inspect:
+        runs-on: ubuntu-latest
+        container: stellargroup/build_env:17
+
+        steps:
+            - uses: actions/checkout@v6
+
+            - name: Setup HPX workspace
+              shell: bash
+              run: |
+                  mkdir -p /hpx/source /hpx/build
+                  cp -r $GITHUB_WORKSPACE/. /hpx/source/
+
+            - name: Configure (Running CMake)
+              shell: bash
+              timeout-minutes: 30
+              working-directory: /hpx/build
+              run: |
+                  cmake --version
+                  if [ "${{ github.event_name }}" != "pull_request" ] && \
+                    ( [ "${{ github.ref_name }}" == "master" ] || \
+                      [[ "${{ github.ref_name }}" =~ ^release.* ]] || \
+                      [ "${{ github.ref_type }}" == "tag" ] ); then
+                    DOCUMENTATION_OUTPUT_FORMATS="html;singlehtml;latexpdf"
+                  else
+                    DOCUMENTATION_OUTPUT_FORMATS="html"  # ← FIX INDENTATION
+                  fi
+
+                  # Disable Vc for now as otherwise we need to reconfigure during the
+                  # install step, which in turn forces everything to be rebuilt.
+                  # -DHPX_WITH_DATAPAR_VC=On
+                  cmake \
+                    /hpx/source \
+                    -G "Ninja" \
+                    -DCMAKE_BUILD_TYPE=Debug \
+                    -DHPX_WITH_MALLOC=system \
+                    -DHPX_WITH_FETCH_ASIO=Off \
+                    -DHPX_WITH_GIT_COMMIT=${{ github.sha }} \
+                    -DHPX_WITH_GIT_BRANCH="${{ github.ref_name }}" \
+                    -DHPX_WITH_GIT_TAG="${{ github.ref_type == 'tag' && github.ref_name || '' }}" \
+                    -DHPX_WITH_TOOLS=On \
+                    -DCMAKE_CXX_FLAGS="-fcolor-diagnostics" \
+                    -DHPX_WITH_TESTS_HEADERS=On \
+                    -DHPX_WITH_COMPILER_WARNINGS=On \
+                    -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=On \
+                    -DHPX_WITH_DEPRECATION_WARNINGS=On \
+                    -DCMAKE_CXX_CLANG_TIDY=clang-tidy-20 \
+                    -DHPX_WITH_THREAD_LOCAL_STORAGE=On \
+                    -DHPX_WITH_STACKTRACES_STATIC_SYMBOLS=On \
+                    -DHPX_WITH_STACKTRACES_DEMANGLE_SYMBOLS=Off \
+                    -DHPX_WITH_TESTS_DEBUG_LOG=On \
+                    -DHPX_WITH_TESTS_DEBUG_LOG_DESTINATION=/hpx/build/debug-log.txt \
+                    -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=On \
+                    -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On \
+                    -DHPX_LOGGING_WITH_SEPARATE_DESTINATIONS=Off \
+                    -DHPX_WITH_THREAD_DEBUG_INFO=On \
+                    -DHPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES=On \
+                    -DHPX_WITH_FETCH_JSON=On \
+                    -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
+                    -DHPX_WITH_DOCUMENTATION=On \
+                    -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="${DOCUMENTATION_OUTPUT_FORMATS}" \
+                    -DHPX_WITH_TESTS_COMMAND_LINE=--hpx:queuing=local-workrequesting-fifo \
+                    -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2
+
+            - name: Building Inspect Tool
+              shell: bash
+              working-directory: /hpx/build
+              run: |
+                ninja -j2 tools.inspect
+
+            - name: Running Inspect Tool
+              shell: bash
+              working-directory: /hpx/build
+              run: |
+                ./bin/inspect --all --output=./hpx_inspect_report.html /hpx/source
+
+            - name: Convert inspect HTML output to XML
+              if: always()
+              shell: bash
+              working-directory: /hpx/build
+              run: |
+                mkdir -p /report
+                /hpx/source/tools/inspect/inspect_to_junit.py \
+                    ./hpx_inspect_report.html \
+                    /report/hpx_inspect.xml
+            
+            - name: Upload inspect report
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                name: hpx-inspect-report
+                path: /hpx/build/hpx_inspect_report.html
+
+            - name: Publish test results
+              if: always()
+              uses: EnricoMi/publish-unit-test-result-action@v2
+              with:
+                files: /report/hpx_inspect.xml
+
+            - name: Upload inspect binary
+              uses: actions/upload-artifact@v4
+              with:
+                name: inspect-binary
+                path: /hpx/build/bin/inspect

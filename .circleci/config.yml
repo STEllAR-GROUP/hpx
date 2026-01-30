@@ -17,7 +17,7 @@ defaults: &defaults # Defining a default anchor block
     <<: *working_dir_default
     <<: *docker_default
 
-convert_xml: &convert_xml
+convert_xml: &convert_xml # Defined in actions\collect-artifact\action.yml
     name: Converting XML
     when: always
     command: |
@@ -26,7 +26,7 @@ convert_xml: &convert_xml
           /hpx/conv.xsl Testing/`head -n 1 < Testing/TAG`/Test.xml \
           > ${CIRCLE_JOB}/Test.xml
 
-move_core_dump: &move_core_dump
+move_core_dump: &move_core_dump # Defined in actions\collect-artifact\action.yml
     name: Moving core dumps
     when: on_fail
     command: |
@@ -34,7 +34,7 @@ move_core_dump: &move_core_dump
         # Ignore errors if there are no core dumps
         cp core.* ${CIRCLE_JOB} || true
 
-move_debug_log: &move_debug_log
+move_debug_log: &move_debug_log # Defined in actions\collect-artifact\action.yml
     name: Moving debug logs
     when: on_fail
     command: |
@@ -62,7 +62,7 @@ configure_local_git: &configure_local_git
 version: 2
 
 jobs:
-  checkout_code:
+  checkout_code: # Using github actions/checkout@v6
     <<: *docker_default
     working_directory: /hpx
     steps:
@@ -86,7 +86,7 @@ jobs:
 
   # Check if the files of the module are listed in the CMakeLists.txt
   # Check if all the module dependencies are listed
-  check_module_cmakelists:
+  check_module_cmakelists: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -105,7 +105,7 @@ jobs:
           path: /tmp/missing_deps.txt
           destination: /hpx/artifacts/missing_deps.txt
 
-  configure:
+  configure: # Defined in configure-core-core_local-components
     <<: *defaults
     steps:
       - attach_workspace:
@@ -154,7 +154,7 @@ jobs:
           paths:
             - ./build
 
-  configure_test_combinations:
+  configure_test_combinations: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -252,7 +252,7 @@ jobs:
       - store_artifacts:
           path: /hpx/build/share/hpx/docs/report
 
-  core_local:
+  core_local: # Defined in configure-core-core_local-components
     <<: *defaults
     steps:
       - attach_workspace:
@@ -266,7 +266,7 @@ jobs:
           paths:
             - ./build
 
-  core:
+  core: # Defined in configure-core-core_local-components
     <<: *defaults
     steps:
       - attach_workspace:
@@ -280,7 +280,7 @@ jobs:
           paths:
             - ./build
 
-  components:
+  components: # Defined in configure-core-core_local-components
     <<: *defaults
     steps:
       - attach_workspace:
@@ -294,7 +294,7 @@ jobs:
           paths:
             - ./build
 
-  tests.examples1:
+  tests.examples1: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -331,7 +331,7 @@ jobs:
           paths:
             - ./build
 
-  tests.examples2:
+  tests.examples2: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -373,7 +373,7 @@ jobs:
           paths:
             - ./build
 
-  tests.unit1.algorithms:
+  tests.unit1.algorithms: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -406,7 +406,7 @@ jobs:
       - store_artifacts:
           path: tests.unit1.algorithms
 
-  tests.unit2.algorithms:
+  tests.unit2.algorithms: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -439,7 +439,7 @@ jobs:
       - store_artifacts:
           path: tests.unit2.algorithms
 
-  tests.unit3.algorithms:
+  tests.unit3.algorithms: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -474,7 +474,7 @@ jobs:
       - store_artifacts:
           path: tests.unit3.algorithms
 
-  tests.unit4.algorithms:
+  tests.unit4.algorithms: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -507,7 +507,7 @@ jobs:
       - store_artifacts:
           path: tests.unit4.algorithms
 
-  tests.unit1.container_algorithms:
+  tests.unit1.container_algorithms: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -542,7 +542,7 @@ jobs:
       - store_artifacts:
           path: tests.unit1.container_algorithms
 
-  tests.unit2.container_algorithms:
+  tests.unit2.container_algorithms: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -575,7 +575,7 @@ jobs:
       - store_artifacts:
           path: tests.unit2.container_algorithms
 
-  tests.unit1.segmented_algorithms:
+  tests.unit1.segmented_algorithms: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -607,7 +607,7 @@ jobs:
       - store_artifacts:
           path: tests.unit1.segmented_algorithms
 
-  tests.unit2.segmented_algorithms:
+  tests.unit2.segmented_algorithms: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -639,7 +639,7 @@ jobs:
       - store_artifacts:
           path: tests.unit2.segmented_algorithms
 
-  tests.unit1:
+  tests.unit1: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -670,7 +670,7 @@ jobs:
       - store_artifacts:
           path: tests.unit1
 
-  tests.unit2:
+  tests.unit2: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -705,7 +705,7 @@ jobs:
       - store_artifacts:
           path: tests.unit2
 
-  tests.unit3:
+  tests.unit3: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -736,7 +736,7 @@ jobs:
       - store_artifacts:
           path: tests.unit3
 
-  tests.unit4:
+  tests.unit4: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -769,7 +769,7 @@ jobs:
       - store_artifacts:
           path: tests.unit4
 
-  tests.unit5:
+  tests.unit5: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -800,7 +800,7 @@ jobs:
       - store_artifacts:
           path: tests.unit5
 
-  tests.regressions1:
+  tests.regressions1: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -832,7 +832,7 @@ jobs:
       - store_artifacts:
           path: tests.regressions1
 
-  tests.regressions2:
+  tests.regressions2: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -868,7 +868,7 @@ jobs:
       - store_artifacts:
           path: tests.regressions2
 
-  tests.headers1_1:
+  tests.headers1_1: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -885,7 +885,7 @@ jobs:
       - store_artifacts:
           path: tests.headers1_1
 
-  tests.headers1_2:
+  tests.headers1_2: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -902,7 +902,7 @@ jobs:
       - store_artifacts:
           path: tests.headers1_2
 
-  tests.headers2_1:
+  tests.headers2_1: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -919,7 +919,7 @@ jobs:
       - store_artifacts:
           path: tests.headers2_1
 
-  tests.headers2_2:
+  tests.headers2_2: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -936,7 +936,7 @@ jobs:
       - store_artifacts:
           path: tests.headers2_2
 
-  tests.headers2_3:
+  tests.headers2_3: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -953,7 +953,7 @@ jobs:
       - store_artifacts:
           path: tests.headers2_3
 
-  tests.headers3_1:
+  tests.headers3_1: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -970,7 +970,7 @@ jobs:
       - store_artifacts:
           path: tests.headers3_1
 
-  tests.headers3_2:
+  tests.headers3_2: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -987,7 +987,7 @@ jobs:
       - store_artifacts:
           path: tests.headers3_2
 
-  tests.headers4_1:
+  tests.headers4_1: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -1004,7 +1004,7 @@ jobs:
       - store_artifacts:
           path: tests.headers4_2
 
-  tests.headers4_2:
+  tests.headers4_2: # DONE
     <<: *defaults
     steps:
       - attach_workspace:
@@ -1021,7 +1021,7 @@ jobs:
       - store_artifacts:
           path: tests.headers4_2
 
-  tests.performance:
+  tests.performance: # DONE
     <<: *defaults
     steps:
       - attach_workspace:

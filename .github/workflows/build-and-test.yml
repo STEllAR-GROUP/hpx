@@ -7,9 +7,7 @@
 name: Build and Test
 
 on:
-    push:
-        paths-ignore:
-            - ".github/workflows/test-only.yml"
+    push
 
 jobs:
     configure-core-core_local-components:
@@ -27,11 +25,9 @@ jobs:
 
             - name: Configure (Running CMake)
               shell: bash
+              working-directory: /hpx/build
               timeout-minutes: 30
               run: |
-                  mkdir -p /hpx/build
-                  cd /hpx/build
-
                   cmake --version
                   if [ "${{ github.event_name }}" != "pull_request" ] && \
                     ( [ "${{ github.ref_name }}" == "master" ] || \
