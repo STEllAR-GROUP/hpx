@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -16,6 +16,7 @@
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
+#include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
@@ -92,7 +93,7 @@ namespace hpx::util {
         struct zip_iterator_category<hpx::tuple<T>,
             std::enable_if_t<hpx::tuple_size<hpx::tuple<T>>::value == 1>>
         {
-            using type = typename zip_iterator_element_category<T>::type;
+            using type = zip_iterator_element_category<T>::type;
         };
 
         HPX_CXX_CORE_EXPORT template <typename T, typename U>
@@ -123,10 +124,9 @@ namespace hpx::util {
         struct dereference_iterator<hpx::tuple<Ts...>>
         {
             template <std::size_t... Is>
-            HPX_HOST_DEVICE static constexpr
-                typename zip_iterator_reference<hpx::tuple<Ts...>>::type
-                call(
-                    util::index_pack<Is...>, hpx::tuple<Ts...> const& iterators)
+            HPX_HOST_DEVICE static constexpr zip_iterator_reference<
+                hpx::tuple<Ts...>>::type
+            call(util::index_pack<Is...>, hpx::tuple<Ts...> const& iterators)
             {
                 return hpx::forward_as_tuple(*hpx::get<Is>(iterators)...);
             }
@@ -290,9 +290,9 @@ namespace hpx::util {
             // the embedded iterators compares equal to hpx::default_sentinel or
             // all iterators are equal. This is done to ensure that the shortest
             // sequence limits the overall iteration (if detectable).
-            template <typename IterTuple, typename Derived_,
-                typename = std::enable_if_t<hpx::tuple_size_v<IterTuple> ==
-                    hpx::tuple_size_v<IteratorTuple>>>
+            template <typename IterTuple, typename Derived_>
+                requires(hpx::tuple_size_v<IterTuple> ==
+                    hpx::tuple_size_v<IteratorTuple>)
             HPX_HOST_DEVICE constexpr bool equal(
                 zip_iterator_base<IterTuple, Derived_> const& other) const
                 noexcept(noexcept(
@@ -303,8 +303,7 @@ namespace hpx::util {
                     other.get_iterator_tuple());
             }
 
-            HPX_HOST_DEVICE constexpr typename base_type::reference
-            dereference() const
+            HPX_HOST_DEVICE constexpr base_type::reference dereference() const
             {
                 return dereference_iterator<IteratorTuple>::call(
                     util::make_index_pack_t<
@@ -354,9 +353,7 @@ namespace hpx::util {
             template <typename Archive>
             void serialize(Archive& ar, unsigned)
             {
-                // clang-format off
                 ar & iterators_;
-                // clang-format on
             }
 
         private:
@@ -402,25 +399,33 @@ namespace hpx::util {
         HPX_HOST_DEVICE ~zip_iterator() = default;
 
         template <typename... Ts_>
-        HPX_HOST_DEVICE std::enable_if_t<
-            std::is_assignable_v<typename zip_iterator::iterator_tuple_type&,
-                typename zip_iterator<Ts_...>::iterator_tuple_type&&>,
-            zip_iterator&>
-        operator=(zip_iterator<Ts_...> const& other)
+            requires(std::is_assignable_v<
+                typename zip_iterator::iterator_tuple_type&,
+                typename zip_iterator<Ts_...>::iterator_tuple_type &&>)
+        HPX_HOST_DEVICE zip_iterator& operator=(
+            zip_iterator<Ts_...> const& other)
         {
             base_type::operator=(other.get_iterator_tuple());
             return *this;
         }
 
         template <typename... Ts_>
-        HPX_HOST_DEVICE std::enable_if_t<
-            std::is_assignable_v<typename zip_iterator::iterator_tuple_type&,
-                typename zip_iterator<Ts_...>::iterator_tuple_type&&>,
-            zip_iterator&>
-        operator=(zip_iterator<Ts_...>&& other) noexcept
+            requires(std::is_assignable_v<
+                typename zip_iterator::iterator_tuple_type&,
+                typename zip_iterator<Ts_...>::iterator_tuple_type &&>)
+        HPX_HOST_DEVICE zip_iterator& operator=(
+            zip_iterator<Ts_...>&& other) noexcept
         {
             base_type::operator=(HPX_MOVE(other).get_iterator_tuple());
             return *this;
+        }
+
+        HPX_HOST_DEVICE constexpr typename zip_iterator::reference operator[](
+            base_type::difference_type n) const
+            requires(std::same_as<typename zip_iterator::iterator_category,
+                std::random_access_iterator_tag>)
+        {
+            return *(*this + n);
         }
     };
 
@@ -482,26 +487,34 @@ namespace hpx::util {
         HPX_HOST_DEVICE ~zip_iterator() = default;
 
         template <typename... Ts_>
-        HPX_HOST_DEVICE std::enable_if_t<
-            std::is_assignable_v<typename zip_iterator::iterator_tuple_type&,
-                typename zip_iterator<Ts_...>::iterator_tuple_type&&>,
-            zip_iterator&>
-        operator=(zip_iterator<Ts_...> const& other)
+            requires(std::is_assignable_v<
+                typename zip_iterator::iterator_tuple_type&,
+                typename zip_iterator<Ts_...>::iterator_tuple_type &&>)
+        HPX_HOST_DEVICE zip_iterator& operator=(
+            zip_iterator<Ts_...> const& other)
         {
             base_type::operator=(base_type(other.get_iterator_tuple()));
             return *this;
         }
 
         template <typename... Ts_>
-        HPX_HOST_DEVICE std::enable_if_t<
-            std::is_assignable_v<typename zip_iterator::iterator_tuple_type&,
-                typename zip_iterator<Ts_...>::iterator_tuple_type&&>,
-            zip_iterator&>
-        operator=(zip_iterator<Ts_...>&& other) noexcept
+            requires(std::is_assignable_v<
+                typename zip_iterator::iterator_tuple_type&,
+                typename zip_iterator<Ts_...>::iterator_tuple_type &&>)
+        HPX_HOST_DEVICE zip_iterator& operator=(
+            zip_iterator<Ts_...>&& other) noexcept
         {
             base_type::operator=(
                 base_type(HPX_MOVE(other).get_iterator_tuple()));
             return *this;
+        }
+
+        HPX_HOST_DEVICE constexpr typename zip_iterator::reference operator[](
+            base_type::difference_type n) const
+            requires(std::same_as<typename zip_iterator::iterator_category,
+                std::random_access_iterator_tag>)
+        {
+            return *(*this + n);
         }
     };
 
@@ -529,8 +542,7 @@ namespace hpx::traits {
         HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
         struct lift_zipped_iterators<F, util::zip_iterator<Ts...>>
         {
-            using tuple_type =
-                typename util::zip_iterator<Ts...>::iterator_tuple_type;
+            using tuple_type = util::zip_iterator<Ts...>::iterator_tuple_type;
             using result_type = hpx::tuple<typename element_result_of<
                 typename F::template apply<Ts>, Ts>::type...>;
 
