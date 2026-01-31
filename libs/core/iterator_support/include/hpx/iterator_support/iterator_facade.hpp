@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2016-2025 Hartmut Kaiser
+//  Copyright (c) 2016-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -272,7 +272,7 @@ namespace hpx::util {
 
         // We can force (not) using the operator_brackets_proxy by adding an
         // embedded type use_brackets_proxy to the iterator that evaluates to
-        // either std::true_type of std::false_type.
+        // either std::true_type or std::false_type.
         HPX_HAS_XXX_TRAIT_DEF(use_brackets_proxy)
 
         // A meta-function that determines whether operator[] must return a
@@ -297,7 +297,8 @@ namespace hpx::util {
         {
             using type = std::conditional_t<
                 use_operator_brackets_proxy<Iterator, Value>::value,
-                operator_brackets_proxy<Iterator>, Value>;
+                operator_brackets_proxy<Iterator>,
+                typename Iterator::reference>;
         };
 
         template <typename Iterator>
@@ -308,7 +309,7 @@ namespace hpx::util {
         }
 
         template <typename Iterator>
-        HPX_HOST_DEVICE typename Iterator::value_type
+        HPX_HOST_DEVICE typename Iterator::reference
         make_operator_brackets_result(Iterator const& iter, std::false_type)
         {
             return *iter;
@@ -334,7 +335,8 @@ namespace hpx::util {
 
             HPX_HOST_DEVICE iterator_facade_base() = default;
 
-            HPX_HOST_DEVICE constexpr auto operator[](difference_type n) const
+            HPX_HOST_DEVICE constexpr decltype(auto) operator[](
+                difference_type n) const
             {
                 using use_proxy = use_operator_brackets_proxy<Derived, T>;
 
@@ -696,22 +698,22 @@ namespace hpx::util {
 #undef HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX
 #undef HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD
 
-    HPX_CXX_CORE_EXPORT template <typename Derived, typename T,
-        typename Category, typename Reference, typename Distance,
-        typename Pointer>
+    // clang-format off
+    HPX_CXX_CORE_EXPORT template <typename Derived, typename T, typename Category,
+        typename Reference, typename Distance, typename Pointer>
     HPX_HOST_DEVICE constexpr std::enable_if_t<
         std::is_same_v<typename Derived::iterator_category,
-            std::random_access_iterator_tag>,
-        Derived>
-    operator+(iterator_facade<Derived, T, Category, Reference, Distance,
-                  Pointer> const& it,
-        typename Derived::difference_type
-            n) noexcept(noexcept(std::declval<Derived>() +=
-        std::declval<typename Derived::difference_type>()))
+            std::random_access_iterator_tag>, Derived>
+    operator+(iterator_facade<Derived, T, Category, Reference,
+                               Distance, Pointer> const& it,
+        typename Derived::difference_type  n)
+        noexcept(noexcept(std::declval<Derived>() +=
+            std::declval<typename Derived::difference_type>()))
     {
         Derived tmp(static_cast<Derived const&>(it));
         return tmp += n;
     }
+    // clang-format on
 
     HPX_CXX_CORE_EXPORT template <typename Derived, typename T,
         typename Category, typename Reference, typename Distance,
