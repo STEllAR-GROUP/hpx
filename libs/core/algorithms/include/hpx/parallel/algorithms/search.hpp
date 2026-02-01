@@ -25,6 +25,12 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include "hpx/config/export_definitions.hpp"
+#include "hpx/config/move.hpp"
+#include "hpx/execution/algorithms/detail/predicates.hpp"
+#include "hpx/execution/traits/is_execution_policy.hpp"
+#include "hpx/iterator_support/traits/is_iterator.hpp"
+#include "hpx/type_support/identity.hpp"
 
 #if defined(DOXYGEN)
 
@@ -420,48 +426,42 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<search_n_t>
     {
     private:
-        template <typename FwdIter, typename FwdIter2,
-            typename Pred = parallel::detail::equal_to>
+        template <typename FwdIter, typename Size, typename T,
+            typename Pred = parallel::detail::equal_to,
+            typename Proj = hpx::identity>
         // clang-format off
-            requires (
-                traits::is_forward_iterator<FwdIter>::value &&
-                traits::is_forward_iterator<FwdIter2>::value &&
+            requires(traits::is_forward_iterator<FwdIter>::value &&
+                std::is_integral_v<Size> &&
                 hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits <FwdIter>::value_type,
-                    typename std::iterator_traits <FwdIter2>::value_type
-                >
-            )
+                    typename std::iterator_traits<FwdIter>::value_type, T>)
         // clang-format on
         friend FwdIter tag_fallback_invoke(hpx::search_n_t, FwdIter first,
-            std::size_t count, FwdIter2 s_first, FwdIter2 s_last,
-            Pred op = Pred())
+            FwdIter last, Size count, T const& value, Pred pred = Pred(),
+            Proj proj = Proj())
         {
             return hpx::parallel::detail::search_n<FwdIter, FwdIter>().call(
-                hpx::execution::seq, first, count, s_first, s_last,
-                HPX_MOVE(op), hpx::identity_v, hpx::identity_v);
-        }
+                hpx::execution::seq, first, last, count, value, HPX_MOVE(pred),
+                HPX_MOVE(proj));
+        }    // namespace hpx
 
-        template <typename ExPolicy, typename FwdIter, typename FwdIter2,
-            typename Pred = parallel::detail::equal_to>
+        template <typename ExPolicy, typename FwdIter, typename Size,
+            typename T, typename Pred = parallel::detail::equal_to,
+            typename Proj = hpx::identity>
         // clang-format off
-            requires (
-                is_execution_policy<ExPolicy>::value &&
+            requires(is_execution_policy<ExPolicy>::value &&
                 traits::is_forward_iterator<FwdIter>::value &&
-                traits::is_forward_iterator<FwdIter2>::value &&
+                std::is_integral_v<Size> &&
                 hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits <FwdIter>::value_type,
-                    typename std::iterator_traits <FwdIter2>::value_type
-                >
-            )
+                    typename std::iterator_traits<FwdIter>::value_type, T>)
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type tag_fallback_invoke(hpx::search_n_t,
-            ExPolicy&& policy, FwdIter first, std::size_t count,
-            FwdIter2 s_first, FwdIter2 s_last, Pred op = Pred())
+            ExPolicy&& policy, FwdIter first, FwdIter last, Size count,
+            T const& value, Pred pred = Pred(), Proj proj = Proj())
         {
             return hpx::parallel::detail::search_n<FwdIter, FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, count, s_first, s_last,
-                HPX_MOVE(op), hpx::identity_v, hpx::identity_v);
+                HPX_FORWARD(ExPolicy, policy), first, last, count, value,
+                HPX_MOVE(pred), HPX_MOVE(proj));
         }
     } search_n{};
 }    // namespace hpx
