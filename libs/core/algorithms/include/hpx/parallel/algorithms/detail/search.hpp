@@ -203,102 +203,45 @@ namespace hpx::parallel::detail {
         {
         }
 
-        template <typename ExPolicy, typename FwdIter2, typename Pred,
-            typename Proj1, typename Proj2>
-        static FwdIter sequential(ExPolicy, FwdIter first, std::size_t count,
-            FwdIter2 s_first, FwdIter2 s_last, Pred&& op, Proj1&& proj1,
-            Proj2&& proj2)
+        template <typename ExPolicy, typename Size, typename T, typename Pred,
+            typename Proj>
+        static FwdIter sequential(ExPolicy, FwdIter first, Sent last,
+            Size count, T const& value, Pred&& pred, Proj&& proj)
         {
-            return std::search(first, std::next(first, count), s_first, s_last,
-                util::compare_projected<Pred&, Proj1&, Proj2&>(
-                    op, proj1, proj2));
-        }
+            using difference_type =
+                typename std::iterator_traits<FwdIter>::difference_type;
 
-        template <typename ExPolicy, typename FwdIter2, typename Pred,
-            typename Proj1, typename Proj2>
-        static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
-            ExPolicy&& orgpolicy, FwdIter first, std::size_t count,
-            FwdIter2 s_first, FwdIter2 s_last, Pred&& op, Proj1&& proj1,
-            Proj2&& proj2)
-        {
-            typedef typename std::iterator_traits<FwdIter>::reference reference;
-            typedef typename std::iterator_traits<FwdIter>::difference_type
-                difference_type;
-            typedef typename std::iterator_traits<FwdIter2>::difference_type
-                s_difference_type;
-            typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
+            if (count <= 0)
+                return first;
+            if (first == last)
+                return last;
+            difference_type n = std::distance(first, last);
+            if (static_cast<difference_type>(count) > n)
+                return last;
 
-            s_difference_type diff = std::distance(s_first, s_last);
-            if (diff <= 0)
-                return result::get(HPX_MOVE(first));
+            auto value_proj = HPX_INVOKE(proj, value);
 
-            if (diff > s_difference_type(count))
-                return result::get(HPX_MOVE(first));
+            FwdIter it = first;
+            FwdIter end = first;
+            std::advance(end, n - static_cast<difference_type>(count) + 1);
 
-            decltype(auto) policy =
-                hpx::execution::experimental::adapt_placement_mode(
-                    HPX_FORWARD(ExPolicy, orgpolicy),
-                    hpx::threads::thread_placement_hint::breadth_first);
-
-            using policy_type = std::decay_t<decltype(policy)>;
-
-            using partitioner =
-                util::partitioner<decltype(policy), FwdIter, void>;
-
-            hpx::parallel::util::cancellation_token<difference_type> tok(count);
-
-            auto f1 = [count, diff, tok, s_first, op = HPX_FORWARD(Pred, op),
-                          proj1 = HPX_FORWARD(Proj1, proj1),
-                          proj2 = HPX_FORWARD(Proj2, proj2)](FwdIter it,
-                          std::size_t part_size,
-                          std::size_t base_idx) mutable -> void {
+            for (; it != end; ++it)
+            {
                 FwdIter curr = it;
+                Size matched = 0;
 
-                util::loop_idx_n<policy_type>(base_idx, it, part_size, tok,
-                    [count, diff, s_first, &tok, &curr,
-                        op = HPX_FORWARD(Pred, op),
-                        proj1 = HPX_FORWARD(Proj1, proj1),
-                        proj2 = HPX_FORWARD(Proj2, proj2)](
-                        reference v, std::size_t i) -> void {
-                        ++curr;
-                        if (HPX_INVOKE(op, HPX_INVOKE(proj1, v),
-                                HPX_INVOKE(proj2, *s_first)))
-                        {
-                            difference_type local_count = 1;
-                            FwdIter2 needle = s_first;
-                            FwdIter mid = curr;
+                while (matched < count &&
+                    HPX_INVOKE(pred, HPX_INVOKE(proj, *curr), value_proj))
+                {
+                    ++curr;
+                    ++matched;
+                }
 
-                            // clang-format off
-                            for (difference_type len = 0; local_count != diff &&
-                                len != difference_type(count);
-                                ++local_count, ++len, ++mid)
-                            // clang-format on
-                            {
-                                if (!HPX_INVOKE(op, HPX_INVOKE(proj1, *mid),
-                                        HPX_INVOKE(proj2, *++needle)))
-                                    break;
-                            }
+                if (matched == count)
+                    return it;
+            }
 
-                            if (local_count == diff)
-                                tok.cancel(i);
-                        }
-                    });
-            };
-
-            auto f2 = [=](auto&& data) mutable -> FwdIter {
-                // make sure iterators embedded in function object that is
-                // attached to futures are invalidated
-                util::detail::clear_container(data);
-                difference_type search_res = tok.get_data();
-                if (search_res != s_difference_type(count))
-                    std::advance(first, search_res);
-
-                return HPX_MOVE(first);
-            };
-
-            return partitioner::call_with_index(
-                HPX_FORWARD(decltype(policy), policy), first,
-                count - (diff - 1), 1, HPX_MOVE(f1), HPX_MOVE(f2));
+            return last;
         }
     };
     /// \endcond
