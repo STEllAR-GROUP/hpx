@@ -19,12 +19,11 @@ namespace hpx::traits {
     struct has_emplace : std::false_type
     {
     };
-    
+
     HPX_CXX_EXPORT template <typename Collection>
     struct has_emplace<Collection,
         std::void_t<decltype(std::declval<Collection>().emplace(
-            std::declval<typename Collection::value_type>()))>>
-      : std::true_type
+            std::declval<typename Collection::value_type>()))>> : std::true_type
     {
     };
 
@@ -35,16 +34,16 @@ namespace hpx::traits {
     struct has_emplace_back : std::false_type
     {
     };
-    
+
     HPX_CXX_EXPORT template <typename Collection>
     struct has_emplace_back<Collection,
         std::void_t<decltype(std::declval<Collection>().emplace_back(
-            std::declval<typename Collection::value_type>()))>>
-      : std::true_type
+            std::declval<typename Collection::value_type>()))>> : std::true_type
     {
     };
 
     HPX_CXX_EXPORT template <typename Collection>
-    inline constexpr bool has_emplace_back_v = has_emplace_back<Collection>::value;
+    inline constexpr bool has_emplace_back_v =
+        has_emplace_back<Collection>::value;
 
 }    // namespace hpx::traits
