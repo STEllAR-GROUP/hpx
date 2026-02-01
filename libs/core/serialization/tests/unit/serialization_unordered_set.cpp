@@ -8,12 +8,12 @@
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <numeric>
 #include <unordered_set>
 #include <utility>
 #include <vector>
-#include <cstddef>
 
 template <typename T>
 struct A
