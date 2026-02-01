@@ -12,6 +12,7 @@
 #include <hpx/serialization/detail/constructor_selector.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/serialization/traits/emplace_func_traits.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -32,6 +33,24 @@ namespace hpx::serialization::detail {
         if constexpr (has_reserve_v<Container>)
         {
             v.reserve(n);
+        }
+    }
+
+    template <typename Container, typename T>
+    void emplace_into_collection(Container& c, T&& t)
+    {
+        if constexpr (hpx::traits::has_emplace_back_v<Container>)
+        {    // vectors, lists, etc.
+            c.emplace_back(HPX_FORWARD(T, t));
+        }
+        else if constexpr (hpx::traits::has_emplace_v<Container>)
+        {    // sets, maps, etc.
+            c.emplace(HPX_FORWARD(T, t));
+        }
+        else
+        {
+            static_assert(sizeof(Container) == 0,
+                "Unsupported container type for emplace_into_collection");
         }
     }
 
@@ -69,7 +88,7 @@ namespace hpx::serialization::detail {
             {
                 value_type elem;
                 ar >> elem;
-                collection.emplace_back(HPX_MOVE(elem));
+                emplace_into_collection(collection, HPX_MOVE(elem));
             }
         }
         else
@@ -84,11 +103,11 @@ namespace hpx::serialization::detail {
                 {
                     std::unique_ptr<value_type> data(
                         constructor_selector_ptr<value_type>::create(ar));
-                    collection.emplace_back(HPX_MOVE(*data));
+                    emplace_into_collection(collection, HPX_MOVE(*data));
                 }
                 else
                 {
-                    collection.emplace_back(
+                    emplace_into_collection(collection,
                         constructor_selector<value_type>::create(ar));
                 }
             }

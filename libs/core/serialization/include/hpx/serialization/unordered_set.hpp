@@ -26,13 +26,7 @@ namespace hpx::serialization {
         std::uint64_t size;
         ar >> size;
 
-        set.clear();
-        for (std::size_t i = 0; i < size; ++i)
-        {
-            T t;
-            ar >> t;
-            set.insert(set.end(), HPX_MOVE(t));
-        }
+        detail::load_collection(ar, set, size);
     }
 
     HPX_CXX_EXPORT template <typename T, typename Hash, typename KeyEqual,
@@ -45,10 +39,7 @@ namespace hpx::serialization {
         if (size == 0)
             return;
 
-        for (T const& val : set)
-        {
-            ar << val;
-        }
+        detail::save_collection(ar, set);
     }
 
     HPX_CXX_EXPORT template <typename T, typename Hash, typename KeyEqual,
@@ -59,13 +50,7 @@ namespace hpx::serialization {
         std::uint64_t size;
         ar >> size;
 
-        set.clear();
-        for (std::size_t i = 0; i < size; ++i)
-        {
-            T t;
-            ar >> t;
-            set.insert(set.end(), HPX_MOVE(t));
-        }
+        detail::load_collection(ar, set, size);
     }
 
     HPX_CXX_EXPORT template <typename T, typename Hash, typename KeyEqual,
@@ -79,9 +64,6 @@ namespace hpx::serialization {
         if (size == 0)
             return;
 
-        for (T const& val : set)
-        {
-            ar << val;
-        }
+        detail::save_collection(ar, set);
     }
 }    // namespace hpx::serialization

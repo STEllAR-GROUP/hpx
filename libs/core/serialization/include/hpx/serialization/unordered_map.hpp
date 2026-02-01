@@ -23,22 +23,10 @@ namespace hpx::serialization {
     void serialize(input_archive& ar,
         std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>& t, unsigned)
     {
-        using container_type =
-            std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>;
+        std::uint64_t size;
+        ar >> size;
 
-        using size_type = typename container_type::size_type;
-        using value_type = typename container_type::value_type;
-
-        size_type size;
-        ar >> size;    //-V128
-
-        t.clear();
-        for (size_type i = 0; i < size; ++i)
-        {
-            value_type v;
-            ar >> v;
-            t.insert(t.end(), HPX_MOVE(v));
-        }
+        detail::load_collection(ar, t, size);
     }
 
     HPX_CXX_EXPORT template <typename Key, typename Value, typename Hash,
@@ -52,10 +40,7 @@ namespace hpx::serialization {
         if (size == 0)
             return;
 
-        for (auto const& val : t)
-        {
-            ar << val;
-        }
+        detail::save_collection(ar, t);
     }
 
     HPX_CXX_EXPORT template <typename Key, typename Value, typename Hash,
@@ -63,22 +48,10 @@ namespace hpx::serialization {
     void serialize(input_archive& ar,
         std::unordered_multimap<Key, Value, Hash, KeyEqual, Alloc>& t, unsigned)
     {
-        using container_type =
-            std::unordered_multimap<Key, Value, Hash, KeyEqual, Alloc>;
+        std::uint64_t size;
+        ar >> size;
 
-        using size_type = typename container_type::size_type;
-        using value_type = typename container_type::value_type;
-
-        size_type size;
-        ar >> size;    //-V128
-
-        t.clear();
-        for (size_type i = 0; i < size; ++i)
-        {
-            value_type v;
-            ar >> v;
-            t.insert(t.end(), HPX_MOVE(v));
-        }
+        detail::load_collection(ar, t, size);
     }
 
     HPX_CXX_EXPORT template <typename Key, typename Value, typename Hash,
@@ -92,9 +65,6 @@ namespace hpx::serialization {
         if (size == 0)
             return;
 
-        for (auto const& val : t)
-        {
-            ar << val;
-        }
+        detail::save_collection(ar, t);
     }
 }    // namespace hpx::serialization
