@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/serialization/detail/serialize_collection.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstddef>
