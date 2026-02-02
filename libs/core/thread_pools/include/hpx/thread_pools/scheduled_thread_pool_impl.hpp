@@ -1804,7 +1804,7 @@ namespace hpx::threads::detail {
         if (tfunc_time == 0)    // avoid division by zero
             return 10000LL;
 
-        HPX_ASSERT(tfunc_time > exec_time);
+        HPX_ASSERT(tfunc_time >= exec_time);
 
         double const percent = 1. -
             (static_cast<double>(exec_time) / static_cast<double>(tfunc_time));

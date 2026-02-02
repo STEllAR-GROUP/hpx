@@ -340,7 +340,9 @@ namespace hpx::execution::experimental {
         // std::execution::as_awaitable. So you have two options for opting into
         // the sender concept if you type is not generally awaitable: (1)
         // specialize enable_sender, or (2) customize as_awaitable for T.
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CXX_EXPORT, completion_signatures)
+        template <typename Sender>
+        inline constexpr bool has_completion_signatures_v =
+            requires { typename std::decay_t<Sender>::completion_signatures; };
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CXX_EXPORT, is_sender)
 
 #ifdef HPX_HAVE_CXX20_COROUTINES
@@ -410,10 +412,7 @@ namespace hpx::execution::experimental {
             static_assert(sizeof(Env),
                 "Incomplete type used with get_completion_signatures");
 
-            if constexpr (requires {
-                              typename std::decay_t<
-                                  Sender>::completion_signatures;
-                          })
+            if constexpr (detail::has_completion_signatures_v<Sender>)
             {
                 return typename std::decay_t<Sender>::completion_signatures{};
             }

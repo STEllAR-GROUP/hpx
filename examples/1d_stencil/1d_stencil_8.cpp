@@ -115,10 +115,10 @@ private:
 
     static void deallocate(double* p) noexcept
     {
-        alloc_.deallocate(p);
+        get_alloc().deallocate(p);
     }
 
-    static partition_allocator<double> alloc_;
+    static partition_allocator<double>& get_alloc();
 
 public:
     partition_data()
@@ -129,7 +129,7 @@ public:
 
     // Create a new (uninitialized) partition of the given size.
     explicit partition_data(std::size_t size)
-      : data_(alloc_.allocate(size), size, buffer_type::take,
+      : data_(get_alloc().allocate(size), size, buffer_type::take,
             &partition_data::deallocate)
       , size_(size)
       , min_index_(0)
@@ -138,7 +138,7 @@ public:
 
     // Create a new (initialized) partition of the given size.
     partition_data(std::size_t size, double initial_value)
-      : data_(alloc_.allocate(size), size, buffer_type::take,
+      : data_(get_alloc().allocate(size), size, buffer_type::take,
             &partition_data::deallocate)
       , size_(size)
       , min_index_(0)
@@ -202,7 +202,11 @@ private:
     std::size_t min_index_;
 };
 
-partition_allocator<double> partition_data::alloc_;
+partition_allocator<double>& partition_data::get_alloc()
+{
+    static partition_allocator<double> alloc{};
+    return alloc;
+}
 
 std::ostream& operator<<(std::ostream& os, partition_data const& c)
 {

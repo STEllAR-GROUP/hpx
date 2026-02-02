@@ -219,20 +219,11 @@ int hpx_main(variables_map& vm)
     nx = vm["nx-value"].as<std::uint64_t>();
     nt = vm["nt-value"].as<std::uint64_t>();
 
-    if (vm.count("c-value"))
-        c = vm["c-value"].as<double>();
-    else
-        c = 1.0;
+    c = vm["c-value"].as<double>();
 
-    if (vm.count("dt-value"))
-        dt = vm["dt-value"].as<double>();
-    else
-        dt = 1.0 / static_cast<double>(nt - 1);
+    dt = vm["dt-value"].as<double>();
 
-    if (vm.count("dx-value"))
-        dx = vm["dx-value"].as<double>();
-    else
-        dx = 1.0 / static_cast<double>(nx - 1);
+    dx = vm["dx-value"].as<double>();
     alpha_squared = (c * dt / dx) * (c * dt / dx);
 
     // check that alpha_squared satisfies the stability condition
@@ -288,25 +279,11 @@ int main(int argc, char* argv[])
 
     // clang-format off
     desc_commandline.add_options()
-        ("dt-value",
-           value<double>()->default_value(0.05),
-           "dt parameter of the wave equation")
-
-        ("dx-value",
-           value<double>()->default_value(0.1),
-           "dx parameter of the wave equation")
-
-        ("c-value",
-           value<double>()->default_value(1.0),
-           "c parameter of the wave equation")
-
-        ("nx-value",
-            value<std::uint64_t>()->default_value(20),
-            "nx parameter of the wave equation")
-
-        ("nt-value",
-            value<std::uint64_t>()->default_value(20),
-            "nt parameter of the wave equation")
+        ("dt-value", value<double>()->default_value(0.05), "dt parameter of the wave equation")
+        ("dx-value", value<double>()->default_value(0.1), "dx parameter of the wave equation")
+        ("c-value", value<double>()->default_value(1.0), "c parameter of the wave equation")
+        ("nx-value", value<std::uint64_t>()->default_value(20), "nx parameter of the wave equation")
+        ("nt-value", value<std::uint64_t>()->default_value(20), "nt parameter of the wave equation")
     ;
     // clang-format on
 
