@@ -243,6 +243,90 @@ namespace hpx::parallel::detail {
 
             return last;
         }
+        template <typename ExPolicy, typename Size, typename T, typename Pred,
+            typename Proj>
+        static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
+            ExPolicy&& orgpolicy, FwdIter first, Sent last, Size count,
+            T const& value, Pred&& pred, Proj&& proj)
+        {
+            using result_type =
+                util::detail::algorithm_result<ExPolicy, FwdIter>;
+            using difference_type =
+                typename std::iterator_traits<FwdIter>::difference_type;
+
+            if (count <= 0)
+                return result_type::get(HPX_MOVE(first));
+
+            if (first == last)
+                return result_type::get(HPX_MOVE(last));
+
+            difference_type n = std::distance(first, last);
+            if (static_cast<difference_type>(count) > n)
+                return result_type::get(HPX_MOVE(last));
+
+            // Number of valid starting positions
+            difference_type max_start =
+                n - static_cast<difference_type>(count) + 1;
+
+            auto value_proj = HPX_INVOKE(proj, value);
+
+            decltype(auto) policy =
+                hpx::execution::experimental::adapt_placement_mode(
+                    HPX_FORWARD(ExPolicy, orgpolicy),
+                    hpx::threads::thread_placement_hint::breadth_first);
+
+            using policy_type = std::decay_t<decltype(policy)>;
+            using partitioner = util::partitioner<policy_type, FwdIter, void>;
+
+            hpx::parallel::util::cancellation_token<difference_type> tok(
+                max_start);
+
+            auto f1 = [first, max_start, count, value_proj,
+                          pred = HPX_FORWARD(Pred, pred),
+                          proj = HPX_FORWARD(Proj, proj),
+                          tok](FwdIter it, std::size_t part_size,
+                          std::size_t base_idx) mutable -> void {
+                util::loop_idx_n<policy_type>(base_idx, it, part_size, tok,
+                    [=, &tok](auto&&, std::size_t idx) mutable -> void {
+                        difference_type start_idx =
+                            static_cast<difference_type>(idx);
+                        if (start_idx >= max_start)
+                            return;
+
+                        FwdIter start = first;
+                        std::advance(start, start_idx);
+
+                        FwdIter curr = start;
+                        Size matched = 0;
+
+                        while (matched < count &&
+                            HPX_INVOKE(
+                                pred, HPX_INVOKE(proj, *curr), value_proj))
+                        {
+                            ++curr;
+                            ++matched;
+                        }
+
+                        if (matched == count)
+                            tok.cancel(start_idx);
+                    });
+            };
+
+            auto f2 = [first, last, max_start](auto&& data) mutable -> FwdIter {
+                util::detail::clear_container(data);
+
+                difference_type idx = tok.get_data();
+                if (idx == max_start)
+                    return HPX_MOVE(last);
+
+                std::advance(first, idx);
+                return HPX_MOVE(first);
+            };
+
+            return partitioner::call_with_index(
+                HPX_FORWARD(decltype(policy), policy), first, max_start, 1,
+                HPX_MOVE(f1), HPX_MOVE(f2));
+        }
     };
     /// \endcond
 }    // namespace hpx::parallel::detail
