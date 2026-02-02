@@ -63,7 +63,7 @@ struct data_server : hpx::components::component_base<data_server>
     // Serialization Definition
     friend class hpx::serialization::access;
     template <typename Archive>
-    void serialize(Archive& arch, const unsigned int /* version */)
+    void serialize(Archive& arch, unsigned int const /* version */)
     {
         // clang-format off
         arch & data_;

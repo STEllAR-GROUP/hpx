@@ -43,13 +43,9 @@ namespace hpx::execution::experimental::detail {
         template <typename T>
         using check_for_property = CheckForProperty<std::decay_t<T>>;
 
-        // clang-format off
-        template <typename Executor, typename Parameters,
-            HPX_CONCEPT_REQUIRES_(
-                !hpx::traits::is_executor_parameters_v<Parameters> ||
-                !check_for_property<Parameters>::value
-            )>
-        // clang-format on
+        template <typename Executor, typename Parameters>
+            requires(!hpx::traits::is_executor_parameters_v<Parameters> ||
+                !check_for_property<Parameters>::value)
         friend HPX_FORCEINLINE constexpr decltype(auto) tag_fallback_invoke(
             derived_property_t, Executor&& /*exec*/, Parameters&& /*params*/,
             Property prop) noexcept
@@ -59,13 +55,9 @@ namespace hpx::execution::experimental::detail {
 
         ///////////////////////////////////////////////////////////////////
         // Parameters directly supports property
-        // clang-format off
-        template <typename Executor, typename Parameters,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters> &&
-                check_for_property<Parameters>::value
-            )>
-        // clang-format on
+        template <typename Executor, typename Parameters>
+            requires(hpx::traits::is_executor_parameters_v<Parameters> &&
+                check_for_property<Parameters>::value)
         friend HPX_FORCEINLINE constexpr decltype(auto) tag_fallback_invoke(
             derived_property_t, Executor&& exec, Parameters&& params,
             Property /*prop*/) noexcept
@@ -76,13 +68,9 @@ namespace hpx::execution::experimental::detail {
 
         ///////////////////////////////////////////////////////////////////
         // Executor directly supports property
-        // clang-format off
-        template <typename Executor, typename Parameters,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<Executor> &&
-                check_for_property<Executor>::value
-            )>
-        // clang-format on
+        template <typename Executor, typename Parameters>
+            requires(hpx::traits::is_executor_any_v<Executor> &&
+                check_for_property<Executor>::value)
         friend HPX_FORCEINLINE constexpr decltype(auto) tag_invoke(
             derived_property_t, Executor&& exec, Parameters&& params,
             Property /*prop*/) noexcept

@@ -419,19 +419,6 @@ Full example code
         // underlying (wrapped) executor.
 
         template <typename BaseExecutor>
-        struct is_never_blocking_one_way_executor<
-            simple_annotating_executor<BaseExecutor>>
-        : is_never_blocking_one_way_executor<BaseExecutor>
-        {
-        };
-
-        template <typename BaseExecutor>
-        struct is_one_way_executor<simple_annotating_executor<BaseExecutor>>
-        : is_one_way_executor<BaseExecutor>
-        {
-        };
-
-        template <typename BaseExecutor>
         struct is_two_way_executor<simple_annotating_executor<BaseExecutor>>
         : is_two_way_executor<BaseExecutor>
         {

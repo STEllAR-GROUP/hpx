@@ -14,10 +14,6 @@
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#endif
-
 #include <algorithm>
 #include <array>
 #include <atomic>
@@ -230,9 +226,9 @@ class pointer_allocator
 public:
     typedef T value_type;
     typedef T* pointer;
-    typedef const T* const_pointer;
+    typedef T const* const_pointer;
     typedef T& reference;
-    typedef const T& const_reference;
+    typedef T const& const_reference;
     typedef std::size_t size_type;
     typedef std::ptrdiff_t difference_type;
 
@@ -316,7 +312,7 @@ alive_map keep_alive_buffers;
 
 //
 void async_callback(
-    const uint64_t index, std::error_code const&, hpx::parcelset::parcel const&)
+    uint64_t const index, std::error_code const&, hpx::parcelset::parcel const&)
 {
     scoped_lock lock(keep_alive_mutex);
     DEBUG_OUTPUT(7, "Async callback triggered for index " << index);
@@ -352,11 +348,8 @@ namespace Storage {
     async_mem_result_type CopyToStorage(
         general_buffer_type const& srcbuffer, uint32_t address, uint64_t length)
     {
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<char[]> src = srcbuffer.data_array();
-#else
-        boost::shared_array<char> src = srcbuffer.data_array();
-#endif
+
         return copy_to_local_storage(src.get(), address, length);
     }
 
@@ -374,13 +367,8 @@ namespace Storage {
         //
         // The memory must be freed after final use.
         std::allocator<char> local_allocator;
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<char[]> local_buffer(local_allocator.allocate(length),
             [](char*) { DEBUG_OUTPUT(6, "Not deleting memory"); });
-#else
-        boost::shared_array<char> local_buffer(local_allocator.allocate(length),
-            [](char*) { DEBUG_OUTPUT(6, "Not deleting memory"); });
-#endif
 
         // allow the storage class to asynchronously copy the data into buffer
 #ifdef ASYNC_MEMORY

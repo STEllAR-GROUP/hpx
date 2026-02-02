@@ -52,17 +52,17 @@ namespace hpx::parcelset {
         using send_immediate_parcels = std::true_type;
         using is_connectionless = std::true_type;
 
-        static constexpr const char* type() noexcept
+        static constexpr char const* type() noexcept
         {
             return "mpi";
         }
 
-        static constexpr const char* pool_name() noexcept
+        static constexpr char const* pool_name() noexcept
         {
             return "parcel-pool-mpi";
         }
 
-        static constexpr const char* pool_name_postfix() noexcept
+        static constexpr char const* pool_name_postfix() noexcept
         {
             return "-mpi";
         }

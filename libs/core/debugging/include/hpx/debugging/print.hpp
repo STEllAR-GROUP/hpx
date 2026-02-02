@@ -78,6 +78,12 @@ namespace hpx::debug {
             std::ostream&, std::int64_t const&, int);
         extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::uint64_t const&, int);
+#if defined(__APPLE__)
+        extern template HPX_CORE_EXPORT void print_dec(
+            std::ostream&, long const&, int);
+        extern template HPX_CORE_EXPORT void print_dec(
+            std::ostream&, unsigned long const&, int);
+#endif
 
         extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::atomic<int> const&, int);

@@ -75,7 +75,7 @@ namespace hpx::parcelset::policies::lci {
         return_t send(bool in_bg_work);
         virtual return_t send_nb() = 0;
         virtual void done() = 0;
-        void profile_start_hook(const header& header_);
+        void profile_start_hook(header const& header_);
         void profile_end_hook();
 
         int dst_rank;

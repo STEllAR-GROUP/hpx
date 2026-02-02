@@ -19,7 +19,7 @@ namespace hpx::util {
     HPX_CXX_EXPORT HPX_CORE_EXPORT void perftests_cfg(
         hpx::program_options::options_description& cmdline);
     HPX_CXX_EXPORT HPX_CORE_EXPORT void perftests_init(
-        const hpx::program_options::variables_map& vm);
+        hpx::program_options::variables_map const& vm);
 #if defined(HPX_HAVE_NANOBENCH)
     HPX_CXX_EXPORT HPX_CORE_EXPORT void perftests_report(
         std::string const& name, std::string const& exec,

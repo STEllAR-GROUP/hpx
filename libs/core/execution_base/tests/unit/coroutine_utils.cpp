@@ -161,7 +161,7 @@ struct recv_set_value
     {
     }
     friend dependent tag_invoke(
-        hpx::execution::experimental::get_env_t, const recv_set_value&) noexcept
+        hpx::execution::experimental::get_env_t, recv_set_value const&) noexcept
     {
         return {};
     }

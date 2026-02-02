@@ -863,12 +863,10 @@ namespace hpx::parallel {
                 auto f2 = [tok, count, first, last](
                               auto&&... data) mutable -> Iter {
                     static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        // make sure iterators embedded in the function objects
-                        // that are attached to futures are invalidated
-                        util::detail::clear_container(data...);
-                    }
+
+                    // make sure iterators embedded in the function objects
+                    // that are attached to futures are invalidated
+                    util::detail::clear_container(data...);
 
                     auto find_res =
                         static_cast<difference_type>(tok.get_data());
@@ -955,13 +953,11 @@ namespace hpx::parallel {
 
                 auto f2 = [tok, count, first, last](
                               auto&&... data) mutable -> Iter {
+                    static_assert(sizeof...(data) < 2);
+
                     // make sure iterators embedded in the function objects that
                     // are attached to futures are invalidated
-                    static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        util::detail::clear_container(data...);
-                    }
+                    util::detail::clear_container(data...);
 
                     auto find_res =
                         static_cast<difference_type>(tok.get_data());
@@ -1047,13 +1043,11 @@ namespace hpx::parallel {
 
                 auto f2 = [tok, count, first, last](
                               auto&&... data) mutable -> Iter {
+                    static_assert(sizeof...(data) < 2);
+
                     // make sure iterators embedded in the function objects that
                     // are attached to futures are invalidated
-                    static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        util::detail::clear_container(data...);
-                    }
+                    util::detail::clear_container(data...);
 
                     auto find_res =
                         static_cast<difference_type>(tok.get_data());
@@ -1166,13 +1160,11 @@ namespace hpx::parallel {
 
                 auto f2 = [tok, count, first1, last1](
                               auto&&... data) mutable -> Iter1 {
+                    static_assert(sizeof...(data) < 2);
+
                     // make sure iterators embedded in the function objects that
                     // are attached to futures are invalidated
-                    static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        util::detail::clear_container(data...);
-                    }
+                    util::detail::clear_container(data...);
 
                     difference_type find_end_res = tok.get_data();
 
@@ -1273,13 +1265,11 @@ namespace hpx::parallel {
 
                 auto f2 = [tok, count, first, last](
                               auto&&... data) mutable -> FwdIter {
+                    static_assert(sizeof...(data) < 2);
+
                     // make sure iterators embedded in the function objects that
                     // are attached to futures are invalidated
-                    static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        util::detail::clear_container(data...);
-                    }
+                    util::detail::clear_container(data...);
 
                     difference_type find_first_of_res = tok.get_data();
 

@@ -20,7 +20,7 @@
 namespace po = hpx::program_options;
 using namespace std;
 
-const double FLOAT_SEPARATION = 0.00000000001;
+double const FLOAT_SEPARATION = 0.00000000001;
 
 template <typename Double1, typename Double2>
 bool check_float(Double1 test, Double2 expected)
@@ -156,7 +156,7 @@ po::options_description set_options()
 vector<string> parse_file(
     stringstream& file, po::options_description& opts, po::variables_map& vm)
 {
-    const bool ALLOW_UNREGISTERED = true;
+    bool const ALLOW_UNREGISTERED = true;
     cout << file.str() << endl;
 
     po::parsed_options parsed =

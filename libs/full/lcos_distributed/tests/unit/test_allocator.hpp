@@ -35,7 +35,7 @@ public:
     typedef std::int64_t difference_type;
     typedef T value_type;
     typedef value_type* pointer;
-    typedef const value_type* const_pointer;
+    typedef value_type const* const_pointer;
     typedef typename std::add_lvalue_reference<value_type>::type reference;
     typedef typename std::add_lvalue_reference<value_type const>::type
         const_reference;
@@ -81,7 +81,7 @@ public:
         return &x;
     }
 
-    pointer allocate(size_type n, const void* = nullptr)
+    pointer allocate(size_type n, void const* = nullptr)
     {
         if (count >= throw_after)
             throw std::bad_alloc();

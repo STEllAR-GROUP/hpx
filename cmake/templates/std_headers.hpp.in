@@ -67,6 +67,10 @@
 #include <asio.hpp>
 #include <hwloc.h>
 
+#if defined(HPX_HAVE_MODULE_LIKWID)
+# include <likwid.h>
+#endif
+
 // Include MPI headers if required
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
     defined(HPX_HAVE_MODULE_MPI_BASE)
@@ -98,7 +102,6 @@
 
 #if defined(HPX_HAVE_MODULE_ASYNC_CUDA)
 # if defined(HPX_HAVE_CUDA) && defined(HPX_HAVE_GPUBLAS)
-#  include <cublas_api.h>
 #  include <cublas_v2.h>
 # elif defined(HPX_HAVE_HIP) && defined(HPX_HAVE_GPUBLAS)
 #  include <hipblas.h>

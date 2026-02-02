@@ -48,11 +48,11 @@ public:
     {
         return chk_;
     }
-    friend std::vector<double>::const_iterator begin(const chk_vector& v)
+    friend std::vector<double>::const_iterator begin(chk_vector const& v)
     {
         return begin(v.data_);
     }
-    friend std::vector<double>::const_iterator end(const chk_vector& v)
+    friend std::vector<double>::const_iterator end(chk_vector const& v)
     {
         return end(v.data_);
     }
@@ -83,7 +83,7 @@ subdomain_future init(int subdomain_index)
 
 double stencil(double left, double center, double right)
 {
-    const double cc = cfl * cfl;
+    double const cc = cfl * cfl;
     // Randomly return an incorrect result.
     if (std::rand() % 100 < chaos_factor)
     {
@@ -98,13 +98,13 @@ double stencil(double left, double center, double right)
 
 double left_flux(double left, double center)
 {
-    const double cc = cfl * cfl;
+    double const cc = cfl * cfl;
     return (1.0 - 0.5 * cfl - 0.5 * cc) * left + 0.5 * (-cfl + cc) * center;
 }
 
 double right_flux(double center, double right)
 {
-    const double cc = cfl * cfl;
+    double const cc = cfl * cfl;
     return 0.5 * (cfl + cc) * center + (1.0 + 0.5 * cfl - 0.5 * cc) * right;
 }
 
@@ -115,9 +115,9 @@ struct validate_exception : std::exception
 chk_vector update(subdomain_future left_input, subdomain_future center_input,
     subdomain_future right_input)
 {
-    const auto left = left_input.get();
-    const auto center = center_input.get();
-    const auto right = right_input.get();
+    auto const left = left_input.get();
+    auto const center = center_input.get();
+    auto const right = right_input.get();
     std::vector<double> workspace(3 * subdomain_width + 1);
     std::copy(begin(left), end(left) - 1, &workspace[0]);
     std::copy(begin(center), end(center) - 1, &workspace[subdomain_width]);
@@ -177,7 +177,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         {
             for (auto& f : input)
             {
-                const auto v = f.get();
+                auto const v = f.get();
                 for (auto it = begin(v); it != end(v) - 1; ++it)
                 {
                     std::cout << *it << " ";

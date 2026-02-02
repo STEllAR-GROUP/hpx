@@ -20,6 +20,7 @@
 #include <iterator>
 #include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -148,24 +149,26 @@ void test_then()
 {
     using executor = hpx::execution::parallel_executor;
 
-    hpx::future<void> f = hpx::make_ready_future();
-
     std::string desc("test_then");
     {
+        hpx::future<void> f = hpx::make_ready_future();
         auto exec = hpx::experimental::prefer(
             hpx::execution::experimental::with_annotation, executor{}, desc);
 
-        HPX_TEST(hpx::parallel::execution::then_execute(exec, &test_f, f, 42)
+        HPX_TEST(hpx::parallel::execution::then_execute(
+                     exec, &test_f, std::move(f), 42)
                      .get() != hpx::this_thread::get_id());
         HPX_TEST_EQ(annotation, desc);
     }
 
     {
+        hpx::future<void> f = hpx::make_ready_future();
         annotation.clear();
         auto exec =
             hpx::execution::experimental::with_annotation(executor{}, desc);
 
-        HPX_TEST(hpx::parallel::execution::then_execute(exec, &test_f, f, 42)
+        HPX_TEST(hpx::parallel::execution::then_execute(
+                     exec, &test_f, std::move(f), 42)
                      .get() != hpx::this_thread::get_id());
         HPX_TEST_EQ(annotation, desc);
     }

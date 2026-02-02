@@ -57,7 +57,7 @@ namespace hpx::util::plugin {
         return dlclose(x);
     }
 
-    inline HMODULE MyLoadLibrary(const char* path)
+    inline HMODULE MyLoadLibrary(char const* path)
     {
         return reinterpret_cast<HMODULE>(dlopen(path, RTLD_GLOBAL | RTLD_LAZY));
     }

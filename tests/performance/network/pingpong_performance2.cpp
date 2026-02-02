@@ -23,13 +23,13 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-const std::size_t nbytes_default = 8;
-const std::size_t nsteps_default = 1;
-const std::size_t window_default = 10000;
-const std::size_t inject_rate_default = 0;
-const std::size_t batch_size_default = 10;
-const std::size_t nwarmups_default = 1;
-const std::size_t niters_default = 1;
+std::size_t const nbytes_default = 8;
+std::size_t const nsteps_default = 1;
+std::size_t const window_default = 10000;
+std::size_t const inject_rate_default = 0;
+std::size_t const batch_size_default = 10;
+std::size_t const nwarmups_default = 1;
+std::size_t const niters_default = 1;
 
 size_t window;
 size_t inject_rate;

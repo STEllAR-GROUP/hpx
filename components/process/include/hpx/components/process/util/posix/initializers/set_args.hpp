@@ -34,7 +34,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
                 args_[0] = nullptr;
             }
 
-            explicit set_args_(const Range& args)
+            explicit set_args_(Range const& args)
             {
                 string_args_.resize(args.size());
                 args_.resize(args.size() + 1);
@@ -83,7 +83,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
         };
 
         template <class Range>
-        set_args_<Range> set_args(const Range& range)
+        set_args_<Range> set_args(Range const& range)
         {
             return set_args_<Range>(range);
         }

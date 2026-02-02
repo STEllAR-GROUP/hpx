@@ -35,7 +35,7 @@ namespace hpx::parcelset::policies::lci {
             return rank_;
         }
 
-        static constexpr const char* type() noexcept
+        static constexpr char const* type() noexcept
         {
             return "lci";
         }

@@ -58,7 +58,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
 
     /// Dummy variable to ensure the enforce_oneapi_device_side_init method is
     //being run
-    const int run_enforced_oneapi_device_init =
+    int const run_enforced_oneapi_device_init =
         enforce_oneapi_device_side_init();
 
 #endif

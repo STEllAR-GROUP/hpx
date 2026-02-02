@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2023 The STE||AR-Group
+# Copyright (c) 2019-2026 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,6 +28,10 @@ set(thread_pools_sources detail/background_thread.cpp detail/scheduling_log.cpp
                          scheduled_thread_pool.cpp
 )
 
+if(HPX_TRACY_WITH_TRACY)
+  set(additional_dependencies hpx_tracy)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   core thread_pools
@@ -52,5 +56,6 @@ add_hpx_module(
     hpx_tag_invoke
     hpx_threading_base
     hpx_topology
+    ${additional_dependencies}
   CMAKE_SUBDIRS examples tests
 )

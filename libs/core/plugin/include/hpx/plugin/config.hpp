@@ -10,11 +10,6 @@
 #include <hpx/plugin/config/defines.hpp>
 #include <hpx/modules/preprocessor.hpp>
 
-////////////////////////////////////////////////////////////////////////////////
-// Older implementations of std::shared_ptr do not support binding function
-// pointers (see http//wg21.link/lwg3018)
-#if defined(HPX_HAVE_CXX11_STD_SHARED_PTR_LWG3018)
-
 #include <memory>
 
 namespace hpx::util::plugin {
@@ -23,22 +18,6 @@ namespace hpx::util::plugin {
     using shared_ptr = std::shared_ptr<T>;
 }    // namespace hpx::util::plugin
 
-#else
-
-// hpxinspect:nodeprecatedinclude:boost/shared_ptr.hpp
-// hpxinspect:nodeprecatedname:boost::shared_ptr
-
-#include <boost/shared_ptr.hpp>
-
-namespace hpx::util::plugin {
-
-    HPX_CXX_EXPORT template <typename T>
-    using shared_ptr = boost::shared_ptr<T>;
-}    // namespace hpx::util::plugin
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_PLUGIN_NO_EXPORT_API)
 
 #define HPX_PLUGIN_EXPORT_API HPX_SYMBOL_EXPORT

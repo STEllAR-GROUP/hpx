@@ -27,7 +27,7 @@ struct DummyContainer
         archive & cargo;
     }
 
-    bool operator<(const DummyContainer<Cargo> other) const
+    bool operator<(DummyContainer<Cargo> const other) const
     {
         return cargo < other.cargo;
     }

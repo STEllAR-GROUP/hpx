@@ -121,12 +121,8 @@ namespace hpx::execution {
         }
 
         // BulkTwoWayExecutor interface
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             [[maybe_unused]] sequenced_executor const& exec, F&& f,
@@ -151,9 +147,9 @@ namespace hpx::execution {
                         desc, f, elem, ts...));
                 }
             }
-            catch (std::bad_alloc const& ba)
+            catch (std::bad_alloc const&)
             {
-                throw ba;
+                throw;
             }
             catch (...)
             {
@@ -163,12 +159,8 @@ namespace hpx::execution {
             return results;
         }
 
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
             sequenced_executor const& exec, F&& f, S const& shape, Ts&&... ts)
@@ -178,12 +170,8 @@ namespace hpx::execution {
         }
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, sequenced_executor>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(std::is_convertible_v<Executor_, sequenced_executor>)
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             Executor_ const& exec, char const* annotation)
@@ -193,12 +181,8 @@ namespace hpx::execution {
             return exec_with_annotation;
         }
 
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, sequenced_executor>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(std::is_convertible_v<Executor_, sequenced_executor>)
         friend auto tag_invoke(hpx::execution::experimental::with_annotation_t,
             Executor_ const& exec, std::string annotation)
         {
@@ -216,12 +200,7 @@ namespace hpx::execution {
         }
 #endif
 
-        // clang-format off
-        template <typename Parameters,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters>
-            )>
-        // clang-format on
+        template <executor_parameters Parameters>
         friend constexpr std::size_t tag_invoke(
             hpx::execution::experimental::processing_units_count_t,
             Parameters&&, sequenced_executor const&,
@@ -261,7 +240,7 @@ namespace hpx::execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& /* ar */, unsigned int const /* version */)
+        static constexpr void serialize(Archive&, unsigned int const) noexcept
         {
         }
 

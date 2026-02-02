@@ -20,7 +20,7 @@ using namespace std;
 /* Function used to check that 'opt1' and 'opt2' are not specified
    at the same time. */
 void conflicting_options(
-    const variables_map& vm, const char* opt1, const char* opt2)
+    variables_map const& vm, char const* opt1, char const* opt2)
 {
     if (vm.count(opt1) && !vm[opt1].defaulted() && vm.count(opt2) &&
         !vm[opt2].defaulted())
@@ -33,7 +33,7 @@ void conflicting_options(
 /* Function used to check that of 'for_what' is specified, then
    'required_option' is specified too. */
 void option_dependency(
-    const variables_map& vm, const char* for_what, const char* required_option)
+    variables_map const& vm, char const* for_what, char const* required_option)
 {
     if (vm.count(for_what) && !vm[for_what].defaulted())
     {

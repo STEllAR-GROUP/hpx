@@ -117,7 +117,7 @@ namespace gc {
               , cd(nullptr)
             {
             }
-            collectable(const collectable& src)
+            collectable(collectable const& src)
               : hpx::components::component_base<collectable>(src)
               , weight(src.weight + 1)
               , max_weight(src.weight)

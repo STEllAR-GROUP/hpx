@@ -7,7 +7,7 @@
 
 set(tests manage_runtime)
 
-if(NOT MSVC)
+if((NOT MSVC) AND HPX_WITH_DISTRIBUTED_RUNTIME)
   set(tests ${tests} auto_wrap_main)
   set(auto_wrap_main_FLAGS NOLIBS DEPENDENCIES HPX::hpx HPX::auto_wrap_main)
 endif()

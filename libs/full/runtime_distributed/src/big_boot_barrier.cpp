@@ -138,7 +138,7 @@ namespace hpx::agas::detail {
                     hpx::serialization::detail::id_registry::instance();
                 std::uint32_t max_id = registry.get_max_registered_id();
 
-                for (const std::string& s :
+                for (std::string const& s :
                     unassigned_ids.serialization_typenames)
                 {
                     std::uint32_t id = registry.try_get_id(s);
@@ -157,7 +157,7 @@ namespace hpx::agas::detail {
                     hpx::actions::detail::action_registry::instance();
                 std::uint32_t max_id = registry.max_id_;
 
-                for (const std::string& s : unassigned_ids.action_typenames)
+                for (std::string const& s : unassigned_ids.action_typenames)
                 {
                     std::uint32_t id = registry.try_get_id(s);
                     if (id == hpx::actions::detail::action_registry::invalid_id)
@@ -326,7 +326,7 @@ namespace hpx::agas {
         naming::gid_type prefix;    // suggested prefix (optional)
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int)
+        void serialize(Archive& ar, unsigned int const)
         {
             // clang-format off
             ar & endpoints;
@@ -393,7 +393,7 @@ namespace hpx::agas {
         std::vector<parcelset::endpoints_type> endpoints;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int)
+        void serialize(Archive& ar, unsigned int const)
         {
             // clang-format off
             ar & prefix;

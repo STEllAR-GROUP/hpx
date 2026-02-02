@@ -106,9 +106,13 @@ void hello_world_foreman()
                 hpx::threads::thread_schedule_hint_mode::thread,
                 static_cast<std::int16_t>(worker));
 
+            // Annotate the created threads with the given thread name
+            hpx::execution::experimental::annotating_executor annotating_exec(
+                hpx::execution::experimental::with_hint(exec, hint),
+                std::string("hello_world_worker#") + std::to_string(worker));
+
             futures.push_back(
-                hpx::async(hpx::execution::experimental::with_hint(exec, hint),
-                    hello_world_worker, worker));
+                hpx::async(annotating_exec, hello_world_worker, worker));
         }
 
         // Wait for all of the futures to finish. The callback version of the

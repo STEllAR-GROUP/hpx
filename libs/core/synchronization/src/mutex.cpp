@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,26 +15,35 @@
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#if defined(HPX_HAVE_MODULE_TRACY)
+#include <hpx/modules/tracy.hpp>
+#endif
 
 #include <mutex>
+#include <string>
 #include <utility>
 
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-#if HPX_HAVE_ITTNOTIFY != 0
+#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_MODULE_TRACY)
     mutex::mutex(char const* const description)
       : owner_id_(threads::invalid_thread_id)
     {
         HPX_ITT_SYNC_CREATE(this, "hpx::mutex", description);
-        HPX_ITT_SYNC_RENAME(this, "hpx::mutex");
+#if defined(HPX_HAVE_MODULE_TRACY)
+        context_ = hpx::tracy::create(std::string("hpx::mutex") + description);
+#endif
     }
 #endif
 
-#if HPX_HAVE_ITTNOTIFY != 0
+#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_MODULE_TRACY)
     mutex::~mutex()
     {
         HPX_ITT_SYNC_DESTROY(this);
+#if defined(HPX_HAVE_MODULE_TRACY)
+        hpx::tracy::destroy(context_);
+#endif
     }
 #else
     mutex::~mutex() = default;
@@ -45,31 +54,42 @@ namespace hpx {
         HPX_ASSERT(threads::get_self_ptr() != nullptr);
 
         HPX_ITT_SYNC_PREPARE(this);
-        std::unique_lock<mutex_type> l(mtx_);
+#if defined(HPX_HAVE_MODULE_TRACY)
+        bool const run_after = hpx::tracy::lock_prepare(context_);
+#endif
 
-        threads::thread_id_type const self_id = threads::get_self_id();
-        if (owner_id_ == self_id)
         {
-            HPX_ITT_SYNC_CANCEL(this);
-            l.unlock();
-            HPX_THROWS_IF(ec, hpx::error::deadlock, description,
-                "The calling thread already owns the mutex");
-            return;
-        }
+            std::unique_lock<mutex_type> l(mtx_);
 
-        while (owner_id_ != threads::invalid_thread_id)
-        {
-            cond_.wait(l, ec);
-            if (ec)
+            threads::thread_id_type const self_id = threads::get_self_id();
+            if (owner_id_ == self_id)
             {
                 HPX_ITT_SYNC_CANCEL(this);
+                l.unlock();
+                HPX_THROWS_IF(ec, hpx::error::deadlock, description,
+                    "The calling thread already owns the mutex");
                 return;
             }
+
+            while (owner_id_ != threads::invalid_thread_id)
+            {
+                cond_.wait(l, ec);
+                if (ec)
+                {
+                    HPX_ITT_SYNC_CANCEL(this);
+                    return;
+                }
+            }
+
+            util::register_lock(this);
+            owner_id_ = self_id;
         }
 
-        util::register_lock(this);
         HPX_ITT_SYNC_ACQUIRED(this);
-        owner_id_ = self_id;
+#if defined(HPX_HAVE_MODULE_TRACY)
+        if (run_after)
+            hpx::tracy::lock_acquired(context_);
+#endif
     }
 
     bool mutex::try_lock(char const* /* description */, error_code& /* ec */)
@@ -77,18 +97,33 @@ namespace hpx {
         HPX_ASSERT(threads::get_self_ptr() != nullptr);
 
         HPX_ITT_SYNC_PREPARE(this);
-        std::unique_lock<mutex_type> l(mtx_);
+#if defined(HPX_HAVE_MODULE_TRACY)
+        bool const run_after = hpx::tracy::lock_prepare(context_);
+#endif
 
-        if (owner_id_ != threads::invalid_thread_id)
         {
-            HPX_ITT_SYNC_CANCEL(this);
-            return false;
+            std::unique_lock<mutex_type> l(mtx_);
+
+            if (owner_id_ != threads::invalid_thread_id)
+            {
+                HPX_ITT_SYNC_CANCEL(this);
+#if defined(HPX_HAVE_MODULE_TRACY)
+                if (run_after)
+                    hpx::tracy::lock_acquired(context_, false);
+#endif
+                return false;
+            }
+
+            util::register_lock(this);
+            owner_id_ = threads::get_self_id();
         }
 
-        threads::thread_id_type const self_id = threads::get_self_id();
-        util::register_lock(this);
         HPX_ITT_SYNC_ACQUIRED(this);
-        owner_id_ = self_id;
+#if defined(HPX_HAVE_MODULE_TRACY)
+        if (run_after)
+            hpx::tracy::lock_acquired(context_, true);
+#endif
+
         return true;
     }
 
@@ -110,8 +145,12 @@ namespace hpx {
             return;
         }
 
-        HPX_ITT_SYNC_RELEASED(this);
         owner_id_ = threads::invalid_thread_id;
+
+        HPX_ITT_SYNC_RELEASED(this);
+#if defined(HPX_HAVE_MODULE_TRACY)
+        hpx::tracy::lock_released(context_);
+#endif
 
         {
             [[maybe_unused]] util::ignore_while_checking il(&l);

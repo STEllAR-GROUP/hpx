@@ -41,9 +41,9 @@ void test_when_all_from_list()
     auto result = r.get();
 
     HPX_TEST_EQ(futures.size(), result.size());
-    for (const auto& f : futures)
+    for (auto const& f : futures)
         HPX_TEST(!f.valid());
-    for (const auto& r : result)
+    for (auto const& r : result)
         HPX_TEST(r.is_ready());
 }
 
@@ -63,9 +63,9 @@ void test_when_all_from_list_iterators()
     auto result = r.get();
 
     HPX_TEST_EQ(futures.size(), result.size());
-    for (const auto& f : futures)
+    for (auto const& f : futures)
         HPX_TEST(!f.valid());
-    for (const auto& r : result)
+    for (auto const& r : result)
         HPX_TEST(r.is_ready());
 }
 

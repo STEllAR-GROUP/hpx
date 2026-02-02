@@ -25,7 +25,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
         class close_fds_ : public initializer_base
         {
         public:
-            explicit close_fds_(const Range& fds)
+            explicit close_fds_(Range const& fds)
               : fds_(fds)
             {
             }
@@ -44,7 +44,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
         };
 
         template <class Range>
-        close_fds_<Range> close_fds(const Range& fds)
+        close_fds_<Range> close_fds(Range const& fds)
         {
             return close_fds_<Range>(fds);
         }

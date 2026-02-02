@@ -460,11 +460,13 @@ namespace hpx::parallel {
                         return std::make_pair(part_dest, part_dest_advanced);
                     },
                     // finalize, called once if no error occurred
-                    [first, dest, count](auto&& data) mutable
+                    [first, dest, count](auto&&... data) mutable
                         -> util::in_out_result<InIter, FwdIter> {
+                        static_assert(sizeof...(data) < 2);
+
                         // make sure iterators embedded in function object that is
                         // attached to futures are invalidated
-                        util::detail::clear_container(data);
+                        util::detail::clear_container(data...);
 
                         std::advance(first, count);
                         std::advance(dest, count);

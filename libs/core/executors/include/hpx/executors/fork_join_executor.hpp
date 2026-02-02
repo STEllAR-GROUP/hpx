@@ -29,6 +29,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -1199,12 +1200,8 @@ namespace hpx::execution::experimental {
     private:
         std::shared_ptr<shared_data> shared_data_ = nullptr;
 
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
             fork_join_executor const& exec, F&& f, S const& shape, Ts&&... ts)
@@ -1213,12 +1210,8 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             fork_join_executor const& exec, F&& f, S const& shape, Ts&&... ts)
@@ -1227,12 +1220,8 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
-        // clang-format off
-        template <typename F, typename... Fs,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...)
-            )>
-        // clang-format on
+        template <typename F, typename... Fs>
+            requires(std::invocable<F> && (std::invocable<Fs> && ...))
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::async_invoke_t,
             fork_join_executor const& exec, F&& f, Fs&&... fs)
@@ -1241,12 +1230,8 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f), HPX_FORWARD(Fs, fs)...);
         }
 
-        // clang-format off
-        template <typename F, typename... Fs,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...)
-            )>
-        // clang-format on
+        template <typename F, typename... Fs>
+            requires(std::invocable<F> && (std::invocable<Fs> && ...))
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::sync_invoke_t,
             fork_join_executor const& exec, F&& f, Fs&&... fs)

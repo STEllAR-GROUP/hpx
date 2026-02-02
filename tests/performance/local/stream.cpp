@@ -60,7 +60,7 @@ double mysecond()
 
 int checktick()
 {
-    static const std::size_t M = 20;
+    static std::size_t const M = 20;
     double timesfound[M];
 
     // Collect a sequence of M unique time values from the system.
@@ -622,7 +622,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     };
     // clang-format on
 
-    const double bytes[num_stream_tests] = {
+    double const bytes[num_stream_tests] = {
         2 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size),
         2 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size),
         3 * sizeof(STREAM_TYPE) * static_cast<double>(vector_size),
@@ -661,7 +661,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 "triad_bw,triad_avg,triad_min,triad_max\n");
         }
         std::size_t const num_executors = 6;
-        const char* executors[num_executors] = {"parallel-serial", "block",
+        char const* executors[num_executors] = {"parallel-serial", "block",
             "parallel-parallel", "fork_join_executor", "scheduler_executor",
             "block_fork_join_executor"};
         hpx::util::format_to(std::cout, "{},{},{},", executors[executor],

@@ -686,7 +686,7 @@ namespace hpx::util {
         split_key.pop_back();
 
         section const* cur_section = this;
-        for (const auto& iter : split_key)
+        for (auto const& iter : split_key)
         {
             auto next = cur_section->sections_.find(iter);
             if (cur_section->sections_.end() == next)

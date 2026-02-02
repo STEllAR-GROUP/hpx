@@ -6,6 +6,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#include <hpx/components/iostreams/ostream.hpp>
+#include <hpx/components/iostreams/server/output_stream.hpp>
+#include <hpx/components/iostreams/standard_streams.hpp>
+
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/component_startup_shutdown.hpp>
@@ -14,10 +19,6 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
-
-#include <hpx/components/iostreams/ostream.hpp>
-#include <hpx/components/iostreams/server/output_stream.hpp>
-#include <hpx/components/iostreams/standard_streams.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_COMPONENT_MODULE()
@@ -40,7 +41,8 @@ HPX_REGISTER_ACTION_ID(ostream_type::write_sync_action,
 ///////////////////////////////////////////////////////////////////////////////
 // Register a startup function which will be called as a HPX-thread during
 // runtime startup.
-namespace hpx { namespace iostreams { namespace detail {
+namespace hpx::iostreams::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     void register_ostreams()
     {
@@ -73,7 +75,7 @@ namespace hpx { namespace iostreams { namespace detail {
         pre_shutdown = false;       // run as pre-startup function
         return true;
     }
-}}}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostreams::detail
 
 // Note that this macro can be used not more than once in one module.
 HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(

@@ -19,6 +19,7 @@
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
 
+#include <concepts>
 #include <cstddef>
 #include <exception>
 #include <functional>
@@ -66,9 +67,8 @@ namespace hpx {
 
         thread() noexcept;
 
-        template <typename F,
-            typename Enable =
-                std::enable_if_t<!std::is_same_v<std::decay_t<F>, thread>>>
+        template <typename F>
+            requires(!std::same_as<std::decay_t<F>, thread>)
         explicit thread(F&& f)
         {
             auto thrd_data = threads::get_self_id_data();
@@ -112,7 +112,7 @@ namespace hpx {
         /// parallel context
         bool joinable() const noexcept
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::scoped_lock<mutex_type> l(mtx_);
             return joinable_locked();
         }
 
@@ -122,7 +122,7 @@ namespace hpx {
         /// permits the thread to execute independently of the thread handle
         void detach()
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::scoped_lock<mutex_type> l(mtx_);
             detach_locked();
         }
 
@@ -132,7 +132,7 @@ namespace hpx {
         /// returns the underlying implementation-defined thread handle
         native_handle_type native_handle() const    //-V659
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::scoped_lock<mutex_type> l(mtx_);
             return id_.noref();
         }
 
@@ -141,15 +141,15 @@ namespace hpx {
         [[nodiscard]] static unsigned int hardware_concurrency() noexcept;
 
         // extensions
-        void interrupt(bool flag = true);
+        void interrupt(bool flag = true) const;
         bool interruption_requested() const;
 
         static void interrupt(id, bool flag = true);
 
-        hpx::future<void> get_future(error_code& ec = throws);
+        hpx::future<void> get_future(error_code& ec = throws) const;
 
         std::size_t get_thread_data() const;
-        std::size_t set_thread_data(std::size_t);
+        std::size_t set_thread_data(std::size_t) const;
 
 #if defined(HPX_HAVE_LIBCDS)
         std::size_t get_libcds_data() const;

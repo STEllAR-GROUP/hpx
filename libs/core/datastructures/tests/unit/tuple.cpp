@@ -76,7 +76,7 @@ struct DD
 
 // something to prevent warnings for unused variables
 template <class T>
-void dummy(const T&)
+void dummy(T const&)
 {
 }
 
@@ -89,7 +89,7 @@ public:
     {
     }
 
-    bool operator==(const foo& other) const
+    bool operator==(foo const& other) const
     {
         return val == other.val;
     }
@@ -111,7 +111,7 @@ public:
 // A non-copyable class
 class no_copy
 {
-    no_copy(const no_copy&) {}
+    no_copy(no_copy const&) {}
 
 public:
     no_copy() {};
@@ -122,12 +122,12 @@ public:
 // ----------------------------------------------------------------------------
 
 typedef hpx::tuple<int> t1;
-typedef hpx::tuple<double&, const double&, const double, double*, const double*>
+typedef hpx::tuple<double&, double const&, double const, double*, double const*>
     t2;
 typedef hpx::tuple<A, int (*)(char, int), C> t3;
 typedef hpx::tuple<std::string, std::pair<A, B>> t4;
-typedef hpx::tuple<A*, hpx::tuple<const A*, const B&, C>, bool, void*> t5;
-typedef hpx::tuple<volatile int, const volatile char&, int (&)(float)> t6;
+typedef hpx::tuple<A*, hpx::tuple<A const*, B const&, C>, bool, void*> t5;
+typedef hpx::tuple<int volatile, char const volatile&, int (&)(float)> t6;
 typedef hpx::tuple<B (A::*)(C&), A&> t7;
 
 // -----------------------------------------------------------------------
@@ -185,7 +185,7 @@ void construction_test()
     double dd = 5;
     dummy(hpx::tuple<double&>(dd));    // ok
 
-    dummy(hpx::tuple<const double&>(dd + 3.14));    // ok, but dangerous
+    dummy(hpx::tuple<double const&>(dd + 3.14));    // ok, but dangerous
 
     //dummy(hpx::tuple<double&>(dd+3.14)); // should fail,
     // temporary to non-const reference
@@ -199,8 +199,8 @@ void element_access_test()
 {
     double d = 2.7;
     A a;
-    hpx::tuple<int, double&, const A&, int> t(1, d, a, 2);
-    const hpx::tuple<int, double&, const A, int> ct = t;
+    hpx::tuple<int, double&, A const&, int> t(1, d, a, 2);
+    hpx::tuple<int, double&, A const, int> const ct = t;
 
     int i = hpx::get<0>(t);
     int i2 = hpx::get<3>(t);
@@ -230,13 +230,13 @@ void element_access_test()
                   hpx::tuple_element<0, hpx::tuple<int, float>>::type>::value !=
         true));
     HPX_TEST((std::is_const<
-        hpx::tuple_element<0, const hpx::tuple<int, float>>::type>::value));
+        hpx::tuple_element<0, hpx::tuple<int, float> const>::type>::value));
 
     HPX_TEST((std::is_const<
                   hpx::tuple_element<1, hpx::tuple<int, float>>::type>::value !=
         true));
     HPX_TEST((std::is_const<
-        hpx::tuple_element<1, const hpx::tuple<int, float>>::type>::value));
+        hpx::tuple_element<1, hpx::tuple<int, float> const>::type>::value));
 
     HPX_TEST((std::is_same<hpx::tuple_element<1, std::array<float, 4>>::type,
         float>::value));
@@ -312,7 +312,7 @@ void make_tuple_test()
 
     A a = A();
     B b;
-    const A ca = a;
+    A const ca = a;
     hpx::make_tuple(std::cref(a), b);
     hpx::make_tuple(std::ref(a), b);
     hpx::make_tuple(std::ref(a), std::cref(b));
@@ -486,7 +486,7 @@ void ordering_test()
 // ----------------------------------------------------------------------------
 void const_tuple_test()
 {
-    const hpx::tuple<int, float> t1(5, 3.3f);
+    hpx::tuple<int, float> const t1(5, 3.3f);
     HPX_TEST_EQ(hpx::get<0>(t1), 5);
     HPX_TEST_EQ(hpx::get<1>(t1), 3.3f);
 }

@@ -9,9 +9,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/parallel/algorithms/remove.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -87,13 +87,13 @@ struct user_defined_type
         return this->val == rand_no;
     }
 
-    static const std::vector<std::string> name_list;
+    static std::vector<std::string> const name_list;
 
     int val;
     std::string name;
 };
 
-const std::vector<std::string> user_defined_type::name_list{
+std::vector<std::string> const user_defined_type::name_list{
     "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"};
 
 struct random_fill
@@ -580,17 +580,17 @@ void test_remove_if(IteratorTag, int rand_base)
     ////////// Test cases for 'int' type.
     test_remove_if(
         IteratorTag(), int(),
-        [rand_base](const int a) -> bool { return a == rand_base; }, rand_base);
+        [rand_base](int const a) -> bool { return a == rand_base; }, rand_base);
     test_remove_if(
         seq, IteratorTag(), int(),
-        [rand_base](const int a) -> bool { return a == rand_base; }, rand_base);
+        [rand_base](int const a) -> bool { return a == rand_base; }, rand_base);
     test_remove_if(
         par, IteratorTag(), int(),
-        [rand_base](const int a) -> bool { return !(a == rand_base); },
+        [rand_base](int const a) -> bool { return !(a == rand_base); },
         rand_base);
     test_remove_if(
         par_unseq, IteratorTag(), int(),
-        [rand_base](const int a) -> bool { return a == rand_base; }, rand_base);
+        [rand_base](int const a) -> bool { return a == rand_base; }, rand_base);
 
     ////////// Test cases for user defined type.
     test_remove_if(
@@ -617,11 +617,11 @@ void test_remove_if(IteratorTag, int rand_base)
     ////////// Asynchronous test cases for 'int' type.
     test_remove_if_async(
         seq(task), IteratorTag(), int(),
-        [rand_base](const int a) -> bool { return !(a == rand_base); },
+        [rand_base](int const a) -> bool { return !(a == rand_base); },
         rand_base);
     test_remove_if_async(
         par(task), IteratorTag(), int(),
-        [rand_base](const int a) -> bool { return a == rand_base; }, rand_base);
+        [rand_base](int const a) -> bool { return a == rand_base; }, rand_base);
 
     ////////// Asynchronous test cases for user defined type.
     test_remove_if_async(
@@ -637,7 +637,7 @@ void test_remove_if(IteratorTag, int rand_base)
 
     ////////// Corner test cases.
     test_remove_if(
-        par, IteratorTag(), int(), [](const int) -> bool { return true; },
+        par, IteratorTag(), int(), [](int const) -> bool { return true; },
         rand_base);
     test_remove_if(
         par_unseq, IteratorTag(), user_defined_type(),
@@ -749,7 +749,7 @@ void test_remove_if_sender(
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
 
     int rand_base = g();
-    auto pred = [rand_base](const int a) -> bool { return a == rand_base; };
+    auto pred = [rand_base](int const a) -> bool { return a == rand_base; };
 
     std::size_t const size = 10007;
     std::vector<int> c(size), d;

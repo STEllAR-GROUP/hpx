@@ -78,7 +78,8 @@ namespace hpx::parallel::util::detail {
             {
                 // Switch to sequential execution for one-core, one-chunk case
                 // if the executor supports it.
-                if constexpr (hpx::traits::is_one_way_executor_v<executor_type>)
+                if constexpr (std::is_void_v<Result> &&
+                    hpx::traits::is_one_way_executor_v<executor_type>)
                 {
                     if (cores == 1 && std::size(reshaped) == 1)
                     {
@@ -107,7 +108,7 @@ namespace hpx::parallel::util::detail {
                         detail::handle_local_exceptions<ExPolicy>;
                     handle_local_exceptions::call(items);
                 }
-                return hpx::unwrap(items);
+                return hpx::unwrap(HPX_MOVE(items));
             }
             else
             {
@@ -170,7 +171,9 @@ namespace hpx::parallel::util::detail {
             try
             {
                 if constexpr (std::is_void_v<decltype(foreach_partition<Result>(
-                                  policy, first, count, f1, reshape))>)
+                                  HPX_FORWARD(ExPolicy_, policy), first, count,
+                                  HPX_FORWARD(F1, f1),
+                                  HPX_FORWARD(ReShape, reshape)))>)
                 {
                     detail::foreach_partition<Result>(
                         HPX_FORWARD(ExPolicy_, policy), first, count,
@@ -222,9 +225,13 @@ namespace hpx::parallel::util::detail {
                 std::enable_if_t<!hpx::traits::is_pair_v<std::decay_t<Items>>>>
         static auto reduce(Items&& items, F&& f, FwdIter last)
         {
+            using decayed_items = std::decay_t<Items>;
+            constexpr bool is_future =
+                hpx::traits::is_future_v<decayed_items> ||
+                hpx::traits::is_future_range_v<decayed_items>;
+
             namespace ex = hpx::execution::experimental;
-            if constexpr (ex::is_sender_v<std::decay_t<Items>> &&
-                !hpx::traits::is_future_v<std::decay_t<Items>>)
+            if constexpr (ex::is_sender_v<decayed_items> && !is_future)
             {
                 // the predecessor sender could be exposing zero or more
                 // value types
@@ -235,12 +242,15 @@ namespace hpx::parallel::util::detail {
             }
             else
             {
-                // wait for all tasks to finish
-                if (hpx::wait_all_nothrow(items))
+                if constexpr (is_future)
                 {
-                    // always rethrow if items has at least one exceptional
-                    // future
-                    handle_local_exceptions::call(items);
+                    // wait for all tasks to finish
+                    if (hpx::wait_all_nothrow(items))
+                    {
+                        // always rethrow if items has at least one exceptional
+                        // future
+                        handle_local_exceptions::call(items);
+                    }
                 }
                 return HPX_INVOKE(f, HPX_MOVE(last));
             }

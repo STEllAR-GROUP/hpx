@@ -72,7 +72,7 @@ struct test_allocator
 {
     typedef T value_type;
     typedef T* pointer;
-    typedef const T* const_pointer;
+    typedef T const* const_pointer;
     typedef test_value_proxy<T> reference;
     typedef test_value_proxy<T const> const_reference;
     typedef std::size_t size_type;
@@ -115,7 +115,7 @@ struct test_allocator
     // topo.allocate(). The pointer hint may be used to provide locality of
     // reference: the allocator, if supported by the implementation, will
     // attempt to allocate the new memory block as close as possible to hint.
-    pointer allocate(size_type n, const void* /* hint */ = nullptr)
+    pointer allocate(size_type n, void const* /* hint */ = nullptr)
     {
         return new T[n];
     }

@@ -88,11 +88,11 @@ public:
         return data_[idx];
     }
 
-    friend std::vector<double>::const_iterator begin(const partition_data& v)
+    friend std::vector<double>::const_iterator begin(partition_data const& v)
     {
         return begin(v.data_);
     }
-    friend std::vector<double>::const_iterator end(const partition_data& v)
+    friend std::vector<double>::const_iterator end(partition_data const& v)
     {
         return end(v.data_);
     }

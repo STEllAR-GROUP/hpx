@@ -33,7 +33,7 @@
 // forward declare the type we will get function annotations from
 namespace hpx::lcos::detail {
 
-    template <typename Frame>
+    HPX_CXX_EXPORT template <typename Frame>
     struct dataflow_finalization;
 }    // namespace hpx::lcos::detail
 
@@ -41,7 +41,7 @@ namespace hpx::lcos::detail {
 
 ///////////////////////////////////////////////////////////////////////////
 // traits specialization to get annotation from dataflow_finalization
-template <typename Frame>
+HPX_CXX_EXPORT template <typename Frame>
 struct hpx::traits::get_function_annotation<
     hpx::lcos::detail::dataflow_finalization<Frame>>
 {
@@ -61,7 +61,7 @@ struct hpx::traits::get_function_annotation<
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::lcos::detail {
 
-    template <typename Frame>
+    HPX_CXX_EXPORT template <typename Frame>
     struct dataflow_finalization
     {
         explicit dataflow_finalization(Frame* df) noexcept
@@ -79,7 +79,7 @@ namespace hpx::lcos::detail {
         hpx::intrusive_ptr<Frame> this_;
     };
 
-    template <typename F, typename Args>
+    HPX_CXX_EXPORT template <typename F, typename Args>
     struct dataflow_not_callable
     {
         static auto error(F f, Args args)
@@ -105,7 +105,7 @@ namespace hpx::lcos::detail {
         using type = hpx::future<hpx::detail::invoke_fused_result_t<F, Args>>;
     };
 
-    template <typename Executor, typename F, typename Args>
+    HPX_CXX_EXPORT template <typename Executor, typename F, typename Args>
     struct dataflow_return_impl_executor;
 
     HPX_CXX_EXPORT template <typename Executor, typename F, typename... Ts>
@@ -136,14 +136,14 @@ namespace hpx::lcos::detail {
     using dataflow_return_t = typename dataflow_return<Policy, F, Args>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Executor, typename Frame, typename Func,
+    HPX_CXX_EXPORT template <typename Executor, typename Frame, typename Func,
         typename Futures, typename Enable = void>
     struct has_dataflow_finalize : std::false_type
     {
     };
 
     // clang-format off
-    template <typename Executor, typename Frame, typename Func,
+    HPX_CXX_EXPORT template <typename Executor, typename Frame, typename Func,
         typename Futures>
     struct has_dataflow_finalize<Executor, Frame, Func, Futures,
         std::void_t<decltype(
@@ -154,7 +154,7 @@ namespace hpx::lcos::detail {
     };
     // clang-format on
 
-    template <typename Executor, typename Frame, typename Func,
+    HPX_CXX_EXPORT template <typename Executor, typename Frame, typename Func,
         typename Futures>
     inline constexpr bool has_dataflow_finalize_v =
         has_dataflow_finalize<Executor, Frame, Func, Futures>::value;
@@ -319,14 +319,14 @@ namespace hpx::lcos::detail {
         // The overload for hpx::dataflow taking an executor simply forwards
         // to the corresponding executor customization point.
         //
+        template <typename Executor, typename Futures_>
         // clang-format off
-        template <typename Executor, typename Futures_,
-            HPX_CONCEPT_REQUIRES_((
+            requires ((
                 traits::is_one_way_executor_v<Executor> ||
                 traits::is_two_way_executor_v<Executor>) &&
                 !has_dataflow_finalize_v<
                     Executor, dataflow_frame, Func, Futures_>
-            )>
+            )
         // clang-format on
         HPX_FORCEINLINE void finalize(Executor&& exec, Futures_&& futures)
         {
@@ -336,14 +336,14 @@ namespace hpx::lcos::detail {
                 HPX_MOVE(this_f_), HPX_FORWARD(Futures_, futures));
         }
 
+        template <typename Executor, typename Futures_>
         // clang-format off
-        template <typename Executor, typename Futures_,
-            HPX_CONCEPT_REQUIRES_((
+            requires ((
                 traits::is_one_way_executor_v<Executor> ||
                 traits::is_two_way_executor_v<Executor>) &&
                 has_dataflow_finalize_v<
                     Executor, dataflow_frame, Func, Futures_>
-            )>
+            )
         // clang-format on
         HPX_FORCEINLINE void finalize(Executor&& exec, Futures_&& futures)
         {
@@ -467,13 +467,11 @@ namespace hpx::detail {
             hpx::traits::is_launch_policy_v<Policy> &&
            !hpx::traits::is_action_v<std::decay_t<F>>
         )>
+    // clang-format on
     auto tag_invoke(dataflow_t, Allocator const& alloc, Policy&& policy, F&& f,
-        Ts&&... ts)
-        -> decltype(
-                hpx::lcos::detail::dataflow_dispatch_impl<
-                    false, std::decay_t<Policy>
-                >::call(alloc, HPX_FORWARD(Policy, policy),
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+        Ts&&... ts) -> decltype(hpx::lcos::detail::dataflow_dispatch_impl<false,
+        std::decay_t<Policy>>::call(alloc, HPX_FORWARD(Policy, policy),
+        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
     // clang-format on
     {
         return hpx::lcos::detail::dataflow_dispatch_impl<false,
@@ -496,12 +494,12 @@ namespace hpx::detail {
                     true, std::decay_t<Policy>
                 >::call(alloc, HPX_FORWARD(Policy, policy),
                     HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
-    // clang-format on
     {
         return hpx::lcos::detail::dataflow_dispatch_impl<true,
             std::decay_t<Policy>>::call(alloc, HPX_FORWARD(Policy, policy),
             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
+    // clang-format on
 
     // executors
     //
@@ -539,10 +537,10 @@ namespace hpx::detail {
                     traits::is_action_v<std::decay_t<F>>, launch
                 >::call(alloc, launch::async, HPX_FORWARD(F, f),
                     HPX_FORWARD(Ts, ts)...))
-    // clang-format on
     {
         return hpx::lcos::detail::dataflow_dispatch_impl<
             traits::is_action_v<std::decay_t<F>>, launch>::call(alloc,
             launch::async, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
+    // clang-format on
 }    // namespace hpx::detail

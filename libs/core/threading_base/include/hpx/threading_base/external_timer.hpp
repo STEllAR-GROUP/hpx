@@ -55,14 +55,14 @@ namespace hpx::util {
 
         // Typedefs of function pointers
         HPX_CXX_EXPORT using init_t =
-            std::uint64_t(char const*, const uint64_t, const uint64_t);
+            std::uint64_t(char const*, uint64_t const, uint64_t const);
         HPX_CXX_EXPORT using finalize_t = void(void);
         HPX_CXX_EXPORT using register_thread_t = void(std::string const&);
         HPX_CXX_EXPORT using new_task_string_t =
-            std::shared_ptr<task_wrapper>(std::string const&, const uint64_t,
-                const std::shared_ptr<task_wrapper>);
+            std::shared_ptr<task_wrapper>(std::string const&, uint64_t const,
+                std::shared_ptr<task_wrapper> const);
         HPX_CXX_EXPORT using new_task_address_t = std::shared_ptr<task_wrapper>(
-            uintptr_t, const uint64_t, const std::shared_ptr<task_wrapper>);
+            uintptr_t, uint64_t const, std::shared_ptr<task_wrapper> const);
         HPX_CXX_EXPORT using sample_value_t = void(std::string const&, double);
         HPX_CXX_EXPORT using send_t = void(uint64_t, uint64_t, uint64_t);
         HPX_CXX_EXPORT using recv_t =
@@ -151,16 +151,16 @@ namespace hpx::util {
             }
         }
         HPX_CXX_EXPORT inline std::shared_ptr<task_wrapper> new_task(
-            std::string const& name, const uint64_t task_id,
-            const std::shared_ptr<task_wrapper> parent_task)
+            std::string const& name, uint64_t const task_id,
+            std::shared_ptr<task_wrapper> const parent_task)
         {
             return (new_task_string_function == nullptr) ?
                 0ULL :
                 new_task_string_function(name, task_id, parent_task);
         }
         HPX_CXX_EXPORT inline std::shared_ptr<task_wrapper> new_task(
-            uintptr_t address, const uint64_t task_id,
-            const std::shared_ptr<task_wrapper> parent_task)
+            uintptr_t address, uint64_t const task_id,
+            std::shared_ptr<task_wrapper> const parent_task)
         {
             return (new_task_address_function == nullptr) ?
                 0ULL :

@@ -21,7 +21,7 @@ namespace hpx { namespace util { namespace external_timer {
     // The actual function pointers. Some of them need to be exported,
     // because through the miracle of chained headers they get referenced
     // outside of the HPX library.
-    static inline void sample_value(const std::string& name, double value)
+    static inline void sample_value(std::string const& name, double value)
     {
         if (sample_value_function != nullptr)
         {

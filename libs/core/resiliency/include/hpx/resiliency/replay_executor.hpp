@@ -7,6 +7,8 @@
 #pragma once
 
 #include <hpx/resiliency/config.hpp>
+#include <hpx/resiliency/async_replay_executor.hpp>
+
 #include <hpx/assert.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/execution.hpp>
@@ -15,7 +17,6 @@
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/resiliency/async_replay_executor.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -175,13 +176,10 @@ namespace hpx::resiliency::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // support all properties exposed by the wrapped executor
-    // clang-format off
     HPX_CXX_EXPORT template <typename Tag, typename BaseExecutor,
         typename Validate, typename Property,
         HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
-    // clang-format on
+            hpx::execution::experimental::is_scheduling_property_v<Tag>)>
     auto tag_invoke(Tag tag,
         replay_executor<BaseExecutor, Validate> const& exec, Property&& prop)
         -> decltype(replay_executor<BaseExecutor, Validate>(
@@ -194,13 +192,10 @@ namespace hpx::resiliency::experimental {
             exec.get_replay_count(), exec.get_validator());
     }
 
-    // clang-format off
     HPX_CXX_EXPORT template <typename Tag, typename BaseExecutor,
         typename Validate,
         HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
-    // clang-format on
+            hpx::execution::experimental::is_scheduling_property_v<Tag>)>
     auto tag_invoke(
         Tag tag, replay_executor<BaseExecutor, Validate> const& exec)
         -> decltype(std::declval<Tag>()(std::declval<BaseExecutor>()))
@@ -209,7 +204,7 @@ namespace hpx::resiliency::experimental {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename BaseExecutor, typename Validate>
+    HPX_CXX_EXPORT template <executor_any BaseExecutor, typename Validate>
     replay_executor<BaseExecutor, std::decay_t<Validate>> make_replay_executor(
         BaseExecutor& exec, std::size_t n, Validate&& validate)
     {
@@ -217,7 +212,7 @@ namespace hpx::resiliency::experimental {
             exec, n, HPX_FORWARD(Validate, validate));
     }
 
-    HPX_CXX_EXPORT template <typename BaseExecutor>
+    HPX_CXX_EXPORT template <executor_any BaseExecutor>
     replay_executor<BaseExecutor, detail::replay_validator>
     make_replay_executor(BaseExecutor& exec, std::size_t n)
     {

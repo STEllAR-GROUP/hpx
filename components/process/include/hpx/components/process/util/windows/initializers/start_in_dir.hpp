@@ -30,7 +30,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
         public:
             start_in_dir_() {}
 
-            explicit start_in_dir_(const String& s)
+            explicit start_in_dir_(String const& s)
               : s_(s)
             {
             }
@@ -59,13 +59,13 @@ namespace hpx { namespace components { namespace process { namespace windows {
             return start_in_dir_<std::wstring>(ws);
         }
 
-        inline start_in_dir_<std::wstring> start_in_dir(const std::wstring& ws)
+        inline start_in_dir_<std::wstring> start_in_dir(std::wstring const& ws)
         {
             return start_in_dir_<std::wstring>(ws);
         }
 
         inline start_in_dir_<std::wstring> start_in_dir(
-            const filesystem::path& p)
+            filesystem::path const& p)
         {
             return start_in_dir_<std::wstring>(p.wstring());
         }
@@ -75,13 +75,13 @@ namespace hpx { namespace components { namespace process { namespace windows {
             return start_in_dir_<std::string>(s);
         }
 
-        inline start_in_dir_<std::string> start_in_dir(const std::string& s)
+        inline start_in_dir_<std::string> start_in_dir(std::string const& s)
         {
             return start_in_dir_<std::string>(s);
         }
 
         inline start_in_dir_<std::string> start_in_dir(
-            const filesystem::path& p)
+            filesystem::path const& p)
         {
             return start_in_dir_<std::string>(p.string());
         }

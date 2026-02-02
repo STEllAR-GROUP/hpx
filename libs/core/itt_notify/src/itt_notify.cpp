@@ -546,12 +546,12 @@ void itt_detach() noexcept
 
 ///////////////////////////////////////////////////////////////////////////////
 void itt_sync_create(
-    void* addr, const char* objtype, const char* objname) noexcept
+    void* addr, char const* objtype, char const* objname) noexcept
 {
     HPX_INTERNAL_ITT_SYNC_CREATE(addr, objtype, objname)
 }
 
-void itt_sync_rename(void* addr, const char* objname) noexcept
+void itt_sync_rename(void* addr, char const* objname) noexcept
 {
     HPX_INTERNAL_ITT_SYNC_RENAME(addr, objname)
 }
@@ -685,7 +685,7 @@ void itt_id_destroy(___itt_id const* id) noexcept
 
 ///////////////////////////////////////////////////////////////////////////////
 __itt_heap_function itt_heap_function_create(
-    const char* name, const char* domain) noexcept
+    char const* name, char const* domain) noexcept
 {
     return HPX_INTERNAL_ITT_HEAP_FUNCTION_CREATE(name, domain);
 }

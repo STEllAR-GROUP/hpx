@@ -38,9 +38,9 @@ void test_wait_for_all_from_array()
 
     std::array<hpx::future<int>, 10> result = r.get();
 
-    for (const auto& f : futures)
+    for (auto const& f : futures)
         HPX_TEST(!f.valid());
-    for (const auto& r : result)
+    for (auto const& r : result)
         HPX_TEST(r.is_ready());
 }
 

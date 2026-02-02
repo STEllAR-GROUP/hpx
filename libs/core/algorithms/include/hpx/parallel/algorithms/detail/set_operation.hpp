@@ -19,11 +19,7 @@
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#else
 #include <memory>
-#endif
 
 #include <algorithm>
 #include <cstddef>
@@ -121,15 +117,9 @@ namespace hpx::parallel::detail {
 
         std::size_t const step = (len1 + cores - 1) / cores;
 
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<buffer_type[]> buffer(
             new buffer_type[combiner(len1, len2)]);
         std::shared_ptr<set_chunk_data[]> chunks(new set_chunk_data[cores]);
-#else
-        boost::shared_array<buffer_type> buffer(
-            new buffer_type[combiner(len1, len2)]);
-        boost::shared_array<set_chunk_data> chunks(new set_chunk_data[cores]);
-#endif
 
         // first step, is applied to all partitions
         auto f1 = [=](set_chunk_data* curr_chunk,
@@ -222,14 +212,13 @@ namespace hpx::parallel::detail {
         // second step, is executed after all partitions are done running
 
         // different versions of clang-format produce different formatting
-        // clang-format off
         auto f2 = [buffer, chunks, cores, first1, first2, dest](
-                      auto&& data) -> result_type {
-            // clang-format on
+                      auto&&... data) -> result_type {
+            static_assert(sizeof...(data) < 2);
 
             // make sure iterators embedded in function object that is attached
             // to futures are invalidated
-            util::detail::clear_container(data);
+            util::detail::clear_container(data...);
 
             // accumulate real length and rightmost positions in input sequences
             std::size_t first1_pos = 0;

@@ -1397,7 +1397,7 @@ struct bitset_test
             }
             size_type after_spaces = pos;
             // {digits} or part of them
-            const typename Bitset::size_type max_digits = w > 0 &&
+            typename Bitset::size_type const max_digits = w > 0 &&
                     static_cast<typename Bitset::size_type>(w) < b.max_size() ?
                 static_cast<typename Bitset::size_type>(w) :
                 b.max_size();

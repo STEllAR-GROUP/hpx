@@ -30,7 +30,7 @@ struct A
     }
     virtual ~A() {}
 
-    virtual const char* foo() = 0;
+    virtual char const* foo() = 0;
 
     template <class Archive>
     void serialize(Archive& ar, unsigned)
@@ -49,7 +49,7 @@ struct B : A
     {
     }
 
-    const char* foo() override
+    char const* foo() override
     {
         return "B::foo";
     }
@@ -89,7 +89,7 @@ public:
     {
     }
 
-    const char* foo() override
+    char const* foo() override
     {
         return "C::foo";
     }
@@ -143,7 +143,7 @@ struct D
     }
     virtual ~D() {}
 
-    virtual const char* foo() = 0;
+    virtual char const* foo() = 0;
 
 private:
     friend class hpx::serialization::access;
@@ -184,7 +184,7 @@ struct E : D
     {
     }
 
-    const char* foo() override
+    char const* foo() override
     {
         return "E::foo";
     }
@@ -224,7 +224,7 @@ public:
     {
     }
 
-    const char* foo() override
+    char const* foo() override
     {
         return "F::foo";
     }

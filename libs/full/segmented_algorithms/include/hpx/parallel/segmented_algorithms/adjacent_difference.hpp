@@ -1,6 +1,6 @@
 //  Copyright (c) 2017 Ajai V George
 //  Copyright (c) 2021 Karame M.Shokooh
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -246,17 +246,13 @@ namespace hpx::parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx::segmented {
 
-    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Op,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
+        typename Op>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<FwdIter1> &&
             hpx::traits::is_segmented_iterator_v<FwdIter1> &&
             hpx::traits::is_iterator_v<FwdIter2> &&
-            hpx::traits::is_segmented_iterator_v<FwdIter2>
-        )>
-    // clang-format on
+            hpx::traits::is_segmented_iterator_v<FwdIter2>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
     tag_invoke(hpx::adjacent_difference_t, ExPolicy&& policy, FwdIter1 first,
         FwdIter1 last, FwdIter2 dest, Op&& op)
@@ -284,15 +280,11 @@ namespace hpx::segmented {
             HPX_FORWARD(Op, op), is_seq());
     }
 
-    // clang-format off
-    template <typename InIter1, typename InIter2, typename Op,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator_v<InIter1> &&
+    template <typename InIter1, typename InIter2, typename Op>
+        requires(hpx::traits::is_iterator_v<InIter1> &&
             hpx::traits::is_segmented_iterator_v<InIter1> &&
             hpx::traits::is_iterator_v<InIter2> &&
-            hpx::traits::is_segmented_iterator_v<InIter2>
-        )>
-    // clang-format on
+            hpx::traits::is_segmented_iterator_v<InIter2>)
     InIter2 tag_invoke(hpx::adjacent_difference_t, InIter1 first, InIter1 last,
         InIter2 dest, Op&& op)
     {

@@ -187,7 +187,7 @@ namespace hpx::parcelset::policies::lci {
         if (!devices_to_progress.empty())
         {
             // magic number
-            const int max_idle_loop_count = 1000;
+            int const max_idle_loop_count = 1000;
             int idle_loop_count = 0;
             while (idle_loop_count < max_idle_loop_count)
             {
@@ -283,7 +283,7 @@ namespace hpx::parcelset::policies::lci {
     }
 
     std::atomic<bool> parcelport::prg_thread_flag = false;
-    void parcelport::progress_thread_fn(const std::vector<device_t>& devices)
+    void parcelport::progress_thread_fn(std::vector<device_t> const& devices)
     {
         while (prg_thread_flag)
         {

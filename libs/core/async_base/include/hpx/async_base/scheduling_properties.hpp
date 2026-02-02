@@ -200,3 +200,10 @@ namespace hpx::execution::experimental {
     {
     };
 }    // namespace hpx::execution::experimental
+
+namespace hpx {
+
+    template <typename Property>
+    concept scheduling_property =
+        hpx::execution::experimental::is_scheduling_property_v<Property>;
+}    // namespace hpx

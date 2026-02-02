@@ -572,7 +572,7 @@ namespace hpx {
     };
 
     HPX_CXX_EXPORT template <typename T>
-    struct tuple_size<const volatile T> : tuple_size<T>
+    struct tuple_size<T const volatile> : tuple_size<T>
     {
     };
 
@@ -612,21 +612,21 @@ namespace hpx {
     };
 
     HPX_CXX_EXPORT template <std::size_t I, typename T>
-    struct tuple_element<I, const T,
+    struct tuple_element<I, T const,
         std::void_t<typename tuple_element<I, T>::type>>
       : std::add_const<typename tuple_element<I, T>::type>
     {
     };
 
     HPX_CXX_EXPORT template <std::size_t I, typename T>
-    struct tuple_element<I, volatile T,
+    struct tuple_element<I, T volatile,
         std::void_t<typename tuple_element<I, T>::type>>
       : std::add_volatile<typename tuple_element<I, T>::type>
     {
     };
 
     HPX_CXX_EXPORT template <std::size_t I, typename T>
-    struct tuple_element<I, const volatile T,
+    struct tuple_element<I, T const volatile,
         std::void_t<typename tuple_element<I, T>::type>>
       : std::add_cv<typename tuple_element<I, T>::type>
     {

@@ -432,7 +432,17 @@ namespace hpx::compute::host {
             }
             return temp.str();
 #else
-            return {};
+            // On platforms without NUMA support (e.g., macOS), return a fallback
+            // string with all zeros, assuming a single NUMA domain
+            std::size_t const pagesize = threads::get_memory_page_size();
+            std::size_t const count = (len + pagesize - 1) / pagesize;
+            std::stringstream temp;
+            temp << "Numa page binding for page count " << count << "\n";
+            for (std::size_t i = 0; i < count; i++)
+            {
+                temp << "0";
+            }
+            return temp.str();
 #endif
         }
 

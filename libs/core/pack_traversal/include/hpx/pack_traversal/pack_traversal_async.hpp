@@ -31,7 +31,7 @@ namespace hpx::util {
     /// Traverses the pack with the given visitor in an asynchronous way.
     ///
     /// This function works in the same way as `traverse_pack`, however, we are
-    /// able to suspend and continue the traversal at later time. Thus we
+    /// able to suspend and continue the traversal at later time. Thus, we
     /// require a visitor callable object which provides three `operator()`
     /// overloads as depicted by the code sample below:
     ///
@@ -59,10 +59,10 @@ namespace hpx::util {
     ///    }; ```
     ///
     /// \param   visitor A visitor object which provides the three `operator()`
-    ///                  overloads that were described above. Additionally the
+    ///                  overloads that were described above. Additionally, the
     ///                  visitor must be compatible for referencing it from a
-    ///                  `hpx::intrusive_ptr`. The visitor should must have a
-    ///                  virtual destructor!
+    ///                  `hpx::intrusive_ptr`. The visitor should have a virtual
+    ///                  destructor!
     ///
     /// \param   pack    The arbitrary parameter pack which is traversed
     ///                  asynchronously. Nested objects inside containers and
@@ -86,7 +86,7 @@ namespace hpx::util {
     /// Traverses the pack with the given visitor in an asynchronous way.
     ///
     /// This function works in the same way as `traverse_pack`, however, we are
-    /// able to suspend and continue the traversal at later time. Thus we
+    /// able to suspend and continue the traversal at later time. Thus, we
     /// require a visitor callable object which provides three `operator()`
     /// overloads as depicted by the code sample below:
     ///
@@ -115,10 +115,10 @@ namespace hpx::util {
     ///    }; ```
     ///
     /// \param   visitor A visitor object which provides the three `operator()`
-    ///                  overloads that were described above. Additionally the
+    ///                  overloads that were described above. Additionally, the
     ///                  visitor must be compatible for referencing it from a
-    ///                  `hpx::intrusive_ptr`. The visitor should must have a
-    ///                  virtual destructor!
+    ///                  `hpx::intrusive_ptr`. The visitor should have a virtual
+    ///                  destructor!
     ///
     /// \param   pack    The arbitrary parameter pack which is traversed
     ///                  asynchronously. Nested objects inside containers and

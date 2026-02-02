@@ -102,11 +102,11 @@ public:
     {
         return size_;
     }
-    friend std::vector<double>::const_iterator begin(const partition_data& v)
+    friend std::vector<double>::const_iterator begin(partition_data const& v)
     {
         return begin(v.data_);
     }
-    friend std::vector<double>::const_iterator end(const partition_data& v)
+    friend std::vector<double>::const_iterator end(partition_data const& v)
     {
         return end(v.data_);
     }
@@ -126,7 +126,7 @@ private:
     friend class hpx::serialization::access;
 
     template <typename Archive>
-    void serialize(Archive& ar, const unsigned int)
+    void serialize(Archive& ar, unsigned int const)
     {
         // clang-format off
         ar & data_;
@@ -151,7 +151,7 @@ double stencil_operation(double left, double center, double right)
 partition_data stencil_update(std::size_t sti, partition_data const& center,
     partition_data const& left, partition_data const& right)
 {
-    const std::size_t size = center.size() - 1;
+    std::size_t const size = center.size() - 1;
     partition_data workspace(size + 2 * sti + 1);
 
     std::copy(end(left) - static_cast<std::ptrdiff_t>(sti) - 1, end(left) - 1,

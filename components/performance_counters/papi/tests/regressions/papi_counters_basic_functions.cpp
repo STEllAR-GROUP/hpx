@@ -22,7 +22,7 @@ inline bool close_enough(double m, double ex, double perc)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map&)
 {
-    const size_t n = 1000000;
+    size_t const n = 1000000;
 
     std::uint32_t const prefix = hpx::get_locality_id();
     // use floating point instructions here to avoid measuring runtime side effects
@@ -37,8 +37,8 @@ int hpx_main(hpx::program_options::variables_map&)
     counter.start(hpx::launch::sync);
 
     // perform n ops, active counter
-    volatile size_t i;
-    volatile double a = 0.0, b = 0.0, c = 0.0;
+    size_t volatile i;
+    double volatile a = 0.0, b = 0.0, c = 0.0;
     for (i = 0; i < n; i++)
         a = b + c;
     (void) a;

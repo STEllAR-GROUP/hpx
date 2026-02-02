@@ -18,11 +18,15 @@
 #if defined(HPX_HAVE_APEX)
 #include <hpx/threading_base/external_timer.hpp>
 #endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+#include <hpx/modules/tracy.hpp>
+#endif
 
 #include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <memory>
+#include <utility>
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads {
@@ -52,7 +56,8 @@ namespace hpx::threads {
     }    // namespace detail
 
     thread_data::thread_data(thread_init_data& init_data, void* queue,
-        std::ptrdiff_t stacksize, bool is_stackless, thread_id_addref addref)
+        std::ptrdiff_t const stacksize, bool const is_stackless,
+        thread_id_addref const addref)
       : detail::thread_data_reference_counting(addref)
       , priority_(init_data.priority)
       , requested_interrupt_(false)
@@ -163,7 +168,7 @@ namespace hpx::threads {
 
     void thread_data::free_thread_exit_callbacks()
     {
-        std::lock_guard<hpx::util::detail::spinlock> l(
+        std::scoped_lock<hpx::util::detail::spinlock> l(
             spinlock_pool::spinlock_for(this));
 
         // Exit functions should have been executed.
@@ -172,7 +177,43 @@ namespace hpx::threads {
         exit_funcs_.clear();
     }
 
-    bool thread_data::interruption_point(bool throw_on_interrupt)
+    bool thread_data::interruption_requested() const noexcept
+    {
+        std::scoped_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        return requested_interrupt_;
+    }
+
+    bool thread_data::interruption_enabled() const noexcept
+    {
+        std::scoped_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        return enabled_interrupt_;
+    }
+
+    bool thread_data::set_interruption_enabled(bool enable) noexcept
+    {
+        std::scoped_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        std::swap(enabled_interrupt_, enable);
+        return enable;
+    }
+
+    void thread_data::interrupt(bool const flag)
+    {
+        std::unique_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        if (flag && !enabled_interrupt_)
+        {
+            l.unlock();
+            HPX_THROW_EXCEPTION(hpx::error::thread_not_interruptable,
+                "thread_data::interrupt",
+                "interrupts are disabled for this thread");
+        }
+        requested_interrupt_ = flag;
+    }
+
+    bool thread_data::interruption_point(bool const throw_on_interrupt)
     {
         // We do not protect enabled_interrupt_ and requested_interrupt_ from
         // concurrent access here (which creates a benign data race) in order to
@@ -273,6 +314,45 @@ namespace hpx::threads {
         set_timer_data(init_data.timer_data);
 #endif
     }
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+    threads::thread_description thread_data::get_description() const
+    {
+        std::scoped_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        return description_;
+    }
+
+    threads::thread_description thread_data::set_description(
+        threads::thread_description value)
+    {
+        std::scoped_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        std::swap(description_, value);
+
+#if defined(HPX_HAVE_MODULE_TRACY)
+        tracy::rename_region(description_.get_description());
+#endif
+
+        return value;
+    }
+
+    threads::thread_description thread_data::get_lco_description() const
+    {
+        std::scoped_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        return lco_description_;
+    }
+
+    threads::thread_description thread_data::set_lco_description(
+        threads::thread_description value)
+    {
+        std::scoped_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        std::swap(lco_description_, value);
+        return value;
+    }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     thread_self& get_self()

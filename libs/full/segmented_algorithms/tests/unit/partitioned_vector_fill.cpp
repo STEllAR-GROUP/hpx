@@ -73,11 +73,11 @@ void fill_algo_tests_with_policy(
     hpx::partitioned_vector<T> c(size, policy);
     iota_vector(c, T(1234));
 
-    const T v(42);
+    T const v(42);
     hpx::fill(fill_policy, c.begin(), c.end(), v);
     verify_vector(c, v);
 
-    const T v1(43);
+    T const v1(43);
     hpx::fill(fill_policy, c.begin() + 1, c.end() - 1, v1);
     verify_values(c.begin() + 1, c.end() - 1, v1);
     verify_values(c.begin(), c.begin() + 1, v1, false);
@@ -91,13 +91,13 @@ void fill_algo_tests_with_policy_async(
     hpx::partitioned_vector<T> c(size, policy);
     iota_vector(c, T(1234));
 
-    const T v(42);
+    T const v(42);
     hpx::future<void> f = hpx::fill(fill_policy, c.begin(), c.end(), v);
     f.wait();
 
     verify_vector(c, v);
 
-    const T v1(43);
+    T const v1(43);
     hpx::future<void> f1 =
         hpx::fill(fill_policy, c.begin() + 1, c.end() - 1, v1);
     f1.wait();

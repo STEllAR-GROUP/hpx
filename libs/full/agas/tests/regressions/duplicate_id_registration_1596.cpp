@@ -31,7 +31,7 @@ namespace tests { namespace server {
             cout << "constructed server listener without name" << endl;
         }
 
-        ViewRegistrationListener(const string& name)
+        ViewRegistrationListener(string const& name)
           : name(name)
         {
             hpx::util::format_to(

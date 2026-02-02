@@ -233,20 +233,15 @@ namespace hpx { namespace parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
 
-    // clang-format off
-    template <typename InIter, typename OutIter,
-        typename T, typename Op = std::plus<T>,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator_v<InIter> &&
+    template <typename InIter, typename OutIter, typename T,
+        typename Op = std::plus<T>>
+        requires(hpx::traits::is_iterator_v<InIter> &&
             hpx::traits::is_segmented_iterator_v<InIter> &&
             hpx::traits::is_iterator_v<OutIter> &&
             hpx::traits::is_segmented_iterator_v<OutIter> &&
             hpx::is_invocable_v<Op,
                 typename std::iterator_traits<InIter>::value_type,
-                typename std::iterator_traits<InIter>::value_type
-            >
-        )>
-    // clang-format on
+                typename std::iterator_traits<InIter>::value_type>)
     OutIter tag_invoke(hpx::exclusive_scan_t, InIter first, InIter last,
         OutIter dest, T init, Op&& op = Op())
     {
@@ -264,21 +259,16 @@ namespace hpx { namespace segmented {
             HPX_FORWARD(Op, op), std::true_type{}, hpx::identity_v);
     }
 
-    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T, typename Op = std::plus<T>,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
+        typename T, typename Op = std::plus<T>>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<FwdIter1> &&
             hpx::traits::is_segmented_iterator_v<FwdIter1> &&
             hpx::traits::is_iterator_v<FwdIter2> &&
             hpx::traits::is_segmented_iterator_v<FwdIter2> &&
             hpx::is_invocable_v<Op,
                 typename std::iterator_traits<FwdIter1>::value_type,
-                typename std::iterator_traits<FwdIter1>::value_type
-            >
-        )>
-    // clang-format on
+                typename std::iterator_traits<FwdIter1>::value_type>)
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     tag_invoke(hpx::exclusive_scan_t, ExPolicy&& policy, FwdIter1 first,
         FwdIter1 last, FwdIter2 dest, T init, Op&& op = Op())

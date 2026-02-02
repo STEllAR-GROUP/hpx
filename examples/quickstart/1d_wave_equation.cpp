@@ -76,8 +76,7 @@ struct data
     // Default constructor: data d1;
     data()
       : mtx()
-      , u_value(0.0)
-      , computed(false)
+      , f()
     {
     }
 
@@ -85,21 +84,18 @@ struct data
     // We can't copy the mutex, because mutexes are noncopyable.
     data(data const& other)
       : mtx()
-      , u_value(other.u_value)
-      , computed(other.computed)
+      , f(other.f)
     {
     }
 
     data& operator=(data const& other)
     {
-        u_value = other.u_value;
-        computed = other.computed;
+        f = other.f;
         return *this;
     }
 
     hpx::mutex mtx;
-    double u_value;
-    bool computed;
+    hpx::shared_future<double> f;
 };
 
 std::vector<std::vector<data>> u;
@@ -133,59 +129,57 @@ double wave(std::uint64_t t, std::uint64_t x)
 {
     {
         std::lock_guard<hpx::mutex> l(u[t][x].mtx);
-        //  hpx::util::format_to(cout, "calling wave... t={1} x={2}\n", t, x);
-        if (u[t][x].computed)
+        if (u[t][x].f.valid())
         {
-            //cout << ("already computed!\n");
-            return u[t][x].u_value;
+            return u[t][x].f.get();
         }
-        u[t][x].computed = true;
 
-        if (t == 0)    //first timestep are initial values
+        hpx::promise<double> p;
+        u[t][x].f = p.get_future();
+
+        if (t == 0)
         {
-            //        hpx::util::format_to(cout, "first timestep\n");
-            u[t][x].u_value = std::sin(
-                2. * pi * static_cast<double>(x) * dx);    // initial u(x) value
-            return u[t][x].u_value;
+            double val = std::sin(2. * pi * static_cast<double>(x) * dx);
+            p.set_value(val);
+            return val;
         }
+
+        hpx::async([t, x, p = std::move(p)]() mutable {
+            future<double> n1;
+            if (x == 0)
+                n1 = async(&wave, t - 1, nx - 1);
+            else
+                n1 = async(&wave, t - 1, x - 1);
+
+            future<double> n2 = async(&wave, t - 1, x);
+
+            future<double> n3;
+            if (x == (nx - 1))
+                n3 = async(&wave, t - 1, 0);
+            else
+                n3 = async(&wave, t - 1, x + 1);
+
+            double u_t_xminus = n1.get();
+            double u_t_x = n2.get();
+            double u_t_xplus = n3.get();
+
+            double result = 0.0;
+            if (t == 1)
+            {
+                double u_dot = 0;
+                result = calculate_u_tplus_x_1st(
+                    u_t_xplus, u_t_x, u_t_xminus, u_dot);
+            }
+            else
+            {
+                double u_tminus_x = async(&wave, t - 2, x).get();
+                result = calculate_u_tplus_x(
+                    u_t_xplus, u_t_x, u_t_xminus, u_tminus_x);
+            }
+            p.set_value(result);
+        });
     }
-
-    // NOT using ghost zones here... just letting the stencil cross the periodic
-    // boundary.
-    future<double> n1;
-    if (x == 0)
-        n1 = async<wave_action>(here, t - 1, nx - 1);
-    else
-        n1 = async<wave_action>(here, t - 1, x - 1);
-
-    future<double> n2 = async<wave_action>(here, t - 1, x);
-
-    future<double> n3;
-    if (x == (nx - 1))
-        n3 = async<wave_action>(here, t - 1, 0);
-    else
-        n3 = async<wave_action>(here, t - 1, x + 1);
-
-    double u_t_xminus = n1.get();    //get the futures
-    double u_t_x = n2.get();
-    double u_t_xplus = n3.get();
-
-    if (t == 1)    //second time coordinate handled differently
-    {
-        std::lock_guard<hpx::mutex> l(u[t][x].mtx);
-        double u_dot = 0;    // initial du/dt(x)
-        u[t][x].u_value =
-            calculate_u_tplus_x_1st(u_t_xplus, u_t_x, u_t_xminus, u_dot);
-        return u[t][x].u_value;
-    }
-    else
-    {
-        double u_tminus_x = async<wave_action>(here, t - 2, x).get();
-        std::lock_guard<hpx::mutex> l(u[t][x].mtx);
-        u[t][x].u_value =
-            calculate_u_tplus_x(u_t_xplus, u_t_x, u_t_xminus, u_tminus_x);
-        return u[t][x].u_value;
-    }
+    return u[t][x].f.get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -226,7 +220,7 @@ int hpx_main(variables_map& vm)
 
         std::vector<future<double>> futures;
         for (std::uint64_t i = 0; i < nx; i++)
-            futures.push_back(async<wave_action>(here, nt - 1, i));
+            futures.push_back(async(&wave, nt - 1, i));
 
         // open file for output
         std::ofstream outfile;

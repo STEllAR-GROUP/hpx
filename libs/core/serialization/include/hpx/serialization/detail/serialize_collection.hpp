@@ -37,7 +37,7 @@ namespace hpx::serialization::detail {
 
     ////////////////////////////////////////////////////////////////////////////
     template <typename Archive, typename Collection>
-    void save_collection(Archive& ar, const Collection& collection)
+    void save_collection(Archive& ar, Collection const& collection)
     {
         using value_type = typename Collection::value_type;
 

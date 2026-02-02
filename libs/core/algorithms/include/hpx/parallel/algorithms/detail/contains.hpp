@@ -25,7 +25,7 @@ namespace hpx::parallel::detail {
         template <typename Iterator, typename Sentinel, typename T,
             typename Proj>
         friend constexpr bool tag_fallback_invoke(sequential_contains_t,
-            Iterator first, Sentinel last, const T& val, Proj&& proj)
+            Iterator first, Sentinel last, T const& val, Proj&& proj)
         {
             using difference_type =
                 typename std::iterator_traits<Iterator>::difference_type;
@@ -33,9 +33,9 @@ namespace hpx::parallel::detail {
             if (distance <= 0)
                 return false;
 
-            const auto itr =
+            auto const itr =
                 util::loop_pred<std::decay_t<hpx::execution::sequenced_policy>>(
-                    first, last, [&val, &proj](const auto& cur) {
+                    first, last, [&val, &proj](auto const& cur) {
                         return HPX_INVOKE(proj, *cur) == val;
                     });
 
@@ -48,7 +48,7 @@ namespace hpx::parallel::detail {
             Proj&& proj)
         {
             util::loop_n<ExPolicy>(
-                first, count, tok, [&val, &tok, &proj](const auto& cur) {
+                first, count, tok, [&val, &tok, &proj](auto const& cur) {
                     if (HPX_INVOKE(proj, *cur) == val)
                     {
                         tok.cancel();

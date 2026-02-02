@@ -114,8 +114,7 @@ namespace hpx::execution::experimental {
         using future_type = hpx::future<T>;
 
     private:
-        template <typename Parameters>
-            requires(hpx::traits::is_executor_parameters_v<Parameters>)
+        template <executor_parameters Parameters>
         friend auto tag_invoke(
             hpx::execution::experimental::processing_units_count_t tag,
             Parameters&& params, scheduler_executor const& exec,
@@ -310,8 +309,9 @@ namespace hpx::execution::experimental {
 
     // support all properties exposed by the wrapped scheduler
     HPX_CXX_EXPORT template <typename Tag, typename BaseScheduler,
-        typename Property>
-        requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
+        typename Property,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>)>
     auto tag_invoke(
         Tag tag, scheduler_executor<BaseScheduler> const& exec, Property&& prop)
         -> decltype(scheduler_executor<BaseScheduler>(std::declval<Tag>()(

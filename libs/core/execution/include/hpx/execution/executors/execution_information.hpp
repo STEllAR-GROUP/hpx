@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2024 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/topology.hpp>
@@ -45,25 +44,17 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_fallback<has_pending_closures_t>
     {
     private:
-        // clang-format off
-        template <typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Executor>
+            requires(hpx::traits::is_executor_any_v<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             has_pending_closures_t, Executor&& /*exec*/)
         {
             return false;    // assume stateless scheduling
         }
 
-        // clang-format off
-        template <typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<Executor> &&
-                detail::has_has_pending_closures_v<Executor>
-            )>
-        // clang-format on
+        template <typename Executor>
+            requires(hpx::traits::is_executor_any_v<Executor> &&
+                detail::has_has_pending_closures_v<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_invoke(
             has_pending_closures_t, Executor&& exec)
         {
@@ -90,12 +81,8 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_fallback<get_pu_mask_t>
     {
     private:
-        // clang-format off
-        template <typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Executor>
+            requires(hpx::traits::is_executor_any_v<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(get_pu_mask_t,
             Executor&& /*exec*/, threads::topology& topo,
             std::size_t thread_num)
@@ -104,13 +91,9 @@ namespace hpx::execution::experimental {
                 topo, thread_num);
         }
 
-        // clang-format off
-        template <typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<Executor> &&
-                detail::has_get_pu_mask_v<Executor>
-            )>
-        // clang-format on
+        template <typename Executor>
+            requires(hpx::traits::is_executor_any_v<Executor> &&
+                detail::has_get_pu_mask_v<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_invoke(get_pu_mask_t,
             Executor&& exec, threads::topology& topo, std::size_t thread_num)
         {
@@ -131,24 +114,16 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_fallback<set_scheduler_mode_t>
     {
     private:
-        // clang-format off
-        template <typename Executor, typename Mode,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Executor, typename Mode>
+            requires(hpx::traits::is_executor_any_v<Executor>)
         friend HPX_FORCEINLINE void tag_fallback_invoke(
             set_scheduler_mode_t, Executor&& /*exec*/, Mode const& /*mode*/)
         {
         }
 
-        // clang-format off
-        template <typename Executor, typename Mode,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<Executor> &&
-                detail::has_set_scheduler_mode_v<Executor>
-            )>
-        // clang-format on
+        template <typename Executor, typename Mode>
+            requires(hpx::traits::is_executor_any_v<Executor> &&
+                detail::has_set_scheduler_mode_v<Executor>)
         friend HPX_FORCEINLINE void tag_invoke(
             set_scheduler_mode_t, Executor&& exec, Mode const& mode)
         {

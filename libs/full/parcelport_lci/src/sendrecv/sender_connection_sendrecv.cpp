@@ -149,8 +149,8 @@ namespace hpx::parcelset::policies::lci {
     sender_connection_sendrecv::return_t
     sender_connection_sendrecv::send_header()
     {
-        const auto current_state = connection_state::initialized;
-        const auto next_state = connection_state::sent_header;
+        auto const current_state = connection_state::initialized;
+        auto const next_state = connection_state::sent_header;
         HPX_ASSERT(state.load(std::memory_order_acquire) == current_state);
         HPX_UNUSED(current_state);
         ::lci::status_t status;
@@ -246,8 +246,8 @@ namespace hpx::parcelset::policies::lci {
     sender_connection_sendrecv::return_t
     sender_connection_sendrecv::send_transmission_chunks()
     {
-        const auto current_state = connection_state::sent_header;
-        const auto next_state = connection_state::sent_transmission_chunks;
+        auto const current_state = connection_state::sent_header;
+        auto const next_state = connection_state::sent_transmission_chunks;
         HPX_ASSERT(state.load(std::memory_order_acquire) == current_state);
         if (!need_send_tchunks)
         {
@@ -280,8 +280,8 @@ namespace hpx::parcelset::policies::lci {
 
     sender_connection_sendrecv::return_t sender_connection_sendrecv::send_data()
     {
-        const auto current_state = connection_state::sent_transmission_chunks;
-        const auto next_state = connection_state::sent_data;
+        auto const current_state = connection_state::sent_transmission_chunks;
+        auto const next_state = connection_state::sent_data;
         HPX_ASSERT(state.load(std::memory_order_acquire) == current_state);
         if (!need_send_data)
         {
@@ -311,8 +311,8 @@ namespace hpx::parcelset::policies::lci {
     sender_connection_sendrecv::return_t
     sender_connection_sendrecv::send_chunks()
     {
-        const auto current_state = connection_state::sent_data;
-        const auto next_state = connection_state::sent_chunks;
+        auto const current_state = connection_state::sent_data;
+        auto const next_state = connection_state::sent_chunks;
         HPX_ASSERT(state.load(std::memory_order_acquire) == current_state);
 
         while (send_chunks_idx < buffer_.chunks_.size())

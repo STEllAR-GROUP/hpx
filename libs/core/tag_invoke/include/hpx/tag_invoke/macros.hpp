@@ -8,8 +8,7 @@
 
 #include <hpx/config.hpp>
 
-#if !defined(HPX_COMPILE_WITH_MODULES) ||                                      \
-    (defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_TAG_INVOKE_WITH_MODULES))
+#if !defined(HPX_COMPILE_WITH_MODULES) || defined(HPX_COMPILE_BMI)
 #include <hpx/modules/type_support.hpp>
 #endif
 

@@ -92,7 +92,7 @@ namespace hpx::parcelset::policies::lci {
         return ret;
     }
 
-    void sender_connection_base::profile_start_hook(const header& header_)
+    void sender_connection_base::profile_start_hook(header const& header_)
     {
         util::lci_environment::pcounter_add(
             util::lci_environment::send_conn_start, 1);

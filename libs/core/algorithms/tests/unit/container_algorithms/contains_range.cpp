@@ -32,7 +32,7 @@ void test_contains(IteratorTag)
 
     std::vector<int> c(10007);
     std::fill(std::begin(c), std::end(c), dis(gen));
-    const std::size_t n = c.size();
+    std::size_t const n = c.size();
     c.at(n / 2) = 1;
 
     bool result1 = hpx::ranges::contains(
@@ -51,7 +51,7 @@ void test_contains(ExPolicy&& policy, IteratorTag)
 
     std::vector<int> c(10007);
     std::fill(std::begin(c), std::end(c), dis(gen));
-    const std::size_t n = c.size();
+    std::size_t const n = c.size();
     c.at(n / 2) = 1;
 
     bool result1 = hpx::ranges::contains(
@@ -73,7 +73,7 @@ void test_contains_async(ExPolicy&& policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    const std::size_t n = c.size();
+    std::size_t const n = c.size();
     std::fill(std::begin(c), std::end(c), dis(gen));
     c.at(n / 2) = 1;
 
@@ -126,7 +126,7 @@ void test_contains_exception(IteratorTag)
         decorated_iterator;
     std::vector<int> c(10007);
     std::iota(std::begin(c), std::end(c), gen() + 1);
-    const std::size_t n = c.size();
+    std::size_t const n = c.size();
     c.at(n / 2) = 0;
     bool caught_exception = false;
     try
@@ -164,7 +164,7 @@ void test_contains_exception(ExPolicy&& policy, IteratorTag)
         decorated_iterator;
 
     std::vector<int> c(10007);
-    const std::size_t n = c.size();
+    std::size_t const n = c.size();
     std::iota(std::begin(c), std::end(c), gen() + 1);
     c.at(n / 2) = 0;
 
@@ -204,7 +204,7 @@ void test_contains_exception_async(ExPolicy&& policy, IteratorTag)
         decorated_iterator;
 
     std::vector<int> c(10007);
-    const std::size_t n = c.size();
+    std::size_t const n = c.size();
     std::iota(std::begin(c), std::end(c), gen() + 1);
     c.at(n / 2) = 0;
 
@@ -276,7 +276,7 @@ void test_contains_bad_alloc(ExPolicy&& policy, IteratorTag)
         decorated_iterator;
 
     std::vector<int> c(10007);
-    const std::size_t n = c.size();
+    std::size_t const n = c.size();
     std::iota(std::begin(c), std::end(c), gen() + 1);
     c.at(n / 2) = 0;
     bool caught_bad_alloc = false;
@@ -312,7 +312,7 @@ void test_contains_bad_alloc_async(ExPolicy&& policy, IteratorTag)
         decorated_iterator;
 
     std::vector<int> c(10007);
-    const std::size_t n = c.size();
+    std::size_t const n = c.size();
     std::iota(std::begin(c), std::end(c), gen() + 1);
     c.at(n / 2) = 0;
     bool caught_bad_alloc = false;

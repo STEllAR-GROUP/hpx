@@ -14,6 +14,7 @@
 #include <iterator>
 #include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,8 +67,8 @@ void test_then(bool sync)
 
     executor exec;
     bool result =
-        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get() ==
-        hpx::this_thread::get_id();
+        hpx::parallel::execution::then_execute(exec, &test_f, std::move(f), 42)
+            .get() == hpx::this_thread::get_id();
 
     HPX_TEST_EQ(sync, result);
 }

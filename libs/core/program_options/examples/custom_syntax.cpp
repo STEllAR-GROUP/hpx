@@ -26,7 +26,7 @@ using namespace std;
 /*  This custom option parse function recognize gcc-style
     option "-fbar" / "-fno-bar".
 */
-pair<string, string> reg_foo(const string& s)
+pair<string, string> reg_foo(string const& s)
 {
     if (s.find("-f") == 0)
     {

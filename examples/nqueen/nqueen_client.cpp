@@ -25,7 +25,7 @@
 
 int hpx_main(hpx::program_options::variables_map&)
 {
-    const std::size_t default_size = 8;
+    std::size_t const default_size = 8;
 
     std::size_t soln_count_total = 0;
 

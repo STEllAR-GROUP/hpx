@@ -122,7 +122,7 @@ int hpx_main(variables_map& vm)
         for (std::size_t j = 0; j < hpxthread_count; ++j)
         {
             // Compute the mutex to be used for this thread.
-            const std::size_t index = j % mutex_count;
+            std::size_t const index = j % mutex_count;
 
             thread_init_data data(
                 make_thread_function_nullary(hpx::bind(&lock_and_wait,

@@ -18,7 +18,7 @@ namespace mylib {
     {
         constexpr friend HPX_FORCEINLINE auto tag_invoke(
             hpx::execution::experimental::get_forward_progress_guarantee_t,
-            const inline_scheduler_0&) noexcept
+            inline_scheduler_0 const&) noexcept
         {
             return hpx::execution::experimental::forward_progress_guarantee::
                 concurrent;

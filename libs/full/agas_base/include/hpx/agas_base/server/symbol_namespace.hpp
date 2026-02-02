@@ -54,7 +54,7 @@ namespace hpx::agas::server {
         using on_event_data_map_type = std::multimap<std::string, hpx::id_type>;
 
     private:
-        mutex_type mutex_;
+        mutex_type mutex_ = mutex_type("symbol_namespace");
         gid_table_type gids_;
         std::string instance_name_;
         on_event_data_map_type on_event_data_;

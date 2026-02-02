@@ -325,12 +325,11 @@ namespace hpx::parallel {
 
                 auto f2 = [dest, count](auto&&... data) mutable -> FwdIter2 {
                     static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        // make sure iterators embedded in function object that
-                        // is attached to futures are invalidated
-                        util::detail::clear_container(data...);
-                    }
+
+                    // make sure iterators embedded in function object that
+                    // is attached to futures are invalidated
+                    util::detail::clear_container(data...);
+
                     std::advance(dest, count);
                     return dest;
                 };

@@ -67,10 +67,10 @@ namespace hpx::util {
     // possible. This can be used to create a mapper function used in map_pack
     // that maps one element to an arbitrary count (1:n).
     HPX_CXX_EXPORT template <typename... T>
-    constexpr detail::spreading::spread_box<typename std::decay<T>::type...>
-    spread_this(T&&... args)
+    constexpr detail::spreading::spread_box<std::decay_t<T>...> spread_this(
+        T&&... args)
     {
-        return detail::spreading::spread_box<typename std::decay<T>::type...>(
+        return detail::spreading::spread_box<std::decay_t<T>...>(
             hpx::make_tuple(HPX_FORWARD(T, args)...));
     }
 

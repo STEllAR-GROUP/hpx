@@ -134,8 +134,7 @@ namespace hpx::agas::server {
     private:
         // REVIEW: Separate mutexes might reduce contention here. This has to be
         // investigated carefully.
-        mutex_type mutex_;
-
+        mutex_type mutex_ = mutex_type("primary_namespace");
         gva_table_type gvas_;
         refcnt_table_type refcnts_;
 

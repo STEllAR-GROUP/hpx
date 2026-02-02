@@ -360,15 +360,9 @@ foreach(lib ${HPX_LIBS})
       # generate module interface unit
       set(cxx_module_headers)
       foreach(cxx_module ${HPX_${uppercase_lib}_ENABLED_CXX_MODULES})
-        if(HPX_WITH_BUILD_USING_CXX_MODULES)
-          set(cxx_module_headers
-              "${cxx_module_headers}export import HPX.Core.${cxx_module};\n"
-          )
-        else()
-          set(cxx_module_headers
-              "${cxx_module_headers}#include <hpx/modules/${cxx_module}.hpp>\n"
-          )
-        endif()
+        set(cxx_module_headers
+            "${cxx_module_headers}#include <hpx/modules/${cxx_module}.hpp>\n"
+        )
       endforeach()
 
       set(cxx_standard_headers)
@@ -433,15 +427,19 @@ foreach(lib ${HPX_LIBS})
       set(module_install_targets hpx_${lib}_module hpx_${lib}_module_if)
       # cmake-format: on
 
-      if(HPX_WITH_BUILD_USING_CXX_MODULES AND MSVC)
-        # suppress linker MSVC warning LNK4286: defined symbol imported
-        target_link_options(hpx_${lib} PRIVATE "/ignore:4286")
-      endif()
-
       target_link_libraries(hpx INTERFACE hpx_${lib}_module_if)
     endif()
 
     set_target_properties(hpx_${lib} PROPERTIES FOLDER "Core")
+
+    # Clang emits DWARF-5 records while compiling the TracyClient library
+    if(HPX_TRACY_WITH_TRACY
+       AND (NOT MSVC)
+       AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID
+                                                     MATCHES "AppleClang")
+    )
+      target_link_options(hpx_${lib} PRIVATE "-fuse-ld=lld")
+    endif()
 
     install(
       TARGETS hpx_${lib} ${module_install_targets}

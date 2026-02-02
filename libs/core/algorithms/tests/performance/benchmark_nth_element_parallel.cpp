@@ -40,7 +40,7 @@ void function01(void)
     typedef std::less<uint64_t> compare_t;
     std::mt19937 my_rand(0);
     std::vector<uint64_t> A, B;
-    const uint32_t NELEM = 10000;
+    uint32_t const NELEM = 10000;
     A.reserve(NELEM);
     B.reserve(NELEM);
 
@@ -86,7 +86,7 @@ void function02(void)
     typedef std::less<uint64_t> compare_t;
     std::mt19937 my_rand(0);
     std::vector<uint64_t> A, B;
-    const uint32_t NELEM = 10000000;
+    uint32_t const NELEM = 10000000;
     A.reserve(NELEM);
     B.reserve(NELEM);
 
@@ -95,7 +95,7 @@ void function02(void)
     std::shuffle(A.begin(), A.end(), my_rand);
 
     uint64_t ac1 = 0, ac2 = 0;
-    const uint32_t STEP = NELEM / 20;
+    uint32_t const STEP = NELEM / 20;
     for (uint64_t i = 0; i < NELEM; i += STEP)
     {
         std::cout << "Searched position [" << i << "]   \t";

@@ -172,7 +172,7 @@ int void_parallel_sum(iter first, iter last, int num_parts)
     std::vector<hpx::future<void>> f =
         hpx::parallel::execution::bulk_async_execute(
             exec,
-            [&](const int& i) {
+            [&](int const& i) {
                 iter b = first + i * section_size;    //-V104
                 iter e = first +
                     (std::min) (std::distance(first, last),

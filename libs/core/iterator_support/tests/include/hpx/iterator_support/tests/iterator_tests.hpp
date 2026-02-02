@@ -42,7 +42,7 @@ namespace tests {
             return x_;
         }
 
-        bool operator==(const dummy_type& d) const
+        bool operator==(dummy_type const& d) const
         {
             return x_ == d.x_;
         }
@@ -55,7 +55,7 @@ namespace tests {
     // TrivialIterator.
     // Preconditions: i != j, *i == val
     template <class Iterator, class T>
-    void trivial_iterator_test(const Iterator i, const Iterator j, T val)
+    void trivial_iterator_test(Iterator const i, Iterator const j, T val)
     {
         Iterator k;
         HPX_TEST(i == i);
@@ -147,12 +147,12 @@ namespace tests {
     }
 
     template <typename Iterator, typename T>
-    void readable_iterator_traversal_test(const Iterator, T, std::false_type)
+    void readable_iterator_traversal_test(Iterator const, T, std::false_type)
     {
     }
 
     template <typename Iterator, typename T>
-    void readable_iterator_test(const Iterator i1, T v)
+    void readable_iterator_test(Iterator const i1, T v)
     {
         using ref_t = typename std::iterator_traits<Iterator>::reference;
 
@@ -343,7 +343,7 @@ namespace tests {
     {
         HPX_ASSERT(N >= 2);
         bidirectional_readable_iterator_test(i, vals[0], vals[1]);
-        const Iterator j = i;
+        Iterator const j = i;
         int c;
 
         for (c = 0; c < N - 1; ++c)
@@ -385,7 +385,7 @@ namespace tests {
         Iterator i2(i);
         using value_type = typename std::iterator_traits<Iterator>::value_type;
         using reference = typename std::iterator_traits<Iterator>::reference;
-        HPX_TEST((std::is_same_v<const value_type&, reference>) );
+        HPX_TEST((std::is_same_v<value_type const&, reference>) );
         T const& v2 = *i2;
         HPX_TEST_EQ(v1, v2);
         //HPX_TEST(is_lvalue_iterator<Iterator>::value);
@@ -439,7 +439,7 @@ namespace tests {
     }
 
     template <class Iterator, class T>
-    void writable_iterator_traversal_test(const Iterator, T, std::false_type)
+    void writable_iterator_traversal_test(Iterator const, T, std::false_type)
     {
     }
 
@@ -486,7 +486,7 @@ namespace tests {
         using value_type = T;
         struct reference
         {
-            reference& operator=(const T&)
+            reference& operator=(T const&)
             {
                 return *this;
             }
@@ -496,7 +496,7 @@ namespace tests {
             }
         };
 
-        using pointer = const T*;
+        using pointer = T const*;
         using difference_type = std::ptrdiff_t;
 
         input_output_iterator_archetype() = default;
@@ -573,19 +573,19 @@ namespace tests {
     public:
         using iterator_category = std::forward_iterator_tag;
         using value_type = T;
-        using reference = const T&;
+        using reference = T const&;
         using pointer = T const*;
         using difference_type = std::ptrdiff_t;
 
         forward_iterator_archetype() = default;
         forward_iterator_archetype(forward_iterator_archetype const&) = default;
-        self& operator=(const self&) = default;
+        self& operator=(self const&) = default;
 
-        bool operator==(const self&) const
+        bool operator==(self const&) const
         {
             return true;
         }
-        bool operator!=(const self&) const
+        bool operator!=(self const&) const
         {
             return true;
         }

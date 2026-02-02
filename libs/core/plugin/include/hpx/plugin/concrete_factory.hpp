@@ -19,12 +19,12 @@ namespace hpx::util::plugin {
 
         HPX_CXX_EXPORT template <typename BasePlugin, typename Concrete,
             typename Base, typename Parameter>
-        struct concrete_factory_item;
+        struct HPX_PLUGIN_EXPORT_API concrete_factory_item;
 
         HPX_CXX_EXPORT template <typename BasePlugin, typename Concrete,
             typename Base, typename... Parameters>
-        struct concrete_factory_item<BasePlugin, Concrete, Base,
-            hpx::util::pack<Parameters...>> : public Base
+        struct HPX_PLUGIN_EXPORT_API concrete_factory_item<BasePlugin, Concrete,
+            Base, hpx::util::pack<Parameters...>> : public Base
         {
             [[nodiscard]] BasePlugin* create(
                 dll_handle const& dll, Parameters... parameters) override
@@ -37,7 +37,7 @@ namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_EXPORT template <typename BasePlugin, typename Concrete>
-    struct concrete_factory
+    struct HPX_PLUGIN_EXPORT_API concrete_factory
       : detail::concrete_factory_item<BasePlugin, Concrete,
             abstract_factory<BasePlugin>, virtual_constructor_t<BasePlugin>>
     {

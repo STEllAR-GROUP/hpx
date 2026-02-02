@@ -28,7 +28,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
         class set_cmd_line_ : public initializer_base
         {
         public:
-            explicit set_cmd_line_(const String& s)
+            explicit set_cmd_line_(String const& s)
               : cmd_line_(s)
             {
             }
@@ -57,7 +57,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
             return set_cmd_line_<std::wstring>(ws);
         }
 
-        inline set_cmd_line_<std::wstring> set_cmd_line(const std::wstring& ws)
+        inline set_cmd_line_<std::wstring> set_cmd_line(std::wstring const& ws)
         {
             return set_cmd_line_<std::wstring>(ws);
         }
@@ -67,7 +67,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
             return set_cmd_line_<std::string>(s);
         }
 
-        inline set_cmd_line_<std::string> set_cmd_line(const std::string& s)
+        inline set_cmd_line_<std::string> set_cmd_line(std::string const& s)
         {
             return set_cmd_line_<std::string>(s);
         }

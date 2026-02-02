@@ -42,8 +42,17 @@ namespace hpx::parallel::execution {
 namespace hpx::traits {
 
     // new executor framework
-    template <typename Executor, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
     struct is_timed_executor : parallel::execution::is_timed_executor<Executor>
     {
     };
+
+    HPX_CXX_EXPORT template <typename T>
+    inline constexpr bool is_timed_executor_v = is_timed_executor<T>::value;
 }    // namespace hpx::traits
+
+namespace hpx {
+
+    HPX_CXX_EXPORT template <typename Executor>
+    concept timed_executor = hpx::traits::is_timed_executor_v<Executor>;
+}

@@ -214,7 +214,7 @@ namespace hpx::threads::detail {
             if (blocking)
             {
                 bool must_wait = true;
-                for (const auto& thread : threads_)
+                for (auto const& thread : threads_)
                 {
                     // skip this if already stopped
                     if (!thread.joinable())

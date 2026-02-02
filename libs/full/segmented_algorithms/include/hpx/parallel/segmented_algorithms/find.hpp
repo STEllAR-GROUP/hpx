@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Ajai V George
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,6 +22,7 @@
 #include <vector>
 
 namespace hpx { namespace parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // segmented_find
     namespace detail {
@@ -116,7 +117,7 @@ namespace hpx { namespace parallel {
             typedef util::detail::algorithm_result<ExPolicy, FwdIter> result;
 
             typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<FwdIter>::value>
+                !hpx::traits::is_forward_iterator_v<FwdIter>>
                 forced_seq;
 
             segment_iterator sit = traits::segment(first);
@@ -225,16 +226,12 @@ namespace hpx { namespace parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
 
-    // clang-format off
-    template <typename SegIter, typename T,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator_v<SegIter> &&
-            hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
-    // clang-format on
+    template <typename SegIter, typename T>
+        requires(hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter>)
     SegIter tag_invoke(hpx::find_t, SegIter first, SegIter last, T const& val)
     {
-        static_assert(hpx::traits::is_input_iterator<SegIter>::value,
+        static_assert(hpx::traits::is_input_iterator_v<SegIter>,
             "Requires at least input iterator.");
 
         if (first == last)
@@ -250,19 +247,15 @@ namespace hpx { namespace segmented {
             hpx::execution::seq, first, last, val, std::true_type{});
     }
 
-    // clang-format off
-    template <typename ExPolicy, typename SegIter, typename T,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
+    template <typename ExPolicy, typename SegIter, typename T>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
-            hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
-    // clang-format on
+            hpx::traits::is_segmented_iterator_v<SegIter>)
     typename parallel::util::detail::algorithm_result<ExPolicy, SegIter>::type
     tag_invoke(hpx::find_t, ExPolicy&& policy, SegIter first, SegIter last,
         T const& val)
     {
-        static_assert(hpx::traits::is_forward_iterator<SegIter>::value,
+        static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
@@ -281,16 +274,12 @@ namespace hpx { namespace segmented {
             HPX_FORWARD(ExPolicy, policy), first, last, val, is_seq());
     }
 
-    // clang-format off
-    template <typename FwdIter, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator<FwdIter>::value &&
-            hpx::traits::is_segmented_iterator<FwdIter>::value
-        )>
-    // clang-format on
+    template <typename FwdIter, typename F>
+        requires(hpx::traits::is_iterator_v<FwdIter> &&
+            hpx::traits::is_segmented_iterator_v<FwdIter>)
     FwdIter tag_invoke(hpx::find_if_t, FwdIter first, FwdIter last, F&& f)
     {
-        static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
+        static_assert(hpx::traits::is_input_iterator_v<FwdIter>,
             "Requires at least input iterator.");
 
         if (first == last)
@@ -307,19 +296,15 @@ namespace hpx { namespace segmented {
             std::true_type{});
     }
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator<FwdIter>::value &&
-            hpx::traits::is_segmented_iterator<FwdIter>::value
-        )>
-    // clang-format on
+    template <typename ExPolicy, typename FwdIter, typename F>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter> &&
+            hpx::traits::is_segmented_iterator_v<FwdIter>)
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
     tag_invoke(
         hpx::find_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
     {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+        static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
@@ -339,16 +324,12 @@ namespace hpx { namespace segmented {
             is_seq());
     }
 
-    // clang-format off
-    template <typename FwdIter, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator<FwdIter>::value &&
-            hpx::traits::is_segmented_iterator<FwdIter>::value
-        )>
-    // clang-format on
+    template <typename FwdIter, typename F>
+        requires(hpx::traits::is_iterator_v<FwdIter> &&
+            hpx::traits::is_segmented_iterator_v<FwdIter>)
     FwdIter tag_invoke(hpx::find_if_not_t, FwdIter first, FwdIter last, F&& f)
     {
-        static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
+        static_assert(hpx::traits::is_input_iterator_v<FwdIter>,
             "Requires at least input iterator.");
 
         if (first == last)
@@ -365,19 +346,15 @@ namespace hpx { namespace segmented {
             std::true_type{});
     }
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator<FwdIter>::value &&
-            hpx::traits::is_segmented_iterator<FwdIter>::value
-        )>
-    // clang-format on
+    template <typename ExPolicy, typename FwdIter, typename F>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter> &&
+            hpx::traits::is_segmented_iterator_v<FwdIter>)
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
     tag_invoke(hpx::find_if_not_t, ExPolicy&& policy, FwdIter first,
         FwdIter last, F&& f)
     {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+        static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;

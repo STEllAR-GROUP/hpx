@@ -33,7 +33,7 @@ namespace hpx { namespace util {
         // time, level, count
         typedef std::tuple<double, int, int> valtype;
 
-        simple_profiler(const char* title, bool output = true)
+        simple_profiler(char const* title, bool output = true)
         {
             this->_parent = nullptr;
             this->_title = title;
@@ -41,7 +41,7 @@ namespace hpx { namespace util {
             this->_output = output;
         }
 
-        simple_profiler(simple_profiler& parent, const char* title)
+        simple_profiler(simple_profiler& parent, char const* title)
         {
             this->_parent = &parent;
             this->_title = title;
@@ -64,7 +64,7 @@ namespace hpx { namespace util {
                     this->_title, std::make_tuple(elapsed, 0, 1));
                 std::for_each(this->_profiles.begin(), this->_profiles.end(),
                     [HPX_CXX20_CAPTURE_THIS(=)](
-                        std::map<const char*, valtype>::value_type& p) {
+                        std::map<char const*, valtype>::value_type& p) {
                         this->_parent->addProfile(p.first, p.second);
                     });
             }
@@ -73,7 +73,7 @@ namespace hpx { namespace util {
                 // get the max depth of the profile tree so we can prepare string lengths
                 int maxlevel = 0;
                 std::for_each(this->_profiles.begin(), this->_profiles.end(),
-                    [&](std::map<const char*, valtype>::value_type& p) {
+                    [&](std::map<char const*, valtype>::value_type& p) {
                         maxlevel = (std::max) (maxlevel, std::get<1>(p.second));
                     });
                 // prepare format string for output
@@ -147,7 +147,7 @@ namespace hpx { namespace util {
             this->_done = true;
         }
 
-        void addProfile(const char* title, valtype value)
+        void addProfile(char const* title, valtype value)
         {
             if (this->_profiles.find(title) == this->_profiles.end())
             {
@@ -164,8 +164,8 @@ namespace hpx { namespace util {
         //
         simple_profiler* _parent;
         hpx::chrono::high_resolution_timer _timer;
-        const char* _title;
-        std::map<const char*, valtype> _profiles;
+        char const* _title;
+        std::map<char const*, valtype> _profiles;
         bool _done;
         bool _output;
     };

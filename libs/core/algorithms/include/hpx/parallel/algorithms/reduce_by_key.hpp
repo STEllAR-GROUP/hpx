@@ -323,7 +323,7 @@ namespace hpx::parallel::detail {
         using zip_ref = typename zip_iterator<reducebykey_iter,
             keystate_iter_type>::reference;
         //
-        const std::uint64_t number_of_keys = std::distance(key_first, key_last);
+        std::uint64_t const number_of_keys = std::distance(key_first, key_last);
         //
         key_state.assign(number_of_keys, reduce_key_series_states());
         {

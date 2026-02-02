@@ -60,7 +60,7 @@ namespace hpx::agas::server {
     private:
         // REVIEW: Separate mutexes might reduce contention here. This has to be
         // investigated carefully.
-        mutex_type mutex_;
+        mutex_type mutex_ = mutex_type("component_namespace");
         component_id_table_type component_ids_;
         factory_table_type factories_;
         component_id_type type_counter;

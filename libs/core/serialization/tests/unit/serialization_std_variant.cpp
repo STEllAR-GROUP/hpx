@@ -82,7 +82,7 @@ int main()
     HPX_TEST_EQ(ivar.index(), ovar.index());
     HPX_TEST(ivar == ovar);
 
-    const std::variant<std::string> sovar = std::string("string");
+    std::variant<std::string> const sovar = std::string("string");
     std::variant<std::string> sivar;
     oar << sovar;
     iar >> sivar;

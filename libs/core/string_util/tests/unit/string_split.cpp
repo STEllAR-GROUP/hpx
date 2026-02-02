@@ -20,7 +20,7 @@ int main()
     std::string str2("Xx-abc--xX-abb-xx");
     std::string str3("xx");
     std::string strempty("");
-    const char* pch1 = "xx-abc--xx-abb";
+    char const* pch1 = "xx-abc--xx-abb";
     std::vector<std::string> tokens;
 
     // split tests

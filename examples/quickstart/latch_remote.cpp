@@ -16,7 +16,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-static const char* const latch_name = "latch_remote_example";
+static char const* const latch_name = "latch_remote_example";
 
 int hpx_main()
 {

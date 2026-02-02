@@ -58,7 +58,7 @@ namespace hpx { namespace util { namespace storage {
             }
             else
             {
-                for (const auto& it : tuple_)
+                for (auto const& it : tuple_)
                 {
                     if (it.has_value())
                     {
@@ -74,14 +74,14 @@ namespace hpx { namespace util { namespace storage {
             return tuple_.size();
         }
 
-        tuple& push_back(const elem_type& elem)
+        tuple& push_back(elem_type const& elem)
         {
             tuple_.push_back(elem);
             return *this;
         }
 
         template <typename T>
-        tuple& push_back(const T& field,
+        tuple& push_back(T const& field,
             typename std::enable_if<!std::is_same<elem_type,
                 typename std::decay<T>::type>::value>::type* = nullptr)
         {

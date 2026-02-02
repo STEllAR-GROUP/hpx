@@ -21,7 +21,7 @@
 namespace hpx { namespace components { namespace process { namespace posix {
 
     template <class Process>
-    void terminate(const Process& p)
+    void terminate(Process const& p)
     {
         if (::kill(p.pid, SIGKILL) == -1)
         {
@@ -31,7 +31,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
     }
 
     template <class Process>
-    void terminate(const Process& p, hpx::error_code& ec)
+    void terminate(Process const& p, hpx::error_code& ec)
     {
         if (::kill(p.pid, SIGKILL) == -1)
         {

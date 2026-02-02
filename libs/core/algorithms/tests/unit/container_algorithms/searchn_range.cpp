@@ -335,9 +335,9 @@ void test_search_n5(ExPolicy policy, IteratorTag)
     auto op = [](std::size_t a, std::size_t b) { return (a == b); };
 
     //Provide custom projections
-    auto proj1 = [](const user_defined_type_1& ut1) { return ut1.val; };
+    auto proj1 = [](user_defined_type_1 const& ut1) { return ut1.val; };
 
-    auto proj2 = [](const user_defined_type_2& ut2) { return ut2.val; };
+    auto proj2 = [](user_defined_type_2 const& ut2) { return ut2.val; };
 
     auto index =
         hpx::ranges::search_n(policy, c, c.size(), h, op, proj1, proj2);
@@ -363,9 +363,9 @@ void test_search_n5_async(ExPolicy p, IteratorTag)
     auto op = [](std::size_t a, std::size_t b) { return !(a != b); };
 
     //Provide custom projections
-    auto proj1 = [](const user_defined_type_1& ut1) { return ut1.val; };
+    auto proj1 = [](user_defined_type_1 const& ut1) { return ut1.val; };
 
-    auto proj2 = [](const user_defined_type_2& ut2) { return ut2.val; };
+    auto proj2 = [](user_defined_type_2 const& ut2) { return ut2.val; };
 
     auto f = hpx::ranges::search_n(p, c, c.size(), h, op, proj1, proj2);
 

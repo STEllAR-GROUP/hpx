@@ -25,26 +25,26 @@
 using namespace hpx::program_options;
 using namespace std;
 
-pair<string, vector<vector<string>>> msp(const string& s1)
+pair<string, vector<vector<string>>> msp(string const& s1)
 {
     return std::make_pair(s1, vector<vector<string>>());
 }
 
-pair<string, vector<vector<string>>> msp(const string& s1, const string& s2)
+pair<string, vector<vector<string>>> msp(string const& s1, string const& s2)
 {
     vector<vector<string>> v(1);
     v[0].push_back(s2);
     return std::make_pair(s1, v);
 }
 
-void check_value(const option& option, const char* name, const char* value)
+void check_value(option const& option, char const* name, char const* value)
 {
     HPX_TEST_EQ(option.string_key, name);
     HPX_TEST_EQ(option.value.size(), std::size_t(1));
     HPX_TEST_EQ(option.value.front(), value);
 }
 
-vector<string> sv(const char* array[], unsigned size)
+vector<string> sv(char const* array[], unsigned size)
 {
     vector<string> r;
     for (unsigned i = 0; i < size; ++i)
@@ -52,7 +52,7 @@ vector<string> sv(const char* array[], unsigned size)
     return r;
 }
 
-pair<string, string> additional_parser(const std::string&)
+pair<string, string> additional_parser(std::string const&)
 {
     return pair<string, string>();
 }
@@ -67,10 +67,10 @@ namespace command_line {
             value<std::string>(), "")("car,voiture", new untyped_value())(
             "dog,dawg", new untyped_value())("baz", new untyped_value())(
             "plug*", new untyped_value());
-        const char* cmdline3_[] = {"--foo=12", "-f4", "--bar=11", "-b4",
+        char const* cmdline3_[] = {"--foo=12", "-f4", "--bar=11", "-b4",
             "--voiture=15", "--dawg=16", "--dog=17", "--plug3=10"};
         vector<string> cmdline3 =
-            sv(cmdline3_, sizeof(cmdline3_) / sizeof(const char*));
+            sv(cmdline3_, sizeof(cmdline3_) / sizeof(char const*));
         vector<option> a3 =
             command_line_parser(cmdline3).options(desc).run().options;
         HPX_TEST_EQ(a3.size(), 8u);
@@ -86,7 +86,7 @@ namespace command_line {
         // Regression test: check that '0' as style is interpreted as
         // 'default_style'
         vector<option> a4 =
-            parse_command_line(sizeof(cmdline3_) / sizeof(const char*),
+            parse_command_line(sizeof(cmdline3_) / sizeof(char const*),
                 cmdline3_, desc, 0, additional_parser)
                 .options;
         // The default style is unix-style, where the first argument on the command-line
@@ -104,23 +104,23 @@ namespace command_line {
     void test_not_crashing_with_empty_string_values()
     {
         // Check that we don't crash on empty values of type 'string'
-        const char* cmdline4[] = {"", "--open", ""};
+        char const* cmdline4[] = {"", "--open", ""};
         options_description desc2;
         desc2.add_options()("open", value<string>());
         variables_map vm;
-        store(parse_command_line(sizeof(cmdline4) / sizeof(const char*),
+        store(parse_command_line(sizeof(cmdline4) / sizeof(char const*),
                   const_cast<char**>(cmdline4), desc2),
             vm);
     }
 
     void test_multitoken()
     {
-        const char* cmdline5[] = {"", "-p7", "-o", "1", "2", "3", "-x8"};
+        char const* cmdline5[] = {"", "-p7", "-o", "1", "2", "3", "-x8"};
         options_description desc3;
         desc3.add_options()(",p", value<string>())(
             ",o", value<string>()->multitoken())(",x", value<string>());
         vector<option> a5 =
-            parse_command_line(sizeof(cmdline5) / sizeof(const char*),
+            parse_command_line(sizeof(cmdline5) / sizeof(char const*),
                 const_cast<char**>(cmdline5), desc3, 0, additional_parser)
                 .options;
         HPX_TEST_EQ(a5.size(), 3u);
@@ -136,14 +136,14 @@ namespace command_line {
     void test_multitoken_and_multiname()
     {
         // the long_names() API function was introduced in Boost V1.68
-        const char* cmdline[] = {"program", "-fone", "-b", "two", "--foo",
+        char const* cmdline[] = {"program", "-fone", "-b", "two", "--foo",
             "three", "four", "-zfive", "--fee", "six"};
         options_description desc;
         desc.add_options()("bar,b", value<string>())("foo,fee,f",
             value<string>()->multitoken())("fizbaz,baz,z", value<string>());
 
         vector<option> parsed_options =
-            parse_command_line(sizeof(cmdline) / sizeof(const char*),
+            parse_command_line(sizeof(cmdline) / sizeof(char const*),
                 const_cast<char**>(cmdline), desc, 0, additional_parser)
                 .options;
 
@@ -157,11 +157,11 @@ namespace command_line {
         check_value(parsed_options[3], "fizbaz", "five");
         check_value(parsed_options[4], "foo", "six");
 
-        const char* cmdline_2[] = {"program", "-fone", "-b", "two", "--fee",
+        char const* cmdline_2[] = {"program", "-fone", "-b", "two", "--fee",
             "three", "four", "-zfive", "--foo", "six"};
 
         parsed_options =
-            parse_command_line(sizeof(cmdline_2) / sizeof(const char*),
+            parse_command_line(sizeof(cmdline_2) / sizeof(char const*),
                 const_cast<char**>(cmdline_2), desc, 0, additional_parser)
                 .options;
 
@@ -185,10 +185,10 @@ namespace command_line {
             "values")("file", value<std::string>(), "the file to process");
         positional_options_description p;
         p.add("file", 1);
-        const char* cmdline6[] = {
+        char const* cmdline6[] = {
             "", "-m", "token1", "token2", "--", "some_file"};
         vector<option> a6 =
-            command_line_parser(sizeof(cmdline6) / sizeof(const char*),
+            command_line_parser(sizeof(cmdline6) / sizeof(char const*),
                 const_cast<char**>(cmdline6))
                 .options(desc4)
                 .positional(p)
@@ -216,7 +216,7 @@ void test_command_line()
     command_line::test_multitoken_and_multiname();
 }
 
-void test_config_file(const char* config_file)
+void test_config_file(char const* config_file)
 {
     // the long_names() API function was introduced in Boost V1.68
     options_description desc;
@@ -225,7 +225,7 @@ void test_config_file(const char* config_file)
         "m1.v1", new untyped_value)("m1.v2", new untyped_value)(
         "m1.v3,alias3", new untyped_value)("b", bool_switch());
 
-    const char content1[] = " gv1 = 0#asd\n"
+    char const content1[] = " gv1 = 0#asd\n"
                             "empty_value = \n"
                             "plug3 = 7\n"
                             "b = true\n"
@@ -284,9 +284,9 @@ void test_unregistered()
 {
     options_description desc;
 
-    const char* cmdline1_[] = {"--foo=12", "--bar", "1"};
+    char const* cmdline1_[] = {"--foo=12", "--bar", "1"};
     vector<string> cmdline1 =
-        sv(cmdline1_, sizeof(cmdline1_) / sizeof(const char*));
+        sv(cmdline1_, sizeof(cmdline1_) / sizeof(char const*));
     vector<option> a1 = command_line_parser(cmdline1)
                             .options(desc)
                             .allow_unregistered()
@@ -318,7 +318,7 @@ void test_unregistered()
 
     HPX_TEST_EQ(vm.size(), 0u);
 
-    const char content1[] = "gv1 = 0\n"
+    char const content1[] = "gv1 = 0\n"
                             "[m1]\n"
                             "v1 = 1\n";
 

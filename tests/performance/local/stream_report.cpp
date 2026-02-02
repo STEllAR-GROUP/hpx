@@ -102,7 +102,7 @@ double mysecond()
 
 int checktick()
 {
-    static const std::size_t M = 20;
+    static std::size_t const M = 20;
     double timesfound[M];
 
     // Collect a sequence of M unique time values from the system.

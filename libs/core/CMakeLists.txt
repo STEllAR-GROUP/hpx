@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 The STE||AR-Group
+# Copyright (c) 2020-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -49,10 +49,13 @@ set(_hpx_core_modules
     ini
     init_runtime_local
     io_service
+    iostream
     iterator_support
     itt_notify
     lci_base
+    lcw_base
     lcos_local
+    likwid
     lock_registration
     logging
     memory
@@ -84,6 +87,7 @@ set(_hpx_core_modules
     timed_execution
     timing
     topology
+    tracy
     type_support
     util
     version
@@ -96,8 +100,3 @@ hpx_info("  Configuring libhpx_core modules:")
 foreach(module ${_hpx_core_modules})
   add_subdirectory(${module})
 endforeach()
-
-set(_hpx_core_modules
-    ${_hpx_core_modules}
-    PARENT_SCOPE
-)

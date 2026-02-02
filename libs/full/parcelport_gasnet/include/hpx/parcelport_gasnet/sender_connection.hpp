@@ -152,10 +152,10 @@ namespace hpx::parcelset::policies::gasnet {
                 // compute + send the number of GASNET_PAGEs to send and the
                 // remainder number of bytes to a GASNET_PAGE
                 //
-                const std::size_t chunks[] = {
+                std::size_t const chunks[] = {
                     static_cast<size_t>(header_.data_size_ / GASNET_PAGESIZE),
                     static_cast<size_t>(header_.data_size_ % GASNET_PAGESIZE)};
-                const std::size_t sizeof_chunks = sizeof(chunks);
+                std::size_t const sizeof_chunks = sizeof(chunks);
                 // clang-format off
                 std::memcpy(hpx::util::gasnet_environment::segments
                     [hpx::util::gasnet_environment::rank()].addr,

@@ -52,7 +52,7 @@ void measureScanAlgorithms()
         std::size_t start = 32;
         std::size_t till = 1 << 10;
 
-        const auto NUM_ITERATIONS = 5;
+        auto const NUM_ITERATIONS = 5;
 
         std::vector<std::array<double, 3>> data;
 

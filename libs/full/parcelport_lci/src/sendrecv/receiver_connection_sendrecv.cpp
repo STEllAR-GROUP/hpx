@@ -154,8 +154,8 @@ namespace hpx::parcelset::policies::lci {
     receiver_connection_sendrecv::return_t
     receiver_connection_sendrecv::receive_transmission_chunks()
     {
-        const auto current_state = connection_state::initialized;
-        const auto next_state = connection_state::rcvd_transmission_chunks;
+        auto const current_state = connection_state::initialized;
+        auto const next_state = connection_state::rcvd_transmission_chunks;
         HPX_ASSERT(state.load(std::memory_order_acquire) == current_state);
         HPX_UNUSED(current_state);
         if (need_recv_tchunks)
@@ -179,8 +179,8 @@ namespace hpx::parcelset::policies::lci {
     receiver_connection_sendrecv::return_t
     receiver_connection_sendrecv::receive_data()
     {
-        const auto current_state = connection_state::rcvd_transmission_chunks;
-        const auto next_state = connection_state::rcvd_data;
+        auto const current_state = connection_state::rcvd_transmission_chunks;
+        auto const next_state = connection_state::rcvd_data;
         HPX_ASSERT(state.load(std::memory_order_acquire) == current_state);
         HPX_UNUSED(current_state);
         if (need_recv_data)
@@ -248,8 +248,8 @@ namespace hpx::parcelset::policies::lci {
     receiver_connection_sendrecv::return_t
     receiver_connection_sendrecv::receive_chunks_zc()
     {
-        const auto current_state = connection_state::rcvd_data;
-        const auto next_state = connection_state::rcvd_chunks;
+        auto const current_state = connection_state::rcvd_data;
+        auto const next_state = connection_state::rcvd_chunks;
         HPX_ASSERT(state.load(std::memory_order_acquire) == current_state);
         HPX_UNUSED(current_state);
         // handle zero-copy receive, this should be done on the first entry
@@ -298,8 +298,8 @@ namespace hpx::parcelset::policies::lci {
     receiver_connection_sendrecv::return_t
     receiver_connection_sendrecv::receive_chunks_nzc()
     {
-        const auto current_state = connection_state::rcvd_data;
-        const auto next_state = connection_state::rcvd_chunks;
+        auto const current_state = connection_state::rcvd_data;
+        auto const next_state = connection_state::rcvd_chunks;
         HPX_ASSERT(state.load(std::memory_order_acquire) == current_state);
         HPX_UNUSED(current_state);
         while (recv_chunks_idx < buffer.chunks_.size())

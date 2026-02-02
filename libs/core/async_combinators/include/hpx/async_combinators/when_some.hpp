@@ -393,7 +393,7 @@ namespace hpx::lcos::detail {
             return HPX_MOVE(values_);
         }
 
-        mutable mutex_type mtx_;
+        mutable mutex_type mtx_ = mutex_type("when_some");
         when_some_result<Sequence> values_;
         std::atomic<std::size_t> count_;
         std::size_t needed_count_;

@@ -46,7 +46,7 @@ void test_interrupt_by_destructor()
                 // "interrupted" not derived from std::exception
                 HPX_TEST(false);
             }
-            catch (const char*)
+            catch (char const*)
             {
                 HPX_TEST(stoken.stop_requested());
                 was_interrupted = true;

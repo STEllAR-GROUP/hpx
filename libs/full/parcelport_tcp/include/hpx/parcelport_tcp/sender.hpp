@@ -95,7 +95,9 @@ namespace hpx::parcelset::policies::tcp {
             return there_;
         }
 
-        void verify_(parcelset::locality const& parcel_locality_id) const
+        void verify_(
+            [[maybe_unused]] parcelset::locality const& parcel_locality_id)
+            const
         {
 #if defined(HPX_DEBUG)
             std::error_code ec;
@@ -114,8 +116,6 @@ namespace hpx::parcelset::policies::tcp {
                         endpoint.address().to_string()));
                 HPX_ASSERT(impl.port() == endpoint.port());
             }
-#else
-            HPX_UNUSED(parcel_locality_id);
 #endif
         }
 

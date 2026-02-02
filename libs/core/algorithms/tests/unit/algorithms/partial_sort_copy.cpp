@@ -380,7 +380,7 @@ void test_partial_sort_copy3(IteratorTag)
     std::shuffle(A.begin(), A.end(), my_rand);
     lst.insert(lst.end(), A.begin(), A.end());
 
-    const uint32_t STEP = NELEM / 20;
+    uint32_t const STEP = NELEM / 20;
 
     for (std::uint64_t i = 0; i <= NELEM; i += STEP)
     {
@@ -415,7 +415,7 @@ void test_partial_sort_copy3(ExPolicy policy, IteratorTag)
     std::shuffle(A.begin(), A.end(), my_rand);
     lst.insert(lst.end(), A.begin(), A.end());
 
-    const uint32_t STEP = NELEM / 20;
+    uint32_t const STEP = NELEM / 20;
 
     for (std::uint64_t i = 0; i <= NELEM; i += STEP)
     {
@@ -450,7 +450,7 @@ void test_partial_sort_copy3_async(ExPolicy p, IteratorTag)
     std::shuffle(A.begin(), A.end(), my_rand);
     lst.insert(lst.end(), A.begin(), A.end());
 
-    const uint32_t STEP = NELEM / 20;
+    uint32_t const STEP = NELEM / 20;
 
     for (std::uint64_t i = 0; i <= NELEM; i += STEP)
     {

@@ -21,7 +21,7 @@
 typedef std::tuple<std::size_t, std::ptrdiff_t, std::ptrdiff_t> info;
 typedef std::stack<info> info_stack;
 
-void stack_remaining(const char* txt, info_stack& stack)
+void stack_remaining(char const* txt, info_stack& stack)
 {
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
     std::size_t stack_ptr = hpx::threads::coroutines::detail::get_stack_ptr();

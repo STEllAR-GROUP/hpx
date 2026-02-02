@@ -29,8 +29,8 @@ namespace hpx { namespace util {
     {
         static bool check_gasnet_environment(runtime_configuration const& cfg);
 
-        static int init(int* argc, char*** argv, const int minimal,
-            const int required, int& provided);
+        static int init(int* argc, char*** argv, int const minimal,
+            int const required, int& provided);
         static void init(int* argc, char*** argv, runtime_configuration& cfg);
         static void finalize();
 
@@ -43,13 +43,13 @@ namespace hpx { namespace util {
 
         static std::string get_processor_name();
 
-        static bool gettable(const int node, void* start, const size_t len);
+        static bool gettable(int const node, void* start, size_t const len);
 
-        static void put(std::uint8_t* addr, const int rank, std::uint8_t* raddr,
-            const std::size_t size);
+        static void put(std::uint8_t* addr, int const rank, std::uint8_t* raddr,
+            std::size_t const size);
 
-        static void get(std::uint8_t* addr, const int rank, std::uint8_t* raddr,
-            const std::size_t size);
+        static void get(std::uint8_t* addr, int const rank, std::uint8_t* raddr,
+            std::size_t const size);
 
         struct HPX_CORE_EXPORT scoped_lock
         {

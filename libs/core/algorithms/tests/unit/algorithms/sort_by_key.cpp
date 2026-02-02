@@ -30,7 +30,7 @@
 //
 namespace debug {
     template <typename T>
-    void output(const std::string& name, const std::vector<T>& v)
+    void output(std::string const& name, std::vector<T> const& v)
     {
 #ifdef EXTRA_DEBUG7
         std::cout << name.c_str() << "\t : {" << v.size() << "} : ";
@@ -44,7 +44,7 @@ namespace debug {
     }
 
     template <typename Iter>
-    void output(const std::string& name, Iter begin, Iter end)
+    void output(std::string const& name, Iter begin, Iter end)
     {
 #ifdef EXTRA_DEBUG
         std::cout << name.c_str() << "\t : {" << std::distance(begin, end)
@@ -78,7 +78,7 @@ void sort_by_key_benchmark()
 {
     try
     {
-        const int bench_size = HPX_SORT_BY_KEY_TEST_SIZE * 256;
+        int const bench_size = HPX_SORT_BY_KEY_TEST_SIZE * 256;
         // vector of values, and keys
         std::vector<double> values, o_values;
         std::vector<int64_t> keys, o_keys;
@@ -124,7 +124,7 @@ void sort_by_key_benchmark()
 template <typename ExPolicy, typename Tkey, typename Tval, typename Op,
     typename HelperOp>
 void test_sort_by_key1(
-    ExPolicy&& policy, Tkey, Tval, const Op&, const HelperOp&)
+    ExPolicy&& policy, Tkey, Tval, Op const&, HelperOp const&)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -177,7 +177,7 @@ void test_sort_by_key1(
 template <typename ExPolicy, typename Tkey, typename Tval, typename Op,
     typename HelperOp>
 void test_sort_by_key_async(
-    ExPolicy&& policy, Tkey, Tval, const Op&, const HelperOp&)
+    ExPolicy&& policy, Tkey, Tval, Op const&, HelperOp const&)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -235,7 +235,7 @@ void test_sort_by_key1()
     //
     // run many tests in a loop for N seconds just to play safe
     //
-    const int seconds = 1;
+    int const seconds = 1;
     //
     hpx::chrono::high_resolution_timer t;
     do

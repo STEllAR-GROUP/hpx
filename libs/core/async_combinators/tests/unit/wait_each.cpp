@@ -71,12 +71,12 @@ void test_wait_each_from_list()
     HPX_TEST_EQ(call_count, count);
     HPX_TEST_EQ(call_with_index_count, count);
 
-    for (const auto& f : futures1)
+    for (auto const& f : futures1)
     {
         HPX_TEST(!f.valid());
     }
 
-    for (const auto& f : futures2)
+    for (auto const& f : futures2)
     {
         HPX_TEST(!f.valid());
     }
@@ -125,12 +125,12 @@ void test_wait_each_from_list_iterators()
     HPX_TEST_EQ(call_count, count);
     HPX_TEST_EQ(call_with_index_count, count);
 
-    for (const auto& f : futures1)
+    for (auto const& f : futures1)
     {
         HPX_TEST(!f.valid());
     }
 
-    for (const auto& f : futures2)
+    for (auto const& f : futures2)
     {
         HPX_TEST(!f.valid());
     }

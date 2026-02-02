@@ -1411,7 +1411,7 @@ namespace hpx::threads::policies {
 
         detail::affinity_data const& affinity_data_;
 
-        const thread_queue_init_parameters queue_parameters_;
+        thread_queue_init_parameters const queue_parameters_;
 
         // used to make sure the scheduler is only initialized once on a thread
         std::mutex init_mutex;

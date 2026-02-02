@@ -88,9 +88,11 @@ namespace hpx::parcelset {
       : tm_(nullptr)
       , use_alternative_parcelports_(false)
       , enable_parcel_handling_(true)
+      , handlers_mtx_("parcelhandler::handlers_mtx")
       , load_message_handlers_(
             util::get_entry_as<int>(cfg, "hpx.parcel.message_handlers", 0) != 0)
       , count_routed_(0)
+      , mtx_("parcelhandler::mtx")
       , write_handler_(&default_write_handler)
 #if defined(HPX_HAVE_NETWORKING)
       , is_networking_enabled_(cfg.enable_networking())
@@ -525,7 +527,6 @@ namespace hpx::parcelset {
     }
 
     namespace detail {
-
         void parcel_sent_handler(
             parcelhandler::write_handler_type const& f,    //-V669
             std::error_code const& ec, parcelset::parcel const& p)

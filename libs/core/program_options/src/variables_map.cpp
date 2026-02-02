@@ -218,7 +218,7 @@ namespace hpx::program_options {
     void variables_map::notify()
     {
         // This checks if all required options occur
-        for (const auto& r : m_required)
+        for (auto const& r : m_required)
         {
             std::string const& opt = r.first;
             std::string const& display_opt = r.second;

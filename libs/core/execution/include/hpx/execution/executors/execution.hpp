@@ -1056,7 +1056,7 @@ namespace hpx::parallel::execution {
                             results.push_back(
                                 execution::async_execute(exec, f, elem, ts...));
                         }
-                        return hpx::unwrap(results);
+                        return hpx::unwrap(HPX_MOVE(results));
                     }
                 }
                 catch (std::bad_alloc const& ba)

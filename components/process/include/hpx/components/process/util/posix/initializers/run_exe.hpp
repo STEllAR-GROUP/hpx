@@ -29,7 +29,7 @@ namespace hpx::components::process::posix::initializers {
             cmd_line_[0] = cmd_line_[1] = nullptr;
         }
 
-        explicit run_exe_(const std::string& s)
+        explicit run_exe_(std::string const& s)
           : s_(s)
         {
             cmd_line_[0] = const_cast<char*>(s_.c_str());
@@ -54,7 +54,7 @@ namespace hpx::components::process::posix::initializers {
         }
 
         template <typename Archive>
-        void load(Archive& ar, const unsigned int)
+        void load(Archive& ar, unsigned int const)
         {
             ar & s_;
 
@@ -68,17 +68,17 @@ namespace hpx::components::process::posix::initializers {
         char* cmd_line_[2];
     };
 
-    inline run_exe_ run_exe(const char* s)
+    inline run_exe_ run_exe(char const* s)
     {
         return run_exe_(s);
     }
 
-    inline run_exe_ run_exe(const std::string& s)
+    inline run_exe_ run_exe(std::string const& s)
     {
         return run_exe_(s);
     }
 
-    inline run_exe_ run_exe(const filesystem::path& p)
+    inline run_exe_ run_exe(filesystem::path const& p)
     {
         return run_exe_(p.string());
     }

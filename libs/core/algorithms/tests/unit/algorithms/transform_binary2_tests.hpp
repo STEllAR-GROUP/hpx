@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/container_algorithms/transform.hpp>
 
 #include <cstddef>
 #include <iostream>

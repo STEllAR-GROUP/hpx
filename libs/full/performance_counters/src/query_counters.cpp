@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,10 +33,16 @@
 #include <utility>
 #include <vector>
 
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#if !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0
 #include <hpx/itt_notify/detail/use_ittnotify_api.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <map>
+#endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+#include <hpx/modules/tracy.hpp>
+#include <set>
+#endif
 #endif
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -84,7 +90,8 @@ namespace hpx::util {
         if (!reset_names_.empty())
             counters_.add_counters(reset_names_, true);
 
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#if !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0
         if (use_ittnotify_api)
         {
             typedef std::map<std::string, util::itt::counter>::value_type
@@ -100,6 +107,16 @@ namespace hpx::util {
                         __itt_metadata_double)));
             }
         }
+#endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+        for (auto const& info : counters_.get_counter_infos())
+        {
+            std::string real_name =
+                performance_counters::remove_counter_prefix(info.fullname_);
+            tracy::create_counter(real_name);
+            tracy_counters_.insert(info.fullname_);
+        }
+#endif
 #endif
     }
 
@@ -184,7 +201,8 @@ namespace hpx::util {
         {
 #ifdef HPX_HAVE_APEX
             external_timer::sample_value(info, val);
-#elif HPX_HAVE_ITTNOTIFY != 0
+#else
+#if HPX_HAVE_ITTNOTIFY != 0
             if (use_ittnotify_api)
             {
                 auto it = itt_counters_.find(name);
@@ -193,6 +211,15 @@ namespace hpx::util {
                     (*it).second.set_value(val);
                 }
             }
+#endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+            if (tracy_counters_.find(name) != tracy_counters_.end())
+            {
+                std::string real_name =
+                    performance_counters::remove_counter_prefix(name);
+                tracy::sample_value(real_name, val);
+            }
+#endif
 #endif
 
             if (out == nullptr)
@@ -263,7 +290,7 @@ namespace hpx::util {
 
     template <typename Stream>
     void query_counters::print_value_csv(Stream* out,
-        performance_counters::counter_info const& info,
+        [[maybe_unused]] performance_counters::counter_info const& info,
         performance_counters::counter_value const& value)
     {
         error_code ec(throwmode::lightweight);
@@ -273,7 +300,8 @@ namespace hpx::util {
         {
 #ifdef HPX_HAVE_APEX
             external_timer::sample_value(info, val);
-#elif HPX_HAVE_ITTNOTIFY != 0
+#else
+#if HPX_HAVE_ITTNOTIFY != 0
             if (use_ittnotify_api)
             {
                 auto it = itt_counters_.find(info.fullname_);
@@ -282,8 +310,15 @@ namespace hpx::util {
                     (*it).second.set_value(val);
                 }
             }
-#else
-            HPX_UNUSED(info);
+#endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+            if (tracy_counters_.find(info.fullname_) != tracy_counters_.end())
+            {
+                std::string real_name =
+                    performance_counters::remove_counter_prefix(info.fullname_);
+                tracy::sample_value(real_name, val);
+            }
+#endif
 #endif
             if (out == nullptr)
                 return;
@@ -648,10 +683,17 @@ namespace hpx::util {
             no_output = destination_ == "none";
         }
 
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#if !defined(HPX_HAVE_APEX)
+#if HPX_HAVE_ITTNOTIFY != 0
         // don't generate any console-output if the ITTNotify API is used
         if (!no_output && destination_is_cout && use_ittnotify_api)
             no_output = true;
+#endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+        // don't generate any console-output if the Tracy API is used
+        if (!no_output && destination_is_cout)
+            no_output = true;
+#endif
 #endif
 
         if (counters_.size() == 0)

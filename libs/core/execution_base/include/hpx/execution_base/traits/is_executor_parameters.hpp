@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2024 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //  Copyright (c) 2016 Marcin Copik
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -139,17 +139,24 @@ namespace hpx::execution::experimental {
         is_executor_parameters<T>::value;
 }    // namespace hpx::execution::experimental
 
-namespace hpx::traits {
+namespace hpx {
 
-    // new executor framework
-    HPX_CXX_EXPORT template <typename Parameters, typename Enable>
-    struct is_executor_parameters
-      : hpx::execution::experimental::is_executor_parameters<
-            std::decay_t<Parameters>>
-    {
-    };
+    namespace traits {
 
-    HPX_CXX_EXPORT template <typename T>
-    inline constexpr bool is_executor_parameters_v =
-        is_executor_parameters<T>::value;
-}    // namespace hpx::traits
+        // new executor framework
+        HPX_CXX_EXPORT template <typename Parameters, typename Enable>
+        struct is_executor_parameters
+          : hpx::execution::experimental::is_executor_parameters<
+                std::decay_t<Parameters>>
+        {
+        };
+
+        HPX_CXX_EXPORT template <typename T>
+        inline constexpr bool is_executor_parameters_v =
+            is_executor_parameters<T>::value;
+    }    // namespace traits
+
+    HPX_CXX_EXPORT template <typename Parameters>
+    concept executor_parameters =
+        hpx::traits::is_executor_parameters_v<Parameters>;
+}    // namespace hpx

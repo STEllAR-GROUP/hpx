@@ -14,6 +14,7 @@
 #include <string>
 
 namespace hpx {
+
     HPX_IOSTREAMS_EXPORT extern iostreams::ostream<> cout;
     HPX_IOSTREAMS_EXPORT extern iostreams::ostream<> cerr;
 

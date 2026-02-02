@@ -43,6 +43,10 @@ set(concurrency_compat_headers
 # Default location is $HPX_ROOT/libs/concurrency/src
 set(concurrency_sources barrier.cpp)
 
+if(HPX_TRACY_WITH_TRACY)
+  set(additional_dependencies hpx_tracy)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   core concurrency
@@ -67,5 +71,6 @@ add_hpx_module(
     hpx_thread_support
     hpx_type_support
     hpx_version
+    ${additional_dependencies}
   CMAKE_SUBDIRS examples tests
 )
