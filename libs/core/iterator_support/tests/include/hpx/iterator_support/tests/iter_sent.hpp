@@ -169,7 +169,7 @@ struct iterator
         return this->state >= that.state;
     }
 
-    difference_type operator-(const iterator& that) const
+    difference_type operator-(iterator const& that) const
     {
         return static_cast<difference_type>(this->state) -
             static_cast<difference_type>(that.state);
