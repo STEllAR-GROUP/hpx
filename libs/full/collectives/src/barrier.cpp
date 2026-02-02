@@ -205,8 +205,12 @@ namespace hpx { namespace distributed {
     void barrier::synchronize()
     {
         static std::atomic<std::size_t> gen = 0;
-        static std::array<barrier, 2>& b = get_global_barrier();
-        HPX_ASSERT(b[0].node_ && b[1].node_);
+        std::array<barrier, 2>& b = get_global_barrier();
+
+        if (!b[0].node_ || !b[1].node_)
+        {
+            return;
+        }
 
         b[++gen % 2].wait();
     }
