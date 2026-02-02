@@ -12,7 +12,6 @@
 #include <hpx/serialization/detail/constructor_selector.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/serialization/traits/emplace_func_traits.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -25,6 +24,8 @@ namespace hpx::serialization::detail {
     // not every random access sequence is reservable, so we need an explicit
     // trait to determine this
     HPX_HAS_MEMBER_XXX_TRAIT_DEF(reserve)
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(emplace_back)
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(emplace)
 
     template <typename Container>
     HPX_FORCEINLINE void reserve_if_container(
@@ -39,18 +40,17 @@ namespace hpx::serialization::detail {
     template <typename Container, typename T>
     void emplace_into_collection(Container& c, T&& t)
     {
-        if constexpr (hpx::traits::has_emplace_back_v<Container>)
+        if constexpr (has_emplace_back_v<Container>)
         {    // vectors, lists, etc.
             c.emplace_back(HPX_FORWARD(T, t));
         }
-        else if constexpr (hpx::traits::has_emplace_v<Container>)
+        else if constexpr (has_emplace_v<Container>)
         {    // sets, maps, etc.
             c.emplace(HPX_FORWARD(T, t));
         }
         else
         {
-            static_assert(sizeof(Container) == 0,
-                "Unsupported container type for emplace_into_collection");
+            c.insert(c.end(), HPX_FORWARD(T, t));
         }
     }
 

@@ -151,7 +151,6 @@ set(serialization_headers
     hpx/serialization/serialization_fwd.hpp
     hpx/serialization/serialize.hpp
     hpx/serialization/traits/brace_initializable_traits.hpp
-    hpx/serialization/traits/emplace_func_traits.hpp
     hpx/serialization/traits/is_bitwise_serializable.hpp
     hpx/serialization/traits/is_not_bitwise_serializable.hpp
     hpx/serialization/traits/is_serializable.hpp
@@ -199,7 +198,6 @@ set(serialization_compat_headers
     hpx/traits/is_bitwise_serializable.hpp => hpx/serialization.hpp
     hpx/traits/needs_automatic_registration.hpp => hpx/serialization.hpp
     hpx/traits/polymorphic_traits.hpp => hpx/serialization.hpp
-    hpx/traits/emplace_func_traits.hpp => hpx/serialization.hpp
     hpx/traits/serialization_access_data.hpp => hpx/serialization.hpp
 )
 # cmake-format: on

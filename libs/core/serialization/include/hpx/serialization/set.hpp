@@ -37,10 +37,7 @@ namespace hpx::serialization {
         if (size == 0)
             return;
 
-        for (T const& i : set)
-        {
-            ar << i;
-        }
+        detail::save_collection(ar, set);
     }
 
     HPX_CXX_EXPORT template <typename T, typename Compare, typename Allocator>
