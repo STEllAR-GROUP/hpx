@@ -48,8 +48,8 @@ namespace hpx { namespace ranges {
     ///           The \a shift_left algorithm returns an iterator to the
     ///           end of the resulting range.
     ///
-    template <typename FwdIter, typename Sent, typename Size>
-    FwdIter shift_left(FwdIter first, Sent last, Size n);
+    template <typename RaIter, typename Sent, typename Size>
+    RaIter shift_left(RaIter first, Sent last, Size n);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Shifts the elements in the range [first, last) by n positions towards
@@ -63,11 +63,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter.
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     positions to shift by.
     ///
@@ -89,22 +88,22 @@ namespace hpx { namespace ranges {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note The type of dereferenced \a FwdIter must meet the requirements
+    /// \note The type of dereferenced \a RaIter must meet the requirements
     ///       of \a MoveAssignable.
     ///
     /// \returns  The \a shift_left algorithm returns a
-    ///           \a hpx::future<FwdIter> if
+    ///           \a hpx::future<RaIter> if
     ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a FwdIter otherwise.
+    ///           returns \a RaIter otherwise.
     ///           The \a shift_left algorithm returns an iterator to the
     ///           end of the resulting range.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Size>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
-    shift_left(ExPolicy&& policy, FwdIter first, Sent last, Size n);
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+    shift_left(ExPolicy&& policy, RaIter first, Sent last, Size n);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Shifts the elements in the range [first, last) by n positions towards
@@ -151,9 +150,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     positions to shift by.
     ///
@@ -227,22 +228,21 @@ namespace hpx::ranges {
                 hpx::execution::seq, first, last, n);
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Size>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter>
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
         tag_fallback_invoke(hpx::ranges::shift_left_t, ExPolicy&& policy,
-            FwdIter first, Sent last, Size n)
+            RaIter first, Sent last, Size n)
         {
-            return hpx::parallel::detail::shift_left<FwdIter>().call(
+            return hpx::parallel::detail::shift_left<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, n);
         }
 

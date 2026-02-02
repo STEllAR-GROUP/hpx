@@ -24,9 +24,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -67,7 +69,7 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the source iterators used for the
+    /// \tparam RaIter        The type of the source iterators used for the
     ///                     range (deduced).
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
@@ -98,11 +100,11 @@ namespace hpx { namespace ranges {
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent,
-        typename T = typename std::iterator_traits<Iter>::value_type>
+    template <typename ExPolicy, typename RaIter, typename Sent,
+        typename T = typename std::iterator_traits<RaIter>::value_type>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        Iter>::type
-    fill(ExPolicy&& policy, Iter first, Sent last, T const& value);
+        RaIter>::type
+    fill(ExPolicy&& policy, RaIter first, Sent last, T const& value);
 
     /// Assigns the given value to the elements in the range [first, last).
     ///
@@ -152,9 +154,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -197,10 +201,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used for the
+    /// \tparam RaIter     The type of the source iterators used for the
     ///                     range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
     /// \tparam T           The type of the value to be assigned (deduced).
@@ -230,11 +233,11 @@ namespace hpx { namespace ranges {
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Size,
-        typename T = typename std::iterator_traits<FwdIter>::value_type>
+    template <typename ExPolicy, typename RaIter, typename Size,
+        typename T = typename std::iterator_traits<RaIter>::value_type>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        FwdIter>::type
-    fill_n(ExPolicy&& policy, FwdIter first, Size count, T const& value);
+        RaIter>::type
+    fill_n(ExPolicy&& policy, RaIter first, Size count, T const& value);
 
     /// Assigns the given value value to the first count elements in the range
     /// beginning at first if count > 0. Does nothing otherwise.
@@ -332,20 +335,20 @@ namespace hpx::ranges {
                 hpx::util::end(rng), value);
         }
 
-        template <typename ExPolicy, typename Iter, typename Sent,
-            typename T = typename std::iterator_traits<Iter>::value_type>
+        template <typename ExPolicy, typename RaIter, typename Sent,
+            typename T = typename std::iterator_traits<RaIter>::value_type>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<Iter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, Iter>
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter>
             )
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
         tag_fallback_invoke(
-            fill_t, ExPolicy&& policy, Iter first, Sent last, T const& value)
+            fill_t, ExPolicy&& policy, RaIter first, Sent last, T const& value)
         {
-            return hpx::parallel::detail::fill<Iter>().call(
+            return hpx::parallel::detail::fill<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, value);
         }
 
@@ -421,28 +424,28 @@ namespace hpx::ranges {
                 hpx::util::size(rng), value);
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Size,
-            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        template <typename ExPolicy, typename RaIter, typename Size,
+            typename T = typename std::iterator_traits<RaIter>::value_type>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
-        tag_fallback_invoke(fill_n_t, ExPolicy&& policy, FwdIter first,
+            RaIter>::type
+        tag_fallback_invoke(fill_n_t, ExPolicy&& policy, RaIter first,
             Size count, T const& value)
         {
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::detail::is_negative(count))
             {
                 return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(HPX_MOVE(first));
+                    RaIter>::get(HPX_MOVE(first));
             }
 
-            return hpx::parallel::detail::fill_n<FwdIter>().call(
+            return hpx::parallel::detail::fill_n<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first,
                 static_cast<std::size_t>(count), value);
         }

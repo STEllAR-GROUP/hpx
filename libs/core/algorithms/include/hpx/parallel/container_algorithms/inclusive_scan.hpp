@@ -98,15 +98,13 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
-    /// \tparam FwdIter2    The type of the iterator representing the
+    /// \tparam RaIter2    The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Op          The type of the binary function object used for
     ///                     the reduction operation.
     ///
@@ -144,11 +142,11 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a inclusive_scan algorithm returns a
-    ///           \a hpx::future<util::in_out_result<FwdIter1, FwdIter2>> if
+    ///           \a hpx::future<util::in_out_result<RaIter1, RaIter2>> if
     ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a util::in_out_result<FwdIter1, FwdIter2> otherwise.
+    ///           returns \a util::in_out_result<RaIter1, RaIter2> otherwise.
     ///           The \a inclusive_scan algorithm returns an input iterator to
     ///           the point denoted by the sentinel and an output iterator
     ///           to the element in the destination range, one past the last
@@ -247,13 +245,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam O           The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Op          The type of the binary function object used for
     ///                     the reduction operation.
     ///
@@ -404,8 +403,7 @@ namespace hpx { namespace ranges {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam InIter      The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
     /// \tparam OutIter     The type of the iterator representing the
@@ -564,13 +562,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam O           The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Op          The type of the binary function object used for
     ///                     the reduction operation.
     /// \tparam T           The type of the value to be used as initial (and

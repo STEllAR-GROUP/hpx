@@ -25,9 +25,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a F to meet the
@@ -43,7 +45,7 @@ namespace hpx { namespace ranges {
     ///                     Ret fun();
     ///                     \endcode \n
     ///                     The type \a Ret must be such that an object of type
-    ///                     \a FwdIter can be dereferenced and assigned a value
+    ///                     \a RaIter can be dereferenced and assigned a value
     ///                     of type \a Ret.
     ///
     /// The assignments in the parallel \a generate algorithm invoked with an
@@ -56,11 +58,11 @@ namespace hpx { namespace ranges {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a replace_if algorithm returns a \a hpx::future<FwdIter>
+    /// \returns  The \a replace_if algorithm returns a \a hpx::future<RaIter>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy
-    ///           and returns \a FwdIter otherwise.
+    ///           and returns \a RaIter otherwise.
     ///           It returns \a last.
     ///
     template <typename ExPolicy, typename Rng, typename F>
@@ -78,12 +80,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the source begin iterator used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter        The type of the source begin iterator used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the source end iterator used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a F to meet the
@@ -101,7 +101,7 @@ namespace hpx { namespace ranges {
     ///                     Ret fun();
     ///                     \endcode \n
     ///                     The type \a Ret must be such that an object of type
-    ///                     \a FwdIter can be dereferenced and assigned a value
+    ///                     \a RaIter can be dereferenced and assigned a value
     ///                     of type \a Ret.
     ///
     /// The assignments in the parallel \a generate algorithm invoked with an
@@ -114,16 +114,16 @@ namespace hpx { namespace ranges {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a replace_if algorithm returns a \a hpx::future<FwdIter>
+    /// \returns  The \a replace_if algorithm returns a \a hpx::future<RaIter>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy
-    ///           and returns \a FwdIter otherwise.
+    ///           and returns \a RaIter otherwise.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent, typename F>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
-    generate(ExPolicy&& policy, Iter first, Sent last, F&& f);
+    template <typename ExPolicy, typename RaIter, typename Sent, typename F>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+    generate(ExPolicy&& policy, RaIter first, Sent last, F&& f);
 
     /// Assign each element in range [first, last) a value generated by the
     /// given function object f
@@ -201,9 +201,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
     /// \tparam F           The type of the function/function object to use
@@ -237,16 +236,16 @@ namespace hpx { namespace ranges {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a replace_if algorithm returns a \a hpx::future<FwdIter>
+    /// \returns  The \a replace_if algorithm returns a \a hpx::future<RaIter>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy
-    ///           and returns \a FwdIter otherwise.
+    ///           and returns \a RaIter otherwise.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Size, typename F>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
-    generate_n(ExPolicy&& policy, FwdIter first, Size count, F&& f);
+    template <typename ExPolicy, typename RaIter, typename Size, typename F>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+    generate_n(ExPolicy&& policy, RaIter first, Size count, F&& f);
 
     /// Assigns each element in range [first, first+count) a value generated by
     /// the given function object g.
@@ -254,9 +253,8 @@ namespace hpx { namespace ranges {
     /// \note   Complexity: Exactly \a count invocations of \a f and
     ///         assignments, for count > 0.
     ///
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
     /// \tparam F           The type of the function/function object to use
@@ -280,8 +278,8 @@ namespace hpx { namespace ranges {
     ///
     /// \returns  The \a replace_if algorithm returns \a last.
     ///
-    template <typename FwdIter, typename Size, typename F>
-    FwdIter generate_n(FwdIter first, Size count, F&& f);
+    template <typename RaIter, typename Size, typename F>
+    RaIter generate_n(RaIter first, Size count, F&& f);
 
     // clang-format on
 }}    // namespace hpx::ranges

@@ -71,11 +71,11 @@ namespace hpx { namespace ranges {
     /// \returns  The \a replace_if algorithm returns \a Iter.
     ///           It returns \a last.
     ///
-    template <typename Iter, typename Sent, typename Pred,
+    template <typename RaIter, typename Sent, typename Pred,
         typename Proj = hpx::identity,
         typename T =
-            typename hpx::parallel::traits::projected<Iter, Proj>::value_type>
-    Iter replace_if(Iter first, Sent sent, Pred&& pred, T const& new_value,
+            typename hpx::parallel::traits::projected<RaIter, Proj>::value_type>
+    RaIter replace_if(RaIter first, Sent sent, Pred&& pred, T const& new_value,
         Proj&& proj = Proj());
 
     /// Replaces all elements satisfying specific criteria (for which predicate
@@ -88,9 +88,11 @@ namespace hpx { namespace ranges {
     ///          rng with new_value, when the following corresponding
     ///          conditions hold: INVOKE(f, INVOKE(proj, *it)) != false
     ///
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a forward iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a F to meet the
@@ -115,7 +117,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
+    ///                     type \a RaIter can be dereferenced and then
     ///                     implicitly converted to \a Type.
     /// \param new_value    Refers to the new value to use as the replacement.
     /// \param proj         Specifies the function (or function object) which
@@ -147,11 +149,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the source iterator used (deduced).
+    /// \tparam RaIter        The type of the source iterator used (deduced).
     ///                     The iterator type must
-    ///                     meet the requirements of a forward iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
-    ///                     sentinel type must be a sentinel for Iter.
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a Pred to meet the
@@ -180,7 +182,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
+    ///                     type \a RaIter can be dereferenced and then
     ///                     implicitly converted to \a Type.
     /// \param new_value    Refers to the new value to use as the replacement.
     /// \param proj         Specifies the function (or function object) which
@@ -198,18 +200,18 @@ namespace hpx { namespace ranges {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a replace_if algorithm returns a \a hpx::future<Iter>
+    /// \returns  The \a replace_if algorithm returns a \a hpx::future<RaIter>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent, typename Pred,
+    template <typename ExPolicy, typename RaIter, typename Sent, typename Pred,
         typename Proj = hpx::identity,
         typename T =
-            typename hpx::parallel::traits::projected<Iter, Proj>::value_type>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter> replace_if(
-        ExPolicy&& policy, Iter first, Sent sent, Pred&& pred,
+            typename hpx::parallel::traits::projected<RaIter, Proj>::value_type>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+    replace_if(ExPolicy&& policy, RaIter first, Sent sent, Pred&& pred,
         T const& new_value, Proj&& proj = Proj());
 
     /// Replaces all elements satisfying specific criteria (for which predicate
@@ -226,9 +228,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a forward iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a F to meet the
@@ -255,7 +259,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
+    ///                     type \a RaIter can be dereferenced and then
     ///                     implicitly converted to \a Type.
     /// \param new_value    Refers to the new value to use as the replacement.
     /// \param proj         Specifies the function (or function object) which
@@ -299,11 +303,11 @@ namespace hpx { namespace ranges {
     ///          [first,last) with new_value, when the following corresponding
     ///          conditions hold: INVOKE(proj, *i) == old_value
     ///
-    /// \tparam Iter        The type of the source iterator used (deduced).
+    /// \tparam RaIter        The type of the source iterator used (deduced).
     ///                     The iterator type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
-    ///                     sentinel type must be a sentinel for Iter.
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam T1          The type of the old value to replace (deduced).
     /// \tparam T2          The type of the new values to replace (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -323,13 +327,13 @@ namespace hpx { namespace ranges {
     /// The assignments in the parallel \a replace algorithm
     /// execute in sequential order in the calling thread.
     ///
-    /// \returns  The \a replace algorithm returns an \a Iter.
+    /// \returns  The \a replace algorithm returns an \a RaIter.
     ///
-    template <typename Iter, typename Sent, typename Proj = hpx::identity,
+    template <typename RaIter, typename Sent, typename Proj = hpx::identity,
         typename T1 =
-            typename hpx::parallel::traits::projected<Iter, Proj>::value_type,
+            typename hpx::parallel::traits::projected<RaIter, Proj>::value_type,
         typename T2 = T1>
-    Iter replace(Iter first, Sent sent, T1 const& old_value,
+    RaIter replace(RaIter first, Sent sent, T1 const& old_value,
         T2 const& new_value, Proj&& proj = Proj());
 
     /// Replaces all elements satisfying specific criteria with \a new_value
@@ -342,9 +346,11 @@ namespace hpx { namespace ranges {
     ///          rng with new_value, when the following corresponding
     ///          conditions hold: INVOKE(proj, *i) == old_value
     ///
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a forward iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam T1          The type of the old value to replace (deduced).
     /// \tparam T2          The type of the new values to replace (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -385,11 +391,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the source iterator used (deduced).
+    /// \tparam RaIter        The type of the source iterator used (deduced).
     ///                     The iterator type must
-    ///                     meet the requirements of a forward iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
-    ///                     sentinel type must be a sentinel for Iter.
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam T1          The type of the old value to replace (deduced).
     /// \tparam T2          The type of the new values to replace (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -418,19 +424,19 @@ namespace hpx { namespace ranges {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a replace algorithm returns a \a hpx::future<Iter> if
+    /// \returns  The \a replace algorithm returns a \a hpx::future<RaIter> if
     ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a Iter otherwise.
+    ///           returns \a RaIter otherwise.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Proj = hpx::identity,
         typename T1 =
-            typename hpx::parallel::traits::projected<Iter, Proj>::value_type,
+            typename hpx::parallel::traits::projected<RaIter, Proj>::value_type,
         typename T2 = T1>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter> replace(
-        ExPolicy&& policy, Iter first, Sent sent, T1 const& old_value,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter> replace(
+        ExPolicy&& policy, RaIter first, Sent sent, T1 const& old_value,
         T2 const& new_value, Proj&& proj = Proj());
 
     /// Replaces all elements satisfying specific criteria with \a new_value
@@ -447,9 +453,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a forward iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam T1          The type of the old value to replace (deduced).
     /// \tparam T2          The type of the new values to replace (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -654,15 +662,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterator used (deduced).
+    /// \tparam RaIter1    The type of the source iterator used (deduced).
     ///                     The iterator type must
-    ///                     meet the requirements of a forward iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
-    /// \tparam FwdIter2    The type of the iterator representing the
+    /// \tparam RaIter2    The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a Pred to meet the
@@ -692,7 +699,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
+    ///                     type \a RaIter can be dereferenced and then
     ///                     implicitly converted to \a Type.
     /// \param new_value    Refers to the new value to use as the replacement.
     /// \param proj         Specifies the function (or function object) which
@@ -711,19 +718,19 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a replace_copy_if algorithm returns an
-    ///           \a hpx::future<FwdIter1, FwdIter2>.
+    ///           \a hpx::future<RaIter1, RaIter2>.
     ///           The \a replace_copy_if algorithm returns the input iterator
     ///           \a last and the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Sent,
-        typename FwdIter2, typename Pred,
-        typename T = typename std::iterator_traits<FwdIter2>::value_type,
+    template <typename ExPolicy, typename RaIter1, typename Sent,
+        typename RaIter2, typename Pred,
+        typename T = typename std::iterator_traits<RaIter2>::value_type,
         typename Proj = hpx::identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        replace_copy_if_result<FwdIter1, FwdIter2>>::type
-    replace_copy_if(ExPolicy&& policy, FwdIter1 first, Sent sent, FwdIter2 dest,
+        replace_copy_if_result<RaIter1, RaIter2>>::type
+    replace_copy_if(ExPolicy&& policy, RaIter1 first, Sent sent, RaIter2 dest,
         Pred&& pred, T const& new_value, Proj&& proj = Proj());
 
     /// Copies the all elements from the range rng to another range
@@ -743,13 +750,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam RaIter     The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a Pred to meet the
@@ -777,7 +785,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
+    ///                     type \a RaIter can be dereferenced and then
     ///                     implicitly converted to \a Type.
     /// \param new_value    Refers to the new value to use as the replacement.
     /// \param proj         Specifies the function (or function object) which
@@ -803,13 +811,13 @@ namespace hpx { namespace ranges {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename Rng, typename FwdIter, typename Pred,
-        typename T = typename std::iterator_traits<FwdIter>::value_type,
+    template <typename ExPolicy, typename Rng, typename RaIter, typename Pred,
+        typename T = typename std::iterator_traits<RaIter>::value_type,
         typename Proj = hpx::identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         replace_copy_if_result<hpx::traits::range_iterator_t<Rng>,
-            FwdIter>>::type
-    replace_copy_if(ExPolicy&& policy, Rng&& rng, FwdIter dest, Pred&& pred,
+            RaIter>>::type
+    replace_copy_if(ExPolicy&& policy, Rng&& rng, RaIter dest, Pred&& pred,
         T const& new_value, Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -942,15 +950,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterator used (deduced).
+    /// \tparam RaIter1    The type of the source iterator used (deduced).
     ///                     The iterator type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
-    ///                     sentinel type must be a sentinel for Iter.
-    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     sentinel type must be a sentinel for RaIter.
+    /// \tparam RaIter2    The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam T1          The type of the old value to replace (deduced).
     /// \tparam T2          The type of the new values to replace (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -981,25 +988,25 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a replace_copy algorithm returns a
-    ///           \a hpx::future<in_out_result<FwdIter1, FwdIter2>>
+    ///           \a hpx::future<in_out_result<RaIter1, RaIter2>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a in_out_result<FwdIter1, FwdIter2>
+    ///           returns \a in_out_result<RaIter1, RaIter2>
     ///           otherwise.
     ///           The \a copy algorithm returns the pair of the forward iterator
     ///           \a last and the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Sent,
-        typename FwdIter2, typename Proj = hpx::identity,
-        typename T1 = typename hpx::parallel::traits::projected<FwdIter1,
+    template <typename ExPolicy, typename RaIter1, typename Sent,
+        typename RaIter2, typename Proj = hpx::identity,
+        typename T1 = typename hpx::parallel::traits::projected<RaIter1,
             Proj>::value_type,
         typename T2 = T1>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        replace_copy_result<FwdIter1, FwdIter2>>::type
-    replace_copy(ExPolicy&& policy, FwdIter1 first, Sent sent, FwdIter2 dest,
+        replace_copy_result<RaIter1, RaIter2>>::type
+    replace_copy(ExPolicy&& policy, RaIter1 first, Sent sent, RaIter2 dest,
         T1 const& old_value, T2 const& new_value, Proj&& proj = Proj());
 
     /// Copies the all elements from the range rbg to another range
@@ -1019,13 +1026,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam RaIter     The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam T1          The type of the old value to replace (deduced).
     /// \tparam T2          The type of the new values to replace (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -1055,26 +1063,26 @@ namespace hpx { namespace ranges {
     ///
     /// \returns  The \a replace_copy algorithm returns a
     ///           \a hpx::future<in_out_result<
-    ///            hpx::traits::range_iterator_t<Rng>, FwdIter>>
+    ///            hpx::traits::range_iterator_t<Rng>, RaIter>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a in_out_result<
-    ///            hpx::traits::range_iterator_t<Rng>, FwdIter>>
+    ///            hpx::traits::range_iterator_t<Rng>, RaIter>>
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           \a last and the forward iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename Rng, typename FwdIter,
+    template <typename ExPolicy, typename Rng, typename RaIter,
         typename Proj = hpx::identity,
         typename T1 = typename hpx::parallel::traits::projected<
             hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
         typename T2 = T1>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        replace_copy_result<hpx::traits::range_iterator_t<Rng>, FwdIter>>::type
-    replace_copy(ExPolicy&& policy, Rng&& rng, FwdIter dest,
-        T1 const& old_value, T2 const& new_value, Proj&& proj = Proj());
+        replace_copy_result<hpx::traits::range_iterator_t<Rng>, RaIter>>::type
+    replace_copy(ExPolicy&& policy, Rng&& rng, RaIter dest, T1 const& old_value,
+        T2 const& new_value, Proj&& proj = Proj());
 
 }}    // namespace hpx::ranges
 
@@ -1278,26 +1286,26 @@ namespace hpx::ranges {
                 new_value, HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename Iter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Proj = hpx::identity,
-            typename T1 = typename hpx::parallel::traits::projected<Iter,
+            typename T1 = typename hpx::parallel::traits::projected<RaIter,
                 Proj>::value_type,
             typename T2 = T1>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<Iter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
-                hpx::parallel::traits::is_projected_v<Proj, Iter>
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter>
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type
+            RaIter>::type
         tag_fallback_invoke(hpx::ranges::replace_t, ExPolicy&& policy,
-            Iter first, Sent sent, T1 const& old_value, T2 const& new_value,
+            RaIter first, Sent sent, T1 const& old_value, T2 const& new_value,
             Proj proj = Proj())
         {
-            using type = typename std::iterator_traits<Iter>::value_type;
+            using type = typename std::iterator_traits<RaIter>::value_type;
 
             return hpx::ranges::replace_if(
                 HPX_FORWARD(ExPolicy, policy), first, sent,
@@ -1409,44 +1417,44 @@ namespace hpx::ranges {
                     HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent,
-            typename FwdIter2, typename Pred,
-            typename T = typename std::iterator_traits<FwdIter2>::value_type,
+        template <typename ExPolicy, typename RaIter1, typename Sent,
+            typename RaIter2, typename Pred,
+            typename T = typename std::iterator_traits<RaIter2>::value_type,
             typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter2> &&
-                hpx::parallel::traits::is_projected_v<Proj, FwdIter1> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter1> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy,
-                    Pred, hpx::parallel::traits::projected<Proj, FwdIter1>
+                    Pred, hpx::parallel::traits::projected<Proj, RaIter1>
                 >
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            replace_copy_if_result<FwdIter1, FwdIter2>>
+            replace_copy_if_result<RaIter1, RaIter2>>
         tag_fallback_invoke(hpx::ranges::replace_copy_if_t, ExPolicy&& policy,
-            FwdIter1 first, Sent sent, FwdIter2 dest, Pred pred,
+            RaIter1 first, Sent sent, RaIter2 dest, Pred pred,
             T const& new_value, Proj proj = Proj())
         {
             return hpx::parallel::detail::replace_copy_if<
-                hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
+                hpx::parallel::util::in_out_result<RaIter1, RaIter2>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, sent, dest,
                     HPX_MOVE(pred), new_value, HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename Rng, typename FwdIter,
+        template <typename ExPolicy, typename Rng, typename RaIter,
             typename Pred,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
+            typename T = typename std::iterator_traits<RaIter>::value_type,
             typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_random_access_range_v<Rng> &&
                 hpx::traits::is_sized_range_v<Rng> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy,
                     Pred, hpx::parallel::traits::projected_range<Proj, Rng>
@@ -1454,14 +1462,13 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            replace_copy_if_result<hpx::traits::range_iterator_t<Rng>, FwdIter>>
+            replace_copy_if_result<hpx::traits::range_iterator_t<Rng>, RaIter>>
         tag_fallback_invoke(hpx::ranges::replace_copy_if_t, ExPolicy&& policy,
-            Rng&& rng, FwdIter dest, Pred pred, T const& new_value,
+            Rng&& rng, RaIter dest, Pred pred, T const& new_value,
             Proj proj = Proj())
         {
-            return hpx::parallel::detail::replace_copy_if<
-                hpx::parallel::util::in_out_result<
-                    hpx::traits::range_iterator_t<Rng>, FwdIter>>()
+            return hpx::parallel::detail::replace_copy_if<hpx::parallel::util::
+                    in_out_result<hpx::traits::range_iterator_t<Rng>, RaIter>>()
                 .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                     hpx::util::end(rng), dest, HPX_MOVE(pred), new_value,
                     HPX_MOVE(proj));
@@ -1535,27 +1542,27 @@ namespace hpx::ranges {
                 new_value, HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent,
-            typename FwdIter2, typename Proj = hpx::identity,
-            typename T1 = typename hpx::parallel::traits::projected<FwdIter1,
+        template <typename ExPolicy, typename RaIter1, typename Sent,
+            typename RaIter2, typename Proj = hpx::identity,
+            typename T1 = typename hpx::parallel::traits::projected<RaIter1,
                 Proj>::value_type,
             typename T2 = T1>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter2> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter1> &&
-                hpx::parallel::traits::is_projected_v<Proj, FwdIter1>
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter1> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter1>
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            replace_copy_result<FwdIter1, FwdIter2>>::type
+            replace_copy_result<RaIter1, RaIter2>>::type
         tag_fallback_invoke(hpx::ranges::replace_copy_t, ExPolicy&& policy,
-            FwdIter1 first, Sent sent, FwdIter2 dest, T1 const& old_value,
+            RaIter1 first, Sent sent, RaIter2 dest, T1 const& old_value,
             T2 const& new_value, Proj proj = Proj())
         {
-            using type = typename std::iterator_traits<FwdIter1>::value_type;
+            using type = typename std::iterator_traits<RaIter1>::value_type;
 
             return hpx::ranges::replace_copy_if(
                 HPX_FORWARD(ExPolicy, policy), first, sent, dest,
@@ -1563,7 +1570,7 @@ namespace hpx::ranges {
                 new_value, HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename Rng, typename FwdIter,
+        template <typename ExPolicy, typename Rng, typename RaIter,
             typename Proj = hpx::identity,
             typename T1 = typename hpx::parallel::traits::projected<
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
@@ -1573,14 +1580,14 @@ namespace hpx::ranges {
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_random_access_range_v<Rng> &&
                 hpx::traits::is_sized_range_v<Rng> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            replace_copy_result<hpx::traits::range_iterator_t<Rng>, FwdIter>>
+            replace_copy_result<hpx::traits::range_iterator_t<Rng>, RaIter>>
         tag_fallback_invoke(hpx::ranges::replace_copy_t, ExPolicy&& policy,
-            Rng&& rng, FwdIter dest, T1 const& old_value, T2 const& new_value,
+            Rng&& rng, RaIter dest, T1 const& old_value, T2 const& new_value,
             Proj proj = Proj())
         {
             using type = typename std::iterator_traits<

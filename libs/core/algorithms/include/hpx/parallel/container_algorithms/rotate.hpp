@@ -46,8 +46,8 @@ namespace hpx { namespace ranges {
     ///           The \a rotate algorithm returns the iterator equal to
     ///           pair(first + (last - middle), last).
     ///
-    template <typename FwdIter, typename Sent>
-    subrange_t<FwdIter, Sent> rotate(FwdIter first, FwdIter middle, Sent last);
+    template <typename RaIter, typename Sent>
+    subrange_t<RaIter, Sent> rotate(RaIter first, RaIter middle, Sent last);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Performs a left rotation on a range of elements. Specifically,
@@ -61,11 +61,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced).
-    ///                     This sentinel type must be a sentinel for FwdIter.
+    ///                     This sentinel type must be a sentinel for RaIter.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -86,22 +85,22 @@ namespace hpx { namespace ranges {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note The type of dereferenced \a FwdIter must meet the requirements
+    /// \note The type of dereferenced \a RaIter must meet the requirements
     ///       of \a MoveAssignable and \a MoveConstructible.
     ///
     /// \returns  The \a rotate algorithm returns a
-    ///           \a hpx::future<subrange_t<FwdIter, Sent>>
+    ///           \a hpx::future<subrange_t<RaIter, Sent>>
     ///           if the execution policy is of type
     ///           \a parallel_task_policy and
-    ///           returns a \a subrange_t<FwdIter, Sent>
+    ///           returns a \a subrange_t<RaIter, Sent>
     ///           otherwise.
     ///           The \a rotate algorithm returns the iterator equal to
     ///           pair(first + (last - middle), last).
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent>
+    template <typename ExPolicy, typename RaIter, typename Sent>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        subrange_t<FwdIter, Sent>>::type
-    rotate(ExPolicy&& policy, FwdIter first, FwdIter middle, Sent last);
+        subrange_t<RaIter, Sent>>::type
+    rotate(ExPolicy&& policy, RaIter first, RaIter middle, Sent last);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Uses \a rng as the source range, as if using \a util::begin(rng) as
@@ -153,9 +152,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a forward iterator.
+    ///                     meet the requirements of a random access iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -174,7 +175,7 @@ namespace hpx { namespace ranges {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note The type of dereferenced \a FwdIter must meet the requirements
+    /// \note The type of dereferenced \a RaIter must meet the requirements
     ///       of \a MoveAssignable and \a MoveConstructible.
     ///
     /// \returns  The \a rotate algorithm returns a \a hpx::future
@@ -232,9 +233,9 @@ namespace hpx { namespace ranges {
     ///           The \a rotate_copy algorithm returns the output iterator to
     ///           the element past the last element copied.
     ///
-    template <typename FwdIter, typename Sent, typename OutIter>
-    rotate_copy_result<FwdIter, OutIter> rotate_copy(
-        FwdIter first, FwdIter middle, Sent last, OutIter dest_first);
+    template <typename RaIter, typename Sent, typename OutRaIter>
+    rotate_copy_result<RaIter, OutRaIter> rotate_copy(
+        RaIter first, RaIter middle, Sent last, OutRaIter dest_first);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements from the range [first, last), to another range
@@ -248,15 +249,13 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced).
-    ///                     This sentinel type must be a sentinel for FwdIter.
-    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     This sentinel type must be a sentinel for RaIter.
+    /// \tparam RaIter2    The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -282,19 +281,19 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a rotate_copy algorithm returns areturns hpx::future<
-    ///           rotate_copy_result<FwdIter1, FwdIter2>> if the
+    ///           rotate_copy_result<RaIter1, RaIter2>> if the
     ///           execution policy is of type \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a
-    ///           rotate_copy_result<FwdIter1, FwdIter2> otherwise.
+    ///           rotate_copy_result<RaIter1, RaIter2> otherwise.
     ///           The \a rotate_copy algorithm returns the output iterator to
     ///           the element past the last element copied.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Sent,
-        typename FwdIter2>
+    template <typename ExPolicy, typename RaIter1, typename Sent,
+        typename RaIter2>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        rotate_copy_result<FwdIter1, FwdIter2>>::type
-    rotate_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 middle, Sent last,
-        FwdIter2 dest_first);
+        rotate_copy_result<RaIter1, RaIter2>>::type
+    rotate_copy(ExPolicy&& policy, RaIter1 first, RaIter1 middle, Sent last,
+        RaIter2 dest_first);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Uses \a rng as the source range, as if using \a util::begin(rng) as
@@ -332,10 +331,10 @@ namespace hpx { namespace ranges {
     ///           The \a rotate_copy algorithm returns the output iterator to
     ///           the element past the last element copied.
     ///
-    template <typename Rng, typename OutIter>
-    rotate_copy_result<hpx::traits::range_iterator_t<Rng>, OutIter> rotate_copy(
-        Rng&& rng, hpx::traits::range_iterator_t<Rng> middle,
-        OutIter dest_first);
+    template <typename Rng, typename OutRaIter>
+    rotate_copy_result<hpx::traits::range_iterator_t<Rng>, OutRaIter>
+    rotate_copy(Rng&& rng, hpx::traits::range_iterator_t<Rng> middle,
+        OutRaIter dest_first);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Uses \a rng as the source range, as if using \a util::begin(rng) as
@@ -351,10 +350,12 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a forward iterator.
-    /// \tparam OutIter     The type of the iterator representing the
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam OutRaIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
@@ -382,20 +383,20 @@ namespace hpx { namespace ranges {
     ///
     /// \returns  The \a rotate_copy algorithm returns a
     ///           \a hpx::future<otate_copy_result<
-    ///           hpx::traits::range_iterator_t<Rng>, OutIter>>
+    ///           hpx::traits::range_iterator_t<Rng>, OutRaIter>>
     ///           if the execution policy is of type
     ///           \a parallel_task_policy and
     ///           returns \a rotate_copy_result<
-    ///           hpx::traits::range_iterator_t<Rng>, OutIter>
+    ///           hpx::traits::range_iterator_t<Rng>, OutRaIter>
     ///           otherwise.
     ///           The \a rotate_copy algorithm returns the output iterator to
     ///           the element past the last element copied.
     ///
-    template <typename ExPolicy, typename Rng, typename OutIter>
+    template <typename ExPolicy, typename Rng, typename OutRaIter>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        rotate_copy_result<hpx::traits::range_iterator_t<Rng>, OutIter>>
+        rotate_copy_result<hpx::traits::range_iterator_t<Rng>, OutRaIter>>
     rotate_copy(ExPolicy&& policy, Rng&& rng,
-        hpx::traits::range_iterator_t<Rng> middle, OutIter dest_first);
+        hpx::traits::range_iterator_t<Rng> middle, OutRaIter dest_first);
 
 }}    // namespace hpx::ranges
 
@@ -439,26 +440,26 @@ namespace hpx::ranges {
                     .call(hpx::execution::seq, first, middle, last));
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent>
+        template <typename ExPolicy, typename RaIter, typename Sent>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter>
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter>
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            subrange_t<FwdIter, Sent>>::type
+            subrange_t<RaIter, Sent>>::type
         tag_fallback_invoke(hpx::ranges::rotate_t, ExPolicy&& policy,
-            FwdIter first, FwdIter middle, Sent last)
+            RaIter first, RaIter middle, Sent last)
         {
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                    !hpx::traits::is_bidirectional_iterator_v<FwdIter>>;
+                    !hpx::traits::is_bidirectional_iterator_v<RaIter>>;
 
-            return hpx::parallel::util::get_subrange<FwdIter, Sent>(
+            return hpx::parallel::util::get_subrange<RaIter, Sent>(
                 hpx::parallel::detail::rotate<
-                    parallel::util::in_out_result<FwdIter, Sent>>()
+                    parallel::util::in_out_result<RaIter, Sent>>()
                     .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first,
                         middle, last));
         }

@@ -85,9 +85,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a partition requires \a Pred to meet
@@ -111,7 +113,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
+    ///                     type \a RaIter can be dereferenced and then
     ///                     implicitly converted to \a Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -197,9 +199,9 @@ namespace hpx { namespace ranges {
     ///           an iterator to the first element of the second group and
     ///           finishing with an iterator equal to last.
     ///
-    template <typename FwdIter, typename Sent, typename Pred,
+    template <typename RaIter, typename Sent, typename Pred,
         typename Proj = hpx::identity>
-    subrange_t<FwdIter> partition(FwdIter first, Sent last, Pred&& pred,
+    subrange_t<RaIter> partition(RaIter first, Sent last, Pred&& pred,
         Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -216,11 +218,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter.
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a partition requires \a Pred to meet
@@ -264,19 +265,19 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a partition algorithm returns a \a
-    ///           hpx::future<subrange_t<FwdIter>>
+    ///           hpx::future<subrange_t<RaIter>>
     ///           if the execution policy is of type \a parallel_task_policy
-    ///           and returns \a subrange_t<FwdIter> otherwise.
+    ///           and returns \a subrange_t<RaIter> otherwise.
     ///           The \a partition algorithm returns a subrange starting with
     ///           an iterator to the first element of the second group and
     ///           finishing with an iterator equal to last.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Pred,
         typename Proj = hpx::identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        subrange_t<FwdIter>>::type
-    partition(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred,
+        subrange_t<RaIter>>::type
+    partition(ExPolicy&& policy, RaIter first, Sent last, Pred&& pred,
         Proj&& proj = Proj());
 
      ///////////////////////////////////////////////////////////////////////////
@@ -351,7 +352,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an birdirectional iterator
     /// \tparam Pred        The type of the function/function object to use
@@ -376,7 +379,7 @@ namespace hpx { namespace ranges {
     ///                     \endcode \n
     ///                     The signature does not need to have const&.
     ///                     The type \a Type must be such that an object of
-    ///                     type \a BidirIter can be dereferenced and then
+    ///                     type \a BidirRaIter can be dereferenced and then
     ///                     implicitly converted to \a Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -466,9 +469,9 @@ namespace hpx { namespace ranges {
     ///           INVOKE(f, INVOKE (proj, *k)) == false. The relative order of
     ///           the elements in both groups is preserved.
     ///
-    template <typename BidirIter, typename Sent, typename Pred,
+    template <typename BidirRaIter, typename Sent, typename Pred,
         typename Proj = hpx::identity>
-    subrange_t<BidirIter> stable_partition(BidirIter first, Sent last,
+    subrange_t<BidirRaIter> stable_partition(BidirRaIter first, Sent last,
         Pred&& pred, Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -486,11 +489,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
-    /// \tparam BidirIter   The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    /// \tparam BidirRaIter   The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for BidirIter.
+    ///                     sentinel type must be a sentinel for BidirRaIter.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a partition requires \a Pred to meet
@@ -515,7 +517,7 @@ namespace hpx { namespace ranges {
     ///                     \endcode \n
     ///                     The signature does not need to have const&.
     ///                     The type \a Type must be such that an object of
-    ///                     type \a BidirIter can be dereferenced and then
+    ///                     type \a BidirRaIter can be dereferenced and then
     ///                     implicitly converted to \a Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -542,12 +544,12 @@ namespace hpx { namespace ranges {
     ///           If the execution policy is of type \a parallel_task_policy
     ///           the algorithm returns a future<> referring to this iterator.
     ///
-    template <typename ExPolicy, typename BidirIter, typename Sent,
+    template <typename ExPolicy, typename BidirRaIter, typename Sent,
         typename Pred,
         typename Proj = hpx::identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        subrange_t<BidirIter>>::type
-    stable_partition(ExPolicy&& policy, BidirIter first, Sent last,
+        subrange_t<BidirRaIter>>::type
+    stable_partition(ExPolicy&& policy, BidirRaIter first, Sent last,
         Pred&& pred, Proj&& proj = Proj());
 
 ///////////////////////////////////////////////////////////////////////////
@@ -621,12 +623,12 @@ namespace hpx { namespace ranges {
     ///           range, and the destination iterator to the end of the \a
     ///           dest_false range.
     ///
-    template <typename Rng, typename OutIter2,
-        typename OutIter3, typename Pred,
+    template <typename Rng, typename OutRaIter2,
+        typename OutRaIter3, typename Pred,
         typename Proj = hpx::identity>
     partition_copy_result<hpx::traits::range_iterator_t<Rng>,
-        OutIter2, OutIter3>
-    partition_copy(Rng&& rng, OutIter2 dest_true, OutIter3 dest_false,
+        OutRaIter2, OutRaIter3>
+    partition_copy(Rng&& rng, OutRaIter2 dest_true, OutRaIter3 dest_false,
         Pred&& pred, Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -645,19 +647,19 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
-    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     meet the requirements of an random access iterator.
+    /// \tparam RaIter2    The type of the iterator representing the
     ///                     destination range for the elements that satisfy
     ///                     the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter3    The type of the iterator representing the
+    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter3    The type of the iterator representing the
     ///                     destination range for the elements that don't
     ///                     satisfy the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a partition_copy requires \a Pred to
@@ -706,11 +708,11 @@ namespace hpx { namespace ranges {
     /// \returns  The \a partition_copy algorithm returns a
     ///           \a hpx::future<partition_copy_result
     ///           <hpx::traits::range_iterator_t<Rng>,
-    ///           FwdIter2, FwdIter3>>
+    ///           RaIter2, RaIter3>>
     ///           if the execution policy is of type \a parallel_task_policy
     ///           and returns
     ///           partition_copy_result<hpx::traits::range_iterator_t<Rng>,
-    ///           FwdIter2, FwdIter3>
+    ///           RaIter2, RaIter3>
     ///           otherwise.
     ///           The \a partition_copy algorithm returns the tuple of
     ///           the source iterator \a last,
@@ -718,14 +720,14 @@ namespace hpx { namespace ranges {
     ///           range, and the destination iterator to the end of the \a
     ///           dest_false range.
     ///
-    template <typename ExPolicy, typename Rng, typename FwdIter2,
-        typename FwdIter3, typename Pred,
+    template <typename ExPolicy, typename Rng, typename RaIter2,
+        typename RaIter3, typename Pred,
         typename Proj = hpx::identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        partition_copy_result<hpx::traits::range_iterator_t<Rng>, FwdIter2,
-            FwdIter3>>::type
-    partition_copy(ExPolicy&& policy, Rng&& rng, FwdIter2 dest_true,
-        FwdIter3 dest_false, Pred&& pred, Proj&& proj = Proj());
+        partition_copy_result<hpx::traits::range_iterator_t<Rng>, RaIter2,
+            RaIter3>>::type
+    partition_copy(ExPolicy&& policy, Rng&& rng, RaIter2 dest_true,
+        RaIter3 dest_false, Pred&& pred, Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements in the range, defined by [first, last),
@@ -801,12 +803,12 @@ namespace hpx { namespace ranges {
     ///           dest_true range, and the destination iterator to the end of
     ///           the \a dest_false range.
     ///
-    template <typename InIter, typename Sent, typename OutIter2,
-        typename OutIter3, typename Pred,
+    template <typename InIter, typename Sent, typename OutRaIter2,
+        typename OutRaIter3, typename Pred,
         typename Proj = hpx::identity>
-    partition_copy_result<InIter, OutIter2, OutIter3>
+    partition_copy_result<InIter, OutRaIter2, OutRaIter3>
     partition_copy(InIter first,
-        Sent last, OutIter2 dest_true, OutIter3 dest_false, Pred&& pred,
+        Sent last, OutRaIter2 dest_true, OutRaIter3 dest_false, Pred&& pred,
         Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -825,21 +827,18 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter.
-    /// \tparam OutIter2    The type of the iterator representing the
+    ///                     sentinel type must be a sentinel for RaIter.
+    /// \tparam OutRaIter2    The type of the iterator representing the
     ///                     destination range for the elements that satisfy
     ///                     the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam OutIter3    The type of the iterator representing the
+    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam OutRaIter3    The type of the iterator representing the
     ///                     destination range for the elements that don't
     ///                     satisfy the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a partition_copy requires \a Pred to
@@ -888,11 +887,11 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a partition_copy algorithm returns a
-    ///           hpx::future<partition_copy_result<FwdIter, OutIter2,
-    ///           OutIter3>>
+    ///           hpx::future<partition_copy_result<RaIter, OutRaIter2,
+    ///           OutRaIter3>>
     ///           if the execution policy is of type \a parallel_task_policy
     ///           and returns
-    ///           \a partition_copy_result<FwdIter, OutIter2, OutIter3>
+    ///           \a partition_copy_result<RaIter, OutRaIter2, OutRaIter3>
     ///           otherwise.
     ///           The \a partition_copy algorithm returns the tuple of
     ///           the source iterator \a last,
@@ -900,13 +899,13 @@ namespace hpx { namespace ranges {
     ///           dest_true range, and the destination iterator to the end of
     ///           the \a dest_false range.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent,
-        typename OutIter2, typename OutIter3, typename Pred,
+    template <typename ExPolicy, typename RaIter, typename Sent,
+        typename OutRaIter2, typename OutRaIter3, typename Pred,
         typename Proj = hpx::identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        partition_copy_result<FwdIter, OutIter2, OutIter3>>::type
+        partition_copy_result<RaIter, OutRaIter2, OutRaIter3>>::type
     partition_copy(ExPolicy&& policy,
-        FwdIter first, Sent last, OutIter2 dest_true, OutIter3 dest_false,
+        RaIter first, Sent last, OutRaIter2 dest_true, OutRaIter3 dest_false,
         Pred&& pred, Proj&& proj = Proj());
 
     // clang-format on
@@ -1021,25 +1020,25 @@ namespace hpx::ranges {
                 parallel::detail::advance_to_sentinel(first, last));
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Pred, typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
-                    parallel::traits::projected<Proj, FwdIter>
+                    parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            subrange_t<FwdIter>>::type
+            subrange_t<RaIter>>::type
         tag_fallback_invoke(hpx::ranges::partition_t, ExPolicy&& policy,
-            FwdIter first, Sent last, Pred pred, Proj proj = Proj())
+            RaIter first, Sent last, Pred pred, Proj proj = Proj())
         {
-            return hpx::parallel::util::make_subrange<FwdIter, FwdIter>(
-                hpx::parallel::detail::partition<FwdIter>().call(
+            return hpx::parallel::util::make_subrange<RaIter, RaIter>(
+                hpx::parallel::detail::partition<RaIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
                     HPX_MOVE(proj)),
                 parallel::detail::advance_to_sentinel(first, last));
@@ -1143,28 +1142,28 @@ namespace hpx::ranges {
                 parallel::detail::advance_to_sentinel(first, last));
         }
 
-        template <typename ExPolicy, typename BidirIter, typename Sent,
+        template <typename ExPolicy, typename BidirRaIter, typename Sent,
             typename Pred, typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<BidirIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, BidirIter> &&
+                hpx::traits::is_random_access_iterator_v<BidirRaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, BidirRaIter> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
-                    parallel::traits::projected<Proj, BidirIter>
+                    parallel::traits::projected<Proj, BidirRaIter>
                 >
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            subrange_t<BidirIter>>
+            subrange_t<BidirRaIter>>
         tag_fallback_invoke(hpx::ranges::stable_partition_t, ExPolicy&& policy,
-            BidirIter first, Sent last, Pred pred, Proj proj = Proj())
+            BidirRaIter first, Sent last, Pred pred, Proj proj = Proj())
         {
             using is_seq = std::integral_constant<bool,
-                !hpx::traits::is_random_access_iterator_v<BidirIter>>;
+                !hpx::traits::is_random_access_iterator_v<BidirRaIter>>;
 
-            return hpx::parallel::util::make_subrange<BidirIter, BidirIter>(
-                hpx::parallel::detail::stable_partition<BidirIter>().call2(
+            return hpx::parallel::util::make_subrange<BidirRaIter, BidirRaIter>(
+                hpx::parallel::detail::stable_partition<BidirRaIter>().call2(
                     HPX_FORWARD(ExPolicy, policy), is_seq(), first, last,
                     HPX_MOVE(pred), HPX_MOVE(proj)),
                 parallel::detail::advance_to_sentinel(first, last));
@@ -1208,15 +1207,15 @@ namespace hpx::ranges {
                     HPX_MOVE(proj)));
         }
 
-        template <typename ExPolicy, typename Rng, typename FwdIter2,
-            typename FwdIter3, typename Pred, typename Proj = hpx::identity>
+        template <typename ExPolicy, typename Rng, typename RaIter2,
+            typename RaIter3, typename Pred, typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_random_access_range_v<Rng> &&
                 hpx::traits::is_sized_range_v<Rng> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter2> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter3> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::traits::is_random_access_iterator_v<RaIter3> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     parallel::traits::projected_range<Proj, Rng>
@@ -1224,14 +1223,14 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            partition_copy_result<hpx::traits::range_iterator_t<Rng>, FwdIter2,
-                FwdIter3>>
+            partition_copy_result<hpx::traits::range_iterator_t<Rng>, RaIter2,
+                RaIter3>>
         tag_fallback_invoke(hpx::ranges::partition_copy_t, ExPolicy&& policy,
-            Rng&& rng, FwdIter2 dest_true, FwdIter3 dest_false, Pred pred,
+            Rng&& rng, RaIter2 dest_true, RaIter3 dest_false, Pred pred,
             Proj proj = Proj())
         {
             using iterator = hpx::traits::range_iterator_t<Rng>;
-            using result_type = hpx::tuple<iterator, FwdIter2, FwdIter3>;
+            using result_type = hpx::tuple<iterator, RaIter2, RaIter3>;
 
             return parallel::util::make_in_out_out_result(
                 parallel::detail::partition_copy<result_type>().call(
@@ -1271,30 +1270,30 @@ namespace hpx::ranges {
                     HPX_MOVE(pred), HPX_MOVE(proj)));
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename OutIter2, typename OutIter3, typename Pred,
+        template <typename ExPolicy, typename RaIter, typename Sent,
+            typename OutRaIter2, typename OutRaIter3, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter> &&
-                hpx::traits::is_random_access_iterator_v<OutIter2> &&
-                hpx::traits::is_random_access_iterator_v<OutIter3> &&
-                parallel::traits::is_projected_v<Proj, FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::traits::is_random_access_iterator_v<OutRaIter2> &&
+                hpx::traits::is_random_access_iterator_v<OutRaIter3> &&
+                parallel::traits::is_projected_v<Proj, RaIter> &&
                 parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,
-                    parallel::traits::projected<Proj, FwdIter>
+                    parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            partition_copy_result<FwdIter, OutIter2, OutIter3>>
+            partition_copy_result<RaIter, OutRaIter2, OutRaIter3>>
         tag_fallback_invoke(hpx::ranges::partition_copy_t, ExPolicy&& policy,
-            FwdIter first, Sent last, OutIter2 dest_true, OutIter3 dest_false,
-            Pred pred, Proj proj = Proj())
+            RaIter first, Sent last, OutRaIter2 dest_true,
+            OutRaIter3 dest_false, Pred pred, Proj proj = Proj())
         {
-            using result_type = hpx::tuple<FwdIter, OutIter2, OutIter3>;
+            using result_type = hpx::tuple<RaIter, OutRaIter2, OutRaIter3>;
 
             return parallel::util::make_in_out_out_result(
                 parallel::detail::partition_copy<result_type>().call(

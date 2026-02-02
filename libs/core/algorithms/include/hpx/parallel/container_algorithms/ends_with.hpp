@@ -87,15 +87,15 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the begin source iterators used
+    /// \tparam RaIter1    The type of the begin source iterators used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an forward iterator.
+    ///                     requirements of an random access iterator.
     /// \tparam Sent1       The type of the end source iterators used(deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter1.
-    /// \tparam FwdIter2    The type of the begin destination iterators used
+    /// \tparam RaIter2    The type of the begin destination iterators used
     ///                     deduced). This iterator type must meet the
-    ///                     requirements of a forward iterator.
+    ///                     requirements of a random access iterator.
     /// \tparam Sent2       The type of the end destination iterators used
     ///                     (deduced). This iterator type must meet the
     ///                     requirements of an sentinel for Iter2.
@@ -146,13 +146,13 @@ namespace hpx { namespace ranges {
     ///           The \a ends_with algorithm returns a boolean with the
     ///           value true if the second range matches the suffix of the
     ///           first range, false otherwise.
-    template <typename ExPolicy, typename FwdIter1, typename Sent1, typename FwdIter2,
+    template <typename ExPolicy, typename RaIter1, typename Sent1, typename RaIter2,
         typename Sent2, typename Pred = ranges::equal_to,
         typename Proj1 = hpx::identity,
         typename Proj2 = hpx::identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         bool>::type
-    ends_with(ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
+    ends_with(ExPolicy&& policy, RaIter1 first1, Sent1 last1, RaIter2 first2,
         Sent2 last2, Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2());
 
@@ -217,12 +217,16 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1        The type of the source range used (deduced).
+    /// \tparam Rng1
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.        The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
-    /// \tparam Rng2        The type of the destination range used (deduced).
+    ///                     meet the requirements of an random access iterator.
+    /// \tparam Rng2
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.        The type of the destination range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        The binary predicate that compares the projected
     ///                     elements.
     /// \tparam Proj1       The type of an optional projection function for
@@ -328,26 +332,26 @@ namespace hpx::ranges {
                 HPX_MOVE(proj2));
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename Sent2, typename Pred = ranges::equal_to,
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter2, typename Sent2, typename Pred = ranges::equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent1, FwdIter1> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter2> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent2, FwdIter2> &&
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent2, RaIter2> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,
-                    hpx::parallel::traits::projected<Proj1, FwdIter1>,
-                    hpx::parallel::traits::projected<Proj2, FwdIter2>
+                    hpx::parallel::traits::projected<Proj1, RaIter1>,
+                    hpx::parallel::traits::projected<Proj2, RaIter2>
                 >
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(hpx::ranges::ends_with_t, ExPolicy&& policy,
-            FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2,
+            RaIter1 first1, Sent1 last1, RaIter2 first2, Sent2 last2,
             Pred pred = Pred(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             return hpx::parallel::detail::ends_with().call(

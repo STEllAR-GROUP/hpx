@@ -38,23 +38,23 @@ namespace hpx::parallel::detail {
         {
         }
 
-        template <typename ExPolicy, typename Iterator, typename Sentinel,
+        template <typename ExPolicy, typename RaIterator, typename Sentinel,
             typename T, typename Proj>
-        static constexpr bool sequential(
-            ExPolicy, Iterator first, Sentinel last, T const& val, Proj&& proj)
+        static constexpr bool sequential(ExPolicy, RaIterator first,
+            Sentinel last, T const& val, Proj&& proj)
         {
             return sequential_contains<std::decay<ExPolicy>>(
                 first, last, val, HPX_FORWARD(Proj, proj));
         }
 
-        template <typename ExPolicy, typename Iterator, typename Sentinel,
+        template <typename ExPolicy, typename RaIterator, typename Sentinel,
             typename T, typename Proj>
         static util::detail::algorithm_result_t<ExPolicy, bool> parallel(
-            ExPolicy&& orgpolicy, Iterator first, Sentinel last, T const& val,
+            ExPolicy&& orgpolicy, RaIterator first, Sentinel last, T const& val,
             Proj&& proj)
         {
             using difference_type =
-                typename std::iterator_traits<Iterator>::difference_type;
+                typename std::iterator_traits<RaIterator>::difference_type;
             difference_type count = detail::distance(first, last);
             if (count <= 0)
                 return util::detail::algorithm_result<ExPolicy, bool>::get(
@@ -67,7 +67,7 @@ namespace hpx::parallel::detail {
 
             using policy_type = std::decay_t<decltype(policy)>;
             util::cancellation_token<> tok;
-            auto f1 = [val, tok, proj](Iterator first, std::size_t count) {
+            auto f1 = [val, tok, proj](RaIterator first, std::size_t count) {
                 sequential_contains<policy_type>(first, val, count, tok, proj);
                 return tok.was_cancelled();
             };
@@ -116,11 +116,11 @@ namespace hpx::parallel::detail {
         {
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename Sent2, typename Pred, typename Proj1,
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter2, typename Sent2, typename Pred, typename Proj1,
             typename Proj2>
-        static bool sequential(ExPolicy, FwdIter1 first1, Sent1 last1,
-            FwdIter2 first2, Sent2 last2, Pred pred, Proj1&& proj1,
+        static bool sequential(ExPolicy, RaIter1 first1, Sent1 last1,
+            RaIter2 first2, Sent2 last2, Pred pred, Proj1&& proj1,
             Proj2&& proj2)
         {
             auto itr = hpx::ranges::search(hpx::execution::seq, first1, last1,
@@ -130,19 +130,18 @@ namespace hpx::parallel::detail {
             return itr != last1;
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename Sent2, typename Pred, typename Proj1,
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter2, typename Sent2, typename Pred, typename Proj1,
             typename Proj2>
         static constexpr util::detail::algorithm_result_t<ExPolicy, bool>
-        parallel(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
-            FwdIter2 first2, Sent2 last2, Pred pred, Proj1&& proj1,
-            Proj2&& proj2)
+        parallel(ExPolicy&& policy, RaIter1 first1, Sent1 last1, RaIter2 first2,
+            Sent2 last2, Pred pred, Proj1&& proj1, Proj2&& proj2)
         {
             auto itr = hpx::ranges::search(policy, first1, last1, first2, last2,
                 HPX_MOVE(pred), HPX_FORWARD(Proj1, proj1),
                 HPX_FORWARD(Proj2, proj2));
 
-            return contains_subrange_helper<ExPolicy, FwdIter1>().get_result(
+            return contains_subrange_helper<ExPolicy, RaIter1>().get_result(
                 itr, last1);
         }
     };
@@ -190,20 +189,20 @@ namespace hpx::ranges {
                 hpx::util::begin(rng), hpx::util::end(rng), t, HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename Iterator, typename Sentinel,
+        template <typename ExPolicy, typename RaIterator, typename Sentinel,
             typename T, typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<Iterator> &&
-                hpx::traits::is_sized_sentinel_for_v<Sentinel, Iterator> &&
+                hpx::traits::is_random_access_iterator_v<RaIterator> &&
+                hpx::traits::is_sized_sentinel_for_v<Sentinel, RaIterator> &&
                 hpx::is_invocable_v<Proj,
-                typename std::iterator_traits<Iterator>::value_type>
+                typename std::iterator_traits<RaIterator>::value_type>
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type tag_fallback_invoke(hpx::ranges::contains_t,
-            ExPolicy&& policy, Iterator first, Sentinel last, T const& val,
+            ExPolicy&& policy, RaIterator first, Sentinel last, T const& val,
             Proj&& proj = Proj())
         {
             return hpx::parallel::detail::contains().call(
@@ -235,33 +234,33 @@ namespace hpx::ranges {
       : hpx::functional::detail::tag_fallback<contains_subrange_t>
     {
     private:
-        template <typename FwdIter1, typename Sent1, typename FwdIter2,
+        template <typename RaIter1, typename Sent1, typename RaIter2,
             typename Sent2, typename Pred = ranges::equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1,FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::traits::is_sentinel_for_v<Sent2,FwdIter2> &&
+                hpx::traits::is_iterator_v<RaIter1> &&
+                hpx::traits::is_sentinel_for_v<Sent1,RaIter1> &&
+                hpx::traits::is_iterator_v<RaIter2> &&
+                hpx::traits::is_sentinel_for_v<Sent2,RaIter2> &&
                 hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type> &&
+                    typename std::iterator_traits<RaIter1>::value_type,
+                    typename std::iterator_traits<RaIter2>::value_type> &&
                 hpx::is_invocable_v<Proj1,
-                    typename std::iterator_traits<FwdIter1>::value_type> &&
+                    typename std::iterator_traits<RaIter1>::value_type> &&
                 hpx::is_invocable_v<Proj2,
-                    typename std::iterator_traits<FwdIter2>::value_type>
+                    typename std::iterator_traits<RaIter2>::value_type>
             )
         // clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::contains_subrange_t,
-            FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2,
+            RaIter1 first1, Sent1 last1, RaIter2 first2, Sent2 last2,
             Pred pred = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(hpx::traits::is_forward_iterator_v<RaIter1>,
                 "Required at least forward iterator.");
 
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(hpx::traits::is_forward_iterator_v<RaIter2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::contains_subrange().call(
@@ -297,25 +296,25 @@ namespace hpx::ranges {
                 HPX_MOVE(proj2));
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename Sent2,
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter2, typename Sent2,
             typename Pred = hpx::ranges::equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent1,FwdIter1> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter2> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent2,FwdIter2> &&
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1,RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent2,RaIter2> &&
                 hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type>
+                    typename std::iterator_traits<RaIter1>::value_type,
+                    typename std::iterator_traits<RaIter2>::value_type>
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type tag_fallback_invoke(hpx::ranges::contains_subrange_t,
-            ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
+            ExPolicy&& policy, RaIter1 first1, Sent1 last1, RaIter2 first2,
             Sent2 last2, Pred pred = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {

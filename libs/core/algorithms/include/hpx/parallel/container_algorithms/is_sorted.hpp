@@ -60,11 +60,11 @@ namespace hpx { namespace ranges {
     ///           If the range [first, last) contains less than two elements,
     ///           the function always returns true.
     ///
-    template <typename FwdIter, typename Sent,
+    template <typename RaIter, typename Sent,
         typename Pred = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
     bool is_sorted(
-        FwdIter first, Sent last, Pred&& pred = Pred(), Proj&& proj = Proj());
+        RaIter first, Sent last, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     /// Determines if the range [first, last) is sorted. Uses pred to
     /// compare elements.
@@ -77,11 +77,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used for the
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used for the
+    ///                     This iterator type must meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter.
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a is_sorted requires \a Pred to meet the
@@ -106,7 +105,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that objects of
-    ///                     types \a FwdIter can be dereferenced and then
+    ///                     types \a RaIter can be dereferenced and then
     ///                     implicitly converted to Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -131,11 +130,11 @@ namespace hpx { namespace ranges {
     ///           If the range [first, last) contains less than two elements,
     ///           the function always returns true.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Pred = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-    is_sorted(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred = Pred(),
+    is_sorted(ExPolicy&& policy, RaIter first, Sent last, Pred&& pred = Pred(),
         Proj&& proj = Proj());
 
     /// Determines if the range rng is sorted. Uses pred to
@@ -195,9 +194,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a is_sorted requires \a Pred to meet the
@@ -220,7 +221,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that objects of
-    ///                     types \a FwdIter can be dereferenced and then
+    ///                     types \a RaIter can be dereferenced and then
     ///                     implicitly converted to Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -297,11 +298,11 @@ namespace hpx { namespace ranges {
     ///           element. If the sequence has less than two elements or the
     ///           sequence is sorted, last is returned.
     ///
-    template <typename FwdIter, typename Sent,
+    template <typename RaIter, typename Sent,
         typename Pred = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
-    FwdIter is_sorted_until(
-        FwdIter first, Sent last, Pred&& pred = Pred(), Proj&& proj = Proj());
+    RaIter is_sorted_until(
+        RaIter first, Sent last, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     /// Returns the first element in the range [first, last) that is not sorted.
     /// Uses a predicate to compare elements or the less than operator.
@@ -314,11 +315,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used for the
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used for the
+    ///                     This iterator type must meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter.
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a is_sorted_until requires \a Pred to meet
@@ -343,7 +343,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that objects of
-    ///                     types \a FwdIter can be dereferenced and then
+    ///                     types \a RaIter can be dereferenced and then
     ///                     implicitly converted to Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -361,19 +361,19 @@ namespace hpx { namespace ranges {
     /// permitted to execute in an unordered fashion in unspecified threads,
     /// and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a is_sorted_until algorithm returns a \a hpx::future<FwdIter>
+    /// \returns  The \a is_sorted_until algorithm returns a \a hpx::future<RaIter>
     ///           if the execution policy is of type \a task_execution_policy
-    ///           and returns \a FwdIter otherwise.
+    ///           and returns \a RaIter otherwise.
     ///           The \a is_sorted_until algorithm returns the first unsorted
     ///           element. If the sequence has less than two elements or the
     ///           sequence is sorted, last is returned.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Pred = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        FwdIter>::type
-    is_sorted_until(ExPolicy&& policy, FwdIter first, Sent last,
+        RaIter>::type
+    is_sorted_until(ExPolicy&& policy, RaIter first, Sent last,
         Pred&& pred = Pred(), Proj&& proj = Proj());
 
     /// Returns the first element in the range rng that is not sorted.
@@ -434,9 +434,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a is_sorted_until requires \a Pred to meet
@@ -459,7 +461,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that objects of
-    ///                     types \a FwdIter can be dereferenced and then
+    ///                     types \a RaIter can be dereferenced and then
     ///                     implicitly converted to Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -477,9 +479,9 @@ namespace hpx { namespace ranges {
     /// permitted to execute in an unordered fashion in unspecified threads,
     /// and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a is_sorted_until algorithm returns a \a hpx::future<FwdIter>
+    /// \returns  The \a is_sorted_until algorithm returns a \a hpx::future<RaIter>
     ///           if the execution policy is of type \a task_execution_policy
-    ///           and returns \a FwdIter otherwise.
+    ///           and returns \a RaIter otherwise.
     ///           The \a is_sorted_until algorithm returns the first unsorted
     ///           element. If the sequence has less than two elements or the
     ///           sequence is sorted, last is returned.
@@ -537,27 +539,27 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter> &&
-                hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
-                    hpx::parallel::traits::projected<Proj, FwdIter>,
-                    hpx::parallel::traits::projected<Proj, FwdIter>
+                    hpx::parallel::traits::projected<Proj, RaIter>,
+                    hpx::parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(hpx::ranges::is_sorted_t, ExPolicy&& policy,
-            FwdIter first, Sent last, Pred pred = Pred(), Proj proj = Proj())
+            RaIter first, Sent last, Pred pred = Pred(), Proj proj = Proj())
         {
-            return hpx::parallel::detail::is_sorted<FwdIter, Sent>().call(
+            return hpx::parallel::detail::is_sorted<RaIter, Sent>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
                 HPX_MOVE(proj));
         }
@@ -640,28 +642,27 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter> &&
-                hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
-                    hpx::parallel::traits::projected<Proj, FwdIter>,
-                    hpx::parallel::traits::projected<Proj, FwdIter>
+                    hpx::parallel::traits::projected<Proj, RaIter>,
+                    hpx::parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter>
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
         tag_fallback_invoke(hpx::ranges::is_sorted_until_t, ExPolicy&& policy,
-            FwdIter first, Sent last, Pred pred = Pred(), Proj proj = Proj())
+            RaIter first, Sent last, Pred pred = Pred(), Proj proj = Proj())
         {
-            return hpx::parallel::detail::is_sorted_until<FwdIter, Sent>().call(
+            return hpx::parallel::detail::is_sorted_until<RaIter, Sent>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
                 HPX_MOVE(proj));
         }

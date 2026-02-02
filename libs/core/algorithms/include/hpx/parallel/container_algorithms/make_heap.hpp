@@ -24,9 +24,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution of
     ///                     the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the begin source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter        The type of the begin source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter1.
@@ -69,18 +68,18 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a make_heap algorithm returns a
-    ///           \a hpx::future<Iter> if the execution policy is of
+    ///           \a hpx::future<RaIter> if the execution policy is of
     ///           type
     ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a Iter
+    ///           \a parallel_task_policy and returns \a RaIter
     ///           otherwise.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Comp,
         typename Proj = hpx::identity>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
-    make_heap(ExPolicy&& policy, Iter first, Sent last, Comp&& comp,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+    make_heap(ExPolicy&& policy, RaIter first, Sent last, Comp&& comp,
         Proj&& proj = Proj{});
 
     /// Constructs a \a max \a heap in the range [first, last).
@@ -92,9 +91,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution of
     ///                     the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -132,10 +133,10 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a make_heap algorithm returns a
-    ///           \a hpx::future<Iter> if the execution policy is of
+    ///           \a hpx::future<RaIter> if the execution policy is of
     ///           type
     ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a Iter
+    ///           \a parallel_task_policy and returns \a RaIter
     ///           otherwise.
     ///           It returns \a last.
     ///
@@ -154,9 +155,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution of
     ///                     the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the begin source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter        The type of the begin source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter1.
@@ -185,17 +185,17 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a make_heap algorithm returns a
-    ///           \a hpx::future<Iter> if the execution policy is of
+    ///           \a hpx::future<RaIter> if the execution policy is of
     ///           type
     ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a Iter
+    ///           \a parallel_task_policy and returns \a RaIter
     ///           otherwise.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Proj = hpx::identity>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
-    make_heap(ExPolicy&& policy, Iter first, Sent last, Proj&& proj = Proj{});
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+    make_heap(ExPolicy&& policy, RaIter first, Sent last, Proj&& proj = Proj{});
 
     /// Constructs a \a max \a heap in the range [first, last).
     ///
@@ -206,9 +206,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution of
     ///                     the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a hpx::identity
     ///
@@ -232,10 +234,10 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a make_heap algorithm returns a
-    ///           \a hpx::future<Iter> if the execution policy is of
+    ///           \a hpx::future<RaIter> if the execution policy is of
     ///           type
     ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a Iter
+    ///           \a parallel_task_policy and returns \a RaIter
     ///           otherwise.
     ///           It returns \a last.
     ///
@@ -250,9 +252,8 @@ namespace hpx { namespace ranges {
     /// \note Complexity: at most (3*N) comparisons where
     ///       \a N = distance(first, last).
     ///
-    /// \tparam Iter        The type of the begin source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter        The type of the begin source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter1.
@@ -283,12 +284,12 @@ namespace hpx { namespace ranges {
     ///                     \a comp is invoked.
     ///
     ///
-    /// \returns  The \a make_heap algorithm returns \a Iter.
+    /// \returns  The \a make_heap algorithm returns \a RaIter.
     ///           It returns \a last.
     ///
-    template <typename Iter, typename Sent, typename Comp,
+    template <typename RaIter, typename Sent, typename Comp,
         typename Proj = hpx::identity>
-    Iter make_heap(Iter first, Sent last, Comp&& comp, Proj&& proj = Proj{});
+    RaIter make_heap(RaIter first, Sent last, Comp&& comp, Proj&& proj = Proj{});
 
     /// Constructs a \a max \a heap in the range [first, last).
     ///
@@ -411,27 +412,27 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<make_heap_t>
     {
     private:
-        template <typename ExPolicy, typename Iter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Comp, typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<Iter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
-                    hpx::parallel::traits::projected<Proj, Iter>,
-                    hpx::parallel::traits::projected<Proj, Iter>
+                    hpx::parallel::traits::projected<Proj, RaIter>,
+                    hpx::parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
-        tag_fallback_invoke(make_heap_t, ExPolicy&& policy, Iter first,
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+        tag_fallback_invoke(make_heap_t, ExPolicy&& policy, RaIter first,
             Sent last, Comp comp, Proj proj = Proj{})
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
+            static_assert(hpx::traits::is_random_access_iterator_v<RaIter>,
                 "Requires random access iterator.");
 
-            return hpx::parallel::detail::make_heap<Iter>().call(
+            return hpx::parallel::detail::make_heap<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(comp),
                 HPX_MOVE(proj));
         }
@@ -466,31 +467,32 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename Iter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<Iter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy,
-                    std::less<typename std::iterator_traits<Iter>::value_type>,
-                    hpx::parallel::traits::projected<Proj, Iter>,
-                    hpx::parallel::traits::projected<Proj, Iter>
+                    std::less<typename std::iterator_traits<RaIter>::value_type>,
+                    hpx::parallel::traits::projected<Proj, RaIter>,
+                    hpx::parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type
-        tag_fallback_invoke(make_heap_t, ExPolicy&& policy, Iter first,
+            RaIter>::type
+        tag_fallback_invoke(make_heap_t, ExPolicy&& policy, RaIter first,
             Sent last, Proj proj = Proj{})
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
+            static_assert(hpx::traits::is_random_access_iterator_v<RaIter>,
                 "Requires random access iterator.");
 
-            using value_type = typename std::iterator_traits<Iter>::value_type;
+            using value_type =
+                typename std::iterator_traits<RaIter>::value_type;
 
-            return hpx::parallel::detail::make_heap<Iter>().call(
+            return hpx::parallel::detail::make_heap<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last,
                 std::less<value_type>(), HPX_MOVE(proj));
         }

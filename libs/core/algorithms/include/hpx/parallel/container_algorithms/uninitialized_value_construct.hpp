@@ -44,8 +44,8 @@ namespace hpx { namespace ranges {
     ///           output iterator to the element in the range, one past
     ///           the last element constructed.
     ///
-    template <typename FwdIter, typename Sent>
-    FwdIter uninitialized_value_construct(FwdIter first, Sent last);
+    template <typename RaIter, typename Sent>
+    RaIter uninitialized_value_construct(RaIter first, Sent last);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>::value_type
     /// in the uninitialized storage designated by the range
@@ -58,11 +58,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter.
+    ///                     sentinel type must be a sentinel for RaIter.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -82,17 +81,17 @@ namespace hpx { namespace ranges {
     /// sequenced within each thread.
     ///
     /// \returns  The \a uninitialized_value_construct algorithm returns a
-    ///           \a hpx::future<FwdIter> if the execution policy is of type
+    ///           \a hpx::future<RaIter> if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a FwdIter otherwise.
+    ///           returns \a RaIter otherwise.
     ///           The \a uninitialized_value_construct algorithm returns
     ///           the iterator to the element in the source range, one past
     ///           the last element constructed.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
-    uninitialized_value_construct(ExPolicy&& policy, FwdIter first, Sent last);
+    template <typename ExPolicy, typename RaIter, typename Sent>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+    uninitialized_value_construct(ExPolicy&& policy, RaIter first, Sent last);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>::value_type
     /// in the uninitialized storage designated by the range
@@ -133,9 +132,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -195,8 +196,8 @@ namespace hpx { namespace ranges {
     ///           the iterator to the element in the source range, one past
     ///           the last element constructed.
     ///
-    template <typename FwdIter, typename Size>
-    FwdIter uninitialized_value_construct_n(FwdIter first, Size count);
+    template <typename RaIter, typename Size>
+    RaIter uninitialized_value_construct_n(RaIter first, Size count);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>::value_type
     /// in the uninitialized storage designated by the range
@@ -210,9 +211,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a random access iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
     ///
@@ -236,17 +236,17 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a uninitialized_value_construct_n algorithm returns a
-    ///           \a hpx::future<FwdIter> if the execution policy is of type
+    ///           \a hpx::future<RaIter> if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a FwdIter otherwise.
+    ///           returns \a RaIter otherwise.
     ///           The \a uninitialized_value_construct_n algorithm returns
     ///           the iterator to the element in the source range, one past
     ///           the last element constructed.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Size>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
-    uninitialized_value_construct_n(ExPolicy&& policy, FwdIter first, Size count);
+    template <typename ExPolicy, typename RaIter, typename Size>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+    uninitialized_value_construct_n(ExPolicy&& policy, RaIter first, Size count);
 
     // clang-format on
 }}    // namespace hpx::ranges
@@ -272,39 +272,39 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_t>
     {
     private:
-        template <typename FwdIter, typename Sent>
+        template <typename RaIter, typename Sent>
         // clang-format off
             requires(
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
+                hpx::traits::is_forward_iterator_v<RaIter> &&
+                hpx::traits::is_sentinel_for_v<Sent, RaIter>
             )
         // clang-format on
-        friend FwdIter tag_fallback_invoke(
-            hpx::ranges::uninitialized_value_construct_t, FwdIter first,
+        friend RaIter tag_fallback_invoke(
+            hpx::ranges::uninitialized_value_construct_t, RaIter first,
             Sent last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(hpx::traits::is_forward_iterator_v<RaIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::uninitialized_value_construct<
-                FwdIter>()
+                RaIter>()
                 .call(hpx::execution::seq, first, last);
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent>
+        template <typename ExPolicy, typename RaIter, typename Sent>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter>
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter>
             )
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
         tag_fallback_invoke(hpx::ranges::uninitialized_value_construct_t,
-            ExPolicy&& policy, FwdIter first, Sent last)
+            ExPolicy&& policy, RaIter first, Sent last)
         {
             return hpx::parallel::detail::uninitialized_value_construct<
-                FwdIter>()
+                RaIter>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, last);
         }
 
@@ -375,20 +375,20 @@ namespace hpx::ranges {
                 .call(hpx::execution::seq, first, count);
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Size>
+        template <typename ExPolicy, typename RaIter, typename Size>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
         tag_fallback_invoke(hpx::ranges::uninitialized_value_construct_n_t,
-            ExPolicy&& policy, FwdIter first, Size count)
+            ExPolicy&& policy, RaIter first, Size count)
         {
             return hpx::parallel::detail::uninitialized_value_construct_n<
-                FwdIter>()
+                RaIter>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, count);
         }
     } uninitialized_value_construct_n{};
