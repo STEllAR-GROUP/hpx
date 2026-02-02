@@ -67,14 +67,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the first range of iterators to swap
+    /// \tparam RaIter1    The type of the first range of iterators to swap
     ///                     (deduced).
     /// \tparam Sent1       The type of the first sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter1.
-    /// \tparam FwdIter2    The type of the second range of iterators to swap
+    ///                     sentinel type must be a sentinel for RaIter1.
+    /// \tparam RaIter2    The type of the second range of iterators to swap
     ///                     (deduced).
     /// \tparam Sent2       The type of the second sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter2.
+    ///                     sentinel type must be a sentinel for RaIter2.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -99,21 +99,21 @@ namespace hpx { namespace ranges {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a swap_ranges algorithm returns a
-    ///           \a hpx::future<swap_ranges_result<FwdIter1, FwdIter2>>
+    ///           \a hpx::future<swap_ranges_result<RaIter1, RaIter2>>
     ///           if the execution policy is of type \a parallel_task_policy
-    ///           and returns \a FwdIter2 otherwise.
+    ///           and returns \a RaIter2 otherwise.
     ///           The \a swap_ranges algorithm returns in_in_result with the
     ///           first element as the iterator to the element past the last
     ///           element exchanged in range beginning with \a first1 and the
     ///           second element as the iterator to the element past the last
     ///           element exchanged in the range beginning with \a first2.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Sent1,
-        typename FwdIter2, typename Sent2>
+    template <typename ExPolicy, typename RaIter1, typename Sent1,
+        typename RaIter2, typename Sent2>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        swap_ranges_result<FwdIter1, FwdIter2>>::type
-    swap_ranges(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
-        FwdIter2 first2, Sent2 last2);
+        swap_ranges_result<RaIter1, RaIter2>>::type
+    swap_ranges(ExPolicy&& policy, RaIter1 first1, Sent1 last1,
+        RaIter2 first2, Sent2 last2);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Exchanges elements between range [first1, last1) and another range
@@ -162,12 +162,16 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1        The type of the source range used (deduced).
+    /// \tparam Rng1
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.        The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Rng2        The type of the destination range used (deduced).
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam Rng2
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.        The type of the destination range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -259,24 +263,24 @@ namespace hpx::ranges {
                 .call(hpx::execution::seq, first1, last1, first2, last2);
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename Sent2>
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter2, typename Sent2>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent1, FwdIter1> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter2> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent2, FwdIter2>
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent2, RaIter2>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            swap_ranges_result<FwdIter1, FwdIter2>>
+            swap_ranges_result<RaIter1, RaIter2>>
         tag_fallback_invoke(hpx::ranges::swap_ranges_t, ExPolicy&& policy,
-            FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2)
+            RaIter1 first1, Sent1 last1, RaIter2 first2, Sent2 last2)
         {
             return hpx::parallel::detail::swap_ranges<
-                swap_ranges_result<FwdIter1, FwdIter2>>()
+                swap_ranges_result<RaIter1, RaIter2>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
                     last2);
         }

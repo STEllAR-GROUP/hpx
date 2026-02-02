@@ -79,9 +79,11 @@ namespace hpx { namespace ranges {
     ///         \a util::end(rng) - \a util::begin(rng) applications of
     ///         the operator==() and the projection \a proj.
     ///
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a remove_if requires \a Pred to meet the
@@ -103,7 +105,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
+    ///                     type \a RaIter can be dereferenced and then
     ///                     implicitly converted to Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -135,11 +137,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used for the
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used for the
+    ///                     This iterator type must meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter.
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a remove_if requires \a Pred to meet the
@@ -165,7 +166,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
+    ///                     type \a RaIter can be dereferenced and then
     ///                     implicitly converted to Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -183,16 +184,16 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a remove_if algorithm returns a \a
-    ///           hpx::future<subrange_t<FwdIter, Sent>>.
+    ///           hpx::future<subrange_t<RaIter, Sent>>.
     ///           The \a remove_if algorithm returns an object {ret, last},
     ///           where ret is a past-the-end iterator for a new
     ///           subrange of the values all in valid but unspecified state.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent, typename Pred,
+    template <typename ExPolicy, typename RaIter, typename Sent, typename Pred,
         typename Proj = hpx::identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        subrange_t<FwdIter, Sent>>::type
-    remove_if(ExPolicy&& policy, FwdIter first, Sent sent, Pred&& pred,
+        subrange_t<RaIter, Sent>>::type
+    remove_if(ExPolicy&& policy, RaIter first, Sent sent, Pred&& pred,
         Proj&& proj = Proj());
 
     /// Removes all elements that are equal to \a value from the range
@@ -208,9 +209,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a remove_if requires \a Pred to meet the
@@ -234,7 +237,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
+    ///                     type \a RaIter can be dereferenced and then
     ///                     implicitly converted to Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -256,7 +259,7 @@ namespace hpx { namespace ranges {
     ///           hpx::traits::range_iterator_t<Rng>>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or \a parallel_task_policy and
-    ///           returns \a FwdIter otherwise.
+    ///           returns \a RaIter otherwise.
     ///           The \a remove_if algorithm returns an object {ret, last},
     ///           where ret is a past-the-end iterator for a new
     ///           subrange of the values all in valid but unspecified state.
@@ -276,10 +279,9 @@ namespace hpx { namespace ranges {
     ///         the operator==() and the projection \a proj.
     ///
     /// \tparam Iter        The type of the source iterators used for the
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter.
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam T           The type of the value to remove (deduced).
     ///                     This value type must meet the requirements of
     ///                     \a CopyConstructible.
@@ -300,7 +302,7 @@ namespace hpx { namespace ranges {
     /// execute in sequential order in the calling thread.
     ///
     /// \returns  The \a remove algorithm returns a \a
-    ///           subrange_t<FwdIter, Sent>.
+    ///           subrange_t<RaIter, Sent>.
     ///           The \a remove algorithm returns an object {ret, last},
     ///           where ret is a past-the-end iterator for a new
     ///           subrange of the values all in valid but unspecified state.
@@ -320,9 +322,11 @@ namespace hpx { namespace ranges {
     ///         \a util::end(rng) - \a util::begin(rng) applications of
     ///         the operator==() and the projection \a proj.
     ///
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam T           The type of the value to remove (deduced).
     ///                     This value type must meet the requirements of
     ///                     \a CopyConstructible.
@@ -364,11 +368,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used for the
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used for the
+    ///                     This iterator type must meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter.
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam T           The type of the value to remove (deduced).
     ///                     This value type must meet the requirements of
     ///                     \a CopyConstructible.
@@ -398,18 +401,18 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a remove algorithm returns a \a
-    ///           hpx::future<subrange_t<FwdIter, Sent>>.
+    ///           hpx::future<subrange_t<RaIter, Sent>>.
     ///           The \a remove algorithm returns an object {ret, last},
     ///           where ret is a past-the-end iterator for a new
     ///           subrange of the values all in valid but unspecified state.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Proj = hpx::identity,
-        typename T = typename hpx::parallel::traits::projected<FwdIter,
-            Proj>::value_type>
+        typename T =
+            typename hpx::parallel::traits::projected<RaIter, Proj>::value_type>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        subrange_t<FwdIter, Sent>>::type
-    remove(ExPolicy&& policy, FwdIter first, Sent last, T const& value,
+        subrange_t<RaIter, Sent>>::type
+    remove(ExPolicy&& policy, RaIter first, Sent last, T const& value,
         Proj&& proj = Proj());
 
     /// Removes all elements that are equal to \a value from the range
@@ -425,9 +428,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam T           The type of the value to remove (deduced).
     ///                     This value type must meet the requirements of
     ///                     \a CopyConstructible.
@@ -458,7 +463,7 @@ namespace hpx { namespace ranges {
     ///           subrange_t<hpx::traits::range_iterator_t<Rng>>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or \a parallel_task_policy and
-    ///           returns \a FwdIter otherwise.
+    ///           returns \a RaIter otherwise.
     ///           The \a remove algorithm returns the iterator to the new end
     ///           of the range.
     ///
@@ -549,26 +554,26 @@ namespace hpx::ranges {
                 hpx::util::end(rng));
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Pred, typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter> &&
-                hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy,
-                    Pred, hpx::parallel::traits::projected<Proj, FwdIter>
+                    Pred, hpx::parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            subrange_t<FwdIter, Sent>>::type
+            subrange_t<RaIter, Sent>>::type
         tag_fallback_invoke(hpx::ranges::remove_if_t, ExPolicy&& policy,
-            FwdIter first, Sent sent, Pred pred, Proj proj = Proj())
+            RaIter first, Sent sent, Pred pred, Proj proj = Proj())
         {
-            return hpx::parallel::util::make_subrange<FwdIter, Sent>(
-                hpx::parallel::detail::remove_if<FwdIter>().call(
+            return hpx::parallel::util::make_subrange<RaIter, Sent>(
+                hpx::parallel::detail::remove_if<RaIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first, sent, HPX_MOVE(pred),
                     HPX_MOVE(proj)),
                 sent);
@@ -663,24 +668,24 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Proj = hpx::identity,
-            typename T = typename hpx::parallel::traits::projected<FwdIter,
+            typename T = typename hpx::parallel::traits::projected<RaIter,
                 Proj>::value_type>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter> &&
-                hpx::parallel::traits::is_projected_v<Proj, FwdIter>
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter>
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            subrange_t<FwdIter, Sent>>::type
+            subrange_t<RaIter, Sent>>::type
         tag_fallback_invoke(hpx::ranges::remove_t, ExPolicy&& policy,
-            FwdIter first, Sent last, T const& value, Proj proj = Proj())
+            RaIter first, Sent last, T const& value, Proj proj = Proj())
         {
-            using type = typename std::iterator_traits<FwdIter>::value_type;
+            using type = typename std::iterator_traits<RaIter>::value_type;
 
             return hpx::ranges::remove_if(
                 HPX_FORWARD(ExPolicy, policy), first, last,

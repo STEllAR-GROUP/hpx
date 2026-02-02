@@ -71,10 +71,10 @@ namespace hpx { namespace ranges {
     ///           where ret is a past-the-end iterator for a new
     ///           subrange.
     ///
-    template <typename FwdIter, typename Sent,
+    template <typename RaIter, typename Sent,
         typename Pred = ranges::equal_to,
         typename Proj = hpx::identity>
-    subrange_t<FwdIter, Sent> unique(FwdIter first, Sent last,
+    subrange_t<RaIter, Sent> unique(RaIter first, Sent last,
         Pred&& pred = Pred(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -91,11 +91,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter.
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a unique requires \a Pred to meet the
@@ -122,7 +121,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 and \a Type2 must be
-    ///                     such that objects of types \a FwdIter can be
+    ///                     such that objects of types \a RaIter can be
     ///                     dereferenced and then implicitly converted to
     ///                     both \a Type1 and \a Type2
     /// \param proj         Specifies the function (or function object) which
@@ -140,17 +139,17 @@ namespace hpx { namespace ranges {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a unique algorithm returns \a subrange_t<FwdIter, Sent>.
+    /// \returns  The \a unique algorithm returns \a subrange_t<RaIter, Sent>.
     ///           The \a unique algorithm returns an object {ret, last},
     ///           where ret is a past-the-end iterator for a new
     ///           subrange.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Pred = ranges::equal_to,
         typename Proj = hpx::identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        subrange_t<FwdIter, Sent>>::type
-    unique(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred = Pred(),
+        subrange_t<RaIter, Sent>>::type
+    unique(ExPolicy&& policy, RaIter first, Sent last, Pred&& pred = Pred(),
         Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -227,9 +226,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a unique requires \a Pred to meet the
@@ -373,9 +374,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for FwdIter1.
     /// \tparam O           The type of the iterator representing the
@@ -407,7 +407,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
+    ///                     type \a RaIter can be dereferenced and then
     ///                     implicitly converted to \a Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -425,22 +425,22 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a unique_copy algorithm returns returns a hpx::future<
-    ///           unique_copy_result<FwdIter, O>> if the
+    ///           unique_copy_result<RaIter, O>> if the
     ///           execution policy is of type \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a
-    ///           unique_copy_result<FwdIter, O> otherwise.
+    ///           unique_copy_result<RaIter, O> otherwise.
     ///           The \a unique_copy algorithm returns an in_out_result with
     ///           the source iterator to one past the last element and out
     ///           containing the destination iterator to the end of the
     ///           \a dest range.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename O,
         typename Pred = ranges::equal_to,
         typename Proj = hpx::identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        unique_copy_result<FwdIter, O>>::type
-    unique_copy(ExPolicy&& policy, FwdIter first, Sent last,
+        unique_copy_result<RaIter, O>>::type
+    unique_copy(ExPolicy&& policy, RaIter first, Sent last,
         O dest, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -521,13 +521,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam O           The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of a random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a unique_copy requires \a Pred to meet the
@@ -649,28 +650,28 @@ namespace hpx::ranges {
                 last);
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Pred = ranges::equal_to, typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter> &&
-                parallel::traits::is_projected_v<Proj, FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                parallel::traits::is_projected_v<Proj, RaIter> &&
                 parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,
-                    parallel::traits::projected<Proj, FwdIter>,
-                    parallel::traits::projected<Proj, FwdIter>
+                    parallel::traits::projected<Proj, RaIter>,
+                    parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            subrange_t<FwdIter, Sent>>::type
+            subrange_t<RaIter, Sent>>::type
         tag_fallback_invoke(hpx::ranges::unique_t, ExPolicy&& policy,
-            FwdIter first, Sent last, Pred pred = Pred(), Proj proj = Proj())
+            RaIter first, Sent last, Pred pred = Pred(), Proj proj = Proj())
         {
-            return hpx::parallel::util::make_subrange<FwdIter, Sent>(
-                hpx::parallel::detail::unique<FwdIter>().call(
+            return hpx::parallel::util::make_subrange<RaIter, Sent>(
+                hpx::parallel::detail::unique<RaIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
                     HPX_MOVE(proj)),
                 last);
@@ -783,29 +784,28 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename O, typename Pred = ranges::equal_to,
-            typename Proj = hpx::identity>
+        template <typename ExPolicy, typename RaIter, typename Sent, typename O,
+            typename Pred = ranges::equal_to, typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter> &&
-                parallel::traits::is_projected_v<Proj, FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                parallel::traits::is_projected_v<Proj, RaIter> &&
                 parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,
-                    parallel::traits::projected<Proj, FwdIter>,
-                    parallel::traits::projected<Proj, FwdIter>
+                    parallel::traits::projected<Proj, RaIter>,
+                    parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            unique_copy_result<FwdIter, O>>
+            unique_copy_result<RaIter, O>>
         tag_fallback_invoke(hpx::ranges::unique_copy_t, ExPolicy&& policy,
-            FwdIter first, Sent last, O dest, Pred pred = Pred(),
+            RaIter first, Sent last, O dest, Pred pred = Pred(),
             Proj proj = Proj())
         {
-            using result_type = unique_copy_result<FwdIter, O>;
+            using result_type = unique_copy_result<RaIter, O>;
 
             return hpx::parallel::detail::unique_copy<result_type>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, dest,

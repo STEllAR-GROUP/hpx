@@ -29,7 +29,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam Comp        The type of the function/function object to use
@@ -92,9 +94,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the begin source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter        The type of the begin source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter1.
@@ -140,11 +141,11 @@ namespace hpx { namespace ranges {
     ///           The \a is_heap algorithm returns whether the range is max heap.
     ///           That is, true if the range is max heap, false otherwise.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Comp = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-    is_heap(ExPolicy&& policy, Iter first, Sent last, Comp&& comp = Comp(),
+    is_heap(ExPolicy&& policy, RaIter first, Sent last, Comp&& comp = Comp(),
         Proj&& proj = Proj());
 
     /// Returns whether the range is max heap. That is, true if the range is
@@ -156,7 +157,9 @@ namespace hpx { namespace ranges {
     ///         at most 2 * N applications of the projection \a proj,
     ///         where N = last - first.
     ///
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam Comp        The type of the function/function object to use
@@ -231,10 +234,10 @@ namespace hpx { namespace ranges {
     ///           The \a is_heap algorithm returns whether the range is max heap.
     ///           That is, true if the range is max heap, false otherwise.
     ///
-    template <typename Iter, typename Sent,
+    template <typename RaIter, typename Sent,
         typename Comp = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
-    bool is_heap(Iter first, Sent last, Comp&& comp = Comp(), Proj&& proj = Proj());
+    bool is_heap(RaIter first, Sent last, Comp&& comp = Comp(), Proj&& proj = Proj());
 
     /// Returns the upper bound of the largest range beginning at \a first
     /// which is a max heap. That is, the last iterator \a it for
@@ -251,7 +254,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam Comp        The type of the function/function object to use
@@ -319,9 +324,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the begin source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter        The type of the begin source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter1.
@@ -369,11 +373,11 @@ namespace hpx { namespace ranges {
     ///           That is, the last iterator \a it for which range [first, it)
     ///           is a max heap.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Comp = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
-    is_heap_until(ExPolicy&& policy, Iter first, Sent last, Comp&& comp = Comp(),
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+    is_heap_until(ExPolicy&& policy, RaIter first, Sent last, Comp&& comp = Comp(),
         Proj&& proj = Proj());
 
     /// Returns the upper bound of the largest range beginning at \a first
@@ -387,7 +391,9 @@ namespace hpx { namespace ranges {
     ///         at most 2 * N applications of the projection \a proj,
     ///         where N = last - first.
     ///
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam Comp        The type of the function/function object to use
@@ -435,9 +441,8 @@ namespace hpx { namespace ranges {
     ///         at most 2 * N applications of the projection \a proj,
     ///         where N = last - first.
     ///
-    /// \tparam Iter        The type of the begin source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter        The type of the begin source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter1.
@@ -470,10 +475,10 @@ namespace hpx { namespace ranges {
     ///           That is, the last iterator \a it for which range [first, it)
     ///           is a max heap.
     ///
-    template <typename Iter, typename Sent,
+    template <typename RaIter, typename Sent,
         typename Comp = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
-    Iter is_heap_until(Iter first, Sent last, Comp&& comp = Comp(),
+    RaIter is_heap_until(RaIter first, Sent last, Comp&& comp = Comp(),
         Proj&& proj = Proj());
     // clang-format on
 }}    // namespace hpx::ranges
@@ -530,28 +535,28 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename Iter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<Iter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
-                    hpx::parallel::traits::projected<Proj, Iter>,
-                    hpx::parallel::traits::projected<Proj, Iter>
+                    hpx::parallel::traits::projected<Proj, RaIter>,
+                    hpx::parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-        tag_fallback_invoke(is_heap_t, ExPolicy&& policy, Iter first, Sent last,
-            Comp comp = Comp(), Proj proj = Proj())
+        tag_fallback_invoke(is_heap_t, ExPolicy&& policy, RaIter first,
+            Sent last, Comp comp = Comp(), Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
+            static_assert(hpx::traits::is_random_access_iterator_v<RaIter>,
                 "Requires a random access iterator.");
 
-            return hpx::parallel::detail::is_heap<Iter>().call(
+            return hpx::parallel::detail::is_heap<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(comp),
                 HPX_MOVE(proj));
         }
@@ -646,28 +651,28 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename Iter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<Iter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
-                    hpx::parallel::traits::projected<Proj, Iter>,
-                    hpx::parallel::traits::projected<Proj, Iter>
+                    hpx::parallel::traits::projected<Proj, RaIter>,
+                    hpx::parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
-        tag_fallback_invoke(is_heap_until_t, ExPolicy&& policy, Iter first,
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+        tag_fallback_invoke(is_heap_until_t, ExPolicy&& policy, RaIter first,
             Sent last, Comp comp = Comp(), Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
+            static_assert(hpx::traits::is_random_access_iterator_v<RaIter>,
                 "Requires a random access iterator.");
 
-            return hpx::parallel::detail::is_heap_until<Iter>().call(
+            return hpx::parallel::detail::is_heap_until<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(comp),
                 HPX_MOVE(proj));
         }

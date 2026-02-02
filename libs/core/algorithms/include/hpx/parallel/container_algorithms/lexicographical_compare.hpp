@@ -108,26 +108,24 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used for the
+    /// \tparam RaIter1    The type of the source iterators used for the
     ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent1       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter1.
-    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     sentinel type must be a sentinel for RaIter1.
+    /// \tparam RaIter2    The type of the source iterators used for the
     ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent2       The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter2.
+    ///                     sentinel type must be a sentinel for RaIter2.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a lexicographical_compare requires \a Pred to
     ///                     meet the requirements of \a CopyConstructible. This defaults
     ///                     to std::less<>
-    /// \tparam Proj1       The type of an optional projection function for FwdIter1. This
+    /// \tparam Proj1       The type of an optional projection function for RaIter1. This
     ///                     defaults to \a hpx::identity
-    /// \tparam Proj2       The type of an optional projection function for FwdIter2. This
+    /// \tparam Proj2       The type of an optional projection function for RaIter2. This
     ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -187,14 +185,14 @@ namespace hpx { namespace ranges {
     ///           it returns false.
     ///           range [first2, last2), it returns false.
 
-    template <typename ExPolicy, typename FwdIter1, typename Sent1,
-        typename FwdIter2, typename Sent2,
+    template <typename ExPolicy, typename RaIter1, typename Sent1,
+        typename RaIter2, typename Sent2,
         typename Proj1 = hpx::identity,
         typename Proj2 = hpx::identity,
         typename Pred = hpx::parallel::detail::less>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-    lexicographical_compare(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
-        FwdIter2 first2, Sent2 last2, Pred&& pred = Pred(),
+    lexicographical_compare(ExPolicy&& policy, RaIter1 first1, Sent1 last1,
+        RaIter2 first2, Sent2 last2, Pred&& pred = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Checks if the first range rng1 is lexicographically less than
@@ -278,12 +276,16 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1        The type of the source range used (deduced).
+    /// \tparam Rng1
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.        The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Rng2        The type of the source range used (deduced).
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam Rng2
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.        The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a lexicographical_compare requires \a Pred to
@@ -414,29 +416,29 @@ namespace hpx::ranges {
                 HPX_MOVE(pred), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename Sent2, typename Proj1 = hpx::identity,
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter2, typename Sent2, typename Proj1 = hpx::identity,
             typename Proj2 = hpx::identity,
             typename Pred = hpx::parallel::detail::less>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent1, FwdIter1> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter2> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent2, FwdIter2> &&
-                hpx::parallel::traits::is_projected_v<Proj1, FwdIter1> &&
-                hpx::parallel::traits::is_projected_v<Proj2, FwdIter2> &&
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent2, RaIter2> &&
+                hpx::parallel::traits::is_projected_v<Proj1, RaIter1> &&
+                hpx::parallel::traits::is_projected_v<Proj2, RaIter2> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,
-                    hpx::parallel::traits::projected<Proj1, FwdIter1>,
-                    hpx::parallel::traits::projected<Proj2, FwdIter2>
+                    hpx::parallel::traits::projected<Proj1, RaIter1>,
+                    hpx::parallel::traits::projected<Proj2, RaIter2>
                 >
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
-            ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
+            ExPolicy&& policy, RaIter1 first1, Sent1 last1, RaIter2 first2,
             Sent2 last2, Pred pred = Pred(), Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {

@@ -39,22 +39,20 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam Iter1       The type of the source iterators used (deduced)
+    /// \tparam RaIter1       The type of the source iterators used (deduced)
     ///                     representing the first sequence.
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter1.
-    /// \tparam Iter2       The type of the source iterators used (deduced)
+    ///                     sentinel for RaIter1.
+    /// \tparam RaIter2       The type of the source iterators used (deduced)
     ///                     representing the second sequence.
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent2       The type of the end source iterators used (deduced)
     ///                     representing the second sequence.
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter2.
-    /// \tparam Iter3       The type of the iterator representing the
+    ///                     sentinel for RaIter2.
+    /// \tparam RaIter3       The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
@@ -116,24 +114,24 @@ namespace hpx { namespace ranges {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a set_symmetric_difference algorithm returns a
-    ///           \a hpx::future<ranges::set_symmetric_difference_result<Iter1, Iter2, Iter3>>
+    ///           \a hpx::future<ranges::set_symmetric_difference_result<RaIter1, RaIter2, RaIter3>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a ranges::set_symmetric_difference_result<Iter1, Iter2, Iter3> otherwise.
+    ///           returns \a ranges::set_symmetric_difference_result<RaIter1, RaIter2, RaIter3> otherwise.
     ///           The \a set_symmetric_difference algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename Iter1, typename Sent1,
-        typename Iter2, typename Sent2, typename Iter3,
+    template <typename ExPolicy, typename RaIter1, typename Sent1,
+        typename RaIter2, typename Sent2, typename RaIter3,
         typename Pred = hpx::parallel::detail::less,
         typename Proj1 = hpx::identity,
         typename Proj2 = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        set_symmetric_difference_result<Iter1, Iter2, Iter3>>::type
-    set_symmetric_difference(ExPolicy&& policy, Iter1 first1, Sent1 last1,
-        Iter2 first2, Sent2 last2, Iter3 dest, Pred&& op = Pred(),
+        set_symmetric_difference_result<RaIter1, RaIter2, RaIter3>>::type
+    set_symmetric_difference(ExPolicy&& policy, RaIter1 first1, Sent1 last1,
+        RaIter2 first2, Sent2 last2, RaIter3 dest, Pred&& op = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Constructs a sorted range beginning at dest consisting of all elements
@@ -160,13 +158,17 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam Rng1        The type of the source range used (deduced).
+    /// \tparam Rng1
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.        The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Rng2        The type of the source range used (deduced).
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam Rng2
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.        The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Iter3       The type of the iterator representing the
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam RaIter3       The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
@@ -224,26 +226,26 @@ namespace hpx { namespace ranges {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a set_symmetric_difference algorithm returns a
-    ///           \a hpx::future<ranges::set_symmetric_difference_result<Iter1, Iter2, Iter3>>
+    ///           \a hpx::future<ranges::set_symmetric_difference_result<RaIter1, RaIter2, RaIter3>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a ranges::set_symmetric_difference_result<Iter1, Iter2, Iter3> otherwise.
-    ///           where Iter1 is range_iterator_t<Rng1> and Iter2 is range_iterator_t<Rng2>
+    ///           returns \a ranges::set_symmetric_difference_result<RaIter1, RaIter2, RaIter3> otherwise.
+    ///           where RaIter1 is range_iterator_t<Rng1> and RaIter2 is range_iterator_t<Rng2>
     ///           The \a set_symmetric_difference algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename Rng1, typename Rng2, typename Iter3,
+    template <typename ExPolicy, typename Rng1, typename Rng2, typename RaIter3,
         typename Pred = hpx::parallel::detail::less,
         typename Proj1 = hpx::identity,
         typename Proj2 = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         set_symmetric_difference_result<
             hpx::traits::range_iterator_t<Rng1>,
-            hpx::traits::range_iterator_t<Rng2>, Iter3>>
+            hpx::traits::range_iterator_t<Rng2>, RaIter3>>
     set_symmetric_difference(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
-        Iter3 dest, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+        RaIter3 dest, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2());
 
     /// Constructs a sorted range beginning at dest consisting of all elements
@@ -266,22 +268,20 @@ namespace hpx { namespace ranges {
     ///
     /// The resulting range cannot overlap with either of the input ranges.
     ///
-    /// \tparam Iter1       The type of the source iterators used (deduced)
+    /// \tparam RaIter1       The type of the source iterators used (deduced)
     ///                     representing the first sequence.
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter1.
-    /// \tparam Iter2       The type of the source iterators used (deduced)
+    ///                     sentinel for RaIter1.
+    /// \tparam RaIter2       The type of the source iterators used (deduced)
     ///                     representing the second sequence.
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent2       The type of the end source iterators used (deduced)
     ///                     representing the second sequence.
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter2.
-    /// \tparam Iter3       The type of the iterator representing the
+    ///                     sentinel for RaIter2.
+    /// \tparam RaIter3       The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
@@ -329,18 +329,18 @@ namespace hpx { namespace ranges {
     ///                     actual predicate \a op is invoked.
     ///
     /// \returns  The \a set_symmetric_difference algorithm returns \a
-    ///           ranges::set_symmetric_difference_result<Iter1, Iter2, Iter3>.
+    ///           ranges::set_symmetric_difference_result<RaIter1, RaIter2, RaIter3>.
     ///           The \a set_symmetric_difference algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename Iter1, typename Sent1, typename Iter2, typename Sent2,
-            typename Iter3, typename Pred = hpx::parallel::detail::less,
+    template <typename RaIter1, typename Sent1, typename RaIter2, typename Sent2,
+            typename RaIter3, typename Pred = hpx::parallel::detail::less,
             typename Proj1 = hpx::identity,
             typename Proj2 = hpx::identity>
-    set_symmetric_difference_result<Iter1, Iter2, Iter3>
-    set_symmetric_difference(Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
-        Iter3 dest, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+    set_symmetric_difference_result<RaIter1, RaIter2, RaIter3>
+    set_symmetric_difference(RaIter1 first1, Sent1 last1, RaIter2 first2, Sent2 last2,
+        RaIter3 dest, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2());
 
     /// Constructs a sorted range beginning at dest consisting of all elements
@@ -363,13 +363,17 @@ namespace hpx { namespace ranges {
     ///
     /// The resulting range cannot overlap with either of the input ranges.
     ///
-    /// \tparam Rng1        The type of the source range used (deduced).
+    /// \tparam Rng1
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.        The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Rng2        The type of the source range used (deduced).
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam Rng2
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.        The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Iter3       The type of the iterator representing the
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam RaIter3       The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
@@ -413,20 +417,20 @@ namespace hpx { namespace ranges {
     ///                     actual predicate \a op is invoked.
     ///
     /// \returns  The \a set_symmetric_difference algorithm returns \a
-    ///           ranges::set_symmetric_difference_result<Iter1, Iter2, Iter3>.
-    ///           where Iter1 is range_iterator_t<Rng1> and Iter2 is range_iterator_t<Rng2>
+    ///           ranges::set_symmetric_difference_result<RaIter1, RaIter2, RaIter3>.
+    ///           where RaIter1 is range_iterator_t<Rng1> and RaIter2 is range_iterator_t<Rng2>
     ///           The \a set_symmetric_difference algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename Rng1, typename Rng2, typename Iter3,
+    template <typename Rng1, typename Rng2, typename RaIter3,
         typename Pred = hpx::parallel::detail::less,
         typename Proj1 = hpx::identity,
         typename Proj2 = hpx::identity>
     set_symmetric_difference_result<
         hpx::traits::range_iterator_t<Rng1>,
-        hpx::traits::range_iterator_t<Rng2>, Iter3>
-    set_symmetric_difference(Rng1&& rng1, Rng2&& rng2, Iter3 dest, Pred&& op = Pred(),
+        hpx::traits::range_iterator_t<Rng2>, RaIter3>
+    set_symmetric_difference(Rng1&& rng1, Rng2&& rng2, RaIter3 dest, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     // clang-format on
@@ -460,40 +464,41 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<set_symmetric_difference_t>
     {
     private:
-        template <typename ExPolicy, typename Iter1, typename Sent1,
-            typename Iter2, typename Sent2, typename Iter3,
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter2, typename Sent2, typename RaIter3,
             typename Pred = hpx::parallel::detail::less,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<Iter1> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent1, Iter1> &&
-                hpx::parallel::traits::is_projected_v<Proj1, Iter1> &&
-                hpx::traits::is_random_access_iterator_v<Iter2> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent2, Iter2> &&
-                hpx::parallel::traits::is_projected_v<Proj2, Iter2> &&
-                hpx::traits::is_random_access_iterator_v<Iter3> &&
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, RaIter1> &&
+                hpx::parallel::traits::is_projected_v<Proj1, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent2, RaIter2> &&
+                hpx::parallel::traits::is_projected_v<Proj2, RaIter2> &&
+                hpx::traits::is_random_access_iterator_v<RaIter3> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,
-                    hpx::parallel::traits::projected<Proj1, Iter1>,
-                    hpx::parallel::traits::projected<Proj2, Iter2>
+                    hpx::parallel::traits::projected<Proj1, RaIter1>,
+                    hpx::parallel::traits::projected<Proj2, RaIter2>
                 >
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            set_symmetric_difference_result<Iter1, Iter2, Iter3>>
+            set_symmetric_difference_result<RaIter1, RaIter2, RaIter3>>
         tag_fallback_invoke(set_symmetric_difference_t, ExPolicy&& policy,
-            Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest,
-            Pred op = Pred(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
+            RaIter1 first1, Sent1 last1, RaIter2 first2, Sent2 last2,
+            RaIter3 dest, Pred op = Pred(), Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                    !hpx::traits::is_random_access_iterator_v<Iter1> ||
-                    !hpx::traits::is_random_access_iterator_v<Iter2>>;
+                    !hpx::traits::is_random_access_iterator_v<RaIter1> ||
+                    !hpx::traits::is_random_access_iterator_v<RaIter2>>;
 
             using result_type =
-                set_symmetric_difference_result<Iter1, Iter2, Iter3>;
+                set_symmetric_difference_result<RaIter1, RaIter2, RaIter3>;
 
             return hpx::parallel::detail::set_symmetric_difference<
                 result_type>()
@@ -503,7 +508,7 @@ namespace hpx::ranges {
         }
 
         template <typename ExPolicy, typename Rng1, typename Rng2,
-            typename Iter3, typename Pred = hpx::parallel::detail::less,
+            typename RaIter3, typename Pred = hpx::parallel::detail::less,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires(
@@ -514,7 +519,7 @@ namespace hpx::ranges {
                 hpx::traits::is_random_access_range_v<Rng2> &&
                 hpx::traits::is_sized_range_v<Rng2> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
-                hpx::traits::is_random_access_iterator_v<Iter3> &&
+                hpx::traits::is_random_access_iterator_v<RaIter3> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
@@ -524,9 +529,9 @@ namespace hpx::ranges {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             set_symmetric_difference_result<hpx::traits::range_iterator_t<Rng1>,
-                hpx::traits::range_iterator_t<Rng2>, Iter3>>
+                hpx::traits::range_iterator_t<Rng2>, RaIter3>>
         tag_fallback_invoke(set_symmetric_difference_t, ExPolicy&& policy,
-            Rng1&& rng1, Rng2&& rng2, Iter3 dest, Pred op = Pred(),
+            Rng1&& rng1, Rng2&& rng2, RaIter3 dest, Pred op = Pred(),
             Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
@@ -538,7 +543,7 @@ namespace hpx::ranges {
                     !hpx::traits::is_random_access_iterator_v<iterator_type2>>;
 
             using result_type = set_symmetric_difference_result<iterator_type1,
-                iterator_type2, Iter3>;
+                iterator_type2, RaIter3>;
 
             return hpx::parallel::detail::set_symmetric_difference<
                 result_type>()

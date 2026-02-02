@@ -123,15 +123,13 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for FwdIter.
     /// \tparam FwdIter2    The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam BinOp       The type of the binary function object used for
@@ -173,7 +171,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     type \a RaIter1 can be dereferenced and then
     ///                     implicitly converted to Type.
     ///                     The type \a R must be such that an object of this
     ///                     type can be implicitly converted to \a T.
@@ -189,12 +187,12 @@ namespace hpx { namespace ranges {
     /// sequenced within each thread.
     ///
     /// \returns  The \a transform_exclusive_scan algorithm returns a
-    ///           \a hpx::future<transform_exclusive_result<FwdIter1,
+    ///           \a hpx::future<transform_exclusive_result<RaIter1,
     ///           FwdIter2>> if
     ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a transform_exclusive_result<FwdIter1,
+    ///           returns \a transform_exclusive_result<RaIter1,
     ///           FwdIter2> otherwise.
     ///           The \a transform_exclusive_scan algorithm returns an input
     ///           iterator to the point denoted by the sentinel and an output
@@ -323,15 +321,15 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam O           The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam BinOp       The type of the binary function object used for
@@ -371,7 +369,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     type \a RaIter1 can be dereferenced and then
     ///                     implicitly converted to Type.
     ///                     The type \a R must be such that an object of this
     ///                     type can be implicitly converted to \a T.

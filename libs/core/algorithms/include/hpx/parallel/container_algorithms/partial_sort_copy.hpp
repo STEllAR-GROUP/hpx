@@ -102,11 +102,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent1       The type of the source sentinel (deduced).This
-    ///                     sentinel type must be a sentinel for FwdIter.
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam RandIter    The type of the destination iterators used(deduced)
     ///                     This iterator type must meet the requirements of an
     ///                     random iterator.
@@ -160,22 +159,22 @@ namespace hpx { namespace ranges {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a partial_sort_copy algorithm returns a
-    ///           \a hpx::future<partial_sort_copy_result<FwdIter, RandIter>>
+    ///           \a hpx::future<partial_sort_copy_result<RaIter, RandIter>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a
-    ///           partial_sort_copy_result<FwdIter, RandIter> otherwise.
+    ///           partial_sort_copy_result<RaIter, RandIter> otherwise.
     ///           The algorithm returns {last, result_first + N}.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent1,
+    template <typename ExPolicy, typename RaIter, typename Sent1,
         typename RandIter, typename Sent2,
         typename Comp = ranges::less,
         typename Proj1 = hpx::identity,
         typename Proj2 = hpx::identity>
     typename parallel::util::detail::algorithm_result_t<ExPolicy,
-        partial_sort_copy_result<FwdIter, RandIter>>
+        partial_sort_copy_result<RaIter, RandIter>>
     partial_sort_copy(
-        ExPolicy&& policy, FwdIter first, Sent1 last, RandIter r_first,
+        ExPolicy&& policy, RaIter first, Sent1 last, RandIter r_first,
         Sent2 r_last, Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2());
 
@@ -257,10 +256,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1        The type of the source range used (deduced).
+    /// \tparam Rng1
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.        The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a forward iterator.
-    /// \tparam Rng2        The type of the destination range used (deduced).
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam Rng2
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.        The type of the destination range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random iterator.
     /// \tparam Comp        The type of the function/function object to use
@@ -389,35 +392,35 @@ namespace hpx::ranges {
                 HPX_MOVE(comp), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent1,
+        template <typename ExPolicy, typename RaIter, typename Sent1,
             typename RandIter, typename Sent2, typename Comp = ranges::less,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent1, FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, RaIter> &&
                 hpx::traits::is_random_access_iterator_v<RandIter> &&
                 hpx::traits::is_sized_sentinel_for_v<Sent2, RandIter> &&
-                parallel::traits::is_projected_v<Proj1, FwdIter> &&
+                parallel::traits::is_projected_v<Proj1, RaIter> &&
                 parallel::traits::is_projected_v<Proj2, RandIter> &&
                 parallel::traits::is_indirect_callable_v<
                     ExPolicy, Comp,
-                    parallel::traits::projected<Proj1, FwdIter>,
-                    parallel::traits::projected<Proj1, FwdIter>
+                    parallel::traits::projected<Proj1, RaIter>,
+                    parallel::traits::projected<Proj1, RaIter>
                 >
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            partial_sort_copy_result<FwdIter, RandIter>>
+            partial_sort_copy_result<RaIter, RandIter>>
         tag_fallback_invoke(hpx::ranges::partial_sort_copy_t, ExPolicy&& policy,
-            FwdIter first, Sent1 last, RandIter r_first, Sent2 r_last,
+            RaIter first, Sent1 last, RandIter r_first, Sent2 r_last,
             Comp comp = Comp(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires a random access iterator.");
 
-            using result_type = partial_sort_copy_result<FwdIter, RandIter>;
+            using result_type = partial_sort_copy_result<RaIter, RandIter>;
 
             return hpx::parallel::detail::partial_sort_copy<result_type>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, r_first, r_last,

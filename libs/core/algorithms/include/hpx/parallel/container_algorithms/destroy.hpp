@@ -24,9 +24,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -62,7 +64,7 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the source iterators used for the
+    /// \tparam RaIter        The type of the source iterators used for the
     ///                     range (deduced).
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
@@ -89,18 +91,20 @@ namespace hpx { namespace ranges {
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a void otherwise.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
-    destroy(ExPolicy&& policy, Iter first, Sent last);
+    template <typename ExPolicy, typename RaIter, typename Sent>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+    destroy(ExPolicy&& policy, RaIter first, Sent last);
 
     /// Destroys objects of type typename iterator_traits<ForwardIt>::value_type
     /// in the range [first, last).
     ///
     /// \note   Complexity: Performs exactly \a last - \a first operations.
     ///
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
@@ -126,7 +130,7 @@ namespace hpx { namespace ranges {
     ///
     /// \returns  The \a destroy algorithm returns \a void.
     ///
-    template <typename Iter, typename Sent> Iter destroy(Iter first, Sent last);
+    template <typename RaIter, typename Sent> RaIter destroy(RaIter first, Sent last);
 
     /// Destroys objects of type typename iterator_traits<ForwardIt>::value_type
     /// in the range [first, first + count).
@@ -138,9 +142,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply this algorithm to.
     ///
@@ -164,18 +167,18 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a destroy_n algorithm returns a
-    ///           \a hpx::future<FwdIter> if the execution policy is of type
+    ///           \a hpx::future<RaIter> if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a FwdIter otherwise.
+    ///           returns \a RaIter otherwise.
     ///           The \a destroy_n algorithm returns the
     ///           iterator to the element in the source range, one past
     ///           the last element constructed.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Size>
+    template <typename ExPolicy, typename RaIter, typename Size>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        FwdIter>::type
-    destroy_n(ExPolicy&& policy, FwdIter first, Size count);
+        RaIter>::type
+    destroy_n(ExPolicy&& policy, RaIter first, Size count);
 
     /// Destroys objects of type typename iterator_traits<ForwardIt>::value_type
     /// in the range [first, first + count).
@@ -198,8 +201,8 @@ namespace hpx { namespace ranges {
     ///           iterator to the element in the source range, one past
     ///           the last element constructed.
     ///
-    template <typename FwdIter, typename Size>
-    FwdIter destroy_n(FwdIter first, Size count);
+    template <typename RaIter, typename Size>
+    RaIter destroy_n(RaIter first, Size count);
 
     // clang-format on
 }}    // namespace hpx::ranges

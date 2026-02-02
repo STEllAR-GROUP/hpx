@@ -26,9 +26,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the comparisons.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam T           The type of the value to search for (deduced).
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a hpx::identity
@@ -82,7 +84,7 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the comparisons.
-    /// \tparam Iter        The type of the source iterators used for the
+    /// \tparam RaIter        The type of the source iterators used for the
     ///                     range (deduced).
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
@@ -122,13 +124,13 @@ namespace hpx { namespace ranges {
     ///           The \a count algorithm returns the number of elements
     ///           satisfying the given criteria.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Proj = hpx::identity,
-        typename T = typename hpx::parallel::traits::projected<Iter,
+        typename T = typename hpx::parallel::traits::projected<RaIter,
             Proj>::value_type>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        typename std::iterator_traits<Iter>::difference_type>::type
-    count(ExPolicy&& policy, Iter first, Sent last, T const& value,
+        typename std::iterator_traits<RaIter>::difference_type>::type
+    count(ExPolicy&& policy, RaIter first, Sent last, T const& value,
         Proj&& proj = Proj());
 
     /// Returns the number of elements in the range [first, last) satisfying
@@ -208,9 +210,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the comparisons.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a count_if requires \a F to meet the
@@ -278,7 +282,7 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the comparisons.
-    /// \tparam Iter        The type of the source iterators used for the
+    /// \tparam RaIter        The type of the source iterators used for the
     ///                     range (deduced).
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
@@ -333,11 +337,11 @@ namespace hpx { namespace ranges {
     ///           The \a count algorithm returns the number of elements
     ///           satisfying the given criteria.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent, typename F,
+    template <typename ExPolicy, typename RaIter, typename Sent, typename F,
         typename Proj = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        typename std::iterator_traits<Iter>::difference_type>::type
-    count_if(ExPolicy&& policy, Iter first, Sent last, F&& f,
+        typename std::iterator_traits<RaIter>::difference_type>::type
+    count_if(ExPolicy&& policy, RaIter first, Sent last, F&& f,
         Proj&& proj = Proj());
 
     /// Returns the number of elements in the range [first, last) satisfying
@@ -491,24 +495,24 @@ namespace hpx::ranges {
                 hpx::util::end(rng), value, HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename Iter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Proj = hpx::identity,
-            typename T = typename hpx::parallel::traits::projected<Iter,
+            typename T = typename hpx::parallel::traits::projected<RaIter,
                 Proj>::value_type>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<Iter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, Iter>
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            typename std::iterator_traits<Iter>::difference_type>
-        tag_fallback_invoke(count_t, ExPolicy&& policy, Iter first, Sent last,
+            typename std::iterator_traits<RaIter>::difference_type>
+        tag_fallback_invoke(count_t, ExPolicy&& policy, RaIter first, Sent last,
             T const& value, Proj proj = Proj())
         {
             using difference_type =
-                typename std::iterator_traits<Iter>::difference_type;
+                typename std::iterator_traits<RaIter>::difference_type;
 
             return hpx::parallel::detail::count<difference_type>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, value,
@@ -605,26 +609,26 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(f), HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename Iter, typename Sent, typename F,
+        template <typename ExPolicy, typename RaIter, typename Sent, typename F,
             typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<Iter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
-                hpx::parallel::traits::is_projected_v<Proj, Iter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, F,
-                    hpx::parallel::traits::projected<Proj, Iter>
+                    hpx::parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            typename std::iterator_traits<Iter>::difference_type>
-        tag_fallback_invoke(count_if_t, ExPolicy&& policy, Iter first,
+            typename std::iterator_traits<RaIter>::difference_type>
+        tag_fallback_invoke(count_if_t, ExPolicy&& policy, RaIter first,
             Sent last, F f, Proj proj = Proj())
         {
             using difference_type =
-                typename std::iterator_traits<Iter>::difference_type;
+                typename std::iterator_traits<RaIter>::difference_type;
 
             return hpx::parallel::detail::count_if<difference_type>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
