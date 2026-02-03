@@ -119,14 +119,10 @@ namespace hpx::experimental {
         // noexcept if the memmove path is taken or if the move path is noexcept
         noexcept(detail::relocate_at_helper(src, dst)))
     {
-#if defined(__cpp_lib_trivially_relocatable)
-        return std::relocate_at(src, dst);
-#else
-        static_assert(is_relocatable_v<T>,
-            "new (dst) T(std::move(*src)) must be well-formed");
+        static_assert(
+            is_relocatable_v<T>, "T(std::move(*src)) must be well-formed");
 
         return detail::relocate_at_helper(src, dst);
-#endif
     }
 
     HPX_CXX_CORE_EXPORT template <typename T>

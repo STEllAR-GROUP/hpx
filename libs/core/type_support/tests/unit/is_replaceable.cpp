@@ -1,4 +1,4 @@
-//  Copyright (c) 2025 Isidoros Tsaousis-Seiras
+//  Copyright (c) 2025 Pratyksh Gupta
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,16 +11,19 @@
 #include <mutex>
 #include <type_traits>
 
+using hpx::experimental::is_replaceable;
 using hpx::experimental::is_replaceable_v;
 
-// Integral types are replaceable
+// Integral types are replaceable (trivially relocatable)
 static_assert(is_replaceable_v<int>);
-// Const types are not assignable
+// Const types are not assignable (thus not replaceable)
 static_assert(!is_replaceable_v<int const>);
 
 // Pointer types are replaceable
 static_assert(is_replaceable_v<int*>);
-static_assert(is_replaceable_v<int const*>);
+static_assert(is_replaceable_v<int const*>);    // pointer itself is mutable
+static_assert(
+    !is_replaceable_v<int* const>);    // const pointer is not replaceable
 
 // Function pointers are replaceable
 static_assert(is_replaceable_v<int (*)()>);
@@ -36,7 +39,7 @@ static_assert(!is_replaceable_v<int&&>);
 // Void types
 static_assert(!is_replaceable_v<void>);
 
-// std::mutex is not move assignable
+// std::mutex is not move assignable, nor trivially relocatable
 static_assert(!is_replaceable_v<std::mutex>);
 
 struct not_destructible
@@ -60,12 +63,32 @@ struct not_move_constructible
 };
 static_assert(!is_replaceable_v<not_move_constructible>);
 
-struct move_assignable
+struct move_assignable_but_not_trivially_relocatable
 {
-    move_assignable(move_assignable&&);
-    move_assignable& operator=(move_assignable&&);
-    ~move_assignable();
+    std::unique_ptr<int> p;
+    move_assignable_but_not_trivially_relocatable(
+        move_assignable_but_not_trivially_relocatable&&) = default;
+    move_assignable_but_not_trivially_relocatable& operator=(
+        move_assignable_but_not_trivially_relocatable&&) = default;
 };
-static_assert(is_replaceable_v<move_assignable>);
+static_assert(!is_replaceable_v<move_assignable_but_not_trivially_relocatable>);
+
+// Opt-in example
+struct opt_in_replaceable
+{
+    std::unique_ptr<int> p;
+    opt_in_replaceable(opt_in_replaceable&&) = default;
+    opt_in_replaceable& operator=(opt_in_replaceable&&) = default;
+};
+
+// Specialize is_replaceable for opt_in_replaceable
+namespace hpx::experimental {
+    template <>
+    struct is_replaceable<opt_in_replaceable> : std::true_type
+    {
+    };
+}    // namespace hpx::experimental
+
+static_assert(is_replaceable_v<opt_in_replaceable>);
 
 int main() {}
