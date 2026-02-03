@@ -10,13 +10,14 @@
 
 #include <type_traits>
 
+#include <hpx/type_support/is_trivially_relocatable.hpp>
+
 namespace hpx::experimental {
 
     HPX_CXX_EXPORT template <typename T>
     struct is_replaceable
-      : std::bool_constant<std::is_object_v<T> &&
-            std::is_move_constructible_v<T> && std::is_move_assignable_v<T> &&
-            std::is_destructible_v<T> && !std::is_volatile_v<T>>
+      : std::bool_constant<std::is_move_constructible_v<T> &&
+            std::is_move_assignable_v<T> && is_trivially_relocatable_v<T>>
     {
     };
 
