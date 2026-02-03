@@ -217,7 +217,7 @@ namespace hpx::parallel::detail {
             if (static_cast<difference_type>(count) > n)
                 return last;
 
-            auto value_proj = HPX_INVOKE(proj, value);
+            auto value_proj = proj(value);
 
             FwdIter it = first;
             FwdIter end = first;
@@ -228,8 +228,7 @@ namespace hpx::parallel::detail {
                 FwdIter curr = it;
                 Size matched = 0;
 
-                while (matched < count &&
-                    HPX_INVOKE(pred, HPX_INVOKE(proj, *curr), value_proj))
+                while (matched < count && pred(proj(*curr), value_proj))
                 {
                     ++curr;
                     ++matched;
@@ -266,7 +265,7 @@ namespace hpx::parallel::detail {
             difference_type max_start =
                 n - static_cast<difference_type>(count) + 1;
 
-            auto value_proj = HPX_INVOKE(proj, value);
+            auto value_proj = proj(value);
 
             decltype(auto) policy =
                 hpx::execution::experimental::adapt_placement_mode(
@@ -297,9 +296,7 @@ namespace hpx::parallel::detail {
                         FwdIter curr = start;
                         Size matched = 0;
 
-                        while (matched < count &&
-                            HPX_INVOKE(
-                                pred, HPX_INVOKE(proj, *curr), value_proj))
+                        while (matched < count && pred(proj(*curr), value_proj))
                         {
                             ++curr;
                             ++matched;
@@ -310,7 +307,8 @@ namespace hpx::parallel::detail {
                     });
             };
 
-            auto f2 = [first, last, max_start](auto&& data) mutable -> FwdIter {
+            auto f2 = [first, last, max_start, &tok](
+                          auto&& data) mutable -> FwdIter {
                 util::detail::clear_container(data);
 
                 difference_type idx = tok.get_data();
