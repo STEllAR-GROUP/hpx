@@ -98,6 +98,9 @@ endif()
 if(HPX_LIKWID_WITH_LIKWID)
   set(additional_dependencies ${additional_dependencies} hpx_likwid)
 endif()
+if(HPX_TRACY_WITH_TRACY)
+  set(additional_dependencies ${additional_dependencies} hpx_tracy)
+endif()
 
 include(HPX_AddModule)
 add_hpx_module(

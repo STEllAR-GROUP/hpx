@@ -20,6 +20,11 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
   hpx_setup_lci()
   set(additional_dependencies ${additional_dependencies} LCI::LCI)
 endif()
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCW)
+  include(HPX_SetupLCW)
+  hpx_setup_lcw()
+  set(additional_dependencies ${additional_dependencies} LCW::LCW)
+endif()
 if(HPX_WITH_NETWORKING
    AND HPX_WITH_PARCELPORT_GASNET
    AND HPX_WITH_PARCELPORT_GASNET_CONDUIT

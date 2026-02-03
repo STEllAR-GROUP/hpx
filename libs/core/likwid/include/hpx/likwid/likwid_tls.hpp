@@ -16,7 +16,8 @@ namespace hpx::likwid {
 
     HPX_CXX_EXPORT HPX_CORE_EXPORT char const* start_region(
         char const*) noexcept;
-    HPX_CXX_EXPORT HPX_CORE_EXPORT char const* stop_region() noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT char const* stop_region(
+        char const*) noexcept;
 
     HPX_CXX_EXPORT struct region
     {
@@ -24,12 +25,10 @@ namespace hpx::likwid {
           : surrounding_region(start_region(name))
         {
         }
+
         ~region() noexcept
         {
-            if (surrounding_region != nullptr)
-            {
-                stop_region();
-            }
+            stop_region(surrounding_region);
         }
 
         char const* surrounding_region;
@@ -38,9 +37,10 @@ namespace hpx::likwid {
     HPX_CXX_EXPORT struct suspend_region
     {
         suspend_region() noexcept
-          : suspended_region(stop_region())
+          : suspended_region(stop_region(nullptr))
         {
         }
+
         ~suspend_region() noexcept
         {
             if (suspended_region != nullptr)

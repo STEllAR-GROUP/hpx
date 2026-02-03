@@ -123,7 +123,7 @@ namespace hpx::serialization::detail {
         }
 
     private:
-        mutable mutex_type mtx_;
+        mutable mutex_type mtx_ = mutex_type("preprocess_gid_types");
         split_gids_map split_gids_;
     };
 }    // namespace hpx::serialization::detail

@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2016 Hartmut Kaiser
+//  Copyright (c) 2011-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,50 +19,27 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace iostreams { namespace detail {
-    struct buffer
+namespace hpx::iostreams::detail {
+
+    struct data_buffer
     {
     protected:
         typedef hpx::recursive_mutex mutex_type;
 
     public:
-        buffer()
+        data_buffer()
           : data_(new std::vector<char>)
-          , mtx_(new mutex_type)
+          , mtx_(new mutex_type("iostreams::data_buffer"))
         {
         }
 
-        buffer(buffer const& rhs)
-          : data_(rhs.data_)
-          , mtx_(rhs.mtx_)
-        {
-        }
+        data_buffer(data_buffer const& rhs) = default;
+        data_buffer(data_buffer&& rhs) = default;
 
-        buffer(buffer&& rhs) noexcept
-          : data_(HPX_MOVE(rhs.data_))
-          , mtx_(HPX_MOVE(rhs.mtx_))
-        {
-        }
+        data_buffer& operator=(data_buffer const& rhs) = default;
+        data_buffer& operator=(data_buffer&& rhs) = default;
 
-        buffer& operator=(buffer const& rhs)
-        {
-            if (this != &rhs)
-            {
-                data_ = rhs.data_;
-                mtx_ = rhs.mtx_;
-            }
-            return *this;
-        }
-
-        buffer& operator=(buffer&& rhs) noexcept
-        {
-            if (this != &rhs)
-            {
-                data_ = HPX_MOVE(rhs.data_);
-                mtx_ = HPX_MOVE(rhs.mtx_);
-            }
-            return *this;
-        }
+        ~data_buffer() = default;
 
         bool empty() const
         {
@@ -75,15 +52,15 @@ namespace hpx { namespace iostreams { namespace detail {
             return !data_.get() || data_->empty();
         }
 
-        buffer init()
+        data_buffer init()
         {
             std::lock_guard<mutex_type> l(*mtx_);
             return init_locked();
         }
 
-        buffer init_locked()
+        data_buffer init_locked()
         {
-            buffer b;
+            data_buffer b;
             std::swap(b.data_, data_);
             return b;
         }
@@ -128,4 +105,4 @@ namespace hpx { namespace iostreams { namespace detail {
 
         HPX_SERIALIZATION_SPLIT_MEMBER();
     };
-}}}    // namespace hpx::iostreams::detail
+}    // namespace hpx::iostreams::detail

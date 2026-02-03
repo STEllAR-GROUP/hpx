@@ -45,14 +45,33 @@ if(NOT TARGET hpx_dependencies_boost)
     if(NOT Boost_FOUND)
       # Search using MODULE mode
       find_package(
+        Boost ${Boost_MINIMUM_VERSION} MODULE QUIET NO_POLICY_SCOPE
+        COMPONENTS ${__boost_libraries}
+      )
+    endif()
+
+    if(NOT Boost_FOUND AND NOT Boost_USE_STATIC_LIBS)
+      hpx_info(
+        "Shared Boost not found, attempting to find static Boost libraries."
+      )
+      set(Boost_USE_STATIC_LIBS ON)
+      find_package(
         Boost ${Boost_MINIMUM_VERSION} MODULE REQUIRED NO_POLICY_SCOPE
         COMPONENTS ${__boost_libraries}
       )
     endif()
 
+    if(NOT Boost_FOUND)
+      hpx_error("Could not find Boost. Please check your configuration.")
+    endif()
+
     add_library(hpx_dependencies_boost INTERFACE IMPORTED)
 
-    target_link_libraries(hpx_dependencies_boost INTERFACE Boost::boost)
+    if(TARGET Boost::boost)
+      target_link_libraries(hpx_dependencies_boost INTERFACE Boost::boost)
+    else()
+      target_link_libraries(hpx_dependencies_boost INTERFACE Boost::headers)
+    endif()
 
     foreach(__boost_library ${__boost_libraries})
       target_link_libraries(
