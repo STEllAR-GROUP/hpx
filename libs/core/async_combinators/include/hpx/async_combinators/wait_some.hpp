@@ -336,7 +336,7 @@ namespace hpx {
             bool has_exceptional_results_ = false;
             bool notified_ = false;
 
-            mutable util::cache_line_data<hpx::spinlock> mtx_;
+            mutable util::cache_line_data<hpx::spinlock> mtx_ = {"wait_some"};
             mutable util::cache_line_data<
                 hpx::lcos::local::detail::condition_variable>
                 cond_;

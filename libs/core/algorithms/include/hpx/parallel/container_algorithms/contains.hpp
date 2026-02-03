@@ -10,6 +10,7 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/contains.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -71,8 +72,7 @@ namespace hpx::parallel::detail {
 
             auto f2 = [](auto&& results) {
                 return std::any_of(hpx::util::begin(results),
-                    hpx::util::end(results),
-                    [](hpx::future<bool>& val) { return val.get(); });
+                    hpx::util::end(results), hpx::functional::unwrap{});
             };
 
             return util::partitioner<policy_type, bool>::call(

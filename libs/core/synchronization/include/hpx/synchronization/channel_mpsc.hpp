@@ -50,7 +50,7 @@ namespace hpx::lcos::local {
 
         [[nodiscard]] bool is_empty(std::size_t head) const noexcept
         {
-            return head == tail_.data_.tail_.load(std::memory_order_relaxed);
+            return head == tail_.data_.tail_.load(std::memory_order_acquire);
         }
 
     public:
@@ -173,7 +173,7 @@ namespace hpx::lcos::local {
             {
                 tail = 0;
             }
-            tail_.data_.tail_.store(tail, std::memory_order_relaxed);
+            tail_.data_.tail_.store(tail, std::memory_order_release);
 
             return true;
         }
@@ -237,7 +237,7 @@ namespace hpx::lcos::local {
 
         [[nodiscard]] bool is_empty(std::size_t head) const noexcept
         {
-            return head == tail_.data_.tail_.load(std::memory_order_relaxed);
+            return head == tail_.data_.tail_.load(std::memory_order_acquire);
         }
 
     public:
@@ -331,7 +331,7 @@ namespace hpx::lcos::local {
             {
                 tail = 0;
             }
-            tail_.data_.tail_.store(tail, std::memory_order_relaxed);
+            tail_.data_.tail_.store(tail, std::memory_order_release);
 
             return true;
         }

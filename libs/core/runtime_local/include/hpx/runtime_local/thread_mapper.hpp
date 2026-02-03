@@ -153,7 +153,7 @@ namespace hpx::util {
         using label_map_type = std::map<std::string, std::size_t>;
 
         // main lock
-        mutable mutex_type mtx_;
+        mutable mutex_type mtx_ = mutex_type("thread_mapper");
 
         // mapping from thread IDs to thread indices
         thread_map_type thread_map_;

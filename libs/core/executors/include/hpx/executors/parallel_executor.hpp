@@ -1,5 +1,5 @@
 //  Copyright (c) 2019-2020 ETH Zurich
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -178,12 +178,8 @@ namespace hpx::execution {
         // property implementations
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, parallel_policy_executor>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(std::is_convertible_v<Executor_, parallel_policy_executor>)
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             Executor_ const& exec, char const* annotation)
@@ -193,12 +189,8 @@ namespace hpx::execution {
             return exec_with_annotation;
         }
 
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, parallel_policy_executor>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(std::is_convertible_v<Executor_, parallel_policy_executor>)
         friend auto tag_invoke(hpx::execution::experimental::with_annotation_t,
             Executor_ const& exec, std::string annotation)
         {
@@ -216,12 +208,8 @@ namespace hpx::execution {
         }
 #endif
 
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, parallel_policy_executor>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(std::is_convertible_v<Executor_, parallel_policy_executor>)
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_processing_units_count_t,
             Executor_ const& exec, std::size_t num_cores) noexcept
@@ -236,12 +224,8 @@ namespace hpx::execution {
             return exec_with_num_cores;
         }
 
-        // clang-format off
-        template <typename Parameters,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters>
-            )>
-        // clang-format on
+        template <typename Parameters>
+            requires(hpx::traits::is_executor_parameters_v<Parameters>)
         friend constexpr std::size_t tag_invoke(
             hpx::execution::experimental::processing_units_count_t,
             Parameters&&, parallel_policy_executor const& exec,
@@ -251,12 +235,8 @@ namespace hpx::execution {
             return exec.get_num_cores();
         }
 
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, parallel_policy_executor>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(std::is_convertible_v<Executor_, parallel_policy_executor>)
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_first_core_t,
             Executor_ const& exec, std::size_t first_core) noexcept
@@ -423,12 +403,8 @@ namespace hpx::execution {
         }
 
         // BulkTwoWayExecutor interface
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
             parallel_policy_executor const& exec, F&& f, S const& shape,
@@ -465,12 +441,8 @@ namespace hpx::execution {
                 shape, HPX_FORWARD(Ts, ts)...);
         }
 
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             parallel_policy_executor const& exec, F&& f, S const& shape,
@@ -507,12 +479,8 @@ namespace hpx::execution {
                 shape, HPX_FORWARD(Ts, ts)...);
         }
 
-        // clang-format off
-        template <typename F, typename S, typename Future, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename Future, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_then_execute_t,
             parallel_policy_executor const& exec, F&& f, S const& shape,
@@ -674,12 +642,9 @@ namespace hpx::execution {
     };
 
     // support all properties exposed by the embedded policy
-    // clang-format off
     HPX_CXX_EXPORT template <typename Tag, typename Policy, typename Property,
         HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
-    // clang-format on
+            hpx::execution::experimental::is_scheduling_property_v<Tag>)>
     auto tag_invoke(
         Tag tag, parallel_policy_executor<Policy> const& exec, Property&& prop)
         -> decltype(std::declval<parallel_policy_executor<Policy>>().policy(
@@ -692,12 +657,9 @@ namespace hpx::execution {
         return exec_with_prop;
     }
 
-    // clang-format off
     HPX_CXX_EXPORT template <typename Tag, typename Policy,
         HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
-    // clang-format on
+            hpx::execution::experimental::is_scheduling_property_v<Tag>)>
     auto tag_invoke(Tag tag, parallel_policy_executor<Policy> const& exec)
         -> decltype(std::declval<Tag>()(std::declval<Policy>()))
     {

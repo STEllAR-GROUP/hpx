@@ -101,14 +101,11 @@ namespace hpx::detail {
         {
             while (true)
             {
+                std::unique_lock<mutex_type> lk(state_change);
                 auto s = state.load(std::memory_order_acquire);
                 while (s.data.exclusive || s.data.exclusive_waiting_blocked)
                 {
-                    {
-                        std::unique_lock<mutex_type> lk(state_change);
-                        shared_cond.wait(lk);
-                    }
-
+                    shared_cond.wait(lk);
                     s = state.load(std::memory_order_acquire);
                 }
 

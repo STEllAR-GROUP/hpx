@@ -324,12 +324,10 @@ namespace hpx::parallel {
 
                 auto f2 = [tok, count](auto&&... data) mutable -> bool {
                     static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        // make sure iterators embedded in function object that
-                        // is attached to futures are invalidated
-                        util::detail::clear_container(data...);
-                    }
+
+                    // make sure iterators embedded in function object that
+                    // is attached to futures are invalidated
+                    util::detail::clear_container(data...);
 
                     difference_type find_res =
                         static_cast<difference_type>(tok.get_data());
@@ -461,12 +459,10 @@ namespace hpx::parallel {
 
                 auto f2 = [tok, second](auto&&... data) mutable -> Iter {
                     static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        // make sure iterators embedded in function object that is
-                        // attached to futures are invalidated
-                        util::detail::clear_container(data...);
-                    }
+
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    util::detail::clear_container(data...);
 
                     difference_type find_res =
                         static_cast<difference_type>(tok.get_data());

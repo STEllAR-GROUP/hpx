@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -428,14 +428,9 @@ namespace hpx { namespace segmented {
     template <typename T>
     using minmax_element_result = hpx::parallel::util::min_max_result<T>;
 
-    // clang-format off
-    template <typename SegIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator_v<SegIter> &&
-            hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
-    // clang-format on
+    template <typename SegIter, typename F>
+        requires(hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter>)
     SegIter tag_invoke(hpx::min_element_t, SegIter first, SegIter last, F&& f)
     {
         static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
@@ -455,15 +450,10 @@ namespace hpx { namespace segmented {
             hpx::identity_v, std::true_type{});
     }
 
-    // clang-format off
-    template <typename ExPolicy, typename SegIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
+    template <typename ExPolicy, typename SegIter, typename F>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
-            hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
-    // clang-format on
+            hpx::traits::is_segmented_iterator_v<SegIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
     tag_invoke(hpx::min_element_t, ExPolicy&& policy, SegIter first,
         SegIter last, F&& f)
@@ -488,14 +478,9 @@ namespace hpx { namespace segmented {
             hpx::identity_v, is_seq());
     }
 
-    // clang-format off
-    template <typename SegIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator_v<SegIter> &&
-            hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
-    // clang-format on
+    template <typename SegIter, typename F>
+        requires(hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter>)
     SegIter tag_invoke(hpx::max_element_t, SegIter first, SegIter last, F&& f)
     {
         static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
@@ -515,15 +500,10 @@ namespace hpx { namespace segmented {
             hpx::identity_v, std::true_type{});
     }
 
-    // clang-format off
-    template <typename ExPolicy, typename SegIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
+    template <typename ExPolicy, typename SegIter, typename F>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
-            hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
-    // clang-format on
+            hpx::traits::is_segmented_iterator_v<SegIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
     tag_invoke(hpx::max_element_t, ExPolicy&& policy, SegIter first,
         SegIter last, F&& f)
@@ -548,14 +528,9 @@ namespace hpx { namespace segmented {
             hpx::identity_v, is_seq());
     }
 
-    // clang-format off
-    template <typename SegIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator_v<SegIter> &&
-            hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
-    // clang-format on
+    template <typename SegIter, typename F>
+        requires(hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter>)
     minmax_element_result<SegIter> tag_invoke(
         hpx::minmax_element_t, SegIter first, SegIter last, F&& f)
     {
@@ -576,15 +551,10 @@ namespace hpx { namespace segmented {
             hpx::identity_v, std::true_type{});
     }
 
-    // clang-format off
-    template <typename ExPolicy, typename SegIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
+    template <typename ExPolicy, typename SegIter, typename F>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
-            hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
-    // clang-format on
+            hpx::traits::is_segmented_iterator_v<SegIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
         minmax_element_result<SegIter>>
     tag_invoke(hpx::minmax_element_t, ExPolicy&& policy, SegIter first,

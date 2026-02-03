@@ -104,7 +104,9 @@ namespace examples::server {
             });
 
             auto const mtx = mtx_;
-            std::lock_guard<hpx::mutex> l(*mtx);
+            std::unique_lock<hpx::mutex> l(*mtx);
+            [[maybe_unused]] hpx::util::ignore_while_checking il(&l);
+
             HPX_ASSERT(id_ != hpx::thread::id());
             hpx::thread::interrupt(id_);
         }

@@ -7,6 +7,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_COMPRESSION_SNAPPY)
+#include <snappy.h>
+
 #include <hpx/modules/errors.hpp>
 
 #include <hpx/binary_filter/snappy_serialization_filter.hpp>
@@ -16,8 +18,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
-
-#include <snappy.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_PLUGIN_MODULE();

@@ -48,6 +48,14 @@ if(HPX_WITH_DATAPAR)
   )
 endif()
 
+if(HPX_LIKWID_WITH_LIKWID)
+  set(executors_headers ${executors_headers} hpx/executors/likwid_executor.hpp)
+  set(additional_dependencies hpx_likwid)
+endif()
+if(HPX_TRACY_WITH_TRACY)
+  set(additional_dependencies hpx_tracy)
+endif()
+
 # Default location is $HPX_ROOT/libs/executors/include_compatibility
 # cmake-format: off
 set(executors_compat_headers
@@ -125,5 +133,6 @@ add_hpx_module(
     hpx_threading_base
     hpx_topology
     hpx_type_support
+    ${additional_dependencies}
   CMAKE_SUBDIRS examples tests
 )

@@ -19,12 +19,10 @@ set(collectives_headers
     hpx/collectives/barrier.hpp
     hpx/collectives/broadcast.hpp
     hpx/collectives/broadcast_direct.hpp
-    hpx/collectives/communication_set.hpp
     hpx/collectives/channel_communicator.hpp
     hpx/collectives/create_communicator.hpp
     hpx/collectives/detail/barrier_node.hpp
     hpx/collectives/detail/channel_communicator.hpp
-    hpx/collectives/detail/communication_set_node.hpp
     hpx/collectives/detail/communicator.hpp
     hpx/collectives/detail/latch.hpp
     hpx/collectives/exclusive_scan.hpp
@@ -61,12 +59,10 @@ set(collectives_sources
     all_to_all.cpp
     barrier.cpp
     broadcast.cpp
-    create_communication_set.cpp
     channel_communicator.cpp
     create_communicator.cpp
     detail/barrier_node.cpp
     detail/channel_communicator_server.cpp
-    detail/communication_set_node.cpp
     exclusive_scan.cpp
     gather.cpp
     inclusive_scan.cpp

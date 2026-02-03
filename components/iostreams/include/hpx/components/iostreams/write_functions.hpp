@@ -19,7 +19,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace hpx { namespace iostreams {
+namespace hpx::iostreams {
 
     typedef hpx::function<void(std::vector<char> const&)> write_function_type;
 
@@ -52,4 +52,4 @@ namespace hpx { namespace iostreams {
     {
         return hpx::bind_back(std_ostream_write_function, std::ref(os));
     }
-}}    // namespace hpx::iostreams
+}    // namespace hpx::iostreams

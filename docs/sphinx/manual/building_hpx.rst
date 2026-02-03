@@ -153,6 +153,38 @@ Available build types are:
    the ``CMAKE_BUILD_TYPE`` variables have to match and for projects not using
    |cmake|_, the ``HPX_DEBUG`` macro has to be set in debug mode.
 
+.. _cmake_presets:
+
+Using CMake Presets
+===================
+
+|hpx| provides a ``CMakePresets.json`` file which includes a variety of pre-defined build configurations.
+These presets allow you to easily configure the build for common scenarios without needing to manually specify multiple CMake variables.
+
+To use a preset, you can use the ``--preset`` option with CMake:
+
+.. code-block:: shell-session
+
+    $ cmake --preset <preset-name>
+    $ cmake --build --preset <preset-name>
+
+Some of the available presets include:
+
+* ``default``: Standard release build with tests and examples enabled.
+* ``minimal``: Minimal build with only core features (no tests, examples, or tools).
+* ``full``: Full build with all standard features enabled.
+* ``debug``: Debug build with symbols and debug-optimized settings.
+* ``performance``: Build optimized for performance analysis with APEX profiling.
+* ``cuda``: Build with CUDA support (requires CUDA toolkit).
+* ``sycl``: Build with SYCL support (requires compatible compiler).
+* ``sanitizer-address``: Build with AddressSanitizer enabled.
+
+For a full list of available presets, you can run:
+
+.. code-block:: shell-session
+
+    $ cmake --list-presets
+
 .. _build_recipes:
 
 Platform specific build recipes

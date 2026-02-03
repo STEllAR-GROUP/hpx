@@ -15,6 +15,7 @@
 #include <iterator>
 #include <numeric>
 #include <thread>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -55,8 +56,8 @@ void test_then(Executor& exec)
     hpx::future<void> f = hpx::make_ready_future();
 
     HPX_TEST(
-        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get() !=
-        std::this_thread::get_id());
+        hpx::parallel::execution::then_execute(exec, &test_f, std::move(f), 42)
+            .get() != std::this_thread::get_id());
 }
 
 ///////////////////////////////////////////////////////////////////////////////

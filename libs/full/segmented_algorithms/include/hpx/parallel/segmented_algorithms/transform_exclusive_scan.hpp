@@ -1,6 +1,6 @@
 //  Copyright (c) 2017 Ajai V George
 //  Copyright (c) 2021 Akhil J Nair
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,23 +24,20 @@
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
-    // clang-format off
-    template <typename InIter, typename OutIter,
-        typename T, typename Op, typename Conv,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator<InIter>::value &&
-            hpx::traits::is_segmented_iterator<InIter>::value &&
-            hpx::traits::is_iterator<OutIter>::value &&
-            hpx::traits::is_segmented_iterator<OutIter>::value
-        )>
-    // clang-format on
+
+    template <typename InIter, typename OutIter, typename T, typename Op,
+        typename Conv>
+        requires(hpx::traits::is_iterator_v<InIter> &&
+            hpx::traits::is_segmented_iterator_v<InIter> &&
+            hpx::traits::is_iterator_v<OutIter> &&
+            hpx::traits::is_segmented_iterator_v<OutIter>)
     OutIter tag_invoke(hpx::transform_exclusive_scan_t, InIter first,
         InIter last, OutIter dest, T init, Op&& op, Conv&& conv)
     {
-        static_assert(hpx::traits::is_input_iterator<InIter>::value,
+        static_assert(hpx::traits::is_input_iterator_v<InIter>,
             "Requires at least input iterator.");
 
-        static_assert(hpx::traits::is_output_iterator<OutIter>::value,
+        static_assert(hpx::traits::is_output_iterator_v<OutIter>,
             "Requires at least output iterator.");
 
         if (first == last)
@@ -51,26 +48,22 @@ namespace hpx { namespace segmented {
             HPX_FORWARD(Op, op), std::true_type{}, HPX_FORWARD(Conv, conv));
     }
 
-    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T, typename Op, typename Conv,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_segmented_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
-            hpx::traits::is_segmented_iterator<FwdIter2>::value
-        )>
-    // clang-format on
+        typename T, typename Op, typename Conv>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter1> &&
+            hpx::traits::is_segmented_iterator_v<FwdIter1> &&
+            hpx::traits::is_iterator_v<FwdIter2> &&
+            hpx::traits::is_segmented_iterator_v<FwdIter2>)
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     tag_invoke(hpx::transform_exclusive_scan_t, ExPolicy&& policy,
         FwdIter1 first, FwdIter1 last, FwdIter2 dest, T init, Op&& op,
         Conv&& conv)
     {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+        static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
             "Requires at least forward iterator.");
 
-        static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+        static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
             "Requires at least forward iterator.");
 
         if (first == last)
