@@ -15,11 +15,16 @@ set(tests
     serialization_deque
     serialization_list
     serialization_map
+    serialization_multimap
     serialization_set
+    serialization_multiset
     serialization_simple
     serialization_smart_ptr
     serialization_std_tuple
     serialization_unordered_map
+    serialization_unordered_multimap
+    serialization_unordered_set
+    serialization_unordered_multiset
     serialization_vector
     serialize_with_incompatible_signature
     serialization_std_variant
