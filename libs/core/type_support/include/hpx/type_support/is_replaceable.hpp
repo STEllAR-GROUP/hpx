@@ -14,14 +14,36 @@
 
 namespace hpx::experimental {
 
-    HPX_CXX_EXPORT template <typename T>
+#if defined(__cpp_lib_trivially_relocatable)
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct is_replaceable : std::is_replaceable<T>
+    {
+    };
+#else
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_replaceable
-      : std::bool_constant<std::is_move_constructible_v<T> &&
-            std::is_move_assignable_v<T> && is_trivially_relocatable_v<T>>
+      : std::bool_constant<std::is_object_v<T> && !std::is_const_v<T> &&
+            !std::is_volatile_v<T> &&
+            (std::is_scalar_v<T> ||
+                ((std::is_class_v<T> || std::is_union_v<T>) &&
+                    std::is_trivially_move_constructible_v<T> &&
+                    std::is_trivially_move_assignable_v<T> &&
+                    std::is_trivially_destructible_v<T>) )>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct is_replaceable<T[]> : std::false_type
+    {
+    };
+
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N>
+    struct is_replaceable<T[N]> : std::false_type
+    {
+    };
+#endif
+
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_replaceable_v = is_replaceable<T>::value;
 
 }    // namespace hpx::experimental

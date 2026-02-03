@@ -42,9 +42,14 @@ static_assert(!is_replaceable_v<void>);
 // std::mutex is not move assignable, nor trivially relocatable
 static_assert(!is_replaceable_v<std::mutex>);
 
+struct trivial_class
+{
+    int x;
+};
+static_assert(is_replaceable_v<trivial_class>);
+
 struct not_destructible
 {
-    not_destructible(not_destructible const&);
     not_destructible(not_destructible&&);
     ~not_destructible() = delete;
 };
@@ -63,15 +68,16 @@ struct not_move_constructible
 };
 static_assert(!is_replaceable_v<not_move_constructible>);
 
-struct move_assignable_but_not_trivially_relocatable
+struct move_assignable_but_not_implicitly_replaceable
 {
     std::unique_ptr<int> p;
-    move_assignable_but_not_trivially_relocatable(
-        move_assignable_but_not_trivially_relocatable&&) = default;
-    move_assignable_but_not_trivially_relocatable& operator=(
-        move_assignable_but_not_trivially_relocatable&&) = default;
+    move_assignable_but_not_implicitly_replaceable(
+        move_assignable_but_not_implicitly_replaceable&&) = default;
+    move_assignable_but_not_implicitly_replaceable& operator=(
+        move_assignable_but_not_implicitly_replaceable&&) = default;
 };
-static_assert(!is_replaceable_v<move_assignable_but_not_trivially_relocatable>);
+static_assert(
+    !is_replaceable_v<move_assignable_but_not_implicitly_replaceable>);
 
 // Opt-in example
 struct opt_in_replaceable
