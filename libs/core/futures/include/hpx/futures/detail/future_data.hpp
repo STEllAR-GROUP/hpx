@@ -225,13 +225,15 @@ namespace hpx::lcos::detail {
         using mutex_type = hpx::spinlock;
 
         future_data_base() noexcept
-          : state_(empty)
+          : mtx_("future_data_base")
+          , state_(empty)
           , runs_child_(threads::invalid_thread_id)
         {
         }
 
         explicit future_data_base(init_no_addref no_addref) noexcept
           : future_data_refcnt_base(no_addref)
+          , mtx_("future_data_base")
           , state_(empty)
           , runs_child_(threads::invalid_thread_id)
         {

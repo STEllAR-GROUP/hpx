@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2025 The STE||AR-Group
+# Copyright (c) 2019-2026 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@ set(type_support_headers
     hpx/type_support/detail/wrap_int.hpp
     hpx/type_support/aligned_storage.hpp
     hpx/type_support/assert_owns_lock.hpp
+    hpx/type_support/base_from_member.hpp
     hpx/type_support/bit_cast.hpp
     hpx/type_support/construct_at.hpp
     hpx/type_support/decay.hpp
@@ -27,6 +28,7 @@ set(type_support_headers
     hpx/type_support/macros.hpp
     hpx/type_support/meta.hpp
     hpx/type_support/relocate_at.hpp
+    hpx/type_support/select.hpp
     hpx/type_support/static.hpp
     hpx/type_support/uninitialized_relocation_primitives.hpp
     hpx/type_support/unwrap_ref.hpp

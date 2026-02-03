@@ -24,6 +24,8 @@ namespace hpx::serialization::detail {
     // not every random access sequence is reservable, so we need an explicit
     // trait to determine this
     HPX_HAS_MEMBER_XXX_TRAIT_DEF(reserve)
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(emplace_back)
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(emplace)
 
     template <typename Container>
     HPX_FORCEINLINE void reserve_if_container(
@@ -32,6 +34,23 @@ namespace hpx::serialization::detail {
         if constexpr (has_reserve_v<Container>)
         {
             v.reserve(n);
+        }
+    }
+
+    template <typename Container, typename T>
+    void emplace_into_collection(Container& c, T&& t)
+    {
+        if constexpr (has_emplace_back_v<Container>)
+        {    // vectors, lists, etc.
+            c.emplace_back(HPX_FORWARD(T, t));
+        }
+        else if constexpr (has_emplace_v<Container>)
+        {    // sets, maps, etc.
+            c.emplace(HPX_FORWARD(T, t));
+        }
+        else
+        {
+            c.insert(c.end(), HPX_FORWARD(T, t));
         }
     }
 
@@ -69,7 +88,7 @@ namespace hpx::serialization::detail {
             {
                 value_type elem;
                 ar >> elem;
-                collection.emplace_back(HPX_MOVE(elem));
+                emplace_into_collection(collection, HPX_MOVE(elem));
             }
         }
         else
@@ -84,11 +103,11 @@ namespace hpx::serialization::detail {
                 {
                     std::unique_ptr<value_type> data(
                         constructor_selector_ptr<value_type>::create(ar));
-                    collection.emplace_back(HPX_MOVE(*data));
+                    emplace_into_collection(collection, HPX_MOVE(*data));
                 }
                 else
                 {
-                    collection.emplace_back(
+                    emplace_into_collection(collection,
                         constructor_selector<value_type>::create(ar));
                 }
             }

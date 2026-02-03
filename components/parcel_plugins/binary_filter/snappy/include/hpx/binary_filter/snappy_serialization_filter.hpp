@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,7 +24,7 @@ namespace hpx::plugins::compression {
     struct HPX_LIBRARY_EXPORT snappy_serialization_filter
       : public serialization::binary_filter
     {
-        snappy_serialization_filter(bool compress = false,
+        explicit snappy_serialization_filter(bool compress = false,
             serialization::binary_filter* next_filter = nullptr) noexcept
           : current_(0)
           , compress_(compress)
@@ -45,7 +45,8 @@ namespace hpx::plugins::compression {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        HPX_FORCEINLINE void serialize(Archive& ar, unsigned int const)
+        HPX_FORCEINLINE static constexpr void serialize(
+            Archive& ar, unsigned int const) noexcept
         {
         }
 

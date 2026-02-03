@@ -139,3 +139,15 @@ when using the LCI parcelport to get better performance.
    Normally, the ``worker`` option gives better performance, but the ``rp`` option
    has been observed with better performance on some clusters with 
    prior generation of InfiniBand hardware.
+
+Reference
+=========
+
+Yan, Jiakun, Hartmut Kaiser, and Marc Snir. *Understanding the Communication
+Needs of Asynchronous Many-Task Systems--A Case Study of HPX+ LCI.* arXiv
+preprint, 2025.
+
+Yan, Jiakun, and Marc Snir. *LCI: a Lightweight Communication Interface for
+Efficient Asynchronous Multithreaded Communication.* The International
+Conference for High Performance Computing, Networking, Storage, and Analysis
+(SC), 2025.

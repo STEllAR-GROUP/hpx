@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/serialization/detail/serialize_collection.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
@@ -110,19 +111,10 @@ namespace hpx::serialization {
     void serialize(
         input_archive& ar, std::map<Key, Value, Comp, Alloc>& t, unsigned)
     {
-        using value_type =
-            typename std::map<Key, Value, Comp, Alloc>::value_type;
-
         std::uint64_t size;
         ar >> size;    //-V128
 
-        t.clear();
-        for (std::size_t i = 0; i < size; ++i)
-        {
-            value_type v;
-            ar >> v;
-            t.insert(t.end(), HPX_MOVE(v));
-        }
+        detail::load_collection(ar, t, size);
     }
 
     HPX_CXX_EXPORT template <typename Key, typename Value, typename Comp,
@@ -130,17 +122,35 @@ namespace hpx::serialization {
     void serialize(output_archive& ar,
         std::map<Key, Value, Comp, Alloc> const& t, unsigned)
     {
-        using value_type =
-            typename std::map<Key, Value, Comp, Alloc>::value_type;
-
         std::uint64_t const size = t.size();
         ar << size;
         if (size == 0)
             return;
 
-        for (value_type const& val : t)
-        {
-            ar << val;
-        }
+        detail::save_collection(ar, t);
+    }
+
+    HPX_CXX_EXPORT template <typename Key, typename Value, typename Comp,
+        typename Alloc>
+    void serialize(
+        input_archive& ar, std::multimap<Key, Value, Comp, Alloc>& t, unsigned)
+    {
+        std::uint64_t size;
+        ar >> size;
+
+        detail::load_collection(ar, t, size);
+    }
+
+    HPX_CXX_EXPORT template <typename Key, typename Value, typename Comp,
+        typename Alloc>
+    void serialize(output_archive& ar,
+        std::multimap<Key, Value, Comp, Alloc> const& t, unsigned)
+    {
+        std::uint64_t const size = t.size();
+        ar << size;
+        if (size == 0)
+            return;
+
+        detail::save_collection(ar, t);
     }
 }    // namespace hpx::serialization
