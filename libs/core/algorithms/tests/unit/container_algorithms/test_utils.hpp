@@ -296,20 +296,6 @@ namespace test {
         return c;
     }
 
-    inline std::vector<std::size_t> random_repeat(
-        std::size_t size, std::size_t max_value)
-    {
-        std::vector<std::size_t> c(size);
-        std::random_device rd;
-        std::mt19937 g(rd());
-        std::uniform_int_distribution<std::size_t> dist(0, max_value);
-        for (std::size_t i = 0; i < size; ++i)
-        {
-            c[i] = dist(g);
-        }
-        return c;
-    }
-
     template <typename T>
     inline std::vector<T> random_repeat(std::size_t size, T max_value)
     {
