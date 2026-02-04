@@ -393,9 +393,9 @@ namespace hpx::parallel {
             {
                 return HPX_INVOKE(r, *part_begin, *part_begin);
             }
-            T init = HPX_INVOKE(r, *part_begin, *(part_begin + 1));
+            T init = HPX_INVOKE(r, *part_begin, *std::next(part_begin));
             return sequential_reduce<ExPolicy>(
-                part_begin + 2, part_size - 2, HPX_MOVE(init), r);
+                std::next(part_begin, 2), part_size - 2, HPX_MOVE(init), r);
         }
 
         HPX_CXX_EXPORT template <typename T>
