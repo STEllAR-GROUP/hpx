@@ -745,17 +745,22 @@ namespace hpx::experimental {
             }
 
             // If running in non-sequenced execution policy, we must check
-            // that the ranges are not overlapping in the left
+            // that the ranges do not overlap at all for safe parallelization
             if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 // if we can check for overlapping ranges
                 if constexpr (hpx::traits::is_contiguous_iterator_v<InIter> &&
                     hpx::traits::is_contiguous_iterator_v<FwdIter>)
                 {
-                    auto dest_last = std::next(dest, count);
                     auto last = std::next(first, count);
-                    // if it is not overlapping in the left direction
-                    if (!((first < dest_last) && (dest_last < last)))
+                    auto dest_last = std::next(dest, count);
+
+                    // generic overlap check:
+                    // [first, last) and [dest, dest_last) overlap iff
+                    // dest < last && first < dest_last
+                    bool overlap = (dest < last) && (first < dest_last);
+
+                    if (!overlap)
                     {
                         // use parallel version
                         if constexpr (has_scheduler_executor)
@@ -779,9 +784,9 @@ namespace hpx::experimental {
                                         count, dest));
                         }
                     }
-                    // if it is we continue to use the sequential version
+                    // if there is overlap we continue below to the sequential version
                 }
-                // else we assume that the ranges are overlapping, and continue
+                // else we assume that the ranges may be overlapping, and continue
                 // to use the sequential version
             }
 
@@ -893,16 +898,22 @@ namespace hpx::experimental {
             }
 
             // If running in non-sequenced execution policy, we must check
-            // that the ranges are not overlapping in the left
+            // that the ranges do not overlap at all for safe parallelization
             if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 // if we can check for overlapping ranges
-                if constexpr (hpx::traits::is_contiguous_iterator_v<InIter1> &&
+                if constexpr (hpx::traits::is_contiguous_iterator_v<InIter2> &&
                     hpx::traits::is_contiguous_iterator_v<FwdIter>)
                 {
+                    auto last = std::next(first, count);
                     auto dest_last = std::next(dest, count);
-                    // if it is not overlapping in the left direction
-                    if (!((first < dest_last) && (dest_last < last)))
+
+                    // generic overlap check:
+                    // [first, last) and [dest, dest_last) overlap iff
+                    // dest < last && first < dest_last
+                    bool overlap = (dest < last) && (first < dest_last);
+
+                    if (!overlap)
                     {
                         // use parallel version
                         if constexpr (has_scheduler_executor)
@@ -911,7 +922,7 @@ namespace hpx::experimental {
                             return ex::unique_any_sender<
                                 FwdIter>(parallel::util::get_second_element(
                                 hpx::parallel::detail::uninitialized_relocate_n<
-                                    parallel::util::in_out_result<InIter1,
+                                    parallel::util::in_out_result<InIter2,
                                         FwdIter>>()
                                     .call(HPX_FORWARD(ExPolicy, policy), first,
                                         count, dest)));
@@ -920,15 +931,15 @@ namespace hpx::experimental {
                         {
                             return parallel::util::get_second_element(
                                 hpx::parallel::detail::uninitialized_relocate_n<
-                                    parallel::util::in_out_result<InIter1,
+                                    parallel::util::in_out_result<InIter2,
                                         FwdIter>>()
                                     .call(HPX_FORWARD(ExPolicy, policy), first,
                                         count, dest));
                         }
                     }
-                    // if it is we continue to use the sequential version
+                    // if there is overlap we continue below to the sequential version
                 }
-                // else we assume that the ranges are overlapping, and continue
+                // else we assume that the ranges may be overlapping, and continue
                 // to use the sequential version
             }
 
@@ -1035,8 +1046,8 @@ namespace hpx::experimental {
                 }
             }
 
-            // If running in non-sequence execution policy, we must check
-            // that the ranges are not overlapping in the right
+            // If running in non-sequenced execution policy, we must check
+            // that the ranges do not overlap at all for safe parallelization
             if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 // if we can check for overlapping ranges
@@ -1044,8 +1055,13 @@ namespace hpx::experimental {
                     hpx::traits::is_contiguous_iterator_v<BiIter2>)
                 {
                     auto dest_first = std::prev(dest_last, count);
-                    // if it is not overlapping in the right direction
-                    if (!((first < dest_first) && (dest_first < last)))
+
+                    // generic overlap check:
+                    // [first, last) and [dest_first, dest_last) overlap iff
+                    // dest_first < last && first < dest_last
+                    bool overlap = (dest_first < last) && (first < dest_last);
+
+                    if (!overlap)
                     {
                         // use parallel version
                         if constexpr (has_scheduler_executor)
@@ -1071,9 +1087,9 @@ namespace hpx::experimental {
                                             first, last, dest_last));
                         }
                     }
-                    // if it is we continue to use the sequential version
+                    // if there is overlap we continue below to the sequential version
                 }
-                // else we assume that the ranges are overlapping, and continue
+                // else we assume that the ranges may be overlapping, and continue
                 // to use the sequential version
             }
 
