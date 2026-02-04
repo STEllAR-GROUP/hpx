@@ -19,6 +19,7 @@ set(tests
     mismatch_differently_sized_ranges
     num_cores
     reduce_3641
+    reduce_6647
     scan_different_inits
     scan_non_commutative
     scan_shortlength
