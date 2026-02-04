@@ -494,7 +494,7 @@ namespace hpx::execution::experimental {
         friend constexpr hpx::execution::experimental::
             forward_progress_guarantee
             tag_invoke(
-                hpx::execution::experimental::get_forward_progress_guarantee_t,
+                hpx::execution::experimental::get_forward_progress_guarantee_t,1
                 thread_pool_policy_scheduler const& sched) noexcept
         {
             if (hpx::has_async_policy(sched.policy()))
@@ -621,7 +621,8 @@ namespace hpx::execution::experimental {
         return tag(scheduler.policy());
     }
 
-    HPX_CXX_EXPORT using thread_pool_scheduler = thread_pool_policy_scheduler<hpx::launch>;
+    HPX_CXX_EXPORT using thread_pool_scheduler =
+        thread_pool_policy_scheduler<hpx::launch>;
 
 #if defined(HPX_HAVE_STDEXEC)
     // Add get_domain query to the scheduler (following system_context.hpp pattern)
@@ -630,6 +631,25 @@ namespace hpx::execution::experimental {
         thread_pool_policy_scheduler<Policy> const& sched) noexcept
     {
         return thread_pool_domain<Policy>{};
+    }
+
+    // Add stdexec-specific schedule customization
+    // stdexec uses its own schedule tag type, so we need to provide tag_invoke for it
+    template <typename Policy>
+    constexpr auto tag_invoke(stdexec::schedule_t,
+        thread_pool_policy_scheduler<Policy> const& sched) noexcept
+    {
+        // Return the same sender type as HPX's schedule
+        return typename thread_pool_policy_scheduler<Policy>::template sender<
+            thread_pool_policy_scheduler<Policy>>{sched};
+    }
+
+    template <typename Policy>
+    constexpr auto tag_invoke(stdexec::schedule_t,
+        thread_pool_policy_scheduler<Policy>&& sched) noexcept
+    {
+        return typename thread_pool_policy_scheduler<Policy>::template sender<
+            thread_pool_policy_scheduler<Policy>>{HPX_MOVE(sched)};
     }
 #endif
 

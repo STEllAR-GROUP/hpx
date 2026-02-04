@@ -292,9 +292,10 @@ namespace hpx::execution::experimental {
         -> explicit_scheduler_executor<std::decay_t<BaseScheduler>>;
 
     // support all properties exposed by the wrapped scheduler
-    template <typename Tag, typename BaseScheduler, typename Property>
+    HPX_CXX_EXPORT template <typename Tag, typename BaseScheduler,
+        typename Property>
         requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
-    HPX_CXX_EXPORT auto tag_invoke(Tag tag,
+    auto tag_invoke(Tag tag,
         explicit_scheduler_executor<BaseScheduler> const& exec, Property&& prop)
         -> decltype(explicit_scheduler_executor<BaseScheduler>(
             std::declval<Tag>()(
@@ -304,9 +305,9 @@ namespace hpx::execution::experimental {
             tag(exec.sched(), HPX_FORWARD(Property, prop)));
     }
 
-    template <typename Tag, typename BaseScheduler>
+    HPX_CXX_EXPORT template <typename Tag, typename BaseScheduler>
         requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
-    HPX_CXX_EXPORT auto tag_invoke(
+    auto tag_invoke(
         Tag tag, explicit_scheduler_executor<BaseScheduler> const& exec)
         -> decltype(std::declval<Tag>()(std::declval<BaseScheduler>()))
     {
