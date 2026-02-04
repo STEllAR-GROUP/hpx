@@ -99,14 +99,12 @@ static std::map<KernelType, std::string> make_name_by_ktype()
 {
     std::map<KernelType, std::string> names;
 
-    if (names.empty())
+    auto types = ktype_by_name;
+    for (auto pair : types)
     {
-        auto types = ktype_by_name;
-        for (auto pair : types)
-        {
-            names[pair.second] = pair.first;
-        }
+        names[pair.second] = pair.first;
     }
+
 
     return names;
 }
@@ -133,14 +131,12 @@ static std::map<DependenceType, std::string> make_name_by_dtype()
 {
     std::map<DependenceType, std::string> names;
 
-    if (names.empty())
+    auto types = dtype_by_name;
+    for (auto pair : types)
     {
-        auto types = dtype_by_name;
-        for (auto pair : types)
-        {
-            names[pair.second] = pair.first;
-        }
+        names[pair.second] = pair.first;
     }
+
 
     return names;
 }
@@ -397,7 +393,6 @@ size_t TaskGraph::reverse_dependencies(
         }
         return idx;
     }
-    break;
     default:
         assert(false && "unexpected dependence type");
     };
@@ -555,7 +550,6 @@ size_t TaskGraph::dependencies(
         }
         return idx;
     }
-    break;
     default:
         assert(false && "unexpected dependence type");
     };
@@ -645,7 +639,7 @@ void TaskGraph::execute_point(long timestep, long point, char* output_ptr,
                         {
                             printf("ERROR: Task Bench detected corrupted value "
                                    "in task (graph %ld timestep %ld point %ld) "
-                                   "input %ld\n  At position %lu within the "
+                                   "input %zu\n  At position %zu within the "
                                    "buffer, expected value (timestep %ld point "
                                    "%ld) but got (timestep %ld point %ld)\n",
                                 graph_index, timestep, point, idx, i,
@@ -964,7 +958,7 @@ App::App(int argc, char** argv)
             {
                 fprintf(stderr,
                     "error: Invalid flag \"" OUTPUT_FLAG
-                    " %ld\" must be >= %lu\n",
+                    " %ld\" must be >= %zu\n",
                     value, sizeof(std::pair<long, long>));
                 abort();
             }
@@ -1064,7 +1058,7 @@ void App::check() const
 #ifdef DEBUG_CORE
     if (graphs.size() >= sizeof(TaskGraphMask) * 8)
     {
-        fprintf(stderr, "error: Can only execute up to %lu task graphs\n",
+        fprintf(stderr, "error: Can only execute up to %zu task graphs\n",
             sizeof(TaskGraphMask) * 8);
         abort();
     }
@@ -1163,8 +1157,8 @@ void App::display() const
         printf("        Iterations: %ld\n", g.kernel.iterations);
         printf("        Samples: %d\n", g.kernel.samples);
         printf("        Imbalance: %f\n", g.kernel.imbalance);
-        printf("      Output Bytes: %lu\n", g.output_bytes_per_task);
-        printf("      Scratch Bytes: %lu\n", g.scratch_bytes_per_task);
+        printf("      Output Bytes: %zu\n", g.output_bytes_per_task);
+        printf("      Scratch Bytes: %zu\n", g.scratch_bytes_per_task);
 
         if (verbose > 0)
         {
@@ -1382,12 +1376,11 @@ void App::report_timing(double elapsed_seconds) const
 
             for (long p = offset; p < offset + width; ++p)
             {
-                long point_node = 0;
                 long node_first = 0;
                 long node_last = -1;
                 if (nodes > 0)
                 {
-                    point_node = p * nodes / g.max_width;
+                    long point_node = p * nodes / g.max_width;
                     node_first = point_node * g.max_width / nodes;
                     node_last = (point_node + 1) * g.max_width / nodes - 1;
                 }

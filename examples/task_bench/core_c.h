@@ -54,21 +54,21 @@ typedef enum kernel_type_t
 
 typedef struct kernel_t
 {
-    kernel_type_t type;
-    long iterations;
-    int samples;
-    double imbalance;
+    kernel_type_t type; // cppcheck-suppress unusedStructMember
+    long iterations; // cppcheck-suppress unusedStructMember
+    int samples; // cppcheck-suppress unusedStructMember
+    double imbalance; // cppcheck-suppress unusedStructMember
 } kernel_t;
 
 typedef struct interval_t
 {
-    long start;
-    long end;
+    long start; // cppcheck-suppress unusedStructMember
+    long end; // cppcheck-suppress unusedStructMember
 } interval_t;
 
 typedef struct interval_list_t
 {
-    void* impl;
+    void* impl; // cppcheck-suppress unusedStructMember
 } interval_list_t;
 
 void interval_list_destroy(interval_list_t intervals);
@@ -77,17 +77,17 @@ interval_t interval_list_interval(interval_list_t intervals, long index);
 
 typedef struct task_graph_t
 {
-    long graph_index;
-    long timesteps;
-    long max_width;
-    dependence_type_t dependence;
-    long radix;
-    long period;
-    double fraction_connected;
-    kernel_t kernel;
-    size_t output_bytes_per_task;
-    size_t scratch_bytes_per_task;
-    int nb_fields;
+    long graph_index; // cppcheck-suppress unusedStructMember
+    long timesteps; // cppcheck-suppress unusedStructMember
+    long max_width; // cppcheck-suppress unusedStructMember
+    dependence_type_t dependence; // cppcheck-suppress unusedStructMember
+    long radix; // cppcheck-suppress unusedStructMember
+    long period; // cppcheck-suppress unusedStructMember
+    double fraction_connected; // cppcheck-suppress unusedStructMember
+    kernel_t kernel; // cppcheck-suppress unusedStructMember
+    size_t output_bytes_per_task; // cppcheck-suppress unusedStructMember
+    size_t scratch_bytes_per_task; // cppcheck-suppress unusedStructMember
+    int nb_fields; // cppcheck-suppress unusedStructMember
 } task_graph_t;
 
 long task_graph_offset_at_timestep(task_graph_t graph, long timestep);
@@ -119,7 +119,7 @@ void task_graph_prepare_scratch(char* scratch_ptr, size_t scratch_bytes);
 
 typedef struct task_graph_list_t
 {
-    void* impl;
+    void* impl; // cppcheck-suppress unusedStructMember
 } task_graph_list_t;
 
 void task_graph_list_destroy(task_graph_list_t graphs);
@@ -128,7 +128,7 @@ task_graph_t task_graph_list_task_graph(task_graph_list_t graphs, long index);
 
 typedef struct app_t
 {
-    void* impl;
+    void* impl; // cppcheck-suppress unusedStructMember
 } app_t;
 
 app_t app_create(int argc, char** argv);

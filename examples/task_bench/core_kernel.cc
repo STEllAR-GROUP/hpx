@@ -14,12 +14,11 @@
  */
 #include <cassert>
 #include <cmath>
+#include <cstring>
 
 #if (__AVX2__ == 1) || (__AVX__ == 1)
 #include <immintrin.h>
 #endif
-
-#include <string.h>
 
 #include "core.h"
 #include "core_kernel.h"
@@ -70,8 +69,6 @@ void copy(char* scratch_ptr, size_t scratch_bytes)
     char* prolog_dst = prolog_ptr + prolog_padding / 2;
     size_t prolog_cp_size = prolog_padding / 2;
 
-    size_t nb_m256 = nbytes_aligned / 64;
-
     char* epilog_src = epilog_ptr;
     char* epilog_dst = epilog_ptr + epilog_padding / 2;
     size_t epilog_cp_size = epilog_padding / 2;
@@ -87,10 +84,13 @@ void copy(char* scratch_ptr, size_t scratch_bytes)
     assert((intptr_t) aligned_src % 32 == 0);
     assert((intptr_t) aligned_dst % 32 == 0);
 #if (__AVX2__ == 1) || (__AVX__ == 1)
+    size_t nb_m256 = nbytes_aligned / 64;
     for (i = 0; i < nb_m256; i++)
     {
         __m256d* dst_m256 = reinterpret_cast<__m256d*>(aligned_dst);
-        *dst_m256 = _mm256_load_pd(reinterpret_cast<double*>(aligned_src));
+        double temp[4];
+        std::memcpy(temp, aligned_src, sizeof(temp));
+        *dst_m256 = _mm256_load_pd(temp);
         aligned_src += 32;
         aligned_dst += 32;
     }
@@ -176,9 +176,14 @@ void execute_kernel_dgemm(
     alpha = 1.0;
     beta = 1.0;
 
-    double* A = reinterpret_cast<double*>(scratch_ptr);
-    double* B = reinterpret_cast<double*>(scratch_ptr + N * sizeof(double));
-    double* C = reinterpret_cast<double*>(scratch_ptr + 2 * N * sizeof(double));
+    assert(reinterpret_cast<uintptr_t>(scratch_ptr) % alignof(double) == 0);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    double* A = static_cast<double*>(static_cast<void*>(scratch_ptr));
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    double* B = static_cast<double*>(static_cast<void*>(scratch_ptr + N * sizeof(double)));
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    double* C = static_cast<double*>(static_cast<void*>(scratch_ptr + 2 * N * sizeof(double)));
 
     for (long iter = 0; iter < kernel.iterations; iter++)
     {
@@ -207,8 +212,12 @@ void execute_kernel_daxpy(Kernel const& kernel, char* scratch_large_ptr,
 
         alpha = 1.0;
 
-        double* X = reinterpret_cast<double*>(scratch_ptr);
-        double* Y = reinterpret_cast<double*>(scratch_ptr + N * sizeof(double));
+        assert(reinterpret_cast<uintptr_t>(scratch_ptr) % alignof(double) == 0);
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        double* X = static_cast<double*>(static_cast<void*>(scratch_ptr));
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        double* Y = static_cast<double*>(static_cast<void*>(scratch_ptr + N * sizeof(double)));
 
         cblas_daxpy(N, alpha, X, 1, Y, 1);
     }
@@ -268,7 +277,7 @@ double execute_kernel_compute(Kernel const& kernel)
         }
     }
 #endif
-    double* C = (double*) A;
+    double* C = static_cast<double*>(A);
     double dot = 1.0;
     for (int i = 0; i < 64; i++)
     {

@@ -86,7 +86,6 @@ int siphash(uint8_t const* in, size_t const inlen, uint8_t const* k,
     uint64_t v3 = 0x7465646279746573ULL;
     uint64_t k0 = U8TO64_LE(k);
     uint64_t k1 = U8TO64_LE(k + 8);
-    uint64_t m;
     int i;
     uint8_t const* end = in + inlen - (inlen % sizeof(uint64_t));
     int const left = inlen & 7;
@@ -101,7 +100,7 @@ int siphash(uint8_t const* in, size_t const inlen, uint8_t const* k,
 
     for (; in != end; in += 8)
     {
-        m = U8TO64_LE(in);
+        uint64_t m = U8TO64_LE(in);
         v3 ^= m;
 
         TRACE;

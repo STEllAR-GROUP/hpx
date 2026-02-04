@@ -224,18 +224,17 @@ int hpx_main(int argc, char* argv[])
                         policy, first_point, last_point + 1, [&](int point) {
                             std::vector<MPI_Request> requests;
                             long point_index = point - first_point;
-                            auto& point_inputs = inputs[point_index];
                             auto& point_n_inputs = n_inputs[point_index];
                             auto& point_output = outputs[point_index];
                             auto& point_output_new = outputs_new[point_index];
                             auto& point_input_ptr = input_ptr[point_index];
                             auto& point_input_bytes = input_bytes[point_index];
-                            auto& point_deps = deps[point_index];
-                            auto& point_rev_deps = rev_deps[point_index];
 
                             point_n_inputs = 0;
                             if (point >= offset && point < offset + width)
                             {
+                                auto& point_inputs = inputs[point_index];
+                                auto& point_deps = deps[point_index];
                                 for (auto interval : point_deps)
                                 {
                                     for (long dep = interval.first;
@@ -249,10 +248,10 @@ int hpx_main(int argc, char* argv[])
                                         if (first_point <= dep &&
                                             dep <= last_point)
                                         {
-                                            auto& output =
-                                                outputs[dep - first_point];
                                             if (timestep % 2 == 0)
                                             {
+                                                auto& output =
+                                                    outputs[dep - first_point];
                                                 point_inputs[point_n_inputs]
                                                     .assign(output.begin(),
                                                         output.end());
@@ -290,6 +289,7 @@ int hpx_main(int argc, char* argv[])
                             if (point >= last_offset &&
                                 point < last_offset + last_width)
                             {
+                                auto& point_rev_deps = rev_deps[point_index];
                                 for (auto interval : point_rev_deps)
                                 {
                                     for (long dep = interval.first;
@@ -366,15 +366,14 @@ int hpx_main(int argc, char* argv[])
                     for (long point = first_point; point <= last_point; ++point)
                     {
                         long point_index = point - first_point;
-                        auto& point_inputs = inputs[point_index];
                         auto& point_n_inputs = n_inputs[point_index];
                         auto& point_output = outputs[point_index];
-                        auto& point_deps = deps[point_index];
-                        auto& point_rev_deps = rev_deps[point_index];
 
                         point_n_inputs = 0;
                         if (point >= offset && point < offset + width)
                         {
+                            auto& point_inputs = inputs[point_index];
+                            auto& point_deps = deps[point_index];
                             for (auto interval : point_deps)
                             {
                                 for (long dep = interval.first;
@@ -413,6 +412,7 @@ int hpx_main(int argc, char* argv[])
                         if (point >= last_offset &&
                             point < last_offset + last_width)
                         {
+                            auto& point_rev_deps = rev_deps[point_index];
                             for (auto interval : point_rev_deps)
                             {
                                 for (long dep = interval.first;

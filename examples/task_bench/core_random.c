@@ -52,13 +52,13 @@ int main()
     {
         double v = random_uniform(&sample, sizeof(sample));
         size_t bucket = size_t(floor(v * num_buckets));
-        assert(bucket >= 0 && bucket < num_buckets);
+        assert(bucket < num_buckets);
         histogram[bucket]++;
     }
 
     for (size_t bucket = 0; bucket < num_buckets; ++bucket)
     {
-        printf("%lu\n", histogram[bucket]);
+        printf("%zu\n", histogram[bucket]);
     }
 
     return 0;
