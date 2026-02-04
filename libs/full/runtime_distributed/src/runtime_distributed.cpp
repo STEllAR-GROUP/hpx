@@ -406,25 +406,6 @@ namespace hpx {
 
         auto result_value = runtime::run_helper(func, result, false);
 
-        // Ensure all pending collective actions and continuations complete before
-        // runtime teardown. This is critical to avoid use-after-free bugs in Debug
-        // builds on macOS where global allocators may be destroyed while collective
-        // operations are still executing. The issue manifests as crashes in
-        // one_size_heap_list::alloc when collective continuations run after hpx_main
-        // returns but before static destructors complete.
-        //
-        // This synchronization ensures:
-        // 1. All pending parcels are flushed and processed
-        // 2. All background work in the parcel handler completes
-        // 3. All collective operations and their continuations finish
-#if defined(HPX_HAVE_NETWORKING)
-        parcel_handler_.flush_parcels();
-#endif
-
-        // Allow any remaining background work to complete
-        // This gives continuations time to finish before teardown
-        std::this_thread::yield();
-
         if (post_main_ != nullptr)
         {
             post_main_();
