@@ -381,6 +381,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/pointer_category.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
@@ -745,18 +746,28 @@ namespace hpx::experimental {
             }
 
             // If running in non-sequenced execution policy, we must check
-            // that the ranges are not overlapping in the left
+            // that the ranges are not overlapping in the left direction
             if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 // if we can check for overlapping ranges
                 if constexpr (hpx::traits::is_contiguous_iterator_v<InIter> &&
                     hpx::traits::is_contiguous_iterator_v<FwdIter>)
                 {
-                    auto dest_last = std::next(dest, count);
                     auto last = std::next(first, count);
-                    // if it is not overlapping in the left direction
-                    if (!((first < dest_last) && (dest_last < last)))
+                    auto dest_last = std::next(dest, count);
+
+                    // Left-directional overlap check: dest_last falls inside
+                    // [first, last). This detects the overlap direction that is
+                    // safe for forward sequential execution (dest < first).
+                    // Right overlaps (dest >= first) are a bug in both
+                    // sequential and parallel code.
+                    bool overlap = (first < dest_last) && (dest_last < last);
+
+                    if (!overlap)
                     {
+                        // Assert that there is no overlap in any direction
+                        // when going parallel.
+                        HPX_ASSERT(!((dest < last) && (first < dest_last)));
                         // use parallel version
                         if constexpr (has_scheduler_executor)
                         {
@@ -779,9 +790,9 @@ namespace hpx::experimental {
                                         count, dest));
                         }
                     }
-                    // if it is we continue to use the sequential version
+                    // if there is overlap we continue below to the sequential version
                 }
-                // else we assume that the ranges are overlapping, and continue
+                // else we assume that the ranges may be overlapping, and continue
                 // to use the sequential version
             }
 
@@ -893,17 +904,29 @@ namespace hpx::experimental {
             }
 
             // If running in non-sequenced execution policy, we must check
-            // that the ranges are not overlapping in the left
+            // that the ranges are not overlapping in the left direction
             if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 // if we can check for overlapping ranges
                 if constexpr (hpx::traits::is_contiguous_iterator_v<InIter1> &&
+                    hpx::traits::is_contiguous_iterator_v<InIter2> &&
                     hpx::traits::is_contiguous_iterator_v<FwdIter>)
                 {
+                    auto last = std::next(first, count);
                     auto dest_last = std::next(dest, count);
-                    // if it is not overlapping in the left direction
-                    if (!((first < dest_last) && (dest_last < last)))
+
+                    // Left-directional overlap check: dest_last falls inside
+                    // [first, last). This detects the overlap direction that is
+                    // safe for forward sequential execution (dest < first).
+                    // Right overlaps (dest >= first) are a bug in both
+                    // sequential and parallel code.
+                    bool overlap = (first < dest_last) && (dest_last < last);
+
+                    if (!overlap)
                     {
+                        // Assert that there is no overlap in any direction
+                        // when going parallel.
+                        HPX_ASSERT(!((dest < last) && (first < dest_last)));
                         // use parallel version
                         if constexpr (has_scheduler_executor)
                         {
@@ -926,9 +949,9 @@ namespace hpx::experimental {
                                         count, dest));
                         }
                     }
-                    // if it is we continue to use the sequential version
+                    // if there is overlap we continue below to the sequential version
                 }
-                // else we assume that the ranges are overlapping, and continue
+                // else we assume that the ranges may be overlapping, and continue
                 // to use the sequential version
             }
 
@@ -1035,8 +1058,8 @@ namespace hpx::experimental {
                 }
             }
 
-            // If running in non-sequence execution policy, we must check
-            // that the ranges are not overlapping in the right
+            // If running in non-sequenced execution policy, we must check
+            // that the ranges are not overlapping in the right direction
             if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 // if we can check for overlapping ranges
@@ -1044,9 +1067,20 @@ namespace hpx::experimental {
                     hpx::traits::is_contiguous_iterator_v<BiIter2>)
                 {
                     auto dest_first = std::prev(dest_last, count);
-                    // if it is not overlapping in the right direction
-                    if (!((first < dest_first) && (dest_first < last)))
+
+                    // Right-directional overlap check: dest_first falls inside
+                    // (first, last). This detects the overlap direction that is
+                    // safe for backward sequential execution (dest_first > first).
+                    // Left overlaps (dest_first <= first) are a bug in both
+                    // sequential and parallel code.
+                    bool overlap = (first < dest_first) && (dest_first < last);
+
+                    if (!overlap)
                     {
+                        // Assert that there is no overlap in any direction
+                        // when going parallel.
+                        HPX_ASSERT(
+                            !((dest_first < last) && (first < dest_last)));
                         // use parallel version
                         if constexpr (has_scheduler_executor)
                         {
@@ -1071,9 +1105,9 @@ namespace hpx::experimental {
                                             first, last, dest_last));
                         }
                     }
-                    // if it is we continue to use the sequential version
+                    // if there is overlap we continue below to the sequential version
                 }
-                // else we assume that the ranges are overlapping, and continue
+                // else we assume that the ranges may be overlapping, and continue
                 // to use the sequential version
             }
 
