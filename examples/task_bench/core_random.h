@@ -21,7 +21,7 @@
 extern "C" {
 #endif
 
-double random_uniform(const void *input, size_t input_bytes);
+double random_uniform(const void* input, size_t input_bytes);
 
 #ifdef __cplusplus
 }

@@ -26,61 +26,72 @@ typedef kernel_type_t KernelType;
 
 struct TaskGraph;
 
-struct Kernel : public kernel_t {
-  Kernel() = default;
-  Kernel(kernel_t k) : kernel_t(k) {}
+struct Kernel : public kernel_t
+{
+    Kernel() = default;
+    Kernel(kernel_t k)
+      : kernel_t(k)
+    {
+    }
 
 private:
-  void execute(long graph_index, long timestep, long point,
-               char *scratch_ptr, size_t scratch_bytes) const;
-  friend struct TaskGraph;
+    void execute(long graph_index, long timestep, long point, char* scratch_ptr,
+        size_t scratch_bytes) const;
+    friend struct TaskGraph;
 };
 
-struct TaskGraph : public task_graph_t {
-  TaskGraph() = default;
-  TaskGraph(task_graph_t t) : task_graph_t(t) {}
+struct TaskGraph : public task_graph_t
+{
+    TaskGraph() = default;
+    TaskGraph(task_graph_t t)
+      : task_graph_t(t)
+    {
+    }
 
-  long offset_at_timestep(long timestep) const;
-  long width_at_timestep(long timestep) const;
+    long offset_at_timestep(long timestep) const;
+    long width_at_timestep(long timestep) const;
 
-  long max_dependence_sets() const;
-   
-  long timestep_period() const;
-  long dependence_set_at_timestep(long timestep) const;
+    long max_dependence_sets() const;
 
-  std::vector<std::pair<long, long> > reverse_dependencies(long dset, long point) const;
-  std::vector<std::pair<long, long> > dependencies(long dset, long point) const;
+    long timestep_period() const;
+    long dependence_set_at_timestep(long timestep) const;
 
-  size_t reverse_dependencies(long dset, long point, std::pair<long, long> *deps) const;
-  size_t dependencies(long dset, long point, std::pair<long, long> *deps) const;
+    std::vector<std::pair<long, long>> reverse_dependencies(
+        long dset, long point) const;
+    std::vector<std::pair<long, long>> dependencies(
+        long dset, long point) const;
 
-  size_t num_reverse_dependencies(long dset, long point) const;
-  size_t num_dependencies(long dset, long point) const;
+    size_t reverse_dependencies(
+        long dset, long point, std::pair<long, long>* deps) const;
+    size_t dependencies(
+        long dset, long point, std::pair<long, long>* deps) const;
 
-  void execute_point(long timestep, long point,
-                     char *output_ptr, size_t output_bytes,
-                     const char **input_ptr, const size_t *input_bytes,
-                     size_t n_inputs,
-                     char *scratch_ptr, size_t scratch_bytes) const;
-  static void prepare_scratch(char *scratch_ptr, size_t scratch_bytes);
+    size_t num_reverse_dependencies(long dset, long point) const;
+    size_t num_dependencies(long dset, long point) const;
+
+    void execute_point(long timestep, long point, char* output_ptr,
+        size_t output_bytes, char const** input_ptr, size_t const* input_bytes,
+        size_t n_inputs, char* scratch_ptr, size_t scratch_bytes) const;
+    static void prepare_scratch(char* scratch_ptr, size_t scratch_bytes);
 };
 
-struct App {
-  std::vector<TaskGraph> graphs;
-  long nodes;
-  int verbose;
-  bool enable_graph_validation;
+struct App
+{
+    std::vector<TaskGraph> graphs;
+    long nodes;
+    int verbose;
+    bool enable_graph_validation;
 
-  App(int argc, char **argv);
-  void check() const;
-  void display() const;
-  void report_timing(double elapsed_seconds) const;
+    App(int argc, char** argv);
+    void check() const;
+    void display() const;
+    void report_timing(double elapsed_seconds) const;
 };
 
 static_assert(std::is_pod<Kernel>::value, "Kernel must be POD");
 static_assert(std::is_pod<TaskGraph>::value, "TaskGraph must be POD");
 
-long long count_flops_per_task(const TaskGraph &g, long timestep, long point);
-long long count_bytes_per_task(const TaskGraph &g, long timestep, long point);
+long long count_flops_per_task(TaskGraph const& g, long timestep, long point);
+long long count_bytes_per_task(TaskGraph const& g, long timestep, long point);
 
 #endif

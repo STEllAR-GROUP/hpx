@@ -14,8 +14,8 @@
  */
 #include <assert.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "core_random.h"
 
@@ -27,39 +27,40 @@
 #include <stdio.h>
 #endif
 
-void gen_bits(const void *input, size_t input_bytes, void *output)
+void gen_bits(void const* input, size_t input_bytes, void* output)
 {
-
-  const uint8_t k[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-  siphash(input, input_bytes, k, output, sizeof(uint64_t));
+    uint8_t const k[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+    siphash(input, input_bytes, k, output, sizeof(uint64_t));
 }
 
-double random_uniform(const void *input, size_t input_bytes)
+double random_uniform(void const* input, size_t input_bytes)
 {
-  uint64_t bits;
-  gen_bits(input, input_bytes, &bits);
+    uint64_t bits;
+    gen_bits(input, input_bytes, &bits);
 
-  return ((double)bits) * 0x1.p-64;
+    return ((double) bits) * 0x1.p-64;
 }
 
 #ifdef TEST_HARNESS
-int main() {
-  constexpr size_t num_buckets = 1024;
-  size_t histogram[num_buckets] = {0};
+int main()
+{
+    constexpr size_t num_buckets = 1024;
+    size_t histogram[num_buckets] = {0};
 
-  constexpr size_t num_samples = 1 << 20;
-  for (size_t sample = 0; sample < num_samples; sample++) {
-    double v = random_uniform(&sample, sizeof(sample));
-    size_t bucket = size_t(floor(v * num_buckets));
-    assert(bucket >= 0 && bucket < num_buckets);
-    histogram[bucket]++;
-     
-  }
+    constexpr size_t num_samples = 1 << 20;
+    for (size_t sample = 0; sample < num_samples; sample++)
+    {
+        double v = random_uniform(&sample, sizeof(sample));
+        size_t bucket = size_t(floor(v * num_buckets));
+        assert(bucket >= 0 && bucket < num_buckets);
+        histogram[bucket]++;
+    }
 
-  for (size_t bucket = 0; bucket < num_buckets; ++bucket) {
-    printf("%lu\n", histogram[bucket]);
-  }
+    for (size_t bucket = 0; bucket < num_buckets; ++bucket)
+    {
+        printf("%lu\n", histogram[bucket]);
+    }
 
-  return 0;
+    return 0;
 }
 #endif
