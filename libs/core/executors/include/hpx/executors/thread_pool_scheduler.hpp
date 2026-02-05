@@ -494,7 +494,7 @@ namespace hpx::execution::experimental {
         friend constexpr hpx::execution::experimental::
             forward_progress_guarantee
             tag_invoke(
-                hpx::execution::experimental::get_forward_progress_guarantee_t,1
+                hpx::execution::experimental::get_forward_progress_guarantee_t,
                 thread_pool_policy_scheduler const& sched) noexcept
         {
             if (hpx::has_async_policy(sched.policy()))
