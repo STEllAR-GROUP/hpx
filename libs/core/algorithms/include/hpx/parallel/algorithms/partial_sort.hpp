@@ -531,26 +531,43 @@ namespace hpx::parallel {
 
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Comp, typename Proj>
-        static util::detail::algorithm_result_t<ExPolicy, Iter> parallel(
-            ExPolicy&& policy, Iter first, Iter middle, Sent last, Comp&& comp,
-            Proj&& proj)
+        static decltype(auto) parallel(ExPolicy&& policy, Iter first,
+            Iter middle, Sent last, Comp&& comp, Proj&& proj)
         {
-            using algorithm_result =
-                util::detail::algorithm_result<ExPolicy, Iter>;
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-            try
+            if constexpr (has_scheduler_executor)
             {
-                // call the sort routine and return the right type,
-                // depending on execution policy
-                return algorithm_result::get(parallel_partial_sort(
-                    HPX_FORWARD(ExPolicy, policy), first, middle, last,
-                    util::compare_projected<Comp&, Proj&>(comp, proj)));
+                namespace ex = hpx::execution::experimental;
+                return ex::just(first, middle, last) |
+                    ex::then([comp = HPX_FORWARD(Comp, comp),
+                                 proj = HPX_FORWARD(Proj, proj)](
+                                 Iter first, Iter middle, Iter last) -> Iter {
+                        return sequential_partial_sort(first, middle, last,
+                            util::compare_projected<std::decay_t<Comp>,
+                                std::decay_t<Proj>>(comp, proj));
+                    });
             }
-            catch (...)
+            else
             {
-                return algorithm_result::get(
-                    detail::handle_exception<ExPolicy, Iter>::call(
-                        std::current_exception()));
+                using algorithm_result =
+                    util::detail::algorithm_result<ExPolicy, Iter>;
+
+                try
+                {
+                    // call the sort routine and return the right type,
+                    // depending on execution policy
+                    return algorithm_result::get(parallel_partial_sort(
+                        HPX_FORWARD(ExPolicy, policy), first, middle, last,
+                        util::compare_projected<Comp&, Proj&>(comp, proj)));
+                }
+                catch (...)
+                {
+                    return algorithm_result::get(
+                        detail::handle_exception<ExPolicy, Iter>::call(
+                            std::current_exception()));
+                }
             }
         }
     };
@@ -595,9 +612,9 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, RandIter>
-        tag_fallback_invoke(hpx::partial_sort_t, ExPolicy&& policy,
-            RandIter first, RandIter middle, RandIter last, Comp comp = Comp())
+        friend decltype(auto) tag_fallback_invoke(hpx::partial_sort_t,
+            ExPolicy&& policy, RandIter first, RandIter middle, RandIter last,
+            Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires at least random access iterator.");
