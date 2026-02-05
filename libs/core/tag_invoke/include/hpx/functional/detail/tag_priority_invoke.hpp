@@ -324,8 +324,7 @@ namespace hpx::functional::detail {
                     static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
 
-            // Is not nothrow tag-override-invocable, but nothrow
-            // tag-invocable
+            // Is not nothrow tag-override-invocable, but nothrow tag-invocable
             template <typename... Args,
                 typename = std::enable_if_t<
                     !is_nothrow_tag_override_invocable_v<Tag, Args&&...> &&
@@ -340,8 +339,8 @@ namespace hpx::functional::detail {
                     static_cast<Tag const&>(*this), HPX_FORWARD(Args, args)...);
             }
 
-            // Is not nothrow tag-override-invocable, not nothrow
-            // tag-invocable, but nothrow tag-fallback-invocable
+            // Is not nothrow tag-override-invocable, not nothrow tag-invocable,
+            // but nothrow tag-fallback-invocable
             template <typename... Args,
                 typename = std::enable_if_t<
                     !is_nothrow_tag_override_invocable_v<Tag, Args&&...> &&

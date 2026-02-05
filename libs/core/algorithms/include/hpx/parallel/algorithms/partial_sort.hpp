@@ -346,15 +346,6 @@ namespace hpx::parallel {
         hpx::future<Iter> parallel_partial_sort(ExPolicy&& policy, Iter first,
             Iter middle, Iter last, std::uint32_t level, Comp&& comp = Comp());
 
-        HPX_CXX_EXPORT struct sort_thread_helper
-        {
-            template <typename... Ts>
-            decltype(auto) operator()(Ts&&... ts) const
-            {
-                return sort_thread(HPX_FORWARD(Ts, ts)...);
-            }
-        };
-
         HPX_CXX_EXPORT struct parallel_partial_sort_helper
         {
             template <typename... Ts>
@@ -399,15 +390,15 @@ namespace hpx::parallel {
                         policy.parameters(), policy.executor(),
                         hpx::chrono::null_duration, cores, nelem);
 
-                hpx::future<Iter> left = execution::async_execute(
-                    policy.executor(), sort_thread_helper(), policy, first,
-                    c_last, comp, chunk_size);
+                hpx::future<Iter> left =
+                    execution::async_execute(policy.executor(), sort_thread{},
+                        policy, first, c_last, comp, chunk_size);
 
                 hpx::future<Iter> right;
                 if (middle != c_last)
                 {
                     right = execution::async_execute(policy.executor(),
-                        parallel_partial_sort_helper(), policy, c_last + 1,
+                        parallel_partial_sort_helper{}, policy, c_last + 1,
                         middle, last, level - 1, comp);
                 }
                 else
