@@ -25,6 +25,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -326,3 +328,5 @@ namespace hpx::util::plugin {
         }
     };
 }    // namespace hpx::util::plugin
+
+#include <hpx/config/warnings_suffix.hpp>

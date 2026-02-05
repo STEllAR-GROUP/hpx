@@ -10,6 +10,8 @@
 #include <hpx/plugin/config.hpp>
 #include <hpx/plugin/virtual_constructor.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -42,3 +44,5 @@ namespace hpx::util::plugin {
         }
     };
 }    // namespace hpx::util::plugin
+
+#include <hpx/config/warnings_suffix.hpp>
