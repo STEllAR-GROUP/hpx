@@ -623,6 +623,18 @@ namespace hpx::local::detail {
         num_cores_ = detail::handle_num_cores(
             cfgmap, vm, num_threads_, use_process_mask_);
 
+        // Avoid requesting more OS threads than cores, which can cause
+        // initialization to hang when thread binding fails.
+        if (num_threads_ > num_cores_ &&
+            cfgmap.get_value<int>("hpx.allow_oversubscription", 0) == 0)
+        {
+            std::cerr << "hpx::init: command line warning: --hpx:threads ("
+                      << num_threads_ << ") is larger than --hpx:cores ("
+                      << num_cores_ << "); reducing number of OS threads to "
+                      << num_cores_ << std::endl;
+            num_threads_ = num_cores_;
+        }
+
         // Set number of cores and OS threads in configuration.
         ini_config.emplace_back(
             "hpx.os_threads=" + std::to_string(num_threads_));
