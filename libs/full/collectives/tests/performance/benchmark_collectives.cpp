@@ -117,8 +117,8 @@ void write_to_file(std::string const& collective, std::string const& type,
                       "Iterations:        {9}\n"
                       "Mean runtime:      {10}\n"
                       "Variance:          {11}\n";
-    hpx::util::format_to(std::cout, msg, collective, type, nodes, num_l, lpn,
-        threads, size, iterations, moments.first, moments.second)
+    hpx::util::format_to(std::cout, msg, collective, type, arity, nodes, num_l,
+        lpn, threads, size, iterations, moments.first, moments.second)
         << std::flush;
 
     // Create directory
@@ -128,11 +128,12 @@ void write_to_file(std::string const& collective, std::string const& type,
     {
         runtime_file_path = runtime_file_path + "_" + std::to_string(arity);
     }
+    runtime_file_path = runtime_file_path + ".txt";
     create_parent_dir(runtime_file_path);
 
     // Add header if necessary
     std::string const header = "collective;type;arity;nodes;localities;lpn;"
-                               "threads;size;iterations;mean;variance;\n";
+                               "threads;size;iterations;mean;variance\n";
     // Read existing content
     std::ifstream infile(runtime_file_path);
     std::stringstream buffer;
@@ -153,7 +154,7 @@ void write_to_file(std::string const& collective, std::string const& type,
     outfile << collective << ";" << type << ";" << arity << ";" << nodes << ";"
             << num_l << ";" << lpn << ";" << threads << ";" << size << ";"
             << iterations << ";" << moments.first << ";" << moments.second
-            << ";\n";
+            << "\n";
     outfile.close();
 }
 
