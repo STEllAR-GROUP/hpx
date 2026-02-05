@@ -63,7 +63,7 @@ namespace hpx {
     /// with an execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The reduce operations in the parallel \a copy_if algorithm invoked
+    /// The reduce operations in the parallel \a reduce algorithm invoked
     /// with an execution policy object of type \a parallel_policy
     /// or \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
@@ -382,6 +382,22 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
+
+        // Helper function to reduce a partition without requiring an init value.
+        template <typename ExPolicy, typename FwdIterB, typename T,
+            typename Reduce>
+        T reduce_partition(
+            FwdIterB part_begin, std::size_t part_size, Reduce const& r)
+        {
+            if (part_size == 1)
+            {
+                return HPX_INVOKE(r, *part_begin, *part_begin);
+            }
+            T init = HPX_INVOKE(r, *part_begin, *std::next(part_begin));
+            return sequential_reduce<ExPolicy>(
+                std::next(part_begin, 2), part_size - 2, HPX_MOVE(init), r);
+        }
+
         HPX_CXX_EXPORT template <typename T>
         struct reduce : public algorithm<reduce<T>, T>
         {
@@ -418,9 +434,8 @@ namespace hpx::parallel {
                 }
 
                 auto f1 = [r](FwdIterB part_begin, std::size_t part_size) -> T {
-                    T val = *part_begin;
-                    return detail::sequential_reduce<ExPolicy>(
-                        ++part_begin, --part_size, HPX_MOVE(val), r);
+                    return reduce_partition<ExPolicy, FwdIterB, T>(
+                        part_begin, part_size, r);
                 };
 
                 return util::partitioner<ExPolicy, T>::call(
