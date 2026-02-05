@@ -20,6 +20,7 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 
+#include <concepts>
 #include <cstddef>
 #include <functional>
 #include <type_traits>
@@ -211,11 +212,9 @@ namespace hpx::execution::experimental::detail {
         // default implementation
 
         // different versions of clang-format disagree
-        // clang-format off
-            template <typename Target>
-            HPX_FORCEINLINE static constexpr std::size_t
-            maximal_number_of_chunks(Target, std::size_t, std::size_t) noexcept
-        // clang-format on
+        template <typename Target>
+        HPX_FORCEINLINE static constexpr std::size_t maximal_number_of_chunks(
+            Target, std::size_t, std::size_t) noexcept
         {
             // return zero chunks which will tell the implementation to
             // calculate the number of chunks either based on a
@@ -625,18 +624,15 @@ namespace hpx::execution::experimental::detail {
     struct unwrapper : T
     {
         // default constructor is needed for serialization purposes
-        template <typename Dependent = void,
-            typename Enable =
-                std::enable_if_t<std::is_constructible_v<T>, Dependent>>
         unwrapper()
+            requires(std::is_constructible_v<T>)
           : T()
         {
         }
 
         // generic poor-man's forwarding constructor
-        template <typename U,
-            typename Enable =
-                std::enable_if_t<!std::is_same_v<std::decay_t<U>, unwrapper>>>
+        template <typename U>
+            requires(!std::same_as<std::decay_t<U>, unwrapper>)
         unwrapper(U&& u)
           : T(HPX_FORWARD(U, u))
         {
@@ -869,7 +865,7 @@ namespace hpx::execution::experimental::detail {
         "exposing " HPX_PP_STRINGIZE(func) " is not possible") /**/
 
     template <typename... Params>
-    struct executor_parameters : public unwrapper<Params>...
+    struct executor_parameters : unwrapper<Params>...
     {
         static_assert(
             hpx::util::all_of_v<
@@ -890,19 +886,14 @@ namespace hpx::execution::experimental::detail {
         HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(reset_thread_distribution);
         HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(collect_execution_parameters);
 
-        template <typename Dependent = void,
-            typename Enable = std::enable_if_t<
-                hpx::util::all_of_v<std::is_constructible<Params>...>,
-                Dependent>>
         constexpr executor_parameters()
+            requires(hpx::util::all_of_v<std::is_constructible<Params>...>)
           : unwrapper<Params>()...
         {
         }
 
-        template <typename... Params_,
-            typename Enable =
-                std::enable_if_t<hpx::util::pack<Params...>::size ==
-                    hpx::util::pack<Params_...>::size>>
+        template <typename... Params_>
+            requires(sizeof...(Params) == sizeof...(Params_))
         constexpr explicit executor_parameters(Params_&&... params)
           : unwrapper<Params>(HPX_FORWARD(Params_, params))...
         {
@@ -943,11 +934,10 @@ namespace hpx::execution::experimental {
     };
 
     HPX_CXX_CORE_EXPORT template <typename... Params>
-    constexpr HPX_FORCEINLINE typename executor_parameters_join<Params...>::type
+    constexpr HPX_FORCEINLINE executor_parameters_join<Params...>::type
     join_executor_parameters(Params&&... params)
     {
-        using joined_params =
-            typename executor_parameters_join<Params...>::type;
+        using joined_params = executor_parameters_join<Params...>::type;
         return joined_params(HPX_FORWARD(Params, params)...);
     }
 
