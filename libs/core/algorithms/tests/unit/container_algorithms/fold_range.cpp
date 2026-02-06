@@ -135,14 +135,23 @@ void test_fold_left_first_iter()
 
     HPX_TEST(hpx_result.has_value());
     HPX_TEST(manual_result.has_value());
-    HPX_TEST_EQ(*hpx_result, *manual_result);
+    if (hpx_result && manual_result)
+    {
+        HPX_TEST_EQ(*hpx_result, *manual_result);
+    }
 
     std::vector<std::size_t> small_c = test::random_repeat(10, std::size_t(5));
     auto hpx_mult = hpx::ranges::fold_left_first(
         small_c.begin(), small_c.end(), std::multiplies<>{});
     auto manual_mult = manual_fold_left_first(
         small_c.begin(), small_c.end(), std::multiplies<>{});
-    HPX_TEST_EQ(*hpx_mult, *manual_mult);
+
+    HPX_TEST(hpx_mult.has_value());
+    HPX_TEST(manual_mult.has_value());
+    if (hpx_mult && manual_mult)
+    {
+        HPX_TEST_EQ(*hpx_mult, *manual_mult);
+    }
 }
 
 void test_fold_left_first_range()
@@ -155,7 +164,10 @@ void test_fold_left_first_range()
 
     HPX_TEST(hpx_result.has_value());
     HPX_TEST(manual_result.has_value());
-    HPX_TEST_EQ(*hpx_result, *manual_result);
+    if (hpx_result && manual_result)
+    {
+        HPX_TEST_EQ(*hpx_result, *manual_result);
+    }
 }
 
 void test_fold_left_first_empty()
@@ -214,14 +226,23 @@ void test_fold_right_last_iter()
 
     HPX_TEST(hpx_result.has_value());
     HPX_TEST(manual_result.has_value());
-    HPX_TEST_EQ(*hpx_result, *manual_result);
+    if (hpx_result && manual_result)
+    {
+        HPX_TEST_EQ(*hpx_result, *manual_result);
+    }
 
     std::vector<std::size_t> small_c = test::random_repeat(10, std::size_t(5));
     auto hpx_mult = hpx::ranges::fold_right_last(
         small_c.begin(), small_c.end(), std::multiplies<>{});
     auto manual_mult = manual_fold_right_last(
         small_c.begin(), small_c.end(), std::multiplies<>{});
-    HPX_TEST_EQ(*hpx_mult, *manual_mult);
+
+    HPX_TEST(hpx_mult.has_value());
+    HPX_TEST(manual_mult.has_value());
+    if (hpx_mult && manual_mult)
+    {
+        HPX_TEST_EQ(*hpx_mult, *manual_mult);
+    }
 }
 
 void test_fold_right_last_range()
@@ -234,7 +255,10 @@ void test_fold_right_last_range()
 
     HPX_TEST(hpx_result.has_value());
     HPX_TEST(manual_result.has_value());
-    HPX_TEST_EQ(*hpx_result, *manual_result);
+    if (hpx_result && manual_result)
+    {
+        HPX_TEST_EQ(*hpx_result, *manual_result);
+    }
 }
 
 void test_fold_right_last_empty()
@@ -294,7 +318,10 @@ void test_fold_left_first_with_iter_iter()
     HPX_TEST(hpx_iter == c.end());
     HPX_TEST(hpx_value.has_value());
     HPX_TEST(manual_result.has_value());
-    HPX_TEST_EQ(*hpx_value, *manual_result);
+    if (hpx_value && manual_result)
+    {
+        HPX_TEST_EQ(*hpx_value, *manual_result);
+    }
 }
 
 void test_fold_left_first_with_iter_range()
@@ -309,7 +336,10 @@ void test_fold_left_first_with_iter_range()
     HPX_TEST(hpx_iter == c.end());
     HPX_TEST(hpx_value.has_value());
     HPX_TEST(manual_result.has_value());
-    HPX_TEST_EQ(*hpx_value, *manual_result);
+    if (hpx_value && manual_result)
+    {
+        HPX_TEST_EQ(*hpx_value, *manual_result);
+    }
 }
 
 void test_fold_left_first_with_iter_empty()
