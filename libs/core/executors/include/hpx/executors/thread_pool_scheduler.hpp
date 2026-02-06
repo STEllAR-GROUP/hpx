@@ -31,9 +31,11 @@
 
 #include <cstddef>
 #include <exception>
-#include <ranges>
 #include <string>
 #include <utility>
+
+#if defined(HPX_HAVE_STDEXEC)
+#include <ranges>
 
 // Forward declaration
 namespace hpx::execution::experimental::detail {
@@ -41,6 +43,7 @@ namespace hpx::execution::experimental::detail {
         bool IsChunked>
     class thread_pool_bulk_sender;
 }
+#endif
 
 namespace hpx::execution::experimental {
 
@@ -490,7 +493,6 @@ namespace hpx::execution::experimental {
             };
         };
 
-#if defined(HPX_HAVE_STDEXEC)
         friend constexpr hpx::execution::experimental::
             forward_progress_guarantee
             tag_invoke(
@@ -508,7 +510,6 @@ namespace hpx::execution::experimental {
                     forward_progress_guarantee::concurrent;
             }
         }
-#endif
 
         // Direct schedule() member function for newer stdexec
         constexpr sender<thread_pool_policy_scheduler> schedule() const
@@ -597,8 +598,12 @@ namespace hpx::execution::experimental {
     };
 
     // support all properties exposed by the embedded policy
-    HPX_CXX_EXPORT template <typename Tag, typename Policy, typename Property>
-        requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
+    // clang-format off
+    HPX_CXX_EXPORT template <typename Tag, typename Policy, typename Property,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
     auto tag_invoke(Tag tag,
         thread_pool_policy_scheduler<Policy> const& scheduler, Property&& prop)
         -> decltype(std::declval<thread_pool_policy_scheduler<Policy>>().policy(
@@ -612,8 +617,12 @@ namespace hpx::execution::experimental {
         return scheduler_with_prop;
     }
 
-    HPX_CXX_EXPORT template <typename Tag, typename Policy>
-        requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
+    // clang-format off
+    HPX_CXX_EXPORT template <typename Tag, typename Policy,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
     auto tag_invoke(
         Tag tag, thread_pool_policy_scheduler<Policy> const& scheduler)
         -> decltype(std::declval<Tag>()(std::declval<Policy>()))
