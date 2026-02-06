@@ -144,7 +144,8 @@ namespace hpx::util::detail {
             }
 
             HPX_ASSERT(timer_ != nullptr);
-            timer_->expires_at(time_duration.from_now());
+            timer_->expires_at(
+                hpx::chrono::steady_clock::now() + time_duration);
             timer_->async_wait(hpx::bind_front(    //-V779
                 &pool_timer::timer_handler, this->shared_from_this()));
 

@@ -60,7 +60,7 @@ namespace hpx::execution::experimental {
         ///
         explicit auto_chunk_size(hpx::chrono::steady_duration const& rel_time,
             std::uint64_t const num_iters_for_timing = 0) noexcept
-          : min_time_(rel_time.value().count())
+          : min_time_(rel_time.count())
           , num_iters_for_timing_(num_iters_for_timing)
         {
         }
@@ -118,11 +118,11 @@ namespace hpx::execution::experimental {
             std::size_t const cores, std::size_t const count) noexcept
         {
             // return chunk size which will create the required amount of work
-            if (iteration_duration.value().count() != 0)
+            if (iteration_duration.count() != 0)
             {
                 auto const ns =
                     std::chrono::duration_cast<std::chrono::nanoseconds>(
-                        iteration_duration.value());
+                        iteration_duration);
                 return (std::min) (count,
                     (std::size_t) (this_.min_time_ / ns.count()));
             }
@@ -161,11 +161,3 @@ namespace hpx::execution::experimental {
     };
     /// \endcond
 }    // namespace hpx::execution::experimental
-
-namespace hpx::execution {
-
-    using auto_chunk_size HPX_DEPRECATED_V(1, 9,
-        "hpx::execution::auto_chunk_size is deprecated, use "
-        "hpx::execution::experimental::auto_chunk_size instead") =
-        hpx::execution::experimental::auto_chunk_size;
-}    // namespace hpx::execution

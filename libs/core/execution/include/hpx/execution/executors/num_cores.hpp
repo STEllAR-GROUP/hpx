@@ -83,11 +83,3 @@ namespace hpx::execution::experimental {
     };
     /// \endcond
 }    // namespace hpx::execution::experimental
-
-namespace hpx::execution {
-
-    using num_cores HPX_DEPRECATED_V(1, 9,
-        "hpx::execution::num_cores is deprecated, use "
-        "hpx::execution::experimental::num_cores instead") =
-        hpx::execution::experimental::num_cores;
-}    // namespace hpx::execution

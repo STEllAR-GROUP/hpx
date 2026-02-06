@@ -34,6 +34,7 @@
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threadmanager.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -629,7 +630,8 @@ namespace hpx { namespace components { namespace server {
                         return tm.is_busy();
                     },
                     shutdown_check_count,
-                    std::chrono::duration<double>(timeout),
+                    std::chrono::duration_cast<hpx::chrono::steady_duration>(
+                        std::chrono::duration<double>(timeout)),
                     "runtime_support::stop");
 
                 // If it took longer than expected, kill all suspended threads as
@@ -644,7 +646,9 @@ namespace hpx { namespace components { namespace server {
                             return tm.is_busy();
                         },
                         shutdown_check_count,
-                        std::chrono::duration<double>(timeout),
+                        std::chrono::duration_cast<
+                            hpx::chrono::steady_duration>(
+                            std::chrono::duration<double>(timeout)),
                         "runtime_support::stop");
                 }
 

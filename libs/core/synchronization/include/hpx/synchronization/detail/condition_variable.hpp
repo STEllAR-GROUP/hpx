@@ -128,7 +128,8 @@ namespace hpx::lcos::local::detail {
             hpx::chrono::steady_duration const& rel_time,
             char const* description, error_code& ec = throws)
         {
-            return wait_until(lock, rel_time.from_now(), description, ec);
+            return wait_until(lock, hpx::chrono::steady_clock::now() + rel_time,
+                description, ec);
         }
 
         threads::thread_restart_state wait_for(
@@ -136,8 +137,8 @@ namespace hpx::lcos::local::detail {
             hpx::chrono::steady_duration const& rel_time,
             error_code& ec = throws)
         {
-            return wait_until(
-                lock, rel_time.from_now(), "condition_variable::wait_for", ec);
+            return wait_until(lock, hpx::chrono::steady_clock::now() + rel_time,
+                "condition_variable::wait_for", ec);
         }
 
     private:

@@ -52,9 +52,9 @@ namespace hpx::threads::detail {
         thread_schedule_hint schedulehint, std::atomic<bool>* started,
         bool retry_on_active, hpx::error_code& ec)
     {
-        return set_thread_state_timed(scheduler, rel_time.from_now(), thrd,
-            newstate, newstate_ex, priority, schedulehint, started,
-            retry_on_active, ec);
+        return set_thread_state_timed(scheduler,
+            hpx::chrono::steady_clock::now() + rel_time, thrd, newstate,
+            newstate_ex, priority, schedulehint, started, retry_on_active, ec);
     }
 
     HPX_CXX_EXPORT inline thread_id_ref_type set_thread_state_timed(
@@ -63,7 +63,8 @@ namespace hpx::threads::detail {
         thread_id_type const& thrd, std::atomic<bool>* started,
         bool retry_on_active, hpx::error_code& ec)
     {
-        return set_thread_state_timed(scheduler, rel_time.from_now(), thrd,
+        return set_thread_state_timed(scheduler,
+            hpx::chrono::steady_clock::now() + rel_time, thrd,
             thread_schedule_state::pending, thread_restart_state::timeout,
             thread_priority::normal, thread_schedule_hint(), started,
             retry_on_active, ec);

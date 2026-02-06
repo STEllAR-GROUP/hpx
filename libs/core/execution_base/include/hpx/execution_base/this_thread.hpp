@@ -245,9 +245,9 @@ namespace hpx::util {
         {
             // Initialize timer only if needed
             bool const use_timeout =
-                rel_time.value() != std::chrono::steady_clock::duration(0);
+                rel_time != std::chrono::steady_clock::duration(0);
 
-            auto const abs_time = rel_time.from_now();
+            auto const abs_time = hpx::chrono::steady_clock::now() + rel_time;
 
             std::size_t count = 0;
             for (std::size_t k = 0; /**/; ++k)

@@ -338,7 +338,7 @@ namespace hpx {
         HPX_CXX_EXPORT inline void sleep_for(
             hpx::chrono::steady_duration const& rel_time)
         {
-            sleep_until(rel_time.from_now());
+            sleep_until(hpx::chrono::steady_clock::now() + rel_time);
         }
 
         HPX_CXX_EXPORT HPX_CORE_EXPORT std::size_t get_thread_data();

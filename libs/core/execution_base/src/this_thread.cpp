@@ -266,14 +266,14 @@ namespace hpx::execution_base {
             hpx::chrono::steady_duration const& sleep_duration,
             char const* /* desc */)
         {
-            std::this_thread::sleep_for(sleep_duration.value());
+            std::this_thread::sleep_for(sleep_duration);
         }
 
         void default_agent::sleep_until(
             hpx::chrono::steady_time_point const& sleep_time,
             char const* /* desc */)
         {
-            std::this_thread::sleep_until(sleep_time.value());
+            std::this_thread::sleep_until(sleep_time);
         }
     }    // namespace
 

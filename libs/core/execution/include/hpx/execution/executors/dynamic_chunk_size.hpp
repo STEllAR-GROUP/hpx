@@ -90,11 +90,3 @@ namespace hpx::execution::experimental {
     };
     /// \endcond
 }    // namespace hpx::execution::experimental
-
-namespace hpx::execution {
-
-    using dynamic_chunk_size HPX_DEPRECATED_V(1, 9,
-        "hpx::execution::dynamic_chunk_size is deprecated, use "
-        "hpx::execution::experimental::dynamic_chunk_size instead") =
-        hpx::execution::experimental::dynamic_chunk_size;
-}

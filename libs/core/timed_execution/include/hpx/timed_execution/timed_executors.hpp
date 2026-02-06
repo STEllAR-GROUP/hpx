@@ -456,13 +456,13 @@ namespace hpx::parallel::execution {
 
         explicit timed_executor(hpx::chrono::steady_time_point const& abs_time)
           : exec_(BaseExecutor())
-          , execute_at_(abs_time.value())
+          , execute_at_(abs_time)
         {
         }
 
         explicit timed_executor(hpx::chrono::steady_duration const& rel_time)
           : exec_(BaseExecutor())
-          , execute_at_(rel_time.from_now())
+          , execute_at_(hpx::chrono::steady_clock::now() + rel_time)
         {
         }
 
@@ -470,7 +470,7 @@ namespace hpx::parallel::execution {
         timed_executor(
             Executor&& exec, hpx::chrono::steady_time_point const& abs_time)
           : exec_(HPX_FORWARD(Executor, exec))
-          , execute_at_(abs_time.value())
+          , execute_at_(abs_time)
         {
         }
 
@@ -478,7 +478,7 @@ namespace hpx::parallel::execution {
         timed_executor(
             Executor&& exec, hpx::chrono::steady_duration const& rel_time)
           : exec_(HPX_FORWARD(Executor, exec))
-          , execute_at_(rel_time.from_now())
+          , execute_at_(hpx::chrono::steady_clock::now() + rel_time)
         {
         }
 
