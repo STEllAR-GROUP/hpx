@@ -6,6 +6,7 @@
 
 set(iterator_support_headers
     hpx/iterator_support/detail/minimum_category.hpp
+    hpx/iterator_support/traits/is_foldable.hpp
     hpx/iterator_support/traits/is_iterator.hpp
     hpx/iterator_support/traits/is_range.hpp
     hpx/iterator_support/traits/is_segmented_iterator.hpp
@@ -26,6 +27,7 @@ set(iterator_support_headers
 # cmake-format: off
 set(iterator_support_compat_headers
     hpx/iterator_support.hpp => hpx/modules/iterator_support.hpp
+    hpx/traits/is_foldable.hpp => hpx/modules/iterator_support.hpp
     hpx/traits/is_iterator.hpp => hpx/modules/iterator_support.hpp
     hpx/traits/is_range.hpp => hpx/modules/iterator_support.hpp
     hpx/util/iterator_adaptor.hpp => hpx/modules/iterator_support.hpp
