@@ -539,7 +539,7 @@ namespace hpx {
         // This ensures that collective operations and other background work
         // finish before reinit_destruct() destroys component heaps.
         // Fixes issue #6776: crash in one_size_heap_list::alloc on macOS Debug
-        thread_manager_->wait();
+        hpx::local::termination_detection();
 
         LRT_(debug).format("~runtime_local(finished)");
 
@@ -2216,16 +2216,18 @@ namespace hpx {
             return get_stack_size_enum_name(size_enum);
         }
     }    // namespace threads
+}
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Termination detection API implementation
-    void wait_for_local_termination()
+///////////////////////////////////////////////////////////////////////////
+// Termination detection API implementation
+namespace local {
+    void termination_detection()
     {
         runtime* rt = get_runtime_ptr();
         if (rt == nullptr)
         {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                "hpx::wait_for_local_termination",
+                "hpx::local::termination_detection",
                 "the runtime system is not active");
         }
 
@@ -2237,17 +2239,5 @@ namespace hpx {
         // Clean up any terminated threads
         tm.cleanup_terminated(true);
     }
-
-#if defined(HPX_HAVE_NETWORKING)
-    void wait_for_global_termination()
-    {
-        // This function is implemented in the distributed runtime module
-        // as it requires access to runtime_support and the Dijkstra algorithm
-        HPX_THROW_EXCEPTION(hpx::error::not_implemented,
-            "hpx::wait_for_global_termination",
-            "global termination detection requires the distributed runtime. "
-            "This function should be called from the distributed runtime "
-            "module.");
-    }
-#endif
+}    // namespace local
 }    // namespace hpx

@@ -28,7 +28,7 @@ void test_basic_termination()
     }
 
     // Wait for all work to complete
-    hpx::wait_for_local_termination();
+    hpx::local::termination_detection();
 
     // Verify all work completed
     HPX_TEST_EQ(counter.load(), 100);
@@ -46,7 +46,7 @@ void test_multiple_calls()
         hpx::post([&counter] { ++counter; });
     }
 
-    hpx::wait_for_local_termination();
+    hpx::local::termination_detection();
     HPX_TEST_EQ(counter.load(), 50);
 
     // Second batch of work
@@ -55,7 +55,7 @@ void test_multiple_calls()
         hpx::post([&counter] { ++counter; });
     }
 
-    hpx::wait_for_local_termination();
+    hpx::local::termination_detection();
     HPX_TEST_EQ(counter.load(), 100);
 }
 
@@ -79,7 +79,7 @@ void test_nested_async()
     }
 
     // Wait for all work (including nested) to complete
-    hpx::wait_for_local_termination();
+    hpx::local::termination_detection();
 
     // Verify: 10 parent tasks + 50 nested tasks = 60 total
     HPX_TEST_EQ(counter.load(), 60);
@@ -98,7 +98,7 @@ void test_with_futures()
     }
 
     // Wait for termination
-    hpx::wait_for_local_termination();
+    hpx::local::termination_detection();
 
     // All futures should be ready
     for (auto& f : futures)
@@ -113,7 +113,7 @@ void test_with_futures()
 void test_empty_workload()
 {
     // Should return immediately when no work is pending
-    hpx::wait_for_local_termination();
+    hpx::local::termination_detection();
     HPX_TEST(true);    // If we get here, the test passed
 }
 

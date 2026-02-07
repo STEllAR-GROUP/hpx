@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
 
-namespace hpx {
+namespace hpx { namespace local {
 
     /// \brief Wait for all local HPX threads to complete execution.
     ///
@@ -39,61 +39,11 @@ namespace hpx {
     ///     }
     ///
     ///     // Wait for all local threads to complete
-    ///     hpx::wait_for_local_termination();
+    ///     hpx::local::termination_detection();
     ///
     ///     return hpx::finalize();
     /// }
     /// \endcode
-    ///
-    /// \see wait_for_global_termination
-    HPX_CORE_EXPORT void wait_for_local_termination();
+    HPX_CORE_EXPORT void termination_detection();
 
-#if defined(HPX_HAVE_NETWORKING)
-    /// \brief Wait for global termination across all localities.
-    ///
-    /// This function performs distributed termination detection using
-    /// Dijkstra's algorithm. It blocks until all localities in the
-    /// distributed system have become passive (no pending work).
-    ///
-    /// The algorithm works by passing a token around all localities in a ring.
-    /// Each locality colors itself white or black based on whether it has sent
-    /// messages. When a white token completes a full circuit, global
-    /// termination is detected.
-    ///
-    /// \note This function is only available when HPX is built with networking
-    ///       support (HPX_WITH_NETWORKING=ON).
-    ///
-    /// \note This function should typically be called from the root locality
-    ///       (locality 0) to coordinate global shutdown.
-    ///
-    /// \throws hpx::exception if called when the runtime is not in a valid
-    ///         state or if networking is not enabled.
-    ///
-    /// \par Example:
-    /// \code
-    /// #include <hpx/hpx_init.hpp>
-    /// #include <hpx/runtime_local/termination_detection.hpp>
-    ///
-    /// int hpx_main()
-    /// {
-    ///     // Launch distributed work across localities
-    ///     for (auto const& locality : hpx::find_all_localities())
-    ///     {
-    ///         hpx::post(locality, []{ /* do work */ });
-    ///     }
-    ///
-    ///     // Wait for global termination across all localities
-    ///     if (hpx::get_locality_id() == 0)
-    ///     {
-    ///         hpx::wait_for_global_termination();
-    ///     }
-    ///
-    ///     return hpx::finalize();
-    /// }
-    /// \endcode
-    ///
-    /// \see wait_for_local_termination
-    HPX_CORE_EXPORT void wait_for_global_termination();
-#endif
-
-}    // namespace hpx
+}}    // namespace hpx::local
