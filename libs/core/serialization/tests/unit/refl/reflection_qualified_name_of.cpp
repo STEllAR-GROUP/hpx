@@ -12,26 +12,30 @@
 
 namespace empty_space {
     template <typename... Args>
-    struct void_void {};
-}
+    struct void_void
+    {
+    };
+}    // namespace empty_space
 
 namespace a::b::c::d {
     template <typename T1, typename T2, typename T3, typename T4, typename T5>
-    struct pentagon {};
-}
+    struct pentagon
+    {
+    };
+}    // namespace a::b::c::d
 
-namespace world {
-    namespace continent {
-        namespace country {
-            template <typename T>
-            struct city {};
-        }
-    }
-}
+namespace world { namespace continent { namespace country {
+    template <typename T>
+    struct city
+    {
+    };
+}}}    // namespace world::continent::country
 
 namespace local {
-    struct person {};
-}
+    struct person
+    {
+    };
+}    // namespace local
 
 int main()
 {
@@ -49,7 +53,7 @@ int main()
     {
         using type = a::b::c::d::pentagon<int, char, double, float, long>;
         char const* name = qualified_name_of<type>::get();
-        HPX_TEST_EQ(std::string(name), 
+        HPX_TEST_EQ(std::string(name),
             std::string("a::b::c::d::pentagon<int,char,double,float,long>"));
     }
 
@@ -57,16 +61,17 @@ int main()
     {
         // City containing a Person from a different namespace
         using nested_type = world::continent::country::city<local::person>;
-        
+
         // Wrap that in ANOTHER layer
         using deeper_nested_type = world::continent::country::city<nested_type>;
-        
+
         char const* name = qualified_name_of<deeper_nested_type>::get();
-        
+
         // Expected: world::continent::country::city<world::continent::country::city<local::person>>
-        std::string expected = "world::continent::country::city<"
-                               "world::continent::country::city<local::person>>";
-        
+        std::string expected =
+            "world::continent::country::city<"
+            "world::continent::country::city<local::person>>";
+
         HPX_TEST_EQ(std::string(name), expected);
     }
 
