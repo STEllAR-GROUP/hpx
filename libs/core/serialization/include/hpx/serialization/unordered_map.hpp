@@ -68,44 +68,4 @@ namespace hpx::serialization {
 
         detail::save_collection(ar, t);
     }
-
-    HPX_CXX_EXPORT template <typename Key, typename Value, typename Hash,
-        typename KeyEqual, typename Alloc>
-    void serialize(input_archive& ar,
-        std::unordered_multimap<Key, Value, Hash, KeyEqual, Alloc>& t, unsigned)
-    {
-        using container_type =
-            std::unordered_multimap<Key, Value, Hash, KeyEqual, Alloc>;
-
-        using size_type = typename container_type::size_type;
-        using value_type = typename container_type::value_type;
-
-        size_type size;
-        ar >> size;    //-V128
-
-        t.clear();
-        for (size_type i = 0; i < size; ++i)
-        {
-            value_type v;
-            ar >> v;
-            t.insert(t.end(), HPX_MOVE(v));
-        }
-    }
-
-    HPX_CXX_EXPORT template <typename Key, typename Value, typename Hash,
-        typename KeyEqual, typename Alloc>
-    void serialize(output_archive& ar,
-        std::unordered_multimap<Key, Value, Hash, KeyEqual, Alloc> const& t,
-        unsigned)
-    {
-        std::uint64_t const size = t.size();
-        ar << size;
-        if (size == 0)
-            return;
-
-        for (auto const& val : t)
-        {
-            ar << val;
-        }
-    }
 }    // namespace hpx::serialization
