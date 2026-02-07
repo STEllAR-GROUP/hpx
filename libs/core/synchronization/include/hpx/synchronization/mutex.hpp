@@ -392,7 +392,8 @@ namespace hpx {
         bool try_lock_for(hpx::chrono::steady_duration const& rel_time,
             char const* description, error_code& ec = throws)
         {
-            return try_lock_until(rel_time.from_now(), description, ec);
+            return try_lock_until(
+                hpx::chrono::steady_clock::now() + rel_time, description, ec);
         }
 
         ///

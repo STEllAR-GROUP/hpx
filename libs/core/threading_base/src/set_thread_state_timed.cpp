@@ -181,9 +181,8 @@ namespace hpx::threads::detail {
         // this creates a new thread that creates the timer and handles the
         // requested actions
         thread_init_data data(
-            hpx::bind(&at_timer, scheduler, abs_time.value(),
-                thread_id_ref_type(thrd), newstate, newstate_ex, priority,
-                started, retry_on_active),
+            hpx::bind(&at_timer, scheduler, abs_time, thread_id_ref_type(thrd),
+                newstate, newstate_ex, priority, started, retry_on_active),
             "at_timer (expire at)", priority, schedulehint,
             thread_stacksize::small_, thread_schedule_state::pending, true);
 

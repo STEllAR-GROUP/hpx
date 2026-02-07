@@ -126,11 +126,3 @@ struct hpx::execution::experimental::is_executor_parameters<
 {
 };
 /// \endcond
-
-namespace hpx::execution {
-
-    using static_chunk_size HPX_DEPRECATED_V(1, 9,
-        "hpx::execution::static_chunk_size is deprecated, use "
-        "hpx::execution::experimental::static_chunk_size instead") =
-        hpx::execution::experimental::static_chunk_size;
-}    // namespace hpx::execution

@@ -159,8 +159,8 @@ namespace hpx::threads {
         thread_priority priority = thread_priority::normal,
         bool retry_on_active = true, hpx::error_code& ec = hpx::throws)
     {
-        return set_thread_state(id, rel_time.from_now(), state, stateex,
-            priority, retry_on_active, ec);
+        return set_thread_state(id, hpx::chrono::steady_clock::now() + rel_time,
+            state, stateex, priority, retry_on_active, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -586,8 +586,8 @@ namespace hpx::this_thread {
             threads::thread_description("this_thread::suspend"),
         hpx::error_code& ec = hpx::throws)
     {
-        return suspend(
-            rel_time.from_now(), threads::invalid_thread_id, description, ec);
+        return suspend(hpx::chrono::steady_clock::now() + rel_time,
+            threads::invalid_thread_id, description, ec);
     }
 
     /// The function \a suspend will return control to the thread manager
@@ -616,7 +616,8 @@ namespace hpx::this_thread {
             threads::thread_description("this_thread::suspend"),
         hpx::error_code& ec = hpx::throws)
     {
-        return suspend(rel_time.from_now(), id, description, ec);
+        return suspend(
+            hpx::chrono::steady_clock::now() + rel_time, id, description, ec);
     }
 
     /// The function \a suspend will return control to the thread manager

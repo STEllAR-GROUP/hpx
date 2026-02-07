@@ -127,11 +127,3 @@ namespace hpx::execution::experimental {
     };
     /// \endcond
 }    // namespace hpx::execution::experimental
-
-namespace hpx::execution {
-
-    using adaptive_static_chunk_size HPX_DEPRECATED_V(1, 9,
-        "hpx::execution::adaptive_static_chunk_size is deprecated, use "
-        "hpx::execution::experimental::adaptive_static_chunk_size instead") =
-        hpx::execution::experimental::adaptive_static_chunk_size;
-}    // namespace hpx::execution

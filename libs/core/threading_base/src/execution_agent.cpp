@@ -109,7 +109,7 @@ namespace hpx::threads {
     void execution_agent::sleep_for(
         hpx::chrono::steady_duration const& sleep_duration, char const* desc)
     {
-        sleep_until(sleep_duration.from_now(), desc);
+        sleep_until(hpx::chrono::steady_clock::now() + sleep_duration, desc);
     }
 
     void execution_agent::sleep_until(
@@ -135,7 +135,7 @@ namespace hpx::threads {
             }
             ++k;
             now = std::chrono::steady_clock::now();
-        } while (now < sleep_time.value());
+        } while (now < sleep_time);
     }
 
     hpx::threads::thread_restart_state execution_agent::do_yield(

@@ -447,7 +447,8 @@ namespace hpx {
             hpx::chrono::steady_duration const& rel_time,
             error_code& ec = throws)
         {
-            return wait_until(lock, rel_time.from_now(), ec);
+            return wait_until(
+                lock, hpx::chrono::steady_clock::now() + rel_time, ec);
         }
 
         ///
@@ -498,7 +499,8 @@ namespace hpx {
             hpx::chrono::steady_duration const& rel_time, Predicate pred,
             error_code& ec = throws)
         {
-            return wait_until(lock, rel_time.from_now(), HPX_MOVE(pred), ec);
+            return wait_until(lock, hpx::chrono::steady_clock::now() + rel_time,
+                HPX_MOVE(pred), ec);
         }
 
     private:
@@ -946,7 +948,8 @@ namespace hpx {
             hpx::chrono::steady_duration const& rel_time,
             error_code& ec = throws)
         {
-            return wait_until(lock, rel_time.from_now(), ec);
+            return wait_until(
+                lock, hpx::chrono::steady_clock::now() + rel_time, ec);
         }
 
         ///
@@ -997,7 +1000,8 @@ namespace hpx {
         bool wait_for(Lock& lock, hpx::chrono::steady_duration const& rel_time,
             Predicate pred, error_code& ec = throws)
         {
-            return wait_until(lock, rel_time.from_now(), HPX_MOVE(pred), ec);
+            return wait_until(lock, hpx::chrono::steady_clock::now() + rel_time,
+                HPX_MOVE(pred), ec);
         }
 
         ///
@@ -1243,8 +1247,9 @@ namespace hpx {
             hpx::chrono::steady_duration const& rel_time, Predicate pred,
             error_code& ec = throws)
         {
-            return wait_until(
-                lock, stoken, rel_time.from_now(), HPX_MOVE(pred), ec);
+            return wait_until(lock, stoken,
+                hpx::chrono::steady_clock::now() + rel_time, HPX_MOVE(pred),
+                ec);
         }
 
     private:

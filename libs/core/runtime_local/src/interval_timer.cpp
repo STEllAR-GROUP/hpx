@@ -347,7 +347,7 @@ namespace hpx::util {
         hpx::chrono::steady_duration const& rel_time, char const* description,
         bool pre_shutdown)
       : timer_(std::make_shared<detail::interval_timer>(
-            f, rel_time.value().count() / 1000, description, pre_shutdown))
+            f, rel_time.count() / 1000, description, pre_shutdown))
     {
     }
 
@@ -355,8 +355,8 @@ namespace hpx::util {
         hpx::function<bool()> const& f, hpx::function<void()> const& on_term,
         hpx::chrono::steady_duration const& rel_time, char const* description,
         bool pre_shutdown)
-      : timer_(std::make_shared<detail::interval_timer>(f, on_term,
-            rel_time.value().count() / 1000, description, pre_shutdown))
+      : timer_(std::make_shared<detail::interval_timer>(
+            f, on_term, rel_time.count() / 1000, description, pre_shutdown))
     {
     }
 
@@ -378,6 +378,6 @@ namespace hpx::util {
     void interval_timer::change_interval(
         hpx::chrono::steady_duration const& new_interval) const
     {
-        return timer_->change_interval(new_interval.value().count() / 1000);
+        return timer_->change_interval(new_interval.count() / 1000);
     }
 }    // namespace hpx::util

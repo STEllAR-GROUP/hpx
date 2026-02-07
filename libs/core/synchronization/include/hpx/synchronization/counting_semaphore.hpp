@@ -402,7 +402,8 @@ namespace hpx {
 
             bool try_acquire_for(hpx::chrono::steady_duration const& rel_time)
             {
-                return try_acquire_until(rel_time.from_now());
+                return try_acquire_until(
+                    hpx::chrono::steady_clock::now() + rel_time);
             }
 
         protected:

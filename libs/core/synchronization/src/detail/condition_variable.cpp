@@ -262,7 +262,7 @@ namespace hpx::lcos::local::detail {
         {
             // suspend this thread
             unlock_guard<std::unique_lock<mutex_type>> ul(lock);
-            this_ctx.sleep_until(abs_time.value());
+            this_ctx.sleep_until(abs_time);
         }
 
         return f.ctx_ ? threads::thread_restart_state::timeout :

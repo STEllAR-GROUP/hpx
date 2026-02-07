@@ -103,11 +103,3 @@ namespace hpx::execution::experimental {
     };
     /// \endcond
 }    // namespace hpx::execution::experimental
-
-namespace hpx::execution {
-
-    using guided_chunk_size HPX_DEPRECATED_V(1, 9,
-        "hpx::execution::guided_chunk_size is deprecated, use "
-        "hpx::execution::experimental::guided_chunk_size instead") =
-        hpx::execution::experimental::guided_chunk_size;
-}    // namespace hpx::execution

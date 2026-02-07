@@ -485,7 +485,7 @@ namespace hpx::lcos::detail {
                     "this future has no valid shared state");
                 return hpx::future_status::uninitialized;
             }
-            return shared_state_->wait_until(abs_time.value(), ec);
+            return shared_state_->wait_until(abs_time, ec);
         }
 
         // Effects: none if the shared state contains a deferred function
@@ -503,7 +503,7 @@ namespace hpx::lcos::detail {
             hpx::chrono::steady_duration const& rel_time,
             error_code& ec = throws) const
         {
-            return wait_until(rel_time.from_now(), ec);
+            return wait_until(hpx::chrono::steady_clock::now() + rel_time, ec);
         }
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
@@ -1324,8 +1324,7 @@ namespace hpx {
         using init_no_addref = typename shared_state::init_no_addref;
 
         hpx::intrusive_ptr<shared_state> p(
-            new shared_state(
-                init_no_addref{}, abs_time.value(), HPX_FORWARD(T, init)),
+            new shared_state(init_no_addref{}, abs_time, HPX_FORWARD(T, init)),
             false);
 
         return hpx::traits::future_access<future<result_type>>::create(
@@ -1339,7 +1338,7 @@ namespace hpx {
         hpx::chrono::steady_duration const& rel_time, T&& init)
     {
         return hpx::make_ready_future_at(
-            rel_time.from_now(), HPX_FORWARD(T, init));
+            hpx::chrono::steady_clock::now() + rel_time, HPX_FORWARD(T, init));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1379,8 +1378,7 @@ namespace hpx {
         using init_no_addref = shared_state::init_no_addref;
 
         hpx::intrusive_ptr<shared_state> p(
-            new shared_state(
-                init_no_addref{}, abs_time.value(), hpx::util::unused),
+            new shared_state(init_no_addref{}, abs_time, hpx::util::unused),
             false);
 
         return hpx::traits::future_access<future<void>>::create(HPX_MOVE(p));
@@ -1399,7 +1397,8 @@ namespace hpx {
         inline future<void>
         make_ready_future_after(hpx::chrono::steady_duration const& rel_time)
     {
-        return hpx::make_ready_future_at(rel_time.from_now());
+        return hpx::make_ready_future_at(
+            hpx::chrono::steady_clock::now() + rel_time);
     }
 
     /// \copydoc make_ready_future_after(hpx::chrono::steady_duration const& rel_time, T&& init)
@@ -1407,7 +1406,8 @@ namespace hpx {
     std::enable_if_t<std::is_void_v<T>, future<void>> make_ready_future_after(
         hpx::chrono::steady_duration const& rel_time)
     {
-        return hpx::make_ready_future_at(rel_time.from_now());
+        return hpx::make_ready_future_at(
+            hpx::chrono::steady_clock::now() + rel_time);
     }
 }    // namespace hpx
 
