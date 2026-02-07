@@ -33,6 +33,7 @@ set(runtime_local_headers
     hpx/runtime_local/state.hpp
     hpx/runtime_local/shutdown_function.hpp
     hpx/runtime_local/startup_function.hpp
+    hpx/runtime_local/termination_detection.hpp
     hpx/runtime_local/thread_hooks.hpp
     hpx/runtime_local/thread_mapper.hpp
     hpx/runtime_local/thread_pool_helpers.hpp

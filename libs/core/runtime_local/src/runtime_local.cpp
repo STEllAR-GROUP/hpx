@@ -34,6 +34,7 @@
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/runtime_local/state.hpp>
+#include <hpx/runtime_local/termination_detection.hpp>
 #include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/version.hpp>
@@ -2215,4 +2216,38 @@ namespace hpx {
             return get_stack_size_enum_name(size_enum);
         }
     }    // namespace threads
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Termination detection API implementation
+    void wait_for_local_termination()
+    {
+        runtime* rt = get_runtime_ptr();
+        if (rt == nullptr)
+        {
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::wait_for_local_termination",
+                "the runtime system is not active");
+        }
+
+        hpx::threads::threadmanager& tm = rt->get_thread_manager();
+
+        // Wait for all HPX threads to complete
+        tm.wait();
+
+        // Clean up any terminated threads
+        tm.cleanup_terminated(true);
+    }
+
+#if defined(HPX_HAVE_NETWORKING)
+    void wait_for_global_termination()
+    {
+        // This function is implemented in the distributed runtime module
+        // as it requires access to runtime_support and the Dijkstra algorithm
+        HPX_THROW_EXCEPTION(hpx::error::not_implemented,
+            "hpx::wait_for_global_termination",
+            "global termination detection requires the distributed runtime. "
+            "This function should be called from the distributed runtime "
+            "module.");
+    }
+#endif
 }    // namespace hpx
