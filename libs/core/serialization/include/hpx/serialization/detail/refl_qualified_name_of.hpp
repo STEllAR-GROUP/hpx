@@ -6,11 +6,6 @@
 
 #pragma once
 
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-
-#include <hpx/serialization/base_object.hpp>
-
 // This file is only ever included by access.hpp
 // but we will still guard against direct inclusion
 #if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
@@ -25,76 +20,108 @@
 #include <ranges>
 
 namespace hpx::serialization::detail {
+    // A simple wrapper around a char array that can be constructed
+    // and concatenated at compile time.
     template <std::size_t N>
-    struct fixed_string
-    {
-        char data[N]{};
+    struct fixed_string {
+        char data[N + 1]{}; // +1 for null terminator
+        static constexpr std::size_t size = N;
 
-        consteval fixed_string() = default;
-
-        consteval fixed_string(std::string_view str)
-        {
-            std::copy_n(str.data(), std::min(N - 1, str.size()), data);
-            data[N - 1] = '\0';    // Ensure null termination
+        constexpr fixed_string(std::string_view sv) {
+            for (std::size_t i = 0; i < sv.size(); ++i) data[i] = sv[i];
         }
 
-        [[nodiscard]] constexpr char const* c_str() const noexcept
-        {
-            return data;
-        }
-    };
-
-    HPX_CXX_EXPORT template <typename T>
-    struct qualified_name_of
-    {
-        static char const* get() noexcept
-        {
-            return nullptr;
+        template <std::size_t M>
+        constexpr auto operator+(fixed_string<M> const& other) const {
+            fixed_string<N + M> res("");
+            for (std::size_t i = 0; i < N; ++i) res.data[i] = data[i];
+            for (std::size_t i = 0; i < M; ++i) res.data[N + i] = other.data[i];
+            return res;
         }
     };
 
-    HPX_CXX_EXPORT template <template <typename...> typename T,
-        typename... Args>
-    struct qualified_name_of<T<Args...>>
-    {
-        [[nodiscard]] char const* operator()() const noexcept
-        {
-            constexpr auto has_parent = [](std::meta::info info_T) {
-                return std::meta::parent_of(info_T) !=
-                    std::meta::parent_of(std::meta::parent_of(info_T));
-            };
-            .
+    // Helper to recursively build the enclosing namespaces of a type
+    template <std::meta::info Scope>
+    struct scope_builder {
+        static constexpr auto get_value() {
+            if constexpr (Scope == ^^::) {
+                return fixed_string<0>("");
+            } else if constexpr (!std::meta::has_identifier(Scope)) {
+                // For types without identifiers (primitives, pointers, etc.), 
+                // use display_string_of as the fallback, this should guarantee
+                // uniqueness of the string made for a type even though
+                // display_string_of is implementationd defined
+                constexpr auto name_view = std::meta::display_string_of(Scope);
+                return fixed_string<name_view.size()>(name_view);
+            } else {
+                constexpr auto parent = std::meta::parent_of(Scope);
+                constexpr auto prefix = scope_builder<parent>::value;
+                constexpr auto id = std::meta::identifier_of(Scope);
+                constexpr auto name = fixed_string<id.size()>(id);
 
-                static constexpr auto qualified_name = [&has_parent]() {
-                constexpr auto dT = dealias(^^T);
-
-                // Needs to construct the fully qualified name and
-                // find each enclosing namespace
-                std::vector<std::meta::info> scopes;
-                for (auto scope = dT; has_parent(scope);
-                    scope = std::meta::parent_of(scope))
-                {
-                    scopes.push_back(scope);
+                if constexpr (prefix.size > 0) {
+                    return prefix + fixed_string<2>("::") + name;
+                } else {
+                    return name;
                 }
+            }
+        }
+        static constexpr auto value = get_value();
+    };
 
-                // Add all enclosing namespaces in reverse
-                // Todo: Should I use ranges? Should we filter global namespace?
-                auto const scoped_name = scopes | std::views::reverse |
-                    std::views::transform(std::meta::identifier_of) |
-                    std::views::join_with(std::string_view("::")) |
-                    std::ranges::to<std::string>();
+    template <auto StringGetter>
+    static constexpr auto make_fixed()
+    {
+        constexpr std::string_view sv = StringGetter();
+        return fixed_string<sv.size()>(sv);
+    }
 
-                // Put all the template arguments into a string view
-                auto const template_args =
-                    std::define_static_array(
-                        std::meta::template_arguments_of(dT)) |
-                    std::views::transform(std::meta::identifier_of) |
-                    std::views::join_with(',') | std::ranges::to<std::string>();
+    // Primary template for non-template types
+    HPX_CXX_EXPORT template <typename T>
+    struct qualified_name_of {
+    private:
+        static constexpr auto dT = dealias(^^T);
+        static constexpr auto storage = scope_builder<dT>::value;
 
-                return scoped_name + "<" + template_args + ">";
-            };
+    public:
+        [[nodiscard]] static constexpr char const* get() noexcept {
+            return storage.data;
+        }
+    };
 
-            return qualified_name().c_str();
+    // Partial specialization for template types
+    HPX_CXX_EXPORT template <template <typename...> typename T, typename... Args>
+    struct qualified_name_of<T<Args...>> {
+    private:
+        static constexpr auto dT = dealias(^^T);
+        static constexpr auto scoped_name = scope_builder<dT>::value;
+
+        // Recursively call qualified_name_of for each arg
+        static constexpr auto get_args_name() {
+            if constexpr (sizeof...(Args) == 0) {
+                return fixed_string<0>("");
+            } else {
+                // The lambda templ param trick allows this computation
+                // to be done at compile time.
+                // TODO: Is there a more elegant way to do this?
+                return []<std::size_t... Is>(std::index_sequence<Is...>) {
+                    return (... + (
+                        fixed_string<(Is == 0 ? 0 : 1)>(Is == 0 ? "" : ",") + 
+                        make_fixed<qualified_name_of<Args>::get>()
+                    ));
+                }(std::make_index_sequence<sizeof...(Args)>{});
+            }
+        }
+
+        // Final string
+        static constexpr auto storage = scoped_name +
+                                        fixed_string<1>("<") +
+                                        get_args_name() +
+                                        fixed_string<1>(">");
+
+    public:
+        [[nodiscard]] static constexpr char const* get() noexcept {
+            return storage.data;
         }
     };
 }    // namespace hpx::serialization::detail

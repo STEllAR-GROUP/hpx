@@ -14,6 +14,7 @@
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>
+#include <hpx/serialization/detail/refl_qualified_name_of.hpp>
 #include <hpx/serialization/macros.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/needs_automatic_registration.hpp>
@@ -49,11 +50,7 @@ namespace hpx::serialization::detail {
             // we should be able to auto generate a full string description
             // for the type T using reflection and display_string_of()
 
-            // Todo, write a homegrown qualified_name_of() later
-            // display_string_of is not portable yet
-            // return std::meta::display_string_of(^^T).c_str();
-            return "TODO: I have implemented refl_qualified_name_of but "
-                   "not yet integrated it here";
+            return qualified_name_of<T>::get();
         }
 #else
         [[nodiscard]] char const* operator()() const noexcept
@@ -184,40 +181,12 @@ namespace hpx::serialization::detail {
     {
         static void save(output_archive& ar, void const* base)
         {
-#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
-            if constexpr (std::is_class_v<Derived>)
-            {
-                // member serialization
-                // Todo, check if this is the right dispatch
-                refl_serialize(ar,
-                    *static_cast<Derived const*>(const_cast<void*>(base)), 0);
-            }
-            else
-            {
-                serialize(ar,
-                    *static_cast<Derived const*>(const_cast<void*>(base)), 0);
-            }
-#else
             serialize(ar, *static_cast<Derived*>(const_cast<void*>(base)), 0);
-#endif
         }
 
         static void load(input_archive& ar, void* base)
         {
-#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
-            if constexpr (std::is_class_v<Derived>)
-            {
-                // member serialization
-                // Todo, check if this is the right dispatch
-                refl_serialize(ar, *static_cast<Derived*>(base), 0);
-            }
-            else
-            {
-                serialize(ar, *static_cast<Derived*>(base), 0);
-            }
-#else
             serialize(ar, *static_cast<Derived*>(base), 0);
-#endif
         }
 
         // this function is needed for pointer type serialization
