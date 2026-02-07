@@ -130,9 +130,14 @@ void test_transform_binary_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_transform_binary()
 {
+    test_transform_binary(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_transform_binary_parallel()
+{
     using namespace hpx::execution;
 
-    test_transform_binary(IteratorTag());
     test_transform_binary(seq, IteratorTag());
     test_transform_binary(par, IteratorTag());
     test_transform_binary(par_unseq, IteratorTag());
@@ -145,6 +150,8 @@ void transform_binary_test()
 {
     test_transform_binary<std::random_access_iterator_tag>();
     test_transform_binary<std::forward_iterator_tag>();
+
+    test_transform_binary_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -272,12 +279,17 @@ void test_transform_binary_exception_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_transform_binary_exception()
 {
+    test_transform_binary_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_transform_binary_exception_parallel()
+{
     using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_transform_binary_exception(IteratorTag());
     test_transform_binary_exception(seq, IteratorTag());
     test_transform_binary_exception(par, IteratorTag());
 
@@ -289,6 +301,8 @@ void transform_binary_exception_test()
 {
     test_transform_binary_exception<std::random_access_iterator_tag>();
     test_transform_binary_exception<std::forward_iterator_tag>();
+
+    test_transform_binary_exception_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -391,7 +405,6 @@ void test_transform_binary_bad_alloc()
 void transform_binary_bad_alloc_test()
 {
     test_transform_binary_bad_alloc<std::random_access_iterator_tag>();
-    test_transform_binary_bad_alloc<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

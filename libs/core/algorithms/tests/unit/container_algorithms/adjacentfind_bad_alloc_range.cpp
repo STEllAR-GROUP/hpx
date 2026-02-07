@@ -111,7 +111,6 @@ void test_adjacent_find_bad_alloc()
 void adjacent_find_bad_alloc_test()
 {
     test_adjacent_find_bad_alloc<std::random_access_iterator_tag>();
-    test_adjacent_find_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

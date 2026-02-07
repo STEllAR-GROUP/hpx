@@ -25,12 +25,12 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the source iterators used (deduced).
+    /// \tparam RaIter        The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter.
+    ///                     sentinel for RaIter.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam Reduce      The type of the binary function object used for
@@ -72,7 +72,7 @@ namespace hpx {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a Iter can be dereferenced and then
+    ///                     type \a RaIter can be dereferenced and then
     ///                     implicitly converted to Type.
     ///                     The type \a R must be such that an object of this
     ///                     type can be implicitly converted to \a T.
@@ -106,10 +106,10 @@ namespace hpx {
     /// that the behavior of transform_reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent, typename T,
+    template <typename ExPolicy, typename RaIter, typename Sent, typename T,
         typename Reduce, typename Convert>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
-    transform_reduce(ExPolicy&& policy, Iter first, Sent last, T init,
+    transform_reduce(ExPolicy&& policy, RaIter first, Sent last, T init,
         Reduce&& red_op, Convert&& conv_op);
 
     /// Returns GENERALIZED_SUM(red_op, init, conv_op(*first), ...,
@@ -118,12 +118,12 @@ namespace hpx {
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         predicates \a red_op and \a conv_op.
     ///
-    /// \tparam Iter        The type of the source iterators used (deduced).
+    /// \tparam RaIter        The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter.
+    ///                     sentinel for RaIter.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam Reduce      The type of the binary function object used for
@@ -163,7 +163,7 @@ namespace hpx {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a Iter can be dereferenced and then
+    ///                     type \a RaIter can be dereferenced and then
     ///                     implicitly converted to Type.
     ///                     The type \a R must be such that an object of this
     ///                     type can be implicitly converted to \a T.
@@ -185,9 +185,9 @@ namespace hpx {
     /// that the behavior of transform_reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename Iter, typename Sent, typename T, typename Reduce,
+    template <typename RaIter, typename Sent, typename T, typename Reduce,
         typename Convert>
-    T transform_reduce(Iter first, Sent last, T init, Reduce&& red_op,
+    T transform_reduce(RaIter first, Sent last, T init, Reduce&& red_op,
         Convert&& conv_op);
 
     /// Returns GENERALIZED_SUM(red_op, init, conv_op(*first), ...,
@@ -200,13 +200,13 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the source iterators used (deduced).
+    /// \tparam RaIter        The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter.
-    /// \tparam Iter2       The type of the source iterators used (deduced)
+    ///                     sentinel for RaIter.
+    /// \tparam RaIter2       The type of the source iterators used (deduced)
     ///                     representing the second sequence.
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
@@ -252,10 +252,10 @@ namespace hpx {
     /// that the behavior of transform_reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent,
-        typename Iter2, typename T>
+    template <typename ExPolicy, typename RaIter, typename Sent,
+        typename RaIter2, typename T>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
-    transform_reduce(ExPolicy&& policy, Iter first, Sent last, Iter2 first2, T init);
+    transform_reduce(ExPolicy&& policy, RaIter first, Sent last, RaIter2 first2, T init);
 
     /// Returns GENERALIZED_SUM(red_op, init, conv_op(*first), ...,
     /// conv_op(*(first + (last - first) - 1))).
@@ -301,8 +301,8 @@ namespace hpx {
     /// that the behavior of transform_reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename Iter, typename Sent, typename Iter2, typename T>
-    T transform_reduce(Iter first, Sent last, Iter2 first2, T init);
+    template <typename RaIter, typename Sent, typename RaIter2, typename T>
+    T transform_reduce(RaIter first, Sent last, RaIter2 first2, T init);
 
     /// Returns GENERALIZED_SUM(red_op, init, conv_op(*first), ...,
     /// conv_op(*(first + (last - first) - 1))).
@@ -314,13 +314,13 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the source iterators used (deduced).
+    /// \tparam RaIter        The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter.
-    /// \tparam Iter2       The type of the source iterators used (deduced)
+    ///                     sentinel for RaIter.
+    /// \tparam RaIter2       The type of the source iterators used (deduced)
     ///                     representing the second sequence.
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
@@ -367,7 +367,7 @@ namespace hpx {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a Iter can be dereferenced and then
+    ///                     type \a RaIter can be dereferenced and then
     ///                     implicitly converted to Type.
     ///                     The type \a R must be such that an object of this
     ///                     type can be implicitly converted to \a T.
@@ -401,11 +401,11 @@ namespace hpx {
     /// that the behavior of transform_reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent,
-        typename Iter2, typename T, typename Reduce, typename Convert>
+    template <typename ExPolicy, typename RaIter, typename Sent,
+        typename RaIter2, typename T, typename Reduce, typename Convert>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
-    transform_reduce(ExPolicy&& policy, Iter first,
-        Sent last, Iter2 first2, T init, Reduce&& red_op, Convert&& conv_op);
+    transform_reduce(ExPolicy&& policy, RaIter first,
+        Sent last, RaIter2 first2, T init, Reduce&& red_op, Convert&& conv_op);
 
     /// Returns GENERALIZED_SUM(red_op, init, conv_op(*first), ...,
     /// conv_op(*(first + (last - first) - 1))).
@@ -501,9 +501,11 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam Reduce      The type of the binary function object used for
@@ -543,7 +545,7 @@ namespace hpx {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a Iter can be dereferenced and then
+    ///                     type \a RaIter can be dereferenced and then
     ///                     implicitly converted to Type.
     ///                     The type \a R must be such that an object of this
     ///                     type can be implicitly converted to \a T.
@@ -666,12 +668,14 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Iter2       The type of the second source iterators used
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam RaIter2       The type of the second source iterators used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an forward iterator.
+    ///                     requirements of an random access iterator.
     /// \tparam T           The type of the value to be used as return)
     ///                     values (deduced).
     ///
@@ -743,12 +747,14 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Iter2       The type of the second source iterators used
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam RaIter2       The type of the second source iterators used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an forward iterator.
+    ///                     requirements of an random access iterator.
     /// \tparam T           The type of the value to be used as return)
     ///                     values (deduced).
     /// \tparam Reduce      The type of the binary function object used for
@@ -913,7 +919,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_random_access_iterator_v<Iter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
                 hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<Iter>::value_type
                 > &&
@@ -931,9 +938,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Iter first,
             Sent last, T init, Reduce red_op, Convert conv_op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::transform_reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
                 HPX_MOVE(red_op), HPX_MOVE(conv_op));
@@ -973,19 +977,15 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-                hpx::traits::is_iterator_v<Iter2>
+                hpx::traits::is_random_access_iterator_v<Iter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_random_access_iterator_v<Iter2>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Iter first,
             Sent last, Iter2 first2, T init)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, first2,
                 HPX_MOVE(init), hpx::parallel::detail::plus(),
@@ -1018,8 +1018,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-                hpx::traits::is_iterator_v<Iter2> &&
+                hpx::traits::is_random_access_iterator_v<Iter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
+                hpx::traits::is_random_access_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<Iter>::value_type,
                     typename std::iterator_traits<Iter2>::value_type
@@ -1040,11 +1041,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Iter first,
             Sent last, Iter2 first2, T init, Reduce red_op, Convert conv_op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, first2,
                 HPX_MOVE(init), HPX_MOVE(red_op), HPX_MOVE(conv_op));
@@ -1092,7 +1088,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_traits<Rng>::value_type
                 > &&
@@ -1155,21 +1152,15 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
-                hpx::traits::is_iterator_v<Iter2>
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
+                hpx::traits::is_random_access_iterator_v<Iter2>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Rng&& rng,
             Iter2 first2, T init)
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
-
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), first2, HPX_MOVE(init),
@@ -1205,8 +1196,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
-                hpx::traits::is_iterator_v<Iter2> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
+                hpx::traits::is_random_access_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_traits<Rng>::value_type,
                     typename std::iterator_traits<Iter2>::value_type
@@ -1227,13 +1219,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Rng&& rng,
             Iter2 first2, T init, Reduce red_op, Convert conv_op)
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
-
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), first2, HPX_MOVE(init), HPX_MOVE(red_op),

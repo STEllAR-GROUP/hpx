@@ -27,9 +27,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a none_of requires \a F to meet the
@@ -94,7 +96,7 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam Iter        The type of the source iterators used for the
+    /// \tparam RaIter        The type of the source iterators used for the
     ///                     range (deduced).
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
@@ -149,10 +151,10 @@ namespace hpx { namespace ranges {
     ///           \a f returns true for no elements in the range, false
     ///           otherwise. It returns true if the range is empty.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent, typename F,
+    template <typename ExPolicy, typename RaIter, typename Sent, typename F,
         typename Proj = hpx::identity>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-    none_of(ExPolicy&& policy, Iter first, Sent last, F&& f, Proj&& proj = Proj());
+    none_of(ExPolicy&& policy, RaIter first, Sent last, F&& f, Proj&& proj = Proj());
 
     ///  Checks if unary predicate \a f returns true for no elements in the
     ///  range \a rng.
@@ -160,9 +162,11 @@ namespace hpx { namespace ranges {
     /// \note   Complexity: At most std::distance(begin(rng), end(rng))
     ///         applications of the predicate \a f
     ///
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a none_of requires \a F to meet the
@@ -255,9 +259,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a none_of requires \a F to meet the
@@ -322,7 +328,7 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam Iter        The type of the source iterators used for the
+    /// \tparam RaIter        The type of the source iterators used for the
     ///                     range (deduced).
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
@@ -377,10 +383,10 @@ namespace hpx { namespace ranges {
     ///           \a f returns true for at least one element in the range,
     ///           false otherwise. It returns false if the range is empty.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent, typename F,
+    template <typename ExPolicy, typename RaIter, typename Sent, typename F,
         typename Proj = hpx::identity>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-    any_of(ExPolicy&& policy, Iter first, Sent last, F&& f, Proj&& proj = Proj());
+    any_of(ExPolicy&& policy, RaIter first, Sent last, F&& f, Proj&& proj = Proj());
 
     /// Checks if unary predicate \a f returns true for at least one element
     /// in the range \a rng.
@@ -388,9 +394,11 @@ namespace hpx { namespace ranges {
     /// \note   Complexity: At most std::distance(begin(rng), end(rng))
     ///         applications of the predicate \a f
     ///
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a none_of requires \a F to meet the
@@ -483,9 +491,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a none_of requires \a F to meet the
@@ -550,7 +560,7 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam Iter        The type of the source iterators used for the
+    /// \tparam RaIter        The type of the source iterators used for the
     ///                     range (deduced).
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
@@ -605,10 +615,10 @@ namespace hpx { namespace ranges {
     ///           \a f returns true for all elements in the range, false
     ///           otherwise. It returns true if the range is empty.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent, typename F,
+    template <typename ExPolicy, typename RaIter, typename Sent, typename F,
         typename Proj = hpx::identity>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-    all_of(ExPolicy&& policy, Iter first, Sent last, F&& f, Proj&& proj = Proj());
+    all_of(ExPolicy&& policy, RaIter first, Sent last, F&& f, Proj&& proj = Proj());
 
     /// Checks if unary predicate \a f returns true for all elements in the
     /// range \a rng.
@@ -731,7 +741,8 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
                     hpx::parallel::traits::projected_range<Proj, Rng>
@@ -752,26 +763,23 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(f), HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename Iter, typename Sent, typename F,
+        template <typename ExPolicy, typename RaIter, typename Sent, typename F,
             typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-                hpx::parallel::traits::is_projected_v<Proj, Iter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, F,
-                    hpx::parallel::traits::projected<Proj, Iter>
+                    hpx::parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-        tag_fallback_invoke(none_of_t, ExPolicy&& policy, Iter first, Sent last,
-            F f, Proj proj = Proj())
+        tag_fallback_invoke(none_of_t, ExPolicy&& policy, RaIter first,
+            Sent last, F f, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::none_of().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 HPX_MOVE(proj));
@@ -834,8 +842,10 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng, typename F,
             typename Proj = hpx::identity>
         // clang-format off
-            requires(hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+            requires (
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, F,
                     hpx::parallel::traits::projected_range<Proj, Rng>
@@ -856,26 +866,23 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(f), HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename Iter, typename Sent, typename F,
+        template <typename ExPolicy, typename RaIter, typename Sent, typename F,
             typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-                hpx::parallel::traits::is_projected_v<Proj, Iter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, F,
-                    hpx::parallel::traits::projected<Proj, Iter>
+                    hpx::parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-        tag_fallback_invoke(any_of_t, ExPolicy&& policy, Iter first, Sent last,
-            F f, Proj proj = Proj())
+        tag_fallback_invoke(any_of_t, ExPolicy&& policy, RaIter first,
+            Sent last, F f, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::any_of().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 HPX_MOVE(proj));
@@ -940,7 +947,8 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, F,
                     hpx::parallel::traits::projected_range<Proj, Rng>
@@ -961,26 +969,23 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(f), HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename Iter, typename Sent, typename F,
+        template <typename ExPolicy, typename RaIter, typename Sent, typename F,
             typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-                hpx::parallel::traits::is_projected_v<Proj, Iter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, F,
-                    hpx::parallel::traits::projected<Proj, Iter>
+                    hpx::parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-        tag_fallback_invoke(all_of_t, ExPolicy&& policy, Iter first, Sent last,
-            F f, Proj proj = Proj())
+        tag_fallback_invoke(all_of_t, ExPolicy&& policy, RaIter first,
+            Sent last, F f, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::all_of().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 HPX_MOVE(proj));

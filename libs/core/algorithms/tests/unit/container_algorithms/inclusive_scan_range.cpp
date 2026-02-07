@@ -88,13 +88,15 @@ void test_inclusive_scan_sent(ExPolicy policy, IteratorTag)
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
     auto res1 = hpx::ranges::inclusive_scan(policy, std::begin(c),
-        sentinel<std::size_t>{2}, std::begin(d), op, val);
+        test::sentinel_from_iterator(std::begin(c) + end_len), std::begin(d),
+        op, val);
 
-    auto res2 = hpx::ranges::inclusive_scan(
-        policy, std::begin(c), sentinel<std::size_t>{2}, std::begin(d1), op);
+    auto res2 = hpx::ranges::inclusive_scan(policy, std::begin(c),
+        test::sentinel_from_iterator(std::begin(c) + end_len), std::begin(d1),
+        op);
 
-    auto res3 = hpx::ranges::inclusive_scan(
-        policy, std::begin(c), sentinel<std::size_t>{2}, std::begin(d2));
+    auto res3 = hpx::ranges::inclusive_scan(policy, std::begin(c),
+        test::sentinel_from_iterator(std::begin(c) + end_len), std::begin(d2));
 
     HPX_TEST(res1.in == std::begin(c) + end_len);
     HPX_TEST(res1.out == std::begin(d) + end_len);

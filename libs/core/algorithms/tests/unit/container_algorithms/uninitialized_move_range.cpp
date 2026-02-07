@@ -63,11 +63,11 @@ void test_uninitialized_move_sent(ExPolicy&& policy, IteratorTag)
     std::copy(std::begin(c), std::end(c), std::rbegin(d));
     std::size_t sent_len = (std::rand() % 10007) + 1;
     hpx::ranges::uninitialized_move(policy, std::begin(c),
-        sentinel<std::size_t>{
-            *(std::begin(c) + static_cast<std::ptrdiff_t>(sent_len))},
+        test::sentinel_from_iterator(
+            std::begin(c) + static_cast<std::ptrdiff_t>(sent_len)),
         std::begin(d),
-        sentinel<std::size_t>{
-            *(std::begin(d) + static_cast<std::ptrdiff_t>(sent_len))});
+        test::sentinel_from_iterator(
+            std::begin(d) + static_cast<std::ptrdiff_t>(sent_len)));
 
     std::size_t count = 0;
     // loop till for sent_len since either the sentinel for the input or output iterator
@@ -92,11 +92,11 @@ void test_uninitialized_move_sent_async(ExPolicy&& p, IteratorTag)
     std::copy(std::begin(c), std::end(c), std::rbegin(d));
     std::size_t sent_len = (std::rand() % 10007) + 1;
     auto f = hpx::ranges::uninitialized_move(p, std::begin(c),
-        sentinel<std::size_t>{
-            *(std::begin(c) + static_cast<std::ptrdiff_t>(sent_len))},
+        test::sentinel_from_iterator(
+            std::begin(c) + static_cast<std::ptrdiff_t>(sent_len)),
         std::begin(d),
-        sentinel<std::size_t>{
-            *(std::begin(d) + static_cast<std::ptrdiff_t>(sent_len))});
+        test::sentinel_from_iterator(
+            std::begin(d) + static_cast<std::ptrdiff_t>(sent_len)));
     f.wait();
 
     std::size_t count = 0;
@@ -113,9 +113,13 @@ void test_uninitialized_move_sent_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_uninitialized_move_sent()
 {
-    using namespace hpx::execution;
-
     test_uninitialized_move_sent(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_uninitialized_move_sent_parallel()
+{
+    using namespace hpx::execution;
 
     test_uninitialized_move_sent(seq, IteratorTag());
     test_uninitialized_move_sent(par, IteratorTag());
@@ -129,6 +133,7 @@ void uninitialized_move_sent_test()
 {
     test_uninitialized_move_sent<std::random_access_iterator_tag>();
     test_uninitialized_move_sent<std::forward_iterator_tag>();
+    test_uninitialized_move_sent_parallel<std::random_access_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -203,9 +208,13 @@ void test_uninitialized_move_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_uninitialized_move()
 {
-    using namespace hpx::execution;
-
     test_uninitialized_move(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_uninitialized_move_parallel()
+{
+    using namespace hpx::execution;
 
     test_uninitialized_move(seq, IteratorTag());
     test_uninitialized_move(par, IteratorTag());
@@ -219,6 +228,7 @@ void uninitialized_move_test()
 {
     test_uninitialized_move<std::random_access_iterator_tag>();
     test_uninitialized_move<std::forward_iterator_tag>();
+    test_uninitialized_move_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -345,6 +355,12 @@ void test_uninitialized_move_exception_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_uninitialized_move_exception()
 {
+    test_uninitialized_move_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_uninitialized_move_exception_parallel()
+{
     using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
@@ -361,6 +377,8 @@ void uninitialized_move_exception_test()
 {
     test_uninitialized_move_exception<std::random_access_iterator_tag>();
     test_uninitialized_move_exception<std::forward_iterator_tag>();
+    test_uninitialized_move_exception_parallel<
+        std::random_access_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -460,7 +478,6 @@ void test_uninitialized_move_bad_alloc()
 void uninitialized_move_bad_alloc_test()
 {
     test_uninitialized_move_bad_alloc<std::random_access_iterator_tag>();
-    test_uninitialized_move_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
