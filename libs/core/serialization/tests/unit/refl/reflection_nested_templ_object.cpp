@@ -75,13 +75,11 @@ public:
 class deeply_nested_object
 {
 private:
-    // Level 2: Array of PODs (Bitwise-safe)
+    // Array of PODs
     std::array<Coordinate, 4> fixed_points;
-
-    // Level 3: Template-of-template-of-template (Non-bitwise)
+    // Template-of-template-of-template
     std::vector<std::map<int, std::vector<person>>> registry_history;
-
-    // Level 2: Mixed types with optionals
+    // Mixed types with optionals
     hpx::optional<std::list<std::pair<std::string, person>>> metadata;
 
     struct internal_stats
