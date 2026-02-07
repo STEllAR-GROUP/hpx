@@ -145,7 +145,24 @@ namespace hpx::execution::experimental {
           : future_data<T, Allocator, OperationState,
                 future_data_with_run_loop<T, Allocator, OperationState>>
         {
-            hpx::execution::experimental::run_loop& loop;
+            using run_loop_scheduler_t =
+#if defined(HPX_HAVE_STDEXEC)
+                decltype(std::declval<hpx::execution::experimental::run_loop>()
+                        .get_scheduler());
+#else
+                hpx::execution::experimental::run_loop_scheduler;
+#endif
+
+
+            using run_loop_t =
+#if defined(HPX_HAVE_STDEXEC)
+                // needed to work with the internals of stdexec's run_loop
+                decltype(*get_env(schedule(std::declval<run_loop_scheduler_t>())).__loop_);
+#else
+                hpx::execution::experimental::run_loop;
+#endif
+
+            run_loop_t& loop;
 
             using base_type = future_data<T, Allocator, OperationState,
                 future_data_with_run_loop>;
@@ -155,12 +172,7 @@ namespace hpx::execution::experimental {
             template <typename Sender>
             future_data_with_run_loop(init_no_addref no_addref,
                 other_allocator const& alloc,
-#if defined(HPX_HAVE_STDEXEC)
-                decltype(std::declval<hpx::execution::experimental::run_loop>()
-                        .get_scheduler()) const& sched,
-#else
-                hpx::execution::experimental::run_loop_scheduler const& sched,
-#endif
+                run_loop_scheduler_t const& sched,
                 Sender&& sender)
               : base_type(no_addref, alloc, HPX_FORWARD(Sender, sender))
 #if defined(HPX_HAVE_STDEXEC)

@@ -550,19 +550,11 @@ namespace hpx::execution::experimental {
 
     HPX_CXX_EXPORT template <typename ReceiverID>
     using operation = hpx::execution::experimental::stdexec_internal::
-        __connect_awaitable_::__operation<ReceiverID>;
+        __connect_await::__operation<ReceiverID>;
 
     HPX_CXX_EXPORT template <typename ReceiverID>
     using promise = hpx::execution::experimental::stdexec_internal::
-        __connect_awaitable_::__promise<ReceiverID>;
-
-    HPX_CXX_EXPORT template <typename Rec>
-    using promise_t = hpx::execution::experimental::stdexec_internal::
-        __connect_awaitable_::__promise_t<Rec>;
-
-    HPX_CXX_EXPORT template <typename Rec>
-    using operation_t = hpx::execution::experimental::stdexec_internal::
-        __connect_awaitable_::__operation_t<Rec>;
+        __connect_await::__promise<ReceiverID>;
 
     HPX_CXX_EXPORT using connect_awaitable_t =
         hpx::execution::experimental::stdexec_internal::__connect_awaitable_t;
