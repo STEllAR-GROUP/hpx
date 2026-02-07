@@ -6,8 +6,8 @@
 
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/spmd_block.hpp>
 
 #include <array>
 #include <atomic>

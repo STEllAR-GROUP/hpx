@@ -42,7 +42,7 @@ namespace hpx::threads {
     /// Generally, \a threads are not created or executed directly. All
     /// functionality related to the management of \a threads is implemented by
     /// the thread-manager.
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT thread_data_stackless
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT thread_data_stackless
       : public thread_data
     {
     private:

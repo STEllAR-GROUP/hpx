@@ -1,5 +1,5 @@
 //  Copyright Vladimir Prus 2004.
-//  Copyright (c) 2005-2022 Hartmut Kaiser
+//  Copyright (c) 2005-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,12 +10,14 @@
 #include <hpx/plugin/config.hpp>
 #include <hpx/plugin/virtual_constructor.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT struct HPX_PLUGIN_EXPORT_API dll_handle_holder
+        HPX_CXX_CORE_EXPORT struct HPX_PLUGIN_EXPORT_API dll_handle_holder
         {
             explicit dll_handle_holder(dll_handle dll) noexcept
               : m_dll(HPX_MOVE(dll))
@@ -30,15 +32,17 @@ namespace hpx::util::plugin {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Wrapped, typename... Parameters>
+    HPX_CXX_CORE_EXPORT template <typename Wrapped, typename... Parameters>
     struct HPX_PLUGIN_EXPORT_API plugin_wrapper
       : public detail::dll_handle_holder
       , public Wrapped
     {
         explicit plugin_wrapper(dll_handle dll, Parameters... parameters)
           : detail::dll_handle_holder(HPX_MOVE(dll))
-          , Wrapped(parameters...)
+          , Wrapped(HPX_MOVE(parameters)...)
         {
         }
     };
 }    // namespace hpx::util::plugin
+
+#include <hpx/config/warnings_suffix.hpp>

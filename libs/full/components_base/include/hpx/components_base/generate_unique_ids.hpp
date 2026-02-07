@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/concurrency.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <cstddef>
 

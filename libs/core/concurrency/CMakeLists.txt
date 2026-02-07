@@ -55,8 +55,10 @@ add_hpx_module(
   SOURCES ${concurrency_sources}
   HEADERS ${concurrency_headers}
   COMPAT_HEADERS ${concurrency_compat_headers}
-  ADD_TO_GLOBAL_HEADER "hpx/concurrency/detail/contiguous_index_queue.hpp"
-                       "hpx/concurrency/detail/non_contiguous_index_queue.hpp"
+  ADD_TO_GLOBAL_HEADER
+    "hpx/concurrency/detail/contiguous_index_queue.hpp"
+    "hpx/concurrency/detail/non_contiguous_index_queue.hpp"
+    "hpx/concurrency/detail/tagged_ptr.hpp"
   MODULE_DEPENDENCIES
     hpx_allocator_support
     hpx_assertion

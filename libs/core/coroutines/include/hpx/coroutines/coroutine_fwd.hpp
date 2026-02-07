@@ -36,13 +36,13 @@ namespace hpx::threads::coroutines {
 
     namespace detail {
 
-        HPX_CXX_EXPORT class coroutine_self;
-        HPX_CXX_EXPORT class coroutine_stackful_self;
-        HPX_CXX_EXPORT class coroutine_stackful_self_direct;
+        HPX_CXX_CORE_EXPORT class coroutine_self;
+        HPX_CXX_CORE_EXPORT class coroutine_stackful_self;
+        HPX_CXX_CORE_EXPORT class coroutine_stackful_self_direct;
 
-        HPX_CXX_EXPORT class coroutine_impl;
+        HPX_CXX_CORE_EXPORT class coroutine_impl;
     }    // namespace detail
 
-    HPX_CXX_EXPORT class coroutine;
-    HPX_CXX_EXPORT class stackless_coroutine;
+    HPX_CXX_CORE_EXPORT class coroutine;
+    HPX_CXX_CORE_EXPORT class stackless_coroutine;
 }    // namespace hpx::threads::coroutines

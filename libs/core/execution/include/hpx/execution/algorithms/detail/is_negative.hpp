@@ -13,11 +13,11 @@
 namespace hpx::parallel::detail {
 
     // main template represents non-integral types (raises error)
-    HPX_CXX_EXPORT template <typename Size, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Size, typename Enable = void>
     struct is_negative_helper;
 
     // signed integral values may be negative
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_negative_helper<T, std::enable_if_t<std::is_signed_v<T>>>
     {
         HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr bool call(
@@ -39,7 +39,7 @@ namespace hpx::parallel::detail {
     };
 
     // unsigned integral values are never negative
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_negative_helper<T, std::enable_if_t<std::is_unsigned_v<T>>>
     {
         HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr bool call(
@@ -62,20 +62,20 @@ namespace hpx::parallel::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool is_negative(
         T const& val) noexcept
     {
         return is_negative_helper<T>::call(val);
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T abs(T const& val) noexcept
     {
         return is_negative_helper<T>::abs(val);
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T negate(T const& val) noexcept
     {
         return is_negative_helper<T>::negate(val);

@@ -22,7 +22,7 @@ namespace hpx::detail {
 
     ////////////////////////////////////////////////////////////////////////////
     // forward declaration
-    HPX_CXX_EXPORT template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct post_policy_dispatch;
 
     template <>
@@ -163,7 +163,7 @@ namespace hpx::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct post_policy_dispatch
     {
         template <typename F, typename... Ts>

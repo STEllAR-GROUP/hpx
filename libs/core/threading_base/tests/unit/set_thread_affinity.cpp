@@ -11,14 +11,11 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/threading_base/set_thread_affinity.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
-#include <iostream>
+#include <hpx/modules/threading_base.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <stdexcept>
 #include <vector>
 

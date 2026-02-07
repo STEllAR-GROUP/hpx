@@ -13,6 +13,7 @@
 namespace hpx::serialization {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Allocator = std::allocator<T>>
+    HPX_CXX_CORE_EXPORT template <typename T,
+        typename Allocator = std::allocator<T>>
     class serialize_buffer;
 }    // namespace hpx::serialization

@@ -70,7 +70,7 @@ int hpx_main()
     // test stack vars
     stack_waste(20, my_stack_info);
 
-    std::ptrdiff_t current_stack = 0;
+    [[maybe_unused]] std::ptrdiff_t current_stack = 0;
     while (!my_stack_info.empty())
     {
         info i = my_stack_info.top();

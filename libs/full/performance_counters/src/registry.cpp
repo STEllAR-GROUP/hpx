@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,6 +11,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/statistics.hpp>
 #include <hpx/modules/util.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
@@ -20,8 +21,6 @@
 #include <hpx/performance_counters/server/raw_counter.hpp>
 #include <hpx/performance_counters/server/raw_values_counter.hpp>
 #include <hpx/performance_counters/server/statistics_counter.hpp>
-#include <hpx/statistics/rolling_max.hpp>
-#include <hpx/statistics/rolling_min.hpp>
 
 #include <boost/accumulators/statistics/rolling_variance.hpp>
 #include <boost/accumulators/statistics_fwd.hpp>

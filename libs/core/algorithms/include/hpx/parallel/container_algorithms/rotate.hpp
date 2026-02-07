@@ -416,7 +416,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::rotate
-    HPX_CXX_EXPORT inline constexpr struct rotate_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct rotate_t final
       : hpx::detail::tag_parallel_algorithm<rotate_t>
     {
     private:
@@ -514,10 +514,10 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::rotate_copy
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     using rotate_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
-    HPX_CXX_EXPORT inline constexpr struct rotate_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct rotate_copy_t final
       : hpx::detail::tag_parallel_algorithm<rotate_copy_t>
     {
     private:

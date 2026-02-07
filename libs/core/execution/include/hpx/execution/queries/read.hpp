@@ -26,7 +26,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Tag>
+        HPX_CXX_CORE_EXPORT template <typename Tag>
         struct read_sender
         {
             constexpr read_sender() = default;
@@ -151,7 +151,7 @@ namespace hpx::execution::experimental {
     // new sender that uses the scheduler to schedule some nested work onto
     // sync_wait's scheduler.
     //
-    HPX_CXX_EXPORT inline constexpr struct read_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct read_t final
       : hpx::functional::tag<read_t>
     {
     private:

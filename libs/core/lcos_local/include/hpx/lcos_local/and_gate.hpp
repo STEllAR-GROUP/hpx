@@ -25,7 +25,7 @@
 namespace hpx::lcos::local {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Mutex = hpx::spinlock>
+    HPX_CXX_CORE_EXPORT template <typename Mutex = hpx::spinlock>
     struct base_and_gate
     {
     protected:
@@ -408,7 +408,7 @@ namespace hpx::lcos::local {
     // Note: This type is not thread-safe. It has to be protected from
     //       concurrent access by different threads by the code using instances
     //       of this type.
-    HPX_CXX_EXPORT struct and_gate : base_and_gate<hpx::no_mutex>
+    HPX_CXX_CORE_EXPORT struct and_gate : base_and_gate<hpx::no_mutex>
     {
     private:
         using base_type = base_and_gate<hpx::no_mutex>;

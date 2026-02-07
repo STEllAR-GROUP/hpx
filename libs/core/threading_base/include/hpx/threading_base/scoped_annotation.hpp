@@ -31,14 +31,14 @@ namespace hpx {
 
     namespace detail {
 
-        HPX_CXX_EXPORT HPX_CORE_EXPORT char const* store_function_annotation(
-            std::string name);
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const*
+        store_function_annotation(std::string name);
     }    // namespace detail
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_CXX_EXPORT struct [[nodiscard]] scoped_annotation
+    HPX_CXX_CORE_EXPORT struct [[nodiscard]] scoped_annotation
     {
         scoped_annotation(scoped_annotation const&) = delete;
         scoped_annotation(scoped_annotation&&) = delete;
@@ -56,7 +56,7 @@ namespace hpx {
         HPX_HOST_DEVICE ~scoped_annotation() {}
     };
 #elif HPX_HAVE_ITTNOTIFY != 0
-    HPX_CXX_EXPORT struct [[nodiscard]] scoped_annotation
+    HPX_CXX_CORE_EXPORT struct [[nodiscard]] scoped_annotation
     {
         scoped_annotation(scoped_annotation const&) = delete;
         scoped_annotation(scoped_annotation&&) = delete;
@@ -122,7 +122,7 @@ namespace hpx {
         hpx::threads::thread_description desc_;
     };
 #else
-    HPX_CXX_EXPORT struct [[nodiscard]] scoped_annotation
+    HPX_CXX_CORE_EXPORT struct [[nodiscard]] scoped_annotation
     {
         scoped_annotation(scoped_annotation const&) = delete;
         scoped_annotation(scoped_annotation&&) = delete;
@@ -206,7 +206,7 @@ namespace hpx {
     ///        tools like \a Intel \a VTune, \a Apex \a Profiler, etc. That
     ///        allows analyzing performance to figure out which part(s) of code
     ///        is (are) responsible for performance degradation, etc.
-    HPX_CXX_EXPORT struct [[nodiscard]] scoped_annotation
+    HPX_CXX_CORE_EXPORT struct [[nodiscard]] scoped_annotation
     {
         scoped_annotation(scoped_annotation const&) = delete;
         scoped_annotation(scoped_annotation&&) = delete;

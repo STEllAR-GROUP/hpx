@@ -739,7 +739,7 @@ namespace hpx { namespace ranges { namespace experimental {
 
 namespace hpx::ranges::experimental {
 
-    HPX_CXX_EXPORT inline constexpr struct for_loop_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct for_loop_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_t>
     {
     private:
@@ -849,7 +849,7 @@ namespace hpx::ranges::experimental {
         }
     } for_loop{};
 
-    HPX_CXX_EXPORT inline constexpr struct for_loop_strided_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct for_loop_strided_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_strided_t>
     {
     private:

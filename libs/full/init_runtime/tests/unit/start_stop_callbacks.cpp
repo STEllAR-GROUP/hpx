@@ -100,7 +100,12 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     auto on_start = hpx::register_thread_on_start_func(&on_thread_start);
+
+#if defined(HPX_HAVE_MODULE_LIKWID)
+    HPX_TEST(!on_start.empty());    // likwid support installs a start handler
+#else
     HPX_TEST(on_start.empty());
+#endif
 
     auto on_stop = hpx::register_thread_on_stop_func(&on_thread_stop);
     HPX_TEST(on_stop.empty());

@@ -371,7 +371,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::equal
-    HPX_CXX_EXPORT inline constexpr struct equal_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct equal_t final
       : hpx::detail::tag_parallel_algorithm<equal_t>
     {
     private:

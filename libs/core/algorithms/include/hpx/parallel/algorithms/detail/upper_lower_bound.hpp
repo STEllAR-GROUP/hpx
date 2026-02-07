@@ -18,7 +18,7 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename T,
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent, typename T,
         typename F, typename Proj, typename CancelToken>
     Iter lower_bound(
         Iter first, Sent last, T&& value, F&& f, Proj&& proj, CancelToken& tok)
@@ -48,7 +48,7 @@ namespace hpx::parallel::detail {
         return first;
     }
 
-    HPX_CXX_EXPORT template <typename Iter, typename T, typename F,
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename T, typename F,
         typename Proj>
     constexpr Iter lower_bound_n(Iter first,
         typename std::iterator_traits<Iter>::difference_type count, T&& value,
@@ -75,7 +75,7 @@ namespace hpx::parallel::detail {
         return first;
     }
 
-    HPX_CXX_EXPORT template <typename Iter, typename T, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename T, typename F>
     constexpr Iter lower_bound_n(Iter first,
         typename std::iterator_traits<Iter>::difference_type count, T&& value,
         F&& f, hpx::identity)
@@ -130,7 +130,7 @@ namespace hpx::parallel::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename T,
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent, typename T,
         typename F, typename Proj>
     constexpr Iter lower_bound(
         Iter first, Sent last, T&& value, F&& f, Proj&& proj)
@@ -145,7 +145,7 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename T,
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent, typename T,
         typename F, typename Proj, typename CancelToken>
     Iter upper_bound(
         Iter first, Sent last, T&& value, F&& f, Proj&& proj, CancelToken& tok)
@@ -175,7 +175,7 @@ namespace hpx::parallel::detail {
         return first;
     }
 
-    HPX_CXX_EXPORT template <typename Iter, typename T, typename F,
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename T, typename F,
         typename Proj>
     constexpr Iter upper_bound_n(Iter first,
         typename std::iterator_traits<Iter>::difference_type count, T&& value,
@@ -202,7 +202,7 @@ namespace hpx::parallel::detail {
         return first;
     }
 
-    HPX_CXX_EXPORT template <typename Iter, typename T, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename T, typename F>
     constexpr Iter upper_bound_n(Iter first,
         typename std::iterator_traits<Iter>::difference_type count, T&& value,
         F&& f, hpx::identity)
@@ -257,7 +257,7 @@ namespace hpx::parallel::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename T,
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent, typename T,
         typename F, typename Proj>
     constexpr Iter upper_bound(
         Iter first, Sent last, T&& value, F&& f, Proj&& proj)

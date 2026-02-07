@@ -44,10 +44,10 @@ namespace hpx {
     /// specifier (if any) are added to its operator(). hpx::move_only_function
     /// satisfies the requirements of MoveConstructible and MoveAssignable, but
     /// does not satisfy CopyConstructible or CopyAssignable.
-    HPX_CXX_EXPORT template <typename Sig, bool Serializable = false>
+    HPX_CXX_CORE_EXPORT template <typename Sig, bool Serializable = false>
     class move_only_function;
 
-    HPX_CXX_EXPORT template <typename R, typename... Ts, bool Serializable>
+    HPX_CXX_CORE_EXPORT template <typename R, typename... Ts, bool Serializable>
     class move_only_function<R(Ts...), Serializable>
       : public util::detail::basic_function<R(Ts...), false, Serializable>
     {
@@ -100,7 +100,7 @@ namespace hpx {
 
         // serializable move_only_function is equivalent to
         // hpx::distributed::move_only_function
-        HPX_CXX_EXPORT template <typename Sig>
+        HPX_CXX_CORE_EXPORT template <typename Sig>
         using move_only_function = hpx::move_only_function<Sig, true>;
     }    // namespace distributed
 }    // namespace hpx
@@ -109,7 +109,7 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::traits {
 
-    HPX_CXX_EXPORT template <typename Sig, bool Serializable>
+    HPX_CXX_CORE_EXPORT template <typename Sig, bool Serializable>
     struct get_function_address<hpx::move_only_function<Sig, Serializable>>
     {
         [[nodiscard]] static constexpr std::size_t call(
@@ -119,7 +119,7 @@ namespace hpx::traits {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Sig, bool Serializable>
+    HPX_CXX_CORE_EXPORT template <typename Sig, bool Serializable>
     struct get_function_annotation<hpx::move_only_function<Sig, Serializable>>
     {
         [[nodiscard]] static constexpr char const* call(
@@ -130,7 +130,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    HPX_CXX_EXPORT template <typename Sig, bool Serializable>
+    HPX_CXX_CORE_EXPORT template <typename Sig, bool Serializable>
     struct get_function_annotation_itt<
         hpx::move_only_function<Sig, Serializable>>
     {

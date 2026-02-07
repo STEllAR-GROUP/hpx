@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/modules/futures.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 
 #include <vector>
 

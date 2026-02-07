@@ -12,9 +12,9 @@
 
 namespace hpx::traits {
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_pair_v = false;
 
-    HPX_CXX_EXPORT template <typename T1, typename T2>
+    HPX_CXX_CORE_EXPORT template <typename T1, typename T2>
     inline constexpr bool is_pair_v<std::pair<T1, T2>> = true;
 }    // namespace hpx::traits

@@ -56,7 +56,7 @@ namespace hpx::execution::experimental {
 
     /// Rebind the type of executor used by an execution policy. The execution
     /// category of Executor shall not be weaker than that of ExecutionPolicy.
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Executor,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Executor,
         typename Parameters>
     struct rebind_executor
     {
@@ -78,13 +78,13 @@ namespace hpx::execution::experimental {
             parameters_type>::type;
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Executor,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Executor,
         typename Parameters>
     using rebind_executor_t =
         typename rebind_executor<ExPolicy, Executor, Parameters>::type;
 
     //////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct create_rebound_policy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct create_rebound_policy_t final
     {
         template <typename ExPolicy, typename Executor, typename Parameters>
         constexpr decltype(auto) operator()(

@@ -15,7 +15,7 @@
 namespace hpx::parallel::traits {
 
     ////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto choose(Vc::Mask<T, Abi> const& msk,
         Vc::Vector<T, Abi> const& v_true,
         Vc::Vector<T, Abi> const& v_false) noexcept
@@ -27,7 +27,7 @@ namespace hpx::parallel::traits {
     }
 
     ////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE void mask_assign(
         Vc::Mask<T, Abi> const& msk, Vc::Vector<T, Abi>& v,
         Vc::Vector<T, Abi> const& val) noexcept

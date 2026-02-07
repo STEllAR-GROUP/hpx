@@ -9,8 +9,7 @@
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 
-#include <hpx/thrust/algorithms.hpp>
-#include <hpx/thrust/policy.hpp>
+#include <hpx/modules/thrust.hpp>
 
 #include <vector>
 

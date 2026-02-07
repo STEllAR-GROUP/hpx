@@ -40,7 +40,7 @@ namespace hpx::execution::experimental {
     /// \note If the executor does not expose this information, this call
     ///       will always return \a false
     ///
-    HPX_CXX_EXPORT inline constexpr struct has_pending_closures_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct has_pending_closures_t final
       : hpx::functional::detail::tag_fallback<has_pending_closures_t>
     {
     private:
@@ -77,7 +77,7 @@ namespace hpx::execution::experimental {
     /// \note If the executor does not support this operation, this call
     ///       will always invoke hpx::threads::get_pu_mask()
     ///
-    HPX_CXX_EXPORT inline constexpr struct get_pu_mask_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct get_pu_mask_t final
       : hpx::functional::detail::tag_fallback<get_pu_mask_t>
     {
     private:
@@ -110,7 +110,7 @@ namespace hpx::execution::experimental {
     /// \note This calls exec.set_scheduler_mode(mode) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_CXX_EXPORT inline constexpr struct set_scheduler_mode_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct set_scheduler_mode_t final
       : hpx::functional::detail::tag_fallback<set_scheduler_mode_t>
     {
     private:
