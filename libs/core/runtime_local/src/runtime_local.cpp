@@ -2216,28 +2216,27 @@ namespace hpx {
             return get_stack_size_enum_name(size_enum);
         }
     }    // namespace threads
-}
 
-///////////////////////////////////////////////////////////////////////////
-// Termination detection API implementation
-namespace local {
-    void termination_detection()
-    {
-        runtime* rt = get_runtime_ptr();
-        if (rt == nullptr)
+    ///////////////////////////////////////////////////////////////////////////
+    // Termination detection API implementation
+    namespace local {
+        void termination_detection()
         {
-            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                "hpx::local::termination_detection",
-                "the runtime system is not active");
+            runtime* rt = get_runtime_ptr();
+            if (rt == nullptr)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "hpx::local::termination_detection",
+                    "the runtime system is not active");
+            }
+
+            hpx::threads::threadmanager& tm = rt->get_thread_manager();
+
+            // Wait for all HPX threads to complete
+            tm.wait();
+
+            // Clean up any terminated threads
+            tm.cleanup_terminated(true);
         }
-
-        hpx::threads::threadmanager& tm = rt->get_thread_manager();
-
-        // Wait for all HPX threads to complete
-        tm.wait();
-
-        // Clean up any terminated threads
-        tm.cleanup_terminated(true);
-    }
-}    // namespace local
+    }    // namespace local
 }    // namespace hpx
