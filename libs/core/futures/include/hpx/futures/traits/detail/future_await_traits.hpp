@@ -129,7 +129,7 @@ namespace hpx::lcos::detail {
     }
 
     template <typename T>
-    HPX_FORCEINLINE T await_resume(hpx::shared_future<T>& f)
+    HPX_FORCEINLINE decltype(auto) await_resume(hpx::shared_future<T>& f)
     {
         return f.get();
     }
