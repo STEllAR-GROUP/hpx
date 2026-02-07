@@ -334,7 +334,8 @@ namespace hpx::ranges {
         // clang-format off
         requires (
             hpx::traits::is_input_range_v<Rng> &&
-            std::is_same_v<T, hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Rng>>> &&
+            std::is_same_v<T, hpx::traits::iter_value_t<
+                hpx::traits::range_iterator_t<Rng>>> &&
             hpx::traits::is_indirectly_binary_left_foldable<F, T,
                 hpx::traits::range_iterator_t<Rng>>
         )
@@ -441,7 +442,8 @@ namespace hpx::ranges {
         // clang-format off
         requires (
             hpx::traits::is_bidirectional_range_v<Rng> &&
-            std::is_same_v<T, hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Rng>>> &&
+            std::is_same_v<T, hpx::traits::iter_value_t<
+                hpx::traits::range_iterator_t<Rng>>> &&
             hpx::traits::is_indirectly_binary_right_foldable<F, T,
                 hpx::traits::range_iterator_t<Rng>>
         )
@@ -549,7 +551,8 @@ namespace hpx::ranges {
         // clang-format off
         requires (
             hpx::traits::is_input_range_v<Rng> &&
-            std::is_same_v<T, hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Rng>>> &&
+            std::is_same_v<T, hpx::traits::iter_value_t<
+                hpx::traits::range_iterator_t<Rng>>> &&
             hpx::traits::is_indirectly_binary_left_foldable<F, T,
                 hpx::traits::range_iterator_t<Rng>>
         )

@@ -12,6 +12,7 @@
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/boost_iterator_categories.hpp>
 #include <hpx/modules/type_support.hpp>
+#include <concepts>
 #include <iterator>
 #include <type_traits>
 #include <utility>
