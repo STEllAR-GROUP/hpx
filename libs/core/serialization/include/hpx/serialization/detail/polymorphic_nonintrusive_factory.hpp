@@ -14,6 +14,7 @@
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>
+#include <hpx/serialization/detail/refl_qualified_name_of.hpp>
 #include <hpx/serialization/macros.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/needs_automatic_registration.hpp>
@@ -28,6 +29,10 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#include <experimental/meta>
+#endif
+
 namespace hpx::serialization::detail {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -37,6 +42,17 @@ namespace hpx::serialization::detail {
         ;
 #else
     {
+
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+        [[nodiscard]] char const* operator()() const noexcept
+        {
+            // Unless the user specifically creates a specialization of this
+            // we should be able to auto generate a full string description
+            // for the type T using reflection and display_string_of()
+
+            return qualified_name_of<T>::get();
+        }
+#else
         [[nodiscard]] char const* operator()() const noexcept
         {
             // If you encounter this assert while compiling code, that means
@@ -47,6 +63,7 @@ namespace hpx::serialization::detail {
                 "HPX_REGISTER_ACTION_DECLARATION missing");
             return util::debug::type_id<T>();
         }
+#endif
     };
 #endif
 
