@@ -539,7 +539,7 @@ namespace hpx {
         // This ensures that collective operations and other background work
         // finish before reinit_destruct() destroys component heaps.
         // Fixes issue #6776: crash in one_size_heap_list::alloc on macOS Debug
-        hpx::local::termination_detection();
+        thread_manager_->wait();
 
         LRT_(debug).format("~runtime_local(finished)");
 
