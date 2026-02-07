@@ -33,6 +33,7 @@
 #endif
 
 #include <stdexec/execution.hpp>
+#include <stdexec/__detail/__connect_awaitable.hpp>
 
 #if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic pop
@@ -60,11 +61,11 @@ namespace hpx::execution::experimental {
     HPX_CXX_EXPORT using stdexec::get_env;
     HPX_CXX_EXPORT using stdexec::get_env_t;
 
-    HPX_CXX_EXPORT using stdexec::empty_env;
-    HPX_CXX_EXPORT using stdexec::env_of_t;
-
     HPX_CXX_EXPORT using stdexec::env;
     HPX_CXX_EXPORT using stdexec::prop;
+
+    HPX_CXX_EXPORT using empty_env = env<>;
+    HPX_CXX_EXPORT using stdexec::env_of_t;
 
     // Queries
     HPX_CXX_EXPORT using stdexec::forward_progress_guarantee;
@@ -153,6 +154,10 @@ namespace hpx::execution::experimental {
     // Transfer
     HPX_CXX_EXPORT using stdexec::transfer;
     HPX_CXX_EXPORT using stdexec::transfer_t;
+
+    // Continues on
+    HPX_CXX_EXPORT using stdexec::continues_on;
+    HPX_CXX_EXPORT using stdexec::continues_on_t;
 
     // Tags
     namespace tags {
@@ -302,8 +307,8 @@ namespace hpx::execution::experimental {
 
         HPX_CXX_EXPORT using stdexec::__single_sender_value_t;
 
-        namespace __connect_awaitable_ {
-            HPX_CXX_EXPORT using namespace stdexec::__connect_awaitable_;
+        namespace __connect_await {
+            HPX_CXX_EXPORT using namespace stdexec::__connect_await;
         }
 
         HPX_CXX_EXPORT using stdexec::__connect_awaitable_t;
