@@ -65,4 +65,3 @@ tests.unit.modules.algorithms.container_algorithms.is_sorted_range2
 tests.unit.modules.algorithms.container_algorithms.is_sorted_range3
 tests.unit.modules.algorithms.container_algorithms.is_sorted_range_exception
 tests.unit.modules.algorithms.container_algorithms.is_sorted_until_range
-tests.unit.modules.algorithms.container_algorithms.is_sorted_until_range_exception
