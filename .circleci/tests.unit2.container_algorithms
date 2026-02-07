@@ -4,6 +4,7 @@
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+tests.unit.modules.algorithms.container_algorithms.is_sorted_until_range_exception
 tests.unit.modules.algorithms.container_algorithms.lexicographical_compare_range
 tests.unit.modules.algorithms.container_algorithms.make_heap_range
 tests.unit.modules.algorithms.container_algorithms.max_element_range
