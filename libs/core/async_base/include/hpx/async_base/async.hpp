@@ -18,7 +18,7 @@
 namespace hpx::detail {
 
     // dispatch point used for async implementations
-    HPX_CXX_EXPORT template <typename Func, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Func, typename Enable = void>
     struct async_dispatch;
 }    // namespace hpx::detail
 
@@ -77,7 +77,7 @@ namespace hpx {
     /// \returns hpx::future referring to the shared state created by this call
     ///          to \a hpx::async.
     ///
-    HPX_CXX_EXPORT template <typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
     HPX_FORCEINLINE decltype(auto) async(F&& f, Ts&&... ts)
     {
         return detail::async_dispatch<std::decay_t<F>>::call(

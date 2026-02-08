@@ -180,7 +180,7 @@ namespace hpx::util::detail {
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T = int,
+    HPX_CXX_CORE_EXPORT template <typename T = int,
         typename Allocator = std::allocator<T>>
     struct aligned_allocator
     {
@@ -270,14 +270,14 @@ namespace hpx::util {
         }
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator==(
         aligned_allocator<T> const&, aligned_allocator<T> const&) noexcept
     {
         return true;
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator!=(
         aligned_allocator<T> const&, aligned_allocator<T> const&) noexcept
     {

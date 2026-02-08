@@ -46,34 +46,34 @@ namespace hpx::parallel::traits {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename Abi>
     struct vector_pack_type : detail::vector_pack_type<T, N, Abi>
     {
     };
 
     // don't wrap types twice
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename Abi1,
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename Abi1,
         typename Abi2>
     struct vector_pack_type<Vc::Vector<T, Abi1>, N, Abi2>
     {
         using type = Vc::Vector<T, Abi1>;
     };
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N1, typename V,
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N1, typename V,
         std::size_t W, std::size_t N2, typename Abi>
     struct vector_pack_type<Vc::SimdArray<T, N1, V, W>, N2, Abi>
     {
         using type = Vc::SimdArray<T, N1, V, W>;
     };
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename Abi>
     struct vector_pack_type<Vc::Scalar::Vector<T>, N, Abi>
     {
         using type = Vc::Scalar::Vector<T>;
     };
 
     ////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct vector_pack_mask_type<T,
         std::enable_if_t<Vc::Traits::is_simd_vector<T>::value>>
     {

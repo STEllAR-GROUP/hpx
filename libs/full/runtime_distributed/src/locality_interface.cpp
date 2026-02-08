@@ -11,13 +11,12 @@
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcelset/detail/message_handler_interface_functions.hpp>
 #include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/parcelset_base/detail/locality_interface_functions.hpp>
-#include <hpx/parcelset_base/locality.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 
@@ -140,7 +139,7 @@ namespace hpx::parcelset {
     }    // namespace detail::impl
 
     // initialize locality interface function pointers in parcelset modules
-    struct HPX_EXPORT locality_interface_functions
+    HPX_CXX_EXPORT struct HPX_EXPORT locality_interface_functions
     {
         locality_interface_functions()
         {

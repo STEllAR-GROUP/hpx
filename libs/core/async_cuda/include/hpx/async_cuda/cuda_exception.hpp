@@ -18,7 +18,7 @@ namespace hpx::cuda::experimental {
 
     // -------------------------------------------------------------------------
     // exception type for failed launch of cuda functions
-    HPX_CXX_EXPORT struct HPX_ALWAYS_EXPORT cuda_exception : hpx::exception
+    HPX_CXX_CORE_EXPORT struct HPX_ALWAYS_EXPORT cuda_exception : hpx::exception
     {
         cuda_exception(std::string const& msg, cudaError_t const err)
           : hpx::exception(hpx::error::bad_function_call, msg)
@@ -37,5 +37,6 @@ namespace hpx::cuda::experimental {
 
     // -------------------------------------------------------------------------
     // Error message handler for cuda calls
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void check_cuda_error(cudaError_t const err);
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void check_cuda_error(
+        cudaError_t const err);
 }    // namespace hpx::cuda::experimental

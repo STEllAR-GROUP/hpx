@@ -16,7 +16,7 @@
 
 namespace hpx::execution_base {
 
-    HPX_CXX_EXPORT struct agent_base
+    HPX_CXX_CORE_EXPORT struct agent_base
     {
         virtual ~agent_base() = default;
 

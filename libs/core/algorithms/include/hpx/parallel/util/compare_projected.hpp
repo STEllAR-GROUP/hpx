@@ -16,11 +16,11 @@
 namespace hpx::parallel::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Compare, typename... Proj>
+    HPX_CXX_CORE_EXPORT template <typename Compare, typename... Proj>
     struct compare_projected;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Compare, typename Proj>
+    HPX_CXX_CORE_EXPORT template <typename Compare, typename Proj>
     struct compare_projected<Compare, Proj>
     {
         template <typename Compare_, typename Proj_>
@@ -41,7 +41,7 @@ namespace hpx::parallel::util {
         Proj proj_;
     };
 
-    HPX_CXX_EXPORT template <typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Compare>
     struct compare_projected<Compare, hpx::identity>
     {
         template <typename Compare_>
@@ -60,7 +60,8 @@ namespace hpx::parallel::util {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Compare, typename Proj1, typename Proj2>
+    HPX_CXX_CORE_EXPORT template <typename Compare, typename Proj1,
+        typename Proj2>
     struct compare_projected<Compare, Proj1, Proj2>
     {
         template <typename Compare_, typename Proj1_, typename Proj2_>
@@ -84,7 +85,7 @@ namespace hpx::parallel::util {
         Proj2 proj2_;
     };
 
-    HPX_CXX_EXPORT template <typename Compare, typename Proj2>
+    HPX_CXX_CORE_EXPORT template <typename Compare, typename Proj2>
     struct compare_projected<Compare, hpx::identity, Proj2>
     {
         template <typename Compare_, typename Proj2_>
@@ -106,7 +107,7 @@ namespace hpx::parallel::util {
         Proj2 proj2_;
     };
 
-    HPX_CXX_EXPORT template <typename Compare, typename Proj1>
+    HPX_CXX_CORE_EXPORT template <typename Compare, typename Proj1>
     struct compare_projected<Compare, Proj1, hpx::identity>
     {
         template <typename Compare_, typename Proj1_>
@@ -128,7 +129,7 @@ namespace hpx::parallel::util {
         Proj1 proj1_;
     };
 
-    HPX_CXX_EXPORT template <typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Compare>
     struct compare_projected<Compare, hpx::identity, hpx::identity>
     {
         template <typename Compare_>

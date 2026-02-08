@@ -66,7 +66,7 @@ namespace hpx::experimental {
     ///          views are combined by invoking the copy of combiner, passing it
     ///          the two views to be combined.
     ///
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::multiplies<T>>
     reduction_multiplies(T& var)
@@ -74,7 +74,7 @@ namespace hpx::experimental {
         return reduction(var, T(1), std::multiplies<T>());
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::multiplies<T>>
     reduction_multiplies(T& var, T const& identity)

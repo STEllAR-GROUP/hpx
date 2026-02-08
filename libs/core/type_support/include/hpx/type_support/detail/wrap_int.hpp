@@ -11,7 +11,7 @@
 namespace hpx::traits::detail {
 
     // wraps int so that int argument is favored over wrap_int
-    HPX_CXX_EXPORT struct wrap_int
+    HPX_CXX_CORE_EXPORT struct wrap_int
     {
         /*implicit*/ constexpr wrap_int(int) noexcept {}
     };

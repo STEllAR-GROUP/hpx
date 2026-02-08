@@ -24,12 +24,12 @@ namespace hpx::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT enum class async_rw_mutex_access_type {
+        HPX_CXX_CORE_EXPORT enum class async_rw_mutex_access_type {
             read,
             readwrite
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct async_rw_mutex_shared_state
         {
             using shared_state_ptr_type =
@@ -154,11 +154,11 @@ namespace hpx::experimental {
             }
         };
 
-        HPX_CXX_EXPORT template <typename ReadWriteT, typename ReadT,
+        HPX_CXX_CORE_EXPORT template <typename ReadWriteT, typename ReadT,
             async_rw_mutex_access_type AccessType>
         struct async_rw_mutex_access_wrapper;
 
-        HPX_CXX_EXPORT template <typename ReadWriteT, typename ReadT>
+        HPX_CXX_CORE_EXPORT template <typename ReadWriteT, typename ReadT>
         struct async_rw_mutex_access_wrapper<ReadWriteT, ReadT,
             async_rw_mutex_access_type::read>
         {
@@ -197,7 +197,7 @@ namespace hpx::experimental {
             }
         };
 
-        HPX_CXX_EXPORT template <typename ReadWriteT, typename ReadT>
+        HPX_CXX_CORE_EXPORT template <typename ReadWriteT, typename ReadT>
         struct async_rw_mutex_access_wrapper<ReadWriteT, ReadT,
             async_rw_mutex_access_type::readwrite>
         {
@@ -326,7 +326,7 @@ namespace hpx::experimental {
     /// Retrieving senders from the mutex is not thread-safe.
     ///
     /// The mutex is movable and non-copyable.
-    HPX_CXX_EXPORT template <typename ReadWriteT = void,
+    HPX_CXX_CORE_EXPORT template <typename ReadWriteT = void,
         typename ReadT = ReadWriteT,
         typename Allocator = hpx::util::internal_allocator<>>
     class async_rw_mutex;
@@ -357,7 +357,7 @@ namespace hpx::experimental {
     // The protected value is moved from state to state and is released when the
     // last shared state is destroyed.
 
-    HPX_CXX_EXPORT template <typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename Allocator>
     class async_rw_mutex<void, void, Allocator>
     {
     private:
@@ -547,7 +547,7 @@ namespace hpx::experimental {
         shared_state_ptr_type state;
     };
 
-    HPX_CXX_EXPORT template <typename ReadWriteT, typename ReadT,
+    HPX_CXX_CORE_EXPORT template <typename ReadWriteT, typename ReadT,
         typename Allocator>
     class async_rw_mutex
     {

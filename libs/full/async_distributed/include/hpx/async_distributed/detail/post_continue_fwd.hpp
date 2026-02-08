@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/actions_base/actions_base_fwd.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {

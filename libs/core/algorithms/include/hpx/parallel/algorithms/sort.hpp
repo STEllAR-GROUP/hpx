@@ -182,12 +182,12 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT inline constexpr std::size_t sort_limit_per_task =
+        HPX_CXX_CORE_EXPORT inline constexpr std::size_t sort_limit_per_task =
             65536ul;
 
         // \brief this function is the work assigned to each thread in the
         //        parallel process
-        HPX_CXX_EXPORT template <typename ExPolicy, typename RandomIt,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename RandomIt,
             typename Comp>
         hpx::future<RandomIt> sort_thread(ExPolicy&& policy, RandomIt first,
             RandomIt last, Comp comp, std::size_t chunk_size)
@@ -279,7 +279,7 @@ namespace hpx::parallel {
         // [in] first   iterator to the first element to sort
         // [in] last    iterator to the next element after the last
         // [in] comp    object for to Comp
-        HPX_CXX_EXPORT template <typename ExPolicy, typename RandomIt,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename RandomIt,
             typename Comp>
         hpx::future<RandomIt> parallel_sort_async(
             ExPolicy&& policy, RandomIt first, RandomIt last, Comp&& comp)
@@ -332,7 +332,7 @@ namespace hpx::parallel {
 
         ///////////////////////////////////////////////////////////////////////
         // sort
-        HPX_CXX_EXPORT template <typename RandomIt>
+        HPX_CXX_CORE_EXPORT template <typename RandomIt>
         struct sort : public algorithm<sort<RandomIt>, RandomIt>
         {
             constexpr sort() noexcept
@@ -385,7 +385,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::sort
-    HPX_CXX_EXPORT inline constexpr struct sort_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct sort_t final
       : hpx::detail::tag_parallel_algorithm<sort_t>
     {
         template <typename RandomIt,

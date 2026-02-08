@@ -38,25 +38,25 @@ namespace hpx::lockfree {
 
     // The "left" and "right" terminology is used instead of top and bottom to
     // stay consistent with the paper that this code is based on..
-    HPX_CXX_EXPORT enum class deque_status_type : std::int8_t {
+    HPX_CXX_CORE_EXPORT enum class deque_status_type : std::int8_t {
         stable,
         rpush,
         lpush
     };
 
-    HPX_CXX_EXPORT constexpr bool operator==(
+    HPX_CXX_CORE_EXPORT constexpr bool operator==(
         int lhs, deque_status_type rhs) noexcept
     {
         return lhs == static_cast<int>(rhs);
     }
 
-    HPX_CXX_EXPORT constexpr bool operator==(
+    HPX_CXX_CORE_EXPORT constexpr bool operator==(
         deque_status_type lhs, int rhs) noexcept
     {
         return static_cast<int>(lhs) == rhs;
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct deque_node    //-V690
     {
         using pointer = hpx::lockfree::detail::tagged_ptr<deque_node>;
@@ -100,7 +100,7 @@ namespace hpx::lockfree {
 
     // FIXME: A lot of these methods can be dropped; in fact, it may make sense
     // to re-structure this class like deque_node.
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct deque_anchor    //-V690
     {
         using node = deque_node<T>;
@@ -237,7 +237,7 @@ namespace hpx::lockfree {
         }
     };
 
-    HPX_CXX_EXPORT template <typename T,
+    HPX_CXX_CORE_EXPORT template <typename T,
         typename freelist_t = caching_freelist_t,
         typename Alloc = std::allocator<T>>
     struct deque

@@ -195,7 +195,7 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
             typename Sent>
         Iter sequential_uninitialized_default_construct(
             ExPolicy&& policy, Iter first, Sent last)
@@ -208,7 +208,7 @@ namespace hpx::parallel {
                 [](Iter it) -> void { std::destroy_at(std::addressof(*it)); });
         }
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename InIter>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter>
         InIter sequential_uninitialized_default_construct_n(
             ExPolicy&& policy, InIter first, std::size_t count)
         {
@@ -226,7 +226,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter>
         decltype(auto) parallel_uninitialized_default_construct_n(
             ExPolicy&& policy, FwdIter first, std::size_t count)
         {
@@ -276,7 +276,7 @@ namespace hpx::parallel {
                     });
         }
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename FwdIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter>
         struct uninitialized_default_construct
           : public algorithm<uninitialized_default_construct<FwdIter>, FwdIter>
         {
@@ -311,7 +311,7 @@ namespace hpx::parallel {
     namespace detail {
         /// \cond NOINTERNAL
 
-        HPX_CXX_EXPORT template <typename FwdIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter>
         struct uninitialized_default_construct_n
           : public algorithm<uninitialized_default_construct_n<FwdIter>,
                 FwdIter>
@@ -346,8 +346,8 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_default_construct
-    HPX_CXX_EXPORT inline constexpr struct uninitialized_default_construct_t
-        final
+    HPX_CXX_CORE_EXPORT inline constexpr struct
+        uninitialized_default_construct_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_default_construct_t>
     {
         template <typename FwdIter, typename Sent>
@@ -395,8 +395,8 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_default_construct_n
-    HPX_CXX_EXPORT inline constexpr struct uninitialized_default_construct_n_t
-        final
+    HPX_CXX_CORE_EXPORT inline constexpr struct
+        uninitialized_default_construct_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_default_construct_n_t>
     {
         template <typename FwdIter, typename Size>

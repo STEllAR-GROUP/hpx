@@ -14,7 +14,7 @@
 namespace hpx::util {
 
     // this is taken from the Boost.Io library
-    HPX_CXX_EXPORT class ios_flags_saver
+    HPX_CXX_CORE_EXPORT class ios_flags_saver
     {
     public:
         using state_type = ::std::ios_base;

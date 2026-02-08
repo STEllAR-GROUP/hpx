@@ -24,7 +24,7 @@
 
 namespace hpx::parallel::detail {
 
-    HPX_CXX_EXPORT template <typename Iterator>
+    HPX_CXX_CORE_EXPORT template <typename Iterator>
     struct datapar_generate_helper
     {
         using iterator_type = std::decay_t<Iterator>;
@@ -81,7 +81,7 @@ namespace hpx::parallel::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct datapar_generate
+    HPX_CXX_CORE_EXPORT struct datapar_generate
     {
         template <typename ExPolicy, typename Iter, typename Sent, typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
@@ -93,8 +93,8 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename Sent,
-        typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
+        typename Sent, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<hpx::is_vectorpack_execution_policy_v<ExPolicy>,
             Iter>::type
@@ -106,7 +106,7 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct datapar_generate_n
+    HPX_CXX_CORE_EXPORT struct datapar_generate_n
     {
         template <typename ExPolicy, typename Iter, typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
@@ -117,7 +117,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<hpx::is_vectorpack_execution_policy_v<ExPolicy>,
             Iter>::type

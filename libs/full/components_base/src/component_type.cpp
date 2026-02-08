@@ -9,10 +9,10 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/static_reinit.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/thread_support.hpp>
-#include <hpx/naming_base/address.hpp>
 
 #include <cstdint>
 #include <map>

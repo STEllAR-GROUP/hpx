@@ -56,8 +56,9 @@ namespace hpx::lockfree {
      *   - T must have a trivial assignment operator
      *   - T must have a trivial destructor
      */
-    HPX_CXX_EXPORT template <typename T, typename Allocator = std::allocator<T>,
-        std::size_t Capacity = 0, bool IsFixedSize = false>
+    HPX_CXX_CORE_EXPORT template <typename T,
+        typename Allocator = std::allocator<T>, std::size_t Capacity = 0,
+        bool IsFixedSize = false>
     class queue
     {
     private:

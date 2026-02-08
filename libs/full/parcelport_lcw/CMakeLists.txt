@@ -58,6 +58,7 @@ add_hpx_module(
   COMPAT_HEADERS ${parcelport_lcw_compat_headers}
   DEPENDENCIES hpx_core hpx_dependencies_boost LCW::LCW LCI::LCT
   MODULE_DEPENDENCIES hpx_actions hpx_command_line_handling hpx_parcelset
+                      hpx_parcelset_base
   CMAKE_SUBDIRS examples tests
 )
 

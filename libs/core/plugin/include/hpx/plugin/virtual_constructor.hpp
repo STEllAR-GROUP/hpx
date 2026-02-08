@@ -19,22 +19,21 @@
 namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT using exported_plugins_type =
+    HPX_CXX_CORE_EXPORT using exported_plugins_type =
         std::map<std::string, hpx::any_nonser>;
-    HPX_CXX_EXPORT typedef exported_plugins_type*(
+    HPX_CXX_CORE_EXPORT typedef exported_plugins_type*(
         HPX_PLUGIN_API* get_plugins_list_type)();
-    HPX_CXX_EXPORT typedef exported_plugins_type*(
+    HPX_CXX_CORE_EXPORT typedef exported_plugins_type*(
         HPX_PLUGIN_API get_plugins_list_np) ();
-    HPX_CXX_EXPORT using dll_handle = shared_ptr<get_plugins_list_np>;
+    HPX_CXX_CORE_EXPORT using dll_handle = shared_ptr<get_plugins_list_np>;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename BasePlugin>
+    HPX_CXX_CORE_EXPORT template <typename BasePlugin>
     struct HPX_PLUGIN_EXPORT_API virtual_constructor
     {
         using type = hpx::util::pack<>;
     };
 
-    HPX_CXX_EXPORT template <typename BasePlugin>
-    using virtual_constructor_t =
-        typename virtual_constructor<BasePlugin>::type;
+    HPX_CXX_CORE_EXPORT template <typename BasePlugin>
+    using virtual_constructor_t = virtual_constructor<BasePlugin>::type;
 }    // namespace hpx::util::plugin

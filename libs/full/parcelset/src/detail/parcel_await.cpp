@@ -13,10 +13,10 @@
 #include <hpx/modules/serialization.hpp>
 
 #include <hpx/actions/actions_fwd.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/naming/detail/preprocess_gid_types.hpp>
 #include <hpx/parcelset/detail/parcel_await.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/parcelset_base/parcel_interface.hpp>
 
 #include <cstddef>
 #include <cstdint>

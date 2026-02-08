@@ -10,7 +10,7 @@
 #include <hpx/async_distributed/continuation_impl.hpp>
 #include <hpx/async_distributed/set_lco_value_continuation.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <type_traits>
 #include <utility>

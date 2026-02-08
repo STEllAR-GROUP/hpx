@@ -18,7 +18,6 @@ set(_hpx_full_modules
     async_colocated
     async_distributed
     checkpoint
-    checkpoint_base
     collectives
     command_line_handling
     components

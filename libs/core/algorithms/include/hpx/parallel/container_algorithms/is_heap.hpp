@@ -496,7 +496,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::is_heap
-    HPX_CXX_EXPORT inline constexpr struct is_heap_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct is_heap_t final
       : hpx::detail::tag_parallel_algorithm<is_heap_t>
     {
     private:
@@ -608,7 +608,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::is_heap_until
-    HPX_CXX_EXPORT inline constexpr struct is_heap_until_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct is_heap_until_t final
       : hpx::detail::tag_parallel_algorithm<is_heap_until_t>
     {
     private:

@@ -35,7 +35,7 @@ namespace hpx::util {
     // The runtime_configuration class is a wrapper for the runtime
     // configuration data allowing to extract configuration information in a
     // more convenient way
-    HPX_CXX_EXPORT class runtime_configuration : public section
+    HPX_CXX_CORE_EXPORT class runtime_configuration : public section
     {
         std::string hpx_ini_file;
         std::vector<std::string> cmdline_ini_defs;

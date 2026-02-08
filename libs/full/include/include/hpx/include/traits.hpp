@@ -47,6 +47,4 @@
 #include <hpx/components_base/traits/component_type_is_compatible.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/components_base/traits/managed_component_policies.hpp>
-#include <hpx/parcelset_base/traits/action_get_embedded_parcel.hpp>
-#include <hpx/parcelset_base/traits/action_message_handler.hpp>
-#include <hpx/parcelset_base/traits/action_serialization_filter.hpp>
+#include <hpx/modules/parcelset_base.hpp>

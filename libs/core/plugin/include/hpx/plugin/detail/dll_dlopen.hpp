@@ -46,9 +46,9 @@ namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////////
 #if !defined(_WIN32)
-    HPX_CXX_EXPORT using HMODULE = void*;
+    HPX_CXX_CORE_EXPORT using HMODULE = void*;
 #else
-    HPX_CXX_EXPORT using HMODULE = struct HINSTANCE__*;
+    HPX_CXX_CORE_EXPORT using HMODULE = struct HINSTANCE__*;
 #endif
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ namespace hpx::util::plugin {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT class dll
+    HPX_CXX_CORE_EXPORT class dll
     {
     protected:
         ///////////////////////////////////////////////////////////////////////

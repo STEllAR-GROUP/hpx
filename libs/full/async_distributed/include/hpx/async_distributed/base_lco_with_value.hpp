@@ -21,9 +21,9 @@
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/ini.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset/coalescing_message_handler_registration.hpp>
 
 #include <cstddef>

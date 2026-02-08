@@ -22,7 +22,7 @@
 namespace hpx::serialization {
 
     // implement serialization for boost::array
-    HPX_CXX_EXPORT template <typename Archive, typename T, std::size_t N>
+    HPX_CXX_CORE_EXPORT template <typename Archive, typename T, std::size_t N>
     void serialize(
         Archive& ar, boost::array<T, N>& a, unsigned int const /* version */)
     {

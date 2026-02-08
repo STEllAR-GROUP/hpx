@@ -41,11 +41,12 @@ namespace hpx::util {
     //  In addition this type registers global construction and destruction
     //  functions used by the HPX runtime system to reinitialize the held data
     //  structures.
-    HPX_CXX_EXPORT template <typename T, typename Tag = T, std::size_t N = 1>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Tag = T,
+        std::size_t N = 1>
     struct HPX_CORE_EXPORT_REINITIALIZABLE_STATIC reinitializable_static;
 
     //////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Tag, std::size_t N>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Tag, std::size_t N>
     struct HPX_CORE_EXPORT_REINITIALIZABLE_STATIC reinitializable_static
     {
     public:

@@ -10,7 +10,7 @@
 
 namespace hpx::traits {
 
-    HPX_CXX_EXPORT template <typename Result, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Result, typename Enable = void>
     struct promise_remote_result
     {
         using type = Result;
@@ -22,7 +22,7 @@ namespace hpx::traits {
         using type = hpx::util::unused_type;
     };
 
-    HPX_CXX_EXPORT template <typename Result>
+    HPX_CXX_CORE_EXPORT template <typename Result>
     using promise_remote_result_t =
         typename promise_remote_result<Result>::type;
 }    // namespace hpx::traits

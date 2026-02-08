@@ -19,7 +19,7 @@
 
 namespace hpx::threads {
 
-    HPX_CXX_EXPORT struct HPX_CORE_EXPORT execution_context final
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT execution_context final
       : hpx::execution_base::context_base
     {
         hpx::execution_base::resource_base const& resource()
@@ -31,7 +31,7 @@ namespace hpx::threads {
         hpx::execution_base::resource_base resource_;
     };
 
-    HPX_CXX_EXPORT struct HPX_CORE_EXPORT execution_agent
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT execution_agent
       : hpx::execution_base::agent_base
     {
         explicit execution_agent(

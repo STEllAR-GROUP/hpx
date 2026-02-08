@@ -8,9 +8,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/barrier.hpp>
-#include <hpx/concurrency/detail/contiguous_index_queue.hpp>
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/optional.hpp>
 #include <hpx/program_options.hpp>
