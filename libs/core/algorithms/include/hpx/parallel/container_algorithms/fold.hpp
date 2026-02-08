@@ -265,254 +265,15 @@ namespace hpx::ranges {
     ///////////////////////////////////////////////////////////////////////////
     /// Result type for fold_left_with_iter algorithms
     template <typename I, typename T>
-    struct in_value_result
-    {
-        HPX_NO_UNIQUE_ADDRESS I in;
-        HPX_NO_UNIQUE_ADDRESS T value;
-
-        template <typename I2, typename T2,
-            typename Enable =
-                std::enable_if_t<std::is_convertible_v<I const&, I2> &&
-                    std::is_convertible_v<T const&, T2>>>
-        constexpr operator in_value_result<I2, T2>() const&
-        {
-            return {in, value};
-        }
-
-        template <typename I2, typename T2,
-            typename Enable = std::enable_if_t<std::is_convertible_v<I, I2> &&
-                std::is_convertible_v<T, T2>>>
-        constexpr operator in_value_result<I2, T2>() &&
-        {
-            return {HPX_MOVE(in), HPX_MOVE(value)};
-        }
-    };
+    using fold_left_with_iter_result = parallel::util::in_value_result<I, T>;
 
     template <typename I, typename T>
-    using fold_left_with_iter_result = in_value_result<I, T>;
-
-    template <typename I, typename T>
-    using fold_left_first_with_iter_result = in_value_result<I, T>;
-
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::fold_left
-    inline constexpr struct fold_left_t final
-      : hpx::detail::tag_parallel_algorithm<fold_left_t>
-    {
-    private:
-        template <typename InIter, typename Sent, typename T, typename F>
-        // clang-format off
-        requires (
-            hpx::traits::is_input_iterator_v<InIter> &&
-            hpx::traits::is_sentinel_for_v<Sent, InIter> &&
-            std::is_same_v<T, hpx::traits::iter_value_t<InIter>> &&
-            hpx::traits::is_indirectly_binary_left_foldable<F, T, InIter>
-        )
-        // clang-format on
-        friend auto tag_fallback_invoke(
-            hpx::ranges::fold_left_t, InIter first, Sent last, T init, F f)
-        {
-            using U = std::decay_t<hpx::util::invoke_result_t<F&, T,
-                hpx::traits::iter_reference_t<InIter>>>;
-
-            if (first == last)
-            {
-                return U(HPX_MOVE(init));
-            }
-
-            U result = HPX_INVOKE(f, HPX_MOVE(init), *first);
-            ++first;
-
-            for (; first != last; ++first)
-            {
-                result = HPX_INVOKE(f, HPX_MOVE(result), *first);
-            }
-            return result;
-        }
-
-        template <typename Rng, typename T, typename F>
-        // clang-format off
-        requires (
-            hpx::traits::is_input_range_v<Rng> &&
-            std::is_same_v<T, hpx::traits::iter_value_t<
-                hpx::traits::range_iterator_t<Rng>>> &&
-            hpx::traits::is_indirectly_binary_left_foldable<F, T,
-                hpx::traits::range_iterator_t<Rng>>
-        )
-        // clang-format on
-        friend auto tag_fallback_invoke(
-            hpx::ranges::fold_left_t, Rng&& rng, T init, F f)
-        {
-            return tag_fallback_invoke(hpx::ranges::fold_left_t{},
-                hpx::util::begin(rng), hpx::util::end(rng), HPX_MOVE(init),
-                HPX_MOVE(f));
-        }
-    } fold_left{};
-
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::fold_left_first
-    inline constexpr struct fold_left_first_t final
-      : hpx::detail::tag_parallel_algorithm<fold_left_first_t>
-    {
-    private:
-        template <typename InIter, typename Sent, typename F>
-        // clang-format off
-        requires (
-            hpx::traits::is_input_iterator_v<InIter> &&
-            hpx::traits::is_sentinel_for_v<Sent, InIter> &&
-            hpx::traits::is_indirectly_binary_left_foldable<F,
-                hpx::traits::iter_value_t<InIter>, InIter>
-        )
-        // clang-format on
-        friend auto tag_fallback_invoke(
-            hpx::ranges::fold_left_first_t, InIter first, Sent last, F f)
-        {
-            using U = decltype(HPX_INVOKE(f, *first, *first));
-            using result_type = hpx::optional<U>;
-
-            if (first == last)
-            {
-                return result_type();
-            }
-
-            U result = *first;
-            ++first;
-
-            for (; first != last; ++first)
-            {
-                result = HPX_INVOKE(f, HPX_MOVE(result), *first);
-            }
-            return result_type(HPX_MOVE(result));
-        }
-
-        template <typename Rng, typename F>
-        // clang-format off
-        requires (
-            hpx::traits::is_input_range_v<Rng> &&
-            hpx::traits::is_indirectly_binary_left_foldable<F,
-                hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Rng>>,
-                hpx::traits::range_iterator_t<Rng>>
-        )
-        // clang-format on
-        friend auto tag_fallback_invoke(
-            hpx::ranges::fold_left_first_t, Rng&& rng, F f)
-        {
-            return tag_fallback_invoke(hpx::ranges::fold_left_first_t{},
-                hpx::util::begin(rng), hpx::util::end(rng), HPX_MOVE(f));
-        }
-    } fold_left_first{};
-
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::fold_right
-    inline constexpr struct fold_right_t final
-      : hpx::detail::tag_parallel_algorithm<fold_right_t>
-    {
-    private:
-        template <typename BidIter, typename Sent, typename T, typename F>
-        // clang-format off
-        requires (
-            hpx::traits::is_bidirectional_iterator_v<BidIter> &&
-            std::is_same_v<T, hpx::traits::iter_value_t<BidIter>> &&
-            hpx::traits::is_sentinel_for_v<Sent, BidIter> &&
-            hpx::traits::is_indirectly_binary_right_foldable<F, T, BidIter>
-        )
-        // clang-format on
-        friend auto tag_fallback_invoke(
-            hpx::ranges::fold_right_t, BidIter first, Sent last, T init, F f)
-        {
-            using U = std::decay_t<hpx::util::invoke_result_t<F&,
-                hpx::traits::iter_reference_t<BidIter>, T>>;
-
-            if (first == last)
-            {
-                return U(HPX_MOVE(init));
-            }
-
-            auto it = hpx::ranges::next(first, last);
-            U result = HPX_MOVE(init);
-
-            while (it != first)
-            {
-                result = HPX_INVOKE(f, *--it, HPX_MOVE(result));
-            }
-            return result;
-        }
-
-        template <typename Rng, typename T, typename F>
-        // clang-format off
-        requires (
-            hpx::traits::is_bidirectional_range_v<Rng> &&
-            std::is_same_v<T, hpx::traits::iter_value_t<
-                hpx::traits::range_iterator_t<Rng>>> &&
-            hpx::traits::is_indirectly_binary_right_foldable<F, T,
-                hpx::traits::range_iterator_t<Rng>>
-        )
-        // clang-format on
-        friend auto tag_fallback_invoke(
-            hpx::ranges::fold_right_t, Rng&& rng, T init, F f)
-        {
-            return tag_fallback_invoke(hpx::ranges::fold_right_t{},
-                hpx::util::begin(rng), hpx::util::end(rng), HPX_MOVE(init),
-                HPX_MOVE(f));
-        }
-    } fold_right{};
-
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::ranges::fold_right_last
-    inline constexpr struct fold_right_last_t final
-      : hpx::detail::tag_parallel_algorithm<fold_right_last_t>
-    {
-    private:
-        template <typename BidIter, typename Sent, typename F>
-        // clang-format off
-        requires (
-            hpx::traits::is_bidirectional_iterator_v<BidIter> &&
-            hpx::traits::is_sentinel_for_v<Sent, BidIter> &&
-            hpx::traits::is_indirectly_binary_right_foldable<F,
-                hpx::traits::iter_value_t<BidIter>, BidIter>
-        )
-        // clang-format on
-        friend auto tag_fallback_invoke(
-            hpx::ranges::fold_right_last_t, BidIter first, Sent last, F f)
-        {
-            using U = decltype(HPX_INVOKE(f, *first, *first));
-            using result_type = hpx::optional<U>;
-
-            if (first == last)
-            {
-                return result_type();
-            }
-
-            auto it = hpx::ranges::next(first, last);
-            U result = *--it;
-
-            while (it != first)
-            {
-                result = HPX_INVOKE(f, *--it, HPX_MOVE(result));
-            }
-            return result_type(HPX_MOVE(result));
-        }
-
-        template <typename Rng, typename F>
-        // clang-format off
-        requires (
-            hpx::traits::is_bidirectional_range_v<Rng> &&
-            hpx::traits::is_indirectly_binary_right_foldable<F,
-                hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Rng>>,
-                hpx::traits::range_iterator_t<Rng>>
-        )
-        // clang-format on
-        friend auto tag_fallback_invoke(
-            hpx::ranges::fold_right_last_t, Rng&& rng, F f)
-        {
-            return tag_fallback_invoke(hpx::ranges::fold_right_last_t{},
-                hpx::util::begin(rng), hpx::util::end(rng), HPX_MOVE(f));
-        }
-    } fold_right_last{};
+    using fold_left_first_with_iter_result =
+        parallel::util::in_value_result<I, T>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::fold_left_with_iter
-    inline constexpr struct fold_left_with_iter_t final
+    HPX_CXX_EXPORT inline constexpr struct fold_left_with_iter_t final
       : hpx::detail::tag_parallel_algorithm<fold_left_with_iter_t>
     {
     private:
@@ -568,7 +329,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::fold_left_first_with_iter
-    inline constexpr struct fold_left_first_with_iter_t final
+    HPX_CXX_EXPORT inline constexpr struct fold_left_first_with_iter_t final
       : hpx::detail::tag_parallel_algorithm<fold_left_first_with_iter_t>
     {
     private:
@@ -622,6 +383,200 @@ namespace hpx::ranges {
                 hpx::util::begin(rng), hpx::util::end(rng), HPX_MOVE(f));
         }
     } fold_left_first_with_iter{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::ranges::fold_left
+    HPX_CXX_EXPORT inline constexpr struct fold_left_t final
+      : hpx::detail::tag_parallel_algorithm<fold_left_t>
+    {
+    private:
+        template <typename InIter, typename Sent, typename T, typename F>
+        // clang-format off
+        requires (
+            hpx::traits::is_input_iterator_v<InIter> &&
+            hpx::traits::is_sentinel_for_v<Sent, InIter> &&
+            std::is_same_v<T, hpx::traits::iter_value_t<InIter>> &&
+            hpx::traits::is_indirectly_binary_left_foldable<F, T, InIter>
+        )
+        // clang-format on
+        friend auto tag_fallback_invoke(
+            hpx::ranges::fold_left_t, InIter first, Sent last, T init, F f)
+        {
+            return tag_fallback_invoke(hpx::ranges::fold_left_with_iter_t{},
+                HPX_MOVE(first), HPX_MOVE(last), HPX_MOVE(init), HPX_MOVE(f))
+                .value;
+        }
+
+        template <typename Rng, typename T, typename F>
+        // clang-format off
+        requires (
+            hpx::traits::is_input_range_v<Rng> &&
+            std::is_same_v<T, hpx::traits::iter_value_t<
+                hpx::traits::range_iterator_t<Rng>>> &&
+            hpx::traits::is_indirectly_binary_left_foldable<F, T,
+                hpx::traits::range_iterator_t<Rng>>
+        )
+        // clang-format on
+        friend auto tag_fallback_invoke(
+            hpx::ranges::fold_left_t, Rng&& rng, T init, F f)
+        {
+            return tag_fallback_invoke(hpx::ranges::fold_left_with_iter_t{},
+                hpx::util::begin(rng), hpx::util::end(rng), HPX_MOVE(init),
+                HPX_MOVE(f))
+                .value;
+        }
+    } fold_left{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::ranges::fold_left_first
+    HPX_CXX_EXPORT inline constexpr struct fold_left_first_t final
+      : hpx::detail::tag_parallel_algorithm<fold_left_first_t>
+    {
+    private:
+        template <typename InIter, typename Sent, typename F>
+        // clang-format off
+        requires (
+            hpx::traits::is_input_iterator_v<InIter> &&
+            hpx::traits::is_sentinel_for_v<Sent, InIter> &&
+            hpx::traits::is_indirectly_binary_left_foldable<F,
+                hpx::traits::iter_value_t<InIter>, InIter>
+        )
+        // clang-format on
+        friend auto tag_fallback_invoke(
+            hpx::ranges::fold_left_first_t, InIter first, Sent last, F f)
+        {
+            return tag_fallback_invoke(
+                hpx::ranges::fold_left_first_with_iter_t{}, HPX_MOVE(first),
+                HPX_MOVE(last), HPX_MOVE(f))
+                .value;
+        }
+
+        template <typename Rng, typename F>
+        // clang-format off
+        requires (
+            hpx::traits::is_input_range_v<Rng> &&
+            hpx::traits::is_indirectly_binary_left_foldable<F,
+                hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Rng>>,
+                hpx::traits::range_iterator_t<Rng>>
+        )
+        // clang-format on
+        friend auto tag_fallback_invoke(
+            hpx::ranges::fold_left_first_t, Rng&& rng, F f)
+        {
+            return tag_fallback_invoke(
+                hpx::ranges::fold_left_first_with_iter_t{},
+                hpx::util::begin(rng), hpx::util::end(rng), HPX_MOVE(f))
+                .value;
+        }
+    } fold_left_first{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::ranges::fold_right
+    HPX_CXX_EXPORT inline constexpr struct fold_right_t final
+      : hpx::detail::tag_parallel_algorithm<fold_right_t>
+    {
+    private:
+        template <typename BidIter, typename Sent, typename T, typename F>
+        // clang-format off
+        requires (
+            hpx::traits::is_bidirectional_iterator_v<BidIter> &&
+            std::is_same_v<T, hpx::traits::iter_value_t<BidIter>> &&
+            hpx::traits::is_sentinel_for_v<Sent, BidIter> &&
+            hpx::traits::is_indirectly_binary_right_foldable<F, T, BidIter>
+        )
+        // clang-format on
+        friend auto tag_fallback_invoke(
+            hpx::ranges::fold_right_t, BidIter first, Sent last, T init, F f)
+        {
+            using U = std::decay_t<hpx::util::invoke_result_t<F&,
+                hpx::traits::iter_reference_t<BidIter>, T>>;
+
+            if (first == last)
+            {
+                return U(HPX_MOVE(init));
+            }
+
+            auto it = hpx::ranges::next(first, last);
+            U result = HPX_MOVE(init);
+
+            while (it != first)
+            {
+                result = HPX_INVOKE(f, *--it, HPX_MOVE(result));
+            }
+            return result;
+        }
+
+        template <typename Rng, typename T, typename F>
+        // clang-format off
+        requires (
+            hpx::traits::is_bidirectional_range_v<Rng> &&
+            std::is_same_v<T, hpx::traits::iter_value_t<
+                hpx::traits::range_iterator_t<Rng>>> &&
+            hpx::traits::is_indirectly_binary_right_foldable<F, T,
+                hpx::traits::range_iterator_t<Rng>>
+        )
+        // clang-format on
+        friend auto tag_fallback_invoke(
+            hpx::ranges::fold_right_t, Rng&& rng, T init, F f)
+        {
+            return tag_fallback_invoke(hpx::ranges::fold_right_t{},
+                hpx::util::begin(rng), hpx::util::end(rng), HPX_MOVE(init),
+                HPX_MOVE(f));
+        }
+    } fold_right{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::ranges::fold_right_last
+    HPX_CXX_EXPORT inline constexpr struct fold_right_last_t final
+      : hpx::detail::tag_parallel_algorithm<fold_right_last_t>
+    {
+    private:
+        template <typename BidIter, typename Sent, typename F>
+        // clang-format off
+        requires (
+            hpx::traits::is_bidirectional_iterator_v<BidIter> &&
+            hpx::traits::is_sentinel_for_v<Sent, BidIter> &&
+            hpx::traits::is_indirectly_binary_right_foldable<F,
+                hpx::traits::iter_value_t<BidIter>, BidIter>
+        )
+        // clang-format on
+        friend auto tag_fallback_invoke(
+            hpx::ranges::fold_right_last_t, BidIter first, Sent last, F f)
+        {
+            using U = decltype(HPX_INVOKE(f, *first, *first));
+            using result_type = hpx::optional<U>;
+
+            if (first == last)
+            {
+                return result_type();
+            }
+
+            auto it = hpx::ranges::next(first, last);
+            U result = *--it;
+
+            while (it != first)
+            {
+                result = HPX_INVOKE(f, *--it, HPX_MOVE(result));
+            }
+            return result_type(HPX_MOVE(result));
+        }
+
+        template <typename Rng, typename F>
+        // clang-format off
+        requires (
+            hpx::traits::is_bidirectional_range_v<Rng> &&
+            hpx::traits::is_indirectly_binary_right_foldable<F,
+                hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Rng>>,
+                hpx::traits::range_iterator_t<Rng>>
+        )
+        // clang-format on
+        friend auto tag_fallback_invoke(
+            hpx::ranges::fold_right_last_t, Rng&& rng, F f)
+        {
+            return tag_fallback_invoke(hpx::ranges::fold_right_last_t{},
+                hpx::util::begin(rng), hpx::util::end(rng), HPX_MOVE(f));
+        }
+    } fold_right_last{};
 
 }    // namespace hpx::ranges
 
