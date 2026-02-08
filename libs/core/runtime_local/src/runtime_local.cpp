@@ -533,6 +533,13 @@ namespace hpx {
 #ifdef HPX_HAVE_IO_POOL
         io_pool_->stop();
 #endif
+
+        // Wait for all threads to complete before destroying allocators.
+        // This ensures that collective operations and other background work
+        // finish before reinit_destruct() destroys component heaps.
+        // Fixes issue #6776: crash in one_size_heap_list::alloc on macOS Debug
+        thread_manager_->wait();
+
         LRT_(debug).format("~runtime_local(finished)");
 
         LPROGRESS_;
