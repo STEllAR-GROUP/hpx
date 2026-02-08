@@ -554,13 +554,8 @@ namespace hpx::execution::experimental::detail {
             bool reverse_placement =
                 hint.placement_mode() == placement::depth_first_reverse ||
                 hint.placement_mode() == placement::breadth_first_reverse;
-            // Configure work stealing based on execution mode
-            bool base_allow_stealing =
+            bool allow_stealing =
                 !hpx::threads::do_not_share_function(hint.sharing_mode());
-            bool allow_stealing = op_state->is_chunked ?
-                base_allow_stealing :    // Chunked: normal work stealing
-                true;    // Unchunked: always enable aggressive work stealing
-                         // for load balancing
 
             for (std::uint32_t pu = 0;
                 worker_thread != op_state->num_worker_threads && pu != num_pus;

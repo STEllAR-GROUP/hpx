@@ -510,7 +510,7 @@ namespace hpx::execution::experimental {
     // The sender_of concept defines the requirements for a sender type that on
     // successful completion sends the specified set of value types.
     HPX_CXX_EXPORT template <typename Sender, typename Signal,
-        typename Env = hpx::execution::experimental::empty_env>
+        typename Env = hpx::execution::experimental::env<>>
     struct is_sender_of
       : std::bool_constant<
             hpx::execution::experimental::sender_of<Sender, Signal, Env>>
@@ -518,7 +518,7 @@ namespace hpx::execution::experimental {
     };
 
     HPX_CXX_EXPORT template <typename Sender, typename Signal,
-        typename Env = hpx::execution::experimental::empty_env>
+        typename Env = hpx::execution::experimental::env<>>
     inline constexpr bool is_sender_of_v =
         is_sender_of<Sender, Signal, Env>::value;
 
@@ -535,7 +535,7 @@ namespace hpx::execution::experimental {
     // 3. Otherwise, single-sender-value-type<S, E> is ill-formed.
     //
     HPX_CXX_EXPORT template <typename Sender,
-        typename Env = hpx::execution::experimental::empty_env>
+        typename Env = hpx::execution::experimental::env<>>
     using single_sender_value_t =
         hpx::execution::experimental::stdexec_internal::__single_sender_value_t<
             Sender, Env>;
@@ -558,11 +558,11 @@ namespace hpx::execution::experimental {
 
     HPX_CXX_EXPORT template <typename Rec>
     using promise_t = hpx::execution::experimental::stdexec_internal::
-        __connect_awaitable_::__promise_t<Rec>;
+        __connect_awaitable_::__promise<Rec>;
 
     HPX_CXX_EXPORT template <typename Rec>
     using operation_t = hpx::execution::experimental::stdexec_internal::
-        __connect_awaitable_::__operation_t<Rec>;
+        __connect_awaitable_::__operation<Rec>;
 
     HPX_CXX_EXPORT using connect_awaitable_t =
         hpx::execution::experimental::stdexec_internal::__connect_awaitable_t;

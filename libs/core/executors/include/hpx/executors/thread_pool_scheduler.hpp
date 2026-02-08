@@ -94,7 +94,7 @@ namespace hpx::execution::experimental {
     struct thread_pool_domain : stdexec::default_domain
     {
         // transform_sender for bulk operations
-        // (following stdexec system_context.hpp pattern — env-based only)
+        // (following stdexec system_context.hpp pattern env-based only)
         template <bulk_chunked_or_unchunked_sender Sender, typename Env>
         auto transform_sender(Sender&& sndr, Env const& env) const noexcept
         {
@@ -107,7 +107,7 @@ namespace hpx::execution::experimental {
                 "sender's attributes or receiver's environment "
                 "on which to schedule bulk work.");
 
-            auto&& sched = hpx::execution::experimental::get_scheduler(env);
+            auto sched = hpx::execution::experimental::get_scheduler(env);
 
             // Extract bulk parameters using structured binding
             auto&& [tag, data, child] = sndr;
@@ -121,15 +121,11 @@ namespace hpx::execution::experimental {
                         hpx::execution::experimental::bulk_unchunked_t>;
 
             return hpx::execution::experimental::detail::
-                thread_pool_bulk_sender<Policy,
-                    std::decay_t<decltype(child)>,
+                thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
                     std::decay_t<decltype(iota_shape)>,
-                    std::decay_t<decltype(f)>, is_chunked>{
-                    HPX_MOVE(sched),
-                    HPX_FORWARD(decltype(child), child),
-                    HPX_MOVE(iota_shape),
-                    HPX_FORWARD(decltype(f), f)
-                };
+                    std::decay_t<decltype(f)>, is_chunked>{HPX_MOVE(sched),
+                    HPX_FORWARD(decltype(child), child), HPX_MOVE(iota_shape),
+                    HPX_FORWARD(decltype(f), f)};
         }
     };
 
@@ -311,7 +307,7 @@ namespace hpx::execution::experimental {
             {
             }
 
-            operation_state(operation_state&&) = delete;
+            operation_state(operation_state&&) = default;
             operation_state(operation_state const&) = delete;
             operation_state& operator=(operation_state&&) = delete;
             operation_state& operator=(operation_state const&) = delete;

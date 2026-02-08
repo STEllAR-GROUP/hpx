@@ -82,7 +82,7 @@ namespace hpx::when_all_vector_detail {
         using element_value_type =
             std::decay_t<hpx::execution::experimental::detail::single_result_t<
                 hpx::execution::experimental::value_types_of_t<Sender,
-                    hpx::execution::experimental::empty_env, meta::pack,
+                    hpx::execution::experimental::env<>, meta::pack,
                     meta::pack>>>;
 
         static constexpr bool is_void_value_type =
@@ -328,7 +328,7 @@ namespace hpx::when_all_vector_detail {
                 typename hpx::execution::experimental::error_types_of_t<
                     when_all_vector_sender_impl<
                         Sender>::when_all_vector_sender_type,
-                    hpx::execution::experimental::empty_env, hpx::variant>;
+                    hpx::execution::experimental::env<>, hpx::variant>;
 #else
             using error_types = typename generate_completion_signatures<
                 hpx::execution::experimental::empty_env>::

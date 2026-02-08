@@ -2021,12 +2021,9 @@ void test_bulk()
                 HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             });
 
-        // Static assertion to verify the sender type is thread_pool_bulk_sender
-        using sender_type = std::decay_t<decltype(bulk_sender)>;
-
-        // static_assert(is_thread_pool_bulk_sender<sender_type>::value,
-        //    "Bulk sender should be transformed to thread_pool_bulk_sender by "
-        //    "domain customization");
+        // Note: bulk() produces a bulk_t sender at construction time.
+        // Lowering to bulk_chunked happens at connect time via
+        // domain transform_sender.
 
         tt::sync_wait(std::move(bulk_sender));
 #else
@@ -2202,11 +2199,69 @@ void test_stdexec_domain_queries()
 {
     auto scheduler = ex::thread_pool_scheduler{};
 
-    // Verify domain is accessible via stdexec::get_domain
-    static_assert(requires { stdexec::get_domain(scheduler); });
+    // 1. Verify domain derives from stdexec::default_domain
+    static_assert(std::is_base_of_v<stdexec::default_domain,
+                      ex::thread_pool_domain<hpx::launch>>,
+        "thread_pool_domain should derive from default_domain");
+    // 2. Verify domain is accessible via stdexec::get_domain
+    static_assert(
+        requires { stdexec::get_domain(scheduler); },
+        "scheduler should support get_domain query");
     auto domain = stdexec::get_domain(scheduler);
 
-    HPX_TEST(true);    // Domain query successful
+    // 3. Verify the domain type is thread_pool_domain
+    static_assert(
+        std::is_same_v<decltype(domain), ex::thread_pool_domain<hpx::launch>>,
+        "scheduler domain should be thread_pool_domain<hpx::launch>");
+    // 4. Verify transform_sender produces thread_pool_bulk_sender for
+    //    bulk_chunked (proves the domain customization is picked up)
+    {
+        auto env =
+            stdexec::env{stdexec::prop{stdexec::get_scheduler, scheduler}};
+
+        auto chunked_sndr = stdexec::bulk_chunked(
+            ex::schedule(scheduler), stdexec::par, 10, [](int, int) {});
+
+        // Verify the sender matches the bulk concept
+        using chunked_t = std::decay_t<decltype(chunked_sndr)>;
+        static_assert(ex::bulk_chunked_or_unchunked_sender<chunked_t>,
+            "bulk_chunked sender should satisfy "
+            "bulk_chunked_or_unchunked_sender concept");
+
+        auto transformed =
+            domain.transform_sender(std::move(chunked_sndr), env);
+
+        static_assert(is_thread_pool_bulk_sender<
+                          std::decay_t<decltype(transformed)>>::value,
+            "domain transform_sender for bulk_chunked should produce "
+            "thread_pool_bulk_sender");
+    }
+
+    // 5. Verify transform_sender produces thread_pool_bulk_sender for
+    //    bulk_unchunked (proves the domain customization is picked up)
+    {
+        auto env =
+            stdexec::env{stdexec::prop{stdexec::get_scheduler, scheduler}};
+
+        auto unchunked_sndr = stdexec::bulk_unchunked(
+            ex::schedule(scheduler), stdexec::par, 10, [](int) {});
+
+        // Verify the sender matches the bulk concept
+        using unchunked_t = std::decay_t<decltype(unchunked_sndr)>;
+        static_assert(ex::bulk_chunked_or_unchunked_sender<unchunked_t>,
+            "bulk_unchunked sender should satisfy "
+            "bulk_chunked_or_unchunked_sender concept");
+
+        auto transformed =
+            domain.transform_sender(std::move(unchunked_sndr), env);
+
+        static_assert(is_thread_pool_bulk_sender<
+                          std::decay_t<decltype(transformed)>>::value,
+            "domain transform_sender for bulk_unchunked should produce "
+            "thread_pool_bulk_sender");
+    }
+
+    HPX_TEST(true);
 }
 
 void test_stdexec_bulk_domain_customization()
@@ -2225,6 +2280,10 @@ void test_stdexec_bulk_domain_customization()
             chunk_calls.fetch_add(1);
             results[idx] = value + idx;
         });
+
+    // Note: bulk() produces a bulk_t sender at construction time.
+    // Lowering to bulk_chunked happens at connect time via
+    // domain transform_sender.
 
     stdexec::sync_wait(std::move(bulk_sender));
 
@@ -2269,6 +2328,12 @@ void test_stdexec_bulk_chunked_customization()
             }
         });
 
+    // Verify this is recognized as a bulk_chunked sender
+    using chunked_sender_t = std::decay_t<decltype(bulk_chunked_sender)>;
+    static_assert(ex::bulk_chunked_or_unchunked_sender<chunked_sender_t>,
+        "bulk_chunked sender should satisfy "
+        "bulk_chunked_or_unchunked_sender");
+
     stdexec::sync_wait(std::move(bulk_chunked_sender));
 
     // Verify all elements were processed
@@ -2299,6 +2364,12 @@ void test_stdexec_bulk_unchunked_customization()
             function_calls.fetch_add(1, std::memory_order_relaxed);
             results[idx] = value * idx;
         });
+
+    // Verify this is recognized as a bulk_unchunked sender
+    using unchunked_sender_t = std::decay_t<decltype(bulk_unchunked_sender)>;
+    static_assert(ex::bulk_chunked_or_unchunked_sender<unchunked_sender_t>,
+        "bulk_unchunked sender should satisfy "
+        "bulk_chunked_or_unchunked_sender");
 
     stdexec::sync_wait(std::move(bulk_unchunked_sender));
 

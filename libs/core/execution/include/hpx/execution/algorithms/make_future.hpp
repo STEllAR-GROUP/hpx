@@ -167,8 +167,9 @@ namespace hpx::execution::experimental {
               //TODO: Keep an eye on this, it is based on the internal impl of
               // stdexec, so it is subect to change. This is currently relying
               // on the env struct to expose __loop_ as a public member.
-              , loop(*hpx::execution::experimental::get_env(schedule(sched))
-                        .__loop_)
+              , loop(static_cast<hpx::execution::experimental::run_loop&>(
+                    *hpx::execution::experimental::get_env(schedule(sched))
+                        .__loop_))
 #else
               , loop(sched.get_run_loop())
 #endif
@@ -196,7 +197,7 @@ namespace hpx::execution::experimental {
             using allocator_type = Allocator;
 
             using value_types = hpx::execution::experimental::value_types_of_t<
-                std::decay_t<Sender>, hpx::execution::experimental::empty_env,
+                std::decay_t<Sender>, hpx::execution::experimental::env<>,
                 meta::pack, meta::pack>;
 
             using result_type =
@@ -242,7 +243,7 @@ namespace hpx::execution::experimental {
             using allocator_type = Allocator;
 
             using value_types = hpx::execution::experimental::value_types_of_t<
-                std::decay_t<Sender>, hpx::execution::experimental::empty_env,
+                std::decay_t<Sender>, hpx::execution::experimental::env<>,
                 meta::pack, meta::pack>;
 
             using result_type =
