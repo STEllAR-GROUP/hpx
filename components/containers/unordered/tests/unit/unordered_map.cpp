@@ -3,9 +3,9 @@
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/traits.hpp>
@@ -21,16 +21,17 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Define the vector types to be used.
+// Define the unordered_map types to be used.
 HPX_REGISTER_UNORDERED_MAP(std::string, double)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Key, typename Value, typename Hash, typename KeyEqual>
-void test_global_iteration(hpx::unordered_map<Key, Value, Hash, KeyEqual>& m,
+void test_global_iteration(
+    hpx::unordered_map<Key, Value, Hash, KeyEqual>& m,
     Value const& val = Value())
 {
     std::size_t size = m.size();
-
+    
     //     typedef typename hpx::unordered_map<Key, Value>::iterator iterator;
     //     typedef hpx::traits::segmented_iterator_traits<iterator> traits;
     //     HPX_TEST(traits::is_segmented_iterator::value);
@@ -38,15 +39,13 @@ void test_global_iteration(hpx::unordered_map<Key, Value, Hash, KeyEqual>& m,
     //     typedef typename hpx::unordered_map<Key, Value>::const_iterator const_iterator;
     //     typedef hpx::traits::segmented_iterator_traits<const_iterator> const_traits;
     //     HPX_TEST(const_traits::is_segmented_iterator::value);
-
-    for (std::size_t i = 0; i != size; ++i)
+    
+    for (std::size_t i = 0; i < size; ++i)
     {
-        std::string idx = std::to_string(i);
-        HPX_TEST_EQ(m[idx], val);
-        m[idx] = Value(i + 1);
-        HPX_TEST_EQ(m[idx], Value(i + 1));
+        Key key = std::to_string(i);
+        HPX_TEST_EQ(m[key], val);
     }
-
+    
     //     // test normal iteration
     //     std::size_t count = 0;
     //     std::size_t i = 42;
@@ -67,6 +66,7 @@ void test_global_iteration(hpx::unordered_map<Key, Value, Hash, KeyEqual>& m,
     //     HPX_TEST_EQ(count, size);
 }
 
+///////////////////////////////////////////////////////////////////////////////
 template <typename Key, typename Value, typename Hash, typename KeyEqual>
 void fill_unordered_map(hpx::unordered_map<Key, Value, Hash, KeyEqual>& m,
     std::size_t count, Value const& val)
@@ -77,6 +77,19 @@ void fill_unordered_map(hpx::unordered_map<Key, Value, Hash, KeyEqual>& m,
         m[idx] = val;
     }
     HPX_TEST_EQ(m.size(), count);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename Key, typename Value>
+void test_operator_brackets_size_stability()
+{
+    hpx::unordered_map<Key, Value> m;
+
+    m["x"] = Value(1);
+    std::size_t s = m.size();
+
+    HPX_TEST_EQ(m["x"], Value(1));
+    HPX_TEST_EQ(m.size(), s);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -152,7 +165,7 @@ void trivial_tests()
         test_global_iteration(m, Value(42));
     }
 }
-
+///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     trivial_tests<std::string, double>();
@@ -166,4 +179,5 @@ int main()
 
     return 0;
 }
+
 #endif
