@@ -197,8 +197,9 @@ namespace hpx::execution::experimental {
             using allocator_type = Allocator;
 
             using value_types = hpx::execution::experimental::value_types_of_t<
-                std::decay_t<Sender>, hpx::execution::experimental::env<>,
-                meta::pack, meta::pack>;
+                std::decay_t<Sender>,
+                hpx::execution::experimental::empty_env, meta::pack,
+                meta::pack>;
 
             using result_type =
                 std::decay_t<detail::single_result_t<value_types>>;
@@ -243,8 +244,9 @@ namespace hpx::execution::experimental {
             using allocator_type = Allocator;
 
             using value_types = hpx::execution::experimental::value_types_of_t<
-                std::decay_t<Sender>, hpx::execution::experimental::env<>,
-                meta::pack, meta::pack>;
+                std::decay_t<Sender>,
+                hpx::execution::experimental::empty_env, meta::pack,
+                meta::pack>;
 
             using result_type =
                 std::decay_t<detail::single_result_t<value_types>>;
