@@ -21,7 +21,7 @@ namespace hpx::threads::policies::detail {
     ///////////////////////////////////////////////////////////////////////////
     // Structure holding the information related to thread affinity selection
     // for the shepherd threads of this instance
-    HPX_CXX_EXPORT struct HPX_CORE_EXPORT affinity_data
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT affinity_data
     {
         affinity_data();
 

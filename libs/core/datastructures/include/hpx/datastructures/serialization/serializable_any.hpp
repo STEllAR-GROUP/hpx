@@ -45,7 +45,7 @@ namespace hpx::util::detail::any {
 
     ////////////////////////////////////////////////////////////////////////////
     // serializable function pointer table
-    HPX_CXX_EXPORT template <typename IArch, typename OArch, typename Char>
+    HPX_CXX_CORE_EXPORT template <typename IArch, typename OArch, typename Char>
         requires(!std::is_void_v<IArch> && !std::is_void_v<OArch>)
     struct fxn_ptr_table<IArch, OArch, Char, std::true_type>
     {
@@ -83,8 +83,8 @@ namespace hpx::util::detail::any {
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename IArch, typename OArch, typename Vtable,
-        typename Char>
+    HPX_CXX_CORE_EXPORT template <typename IArch, typename OArch,
+        typename Vtable, typename Char>
     struct fxn_ptr<IArch, OArch, Vtable, Char, std::true_type>
       : fxn_ptr_table<IArch, OArch, Char, std::true_type>
     {
@@ -134,7 +134,7 @@ namespace hpx::util::detail::any {
 namespace hpx::util {
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename IArch, typename OArch, typename Char>
+    HPX_CXX_CORE_EXPORT template <typename IArch, typename OArch, typename Char>
     class basic_any<IArch, OArch, Char, std::true_type>
     {
     public:
@@ -386,7 +386,7 @@ namespace hpx::util {
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Char, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Char, typename... Ts>
     basic_any<serialization::input_archive, serialization::output_archive, Char>
     make_any(Ts&&... ts)
     {
@@ -395,7 +395,7 @@ namespace hpx::util {
             std::in_place_type<T>, HPX_FORWARD(Ts, ts)...);
     }
 
-    HPX_CXX_EXPORT template <typename T, typename Char, typename U,
+    HPX_CXX_CORE_EXPORT template <typename T, typename Char, typename U,
         typename... Ts>
     basic_any<serialization::input_archive, serialization::output_archive, Char>
     make_any(std::initializer_list<U> il, Ts&&... ts)
@@ -407,12 +407,12 @@ namespace hpx::util {
 
     ////////////////////////////////////////////////////////////////////////////
     // backwards compatibility
-    HPX_CXX_EXPORT using wany = basic_any<serialization::input_archive,
+    HPX_CXX_CORE_EXPORT using wany = basic_any<serialization::input_archive,
         serialization::output_archive, wchar_t, std::true_type>;
 
     ////////////////////////////////////////////////////////////////////////////
     // support for hashing any
-    HPX_CXX_EXPORT struct hash_any
+    HPX_CXX_CORE_EXPORT struct hash_any
     {
         template <typename Char>
         HPX_CORE_EXPORT std::size_t operator()(
@@ -422,11 +422,11 @@ namespace hpx::util {
     };
 
     // explicitly instantiate the operator()()
-    HPX_CXX_EXPORT extern template HPX_CORE_EXPORT std::size_t
+    HPX_CXX_CORE_EXPORT extern template HPX_CORE_EXPORT std::size_t
     hash_any::operator()(basic_any<serialization::input_archive,
         serialization::output_archive, char, std::true_type> const& elem) const;
 
-    HPX_CXX_EXPORT extern template HPX_CORE_EXPORT std::size_t
+    HPX_CXX_CORE_EXPORT extern template HPX_CORE_EXPORT std::size_t
     hash_any::operator()(
         basic_any<serialization::input_archive, serialization::output_archive,
             wchar_t, std::true_type> const& elem) const;
@@ -440,7 +440,7 @@ namespace hpx {
     /// \code
     ///     return std::any(std::in_place_type<T>, std::forward<Args>(args)...);
     /// \endcode
-    HPX_CXX_EXPORT template <typename T, typename Char>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Char>
     util::basic_any<serialization::input_archive, serialization::output_archive,
         Char>
     make_any(T&& t)
@@ -450,8 +450,9 @@ namespace hpx {
             HPX_FORWARD(T, t));
     }
 
-    HPX_CXX_EXPORT using any = util::basic_any<serialization::input_archive,
-        serialization::output_archive, char, std::true_type>;
+    HPX_CXX_CORE_EXPORT using any =
+        util::basic_any<serialization::input_archive,
+            serialization::output_archive, char, std::true_type>;
 }    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////

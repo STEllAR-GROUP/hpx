@@ -19,7 +19,7 @@ namespace hpx::mpi::experimental {
     namespace detail {
 
         // extract MPI error message
-        HPX_CXX_EXPORT inline std::string error_message(int code)
+        HPX_CXX_CORE_EXPORT inline std::string error_message(int code)
         {
             int N = 1023;
             std::unique_ptr<char[]> err_buff =
@@ -34,7 +34,7 @@ namespace hpx::mpi::experimental {
 
     // -------------------------------------------------------------------------
     // exception type for failed launch of MPI functions
-    HPX_CXX_EXPORT struct HPX_ALWAYS_EXPORT mpi_exception : hpx::exception
+    HPX_CXX_CORE_EXPORT struct HPX_ALWAYS_EXPORT mpi_exception : hpx::exception
     {
         explicit mpi_exception(int err_code, std::string const& msg = "")
           : hpx::exception(hpx::error::bad_function_call,

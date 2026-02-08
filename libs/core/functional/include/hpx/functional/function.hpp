@@ -36,10 +36,10 @@ namespace hpx {
     /// hpx::function results in \a hpx#error#bad_function_call exception being
     /// thrown. hpx::function satisfies the requirements of CopyConstructible
     /// and CopyAssignable.
-    HPX_CXX_EXPORT template <typename Sig, bool Serializable = false>
+    HPX_CXX_CORE_EXPORT template <typename Sig, bool Serializable = false>
     class function;
 
-    HPX_CXX_EXPORT template <typename R, typename... Ts, bool Serializable>
+    HPX_CXX_CORE_EXPORT template <typename R, typename... Ts, bool Serializable>
     class function<R(Ts...), Serializable>
       : public util::detail::basic_function<R(Ts...), true, Serializable>
     {
@@ -89,7 +89,7 @@ namespace hpx {
     namespace distributed {
 
         // serializable function is equivalent to hpx::distributed::function
-        HPX_CXX_EXPORT template <typename Sig>
+        HPX_CXX_CORE_EXPORT template <typename Sig>
         using function = hpx::function<Sig, true>;
     }    // namespace distributed
 }    // namespace hpx
@@ -98,7 +98,7 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::traits {
 
-    HPX_CXX_EXPORT template <typename Sig, bool Serializable>
+    HPX_CXX_CORE_EXPORT template <typename Sig, bool Serializable>
     struct get_function_address<hpx::function<Sig, Serializable>>
     {
         [[nodiscard]] static constexpr std::size_t call(
@@ -108,7 +108,7 @@ namespace hpx::traits {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Sig, bool Serializable>
+    HPX_CXX_CORE_EXPORT template <typename Sig, bool Serializable>
     struct get_function_annotation<hpx::function<Sig, Serializable>>
     {
         [[nodiscard]] static constexpr char const* call(
@@ -119,7 +119,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    HPX_CXX_EXPORT template <typename Sig, bool Serializable>
+    HPX_CXX_CORE_EXPORT template <typename Sig, bool Serializable>
     struct get_function_annotation_itt<hpx::function<Sig, Serializable>>
     {
         [[nodiscard]] static util::itt::string_handle call(

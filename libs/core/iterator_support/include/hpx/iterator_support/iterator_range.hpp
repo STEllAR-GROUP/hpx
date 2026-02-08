@@ -19,7 +19,8 @@
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT template <typename Iterator, typename Sentinel = Iterator>
+    HPX_CXX_CORE_EXPORT template <typename Iterator,
+        typename Sentinel = Iterator>
     class iterator_range
     {
         static_assert(hpx::traits::is_iterator_v<Iterator>);
@@ -72,15 +73,15 @@ namespace hpx::util {
         Sentinel _sentinel;
     };
 
-    HPX_CXX_EXPORT template <typename Range>
+    HPX_CXX_CORE_EXPORT template <typename Range>
     iterator_range(Range& r)
         -> iterator_range<hpx::traits::range_iterator_t<Range>>;
 
-    HPX_CXX_EXPORT template <typename Range>
+    HPX_CXX_CORE_EXPORT template <typename Range>
     iterator_range(Range const& r)
         -> iterator_range<hpx::traits::range_iterator_t<Range const>>;
 
-    HPX_CXX_EXPORT template <typename Iterator, typename Sentinel>
+    HPX_CXX_CORE_EXPORT template <typename Iterator, typename Sentinel>
     iterator_range(Iterator it, Sentinel sent)
         -> iterator_range<Iterator, Sentinel>;
 
@@ -124,7 +125,7 @@ namespace hpx::util {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT template <typename I, typename S = I>
+    HPX_CXX_CORE_EXPORT template <typename I, typename S = I>
     using subrange_t = hpx::util::iterator_range<I, S>;
 }
 // namespace hpx::ranges

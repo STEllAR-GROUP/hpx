@@ -19,25 +19,27 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Scheduler, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Scheduler,
+            typename Enable = void>
         struct exposes_policy_aware_scheduler_types : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Scheduler>
+        HPX_CXX_CORE_EXPORT template <typename Scheduler>
         struct exposes_policy_aware_scheduler_types<Scheduler,
             std::void_t<typename Scheduler::policy_type,
                 typename Scheduler::base_scheduler_type>> : std::true_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Scheduler, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Scheduler,
+            typename Enable = void>
         struct exposes_get_policy : std::false_type
         {
         };
 
         // clang-format off
-        HPX_CXX_EXPORT template <typename Scheduler>
+        HPX_CXX_CORE_EXPORT template <typename Scheduler>
         struct exposes_get_policy<Scheduler,
             std::enable_if_t<hpx::is_execution_policy_v<
                 decltype(std::declval<Scheduler>().get_policy())>>>
@@ -48,7 +50,7 @@ namespace hpx::execution::experimental {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Scheduler, typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename Scheduler, typename ExPolicy>
     struct scheduler_and_policy : std::decay_t<Scheduler>
     {
         using base_scheduler_type = std::decay_t<Scheduler>;
@@ -89,7 +91,7 @@ namespace hpx::execution::experimental {
         policy_type policy;
     };
 
-    HPX_CXX_EXPORT template <typename Scheduler, typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename Scheduler, typename ExPolicy>
     scheduler_and_policy(Scheduler&&, ExPolicy&&)
         -> scheduler_and_policy<std::decay_t<Scheduler>,
             std::decay_t<ExPolicy>>;
@@ -98,7 +100,7 @@ namespace hpx::execution::experimental {
     // support all scheduling properties exposed by the embedded scheduler
 
     // clang-format off
-    HPX_CXX_EXPORT template <typename Tag, typename Scheduler, typename ExPolicy,
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename Scheduler, typename ExPolicy,
         typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
@@ -118,7 +120,7 @@ namespace hpx::execution::experimental {
     }
 
     // clang-format off
-    HPX_CXX_EXPORT template <typename Tag, typename Scheduler, typename ExPolicy,
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename Scheduler, typename ExPolicy,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>
@@ -142,12 +144,13 @@ namespace hpx::execution::experimental {
         // Customizations of the parallel algorithms can reuse the existing
         // implementation of parallel algorithms with ExecutionPolicy template
         // parameter for "known" base_scheduler_type type.
-        HPX_CXX_EXPORT template <typename Scheduler, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Scheduler,
+            typename Enable = void>
         struct is_policy_aware_scheduler : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Scheduler>
+        HPX_CXX_CORE_EXPORT template <typename Scheduler>
         struct is_policy_aware_scheduler<Scheduler,
             std::enable_if_t<is_scheduler_v<Scheduler> &&
                 detail::exposes_policy_aware_scheduler_types<
@@ -156,7 +159,7 @@ namespace hpx::execution::experimental {
         {
         };
 
-        HPX_CXX_EXPORT template <typename Scheduler>
+        HPX_CXX_CORE_EXPORT template <typename Scheduler>
         inline constexpr bool is_policy_aware_scheduler_v =
             is_policy_aware_scheduler<Scheduler>::value;
 
@@ -166,7 +169,7 @@ namespace hpx::execution::experimental {
         //
         // It's up to scheduler customization to check if it can work with the
         // passed execution policy.
-        HPX_CXX_EXPORT inline constexpr struct execute_on_t final
+        HPX_CXX_CORE_EXPORT inline constexpr struct execute_on_t final
           : hpx::functional::detail::tag_fallback<execute_on_t>
         {
         private:

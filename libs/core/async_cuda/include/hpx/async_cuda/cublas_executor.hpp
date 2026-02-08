@@ -36,19 +36,20 @@ namespace hpx::cuda::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT inline constexpr print_on cub_debug("CUBLAS_");
+        HPX_CXX_CORE_EXPORT inline constexpr print_on cub_debug("CUBLAS_");
 
         // -------------------------------------------------------------------------
         // Error handling in cublas calls
         // not all of these are supported by all cuda/cublas versions
         // (comment them out if they cause compiler errors)
-        HPX_CXX_EXPORT HPX_CORE_EXPORT char const* _cublasGetErrorString(
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const* _cublasGetErrorString(
             cublasStatus_t error);
     }    // namespace detail
 
     // -------------------------------------------------------------------------
     // exception type for failed launch of cuda functions
-    HPX_CXX_EXPORT struct HPX_ALWAYS_EXPORT cublas_exception : hpx::exception
+    HPX_CXX_CORE_EXPORT struct HPX_ALWAYS_EXPORT cublas_exception
+      : hpx::exception
     {
         cublas_exception(std::string const& msg, cublasStatus_t err)
           : hpx::exception(hpx::error::bad_function_call, msg)
@@ -65,13 +66,13 @@ namespace hpx::cuda::experimental {
         cublasStatus_t err_;
     };
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT cublasStatus_t check_cublas_error(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT cublasStatus_t check_cublas_error(
         cublasStatus_t err);
 
     namespace detail {
 
         // specialization for return type of cublasStatus_t
-        HPX_CXX_EXPORT template <typename... Args>
+        HPX_CXX_CORE_EXPORT template <typename... Args>
         struct dispatch_helper<cublasStatus_t, Args...>
         {
             inline cublasStatus_t operator()(
@@ -82,7 +83,7 @@ namespace hpx::cuda::experimental {
             }
         };
 
-        HPX_CXX_EXPORT struct cublas_handle
+        HPX_CXX_CORE_EXPORT struct cublas_handle
         {
             static cublasHandle_t create()
             {
@@ -103,7 +104,7 @@ namespace hpx::cuda::experimental {
     // a simple cublas wrapper helper object that can be used to synchronize
     // cublas calls with an hpx future.
     // -------------------------------------------------------------------------
-    HPX_CXX_EXPORT struct cublas_executor : cuda_executor
+    HPX_CXX_CORE_EXPORT struct cublas_executor : cuda_executor
     {
 #ifdef HPX_HAVE_HIP
         // hipblas handle is type : void*

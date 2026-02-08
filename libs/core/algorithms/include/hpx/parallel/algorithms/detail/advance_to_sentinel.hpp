@@ -14,7 +14,7 @@
 namespace hpx::parallel::detail {
 
     // Generic implementation for advancing a given iterator to its sentinel
-    HPX_CXX_EXPORT template <typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     constexpr Iter advance_to_sentinel(Iter first, Sent last)
     {
         if constexpr (std::is_same_v<Iter, Sent>)

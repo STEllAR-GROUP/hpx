@@ -12,10 +12,11 @@ set(checkpoint_base_sources checkpoint_data.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
-  full checkpoint_base
+  core checkpoint_base
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${checkpoint_base_sources}
   HEADERS ${checkpoint_base_headers}
-  DEPENDENCIES hpx_core
+  MODULE_DEPENDENCIES hpx_config hpx_serialization hpx_type_support
   CMAKE_SUBDIRS tests
 )

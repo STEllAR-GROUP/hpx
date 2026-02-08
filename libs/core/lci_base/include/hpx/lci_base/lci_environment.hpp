@@ -27,7 +27,7 @@
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT struct HPX_EXPORT lci_environment
+    HPX_CXX_CORE_EXPORT struct HPX_EXPORT lci_environment
     {
         static bool check_lci_environment(runtime_configuration& cfg);
 
@@ -109,7 +109,7 @@ namespace hpx::util {
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT struct HPX_EXPORT lci_environment
+    HPX_CXX_CORE_EXPORT struct HPX_EXPORT lci_environment
     {
         static bool check_lci_environment(runtime_configuration& cfg);
     };

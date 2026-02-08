@@ -21,11 +21,11 @@
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/actions_base/basic_action.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/naming/detail/preprocess_gid_types.hpp>
 #include <hpx/naming/split_gid.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/parcelset_base/parcelport.hpp>
 
 #if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
 #include <boost/exception/exception.hpp>

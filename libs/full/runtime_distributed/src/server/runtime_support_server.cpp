@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,14 +11,12 @@
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/continuation.hpp>
-#include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/command_line_handling/late_command_line_handling.hpp>
-#include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/create_component.hpp>
 #include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/filesystem.hpp>

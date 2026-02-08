@@ -7,10 +7,18 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCEL_COALESCING)
+
+// MSVC generates a strange error in boost::accumulators if this is compiled
+// with modules enables
+#undef HPX_HAVE_CXX_MODULES
+
+#include <boost/accumulators/accumulators.hpp>
+
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/thread_support.hpp>
@@ -19,10 +27,7 @@
 
 #include <hpx/parcel_coalescing/counter_registry.hpp>
 #include <hpx/parcel_coalescing/message_handler.hpp>
-#include <hpx/parcelset_base/parcelport.hpp>
 #include <hpx/plugin_factories/message_handler_factory.hpp>
-
-#include <boost/accumulators/accumulators.hpp>
 
 #include <chrono>
 #include <cstddef>

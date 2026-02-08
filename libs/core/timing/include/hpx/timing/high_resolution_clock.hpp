@@ -27,7 +27,7 @@ namespace hpx::chrono {
     ///        \c std::chrono::steady_clock, or a third, independent clock.
     ///        \c hpx::chrono::high_resolution_clock meets the requirements of
     ///        \a TrivialClock.
-    HPX_CXX_EXPORT struct high_resolution_clock
+    HPX_CXX_CORE_EXPORT struct high_resolution_clock
     {
         // This function returns a tick count with a resolution (not
         // precision!) of 1 ns.

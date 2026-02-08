@@ -171,7 +171,7 @@ namespace hpx::parallel {
     // starts_with
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename FwdIter1, typename FwdIter2,
+        HPX_CXX_CORE_EXPORT template <typename FwdIter1, typename FwdIter2,
             typename Sent2>
         constexpr bool get_starts_with_result(
             util::in_in_result<FwdIter1, FwdIter2>&& p, Sent2 last2)
@@ -179,7 +179,7 @@ namespace hpx::parallel {
             return p.in2 == last2;
         }
 
-        HPX_CXX_EXPORT template <typename FwdIter1, typename FwdIter2,
+        HPX_CXX_CORE_EXPORT template <typename FwdIter1, typename FwdIter2,
             typename Sent2>
         hpx::future<bool> get_starts_with_result(
             hpx::future<util::in_in_result<FwdIter1, FwdIter2>>&& f,
@@ -192,7 +192,8 @@ namespace hpx::parallel {
                 });
         }
 
-        HPX_CXX_EXPORT struct starts_with : public algorithm<starts_with, bool>
+        HPX_CXX_CORE_EXPORT struct starts_with
+          : public algorithm<starts_with, bool>
         {
             constexpr starts_with() noexcept
               : algorithm("starts_with")
@@ -265,7 +266,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::starts_with
-    HPX_CXX_EXPORT inline constexpr struct starts_with_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct starts_with_t final
       : hpx::detail::tag_parallel_algorithm<starts_with_t>
     {
     private:

@@ -16,37 +16,37 @@
 namespace hpx::detail {
 
     /// \cond NOINTERNAL
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_execution_policy : std::false_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_parallel_execution_policy : std::false_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_sequenced_execution_policy : std::false_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_async_execution_policy : std::false_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     struct is_rebound_execution_policy : std::false_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     struct is_unsequenced_execution_policy : std::false_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     struct is_vectorpack_execution_policy : std::false_type
     {
     };
@@ -66,16 +66,16 @@ namespace hpx {
     /// 3. The behavior of a program that adds specializations for
     ///    is_execution_policy is undefined.
     ///
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_execution_policy
       : hpx::detail::is_execution_policy<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_execution_policy_v = is_execution_policy<T>::value;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     concept execution_policy = is_execution_policy<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -91,13 +91,13 @@ namespace hpx {
     /// 3. The behavior of a program that adds specializations for
     ///    is_parallel_execution_policy is undefined.
     ///
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_parallel_execution_policy
       : hpx::detail::is_parallel_execution_policy<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_parallel_execution_policy_v =
         is_parallel_execution_policy<T>::value;
 
@@ -117,13 +117,13 @@ namespace hpx {
     ///    is_sequenced_execution_policy is undefined.
     ///
     // extension:
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_sequenced_execution_policy
       : hpx::detail::is_sequenced_execution_policy<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_sequenced_execution_policy_v =
         is_sequenced_execution_policy<T>::value;
 
@@ -143,57 +143,57 @@ namespace hpx {
     ///    is_async_execution_policy is undefined.
     ///
     // extension:
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_async_execution_policy
       : hpx::detail::is_async_execution_policy<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_async_execution_policy_v =
         is_async_execution_policy<T>::value;
 
     /// \cond NOINTERNAL
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_rebound_execution_policy
       : hpx::detail::is_rebound_execution_policy<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_rebound_execution_policy_v =
         is_rebound_execution_policy<T>::value;
 
     // extension:
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_unsequenced_execution_policy
       : hpx::detail::is_unsequenced_execution_policy<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_unsequenced_execution_policy_v =
         is_unsequenced_execution_policy<T>::value;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_vectorpack_execution_policy
       : hpx::detail::is_vectorpack_execution_policy<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_vectorpack_execution_policy_v =
         is_vectorpack_execution_policy<T>::value;
 
     ////////////////////////////////////////////////////////////////////////////
     // execution_policy_has_scheduler_executor evaluates to true if the executor
     // the given policy contains returns senders from its scheduling functions
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct execution_policy_has_scheduler_executor : std::false_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct execution_policy_has_scheduler_executor<T,
         std::void_t<typename std::decay_t<T>::executor_type>>
       : hpx::traits::is_scheduler_executor<
@@ -201,7 +201,7 @@ namespace hpx {
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool execution_policy_has_scheduler_executor_v =
         execution_policy_has_scheduler_executor<T>::value;
     /// \endcond

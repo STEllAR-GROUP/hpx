@@ -13,7 +13,7 @@
 
 namespace hpx::execution::experimental {
 
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
         requires(hpx::is_execution_policy_v<ExPolicy>)
     decltype(auto) adapt_placement_mode(
         ExPolicy&& policy, hpx::threads::thread_placement_hint placement)

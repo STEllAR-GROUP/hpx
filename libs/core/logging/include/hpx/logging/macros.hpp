@@ -55,7 +55,7 @@
         ::hpx::util::logging::level::lvl) /**/
 #define LPROGRESS_                                                             \
     HPX_LOG_FORMAT(hpx::util::timing, ::hpx::util::logging::level::fatal,      \
-        " {}:{} {} ", __FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION) /**/
+        " {}:{} {} ", __FILE__, __LINE__, __func__) /**/
 
 #define LTIM_ENABLED(lvl)                                                      \
     hpx::util::timing_logger()->is_enabled(                                    \

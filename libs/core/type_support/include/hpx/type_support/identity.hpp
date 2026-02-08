@@ -12,7 +12,7 @@
 
 namespace hpx {
 
-    HPX_CXX_EXPORT struct identity
+    HPX_CXX_CORE_EXPORT struct identity
     {
         using is_transparent = std::true_type;
 
@@ -23,15 +23,15 @@ namespace hpx {
         }
     };
 
-    HPX_CXX_EXPORT inline constexpr identity identity_v = identity();
+    HPX_CXX_CORE_EXPORT inline constexpr identity identity_v = identity();
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct type_identity
     {
         using type = T;
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     using type_identity_t = typename type_identity<T>::type;
 
 }    // namespace hpx

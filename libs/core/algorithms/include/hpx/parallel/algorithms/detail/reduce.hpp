@@ -17,7 +17,7 @@
 
 namespace hpx::parallel::detail {
 
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct sequential_reduce_t final
       : hpx::functional::detail::tag_fallback<sequential_reduce_t<ExPolicy>>
     {
@@ -85,11 +85,11 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     inline constexpr sequential_reduce_t<ExPolicy> sequential_reduce =
         sequential_reduce_t<ExPolicy>{};
 #else
-    HPX_CXX_EXPORT template <typename ExPolicy, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename... Args>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_reduce(Args&&... args)
     {
         return sequential_reduce_t<ExPolicy>{}(std::forward<Args>(args)...);

@@ -23,20 +23,20 @@ namespace hpx::execution {
 
     namespace experimental {
 
-        HPX_CXX_EXPORT struct adaptive_static_chunk_size;
-        HPX_CXX_EXPORT struct auto_chunk_size;
-        HPX_CXX_EXPORT struct default_parameters;
-        HPX_CXX_EXPORT struct dynamic_chunk_size;
-        HPX_CXX_EXPORT struct guided_chunk_size;
-        HPX_CXX_EXPORT struct persistent_auto_chunk_size;
-        HPX_CXX_EXPORT struct static_chunk_size;
-        HPX_CXX_EXPORT struct num_cores;
+        HPX_CXX_CORE_EXPORT struct adaptive_static_chunk_size;
+        HPX_CXX_CORE_EXPORT struct auto_chunk_size;
+        HPX_CXX_CORE_EXPORT struct default_parameters;
+        HPX_CXX_CORE_EXPORT struct dynamic_chunk_size;
+        HPX_CXX_CORE_EXPORT struct guided_chunk_size;
+        HPX_CXX_CORE_EXPORT struct persistent_auto_chunk_size;
+        HPX_CXX_CORE_EXPORT struct static_chunk_size;
+        HPX_CXX_CORE_EXPORT struct num_cores;
     }    // namespace experimental
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct sequenced_execution_tag;
-    HPX_CXX_EXPORT struct parallel_execution_tag;
-    HPX_CXX_EXPORT struct unsequenced_execution_tag;
+    HPX_CXX_CORE_EXPORT struct sequenced_execution_tag;
+    HPX_CXX_CORE_EXPORT struct parallel_execution_tag;
+    HPX_CXX_CORE_EXPORT struct unsequenced_execution_tag;
 }    // namespace hpx::execution
 
 namespace hpx::execution::experimental {
@@ -53,46 +53,46 @@ namespace hpx::execution::experimental {
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(bulk_then_execute)
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct has_post_member : detail::has_post<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct has_sync_execute_member : detail::has_sync_execute<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct has_async_execute_member : detail::has_async_execute<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct has_then_execute_member : detail::has_then_execute<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct has_bulk_sync_execute_member
       : detail::has_bulk_sync_execute<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct has_bulk_async_execute_member
       : detail::has_bulk_async_execute<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct has_bulk_then_execute_member
       : detail::has_bulk_then_execute<std::decay_t<T>>
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     struct executor_context
     {
         using type =
@@ -106,7 +106,7 @@ namespace hpx::execution::experimental {
     // group.
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     struct executor_execution_category
     {
     private:
@@ -120,7 +120,7 @@ namespace hpx::execution::experimental {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     struct executor_shape
     {
     private:
@@ -133,7 +133,7 @@ namespace hpx::execution::experimental {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     struct executor_index
     {
     private:
@@ -148,7 +148,7 @@ namespace hpx::execution::experimental {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     struct executor_parameters_type
     {
     private:
@@ -164,24 +164,25 @@ namespace hpx::execution::experimental {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Executor, typename T, typename Ts,
-            typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Executor, typename T,
+            typename Ts, typename Enable = void>
         struct executor_future;
 
-        HPX_CXX_EXPORT template <typename Executor, typename T,
+        HPX_CXX_CORE_EXPORT template <typename Executor, typename T,
             typename Enable = void>
         struct exposes_future_type : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Executor, typename T>
+        HPX_CXX_CORE_EXPORT template <typename Executor, typename T>
         struct exposes_future_type<Executor, T,
             std::void_t<typename Executor::template future_type<T>>>
           : std::true_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Executor, typename T, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename Executor, typename T,
+            typename... Ts>
         struct executor_future<Executor, T, hpx::util::pack<Ts...>,
             std::enable_if_t<hpx::traits::is_two_way_executor_v<Executor> &&
                 exposes_future_type<Executor, T>::value>>
@@ -189,7 +190,8 @@ namespace hpx::execution::experimental {
             using type = typename Executor::template future_type<T>;
         };
 
-        HPX_CXX_EXPORT template <typename Executor, typename T, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename Executor, typename T,
+            typename... Ts>
         struct executor_future<Executor, T, hpx::util::pack<Ts...>,
             std::enable_if_t<hpx::traits::is_two_way_executor_v<Executor> &&
                 has_async_execute_member<Executor>::value &&
@@ -199,7 +201,8 @@ namespace hpx::execution::experimental {
                 std::declval<T (*)(Ts...)>(), std::declval<Ts>()...));
         };
 
-        HPX_CXX_EXPORT template <typename Executor, typename T, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename Executor, typename T,
+            typename... Ts>
         struct executor_future<Executor, T, hpx::util::pack<Ts...>,
             std::enable_if_t<hpx::traits::is_two_way_executor_v<Executor> &&
                 !has_async_execute_member<Executor>::value &&
@@ -210,7 +213,8 @@ namespace hpx::execution::experimental {
                 T (*)(Ts...), Ts...>;
         };
 
-        HPX_CXX_EXPORT template <typename Executor, typename T, typename Ts>
+        HPX_CXX_CORE_EXPORT template <typename Executor, typename T,
+            typename Ts>
         struct executor_future<Executor, T, Ts,
             std::enable_if_t<!hpx::traits::is_two_way_executor_v<Executor>>>
         {
@@ -218,14 +222,14 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename Executor, typename T, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename T, typename... Ts>
     struct executor_future
       : detail::executor_future<std::decay_t<Executor>, T,
             hpx::util::pack<std::decay_t<Ts>...>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Executor, typename T, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename T, typename... Ts>
     using executor_future_t =
         typename executor_future<Executor, T, Ts...>::type;
 }    // namespace hpx::execution::experimental
@@ -233,138 +237,138 @@ namespace hpx::execution::experimental {
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct has_post_member
       : hpx::execution::experimental::has_post_member<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct has_sync_execute_member
       : hpx::execution::experimental::has_sync_execute_member<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct has_async_execute_member
       : hpx::execution::experimental::has_async_execute_member<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct has_then_execute_member
       : hpx::execution::experimental::has_then_execute_member<std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct has_bulk_sync_execute_member
       : hpx::execution::experimental::has_bulk_sync_execute_member<
             std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct has_bulk_async_execute_member
       : hpx::execution::experimental::has_bulk_async_execute_member<
             std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct has_bulk_then_execute_member
       : hpx::execution::experimental::has_bulk_then_execute_member<
             std::decay_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool has_post_member_v = has_post_member<T>::value;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool has_sync_execute_member_v =
         has_sync_execute_member<T>::value;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool has_async_execute_member_v =
         has_async_execute_member<T>::value;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool has_then_execute_member_v =
         has_then_execute_member<T>::value;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool has_bulk_sync_execute_member_v =
         has_bulk_sync_execute_member<T>::value;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool has_bulk_async_execute_member_v =
         has_bulk_async_execute_member<T>::value;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool has_bulk_then_execute_member_v =
         has_bulk_then_execute_member<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Enable = void>
     struct executor_context
       : hpx::execution::experimental::executor_context<std::decay_t<Executor>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     using executor_context_t = typename executor_context<Executor>::type;
 
-    HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Enable = void>
     struct executor_execution_category
       : hpx::execution::experimental::executor_execution_category<
             std::decay_t<Executor>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     using executor_execution_category_t =
         typename executor_execution_category<Executor>::type;
 
-    HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Enable = void>
     struct executor_shape
       : hpx::execution::experimental::executor_shape<std::decay_t<Executor>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     using executor_shape_t = typename executor_shape<Executor>::type;
 
-    HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Enable = void>
     struct executor_index
       : hpx::execution::experimental::executor_index<std::decay_t<Executor>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     using executor_index_t = typename executor_index<Executor>::type;
 
-    HPX_CXX_EXPORT template <typename Executor, typename T, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename T, typename... Ts>
     struct executor_future
       : hpx::execution::experimental::executor_future<std::decay_t<Executor>, T,
             std::decay_t<Ts>...>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Executor, typename T, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename T, typename... Ts>
     using executor_future_t =
         typename executor_future<Executor, T, Ts...>::type;
 
     ///////////////////////////////////////////////////////////////////////////
     // extension
-    HPX_CXX_EXPORT template <typename Executor, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Enable = void>
     struct executor_parameters_type
       : hpx::execution::experimental::executor_parameters_type<
             std::decay_t<Executor>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     using executor_parameters_type_t =
         typename executor_parameters_type<Executor>::type;
 }    // namespace hpx::traits

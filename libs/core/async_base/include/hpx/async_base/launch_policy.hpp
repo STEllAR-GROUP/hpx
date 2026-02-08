@@ -22,7 +22,7 @@
 
 namespace hpx {
 
-    HPX_CXX_EXPORT enum class launch_policy : std::int8_t {
+    HPX_CXX_CORE_EXPORT enum class launch_policy : std::int8_t {
         async = 0x01,
         deferred = 0x02,
         task = 0x04,    // see N3632
@@ -745,7 +745,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Launch policies for \a hpx::async etc.
-    HPX_CXX_EXPORT struct launch : detail::policy_holder<>
+    HPX_CXX_CORE_EXPORT struct launch : detail::policy_holder<>
     {
         ///////////////////////////////////////////////////////////////////////
         /// Default constructor. This creates a launch policy representing all
@@ -911,14 +911,14 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
-    HPX_CXX_EXPORT HPX_FORCEINLINE constexpr bool has_async_policy(
+    HPX_CXX_CORE_EXPORT HPX_FORCEINLINE constexpr bool has_async_policy(
         launch const p) noexcept
     {
         return static_cast<bool>(static_cast<int>(p.get_policy()) &
             static_cast<int>(launch_policy::async_policies));
     }
 
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     HPX_FORCEINLINE constexpr bool has_async_policy(
         detail::policy_holder<F> const& p) noexcept
     {

@@ -14,9 +14,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::runtime_local::detail {
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void save_custom_exception(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void save_custom_exception(
         hpx::serialization::output_archive&, std::exception_ptr const&,
         unsigned int);
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void load_custom_exception(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void load_custom_exception(
         hpx::serialization::input_archive&, std::exception_ptr&, unsigned int);
 }    // namespace hpx::runtime_local::detail

@@ -17,7 +17,7 @@
 
 namespace hpx::serialization {
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     void serialize(input_archive& ar, std::complex<T>& c, unsigned)
     {
         T real, imag;
@@ -26,7 +26,7 @@ namespace hpx::serialization {
         c.imag(imag);
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     void serialize(output_archive& ar, std::complex<T> const& c, unsigned)
     {
         ar << c.real() << c.imag();
@@ -35,13 +35,13 @@ namespace hpx::serialization {
 
 namespace hpx::traits {
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_bitwise_serializable<std::complex<T>>
       : is_bitwise_serializable<std::remove_const_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_not_bitwise_serializable<std::complex<T>>
       : std::integral_constant<bool,
             !is_bitwise_serializable_v<std::complex<T>>>

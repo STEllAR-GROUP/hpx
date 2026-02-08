@@ -16,7 +16,7 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Vector>
+    HPX_CXX_CORE_EXPORT template <typename Vector>
         requires(is_vector_pack_v<Vector> || is_scalar_vector_pack_v<Vector>)
     HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
         Vector& vec, std::size_t index) noexcept
@@ -25,7 +25,7 @@ namespace hpx::parallel::traits {
     }
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Vector, typename T>
+    HPX_CXX_CORE_EXPORT template <typename Vector, typename T>
         requires(is_vector_pack_v<Vector> || is_scalar_vector_pack_v<Vector>)
     HPX_HOST_DEVICE HPX_FORCEINLINE auto set(
         Vector& vec, std::size_t index, T val) noexcept

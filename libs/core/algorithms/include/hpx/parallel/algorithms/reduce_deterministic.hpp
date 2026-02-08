@@ -383,7 +383,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct reduce_deterministic
           : public algorithm<reduce_deterministic<T>, T>
         {
@@ -468,7 +468,7 @@ namespace hpx::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::reduce
-    HPX_CXX_EXPORT inline constexpr struct reduce_deterministic_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct reduce_deterministic_t final
       : hpx::detail::tag_parallel_algorithm<reduce_deterministic_t>
     {
     private:

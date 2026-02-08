@@ -7,8 +7,8 @@
 // This test checks that unwrapping of nullary functions works as expected (see
 // #6045)
 
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
 
 bool called = false;
 

@@ -34,7 +34,7 @@ namespace hpx::execution::experimental {
     /// This executor parameters type makes sure that as many loop iterations
     /// are combined as necessary to run for the amount of time specified.
     ///
-    HPX_CXX_EXPORT struct auto_chunk_size
+    HPX_CXX_CORE_EXPORT struct auto_chunk_size
     {
     public:
         /// Construct an \a auto_chunk_size executor parameters object

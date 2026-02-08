@@ -15,8 +15,8 @@
 namespace hpx::util {
 
     // helper function for counter evaluation
-    HPX_CXX_EXPORT [[nodiscard]] constexpr std::uint64_t get_and_reset_value(
-        std::uint64_t& value, bool const reset) noexcept
+    HPX_CXX_CORE_EXPORT [[nodiscard]] constexpr std::uint64_t
+    get_and_reset_value(std::uint64_t& value, bool const reset) noexcept
     {
         std::uint64_t const result = value;
         if (reset)
@@ -24,8 +24,8 @@ namespace hpx::util {
         return result;
     }
 
-    HPX_CXX_EXPORT [[nodiscard]] constexpr std::int64_t get_and_reset_value(
-        std::int64_t& value, bool const reset) noexcept
+    HPX_CXX_CORE_EXPORT [[nodiscard]] constexpr std::int64_t
+    get_and_reset_value(std::int64_t& value, bool const reset) noexcept
     {
         std::int64_t const result = value;
         if (reset)
@@ -33,7 +33,7 @@ namespace hpx::util {
         return result;
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] T get_and_reset_value(
         std::atomic<T>& value, bool const reset) noexcept
     {
@@ -42,7 +42,7 @@ namespace hpx::util {
         return value.load(std::memory_order_relaxed);
     }
 
-    HPX_CXX_EXPORT [[nodiscard]] inline std::vector<std::int64_t>
+    HPX_CXX_CORE_EXPORT [[nodiscard]] inline std::vector<std::int64_t>
     get_and_reset_value(
         std::vector<std::int64_t>& value, bool const reset) noexcept
     {
