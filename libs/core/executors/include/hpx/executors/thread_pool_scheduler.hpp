@@ -79,7 +79,6 @@ namespace hpx::execution::experimental {
     // Forward declarations for domain system
 
     // Concept to match bulk sender types
-    // Note: We keep bulk_t handling as pragmatic workaround for stdexec template issues
     template <typename Sender>
     concept bulk_chunked_or_unchunked_sender =
         hpx::execution::experimental::stdexec_internal::sender_expr_for<Sender,
@@ -88,83 +87,25 @@ namespace hpx::execution::experimental {
             hpx::execution::experimental::bulk_unchunked_t>;
 
     // Domain customization for stdexec bulk operations
-    //
-    // NOTE: While P3481R5 design expects bulk() -> bulk_chunked() through default
-    // implementation, we keep explicit bulk_t handling as a pragmatic workaround
-    // for stdexec template instantiation issues with local lambdas in test code.
-    // This provides the same semantics while avoiding compilation errors.
+    // Only the env-based transform_sender is provided. The early (no-env)
+    // transform falls through to default_domain, and the late transform
+    // handles both completes_on and starts_on patterns at connection time.
     template <typename Policy>
     struct thread_pool_domain : stdexec::default_domain
     {
-        // Unified transform_sender for all bulk operations without environment
-        // (completes_on pattern)
-        template <bulk_chunked_or_unchunked_sender Sender>
-        auto transform_sender(Sender&& sndr) const noexcept
-        {
-            static_assert(
-                hpx::execution::experimental::stdexec_internal::__completes_on<
-                    Sender, thread_pool_policy_scheduler<Policy>,
-                    hpx::execution::experimental::env<>>,
-                "No thread_pool_policy_scheduler instance can be found in the "
-                "sender's "
-                "attributes on which to schedule bulk work.");
-
-            auto&& sched =
-                hpx::execution::experimental::get_completion_scheduler<
-                    hpx::execution::experimental::set_value_t>(
-                    hpx::execution::experimental::get_env(sndr));
-
-            // Extract bulk parameters using structured binding
-            auto&& [tag, data, child] = sndr;
-            auto&& [pol, shape, f] = data;
-
-            auto iota_shape = std::views::iota(decltype(shape){0}, shape);
-
-            if constexpr (
-                hpx::execution::experimental::stdexec_internal::sender_expr_for<
-                    Sender, hpx::execution::experimental::bulk_unchunked_t>)
-            {
-                // This should be launching one hpx thread for each index
-                return hpx::execution::experimental::detail::
-                    thread_pool_bulk_sender<Policy,
-                        std::decay_t<decltype(child)>,
-                        std::decay_t<decltype(iota_shape)>,
-                        std::decay_t<decltype(f)>, false>{
-                        HPX_MOVE(sched),    // scheduler from environment
-                        HPX_FORWARD(decltype(child), child),    // child sender
-                        HPX_MOVE(iota_shape),                   // shape
-                        HPX_FORWARD(decltype(f), f)             // function
-                    };
-            }
-            else if constexpr (
-                hpx::execution::experimental::stdexec_internal::sender_expr_for<
-                    Sender, hpx::execution::experimental::bulk_chunked_t>)
-            {
-                // This should be launching one hpx thread for each chunk
-                return hpx::execution::experimental::detail::
-                    thread_pool_bulk_sender<Policy,
-                        std::decay_t<decltype(child)>,
-                        std::decay_t<decltype(iota_shape)>,
-                        std::decay_t<decltype(f)>, true>{
-                        HPX_MOVE(sched),    // scheduler from environment
-                        HPX_FORWARD(decltype(child), child),    // child sender
-                        HPX_MOVE(iota_shape),                   // shape
-                        HPX_FORWARD(decltype(f), f)             // function
-                    };
-            }
-        }
-
-        // Unified transform_sender for all bulk operations with environment
-        // (starts_on pattern)
+        // transform_sender for bulk operations
+        // (following stdexec system_context.hpp pattern — env-based only)
         template <bulk_chunked_or_unchunked_sender Sender, typename Env>
         auto transform_sender(Sender&& sndr, Env const& env) const noexcept
         {
             static_assert(
-                hpx::execution::experimental::stdexec_internal::__starts_on<
-                    Sender, thread_pool_policy_scheduler<Policy>, Env>,
+                hpx::execution::experimental::stdexec_internal::__completes_on<
+                    Sender, thread_pool_policy_scheduler<Policy>, Env> ||
+                    hpx::execution::experimental::stdexec_internal::__starts_on<
+                        Sender, thread_pool_policy_scheduler<Policy>, Env>,
                 "No thread_pool_policy_scheduler instance can be found in the "
-                "receiver's "
-                "environment on which to schedule bulk work.");
+                "sender's attributes or receiver's environment "
+                "on which to schedule bulk work.");
 
             auto&& sched = hpx::execution::experimental::get_scheduler(env);
 
@@ -174,36 +115,21 @@ namespace hpx::execution::experimental {
 
             auto iota_shape = std::views::iota(decltype(shape){0}, shape);
 
-            if constexpr (
-                hpx::execution::experimental::stdexec_internal::sender_expr_for<
-                    Sender, hpx::execution::experimental::bulk_unchunked_t>)
-            {
-                return hpx::execution::experimental::detail::
-                    thread_pool_bulk_sender<Policy,
-                        std::decay_t<decltype(child)>,
-                        std::decay_t<decltype(iota_shape)>,
-                        std::decay_t<decltype(f)>, false>{
-                        HPX_MOVE(sched),    // scheduler from environment
-                        HPX_FORWARD(decltype(child), child),    // child sender
-                        HPX_MOVE(iota_shape),                   // shape
-                        HPX_FORWARD(decltype(f), f)             // function
-                    };
-            }
-            else if constexpr (
-                hpx::execution::experimental::stdexec_internal::sender_expr_for<
-                    Sender, hpx::execution::experimental::bulk_chunked_t>)
-            {
-                return hpx::execution::experimental::detail::
-                    thread_pool_bulk_sender<Policy,
-                        std::decay_t<decltype(child)>,
-                        std::decay_t<decltype(iota_shape)>,
-                        std::decay_t<decltype(f)>, true>{
-                        HPX_MOVE(sched),    // scheduler from environment
-                        HPX_FORWARD(decltype(child), child),    // child sender
-                        HPX_MOVE(iota_shape),                   // shape
-                        HPX_FORWARD(decltype(f), f)             // function
-                    };
-            }
+            constexpr bool is_chunked =
+                !hpx::execution::experimental::stdexec_internal::
+                    sender_expr_for<Sender,
+                        hpx::execution::experimental::bulk_unchunked_t>;
+
+            return hpx::execution::experimental::detail::
+                thread_pool_bulk_sender<Policy,
+                    std::decay_t<decltype(child)>,
+                    std::decay_t<decltype(iota_shape)>,
+                    std::decay_t<decltype(f)>, is_chunked>{
+                    HPX_MOVE(sched),
+                    HPX_FORWARD(decltype(child), child),
+                    HPX_MOVE(iota_shape),
+                    HPX_FORWARD(decltype(f), f)
+                };
         }
     };
 
