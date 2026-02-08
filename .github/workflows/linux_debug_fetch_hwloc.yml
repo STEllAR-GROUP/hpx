@@ -16,6 +16,9 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
+    - name: Update apt repository
+      run: sudo apt-get update
+
     - name: Install Boost
       run: |
           sudo apt update

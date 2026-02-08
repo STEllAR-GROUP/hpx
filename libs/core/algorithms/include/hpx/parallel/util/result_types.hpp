@@ -17,6 +17,7 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/futures.hpp>
 
+#include <concepts>
 #include <type_traits>
 #include <utility>
 
@@ -399,6 +400,29 @@ namespace hpx::parallel::util {
                 return hpx::util::iterator_range(it, sentinel);
             });
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_CXX_EXPORT template <typename I, typename T>
+    struct in_value_result
+    {
+        HPX_NO_UNIQUE_ADDRESS I in;
+        HPX_NO_UNIQUE_ADDRESS T value;
+
+        template <typename I2, typename T2>
+            requires(std::convertible_to<I const&, I2> &&
+                std::convertible_to<T const&, T2>)
+        constexpr operator in_value_result<I2, T2>() const&
+        {
+            return {in, value};
+        }
+
+        template <typename I2, typename T2>
+            requires(std::convertible_to<I, I2> && std::convertible_to<T, T2>)
+        constexpr operator in_value_result<I2, T2>() &&
+        {
+            return {HPX_MOVE(in), HPX_MOVE(value)};
+        }
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
