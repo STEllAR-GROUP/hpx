@@ -8,26 +8,48 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/modules/async_base.hpp>
-#include <hpx/modules/concepts.hpp>
+#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution_base/completion_scheduler.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
+#include <hpx/execution_base/receiver.hpp>
+#include <hpx/execution_base/sender.hpp>
+#include <hpx/executors/current_executor.hpp>
+#include <hpx/executors/exception_list.hpp>
+#include <hpx/functional/detail/invoke.hpp>
+#include <hpx/functional/invoke_result.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/execution.hpp>
-#include <hpx/modules/execution_base.hpp>
-#include <hpx/modules/threading_base.hpp>
-#include <hpx/modules/timing.hpp>
-#include <hpx/modules/topology.hpp>
+#include <hpx/modules/memory.hpp>
+#include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/threading_base/register_thread.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/topology/cpu_mask.hpp>
+#include <hpx/type_support/detail/with_result_of.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <exception>
 #include <string>
-#include <type_traits>
 #include <utility>
+
+#if defined(HPX_HAVE_STDEXEC)
+#include <ranges>
+
+// Forward declaration
+namespace hpx::execution::experimental::detail {
+    template <typename Policy, typename Sender, typename Shape, typename F,
+        bool IsChunked>
+    class thread_pool_bulk_sender;
+}
+#endif
 
 namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Policy>
+        template <typename Policy>
         struct get_default_scheduler_policy
         {
             static constexpr Policy call() noexcept
@@ -45,6 +67,73 @@ namespace hpx::execution::experimental {
             }
         };
     }    // namespace detail
+
+#if defined(HPX_HAVE_STDEXEC)
+    // Forward declarations
+    template <typename Policy>
+    struct thread_pool_policy_scheduler;
+
+    namespace detail {
+    }
+
+    // Forward declarations for domain system
+
+    // Concept to match bulk sender types
+    template <typename Sender>
+    concept bulk_chunked_or_unchunked_sender =
+        hpx::execution::experimental::stdexec_internal::sender_expr_for<Sender,
+            hpx::execution::experimental::bulk_chunked_t> ||
+        hpx::execution::experimental::stdexec_internal::sender_expr_for<Sender,
+            hpx::execution::experimental::bulk_unchunked_t>;
+
+    // Domain customization for stdexec bulk operations
+    // Only the env-based transform_sender is provided. The early (no-env)
+    // transform falls through to default_domain, and the late transform
+    // handles both completes_on and starts_on patterns at connection time.
+    template <typename Policy>
+    struct thread_pool_domain : stdexec::default_domain
+    {
+        // transform_sender for bulk operations
+        // (following stdexec system_context.hpp pattern — env-based only)
+        template <bulk_chunked_or_unchunked_sender Sender, typename Env>
+        auto transform_sender(Sender&& sndr, Env const& env) const noexcept
+        {
+            static_assert(
+                hpx::execution::experimental::stdexec_internal::__completes_on<
+                    Sender, thread_pool_policy_scheduler<Policy>, Env> ||
+                    hpx::execution::experimental::stdexec_internal::__starts_on<
+                        Sender, thread_pool_policy_scheduler<Policy>, Env>,
+                "No thread_pool_policy_scheduler instance can be found in the "
+                "sender's attributes or receiver's environment "
+                "on which to schedule bulk work.");
+
+            auto&& sched = hpx::execution::experimental::get_scheduler(env);
+
+            // Extract bulk parameters using structured binding
+            auto&& [tag, data, child] = sndr;
+            auto&& [pol, shape, f] = data;
+
+            auto iota_shape = std::views::iota(decltype(shape){0}, shape);
+
+            constexpr bool is_chunked =
+                !hpx::execution::experimental::stdexec_internal::
+                    sender_expr_for<Sender,
+                        hpx::execution::experimental::bulk_unchunked_t>;
+
+            return hpx::execution::experimental::detail::
+                thread_pool_bulk_sender<Policy,
+                    std::decay_t<decltype(child)>,
+                    std::decay_t<decltype(iota_shape)>,
+                    std::decay_t<decltype(f)>, is_chunked>{
+                    HPX_MOVE(sched),
+                    HPX_FORWARD(decltype(child), child),
+                    HPX_MOVE(iota_shape),
+                    HPX_FORWARD(decltype(f), f)
+                };
+        }
+    };
+
+#endif
 
     HPX_CXX_EXPORT template <typename Policy>
     struct thread_pool_policy_scheduler
@@ -279,18 +368,31 @@ namespace hpx::execution::experimental {
             {
                 return {s.scheduler, HPX_FORWARD(Receiver, receiver)};
             }
-#if defined(HPX_HAVE_STDEXEC)
             struct env
             {
                 std::decay_t<Scheduler> const& sched;
 
+#if defined(HPX_HAVE_STDEXEC)
+                // query() member function for newer stdexec
+                auto query(stdexec::get_domain_t) const noexcept
+                {
+                    return stdexec::get_domain(sched);
+                }
+
                 template <typename CPO>
-                // clang-format off
-                    requires (
-                        meta::value<meta::one_of<
-                            CPO, set_value_t, set_stopped_t>>
-                    )
-                // clang-format on
+                    requires meta::value<
+                        meta::one_of<CPO, set_value_t, set_stopped_t>>
+                auto query(
+                    hpx::execution::experimental::get_completion_scheduler_t<
+                        CPO>) const noexcept
+                {
+                    return sched;
+                }
+#endif
+
+                template <typename CPO>
+                    requires(meta::value<
+                        meta::one_of<CPO, set_value_t, set_stopped_t>>)
                 friend constexpr auto tag_invoke(
                     hpx::execution::experimental::get_completion_scheduler_t<
                         CPO>,
@@ -299,42 +401,22 @@ namespace hpx::execution::experimental {
                     return e.sched;
                 }
 
-                // clang-format off
-                template <typename CPO,
-                    HPX_CONCEPT_REQUIRES_(
-                        meta::value<meta::one_of<
-                            CPO, set_value_t, set_stopped_t>>
-                    )>
-                // clang-format on
-                constexpr auto query(
-                    hpx::execution::experimental::get_completion_scheduler_t<
-                        CPO>) const noexcept
+#if defined(HPX_HAVE_STDEXEC)
+                // Add domain query to sender environment
+                friend constexpr auto tag_invoke(
+                    stdexec::get_domain_t, env const& e) noexcept
                 {
-                    return sched;
+                    return stdexec::get_domain(e.sched);
                 }
+#endif
             };
 
-            friend constexpr env tag_invoke(
+            friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_env_t,
                 sender const& s) noexcept
             {
-                return {s.scheduler};
+                return env{s.scheduler};
             };
-#else
-            template <typename CPO>
-            // clang-format off
-                requires (
-                    meta::value<meta::one_of<
-                        CPO, set_value_t, set_stopped_t>>
-                )
-            // clang-format on
-            friend constexpr auto tag_invoke(
-                hpx::execution::experimental::get_completion_scheduler_t<CPO>,
-                sender const& s)
-            {
-                return s.scheduler;
-            }
-#endif
         };
 
         friend constexpr hpx::execution::experimental::
@@ -355,6 +437,12 @@ namespace hpx::execution::experimental {
             }
         }
 
+        // Direct schedule() member function for newer stdexec
+        constexpr sender<thread_pool_policy_scheduler> schedule() const
+        {
+            return {*this};
+        }
+
         friend constexpr sender<thread_pool_policy_scheduler> tag_invoke(
             hpx::execution::experimental::schedule_t,
             thread_pool_policy_scheduler&& sched)
@@ -369,11 +457,6 @@ namespace hpx::execution::experimental {
             return {sched};
         }
 
-        constexpr sender<thread_pool_policy_scheduler> schedule() const
-        {
-            return {*this};
-        }
-
         void policy(Policy policy) noexcept
         {
             policy_ = HPX_MOVE(policy);
@@ -383,6 +466,16 @@ namespace hpx::execution::experimental {
         {
             return policy_;
         }
+
+#if defined(HPX_HAVE_STDEXEC)
+        /// Returns the execution domain of this scheduler (following system_context.hpp pattern).
+        [[nodiscard]]
+        auto query(stdexec::get_domain_t) const noexcept
+            -> thread_pool_domain<Policy>
+        {
+            return {};
+        }
+#endif
         /// \endcond
 
     private:
@@ -431,9 +524,12 @@ namespace hpx::execution::experimental {
     };
 
     // support all properties exposed by the embedded policy
+    // clang-format off
     HPX_CXX_EXPORT template <typename Tag, typename Policy, typename Property,
         HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>)>
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
     auto tag_invoke(Tag tag,
         thread_pool_policy_scheduler<Policy> const& scheduler, Property&& prop)
         -> decltype(std::declval<thread_pool_policy_scheduler<Policy>>().policy(
@@ -447,9 +543,12 @@ namespace hpx::execution::experimental {
         return scheduler_with_prop;
     }
 
+    // clang-format off
     HPX_CXX_EXPORT template <typename Tag, typename Policy,
         HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>)>
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
     auto tag_invoke(
         Tag tag, thread_pool_policy_scheduler<Policy> const& scheduler)
         -> decltype(std::declval<Tag>()(std::declval<Policy>()))
@@ -459,4 +558,40 @@ namespace hpx::execution::experimental {
 
     HPX_CXX_EXPORT using thread_pool_scheduler =
         thread_pool_policy_scheduler<hpx::launch>;
+
+#if defined(HPX_HAVE_STDEXEC)
+    // Add get_domain query to the scheduler (following system_context.hpp pattern)
+    template <typename Policy>
+    constexpr auto tag_invoke(stdexec::get_domain_t,
+        thread_pool_policy_scheduler<Policy> const& sched) noexcept
+    {
+        return thread_pool_domain<Policy>{};
+    }
+
+    // Add stdexec-specific schedule customization
+    // stdexec uses its own schedule tag type, so we need to provide tag_invoke for it
+    template <typename Policy>
+    constexpr auto tag_invoke(stdexec::schedule_t,
+        thread_pool_policy_scheduler<Policy> const& sched) noexcept
+    {
+        // Return the same sender type as HPX's schedule
+        return typename thread_pool_policy_scheduler<Policy>::template sender<
+            thread_pool_policy_scheduler<Policy>>{sched};
+    }
+
+    template <typename Policy>
+    constexpr auto tag_invoke(stdexec::schedule_t,
+        thread_pool_policy_scheduler<Policy>&& sched) noexcept
+    {
+        return typename thread_pool_policy_scheduler<Policy>::template sender<
+            thread_pool_policy_scheduler<Policy>>{HPX_MOVE(sched)};
+    }
+#endif
+
 }    // namespace hpx::execution::experimental
+
+// Include the full bulk sender definition after the scheduler is fully defined
+// to avoid circular dependency issues
+#if defined(HPX_HAVE_STDEXEC)
+#include <hpx/executors/thread_pool_scheduler_bulk.hpp>
+#endif

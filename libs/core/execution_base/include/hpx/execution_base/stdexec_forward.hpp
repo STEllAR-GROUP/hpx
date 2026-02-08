@@ -130,17 +130,25 @@ namespace hpx::execution::experimental {
     HPX_CXX_EXPORT using stdexec::on;
     HPX_CXX_EXPORT using stdexec::on_t;
 
-    // Continue on
-    HPX_CXX_EXPORT using stdexec::continue_on;
-    HPX_CXX_EXPORT using stdexec::continue_on_t;
-
     // Transfer just
     HPX_CXX_EXPORT using stdexec::transfer_just;
     HPX_CXX_EXPORT using stdexec::transfer_just_t;
 
-    // Bulk (NOT FORWARDED)
-    // HPX_CXX_EXPORT using stdexec::bulk_t;
-    // HPX_CXX_EXPORT using stdexec::bulk;
+    // Bulk operations
+    using stdexec::bulk;
+    using stdexec::bulk_chunked;
+    using stdexec::bulk_chunked_t;
+    using stdexec::bulk_t;
+    using stdexec::bulk_unchunked;
+    using stdexec::bulk_unchunked_t;
+
+    // Execution policies
+    using stdexec::is_execution_policy;
+    using stdexec::is_execution_policy_v;
+    using stdexec::par;
+    using stdexec::par_unseq;
+    using stdexec::seq;
+    using stdexec::unseq;
 
     // Split
     HPX_CXX_EXPORT using stdexec::split;
@@ -153,6 +161,8 @@ namespace hpx::execution::experimental {
     // Transfer
     HPX_CXX_EXPORT using stdexec::transfer;
     HPX_CXX_EXPORT using stdexec::transfer_t;
+
+    HPX_CXX_EXPORT using stdexec::dependent_domain;
 
     // Tags
     namespace tags {
@@ -236,6 +246,9 @@ namespace hpx::execution::experimental {
     HPX_CXX_EXPORT using stdexec::sends_stopped;
     HPX_CXX_EXPORT using stdexec::value_types_of_t;
 
+    HPX_CXX_EXPORT using stdexec::transform_env;
+
+    HPX_CXX_EXPORT using stdexec::make_completion_signatures;
     HPX_CXX_EXPORT using stdexec::transform_completion_signatures;
     HPX_CXX_EXPORT using stdexec::transform_completion_signatures_of;
 
@@ -307,6 +320,11 @@ namespace hpx::execution::experimental {
         }
 
         HPX_CXX_EXPORT using stdexec::__connect_awaitable_t;
+
+        // Additional stdexec concepts and utilities needed for domain customization
+        using stdexec::__completes_on;
+        using stdexec::__starts_on;
+        using stdexec::sender_expr_for;
     }    // namespace stdexec_internal
 }    // namespace hpx::execution::experimental
 

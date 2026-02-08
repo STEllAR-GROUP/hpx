@@ -9,14 +9,27 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/execution/algorithms/bulk.hpp>
+#include <hpx/execution/algorithms/keep_future.hpp>
+#include <hpx/execution/algorithms/start_detached.hpp>
+#include <hpx/execution/algorithms/sync_wait.hpp>
+#include <hpx/execution/algorithms/then.hpp>
+#include <hpx/execution/algorithms/transfer.hpp>
+#include <hpx/execution/algorithms/transfer_just.hpp>
+#include <hpx/execution/algorithms/when_all.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/execution_base/execution.hpp>
+#include <hpx/execution_base/sender.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
+#include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/invoke_fused.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/modules/concepts.hpp>
-#include <hpx/modules/datastructures.hpp>
-#include <hpx/modules/execution.hpp>
-#include <hpx/modules/execution_base.hpp>
-#include <hpx/modules/functional.hpp>
-#include <hpx/modules/tag_invoke.hpp>
-#include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -83,12 +96,8 @@ namespace hpx::execution::experimental {
             return sched_;
         }
 
-        // clang-format off
-        template <typename Parameters,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters>
-            )>
-        // clang-format on
+        template <typename Parameters>
+            requires(hpx::traits::is_executor_parameters_v<Parameters>)
         friend auto tag_invoke(
             hpx::execution::experimental::processing_units_count_t tag,
             Parameters&& params, explicit_scheduler_executor const& exec,
@@ -166,11 +175,7 @@ namespace hpx::execution::experimental {
 
         // BulkTwoWayExecutor interface
         template <typename F, typename S, typename... Ts>
-        // clang-format off
-            requires (
-               !std::is_integral_v<S>
-            )
-        // clang-format on
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
@@ -226,18 +231,21 @@ namespace hpx::execution::experimental {
 #if defined(HPX_HAVE_STDEXEC)
                 return just(HPX_MOVE(result_vector), shape, HPX_FORWARD(F, f),
                            HPX_FORWARD(Ts, ts)...) |
-                    continue_on(exec.sched_) |
+                    continues_on(exec.sched_) |
                     bulk(shape_size, HPX_MOVE(f_wrapper)) |
                     then(HPX_MOVE(get_result));
 #else
-                return transfer_just(exec.sched_, HPX_MOVE(result_vector),
-                           shape, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...) |
+                // When stdexec is not available, use HPX's original bulk implementation
+                return just(HPX_MOVE(result_vector), shape, HPX_FORWARD(F, f),
+                           HPX_FORWARD(Ts, ts)...) |
+                    continues_on(exec.sched_) |
                     bulk(shape_size, HPX_MOVE(f_wrapper)) |
                     then(HPX_MOVE(get_result));
 #endif
             }
         }
 
+#if !defined(HPX_HAVE_STDEXEC)
         template <typename F, typename S, typename... Ts>
             requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
@@ -249,7 +257,9 @@ namespace hpx::execution::experimental {
                 hpx::parallel::execution::bulk_async_execute(
                     exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
         }
+#endif
 
+#if !defined(HPX_HAVE_STDEXEC)
         template <typename F, typename S, typename Future, typename... Ts>
             requires(!std::is_integral_v<S>)
         friend auto tag_invoke(hpx::parallel::execution::bulk_then_execute_t,
@@ -266,9 +276,11 @@ namespace hpx::execution::experimental {
             auto pre_req =
                 when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
-            return bulk(transfer(HPX_MOVE(pre_req), exec.sched_), shape,
-                hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+            return transfer(HPX_MOVE(pre_req), exec.sched_) |
+                bulk(shape,
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
         }
+#endif
 
     private:
         std::decay_t<BaseScheduler> sched_;
@@ -280,12 +292,9 @@ namespace hpx::execution::experimental {
         -> explicit_scheduler_executor<std::decay_t<BaseScheduler>>;
 
     // support all properties exposed by the wrapped scheduler
-    // clang-format off
     HPX_CXX_EXPORT template <typename Tag, typename BaseScheduler,
-        typename Property,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
+        typename Property>
+        requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(Tag tag,
         explicit_scheduler_executor<BaseScheduler> const& exec, Property&& prop)
         -> decltype(explicit_scheduler_executor<BaseScheduler>(
@@ -295,14 +304,9 @@ namespace hpx::execution::experimental {
         return explicit_scheduler_executor<BaseScheduler>(
             tag(exec.sched(), HPX_FORWARD(Property, prop)));
     }
-    // clang-format on
 
-    // clang-format off
-    HPX_CXX_EXPORT template <typename Tag, typename BaseScheduler,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
-    // clang-format on
+    HPX_CXX_EXPORT template <typename Tag, typename BaseScheduler>
+        requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(
         Tag tag, explicit_scheduler_executor<BaseScheduler> const& exec)
         -> decltype(std::declval<Tag>()(std::declval<BaseScheduler>()))
