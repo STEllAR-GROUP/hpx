@@ -201,9 +201,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type tag_fallback_invoke(hpx::ranges::contains_t,
-            ExPolicy&& policy, RaIterator first, Sentinel last, T const& val,
-            Proj&& proj = Proj())
+            bool>::type
+        tag_fallback_invoke(hpx::ranges::contains_t, ExPolicy&& policy,
+            RaIterator first, Sentinel last, T const& val, Proj&& proj = Proj())
         {
             return hpx::parallel::detail::contains().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, val,
@@ -221,8 +221,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type tag_fallback_invoke(hpx::ranges::contains_t,
-            ExPolicy&& policy, Rng&& rng, T const& t, Proj proj = Proj())
+            bool>::type
+        tag_fallback_invoke(hpx::ranges::contains_t, ExPolicy&& policy,
+            Rng&& rng, T const& t, Proj proj = Proj())
         {
             return parallel::detail::contains().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
@@ -313,9 +314,10 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type tag_fallback_invoke(hpx::ranges::contains_subrange_t,
-            ExPolicy&& policy, RaIter1 first1, Sent1 last1, RaIter2 first2,
-            Sent2 last2, Pred pred = Pred(), Proj1&& proj1 = Proj1(),
+            bool>::type
+        tag_fallback_invoke(hpx::ranges::contains_subrange_t, ExPolicy&& policy,
+            RaIter1 first1, Sent1 last1, RaIter2 first2, Sent2 last2,
+            Pred pred = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             return hpx::parallel::detail::contains_subrange().call(
@@ -343,9 +345,10 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type tag_fallback_invoke(hpx::ranges::contains_subrange_t,
-            ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred pred = Pred(),
-            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
+            bool>::type
+        tag_fallback_invoke(hpx::ranges::contains_subrange_t, ExPolicy&& policy,
+            Rng1&& rng1, Rng2&& rng2, Pred pred = Pred(), Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
             return hpx::parallel::detail::contains_subrange().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),

@@ -407,10 +407,10 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            mismatch_result<RaIter1, RaIter2>> tag_fallback_invoke(mismatch_t,
-            ExPolicy&& policy, RaIter1 first1, Sent1 last1, RaIter2 first2,
-            Sent2 last2, Pred op = Pred(), Proj1 proj1 = Proj1(),
-            Proj2 proj2 = Proj2())
+            mismatch_result<RaIter1, RaIter2>>
+        tag_fallback_invoke(mismatch_t, ExPolicy&& policy, RaIter1 first1,
+            Sent1 last1, RaIter2 first2, Sent2 last2, Pred op = Pred(),
+            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             return hpx::parallel::detail::mismatch_binary<
                 mismatch_result<RaIter1, RaIter2>>()

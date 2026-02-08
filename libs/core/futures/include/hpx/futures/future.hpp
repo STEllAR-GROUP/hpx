@@ -1398,8 +1398,8 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT    /// \copydoc make_ready_future_after(hpx::chrono::steady_duration const& rel_time, T&& init)
-        inline future<void> make_ready_future_after(
-            hpx::chrono::steady_duration const& rel_time)
+        inline future<void>
+        make_ready_future_after(hpx::chrono::steady_duration const& rel_time)
     {
         return hpx::make_ready_future_at(rel_time.from_now());
     }
