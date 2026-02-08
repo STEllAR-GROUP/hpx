@@ -521,7 +521,8 @@ namespace hpx::execution::experimental {
 
     // support all properties exposed by the embedded policy
     // clang-format off
-    HPX_CXX_CORE_EXPORT template <typename Tag, typename Policy, typename Property,
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename Policy,
+        typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>
