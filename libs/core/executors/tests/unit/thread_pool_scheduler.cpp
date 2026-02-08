@@ -2199,8 +2199,8 @@ void test_stdexec_domain_queries()
 {
     auto scheduler = ex::thread_pool_scheduler{};
 
-    // 1. Verify domain derives from stdexec::default_domain
-    static_assert(std::is_base_of_v<stdexec::default_domain,
+    // 1. Verify domain derives from ex::default_domain
+    static_assert(std::is_base_of_v<ex::default_domain,
                       ex::thread_pool_domain<hpx::launch>>,
         "thread_pool_domain should derive from default_domain");
     // 2. Verify domain is accessible via stdexec::get_domain
@@ -2217,10 +2217,10 @@ void test_stdexec_domain_queries()
     //    bulk_chunked (proves the domain customization is picked up)
     {
         auto env =
-            stdexec::env{stdexec::prop{stdexec::get_scheduler, scheduler}};
+            ex::env{ex::prop{ex::get_scheduler, scheduler}};
 
-        auto chunked_sndr = stdexec::bulk_chunked(
-            ex::schedule(scheduler), stdexec::par, 10, [](int, int) {});
+        auto chunked_sndr = ex::bulk_chunked(
+            ex::schedule(scheduler), ex::par, 10, [](int, int) {});
 
         // Verify the sender matches the bulk concept
         using chunked_t = std::decay_t<decltype(chunked_sndr)>;
@@ -2241,10 +2241,10 @@ void test_stdexec_domain_queries()
     //    bulk_unchunked (proves the domain customization is picked up)
     {
         auto env =
-            stdexec::env{stdexec::prop{stdexec::get_scheduler, scheduler}};
+            ex::env{ex::prop{ex::get_scheduler, scheduler}};
 
-        auto unchunked_sndr = stdexec::bulk_unchunked(
-            ex::schedule(scheduler), stdexec::par, 10, [](int) {});
+        auto unchunked_sndr = ex::bulk_unchunked(
+            ex::schedule(scheduler), ex::par, 10, [](int) {});
 
         // Verify the sender matches the bulk concept
         using unchunked_t = std::decay_t<decltype(unchunked_sndr)>;
@@ -2273,9 +2273,9 @@ void test_stdexec_bulk_domain_customization()
     std::vector<int> results(10, 0);
     std::atomic<int> chunk_calls{0};
 
-    auto bulk_sender = stdexec::bulk(
-        ex::schedule(scheduler) | stdexec::then([]() { return 42; }),
-        stdexec::par, 10, [&](int idx, int value) {
+    auto bulk_sender = ex::bulk(
+        ex::schedule(scheduler) | ex::then([]() { return 42; }),
+        ex::par, 10, [&](int idx, int value) {
             // In unchunked mode, this is called once per index
             chunk_calls.fetch_add(1);
             results[idx] = value + idx;
@@ -2285,7 +2285,7 @@ void test_stdexec_bulk_domain_customization()
     // Lowering to bulk_chunked happens at connect time via
     // domain transform_sender.
 
-    stdexec::sync_wait(std::move(bulk_sender));
+    ex::sync_wait(std::move(bulk_sender));
 
     // Verify that chunked execution happened
     // In our implementation, each element in the chunk calls the function
@@ -2315,9 +2315,9 @@ void test_stdexec_bulk_chunked_customization()
     std::atomic<int> function_calls{0};
     std::atomic<int> total_processed{0};
 
-    auto bulk_chunked_sender = stdexec::bulk_chunked(
-        ex::schedule(scheduler) | stdexec::then([]() { return 1; }),
-        stdexec::par, 100, [&](int start, int end, int value) {
+    auto bulk_chunked_sender = ex::bulk_chunked(
+        ex::schedule(scheduler) | ex::then([]() { return 1; }),
+        ex::par, 100, [&](int start, int end, int value) {
             // With chunked execution: process range [start, end)
 
             for (int idx = start; idx < end; ++idx)
@@ -2334,7 +2334,7 @@ void test_stdexec_bulk_chunked_customization()
         "bulk_chunked sender should satisfy "
         "bulk_chunked_or_unchunked_sender");
 
-    stdexec::sync_wait(std::move(bulk_chunked_sender));
+    ex::sync_wait(std::move(bulk_chunked_sender));
 
     // Verify all elements were processed
     HPX_TEST_EQ(total_processed.load(), 100);
@@ -2356,9 +2356,9 @@ void test_stdexec_bulk_unchunked_customization()
         100, 0);    // Same size as chunked test for comparison
     std::atomic<int> function_calls{0};
 
-    auto bulk_unchunked_sender = stdexec::bulk_unchunked(
-        ex::schedule(scheduler) | stdexec::then([]() { return 5; }),
-        stdexec::par, 100, [&](int idx, int value) {
+    auto bulk_unchunked_sender = ex::bulk_unchunked(
+        ex::schedule(scheduler) | ex::then([]() { return 5; }),
+        ex::par, 100, [&](int idx, int value) {
             // With unchunked execution: smaller chunks (chunk_size=1), better
             // work stealing
             function_calls.fetch_add(1, std::memory_order_relaxed);
@@ -2371,7 +2371,7 @@ void test_stdexec_bulk_unchunked_customization()
         "bulk_unchunked sender should satisfy "
         "bulk_chunked_or_unchunked_sender");
 
-    stdexec::sync_wait(std::move(bulk_unchunked_sender));
+    ex::sync_wait(std::move(bulk_unchunked_sender));
 
     // Verify all elements were processed
     HPX_TEST_EQ(function_calls.load(), 100);    // Called once per element
@@ -2392,14 +2392,14 @@ void test_stdexec_thread_distribution()
     std::set<std::thread::id> worker_threads;
     std::atomic<int> task_count{0};
 
-    auto bulk_sender = stdexec::bulk(
-        ex::schedule(scheduler) | stdexec::then([]() { return 0; }),
-        stdexec::par, 8, [&](int idx, int value) {
+    auto bulk_sender = ex::bulk(
+        ex::schedule(scheduler) | ex::then([]() { return 0; }),
+        ex::par, 8, [&](int idx, int value) {
             worker_threads.insert(std::this_thread::get_id());
             task_count.fetch_add(1, std::memory_order_relaxed);
         });
 
-    stdexec::sync_wait(std::move(bulk_sender));
+    ex::sync_wait(std::move(bulk_sender));
 
     // In chunked mode, each element in the chunk calls the function
     // With chunk_size=4 and 8 items, we process all 8 elements
@@ -2420,12 +2420,12 @@ void test_stdexec_execution_policies()
 
     // Test different execution policies with stdexec bulk operations
     std::vector<int> seq_results(5, 0);
-    auto seq_sender = stdexec::bulk(
-        ex::schedule(scheduler) | stdexec::then([]() { return 10; }),
-        stdexec::seq, 5,
+    auto seq_sender = ex::bulk(
+        ex::schedule(scheduler) | ex::then([]() { return 10; }),
+        ex::seq, 5,
         [&](int idx, int value) { seq_results[idx] = value + idx; });
 
-    stdexec::sync_wait(std::move(seq_sender));
+    ex::sync_wait(std::move(seq_sender));
 
     // In chunked mode, only chunk begin indices are processed
     int seq_processed = 0;
@@ -2440,12 +2440,12 @@ void test_stdexec_execution_policies()
 
     // Test par_unseq policy
     std::vector<int> par_unseq_results(5, 0);
-    auto par_unseq_sender = stdexec::bulk(
-        ex::schedule(scheduler) | stdexec::then([]() { return 20; }),
-        stdexec::par_unseq, 5,
+    auto par_unseq_sender = ex::bulk(
+        ex::schedule(scheduler) | ex::then([]() { return 20; }),
+        ex::par_unseq, 5,
         [&](int idx, int value) { par_unseq_results[idx] = value + idx; });
 
-    stdexec::sync_wait(std::move(par_unseq_sender));
+    ex::sync_wait(std::move(par_unseq_sender));
 
     // In chunked mode, only chunk begin indices are processed
     int par_unseq_processed = 0;
