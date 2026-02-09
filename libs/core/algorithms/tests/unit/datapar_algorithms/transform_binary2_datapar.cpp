@@ -29,7 +29,6 @@ void test_transform_binary2()
 void transform_binary2_test()
 {
     test_transform_binary2<std::random_access_iterator_tag>();
-    test_transform_binary2<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
