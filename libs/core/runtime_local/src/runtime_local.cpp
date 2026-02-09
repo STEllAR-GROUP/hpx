@@ -34,8 +34,10 @@
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/runtime_local/state.hpp>
+#include <hpx/runtime_local/termination_detection.hpp>
 #include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
+#include <hpx/synchronization/stop_token.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>
@@ -533,6 +535,13 @@ namespace hpx {
 #ifdef HPX_HAVE_IO_POOL
         io_pool_->stop();
 #endif
+
+        // Wait for all threads to complete before destroying allocators.
+        // This ensures that collective operations and other background work
+        // finish before reinit_destruct() destroys component heaps.
+        // Fixes issue #6776: crash in one_size_heap_list::alloc on macOS Debug
+        thread_manager_->wait();
+
         LRT_(debug).format("~runtime_local(finished)");
 
         LPROGRESS_;
@@ -2208,4 +2217,91 @@ namespace hpx {
             return get_stack_size_enum_name(size_enum);
         }
     }    // namespace threads
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Termination detection API implementation
+    namespace local {
+        void termination_detection()
+        {
+            runtime* rt = get_runtime_ptr();
+            if (rt == nullptr)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "hpx::local::termination_detection",
+                    "the runtime system is not active");
+            }
+
+            hpx::threads::threadmanager& tm = rt->get_thread_manager();
+
+            // Wait for all HPX threads to complete
+            tm.wait();
+
+            // Clean up any terminated threads
+            tm.cleanup_terminated(true);
+        }
+
+        bool termination_detection(hpx::chrono::steady_duration const& timeout)
+        {
+            runtime* rt = get_runtime_ptr();
+            if (rt == nullptr)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "hpx::local::termination_detection",
+                    "the runtime system is not active");
+            }
+
+            hpx::threads::threadmanager& tm = rt->get_thread_manager();
+
+            // Wait with timeout using threadmanager's wait_for
+            bool completed = tm.wait_for(timeout);
+
+            // Only cleanup if all threads completed
+            if (completed)
+            {
+                tm.cleanup_terminated(true);
+            }
+
+            return completed;
+        }
+
+        bool termination_detection(
+            hpx::chrono::steady_time_point const& deadline)
+        {
+            // Convert deadline to duration from now
+            auto now = hpx::chrono::steady_clock::now();
+
+            if (deadline.value() <= now)
+            {
+                // Deadline already passed
+                return false;
+            }
+
+            auto duration = deadline.value() - now;
+            return termination_detection(
+                hpx::chrono::steady_duration(duration));
+        }
+
+        bool termination_detection(hpx::stop_token stop_token,
+            hpx::chrono::steady_duration const& timeout)
+        {
+            runtime* rt = get_runtime_ptr();
+            if (rt == nullptr)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "hpx::local::termination_detection",
+                    "the runtime system is not active");
+            }
+
+            hpx::threads::threadmanager& tm = rt->get_thread_manager();
+
+            bool completed = tm.wait_for(stop_token, timeout);
+
+            if (completed)
+            {
+                tm.cleanup_terminated(true);
+            }
+
+            return completed;
+        }
+    }    // namespace local
 }    // namespace hpx
