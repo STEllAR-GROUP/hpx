@@ -61,8 +61,46 @@ struct relocate_tracker
     }
 };
 
+void test_uninitialized_relocate_overlap_forward_semantics()
+{
+    using T = relocate_tracker;
+
+    constexpr std::size_t N = 8;
+    constexpr std::size_t Nsrc = 6;
+    constexpr std::size_t offset = 2;
+
+    alignas(T) unsigned char storage[N * sizeof(T)];
+    bool alive[N] = {false};
+
+    T* base = reinterpret_cast<T*>(storage);
+
+    for (std::size_t i = 0; i < Nsrc; ++i)
+    {
+        ::new (static_cast<void*>(base + i)) T(static_cast<int>(i), &alive[i]);
+    }
+
+    hpx::experimental::uninitialized_relocate(
+        hpx::execution::seq, base, base + Nsrc, base + offset);
+
+    std::size_t alive_count = 0;
+    for (std::size_t i = 0; i < N; ++i)
+    {
+        if (alive[i])
+            ++alive_count;
+    }
+
+    // Forward overlapping relocate leaves Nsrc - offset live objects
+    HPX_TEST(alive_count == Nsrc - offset);
+
+    for (std::size_t i = 0; i < N; ++i)
+    {
+        if (alive[i])
+            base[i].~T();
+    }
+}
+
 template <typename ExPolicy>
-void test_uninitialized_relocate_overlap_forward(ExPolicy&& policy)
+void test_uninitialized_relocate_overlap_forward_matches_seq(ExPolicy&& policy)
 {
     using T = relocate_tracker;
 
@@ -607,23 +645,10 @@ int hpx_main()
     test_overlapping<hpx::execution::sequenced_policy>();
     test_overlapping<hpx::execution::parallel_policy>();
 
-    test_uninitialized_relocate_overlap_forward(hpx::execution::par);
+    test_uninitialized_relocate_overlap_forward_semantics();
 
-#if defined(HPX_HAVE_CXX17_STD_EXECUTION_POLICIES)
     test_uninitialized_relocate_overlap_forward_matches_seq(
-        hpx::execution::par_unseq);
-#endif
-
-    //    test_uninitialized_relocate_overlap_forward(hpx::execution::seq);
-    //    test_uninitialized_relocate_overlap_forward(hpx::execution::par);
-
-    // #if defined(HPX_HAVE_CXX17_STD_EXECUTION_POLICIES)
-    //    test_uninitialized_relocate_overlap_forward(hpx::execution::par_unseq);
-    // #endif
-
-    //    test_uninitialized_relocate_overlap_forward(
-    //        hpx::execution::par(hpx::execution::task))
-    //        .get();
+        hpx::execution::par);
 
     return hpx::local::finalize();
 }
